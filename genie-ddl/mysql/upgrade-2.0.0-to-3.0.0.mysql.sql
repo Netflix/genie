@@ -69,17 +69,19 @@ ALTER TABLE `applications`
   ADD COLUMN `description` TEXT DEFAULT NULL AFTER `version`,
   ADD COLUMN `tags` VARCHAR(2048) DEFAULT NULL AFTER `description`,
   MODIFY `status` VARCHAR(20) NOT NULL DEFAULT 'INACTIVE',
+  ADD COLUMN `type` VARCHAR(255) DEFAULT NULL AFTER `status`,
   CHANGE `envPropFile` `setup_file` VARCHAR(1024) DEFAULT NULL,
   CHANGE `entityVersion` `entity_version` INT(11) NOT NULL DEFAULT 0,
   ADD INDEX `APPLICATIONS_NAME_INDEX` (`name`),
   ADD INDEX `APPLICATIONS_TAGS_INDEX` (`tags`),
-  ADD INDEX `APPLICATIONS_STATUS_INDEX` (`status`);
+  ADD INDEX `APPLICATIONS_STATUS_INDEX` (`status`),
+  ADD INDEX `APPLICATIONS_TYPE_INDEX` (`type`);
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully updated the applications table.' AS '';
 
 SELECT CURRENT_TIMESTAMP AS '', 'De-normalizing application tags for 3.0...' AS '';
 UPDATE `applications` AS `a` SET `a`.`tags` =
 (
-  SELECT GROUP_CONCAT(DISTINCT `t`.`element` ORDER BY `t`.`element` SEPARATOR ',')
+  SELECT GROUP_CONCAT(DISTINCT `t`.`element` ORDER BY `t`.`element` SEPARATOR '|')
   FROM `application_tags` AS `t`
   WHERE `a`.`id` = `t`.`APPLICATION_ID`
   GROUP BY `t`.`APPLICATION_ID`
@@ -128,7 +130,7 @@ SELECT CURRENT_TIMESTAMP AS '', 'Successfully updated the clusters table.' AS ''
 SELECT CURRENT_TIMESTAMP AS '', 'De-normalizing cluster tags for 3.0...' AS '';
 UPDATE `clusters` AS `c` SET `c`.`tags` =
 (
-  SELECT GROUP_CONCAT(DISTINCT `t`.`element` ORDER BY `t`.`element` SEPARATOR ',')
+  SELECT GROUP_CONCAT(DISTINCT `t`.`element` ORDER BY `t`.`element` SEPARATOR '|')
   FROM `cluster_tags` AS `t`
   WHERE `c`.`id` = `t`.`CLUSTER_ID`
   GROUP BY `t`.`CLUSTER_ID`
@@ -184,7 +186,7 @@ SELECT CURRENT_TIMESTAMP AS '', 'Successfully updated the commands table.' AS ''
 SELECT CURRENT_TIMESTAMP AS '', 'De-normalizing command tags for 3.0...' AS '';
 UPDATE `commands` AS `c` SET `c`.`tags` =
 (
-  SELECT GROUP_CONCAT(DISTINCT `t`.`element` ORDER BY `t`.`element` SEPARATOR ',')
+  SELECT GROUP_CONCAT(DISTINCT `t`.`element` ORDER BY `t`.`element` SEPARATOR '|')
   FROM `command_tags` AS `t`
   WHERE `c`.`id` = `t`.`COMMAND_ID`
   GROUP BY `t`.`COMMAND_ID`
@@ -219,7 +221,7 @@ CREATE TABLE `job_requests` (
   `setup_file` VARCHAR(1024) DEFAULT NULL,
   `cluster_criterias` VARCHAR(2048) NOT NULL,
   `command_criteria` VARCHAR(1024) NOT NULL,
-  `file_dependencies` TEXT DEFAULT NULL,
+  `dependencies` TEXT DEFAULT NULL,
   `disable_log_archival` BIT(1) NOT NULL DEFAULT 0,
   `email` VARCHAR(255) DEFAULT NULL,
   `tags` VARCHAR(2048) DEFAULT NULL,
@@ -246,7 +248,7 @@ INSERT INTO `job_requests` (
   `setup_file`,
   `cluster_criterias`,
   `command_criteria`,
-  `file_dependencies`,
+  `dependencies`,
   `disable_log_archival`,
   `email`,
   `tags`,
@@ -271,7 +273,7 @@ INSERT INTO `job_requests` (
     `j`.`disableLogArchival`,
     `j`.`email`,
     (
-      SELECT GROUP_CONCAT(DISTINCT `t`.`element` ORDER BY `t`.`element` SEPARATOR ',')
+      SELECT GROUP_CONCAT(DISTINCT `t`.`element` ORDER BY `t`.`element` SEPARATOR '|')
       FROM `job_tags` `t`
       WHERE `j`.`id` = `t`.`JOB_ID`
       GROUP BY `t`.`JOB_ID`
@@ -292,10 +294,10 @@ UPDATE `job_requests` SET `cluster_criterias` = REPLACE(`cluster_criterias`, ','
 UPDATE `job_requests` SET `cluster_criterias` = REPLACE(`cluster_criterias`, '|', '"]},{"tags":["');
 UPDATE `job_requests` SET `cluster_criterias` = '[]' WHERE `cluster_criterias` = '[""]' OR `cluster_criterias` IS NULL;
 -- TODO: Do this in one pass instead of 3?
-UPDATE `job_requests` SET `file_dependencies` = RPAD(`file_dependencies`, LENGTH(`file_dependencies`) + 2, '"]');
-UPDATE `job_requests` SET `file_dependencies` = LPAD(`file_dependencies`, LENGTH(`file_dependencies`) + 2, '["');
-UPDATE `job_requests` SET `file_dependencies` = REPLACE(`file_dependencies`, ',', '","');
-UPDATE `job_requests` SET `file_dependencies` = '[]' WHERE `file_dependencies` = '[""]' OR `file_dependencies` IS NULL;
+UPDATE `job_requests` SET `dependencies` = RPAD(`dependencies`, LENGTH(`dependencies`) + 2, '"]');
+UPDATE `job_requests` SET `dependencies` = LPAD(`dependencies`, LENGTH(`dependencies`) + 2, '["');
+UPDATE `job_requests` SET `dependencies` = REPLACE(`dependencies`, ',', '","');
+UPDATE `job_requests` SET `dependencies` = '[]' WHERE `dependencies` = '[""]' OR `dependencies` IS NULL;
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully inserted values into job_requests table.' AS '';
 
 SELECT CURRENT_TIMESTAMP AS '', 'Creating the job_executions table...' AS '';
@@ -367,6 +369,7 @@ ALTER TABLE `jobs`
   CHANGE `executionClusterName` `cluster_name` VARCHAR(255) DEFAULT NULL,
   CHANGE `commandId` `command_id` VARCHAR(255) DEFAULT NULL,
   CHANGE `commandName` `command_name` VARCHAR(255) DEFAULT NULL,
+  CHANGE `commandArgs` `command_args` TEXT NOT NULL,
   ADD COLUMN `tags` VARCHAR(2048) DEFAULT NULL,
   DROP `forwarded`,
   DROP `applicationId`,
@@ -383,7 +386,6 @@ ALTER TABLE `jobs`
   DROP `processHandle`,
   DROP `email`,
   DROP `groupName`,
-  DROP `commandArgs`,
   DROP `killURI`,
   DROP `outputURI`,
   DROP PRIMARY KEY,
@@ -403,7 +405,7 @@ SELECT CURRENT_TIMESTAMP AS '', 'Successfully updated the jobs table.' AS '';
 SELECT CURRENT_TIMESTAMP AS '', 'De-normalizing jobs tags for 3.0...' AS '';
 UPDATE `jobs` AS `j` SET `j`.`tags` =
 (
-  SELECT GROUP_CONCAT(DISTINCT `t`.`element` ORDER BY `t`.`element` SEPARATOR ',')
+  SELECT GROUP_CONCAT(DISTINCT `t`.`element` ORDER BY `t`.`element` SEPARATOR '|')
   FROM `job_tags` AS `t`
   WHERE `j`.`id` = `t`.`JOB_ID`
   GROUP BY `t`.`JOB_ID`

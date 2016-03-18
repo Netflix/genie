@@ -54,7 +54,7 @@ public class JobRequestEntity extends SetupFileEntity {
 
     @Lob
     @Column(name = "command_args", nullable = false)
-    @Size(min = 1, message = "Must have command line arguments and can't be longer than 1024 characters")
+    @Size(min = 1, message = "Must have command line arguments")
     private String commandArgs;
 
     @Basic
@@ -73,8 +73,8 @@ public class JobRequestEntity extends SetupFileEntity {
     private String commandCriteria = "[]";
 
     @Lob
-    @Column(name = "file_dependencies")
-    private String fileDependencies = "[]";
+    @Column(name = "dependencies")
+    private String dependencies = "[]";
 
     @Basic
     @Column(name = "disable_log_archival")
@@ -181,8 +181,7 @@ public class JobRequestEntity extends SetupFileEntity {
      * Parameters specified to be run and fed as command line arguments to the
      * job run.
      *
-     * @param commandArgs Arguments to be used to run the command with. Not
-     *                    null/empty/blank.
+     * @param commandArgs Arguments to be used to run the command with. Not null/empty/blank.
      */
     public void setCommandArgs(@NotBlank final String commandArgs) {
         this.commandArgs = commandArgs;
@@ -194,39 +193,39 @@ public class JobRequestEntity extends SetupFileEntity {
      * @return The file dependencies for the job
      * @throws GenieException On any exception
      */
-    public Set<String> getFileDependenciesAsSet() throws GenieException {
-        return JsonUtils.unmarshall(this.fileDependencies, new TypeReference<Set<String>>() {
+    public Set<String> getDependenciesAsSet() throws GenieException {
+        return JsonUtils.unmarshall(this.dependencies, new TypeReference<Set<String>>() {
         });
     }
 
     /**
-     * Sets the fileDependencies for the job request from a set of strings.
+     * Sets the dependencies for the job request from a set of strings.
      *
-     * @param fileDependenciesSet Dependent files for the job
+     * @param dependenciesSet Dependent files for the job
      * @throws GenieException for any processing error
      */
-    public void setFileDependenciesFromSet(final Set<String> fileDependenciesSet) throws GenieException {
-        this.fileDependencies = fileDependenciesSet == null
+    public void setDependenciesFromSet(final Set<String> dependenciesSet) throws GenieException {
+        this.dependencies = dependenciesSet == null
             ? JsonUtils.marshall(new HashSet<>())
-            : JsonUtils.marshall(fileDependenciesSet);
+            : JsonUtils.marshall(dependenciesSet);
     }
 
     /**
-     * Gets the fileDependencies for the job as JSON array.
+     * Gets the dependencies for the job as JSON array.
      *
-     * @return fileDependencies
+     * @return dependencies
      */
-    protected String getFileDependencies() {
-        return this.fileDependencies;
+    protected String getDependencies() {
+        return this.dependencies;
     }
 
     /**
-     * Sets the fileDependencies for the job.
+     * Sets the dependencies for the job.
      *
-     * @param fileDependencies Dependent files for the job in csv format
+     * @param dependencies Dependent files for the job in csv format
      */
-    public void setFileDependencies(final String fileDependencies) {
-        this.fileDependencies = fileDependencies;
+    public void setDependencies(final String dependencies) {
+        this.dependencies = dependencies;
     }
 
     /**
@@ -400,7 +399,7 @@ public class JobRequestEntity extends SetupFileEntity {
             .withDescription(this.getDescription())
             .withDisableLogArchival(this.disableLogArchival)
             .withEmail(this.email)
-            .withFileDependencies(this.getFileDependenciesAsSet())
+            .withDependencies(this.getDependenciesAsSet())
             .withGroup(this.group)
             .withSetupFile(this.getSetupFile())
             .withTags(this.getTags())

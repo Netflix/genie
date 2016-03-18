@@ -73,7 +73,7 @@ public class JobTask extends GenieBaseTask {
         }
 
         // Iterate over and get all dependencies
-        for (final String dependencyFile: jobExecEnv.getJobRequest().getFileDependencies()) {
+        for (final String dependencyFile: jobExecEnv.getJobRequest().getDependencies()) {
             final String localPath = this.jobWorkingDirectory
                 + JobConstants.FILE_PATH_DELIMITER
                 + dependencyFile.substring(dependencyFile.lastIndexOf(JobConstants.FILE_PATH_DELIMITER) + 1);

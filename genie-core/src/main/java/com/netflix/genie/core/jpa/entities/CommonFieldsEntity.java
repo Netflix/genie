@@ -43,7 +43,8 @@ public class CommonFieldsEntity extends BaseEntity {
     protected static final String GENIE_TAG_NAMESPACE = "genie.";
     protected static final String GENIE_ID_TAG_NAMESPACE = GENIE_TAG_NAMESPACE + "id:";
     protected static final String GENIE_NAME_TAG_NAMESPACE = GENIE_TAG_NAMESPACE + "name:";
-    protected static final String COMMA = ",";
+    protected static final String PIPE = "|";
+    protected static final String PIPE_REGEX = "\\" + PIPE;
 
     private static final long serialVersionUID = -5040659007494311180L;
 
@@ -164,7 +165,7 @@ public class CommonFieldsEntity extends BaseEntity {
         final Set<String> returnTags = new HashSet<>();
 
         if (this.tags != null) {
-            returnTags.addAll(Arrays.asList(this.tags.split(COMMA)));
+            returnTags.addAll(Arrays.asList(this.tags.split(PIPE_REGEX)));
         }
 
         return returnTags;
@@ -181,7 +182,7 @@ public class CommonFieldsEntity extends BaseEntity {
             this.tags = tags
                 .stream()
                 .sorted(String.CASE_INSENSITIVE_ORDER)
-                .reduce((one, two) -> one + COMMA + two)
+                .reduce((one, two) -> one + PIPE + two)
                 .get();
         }
     }
@@ -197,7 +198,7 @@ public class CommonFieldsEntity extends BaseEntity {
         if (this.tags == null) {
             finalTags = Sets.newHashSet();
         } else {
-            finalTags = Sets.newHashSet(this.tags.split(COMMA))
+            finalTags = Sets.newHashSet(this.tags.split(PIPE_REGEX))
                 .stream()
                 .filter(tag -> !tag.contains(GENIE_TAG_NAMESPACE))
                 .collect(Collectors.toSet());

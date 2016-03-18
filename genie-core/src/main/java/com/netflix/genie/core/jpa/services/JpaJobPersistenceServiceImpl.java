@@ -113,7 +113,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
             throw new GenieConflictException("A job with id " + job.getId() + " already exists");
         }
 
-        final JobRequestEntity jobRequestEntity = jobRequestRepo.findOne(job.getId());
+        final JobRequestEntity jobRequestEntity = this.jobRequestRepo.findOne(job.getId());
 
         if (jobRequestEntity == null) {
             throw new GeniePreconditionException("Cannot find the job request for the id of the job specified.");
@@ -133,7 +133,8 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         }
         jobEntity.setStatus(job.getStatus());
         jobEntity.setStatusMsg(job.getStatusMsg());
-        jobEntity.setTags(jobRequestEntity.getTags());
+        jobEntity.setTags(job.getTags());
+        jobEntity.setCommandArgs(job.getCommandArgs());
 
         jobRequestEntity.setJob(jobEntity);
     }
@@ -225,24 +226,6 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
-    public JobRequest getJobRequest(
-        @NotBlank(message = "No id entered. Unable to get job request.")
-        final String id
-    ) throws GenieException {
-        log.debug("Called with id {}", id);
-        final JobRequestEntity jobRequestEntity = this.jobRequestRepo.findOne(id);
-        if (jobRequestEntity != null) {
-            return jobRequestEntity.getDTO();
-        } else {
-            throw new GenieNotFoundException("No jobrequest with id " + id);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public JobRequest createJobRequest(
         @NotNull(message = "Job Request is null so cannot be saved")
         final JobRequest jobRequest
@@ -265,7 +248,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         jobRequestEntity.setSetupFile(jobRequest.getSetupFile());
         jobRequestEntity.setClusterCriteriasFromList(jobRequest.getClusterCriterias());
         jobRequestEntity.setCommandCriteriaFromSet(jobRequest.getCommandCriteria());
-        jobRequestEntity.setFileDependenciesFromSet(jobRequest.getFileDependencies());
+        jobRequestEntity.setDependenciesFromSet(jobRequest.getDependencies());
         jobRequestEntity.setDisableLogArchival(jobRequest.isDisableLogArchival());
         jobRequestEntity.setEmail(jobRequest.getEmail());
         jobRequestEntity.setTags(jobRequest.getTags());
@@ -295,28 +278,6 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         }
 
         jobRequestEntity.setClientHost(clientHost);
-    }
-
-    /**
-     * Return the Job Entity for the job id provided.
-     *
-     * @param id The id of the job to return.
-     * @return Job Execution details or null if not found
-     * @throws GenieException if there is an error
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public JobExecution getJobExecution(
-        @NotBlank(message = "No id entered. Unable to get job request.")
-        final String id
-    ) throws GenieException {
-        log.debug("Called");
-        final JobExecutionEntity jobExecutionEntity = this.jobExecutionRepo.findOne(id);
-        if (jobExecutionEntity != null) {
-            return jobExecutionEntity.getDTO();
-        } else {
-            throw new GenieNotFoundException("No job with id " + id);
-        }
     }
 
     /**

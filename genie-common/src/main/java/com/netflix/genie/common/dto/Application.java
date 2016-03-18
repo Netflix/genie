@@ -39,6 +39,7 @@ public class Application extends ConfigDTO {
 
     private final Set<String> dependencies = new HashSet<>();
     private final ApplicationStatus status;
+    private final String type;
 
     /**
      * Constructor only accessible via builder build() method.
@@ -49,6 +50,7 @@ public class Application extends ConfigDTO {
         super(builder);
         this.status = builder.bStatus;
         this.dependencies.addAll(builder.bDependencies);
+        this.type = builder.bType;
     }
 
     /**
@@ -70,6 +72,7 @@ public class Application extends ConfigDTO {
 
         private final ApplicationStatus bStatus;
         private final Set<String> bDependencies = new HashSet<>();
+        private String bType;
 
         /**
          * Constructor which has required fields.
@@ -107,6 +110,17 @@ public class Application extends ConfigDTO {
             if (dependencies != null) {
                 this.bDependencies.addAll(dependencies);
             }
+            return this;
+        }
+
+        /**
+         * Set the type of this application.
+         *
+         * @param type The type (e.g. Hadoop, Spark, etc) for grouping applications
+         * @return The builder
+         */
+        public Builder withType(final String type) {
+            this.bType = type;
             return this;
         }
 

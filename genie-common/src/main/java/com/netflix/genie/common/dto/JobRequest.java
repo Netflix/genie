@@ -44,7 +44,7 @@ public class JobRequest extends CommonDTO {
 
     private static final long serialVersionUID = 3163971970144435277L;
 
-    @Size(min = 1, max = 1024, message = "Command arguments are required but no longer than 1024 characters")
+    @Size(min = 1, message = "Command arguments are required")
     private String commandArgs;
     @NotEmpty
     private List<ClusterCriteria> clusterCriterias = new ArrayList<>();
@@ -54,7 +54,7 @@ public class JobRequest extends CommonDTO {
     private String group;
     @Size(max = 1024, message = "Max length is 1024 characters")
     private String setupFile;
-    private Set<String> fileDependencies = new HashSet<>();
+    private Set<String> dependencies = new HashSet<>();
     private boolean disableLogArchival;
     @Size(max = 255, message = "Max length is 255 characters")
     @Email(message = "Must be a valid email address")
@@ -77,7 +77,7 @@ public class JobRequest extends CommonDTO {
         this.commandCriteria.addAll(builder.bCommandCriteria);
         this.group = builder.bGroup;
         this.setupFile = builder.bSetupFile;
-        this.fileDependencies.addAll(builder.bFileDependencies);
+        this.dependencies.addAll(builder.bDependencies);
         this.disableLogArchival = builder.bDisableLogArchival;
         this.email = builder.bEmail;
         this.cpu = builder.bCpu;
@@ -107,8 +107,8 @@ public class JobRequest extends CommonDTO {
      *
      * @return The file dependencies as a read-only set. Attempts to modify will throw exception
      */
-    public Set<String> getFileDependencies() {
-        return Collections.unmodifiableSet(this.fileDependencies);
+    public Set<String> getDependencies() {
+        return Collections.unmodifiableSet(this.dependencies);
     }
 
     /**
@@ -124,7 +124,7 @@ public class JobRequest extends CommonDTO {
         private final Set<String> bCommandCriteria = new HashSet<>();
         private String bGroup;
         private String bSetupFile;
-        private Set<String> bFileDependencies = new HashSet<>();
+        private Set<String> bDependencies = new HashSet<>();
         private boolean bDisableLogArchival;
         private String bEmail;
         private int bCpu = 1;
@@ -189,12 +189,12 @@ public class JobRequest extends CommonDTO {
         /**
          * Set the file dependencies needed to run the job.
          *
-         * @param fileDependencies The file dependencies
+         * @param dependencies The file dependencies
          * @return The builder
          */
-        public Builder withFileDependencies(final Set<String> fileDependencies) {
-            if (fileDependencies != null) {
-                this.bFileDependencies.addAll(fileDependencies);
+        public Builder withDependencies(final Set<String> dependencies) {
+            if (dependencies != null) {
+                this.bDependencies.addAll(dependencies);
             }
             return this;
         }

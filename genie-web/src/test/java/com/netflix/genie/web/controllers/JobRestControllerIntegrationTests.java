@@ -401,7 +401,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         )
             .withDisableLogArchival(true)
             .withSetupFile(setUpFile)
-            .withFileDependencies(dependencies)
+            .withDependencies(dependencies)
             .withDescription(JOB_DESCRIPTION)
             .build();
 
