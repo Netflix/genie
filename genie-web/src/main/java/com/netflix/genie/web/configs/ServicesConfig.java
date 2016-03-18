@@ -65,6 +65,7 @@ import java.util.List;
  * Configuration for all the services.
  *
  * @author amsharma
+ * @since 3.0.0
  */
 @Configuration
 public class ServicesConfig {
