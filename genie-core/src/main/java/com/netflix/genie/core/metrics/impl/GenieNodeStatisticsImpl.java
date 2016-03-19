@@ -19,7 +19,6 @@ package com.netflix.genie.core.metrics.impl;
 
 import com.netflix.genie.core.metrics.GenieNodeStatistics;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -32,7 +31,6 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author skrishnan
  * @author tgianos
  */
-@Component
 @Slf4j
 public class GenieNodeStatisticsImpl implements GenieNodeStatistics {
 

@@ -22,7 +22,6 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.services.ClusterLoadBalancer;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Random;
@@ -33,7 +32,6 @@ import java.util.Random;
  * @author skrishnan
  * @author tgianos
  */
-@Service
 @Slf4j
 public class RandomizedClusterLoadBalancerImpl implements ClusterLoadBalancer {
 

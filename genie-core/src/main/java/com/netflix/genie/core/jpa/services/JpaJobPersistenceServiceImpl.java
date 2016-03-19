@@ -39,8 +39,6 @@ import com.netflix.genie.core.services.JobPersistenceService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.ConstraintViolationException;
@@ -52,7 +50,6 @@ import java.util.Date;
  *
  * @author amsharma
  */
-@Service
 @Transactional(
     rollbackFor = {
         GenieException.class,
@@ -69,7 +66,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
     private final JpaCommandRepository commandRepo;
 
     /**
-     * Default Constructor.
+     * Constructor.
      *
      * @param jobRepo          The job repository to use
      * @param jobRequestRepo   The job request repository to use
@@ -77,7 +74,6 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
      * @param clusterRepo      The cluster repository to use
      * @param commandRepo      The command repository to use
      */
-    @Autowired
     public JpaJobPersistenceServiceImpl(
         final JpaJobRepository jobRepo,
         final JpaJobRequestRepository jobRequestRepo,

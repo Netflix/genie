@@ -55,7 +55,7 @@ import java.util.Set;
  * @since 3.0.0
  */
 @Category(UnitTest.class)
-public class LocalJobSubmitterImplUnitTests {
+public class LocalJobRunnerUnitTests {
 
     private static final String BASE_WORKING_DIR = "file://workingdir";
     private static final String JOB_1_ID = "job1";
@@ -73,13 +73,14 @@ public class LocalJobSubmitterImplUnitTests {
     private ClusterService clusterService;
     private ClusterLoadBalancer clusterLoadBalancer;
     private JobSubmitterService jobSubmitterService;
+    private JobSearchService jobSearchService;
 
     /**
      * Setup for the tests.
      */
     @Before
     public void setup() {
-        final JobSearchService jobSearchService = Mockito.mock(JobSearchService.class);
+        jobSearchService = Mockito.mock(JobSearchService.class);
         this.jobPersistenceService = Mockito.mock(JobPersistenceService.class);
         this.clusterService = Mockito.mock(ClusterService.class);
         final CommandService commandService = Mockito.mock(CommandService.class);
@@ -95,8 +96,8 @@ public class LocalJobSubmitterImplUnitTests {
 
         final Resource baseWorkingDirResource = new DefaultResourceLoader().getResource(BASE_WORKING_DIR);
 
-        this.jobSubmitterService = new LocalJobSubmitterImpl(
-            jobSearchService,
+        this.jobSubmitterService = new LocalJobRunner(
+            this.jobSearchService,
             this.jobPersistenceService,
             this.clusterService,
             commandService,

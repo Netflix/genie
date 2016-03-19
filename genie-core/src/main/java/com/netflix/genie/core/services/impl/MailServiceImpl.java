@@ -22,14 +22,9 @@ import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.services.MailService;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.stereotype.Component;
 
 /**
  * Implementation of the Mail service interface.
@@ -37,13 +32,11 @@ import org.springframework.stereotype.Component;
  * @author amsharma
  * @since 3.0.0
  */
-@ConditionalOnClass(JavaMailSender.class)
-@ConditionalOnProperty("genie.mail.enabled")
-@Component
 public class MailServiceImpl implements MailService {
 
     private final JavaMailSender javaMailSender;
     private final String fromAddress;
+    // TODO can we use this here?
     private final String mailUser;
     private final String mailPassword;
 
@@ -57,14 +50,10 @@ public class MailServiceImpl implements MailService {
      *
      * @throws GenieException If there is any problem.
      */
-    @Autowired
     public MailServiceImpl(
         final JavaMailSender javaMailSender,
-        @Value("${genie.mail.fromAddress}")
         final String fromAddress,
-        @Value("${genie.mail.user:#{null}}")
         final String mailUser,
-        @Value("${genie.mail.password:#{null}}")
         final String mailPassword
     ) throws GenieException {
         this.javaMailSender = javaMailSender;
