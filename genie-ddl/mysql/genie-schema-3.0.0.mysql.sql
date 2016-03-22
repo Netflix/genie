@@ -205,12 +205,12 @@ CREATE TABLE `job_executions` (
   `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `entity_version` int(11) NOT NULL DEFAULT '0',
-  `hostname` varchar(255) NOT NULL,
+  `host_name` varchar(255) NOT NULL,
   `process_id` int(11) NOT NULL,
   `exit_code` int(11) NOT NULL DEFAULT '-1',
   `check_delay` bigint(20) NOT NULL DEFAULT '10000',
   KEY `id` (`id`),
-  KEY `JOB_EXECUTIONS_HOSTNAME_INDEX` (`hostname`),
+  KEY `JOB_EXECUTIONS_HOSTNAME_INDEX` (`host_name`),
   KEY `JOB_EXECUTIONS_EXIT_CODE_INDEX` (`exit_code`),
   CONSTRAINT `job_executions_ibfk_1` FOREIGN KEY (`id`) REFERENCES `jobs` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -320,4 +320,4 @@ CREATE TABLE `jobs_applications` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-03-21 20:12:57
+-- Dump completed on 2016-03-22 11:15:37

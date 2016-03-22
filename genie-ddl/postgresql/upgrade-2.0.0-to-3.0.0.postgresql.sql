@@ -377,7 +377,7 @@ CREATE TABLE job_executions (
   created TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
   entity_version INT NOT NULL DEFAULT 0,
-  hostname VARCHAR(255) NOT NULL,
+  host_name VARCHAR(255) NOT NULL,
   process_id INT NOT NULL,
   exit_code INT NOT NULL DEFAULT -1,
   check_delay BIGINT NOT NULL DEFAULT 10000,
@@ -394,7 +394,7 @@ INSERT INTO job_executions (
   created,
   updated,
   entity_version,
-  hostname,
+  host_name,
   process_id,
   exit_code
 ) SELECT

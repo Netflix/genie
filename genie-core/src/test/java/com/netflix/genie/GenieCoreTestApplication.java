@@ -71,7 +71,7 @@ public class GenieCoreTestApplication {
      * @return localhost always
      */
     @Bean
-    public String hostname() {
+    public String hostName() {
         return "localhost";
     }
 

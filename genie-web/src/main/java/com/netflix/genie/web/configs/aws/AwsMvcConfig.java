@@ -44,11 +44,11 @@ public class AwsMvcConfig {
     private static final Charset UTF_8 = Charset.forName("UTF-8");
 
     // See: http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AESDG-chapter-instancedata.html
-    protected HttpGet publicHostnameGet = new HttpGet("http://169.254.169.254/latest/meta-data/public-hostname");
-    protected HttpGet localIPV4HostnameGet = new HttpGet("http://169.254.169.254/latest/meta-data/local-ipv4");
+    protected HttpGet publicHostNameGet = new HttpGet("http://169.254.169.254/latest/meta-data/public-hostname");
+    protected HttpGet localIPV4HostNameGet = new HttpGet("http://169.254.169.254/latest/meta-data/local-ipv4");
 
     /**
-     * Get the hostname for this application by calling the AWS metadata endpoints. Overrides default implementation
+     * Get the host name for this application by calling the AWS metadata endpoints. Overrides default implementation
      * which defaults to using InetAddress class. Only active when profile enabled.
      *
      * @param httpClient The http client to use to call the Amazon endpoints
@@ -56,15 +56,15 @@ public class AwsMvcConfig {
      * @throws IOException When the host can't be calculated
      */
     @Bean
-    public String hostname(final HttpClient httpClient) throws IOException {
-        final HttpResponse publicHostnameResponse = httpClient.execute(this.publicHostnameGet);
+    public String hostName(final HttpClient httpClient) throws IOException {
+        final HttpResponse publicHostnameResponse = httpClient.execute(this.publicHostNameGet);
         if (publicHostnameResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
             final String hostname = EntityUtils.toString(publicHostnameResponse.getEntity(), UTF_8);
             log.debug("AWS Public Hostname: {}", hostname);
             return hostname;
         }
 
-        final HttpResponse ipv4Response = httpClient.execute(this.localIPV4HostnameGet);
+        final HttpResponse ipv4Response = httpClient.execute(this.localIPV4HostNameGet);
         if (ipv4Response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
             final String hostname = EntityUtils.toString(ipv4Response.getEntity(), UTF_8);
             log.debug("AWS IPV4 Hostname: {}", hostname);

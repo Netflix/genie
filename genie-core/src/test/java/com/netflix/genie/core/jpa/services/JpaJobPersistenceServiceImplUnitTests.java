@@ -438,7 +438,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
         Mockito.verify(jobEntity).setExecution(argument.capture());
         Mockito.verify(jobEntity).setStatus(argument1.capture());
 
-        Assert.assertEquals(hostname, argument.getValue().getHostname());
+        Assert.assertEquals(hostname, argument.getValue().getHostName());
         Assert.assertEquals(pid, argument.getValue().getProcessId());
         Assert.assertThat(argument.getValue().getCheckDelay(), Matchers.is(checkDelay));
         Assert.assertEquals(JOB_1_ID, argument.getValue().getId());

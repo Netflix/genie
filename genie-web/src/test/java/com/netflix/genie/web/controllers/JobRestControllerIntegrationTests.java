@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.controllers;
 
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.dto.Cluster;
@@ -24,6 +25,7 @@ import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
+import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.core.jobs.JobConstants;
@@ -62,17 +64,34 @@ import java.util.UUID;
  * Integration tests for Jobs REST API.
  *
  * @author amsharma
+ * @author tgianos
  * @since 3.0.0
  */
 @Slf4j
 public class JobRestControllerIntegrationTests extends RestControllerIntegrationTestsBase {
 
+    private static final String COMMAND_ARGS_PATH = "$.commandArgs";
     private static final String STATUS_MESSAGE_PATH = "$.statusMsg";
     private static final String CLUSTER_NAME_PATH = "$.clusterName";
     private static final String COMMAND_NAME_PATH = "$.commandName";
     private static final String ARCHIVE_LOCATION_PATH = "$.archiveLocation";
     private static final String STARTED_PATH = "$.started";
     private static final String FINISHED_PATH = "$.finished";
+    private static final String CLUSTER_CRITERIAS_PATH = "$.clusterCriterias";
+    private static final String COMMAND_CRITERIA_PATH = "$.commandCriteria";
+    private static final String GROUP_PATH = "$.group";
+    private static final String DISABLE_LOG_ARCHIVAL_PATH = "$.disableLogArchival";
+    private static final String EMAIL_PATH = "$.email";
+    private static final String CPU_PATH = "$.cpu";
+    private static final String MEMORY_PATH = "$.memory";
+    private static final String DEPENDENCIES_PATH = "$.dependencies";
+    private static final String APPLICATIONS_PATH = "$.applications";
+    private static final String HOST_NAME_PATH = "$.hostName";
+    private static final String PROCESS_ID_PATH = "$.processId";
+    private static final String CHECK_DELAY_PATH = "$.checkDelay";
+    private static final String EXIT_CODE_PATH = "$.exitCode";
+
+    private static final long CHECK_DELAY = 1L;
 
     private static final String BASE_DIR
         = "com/netflix/genie/web/controllers/JobRestControllerIntegrationTests/";
@@ -96,6 +115,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     private static final String CMD1_NAME = "Unix Bash command";
     private static final String CMD1_USER = "genie";
     private static final String CMD1_VERSION = "1.0";
+    private static final String CMD1_EXECUTABLE = "/bin/bash";
 
     private static final String CLUSTER1_ID = "cluster1";
     private static final String CLUSTER1_NAME = "Local laptop";
@@ -121,6 +141,9 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
 
     @Autowired
     private JpaClusterRepository clusterRepository;
+
+    @Autowired
+    private String hostname;
 
     /**
      * Setup for tests.
@@ -320,8 +343,8 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             CMD1_USER,
             CMD1_VERSION,
             CommandStatus.ACTIVE,
-            "/bin/bash",
-            1
+            CMD1_EXECUTABLE,
+            CHECK_DELAY
         )
             .withId(CMD1_ID)
             .withSetupFile(setUpFile)
@@ -365,9 +388,8 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         final String commandArgs = "-c 'echo hello world'";
 
         final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
-        final Set<String> clusterTags = new HashSet<>();
-        clusterTags.add("localhost");
-        final ClusterCriteria clusterCriteria = new ClusterCriteria(clusterTags);
+        final String clusterTag = "localhost";
+        final ClusterCriteria clusterCriteria = new ClusterCriteria(Sets.newHashSet(clusterTag));
         clusterCriteriaList.add(clusterCriteria);
 
         final String setUpFile = this.resourceLoader
@@ -389,8 +411,8 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         dependencies.add(depFile1);
 //        dependencies.add(depFile2);
 
-        final Set<String> commandCriteria = new HashSet<>();
-        commandCriteria.add("bash");
+        final String commandTag = "bash";
+        final Set<String> commandCriteria = Sets.newHashSet(commandTag);
         final JobRequest jobRequest = new JobRequest.Builder(
             JOB_NAME,
             JOB_USER,
@@ -446,8 +468,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .getResponse()
             .getContentAsString(), "{\"status\":\"SUCCEEDED\"}");
 
-        // TODO check job request and execution once api implemented
-
         // Check if all the fields are created right in the database
         this.mvc
             .perform(MockMvcRequestBuilders.get(JOBS_API + "/" + jobId))
@@ -460,6 +480,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andExpect(MockMvcResultMatchers.jsonPath(USER_PATH, Matchers.is(JOB_USER)))
             .andExpect(MockMvcResultMatchers.jsonPath(NAME_PATH, Matchers.is(JOB_NAME)))
             .andExpect(MockMvcResultMatchers.jsonPath(DESCRIPTION_PATH, Matchers.is(JOB_DESCRIPTION)))
+            .andExpect(MockMvcResultMatchers.jsonPath(COMMAND_ARGS_PATH, Matchers.is(commandArgs)))
             .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(JobStatus.SUCCEEDED.toString())))
             .andExpect(MockMvcResultMatchers.jsonPath(STATUS_MESSAGE_PATH, Matchers.is(JOB_STATUS_MSG)))
             .andExpect(MockMvcResultMatchers.jsonPath(STARTED_PATH, Matchers.not(new Date(0))))
@@ -488,6 +509,72 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andExpect(MockMvcResultMatchers.jsonPath("$.files[2].name", Matchers.is("run.sh")))
             .andExpect(MockMvcResultMatchers.jsonPath("$.files[3].name", Matchers.is("stderr")))
             .andExpect(MockMvcResultMatchers.jsonPath("$.files[4].name", Matchers.is("stdout")));
+
+        // Make sure all the linked entities are correct
+        this.mvc
+            .perform(MockMvcRequestBuilders.get(JOBS_API + "/" + jobId + "/request"))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.jsonPath(ID_PATH, Matchers.is(jobId)))
+            .andExpect(MockMvcResultMatchers.jsonPath(CREATED_PATH, Matchers.notNullValue()))
+            .andExpect(MockMvcResultMatchers.jsonPath(UPDATED_PATH, Matchers.notNullValue()))
+            .andExpect(MockMvcResultMatchers.jsonPath(NAME_PATH, Matchers.is(JOB_NAME)))
+            .andExpect(MockMvcResultMatchers.jsonPath(VERSION_PATH, Matchers.is(JOB_VERSION)))
+            .andExpect(MockMvcResultMatchers.jsonPath(USER_PATH, Matchers.is(JOB_USER)))
+            .andExpect(MockMvcResultMatchers.jsonPath(DESCRIPTION_PATH, Matchers.is(JOB_DESCRIPTION)))
+            .andExpect(MockMvcResultMatchers.jsonPath(COMMAND_ARGS_PATH, Matchers.is(commandArgs)))
+            .andExpect(MockMvcResultMatchers.jsonPath(SETUP_FILE_PATH, Matchers.is(setUpFile)))
+            .andExpect(MockMvcResultMatchers.jsonPath(CLUSTER_CRITERIAS_PATH, Matchers.hasSize(1)))
+            .andExpect(MockMvcResultMatchers.jsonPath(CLUSTER_CRITERIAS_PATH + "[0].tags", Matchers.hasSize(1)))
+            .andExpect(MockMvcResultMatchers.jsonPath(CLUSTER_CRITERIAS_PATH + "[0].tags[0]", Matchers.is(clusterTag)))
+            .andExpect(MockMvcResultMatchers.jsonPath(COMMAND_CRITERIA_PATH, Matchers.hasSize(1)))
+            .andExpect(MockMvcResultMatchers.jsonPath(COMMAND_CRITERIA_PATH + "[0]", Matchers.is(commandTag)))
+            .andExpect(MockMvcResultMatchers.jsonPath(GROUP_PATH, Matchers.nullValue()))
+            .andExpect(MockMvcResultMatchers.jsonPath(DISABLE_LOG_ARCHIVAL_PATH, Matchers.is(true)))
+            .andExpect(MockMvcResultMatchers.jsonPath(DEPENDENCIES_PATH, Matchers.hasSize(1)))
+            .andExpect(MockMvcResultMatchers.jsonPath(DEPENDENCIES_PATH + "[0]", Matchers.is(depFile1)))
+            .andExpect(MockMvcResultMatchers.jsonPath(EMAIL_PATH, Matchers.nullValue()))
+            .andExpect(MockMvcResultMatchers.jsonPath(CPU_PATH, Matchers.is(1)))
+            .andExpect(MockMvcResultMatchers.jsonPath(MEMORY_PATH, Matchers.is(1536)))
+            .andExpect(MockMvcResultMatchers.jsonPath(APPLICATIONS_PATH, Matchers.empty()));
+
+        this.mvc
+            .perform(MockMvcRequestBuilders.get(JOBS_API + "/" + jobId + "/execution"))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.jsonPath(ID_PATH, Matchers.is(jobId)))
+            .andExpect(MockMvcResultMatchers.jsonPath(CREATED_PATH, Matchers.notNullValue()))
+            .andExpect(MockMvcResultMatchers.jsonPath(UPDATED_PATH, Matchers.notNullValue()))
+            .andExpect(MockMvcResultMatchers.jsonPath(HOST_NAME_PATH, Matchers.is(this.hostname)))
+            .andExpect(MockMvcResultMatchers.jsonPath(PROCESS_ID_PATH, Matchers.notNullValue()))
+            .andExpect(MockMvcResultMatchers.jsonPath(CHECK_DELAY_PATH, Matchers.is((int) CHECK_DELAY)))
+            .andExpect(MockMvcResultMatchers.jsonPath(EXIT_CODE_PATH, Matchers.is(JobExecution.SUCCESS_EXIT_CODE)));
+
+        this.mvc
+            .perform(MockMvcRequestBuilders.get(JOBS_API + "/" + jobId + "/cluster"))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.jsonPath(ID_PATH, Matchers.is(CLUSTER1_ID)))
+            .andExpect(MockMvcResultMatchers.jsonPath(CREATED_PATH, Matchers.notNullValue()))
+            .andExpect(MockMvcResultMatchers.jsonPath(UPDATED_PATH, Matchers.notNullValue()))
+            .andExpect(MockMvcResultMatchers.jsonPath(NAME_PATH, Matchers.is(CLUSTER1_NAME)))
+            .andExpect(MockMvcResultMatchers.jsonPath(USER_PATH, Matchers.is(CLUSTER1_USER)))
+            .andExpect(MockMvcResultMatchers.jsonPath(VERSION_PATH, Matchers.is(CLUSTER1_VERSION)));
+
+        this.mvc
+            .perform(MockMvcRequestBuilders.get(JOBS_API + "/" + jobId + "/command"))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.jsonPath(ID_PATH, Matchers.is(CMD1_ID)))
+            .andExpect(MockMvcResultMatchers.jsonPath(CREATED_PATH, Matchers.notNullValue()))
+            .andExpect(MockMvcResultMatchers.jsonPath(UPDATED_PATH, Matchers.notNullValue()))
+            .andExpect(MockMvcResultMatchers.jsonPath(NAME_PATH, Matchers.is(CMD1_NAME)))
+            .andExpect(MockMvcResultMatchers.jsonPath(USER_PATH, Matchers.is(CMD1_USER)))
+            .andExpect(MockMvcResultMatchers.jsonPath(VERSION_PATH, Matchers.is(CMD1_VERSION)))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.executable", Matchers.is(CMD1_EXECUTABLE)));
+
+        this.mvc
+            .perform(MockMvcRequestBuilders.get(JOBS_API + "/" + jobId + "/applications"))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(APP1_ID)))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[1].id", Matchers.is(APP2_ID)));
 
         Assert.assertThat(this.jobRepository.count(), Matchers.is(1L));
         Assert.assertThat(this.jobRequestRepository.count(), Matchers.is(1L));

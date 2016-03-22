@@ -48,9 +48,9 @@ public class JobExecutionEntity extends BaseEntity {
     private static final long serialVersionUID = -5073493356472801960L;
 
     @Basic(optional = false)
-    @Column(name = "hostname", nullable = false)
-    @Size(min = 1, max = 255, message = "Must have a hostname no longer than 255 characters")
-    private String hostname;
+    @Column(name = "host_name", nullable = false)
+    @Size(min = 1, max = 255, message = "Must have a host name no longer than 255 characters")
+    private String hostName;
 
     @Basic(optional = false)
     @Column(name = "process_id", nullable = false)
@@ -71,21 +71,21 @@ public class JobExecutionEntity extends BaseEntity {
     private JobEntity job;
 
     /**
-     * Get the hostname this job is running on.
+     * Get the host name this job is running on.
      *
      * @return The hostname
      */
-    public String getHostname() {
-        return this.hostname;
+    public String getHostName() {
+        return this.hostName;
     }
 
     /**
      * Set the hostname this job is running on.
      *
-     * @param hostname The hostname
+     * @param hostName The hostname
      */
-    public void setHostname(final String hostname) {
-        this.hostname = hostname;
+    public void setHostName(final String hostName) {
+        this.hostName = hostName;
     }
 
     /**
@@ -149,7 +149,7 @@ public class JobExecutionEntity extends BaseEntity {
      */
     public JobExecution getDTO() {
         return new JobExecution.Builder(
-            this.hostname,
+            this.hostName,
             this.processId,
             this.checkDelay
         )

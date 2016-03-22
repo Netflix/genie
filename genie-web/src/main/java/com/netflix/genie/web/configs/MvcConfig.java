@@ -81,7 +81,7 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
      */
     @Bean
     @ConditionalOnMissingBean
-    public String hostname() throws UnknownHostException {
+    public String hostName() throws UnknownHostException {
         return InetAddress.getLocalHost().getCanonicalHostName();
     }
 

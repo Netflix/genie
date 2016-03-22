@@ -56,7 +56,7 @@ public class JobExecution extends BaseDTO {
     private static final long serialVersionUID = 5005391660522052211L;
 
     @Size(min = 1, max = 1024, message = "Host name is required but no longer than 1024 characters")
-    private final String hostname;
+    private final String hostName;
     private final int processId;
     @Min(
         value = 1,
@@ -72,7 +72,7 @@ public class JobExecution extends BaseDTO {
      */
     protected JobExecution(final Builder builder) {
         super(builder);
-        this.hostname = builder.bHostname;
+        this.hostName = builder.bHostName;
         this.processId = builder.bProcessId;
         this.checkDelay = builder.bCheckDelay;
         this.exitCode = builder.bExitCode;
@@ -86,7 +86,7 @@ public class JobExecution extends BaseDTO {
      */
     public static class Builder extends BaseDTO.Builder<Builder> {
 
-        private final String bHostname;
+        private final String bHostName;
         private final int bProcessId;
         private final long bCheckDelay;
         private int bExitCode = -1;
@@ -94,20 +94,20 @@ public class JobExecution extends BaseDTO {
         /**
          * Constructor which has required fields.
          *
-         * @param hostname   The hostname where the job is running
+         * @param hostName   The hostname where the job is running
          * @param processId  The id of the process running the job
          * @param checkDelay How long, in milliseconds, to wait between checks for job status
          */
         public Builder(
-            @JsonProperty("hostname")
-            final String hostname,
+            @JsonProperty("hostName")
+            final String hostName,
             @JsonProperty("processId")
             final int processId,
             @JsonProperty("checkDelay")
             final long checkDelay
         ) {
             super();
-            this.bHostname = hostname;
+            this.bHostName = hostName;
             this.bProcessId = processId;
             this.bCheckDelay = checkDelay;
         }

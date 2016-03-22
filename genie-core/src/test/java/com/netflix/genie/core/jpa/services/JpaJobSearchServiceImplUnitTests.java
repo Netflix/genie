@@ -227,11 +227,11 @@ public class JpaJobSearchServiceImplUnitTests {
     @Test
     public void canGetJobHost() throws GenieException {
         final String jobId = UUID.randomUUID().toString();
-        final String hostname = UUID.randomUUID().toString();
+        final String hostName = UUID.randomUUID().toString();
         final JobExecutionEntity jobExecution = Mockito.mock(JobExecutionEntity.class);
-        Mockito.when(jobExecution.getHostname()).thenReturn(hostname);
+        Mockito.when(jobExecution.getHostName()).thenReturn(hostName);
         Mockito.when(this.jobExecutionRepository.findOne(jobId)).thenReturn(jobExecution);
 
-        Assert.assertThat(this.service.getJobHost(jobId), Matchers.is(hostname));
+        Assert.assertThat(this.service.getJobHost(jobId), Matchers.is(hostName));
     }
 }

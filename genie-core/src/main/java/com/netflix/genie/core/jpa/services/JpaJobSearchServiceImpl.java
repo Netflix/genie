@@ -194,7 +194,7 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
     public Set<JobExecution> getAllRunningJobExecutionsOnHost(@NotBlank final String hostname) throws GenieException {
         log.debug("Called with hostname {}", hostname);
         return this.jobExecutionRepository
-            .findByHostnameAndExitCode(hostname, JobExecution.DEFAULT_EXIT_CODE)
+            .findByHostNameAndExitCode(hostname, JobExecution.DEFAULT_EXIT_CODE)
             .stream()
             .map(JobExecutionEntity::getDTO)
             .collect(Collectors.toSet());
@@ -327,7 +327,7 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
     public String getJobHost(@NotBlank final String jobId) throws GenieException {
         final JobExecutionEntity jobExecution = this.jobExecutionRepository.findOne(jobId);
         if (jobExecution != null) {
-            return jobExecution.getHostname();
+            return jobExecution.getHostName();
         } else {
             throw new GenieNotFoundException("No job execution found for id " + jobId);
         }

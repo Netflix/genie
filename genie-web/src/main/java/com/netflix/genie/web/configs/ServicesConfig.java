@@ -217,18 +217,18 @@ public class ServicesConfig {
     /**
      * Get an local implementation of the JobKillService.
      *
-     * @param hostname         The name of the host this Genie node is running on.
+     * @param hostName         The name of the host this Genie node is running on.
      * @param jobSearchService The job search service to use to locate job information.
      * @param executor         The executor to use to run system processes.
      * @return A job kill service instance.
      */
     @Bean
     public JobKillService jobKillService(
-        final String hostname,
+        final String hostName,
         final JobSearchService jobSearchService,
         final Executor executor
     ) {
-        return new LocalJobKillServiceImpl(hostname, jobSearchService, executor);
+        return new LocalJobKillServiceImpl(hostName, jobSearchService, executor);
     }
 
     /**
@@ -270,7 +270,7 @@ public class ServicesConfig {
      * @param aep                 Instance of the event publisher.
      * @param workflowTasks       List of all the workflow tasks to be executed.
      * @param genieWorkingDir     Working directory for genie where it creates jobs directories.
-     * @param hostname            Hostname of this host.
+     * @param hostName            Hostname of this host.
      * @param maxRunningJobs      Maximum number of jobs allowed to run on this host.
      * @return An instance of the JobSubmitterService.
      */
@@ -286,7 +286,7 @@ public class ServicesConfig {
         final ApplicationEventPublisher aep,
         final List<WorkflowTask> workflowTasks,
         final Resource genieWorkingDir,
-        final String hostname,
+        final String hostName,
         @Value("${genie.jobs.max.running:2}")
         final int maxRunningJobs
     ) {
@@ -301,7 +301,7 @@ public class ServicesConfig {
             aep,
             workflowTasks,
             genieWorkingDir,
-            hostname,
+            hostName,
             maxRunningJobs
         );
     }

@@ -35,7 +35,7 @@ import java.util.UUID;
 @Category(UnitTest.class)
 public class JobExecutionUnitTests {
 
-    private static final String HOSTNAME = UUID.randomUUID().toString();
+    private static final String HOST_NAME = UUID.randomUUID().toString();
     private static final long CHECK_DELAY = 280843L;
     private static final int PROCESS_ID = 134234;
 
@@ -44,8 +44,8 @@ public class JobExecutionUnitTests {
      */
     @Test
     public void canBuildJob() {
-        final JobExecution execution = new JobExecution.Builder(HOSTNAME, PROCESS_ID, CHECK_DELAY).build();
-        Assert.assertThat(execution.getHostname(), Matchers.is(HOSTNAME));
+        final JobExecution execution = new JobExecution.Builder(HOST_NAME, PROCESS_ID, CHECK_DELAY).build();
+        Assert.assertThat(execution.getHostName(), Matchers.is(HOST_NAME));
         Assert.assertThat(execution.getProcessId(), Matchers.is(PROCESS_ID));
         Assert.assertThat(execution.getCheckDelay(), Matchers.is(CHECK_DELAY));
         Assert.assertThat(execution.getExitCode(), Matchers.is(-1));
@@ -59,7 +59,7 @@ public class JobExecutionUnitTests {
      */
     @Test
     public void canBuildJobWithOptionals() {
-        final JobExecution.Builder builder = new JobExecution.Builder(HOSTNAME, PROCESS_ID, CHECK_DELAY);
+        final JobExecution.Builder builder = new JobExecution.Builder(HOST_NAME, PROCESS_ID, CHECK_DELAY);
 
         final int exitCode = 0;
         builder.withExitCode(exitCode);
@@ -74,7 +74,7 @@ public class JobExecutionUnitTests {
         builder.withUpdated(updated);
 
         final JobExecution execution = builder.build();
-        Assert.assertThat(execution.getHostname(), Matchers.is(HOSTNAME));
+        Assert.assertThat(execution.getHostName(), Matchers.is(HOST_NAME));
         Assert.assertThat(execution.getProcessId(), Matchers.is(PROCESS_ID));
         Assert.assertThat(execution.getCheckDelay(), Matchers.is(CHECK_DELAY));
         Assert.assertThat(execution.getExitCode(), Matchers.is(exitCode));
@@ -88,13 +88,13 @@ public class JobExecutionUnitTests {
      */
     @Test
     public void canBuildJobWithNulls() {
-        final JobExecution.Builder builder = new JobExecution.Builder(HOSTNAME, PROCESS_ID, CHECK_DELAY);
+        final JobExecution.Builder builder = new JobExecution.Builder(HOST_NAME, PROCESS_ID, CHECK_DELAY);
         builder.withCreated(null);
         builder.withId(null);
         builder.withUpdated(null);
 
         final JobExecution execution = builder.build();
-        Assert.assertThat(execution.getHostname(), Matchers.is(HOSTNAME));
+        Assert.assertThat(execution.getHostName(), Matchers.is(HOST_NAME));
         Assert.assertThat(execution.getProcessId(), Matchers.is(PROCESS_ID));
         Assert.assertThat(execution.getCheckDelay(), Matchers.is(CHECK_DELAY));
         Assert.assertThat(execution.getExitCode(), Matchers.is(-1));
@@ -108,7 +108,7 @@ public class JobExecutionUnitTests {
      */
     @Test
     public void canFindEquality() {
-        final JobExecution.Builder builder = new JobExecution.Builder(HOSTNAME, PROCESS_ID, CHECK_DELAY);
+        final JobExecution.Builder builder = new JobExecution.Builder(HOST_NAME, PROCESS_ID, CHECK_DELAY);
         builder.withCreated(null);
         builder.withId(UUID.randomUUID().toString());
         builder.withUpdated(null);
@@ -128,7 +128,7 @@ public class JobExecutionUnitTests {
      */
     @Test
     public void canUseHashCode() {
-        final JobExecution.Builder builder = new JobExecution.Builder(HOSTNAME, PROCESS_ID, CHECK_DELAY);
+        final JobExecution.Builder builder = new JobExecution.Builder(HOST_NAME, PROCESS_ID, CHECK_DELAY);
         builder.withCreated(null);
         builder.withId(UUID.randomUUID().toString());
         builder.withUpdated(null);

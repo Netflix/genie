@@ -306,7 +306,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         final JobExecutionEntity jobExecutionEntity = new JobExecutionEntity();
 
         jobExecutionEntity.setId(jobExecution.getId());
-        jobExecutionEntity.setHostname(jobExecution.getHostname());
+        jobExecutionEntity.setHostName(jobExecution.getHostName());
         jobExecutionEntity.setProcessId(jobExecution.getProcessId());
         jobExecutionEntity.setCheckDelay(jobExecution.getCheckDelay());
 

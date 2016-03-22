@@ -46,23 +46,23 @@ import java.io.IOException;
 @Slf4j
 public class LocalJobKillServiceImpl implements JobKillService {
 
-    private final String hostname;
+    private final String hostName;
     private final JobSearchService jobSearchService;
     private final Executor executor;
 
     /**
      * Constructor.
      *
-     * @param hostname         The name of the host this Genie node is running on
+     * @param hostName         The name of the host this Genie node is running on
      * @param jobSearchService The job search service to use to locate job information
      * @param executor         The executor to use to run system processes
      */
     public LocalJobKillServiceImpl(
-        @NotBlank final String hostname,
+        @NotBlank final String hostName,
         @NotNull final JobSearchService jobSearchService,
         @NotNull final Executor executor
     ) {
-        this.hostname = hostname;
+        this.hostName = hostName;
         this.jobSearchService = jobSearchService;
         this.executor = executor;
     }
@@ -80,14 +80,14 @@ public class LocalJobKillServiceImpl implements JobKillService {
             return;
         }
 
-        if (!this.hostname.equals(jobExecution.getHostname())) {
+        if (!this.hostName.equals(jobExecution.getHostName())) {
             throw new GeniePreconditionException(
                 "Job with id "
                     + id
                     + " is not running on this host ("
-                    + this.hostname
+                    + this.hostName
                     + "). It's actually on "
-                    + jobExecution.getHostname()
+                    + jobExecution.getHostName()
             );
         }
 

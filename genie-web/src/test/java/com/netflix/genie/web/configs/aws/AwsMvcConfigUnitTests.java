@@ -63,7 +63,7 @@ public class AwsMvcConfigUnitTests {
     public void canGetPublicHostname() throws IOException {
         final HttpClient client = Mockito.mock(HttpClient.class);
         final HttpResponse response = Mockito.mock(HttpResponse.class);
-        Mockito.when(client.execute(this.awsMvcConfig.publicHostnameGet)).thenReturn(response);
+        Mockito.when(client.execute(this.awsMvcConfig.publicHostNameGet)).thenReturn(response);
 
         final StatusLine statusLine = Mockito.mock(StatusLine.class);
         Mockito.when(response.getStatusLine()).thenReturn(statusLine);
@@ -75,9 +75,9 @@ public class AwsMvcConfigUnitTests {
         final ByteArrayInputStream bis = new ByteArrayInputStream(hostname.getBytes(Charset.forName("UTF-8")));
         Mockito.when(entity.getContent()).thenReturn(bis);
 
-        Assert.assertThat(this.awsMvcConfig.hostname(client), Matchers.is(hostname));
-        Mockito.verify(client, Mockito.times(1)).execute(awsMvcConfig.publicHostnameGet);
-        Mockito.verify(client, Mockito.never()).execute(awsMvcConfig.localIPV4HostnameGet);
+        Assert.assertThat(this.awsMvcConfig.hostName(client), Matchers.is(hostname));
+        Mockito.verify(client, Mockito.times(1)).execute(awsMvcConfig.publicHostNameGet);
+        Mockito.verify(client, Mockito.never()).execute(awsMvcConfig.localIPV4HostNameGet);
     }
 
     /**
@@ -89,14 +89,14 @@ public class AwsMvcConfigUnitTests {
     public void canGetIPv4Hostname() throws IOException {
         final HttpClient client = Mockito.mock(HttpClient.class);
         final HttpResponse response = Mockito.mock(HttpResponse.class);
-        Mockito.when(client.execute(this.awsMvcConfig.publicHostnameGet)).thenReturn(response);
+        Mockito.when(client.execute(this.awsMvcConfig.publicHostNameGet)).thenReturn(response);
 
         final StatusLine statusLine = Mockito.mock(StatusLine.class);
         Mockito.when(response.getStatusLine()).thenReturn(statusLine);
         Mockito.when(statusLine.getStatusCode()).thenReturn(HttpStatus.SC_NOT_FOUND);
 
         final HttpResponse ip4Response = Mockito.mock(HttpResponse.class);
-        Mockito.when(client.execute(this.awsMvcConfig.localIPV4HostnameGet)).thenReturn(ip4Response);
+        Mockito.when(client.execute(this.awsMvcConfig.localIPV4HostNameGet)).thenReturn(ip4Response);
 
         final StatusLine ip4StatusLine = Mockito.mock(StatusLine.class);
         Mockito.when(ip4Response.getStatusLine()).thenReturn(ip4StatusLine);
@@ -108,9 +108,9 @@ public class AwsMvcConfigUnitTests {
         final ByteArrayInputStream bis = new ByteArrayInputStream(hostname.getBytes(Charset.forName("UTF-8")));
         Mockito.when(entity.getContent()).thenReturn(bis);
 
-        Assert.assertThat(this.awsMvcConfig.hostname(client), Matchers.is(hostname));
-        Mockito.verify(client, Mockito.times(1)).execute(awsMvcConfig.publicHostnameGet);
-        Mockito.verify(client, Mockito.times(1)).execute(awsMvcConfig.localIPV4HostnameGet);
+        Assert.assertThat(this.awsMvcConfig.hostName(client), Matchers.is(hostname));
+        Mockito.verify(client, Mockito.times(1)).execute(awsMvcConfig.publicHostNameGet);
+        Mockito.verify(client, Mockito.times(1)).execute(awsMvcConfig.localIPV4HostNameGet);
     }
 
     /**
@@ -122,19 +122,19 @@ public class AwsMvcConfigUnitTests {
     public void cantGetHostname() throws IOException {
         final HttpClient client = Mockito.mock(HttpClient.class);
         final HttpResponse response = Mockito.mock(HttpResponse.class);
-        Mockito.when(client.execute(this.awsMvcConfig.publicHostnameGet)).thenReturn(response);
+        Mockito.when(client.execute(this.awsMvcConfig.publicHostNameGet)).thenReturn(response);
 
         final StatusLine statusLine = Mockito.mock(StatusLine.class);
         Mockito.when(response.getStatusLine()).thenReturn(statusLine);
         Mockito.when(statusLine.getStatusCode()).thenReturn(HttpStatus.SC_NOT_FOUND);
 
         final HttpResponse ip4Response = Mockito.mock(HttpResponse.class);
-        Mockito.when(client.execute(this.awsMvcConfig.localIPV4HostnameGet)).thenReturn(ip4Response);
+        Mockito.when(client.execute(this.awsMvcConfig.localIPV4HostNameGet)).thenReturn(ip4Response);
 
         final StatusLine ip4StatusLine = Mockito.mock(StatusLine.class);
         Mockito.when(ip4Response.getStatusLine()).thenReturn(ip4StatusLine);
         Mockito.when(ip4StatusLine.getStatusCode()).thenReturn(HttpStatus.SC_BAD_REQUEST);
 
-        this.awsMvcConfig.hostname(client);
+        this.awsMvcConfig.hostName(client);
     }
 }

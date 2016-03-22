@@ -361,12 +361,12 @@ CREATE TABLE `job_executions` (
   `created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `entity_version` INT(11) NOT NULL DEFAULT 0,
-  `hostname` VARCHAR(255) NOT NULL,
+  `host_name` VARCHAR(255) NOT NULL,
   `process_id` INT(11) NOT NULL,
   `exit_code` INT(11) NOT NULL DEFAULT -1,
   `check_delay` BIGINT NOT NULL DEFAULT 10000,
   FOREIGN KEY (`id`) REFERENCES `jobs` (`id`) ON DELETE CASCADE,
-  INDEX `JOB_EXECUTIONS_HOSTNAME_INDEX` (`hostname`),
+  INDEX `JOB_EXECUTIONS_HOSTNAME_INDEX` (`host_name`),
   INDEX `JOB_EXECUTIONS_EXIT_CODE_INDEX` (`exit_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully created the job_executions table.' AS '';
@@ -377,7 +377,7 @@ INSERT INTO `job_executions` (
   `created`,
   `updated`,
   `entity_version`,
-  `hostname`,
+  `host_name`,
   `process_id`,
   `exit_code`
 ) SELECT

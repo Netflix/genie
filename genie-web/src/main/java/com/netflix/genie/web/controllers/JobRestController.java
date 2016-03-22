@@ -118,7 +118,7 @@ public class JobRestController {
     private final JobRequestResourceAssembler jobRequestResourceAssembler;
     private final JobExecutionResourceAssembler jobExecutionResourceAssembler;
     private final JobSearchResultResourceAssembler jobSearchResultResourceAssembler;
-    private final String hostname;
+    private final String hostName;
     private final HttpClient httpClient;
     private final GenieResourceHttpRequestHandler resourceHttpRequestHandler;
     private final boolean forwardingEnabled;
@@ -136,7 +136,7 @@ public class JobRestController {
      * @param jobRequestResourceAssembler      Assemble job request resources out of job requests
      * @param jobExecutionResourceAssembler    Assemble job execution resources out of job executions
      * @param jobSearchResultResourceAssembler Assemble job search resources out of jobs
-     * @param hostname                         The hostname this Genie instance is running on
+     * @param hostName                         The hostname this Genie instance is running on
      * @param httpClient                       The http client to use for forwarding requests
      * @param resourceHttpRequestHandler       The handler to return requests for static resources on the
      *                                         Genie File System.
@@ -154,7 +154,7 @@ public class JobRestController {
         final JobRequestResourceAssembler jobRequestResourceAssembler,
         final JobExecutionResourceAssembler jobExecutionResourceAssembler,
         final JobSearchResultResourceAssembler jobSearchResultResourceAssembler,
-        final String hostname,
+        final String hostName,
         final HttpClient httpClient,
         final GenieResourceHttpRequestHandler resourceHttpRequestHandler,
         @Value("${genie.jobs.forwarding.enabled}") final boolean forwardingEnabled
@@ -169,7 +169,7 @@ public class JobRestController {
         this.jobRequestResourceAssembler = jobRequestResourceAssembler;
         this.jobExecutionResourceAssembler = jobExecutionResourceAssembler;
         this.jobSearchResultResourceAssembler = jobSearchResultResourceAssembler;
-        this.hostname = hostname;
+        this.hostName = hostName;
         this.httpClient = httpClient;
         this.resourceHttpRequestHandler = resourceHttpRequestHandler;
         this.forwardingEnabled = forwardingEnabled;
@@ -463,7 +463,7 @@ public class JobRestController {
         // If forwarded from is null this request hasn't been forwarded at all. Check we're on the right node
         if (this.forwardingEnabled && forwardedFrom == null) {
             final String jobHostname = this.jobSearchService.getJobHost(id);
-            if (!this.hostname.equals(jobHostname)) {
+            if (!this.hostName.equals(jobHostname)) {
                 //Need to forward job
                 final HttpDelete deleteRequest = new HttpDelete(this.buildForwardURL(request, jobHostname));
                 this.copyRequestHeaders(request, deleteRequest);
@@ -595,7 +595,7 @@ public class JobRestController {
             //       However that could get into problems where the job finished or died
             //       and it would return false on check if the job with given id is running on that node
             final String jobHostname = this.jobSearchService.getJobHost(id);
-            if (!this.hostname.equals(jobHostname)) {
+            if (!this.hostName.equals(jobHostname)) {
                 // Use Apache HttpClient for easier access to result bytes as stream than RestTemplate
                 // RestTemplate read entire byte[] payload into memory before the result object even given back to
                 // application control. Concerned about people getting stdout which could be huge file.
