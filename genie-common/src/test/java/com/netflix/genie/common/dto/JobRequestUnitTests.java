@@ -84,6 +84,7 @@ public class JobRequestUnitTests {
         Assert.assertThat(request.getId(), Matchers.nullValue());
         Assert.assertThat(request.getTags(), Matchers.empty());
         Assert.assertThat(request.getUpdated(), Matchers.nullValue());
+        Assert.assertThat(request.getApplications(), Matchers.empty());
     }
 
     /**
@@ -138,6 +139,14 @@ public class JobRequestUnitTests {
         final Date updated = new Date();
         builder.withUpdated(updated);
 
+        final List<String> applications = Lists.newArrayList(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
+        );
+        builder.withApplications(applications);
+
         final JobRequest request = builder.build();
         Assert.assertThat(request.getName(), Matchers.is(NAME));
         Assert.assertThat(request.getUser(), Matchers.is(USER));
@@ -157,6 +166,7 @@ public class JobRequestUnitTests {
         Assert.assertThat(request.getId(), Matchers.is(id));
         Assert.assertThat(request.getTags(), Matchers.is(tags));
         Assert.assertThat(request.getUpdated(), Matchers.is(updated));
+        Assert.assertThat(request.getApplications(), Matchers.is(applications));
     }
 
     /**
@@ -175,6 +185,7 @@ public class JobRequestUnitTests {
         builder.withId(null);
         builder.withTags(null);
         builder.withUpdated(null);
+        builder.withApplications(null);
 
         final JobRequest request = builder.build();
         Assert.assertThat(request.getName(), Matchers.is(NAME));
@@ -195,6 +206,7 @@ public class JobRequestUnitTests {
         Assert.assertThat(request.getId(), Matchers.nullValue());
         Assert.assertThat(request.getTags(), Matchers.empty());
         Assert.assertThat(request.getUpdated(), Matchers.nullValue());
+        Assert.assertThat(request.getApplications(), Matchers.empty());
     }
 
     /**
@@ -213,6 +225,7 @@ public class JobRequestUnitTests {
         builder.withId(UUID.randomUUID().toString());
         builder.withTags(null);
         builder.withUpdated(null);
+        builder.withApplications(null);
 
         final JobRequest jobRequest1 = builder.build();
         final JobRequest jobRequest2 = builder.build();
@@ -240,6 +253,7 @@ public class JobRequestUnitTests {
         builder.withId(UUID.randomUUID().toString());
         builder.withTags(null);
         builder.withUpdated(null);
+        builder.withApplications(null);
 
         final JobRequest jobRequest1 = builder.build();
         final JobRequest jobRequest2 = builder.build();

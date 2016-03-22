@@ -43,7 +43,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
@@ -83,7 +82,6 @@ public class JpaApplicationServiceImpl implements ApplicationService {
      * @param applicationRepo The application repository to use
      * @param commandRepo     The command repository to use
      */
-    @Autowired
     public JpaApplicationServiceImpl(
         final JpaApplicationRepository applicationRepo,
         final JpaCommandRepository commandRepo
@@ -136,16 +134,17 @@ public class JpaApplicationServiceImpl implements ApplicationService {
     @Transactional(readOnly = true)
     public Page<Application> getApplications(
         final String name,
-        final String userName,
+        final String user,
         final Set<ApplicationStatus> statuses,
         final Set<String> tags,
+        final String type,
         final Pageable page
     ) {
         log.debug("Called");
 
         @SuppressWarnings("unchecked")
         final Page<ApplicationEntity> applicationEntities
-            = this.applicationRepo.findAll(JpaApplicationSpecs.find(name, userName, statuses, tags), page);
+            = this.applicationRepo.findAll(JpaApplicationSpecs.find(name, user, statuses, tags, type), page);
 
         return applicationEntities.map(ApplicationEntity::getDTO);
     }
@@ -473,6 +472,7 @@ public class JpaApplicationServiceImpl implements ApplicationService {
         entity.setConfigs(dto.getConfigs());
         entity.setDependencies(dto.getDependencies());
         entity.setTags(dto.getTags());
+        entity.setType(dto.getType());
 
         this.applicationRepo.save(entity);
     }

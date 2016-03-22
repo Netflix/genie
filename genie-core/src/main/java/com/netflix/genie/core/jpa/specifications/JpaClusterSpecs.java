@@ -61,11 +61,12 @@ public final class JpaClusterSpecs {
      * @return The specification
      */
     public static Specification<ClusterEntity> find(
-            final String name,
-            final Set<ClusterStatus> statuses,
-            final Set<String> tags,
-            final Date minUpdateTime,
-            final Date maxUpdateTime) {
+        final String name,
+        final Set<ClusterStatus> statuses,
+        final Set<String> tags,
+        final Date minUpdateTime,
+        final Date maxUpdateTime
+    ) {
         return (final Root<ClusterEntity> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
             final List<Predicate> predicates = new ArrayList<>();
             if (StringUtils.isNotBlank(name)) {
@@ -79,19 +80,19 @@ public final class JpaClusterSpecs {
             }
             if (tags != null && !tags.isEmpty()) {
                 predicates.add(
-                        cb.like(
-                                root.get(ClusterEntity_.tags),
-                                JpaSpecificationUtils.getTagLikeString(tags)
-                        )
+                    cb.like(
+                        root.get(ClusterEntity_.tags),
+                        JpaSpecificationUtils.getTagLikeString(tags)
+                    )
                 );
             }
             if (statuses != null && !statuses.isEmpty()) {
                 //Could optimize this as we know size could use native array
                 final List<Predicate> orPredicates =
-                        statuses
-                                .stream()
-                                .map(status -> cb.equal(root.get(ClusterEntity_.status), status))
-                                .collect(Collectors.toList());
+                    statuses
+                        .stream()
+                        .map(status -> cb.equal(root.get(ClusterEntity_.status), status))
+                        .collect(Collectors.toList());
                 predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
             }
 
@@ -107,8 +108,9 @@ public final class JpaClusterSpecs {
      * @return The specification
      */
     public static Specification<ClusterEntity> findByClusterAndCommandCriteria(
-            final ClusterCriteria clusterCriteria,
-            final Set<String> commandCriteria) {
+        final ClusterCriteria clusterCriteria,
+        final Set<String> commandCriteria
+    ) {
         return (final Root<ClusterEntity> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
             final List<Predicate> predicates = new ArrayList<>();
             final Join<ClusterEntity, CommandEntity> commands = root.join(ClusterEntity_.commands);
@@ -120,19 +122,19 @@ public final class JpaClusterSpecs {
 
             if (commandCriteria != null && !commandCriteria.isEmpty()) {
                 predicates.add(
-                        cb.like(
-                                commands.get(CommandEntity_.tags),
-                                JpaSpecificationUtils.getTagLikeString(commandCriteria)
-                        )
+                    cb.like(
+                        commands.get(CommandEntity_.tags),
+                        JpaSpecificationUtils.getTagLikeString(commandCriteria)
+                    )
                 );
             }
 
             if (clusterCriteria != null && clusterCriteria.getTags() != null && !clusterCriteria.getTags().isEmpty()) {
                 predicates.add(
-                        cb.like(
-                                root.get(ClusterEntity_.tags),
-                                JpaSpecificationUtils.getTagLikeString(clusterCriteria.getTags())
-                        )
+                    cb.like(
+                        root.get(ClusterEntity_.tags),
+                        JpaSpecificationUtils.getTagLikeString(clusterCriteria.getTags())
+                    )
                 );
             }
 
@@ -148,8 +150,8 @@ public final class JpaClusterSpecs {
      * @return The specification
      */
     public static Specification<ClusterEntity> findClustersForCommand(
-            final String commandId,
-            final Set<ClusterStatus> statuses) {
+        final String commandId,
+        final Set<ClusterStatus> statuses) {
         return (final Root<ClusterEntity> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
             final List<Predicate> predicates = new ArrayList<>();
             final Join<ClusterEntity, CommandEntity> commands = root.join(ClusterEntity_.commands);
@@ -159,9 +161,9 @@ public final class JpaClusterSpecs {
             if (statuses != null && !statuses.isEmpty()) {
                 //Could optimize this as we know size could use native array
                 final List<Predicate> orPredicates =
-                        statuses.stream()
-                                .map(status -> cb.equal(root.get(ClusterEntity_.status), status))
-                                .collect(Collectors.toList());
+                    statuses.stream()
+                        .map(status -> cb.equal(root.get(ClusterEntity_.status), status))
+                        .collect(Collectors.toList());
                 predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
             }
 

@@ -47,7 +47,7 @@ public class BaseEntity implements Serializable {
     private static final long serialVersionUID = 7526472297322776147L;
 
     @Id
-    @Column(name = "id", updatable = false, length = 255)
+    @Column(name = "id", updatable = false)
     @Length(max = 255, message = "Max length in database is 255 characters")
     private String id;
 

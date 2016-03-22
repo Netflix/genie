@@ -54,9 +54,9 @@ public class JobExecutionEntityUnitTests {
      */
     @Test
     public void canSetHostName() {
-        final String hostname = UUID.randomUUID().toString();
-        this.entity.setHostname(hostname);
-        Assert.assertThat(this.entity.getHostname(), Matchers.is(hostname));
+        final String hostName = UUID.randomUUID().toString();
+        this.entity.setHostName(hostName);
+        Assert.assertThat(this.entity.getHostName(), Matchers.is(hostName));
     }
 
     /**
@@ -111,7 +111,7 @@ public class JobExecutionEntityUnitTests {
     @Test
     public void canGetDTO() throws GenieException {
         final String hostName = UUID.randomUUID().toString();
-        this.entity.setHostname(hostName);
+        this.entity.setHostName(hostName);
         final int processId = 29038;
         this.entity.setProcessId(processId);
         final long checkDelay = 1890347L;
@@ -124,7 +124,7 @@ public class JobExecutionEntityUnitTests {
         Assert.assertThat(execution.getCreated(), Matchers.is(this.entity.getCreated()));
         Assert.assertThat(execution.getUpdated(), Matchers.is(this.entity.getUpdated()));
         Assert.assertThat(execution.getExitCode(), Matchers.is(exitCode));
-        Assert.assertThat(execution.getHostname(), Matchers.is(hostName));
+        Assert.assertThat(execution.getHostName(), Matchers.is(hostName));
         Assert.assertThat(execution.getProcessId(), Matchers.is(processId));
         Assert.assertThat(execution.getCheckDelay(), Matchers.is(checkDelay));
     }

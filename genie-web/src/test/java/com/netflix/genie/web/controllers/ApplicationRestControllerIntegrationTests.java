@@ -53,8 +53,10 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
     private static final String NAME = "spark";
     private static final String USER = "genie";
     private static final String VERSION = "0.15.0";
+    private static final String TYPE = "spark";
 
     private static final String DEPENDENCIES_PATH = "$.dependencies";
+    private static final String TYPE_PATH = "$.type";
 
     private static final String APPLICATIONS_LIST_PATH = EMBEDDED_PATH + ".applicationList";
 
@@ -86,7 +88,8 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             NAME,
             USER,
             VERSION,
-            ApplicationStatus.ACTIVE
+            ApplicationStatus.ACTIVE,
+            TYPE
         );
 
         this.mvc
@@ -107,6 +110,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             .andExpect(MockMvcResultMatchers.jsonPath(TAGS_PATH, Matchers.hasItem("genie.name:" + NAME)))
             .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(ApplicationStatus.ACTIVE.toString())))
             .andExpect(MockMvcResultMatchers.jsonPath(DEPENDENCIES_PATH, Matchers.empty()))
+            .andExpect(MockMvcResultMatchers.jsonPath(TYPE_PATH, Matchers.is(TYPE)))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH + ".*", Matchers.hasSize(2)))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(SELF_LINK_KEY)))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(COMMANDS_LINK_KEY)));
@@ -127,7 +131,8 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             NAME,
             USER,
             VERSION,
-            ApplicationStatus.ACTIVE
+            ApplicationStatus.ACTIVE,
+            null
         );
 
         this.mvc
@@ -148,6 +153,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             .andExpect(MockMvcResultMatchers.jsonPath(TAGS_PATH, Matchers.hasItem("genie.name:" + NAME)))
             .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(ApplicationStatus.ACTIVE.toString())))
             .andExpect(MockMvcResultMatchers.jsonPath(DEPENDENCIES_PATH, Matchers.empty()))
+            .andExpect(MockMvcResultMatchers.jsonPath(TYPE_PATH, Matchers.nullValue()))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH + ".*", Matchers.hasSize(2)))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(SELF_LINK_KEY)))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(COMMANDS_LINK_KEY)));
@@ -193,12 +199,15 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
         final String version1 = UUID.randomUUID().toString();
         final String version2 = UUID.randomUUID().toString();
         final String version3 = UUID.randomUUID().toString();
+        final String type1 = UUID.randomUUID().toString();
+        final String type2 = UUID.randomUUID().toString();
+        final String type3 = UUID.randomUUID().toString();
 
-        createApplication(id1, name1, user1, version1, ApplicationStatus.ACTIVE);
+        createApplication(id1, name1, user1, version1, ApplicationStatus.ACTIVE, type1);
         Thread.sleep(1000);
-        createApplication(id2, name2, user2, version2, ApplicationStatus.DEPRECATED);
+        createApplication(id2, name2, user2, version2, ApplicationStatus.DEPRECATED, type2);
         Thread.sleep(1000);
-        createApplication(id3, name3, user3, version3, ApplicationStatus.INACTIVE);
+        createApplication(id3, name3, user3, version3, ApplicationStatus.INACTIVE, type3);
 
         // Test finding all applications
         this.mvc
@@ -224,7 +233,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
 
         // Query by user
         this.mvc
-            .perform(MockMvcRequestBuilders.get(APPLICATIONS_API).param("userName", user3))
+            .perform(MockMvcRequestBuilders.get(APPLICATIONS_API).param("user", user3))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath(APPLICATIONS_LIST_PATH, Matchers.hasSize(1)))
@@ -251,6 +260,14 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             .andExpect(MockMvcResultMatchers.jsonPath(APPLICATIONS_LIST_PATH, Matchers.hasSize(1)))
             .andExpect(MockMvcResultMatchers.jsonPath(APPLICATIONS_LIST_PATH + "[0].id", Matchers.is(id1)));
 
+        // Query by type
+        this.mvc
+            .perform(MockMvcRequestBuilders.get(APPLICATIONS_API).param("type", type2))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.jsonPath(APPLICATIONS_LIST_PATH, Matchers.hasSize(1)))
+            .andExpect(MockMvcResultMatchers.jsonPath(APPLICATIONS_LIST_PATH + "[0].id", Matchers.is(id2)));
+
         //TODO: Add tests for sort, orderBy etc
 
         Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(3L));
@@ -264,7 +281,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
     @Test
     public void canUpdateApplication() throws Exception {
         Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
-        final String id = this.createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE);
+        final String id = this.createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE, null);
         final String applicationResource = APPLICATIONS_API + "/" + id;
         final Application createdApp = OBJECT_MAPPER
             .readValue(
@@ -317,7 +334,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
     @Test
     public void canPatchApplication() throws Exception {
         Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
-        final String id = this.createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE);
+        final String id = this.createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE, null);
         final String applicationResource = APPLICATIONS_API + "/" + id;
         this.mvc
             .perform(MockMvcRequestBuilders.get(applicationResource))
@@ -352,9 +369,9 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
     @Test
     public void canDeleteAllApplications() throws Exception {
         Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
-        createApplication(null, NAME, USER, VERSION, ApplicationStatus.ACTIVE);
-        createApplication(null, NAME, USER, VERSION, ApplicationStatus.DEPRECATED);
-        createApplication(null, NAME, USER, VERSION, ApplicationStatus.INACTIVE);
+        createApplication(null, NAME, USER, VERSION, ApplicationStatus.ACTIVE, null);
+        createApplication(null, NAME, USER, VERSION, ApplicationStatus.DEPRECATED, null);
+        createApplication(null, NAME, USER, VERSION, ApplicationStatus.INACTIVE, null);
         Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(3L));
 
         this.mvc
@@ -385,9 +402,9 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
         final String version2 = UUID.randomUUID().toString();
         final String version3 = UUID.randomUUID().toString();
 
-        createApplication(id1, name1, user1, version1, ApplicationStatus.ACTIVE);
-        createApplication(id2, name2, user2, version2, ApplicationStatus.DEPRECATED);
-        createApplication(id3, name3, user3, version3, ApplicationStatus.INACTIVE);
+        createApplication(id1, name1, user1, version1, ApplicationStatus.ACTIVE, null);
+        createApplication(id2, name2, user2, version2, ApplicationStatus.DEPRECATED, null);
+        createApplication(id3, name3, user3, version3, ApplicationStatus.INACTIVE, null);
         Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(3L));
 
         this.mvc
@@ -409,7 +426,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
     @Test
     public void canAddConfigsToApplication() throws Exception {
         Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
-        createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE);
+        createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE, null);
         this.canAddElementsToResource(APPLICATIONS_API + "/" + ID + "/configs");
     }
 
@@ -421,7 +438,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
     @Test
     public void canUpdateConfigsForApplication() throws Exception {
         Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
-        createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE);
+        createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE, null);
         this.canUpdateElementsForResource(APPLICATIONS_API + "/" + ID + "/configs");
     }
 
@@ -433,7 +450,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
     @Test
     public void canDeleteConfigsForApplication() throws Exception {
         Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
-        createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE);
+        createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE, null);
         this.canDeleteElementsFromResource(APPLICATIONS_API + "/" + ID + "/configs");
     }
 
@@ -445,7 +462,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
     @Test
     public void canAddDependenciesToApplication() throws Exception {
         Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
-        createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE);
+        createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE, null);
         this.canAddElementsToResource(APPLICATIONS_API + "/" + ID + "/dependencies");
     }
 
@@ -457,7 +474,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
     @Test
     public void canUpdateDependenciesForApplication() throws Exception {
         Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
-        createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE);
+        createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE, null);
         this.canUpdateElementsForResource(APPLICATIONS_API + "/" + ID + "/dependencies");
     }
 
@@ -469,7 +486,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
     @Test
     public void canDeleteDependenciesForApplication() throws Exception {
         Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
-        createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE);
+        createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE, null);
         this.canDeleteElementsFromResource(APPLICATIONS_API + "/" + ID + "/dependencies");
     }
 
@@ -481,7 +498,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
     @Test
     public void canAddTagsToApplication() throws Exception {
         Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
-        createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE);
+        createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE, null);
         final String api = APPLICATIONS_API + "/" + ID + "/tags";
         this.canAddTagsToResource(api, ID, NAME);
     }
@@ -494,7 +511,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
     @Test
     public void canUpdateTagsForApplication() throws Exception {
         Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
-        createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE);
+        createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE, null);
         final String api = APPLICATIONS_API + "/" + ID + "/tags";
         this.canUpdateTagsForResource(api, ID, NAME);
     }
@@ -507,7 +524,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
     @Test
     public void canDeleteTagsForApplication() throws Exception {
         Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
-        createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE);
+        createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE, null);
         final String api = APPLICATIONS_API + "/" + ID + "/tags";
         this.canDeleteTagsForResource(api, ID, NAME);
     }
@@ -520,7 +537,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
     @Test
     public void canDeleteTagForApplication() throws Exception {
         Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
-        createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE);
+        createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE, null);
         final String api = APPLICATIONS_API + "/" + ID + "/tags";
         this.canDeleteTagForResource(api, ID, NAME);
     }
@@ -532,7 +549,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
      */
     @Test
     public void canGetCommandsForApplication() throws Exception {
-        createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE);
+        createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE, null);
         final String placeholder = UUID.randomUUID().toString();
         final String command1Id = UUID.randomUUID().toString();
         final String command2Id = UUID.randomUUID().toString();

@@ -33,6 +33,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Tests for the application specifications.
@@ -49,6 +50,7 @@ public class JpaApplicationSpecsUnitTests {
     private static final String TAG_3 = "hadoop";
     private static final Set<String> TAGS = new HashSet<>();
     private static final Set<ApplicationStatus> STATUSES = new HashSet<>();
+    private static final String TYPE = UUID.randomUUID().toString();
 
     private Root<ApplicationEntity> root;
     private CriteriaQuery<?> cq;
@@ -74,17 +76,15 @@ public class JpaApplicationSpecsUnitTests {
         this.cq = Mockito.mock(CriteriaQuery.class);
         this.cb = Mockito.mock(CriteriaBuilder.class);
 
-        final Path<String> commandNamePath = (Path<String>) Mockito.mock(Path.class);
+        final Path<String> namePath = (Path<String>) Mockito.mock(Path.class);
         final Predicate equalNamePredicate = Mockito.mock(Predicate.class);
-        Mockito.when(this.root.get(ApplicationEntity_.name)).thenReturn(commandNamePath);
-        Mockito.when(this.cb.equal(commandNamePath, NAME))
-                .thenReturn(equalNamePredicate);
+        Mockito.when(this.root.get(ApplicationEntity_.name)).thenReturn(namePath);
+        Mockito.when(this.cb.equal(namePath, NAME)).thenReturn(equalNamePredicate);
 
         final Path<String> userNamePath = (Path<String>) Mockito.mock(Path.class);
         final Predicate equalUserNamePredicate = Mockito.mock(Predicate.class);
         Mockito.when(this.root.get(ApplicationEntity_.user)).thenReturn(userNamePath);
-        Mockito.when(this.cb.equal(userNamePath, USER_NAME))
-                .thenReturn(equalUserNamePredicate);
+        Mockito.when(this.cb.equal(userNamePath, USER_NAME)).thenReturn(equalUserNamePredicate);
 
         final Path<ApplicationStatus> statusPath = (Path<ApplicationStatus>) Mockito.mock(Path.class);
         final Predicate equalStatusPredicate = Mockito.mock(Predicate.class);
@@ -99,6 +99,11 @@ public class JpaApplicationSpecsUnitTests {
                 .thenReturn(likeTagPredicate);
 
         this.tagLikeStatement = JpaSpecificationUtils.getTagLikeString(TAGS);
+
+        final Path<String> typePath = (Path<String>) Mockito.mock(Path.class);
+        final Predicate typePredicate = Mockito.mock(Predicate.class);
+        Mockito.when(this.root.get(ApplicationEntity_.type)).thenReturn(typePath);
+        Mockito.when(this.cb.equal(typePath, TYPE)).thenReturn(typePredicate);
     }
 
     /**
@@ -106,20 +111,16 @@ public class JpaApplicationSpecsUnitTests {
      */
     @Test
     public void testFindAll() {
-        final Specification<ApplicationEntity> spec = JpaApplicationSpecs
-                .find(NAME, USER_NAME, STATUSES, TAGS);
+        final Specification<ApplicationEntity> spec = JpaApplicationSpecs.find(NAME, USER_NAME, STATUSES, TAGS, TYPE);
 
         spec.toPredicate(this.root, this.cq, this.cb);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(ApplicationEntity_.name), NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(ApplicationEntity_.user), USER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.name), NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.user), USER_NAME);
         for (final ApplicationStatus status : STATUSES) {
-            Mockito.verify(this.cb, Mockito.times(1))
-                    .equal(this.root.get(ApplicationEntity_.status), status);
+            Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.status), status);
         }
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(ApplicationEntity_.tags), this.tagLikeStatement);
+        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(ApplicationEntity_.tags), this.tagLikeStatement);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.type), TYPE);
     }
 
     /**
@@ -127,20 +128,16 @@ public class JpaApplicationSpecsUnitTests {
      */
     @Test
     public void testFindNoName() {
-        final Specification<ApplicationEntity> spec = JpaApplicationSpecs
-                .find(null, USER_NAME, STATUSES, TAGS);
+        final Specification<ApplicationEntity> spec = JpaApplicationSpecs.find(null, USER_NAME, STATUSES, TAGS, TYPE);
 
         spec.toPredicate(this.root, this.cq, this.cb);
-        Mockito.verify(this.cb, Mockito.never())
-                .equal(this.root.get(ApplicationEntity_.name), NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(ApplicationEntity_.user), USER_NAME);
+        Mockito.verify(this.cb, Mockito.never()).equal(this.root.get(ApplicationEntity_.name), NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.user), USER_NAME);
         for (final ApplicationStatus status : STATUSES) {
-            Mockito.verify(this.cb, Mockito.times(1))
-                    .equal(this.root.get(ApplicationEntity_.status), status);
+            Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.status), status);
         }
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(ApplicationEntity_.tags), this.tagLikeStatement);
+        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(ApplicationEntity_.tags), this.tagLikeStatement);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.type), TYPE);
     }
 
     /**
@@ -148,20 +145,16 @@ public class JpaApplicationSpecsUnitTests {
      */
     @Test
     public void testFindNoUserName() {
-        final Specification<ApplicationEntity> spec = JpaApplicationSpecs
-                .find(NAME, null, STATUSES, TAGS);
+        final Specification<ApplicationEntity> spec = JpaApplicationSpecs.find(NAME, null, STATUSES, TAGS, TYPE);
 
         spec.toPredicate(this.root, this.cq, this.cb);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(ApplicationEntity_.name), NAME);
-        Mockito.verify(this.cb, Mockito.never())
-                .equal(this.root.get(ApplicationEntity_.user), USER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.name), NAME);
+        Mockito.verify(this.cb, Mockito.never()).equal(this.root.get(ApplicationEntity_.user), USER_NAME);
         for (final ApplicationStatus status : STATUSES) {
-            Mockito.verify(this.cb, Mockito.times(1))
-                    .equal(this.root.get(ApplicationEntity_.status), status);
+            Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.status), status);
         }
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(ApplicationEntity_.tags), this.tagLikeStatement);
+        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(ApplicationEntity_.tags), this.tagLikeStatement);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.type), TYPE);
     }
 
     /**
@@ -169,20 +162,16 @@ public class JpaApplicationSpecsUnitTests {
      */
     @Test
     public void testFindNoStatuses() {
-        final Specification<ApplicationEntity> spec = JpaApplicationSpecs
-                .find(NAME, USER_NAME, null, TAGS);
+        final Specification<ApplicationEntity> spec = JpaApplicationSpecs.find(NAME, USER_NAME, null, TAGS, TYPE);
 
         spec.toPredicate(this.root, this.cq, this.cb);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(ApplicationEntity_.name), NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(ApplicationEntity_.user), USER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.name), NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.user), USER_NAME);
         for (final ApplicationStatus status : STATUSES) {
-            Mockito.verify(this.cb, Mockito.never())
-                    .equal(this.root.get(ApplicationEntity_.status), status);
+            Mockito.verify(this.cb, Mockito.never()).equal(this.root.get(ApplicationEntity_.status), status);
         }
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(ApplicationEntity_.tags), this.tagLikeStatement);
+        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(ApplicationEntity_.tags), this.tagLikeStatement);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.type), TYPE);
     }
 
     /**
@@ -190,20 +179,17 @@ public class JpaApplicationSpecsUnitTests {
      */
     @Test
     public void testFindEmptyStatuses() {
-        final Specification<ApplicationEntity> spec = JpaApplicationSpecs
-                .find(NAME, USER_NAME, new HashSet<>(), TAGS);
+        final Specification<ApplicationEntity> spec
+            = JpaApplicationSpecs.find(NAME, USER_NAME, new HashSet<>(), TAGS, TYPE);
 
         spec.toPredicate(this.root, this.cq, this.cb);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(ApplicationEntity_.name), NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(ApplicationEntity_.user), USER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.name), NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.user), USER_NAME);
         for (final ApplicationStatus status : STATUSES) {
-            Mockito.verify(this.cb, Mockito.never())
-                    .equal(this.root.get(ApplicationEntity_.status), status);
+            Mockito.verify(this.cb, Mockito.never()).equal(this.root.get(ApplicationEntity_.status), status);
         }
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(ApplicationEntity_.tags), this.tagLikeStatement);
+        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(ApplicationEntity_.tags), this.tagLikeStatement);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.type), TYPE);
     }
 
     /**
@@ -211,20 +197,16 @@ public class JpaApplicationSpecsUnitTests {
      */
     @Test
     public void testFindNoTags() {
-        final Specification<ApplicationEntity> spec = JpaApplicationSpecs
-                .find(NAME, USER_NAME, STATUSES, null);
+        final Specification<ApplicationEntity> spec = JpaApplicationSpecs.find(NAME, USER_NAME, STATUSES, null, TYPE);
 
         spec.toPredicate(this.root, this.cq, this.cb);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(ApplicationEntity_.name), NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(ApplicationEntity_.user), USER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.name), NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.user), USER_NAME);
         for (final ApplicationStatus status : STATUSES) {
-            Mockito.verify(this.cb, Mockito.times(1))
-                    .equal(this.root.get(ApplicationEntity_.status), status);
+            Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.status), status);
         }
-        Mockito.verify(this.cb, Mockito.never())
-                .like(this.root.get(ApplicationEntity_.tags), this.tagLikeStatement);
+        Mockito.verify(this.cb, Mockito.never()).like(this.root.get(ApplicationEntity_.tags), this.tagLikeStatement);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.type), TYPE);
     }
 
     /**
@@ -233,20 +215,33 @@ public class JpaApplicationSpecsUnitTests {
     @Test
     public void testFindEmptyTag() {
         TAGS.add("");
-        final Specification<ApplicationEntity> spec = JpaApplicationSpecs
-                .find(NAME, USER_NAME, STATUSES, TAGS);
+        final Specification<ApplicationEntity> spec = JpaApplicationSpecs.find(NAME, USER_NAME, STATUSES, TAGS, TYPE);
 
         spec.toPredicate(this.root, this.cq, this.cb);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(ApplicationEntity_.name), NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(ApplicationEntity_.user), USER_NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.name), NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.user), USER_NAME);
         for (final ApplicationStatus status : STATUSES) {
-            Mockito.verify(this.cb, Mockito.times(1))
-                    .equal(this.root.get(ApplicationEntity_.status), status);
+            Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.status), status);
         }
-        Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(ApplicationEntity_.tags), this.tagLikeStatement);
+        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(ApplicationEntity_.tags), this.tagLikeStatement);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.type), TYPE);
+    }
+
+    /**
+     * Test the find specification.
+     */
+    @Test
+    public void testFindNoType() {
+        final Specification<ApplicationEntity> spec = JpaApplicationSpecs.find(NAME, USER_NAME, STATUSES, TAGS, null);
+
+        spec.toPredicate(this.root, this.cq, this.cb);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.name), NAME);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.user), USER_NAME);
+        for (final ApplicationStatus status : STATUSES) {
+            Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.status), status);
+        }
+        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(ApplicationEntity_.tags), this.tagLikeStatement);
+        Mockito.verify(this.cb, Mockito.never()).equal(this.root.get(ApplicationEntity_.type), TYPE);
     }
 
     /**

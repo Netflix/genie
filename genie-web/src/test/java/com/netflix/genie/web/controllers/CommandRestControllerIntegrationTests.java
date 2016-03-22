@@ -221,7 +221,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
 
         // Query by user
         this.mvc
-            .perform(MockMvcRequestBuilders.get(COMMANDS_API).param("userName", user3))
+            .perform(MockMvcRequestBuilders.get(COMMANDS_API).param("user", user3))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath(COMMANDS_LIST_PATH, Matchers.hasSize(1)))
@@ -510,8 +510,8 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
         final String placeholder = UUID.randomUUID().toString();
         final String applicationId1 = UUID.randomUUID().toString();
         final String applicationId2 = UUID.randomUUID().toString();
-        createApplication(applicationId1, placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE);
-        createApplication(applicationId2, placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE);
+        createApplication(applicationId1, placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE, null);
+        createApplication(applicationId2, placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE, null);
 
         this.mvc
             .perform(
@@ -541,7 +541,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             .andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
 
         final String applicationId3 = UUID.randomUUID().toString();
-        createApplication(applicationId3, placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE);
+        createApplication(applicationId3, placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE, null);
         this.mvc
             .perform(
                 MockMvcRequestBuilders
@@ -579,8 +579,8 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
         final String placeholder = UUID.randomUUID().toString();
         final String applicationId1 = UUID.randomUUID().toString();
         final String applicationId2 = UUID.randomUUID().toString();
-        createApplication(applicationId1, placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE);
-        createApplication(applicationId2, placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE);
+        createApplication(applicationId1, placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE, null);
+        createApplication(applicationId2, placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE, null);
 
         this.mvc
             .perform(
@@ -647,8 +647,8 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
         final String placeholder = UUID.randomUUID().toString();
         final String applicationId1 = UUID.randomUUID().toString();
         final String applicationId2 = UUID.randomUUID().toString();
-        createApplication(applicationId1, placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE);
-        createApplication(applicationId2, placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE);
+        createApplication(applicationId1, placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE, null);
+        createApplication(applicationId2, placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE, null);
 
         this.mvc
             .perform(
@@ -684,9 +684,9 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
         final String applicationId1 = UUID.randomUUID().toString();
         final String applicationId2 = UUID.randomUUID().toString();
         final String applicationId3 = UUID.randomUUID().toString();
-        createApplication(applicationId1, placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE);
-        createApplication(applicationId2, placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE);
-        createApplication(applicationId3, placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE);
+        createApplication(applicationId1, placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE, null);
+        createApplication(applicationId2, placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE, null);
+        createApplication(applicationId3, placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE, null);
 
         this.mvc
             .perform(

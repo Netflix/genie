@@ -26,10 +26,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
-import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -62,7 +60,6 @@ public class JpaJobSpecsUnitTests {
     private static final Date MAX_FINISHED = new Date(MIN_FINISHED.getTime() + 10);
 
     private Root<JobEntity> root;
-    private CriteriaQuery<?> cq;
     private CriteriaBuilder cb;
     private String tagLikeStatement;
 
@@ -80,7 +77,6 @@ public class JpaJobSpecsUnitTests {
         STATUSES.add(JobStatus.FAILED);
 
         this.root = (Root<JobEntity>) Mockito.mock(Root.class);
-        this.cq = Mockito.mock(CriteriaQuery.class);
         this.cb = Mockito.mock(CriteriaBuilder.class);
 
         final Path<String> idPath = (Path<String>) Mockito.mock(Path.class);
@@ -825,53 +821,6 @@ public class JpaJobSpecsUnitTests {
             .verify(this.cb, Mockito.times(1))
             .greaterThanOrEqualTo(this.root.get(JobEntity_.finished), MIN_FINISHED);
         Mockito.verify(this.cb, Mockito.times(1)).lessThan(this.root.get(JobEntity_.finished), MAX_FINISHED);
-    }
-
-    /**
-     * Test the find zombie specification.
-     */
-    @Test
-    @SuppressWarnings("unchecked")
-    public void testFindZombies() {
-        final long diff = 54000L;
-        final Date now = new Date();
-        final Date before = new Date(now.getTime() - diff);
-
-        final Path<Date> updatedPath = (Path<Date>) Mockito.mock(Path.class);
-        final Predicate lessThanUpdatedPredicate = Mockito.mock(Predicate.class);
-        Mockito.when(this.root.get(JobEntity_.updated)).thenReturn(updatedPath);
-        Mockito.when(this.cb.lessThan(updatedPath, new Date(diff)))
-            .thenReturn(lessThanUpdatedPredicate);
-
-        final Path<JobStatus> runningPath = (Path<JobStatus>) Mockito.mock(Path.class);
-        final Predicate equalRunningPredicate = Mockito.mock(Predicate.class);
-        Mockito.when(this.root.get(JobEntity_.status)).thenReturn(runningPath);
-        Mockito.when(this.cb.equal(runningPath, JobStatus.RUNNING))
-            .thenReturn(equalRunningPredicate);
-
-        final Path<JobStatus> initPath = (Path<JobStatus>) Mockito.mock(Path.class);
-        final Predicate equalInitPredicate = Mockito.mock(Predicate.class);
-        Mockito.when(this.root.get(JobEntity_.status)).thenReturn(initPath);
-        Mockito.when(this.cb.equal(initPath, JobStatus.INIT))
-            .thenReturn(equalInitPredicate);
-
-        final Predicate orPredicate = Mockito.mock(Predicate.class);
-        Mockito.when(this.cb.or(equalRunningPredicate, equalInitPredicate))
-            .thenReturn(orPredicate);
-
-        final Specification<JobEntity> findZombies = JpaJobSpecs.findZombies(
-            now.getTime(),
-            before.getTime()
-        );
-        findZombies.toPredicate(this.root, this.cq, this.cb);
-        Mockito.verify(this.cb, Mockito.times(1))
-            .lessThan(this.root.get(JobEntity_.updated), new Date(diff));
-        Mockito.verify(this.cb, Mockito.times(1))
-            .equal(this.root.get(JobEntity_.status), JobStatus.RUNNING);
-        Mockito.verify(this.cb, Mockito.times(1))
-            .equal(this.root.get(JobEntity_.status), JobStatus.INIT);
-        Mockito.verify(this.cb, Mockito.times(1))
-            .or(Mockito.any(Predicate.class), Mockito.any(Predicate.class));
     }
 
     /**

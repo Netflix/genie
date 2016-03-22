@@ -61,7 +61,7 @@ public class ApplicationEntity extends SetupFileEntity {
     @NotNull(message = "No application status entered and is required.")
     private ApplicationStatus status;
 
-    @Column(name = "type", length = 255)
+    @Column(name = "type")
     private String type;
 
     @ElementCollection(fetch = FetchType.EAGER)
@@ -82,6 +82,9 @@ public class ApplicationEntity extends SetupFileEntity {
 
     @ManyToMany(mappedBy = "applications", fetch = FetchType.LAZY)
     private Set<CommandEntity> commands = new HashSet<>();
+
+//    @ManyToMany(mappedBy = "applications", fetch = FetchType.LAZY)
+//    private Set<JobEntity> jobs = new HashSet<>();
 
     /**
      * Default constructor.
@@ -176,13 +179,34 @@ public class ApplicationEntity extends SetupFileEntity {
      *
      * @param commands The commands to set.
      */
-    //TODO: Add @Valid?
     protected void setCommands(final Set<CommandEntity> commands) {
         this.commands.clear();
         if (commands != null) {
             this.commands.addAll(commands);
         }
     }
+
+//    /**
+//     * Get all the jobs which ran using this application. Potentially huge data set. Shouldn't really be used, hence
+//     * protected.
+//     *
+//     * @return The jobs
+//     */
+//    protected Set<JobEntity> getJobs() {
+//        return this.jobs;
+//    }
+//
+//    /**
+//     * Set all the jobs which used this application
+//     *
+//     * @param jobs The jobs to set.
+//     */
+//    protected void setJobs(final Set<JobEntity> jobs) {
+//        this.jobs.clear();
+//        if (jobs != null) {
+//            this.jobs.addAll(jobs);
+//        }
+//    }
 
     /**
      * Get a DTO from this entity.

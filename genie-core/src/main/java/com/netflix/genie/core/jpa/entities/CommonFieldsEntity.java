@@ -49,19 +49,19 @@ public class CommonFieldsEntity extends BaseEntity {
     private static final long serialVersionUID = -5040659007494311180L;
 
     @Basic(optional = false)
-    @Column(name = "version", nullable = false, length = 255)
+    @Column(name = "version", nullable = false)
     @NotBlank(message = "Version is missing and is required.")
     @Size(max = 255, message = "Max length in database is 255 characters")
     private String version;
 
     @Basic(optional = false)
-    @Column(name = "user", nullable = false, length = 255)
+    @Column(name = "user", nullable = false)
     @NotBlank(message = "User name is missing and is required.")
     @Size(max = 255, message = "Max length in database is 255 characters")
     private String user;
 
     @Basic(optional = false)
-    @Column(name = "name", nullable = false, length = 255)
+    @Column(name = "name", nullable = false)
     @NotBlank(message = "Name is missing and is required.")
     @Size(max = 255, message = "Max length in database is 255 characters")
     private String name;

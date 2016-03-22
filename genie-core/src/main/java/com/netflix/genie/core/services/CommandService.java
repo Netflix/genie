@@ -54,9 +54,9 @@ public interface CommandService {
      * @throws GenieException if there is an error
      */
     String createCommand(
-            @NotNull(message = "No command entered. Unable to create.")
-            @Valid
-            final Command command
+        @NotNull(message = "No command entered. Unable to create.")
+        @Valid
+        final Command command
     ) throws GenieException;
 
     /**
@@ -67,26 +67,26 @@ public interface CommandService {
      * @throws GenieException if there is an error
      */
     Command getCommand(
-            @NotBlank(message = "No id entered unable to get.")
-            final String id
+        @NotBlank(message = "No id entered unable to get.")
+        final String id
     ) throws GenieException;
 
     /**
      * Get command configurations for given filter criteria.
      *
-     * @param name       Name of command config
-     * @param userName   The name of the user who created the configuration
-     * @param statuses   The status of the applications to get. Can be null.
-     * @param tags       tags allocated to this command
-     * @param page       The page of results to get
+     * @param name     Name of command config
+     * @param user     The name of the user who created the configuration
+     * @param statuses The status of the applications to get. Can be null.
+     * @param tags     tags allocated to this command
+     * @param page     The page of results to get
      * @return All the commands matching the specified criteria
      */
     Page<Command> getCommands(
-            final String name,
-            final String userName,
-            final Set<CommandStatus> statuses,
-            final Set<String> tags,
-            final Pageable page
+        final String name,
+        final String user,
+        final Set<CommandStatus> statuses,
+        final Set<String> tags,
+        final Pageable page
     );
 
     /**
@@ -98,11 +98,11 @@ public interface CommandService {
      * @throws GenieException if there is an error
      */
     void updateCommand(
-            @NotBlank(message = "No id entered. Unable to update.")
-            final String id,
-            @NotNull(message = "No command information entered. Unable to update.")
-            @Valid
-            final Command updateCommand
+        @NotBlank(message = "No id entered. Unable to update.")
+        final String id,
+        @NotNull(message = "No command information entered. Unable to update.")
+        @Valid
+        final Command updateCommand
     ) throws GenieException;
 
     /**
@@ -128,8 +128,8 @@ public interface CommandService {
      * @throws GenieException if there is an error
      */
     void deleteCommand(
-            @NotBlank(message = "No id entered. Unable to delete.")
-            final String id
+        @NotBlank(message = "No id entered. Unable to delete.")
+        final String id
     ) throws GenieException;
 
     /**
@@ -141,10 +141,10 @@ public interface CommandService {
      * @throws GenieException if there is an error
      */
     void addConfigsForCommand(
-            @NotBlank(message = "No command id entered. Unable to add configurations.")
-            final String id,
-            @NotEmpty(message = "No configuration files entered. Unable to add.")
-            final Set<String> configs
+        @NotBlank(message = "No command id entered. Unable to add configurations.")
+        final String id,
+        @NotEmpty(message = "No configuration files entered. Unable to add.")
+        final Set<String> configs
     ) throws GenieException;
 
     /**
@@ -157,8 +157,8 @@ public interface CommandService {
      * @throws GenieException if there is an error
      */
     Set<String> getConfigsForCommand(
-            @NotBlank(message = "No command id entered. Unable to get configs.")
-            final String id
+        @NotBlank(message = "No command id entered. Unable to get configs.")
+        final String id
     ) throws GenieException;
 
     /**
@@ -172,10 +172,10 @@ public interface CommandService {
      * @throws GenieException if there is an error
      */
     void updateConfigsForCommand(
-            @NotBlank(message = "No command id entered. Unable to update configurations.")
-            final String id,
-            @NotEmpty(message = "No configs entered. Unable to update.")
-            final Set<String> configs
+        @NotBlank(message = "No command id entered. Unable to update configurations.")
+        final String id,
+        @NotEmpty(message = "No configs entered. Unable to update.")
+        final Set<String> configs
     ) throws GenieException;
 
     /**
@@ -186,8 +186,8 @@ public interface CommandService {
      * @throws GenieException if there is an error
      */
     void removeAllConfigsForCommand(
-            @NotBlank(message = "No command id entered. Unable to remove configs.")
-            final String id
+        @NotBlank(message = "No command id entered. Unable to remove configs.")
+        final String id
     ) throws GenieException;
 
     /**
@@ -199,10 +199,10 @@ public interface CommandService {
      * @throws GenieException if there is an error
      */
     void removeConfigForCommand(
-            @NotBlank(message = "No command id entered. Unable to remove configuration.")
-            final String id,
-            @NotBlank(message = "No config entered. Unable to remove.")
-            final String config
+        @NotBlank(message = "No command id entered. Unable to remove configuration.")
+        final String id,
+        @NotBlank(message = "No config entered. Unable to remove.")
+        final String config
     ) throws GenieException;
 
     /**
@@ -214,10 +214,10 @@ public interface CommandService {
      * @throws GenieException if there is an error
      */
     void addTagsForCommand(
-            @NotBlank(message = "No command id entered. Unable to add tags.")
-            final String id,
-            @NotEmpty(message = "No tags entered. Unable to add.")
-            final Set<String> tags
+        @NotBlank(message = "No command id entered. Unable to add tags.")
+        final String id,
+        @NotEmpty(message = "No tags entered. Unable to add.")
+        final Set<String> tags
     ) throws GenieException;
 
     /**
@@ -230,8 +230,8 @@ public interface CommandService {
      * @throws GenieException if there is an error
      */
     Set<String> getTagsForCommand(
-            @NotBlank(message = "No command id sent. Cannot retrieve tags.")
-            final String id
+        @NotBlank(message = "No command id sent. Cannot retrieve tags.")
+        final String id
     ) throws GenieException;
 
     /**
@@ -245,10 +245,10 @@ public interface CommandService {
      * @throws GenieException if there is an error
      */
     void updateTagsForCommand(
-            @NotBlank(message = "No command id entered. Unable to update tags.")
-            final String id,
-            @NotEmpty(message = "No tags entered. Unable to update.")
-            final Set<String> tags
+        @NotBlank(message = "No command id entered. Unable to update tags.")
+        final String id,
+        @NotEmpty(message = "No tags entered. Unable to update.")
+        final Set<String> tags
     ) throws GenieException;
 
     /**
@@ -259,8 +259,8 @@ public interface CommandService {
      * @throws GenieException if there is an error
      */
     void removeAllTagsForCommand(
-            @NotBlank(message = "No command id entered. Unable to remove tags.")
-            final String id
+        @NotBlank(message = "No command id entered. Unable to remove tags.")
+        final String id
     ) throws GenieException;
 
     /**
@@ -272,10 +272,10 @@ public interface CommandService {
      * @throws GenieException if there is an error
      */
     void removeTagForCommand(
-            @NotBlank(message = "No command id entered. Unable to remove tag.")
-            final String id,
-            @NotBlank(message = "No tag entered. Unable to remove.")
-            final String tag
+        @NotBlank(message = "No command id entered. Unable to remove tag.")
+        final String id,
+        @NotBlank(message = "No tag entered. Unable to remove.")
+        final String tag
     ) throws GenieException;
 
     /**
@@ -287,10 +287,10 @@ public interface CommandService {
      * @throws GenieException if there is an error
      */
     void addApplicationsForCommand(
-            @NotBlank(message = "No command id entered. Unable to add applications.")
-            final String id,
-            @NotEmpty(message = "No application ids entered. Unable to add applications.")
-            final List<String> applicationIds
+        @NotBlank(message = "No command id entered. Unable to add applications.")
+        final String id,
+        @NotEmpty(message = "No application ids entered. Unable to add applications.")
+        final List<String> applicationIds
     ) throws GenieException;
 
     /**
@@ -302,10 +302,10 @@ public interface CommandService {
      * @throws GenieException if there is an error
      */
     void setApplicationsForCommand(
-            @NotBlank(message = "No command id entered. Unable to set applications.")
-            final String id,
-            @NotNull(message = "No application ids entered. Unable to set applications.")
-            final List<String> applicationIds
+        @NotBlank(message = "No command id entered. Unable to set applications.")
+        final String id,
+        @NotNull(message = "No application ids entered. Unable to set applications.")
+        final List<String> applicationIds
     ) throws GenieException;
 
     /**
@@ -317,8 +317,8 @@ public interface CommandService {
      * @throws GenieException if there is an error
      */
     List<Application> getApplicationsForCommand(
-            @NotBlank(message = "No command id entered. Unable to get applications.")
-            final String id
+        @NotBlank(message = "No command id entered. Unable to get applications.")
+        final String id
     ) throws GenieException;
 
     /**
@@ -329,22 +329,22 @@ public interface CommandService {
      * @throws GenieException if there is an error
      */
     void removeApplicationsForCommand(
-            @NotBlank(message = "No command id entered. Unable to remove applications.")
-            final String id
+        @NotBlank(message = "No command id entered. Unable to remove applications.")
+        final String id
     ) throws GenieException;
 
     /**
      * Remove the application from the command.
      *
-     * @param id The id of the command to remove the application from. Not null/empty/blank.
+     * @param id    The id of the command to remove the application from. Not null/empty/blank.
      * @param appId The id of the application to remove. Not null/empty/blank
      * @throws GenieException if there is an error
      */
     void removeApplicationForCommand(
-            @NotBlank(message = "No command id entered. Unable to remove application.")
-            final String id,
-            @NotBlank(message = "No application id entered. Unable to remove application.")
-            final String appId
+        @NotBlank(message = "No command id entered. Unable to remove application.")
+        final String id,
+        @NotBlank(message = "No application id entered. Unable to remove application.")
+        final String appId
     ) throws GenieException;
 
     /**
@@ -356,8 +356,8 @@ public interface CommandService {
      * @throws GenieException if there is an error
      */
     Set<Cluster> getClustersForCommand(
-            @NotBlank(message = "No command id entered. Unable to get clusters.")
-            final String id,
-            final Set<ClusterStatus> statuses
+        @NotBlank(message = "No command id entered. Unable to get clusters.")
+        final String id,
+        final Set<ClusterStatus> statuses
     ) throws GenieException;
 }

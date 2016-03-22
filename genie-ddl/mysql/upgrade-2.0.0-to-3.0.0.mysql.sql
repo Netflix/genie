@@ -58,6 +58,25 @@ INSERT INTO `commands_applications` (`command_id`, `application_id`, `applicatio
   SELECT `id`, `APPLICATION_ID`, 0 FROM `commands` WHERE `APPLICATION_ID` IS NOT NULL;
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully added existing applications to commands.' AS '';
 
+-- Create a new Many to Many table for commands to applications
+SELECT CURRENT_TIMESTAMP AS '', 'Creating jobs_applications table...' AS '';
+CREATE TABLE `jobs_applications` (
+  `job_id` VARCHAR(255) NOT NULL,
+  `application_id` VARCHAR(255) NOT NULL,
+  `application_order` INT(11) NOT NULL,
+  FOREIGN KEY (`job_id`) REFERENCES `jobs` (`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`application_id`) REFERENCES `applications` (`id`) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+SELECT CURRENT_TIMESTAMP AS '', 'Successfully created jobs_applications table.' AS '';
+
+-- Save the values of the current job to application relationship for the new table
+SELECT CURRENT_TIMESTAMP AS '', 'Adding existing applications to jobs...' AS '';
+INSERT INTO `jobs_applications` (`job_id`, `application_id`, `application_order`)
+  SELECT `id`, `applicationId`, 0 FROM `jobs` WHERE `applicationId` IS NOT NULL AND `applicationId` IN (
+    SELECT `id` FROM `applications`
+  );
+SELECT CURRENT_TIMESTAMP AS '', 'Successfully added existing applications to jobs.' AS '';
+
 -- Modify the applications and the associated children tables
 SELECT CURRENT_TIMESTAMP AS '', 'Altering the applications table for 3.0...' AS '';
 ALTER TABLE `applications`
@@ -205,7 +224,6 @@ SELECT CURRENT_TIMESTAMP AS '', 'Dropping the command_tags table for 3.0...' AS 
 DROP TABLE `command_tags`;
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully dropped the command_tags table.' AS '';
 
--- TODO: May want these TEXT fields to be large varchars instead?
 SELECT CURRENT_TIMESTAMP AS '', 'Creating the job_requests table...' AS '';
 CREATE TABLE `job_requests` (
   `id` VARCHAR(255) NOT NULL,
@@ -219,8 +237,8 @@ CREATE TABLE `job_requests` (
   `command_args` TEXT NOT NULL,
   `group_name` VARCHAR(255) DEFAULT NULL,
   `setup_file` VARCHAR(1024) DEFAULT NULL,
-  `cluster_criterias` VARCHAR(2048) NOT NULL,
-  `command_criteria` VARCHAR(1024) NOT NULL,
+  `cluster_criterias` VARCHAR(2048) NOT NULL DEFAULT '[]',
+  `command_criteria` VARCHAR(1024) NOT NULL DEFAULT '[]',
   `dependencies` TEXT DEFAULT NULL,
   `disable_log_archival` BIT(1) NOT NULL DEFAULT 0,
   `email` VARCHAR(255) DEFAULT NULL,
@@ -228,6 +246,7 @@ CREATE TABLE `job_requests` (
   `cpu` INT(11) NOT NULL DEFAULT 1,
   `memory` INT(11) NOT NULL DEFAULT 1560,
   `client_host` VARCHAR(255) DEFAULT NULL,
+  `applications` VARCHAR(2048) NOT NULL DEFAULT '[]',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully created the job_requests table.' AS '';
@@ -282,23 +301,59 @@ INSERT INTO `job_requests` (
     1560,
     `j`.`clientHost`
   FROM `jobs` `j`;
--- TODO: Do this in one pass instead of 3?
-UPDATE `job_requests` SET `command_criteria` = RPAD(`command_criteria`, LENGTH(`command_criteria`) + 2, '"]');
-UPDATE `job_requests` SET `command_criteria` = LPAD(`command_criteria`, LENGTH(`command_criteria`) + 2, '["');
-UPDATE `job_requests` SET `command_criteria` = REPLACE(`command_criteria`, ',', '","');
-UPDATE `job_requests` SET `command_criteria` = '[]' WHERE `command_criteria` = '[""]' OR `command_criteria` IS NULL;
--- TODO: Less passes?
-UPDATE `job_requests` SET `cluster_criterias` = RPAD(`cluster_criterias`, LENGTH(`cluster_criterias`) + 4, '"]}]');
-UPDATE `job_requests` SET `cluster_criterias` = LPAD(`cluster_criterias`, LENGTH(`cluster_criterias`) + 11, '[{"tags":["');
-UPDATE `job_requests` SET `cluster_criterias` = REPLACE(`cluster_criterias`, ',', '","');
-UPDATE `job_requests` SET `cluster_criterias` = REPLACE(`cluster_criterias`, '|', '"]},{"tags":["');
-UPDATE `job_requests` SET `cluster_criterias` = '[]' WHERE `cluster_criterias` = '[""]' OR `cluster_criterias` IS NULL;
--- TODO: Do this in one pass instead of 3?
-UPDATE `job_requests` SET `dependencies` = RPAD(`dependencies`, LENGTH(`dependencies`) + 2, '"]');
-UPDATE `job_requests` SET `dependencies` = LPAD(`dependencies`, LENGTH(`dependencies`) + 2, '["');
-UPDATE `job_requests` SET `dependencies` = REPLACE(`dependencies`, ',', '","');
-UPDATE `job_requests` SET `dependencies` = '[]' WHERE `dependencies` = '[""]' OR `dependencies` IS NULL;
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully inserted values into job_requests table.' AS '';
+
+SELECT CURRENT_TIMESTAMP AS '', 'Attempting to convert command_criteria to JSON in job_requests table...' AS '';
+UPDATE `job_requests`
+  SET `command_criteria` = RPAD(`command_criteria`, LENGTH(`command_criteria`) + 2, '"]')
+  WHERE `command_criteria` IS NOT NULL;
+UPDATE `job_requests`
+  SET `command_criteria` = LPAD(`command_criteria`, LENGTH(`command_criteria`) + 2, '["')
+  WHERE `command_criteria` IS NOT NULL;
+UPDATE `job_requests`
+  SET `command_criteria` = REPLACE(`command_criteria`, ',', '","')
+  WHERE `command_criteria` IS NOT NULL;
+UPDATE `job_requests`
+  SET `command_criteria` = '[]'
+  WHERE `command_criteria` = '[""]' OR `command_criteria` IS NULL;
+SELECT CURRENT_TIMESTAMP AS '', 'Successfully converted command_criteria to JSON in job_requests table.' AS '';
+
+SELECT CURRENT_TIMESTAMP AS '', 'Attempting to convert cluster_criterias to JSON in job_requests table...' AS '';
+UPDATE `job_requests`
+  SET `cluster_criterias` = RPAD(`cluster_criterias`, LENGTH(`cluster_criterias`) + 4, '"]}]')
+  WHERE `cluster_criterias` IS NOT NULL;
+UPDATE `job_requests`
+  SET `cluster_criterias` = LPAD(`cluster_criterias`, LENGTH(`cluster_criterias`) + 11, '[{"tags":["')
+  WHERE `cluster_criterias` IS NOT NULL;
+UPDATE `job_requests`
+  SET `cluster_criterias` = REPLACE(`cluster_criterias`, ',', '","')
+  WHERE `cluster_criterias` IS NOT NULL;
+UPDATE `job_requests`
+  SET `cluster_criterias` = REPLACE(`cluster_criterias`, '|', '"]},{"tags":["')
+  WHERE `cluster_criterias` IS NOT NULL;
+UPDATE `job_requests`
+  SET `cluster_criterias` = '[]'
+  WHERE `cluster_criterias` = '[""]' OR `cluster_criterias` IS NULL;
+SELECT CURRENT_TIMESTAMP AS '', 'Successfully converted to cluster_criterias to JSON in job_requests table.' AS '';
+
+SELECT CURRENT_TIMESTAMP AS '', 'Attempting to convert dependencies to JSON in job_requests table...' AS '';
+UPDATE `job_requests`
+  SET `dependencies` = RPAD(`dependencies`, LENGTH(`dependencies`) + 2, '"]')
+  WHERE `dependencies` IS NOT NULL;
+UPDATE `job_requests`
+  SET `dependencies` = LPAD(`dependencies`, LENGTH(`dependencies`) + 2, '["')
+  WHERE `dependencies` IS NOT NULL;
+UPDATE `job_requests`
+  SET `dependencies` = REPLACE(`dependencies`, ',', '","')
+  WHERE `dependencies` IS NOT NULL;
+UPDATE `job_requests`
+  SET `dependencies` = '[]'
+  WHERE `dependencies` = '[""]' OR `dependencies` IS NULL;
+SELECT CURRENT_TIMESTAMP AS '', 'Successfully converted dependencies to JSON in job_requests table...' AS '';
+
+SELECT CURRENT_TIMESTAMP AS '', 'Attempting to make dependencies field not null in job_requests table...' AS '';
+ALTER TABLE `job_requests` MODIFY `dependencies` TEXT NOT NULL;
+SELECT CURRENT_TIMESTAMP AS '', 'Successfully made dependencies field not null in job_requests table.' AS '';
 
 SELECT CURRENT_TIMESTAMP AS '', 'Creating the job_executions table...' AS '';
 CREATE TABLE `job_executions` (
@@ -306,12 +361,12 @@ CREATE TABLE `job_executions` (
   `created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `entity_version` INT(11) NOT NULL DEFAULT 0,
-  `hostname` VARCHAR(255) NOT NULL,
+  `host_name` VARCHAR(255) NOT NULL,
   `process_id` INT(11) NOT NULL,
   `exit_code` INT(11) NOT NULL DEFAULT -1,
   `check_delay` BIGINT NOT NULL DEFAULT 10000,
   FOREIGN KEY (`id`) REFERENCES `jobs` (`id`) ON DELETE CASCADE,
-  INDEX `JOB_EXECUTIONS_HOSTNAME_INDEX` (`hostname`),
+  INDEX `JOB_EXECUTIONS_HOSTNAME_INDEX` (`host_name`),
   INDEX `JOB_EXECUTIONS_EXIT_CODE_INDEX` (`exit_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully created the job_executions table.' AS '';
@@ -322,7 +377,7 @@ INSERT INTO `job_executions` (
   `created`,
   `updated`,
   `entity_version`,
-  `hostname`,
+  `host_name`,
   `process_id`,
   `exit_code`
 ) SELECT

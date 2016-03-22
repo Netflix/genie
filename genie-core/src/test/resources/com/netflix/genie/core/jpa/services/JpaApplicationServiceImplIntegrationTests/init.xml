@@ -49,6 +49,7 @@
         status="ACTIVE"
         entity_version="0"
         tags="genie.id:app2|genie.name:spark|prod|yarn"
+        type="spark"
     />
     <application_configs
         application_id="app2"
@@ -70,6 +71,7 @@
         status="DEPRECATED"
         entity_version="0"
         tags="genie.id:app3|genie.name:storm|prod"
+        type="storm"
     />
     <application_configs
         application_id="app3"

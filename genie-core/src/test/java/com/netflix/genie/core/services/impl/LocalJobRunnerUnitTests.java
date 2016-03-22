@@ -17,6 +17,9 @@
  */
 package com.netflix.genie.core.services.impl;
 
+import com.google.common.collect.Lists;
+import com.netflix.genie.common.dto.Application;
+import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
@@ -26,6 +29,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
+import com.netflix.genie.core.services.ApplicationService;
 import com.netflix.genie.core.services.ClusterLoadBalancer;
 import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;
@@ -33,6 +37,7 @@ import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobSubmitterService;
 import com.netflix.genie.test.categories.UnitTest;
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,6 +52,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Unit Tests for the Local Job Submitter Impl class.
@@ -73,15 +79,16 @@ public class LocalJobRunnerUnitTests {
     private ClusterService clusterService;
     private ClusterLoadBalancer clusterLoadBalancer;
     private JobSubmitterService jobSubmitterService;
-    private JobSearchService jobSearchService;
+    private ApplicationService applicationService;
 
     /**
      * Setup for the tests.
      */
     @Before
     public void setup() {
-        jobSearchService = Mockito.mock(JobSearchService.class);
+        final JobSearchService jobSearchService = Mockito.mock(JobSearchService.class);
         this.jobPersistenceService = Mockito.mock(JobPersistenceService.class);
+        this.applicationService = Mockito.mock(ApplicationService.class);
         this.clusterService = Mockito.mock(ClusterService.class);
         final CommandService commandService = Mockito.mock(CommandService.class);
         this.clusterLoadBalancer = Mockito.mock(ClusterLoadBalancer.class);
@@ -97,8 +104,9 @@ public class LocalJobRunnerUnitTests {
         final Resource baseWorkingDirResource = new DefaultResourceLoader().getResource(BASE_WORKING_DIR);
 
         this.jobSubmitterService = new LocalJobRunner(
-            this.jobSearchService,
+            jobSearchService,
             this.jobPersistenceService,
+            this.applicationService,
             this.clusterService,
             commandService,
             this.clusterLoadBalancer,
@@ -192,11 +200,40 @@ public class LocalJobRunnerUnitTests {
      *
      * @throws GenieException If there is any problem.
      */
+    @SuppressWarnings("unchecked")
     @Test(expected = GenieServerException.class)
     public void testSubmitJob() throws GenieException {
 
         final Set<CommandStatus> enumStatuses = EnumSet.noneOf(CommandStatus.class);
         enumStatuses.add(CommandStatus.ACTIVE);
+
+        final String app1 = UUID.randomUUID().toString();
+        final String app2 = UUID.randomUUID().toString();
+        final String app3 = UUID.randomUUID().toString();
+        final List<String> applications = Lists.newArrayList(app3, app1, app2);
+
+        final String placeholder = UUID.randomUUID().toString();
+        Mockito
+            .when(this.applicationService.getApplication(app3))
+            .thenReturn(
+                new Application.Builder(placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE)
+                    .withId(app3)
+                    .build()
+            );
+        Mockito
+            .when(this.applicationService.getApplication(app1))
+            .thenReturn(
+                new Application.Builder(placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE)
+                    .withId(app1)
+                    .build()
+            );
+        Mockito
+            .when(this.applicationService.getApplication(app2))
+            .thenReturn(
+                new Application.Builder(placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE)
+                    .withId(app2)
+                    .build()
+            );
 
         final JobRequest jobRequest = new JobRequest.Builder(
             JOB_1_NAME,
@@ -205,8 +242,9 @@ public class LocalJobRunnerUnitTests {
             null,
             null,
             null
-        ).
-            withId(JOB_1_ID)
+        )
+            .withId(JOB_1_ID)
+            .withApplications(applications)
             .build();
 
         final Cluster cluster = new Cluster.Builder(
@@ -222,7 +260,6 @@ public class LocalJobRunnerUnitTests {
         final List<Cluster> clusterList = new ArrayList<>();
         clusterList.add(cluster);
 
-
         final Command command = new Command.Builder(
             COMMAND_NAME,
             USER,
@@ -237,26 +274,33 @@ public class LocalJobRunnerUnitTests {
         final List<Command> commandList = new ArrayList<>();
         commandList.add(command);
 
-        Mockito.when(this.clusterService.chooseClusterForJobRequest(Mockito.eq(jobRequest))).thenReturn(clusterList);
-        Mockito.when(this.clusterLoadBalancer.selectCluster(Mockito.eq(clusterList))).thenReturn(cluster);
+        Mockito.when(this.clusterService.chooseClusterForJobRequest(jobRequest)).thenReturn(clusterList);
+        Mockito.when(this.clusterLoadBalancer.selectCluster(clusterList)).thenReturn(cluster);
         Mockito
-            .when(this.clusterService.getCommandsForCluster(Mockito.eq(CLUSTER_ID), Mockito.eq(enumStatuses)))
+            .when(this.clusterService.getCommandsForCluster(CLUSTER_ID, enumStatuses))
             .thenReturn(commandList);
-        //Mockito.when(this.wfExecutor.executeWorkflow(Mockito.any(), Mockito.anyMap())).thenReturn(true);
 
         final ArgumentCaptor<String> jobId1 = ArgumentCaptor.forClass(String.class);
-        final ArgumentCaptor<String> jobId2 = ArgumentCaptor.forClass(String.class);
         final ArgumentCaptor<String> clusterId = ArgumentCaptor.forClass(String.class);
         final ArgumentCaptor<String> commandId = ArgumentCaptor.forClass(String.class);
+        final ArgumentCaptor<List<String>> applicationIds = ArgumentCaptor.forClass((Class) List.class);
 
         this.jobSubmitterService.submitJob(jobRequest);
 
-        Mockito.verify(this.jobPersistenceService).updateClusterForJob(jobId1.capture(), clusterId.capture());
-        Mockito.verify(this.jobPersistenceService).updateCommandForJob(jobId2.capture(), commandId.capture());
+        Mockito
+            .verify(this.jobPersistenceService)
+            .updateJobWithRuntimeEnvironment(
+                jobId1.capture(),
+                clusterId.capture(),
+                commandId.capture(),
+                applicationIds.capture()
+            );
 
-        Assert.assertEquals(JOB_1_ID, jobId1.getValue());
-        Assert.assertEquals(JOB_1_ID, jobId2.getValue());
-        Assert.assertEquals(CLUSTER_ID, clusterId.getValue());
-        Assert.assertEquals(COMMAND_ID, commandId.getValue());
+        Assert.assertThat(jobId1.getValue(), Matchers.is(JOB_1_ID));
+        Assert.assertThat(clusterId.getValue(), Matchers.is(CLUSTER_ID));
+        Assert.assertThat(commandId.getValue(), Matchers.is(COMMAND_ID));
+        Assert.assertThat(applicationIds.getValue().get(0), Matchers.is(app3));
+        Assert.assertThat(applicationIds.getValue().get(1), Matchers.is(app1));
+        Assert.assertThat(applicationIds.getValue().get(2), Matchers.is(app2));
     }
 }

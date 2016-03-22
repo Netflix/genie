@@ -18,6 +18,9 @@
 package com.netflix.genie.core.jpa.services;
 
 import com.google.common.collect.Lists;
+import com.netflix.genie.common.dto.Application;
+import com.netflix.genie.common.dto.Cluster;
+import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
@@ -25,6 +28,9 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
+import com.netflix.genie.core.jpa.entities.ApplicationEntity;
+import com.netflix.genie.core.jpa.entities.ClusterEntity;
+import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.entities.JobEntity;
 import com.netflix.genie.core.jpa.entities.JobEntity_;
 import com.netflix.genie.core.jpa.entities.JobExecutionEntity;
@@ -52,9 +58,9 @@ import javax.persistence.criteria.Root;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Jpa implementation of the Job Search Service.
@@ -96,7 +102,7 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
     public Page<JobSearchResult> findJobs(
         final String id,
         final String jobName,
-        final String userName,
+        final String user,
         final Set<JobStatus> statuses,
         final Set<String> tags,
         final String clusterName,
@@ -121,7 +127,7 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
                 cb,
                 id,
                 jobName,
-                userName,
+                user,
                 statuses,
                 tags,
                 clusterName,
@@ -187,14 +193,11 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
     @Override
     public Set<JobExecution> getAllRunningJobExecutionsOnHost(@NotBlank final String hostname) throws GenieException {
         log.debug("Called with hostname {}", hostname);
-        final Set<JobExecutionEntity> entities
-            = this.jobExecutionRepository.findByHostnameAndExitCode(hostname, JobExecution.DEFAULT_EXIT_CODE);
-
-        final Set<JobExecution> executions = new HashSet<>();
-        for (final JobExecutionEntity entity : entities) {
-            executions.add(entity.getDTO());
-        }
-        return executions;
+        return this.jobExecutionRepository
+            .findByHostNameAndExitCode(hostname, JobExecution.DEFAULT_EXIT_CODE)
+            .stream()
+            .map(JobExecutionEntity::getDTO)
+            .collect(Collectors.toSet());
     }
 
     /**
@@ -261,11 +264,72 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
     }
 
     /**
-     * Set the entity manager to use for transactions in this service.
-     *
-     * @param entityManager The entity manager to use.
+     * {@inheritDoc}
      */
-    protected void setEntityManager(final EntityManager entityManager) {
-        this.entityManager = entityManager;
+    @Override
+    public Cluster getJobCluster(@NotBlank final String id) throws GenieException {
+        log.debug("Called for job with id {}", id);
+        final JobEntity job = this.jobRepository.findOne(id);
+        if (job != null) {
+            final ClusterEntity cluster = job.getCluster();
+            if (cluster != null) {
+                return cluster.getDTO();
+            } else {
+                throw new GenieNotFoundException("Job " + id + " doesn't have a cluster associated with it");
+            }
+        } else {
+            throw new GenieNotFoundException("No job with id " + id + " exists. Unable to get cluster");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Command getJobCommand(@NotBlank final String id) throws GenieException {
+        log.debug("Called for job with id {}", id);
+        final JobEntity job = this.jobRepository.findOne(id);
+        if (job != null) {
+            final CommandEntity command = job.getCommand();
+            if (command != null) {
+                return command.getDTO();
+            } else {
+                throw new GenieNotFoundException("Job " + id + " doesn't have a command associated with it");
+            }
+        } else {
+            throw new GenieNotFoundException("No job with id " + id + " exists. Unable to get command");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<Application> getJobApplications(@NotBlank final String id) throws GenieException {
+        log.debug("Called for job with id {}", id);
+        final JobEntity job = this.jobRepository.findOne(id);
+        if (job != null) {
+            final List<ApplicationEntity> applications = job.getApplications();
+            if (applications != null && !applications.isEmpty()) {
+                return applications.stream().map(ApplicationEntity::getDTO).collect(Collectors.toList());
+            } else {
+                throw new GenieNotFoundException("Job " + id + " doesn't have a cluster associated with it");
+            }
+        } else {
+            throw new GenieNotFoundException("No job with id " + id + " exists. Unable to get cluster");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getJobHost(@NotBlank final String jobId) throws GenieException {
+        final JobExecutionEntity jobExecution = this.jobExecutionRepository.findOne(jobId);
+        if (jobExecution != null) {
+            return jobExecution.getHostName();
+        } else {
+            throw new GenieNotFoundException("No job execution found for id " + jobId);
+        }
     }
 }

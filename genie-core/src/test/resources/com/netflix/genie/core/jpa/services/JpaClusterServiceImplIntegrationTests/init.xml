@@ -141,6 +141,7 @@
             {&quot;tags&quot;:[&quot;adhoc&quot;,&quot;yarn&quot;]}
         ]"
         command_criteria="[&quot;pig&quot;,&quot;0.15.0&quot;]"
+        applications="[]"
         cpu="1"
         memory="1560"
         entity_version="1"
@@ -169,6 +170,7 @@
             {&quot;tags&quot;:[&quot;adhoc&quot;,&quot;yarn&quot;]}
         ]"
         command_criteria="[&quot;spark&quot;]"
+        applications="[]"
         cpu="2"
         memory="2048"
         entity_version="1"

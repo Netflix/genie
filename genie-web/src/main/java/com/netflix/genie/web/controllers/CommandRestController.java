@@ -136,7 +136,7 @@ public class CommandRestController {
      * Get Command configuration based on user parameters.
      *
      * @param name      Name for command (optional)
-     * @param userName  The user who created the configuration (optional)
+     * @param user      The user who created the configuration (optional)
      * @param statuses  The statuses of the commands to get (optional)
      * @param tags      The set of tags you want the command for.
      * @param page      The page to get
@@ -148,14 +148,14 @@ public class CommandRestController {
     @ResponseStatus(HttpStatus.OK)
     public PagedResources<CommandResource> getCommands(
         @RequestParam(value = "name", required = false) final String name,
-        @RequestParam(value = "userName", required = false) final String userName,
+        @RequestParam(value = "user", required = false) final String user,
         @RequestParam(value = "status", required = false) final Set<String> statuses,
         @RequestParam(value = "tag", required = false) final Set<String> tags,
         @PageableDefault(page = 0, size = 64, sort = {"updated"}, direction = Sort.Direction.DESC) final Pageable page,
         final PagedResourcesAssembler<Command> assembler
     ) throws GenieException {
-        log.debug("Called [name | userName | status | tags | page]");
-        log.debug("{} | {} | {} | {} | {}", name, userName, statuses, tags, page);
+        log.debug("Called [name | user | status | tags | page]");
+        log.debug("{} | {} | {} | {} | {}", name, user, statuses, tags, page);
 
         Set<CommandStatus> enumStatuses = null;
         if (statuses != null) {
@@ -172,7 +172,7 @@ public class CommandRestController {
                     .methodOn(CommandRestController.class)
                     .getCommands(
                         name,
-                        userName,
+                        user,
                         statuses,
                         tags,
                         page,
@@ -181,7 +181,7 @@ public class CommandRestController {
             ).withSelfRel();
 
         return assembler.toResource(
-            this.commandService.getCommands(name, userName, enumStatuses, tags, page),
+            this.commandService.getCommands(name, user, enumStatuses, tags, page),
             this.commandResourceAssembler,
             self
         );

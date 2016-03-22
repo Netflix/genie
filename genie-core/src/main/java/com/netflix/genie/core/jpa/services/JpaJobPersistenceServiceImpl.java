@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.core.jpa.services;
 
+import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
@@ -25,11 +26,13 @@ import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.core.jpa.entities.ApplicationEntity;
 import com.netflix.genie.core.jpa.entities.ClusterEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.entities.JobEntity;
 import com.netflix.genie.core.jpa.entities.JobExecutionEntity;
 import com.netflix.genie.core.jpa.entities.JobRequestEntity;
+import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobExecutionRepository;
@@ -44,6 +47,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.List;
 
 /**
  * JPA implementation of the job persistence service.
@@ -62,6 +66,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
     private final JpaJobRepository jobRepo;
     private final JpaJobRequestRepository jobRequestRepo;
     private final JpaJobExecutionRepository jobExecutionRepo;
+    private final JpaApplicationRepository applicationRepo;
     private final JpaClusterRepository clusterRepo;
     private final JpaCommandRepository commandRepo;
 
@@ -71,6 +76,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
      * @param jobRepo          The job repository to use
      * @param jobRequestRepo   The job request repository to use
      * @param jobExecutionRepo The jobExecution Repository to use
+     * @param applicationRepo  The application repository to use
      * @param clusterRepo      The cluster repository to use
      * @param commandRepo      The command repository to use
      */
@@ -78,12 +84,14 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         final JpaJobRepository jobRepo,
         final JpaJobRequestRepository jobRequestRepo,
         final JpaJobExecutionRepository jobExecutionRepo,
+        final JpaApplicationRepository applicationRepo,
         final JpaClusterRepository clusterRepo,
         final JpaCommandRepository commandRepo
     ) {
         this.jobRepo = jobRepo;
         this.jobRequestRepo = jobRequestRepo;
         this.jobExecutionRepo = jobExecutionRepo;
+        this.applicationRepo = applicationRepo;
         this.clusterRepo = clusterRepo;
         this.commandRepo = commandRepo;
     }
@@ -142,7 +150,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
     public void updateJobStatus(
         @NotBlank(message = "No job id entered. Unable to update.")
         final String id,
-        @NotNull (message = "Status cannot be null.")
+        @NotNull(message = "Status cannot be null.")
         final JobStatus jobStatus,
         @NotBlank(message = "Status message cannot be empty.")
         final String statusMsg
@@ -172,50 +180,47 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
      * {@inheritDoc}
      */
     @Override
-    public void updateClusterForJob(
-        @NotBlank(message = "Job id cannot be null while updating cluster information")
-        final String jobId,
-        @NotBlank(message = "Cluster id cannot be null while updating cluster information")
-        final String clusterId
+    public void updateJobWithRuntimeEnvironment(
+        @NotBlank final String jobId,
+        @NotBlank final String clusterId,
+        @NotBlank final String commandId,
+        @NotNull final List<String> applicationIds
     ) throws GenieException {
-        log.debug("Called with jobId {} and clusterID {}", jobId, clusterId);
+        log.debug(
+            "Called to update job ({}) runtime with cluster {}, command {} and applications {}",
+            jobId,
+            clusterId,
+            commandId,
+            applicationIds
+        );
 
-        final JobEntity jobEntity = this.jobRepo.findOne(jobId);
-        if (jobEntity == null) {
-            throw new GenieNotFoundException("Cannot find job with ID " + jobId);
+        final JobEntity job = this.jobRepo.findOne(jobId);
+        if (job == null) {
+            throw new GenieNotFoundException("No job with id " + jobId + " exists.");
         }
 
-        final ClusterEntity clusterEntity = this.clusterRepo.findOne(clusterId);
-        if (clusterEntity == null) {
+        final ClusterEntity cluster = this.clusterRepo.findOne(clusterId);
+        if (cluster == null) {
             throw new GenieNotFoundException("Cannot find cluster with ID " + clusterId);
         }
 
-        jobEntity.setCluster(clusterEntity);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void updateCommandForJob(
-        @NotBlank(message = "Job id cannot be null while updating command information")
-        final String jobId,
-        @NotBlank(message = "Command id cannot be null while updating command information")
-        final String commandId
-    ) throws GenieException {
-        log.debug("Called with jobId {} and commandId {}", jobId, commandId);
-
-        final JobEntity jobEntity = this.jobRepo.findOne(jobId);
-        if (jobEntity == null) {
-            throw new GenieNotFoundException("Cannot find job with ID " + jobId);
-        }
-
-        final CommandEntity commandEntity = this.commandRepo.findOne(commandId);
-        if (commandEntity == null) {
+        final CommandEntity command = this.commandRepo.findOne(commandId);
+        if (command == null) {
             throw new GenieNotFoundException("Cannot find command with ID " + commandId);
         }
 
-        jobEntity.setCommand(commandEntity);
+        final List<ApplicationEntity> applications = Lists.newArrayList();
+        for (final String applicationId : applicationIds) {
+            final ApplicationEntity application = this.applicationRepo.findOne(applicationId);
+            if (application == null) {
+                throw new GenieNotFoundException("Cannot find application with ID + " + applicationId);
+            }
+            applications.add(application);
+        }
+
+        job.setCluster(cluster);
+        job.setCommand(command);
+        job.setApplications(applications);
     }
 
     /**
@@ -250,6 +255,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         jobRequestEntity.setTags(jobRequest.getTags());
         jobRequestEntity.setCpu(jobRequest.getCpu());
         jobRequestEntity.setMemory(jobRequest.getMemory());
+        jobRequestEntity.setApplicationsFromList(jobRequest.getApplications());
 
         this.jobRequestRepo.save(jobRequestEntity);
         return jobRequestEntity.getDTO();
@@ -300,7 +306,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         final JobExecutionEntity jobExecutionEntity = new JobExecutionEntity();
 
         jobExecutionEntity.setId(jobExecution.getId());
-        jobExecutionEntity.setHostname(jobExecution.getHostname());
+        jobExecutionEntity.setHostName(jobExecution.getHostName());
         jobExecutionEntity.setProcessId(jobExecution.getProcessId());
         jobExecutionEntity.setCheckDelay(jobExecution.getCheckDelay());
 

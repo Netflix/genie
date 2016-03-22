@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.core.jpa.entities;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobStatus;
@@ -32,6 +33,7 @@ import org.junit.experimental.categories.Category;
 import javax.validation.ConstraintViolationException;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -341,6 +343,26 @@ public class JobEntityUnitTests extends EntityTestsBase {
         Assert.assertThat(this.jobEntity.getCommand(), Matchers.nullValue());
         Assert.assertThat(command.getJobs(), Matchers.empty());
         Assert.assertThat(this.jobEntity.getCommandName(), Matchers.nullValue());
+    }
+
+    /**
+     * Test the application set and get methods.
+     *
+     * @throws GenieException on any issue
+     */
+    @Test
+    public void canSetApplications() throws GenieException {
+        final ApplicationEntity application1 = new ApplicationEntity();
+        application1.setId(UUID.randomUUID().toString());
+        final ApplicationEntity application2 = new ApplicationEntity();
+        application2.setId(UUID.randomUUID().toString());
+        final ApplicationEntity application3 = new ApplicationEntity();
+        application3.setId(UUID.randomUUID().toString());
+        final List<ApplicationEntity> applications = Lists.newArrayList(application1, application2, application3);
+
+        Assert.assertThat(this.jobEntity.getApplications(), Matchers.empty());
+        this.jobEntity.setApplications(applications);
+        Assert.assertThat(this.jobEntity.getApplications(), Matchers.is(applications));
     }
 
     /**

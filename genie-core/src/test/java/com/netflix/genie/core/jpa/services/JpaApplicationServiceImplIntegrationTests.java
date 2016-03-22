@@ -53,6 +53,7 @@ import java.util.UUID;
  * Integration tests for the ApplicationServiceJPAImpl.
  *
  * @author tgianos
+ * @since 2.0.0
  */
 @Category(IntegrationTest.class)
 @DatabaseSetup("JpaApplicationServiceImplIntegrationTests/init.xml")
@@ -71,12 +72,14 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
     private static final String APP_2_NAME = "spark";
     private static final String APP_2_USER = "amsharma";
     private static final String APP_2_VERSION = "4.5.6";
+    private static final String APP_2_TYPE = "spark";
     private static final ApplicationStatus APP_2_STATUS = ApplicationStatus.ACTIVE;
 
     private static final String APP_3_ID = "app3";
     private static final String APP_3_NAME = "storm";
     private static final String APP_3_USER = "tgianos";
     private static final String APP_3_VERSION = "7.8.9";
+    private static final String APP_3_TYPE = "storm";
     private static final ApplicationStatus APP_3_STATUS = ApplicationStatus.DEPRECATED;
 
     private static final Pageable PAGEABLE = new PageRequest(0, 10, Sort.Direction.DESC, "updated");
@@ -100,6 +103,7 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(APP_1_USER, app.getUser());
         Assert.assertEquals(APP_1_VERSION, app.getVersion());
         Assert.assertEquals(APP_1_STATUS, app.getStatus());
+        Assert.assertThat(app.getType(), Matchers.nullValue());
         Assert.assertEquals(3, app.getTags().size());
         Assert.assertEquals(2, app.getConfigs().size());
         Assert.assertEquals(2, app.getDependencies().size());
@@ -110,6 +114,7 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(APP_2_USER, app2.getUser());
         Assert.assertEquals(APP_2_VERSION, app2.getVersion());
         Assert.assertEquals(APP_2_STATUS, app2.getStatus());
+        Assert.assertThat(app2.getType(), Matchers.is(APP_2_TYPE));
         Assert.assertEquals(4, app2.getTags().size());
         Assert.assertEquals(2, app2.getConfigs().size());
         Assert.assertEquals(1, app2.getDependencies().size());
@@ -120,6 +125,7 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(APP_3_USER, app3.getUser());
         Assert.assertEquals(APP_3_VERSION, app3.getVersion());
         Assert.assertEquals(APP_3_STATUS, app3.getStatus());
+        Assert.assertThat(app3.getType(), Matchers.is(APP_3_TYPE));
         Assert.assertEquals(3, app3.getTags().size());
         Assert.assertEquals(1, app3.getConfigs().size());
         Assert.assertEquals(2, app3.getDependencies().size());
@@ -150,7 +156,7 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void testGetApplicationsByName() {
-        final Page<Application> apps = this.appService.getApplications(APP_2_NAME, null, null, null, PAGEABLE);
+        final Page<Application> apps = this.appService.getApplications(APP_2_NAME, null, null, null, null, PAGEABLE);
         Assert.assertEquals(1, apps.getNumberOfElements());
         Assert.assertTrue(apps.getContent().stream().allMatch(application -> application.getId().equals(APP_2_ID)));
     }
@@ -159,8 +165,8 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
      * Test the get applications method.
      */
     @Test
-    public void testGetApplicationsByUserName() {
-        final Page<Application> apps = this.appService.getApplications(null, APP_1_USER, null, null, PAGEABLE);
+    public void testGetApplicationsByUser() {
+        final Page<Application> apps = this.appService.getApplications(null, APP_1_USER, null, null, null, PAGEABLE);
         Assert.assertEquals(2, apps.getNumberOfElements());
         Assert.assertEquals(APP_3_ID, apps.getContent().get(0).getId());
         Assert.assertEquals(APP_1_ID, apps.getContent().get(1).getId());
@@ -174,7 +180,7 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
         final Set<ApplicationStatus> statuses = new HashSet<>();
         statuses.add(ApplicationStatus.ACTIVE);
         statuses.add(ApplicationStatus.INACTIVE);
-        final Page<Application> apps = this.appService.getApplications(null, null, statuses, null, PAGEABLE);
+        final Page<Application> apps = this.appService.getApplications(null, null, statuses, null, null, PAGEABLE);
         Assert.assertEquals(2, apps.getNumberOfElements());
         Assert.assertEquals(APP_2_ID, apps.getContent().get(0).getId());
         Assert.assertEquals(APP_1_ID, apps.getContent().get(1).getId());
@@ -187,33 +193,43 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
     public void testGetApplicationsByTags() {
         final Set<String> tags = new HashSet<>();
         tags.add("prod");
-        Page<Application> apps = this.appService.getApplications(null, null, null, tags, PAGEABLE);
+        Page<Application> apps = this.appService.getApplications(null, null, null, tags, null, PAGEABLE);
         Assert.assertEquals(3, apps.getNumberOfElements());
         Assert.assertEquals(APP_3_ID, apps.getContent().get(0).getId());
         Assert.assertEquals(APP_2_ID, apps.getContent().get(1).getId());
         Assert.assertEquals(APP_1_ID, apps.getContent().get(2).getId());
 
         tags.add("yarn");
-        apps = this.appService.getApplications(null, null, null, tags, PAGEABLE);
+        apps = this.appService.getApplications(null, null, null, tags, null, PAGEABLE);
         Assert.assertEquals(1, apps.getNumberOfElements());
         Assert.assertEquals(APP_2_ID, apps.getContent().get(0).getId());
 
         tags.clear();
         tags.add("genie.name:spark");
-        apps = this.appService.getApplications(null, null, null, tags, PAGEABLE);
+        apps = this.appService.getApplications(null, null, null, tags, null, PAGEABLE);
         Assert.assertEquals(1, apps.getNumberOfElements());
         Assert.assertEquals(APP_2_ID, apps.getContent().get(0).getId());
 
         tags.add("somethingThatWouldNeverReallyExist");
-        apps = this.appService.getApplications(null, null, null, tags, PAGEABLE);
+        apps = this.appService.getApplications(null, null, null, tags, null, PAGEABLE);
         Assert.assertTrue(apps.getNumberOfElements() == 0);
 
         tags.clear();
-        apps = this.appService.getApplications(null, null, null, tags, PAGEABLE);
+        apps = this.appService.getApplications(null, null, null, tags, null, PAGEABLE);
         Assert.assertEquals(3, apps.getNumberOfElements());
         Assert.assertEquals(APP_3_ID, apps.getContent().get(0).getId());
         Assert.assertEquals(APP_2_ID, apps.getContent().get(1).getId());
         Assert.assertEquals(APP_1_ID, apps.getContent().get(2).getId());
+    }
+
+    /**
+     * Test the get applications method.
+     */
+    @Test
+    public void testGetApplicationsByType() {
+        final Page<Application> apps = this.appService.getApplications(null, null, null, null, APP_2_TYPE, PAGEABLE);
+        Assert.assertEquals(1, apps.getNumberOfElements());
+        Assert.assertEquals(APP_2_ID, apps.getContent().get(0).getId());
     }
 
     /**
@@ -222,7 +238,7 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
     @Test
     public void testGetClustersDescending() {
         //Default to order by Updated
-        final Page<Application> applications = this.appService.getApplications(null, null, null, null, PAGEABLE);
+        final Page<Application> applications = this.appService.getApplications(null, null, null, null, null, PAGEABLE);
         Assert.assertEquals(3, applications.getNumberOfElements());
         Assert.assertEquals(APP_3_ID, applications.getContent().get(0).getId());
         Assert.assertEquals(APP_2_ID, applications.getContent().get(1).getId());
@@ -236,7 +252,8 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
     public void testGetClustersAscending() {
         //Default to order by Updated
         final Pageable ascendingPage = new PageRequest(0, 10, Sort.Direction.ASC, "updated");
-        final Page<Application> applications = this.appService.getApplications(null, null, null, null, ascendingPage);
+        final Page<Application> applications
+            = this.appService.getApplications(null, null, null, null, null, ascendingPage);
         Assert.assertEquals(3, applications.getNumberOfElements());
         Assert.assertEquals(APP_1_ID, applications.getContent().get(0).getId());
         Assert.assertEquals(APP_2_ID, applications.getContent().get(1).getId());
@@ -249,7 +266,7 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
     @Test
     public void testGetClustersOrderBysDefault() {
         //Default to order by Updated
-        final Page<Application> applications = this.appService.getApplications(null, null, null, null, PAGEABLE);
+        final Page<Application> applications = this.appService.getApplications(null, null, null, null, null, PAGEABLE);
         Assert.assertEquals(3, applications.getNumberOfElements());
         Assert.assertEquals(APP_3_ID, applications.getContent().get(0).getId());
         Assert.assertEquals(APP_2_ID, applications.getContent().get(1).getId());
@@ -262,7 +279,8 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
     @Test
     public void testGetClustersOrderBysName() {
         final Pageable orderByNamePage = new PageRequest(0, 10, Sort.Direction.DESC, "name");
-        final Page<Application> applications = this.appService.getApplications(null, null, null, null, orderByNamePage);
+        final Page<Application> applications
+            = this.appService.getApplications(null, null, null, null, null, orderByNamePage);
         Assert.assertEquals(3, applications.getNumberOfElements());
         Assert.assertEquals(APP_1_ID, applications.getContent().get(0).getId());
         Assert.assertEquals(APP_3_ID, applications.getContent().get(1).getId());
@@ -275,7 +293,7 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
     @Test(expected = PropertyReferenceException.class)
     public void testGetClustersOrderBysInvalidField() {
         final Pageable orderByInvalidPage = new PageRequest(0, 10, Sort.Direction.DESC, "I'mNotAValidField");
-        this.appService.getApplications(null, null, null, null, orderByInvalidPage);
+        this.appService.getApplications(null, null, null, null, null, orderByInvalidPage);
     }
 
     /**
@@ -285,7 +303,8 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
     @Ignore
     public void testGetClustersOrderBysCollectionField() {
         final Pageable orderByTagsPage = new PageRequest(0, 10, Sort.Direction.DESC, "tags");
-        final Page<Application> applications = this.appService.getApplications(null, null, null, null, orderByTagsPage);
+        final Page<Application> applications
+            = this.appService.getApplications(null, null, null, null, null, orderByTagsPage);
         Assert.assertThat(applications.getContent().toString(), Matchers.is("blahs"));
         Assert.assertEquals(3, applications.getNumberOfElements());
         Assert.assertEquals(APP_3_ID, applications.getContent().get(0).getId());
@@ -485,13 +504,13 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
     public void testDeleteAll() throws GenieException {
         Assert.assertEquals(
                 3,
-                this.appService.getApplications(null, null, null, null, PAGEABLE).getNumberOfElements()
+                this.appService.getApplications(null, null, null, null, null, PAGEABLE).getNumberOfElements()
         );
         // To solve referential integrity problem
         this.commandService.deleteCommand(COMMAND_1_ID);
         this.appService.deleteAllApplications();
         Assert.assertTrue(
-                this.appService.getApplications(null, null, null, null, PAGEABLE).getNumberOfElements() == 0
+                this.appService.getApplications(null, null, null, null, null, PAGEABLE).getNumberOfElements() == 0
         );
     }
 

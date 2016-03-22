@@ -23,6 +23,7 @@ import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.test.categories.UnitTest;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
@@ -44,6 +45,8 @@ import java.util.UUID;
  */
 @Category(UnitTest.class)
 public class JobRequestEntityUnitTests {
+
+    private static final String EMPTY_JSON_ARRAY = "[]";
 
     private JobRequestEntity entity;
 
@@ -71,14 +74,14 @@ public class JobRequestEntityUnitTests {
         Assert.assertThat(this.entity.getUpdated(), Matchers.notNullValue());
         Assert.assertThat(this.entity.getTags(), Matchers.empty());
         Assert.assertThat(this.entity.getClientHost(), Matchers.nullValue());
-        Assert.assertThat(this.entity.getClusterCriterias(), Matchers.is("[]"));
+        Assert.assertThat(this.entity.getClusterCriterias(), Matchers.is(EMPTY_JSON_ARRAY));
         Assert.assertThat(this.entity.getClusterCriteriasAsList(), Matchers.empty());
         Assert.assertThat(this.entity.getCommandArgs(), Matchers.nullValue());
-        Assert.assertThat(this.entity.getCommandCriteria(), Matchers.is("[]"));
+        Assert.assertThat(this.entity.getCommandCriteria(), Matchers.is(EMPTY_JSON_ARRAY));
         Assert.assertThat(this.entity.getCommandCriteriaAsSet(), Matchers.empty());
         Assert.assertThat(this.entity.getCpu(), Matchers.is(1));
         Assert.assertThat(this.entity.getEmail(), Matchers.nullValue());
-        Assert.assertThat(this.entity.getDependencies(), Matchers.is("[]"));
+        Assert.assertThat(this.entity.getDependencies(), Matchers.is(EMPTY_JSON_ARRAY));
         Assert.assertThat(this.entity.getDependenciesAsSet(), Matchers.empty());
         Assert.assertThat(this.entity.getGroup(), Matchers.nullValue());
         Assert.assertThat(this.entity.getJob(), Matchers.nullValue());
@@ -86,6 +89,8 @@ public class JobRequestEntityUnitTests {
         Assert.assertThat(this.entity.getSetupFile(), Matchers.nullValue());
         Assert.assertThat(this.entity.getTags(), Matchers.empty());
         Assert.assertFalse(this.entity.isDisableLogArchival());
+        Assert.assertThat(this.entity.getApplicationsAsList(), Matchers.empty());
+        Assert.assertThat(this.entity.getApplications(), Matchers.is(EMPTY_JSON_ARRAY));
     }
 
     /**
@@ -330,6 +335,44 @@ public class JobRequestEntityUnitTests {
     }
 
     /**
+     * Make sure the entity class sets the applications right.
+     */
+    @Test
+    public void canSetApplications() {
+        final String applications = UUID.randomUUID().toString();
+        this.entity.setApplications(applications);
+        Assert.assertThat(this.entity.getApplications(), Matchers.is(applications));
+    }
+
+    /**
+     * Make sure if the String isn't JSON a GenieException is thrown.
+     *
+     * @throws GenieException on problem
+     */
+    @Test(expected = GenieServerException.class)
+    public void cantGetApplicationsFromBadString() throws GenieException {
+        this.entity.setApplications(UUID.randomUUID().toString());
+        this.entity.getApplicationsAsList();
+    }
+
+    /**
+     * Make can get applications from List.
+     *
+     * @throws GenieException on problem
+     */
+    @Test
+    public void canSetApplicationsList() throws GenieException {
+        final List<String> applications = Lists.newArrayList(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
+        );
+        this.entity.setApplicationsFromList(applications);
+        Assert.assertThat(this.entity.getApplicationsAsList(), Matchers.is(applications));
+    }
+
+    /**
      * Test to make sure can get a valid DTO from the job request entity.
      *
      * @throws GenieException on error
@@ -410,6 +453,14 @@ public class JobRequestEntityUnitTests {
         final int memory = 3060;
         requestEntity.setMemory(memory);
 
+        final List<String> applications = Lists.newArrayList(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
+        );
+        requestEntity.setApplicationsFromList(applications);
+
         final JobRequest request = requestEntity.getDTO();
         Assert.assertThat(request.getId(), Matchers.is(id));
         Assert.assertThat(request.getName(), Matchers.is(name));
@@ -435,5 +486,6 @@ public class JobRequestEntityUnitTests {
         Assert.assertThat(request.getSetupFile(), Matchers.is(setupFile));
         Assert.assertThat(request.getCpu(), Matchers.is(cpu));
         Assert.assertThat(request.getMemory(), Matchers.is(memory));
+        Assert.assertThat(request.getApplications(), Matchers.is(applications));
     }
 }

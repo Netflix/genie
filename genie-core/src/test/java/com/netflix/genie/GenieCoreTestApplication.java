@@ -71,7 +71,7 @@ public class GenieCoreTestApplication {
      * @return localhost always
      */
     @Bean
-    public String hostname() {
+    public String hostName() {
         return "localhost";
     }
 
@@ -89,7 +89,7 @@ public class GenieCoreTestApplication {
 
     /**
      * Get the jobs dir as a Spring Resource. Will create if it doesn't exist.
-
+     *
      * @return The job dir as a resource
      * @throws IOException on error reading or creading the directory
      */
@@ -97,6 +97,6 @@ public class GenieCoreTestApplication {
     @ConditionalOnMissingBean
     public Resource jobsDir(
     ) throws IOException {
-       return new DefaultResourceLoader().getResource("/tmp");
+        return new DefaultResourceLoader().getResource("/tmp");
     }
 }

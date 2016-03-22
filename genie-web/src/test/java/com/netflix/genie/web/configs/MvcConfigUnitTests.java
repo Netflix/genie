@@ -84,7 +84,7 @@ public class MvcConfigUnitTests {
     @Test
     public void canGetHostname() throws UnknownHostException {
         final String expectedHostname = InetAddress.getLocalHost().getCanonicalHostName();
-        Assert.assertThat(this.mvcConfig.hostname(), Matchers.is(expectedHostname));
+        Assert.assertThat(this.mvcConfig.hostName(), Matchers.is(expectedHostname));
     }
 
     /**

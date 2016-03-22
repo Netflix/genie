@@ -71,17 +71,19 @@ public interface ApplicationService {
      * Get applications for given filter criteria.
      *
      * @param name     Name of application. Can be null or empty.
-     * @param userName The user who created the application. Can be null/empty
+     * @param user     The user who created the application. Can be null/empty
      * @param statuses The statuses of the applications to find. Can be null.
      * @param tags     Tags allocated to this application
+     * @param type     The type of the application to find
      * @param pageable The page requested from the search results
      * @return The page of found applications
      */
     Page<Application> getApplications(
         final String name,
-        final String userName,
+        final String user,
         final Set<ApplicationStatus> statuses,
         final Set<String> tags,
+        final String type,
         final Pageable pageable
     );
 

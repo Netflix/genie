@@ -137,7 +137,7 @@ public class JpaCommandServiceImpl implements CommandService {
     @Transactional(readOnly = true)
     public Page<Command> getCommands(
         final String name,
-        final String userName,
+        final String user,
         final Set<CommandStatus> statuses,
         final Set<String> tags,
         final Pageable page
@@ -148,7 +148,7 @@ public class JpaCommandServiceImpl implements CommandService {
         final Page<CommandEntity> commandEntities = this.commandRepo.findAll(
             JpaCommandSpecs.find(
                 name,
-                userName,
+                user,
                 statuses,
                 tags
             ),
@@ -508,7 +508,7 @@ public class JpaCommandServiceImpl implements CommandService {
         }
     }
 
-    private void  updateAndSaveCommandEntity(final CommandEntity commandEntity, final Command command) {
+    private void updateAndSaveCommandEntity(final CommandEntity commandEntity, final Command command) {
         commandEntity.setName(command.getName());
         commandEntity.setUser(command.getUser());
         commandEntity.setVersion(command.getVersion());

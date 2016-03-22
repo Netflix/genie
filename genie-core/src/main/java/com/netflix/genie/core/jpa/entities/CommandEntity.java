@@ -69,7 +69,7 @@ public class CommandEntity extends SetupFileEntity {
     private CommandStatus status;
 
     @Basic(optional = false)
-    @Column(name = "executable", nullable = false, length = 255)
+    @Column(name = "executable", nullable = false)
     @NotBlank(message = "No executable entered for command and is required.")
     @Length(max = 255, message = "Max length in database is 255 characters")
     private String executable;

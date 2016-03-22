@@ -47,7 +47,7 @@ import java.util.concurrent.ScheduledFuture;
 public class JobMonitoringCoordinator {
 
     private final Map<String, ScheduledFuture<?>> jobMonitors;
-    private final String hostname;
+    private final String hostName;
     private final JobSearchService jobSearchService;
     private final TaskScheduler scheduler;
     private final ApplicationEventPublisher publisher;
@@ -56,7 +56,7 @@ public class JobMonitoringCoordinator {
     /**
      * Constructor.
      *
-     * @param hostname         The name of the host this Genie process is running on
+     * @param hostName         The name of the host this Genie process is running on
      * @param jobSearchService The search service to use to find jobs
      * @param publisher        The event publisher to use to publish events
      * @param scheduler        The task scheduler to use to register scheduling of job checkers
@@ -64,14 +64,14 @@ public class JobMonitoringCoordinator {
      */
     @Autowired
     public JobMonitoringCoordinator(
-        final String hostname,
+        final String hostName,
         final JobSearchService jobSearchService,
         final ApplicationEventPublisher publisher,
         final TaskScheduler scheduler,
         final Executor executor
     ) {
         this.jobMonitors = new HashMap<>();
-        this.hostname = hostname;
+        this.hostName = hostName;
         this.jobSearchService = jobSearchService;
         this.publisher = publisher;
         this.scheduler = scheduler;
@@ -89,7 +89,7 @@ public class JobMonitoringCoordinator {
     public void attachToRunningJobs(final ApplicationReadyEvent event) {
         log.info("Application is ready according to event {}. Attempting to re-attach to any running jobs", event);
         try {
-            final Set<JobExecution> executions = this.jobSearchService.getAllRunningJobExecutionsOnHost(this.hostname);
+            final Set<JobExecution> executions = this.jobSearchService.getAllRunningJobExecutionsOnHost(this.hostName);
             if (executions.isEmpty()) {
                 log.info("No jobs currently running on this node.");
                 return;
