@@ -20,18 +20,16 @@ package com.netflix.genie.core.jpa.services;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseTearDown;
 import com.google.common.collect.Sets;
+import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
-import com.netflix.genie.core.jpa.repositories.JpaJobExecutionRepository;
-import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
-import com.netflix.genie.core.jpa.repositories.JpaJobRequestRepository;
+import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.test.categories.IntegrationTest;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,8 +38,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -60,29 +57,9 @@ public class JpaJobSearchServiceImplIntegrationTests extends DBUnitTestBase {
     private static final String JOB_2_ID = "job2";
     private static final String JOB_3_ID = "job3";
 
+    // This needs to be injected as a Spring Bean otherwise transactions don't work as there is no proxy
     @Autowired
-    private JpaJobRepository jobRepository;
-
-    @Autowired
-    private JpaJobRequestRepository requestRepository;
-
-    @Autowired
-    private JpaJobExecutionRepository executionRepository;
-
-    @PersistenceContext
-    private EntityManager entityManager;
-
-    private JpaJobSearchServiceImpl service;
-
-    /**
-     * Setup for the tests.
-     */
-    @Before
-    public void setup() {
-        this.service
-            = new JpaJobSearchServiceImpl(this.jobRepository, this.requestRepository, this.executionRepository);
-        this.service.setEntityManager(this.entityManager);
-    }
+    private JobSearchService service;
 
     /**
      * Make sure we can search jobs successfully.
@@ -201,8 +178,8 @@ public class JpaJobSearchServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void canGetJob() throws GenieException {
-        Assert.assertThat(this.service.getJob(JOB_1_ID).getName(), Matchers.is("testPigJob"));
-        Assert.assertThat(this.service.getJob(JOB_2_ID).getName(), Matchers.is("testSparkJob"));
+        Assert.assertThat(this.service.getJob(JOB_1_ID).getName(), Matchers.is("testSparkJob"));
+        Assert.assertThat(this.service.getJob(JOB_2_ID).getName(), Matchers.is("testSparkJob1"));
         Assert.assertThat(this.service.getJob(JOB_3_ID).getName(), Matchers.is("testSparkJob2"));
 
         try {
@@ -239,7 +216,7 @@ public class JpaJobSearchServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void canGetJobRequest() throws GenieException {
-        Assert.assertThat(this.service.getJobRequest(JOB_1_ID).getCommandArgs(), Matchers.is("-f query.pig"));
+        Assert.assertThat(this.service.getJobRequest(JOB_1_ID).getCommandArgs(), Matchers.is("-f query.q"));
         Assert.assertThat(this.service.getJobRequest(JOB_2_ID).getCommandArgs(), Matchers.is("-f spark.jar"));
         Assert.assertThat(this.service.getJobRequest(JOB_3_ID).getCommandArgs(), Matchers.is("-f spark.jar"));
 
@@ -268,5 +245,43 @@ public class JpaJobSearchServiceImplIntegrationTests extends DBUnitTestBase {
         } catch (final GenieException ge) {
             Assert.assertTrue(ge instanceof GenieNotFoundException);
         }
+    }
+
+    /**
+     * Make sure getting the job cluster method returns a valid cluster.
+     *
+     * @throws GenieException on error
+     */
+    @Test
+    public void canGetJobCluster() throws GenieException {
+        Assert.assertThat(this.service.getJobCluster(JOB_1_ID).getId(), Matchers.is("cluster1"));
+    }
+
+    /**
+     * Make sure getting the job command method returns a valid command.
+     *
+     * @throws GenieException on error
+     */
+    @Test
+    public void canGetJobCommand() throws GenieException {
+        Assert.assertThat(this.service.getJobCommand(JOB_1_ID).getId(), Matchers.is("command1"));
+    }
+
+    /**
+     * Make sure getting the job applications method returns a valid list of applications.
+     *
+     * @throws GenieException on error
+     */
+    @Test
+    public void canGetJobApplications() throws GenieException {
+        List<Application> applications;
+        applications = this.service.getJobApplications(JOB_1_ID);
+        Assert.assertThat(applications.size(), Matchers.is(2));
+        Assert.assertThat(applications.get(0).getId(), Matchers.is("app1"));
+        Assert.assertThat(applications.get(1).getId(), Matchers.is("app3"));
+        applications = this.service.getJobApplications(JOB_2_ID);
+        Assert.assertThat(applications.size(), Matchers.is(2));
+        Assert.assertThat(applications.get(0).getId(), Matchers.is("app1"));
+        Assert.assertThat(applications.get(1).getId(), Matchers.is("app2"));
     }
 }

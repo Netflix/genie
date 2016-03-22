@@ -27,4 +27,5 @@
     <job_requests/>
     <jobs/>
     <job_executions/>
+    <jobs_applications/>
 </dataset>

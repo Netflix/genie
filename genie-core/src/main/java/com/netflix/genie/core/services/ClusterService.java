@@ -18,10 +18,10 @@
 package com.netflix.genie.core.services;
 
 import com.github.fge.jsonpatch.JsonPatch;
-import com.netflix.genie.common.dto.Command;
-import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
+import com.netflix.genie.common.dto.Command;
+import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import org.hibernate.validator.constraints.NotBlank;
@@ -54,9 +54,9 @@ public interface ClusterService {
      * @throws GenieException if there is an error
      */
     String createCluster(
-            @NotNull(message = "No cluster entered. Unable to create.")
-            @Valid
-            final Cluster cluster
+        @NotNull(message = "No cluster entered. Unable to create.")
+        @Valid
+        final Cluster cluster
     ) throws GenieException;
 
     /**
@@ -67,8 +67,8 @@ public interface ClusterService {
      * @throws GenieException For any error
      */
     Cluster getCluster(
-            @NotBlank(message = "No id entered. Unable to get.")
-            final String id
+        @NotBlank(message = "No id entered. Unable to get.")
+        final String id
     ) throws GenieException;
 
     /**
@@ -84,12 +84,12 @@ public interface ClusterService {
      * @return All the clusters matching the criteria
      */
     Page<Cluster> getClusters(
-            final String name,
-            final Set<ClusterStatus> statuses,
-            final Set<String> tags,
-            final Date minUpdateTime,
-            final Date maxUpdateTime,
-            final Pageable page
+        final String name,
+        final Set<ClusterStatus> statuses,
+        final Set<String> tags,
+        final Date minUpdateTime,
+        final Date maxUpdateTime,
+        final Pageable page
     );
 
     /**
@@ -100,8 +100,8 @@ public interface ClusterService {
      * @throws GenieException if there is an error
      */
     List<Cluster> chooseClusterForJobRequest(
-            @NotNull(message = "JobRequest object is null. Unable to continue.")
-            final JobRequest jobRequest
+        @NotNull(message = "JobRequest object is null. Unable to continue.")
+        final JobRequest jobRequest
     ) throws GenieException;
 
     /**
@@ -112,11 +112,11 @@ public interface ClusterService {
      * @throws GenieException if there is an error
      */
     void updateCluster(
-            @NotBlank(message = "No cluster id entered. Unable to update.")
-            final String id,
-            @NotNull(message = "No cluster information entered. Unable to update.")
-            @Valid
-            final Cluster updateCluster
+        @NotBlank(message = "No cluster id entered. Unable to update.")
+        final String id,
+        @NotNull(message = "No cluster information entered. Unable to update.")
+        @Valid
+        final Cluster updateCluster
     ) throws GenieException;
 
     /**
@@ -142,8 +142,8 @@ public interface ClusterService {
      * @throws GenieException if there is an error
      */
     void deleteCluster(
-            @NotBlank(message = "No id entered unable to delete.")
-            final String id
+        @NotBlank(message = "No id entered unable to delete.")
+        final String id
     ) throws GenieException;
 
     /**
@@ -155,10 +155,10 @@ public interface ClusterService {
      * @throws GenieException if there is an error
      */
     void addConfigsForCluster(
-            @NotBlank(message = "No cluster id entered. Unable to add configurations.")
-            final String id,
-            @NotEmpty(message = "No configuration files entered. Unable to add.")
-            final Set<String> configs
+        @NotBlank(message = "No cluster id entered. Unable to add configurations.")
+        final String id,
+        @NotEmpty(message = "No configuration files entered. Unable to add.")
+        final Set<String> configs
     ) throws GenieException;
 
     /**
@@ -171,8 +171,8 @@ public interface ClusterService {
      * @throws GenieException if there is an error
      */
     Set<String> getConfigsForCluster(
-            @NotBlank(message = "No cluster id sent. Cannot retrieve configurations.")
-            final String id
+        @NotBlank(message = "No cluster id sent. Cannot retrieve configurations.")
+        final String id
     ) throws GenieException;
 
     /**
@@ -186,10 +186,10 @@ public interface ClusterService {
      * @throws GenieException if there is an error
      */
     void updateConfigsForCluster(
-            @NotBlank(message = "No cluster id entered. Unable to update configurations.")
-            final String id,
-            @NotEmpty(message = "No configs entered. Unable to update.")
-            final Set<String> configs
+        @NotBlank(message = "No cluster id entered. Unable to update configurations.")
+        final String id,
+        @NotEmpty(message = "No configs entered. Unable to update.")
+        final Set<String> configs
     ) throws GenieException;
 
     /**
@@ -200,8 +200,8 @@ public interface ClusterService {
      * @throws GenieException if there is an error
      */
     void removeAllConfigsForCluster(
-            @NotBlank(message = "No cluster id entered. Unable to remove configs.")
-            final String id
+        @NotBlank(message = "No cluster id entered. Unable to remove configs.")
+        final String id
     ) throws GenieException;
 
     /**
@@ -213,10 +213,10 @@ public interface ClusterService {
      * @throws GenieException if there is an error
      */
     void addTagsForCluster(
-            @NotBlank(message = "No cluster id entered. Unable to add tags.")
-            final String id,
-            @NotEmpty(message = "No tags entered. Unable to add to tags.")
-            final Set<String> tags
+        @NotBlank(message = "No cluster id entered. Unable to add tags.")
+        final String id,
+        @NotEmpty(message = "No tags entered. Unable to add to tags.")
+        final Set<String> tags
     ) throws GenieException;
 
     /**
@@ -229,8 +229,8 @@ public interface ClusterService {
      * @throws GenieException if there is an error
      */
     Set<String> getTagsForCluster(
-            @NotBlank(message = "No cluster id sent. Cannot retrieve tags.")
-            final String id
+        @NotBlank(message = "No cluster id sent. Cannot retrieve tags.")
+        final String id
     ) throws GenieException;
 
     /**
@@ -244,10 +244,10 @@ public interface ClusterService {
      * @throws GenieException if there is an error
      */
     void updateTagsForCluster(
-            @NotBlank(message = "No cluster id entered. Unable to update tags.")
-            final String id,
-            @NotEmpty(message = "No tags entered. Unable to update.")
-            final Set<String> tags
+        @NotBlank(message = "No cluster id entered. Unable to update tags.")
+        final String id,
+        @NotEmpty(message = "No tags entered. Unable to update.")
+        final Set<String> tags
     ) throws GenieException;
 
     /**
@@ -258,8 +258,8 @@ public interface ClusterService {
      * @throws GenieException if there is an error
      */
     void removeAllTagsForCluster(
-            @NotBlank(message = "No cluster id entered. Unable to remove tags.")
-            final String id
+        @NotBlank(message = "No cluster id entered. Unable to remove tags.")
+        final String id
     ) throws GenieException;
 
     /**
@@ -271,10 +271,10 @@ public interface ClusterService {
      * @throws GenieException if there is an error
      */
     void removeTagForCluster(
-            @NotBlank(message = "No cluster id entered. Unable to remove tag.")
-            final String id,
-            @NotBlank(message = "No tag entered. Unable to remove.")
-            final String tag
+        @NotBlank(message = "No cluster id entered. Unable to remove tag.")
+        final String id,
+        @NotBlank(message = "No tag entered. Unable to remove.")
+        final String tag
     ) throws GenieException;
 
     /**
@@ -286,10 +286,10 @@ public interface ClusterService {
      * @throws GenieException if there is an error
      */
     void addCommandsForCluster(
-            @NotBlank(message = "No cluster id entered. Unable to add commands.")
-            final String id,
-            @NotEmpty(message = "No command ids entered. Unable to add commands.")
-            final List<String> commandIds
+        @NotBlank(message = "No cluster id entered. Unable to add commands.")
+        final String id,
+        @NotEmpty(message = "No command ids entered. Unable to add commands.")
+        final List<String> commandIds
     ) throws GenieException;
 
     /**
@@ -302,9 +302,9 @@ public interface ClusterService {
      * @throws GenieException if there is an error
      */
     List<Command> getCommandsForCluster(
-            @NotBlank(message = "No cluster id entered. Unable to get commands.")
-            final String id,
-            final Set<CommandStatus> statuses
+        @NotBlank(message = "No cluster id entered. Unable to get commands.")
+        final String id,
+        final Set<CommandStatus> statuses
     ) throws GenieException;
 
     /**
@@ -318,10 +318,10 @@ public interface ClusterService {
      * @throws GenieException if there is an error
      */
     void updateCommandsForCluster(
-            @NotBlank(message = "No cluster id entered. Unable to update commands.")
-            final String id,
-            @NotNull(message = "No command ids entered. Unable to update commands.")
-            final List<String> commandIds
+        @NotBlank(message = "No cluster id entered. Unable to update commands.")
+        final String id,
+        @NotNull(message = "No command ids entered. Unable to update commands.")
+        final List<String> commandIds
     ) throws GenieException;
 
     /**
@@ -332,8 +332,8 @@ public interface ClusterService {
      * @throws GenieException if there is an error
      */
     void removeAllCommandsForCluster(
-            @NotBlank(message = "No cluster id entered. Unable to remove commands.")
-            final String id
+        @NotBlank(message = "No cluster id entered. Unable to remove commands.")
+        final String id
     ) throws GenieException;
 
     /**
@@ -345,9 +345,9 @@ public interface ClusterService {
      * @throws GenieException if there is an error
      */
     void removeCommandForCluster(
-            @NotBlank(message = "No cluster id entered. Unable to remove command.")
-            final String id,
-            @NotBlank(message = "No command id entered. Unable to remove command.")
-            final String cmdId
+        @NotBlank(message = "No cluster id entered. Unable to remove command.")
+        final String id,
+        @NotBlank(message = "No command id entered. Unable to remove command.")
+        final String cmdId
     ) throws GenieException;
 }

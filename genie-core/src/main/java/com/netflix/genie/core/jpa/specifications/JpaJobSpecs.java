@@ -19,10 +19,8 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.core.jpa.entities.JobEntity;
 import com.netflix.genie.core.jpa.entities.JobEntity_;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
@@ -46,35 +44,13 @@ public final class JpaJobSpecs {
     }
 
     /**
-     * Find jobs that are zombies.
-     *
-     * @param currentTime The current time
-     * @param zombieTime  The time that zombies should be marked by
-     * @return The specification for this query
-     */
-    public static Specification<JobEntity> findZombies(final long currentTime, final long zombieTime) {
-        return (final Root<JobEntity> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
-            // the equivalent query is as follows:
-            // update Job set status='FAILED', finishTime=$max, exitCode=$zombie_code,
-            // statusMsg='Job has been marked as a zombie'
-            // where updateTime < $min and (status='RUNNING' or status='INIT')"
-            final List<Predicate> predicates = new ArrayList<>();
-            predicates.add(cb.lessThan(root.get(JobEntity_.updated), new Date(currentTime - zombieTime)));
-            final Predicate orPredicate1 = cb.equal(root.get(JobEntity_.status), JobStatus.RUNNING);
-            final Predicate orPredicate2 = cb.equal(root.get(JobEntity_.status), JobStatus.INIT);
-            predicates.add(cb.or(orPredicate1, orPredicate2));
-            return cb.and(predicates.toArray(new Predicate[predicates.size()]));
-        };
-    }
-
-    /**
      * Generate a criteria query predicate for a where clause based on the given parameters.
      *
      * @param root        The root to use
      * @param cb          The criteria builder to use
      * @param id          The job id
-     * @param jobName     The job name
-     * @param userName    The user who created the job
+     * @param name        The job name
+     * @param user        The user who created the job
      * @param statuses    The job statuses
      * @param tags        The tags for the jobs to find
      * @param clusterName The cluster name
@@ -91,8 +67,8 @@ public final class JpaJobSpecs {
         final Root<JobEntity> root,
         final CriteriaBuilder cb,
         final String id,
-        final String jobName,
-        final String userName,
+        final String name,
+        final String user,
         final Set<JobStatus> statuses,
         final Set<String> tags,
         final String clusterName,
@@ -108,11 +84,11 @@ public final class JpaJobSpecs {
         if (StringUtils.isNotBlank(id)) {
             predicates.add(cb.like(root.get(JobEntity_.id), id));
         }
-        if (StringUtils.isNotBlank(jobName)) {
-            predicates.add(cb.like(root.get(JobEntity_.name), jobName));
+        if (StringUtils.isNotBlank(name)) {
+            predicates.add(cb.like(root.get(JobEntity_.name), name));
         }
-        if (StringUtils.isNotBlank(userName)) {
-            predicates.add(cb.equal(root.get(JobEntity_.user), userName));
+        if (StringUtils.isNotBlank(user)) {
+            predicates.add(cb.equal(root.get(JobEntity_.user), user));
         }
         if (statuses != null && !statuses.isEmpty()) {
             final List<Predicate> orPredicates =

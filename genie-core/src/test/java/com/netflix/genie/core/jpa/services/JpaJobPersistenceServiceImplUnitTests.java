@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.core.jpa.services;
 
+import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
@@ -25,9 +26,13 @@ import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.core.jpa.entities.ApplicationEntity;
+import com.netflix.genie.core.jpa.entities.ClusterEntity;
+import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.entities.JobEntity;
 import com.netflix.genie.core.jpa.entities.JobExecutionEntity;
 import com.netflix.genie.core.jpa.entities.JobRequestEntity;
+import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobExecutionRepository;
@@ -48,9 +53,10 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Tests for the ApplicationServiceJPAImpl.
+ * Tests for the JpaJobPersistenceServiceImpl.
  *
  * @author tgianos
+ * @since 3.0.0
  */
 @Category(UnitTest.class)
 public class JpaJobPersistenceServiceImplUnitTests {
@@ -65,6 +71,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
     private JpaJobRepository jobRepo;
     private JpaJobRequestRepository jobRequestRepo;
     private JpaJobExecutionRepository jobExecutionRepo;
+    private JpaApplicationRepository applicationRepo;
     private JpaClusterRepository clusterRepo;
     private JpaCommandRepository commandRepo;
 
@@ -78,6 +85,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
         this.jobRepo = Mockito.mock(JpaJobRepository.class);
         this.jobRequestRepo = Mockito.mock(JpaJobRequestRepository.class);
         this.jobExecutionRepo = Mockito.mock(JpaJobExecutionRepository.class);
+        this.applicationRepo = Mockito.mock(JpaApplicationRepository.class);
         this.clusterRepo = Mockito.mock(JpaClusterRepository.class);
         this.commandRepo = Mockito.mock(JpaCommandRepository.class);
 
@@ -85,6 +93,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
             this.jobRepo,
             this.jobRequestRepo,
             this.jobExecutionRepo,
+            this.applicationRepo,
             this.clusterRepo,
             this.commandRepo);
     }
@@ -225,53 +234,70 @@ public class JpaJobPersistenceServiceImplUnitTests {
     }
 
     /**
-     * Test the updateClusterForJob method.
+     * Test the updateJobWithRuntime method.
      *
      * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
-    public void testUpdateClusterForJobNonExistentJob() throws GenieException {
+    public void cantUpdateRuntimeForNonExistentJob() throws GenieException {
         Mockito.when(this.jobRepo.findOne(Mockito.eq(JOB_1_ID))).thenReturn(null);
-        this.jobPersistenceService.updateClusterForJob(JOB_1_ID, "foo");
+        this.jobPersistenceService.updateJobWithRuntimeEnvironment(JOB_1_ID, "foo", "bar", Lists.newArrayList());
     }
 
     /**
-     * Test the updateClusterForJob method.
+     * Test the updateJobWithRuntime method.
      *
      * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
-    public void testUpdateClusterForJobNonExistentCluster() throws GenieException {
+    public void cantUpdateRuntimeForNonExistentCluster() throws GenieException {
         final String id = UUID.randomUUID().toString();
         final JobEntity jobEntity = Mockito.mock(JobEntity.class);
         Mockito.when(this.jobRepo.findOne(JOB_1_ID)).thenReturn(jobEntity);
         Mockito.when(this.clusterRepo.findOne(Mockito.eq(id))).thenReturn(null);
-        this.jobPersistenceService.updateClusterForJob(JOB_1_ID, id);
+        this.jobPersistenceService.updateJobWithRuntimeEnvironment(JOB_1_ID, id, "bar", Lists.newArrayList());
     }
 
     /**
-     * Test the updateCommandForJob method.
+     * Test the updateJobWithRuntime method.
      *
      * @throws GenieException For any problem
      */
     @Test(expected = GenieNotFoundException.class)
-    public void testUpdateCommandForJobNonExistentJob() throws GenieException {
-        Mockito.when(this.jobRepo.findOne(Mockito.eq(JOB_1_ID))).thenReturn(null);
-        this.jobPersistenceService.updateCommandForJob(JOB_1_ID, "foo");
-    }
-
-    /**
-     * Test the updateCommandForJob method.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = GenieNotFoundException.class)
-    public void testUpdateCommandForJobNonExistentCluster() throws GenieException {
-        final String id = UUID.randomUUID().toString();
+    public void cantUpdateRuntimeForNonExistentCommand() throws GenieException {
+        final String clusterId = UUID.randomUUID().toString();
+        final String commandId = UUID.randomUUID().toString();
         final JobEntity jobEntity = Mockito.mock(JobEntity.class);
         Mockito.when(this.jobRepo.findOne(JOB_1_ID)).thenReturn(jobEntity);
-        Mockito.when(this.commandRepo.findOne(Mockito.eq(id))).thenReturn(null);
-        this.jobPersistenceService.updateCommandForJob(JOB_1_ID, id);
+        Mockito.when(this.clusterRepo.findOne(clusterId)).thenReturn(new ClusterEntity());
+        Mockito.when(this.commandRepo.findOne(commandId)).thenReturn(null);
+        this.jobPersistenceService
+            .updateJobWithRuntimeEnvironment(JOB_1_ID, clusterId, commandId, Lists.newArrayList());
+    }
+
+    /**
+     * Test the updateJobWithRuntime method.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test(expected = GenieNotFoundException.class)
+    public void cantUpdateRuntimeForNonExistentApplication() throws GenieException {
+        final String clusterId = UUID.randomUUID().toString();
+        final String commandId = UUID.randomUUID().toString();
+        final String applicationId1 = UUID.randomUUID().toString();
+        final String applicationId2 = UUID.randomUUID().toString();
+        final JobEntity jobEntity = Mockito.mock(JobEntity.class);
+        Mockito.when(this.jobRepo.findOne(JOB_1_ID)).thenReturn(jobEntity);
+        Mockito.when(this.clusterRepo.findOne(clusterId)).thenReturn(new ClusterEntity());
+        Mockito.when(this.commandRepo.findOne(commandId)).thenReturn(new CommandEntity());
+        Mockito.when(this.applicationRepo.findOne(applicationId1)).thenReturn(new ApplicationEntity());
+        Mockito.when(this.applicationRepo.findOne(applicationId2)).thenReturn(null);
+        this.jobPersistenceService.updateJobWithRuntimeEnvironment(
+            JOB_1_ID,
+            clusterId,
+            commandId,
+            Lists.newArrayList(applicationId1, applicationId2)
+        );
     }
 
     /******* Unit Tests for Job Request methods ********/
@@ -334,7 +360,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
             .build();
         final ArgumentCaptor<JobRequestEntity> argument = ArgumentCaptor.forClass(JobRequestEntity.class);
         this.jobPersistenceService.createJobRequest(jobRequest);
-        Mockito.verify(jobRequestRepo).save(argument.capture());
+        Mockito.verify(this.jobRequestRepo).save(argument.capture());
         // Make sure id supplied is used to create the JobRequest
         Assert.assertEquals(JOB_1_ID, argument.getValue().getId());
         Assert.assertEquals(JOB_1_USER, argument.getValue().getUser());
@@ -347,6 +373,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
         Assert.assertEquals(group, argument.getValue().getGroup());
         Assert.assertEquals(tags, argument.getValue().getTags());
         Assert.assertEquals(description, argument.getValue().getDescription());
+        Assert.assertThat(argument.getValue().getApplicationsAsList(), Matchers.empty());
     }
 
     /**

@@ -67,12 +67,12 @@ import java.util.UUID;
 @Slf4j
 public class JobRestControllerIntegrationTests extends RestControllerIntegrationTestsBase {
 
-    protected static final String STATUS_MESSAGE_PATH = "$.statusMsg";
-    protected static final String CLUSTER_NAME_PATH = "$.clusterName";
-    protected static final String COMMAND_NAME_PATH = "$.commandName";
-    protected static final String ARCHIVE_LOCATION_PATH = "$.archiveLocation";
-    protected static final String STARTED_PATH = "$.started";
-    protected static final String FINISHED_PATH = "$.finished";
+    private static final String STATUS_MESSAGE_PATH = "$.statusMsg";
+    private static final String CLUSTER_NAME_PATH = "$.clusterName";
+    private static final String COMMAND_NAME_PATH = "$.commandName";
+    private static final String ARCHIVE_LOCATION_PATH = "$.archiveLocation";
+    private static final String STARTED_PATH = "$.started";
+    private static final String FINISHED_PATH = "$.finished";
 
     private static final String BASE_DIR
         = "com/netflix/genie/web/controllers/JobRestControllerIntegrationTests/";

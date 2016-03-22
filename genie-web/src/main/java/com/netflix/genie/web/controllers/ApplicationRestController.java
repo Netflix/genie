@@ -126,9 +126,10 @@ public class ApplicationRestController {
      * Get Applications based on user parameters.
      *
      * @param name      name for configuration (optional)
-     * @param userName  The user who created the application (optional)
+     * @param user      The user who created the application (optional)
      * @param statuses  The statuses of the applications (optional)
-     * @param tags      The set of tags you want the command for.
+     * @param tags      The set of tags you want the application for. (optional)
+     * @param type      The type of applications to get (optional)
      * @param page      The page to get
      * @param assembler The paged resources assembler to use
      * @return All applications matching the criteria
@@ -138,14 +139,15 @@ public class ApplicationRestController {
     @ResponseStatus(HttpStatus.OK)
     public PagedResources<ApplicationResource> getApplications(
         @RequestParam(value = "name", required = false) final String name,
-        @RequestParam(value = "userName", required = false) final String userName,
+        @RequestParam(value = "user", required = false) final String user,
         @RequestParam(value = "status", required = false) final Set<String> statuses,
         @RequestParam(value = "tag", required = false) final Set<String> tags,
-        @PageableDefault(page = 0, size = 64, sort = {"updated"}, direction = Sort.Direction.DESC) final Pageable page,
+        @RequestParam(value = "type", required = false) final String type,
+        @PageableDefault(sort = {"updated"}, direction = Sort.Direction.DESC) final Pageable page,
         final PagedResourcesAssembler<Application> assembler
     ) throws GenieException {
-        log.debug("Called [name | userName | status | tags | pageable]");
-        log.debug("{} | {} | {} | {} | {}", name, userName, statuses, tags, page);
+        log.debug("Called [name | user | status | tags | type | pageable]");
+        log.debug("{} | {} | {} | {} | | {} | {}", name, user, statuses, tags, type, page);
 
         Set<ApplicationStatus> enumStatuses = null;
         if (statuses != null) {
@@ -158,11 +160,11 @@ public class ApplicationRestController {
         final Link self = ControllerLinkBuilder.linkTo(
             ControllerLinkBuilder
                 .methodOn(ApplicationRestController.class)
-                .getApplications(name, userName, statuses, tags, page, assembler)
+                .getApplications(name, user, statuses, tags, type, page, assembler)
         ).withSelfRel();
 
         return assembler.toResource(
-            this.applicationService.getApplications(name, userName, enumStatuses, tags, page),
+            this.applicationService.getApplications(name, user, enumStatuses, tags, type, page),
             this.applicationResourceAssembler,
             self
         );
@@ -204,7 +206,7 @@ public class ApplicationRestController {
      *
      * @param id    The id of the application to patch
      * @param patch The JSON Patch instructions
-     * @throws GenieException     On error
+     * @throws GenieException On error
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)

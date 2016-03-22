@@ -51,35 +51,39 @@ public final class JpaCommandSpecs {
      * Get a specification using the specified parameters.
      *
      * @param name     The name of the command
-     * @param userName The name of the user who created the command
+     * @param user     The name of the user who created the command
      * @param statuses The status of the command
      * @param tags     The set of tags to search the command for
      * @return A specification object used for querying
      */
     public static Specification<CommandEntity> find(
-            final String name, final String userName, final Set<CommandStatus> statuses, final Set<String> tags) {
+        final String name,
+        final String user,
+        final Set<CommandStatus> statuses,
+        final Set<String> tags
+    ) {
         return (final Root<CommandEntity> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
             final List<Predicate> predicates = new ArrayList<>();
             if (StringUtils.isNotBlank(name)) {
                 predicates.add(cb.equal(root.get(CommandEntity_.name), name));
             }
-            if (StringUtils.isNotBlank(userName)) {
-                predicates.add(cb.equal(root.get(CommandEntity_.user), userName));
+            if (StringUtils.isNotBlank(user)) {
+                predicates.add(cb.equal(root.get(CommandEntity_.user), user));
             }
             if (statuses != null && !statuses.isEmpty()) {
                 final List<Predicate> orPredicates =
-                        statuses
-                                .stream()
-                                .map(status -> cb.equal(root.get(CommandEntity_.status), status))
-                                .collect(Collectors.toList());
+                    statuses
+                        .stream()
+                        .map(status -> cb.equal(root.get(CommandEntity_.status), status))
+                        .collect(Collectors.toList());
                 predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
             }
             if (tags != null && !tags.isEmpty()) {
                 predicates.add(
-                        cb.like(
-                                root.get(CommandEntity_.tags),
-                                JpaSpecificationUtils.getTagLikeString(tags)
-                        )
+                    cb.like(
+                        root.get(CommandEntity_.tags),
+                        JpaSpecificationUtils.getTagLikeString(tags)
+                    )
                 );
             }
             return cb.and(predicates.toArray(new Predicate[predicates.size()]));
@@ -94,8 +98,8 @@ public final class JpaCommandSpecs {
      * @return The specification
      */
     public static Specification<CommandEntity> findCommandsForApplication(
-            final String applicationId,
-            final Set<CommandStatus> statuses
+        final String applicationId,
+        final Set<CommandStatus> statuses
     ) {
         return (final Root<CommandEntity> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
             final List<Predicate> predicates = new ArrayList<>();
@@ -105,10 +109,10 @@ public final class JpaCommandSpecs {
 
             if (statuses != null && !statuses.isEmpty()) {
                 final List<Predicate> orPredicates =
-                        statuses
-                                .stream()
-                                .map(status -> cb.equal(root.get(CommandEntity_.status), status))
-                                .collect(Collectors.toList());
+                    statuses
+                        .stream()
+                        .map(status -> cb.equal(root.get(CommandEntity_.status), status))
+                        .collect(Collectors.toList());
                 predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
             }
 

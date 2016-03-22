@@ -36,7 +36,6 @@ import javax.persistence.Table;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -51,6 +50,14 @@ import java.util.Set;
 public class JobRequestEntity extends SetupFileEntity {
 
     private static final long serialVersionUID = -1895413051636217614L;
+    private static final TypeReference<Set<String>> SET_STRING_TYPE_REFERENCE = new TypeReference<Set<String>>() {
+    };
+    private static final TypeReference<List<String>> LIST_STRING_TYPE_REFERENCE = new TypeReference<List<String>>() {
+    };
+    private static final TypeReference<List<ClusterCriteria>> LIST_CLUSTER_CRITERIA_TYPE_REFERENCE
+        = new TypeReference<List<ClusterCriteria>>() {
+    };
+    private static final String EMPTY_JSON_ARRAY = "[]";
 
     @Lob
     @Column(name = "command_args", nullable = false)
@@ -58,30 +65,30 @@ public class JobRequestEntity extends SetupFileEntity {
     private String commandArgs;
 
     @Basic
-    @Column(name = "group_name", length = 255)
+    @Column(name = "group_name")
     @Size(max = 255, message = "Max length in database is 255 characters")
     private String group;
 
     @Basic(optional = false)
     @Column(name = "cluster_criterias", nullable = false, length = 2048)
     @Size(min = 1, max = 2048, message = "Maximum length is 1024 characters min 1")
-    private String clusterCriterias = "[]";
+    private String clusterCriterias = EMPTY_JSON_ARRAY;
 
     @Basic(optional = false)
     @Column(name = "command_criteria", nullable = false, length = 1024)
     @Size(min = 1, max = 1024, message = "Maximum length is 1024 characters min 1")
-    private String commandCriteria = "[]";
+    private String commandCriteria = EMPTY_JSON_ARRAY;
 
     @Lob
     @Column(name = "dependencies")
-    private String dependencies = "[]";
+    private String dependencies = EMPTY_JSON_ARRAY;
 
     @Basic
     @Column(name = "disable_log_archival")
     private boolean disableLogArchival;
 
     @Basic
-    @Column(name = "email", length = 255)
+    @Column(name = "email")
     @Size(max = 255, message = "Max length in database is 255 characters")
     private String email;
 
@@ -96,9 +103,14 @@ public class JobRequestEntity extends SetupFileEntity {
     private int memory = 1536;
 
     @Basic
-    @Column(name = "client_host", length = 255)
+    @Column(name = "client_host")
     @Size(max = 255, message = "Max length in database is 255 characters")
     private String clientHost;
+
+    @Basic(optional = false)
+    @Column(name = "applications", length = 2048)
+    @Size(min = 1, max = 2048)
+    private String applications = EMPTY_JSON_ARRAY;
 
     @OneToOne(
         mappedBy = "request",
@@ -134,8 +146,7 @@ public class JobRequestEntity extends SetupFileEntity {
      * @throws GenieException on any error
      */
     public List<ClusterCriteria> getClusterCriteriasAsList() throws GenieException {
-        return JsonUtils.unmarshall(this.clusterCriterias, new TypeReference<List<ClusterCriteria>>() {
-        });
+        return JsonUtils.unmarshall(this.clusterCriterias, LIST_CLUSTER_CRITERIA_TYPE_REFERENCE);
     }
 
     /**
@@ -145,7 +156,7 @@ public class JobRequestEntity extends SetupFileEntity {
      * @throws GenieException If any precondition isn't met.
      */
     public void setClusterCriteriasFromList(
-        @NotEmpty(message = "No cluster criterias entered") final List<ClusterCriteria> clusterCriteriasList
+        @NotEmpty final List<ClusterCriteria> clusterCriteriasList
     ) throws GenieException {
         this.clusterCriterias = JsonUtils.marshall(clusterCriteriasList);
     }
@@ -194,8 +205,7 @@ public class JobRequestEntity extends SetupFileEntity {
      * @throws GenieException On any exception
      */
     public Set<String> getDependenciesAsSet() throws GenieException {
-        return JsonUtils.unmarshall(this.dependencies, new TypeReference<Set<String>>() {
-        });
+        return JsonUtils.unmarshall(this.dependencies, SET_STRING_TYPE_REFERENCE);
     }
 
     /**
@@ -205,9 +215,7 @@ public class JobRequestEntity extends SetupFileEntity {
      * @throws GenieException for any processing error
      */
     public void setDependenciesFromSet(final Set<String> dependenciesSet) throws GenieException {
-        this.dependencies = dependenciesSet == null
-            ? JsonUtils.marshall(new HashSet<>())
-            : JsonUtils.marshall(dependenciesSet);
+        this.dependencies = dependenciesSet == null ? EMPTY_JSON_ARRAY : JsonUtils.marshall(dependenciesSet);
     }
 
     /**
@@ -290,8 +298,7 @@ public class JobRequestEntity extends SetupFileEntity {
      * @throws GenieException on any processing error
      */
     public Set<String> getCommandCriteriaAsSet() throws GenieException {
-        return JsonUtils.unmarshall(this.commandCriteria, new TypeReference<Set<String>>() {
-        });
+        return JsonUtils.unmarshall(this.commandCriteria, SET_STRING_TYPE_REFERENCE);
     }
 
     /**
@@ -300,9 +307,7 @@ public class JobRequestEntity extends SetupFileEntity {
      * @param commandCriteriaSet The criteria set. Not null/empty
      * @throws GenieException If any precondition isn't met.
      */
-    public void setCommandCriteriaFromSet(
-        @NotEmpty(message = "At least one command criteria required") final Set<String> commandCriteriaSet
-    ) throws GenieException {
+    public void setCommandCriteriaFromSet(@NotEmpty final Set<String> commandCriteriaSet) throws GenieException {
         this.commandCriteria = JsonUtils.marshall(commandCriteriaSet);
     }
 
@@ -361,6 +366,44 @@ public class JobRequestEntity extends SetupFileEntity {
     }
 
     /**
+     * Get the applications to use for this job as a List of ids.
+     *
+     * @return The applications for the job
+     * @throws GenieException On any exception
+     */
+    public List<String> getApplicationsAsList() throws GenieException {
+        return JsonUtils.unmarshall(this.applications, LIST_STRING_TYPE_REFERENCE);
+    }
+
+    /**
+     * Sets the dependencies for the job request from a set of strings.
+     *
+     * @param applicationsList Application IDs for the job
+     * @throws GenieException for any processing error
+     */
+    public void setApplicationsFromList(final List<String> applicationsList) throws GenieException {
+        this.applications = applicationsList == null ? EMPTY_JSON_ARRAY : JsonUtils.marshall(applicationsList);
+    }
+
+    /**
+     * Gets the applications for the job as JSON array.
+     *
+     * @return applications
+     */
+    protected String getApplications() {
+        return this.applications;
+    }
+
+    /**
+     * Sets the dependencies for the job.
+     *
+     * @param applications Applications for the job in JSON array string
+     */
+    protected void setApplications(final String applications) {
+        this.applications = applications;
+    }
+
+    /**
      * Get the job associated with this job request.
      *
      * @return The job
@@ -406,6 +449,7 @@ public class JobRequestEntity extends SetupFileEntity {
             .withCpu(this.cpu)
             .withMemory(this.memory)
             .withUpdated(this.getUpdated())
+            .withApplications(this.getApplicationsAsList())
             .build();
     }
 }

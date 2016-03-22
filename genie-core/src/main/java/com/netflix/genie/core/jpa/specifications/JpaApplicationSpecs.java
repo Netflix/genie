@@ -48,36 +48,45 @@ public final class JpaApplicationSpecs {
      * Get a specification using the specified parameters.
      *
      * @param name     The name of the application
-     * @param userName The name of the user who created the application
+     * @param user     The name of the user who created the application
      * @param statuses The status of the application
      * @param tags     The set of tags to search the command for
+     * @param type     The type of applications to fine
      * @return A specification object used for querying
      */
     public static Specification<ApplicationEntity> find(
-            final String name, final String userName, final Set<ApplicationStatus> statuses, final Set<String> tags) {
+        final String name,
+        final String user,
+        final Set<ApplicationStatus> statuses,
+        final Set<String> tags,
+        final String type
+    ) {
         return (final Root<ApplicationEntity> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
             final List<Predicate> predicates = new ArrayList<>();
             if (StringUtils.isNotBlank(name)) {
                 predicates.add(cb.equal(root.get(ApplicationEntity_.name), name));
             }
-            if (StringUtils.isNotBlank(userName)) {
-                predicates.add(cb.equal(root.get(ApplicationEntity_.user), userName));
+            if (StringUtils.isNotBlank(user)) {
+                predicates.add(cb.equal(root.get(ApplicationEntity_.user), user));
             }
             if (statuses != null && !statuses.isEmpty()) {
                 final List<Predicate> orPredicates =
-                        statuses
-                                .stream()
-                                .map(status -> cb.equal(root.get(ApplicationEntity_.status), status))
-                                .collect(Collectors.toList());
+                    statuses
+                        .stream()
+                        .map(status -> cb.equal(root.get(ApplicationEntity_.status), status))
+                        .collect(Collectors.toList());
                 predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
             }
             if (tags != null && !tags.isEmpty()) {
                 predicates.add(
-                        cb.like(
-                                root.get(ApplicationEntity_.tags),
-                                JpaSpecificationUtils.getTagLikeString(tags)
-                        )
+                    cb.like(
+                        root.get(ApplicationEntity_.tags),
+                        JpaSpecificationUtils.getTagLikeString(tags)
+                    )
                 );
+            }
+            if (StringUtils.isNotBlank(type)) {
+                predicates.add(cb.equal(root.get(ApplicationEntity_.type), type));
             }
             return cb.and(predicates.toArray(new Predicate[predicates.size()]));
         };

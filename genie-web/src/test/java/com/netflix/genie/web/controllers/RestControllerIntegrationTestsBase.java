@@ -319,9 +319,10 @@ public abstract class RestControllerIntegrationTestsBase {
         final String name,
         final String user,
         final String version,
-        final ApplicationStatus status
+        final ApplicationStatus status,
+        final String type
     ) throws Exception {
-        final Application app = new Application.Builder(name, user, version, status).withId(id).build();
+        final Application app = new Application.Builder(name, user, version, status).withId(id).withType(type).build();
         final MvcResult result = this.mvc
             .perform(
                 MockMvcRequestBuilders

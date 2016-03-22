@@ -19,6 +19,7 @@ package com.netflix.genie.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.google.common.collect.Lists;
 import lombok.Getter;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -54,7 +55,6 @@ public class JobRequest extends CommonDTO {
     private String group;
     @Size(max = 1024, message = "Max length is 1024 characters")
     private String setupFile;
-    private Set<String> dependencies = new HashSet<>();
     private boolean disableLogArchival;
     @Size(max = 255, message = "Max length is 255 characters")
     @Email(message = "Must be a valid email address")
@@ -63,6 +63,8 @@ public class JobRequest extends CommonDTO {
     private int cpu;
     @Min(1)
     private int memory;
+    private Set<String> dependencies = new HashSet<>();
+    private List<String> applications = new ArrayList<>();
 
     /**
      * Constructor used by the builder build() method.
@@ -82,6 +84,10 @@ public class JobRequest extends CommonDTO {
         this.email = builder.bEmail;
         this.cpu = builder.bCpu;
         this.memory = builder.bMemory;
+
+        if (builder.bApplications != null) {
+            this.applications = Lists.newArrayList(builder.bApplications);
+        }
     }
 
     /**
@@ -105,10 +111,14 @@ public class JobRequest extends CommonDTO {
     /**
      * Get the dependencies that should be downloaded for this job.
      *
-     * @return The file dependencies as a read-only set. Attempts to modify will throw exception
+     * @return The file dependencies as a read-only set or null if none. Attempts to modify will throw exception
      */
     public Set<String> getDependencies() {
-        return Collections.unmodifiableSet(this.dependencies);
+        if (this.dependencies != null) {
+            return Collections.unmodifiableSet(this.dependencies);
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -124,11 +134,12 @@ public class JobRequest extends CommonDTO {
         private final Set<String> bCommandCriteria = new HashSet<>();
         private String bGroup;
         private String bSetupFile;
-        private Set<String> bDependencies = new HashSet<>();
+        private final Set<String> bDependencies = new HashSet<>();
         private boolean bDisableLogArchival;
         private String bEmail;
         private int bCpu = 1;
         private int bMemory = 1536;
+        private final List<String> bApplications = new ArrayList<>();
 
         /**
          * Constructor which has required fields.
@@ -193,6 +204,7 @@ public class JobRequest extends CommonDTO {
          * @return The builder
          */
         public Builder withDependencies(final Set<String> dependencies) {
+            this.bDependencies.clear();
             if (dependencies != null) {
                 this.bDependencies.addAll(dependencies);
             }
@@ -240,6 +252,20 @@ public class JobRequest extends CommonDTO {
          */
         public Builder withMemory(final int memory) {
             this.bMemory = memory;
+            return this;
+        }
+
+        /**
+         * Set the ids of applications to override the default applications from the command with.
+         *
+         * @param applications The ids of applications to override
+         * @return The builder
+         */
+        public Builder withApplications(final List<String> applications) {
+            this.bApplications.clear();
+            if (applications != null) {
+                this.bApplications.addAll(applications);
+            }
             return this;
         }
 

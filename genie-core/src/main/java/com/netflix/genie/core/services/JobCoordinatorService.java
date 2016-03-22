@@ -18,24 +18,17 @@
 package com.netflix.genie.core.services;
 
 import com.netflix.genie.common.dto.Job;
-import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
-import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.jobs.JobConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
-import java.util.Set;
 
 
 /**
@@ -92,6 +85,7 @@ public class JobCoordinatorService {
         final JobRequest jobRequest,
         final String clientHost
     ) throws GenieException {
+        // TODO: Should likely validate it has an ID at this point since we return it without ever setting it
         log.debug("Called with job request {}", jobRequest);
 
         // Log the job request
@@ -101,13 +95,12 @@ public class JobCoordinatorService {
             this.jobPersistenceService.addClientHostToJobRequest(jobRequest.getId(), clientHost);
         }
 
-        String jobArchivalLocation = null;
+        String archiveLocation = null;
         if (!jobRequest.isDisableLogArchival()) {
-            if (baseArchiveLocation == null) {
-                throw new
-                    GeniePreconditionException("Job archival is enabled but base location for archival is null.");
+            if (this.baseArchiveLocation == null) {
+                throw new GeniePreconditionException("Job archival is enabled but base location for archival is null.");
             }
-            jobArchivalLocation = baseArchiveLocation
+            archiveLocation = this.baseArchiveLocation
                 + JobConstants.FILE_PATH_DELIMITER
                 + jobRequest.getId()
                 + ".tar.gz";
@@ -119,7 +112,7 @@ public class JobCoordinatorService {
             jobRequest.getVersion(),
             jobRequest.getCommandArgs()
         )
-            .withArchiveLocation(jobArchivalLocation)
+            .withArchiveLocation(archiveLocation)
             .withDescription(jobRequest.getDescription())
             .withId(jobRequest.getId())
             .withStatus(JobStatus.INIT)
@@ -133,85 +126,6 @@ public class JobCoordinatorService {
     }
 
     /**
-     * Gets the Job object to return to user given the id.
-     *
-     * @param jobId of job to retrieve
-     * @return job object
-     * @throws GenieException if there is an error
-     */
-    public Job getJob(@NotBlank final String jobId) throws GenieException {
-        log.debug("Called with id {}", jobId);
-        return this.jobSearchService.getJob(jobId);
-    }
-
-    /**
-     * Gets the status of the job with the given id.
-     *
-     * @param id The id job to get status for
-     * @return The job status
-     * @throws GenieException for any problem particularly not found exceptions
-     */
-    public JobStatus getJobStatus(@NotBlank final String id) throws GenieException {
-        log.debug("Called to get status for job {}", id);
-        return this.jobSearchService.getJobStatus(id);
-    }
-
-    /**
-     * Find subset of metadata about jobs for given filter criteria.
-     *
-     * @param id          id for job
-     * @param jobName     name of job (can be a SQL-style pattern such as HIVE%)
-     * @param userName    user who submitted job
-     * @param statuses    statuses of job
-     * @param tags        tags for the job
-     * @param clusterName name of cluster for job
-     * @param clusterId   id of cluster for job
-     * @param commandName name of the command run in the job
-     * @param commandId   id of the command run in the job
-     * @param minStarted  The time which the job had to start after in order to be return (inclusive)
-     * @param maxStarted  The time which the job had to start before in order to be returned (exclusive)
-     * @param minFinished The time which the job had to finish after in order to be return (inclusive)
-     * @param maxFinished The time which the job had to finish before in order to be returned (exclusive)
-     * @param page        Page information of jobs to get
-     * @return All jobs which match the criteria
-     */
-    public Page<JobSearchResult> findJobs(
-        final String id,
-        final String jobName,
-        final String userName,
-        final Set<JobStatus> statuses,
-        final Set<String> tags,
-        final String clusterName,
-        final String clusterId,
-        final String commandName,
-        final String commandId,
-        final Date minStarted,
-        final Date maxStarted,
-        final Date minFinished,
-        final Date maxFinished,
-        final Pageable page
-    ) {
-        log.debug("called");
-
-        return this.jobSearchService.findJobs(
-            id,
-            jobName,
-            userName,
-            statuses,
-            tags,
-            clusterName,
-            clusterId,
-            commandName,
-            commandId,
-            minStarted,
-            maxStarted,
-            minFinished,
-            maxFinished,
-            page
-        );
-    }
-
-    /**
      * Kill the job identified by the given id.
      *
      * @param jobId id of the job to kill
@@ -219,43 +133,5 @@ public class JobCoordinatorService {
      */
     public void killJob(@NotBlank final String jobId) throws GenieException {
         this.jobKillService.killJob(jobId);
-    }
-
-    /**
-     * Get the hostname a job is running on.
-     *
-     * @param jobId The id of the job to get the hostname for
-     * @return The hostname
-     * @throws GenieException If the job isn't found or any other error
-     */
-    public String getJobHost(@NotBlank final String jobId) throws GenieException {
-        final JobExecution jobExecution = this.jobSearchService.getJobExecution(jobId);
-        if (jobExecution != null) {
-            return jobExecution.getHostname();
-        } else {
-            throw new GenieNotFoundException("No job execution found for id " + jobId);
-        }
-    }
-
-    /**
-     * Get the original job request for the job with the given id.
-     *
-     * @param id The id of the job to get the request for. Not blank
-     * @return The job request for the given id
-     * @throws GenieException If no job request with the given id exists
-     */
-    public JobRequest getJobRequest(@NotBlank final String id) throws GenieException {
-        return this.jobSearchService.getJobRequest(id);
-    }
-
-    /**
-     * Get the job execution for the job with the given id.
-     *
-     * @param id The id of the job to get the execution for. Not blank
-     * @return The job execution for the given id
-     * @throws GenieException If no job execution with the given id exists
-     */
-    public JobExecution getJobExecution(@NotBlank final String id) throws GenieException {
-        return this.jobSearchService.getJobExecution(id);
     }
 }

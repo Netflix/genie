@@ -17,6 +17,9 @@
  */
 package com.netflix.genie.core.services;
 
+import com.netflix.genie.common.dto.Application;
+import com.netflix.genie.common.dto.Cluster;
+import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
@@ -29,6 +32,7 @@ import org.springframework.data.domain.Pageable;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -43,8 +47,8 @@ public interface JobSearchService {
      * Search for jobs which match the given filter criteria.
      *
      * @param id          id for job
-     * @param jobName     name of job (can be a SQL-style pattern such as HIVE%)
-     * @param userName    user who submitted job
+     * @param name        name of job (can be a SQL-style pattern such as HIVE%)
+     * @param user        user who submitted job
      * @param statuses    statuses of job
      * @param tags        tags for the job
      * @param clusterName name of cluster for job
@@ -59,20 +63,20 @@ public interface JobSearchService {
      * @return Metadata information on jobs which match the criteria
      */
     Page<JobSearchResult> findJobs(
-            final String id,
-            final String jobName,
-            final String userName,
-            final Set<JobStatus> statuses,
-            final Set<String> tags,
-            final String clusterName,
-            final String clusterId,
-            final String commandName,
-            final String commandId,
-            final Date minStarted,
-            final Date maxStarted,
-            final Date minFinished,
-            final Date maxFinished,
-            @NotNull final Pageable page
+        final String id,
+        final String name,
+        final String user,
+        final Set<JobStatus> statuses,
+        final Set<String> tags,
+        final String clusterName,
+        final String clusterId,
+        final String commandName,
+        final String commandId,
+        final Date minStarted,
+        final Date maxStarted,
+        final Date minFinished,
+        final Date maxFinished,
+        @NotNull final Pageable page
     );
 
     /**
@@ -119,4 +123,40 @@ public interface JobSearchService {
      * @throws GenieException if there is an error
      */
     JobExecution getJobExecution(@NotBlank final String id) throws GenieException;
+
+    /**
+     * Get the cluster the job was run on or exception if not found.
+     *
+     * @param id The id of the job to get the cluster for
+     * @return The cluster
+     * @throws GenieException If either the job or the cluster is not found
+     */
+    Cluster getJobCluster(@NotBlank final String id) throws GenieException;
+
+    /**
+     * Get the command the job was run with or exception if not found.
+     *
+     * @param id The id of the job to get the command for
+     * @return The command
+     * @throws GenieException If either the job or the command is not found
+     */
+    Command getJobCommand(@NotBlank final String id) throws GenieException;
+
+    /**
+     * Get the applications the job was run with or exception if not found.
+     *
+     * @param id The id of the job to get the applications for
+     * @return The applications
+     * @throws GenieException If either the job or the applications were not found
+     */
+    List<Application> getJobApplications(@NotBlank final String id) throws GenieException;
+
+    /**
+     * Get the hostname a job is running on.
+     *
+     * @param jobId The id of the job to get the hostname for
+     * @return The hostname
+     * @throws GenieException If the job isn't found or any other error
+     */
+    String getJobHost(@NotBlank final String jobId) throws GenieException;
 }

@@ -34,18 +34,13 @@ import org.springframework.test.context.transaction.TransactionalTestExecutionLi
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = GenieCoreTestApplication.class)
-@TestExecutionListeners({
-    DependencyInjectionTestExecutionListener.class,
-    DirtiesContextTestExecutionListener.class,
-    TransactionalTestExecutionListener.class,
-    TransactionDbUnitTestExecutionListener.class
-})
+@TestExecutionListeners(
+    {
+        DependencyInjectionTestExecutionListener.class,
+        DirtiesContextTestExecutionListener.class,
+        TransactionalTestExecutionListener.class,
+        TransactionDbUnitTestExecutionListener.class
+    }
+)
 public abstract class DBUnitTestBase {
-//    /**
-//     * Just some junk test to allow this to be inherited.
-//     */
-//    @Test
-//    public void junk() {
-//        Assert.assertTrue(true);
-//    }
 }

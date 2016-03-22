@@ -48,7 +48,7 @@ public class JobExecutionEntity extends BaseEntity {
     private static final long serialVersionUID = -5073493356472801960L;
 
     @Basic(optional = false)
-    @Column(name = "hostname", nullable = false, length = 255)
+    @Column(name = "hostname", nullable = false)
     @Size(min = 1, max = 255, message = "Must have a hostname no longer than 255 characters")
     private String hostname;
 

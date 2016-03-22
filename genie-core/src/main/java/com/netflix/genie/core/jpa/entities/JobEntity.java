@@ -30,16 +30,21 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.Lob;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
+import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Representation of the state of a Genie 3.0 job.
@@ -68,7 +73,7 @@ public class JobEntity extends CommonFieldsEntity {
     private JobStatus status;
 
     @Basic
-    @Column(name = "status_msg", length = 255)
+    @Column(name = "status_msg")
     @Length(max = 255, message = "Max length in database is 255 characters")
     private String statusMsg;
 
@@ -88,12 +93,12 @@ public class JobEntity extends CommonFieldsEntity {
     private String archiveLocation;
 
     @Basic
-    @Column(name = "cluster_name", length = 255)
+    @Column(name = "cluster_name")
     @Size(max = 255, message = "Max length in database is 255 characters")
     private String clusterName;
 
     @Basic
-    @Column(name = "command_name", length = 255)
+    @Column(name = "command_name")
     @Size(max = 255, message = "Max length in database is 255 characters")
     private String commandName;
 
@@ -117,6 +122,19 @@ public class JobEntity extends CommonFieldsEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "command_id")
     private CommandEntity command;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "jobs_applications",
+        joinColumns = {
+            @JoinColumn(name = "job_id", referencedColumnName = "id", nullable = false)
+        },
+        inverseJoinColumns = {
+            @JoinColumn(name = "application_id", referencedColumnName = "id", nullable = false)
+        }
+    )
+    @OrderColumn(name = "application_order", nullable = false)
+    private List<ApplicationEntity> applications = new ArrayList<>();
 
     /**
      * Default Constructor.
@@ -390,6 +408,27 @@ public class JobEntity extends CommonFieldsEntity {
         if (this.command != null) {
             this.command.addJob(this);
             this.commandName = command.getName();
+        }
+    }
+
+    /**
+     * Get the applications used to run this job.
+     *
+     * @return The applications
+     */
+    public List<ApplicationEntity> getApplications() {
+        return this.applications;
+    }
+
+    /**
+     * Set the applications used to run this job.
+     *
+     * @param applications The applications
+     */
+    public void setApplications(final List<ApplicationEntity> applications) {
+        this.applications.clear();
+        if (applications != null) {
+            this.applications.addAll(applications);
         }
     }
 

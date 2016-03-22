@@ -21,7 +21,11 @@ import com.google.common.collect.Sets;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.services.AttachmentService;
 import com.netflix.genie.core.services.JobCoordinatorService;
+import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.genie.web.hateoas.assemblers.ApplicationResourceAssembler;
+import com.netflix.genie.web.hateoas.assemblers.ClusterResourceAssembler;
+import com.netflix.genie.web.hateoas.assemblers.CommandResourceAssembler;
 import com.netflix.genie.web.hateoas.assemblers.JobExecutionResourceAssembler;
 import com.netflix.genie.web.hateoas.assemblers.JobRequestResourceAssembler;
 import com.netflix.genie.web.hateoas.assemblers.JobResourceAssembler;
@@ -67,7 +71,11 @@ public class JobRestControllerUnitTests {
 
     //Mocked variables
     private JobCoordinatorService jobService;
+    private JobSearchService jobSearchService;
     private AttachmentService attachmentService;
+    private ApplicationResourceAssembler applicationResourceAssembler;
+    private ClusterResourceAssembler clusterResourceAssembler;
+    private CommandResourceAssembler commandResourceAssembler;
     private JobResourceAssembler jobResourceAssembler;
     private JobRequestResourceAssembler jobRequestResourceAssembler;
     private JobExecutionResourceAssembler jobExecutionResourceAssembler;
@@ -84,7 +92,11 @@ public class JobRestControllerUnitTests {
     @Before
     public void setup() {
         this.jobService = Mockito.mock(JobCoordinatorService.class);
+        this.jobSearchService = Mockito.mock(JobSearchService.class);
         this.attachmentService = Mockito.mock(AttachmentService.class);
+        this.applicationResourceAssembler = Mockito.mock(ApplicationResourceAssembler.class);
+        this.clusterResourceAssembler = Mockito.mock(ClusterResourceAssembler.class);
+        this.commandResourceAssembler = Mockito.mock(CommandResourceAssembler.class);
         this.jobResourceAssembler = Mockito.mock(JobResourceAssembler.class);
         this.jobRequestResourceAssembler = Mockito.mock(JobRequestResourceAssembler.class);
         this.jobExecutionResourceAssembler = Mockito.mock(JobExecutionResourceAssembler.class);
@@ -95,7 +107,11 @@ public class JobRestControllerUnitTests {
 
         this.controller = new JobRestController(
             this.jobService,
+            this.jobSearchService,
             this.attachmentService,
+            this.applicationResourceAssembler,
+            this.clusterResourceAssembler,
+            this.commandResourceAssembler,
             this.jobResourceAssembler,
             this.jobRequestResourceAssembler,
             this.jobExecutionResourceAssembler,
@@ -118,7 +134,11 @@ public class JobRestControllerUnitTests {
     public void wontForwardKillRequestIfNotEnabled() throws IOException, ServletException, GenieException {
         this.controller = new JobRestController(
             this.jobService,
+            this.jobSearchService,
             this.attachmentService,
+            this.applicationResourceAssembler,
+            this.clusterResourceAssembler,
+            this.commandResourceAssembler,
             this.jobResourceAssembler,
             this.jobRequestResourceAssembler,
             this.jobExecutionResourceAssembler,
@@ -136,7 +156,7 @@ public class JobRestControllerUnitTests {
 
         this.controller.killJob(jobId, forwardedFrom, request, response);
 
-        Mockito.verify(this.jobService, Mockito.never()).getJobHost(Mockito.eq(jobId));
+        Mockito.verify(this.jobSearchService, Mockito.never()).getJobHost(Mockito.eq(jobId));
     }
 
     /**
@@ -155,7 +175,7 @@ public class JobRestControllerUnitTests {
 
         this.controller.killJob(jobId, forwardedFrom, request, response);
 
-        Mockito.verify(this.jobService, Mockito.never()).getJobHost(Mockito.eq(jobId));
+        Mockito.verify(this.jobSearchService, Mockito.never()).getJobHost(Mockito.eq(jobId));
     }
 
     /**
@@ -172,11 +192,11 @@ public class JobRestControllerUnitTests {
         final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
 
-        Mockito.when(this.jobService.getJobHost(jobId)).thenReturn(this.hostname);
+        Mockito.when(this.jobSearchService.getJobHost(jobId)).thenReturn(this.hostname);
 
         this.controller.killJob(jobId, forwardedFrom, request, response);
 
-        Mockito.verify(this.jobService, Mockito.times(1)).getJobHost(jobId);
+        Mockito.verify(this.jobSearchService, Mockito.times(1)).getJobHost(jobId);
         Mockito.verify(this.httpClient, Mockito.never()).execute(Mockito.any());
     }
 
@@ -195,7 +215,7 @@ public class JobRestControllerUnitTests {
         final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
 
         Mockito.when(request.getRequestURL()).thenReturn(new StringBuffer(UUID.randomUUID().toString()));
-        Mockito.when(this.jobService.getJobHost(jobId)).thenReturn(UUID.randomUUID().toString());
+        Mockito.when(this.jobSearchService.getJobHost(jobId)).thenReturn(UUID.randomUUID().toString());
 
         final StatusLine statusLine = Mockito.mock(StatusLine.class);
         Mockito.when(statusLine.getStatusCode()).thenReturn(HttpStatus.NOT_FOUND.value());
@@ -208,7 +228,7 @@ public class JobRestControllerUnitTests {
         Mockito
             .verify(response, Mockito.times(1))
             .sendError(Mockito.eq(HttpStatus.NOT_FOUND.value()), Mockito.anyString());
-        Mockito.verify(this.jobService, Mockito.times(1)).getJobHost(jobId);
+        Mockito.verify(this.jobSearchService, Mockito.times(1)).getJobHost(jobId);
         Mockito.verify(this.httpClient, Mockito.times(1)).execute(Mockito.any(HttpDelete.class));
     }
 
@@ -227,7 +247,7 @@ public class JobRestControllerUnitTests {
         final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
 
         Mockito.when(request.getRequestURL()).thenReturn(new StringBuffer(UUID.randomUUID().toString()));
-        Mockito.when(this.jobService.getJobHost(jobId)).thenReturn(UUID.randomUUID().toString());
+        Mockito.when(this.jobSearchService.getJobHost(jobId)).thenReturn(UUID.randomUUID().toString());
 
         final StatusLine statusLine = Mockito.mock(StatusLine.class);
         Mockito.when(statusLine.getStatusCode()).thenReturn(HttpStatus.ACCEPTED.value());
@@ -240,7 +260,7 @@ public class JobRestControllerUnitTests {
 
         Mockito.verify(response, Mockito.never()).sendError(Mockito.anyInt(), Mockito.anyString());
         Mockito.verify(response, Mockito.times(1)).setStatus(HttpStatus.ACCEPTED.value());
-        Mockito.verify(this.jobService, Mockito.times(1)).getJobHost(jobId);
+        Mockito.verify(this.jobSearchService, Mockito.times(1)).getJobHost(jobId);
         Mockito.verify(this.httpClient, Mockito.times(1)).execute(Mockito.any(HttpDelete.class));
     }
 
@@ -255,7 +275,11 @@ public class JobRestControllerUnitTests {
     public void wontForwardJobOutputRequestIfNotEnabled() throws IOException, ServletException, GenieException {
         this.controller = new JobRestController(
             this.jobService,
+            this.jobSearchService,
             this.attachmentService,
+            this.applicationResourceAssembler,
+            this.clusterResourceAssembler,
+            this.commandResourceAssembler,
             this.jobResourceAssembler,
             this.jobRequestResourceAssembler,
             this.jobExecutionResourceAssembler,
@@ -275,7 +299,7 @@ public class JobRestControllerUnitTests {
 
         this.controller.getJobOutput(jobId, forwardedFrom, request, response);
 
-        Mockito.verify(this.jobService, Mockito.never()).getJobHost(Mockito.eq(jobId));
+        Mockito.verify(this.jobSearchService, Mockito.never()).getJobHost(Mockito.eq(jobId));
         Mockito.verify(this.genieResourceHttpRequestHandler, Mockito.times(1)).handleRequest(request, response);
     }
 
@@ -297,7 +321,7 @@ public class JobRestControllerUnitTests {
 
         this.controller.getJobOutput(jobId, forwardedFrom, request, response);
 
-        Mockito.verify(this.jobService, Mockito.never()).getJobHost(Mockito.eq(jobId));
+        Mockito.verify(this.jobSearchService, Mockito.never()).getJobHost(Mockito.eq(jobId));
         Mockito.verify(this.genieResourceHttpRequestHandler, Mockito.times(1)).handleRequest(request, response);
     }
 
@@ -317,11 +341,11 @@ public class JobRestControllerUnitTests {
 
         Mockito.doNothing().when(this.genieResourceHttpRequestHandler).handleRequest(request, response);
 
-        Mockito.when(this.jobService.getJobHost(jobId)).thenReturn(this.hostname);
+        Mockito.when(this.jobSearchService.getJobHost(jobId)).thenReturn(this.hostname);
 
         this.controller.getJobOutput(jobId, forwardedFrom, request, response);
 
-        Mockito.verify(this.jobService, Mockito.times(1)).getJobHost(Mockito.eq(jobId));
+        Mockito.verify(this.jobSearchService, Mockito.times(1)).getJobHost(Mockito.eq(jobId));
         Mockito.verify(this.httpClient, Mockito.never()).execute(Mockito.any());
         Mockito.verify(this.genieResourceHttpRequestHandler, Mockito.times(1)).handleRequest(request, response);
     }
@@ -343,7 +367,7 @@ public class JobRestControllerUnitTests {
         Mockito.doNothing().when(this.genieResourceHttpRequestHandler).handleRequest(request, response);
 
         final String jobHostName = UUID.randomUUID().toString();
-        Mockito.when(this.jobService.getJobHost(jobId)).thenReturn(jobHostName);
+        Mockito.when(this.jobSearchService.getJobHost(jobId)).thenReturn(jobHostName);
 
         //Mock parts of the http request
         final String http = "http";
@@ -367,7 +391,7 @@ public class JobRestControllerUnitTests {
 
         this.controller.getJobOutput(jobId, forwardedFrom, request, response);
 
-        Mockito.verify(this.jobService, Mockito.times(1)).getJobHost(Mockito.eq(jobId));
+        Mockito.verify(this.jobSearchService, Mockito.times(1)).getJobHost(Mockito.eq(jobId));
         Mockito.verify(this.httpClient, Mockito.times(1)).execute(Mockito.any());
         Mockito.verify(response, Mockito.times(1)).sendError(Mockito.eq(errorCode), Mockito.anyString());
         Mockito.verify(this.genieResourceHttpRequestHandler, Mockito.never()).handleRequest(request, response);
@@ -390,7 +414,7 @@ public class JobRestControllerUnitTests {
         Mockito.doNothing().when(this.genieResourceHttpRequestHandler).handleRequest(request, response);
 
         final String jobHostName = UUID.randomUUID().toString();
-        Mockito.when(this.jobService.getJobHost(jobId)).thenReturn(jobHostName);
+        Mockito.when(this.jobSearchService.getJobHost(jobId)).thenReturn(jobHostName);
 
         //Mock parts of the http request
         final String http = "http";
@@ -433,7 +457,7 @@ public class JobRestControllerUnitTests {
 
         Assert.assertThat(new String(bos.toByteArray(), UTF_8), Matchers.is(text));
         Mockito.verify(request, Mockito.times(1)).getHeader(HttpHeaders.ACCEPT);
-        Mockito.verify(this.jobService, Mockito.times(1)).getJobHost(Mockito.eq(jobId));
+        Mockito.verify(this.jobSearchService, Mockito.times(1)).getJobHost(Mockito.eq(jobId));
         Mockito.verify(this.httpClient, Mockito.times(1)).execute(Mockito.any());
         Mockito.verify(response, Mockito.never()).sendError(Mockito.anyInt());
         Mockito.verify(response, Mockito.times(1)).setHeader(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE);

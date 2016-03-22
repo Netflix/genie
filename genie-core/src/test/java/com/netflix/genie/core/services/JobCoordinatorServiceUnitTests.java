@@ -18,18 +18,14 @@
 package com.netflix.genie.core.services;
 
 import com.netflix.genie.common.dto.Job;
-import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.test.categories.UnitTest;
-import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.ArgumentCaptor;
@@ -224,44 +220,6 @@ public class JobCoordinatorServiceUnitTests {
         this.jobCoordinatorService.coordinateJob(jobRequest, clientHost);
         Mockito.verify(this.jobPersistenceService).createJob(argument.capture());
         Assert.assertNull(argument.getValue().getArchiveLocation());
-    }
-
-    /**
-     * Test the get jobs method.
-     *
-     * @throws GenieException If there is any problem
-     */
-    @Test
-    @Ignore
-    public void testGetJobs() throws GenieException {
-    }
-
-    /**
-     * Make sure if a job execution isn't found it returns a GenieNotFound exception.
-     *
-     * @throws GenieException for any problem
-     */
-    @Test(expected = GenieNotFoundException.class)
-    public void cantGetJobHostIfNoJobExecution() throws GenieException {
-        final String jobId = UUID.randomUUID().toString();
-        Mockito.when(this.jobSearchService.getJobExecution(Mockito.eq(jobId))).thenReturn(null);
-        this.jobCoordinatorService.getJobHost(jobId);
-    }
-
-    /**
-     * Make sure that if the job execution exists we return a valid host.
-     *
-     * @throws GenieException on any problem
-     */
-    @Test
-    public void canGetJobHost() throws GenieException {
-        final String jobId = UUID.randomUUID().toString();
-        final String hostname = UUID.randomUUID().toString();
-        final JobExecution jobExecution = Mockito.mock(JobExecution.class);
-        Mockito.when(jobExecution.getHostname()).thenReturn(hostname);
-        Mockito.when(this.jobSearchService.getJobExecution(Mockito.eq(jobId))).thenReturn(jobExecution);
-
-        Assert.assertThat(this.jobCoordinatorService.getJobHost(jobId), Matchers.is(hostname));
     }
 
     /**

@@ -25,6 +25,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * Interfaces for providing persistence functions for jobs other than search.
@@ -40,10 +41,7 @@ public interface JobPersistenceService {
      * @param job the Job object to create
      * @throws GenieException if there is an error
      */
-    void createJob(
-            @NotNull(message = "Job is null so cannot be saved")
-            final Job job
-    ) throws GenieException;
+    void createJob(@NotNull final Job job) throws GenieException;
 
     /**
      * Update the status and status message of the job.
@@ -54,40 +52,25 @@ public interface JobPersistenceService {
      * @throws GenieException if there is an error
      */
     void updateJobStatus(
-        @NotBlank(message = "No job id entered. Unable to update.")
-        final String id,
-        @NotNull (message = "Status cannot be null.")
-        final JobStatus jobStatus,
-        @NotBlank(message = "Status message cannot be empty.")
-        final String statusMsg
+        @NotBlank final String id,
+        @NotNull final JobStatus jobStatus,
+        @NotBlank final String statusMsg
     ) throws GenieException;
 
     /**
-     * Method that updates the cluster information on which a job is run.
+     * Update the job with the various resources used to run the job including the cluster, command and applications.
      *
-     * @param jobId The id of the job
-     * @param clusterId The id of the cluster
-     * @throws GenieException Throw exception in case of an error.
+     * @param jobId The id of the job to update
+     * @param clusterId The id of the cluster the job runs on
+     * @param commandId The id of the command the job runs with
+     * @param applicationIds The ids of the applications used to run the job
+     * @throws GenieException For any problems while updating
      */
-    void updateClusterForJob(
-        @NotNull(message = "Job id cannot be null while updating cluster information")
-        final String jobId,
-        @NotNull(message = "Cluster id cannot be null while updating cluster information")
-        final String clusterId
-    ) throws GenieException;
-
-    /**
-     * Method that updates the cluster information on which a job is run.
-     *
-     * @param jobId The id of the job
-     * @param commandId The id of the cluster
-     * @throws GenieException Throw exception in case of an error.
-     */
-    void updateCommandForJob(
-        @NotNull(message = "Job id cannot be null while updating command information")
-        final String jobId,
-        @NotNull(message = "Command id cannot be null while updating command information")
-        final String commandId
+    void updateJobWithRuntimeEnvironment(
+        @NotBlank final String jobId,
+        @NotBlank final String clusterId,
+        @NotBlank final String commandId,
+        @NotNull final List<String> applicationIds
     ) throws GenieException;
 
     /**
@@ -98,10 +81,7 @@ public interface JobPersistenceService {
      * @return The job request object that was created
      * @throws GenieException if there is an error
      */
-    JobRequest createJobRequest(
-            @NotNull(message = "Job Request is null so cannot be saved")
-            final JobRequest jobRequest
-    ) throws GenieException;
+    JobRequest createJobRequest(@NotNull final JobRequest jobRequest) throws GenieException;
 
     /**
      * Add the information of client host to jobRequest.
@@ -110,12 +90,7 @@ public interface JobPersistenceService {
      * @param clientHost Host of the client that sent the request.
      * @throws GenieException If there is an error
      */
-    void addClientHostToJobRequest(
-        @NotNull(message = "job request id not provided.")
-        final String id,
-        @NotBlank(message = "client host cannot be null")
-        final String clientHost
-    ) throws GenieException;
+    void addClientHostToJobRequest(@NotNull final String id, @NotBlank final String clientHost) throws GenieException;
 
     /**
      * Save the jobExecution object in the data store.
@@ -123,10 +98,7 @@ public interface JobPersistenceService {
      * @param jobExecution the Job object to save
      * @throws GenieException if there is an error
      */
-    void createJobExecution(
-            @NotNull(message = "Job Request is null so cannot be saved")
-            final JobExecution jobExecution
-    ) throws GenieException;
+    void createJobExecution(@NotNull final JobExecution jobExecution) throws GenieException;
 
     /**
      * Method to set exit code for the job execution.
@@ -135,10 +107,5 @@ public interface JobPersistenceService {
      * @param exitCode The exit code of the process
      * @throws GenieException if there is an error
      */
-    void setExitCode(
-            @NotBlank(message = "No job id entered. Unable to update.")
-            final String id,
-            @NotBlank(message = "Exit code cannot be blank")
-            final int exitCode
-    ) throws GenieException;
+    void setExitCode(@NotBlank final String id, @NotBlank final int exitCode) throws GenieException;
 }

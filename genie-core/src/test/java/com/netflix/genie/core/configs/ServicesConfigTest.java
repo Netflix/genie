@@ -67,7 +67,6 @@ public class ServicesConfigTest {
      *
      * @param applicationRepo The application repository to use.
      * @param commandRepo     The command repository to use.
-     *
      * @return An application service instance.
      */
     @Bean
@@ -83,7 +82,6 @@ public class ServicesConfigTest {
      *
      * @param clusterRepo The cluster repository to use.
      * @param commandRepo The command repository to use.
-     *
      * @return A cluster service instance.
      */
     @Bean
@@ -100,7 +98,6 @@ public class ServicesConfigTest {
      * @param commandRepo the command repository to use
      * @param appRepo     the application repository to use
      * @param clusterRepo the cluster repository to use
-     *
      * @return A command service instance.
      */
     @Bean
@@ -118,7 +115,6 @@ public class ServicesConfigTest {
      * @param jobRepository          The repository to use for job entities
      * @param jobRequestRepository   The repository to use for job request entities
      * @param jobExecutionRepository The repository to use for job execution entities
-     *
      * @return A job search service instance.
      */
     @Bean
@@ -136,9 +132,9 @@ public class ServicesConfigTest {
      * @param jobRepo          The job repository to use
      * @param jobRequestRepo   The job request repository to use
      * @param jobExecutionRepo The jobExecution Repository to use
+     * @param applicationRepo  The application repository to use
      * @param clusterRepo      The cluster repository to use
      * @param commandRepo      The command repository to use
-     *
      * @return A job search service instance.
      */
     @Bean
@@ -146,19 +142,26 @@ public class ServicesConfigTest {
         final JpaJobRepository jobRepo,
         final JpaJobRequestRepository jobRequestRepo,
         final JpaJobExecutionRepository jobExecutionRepo,
+        final JpaApplicationRepository applicationRepo,
         final JpaClusterRepository clusterRepo,
         final JpaCommandRepository commandRepo
     ) {
-        return new JpaJobPersistenceServiceImpl(jobRepo, jobRequestRepo, jobExecutionRepo, clusterRepo, commandRepo);
+        return new JpaJobPersistenceServiceImpl(
+            jobRepo,
+            jobRequestRepo,
+            jobExecutionRepo,
+            applicationRepo,
+            clusterRepo,
+            commandRepo
+        );
     }
 
     /**
      * Get an local implementation of the JobKillService.
      *
-     * @param hostname              The name of the host this Genie node is running on.
+     * @param hostname         The name of the host this Genie node is running on.
      * @param jobSearchService The job search service to use to locate job information.
-     * @param executor              The executor to use to run system processes.
-     *
+     * @param executor         The executor to use to run system processes.
      * @return A job kill service instance.
      */
     @Bean
@@ -186,7 +189,6 @@ public class ServicesConfigTest {
      * Get an instance of the Genie File Transfer service.
      *
      * @param fileTransferImpls List of implementations of all fileTransfer interface
-     *
      * @return An singelton for GenieFileTransferService
      * @throws GenieException If there is any problem
      */
@@ -200,24 +202,25 @@ public class ServicesConfigTest {
     /**
      * Get a implementation of the JobSubmitterService that runs jobs locally.
      *
-     * @param jss                  Implementaion of the jobSearchService.
-     * @param jps                  Implementation of the job persistence service.
-     * @param clusterService       Implementation of cluster service interface.
-     * @param commandService       Implementation of command service interface.
-     * @param clusterLoadBalancer  Implementation of the cluster load balancer interface.
-     * @param fts File Transfer service.
-     * @param aep Instance of the event publisher.
-     * @param workflowTasks List of all the workflow tasks to be executed.
-     * @param genieWorkingDir Working directory for genie where it creates jobs directories.
-     * @param hostname Hostname of this host.
-     * @param maxRunningJobs Maximum number of jobs allowed to run on this host.
-     *
+     * @param jss                 Implementaion of the jobSearchService.
+     * @param jps                 Implementation of the job persistence service.
+     * @param applicationService  Implementation of application service interface.
+     * @param clusterService      Implementation of cluster service interface.
+     * @param commandService      Implementation of command service interface.
+     * @param clusterLoadBalancer Implementation of the cluster load balancer interface.
+     * @param fts                 File Transfer service.
+     * @param aep                 Instance of the event publisher.
+     * @param workflowTasks       List of all the workflow tasks to be executed.
+     * @param genieWorkingDir     Working directory for genie where it creates jobs directories.
+     * @param hostname            Hostname of this host.
+     * @param maxRunningJobs      Maximum number of jobs allowed to run on this host.
      * @return An instance of the JobSubmitterService.
      */
     @Bean
     public JobSubmitterService jobSubmitterService(
         final JobSearchService jss,
         final JobPersistenceService jps,
+        final ApplicationService applicationService,
         final ClusterService clusterService,
         final CommandService commandService,
         final ClusterLoadBalancer clusterLoadBalancer,
@@ -232,6 +235,7 @@ public class ServicesConfigTest {
         return new LocalJobRunner(
             jss,
             jps,
+            applicationService,
             clusterService,
             commandService,
             clusterLoadBalancer,
@@ -252,7 +256,6 @@ public class ServicesConfigTest {
      * @param jobSubmitterService   implementation of the job submitter service.
      * @param jobKillService        The job kill service to use.
      * @param baseArchiveLocation   The base directory location of where the job dir should be archived.
-     *
      * @return An instance of the JobCoordinatorService.
      */
     @Bean

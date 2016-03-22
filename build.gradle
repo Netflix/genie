@@ -112,6 +112,7 @@ subprojects {
          *******************************/
 
         provided("org.projectlombok:lombok")
+        provided("com.google.code.findbugs:annotations:${findbugs_annotations_version}")
 
         /*******************************
          * Runtime Dependencies
