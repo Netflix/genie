@@ -91,6 +91,30 @@ public class JobResourceAssembler implements ResourceAssembler<Job, JobResource>
                         .getJobStatus(job.getId())
                 ).withRel("status")
             );
+
+            jobResource.add(
+                ControllerLinkBuilder.linkTo(
+                    ControllerLinkBuilder
+                        .methodOn(JobRestController.class)
+                        .getJobCluster(job.getId())
+                ).withRel("cluster")
+            );
+
+            jobResource.add(
+                ControllerLinkBuilder.linkTo(
+                    ControllerLinkBuilder
+                        .methodOn(JobRestController.class)
+                        .getJobCommand(job.getId())
+                ).withRel("command")
+            );
+
+            jobResource.add(
+                ControllerLinkBuilder.linkTo(
+                    ControllerLinkBuilder
+                        .methodOn(JobRestController.class)
+                        .getJobApplications(job.getId())
+                ).withRel("applications")
+            );
         } catch (final GenieException ge) {
             // If we can't convert it we might as well force a server exception
             throw new RuntimeException(ge);

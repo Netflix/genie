@@ -235,15 +235,16 @@ CREATE TABLE `job_requests` (
   `command_args` text NOT NULL,
   `group_name` varchar(255) DEFAULT NULL,
   `setup_file` varchar(1024) DEFAULT NULL,
-  `cluster_criterias` varchar(2048) NOT NULL,
-  `command_criteria` varchar(1024) NOT NULL,
-  `dependencies` text,
+  `cluster_criterias` varchar(2048) NOT NULL DEFAULT '[]',
+  `command_criteria` varchar(1024) NOT NULL DEFAULT '[]',
+  `dependencies` text NOT NULL,
   `disable_log_archival` bit(1) NOT NULL DEFAULT b'0',
   `email` varchar(255) DEFAULT NULL,
   `tags` varchar(2048) DEFAULT NULL,
   `cpu` int(11) NOT NULL DEFAULT '1',
   `memory` int(11) NOT NULL DEFAULT '1560',
   `client_host` varchar(255) DEFAULT NULL,
+  `applications` varchar(2048) NOT NULL DEFAULT '[]',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -291,6 +292,24 @@ CREATE TABLE `jobs` (
   CONSTRAINT `jobs_ibfk_3` FOREIGN KEY (`command_id`) REFERENCES `commands` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `jobs_applications`
+--
+
+DROP TABLE IF EXISTS `jobs_applications`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `jobs_applications` (
+  `job_id` varchar(255) NOT NULL,
+  `application_id` varchar(255) NOT NULL,
+  `application_order` int(11) NOT NULL,
+  KEY `job_id` (`job_id`),
+  KEY `application_id` (`application_id`),
+  CONSTRAINT `jobs_applications_ibfk_1` FOREIGN KEY (`job_id`) REFERENCES `jobs` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `jobs_applications_ibfk_2` FOREIGN KEY (`application_id`) REFERENCES `applications` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -301,4 +320,4 @@ CREATE TABLE `jobs` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-03-17 16:21:47
+-- Dump completed on 2016-03-21 20:12:57
