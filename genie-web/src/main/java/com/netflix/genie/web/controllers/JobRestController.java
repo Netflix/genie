@@ -265,6 +265,7 @@ public class JobRestController {
                 .withTags(jobRequest.getTags())
                 .withEmail(jobRequest.getEmail())
                 .withDependencies(jobRequest.getDependencies())
+                .withTimeout(jobRequest.getTimeout())
                 .build();
         }
 
