@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.core.util;
 
+import com.netflix.genie.common.exceptions.GenieTimeoutException;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.Executor;
@@ -25,8 +26,8 @@ import org.apache.commons.lang3.SystemUtils;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Implementation of ProcessChecker for Unix based systems.
@@ -36,40 +37,47 @@ import java.util.Map;
  */
 public class UnixProcessChecker implements ProcessChecker {
 
-    protected static final String PID_KEY = "pid";
-
     private final Executor executor;
     private final CommandLine commandLine;
+    private final Date timeout;
+    private final SimpleDateFormat dateFormatter;
 
     /**
      * Constructor.
      *
      * @param pid      The process id to check.
      * @param executor The executor to use for generating system commands.
+     * @param timeout  The time which after this job should be killed due to timeout
      */
-    public UnixProcessChecker(@Min(1) final int pid, @NotNull final Executor executor) {
+    public UnixProcessChecker(@Min(1) final int pid, @NotNull final Executor executor, @NotNull final Date timeout) {
         if (!SystemUtils.IS_OS_UNIX) {
             throw new IllegalArgumentException("Not running on a Unix system.");
         }
 
         this.executor = executor;
 
-        final Map<String, Object> substitutionMap = new HashMap<>();
-        substitutionMap.put(PID_KEY, pid);
-
         // Using PS for now but could instead check for existence of done file if this proves to have bad performance
         // send output to /dev/null so it doesn't print to the logs
         this.commandLine = new CommandLine("ps");
         this.commandLine.addArgument("-p");
-        this.commandLine.addArgument("${" + PID_KEY + "}");
-        this.commandLine.setSubstitutionMap(substitutionMap);
+        this.commandLine.addArgument(Integer.toString(pid));
+
+        this.timeout = new Date(timeout.getTime());
+        this.dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void checkProcess() throws ExecuteException, IOException {
+    public void checkProcess() throws GenieTimeoutException, ExecuteException, IOException {
         this.executor.execute(this.commandLine);
+
+        // If we get here the process is still running. Check if it should be killed due to timeout.
+        if (new Date().getTime() > this.timeout.getTime()) {
+            throw new GenieTimeoutException(
+                "Job has exceeded its timeout time of " + this.dateFormatter.format(this.timeout)
+            );
+        }
     }
 }

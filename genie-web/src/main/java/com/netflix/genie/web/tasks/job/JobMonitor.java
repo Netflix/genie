@@ -18,6 +18,7 @@
 package com.netflix.genie.web.tasks.job;
 
 import com.netflix.genie.common.dto.JobExecution;
+import com.netflix.genie.common.exceptions.GenieTimeoutException;
 import com.netflix.genie.core.events.JobFinishedEvent;
 import com.netflix.genie.core.events.KillJobEvent;
 import com.netflix.genie.core.util.ProcessChecker;
@@ -71,7 +72,7 @@ public class JobMonitor implements NodeTask {
         this.errorCount = 0;
         this.execution = execution;
         this.publisher = publisher;
-        this.processChecker = new UnixProcessChecker(execution.getProcessId(), executor);
+        this.processChecker = new UnixProcessChecker(execution.getProcessId(), executor, execution.getTimeout());
     }
 
     /**
@@ -80,7 +81,6 @@ public class JobMonitor implements NodeTask {
      */
     @Override
     public void run() {
-        // TODO: Should we add a timeout?
         try {
             // Blocks until result
             this.processChecker.checkProcess();
@@ -88,6 +88,9 @@ public class JobMonitor implements NodeTask {
             if (this.errorCount != 0) {
                 this.errorCount = 0;
             }
+        } catch (final GenieTimeoutException gte) {
+            log.info("Job {} has timed out", this.execution.getId(), gte);
+            this.publisher.publishEvent(new KillJobEvent(this.execution.getId(), "Job exceeded timeout", this));
         } catch (final ExecuteException ee) {
             log.info("Job {} has finished", this.execution.getId());
             this.publisher.publishEvent(new JobFinishedEvent(this.execution, this));
@@ -102,7 +105,13 @@ public class JobMonitor implements NodeTask {
             // If this keeps throwing errors out we should kill the job
             if (this.errorCount > MAX_ERRORS) {
                 // TODO: What if they throw an exception?
-                this.publisher.publishEvent(new KillJobEvent(this.execution.getId(), this));
+                this.publisher.publishEvent(
+                    new KillJobEvent(
+                        this.execution.getId(),
+                        "Couldn't check process status " + MAX_ERRORS + " consecutive times",
+                        this
+                    )
+                );
                 // Also send a job finished event
                 this.publisher.publishEvent(new JobFinishedEvent(this.execution, this));
             }

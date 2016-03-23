@@ -19,7 +19,6 @@ package com.netflix.genie.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.google.common.collect.Lists;
 import lombok.Getter;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -46,25 +45,27 @@ public class JobRequest extends CommonDTO {
     private static final long serialVersionUID = 3163971970144435277L;
 
     @Size(min = 1, message = "Command arguments are required")
-    private String commandArgs;
+    private final String commandArgs;
     @NotEmpty
-    private List<ClusterCriteria> clusterCriterias = new ArrayList<>();
+    private final List<ClusterCriteria> clusterCriterias = new ArrayList<>();
     @NotEmpty
-    private Set<String> commandCriteria = new HashSet<>();
+    private final Set<String> commandCriteria = new HashSet<>();
     @Size(max = 255, message = "Max length is 255 characters")
-    private String group;
+    private final String group;
     @Size(max = 1024, message = "Max length is 1024 characters")
-    private String setupFile;
-    private boolean disableLogArchival;
+    private final String setupFile;
+    private final boolean disableLogArchival;
     @Size(max = 255, message = "Max length is 255 characters")
     @Email(message = "Must be a valid email address")
-    private String email;
+    private final String email;
     @Min(1)
-    private int cpu;
+    private final int cpu;
     @Min(1)
-    private int memory;
-    private Set<String> dependencies = new HashSet<>();
-    private List<String> applications = new ArrayList<>();
+    private final int memory;
+    @Min(1)
+    private final int timeout;
+    private final Set<String> dependencies = new HashSet<>();
+    private final List<String> applications = new ArrayList<>();
 
     /**
      * Constructor used by the builder build() method.
@@ -84,9 +85,10 @@ public class JobRequest extends CommonDTO {
         this.email = builder.bEmail;
         this.cpu = builder.bCpu;
         this.memory = builder.bMemory;
+        this.timeout = builder.bTimeout;
 
         if (builder.bApplications != null) {
-            this.applications = Lists.newArrayList(builder.bApplications);
+            this.applications.addAll(builder.bApplications);
         }
     }
 
@@ -122,6 +124,15 @@ public class JobRequest extends CommonDTO {
     }
 
     /**
+     * Get the list of application id's this job is requesting to override the default applications with.
+     *
+     * @return The application ids as an read-only list. Attempts to modify with throw runtime exception.
+     */
+    public List<String> getApplications() {
+        return Collections.unmodifiableList(this.applications);
+    }
+
+    /**
      * A builder to create job requests.
      *
      * @author tgianos
@@ -140,6 +151,7 @@ public class JobRequest extends CommonDTO {
         private int bCpu = 1;
         private int bMemory = 1536;
         private final List<String> bApplications = new ArrayList<>();
+        private int bTimeout = 604800;
 
         /**
          * Constructor which has required fields.
@@ -266,6 +278,17 @@ public class JobRequest extends CommonDTO {
             if (applications != null) {
                 this.bApplications.addAll(applications);
             }
+            return this;
+        }
+
+        /**
+         * Set the length of the job timeout in seconds after which Genie will kill the client process.
+         *
+         * @param timeout The timeout to use
+         * @return The builder
+         */
+        public Builder withTimeout(final int timeout) {
+            this.bTimeout = timeout;
             return this;
         }
 

@@ -18,6 +18,7 @@
 package com.netflix.genie.core.jobs.workflow.impl;
 
 import com.netflix.genie.common.dto.JobExecution;
+import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.jobs.JobConstants;
@@ -31,8 +32,10 @@ import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 /**
  * Implementation of the workflow task for processing job information for genie mode.
@@ -42,6 +45,8 @@ import java.util.Map;
  */
 @Slf4j
 public class JobKickoffTask extends GenieBaseTask {
+
+    private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
 
     private boolean isRunAsUserEnabled;
     private boolean isUserCreationEnabled;
@@ -114,9 +119,13 @@ public class JobKickoffTask extends GenieBaseTask {
         try {
             final Process process = pb.start();
             final int processId = Utils.getProcessId(process);
+            final JobRequest request = this.jobExecEnv.getJobRequest();
+            final Calendar calendar = Calendar.getInstance(UTC);
+//            context.put(JobConstants.JOB_STARTED_KEY, new Date(calendar.getTime().getTime()));
+            calendar.add(Calendar.SECOND, request.getTimeout());
             final JobExecution jobExecution = new JobExecution
-                .Builder(this.hostname, processId, this.jobExecEnv.getCommand().getCheckDelay())
-                .withId(this.jobExecEnv.getJobRequest().getId())
+                .Builder(this.hostname, processId, this.jobExecEnv.getCommand().getCheckDelay(), calendar.getTime())
+                .withId(request.getId())
                 .build();
             context.put(JobConstants.JOB_EXECUTION_DTO_KEY, jobExecution);
         } catch (IOException ie) {
@@ -141,7 +150,7 @@ public class JobKickoffTask extends GenieBaseTask {
         idCheckCommandLine.addArgument(user);
 
         try {
-            executor.execute(idCheckCommandLine);
+            this.executor.execute(idCheckCommandLine);
             log.info("User already exists");
         } catch (IOException ioe) {
             log.info("User does not exist. Creating it now.");
@@ -157,7 +166,7 @@ public class JobKickoffTask extends GenieBaseTask {
             userCreateCommandLine.addArgument("-M");
 
             try {
-                executor.execute(userCreateCommandLine);
+                this.executor.execute(userCreateCommandLine);
             } catch (IOException ioexception) {
                 throw new GenieServerException("Could not create user " + user + "with exception " + ioexception);
             }
@@ -184,7 +193,7 @@ public class JobKickoffTask extends GenieBaseTask {
         commandLine.addArgument(dir);
 
         try {
-            executor.execute(commandLine);
+            this.executor.execute(commandLine);
         } catch (IOException ioexception) {
             throw new GenieServerException("Could not change ownership with exception " + ioexception);
         }

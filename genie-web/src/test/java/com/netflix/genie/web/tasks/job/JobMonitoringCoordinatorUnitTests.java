@@ -22,6 +22,7 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.events.JobFinishedEvent;
 import com.netflix.genie.core.events.JobStartedEvent;
+import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.test.categories.UnitTest;
 import org.apache.commons.exec.Executor;
@@ -33,6 +34,8 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.TaskScheduler;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ScheduledFuture;
@@ -51,12 +54,16 @@ public class JobMonitoringCoordinatorUnitTests {
     private TaskScheduler scheduler;
     private JobMonitoringCoordinator coordinator;
     private JobSearchService jobSearchService;
+    private Date tomorrow;
 
     /**
      * Setup for the tests.
      */
     @Before
     public void setup() {
+        final Calendar cal = Calendar.getInstance(JobConstants.UTC);
+        cal.add(Calendar.DAY_OF_YEAR, 1);
+        this.tomorrow = cal.getTime();
         this.jobSearchService = Mockito.mock(JobSearchService.class);
         final Executor executor = Mockito.mock(Executor.class);
         this.scheduler = Mockito.mock(TaskScheduler.class);
@@ -87,7 +94,8 @@ public class JobMonitoringCoordinatorUnitTests {
         final String job2Id = UUID.randomUUID().toString();
         final String job3Id = UUID.randomUUID().toString();
         final String job4Id = UUID.randomUUID().toString();
-        final JobExecution.Builder builder = new JobExecution.Builder(UUID.randomUUID().toString(), 2818, DELAY);
+        final JobExecution.Builder builder
+            = new JobExecution.Builder(UUID.randomUUID().toString(), 2818, DELAY, this.tomorrow);
         builder.withId(job1Id);
         final JobExecution job1 = builder.build();
         builder.withId(job2Id);
@@ -135,7 +143,8 @@ public class JobMonitoringCoordinatorUnitTests {
         final String job2Id = UUID.randomUUID().toString();
         final String job3Id = UUID.randomUUID().toString();
         final String job4Id = UUID.randomUUID().toString();
-        final JobExecution.Builder builder = new JobExecution.Builder(UUID.randomUUID().toString(), 2818, DELAY);
+        final JobExecution.Builder builder
+            = new JobExecution.Builder(UUID.randomUUID().toString(), 2818, DELAY, this.tomorrow);
         builder.withId(job1Id);
         final JobExecution job1 = builder.build();
         builder.withId(job2Id);
@@ -175,7 +184,8 @@ public class JobMonitoringCoordinatorUnitTests {
     @SuppressWarnings("unchecked")
     public void canStopJobMonitor() {
         final String job1Id = UUID.randomUUID().toString();
-        final JobExecution.Builder builder = new JobExecution.Builder(UUID.randomUUID().toString(), 2818, DELAY);
+        final JobExecution.Builder builder
+            = new JobExecution.Builder(UUID.randomUUID().toString(), 2818, DELAY, this.tomorrow);
         builder.withId(job1Id);
         final JobExecution job1 = builder.build();
         final String job2Id = UUID.randomUUID().toString();

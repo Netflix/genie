@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.core.util;
 
+import com.netflix.genie.common.exceptions.GenieTimeoutException;
 import com.netflix.genie.test.categories.UnitTest;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.Executor;
@@ -31,6 +32,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import java.io.IOException;
+import java.util.Calendar;
 
 /**
  * Unit tests for UnixProcessChecker.
@@ -53,16 +55,20 @@ public class UnixProcessCheckerUnitTests {
     public void setup() {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
         this.executor = Mockito.mock(Executor.class);
-        this.processChecker = new UnixProcessChecker(PID, executor);
+        final Calendar tomorrow = Calendar.getInstance();
+        // For standard tests this will keep it from dying
+        tomorrow.add(Calendar.DAY_OF_YEAR, 1);
+        this.processChecker = new UnixProcessChecker(PID, this.executor, tomorrow.getTime());
     }
 
     /**
      * Make sure the correct process is invoked.
      *
-     * @throws IOException on error
+     * @throws GenieTimeoutException on timeout
+     * @throws IOException           on error
      */
     @Test
-    public void canCheckProcess() throws IOException {
+    public void canCheckProcess() throws GenieTimeoutException, IOException {
         final ArgumentCaptor<CommandLine> argumentCaptor = ArgumentCaptor.forClass(CommandLine.class);
         this.processChecker.checkProcess();
         Mockito.verify(this.executor).execute(argumentCaptor.capture());
@@ -73,10 +79,19 @@ public class UnixProcessCheckerUnitTests {
             argumentCaptor.getValue().getArguments()[1],
             Matchers.is(Integer.toString(PID))
         );
-        Assert.assertNotNull(argumentCaptor.getValue().getSubstitutionMap());
-        Assert.assertThat(
-            argumentCaptor.getValue().getSubstitutionMap().get(UnixProcessChecker.PID_KEY),
-            Matchers.is(PID)
-        );
+    }
+
+    /**
+     * Make sure if the timeout has been exceeded then an exception is thrown indicating the process should be killed.
+     *
+     * @throws GenieTimeoutException on timeout
+     * @throws IOException           on any other error
+     */
+    @Test(expected = GenieTimeoutException.class)
+    public void canCheckProcessTimeout() throws GenieTimeoutException, IOException {
+        final Calendar yesterday = Calendar.getInstance();
+        yesterday.add(Calendar.DAY_OF_YEAR, -1);
+        this.processChecker = new UnixProcessChecker(PID, this.executor, yesterday.getTime());
+        this.processChecker.checkProcess();
     }
 }

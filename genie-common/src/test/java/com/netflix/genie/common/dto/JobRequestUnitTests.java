@@ -85,6 +85,7 @@ public class JobRequestUnitTests {
         Assert.assertThat(request.getTags(), Matchers.empty());
         Assert.assertThat(request.getUpdated(), Matchers.nullValue());
         Assert.assertThat(request.getApplications(), Matchers.empty());
+        Assert.assertThat(request.getTimeout(), Matchers.is(604800));
     }
 
     /**
@@ -147,6 +148,9 @@ public class JobRequestUnitTests {
         );
         builder.withApplications(applications);
 
+        final int timeout = 8970243;
+        builder.withTimeout(timeout);
+
         final JobRequest request = builder.build();
         Assert.assertThat(request.getName(), Matchers.is(NAME));
         Assert.assertThat(request.getUser(), Matchers.is(USER));
@@ -167,6 +171,7 @@ public class JobRequestUnitTests {
         Assert.assertThat(request.getTags(), Matchers.is(tags));
         Assert.assertThat(request.getUpdated(), Matchers.is(updated));
         Assert.assertThat(request.getApplications(), Matchers.is(applications));
+        Assert.assertThat(request.getTimeout(), Matchers.is(timeout));
     }
 
     /**
@@ -174,8 +179,7 @@ public class JobRequestUnitTests {
      */
     @Test
     public void canBuildJobRequestWithNulls() {
-        final JobRequest.Builder builder
-            = new JobRequest.Builder(NAME, USER, VERSION, COMMAND_ARGS, null, null);
+        final JobRequest.Builder builder = new JobRequest.Builder(NAME, USER, VERSION, COMMAND_ARGS, null, null);
         builder.withEmail(null);
         builder.withDependencies(null);
         builder.withGroup(null);
@@ -214,8 +218,7 @@ public class JobRequestUnitTests {
      */
     @Test
     public void canFindEquality() {
-        final JobRequest.Builder builder
-            = new JobRequest.Builder(NAME, USER, VERSION, COMMAND_ARGS, null, null);
+        final JobRequest.Builder builder = new JobRequest.Builder(NAME, USER, VERSION, COMMAND_ARGS, null, null);
         builder.withEmail(null);
         builder.withDependencies(null);
         builder.withGroup(null);
@@ -242,8 +245,7 @@ public class JobRequestUnitTests {
      */
     @Test
     public void canUseHashCode() {
-        final JobRequest.Builder builder
-            = new JobRequest.Builder(NAME, USER, VERSION, COMMAND_ARGS, null, null);
+        final JobRequest.Builder builder = new JobRequest.Builder(NAME, USER, VERSION, COMMAND_ARGS, null, null);
         builder.withEmail(null);
         builder.withDependencies(null);
         builder.withGroup(null);

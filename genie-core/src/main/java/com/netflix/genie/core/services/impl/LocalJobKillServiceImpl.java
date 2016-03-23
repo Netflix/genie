@@ -22,6 +22,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.events.KillJobEvent;
+import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.services.JobKillService;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.util.ProcessChecker;
@@ -36,6 +37,7 @@ import org.springframework.context.event.EventListener;
 
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.util.Calendar;
 
 /**
  * Implementation of the JobKillService interface which attempts to kill jobs running on the local node.
@@ -101,7 +103,7 @@ public class LocalJobKillServiceImpl implements JobKillService {
     }
 
     /**
-     * Listen for job kill events from witihin the system as opposed to on calls from users directly to killJob.
+     * Listen for job kill events from within the system as opposed to on calls from users directly to killJob.
      *
      * @param event The {@link KillJobEvent}
      * @throws GenieException On error
@@ -116,7 +118,10 @@ public class LocalJobKillServiceImpl implements JobKillService {
 
     private void killJobOnUnix(final int pid) throws GenieException {
         try {
-            final ProcessChecker processChecker = new UnixProcessChecker(pid, this.executor);
+            // Ensure this process check can't be timed out
+            final Calendar tomorrow = Calendar.getInstance(JobConstants.UTC);
+            tomorrow.add(Calendar.DAY_OF_YEAR, 1);
+            final ProcessChecker processChecker = new UnixProcessChecker(pid, this.executor, tomorrow.getTime());
             processChecker.checkProcess();
         } catch (final ExecuteException ee) {
             // This means the job was done already

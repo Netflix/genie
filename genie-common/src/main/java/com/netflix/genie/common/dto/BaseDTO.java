@@ -19,7 +19,9 @@ package com.netflix.genie.common.dto;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.netflix.genie.common.util.JsonDateDeserializer;
 import com.netflix.genie.common.util.JsonDateSerializer;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -110,7 +112,9 @@ public abstract class BaseDTO implements Serializable {
     protected abstract static class Builder<T extends Builder> {
 
         private String bId;
+        @JsonDeserialize(using = JsonDateDeserializer.class)
         private Date bCreated;
+        @JsonDeserialize(using = JsonDateDeserializer.class)
         private Date bUpdated;
 
         protected Builder() {
