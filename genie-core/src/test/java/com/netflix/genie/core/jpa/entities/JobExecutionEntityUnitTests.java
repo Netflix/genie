@@ -27,6 +27,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -104,6 +105,17 @@ public class JobExecutionEntityUnitTests {
     }
 
     /**
+     * Make sure setting timeout works.
+     */
+    @Test
+    public void canSetTimeout() {
+        Assert.assertThat(this.entity.getTimeout(), Matchers.notNullValue());
+        final Date timeout = new Date(this.entity.getTimeout().getTime() + 100);
+        this.entity.setTimeout(timeout);
+        Assert.assertThat(this.entity.getTimeout(), Matchers.is(timeout));
+    }
+
+    /**
      * Test to make sure can generate valid DTO.
      *
      * @throws GenieException On serialization issues
@@ -118,6 +130,8 @@ public class JobExecutionEntityUnitTests {
         this.entity.setCheckDelay(checkDelay);
         final int exitCode = 2084390;
         this.entity.setExitCode(exitCode);
+        final Date timeout = new Date();
+        this.entity.setTimeout(timeout);
 
         final JobExecution execution = this.entity.getDTO();
         Assert.assertThat(execution.getId(), Matchers.is(ID));
@@ -127,5 +141,6 @@ public class JobExecutionEntityUnitTests {
         Assert.assertThat(execution.getHostName(), Matchers.is(hostName));
         Assert.assertThat(execution.getProcessId(), Matchers.is(processId));
         Assert.assertThat(execution.getCheckDelay(), Matchers.is(checkDelay));
+        Assert.assertThat(execution.getTimeout(), Matchers.is(timeout));
     }
 }

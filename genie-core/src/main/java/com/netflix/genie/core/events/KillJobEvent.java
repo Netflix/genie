@@ -32,15 +32,18 @@ public class KillJobEvent extends ApplicationEvent {
 
     private static final long serialVersionUID = 1701855508124286343L;
     private final String id;
+    private final String reason;
 
     /**
      * Constructor.
      *
-     * @param id  The id of the job to kill
+     * @param id     The id of the job to kill
+     * @param reason The reason this job is being requested to be killed
      * @param source The source object which threw this event
      */
-    public KillJobEvent(@NotBlank final String id, final Object source) {
+    public KillJobEvent(@NotBlank final String id, @NotBlank final String reason, final Object source) {
         super(source);
         this.id = id;
+        this.reason = reason;
     }
 }

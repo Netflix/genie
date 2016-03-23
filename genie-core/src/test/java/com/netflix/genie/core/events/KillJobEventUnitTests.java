@@ -40,8 +40,10 @@ public class KillJobEventUnitTests {
     @Test
     public void canGetJobId() {
         final String id = UUID.randomUUID().toString();
-        final KillJobEvent event = new KillJobEvent(id, this);
+        final String reason = UUID.randomUUID().toString();
+        final KillJobEvent event = new KillJobEvent(id, reason, this);
 
         Assert.assertThat(event.getId(), Matchers.is(id));
+        Assert.assertThat(event.getReason(), Matchers.is(reason));
     }
 }

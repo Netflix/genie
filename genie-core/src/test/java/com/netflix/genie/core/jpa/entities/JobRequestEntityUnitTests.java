@@ -91,6 +91,7 @@ public class JobRequestEntityUnitTests {
         Assert.assertFalse(this.entity.isDisableLogArchival());
         Assert.assertThat(this.entity.getApplicationsAsList(), Matchers.empty());
         Assert.assertThat(this.entity.getApplications(), Matchers.is(EMPTY_JSON_ARRAY));
+        Assert.assertThat(this.entity.getTimeout(), Matchers.is(604800));
     }
 
     /**
@@ -373,6 +374,17 @@ public class JobRequestEntityUnitTests {
     }
 
     /**
+     * Make sure can set the timeout date for the job.
+     */
+    @Test
+    public void canSetTimeout() {
+        Assert.assertThat(this.entity.getTimeout(), Matchers.is(604800));
+        final int timeout = 28023423;
+        this.entity.setTimeout(timeout);
+        Assert.assertThat(this.entity.getTimeout(), Matchers.is(timeout));
+    }
+
+    /**
      * Test to make sure can get a valid DTO from the job request entity.
      *
      * @throws GenieException on error
@@ -461,6 +473,9 @@ public class JobRequestEntityUnitTests {
         );
         requestEntity.setApplicationsFromList(applications);
 
+        final int timeout = 824197;
+        requestEntity.setTimeout(timeout);
+
         final JobRequest request = requestEntity.getDTO();
         Assert.assertThat(request.getId(), Matchers.is(id));
         Assert.assertThat(request.getName(), Matchers.is(name));
@@ -487,5 +502,6 @@ public class JobRequestEntityUnitTests {
         Assert.assertThat(request.getCpu(), Matchers.is(cpu));
         Assert.assertThat(request.getMemory(), Matchers.is(memory));
         Assert.assertThat(request.getApplications(), Matchers.is(applications));
+        Assert.assertThat(request.getTimeout(), Matchers.is(timeout));
     }
 }

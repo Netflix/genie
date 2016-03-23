@@ -38,16 +38,18 @@ public class JobExecutionUnitTests {
     private static final String HOST_NAME = UUID.randomUUID().toString();
     private static final long CHECK_DELAY = 280843L;
     private static final int PROCESS_ID = 134234;
+    private static final Date TIMEOUT = new Date();
 
     /**
      * Test to make sure can build a valid JobExecution using the builder.
      */
     @Test
     public void canBuildJob() {
-        final JobExecution execution = new JobExecution.Builder(HOST_NAME, PROCESS_ID, CHECK_DELAY).build();
+        final JobExecution execution = new JobExecution.Builder(HOST_NAME, PROCESS_ID, CHECK_DELAY, TIMEOUT).build();
         Assert.assertThat(execution.getHostName(), Matchers.is(HOST_NAME));
         Assert.assertThat(execution.getProcessId(), Matchers.is(PROCESS_ID));
         Assert.assertThat(execution.getCheckDelay(), Matchers.is(CHECK_DELAY));
+        Assert.assertThat(execution.getTimeout(), Matchers.is(TIMEOUT));
         Assert.assertThat(execution.getExitCode(), Matchers.is(-1));
         Assert.assertThat(execution.getCreated(), Matchers.nullValue());
         Assert.assertThat(execution.getId(), Matchers.nullValue());
@@ -59,7 +61,7 @@ public class JobExecutionUnitTests {
      */
     @Test
     public void canBuildJobWithOptionals() {
-        final JobExecution.Builder builder = new JobExecution.Builder(HOST_NAME, PROCESS_ID, CHECK_DELAY);
+        final JobExecution.Builder builder = new JobExecution.Builder(HOST_NAME, PROCESS_ID, CHECK_DELAY, TIMEOUT);
 
         final int exitCode = 0;
         builder.withExitCode(exitCode);
@@ -77,6 +79,7 @@ public class JobExecutionUnitTests {
         Assert.assertThat(execution.getHostName(), Matchers.is(HOST_NAME));
         Assert.assertThat(execution.getProcessId(), Matchers.is(PROCESS_ID));
         Assert.assertThat(execution.getCheckDelay(), Matchers.is(CHECK_DELAY));
+        Assert.assertThat(execution.getTimeout(), Matchers.is(TIMEOUT));
         Assert.assertThat(execution.getExitCode(), Matchers.is(exitCode));
         Assert.assertThat(execution.getCreated(), Matchers.is(created));
         Assert.assertThat(execution.getId(), Matchers.is(id));
@@ -88,7 +91,7 @@ public class JobExecutionUnitTests {
      */
     @Test
     public void canBuildJobWithNulls() {
-        final JobExecution.Builder builder = new JobExecution.Builder(HOST_NAME, PROCESS_ID, CHECK_DELAY);
+        final JobExecution.Builder builder = new JobExecution.Builder(HOST_NAME, PROCESS_ID, CHECK_DELAY, TIMEOUT);
         builder.withCreated(null);
         builder.withId(null);
         builder.withUpdated(null);
@@ -97,6 +100,7 @@ public class JobExecutionUnitTests {
         Assert.assertThat(execution.getHostName(), Matchers.is(HOST_NAME));
         Assert.assertThat(execution.getProcessId(), Matchers.is(PROCESS_ID));
         Assert.assertThat(execution.getCheckDelay(), Matchers.is(CHECK_DELAY));
+        Assert.assertThat(execution.getTimeout(), Matchers.is(TIMEOUT));
         Assert.assertThat(execution.getExitCode(), Matchers.is(-1));
         Assert.assertThat(execution.getCreated(), Matchers.nullValue());
         Assert.assertThat(execution.getId(), Matchers.nullValue());
@@ -108,7 +112,7 @@ public class JobExecutionUnitTests {
      */
     @Test
     public void canFindEquality() {
-        final JobExecution.Builder builder = new JobExecution.Builder(HOST_NAME, PROCESS_ID, CHECK_DELAY);
+        final JobExecution.Builder builder = new JobExecution.Builder(HOST_NAME, PROCESS_ID, CHECK_DELAY, TIMEOUT);
         builder.withCreated(null);
         builder.withId(UUID.randomUUID().toString());
         builder.withUpdated(null);
@@ -128,7 +132,7 @@ public class JobExecutionUnitTests {
      */
     @Test
     public void canUseHashCode() {
-        final JobExecution.Builder builder = new JobExecution.Builder(HOST_NAME, PROCESS_ID, CHECK_DELAY);
+        final JobExecution.Builder builder = new JobExecution.Builder(HOST_NAME, PROCESS_ID, CHECK_DELAY, TIMEOUT);
         builder.withCreated(null);
         builder.withId(UUID.randomUUID().toString());
         builder.withUpdated(null);

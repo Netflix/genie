@@ -27,6 +27,7 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-mail")
     compile("org.springframework.retry:spring-retry")
     compile("org.springframework.cloud:spring-cloud-aws-context:${spring_aws_context_version}")
+//    compile("org.springframework.cloud:spring-cloud-starter-spectator:${spring_cloud_netflix_version}")
 
     // AWS Libs
     compile("com.amazonaws:aws-java-sdk-sts:${aws_java_sdk_sts_version}")

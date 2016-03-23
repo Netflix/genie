@@ -17,6 +17,8 @@
  */
 package com.netflix.genie.core.jobs;
 
+import java.util.TimeZone;
+
 /**
  * A class holding some constants to be used everywhere.
  *
@@ -180,6 +182,16 @@ public final class JobConstants {
      * Key used to look up the writer object.
      */
     public static final String WRITER_KEY = "writer";
+
+//    /**
+//     * Key to store when the job was started on the system.
+//     */
+//    public static final String JOB_STARTED_KEY = "jobStarted";
+
+    /**
+     * UTC timezone.
+     */
+    public static final TimeZone UTC = TimeZone.getTimeZone("UTC");
 
     /**
      * Protected constructor for utility class.

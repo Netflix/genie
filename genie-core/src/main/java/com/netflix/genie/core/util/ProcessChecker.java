@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.core.util;
 
+import com.netflix.genie.common.exceptions.GenieTimeoutException;
 import org.apache.commons.exec.ExecuteException;
 
 import java.io.IOException;
@@ -32,8 +33,9 @@ public interface ProcessChecker {
     /**
      * Check the status of the process the process checker was constructed to check.
      *
-     * @throws ExecuteException When the check returns a non-successful exit code
-     * @throws IOException      For any other problem
+     * @throws GenieTimeoutException When the process has been running longer than its configured timeout period
+     * @throws ExecuteException      When the check returns a non-successful exit code
+     * @throws IOException           For any other problem
      */
-    void checkProcess() throws ExecuteException, IOException;
+    void checkProcess() throws GenieTimeoutException, ExecuteException, IOException;
 }

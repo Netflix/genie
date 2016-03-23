@@ -20,6 +20,7 @@ package com.netflix.genie.web.tasks.job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.core.events.JobFinishedEvent;
 import com.netflix.genie.core.events.KillJobEvent;
+import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import org.apache.commons.exec.CommandLine;
@@ -38,6 +39,7 @@ import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
 
@@ -62,9 +64,12 @@ public class JobMonitorUnitTests {
      */
     @Before
     public void setup() {
-        final JobExecution.Builder builder = new JobExecution.Builder(UUID.randomUUID().toString(), 3808, DELAY);
-        builder.withId(UUID.randomUUID().toString());
-        this.jobExecution = builder.build();
+        final Calendar tomorrow = Calendar.getInstance(JobConstants.UTC);
+        tomorrow.add(Calendar.DAY_OF_YEAR, 1);
+        this.jobExecution = new JobExecution
+            .Builder(UUID.randomUUID().toString(), 3808, DELAY, tomorrow.getTime())
+            .withId(UUID.randomUUID().toString())
+            .build();
         this.executor = Mockito.mock(Executor.class);
         this.publisher = Mockito.mock(ApplicationEventPublisher.class);
 
@@ -120,6 +125,37 @@ public class JobMonitorUnitTests {
 
         Assert.assertNotNull(captor.getValue());
         Assert.assertThat(captor.getValue().getJobExecution(), Matchers.is(this.jobExecution));
+        Assert.assertThat(captor.getValue().getSource(), Matchers.is(this.monitor));
+    }
+
+    /**
+     * Make sure that a timed out process sends event.
+     *
+     * @throws IOException on error
+     */
+    @Test
+    public void canTryToKillTimedOutProcess() throws IOException {
+        Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
+
+        // Set timeout to yesterday to force timeout when check happens
+        final Calendar yesterday = Calendar.getInstance(JobConstants.UTC);
+        yesterday.add(Calendar.DAY_OF_YEAR, -1);
+        this.jobExecution = new JobExecution
+            .Builder(UUID.randomUUID().toString(), 3808, DELAY, yesterday.getTime())
+            .withId(UUID.randomUUID().toString())
+            .build();
+        this.monitor = new JobMonitor(this.jobExecution, this.executor, this.publisher);
+
+        this.monitor.run();
+
+        final ArgumentCaptor<KillJobEvent> captor = ArgumentCaptor.forClass(KillJobEvent.class);
+        Mockito
+            .verify(this.publisher, Mockito.times(1))
+            .publishEvent(captor.capture());
+
+        Assert.assertNotNull(captor.getValue());
+        Assert.assertThat(captor.getValue().getId(), Matchers.is(this.jobExecution.getId()));
+        Assert.assertThat(captor.getValue().getReason(), Matchers.is("Job exceeded timeout"));
         Assert.assertThat(captor.getValue().getSource(), Matchers.is(this.monitor));
     }
 

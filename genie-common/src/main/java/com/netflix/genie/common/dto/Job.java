@@ -103,7 +103,9 @@ public class Job extends CommonDTO {
         private final String bCommandArgs;
         private JobStatus bStatus = JobStatus.INIT;
         private String bStatusMsg;
+        @JsonDeserialize(using = JsonDateDeserializer.class)
         private Date bStarted;
+        @JsonDeserialize(using = JsonDateDeserializer.class)
         private Date bFinished;
         private String bArchiveLocation;
         private String bClusterName;

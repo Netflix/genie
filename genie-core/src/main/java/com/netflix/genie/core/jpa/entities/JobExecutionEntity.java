@@ -30,8 +30,14 @@ import javax.persistence.JoinColumn;
 import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * Representation of the original Genie Job request.
@@ -46,6 +52,7 @@ import javax.validation.constraints.Size;
 public class JobExecutionEntity extends BaseEntity {
 
     private static final long serialVersionUID = -5073493356472801960L;
+    private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
 
     @Basic(optional = false)
     @Column(name = "host_name", nullable = false)
@@ -65,10 +72,24 @@ public class JobExecutionEntity extends BaseEntity {
     @Column(name = "exit_code", nullable = false)
     private int exitCode = JobExecution.DEFAULT_EXIT_CODE;
 
+    @Basic(optional = false)
+    @Column(name = "timeout", nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date timeout;
+
     @OneToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "id")
     @MapsId
     private JobEntity job;
+
+    /**
+     * Default constructor.
+     */
+    public JobExecutionEntity() {
+        final Calendar calendar = Calendar.getInstance(UTC);
+        calendar.add(Calendar.DATE, 7);
+        this.timeout = calendar.getTime();
+    }
 
     /**
      * Get the host name this job is running on.
@@ -125,6 +146,24 @@ public class JobExecutionEntity extends BaseEntity {
     }
 
     /**
+     * Get the date this job will be killed due to exceeding its set timeout duration.
+     *
+     * @return The timeout date
+     */
+    public Date getTimeout() {
+        return new Date(this.timeout.getTime());
+    }
+
+    /**
+     * Set the date this job will be killed due to exceeding its set timeout duration.
+     *
+     * @param timeout The new timeout
+     */
+    public void setTimeout(@NotNull final Date timeout) {
+        this.timeout = new Date(timeout.getTime());
+    }
+
+    /**
      * Get the job associated with this job execution.
      *
      * @return The job
@@ -151,7 +190,8 @@ public class JobExecutionEntity extends BaseEntity {
         return new JobExecution.Builder(
             this.hostName,
             this.processId,
-            this.checkDelay
+            this.checkDelay,
+            this.timeout
         )
             .withExitCode(this.exitCode)
             .withId(this.getId())
