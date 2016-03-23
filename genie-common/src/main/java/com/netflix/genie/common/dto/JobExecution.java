@@ -46,7 +46,7 @@ public class JobExecution extends BaseDTO {
     /**
      * The exit code that will be set to indicate a job is killed.
      */
-    public static final int KILLED_EXIT_CODE = 777;
+    public static final int KILLED_EXIT_CODE = 999;
 
     /**
      * The exit code that will be set to indicate a job is marked as zombie.

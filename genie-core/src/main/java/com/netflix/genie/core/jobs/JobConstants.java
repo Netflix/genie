@@ -17,6 +17,8 @@
  */
 package com.netflix.genie.core.jobs;
 
+import com.netflix.genie.common.dto.JobExecution;
+import org.apache.commons.lang3.SystemUtils;
 import java.util.TimeZone;
 
 /**
@@ -59,6 +61,10 @@ public final class JobConstants {
     public static final String FILE_PATH_DELIMITER = "/";
 
     /**
+     * Unix Pkill command.
+     */
+    public static final String UNIX_PKILL_COMMAND = "pkill";
+    /**
      * Bash export command.
      **/
     public static final String EXPORT = "export ";
@@ -71,7 +77,7 @@ public final class JobConstants {
     /**
      * Bash source command.
      **/
-    public static final String SOURCE = "source";
+    public static final String SOURCE = "source ";
 
     /**
      * Semicolon symbol.
@@ -179,6 +185,16 @@ public final class JobConstants {
     public static final String GENIE_DONE_FILE_CONTENT_PREFIX = "printf '{\"exitCode\": \"%s\"}\\n' \"$?\" > ";
 
     /**
+     * Flag to send with the pkill command while killing jobs using the process group ids.
+     */
+    public static final String KILL_PROCESS_GROUP_FLAG = "-g";
+
+    /**
+     * Flag to send with the pkill command using the parent pid.
+     */
+    public static final String KILL_PARENT_PID_FLAG = "-P";
+
+    /**
      * Key used to look up the writer object.
      */
     public static final String WRITER_KEY = "writer";
@@ -194,8 +210,92 @@ public final class JobConstants {
     public static final TimeZone UTC = TimeZone.getTimeZone("UTC");
 
     /**
+     * An object the encapsulates the kill handling logic to be added to the run.sh for each job.
+     */
+    public static final String JOB_KILL_HANDLER_LOGIC = new StringBuilder()
+        .append("trap \"handle_kill_request\" SIGTERM\n")
+        .append("\n")
+        .append("function handle_kill_request {\n")
+        .append("\n")
+        .append("    KILL_EXIT_CODE=").append(JobExecution.KILLED_EXIT_CODE)
+        .append("\n")
+        .append("    # Disable SIGTERM signal for the script itself\n")
+        .append("    trap \"\" SIGTERM\n")
+        .append("\n")
+        .append("    echo \"Kill signal received\"\n")
+        .append("\n")
+        .append("    ### Write the kill exit code to genie.done file as exit code before doing anything else\n")
+        .append("    echo \"Generate done file with exit code ${KILL_EXIT_CODE}\"\n")
+        .append("    printf '{\"exitCode\": \"%s\"}\\n' \"${KILL_EXIT_CODE}\" > ./genie/genie.done\n")
+        .append("\n")
+        .append("    ### Send a kill signal the entire process group\n")
+        .append("    echo \"Sending a kill signal to the process group\"\n")
+        .append("    pkill ").append(getKillFlag()).append(" $$\n")
+        .append("\n")
+        .append("    COUNTER=0\n")
+        .append("    NUM_CHILD_PROCESSES=`pgrep ").append(getKillFlag()).append(" ${SELF_PID} | wc -w`\n")
+        .append("\n")
+        .append("    # Waiting for 30 seconds for the child processes to die\n")
+        .append("    while [[  $COUNTER -lt 30 ]] && [[ \"$NUM_CHILD_PROCESSES\" -gt ")
+        .append(getChildProcessThreshold())
+        .append(" ]]; do\n")
+        .append("        echo The counter is $COUNTER\n")
+        .append("        let COUNTER=COUNTER+1\n")
+        .append("        echo \"Sleeping now for 1 seconds\"\n")
+        .append("        sleep 1\n")
+        .append("        NUM_CHILD_PROCESSES=`pgrep ").append(getKillFlag()).append(" ${SELF_PID} | wc -w`\n")
+        .append("    done\n")
+        .append("\n")
+        .append("    # check if any children are still running. If not just exit.\n")
+        .append("    if [ \"$NUM_CHILD_PROCESSES\" -eq ")
+        .append(getChildProcessThreshold())
+        .append("  ]\n")
+        .append("    then\n")
+        .append("       echo \"Done\"\n")
+        .append("       exit\n")
+        .append("    fi\n")
+        .append("\n")
+        .append("    ### Reaching at this point means the children did not die. ")
+        .append("If so send kill -9 to the entire process group\n")
+        .append("   # this is a hard kill and will this process itself as well\n")
+        .append("    echo \"Sending a kill -9 to children\"\n")
+        .append("\n")
+        .append("    pkill -9 ").append(getKillFlag()).append(" $$\n")
+        .append("    echo \"Done\"\n")
+        .append("}\n")
+        .append("SELF_PID=$$\n")
+        .toString();
+
+    /**
      * Protected constructor for utility class.
      */
     protected JobConstants() {
     }
+
+    /**
+     * Returns the apprporiate flag to append to kill command based on the OS.
+     *
+     * @return The flag to use for kill command.
+     */
+    public static String getKillFlag() {
+        if (SystemUtils.IS_OS_LINUX) {
+            return KILL_PROCESS_GROUP_FLAG;
+        } else {
+            return KILL_PARENT_PID_FLAG;
+        }
+    }
+
+    /**
+     * Returns the child process threshold based on the OS.
+     *
+     * @return The flag to use for kill command.
+     */
+    public static int getChildProcessThreshold() {
+        if (SystemUtils.IS_OS_LINUX) {
+            return 3;
+        } else {
+            return 0;
+        }
+    }
+
 }

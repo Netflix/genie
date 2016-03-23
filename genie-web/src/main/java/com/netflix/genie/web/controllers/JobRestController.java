@@ -265,6 +265,7 @@ public class JobRestController {
                 .withTags(jobRequest.getTags())
                 .withEmail(jobRequest.getEmail())
                 .withDependencies(jobRequest.getDependencies())
+                .withTimeout(jobRequest.getTimeout())
                 .build();
         }
 
@@ -452,6 +453,7 @@ public class JobRestController {
      * @throws ServletException when trying to handle the request
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.ACCEPTED)
     public void killJob(
         @PathVariable("id") final String id,
         @RequestHeader(name = JobConstants.GENIE_FORWARDED_FROM_HEADER, required = false) final String forwardedFrom,

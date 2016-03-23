@@ -402,6 +402,8 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .getResource(BASE_DIR + "job" + FILE_DELIMITER + "dep1")
             .getFile()
             .getAbsolutePath();
+
+        // TODO adding this file as dependency breaks the test.investigate why
 //        final String depFile2 = this.resourceLoader.getResource(
 //            this.BASE_DIR
 //                + "job"
@@ -745,67 +747,146 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     }
 
     /**
-     * Test the job submit method for when the job is killed.
+     * Test the job submit method for when the job is killed by sending a DELETE HTTP call.
      *
      * @throws Exception If there is a problem.
      */
-//    @Test
-//    public void testSubmitJobMethodKill() throws Exception {
-//        Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
-//        final String commandArgs = "-c 'ls foo'";
-//
-//        final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
-//        final Set<String> clusterTags = new HashSet<>();
-//        clusterTags.add("localhost");
-//        final ClusterCriteria clusterCriteria = new ClusterCriteria(clusterTags);
-//        clusterCriteriaList.add(clusterCriteria);
-//
-//        final Set<String> commandCriteria = new HashSet<>();
-//        commandCriteria.add("bash");
-//        final JobRequest jobRequest = new JobRequest.Builder(
-//            JOB_NAME,
-//            JOB_USER,
-//            JOB_VERSION,
-//            commandArgs,
-//            clusterCriteriaList,
-//            commandCriteria
-//        )
-//            .withDisableLogArchival(true)
-//            .build();
-//
-//        final MvcResult result = this.mvc
-//            .perform(
-//                MockMvcRequestBuilders
-//                    .post(JOBS_API)
-//                    .contentType(MediaType.APPLICATION_JSON)
-//                    .content(OBJECT_MAPPER.writeValueAsBytes(jobRequest))
-//            )
-//            .andExpect(MockMvcResultMatchers.status().isAccepted())
-//            .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()))
-//            .andReturn();
-//
-//        final String jobId = this.getIdFromLocation(result.getResponse().getHeader(HttpHeaders.LOCATION));
-//
-//        // Send a kill request to the job.
-//        this.mvc
-//            .perform(
-//                MockMvcRequestBuilders
-//                    .delete(JOBS_API + "/" + jobId)
-//            );
-//
-//        try {
-//            Thread.sleep(1000);
-//        } catch (InterruptedException ie) {
-//            //Handle exception
-//        }
-//
-//        this.mvc
-//            .perform(MockMvcRequestBuilders.get(JOBS_API + "/" + jobId))
-//            .andExpect(MockMvcResultMatchers.status().isOk())
-//            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
-//            .andExpect(MockMvcResultMatchers.jsonPath(ID_PATH, Matchers.is(jobId)))
-//            .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(JobStatus.KILLED.toString())));
-//    }
+    @Test
+    public void testSubmitJobMethodKill() throws Exception {
+        Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
+        final String commandArgs = "-c 'sleep 60'";
+
+        final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
+        final Set<String> clusterTags = new HashSet<>();
+        clusterTags.add("localhost");
+        final ClusterCriteria clusterCriteria = new ClusterCriteria(clusterTags);
+        clusterCriteriaList.add(clusterCriteria);
+
+        final Set<String> commandCriteria = new HashSet<>();
+        commandCriteria.add("bash");
+        final JobRequest jobRequest = new JobRequest.Builder(
+            JOB_NAME,
+            JOB_USER,
+            JOB_VERSION,
+            commandArgs,
+            clusterCriteriaList,
+            commandCriteria
+        )
+            .withDisableLogArchival(true)
+            .build();
+
+        final MvcResult result = this.mvc
+            .perform(
+                MockMvcRequestBuilders
+                    .post(JOBS_API)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(OBJECT_MAPPER.writeValueAsBytes(jobRequest))
+            )
+            .andExpect(MockMvcResultMatchers.status().isAccepted())
+            .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()))
+            .andReturn();
+
+        final String jobId = this.getIdFromLocation(result.getResponse().getHeader(HttpHeaders.LOCATION));
+
+        // Send a kill request to the job.
+        this.mvc
+            .perform(
+                MockMvcRequestBuilders
+                    .delete(JOBS_API + "/" + jobId)
+            );
+
+        int counter = 1;
+        do {
+            counter++;
+            Thread.sleep(1000);
+        } while (
+            this.mvc.perform(MockMvcRequestBuilders.get(
+                JOBS_API
+                    + JobConstants.FILE_PATH_DELIMITER
+                    + jobId
+                    + JobConstants.FILE_PATH_DELIMITER
+                    + "status")
+                .accept(MediaType.APPLICATION_JSON))
+                .andReturn()
+                .getResponse()
+                .getContentAsString().contains("RUNNING") && counter < 10
+            );
+
+        this.mvc
+            .perform(MockMvcRequestBuilders.get(JOBS_API + "/" + jobId))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.jsonPath(ID_PATH, Matchers.is(jobId)))
+            .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(JobStatus.KILLED.toString())));
+    }
+
+    /**
+     * Test the job submit method for when the job is killed as it times out.
+     *
+     * @throws Exception If there is a problem.
+     */
+    @Test
+    public void testSubmitJobMethodKillOnTimeout() throws Exception {
+        Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
+        final String commandArgs = "-c 'sleep 60'";
+
+        final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
+        final Set<String> clusterTags = new HashSet<>();
+        clusterTags.add("localhost");
+        final ClusterCriteria clusterCriteria = new ClusterCriteria(clusterTags);
+        clusterCriteriaList.add(clusterCriteria);
+
+        final Set<String> commandCriteria = new HashSet<>();
+        commandCriteria.add("bash");
+        final JobRequest jobRequest = new JobRequest.Builder(
+            JOB_NAME,
+            JOB_USER,
+            JOB_VERSION,
+            commandArgs,
+            clusterCriteriaList,
+            commandCriteria
+        )
+            .withTimeout(20)
+            .withDisableLogArchival(true)
+            .build();
+
+        final MvcResult result = this.mvc
+            .perform(
+                MockMvcRequestBuilders
+                    .post(JOBS_API)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(OBJECT_MAPPER.writeValueAsBytes(jobRequest))
+            )
+            .andExpect(MockMvcResultMatchers.status().isAccepted())
+            .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()))
+            .andReturn();
+
+        final String jobId = this.getIdFromLocation(result.getResponse().getHeader(HttpHeaders.LOCATION));
+
+        int counter = 1;
+        do {
+            counter++;
+            Thread.sleep(1000);
+        } while (
+            this.mvc.perform(MockMvcRequestBuilders.get(
+                JOBS_API
+                    + JobConstants.FILE_PATH_DELIMITER
+                    + jobId
+                    + JobConstants.FILE_PATH_DELIMITER
+                    + "status")
+                .accept(MediaType.APPLICATION_JSON))
+                .andReturn()
+                .getResponse()
+                .getContentAsString().contains("RUNNING") && counter < 120
+            );
+
+        this.mvc
+            .perform(MockMvcRequestBuilders.get(JOBS_API + "/" + jobId))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.jsonPath(ID_PATH, Matchers.is(jobId)))
+            .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(JobStatus.KILLED.toString())));
+    }
 
     /**
      * Test the job submit method for when the job fails.
