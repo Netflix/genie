@@ -264,6 +264,7 @@ CREATE TABLE job_requests (
   memory INT NOT NULL DEFAULT 1560,
   client_host VARCHAR(255) DEFAULT NULL,
   applications VARCHAR(2048) NOT NULL DEFAULT '[]',
+  timeout INT NOT NULL DEFAULT 604800,
   PRIMARY KEY (id)
 );
 SELECT CURRENT_TIMESTAMP, 'Successfully created the job_requests table.';
@@ -381,10 +382,11 @@ CREATE TABLE job_executions (
   process_id INT NOT NULL,
   exit_code INT NOT NULL DEFAULT -1,
   check_delay BIGINT NOT NULL DEFAULT 10000,
+  timeout TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP::DATE + 7,
   FOREIGN KEY (id) REFERENCES jobs (id) ON DELETE CASCADE
 );
 
-CREATE INDEX JOB_EXECUTIONS_HOSTNAME_INDEX ON job_executions (hostname);
+CREATE INDEX JOB_EXECUTIONS_HOSTNAME_INDEX ON job_executions (host_name);
 CREATE INDEX JOB_EXECUTIONS_EXIT_CODE_INDEX ON job_executions (exit_code);
 SELECT CURRENT_TIMESTAMP, 'Successfully created the job_executions table.';
 

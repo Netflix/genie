@@ -23,6 +23,7 @@ import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
@@ -58,7 +59,7 @@ public class SwaggerConfig {
                         + "<a href=\"https://github.com/Netflix/genie/issues\">here</a>.<br/>",
                     "3.0.0",
                     null,
-                    "Netflix, Inc.",
+                    new Contact("Netflix, Inc.", "https://jobs.netflix.com/", null),
                     "Apache 2.0",
                     "http://www.apache.org/licenses/LICENSE-2.0"
                 )

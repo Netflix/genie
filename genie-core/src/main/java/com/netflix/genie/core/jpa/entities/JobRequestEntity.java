@@ -22,6 +22,8 @@ import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.util.JsonUtils;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -47,6 +49,8 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "job_requests")
+@Getter
+@Setter
 public class JobRequestEntity extends SetupFileEntity {
 
     private static final long serialVersionUID = -1895413051636217614L;
@@ -100,7 +104,7 @@ public class JobRequestEntity extends SetupFileEntity {
     @Basic(optional = false)
     @Column(name = "memory", nullable = false)
     @Min(value = 1, message = "Can't have less than 1 MB of memory allocated")
-    private int memory = 1536;
+    private int memory = 1536; // 1.5 GB in MB
 
     @Basic
     @Column(name = "client_host")
@@ -111,6 +115,11 @@ public class JobRequestEntity extends SetupFileEntity {
     @Column(name = "applications", length = 2048)
     @Size(min = 1, max = 2048)
     private String applications = EMPTY_JSON_ARRAY;
+
+    @Basic(optional = false)
+    @Column(name = "timeout", nullable = false)
+    @Min(value = 1)
+    private int timeout = 604800; // Seven days in seconds
 
     @OneToOne(
         mappedBy = "request",
@@ -450,6 +459,7 @@ public class JobRequestEntity extends SetupFileEntity {
             .withMemory(this.memory)
             .withUpdated(this.getUpdated())
             .withApplications(this.getApplicationsAsList())
+            .withTimeout(this.timeout)
             .build();
     }
 }

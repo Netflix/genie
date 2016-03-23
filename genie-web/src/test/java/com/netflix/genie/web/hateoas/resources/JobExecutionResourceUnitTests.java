@@ -24,6 +24,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -39,6 +40,7 @@ public class JobExecutionResourceUnitTests {
     private static final String NAME = UUID.randomUUID().toString();
     private static final int PID = 38091;
     private static final long CHECK_DELAY = 813309L;
+    private static final Date TIMEOUT = new Date();
 
     private JobExecution jobExecution;
 
@@ -48,7 +50,7 @@ public class JobExecutionResourceUnitTests {
     @Before
     public void setup() {
         this.jobExecution = new JobExecution
-            .Builder(NAME, PID, CHECK_DELAY)
+            .Builder(NAME, PID, CHECK_DELAY, TIMEOUT)
             .withId(ID)
             .build();
     }

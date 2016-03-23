@@ -22,7 +22,7 @@ install: "./gradle/installViaTravis.sh"
 # Setup the database for the integration tests
 before_script:
   - mysql -u root -e 'create database genie;'
-  - mysql -u root genie < genie-ddl/mysql/genie-schema-3.0.0.mysql.sql
+  - mysql -u root genie < genie-ddl/mysql/3.0.0-schema.mysql.sql
 
 script: "./gradle/buildViaTravis.sh"
 

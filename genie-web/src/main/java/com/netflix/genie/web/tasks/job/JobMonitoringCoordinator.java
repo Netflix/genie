@@ -146,8 +146,7 @@ public class JobMonitoringCoordinator {
     }
 
     private void scheduleMonitor(final JobExecution jobExecution) {
-        final JobMonitor monitor
-            = new JobMonitor(jobExecution, this.executor, this.publisher);
+        final JobMonitor monitor = new JobMonitor(jobExecution, this.executor, this.publisher);
         final ScheduledFuture<?> future;
         switch (monitor.getScheduleType()) {
             case TRIGGER:

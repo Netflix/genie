@@ -139,6 +139,7 @@
         cpu="1"
         memory="1560"
         disable_log_archival="true"
+        timeout="608400"
         entity_version="1"
     />
     <jobs
@@ -166,6 +167,7 @@
         exit_code="0"
         process_id="317"
         check_delay="10000"
+        timeout="2015-08-18 01:49:00"
         entity_version="2"
     />
 
@@ -186,6 +188,7 @@
         cpu="2"
         memory="2048"
         disable_log_archival="false"
+        timeout="608400"
         entity_version="1"
     />
     <jobs
@@ -213,6 +216,7 @@
         exit_code="-1"
         process_id="318"
         check_delay="11000"
+        timeout="2015-08-19 01:49:00"
         entity_version="0"
     />
 
@@ -233,6 +237,7 @@
         cpu="2"
         memory="2048"
         disable_log_archival="true"
+        timeout="608400"
         entity_version="1"
     />
     <jobs
@@ -255,11 +260,12 @@
     <job_executions
         id="job3"
         created="2016-02-24 01:49:00"
-        updated="2014-02-24 02:59:00"
+        updated="2016-02-24 02:59:00"
         host_name="b.netflix.com"
         exit_code="-1"
         process_id="319"
         check_delay="12000"
+        timeout="2016-03-03 01:49:00"
         entity_version="0"
     />
 </dataset>

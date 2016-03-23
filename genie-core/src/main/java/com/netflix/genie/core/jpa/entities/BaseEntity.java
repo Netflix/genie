@@ -51,14 +51,14 @@ public class BaseEntity implements Serializable {
     @Length(max = 255, message = "Max length in database is 255 characters")
     private String id;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Basic(optional = false)
     @Column(name = "created", nullable = false, updatable = false)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date created = new Date();
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Basic(optional = false)
     @Column(name = "updated", nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date updated = new Date();
 
     @Version

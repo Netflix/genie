@@ -19,10 +19,15 @@ package com.netflix.genie.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.netflix.genie.common.util.JsonDateDeserializer;
+import com.netflix.genie.common.util.JsonDateSerializer;
 import lombok.Getter;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.Date;
 
 /**
  * All information needed to show state of a running job.
@@ -63,6 +68,8 @@ public class JobExecution extends BaseDTO {
         message = "The delay between checks must be at least 1 millisecond. Probably should be much more than that"
     )
     private final long checkDelay;
+    @JsonSerialize(using = JsonDateSerializer.class)
+    private final Date timeout;
     private final int exitCode;
 
     /**
@@ -76,6 +83,16 @@ public class JobExecution extends BaseDTO {
         this.processId = builder.bProcessId;
         this.checkDelay = builder.bCheckDelay;
         this.exitCode = builder.bExitCode;
+        this.timeout = new Date(builder.bTimeout.getTime());
+    }
+
+    /**
+     * Get the timeout date for this job after which if it is still running the system will attempt to kill it.
+     *
+     * @return The timeout date
+     */
+    public Date getTimeout() {
+        return new Date(this.timeout.getTime());
     }
 
     /**
@@ -89,6 +106,7 @@ public class JobExecution extends BaseDTO {
         private final String bHostName;
         private final int bProcessId;
         private final long bCheckDelay;
+        private final Date bTimeout;
         private int bExitCode = -1;
 
         /**
@@ -97,6 +115,7 @@ public class JobExecution extends BaseDTO {
          * @param hostName   The hostname where the job is running
          * @param processId  The id of the process running the job
          * @param checkDelay How long, in milliseconds, to wait between checks for job status
+         * @param timeout    The time this job will be killed due to timeout
          */
         public Builder(
             @JsonProperty("hostName")
@@ -104,12 +123,17 @@ public class JobExecution extends BaseDTO {
             @JsonProperty("processId")
             final int processId,
             @JsonProperty("checkDelay")
-            final long checkDelay
+            final long checkDelay,
+            @JsonProperty("timeout")
+            @JsonDeserialize(using = JsonDateDeserializer.class)
+            @NotNull
+            final Date timeout
         ) {
             super();
             this.bHostName = hostName;
             this.bProcessId = processId;
             this.bCheckDelay = checkDelay;
+            this.bTimeout = new Date(timeout.getTime());
         }
 
         /**

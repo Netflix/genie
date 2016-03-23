@@ -256,6 +256,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         jobRequestEntity.setCpu(jobRequest.getCpu());
         jobRequestEntity.setMemory(jobRequest.getMemory());
         jobRequestEntity.setApplicationsFromList(jobRequest.getApplications());
+        jobRequestEntity.setTimeout(jobRequest.getTimeout());
 
         this.jobRequestRepo.save(jobRequestEntity);
         return jobRequestEntity.getDTO();
@@ -309,10 +310,13 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         jobExecutionEntity.setHostName(jobExecution.getHostName());
         jobExecutionEntity.setProcessId(jobExecution.getProcessId());
         jobExecutionEntity.setCheckDelay(jobExecution.getCheckDelay());
+        jobExecutionEntity.setTimeout(jobExecution.getTimeout());
 
         jobEntity.setExecution(jobExecutionEntity);
         jobEntity.setStatus(JobStatus.RUNNING);
         jobEntity.setStatusMsg("Job is Running");
+
+        // TODO: This is quite a bit (in terms of code) after it actually started...
         jobEntity.setStarted(new Date());
     }
 

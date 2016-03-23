@@ -24,6 +24,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -38,7 +39,7 @@ public class JobStartedEventUnitTests {
     @Test
     public void canConstruct() {
         final JobExecution.Builder jobExecutionBuilder
-            = new JobExecution.Builder(UUID.randomUUID().toString(), 3029, 238124L);
+            = new JobExecution.Builder(UUID.randomUUID().toString(), 3029, 238124L, new Date());
         jobExecutionBuilder.withId(UUID.randomUUID().toString());
         final JobExecution jobExecution = jobExecutionBuilder.build();
         final Object source = new Object();

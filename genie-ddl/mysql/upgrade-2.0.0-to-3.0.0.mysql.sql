@@ -247,6 +247,7 @@ CREATE TABLE `job_requests` (
   `memory` INT(11) NOT NULL DEFAULT 1560,
   `client_host` VARCHAR(255) DEFAULT NULL,
   `applications` VARCHAR(2048) NOT NULL DEFAULT '[]',
+  `timeout` INT NOT NULL DEFAULT 604800, # Seven days in seconds
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully created the job_requests table.' AS '';
@@ -365,6 +366,7 @@ CREATE TABLE `job_executions` (
   `process_id` INT(11) NOT NULL,
   `exit_code` INT(11) NOT NULL DEFAULT -1,
   `check_delay` BIGINT NOT NULL DEFAULT 10000,
+  `timeout` DATETIME NOT NULL,
   FOREIGN KEY (`id`) REFERENCES `jobs` (`id`) ON DELETE CASCADE,
   INDEX `JOB_EXECUTIONS_HOSTNAME_INDEX` (`host_name`),
   INDEX `JOB_EXECUTIONS_EXIT_CODE_INDEX` (`exit_code`)
@@ -379,7 +381,8 @@ INSERT INTO `job_executions` (
   `entity_version`,
   `host_name`,
   `process_id`,
-  `exit_code`
+  `exit_code`,
+  `timeout`
 ) SELECT
     `id`,
     `created`,
@@ -387,7 +390,8 @@ INSERT INTO `job_executions` (
     `entityVersion`,
     `hostName`,
     `processHandle`,
-    `exitCode`
+    `exitCode`,
+    CURRENT_TIMESTAMP + INTERVAL 7 DAY
   FROM `jobs`;
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully inserted values into the job_executions table.' AS '';
 

@@ -209,6 +209,7 @@ CREATE TABLE `job_executions` (
   `process_id` int(11) NOT NULL,
   `exit_code` int(11) NOT NULL DEFAULT '-1',
   `check_delay` bigint(20) NOT NULL DEFAULT '10000',
+  `timeout` datetime NOT NULL,
   KEY `id` (`id`),
   KEY `JOB_EXECUTIONS_HOSTNAME_INDEX` (`host_name`),
   KEY `JOB_EXECUTIONS_EXIT_CODE_INDEX` (`exit_code`),
@@ -245,6 +246,7 @@ CREATE TABLE `job_requests` (
   `memory` int(11) NOT NULL DEFAULT '1560',
   `client_host` varchar(255) DEFAULT NULL,
   `applications` varchar(2048) NOT NULL DEFAULT '[]',
+  `timeout` int(11) NOT NULL DEFAULT '604800',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -320,4 +322,4 @@ CREATE TABLE `jobs_applications` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-03-22 11:15:37
+-- Dump completed on 2016-03-23 11:12:44
