@@ -183,8 +183,6 @@ public class JobCompletionHandler {
             final String localArchiveFile = jobWorkingDir + JobConstants.FILE_PATH_DELIMITER + jobId + ".tar.gz";
 
             final CommandLine commandLine = new CommandLine("tar");
-            commandLine.addArgument("--exclude=genie");
-            commandLine.addArgument("--exclude=run.sh");
             commandLine.addArgument("-c");
             commandLine.addArgument("-z");
             commandLine.addArgument("-f");
