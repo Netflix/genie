@@ -24,6 +24,7 @@ import com.netflix.genie.core.jobs.workflow.impl.ClusterTask;
 import com.netflix.genie.core.jobs.workflow.impl.CommandTask;
 import com.netflix.genie.core.jobs.workflow.impl.InitialSetupTask;
 import com.netflix.genie.core.jobs.workflow.impl.JobKickoffTask;
+import com.netflix.genie.core.jobs.workflow.impl.JobKillLogicTask;
 import com.netflix.genie.core.jobs.workflow.impl.JobTask;
 import com.netflix.genie.core.services.AttachmentService;
 import com.netflix.genie.core.services.FileTransfer;
@@ -52,6 +53,19 @@ public class JobConfig {
     @Order(value = 2)
     public FileTransfer localFileTransfer() {
         return new LocalFileTransferImpl(); }
+
+
+    /**
+     * Create a task that adds logic to handle kill requests to a job.
+     *
+     * @return A jobKillLogicTask bean.
+     */
+    @Bean
+    @Order(value = 0)
+    public WorkflowTask jobKillLogicTask() {
+        return new JobKillLogicTask();
+    }
+
     /**
      * Create an setup Task bean that does initial setup before any of the tasks start.
      *

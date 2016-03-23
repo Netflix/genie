@@ -95,7 +95,11 @@ public class JobTask extends GenieBaseTask {
                 + JobConstants.STDOUT_LOG_FILE_NAME
                 + JobConstants.STDERR_REDIRECT
                 + JobConstants.STDERR_LOG_FILE_NAME
+                + " &"
         );
+
+        // Wait for the above process started in background mode. Wait lets us get interrupted by kill signals.
+        Utils.appendToWriter(writer, "wait $!");
 
         // capture exit code and write to genie.done file
         Utils.appendToWriter(writer, JobConstants.GENIE_DONE_FILE_CONTENT_PREFIX + JobConstants.GENIE_DONE_FILE_NAME);

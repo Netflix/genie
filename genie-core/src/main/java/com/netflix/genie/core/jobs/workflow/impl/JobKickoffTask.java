@@ -26,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 
 import javax.validation.constraints.NotNull;
 import java.io.File;
@@ -101,6 +102,12 @@ public class JobKickoffTask extends GenieBaseTask {
             command.add("sudo");
             command.add("-u");
             command.add(this.jobExecEnv.getJobRequest().getUser());
+        }
+
+        // If the OS is linux use setsid to launch the process so that the entire process tree
+        // is launched in process group id which is the same as the pid of the parent process
+        if (SystemUtils.IS_OS_LINUX) {
+            command.add("setsid");
         }
         command.add("bash");
         command.add(runScript);

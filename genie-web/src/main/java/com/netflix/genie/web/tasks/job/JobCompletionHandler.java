@@ -59,15 +59,16 @@ public class JobCompletionHandler {
     private final GenieFileTransferService genieFileTransferService;
     private final String baseWorkingDir;
     private final MailService mailServiceImpl;
+    private final Executor executor;
 
     /**
      * Constructor.
      *
-     * @param jobSearchService         An implementation of the job search service
-     * @param jobPersistenceService    An implementation of the job persistence service
-     * @param genieFileTransferService An implementation of the Genie File Transfer service
-     * @param genieWorkingDir          The working directory where all job directories are created
-     * @param mailServiceImpl          An implementation of the mail service
+     * @param jobSearchService         An implementation of the job search service.
+     * @param jobPersistenceService    An implementation of the job persistence service.
+     * @param genieFileTransferService An implementation of the Genie File Transfer service.
+     * @param genieWorkingDir          The working directory where all job directories are created.
+     * @param mailServiceImpl          An implementation of the mail service.
      * @throws GenieException if there is a problem
      */
     @Autowired
@@ -82,6 +83,8 @@ public class JobCompletionHandler {
         this.jobSearchService = jobSearchService;
         this.genieFileTransferService = genieFileTransferService;
         this.mailServiceImpl = mailServiceImpl;
+        this.executor = new DefaultExecutor();
+        executor.setStreamHandler(new PumpStreamHandler(null, null));
 
         try {
             this.baseWorkingDir = genieWorkingDir.getFile().getCanonicalPath();
@@ -104,8 +107,31 @@ public class JobCompletionHandler {
         final String jobId = event.getJobExecution().getId();
 
         updateExitCode(jobId);
+        cleanupProcesses(event.getJobExecution().getProcessId());
         archivedJobDir(jobId);
         sendEmail(jobId);
+    }
+
+    /**
+     * An external fail-safe mechanism to clean up processes left behind by the run.sh after the
+     * job is killed or failed.
+     *
+     * @param pid The process id.
+     * @throws GenieException
+     */
+    private void cleanupProcesses(
+        final int pid
+    ) throws GenieException {
+        final CommandLine commandLine = new CommandLine(JobConstants.UNIX_PKILL_COMMAND);
+        commandLine.addArgument(JobConstants.getKillFlag());
+        commandLine.addArgument(Integer.toString(pid));
+
+        try {
+            executor.execute(commandLine);
+            // TODO whats the point of this exception? who catches it?
+        } catch (IOException ioe) {
+            log.debug("Ignoring exception from this command.");
+        }
     }
 
     /**
@@ -165,9 +191,7 @@ public class JobCompletionHandler {
             commandLine.addArgument(localArchiveFile);
             commandLine.addArgument("./");
 
-            final Executor executor = new DefaultExecutor();
             executor.setWorkingDirectory(new File(jobWorkingDir));
-            executor.setStreamHandler(new PumpStreamHandler(null, null));
 
             try {
                 executor.execute(commandLine);
