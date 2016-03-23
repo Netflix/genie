@@ -212,7 +212,7 @@ public final class JobConstants {
     /**
      * An object the encapsulates the kill handling logic to be added to the run.sh for each job.
      */
-    public static final StringBuilder JOB_KILL_HANDLER_LOGIC = new StringBuilder()
+    public static final String JOB_KILL_HANDLER_LOGIC = new StringBuilder()
         .append("trap \"handle_kill_request\" SIGTERM\n")
         .append("\n")
         .append("function handle_kill_request {\n")
@@ -233,7 +233,7 @@ public final class JobConstants {
         .append("    pkill ").append(getKillFlag()).append(" $$\n")
         .append("\n")
         .append("    COUNTER=0\n")
-        .append("    NUM_CHILD_PROCESSES=`pgrep -P ${SELF_PID} | wc -w`\n")
+        .append("    NUM_CHILD_PROCESSES=`pgrep ").append(getKillFlag()).append(" ${SELF_PID} | wc -w`\n")
         .append("\n")
         .append("    # Waiting for 30 seconds for the child processes to die\n")
         .append("    while [[  $COUNTER -lt 30 ]] && [[ \"$NUM_CHILD_PROCESSES\" -gt ")
@@ -243,7 +243,7 @@ public final class JobConstants {
         .append("        let COUNTER=COUNTER+1\n")
         .append("        echo \"Sleeping now for 1 seconds\"\n")
         .append("        sleep 1\n")
-        .append("        NUM_CHILD_PROCESSES=`pgrep -P ${SELF_PID} | wc -w`\n")
+        .append("        NUM_CHILD_PROCESSES=`pgrep ").append(getKillFlag()).append(" ${SELF_PID} | wc -w`\n")
         .append("    done\n")
         .append("\n")
         .append("    # check if any children are still running. If not just exit.\n")
@@ -263,7 +263,8 @@ public final class JobConstants {
         .append("    pkill -9 ").append(getKillFlag()).append(" $$\n")
         .append("    echo \"Done\"\n")
         .append("}\n")
-        .append("SELF_PID=$$\n");
+        .append("SELF_PID=$$\n")
+        .toString();
 
     /**
      * Protected constructor for utility class.
@@ -291,7 +292,7 @@ public final class JobConstants {
      */
     public static int getChildProcessThreshold() {
         if (SystemUtils.IS_OS_LINUX) {
-            return 1;
+            return 3;
         } else {
             return 0;
         }
