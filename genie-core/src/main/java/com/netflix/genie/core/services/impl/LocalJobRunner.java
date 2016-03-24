@@ -161,8 +161,19 @@ public class LocalJobRunner implements JobSubmitterService {
 
             // Resolve the cluster for the job request based on the tags specified
             //TODO: Combine the cluster and command selection into a single method/database query for efficiency
-            final Cluster cluster
-                = this.clusterLoadBalancer.selectCluster(this.clusterService.chooseClusterForJobRequest(jobRequest));
+            final Cluster cluster;
+            try {
+                cluster =
+                    this.clusterLoadBalancer.selectCluster(this.clusterService.chooseClusterForJobRequest(jobRequest));
+            } catch (GeniePreconditionException gpe) {
+                log.error(gpe.getLocalizedMessage(), gpe);
+                this.jobPersistenceService.updateJobStatus(
+                    id,
+                    JobStatus.INVALID,
+                    "No cluster found for tags specified.");
+                throw gpe;
+            }
+
 
             // Resolve the command for the job request based on command tags and cluster chosen
             final Set<CommandStatus> enumStatuses = EnumSet.noneOf(CommandStatus.class);
@@ -178,6 +189,10 @@ public class LocalJobRunner implements JobSubmitterService {
             }
 
             if (command == null) {
+                this.jobPersistenceService.updateJobStatus(
+                    id,
+                    JobStatus.INVALID,
+                    "No command found for tags specified.");
                 throw new GeniePreconditionException(
                     "No command found matching all command criteria on cluster. Unable to continue."
                 );
@@ -254,7 +269,7 @@ public class LocalJobRunner implements JobSubmitterService {
             }
         } catch (final Exception e) {
             log.error(e.getLocalizedMessage(), e);
-            this.jobPersistenceService.updateJobStatus(id, JobStatus.INVALID, e.getLocalizedMessage());
+            this.jobPersistenceService.updateJobStatus(id, JobStatus.FAILED, e.getLocalizedMessage());
             throw e;
         }
     }

@@ -51,7 +51,7 @@ public abstract class Utils {
     ) throws GenieException {
 
         try {
-            if (StringUtils.isNotBlank(content)) {
+            if (StringUtils.isNotEmpty(content)) {
                 writer.write(content);
                 writer.write("\n");
             }

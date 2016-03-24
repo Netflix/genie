@@ -213,6 +213,15 @@ public final class JobConstants {
      * An object the encapsulates the kill handling logic to be added to the run.sh for each job.
      */
     public static final String JOB_KILL_HANDLER_LOGIC = new StringBuilder()
+        .append("# Set function in case any of the exports or source commands cause an error\n")
+        .append("trap \"handle_failure\" ERR\n")
+        .append("function handle_failure {\n")
+        .append("    ERROR_CODE=$?\n")
+        .append("    printf '{\"exitCode\": \"%s\"}\\n' \"${ERROR_CODE}\" > ./genie/genie.done\n")
+        .append("    exit\n")
+        .append("}\n")
+        .append("\n")
+        .append("# Set function for handling kill signal from the job kill service\n")
         .append("trap \"handle_kill_request\" SIGTERM\n")
         .append("\n")
         .append("function handle_kill_request {\n")
@@ -263,6 +272,7 @@ public final class JobConstants {
         .append("    pkill -9 ").append(getKillFlag()).append(" $$\n")
         .append("    echo \"Done\"\n")
         .append("}\n")
+        .append("\n")
         .append("SELF_PID=$$\n")
         .toString();
 

@@ -69,7 +69,15 @@ public class JobTask extends GenieBaseTask {
                     + jobSetupFile.substring(jobSetupFile.lastIndexOf(JobConstants.FILE_PATH_DELIMITER) + 1);
 
             this.fts.getFile(jobSetupFile, localPath);
-            Utils.appendToWriter(writer, JobConstants.SOURCE + localPath + JobConstants.SEMICOLON_SYMBOL);
+
+            Utils.appendToWriter(writer, "# Sourcing setup file specified in job request ");
+            Utils.appendToWriter(writer,
+                JobConstants.SOURCE
+                    + localPath.replace(this.jobWorkingDirectory, "${" + JobConstants.GENIE_JOB_DIR_ENV_VAR + "}")
+                    + JobConstants.SEMICOLON_SYMBOL);
+
+            // Append new line
+            Utils.appendToWriter(writer, " ");
         }
 
         // Iterate over and get all dependencies
@@ -86,6 +94,11 @@ public class JobTask extends GenieBaseTask {
             jobExecEnv.getJobRequest().getId(),
             jobExecEnv.getJobWorkingDir());
 
+        // Append new line
+        Utils.appendToWriter(writer, " ");
+
+        Utils.appendToWriter(writer, "# Kick off the command in background mode and wait for it using its pid");
+
         Utils.appendToWriter(
             writer,
             jobExecEnv.getCommand().getExecutable()
@@ -101,7 +114,11 @@ public class JobTask extends GenieBaseTask {
         // Wait for the above process started in background mode. Wait lets us get interrupted by kill signals.
         Utils.appendToWriter(writer, "wait $!");
 
+        // Append new line
+        Utils.appendToWriter(writer, " ");
+
         // capture exit code and write to genie.done file
+        Utils.appendToWriter(writer, "# Write the return code from the command in the done file.");
         Utils.appendToWriter(writer, JobConstants.GENIE_DONE_FILE_CONTENT_PREFIX + JobConstants.GENIE_DONE_FILE_NAME);
     }
 }

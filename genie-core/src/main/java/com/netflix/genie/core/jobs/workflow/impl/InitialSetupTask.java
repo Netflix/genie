@@ -89,34 +89,52 @@ public class InitialSetupTask extends GenieBaseTask {
             + JobConstants.EQUALS_SYMBOL
             + this.jobWorkingDirectory);
 
+        // Append new line
+        Utils.appendToWriter(writer, " ");
+
         // create environment variable for the application directory
         Utils.appendToWriter(writer, JobConstants.EXPORT
             + JobConstants.GENIE_APPLICATION_DIR_ENV_VAR
             + JobConstants.EQUALS_SYMBOL
-            + this.jobWorkingDirectory
+            + "${"
+            + JobConstants.GENIE_JOB_DIR_ENV_VAR
+            + "}"
             + JobConstants.FILE_PATH_DELIMITER
             + JobConstants.GENIE_PATH_VAR
             + JobConstants.FILE_PATH_DELIMITER
             + JobConstants.APPLICATION_PATH_VAR);
 
+        // Append new line
+        Utils.appendToWriter(writer, " ");
+
         // create environment variable for the command directory
         Utils.appendToWriter(writer, JobConstants.EXPORT
             + JobConstants.GENIE_COMMAND_DIR_ENV_VAR
             + JobConstants.EQUALS_SYMBOL
-            + this.jobWorkingDirectory
+            + "${"
+            + JobConstants.GENIE_JOB_DIR_ENV_VAR
+            + "}"
             + JobConstants.FILE_PATH_DELIMITER
             + JobConstants.GENIE_PATH_VAR
             + JobConstants.FILE_PATH_DELIMITER
             + JobConstants.COMMAND_PATH_VAR);
 
+        // Append new line
+        Utils.appendToWriter(writer, " ");
+
         // create environment variable for the cluster directory
         Utils.appendToWriter(writer, JobConstants.EXPORT
             + JobConstants.GENIE_CLUSTER_DIR_ENV_VAR
             + JobConstants.EQUALS_SYMBOL
-            + this.jobWorkingDirectory
+            + "${"
+            + JobConstants.GENIE_JOB_DIR_ENV_VAR
+            + "}"
             + JobConstants.FILE_PATH_DELIMITER
             + JobConstants.GENIE_PATH_VAR
             + JobConstants.FILE_PATH_DELIMITER
             + JobConstants.CLUSTER_PATH_VAR);
+
+        // Append new line
+        Utils.appendToWriter(writer, " ");
     }
 }

@@ -383,7 +383,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
      * @throws Exception If there is a problem.
      */
     @Test
-    public void testSubmitJobMethod() throws Exception {
+    public void testSubmitJobMethodSuccess() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
         final String commandArgs = "-c 'echo hello world'";
 
@@ -403,15 +403,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .getFile()
             .getAbsolutePath();
 
-        // TODO adding this file as dependency breaks the test.investigate why
-//        final String depFile2 = this.resourceLoader.getResource(
-//            this.BASE_DIR
-//                + "job"
-//                + FILE_DELIMITER
-//                + "dep2"
-//        ).getFile().getAbsolutePath();
         dependencies.add(depFile1);
-//        dependencies.add(depFile2);
 
         final String commandTag = "bash";
         final Set<String> commandCriteria = Sets.newHashSet(commandTag);
