@@ -21,7 +21,7 @@ import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.jobs.JobConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -42,7 +42,6 @@ import javax.validation.constraints.NotNull;
 public class JobCoordinatorService {
 
     private final JobPersistenceService jobPersistenceService;
-    private final JobSearchService jobSearchService;
     private final JobSubmitterService jobSubmitterService;
     private final JobKillService jobKillService;
 
@@ -52,20 +51,17 @@ public class JobCoordinatorService {
      * Constructor.
      *
      * @param jobPersistenceService implementation of job persistence service interface
-     * @param jobSearchService      implementation of job search service interface
      * @param jobSubmitterService   implementation of the job submitter service
      * @param jobKillService        The job kill service to use
      * @param baseArchiveLocation   The base directory location of where the job dir should be archived
      */
     public JobCoordinatorService(
         final JobPersistenceService jobPersistenceService,
-        final JobSearchService jobSearchService,
         final JobSubmitterService jobSubmitterService,
         final JobKillService jobKillService,
         final String baseArchiveLocation
     ) {
         this.jobPersistenceService = jobPersistenceService;
-        this.jobSearchService = jobSearchService;
         this.jobSubmitterService = jobSubmitterService;
         this.jobKillService = jobKillService;
         this.baseArchiveLocation = baseArchiveLocation;
@@ -85,8 +81,10 @@ public class JobCoordinatorService {
         final JobRequest jobRequest,
         final String clientHost
     ) throws GenieException {
-        // TODO: Should likely validate it has an ID at this point since we return it without ever setting it
         log.debug("Called with job request {}", jobRequest);
+        if (StringUtils.isBlank(jobRequest.getId())) {
+            throw new GenieServerException("Id of the jobRequest cannot be null");
+        }
 
         // Log the job request
         this.jobPersistenceService.createJobRequest(jobRequest);
@@ -97,14 +95,12 @@ public class JobCoordinatorService {
 
         String archiveLocation = null;
         if (!jobRequest.isDisableLogArchival()) {
-            if (this.baseArchiveLocation == null) {
-                throw new GeniePreconditionException("Job archival is enabled but base location for archival is null.");
-            }
             archiveLocation = this.baseArchiveLocation
                 + JobConstants.FILE_PATH_DELIMITER
                 + jobRequest.getId()
                 + ".tar.gz";
         }
+
         // create the job object in the database with status INIT
         final Job job = new Job.Builder(
             jobRequest.getName(),
