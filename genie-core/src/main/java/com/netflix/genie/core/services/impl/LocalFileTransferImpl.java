@@ -89,12 +89,12 @@ public class LocalFileTransferImpl implements FileTransfer {
             final File dest = new File(dstRemotePath);
             Files.copy(src.toPath(), dest.toPath());
         } catch (IOException ioe) {
-            log.error("Got error while copying remote file {} to local path {}", srcLocalPath, dstRemotePath);
+            log.error("Got error while copying local file {} to remote path {}", srcLocalPath, dstRemotePath);
             throw new GenieServerException(
-                "Got error while copying remote file "
-                    + dstRemotePath
-                    + " to local path "
-                    + srcLocalPath, ioe);
+                "Got error while copying local file "
+                    + srcLocalPath
+                    + " to remote path "
+                    + dstRemotePath, ioe);
         }
     }
 }
