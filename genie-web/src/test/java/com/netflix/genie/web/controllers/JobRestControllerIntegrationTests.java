@@ -567,13 +567,13 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         // check that the generated run.sh is correct
         final String runShFileName;
         if (SystemUtils.IS_OS_LINUX) {
-            runShFileName = "linux-run.txt";
+            runShFileName = "linux-runsh.txt";
         } else {
-            runShFileName = "non-linux-run.txt";
+            runShFileName = "non-linux-runsh.txt";
         }
 
         final String runSHFile = this.resourceLoader.getResource(BASE_DIR + runShFileName).getFile().getAbsolutePath();
-        final String runFileContents = new String(Files.readAllBytes(Paths.get(runSHFile)));
+        final String runFileContents = new String(Files.readAllBytes(Paths.get(runSHFile)), "UTF-8");
 
         final String jobWorkingDir = jobDirResource.getFile().getAbsolutePath() + FILE_DELIMITER + jobId;
         final String expectedRunScriptContent = runFileContents.replace("TEST_GENIE_JOB_WORKING_DIR_PLACEHOLDER",
