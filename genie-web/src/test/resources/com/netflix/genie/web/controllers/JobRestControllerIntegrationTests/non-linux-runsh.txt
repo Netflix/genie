@@ -1,0 +1,86 @@
+# Set function in case any of the exports or source commands cause an error
+trap "handle_failure" ERR
+function handle_failure {
+    ERROR_CODE=$?
+    printf '{"exitCode": "%s"}\n' "${ERROR_CODE}" > ./genie/genie.done
+    exit
+}
+
+# Set function for handling kill signal from the job kill service
+trap "handle_kill_request" SIGTERM
+
+function handle_kill_request {
+
+    KILL_EXIT_CODE=999
+    # Disable SIGTERM signal for the script itself
+    trap "" SIGTERM
+
+    echo "Kill signal received"
+
+    ### Write the kill exit code to genie.done file as exit code before doing anything else
+    echo "Generate done file with exit code ${KILL_EXIT_CODE}"
+    printf '{"exitCode": "%s"}\n' "${KILL_EXIT_CODE}" > ./genie/genie.done
+
+    ### Send a kill signal the entire process group
+    echo "Sending a kill signal to the process group"
+    pkill -P $$
+
+    COUNTER=0
+    NUM_CHILD_PROCESSES=`pgrep -P ${SELF_PID} | wc -w`
+
+    # Waiting for 30 seconds for the child processes to die
+    while [[  $COUNTER -lt 30 ]] && [[ "$NUM_CHILD_PROCESSES" -gt 0 ]]; do
+        echo The counter is $COUNTER
+        let COUNTER=COUNTER+1
+        echo "Sleeping now for 1 seconds"
+        sleep 1
+        NUM_CHILD_PROCESSES=`pgrep -P ${SELF_PID} | wc -w`
+    done
+
+    # check if any children are still running. If not just exit.
+    if [ "$NUM_CHILD_PROCESSES" -eq 0  ]
+    then
+       echo "Done"
+       exit
+    fi
+
+    ### Reaching at this point means the children did not die. If so send kill -9 to the entire process group
+   # this is a hard kill and will this process itself as well
+    echo "Sending a kill -9 to children"
+
+    pkill -9 -P $$
+    echo "Done"
+}
+
+SELF_PID=$$
+
+export GENIE_JOB_DIR=TEST_GENIE_JOB_WORKING_DIR_PLACEHOLDER
+ 
+export GENIE_APPLICATION_DIR=${GENIE_JOB_DIR}/genie/applications
+ 
+export GENIE_COMMAND_DIR=${GENIE_JOB_DIR}/genie/command
+ 
+export GENIE_CLUSTER_DIR=${GENIE_JOB_DIR}/genie/cluster
+ 
+# Sourcing setup file from cluster cluster1
+source ${GENIE_JOB_DIR}/genie/cluster/cluster1/setupfile;
+ 
+# Sourcing setup file from application app1
+source ${GENIE_JOB_DIR}/genie/applications/app1/setupfile;
+ 
+# Sourcing setup file from application app2
+source ${GENIE_JOB_DIR}/genie/applications/app2/setupfile;
+ 
+# Sourcing setup file from command cmd1
+source ${GENIE_JOB_DIR}/genie/command/cmd1/setupfile;
+ 
+# Sourcing setup file specified in job request
+source ${GENIE_JOB_DIR}/jobsetupfile;
+ 
+ 
+# Kick off the command in background mode and wait for it using its pid
+/bin/bash -c 'echo hello world' > stdout 2> stderr &
+wait $!
+ 
+# Write the return code from the command in the done file.
+printf '{"exitCode": "%s"}\n' "$?" > ./genie/genie.done

@@ -70,7 +70,7 @@ public class JobTask extends GenieBaseTask {
 
             this.fts.getFile(jobSetupFile, localPath);
 
-            Utils.appendToWriter(writer, "# Sourcing setup file specified in job request ");
+            Utils.appendToWriter(writer, "# Sourcing setup file specified in job request");
             Utils.appendToWriter(writer,
                 JobConstants.SOURCE
                     + localPath.replace(this.jobWorkingDirectory, "${" + JobConstants.GENIE_JOB_DIR_ENV_VAR + "}")

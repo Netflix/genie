@@ -45,6 +45,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
@@ -53,6 +54,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -144,6 +147,9 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
 
     @Autowired
     private String hostname;
+
+    @Autowired
+    private Resource jobDirResource;
 
     /**
      * Setup for tests.
@@ -392,17 +398,13 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         final ClusterCriteria clusterCriteria = new ClusterCriteria(Sets.newHashSet(clusterTag));
         clusterCriteriaList.add(clusterCriteria);
 
-        final String setUpFile = this.resourceLoader
-            .getResource(BASE_DIR + "job" + FILE_DELIMITER + "jobsetupfile")
+        final String setUpFile = this.resourceLoader.getResource(BASE_DIR + "job" + FILE_DELIMITER + "jobsetupfile")
             .getFile()
             .getAbsolutePath();
 
         final Set<String> dependencies = new HashSet<>();
-        final String depFile1 = this.resourceLoader
-            .getResource(BASE_DIR + "job" + FILE_DELIMITER + "dep1")
-            .getFile()
+        final String depFile1 = this.resourceLoader.getResource(BASE_DIR + "job" + FILE_DELIMITER + "dep1").getFile()
             .getAbsolutePath();
-
         dependencies.add(depFile1);
 
         final String commandTag = "bash";
@@ -415,9 +417,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             clusterCriteriaList,
             commandCriteria
         )
-            .withDisableLogArchival(true)
-            .withSetupFile(setUpFile)
-            .withDependencies(dependencies)
+            .withDisableLogArchival(true).withSetupFile(setUpFile).withDependencies(dependencies)
             .withDescription(JOB_DESCRIPTION)
             .build();
 
@@ -440,11 +440,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             Thread.sleep(1000);
         } while (
             this.mvc.perform(MockMvcRequestBuilders.get(
-                JOBS_API
-                    + JobConstants.FILE_PATH_DELIMITER
-                    + jobId
-                    + JobConstants.FILE_PATH_DELIMITER
-                    + "status")
+                JOBS_API + JobConstants.FILE_PATH_DELIMITER + jobId + JobConstants.FILE_PATH_DELIMITER + "status")
                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn()
                 .getResponse()
@@ -453,8 +449,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
 
         Assert.assertEquals(this.mvc.perform(MockMvcRequestBuilders.get(
             JOBS_API
-                + JobConstants.FILE_PATH_DELIMITER
-                + jobId
+                + JobConstants.FILE_PATH_DELIMITER + jobId
                 + JobConstants.FILE_PATH_DELIMITER
                 + "status")
             .accept(MediaType.APPLICATION_JSON))
@@ -491,7 +486,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey("cluster")))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey("command")))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey("applications")));
-
 
         // Check the structure of the output directory for the job using the output api
         this.mvc
@@ -569,6 +563,26 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
             .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(APP1_ID)))
             .andExpect(MockMvcResultMatchers.jsonPath("$[1].id", Matchers.is(APP2_ID)));
+
+        // check that the generated run.sh is correct
+        final String runShFileName;
+        if (SystemUtils.IS_OS_LINUX) {
+            runShFileName = "linux-run.txt";
+        } else {
+            runShFileName = "non-linux-run.txt";
+        }
+
+        final String runSHFile = this.resourceLoader.getResource(BASE_DIR + runShFileName).getFile().getAbsolutePath();
+        final String runFileContents = new String(Files.readAllBytes(Paths.get(runSHFile)));
+
+        final String jobWorkingDir = jobDirResource.getFile().getAbsolutePath() + FILE_DELIMITER + jobId;
+        final String expectedRunScriptContent = runFileContents.replace("TEST_GENIE_JOB_WORKING_DIR_PLACEHOLDER",
+            jobWorkingDir);
+
+        this.mvc
+            .perform(MockMvcRequestBuilders.get(JOBS_API + "/" + jobId + "/output/run.sh"))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.content().string(expectedRunScriptContent));
 
         Assert.assertThat(this.jobRepository.count(), Matchers.is(1L));
         Assert.assertThat(this.jobRequestRepository.count(), Matchers.is(1L));
