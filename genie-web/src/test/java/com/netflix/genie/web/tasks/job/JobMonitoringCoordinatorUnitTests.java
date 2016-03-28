@@ -25,6 +25,7 @@ import com.netflix.genie.core.events.JobStartedEvent;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.spectator.api.Registry;
 import org.apache.commons.exec.Executor;
 import org.junit.Before;
 import org.junit.Test;
@@ -68,9 +69,16 @@ public class JobMonitoringCoordinatorUnitTests {
         final Executor executor = Mockito.mock(Executor.class);
         this.scheduler = Mockito.mock(TaskScheduler.class);
         final ApplicationEventPublisher publisher = Mockito.mock(ApplicationEventPublisher.class);
+        final Registry registry = Mockito.mock(Registry.class);
 
-        this.coordinator
-            = new JobMonitoringCoordinator(HOSTNAME, this.jobSearchService, publisher, this.scheduler, executor);
+        this.coordinator = new JobMonitoringCoordinator(
+            HOSTNAME,
+            this.jobSearchService,
+            publisher,
+            this.scheduler,
+            executor,
+            registry
+        );
     }
 
     /**

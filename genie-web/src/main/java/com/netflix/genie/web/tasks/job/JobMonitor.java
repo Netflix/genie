@@ -25,6 +25,8 @@ import com.netflix.genie.core.util.ProcessChecker;
 import com.netflix.genie.core.util.UnixProcessChecker;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import com.netflix.genie.web.tasks.node.NodeTask;
+import com.netflix.spectator.api.Counter;
+import com.netflix.spectator.api.Registry;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.Executor;
@@ -53,17 +55,25 @@ public class JobMonitor implements NodeTask {
     private final ApplicationEventPublisher publisher;
     private int errorCount;
 
+    // Metrics
+    private final Counter successfulCheckRate;
+    private final Counter timeoutRate;
+    private final Counter finishedRate;
+    private final Counter unsuccessfulCheckRate;
+
     /**
      * Constructor.
      *
      * @param execution The job execution object including the pid
      * @param executor  The process executor to use
      * @param publisher The event publisher to use when a job isn't running anymore
+     * @param registry  The metrics event registry
      */
     public JobMonitor(
         @Valid final JobExecution execution,
         @NotNull final Executor executor,
-        @NotNull final ApplicationEventPublisher publisher
+        @NotNull final ApplicationEventPublisher publisher,
+        @NotNull final Registry registry
     ) {
         if (!SystemUtils.IS_OS_UNIX) {
             throw new UnsupportedOperationException("Genie doesn't currently support " + SystemUtils.OS_NAME);
@@ -73,6 +83,10 @@ public class JobMonitor implements NodeTask {
         this.execution = execution;
         this.publisher = publisher;
         this.processChecker = new UnixProcessChecker(execution.getProcessId(), executor, execution.getTimeout());
+        this.successfulCheckRate = registry.counter("genie.jobs.successfulStatusCheck.rate");
+        this.timeoutRate = registry.counter("genie.jobs.timeout.rate");
+        this.finishedRate = registry.counter("genie.jobs.finished.rate");
+        this.unsuccessfulCheckRate = registry.counter("genie.jobs.unsuccessfulStatusCheck.rate");
     }
 
     /**
@@ -88,11 +102,14 @@ public class JobMonitor implements NodeTask {
             if (this.errorCount != 0) {
                 this.errorCount = 0;
             }
+            this.successfulCheckRate.increment();
         } catch (final GenieTimeoutException gte) {
             log.info("Job {} has timed out", this.execution.getId(), gte);
+            this.timeoutRate.increment();
             this.publisher.publishEvent(new KillJobEvent(this.execution.getId(), "Job exceeded timeout", this));
         } catch (final ExecuteException ee) {
             log.info("Job {} has finished", this.execution.getId());
+            this.finishedRate.increment();
             this.publisher.publishEvent(new JobFinishedEvent(this.execution, this));
         } catch (final IOException ioe) {
             // Some other error
@@ -102,6 +119,7 @@ public class JobMonitor implements NodeTask {
                 ioe
             );
             this.errorCount++;
+            this.unsuccessfulCheckRate.increment();
             // If this keeps throwing errors out we should kill the job
             if (this.errorCount > MAX_ERRORS) {
                 // TODO: What if they throw an exception?

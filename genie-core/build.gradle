@@ -21,13 +21,15 @@ dependencies {
     compile("commons-io:commons-io")
     compile("org.apache.commons:commons-exec:${commons_exec_version}")
 
+    // Netflix Libs
+    compile("com.netflix.spectator:spectator-api:${spectator_version}")
+
     // Spring Libs
     compile("org.springframework.boot:spring-boot-starter-aop")
     compile("org.springframework.boot:spring-boot-starter-data-jpa")
     compile("org.springframework.boot:spring-boot-starter-mail")
     compile("org.springframework.retry:spring-retry")
-    compile("org.springframework.cloud:spring-cloud-aws-context:${spring_aws_context_version}")
-//    compile("org.springframework.cloud:spring-cloud-starter-spectator:${spring_cloud_netflix_version}")
+    compile("org.springframework.cloud:spring-cloud-aws-context")
 
     // AWS Libs
     compile("com.amazonaws:aws-java-sdk-sts:${aws_java_sdk_sts_version}")
