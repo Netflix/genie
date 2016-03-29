@@ -26,11 +26,11 @@ import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import com.netflix.genie.core.services.impl.GenieFileTransferService;
-import com.netflix.genie.core.util.Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
+import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
@@ -58,7 +58,7 @@ public abstract class GenieBaseTask implements WorkflowTask {
     public void executeTask(
         @NotNull
         final Map<String, Object> context
-    ) throws GenieException {
+    ) throws GenieException, IOException {
         log.debug("called");
 
         this.jobExecEnv =
@@ -193,7 +193,7 @@ public abstract class GenieBaseTask implements WorkflowTask {
             default:
         }
 
-        Utils.createDirectory(
+        this.createDirectory(
             this.genieDir
                 + JobConstants.FILE_PATH_DELIMITER
                 + entityPathVar
@@ -232,7 +232,7 @@ public abstract class GenieBaseTask implements WorkflowTask {
             default:
         }
 
-        Utils.createDirectory(
+        this.createDirectory(
             this.genieDir
                 + JobConstants.FILE_PATH_DELIMITER
                 + entityPathVar
@@ -273,7 +273,7 @@ public abstract class GenieBaseTask implements WorkflowTask {
             default:
         }
 
-        Utils.createDirectory(
+        this.createDirectory(
             this.genieDir
                 + JobConstants.FILE_PATH_DELIMITER
                 + entityPathVar
@@ -281,5 +281,37 @@ public abstract class GenieBaseTask implements WorkflowTask {
                 + id
                 + JobConstants.FILE_PATH_DELIMITER
                 + JobConstants.DEPENDENCY_FILE_PATH_PREFIX);
+    }
+
+    /**
+     * Helper method to create directories on local filesystem.
+     *
+     * @param dirPath The directory path to create
+     * @throws GenieException If there is a problem.
+     */
+    protected void createDirectory(
+        @NotBlank(message = "Directory path cannot be blank.")
+        final String dirPath
+    ) throws GenieException {
+        final File dir = new File(dirPath);
+        if (!dir.mkdirs()) {
+            throw new GenieServerException("Could not create directory: " + dirPath);
+        }
+    }
+
+    protected void generateSetupFileSourceSnippet(
+        final String id,
+        final String type,
+        final String filePath
+    ) throws IOException {
+        writer.write("# Sourcing setup file from " + type + " " + id + System.lineSeparator());
+
+        writer.write(
+            JobConstants.SOURCE
+                + filePath.replace(this.jobWorkingDirectory, "${" + JobConstants.GENIE_JOB_DIR_ENV_VAR + "}")
+                + System.lineSeparator());
+
+        // Append new line
+        writer.write(System.lineSeparator());
     }
 }

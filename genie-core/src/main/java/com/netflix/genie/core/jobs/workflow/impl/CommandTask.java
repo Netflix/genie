@@ -20,11 +20,11 @@ package com.netflix.genie.core.jobs.workflow.impl;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.jobs.AdminResources;
 import com.netflix.genie.core.jobs.FileType;
-import com.netflix.genie.core.util.Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -43,7 +43,7 @@ public class CommandTask extends GenieBaseTask {
     public void executeTask(
         @NotNull
         final Map<String, Object> context
-    ) throws GenieException {
+    ) throws GenieException, IOException {
         log.debug("Executing Command Task in the workflow.");
 
         super.executeTask(context);
@@ -78,7 +78,11 @@ public class CommandTask extends GenieBaseTask {
             );
 
             this.fts.getFile(commandSetupFile, localPath);
-            Utils.appendToWriter(writer, "source " + localPath + ";");
+
+            super.generateSetupFileSourceSnippet(
+                jobExecEnv.getCommand().getId(),
+                "Command:",
+                localPath);
         }
 
         // Iterate over and get all configuration files

@@ -264,12 +264,11 @@ public class ServicesConfigTest {
         final JobSearchService jobSearchService,
         final JobSubmitterService jobSubmitterService,
         final JobKillService jobKillService,
-        @Value("${genie.jobs.archive.location:#{null}}")
+        @Value("${genie.jobs.archive.location}")
         final String baseArchiveLocation
     ) {
         return new JobCoordinatorService(
             jobPersistenceService,
-            jobSearchService,
             jobSubmitterService,
             jobKillService,
             baseArchiveLocation);

@@ -123,7 +123,7 @@ public class S3FileTransferImpl implements FileTransfer {
                 s3Client.putObject(bucket, key, new File(srcLocalPath));
             } catch (AmazonS3Exception ase) {
                 log.error("Error posting file {} to s3 due to exception {}", dstRemotePath, ase);
-                throw new GenieServerException("Error downloading file from s3. Filename: " + dstRemotePath);
+                throw new GenieServerException("Error uploading file to s3. Filename: " + dstRemotePath);
             }
         } else {
             throw new GenieServerException("Invalid path for s3 file" + dstRemotePath);

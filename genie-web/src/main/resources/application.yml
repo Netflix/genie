@@ -33,6 +33,8 @@ genie:
       enabled: true
     runasuser:
       enabled: false
+    archive:
+      location: base_archival_location_path
   leader:
     enabled: false
   redis:
