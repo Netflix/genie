@@ -21,7 +21,6 @@ import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.test.categories.UnitTest;
 import org.junit.Assert;
@@ -52,7 +51,6 @@ public class JobCoordinatorServiceUnitTests {
 
     private JobCoordinatorService jobCoordinatorService;
     private JobPersistenceService jobPersistenceService;
-    private JobSearchService jobSearchService;
     private JobSubmitterService jobSubmitterService;
     private JobKillService jobKillService;
 
@@ -62,13 +60,11 @@ public class JobCoordinatorServiceUnitTests {
     @Before
     public void setup() {
         this.jobPersistenceService = Mockito.mock(JobPersistenceService.class);
-        this.jobSearchService = Mockito.mock(JobSearchService.class);
         this.jobSubmitterService = Mockito.mock(JobSubmitterService.class);
         this.jobKillService = Mockito.mock(JobKillService.class);
 
         this.jobCoordinatorService = new JobCoordinatorService(
             this.jobPersistenceService,
-            this.jobSearchService,
             this.jobSubmitterService,
             this.jobKillService,
             BASE_ARCHIVE_LOCATION
@@ -161,39 +157,6 @@ public class JobCoordinatorServiceUnitTests {
             + ".tar.gz",
             argument.getValue().getArchiveLocation());
 
-    }
-
-    /**
-     * Test the coordinate job method with archive location enabled but base archive directory not set.
-     *
-     * @throws GenieException If there is any problem
-     */
-    @Test(expected = GeniePreconditionException.class)
-    public void testCoordinateJobArchiveLocationEnabledBaseLocationMissing() throws GenieException {
-        final String clientHost = "localhost";
-        final JobRequest jobRequest = new JobRequest.Builder(
-            JOB_1_NAME,
-            JOB_1_USER,
-            JOB_1_VERSION,
-            null,
-            null,
-            null
-        ).withDisableLogArchival(false)
-            .withId(JOB_1_ID)
-            .build();
-
-        Mockito.when(this.jobPersistenceService.createJobRequest(Mockito.eq(jobRequest))).thenReturn(jobRequest);
-        final ArgumentCaptor<Job> argument = ArgumentCaptor.forClass(Job.class);
-        final JobCoordinatorService jcs = new JobCoordinatorService(
-            this.jobPersistenceService,
-            this.jobSearchService,
-            this.jobSubmitterService,
-            this.jobKillService,
-            null
-        );
-        jcs.coordinateJob(jobRequest, clientHost);
-        Mockito.verify(this.jobPersistenceService).createJob(argument.capture());
-        Assert.assertEquals(BASE_ARCHIVE_LOCATION + "/" + JOB_1_ID, argument.getValue().getArchiveLocation());
     }
 
     /**

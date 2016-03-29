@@ -19,6 +19,7 @@ package com.netflix.genie.core.jobs.workflow;
 
 import com.netflix.genie.common.exceptions.GenieException;
 
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -32,10 +33,11 @@ public interface WorkflowTask {
     /**
      * Execute the task.
      *
-     * @param context Information needed to execute the task
-     * @throws GenieException if there is an error
+     * @param context Information needed to execute the task.
+     * @throws GenieException if there is an error.
+     * @throws IOException if there is a problem writing to the disk.
      */
     void executeTask(
         Map<String, Object> context
-    ) throws GenieException;
+    ) throws GenieException, IOException;
 }

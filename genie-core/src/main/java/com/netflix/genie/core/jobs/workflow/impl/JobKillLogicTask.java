@@ -19,10 +19,10 @@ package com.netflix.genie.core.jobs.workflow.impl;
 
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.jobs.JobConstants;
-import com.netflix.genie.core.util.Utils;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -40,12 +40,12 @@ public class JobKillLogicTask extends GenieBaseTask {
     public void executeTask(
         @NotNull
         final Map<String, Object> context
-    ) throws GenieException {
+    ) throws GenieException, IOException {
 
         log.debug("Executing JobKillLogic Task in the workflow.");
         super.executeTask(context);
 
         // Append logic for handling job kill signal
-        Utils.appendToWriter(writer, JobConstants.JOB_KILL_HANDLER_LOGIC);
+        writer.write(JobConstants.JOB_KILL_HANDLER_LOGIC + System.lineSeparator());
     }
 }

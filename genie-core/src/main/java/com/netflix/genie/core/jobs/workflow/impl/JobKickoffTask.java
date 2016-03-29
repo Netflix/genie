@@ -22,7 +22,6 @@ import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.jobs.JobConstants;
-import com.netflix.genie.core.util.Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.Executor;
@@ -32,6 +31,7 @@ import org.apache.commons.lang3.SystemUtils;
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -80,7 +80,7 @@ public class JobKickoffTask extends GenieBaseTask {
     public void executeTask(
         @NotNull
         final Map<String, Object> context
-    ) throws GenieException {
+    ) throws GenieException, IOException {
         log.info("Executing Job Kickoff Task in the workflow.");
         super.executeTask(context);
 
@@ -125,7 +125,7 @@ public class JobKickoffTask extends GenieBaseTask {
 
         try {
             final Process process = pb.start();
-            final int processId = Utils.getProcessId(process);
+            final int processId = this.getProcessId(process);
             final JobRequest request = this.jobExecEnv.getJobRequest();
             final Calendar calendar = Calendar.getInstance(UTC);
 //            context.put(JobConstants.JOB_STARTED_KEY, new Date(calendar.getTime().getTime()));
@@ -203,6 +203,30 @@ public class JobKickoffTask extends GenieBaseTask {
             this.executor.execute(commandLine);
         } catch (IOException ioexception) {
             throw new GenieServerException("Could not change ownership with exception " + ioexception);
+        }
+    }
+
+    /**
+     * Helper method  to get process id for the given process.
+     *
+     * @param proc java process object representing the job launcher
+     * @return pid for this process
+     * @throws GenieException if there is an error getting the process id
+     */
+    private int getProcessId(final Process proc) throws GenieException {
+        log.debug("called");
+
+        try {
+            final Field f = proc.getClass().getDeclaredField(JobConstants.PID);
+            f.setAccessible(true);
+            return f.getInt(proc);
+        } catch (final IllegalAccessException
+            | IllegalArgumentException
+            | NoSuchFieldException
+            | SecurityException e) {
+            final String msg = "Can't get process id for job";
+            log.error(msg, e);
+            throw new GenieServerException(msg, e);
         }
     }
 }

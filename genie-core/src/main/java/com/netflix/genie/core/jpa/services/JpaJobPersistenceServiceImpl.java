@@ -360,9 +360,12 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
                 }
                 jobExecutionEntity.setExitCode(exitCode);
             } else {
-                throw new GeniePreconditionException("Exit code already changed from default. Cannot update.");
+                // If the exit code is not default check if its being set to the current value itself. If yes
+                // then ignore, else throw exception.
+                if (jobExecutionEntity.getExitCode() != exitCode) {
+                    throw new GeniePreconditionException("Exit code already changed from default. Cannot update.");
+                }
             }
-
         } else {
             throw new GenieNotFoundException("No job with id " + id);
         }
