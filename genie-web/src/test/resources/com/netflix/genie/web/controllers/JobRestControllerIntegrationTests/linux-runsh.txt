@@ -55,32 +55,32 @@ function handle_kill_request {
 SELF_PID=$$
 
 export GENIE_JOB_DIR=TEST_GENIE_JOB_WORKING_DIR_PLACEHOLDER
- 
+
 export GENIE_APPLICATION_DIR=${GENIE_JOB_DIR}/genie/applications
- 
+
 export GENIE_COMMAND_DIR=${GENIE_JOB_DIR}/genie/command
- 
+
 export GENIE_CLUSTER_DIR=${GENIE_JOB_DIR}/genie/cluster
- 
+
 # Sourcing setup file from cluster cluster1
 source ${GENIE_JOB_DIR}/genie/cluster/cluster1/setupfile;
- 
+
 # Sourcing setup file from application app1
 source ${GENIE_JOB_DIR}/genie/applications/app1/setupfile;
- 
+
 # Sourcing setup file from application app2
 source ${GENIE_JOB_DIR}/genie/applications/app2/setupfile;
- 
+
 # Sourcing setup file from command cmd1
 source ${GENIE_JOB_DIR}/genie/command/cmd1/setupfile;
- 
+
 # Sourcing setup file specified in job request
 source ${GENIE_JOB_DIR}/jobsetupfile;
- 
- 
+
+
 # Kick off the command in background mode and wait for it using its pid
 /bin/bash -c 'echo hello world' > stdout 2> stderr &
 wait $!
- 
+
 # Write the return code from the command in the done file.
 printf '{"exitCode": "%s"}\n' "$?" > ./genie/genie.done

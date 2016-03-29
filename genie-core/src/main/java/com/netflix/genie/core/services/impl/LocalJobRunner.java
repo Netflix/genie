@@ -39,7 +39,6 @@ import com.netflix.genie.core.services.CommandService;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobSubmitterService;
-import com.netflix.genie.core.util.Utils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -236,7 +235,11 @@ public class LocalJobRunner implements JobSubmitterService {
             final String runScript;
             try {
                 // Create the job working directory
-                Utils.createDirectory(jobWorkingDir.getCanonicalPath());
+                final File dir = new File(jobWorkingDir.getCanonicalPath());
+                if (!dir.mkdirs()) {
+                    throw new GenieServerException("Could not create job working directory directory: "
+                        + jobWorkingDir.getCanonicalPath());
+                }
 
                 // Run script path for this job like basedir/jobId/run.sh
                 runScript = jobWorkingDir.getCanonicalPath()

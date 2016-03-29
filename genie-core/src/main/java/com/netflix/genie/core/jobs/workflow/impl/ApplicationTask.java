@@ -22,11 +22,11 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.jobs.AdminResources;
 import com.netflix.genie.core.jobs.FileType;
 import com.netflix.genie.core.jobs.JobConstants;
-import com.netflix.genie.core.util.Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -45,7 +45,7 @@ public class ApplicationTask extends GenieBaseTask {
     public void executeTask(
         @NotNull
         final Map<String, Object> context
-    ) throws GenieException {
+    ) throws GenieException, IOException {
         log.debug("Executing Application Task in the workflow.");
         super.executeTask(context);
 
@@ -81,14 +81,19 @@ public class ApplicationTask extends GenieBaseTask {
                         AdminResources.APPLICATION
                     );
                     this.fts.getFile(applicationSetupFile, localPath);
-                    Utils.appendToWriter(writer, "# Sourcing setup file from application " + application.getId());
-                    Utils.appendToWriter(writer,
+                    writer.write("# Sourcing setup file from application "
+                        + application.getId()
+                        + System.lineSeparator());
+
+                    writer.write(
                         JobConstants.SOURCE
                         + localPath.replace(this.jobWorkingDirectory, "${" + JobConstants.GENIE_JOB_DIR_ENV_VAR + "}")
-                        + JobConstants.SEMICOLON_SYMBOL);
+                        + JobConstants.SEMICOLON_SYMBOL
+                        + System.lineSeparator());
 
                     // Append new line
-                    Utils.appendToWriter(writer, " ");
+                    writer.write(System.lineSeparator());
+
                 }
 
                 // Iterate over and get all dependencies

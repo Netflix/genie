@@ -28,6 +28,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,7 +41,6 @@ import java.util.Map;
 @Category(UnitTest.class)
 public class GenieBaseTaskUnitTest {
 
-    private static final String INVALID_FILE_PATH = "/foo/bar";
     private GenieBaseTask genieBaseTask;
 
     /**
@@ -218,9 +218,10 @@ public class GenieBaseTaskUnitTest {
      * Tests the execute method when no JobExecutionEnvironment present in the map.
      *
      * @throws GenieException If there is any problem.
+     * @throws IOException For file system related issues.
      */
     @Test(expected = GeniePreconditionException.class)
-    public void testExecuteMethodNoJobExecution() throws GenieException {
+    public void testExecuteMethodNoJobExecution() throws GenieException, IOException {
         final Map<String, Object> context = new HashMap<>();
         this.genieBaseTask.executeTask(context);
     }
