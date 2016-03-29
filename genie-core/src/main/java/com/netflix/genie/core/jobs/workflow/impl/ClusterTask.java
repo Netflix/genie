@@ -20,7 +20,6 @@ package com.netflix.genie.core.jobs.workflow.impl;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.jobs.AdminResources;
 import com.netflix.genie.core.jobs.FileType;
-import com.netflix.genie.core.jobs.JobConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -79,18 +78,11 @@ public class ClusterTask extends GenieBaseTask {
             );
 
             fts.getFile(clusterSetupFile, localPath);
-            writer.write("# Sourcing setup file from cluster "
-                + jobExecEnv.getCluster().getId()
-                + System.lineSeparator());
 
-            writer.write(
-                JobConstants.SOURCE
-                    + localPath.replace(this.jobWorkingDirectory, "${" + JobConstants.GENIE_JOB_DIR_ENV_VAR + "}")
-                    + JobConstants.SEMICOLON_SYMBOL
-                    + System.lineSeparator());
-
-            // Append new line
-            writer.write(System.lineSeparator());
+            super.generateSetupFileSourceSnippet(
+                jobExecEnv.getCluster().getId(),
+                "Cluster:",
+                localPath);
         }
 
         // Iterate over and get all configuration files

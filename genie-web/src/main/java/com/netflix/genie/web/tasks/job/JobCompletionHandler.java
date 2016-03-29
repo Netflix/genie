@@ -229,7 +229,7 @@ public class JobCompletionHandler {
             final JobRequest jobRequest = this.jobSearchService.getJobRequest(jobId);
             final Job job = this.jobSearchService.getJob(jobId);
 
-            if (org.apache.commons.lang3.StringUtils.isNotBlank(jobRequest.getEmail())) {
+            if (StringUtils.isNotBlank(jobRequest.getEmail())) {
                 final String message = new StringBuilder()
                     .append("Job with id [")
                     .append(jobId).append("] finished with status ")

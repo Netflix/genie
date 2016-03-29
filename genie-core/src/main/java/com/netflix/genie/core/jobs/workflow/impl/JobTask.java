@@ -74,7 +74,6 @@ public class JobTask extends GenieBaseTask {
             writer.write(
                 JobConstants.SOURCE
                     + localPath.replace(this.jobWorkingDirectory, "${" + JobConstants.GENIE_JOB_DIR_ENV_VAR + "}")
-                    + JobConstants.SEMICOLON_SYMBOL
                     + System.lineSeparator());
 
             // Append new line

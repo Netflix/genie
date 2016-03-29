@@ -21,7 +21,6 @@ import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.jobs.AdminResources;
 import com.netflix.genie.core.jobs.FileType;
-import com.netflix.genie.core.jobs.JobConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -81,19 +80,11 @@ public class ApplicationTask extends GenieBaseTask {
                         AdminResources.APPLICATION
                     );
                     this.fts.getFile(applicationSetupFile, localPath);
-                    writer.write("# Sourcing setup file from application "
-                        + application.getId()
-                        + System.lineSeparator());
 
-                    writer.write(
-                        JobConstants.SOURCE
-                        + localPath.replace(this.jobWorkingDirectory, "${" + JobConstants.GENIE_JOB_DIR_ENV_VAR + "}")
-                        + JobConstants.SEMICOLON_SYMBOL
-                        + System.lineSeparator());
-
-                    // Append new line
-                    writer.write(System.lineSeparator());
-
+                    super.generateSetupFileSourceSnippet(
+                        application.getId(),
+                        "Application:",
+                        localPath);
                 }
 
                 // Iterate over and get all dependencies

@@ -298,4 +298,20 @@ public abstract class GenieBaseTask implements WorkflowTask {
             throw new GenieServerException("Could not create directory: " + dirPath);
         }
     }
+
+    protected void generateSetupFileSourceSnippet(
+        final String id,
+        final String type,
+        final String filePath
+    ) throws IOException {
+        writer.write("# Sourcing setup file from " + type + " " + id + System.lineSeparator());
+
+        writer.write(
+            JobConstants.SOURCE
+                + filePath.replace(this.jobWorkingDirectory, "${" + JobConstants.GENIE_JOB_DIR_ENV_VAR + "}")
+                + System.lineSeparator());
+
+        // Append new line
+        writer.write(System.lineSeparator());
+    }
 }
