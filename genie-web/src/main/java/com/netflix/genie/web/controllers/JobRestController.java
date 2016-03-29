@@ -241,7 +241,7 @@ public class JobRestController {
         }
 
         final JobRequest jobRequestWithId;
-        // If the jobrequest does not contain an id create one else use the one provided.
+        // If the job request does not contain an id create one else use the one provided.
         final String jobId;
         if (StringUtils.isNotBlank(jobRequest.getId())) {
             jobId = jobRequest.getId();
@@ -360,7 +360,7 @@ public class JobRestController {
         @RequestParam(value = "maxStarted", required = false) final Long maxStarted,
         @RequestParam(value = "minFinished", required = false) final Long minFinished,
         @RequestParam(value = "maxFinished", required = false) final Long maxFinished,
-        @PageableDefault(sort = {"updated"}, direction = Sort.Direction.DESC) final Pageable page,
+        @PageableDefault(sort = {"created"}, direction = Sort.Direction.DESC) final Pageable page,
         final PagedResourcesAssembler<JobSearchResult> assembler
     ) throws GenieException {
         log.debug(

@@ -1,0 +1,43 @@
+apply plugin: 'spring-boot'
+
+dependencies {
+    /*******************************
+     * Compile Dependencies
+     *******************************/
+
+    compile(project(":genie-web"))
+
+    /*******************************
+     * Provided Dependencies
+     *******************************/
+
+    /*******************************
+     * Optional Dependencies
+     *******************************/
+
+    /*******************************
+     * Runtime Dependencies
+     *******************************/
+
+    /*******************************
+     * Test Dependencies
+     *******************************/
+}
+
+jar {
+    manifest {
+        attributes("Implementation-Version": version)
+    }
+}
+
+springBoot {
+    layout = 'ZIP'
+    mainClass = 'com.netflix.genie.GenieWeb'
+}
+
+def env = project.hasProperty("env") ? project.getProperty("env") : "dev"
+
+bootRun {
+    addResources = false
+    systemProperty 'spring.profiles.active', env
+}

@@ -25,6 +25,7 @@ import com.netflix.genie.core.events.JobStartedEvent;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.spectator.api.Counter;
 import com.netflix.spectator.api.Registry;
 import org.apache.commons.exec.Executor;
 import org.junit.Before;
@@ -56,6 +57,7 @@ public class JobMonitoringCoordinatorUnitTests {
     private JobMonitoringCoordinator coordinator;
     private JobSearchService jobSearchService;
     private Date tomorrow;
+    private Counter unableToCancel;
 
     /**
      * Setup for the tests.
@@ -70,6 +72,8 @@ public class JobMonitoringCoordinatorUnitTests {
         this.scheduler = Mockito.mock(TaskScheduler.class);
         final ApplicationEventPublisher publisher = Mockito.mock(ApplicationEventPublisher.class);
         final Registry registry = Mockito.mock(Registry.class);
+        this.unableToCancel = Mockito.mock(Counter.class);
+        Mockito.when(registry.counter(Mockito.anyString())).thenReturn(this.unableToCancel);
 
         this.coordinator = new JobMonitoringCoordinator(
             HOSTNAME,
@@ -227,5 +231,6 @@ public class JobMonitoringCoordinatorUnitTests {
 
         Mockito.verify(future1, Mockito.times(1)).cancel(true);
         Mockito.verify(future2, Mockito.times(1)).cancel(true);
+        Mockito.verify(this.unableToCancel, Mockito.times(1)).increment();
     }
 }

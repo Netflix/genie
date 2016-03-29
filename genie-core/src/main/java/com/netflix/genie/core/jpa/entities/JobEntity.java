@@ -31,7 +31,6 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
-import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
@@ -62,9 +61,9 @@ public class JobEntity extends CommonFieldsEntity {
 
     private static final long serialVersionUID = 2849367731657512224L;
 
-    @Lob
-    @Column(name = "command_args", nullable = false)
-    @Size(min = 1, message = "Must have command line arguments")
+    @Basic
+    @Column(name = "command_args", nullable = false, length = 15000)
+    @Size(min = 1, max = 15000, message = "Must have command line arguments and be no longer than 15000 characters")
     private String commandArgs;
 
     @Basic(optional = false)

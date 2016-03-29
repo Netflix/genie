@@ -1,2 +1,2 @@
 rootProject.name='genie'
-include 'genie-test', 'genie-common', 'genie-core', 'genie-web', 'genie-docs'//, 'genie-client'
+include 'genie-test', 'genie-common', 'genie-core', 'genie-web', 'genie-docs', 'genie-app'//, 'genie-client'

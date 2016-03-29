@@ -85,7 +85,7 @@ ALTER TABLE `applications`
   MODIFY `name` VARCHAR(255) NOT NULL,
   MODIFY `user` VARCHAR(255) NOT NULL,
   MODIFY `version` VARCHAR(255) NOT NULL,
-  ADD COLUMN `description` TEXT DEFAULT NULL AFTER `version`,
+  ADD COLUMN `description` VARCHAR(5000) DEFAULT NULL AFTER `version`,
   ADD COLUMN `tags` VARCHAR(2048) DEFAULT NULL AFTER `description`,
   MODIFY `status` VARCHAR(20) NOT NULL DEFAULT 'INACTIVE',
   ADD COLUMN `type` VARCHAR(255) DEFAULT NULL AFTER `status`,
@@ -135,7 +135,7 @@ ALTER TABLE `clusters`
   MODIFY `name` VARCHAR(255) NOT NULL,
   MODIFY `user` VARCHAR(255) NOT NULL,
   MODIFY `version` VARCHAR(255) NOT NULL,
-  ADD COLUMN `description` TEXT DEFAULT NULL AFTER `version`,
+  ADD COLUMN `description` VARCHAR(5000) DEFAULT NULL AFTER `version`,
   ADD COLUMN `tags` VARCHAR(2048) DEFAULT NULL AFTER `description`,
   ADD COLUMN `setup_file` VARCHAR(1024) DEFAULT NULL AFTER `tags`,
   MODIFY `status` VARCHAR(20) NOT NULL DEFAULT 'OUT_OF_SERVICE',
@@ -188,7 +188,7 @@ ALTER TABLE `commands`
   MODIFY `name` VARCHAR(255) NOT NULL,
   MODIFY `user` VARCHAR(255) NOT NULL,
   MODIFY `version` VARCHAR(255) NOT NULL,
-  ADD COLUMN `description` TEXT DEFAULT NULL AFTER `version`,
+  ADD COLUMN `description` VARCHAR(5000) DEFAULT NULL AFTER `version`,
   ADD COLUMN `tags` VARCHAR(2048) DEFAULT NULL AFTER `description`,
   ADD COLUMN `check_delay` BIGINT NOT NULL DEFAULT 10000 AFTER `executable`,
   MODIFY `status` VARCHAR(20) NOT NULL DEFAULT 'INACTIVE',
@@ -232,14 +232,14 @@ CREATE TABLE `job_requests` (
   `name` VARCHAR(255) NOT NULL,
   `user` VARCHAR(255) NOT NULL,
   `version` VARCHAR(255) NOT NULL,
-  `description` TEXT DEFAULT NULL,
+  `description` VARCHAR(5000) DEFAULT NULL,
   `entity_version` INT(11) NOT NULL DEFAULT 0,
-  `command_args` TEXT NOT NULL,
+  `command_args` VARCHAR(15000) NOT NULL,
   `group_name` VARCHAR(255) DEFAULT NULL,
   `setup_file` VARCHAR(1024) DEFAULT NULL,
   `cluster_criterias` VARCHAR(2048) NOT NULL DEFAULT '[]',
   `command_criteria` VARCHAR(1024) NOT NULL DEFAULT '[]',
-  `dependencies` TEXT DEFAULT NULL,
+  `dependencies` VARCHAR(30000) DEFAULT NULL,
   `disable_log_archival` BIT(1) NOT NULL DEFAULT 0,
   `email` VARCHAR(255) DEFAULT NULL,
   `tags` VARCHAR(2048) DEFAULT NULL,
@@ -353,7 +353,7 @@ UPDATE `job_requests`
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully converted dependencies to JSON in job_requests table...' AS '';
 
 SELECT CURRENT_TIMESTAMP AS '', 'Attempting to make dependencies field not null in job_requests table...' AS '';
-ALTER TABLE `job_requests` MODIFY `dependencies` TEXT NOT NULL;
+ALTER TABLE `job_requests` MODIFY `dependencies` VARCHAR(30000) NOT NULL;
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully made dependencies field not null in job_requests table.' AS '';
 
 SELECT CURRENT_TIMESTAMP AS '', 'Creating the job_executions table...' AS '';
@@ -397,7 +397,9 @@ SELECT CURRENT_TIMESTAMP AS '', 'Successfully inserted values into the job_execu
 
 -- Modify the job table to remove the cluster id if cluster doesn't exist to prepare for foreign key constraints
 SELECT CURRENT_TIMESTAMP AS '', 'Setting executionClusterId in jobs table to NULL if cluster no longer exists...' AS '';
-UPDATE `jobs` AS `j` SET `j`.`executionClusterId` = NULL WHERE `j`.`executionClusterId` NOT IN (SELECT `id` FROM `clusters`);
+UPDATE `jobs` AS `j`
+  SET `j`.`executionClusterId` = NULL
+  WHERE `j`.`executionClusterId` NOT IN (SELECT `id` FROM `clusters`);
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully updated executionClusterId.' AS '';
 
 -- Modify the job table to remove the command id if the command doesn't exist to prepare for foreign key constraints
@@ -419,7 +421,7 @@ ALTER TABLE `jobs`
   MODIFY `name` VARCHAR(255) NOT NULL,
   MODIFY `user` VARCHAR(255) NOT NULL,
   MODIFY `version` VARCHAR(255) NOT NULL,
-  MODIFY `description` TEXT DEFAULT NULL,
+  MODIFY `description` VARCHAR(5000) DEFAULT NULL,
   CHANGE `entityVersion` `entity_version` INT(11) NOT NULL DEFAULT 0,
   MODIFY `status` VARCHAR(20) NOT NULL DEFAULT 'INIT',
   CHANGE `statusMsg` `status_msg` VARCHAR(255) DEFAULT NULL,
@@ -428,7 +430,7 @@ ALTER TABLE `jobs`
   CHANGE `executionClusterName` `cluster_name` VARCHAR(255) DEFAULT NULL,
   CHANGE `commandId` `command_id` VARCHAR(255) DEFAULT NULL,
   CHANGE `commandName` `command_name` VARCHAR(255) DEFAULT NULL,
-  CHANGE `commandArgs` `command_args` TEXT NOT NULL,
+  CHANGE `commandArgs` `command_args` VARCHAR(15000) NOT NULL,
   ADD COLUMN `tags` VARCHAR(2048) DEFAULT NULL,
   DROP `forwarded`,
   DROP `applicationId`,
