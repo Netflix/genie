@@ -59,7 +59,7 @@ CREATE TABLE `applications` (
   `name` varchar(255) NOT NULL,
   `user` varchar(255) NOT NULL,
   `version` varchar(255) NOT NULL,
-  `description` varchar(5000) DEFAULT NULL,
+  `description` varchar(10000) DEFAULT NULL,
   `tags` varchar(2048) DEFAULT NULL,
   `setup_file` varchar(1024) DEFAULT NULL,
   `status` varchar(20) NOT NULL DEFAULT 'INACTIVE',
@@ -102,7 +102,7 @@ CREATE TABLE `clusters` (
   `name` varchar(255) NOT NULL,
   `user` varchar(255) NOT NULL,
   `version` varchar(255) NOT NULL,
-  `description` varchar(5000) DEFAULT NULL,
+  `description` varchar(10000) DEFAULT NULL,
   `tags` varchar(2048) DEFAULT NULL,
   `setup_file` varchar(1024) DEFAULT NULL,
   `status` varchar(20) NOT NULL DEFAULT 'OUT_OF_SERVICE',
@@ -161,7 +161,7 @@ CREATE TABLE `commands` (
   `name` varchar(255) NOT NULL,
   `user` varchar(255) NOT NULL,
   `version` varchar(255) NOT NULL,
-  `description` varchar(5000) DEFAULT NULL,
+  `description` varchar(10000) DEFAULT NULL,
   `tags` varchar(2048) DEFAULT NULL,
   `setup_file` varchar(1024) DEFAULT NULL,
   `executable` varchar(255) NOT NULL,
@@ -231,9 +231,9 @@ CREATE TABLE `job_requests` (
   `name` varchar(255) NOT NULL,
   `user` varchar(255) NOT NULL,
   `version` varchar(255) NOT NULL,
-  `description` varchar(5000) DEFAULT NULL,
+  `description` varchar(10000) DEFAULT NULL,
   `entity_version` int(11) NOT NULL DEFAULT '0',
-  `command_args` varchar(15000) NOT NULL,
+  `command_args` varchar(10000) NOT NULL,
   `group_name` varchar(255) DEFAULT NULL,
   `setup_file` varchar(1024) DEFAULT NULL,
   `cluster_criterias` varchar(2048) NOT NULL DEFAULT '[]',
@@ -266,10 +266,10 @@ CREATE TABLE `jobs` (
   `user` varchar(255) NOT NULL,
   `version` varchar(255) NOT NULL,
   `archive_location` varchar(1024) DEFAULT NULL,
-  `command_args` varchar(15000) NOT NULL,
+  `command_args` varchar(10000) NOT NULL,
   `command_id` varchar(255) DEFAULT NULL,
   `command_name` varchar(255) DEFAULT NULL,
-  `description` varchar(5000) DEFAULT NULL,
+  `description` varchar(10000) DEFAULT NULL,
   `cluster_id` varchar(255) DEFAULT NULL,
   `cluster_name` varchar(255) DEFAULT NULL,
   `finished` datetime DEFAULT NULL,
@@ -322,4 +322,4 @@ CREATE TABLE `jobs_applications` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-03-29 14:14:58
+-- Dump completed on 2016-03-30 13:27:05

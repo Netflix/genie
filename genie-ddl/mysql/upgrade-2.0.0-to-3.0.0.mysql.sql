@@ -41,6 +41,19 @@ RENAME TABLE `Job_tags` TO `Job_tags_tmp`;
 RENAME TABLE `Job_tags_tmp` TO `job_tags`;
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully renamed all tables' AS '';
 
+SELECT CURRENT_TIMESTAMP AS '', 'Truncating job description field for new size limit of 10000 characters...' AS '';
+UPDATE `jobs` SET `description` = SUBSTRING(`description`, 1, 10000) WHERE LENGTH(`description`) > 10000;
+SELECT CURRENT_TIMESTAMP AS '', 'Finished truncating job description field to 10000 characters.' AS '';
+
+SELECT CURRENT_TIMESTAMP AS '', 'Truncating job command args field for new size limit of 10000 characters...' AS '';
+UPDATE `jobs` SET `commandArgs` = SUBSTRING(`commandArgs`, 1, 10000) WHERE LENGTH(`commandArgs`) > 10000;
+SELECT CURRENT_TIMESTAMP AS '', 'Finished truncating job command args field to 10000 characters.' AS '';
+
+-- Really truncate to 29500 to allow for conversion to JSON
+SELECT CURRENT_TIMESTAMP AS '', 'Truncating job dependencies field for new size limit of 30000 characters...' AS '';
+UPDATE `jobs` SET `fileDependencies` = SUBSTRING(`fileDependencies`, 1, 29500) WHERE LENGTH(`fileDependencies`) > 30000;
+SELECT CURRENT_TIMESTAMP AS '', 'Finished truncating job dependencies field to 30000 characters.' AS '';
+
 -- Create a new Many to Many table for commands to applications
 SELECT CURRENT_TIMESTAMP AS '', 'Creating commands_applications table...' AS '';
 CREATE TABLE `commands_applications` (
@@ -85,7 +98,7 @@ ALTER TABLE `applications`
   MODIFY `name` VARCHAR(255) NOT NULL,
   MODIFY `user` VARCHAR(255) NOT NULL,
   MODIFY `version` VARCHAR(255) NOT NULL,
-  ADD COLUMN `description` VARCHAR(5000) DEFAULT NULL AFTER `version`,
+  ADD COLUMN `description` VARCHAR(10000) DEFAULT NULL AFTER `version`,
   ADD COLUMN `tags` VARCHAR(2048) DEFAULT NULL AFTER `description`,
   MODIFY `status` VARCHAR(20) NOT NULL DEFAULT 'INACTIVE',
   ADD COLUMN `type` VARCHAR(255) DEFAULT NULL AFTER `status`,
@@ -135,7 +148,7 @@ ALTER TABLE `clusters`
   MODIFY `name` VARCHAR(255) NOT NULL,
   MODIFY `user` VARCHAR(255) NOT NULL,
   MODIFY `version` VARCHAR(255) NOT NULL,
-  ADD COLUMN `description` VARCHAR(5000) DEFAULT NULL AFTER `version`,
+  ADD COLUMN `description` VARCHAR(10000) DEFAULT NULL AFTER `version`,
   ADD COLUMN `tags` VARCHAR(2048) DEFAULT NULL AFTER `description`,
   ADD COLUMN `setup_file` VARCHAR(1024) DEFAULT NULL AFTER `tags`,
   MODIFY `status` VARCHAR(20) NOT NULL DEFAULT 'OUT_OF_SERVICE',
@@ -188,7 +201,7 @@ ALTER TABLE `commands`
   MODIFY `name` VARCHAR(255) NOT NULL,
   MODIFY `user` VARCHAR(255) NOT NULL,
   MODIFY `version` VARCHAR(255) NOT NULL,
-  ADD COLUMN `description` VARCHAR(5000) DEFAULT NULL AFTER `version`,
+  ADD COLUMN `description` VARCHAR(10000) DEFAULT NULL AFTER `version`,
   ADD COLUMN `tags` VARCHAR(2048) DEFAULT NULL AFTER `description`,
   ADD COLUMN `check_delay` BIGINT NOT NULL DEFAULT 10000 AFTER `executable`,
   MODIFY `status` VARCHAR(20) NOT NULL DEFAULT 'INACTIVE',
@@ -232,9 +245,9 @@ CREATE TABLE `job_requests` (
   `name` VARCHAR(255) NOT NULL,
   `user` VARCHAR(255) NOT NULL,
   `version` VARCHAR(255) NOT NULL,
-  `description` VARCHAR(5000) DEFAULT NULL,
+  `description` VARCHAR(10000) DEFAULT NULL,
   `entity_version` INT(11) NOT NULL DEFAULT 0,
-  `command_args` VARCHAR(15000) NOT NULL,
+  `command_args` VARCHAR(10000) NOT NULL,
   `group_name` VARCHAR(255) DEFAULT NULL,
   `setup_file` VARCHAR(1024) DEFAULT NULL,
   `cluster_criterias` VARCHAR(2048) NOT NULL DEFAULT '[]',
@@ -421,7 +434,7 @@ ALTER TABLE `jobs`
   MODIFY `name` VARCHAR(255) NOT NULL,
   MODIFY `user` VARCHAR(255) NOT NULL,
   MODIFY `version` VARCHAR(255) NOT NULL,
-  MODIFY `description` VARCHAR(5000) DEFAULT NULL,
+  MODIFY `description` VARCHAR(10000) DEFAULT NULL,
   CHANGE `entityVersion` `entity_version` INT(11) NOT NULL DEFAULT 0,
   MODIFY `status` VARCHAR(20) NOT NULL DEFAULT 'INIT',
   CHANGE `statusMsg` `status_msg` VARCHAR(255) DEFAULT NULL,
@@ -430,7 +443,7 @@ ALTER TABLE `jobs`
   CHANGE `executionClusterName` `cluster_name` VARCHAR(255) DEFAULT NULL,
   CHANGE `commandId` `command_id` VARCHAR(255) DEFAULT NULL,
   CHANGE `commandName` `command_name` VARCHAR(255) DEFAULT NULL,
-  CHANGE `commandArgs` `command_args` VARCHAR(15000) NOT NULL,
+  CHANGE `commandArgs` `command_args` VARCHAR(10000) NOT NULL,
   ADD COLUMN `tags` VARCHAR(2048) DEFAULT NULL,
   DROP `forwarded`,
   DROP `applicationId`,

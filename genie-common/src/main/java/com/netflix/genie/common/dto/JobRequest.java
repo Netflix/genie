@@ -44,7 +44,7 @@ public class JobRequest extends CommonDTO {
 
     private static final long serialVersionUID = 3163971970144435277L;
 
-    @Size(min = 1, message = "Command arguments are required")
+    @Size(min = 1, max = 10000, message = "Command arguments are required and max at 10000 characters")
     private final String commandArgs;
     @NotEmpty
     private final List<ClusterCriteria> clusterCriterias = new ArrayList<>();

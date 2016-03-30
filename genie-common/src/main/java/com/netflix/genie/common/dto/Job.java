@@ -40,7 +40,7 @@ public class Job extends CommonDTO {
 
     private static final long serialVersionUID = -4218933066048954819L;
 
-    @Size(min = 1, message = "Command arguments are required")
+    @Size(min = 1, max = 10000, message = "Command arguments are required and max at 10000 characters")
     private String commandArgs;
     @NotNull
     private final JobStatus status;

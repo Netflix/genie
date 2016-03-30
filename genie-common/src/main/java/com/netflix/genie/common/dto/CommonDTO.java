@@ -47,6 +47,7 @@ public abstract class CommonDTO extends BaseDTO {
     @NotEmpty
     @Size(max = 255)
     private final String name;
+    @Size(max = 10000)
     private final String description;
 
     /**

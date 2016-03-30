@@ -62,8 +62,8 @@ public class JobEntity extends CommonFieldsEntity {
     private static final long serialVersionUID = 2849367731657512224L;
 
     @Basic
-    @Column(name = "command_args", nullable = false, length = 15000)
-    @Size(min = 1, max = 15000, message = "Must have command line arguments and be no longer than 15000 characters")
+    @Column(name = "command_args", nullable = false, length = 10000)
+    @Size(min = 1, max = 10000, message = "Must have command line arguments and be no longer than 10000 characters")
     private String commandArgs;
 
     @Basic(optional = false)

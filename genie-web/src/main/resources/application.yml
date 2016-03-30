@@ -19,10 +19,6 @@
 banner:
   location: genie-banner.txt
 
-eureka:
-  client:
-    enabled: false
-
 genie:
   jobs:
     createuser:

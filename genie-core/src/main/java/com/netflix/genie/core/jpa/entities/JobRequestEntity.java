@@ -63,8 +63,8 @@ public class JobRequestEntity extends SetupFileEntity {
     private static final String EMPTY_JSON_ARRAY = "[]";
 
     @Basic
-    @Column(name = "command_args", nullable = false, length = 15000)
-    @Size(min = 1, max = 15000, message = "Must have command line arguments and be no longer than 15000 characters")
+    @Column(name = "command_args", nullable = false, length = 10000)
+    @Size(min = 1, max = 10000, message = "Must have command line arguments and be no longer than 10000 characters")
     private String commandArgs;
 
     @Basic

@@ -27,6 +27,19 @@ ALTER TABLE command RENAME TO commands;
 ALTER TABLE job RENAME TO jobs;
 SELECT CURRENT_TIMESTAMP, 'Successfully renamed all tables';
 
+SELECT CURRENT_TIMESTAMP, 'Truncating job description field for new size limit of 10000 characters...';
+UPDATE jobs SET description = SUBSTRING(description FROM 1 FOR 10000) WHERE LENGTH(description) > 10000;
+SELECT CURRENT_TIMESTAMP, 'Finished truncating job description field to 10000 characters.';
+
+SELECT CURRENT_TIMESTAMP, 'Truncating job command args field for new size limit of 10000 characters...';
+UPDATE jobs SET commandargs = SUBSTRING(commandargs FROM 1 FOR 10000) WHERE LENGTH(commandargs) > 10000;
+SELECT CURRENT_TIMESTAMP, 'Finished truncating job command args field to 10000 characters.';
+
+-- Really truncate to 29500 to allow for conversion to JSON
+SELECT CURRENT_TIMESTAMP, 'Truncating job dependencies field for new size limit of 30000 characters...';
+UPDATE jobs SET filedependencies = SUBSTRING(filedependencies FROM 1 FOR 29500) WHERE LENGTH(filedependencies) > 30000;
+SELECT CURRENT_TIMESTAMP, 'Finished truncating job dependencies field to 30000 characters.';
+
 -- Create a new Many to Many table for commands to applications
 SELECT CURRENT_TIMESTAMP, 'Creating commands_applications table...';
 CREATE TABLE commands_applications (
@@ -73,7 +86,7 @@ ALTER TABLE applications ALTER COLUMN name SET NOT NULL;
 ALTER TABLE applications ALTER COLUMN user0 SET NOT NULL;
 ALTER TABLE applications RENAME COLUMN user0 TO "user";
 ALTER TABLE applications ALTER COLUMN version SET NOT NULL;
-ALTER TABLE applications ADD COLUMN description VARCHAR(5000) DEFAULT NULL;
+ALTER TABLE applications ADD COLUMN description VARCHAR(10000) DEFAULT NULL;
 ALTER TABLE applications ADD COLUMN tags VARCHAR(2048) DEFAULT NULL;
 ALTER TABLE applications ALTER COLUMN status SET NOT NULL;
 ALTER TABLE applications ALTER COLUMN status SET DEFAULT 'INACTIVE';
@@ -134,7 +147,7 @@ ALTER TABLE clusters ALTER COLUMN name SET NOT NULL;
 ALTER TABLE clusters ALTER COLUMN user0 SET NOT NULL;
 ALTER TABLE clusters RENAME COLUMN user0 TO "user";
 ALTER TABLE clusters ALTER COLUMN version SET NOT NULL;
-ALTER TABLE clusters ADD COLUMN description VARCHAR(5000) DEFAULT NULL;
+ALTER TABLE clusters ADD COLUMN description VARCHAR(10000) DEFAULT NULL;
 ALTER TABLE clusters ADD COLUMN tags VARCHAR(2048) DEFAULT NULL;
 ALTER TABLE clusters ADD COLUMN setup_file VARCHAR(1024) DEFAULT NULL;
 ALTER TABLE clusters ALTER COLUMN status SET NOT NULL;
@@ -197,7 +210,7 @@ ALTER TABLE commands ALTER COLUMN name SET NOT NULL;
 ALTER TABLE commands ALTER COLUMN user0 SET NOT NULL;
 ALTER TABLE commands RENAME COLUMN user0 TO "user";
 ALTER TABLE commands ALTER COLUMN version SET NOT NULL;
-ALTER TABLE commands ADD COLUMN description VARCHAR(5000) DEFAULT NULL;
+ALTER TABLE commands ADD COLUMN description VARCHAR(10000) DEFAULT NULL;
 ALTER TABLE commands ADD COLUMN tags VARCHAR(2048) DEFAULT NULL;
 ALTER TABLE commands ADD COLUMN check_delay BIGINT NOT NULL DEFAULT 10000;
 ALTER TABLE commands ALTER COLUMN status SET NOT NULL;
@@ -249,9 +262,9 @@ CREATE TABLE job_requests (
   name VARCHAR(255) NOT NULL,
   "user" VARCHAR(255) NOT NULL,
   version VARCHAR(255) NOT NULL,
-  description VARCHAR(5000) DEFAULT NULL,
+  description VARCHAR(10000) DEFAULT NULL,
   entity_version INT NOT NULL DEFAULT 0,
-  command_args VARCHAR(15000) NOT NULL,
+  command_args VARCHAR(10000) NOT NULL,
   group_name VARCHAR(255) DEFAULT NULL,
   setup_file VARCHAR(1024) DEFAULT NULL,
   cluster_criterias VARCHAR(2048) NOT NULL DEFAULT '[]',
@@ -431,7 +444,7 @@ ALTER TABLE jobs ALTER COLUMN user0 SET NOT NULL;
 ALTER TABLE jobs RENAME COLUMN user0 TO "user";
 ALTER TABLE jobs ALTER COLUMN version SET NOT NULL;
 ALTER TABLE jobs ALTER COLUMN description SET DEFAULT NULL;
-ALTER TABLE jobs ALTER COLUMN description TYPE VARCHAR(5000);
+ALTER TABLE jobs ALTER COLUMN description TYPE VARCHAR(10000);
 ALTER TABLE jobs ALTER COLUMN entityversion SET NOT NULL;
 ALTER TABLE jobs ALTER COLUMN entityversion SET DEFAULT 0;
 ALTER TABLE jobs ALTER COLUMN entityversion TYPE INT;
@@ -450,7 +463,7 @@ ALTER TABLE jobs ALTER COLUMN commandid SET DEFAULT NULL;
 ALTER TABLE jobs RENAME COLUMN commandid TO command_id;
 ALTER TABLE jobs ALTER COLUMN commandname SET DEFAULT NULL;
 ALTER TABLE jobs RENAME COLUMN commandname TO command_name;
-ALTER TABLE jobs ALTER COLUMN commandargs TYPE VARCHAR(15000);
+ALTER TABLE jobs ALTER COLUMN commandargs TYPE VARCHAR(10000);
 ALTER TABLE jobs ALTER COLUMN commandargs SET NOT NULL;
 ALTER TABLE jobs RENAME COLUMN commandargs TO command_args;
 ALTER TABLE jobs ADD COLUMN tags VARCHAR(2048) DEFAULT NULL;
