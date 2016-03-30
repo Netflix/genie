@@ -1,5 +1,3 @@
-apply plugin: 'spring-boot'
-
 dependencies {
     /*******************************
      * Compile Dependencies
@@ -21,7 +19,7 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.cloud:spring-cloud-cluster-autoconfigure:${spring_cloud_cluster_version}")
     compile("org.springframework.cloud:spring-cloud-cluster-zookeeper:${spring_cloud_cluster_version}")
-//    compile("org.springframework.cloud:spring-cloud-starter-eureka:${spring_cloud_netflix_version}")
+    compile("org.springframework.cloud:spring-cloud-starter-spectator:${spring_cloud_netflix_version}")
     compile("org.springframework.security.extensions:spring-security-saml2-core:${spring_security_saml_version}")
     compile("org.springframework.security.oauth:spring-security-oauth2")
     compile("org.springframework.session:spring-session")
@@ -73,15 +71,4 @@ jar {
     manifest {
         attributes("Implementation-Version": version)
     }
-}
-
-springBoot {
-    layout = 'ZIP'
-}
-
-def env = project.hasProperty("env") ? project.getProperty("env") : "dev"
-
-bootRun {
-    addResources = false
-    systemProperty 'spring.profiles.active', env
 }

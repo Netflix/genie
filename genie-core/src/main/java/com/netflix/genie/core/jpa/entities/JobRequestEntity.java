@@ -32,7 +32,6 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.Lob;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Min;
@@ -63,9 +62,9 @@ public class JobRequestEntity extends SetupFileEntity {
     };
     private static final String EMPTY_JSON_ARRAY = "[]";
 
-    @Lob
-    @Column(name = "command_args", nullable = false)
-    @Size(min = 1, message = "Must have command line arguments")
+    @Basic
+    @Column(name = "command_args", nullable = false, length = 10000)
+    @Size(min = 1, max = 10000, message = "Must have command line arguments and be no longer than 10000 characters")
     private String commandArgs;
 
     @Basic
@@ -83,8 +82,9 @@ public class JobRequestEntity extends SetupFileEntity {
     @Size(min = 1, max = 1024, message = "Maximum length is 1024 characters min 1")
     private String commandCriteria = EMPTY_JSON_ARRAY;
 
-    @Lob
-    @Column(name = "dependencies")
+    @Basic
+    @Column(name = "dependencies", length = 30000)
+    @Size(max = 30000, message = "Max length in the database is 30000 characters")
     private String dependencies = EMPTY_JSON_ARRAY;
 
     @Basic
