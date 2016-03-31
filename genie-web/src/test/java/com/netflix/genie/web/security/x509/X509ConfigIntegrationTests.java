@@ -43,7 +43,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 @WebIntegrationTest(randomPort = true)
 @ActiveProfiles({"integration"})
 @DirtiesContext
-@TestPropertySource(properties = { "genie.security.x509.enabled = true" })
+@TestPropertySource(properties = { "genie.security.x509.enabled = true", "management.security.enabled = true" })
 public class X509ConfigIntegrationTests extends AbstractAPISecurityIntegrationTests {
 
     /**

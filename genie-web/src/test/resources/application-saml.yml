@@ -16,6 +16,10 @@
 #
 ##
 
+management:
+  security:
+    enabled: true
+
 genie:
   security:
     saml:
