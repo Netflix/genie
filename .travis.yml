@@ -34,8 +34,8 @@ cache:
     - "$HOME/.gradle/caches/"
     - "$HOME/.gradle/wrapper/"
 
-after_success:
-  - ./gradlew coveralls
+#after_success:
+#  - ./gradlew coveralls
 
 env:
   global:

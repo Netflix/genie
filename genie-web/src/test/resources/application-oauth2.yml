@@ -23,6 +23,10 @@ genie:
       pingfederate:
         enabled: true
 
+management:
+  security:
+    enabled: true
+
 security:
   oauth2:
     client:

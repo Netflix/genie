@@ -57,6 +57,8 @@ genie:
 
 management:
   context-path: /actuator
+  security:
+    enabled: false
 
 multipart:
   max-file-size: 100MB
