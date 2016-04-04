@@ -24,6 +24,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
@@ -43,6 +44,7 @@ public class Command extends ConfigDTO {
 
     private static final long serialVersionUID = -3559641165667609041L;
 
+    @NotNull
     private final CommandStatus status;
     @NotEmpty
     @Size(max = 255, message = "Executable path can't be longer than 255 characters")
