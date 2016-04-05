@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Getter;
 
+import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -38,6 +39,7 @@ public class Application extends ConfigDTO {
     private static final long serialVersionUID = 212266105066344180L;
 
     private final Set<String> dependencies = new HashSet<>();
+    @NotNull
     private final ApplicationStatus status;
     private final String type;
 

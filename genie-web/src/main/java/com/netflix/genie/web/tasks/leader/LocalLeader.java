@@ -63,7 +63,7 @@ public class LocalLeader {
     public void startLeadership(final ApplicationReadyEvent event) {
         if (this.isLeader) {
             log.debug("Starting Leadership due to " + event);
-            this.publisher.publishEvent(new OnGrantedEvent(this, null));
+            this.publisher.publishEvent(new OnGrantedEvent(this, null, "leader"));
         }
     }
 
@@ -76,7 +76,7 @@ public class LocalLeader {
     public void stopLeadership(final ContextClosedEvent event) {
         if (this.isLeader) {
             log.debug("Stopping Leadership due to " + event);
-            this.publisher.publishEvent(new OnRevokedEvent(this, null));
+            this.publisher.publishEvent(new OnRevokedEvent(this, null, "leader"));
         }
     }
 }

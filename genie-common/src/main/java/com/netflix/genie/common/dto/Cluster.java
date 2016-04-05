@@ -21,6 +21,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Getter;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * Cluster DTO object. Read only after construction.
  *
@@ -33,6 +35,7 @@ public class Cluster extends ConfigDTO {
 
     private static final long serialVersionUID = 8562447832504925029L;
 
+    @NotNull
     private final ClusterStatus status;
 
     /**

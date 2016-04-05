@@ -23,6 +23,8 @@ import com.netflix.genie.core.events.KillJobEvent;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
+import com.netflix.spectator.api.Counter;
+import com.netflix.spectator.api.Registry;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.Executor;
@@ -58,6 +60,11 @@ public class JobMonitorUnitTests {
     private JobExecution jobExecution;
     private Executor executor;
     private ApplicationEventPublisher publisher;
+    private Registry registry;
+    private Counter successfulCheckRate;
+    private Counter timeoutRate;
+    private Counter finishedRate;
+    private Counter unsuccessfulCheckRate;
 
     /**
      * Setup for the tests.
@@ -72,8 +79,25 @@ public class JobMonitorUnitTests {
             .build();
         this.executor = Mockito.mock(Executor.class);
         this.publisher = Mockito.mock(ApplicationEventPublisher.class);
+        this.successfulCheckRate = Mockito.mock(Counter.class);
+        this.timeoutRate = Mockito.mock(Counter.class);
+        this.finishedRate = Mockito.mock(Counter.class);
+        this.unsuccessfulCheckRate = Mockito.mock(Counter.class);
+        this.registry = Mockito.mock(Registry.class);
+        Mockito
+            .when(this.registry.counter("genie.jobs.successfulStatusCheck.rate"))
+            .thenReturn(this.successfulCheckRate);
+        Mockito
+            .when(this.registry.counter("genie.jobs.timeout.rate"))
+            .thenReturn(this.timeoutRate);
+        Mockito
+            .when(this.registry.counter("genie.jobs.finished.rate"))
+            .thenReturn(this.finishedRate);
+        Mockito
+            .when(this.registry.counter("genie.jobs.unsuccessfulStatusCheck.rate"))
+            .thenReturn(this.unsuccessfulCheckRate);
 
-        this.monitor = new JobMonitor(this.jobExecution, this.executor, this.publisher);
+        this.monitor = new JobMonitor(this.jobExecution, this.executor, this.publisher, this.registry);
     }
 
     /**
@@ -103,7 +127,9 @@ public class JobMonitorUnitTests {
             this.monitor.run();
         }
 
+        Mockito.verify(this.successfulCheckRate, Mockito.times(2)).increment();
         Mockito.verify(this.publisher, Mockito.never()).publishEvent(Mockito.any(ApplicationEvent.class));
+        Mockito.verify(this.unsuccessfulCheckRate, Mockito.times(1)).increment();
     }
 
     /**
@@ -126,6 +152,7 @@ public class JobMonitorUnitTests {
         Assert.assertNotNull(captor.getValue());
         Assert.assertThat(captor.getValue().getJobExecution(), Matchers.is(this.jobExecution));
         Assert.assertThat(captor.getValue().getSource(), Matchers.is(this.monitor));
+        Mockito.verify(this.finishedRate, Mockito.times(1)).increment();
     }
 
     /**
@@ -144,7 +171,7 @@ public class JobMonitorUnitTests {
             .Builder(UUID.randomUUID().toString(), 3808, DELAY, yesterday.getTime())
             .withId(UUID.randomUUID().toString())
             .build();
-        this.monitor = new JobMonitor(this.jobExecution, this.executor, this.publisher);
+        this.monitor = new JobMonitor(this.jobExecution, this.executor, this.publisher, this.registry);
 
         this.monitor.run();
 
@@ -157,6 +184,7 @@ public class JobMonitorUnitTests {
         Assert.assertThat(captor.getValue().getId(), Matchers.is(this.jobExecution.getId()));
         Assert.assertThat(captor.getValue().getReason(), Matchers.is("Job exceeded timeout"));
         Assert.assertThat(captor.getValue().getSource(), Matchers.is(this.monitor));
+        Mockito.verify(this.timeoutRate, Mockito.times(1)).increment();
     }
 
     /**
@@ -184,6 +212,7 @@ public class JobMonitorUnitTests {
         Assert.assertTrue(events.get(1) instanceof JobFinishedEvent);
         Assert.assertThat(((JobFinishedEvent) events.get(1)).getJobExecution(), Matchers.is(this.jobExecution));
         Assert.assertThat(events.get(1).getSource(), Matchers.is(this.monitor));
+        Mockito.verify(this.unsuccessfulCheckRate, Mockito.times(6)).increment();
     }
 
     /**

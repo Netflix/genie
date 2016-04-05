@@ -78,7 +78,7 @@ public class LeadershipTasksCoordinatorUnitTests {
         Mockito.when(this.task3.getScheduleType()).thenReturn(GenieTaskScheduleType.TRIGGER);
         Mockito.when(this.task3.getTrigger()).thenReturn(task3Trigger);
 
-        final OnGrantedEvent event = new OnGrantedEvent(this, null);
+        final OnGrantedEvent event = new OnGrantedEvent(this, null, "blah");
 
         this.coordinator.onLeaderEvent(event);
 
@@ -128,7 +128,7 @@ public class LeadershipTasksCoordinatorUnitTests {
         Mockito.when(future3.cancel(true)).thenReturn(false);
         Mockito.when(this.scheduler.schedule(this.task3, task3Trigger)).thenReturn(future3);
 
-        final OnGrantedEvent grantedEvent = new OnGrantedEvent(this, null);
+        final OnGrantedEvent grantedEvent = new OnGrantedEvent(this, null, "blah");
 
         this.coordinator.onLeaderEvent(grantedEvent);
 
@@ -144,7 +144,7 @@ public class LeadershipTasksCoordinatorUnitTests {
 
         // Should now be running
 
-        final OnRevokedEvent revokedEvent = new OnRevokedEvent(this, null);
+        final OnRevokedEvent revokedEvent = new OnRevokedEvent(this, null, "blah");
 
         this.coordinator.onLeaderEvent(revokedEvent);
 

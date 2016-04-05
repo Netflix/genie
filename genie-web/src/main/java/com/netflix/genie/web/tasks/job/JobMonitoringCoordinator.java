@@ -22,6 +22,8 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.events.JobFinishedEvent;
 import com.netflix.genie.core.events.JobStartedEvent;
 import com.netflix.genie.core.services.JobSearchService;
+import com.netflix.spectator.api.Counter;
+import com.netflix.spectator.api.Registry;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.Executor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +54,9 @@ public class JobMonitoringCoordinator {
     private final TaskScheduler scheduler;
     private final ApplicationEventPublisher publisher;
     private final Executor executor;
+    private final Registry registry;
+
+    private final Counter unableToCancel;
 
     /**
      * Constructor.
@@ -61,6 +66,7 @@ public class JobMonitoringCoordinator {
      * @param publisher        The event publisher to use to publish events
      * @param scheduler        The task scheduler to use to register scheduling of job checkers
      * @param executor         The executor to use to launch processes
+     * @param registry         The metrics registry
      */
     @Autowired
     public JobMonitoringCoordinator(
@@ -68,7 +74,8 @@ public class JobMonitoringCoordinator {
         final JobSearchService jobSearchService,
         final ApplicationEventPublisher publisher,
         final TaskScheduler scheduler,
-        final Executor executor
+        final Executor executor,
+        final Registry registry
     ) {
         this.jobMonitors = new HashMap<>();
         this.hostName = hostName;
@@ -76,6 +83,11 @@ public class JobMonitoringCoordinator {
         this.publisher = publisher;
         this.scheduler = scheduler;
         this.executor = executor;
+        this.registry = registry;
+
+        // Automatically track the number of jobs running on this node
+        this.registry.mapSize("genie.jobs.running.gauge", this.jobMonitors);
+        this.unableToCancel = registry.counter("genie.jobs.unableToCancel.rate");
     }
 
     /**
@@ -140,13 +152,13 @@ public class JobMonitoringCoordinator {
                 this.jobMonitors.remove(jobId);
             } else {
                 log.error("Unable to cancel task monitoring job {}", jobId);
-                //TODO: Add metric here
+                this.unableToCancel.increment();
             }
         }
     }
 
     private void scheduleMonitor(final JobExecution jobExecution) {
-        final JobMonitor monitor = new JobMonitor(jobExecution, this.executor, this.publisher);
+        final JobMonitor monitor = new JobMonitor(jobExecution, this.executor, this.publisher, this.registry);
         final ScheduledFuture<?> future;
         switch (monitor.getScheduleType()) {
             case TRIGGER:
