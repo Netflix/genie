@@ -1,0 +1,50 @@
+package com.netflix.genie.client;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.netflix.genie.common.dto.Job;
+import com.netflix.genie.common.dto.JobRequest;
+import retrofit2.Call;
+import retrofit2.http.Body;
+import retrofit2.http.GET;
+import retrofit2.http.POST;
+import retrofit2.http.Path;
+
+/**
+ * An interface for Retrofit to use and generate all the methods needed for the Genie client implementation.
+ *
+ * @author amsharma
+ */
+public interface GenieService {
+
+    /**
+     * Path to Jobs.
+     */
+    String JOBS_URL_SUFFIX = "/api/v3/jobs";
+
+    /**
+     * Method to get all jobs from Genie.
+     *
+     * @return A callable object.
+     */
+    // TODO need to add query parameters
+    @GET(JOBS_URL_SUFFIX)
+    Call<JsonNode> getJobs();
+
+    /**
+     * Method to fetch a single job from Genie.
+     *
+     * @param jobId The id of the job to get.
+     * @return A callable object.
+     */
+    @GET(JOBS_URL_SUFFIX + "/{id}")
+    Call<Job> getJob(@Path("id") final String jobId);
+
+    /**
+     * Method to submit a job to Genie.
+     *
+     * @param request The request object containing all the
+     * @return A callable object.
+     */
+    @POST(JOBS_URL_SUFFIX)
+    Call<Void> submitJob(@Body final JobRequest request);
+}
