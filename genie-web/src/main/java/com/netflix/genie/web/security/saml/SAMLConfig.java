@@ -417,6 +417,9 @@ public class SAMLConfig extends WebSecurityConfigurerAdapter {
         metadataGenerator.setExtendedMetadata(extendedMetadata());
         metadataGenerator.setIncludeDiscoveryExtension(false);
         metadataGenerator.setKeyManager(keyManager());
+        if (this.samlProperties.getSp().getEntityBaseURL() != null) {
+            metadataGenerator.setEntityBaseURL(this.samlProperties.getSp().getEntityBaseURL());
+        }
         return metadataGenerator;
     }
 

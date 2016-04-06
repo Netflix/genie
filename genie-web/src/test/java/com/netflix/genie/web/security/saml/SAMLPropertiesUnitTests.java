@@ -44,6 +44,7 @@ public class SAMLPropertiesUnitTests {
     private static final String DEFAULT_KEY_NAME = UUID.randomUUID().toString();
     private static final String DEFAULT_KEY_PASSWORD = UUID.randomUUID().toString();
     private static final String SP_ENTITY_ID = UUID.randomUUID().toString();
+    private static final String SP_ENTITY_BASE_URL = UUID.randomUUID().toString();
 
     private SAMLProperties properties;
 
@@ -85,6 +86,7 @@ public class SAMLPropertiesUnitTests {
 
         final SAMLProperties.Sp sp = new SAMLProperties.Sp();
         sp.setEntityId(SP_ENTITY_ID);
+        sp.setEntityBaseURL(SP_ENTITY_BASE_URL);
         this.properties.setSp(sp);
 
         Assert.assertThat(this.properties.getAttributes(), Matchers.is(attributes));
@@ -109,5 +111,6 @@ public class SAMLPropertiesUnitTests {
         );
         Assert.assertThat(this.properties.getSp(), Matchers.is(sp));
         Assert.assertThat(this.properties.getSp().getEntityId(), Matchers.is(SP_ENTITY_ID));
+        Assert.assertThat(this.properties.getSp().getEntityBaseURL(), Matchers.is(SP_ENTITY_BASE_URL));
     }
 }
