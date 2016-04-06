@@ -140,5 +140,6 @@ public class SAMLProperties {
     public static class Sp {
         @NotBlank
         private String entityId;
+        private String entityBaseURL;
     }
 }
