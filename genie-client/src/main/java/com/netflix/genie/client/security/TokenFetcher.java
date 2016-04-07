@@ -26,6 +26,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
+import java.net.URL;
 import java.util.HashMap;
 
 /**
@@ -60,6 +61,8 @@ public class TokenFetcher {
      * @param clientSecret The clientSecret to use to get the credentials.
      * @param grantType The type of the grant.
      * @param scope The scope of the credentials returned.
+     *
+     * @throws GenieException If there is any problem.
      */
     public TokenFetcher(
         final String oauthUrl,
@@ -67,22 +70,31 @@ public class TokenFetcher {
         final String clientSecret,
         final String grantType,
         final String scope
-    ) {
-        final Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl(oauthUrl)
-            .addConverterFactory(JacksonConverterFactory.create())
-            .build();
+    ) throws GenieException {
 
-        this.oauthUrl = oauthUrl;
+        try {
+            final URL url = new URL(oauthUrl);
 
-        // Instantiate the token service
-        tokenService = retrofit.create(TokenService.class);
+            // Construct the Base path of the type http[s]://serverhost/ for retrofit to work.
+            final String oAuthServer = url.getProtocol() + "://" + url.getHost() + "/";
+            final Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(oAuthServer)
+                .addConverterFactory(JacksonConverterFactory.create())
+                .build();
 
-        // Construct the fields map to send to the IDP url.
-        credentialParams.put(CLIENT_ID, clientId);
-        credentialParams.put(CLIENT_SECRET, clientSecret);
-        credentialParams.put(GRANT_TYPE, grantType);
-        credentialParams.put(SCOPE, scope);
+            this.oauthUrl = oauthUrl;
+
+            // Instantiate the token service
+            tokenService = retrofit.create(TokenService.class);
+
+            // Construct the fields map to send to the IDP url.
+            credentialParams.put(CLIENT_ID, clientId);
+            credentialParams.put(CLIENT_SECRET, clientSecret);
+            credentialParams.put(GRANT_TYPE, grantType);
+            credentialParams.put(SCOPE, scope);
+        } catch (Exception e) {
+           throw new GenieServerException("Could not instantiate Token service to fetch OAuth Token", e);
+        }
     }
 
     /**
