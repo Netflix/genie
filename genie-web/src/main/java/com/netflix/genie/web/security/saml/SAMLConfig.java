@@ -19,6 +19,7 @@ package com.netflix.genie.web.security.saml;
 
 import com.google.common.collect.Lists;
 import com.netflix.genie.web.security.x509.X509UserDetailsService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.velocity.app.VelocityEngine;
@@ -45,6 +46,7 @@ import org.springframework.security.saml.SAMLLogoutProcessingFilter;
 import org.springframework.security.saml.SAMLProcessingFilter;
 import org.springframework.security.saml.SAMLWebSSOHoKProcessingFilter;
 import org.springframework.security.saml.context.SAMLContextProviderImpl;
+import org.springframework.security.saml.context.SAMLContextProviderLB;
 import org.springframework.security.saml.key.JKSKeyManager;
 import org.springframework.security.saml.key.KeyManager;
 import org.springframework.security.saml.log.SAMLDefaultLogger;
@@ -62,6 +64,7 @@ import org.springframework.security.saml.processor.HTTPRedirectDeflateBinding;
 import org.springframework.security.saml.processor.HTTPSOAP11Binding;
 import org.springframework.security.saml.processor.SAMLBinding;
 import org.springframework.security.saml.processor.SAMLProcessorImpl;
+import org.springframework.security.saml.userdetails.SAMLUserDetailsService;
 import org.springframework.security.saml.util.VelocityFactory;
 import org.springframework.security.saml.websso.ArtifactResolutionProfile;
 import org.springframework.security.saml.websso.ArtifactResolutionProfileImpl;
@@ -105,6 +108,7 @@ import java.util.Timer;
 @Configuration
 @Order(5)
 //@EnableGlobalMethodSecurity(securedEnabled = true)
+@Slf4j
 public class SAMLConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
@@ -112,9 +116,6 @@ public class SAMLConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private X509UserDetailsService x509UserDetailsService;
-
-    @Autowired
-    private SAMLUserDetailsServiceImpl samlUserDetailsServiceImpl;
 
     @Autowired
     private SAMLProperties samlProperties;
@@ -188,13 +189,14 @@ public class SAMLConfig extends WebSecurityConfigurerAdapter {
     /**
      * Parses the response SAML messages.
      *
+     * @param samlUserDetailsService The user details service to use
      * @return The SAML authentication provider
      * @see SAMLAuthenticationProvider
      */
     @Bean
-    public SAMLAuthenticationProvider samlAuthenticationProvider() {
+    public SAMLAuthenticationProvider samlAuthenticationProvider(final SAMLUserDetailsService samlUserDetailsService) {
         final SAMLAuthenticationProvider samlAuthenticationProvider = new SAMLAuthenticationProvider();
-        samlAuthenticationProvider.setUserDetails(this.samlUserDetailsServiceImpl);
+        samlAuthenticationProvider.setUserDetails(samlUserDetailsService);
         samlAuthenticationProvider.setForcePrincipalAsString(false);
         return samlAuthenticationProvider;
     }
@@ -202,12 +204,36 @@ public class SAMLConfig extends WebSecurityConfigurerAdapter {
     /**
      * Provider of the SAML context.
      *
+     * @param properties The SAML properties to use
      * @return the context provider implementation
      * @see SAMLContextProviderImpl
      */
     @Bean
-    public SAMLContextProviderImpl contextProvider() {
-        return new SAMLContextProviderImpl();
+    public SAMLContextProviderImpl contextProvider(final SAMLProperties properties) {
+        if (properties.getLoadBalancer() != null) {
+            log.info("Using SAMLContextProviderLB implementation of SAMLContextProvider for context provider bean.");
+            final SAMLContextProviderLB lb = new SAMLContextProviderLB();
+            final SAMLProperties.LoadBalancer lbProps = properties.getLoadBalancer();
+            final String scheme = lbProps.getScheme();
+            log.info("Setting the load balancer scheme to {}", scheme);
+            lb.setScheme(scheme);
+            final String serverName = lbProps.getServerName();
+            log.info("Setting the load balancer server name to {}", serverName);
+            lb.setServerName(serverName);
+            final String contextPath = lbProps.getContextPath();
+            log.info("Setting the load balancer context path to {}", contextPath);
+            lb.setContextPath(contextPath);
+            final int serverPort = lbProps.getServerPort();
+            log.info("Setting the load balancer port to {}", serverPort);
+            lb.setServerPort(serverPort);
+            final boolean includeServerPort = lbProps.isIncludeServerPortInRequestURL();
+            log.info("Setting whether to include the server port in the request URL to {}", includeServerPort);
+            lb.setIncludeServerPortInRequestURL(includeServerPort);
+            return lb;
+        } else {
+            log.info("Using SAMLContextProviderImpl implementation of SAMLContextProvider for context provider bean.");
+            return new SAMLContextProviderImpl();
+        }
     }
 
     /**
@@ -348,10 +374,6 @@ public class SAMLConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public ExtendedMetadata extendedMetadata() {
         return new ExtendedMetadata();
-        //TODO: set these as properties?
-//        extendedMetadata.setIdpDiscoveryEnabled(false);
-//        extendedMetadata.setSignMetadata(false);
-//        return extendedMetadata;
     }
 
     /**
@@ -368,6 +390,7 @@ public class SAMLConfig extends WebSecurityConfigurerAdapter {
     /**
      * Setup the extended metadata delegate for the IDP.
      *
+     * @param properties The SAML properties
      * @return The sso circle of trust metadata provider configured via the url.
      * @throws MetadataProviderException On any configuration error
      * @see ExtendedMetadataDelegate
@@ -375,13 +398,15 @@ public class SAMLConfig extends WebSecurityConfigurerAdapter {
      */
     @Bean
     @Qualifier("idp-ssocircle")
-    public ExtendedMetadataDelegate ssoCircleExtendedMetadataProvider() throws MetadataProviderException {
+    public ExtendedMetadataDelegate ssoCircleExtendedMetadataProvider(
+        final SAMLProperties properties
+    ) throws MetadataProviderException {
         // Create a daemon timer for updating the IDP metadata from the server
         final Timer backgroundTaskTimer = new Timer(true);
         final HTTPMetadataProvider httpMetadataProvider = new HTTPMetadataProvider(
             backgroundTaskTimer,
             httpClient(),
-            this.samlProperties.getIdp().getServiceProviderMetadataURL()
+            properties.getIdp().getServiceProviderMetadataURL()
         );
         httpMetadataProvider.setParserPool(parserPool());
         final ExtendedMetadataDelegate extendedMetadataDelegate
@@ -394,14 +419,17 @@ public class SAMLConfig extends WebSecurityConfigurerAdapter {
     /**
      * Get the metadata manager for the IDP metadata. This version caches locally and refreshes periodically.
      *
+     * @param ssoCircleExtendedMetadataProvider The extended metadata delegate
      * @return The metadata manager
      * @throws MetadataProviderException on any configuration error
      * @see CachingMetadataManager
      */
     @Bean
     @Qualifier("metadata")
-    public CachingMetadataManager metadata() throws MetadataProviderException {
-        return new CachingMetadataManager(Lists.newArrayList(ssoCircleExtendedMetadataProvider()));
+    public CachingMetadataManager metadata(
+        final ExtendedMetadataDelegate ssoCircleExtendedMetadataProvider
+    ) throws MetadataProviderException {
+        return new CachingMetadataManager(Lists.newArrayList(ssoCircleExtendedMetadataProvider));
     }
 
     /**
@@ -443,8 +471,6 @@ public class SAMLConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public SavedRequestAwareAuthenticationSuccessHandler successRedirectHandler() {
         return new SavedRequestAwareAuthenticationSuccessHandler();
-//        successRedirectHandler.setDefaultTargetUrl("/");
-//        return successRedirectHandler;
     }
 
     /**
@@ -737,10 +763,6 @@ public class SAMLConfig extends WebSecurityConfigurerAdapter {
             .logout()
             .logoutSuccessUrl("/");
         // @formatter:on
-    }
-
-    protected void setSamlUserDetailsServiceImpl(final SAMLUserDetailsServiceImpl samlUserDetailsServiceImpl) {
-        this.samlUserDetailsServiceImpl = samlUserDetailsServiceImpl;
     }
 
     protected void setSamlProperties(final SAMLProperties samlProperties) {

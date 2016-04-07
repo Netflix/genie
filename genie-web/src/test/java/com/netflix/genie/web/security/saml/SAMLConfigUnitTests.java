@@ -34,9 +34,12 @@ import org.opensaml.xml.parse.ParserPool;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.security.saml.SAMLAuthenticationProvider;
+import org.springframework.security.saml.context.SAMLContextProvider;
+import org.springframework.security.saml.context.SAMLContextProviderLB;
 import org.springframework.security.saml.key.JKSKeyManager;
 import org.springframework.security.saml.key.KeyManager;
 import org.springframework.security.saml.metadata.CachingMetadataManager;
+import org.springframework.security.saml.metadata.ExtendedMetadataDelegate;
 import org.springframework.security.saml.metadata.MetadataGenerator;
 import org.springframework.security.saml.websso.WebSSOProfileConsumerImpl;
 import org.springframework.security.saml.websso.WebSSOProfileImpl;
@@ -123,8 +126,7 @@ public class SAMLConfigUnitTests {
     @Test
     public void canGetSAMLAuthenticationProvider() {
         final SAMLUserDetailsServiceImpl service = Mockito.mock(SAMLUserDetailsServiceImpl.class);
-        this.config.setSamlUserDetailsServiceImpl(service);
-        final SAMLAuthenticationProvider provider = this.config.samlAuthenticationProvider();
+        final SAMLAuthenticationProvider provider = this.config.samlAuthenticationProvider(service);
         Assert.assertNotNull(provider);
         Assert.assertThat(provider.getUserDetails(), Matchers.is(service));
         Assert.assertFalse(provider.isForcePrincipalAsString());
@@ -135,7 +137,28 @@ public class SAMLConfigUnitTests {
      */
     @Test
     public void canGetContextProvider() {
-        Assert.assertNotNull(this.config.contextProvider());
+        final SAMLProperties properties = Mockito.mock(SAMLProperties.class);
+
+        Mockito.when(properties.getLoadBalancer()).thenReturn(null);
+
+        SAMLContextProvider provider = this.config.contextProvider(properties);
+        Assert.assertNotNull(provider);
+        Assert.assertFalse(provider instanceof SAMLContextProviderLB);
+
+        final SAMLProperties.LoadBalancer loadBalancer = new SAMLProperties.LoadBalancer();
+        final String scheme = UUID.randomUUID().toString();
+        loadBalancer.setScheme(scheme);
+        final String serverName = UUID.randomUUID().toString();
+        loadBalancer.setServerName(serverName);
+        final int port = 443;
+        loadBalancer.setServerPort(port);
+        final String contextPath = UUID.randomUUID().toString();
+        loadBalancer.setContextPath(contextPath);
+
+        Mockito.when(properties.getLoadBalancer()).thenReturn(loadBalancer);
+        provider = this.config.contextProvider(properties);
+        Assert.assertNotNull(provider);
+        Assert.assertTrue(provider instanceof SAMLContextProviderLB);
     }
 
     /**
@@ -246,14 +269,13 @@ public class SAMLConfigUnitTests {
     @Test
     public void canGetExtendedMetdataDelegate() throws MetadataProviderException {
         final SAMLProperties properties = Mockito.mock(SAMLProperties.class);
-        this.config.setSamlProperties(properties);
 
         final String metadataUrl = UUID.randomUUID().toString();
         final SAMLProperties.Idp idp = Mockito.mock(SAMLProperties.Idp.class);
         Mockito.when(idp.getServiceProviderMetadataURL()).thenReturn(metadataUrl);
         Mockito.when(properties.getIdp()).thenReturn(idp);
 
-        Assert.assertNotNull(this.config.ssoCircleExtendedMetadataProvider());
+        Assert.assertNotNull(this.config.ssoCircleExtendedMetadataProvider(properties));
     }
 
     /**
@@ -271,9 +293,12 @@ public class SAMLConfigUnitTests {
         Mockito.when(idp.getServiceProviderMetadataURL()).thenReturn(metadataUrl);
         Mockito.when(properties.getIdp()).thenReturn(idp);
 
-        final CachingMetadataManager metadataManager = this.config.metadata();
+        final ExtendedMetadataDelegate extendedMetadataDelegate = Mockito.mock(ExtendedMetadataDelegate.class);
+
+        final CachingMetadataManager metadataManager = this.config.metadata(extendedMetadataDelegate);
         Assert.assertNotNull(metadataManager);
         Assert.assertThat(metadataManager.getAvailableProviders().size(), Matchers.is(1));
+        Assert.assertThat(metadataManager.getAvailableProviders(), Matchers.hasItem(extendedMetadataDelegate));
     }
 
     /**
