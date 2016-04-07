@@ -196,7 +196,7 @@ public class JobRestController {
         if (jobRequest == null) {
             throw new GenieException(HttpURLConnection.HTTP_PRECON_FAILED, "No job entered. Unable to submit.");
         }
-        log.debug("Called to submit job: {}", jobRequest);
+        log.debug("Called json method type to submit job: {}", jobRequest);
 
         return this.submitJob(
             jobRequest,
@@ -230,7 +230,7 @@ public class JobRestController {
         if (jobRequest == null) {
             throw new GenieException(HttpURLConnection.HTTP_PRECON_FAILED, "No job entered. Unable to submit.");
         }
-        log.debug("Called to submit job: {}", jobRequest);
+        log.debug("Called multipart method to submit job: {}", jobRequest);
 
         // get client's host from the context
         final String localClientHost;

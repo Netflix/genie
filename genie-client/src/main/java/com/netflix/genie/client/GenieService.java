@@ -3,11 +3,16 @@ package com.netflix.genie.client;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobRequest;
+import okhttp3.MultipartBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.Part;
 import retrofit2.http.Path;
+
+import java.util.List;
 
 /**
  * An interface for Retrofit to use and generate all the methods needed for the Genie client implementation.
@@ -47,4 +52,16 @@ public interface GenieService {
      */
     @POST(JOBS_URL_SUFFIX)
     Call<Void> submitJob(@Body final JobRequest request);
+
+    /**
+     * Submit a job with attachments.
+     *
+     * @param request A JobRequest object containing all the details needed to run the job.
+     * @param attachments A list of all the attachment files to be sent to the server.
+     *
+     * @return A callable object.
+     */
+    @Multipart
+    @POST(JOBS_URL_SUFFIX)
+    Call<Void> submitJobWithAttachments(@Part("request") JobRequest request, @Part List<MultipartBody.Part> attachments);
 }

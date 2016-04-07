@@ -7,9 +7,14 @@ import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Response;
 
+import java.io.File;
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,18 +49,47 @@ public class JobClient extends BaseGenieClient {
     public String submitJob(
         final JobRequest jobRequest
         ) throws GenieException {
-//        final ResponseEntity<String> response =
-//            restTemplate.postForEntity(serviceBaseURL, jobRequest, String.class);
 
-//        final URI jobLocation = restTemplate.postForLocation(serviceBaseURL, jobRequest);
-//
-//        if (jobLocation != null) {
-//            return getIdFromLocation(jobLocation.toString());
-//        } else {
-//            throw new GenieServerException("Failed to submit job successfully.");
-//        }
         try {
             final Call<Void> post = genieService.submitJob(jobRequest);
+
+            final Response<Void> response = post.execute();
+            if (response.isSuccessful()) {
+                return getIdFromLocation(response.headers().get("location"));
+            } else {
+                throw new GenieServerException("Could not submit job");
+            }
+        } catch (Exception e) {
+            throw new GenieServerException("Could not submit job", e);
+        }
+    }
+
+    /**
+     * Submit a job to genie using the jobRequest and attachments provided.
+     *
+     * @param jobRequest A job request containing all the details for running a job.
+     * @param files A list of uri's to the files needed to be sent to the server.
+     *
+     * @return jobId The id of the job submitted.
+     * @throws GenieException If there is any problem.
+     */
+    public String submitJobWithAttachments(
+        final JobRequest jobRequest,
+        final List<URI> files
+    ) throws GenieException {
+        try {
+
+            final MultipartBody.Part part = MultipartBody.Part.createFormData("attachment", "foo1.txt",
+                    RequestBody.create(MediaType.parse("application/octet-stream"), new File("/Users/amsharma/foo.txt")));
+
+            final MultipartBody.Part part1 = MultipartBody.Part.createFormData("attachment", "foo2.txt",
+                RequestBody.create(MediaType.parse("application/octet-stream"), new File("/Users/amsharma/foo.txt")));
+
+            final ArrayList<MultipartBody.Part> attachmentFiles = new ArrayList<>();
+            attachmentFiles.add(part);
+            attachmentFiles.add(part1);
+
+            final Call<Void> post = genieService.submitJobWithAttachments(jobRequest, attachmentFiles);
 
             final Response<Void> response = post.execute();
             if (response.isSuccessful()) {
@@ -80,31 +114,36 @@ public class JobClient extends BaseGenieClient {
             final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
             final Response<JsonNode> response = jobsCallable.execute();
-            final JsonNode content = response.body();
-            final ObjectMapper mapper = new ObjectMapper();
-            final ArrayList<Map<String, String>> jobs = (ArrayList<Map<String, String>>)
-                mapper.readValue(content.get("_embedded").get("jobSearchResultList").toString(),
-                List.class);
+            if (response.isSuccessful()) {
+                final JsonNode content = response.body();
+                final ObjectMapper mapper = new ObjectMapper();
+                final ArrayList<Map<String, String>> jobs = (ArrayList<Map<String, String>>)
+                    mapper.readValue(content.get("_embedded").get("jobSearchResultList").toString(),
+                        List.class);
 
-            final ArrayList<Job> jobList = new ArrayList<>();
-            for (Map<String, String> job: jobs) {
-                jobList.add(
-                    new Job.Builder(
-                        job.get("name"),
-                        job.get("user"),
-                        job.get("version"),
-                        job.get("commandArgs")
-                    )
-                        .withId(job.get("id"))
-                        .withStatus(JobStatus.parse(job.get("status")))
-                        .withClusterName(job.get("clusterName"))
-                        .withCommandName(job.get("commandName"))
-                        .withStarted(dateFormatter.parse(job.get("started")))
-                        //.withFinished(dateFormatter.parse(job.get("finished")))
-                        .build());
+                final ArrayList<Job> jobList = new ArrayList<>();
+                for (Map<String, String> job: jobs) {
+                    jobList.add(
+                        new Job.Builder(
+                            job.get("name"),
+                            job.get("user"),
+                            job.get("version"),
+                            job.get("commandArgs")
+                        )
+                            .withId(job.get("id"))
+                            .withStatus(JobStatus.parse(job.get("status")))
+                            .withClusterName(job.get("clusterName"))
+                            .withCommandName(job.get("commandName"))
+                            .withStarted(dateFormatter.parse(job.get("started")))
+                            .withFinished(dateFormatter.parse(job.get("finished")))
+                            .build());
+                }
+
+                return jobList;
+            } else {
+                throw new GenieServerException("Could not fetch jobs due to error code: "
+                    + response.code() + " Error Message:  " + response.message());
             }
-
-            return jobList;
 
         } catch (Exception e) {
             throw new GenieServerException("Could not fetch jobs.", e);
