@@ -27,6 +27,7 @@ import com.netflix.genie.common.exceptions.GenieServerException;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import org.apache.commons.configuration2.Configuration;
 import retrofit2.Call;
 import retrofit2.Response;
 
@@ -48,12 +49,14 @@ public class JobClient extends BaseGenieClient {
     /**
      * Constructor.
      *
-     * @param genieServiceURI The base URL for the Genie service of the type: http://localhost:8080
+     * @param configuration The configuration object containing all information for instantiating the client.
+     *
+     * @throws GenieException If there is any problem.
      */
     public JobClient(
-        final String genieServiceURI
-    ) {
-        super(genieServiceURI);
+        final Configuration configuration
+    ) throws GenieException {
+        super(configuration);
     }
 
     /**
