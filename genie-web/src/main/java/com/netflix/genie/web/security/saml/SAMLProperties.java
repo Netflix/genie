@@ -18,6 +18,8 @@
 package com.netflix.genie.web.security.saml;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.URL;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -29,13 +31,16 @@ import javax.validation.constraints.NotNull;
 /**
  * Class to bind properties to for SAML configurations.
  *
+ * See: http://docs.spring.io/spring-security-saml/docs/1.0.x/reference/html/
+ *
  * @author tgianos
  * @since 3.0.0
  */
 @ConditionalOnProperty("genie.security.saml.enabled")
 @ConfigurationProperties(prefix = "genie.security.saml")
 @Component
-@Data
+@Getter
+@Setter
 public class SAMLProperties {
 
     @NotNull
@@ -44,6 +49,7 @@ public class SAMLProperties {
     private Idp idp;
     @NotNull
     private Keystore keystore;
+    private LoadBalancer loadBalancer;
     @NotNull
     private Sp sp;
 
@@ -53,7 +59,8 @@ public class SAMLProperties {
      * @author tgianos
      * @since 3.0.0
      */
-    @Data
+    @Getter
+    @Setter
     public static class Attributes {
 
         @NotNull
@@ -67,7 +74,8 @@ public class SAMLProperties {
          * @author tgianos
          * @since 3.0.0
          */
-        @Data
+        @Getter
+        @Setter
         public static class User {
             @NotBlank
             private String name;
@@ -79,7 +87,8 @@ public class SAMLProperties {
          * @author tgianos
          * @since 3.0.0
          */
-        @Data
+        @Getter
+        @Setter
         public static class Groups {
             @NotBlank
             private String name;
@@ -94,7 +103,8 @@ public class SAMLProperties {
      * @author tgianos
      * @since 3.0.0
      */
-    @Data
+    @Getter
+    @Setter
     public static class Idp {
         @URL
         private String serviceProviderMetadataURL;
@@ -106,7 +116,8 @@ public class SAMLProperties {
      * @author tgianos
      * @since 3.0.0
      */
-    @Data
+    @Getter
+    @Setter
     public static class Keystore {
         @NotBlank
         private String name;
@@ -131,14 +142,35 @@ public class SAMLProperties {
     }
 
     /**
+     * Information about an optional load balancer this service could sit behind.
+     *
+     * @author tgianos
+     * @since 3.0.0
+     */
+    @Getter
+    @Setter
+    public static class LoadBalancer {
+        @NotBlank
+        private String scheme = "http";
+        @NotBlank
+        private String serverName;
+        private int serverPort = 80;
+        private boolean includeServerPortInRequestURL;
+        @NotBlank
+        private String contextPath = "/";
+    }
+
+    /**
      * Information about the service provider from the IDP.
      *
      * @author tgianos
      * @since 3.0.0
      */
-    @Data
+    @Getter
+    @Setter
     public static class Sp {
         @NotBlank
         private String entityId;
+        private String entityBaseURL;
     }
 }

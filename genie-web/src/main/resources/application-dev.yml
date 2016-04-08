@@ -25,29 +25,3 @@ spring:
     url: jdbc:hsqldb:mem:genie-db;shutdown=true
     username: SA
     password:
-
-com:
-  netflix:
-    genie:
-      environment: dev
-      server:
-        janitor:
-          min:
-            sleep:
-              ms: 150000
-          max:
-            sleep:
-              ms: 300000
-          zombie:
-            delta:
-              ms: 360000
-        max:
-          running:
-            jobs: 3
-        idle:
-          host:
-            threshold:
-              delta: 1
-        forward:
-          jobs:
-            treshold: 5

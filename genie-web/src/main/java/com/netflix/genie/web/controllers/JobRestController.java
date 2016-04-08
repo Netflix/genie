@@ -43,6 +43,7 @@ import com.netflix.genie.web.hateoas.resources.JobExecutionResource;
 import com.netflix.genie.web.hateoas.resources.JobRequestResource;
 import com.netflix.genie.web.hateoas.resources.JobResource;
 import com.netflix.genie.web.hateoas.resources.JobSearchResultResource;
+import com.netflix.genie.web.properties.JobForwardingProperties;
 import com.netflix.genie.web.resources.handlers.GenieResourceHttpRequestHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -53,7 +54,6 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -121,7 +121,7 @@ public class JobRestController {
     private final String hostName;
     private final HttpClient httpClient;
     private final GenieResourceHttpRequestHandler resourceHttpRequestHandler;
-    private final boolean forwardingEnabled;
+    private final JobForwardingProperties jobForwardingProperties;
 
     /**
      * Constructor.
@@ -140,7 +140,7 @@ public class JobRestController {
      * @param httpClient                       The http client to use for forwarding requests
      * @param resourceHttpRequestHandler       The handler to return requests for static resources on the
      *                                         Genie File System.
-     * @param forwardingEnabled                Whether directory and kill request forwarding is enabled or not
+     * @param jobForwardingProperties          All the properties associated with job forwarding
      */
     @Autowired
     public JobRestController(
@@ -157,7 +157,7 @@ public class JobRestController {
         final String hostName,
         final HttpClient httpClient,
         final GenieResourceHttpRequestHandler resourceHttpRequestHandler,
-        @Value("${genie.jobs.forwarding.enabled}") final boolean forwardingEnabled
+        final JobForwardingProperties jobForwardingProperties
     ) {
         this.jobCoordinatorService = jobCoordinatorService;
         this.jobSearchService = jobSearchService;
@@ -172,7 +172,7 @@ public class JobRestController {
         this.hostName = hostName;
         this.httpClient = httpClient;
         this.resourceHttpRequestHandler = resourceHttpRequestHandler;
-        this.forwardingEnabled = forwardingEnabled;
+        this.jobForwardingProperties = jobForwardingProperties;
     }
 
     /**
@@ -463,7 +463,7 @@ public class JobRestController {
         log.debug("Called for job id: {}. Forwarded from: {}", id, forwardedFrom);
 
         // If forwarded from is null this request hasn't been forwarded at all. Check we're on the right node
-        if (this.forwardingEnabled && forwardedFrom == null) {
+        if (this.jobForwardingProperties.isEnabled() && forwardedFrom == null) {
             final String jobHostname = this.jobSearchService.getJobHost(id);
             if (!this.hostName.equals(jobHostname)) {
                 //Need to forward job
@@ -592,7 +592,7 @@ public class JobRestController {
         final HttpServletResponse response
     ) throws IOException, ServletException, GenieException {
         // if forwarded from isn't null it's already been forwarded to this node. Assume data is on this node.
-        if (this.forwardingEnabled && forwardedFrom == null) {
+        if (this.jobForwardingProperties.isEnabled() && forwardedFrom == null) {
             // TODO: It's possible that could use the JobMonitorCoordinator to check this in memory
             //       However that could get into problems where the job finished or died
             //       and it would return false on check if the job with given id is running on that node
@@ -643,7 +643,12 @@ public class JobRestController {
     }
 
     private String buildForwardURL(final HttpServletRequest request, final String jobHostname) {
-        return request.getScheme() + "://" + jobHostname + ":" + request.getServerPort() + request.getRequestURI();
+        return this.jobForwardingProperties.getScheme()
+            + "://"
+            + jobHostname
+            + ":"
+            + this.jobForwardingProperties.getPort()
+            + request.getRequestURI();
     }
 
     private void copyRequestHeaders(final HttpServletRequest request, final HttpRequestBase forwardRequest) {
