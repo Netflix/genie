@@ -19,6 +19,7 @@ package com.netflix.genie.client;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.netflix.genie.client.interceptor.ResponseMappingInterceptor;
 import com.netflix.genie.client.interceptor.SecurityHeaderInterceptor;
 import com.netflix.genie.client.retrofit.GenieService;
 import com.netflix.genie.client.security.TokenFetcher;
@@ -86,6 +87,8 @@ public abstract class BaseGenieClient {
         if (this.tokenFetcher != null) {
             builder.interceptors().add(new SecurityHeaderInterceptor(tokenFetcher));
         }
+
+        builder.addInterceptor(new ResponseMappingInterceptor());
 
         final OkHttpClient client = builder.build();
 

@@ -28,10 +28,11 @@ import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import org.apache.commons.configuration2.Configuration;
-import retrofit2.Call;
 import retrofit2.Response;
 
 import java.io.File;
+import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -69,24 +70,14 @@ public class JobClient extends BaseGenieClient {
      * @param jobRequest A job request containing all the details for running a job.
      *
      * @return jobId The id of the job submitted.
-     * @throws GenieException If there is any problem.
+     * @throws IOException If there is any problem.
      */
     public String submitJob(
         final JobRequest jobRequest
-        ) throws GenieException {
+        ) throws IOException {
 
-        try {
-            final Call<Void> post = genieService.submitJob(jobRequest);
-
-            final Response<Void> response = post.execute();
-            if (response.isSuccessful()) {
-                return getIdFromLocation(response.headers().get("location"));
-            } else {
-                throw new GenieServerException("Could not submit job");
-            }
-        } catch (Exception e) {
-            throw new GenieServerException("Could not submit job", e);
-        }
+        final Response response = genieService.submitJob(jobRequest).execute();
+        return getIdFromLocation(response.headers().get("location"));
     }
 
     /**
@@ -96,14 +87,12 @@ public class JobClient extends BaseGenieClient {
      * @param filePaths A list of filesPaths needed to be sent to the server as attachments.
      *
      * @return jobId The id of the job submitted.
-     * @throws GenieException If there is any problem.
+     * @throws IOException If there is any problem.
      */
     public String submitJobWithAttachments(
         final JobRequest jobRequest,
         final List<String> filePaths
-    ) throws GenieException {
-        try {
-
+    ) throws IOException {
             final ArrayList<MultipartBody.Part> attachmentFiles = new ArrayList<>();
 
             for (String path: filePaths) {
@@ -116,32 +105,23 @@ public class JobClient extends BaseGenieClient {
                 attachmentFiles.add(part);
             }
 
-            final Call<Void> post = genieService.submitJobWithAttachments(jobRequest, attachmentFiles);
-
-            final Response<Void> response = post.execute();
-            if (response.isSuccessful()) {
-                return getIdFromLocation(response.headers().get("location"));
-            } else {
-                throw new GenieServerException("Could not submit job");
-            }
-        } catch (Exception e) {
-            throw new GenieServerException("Could not submit job", e);
-        }
+            final Response response = genieService.submitJobWithAttachments(jobRequest, attachmentFiles).execute();
+            return getIdFromLocation(response.headers().get("location"));
     }
 
     /**
      * Method to get a list of all the jobs from Genie for the query parameters specified.
      *
      * @return A list of jobs.
-     * @throws GenieException If there is any problem.
+     * @throws GenieException If there is a Genie server issue.
+     * @throws IOException If there is a problem with the request.
      */
-    public List<Job> getJobs() throws GenieException {
-        final Call<JsonNode> jobsCallable = genieService.getJobs();
+    public List<Job> getJobs() throws IOException, GenieException {
+
         try {
             final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-            final Response<JsonNode> response = jobsCallable.execute();
-            if (response.isSuccessful()) {
+            final Response<JsonNode> response = genieService.getJobs().execute();
                 final JsonNode content = response.body();
                 final ObjectMapper mapper = new ObjectMapper();
                 final ArrayList<Map<String, String>> jobs = (ArrayList<Map<String, String>>)
@@ -165,15 +145,10 @@ public class JobClient extends BaseGenieClient {
                             .withFinished(dateFormatter.parse(job.get("finished")))
                             .build());
                 }
-
                 return jobList;
-            } else {
-                throw new GenieServerException("Could not fetch jobs due to error code: "
-                    + response.code() + " Error Message:  " + response.message());
-            }
 
-        } catch (Exception e) {
-            throw new GenieServerException("Could not fetch jobs.", e);
+        } catch (ParseException e) {
+            throw new GenieServerException("Could not fetch jobs.");
         }
     }
 
@@ -182,19 +157,12 @@ public class JobClient extends BaseGenieClient {
      *
      * @param jobId The id of the job to get.
      * @return The job details.
-     * @throws GenieException If there is any problem.
+     * @throws IOException If there is any problem.
      */
     public Job getJob(
         final String jobId
-    ) throws GenieException {
+    ) throws IOException {
+        return genieService.getJob(jobId).execute().body();
 
-        final Call<Job> jobCall = genieService.getJob(jobId);
-        try {
-            final Response<Job> response = jobCall.execute();
-            // Check for 404 vs 5xx before throwing exception
-            return response.body();
-        } catch (Exception e) {
-            throw  new GenieServerException("Could not fetch jobs.", e);
-        }
     }
 }
