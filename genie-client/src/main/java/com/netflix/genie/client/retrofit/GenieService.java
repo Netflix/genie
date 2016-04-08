@@ -24,6 +24,7 @@ import okhttp3.MultipartBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
@@ -96,4 +97,22 @@ public interface GenieService {
     @Streaming
     @GET(JOBS_URL_SUFFIX + "/{id}/output/stdout")
     Call<ResponseBody> getJobOutput(@Path("id") final String jobId);
+
+    /**
+     * Method to get Job status.
+     *
+     * @param jobId The id of the job whose status is desired.
+     * @return A callable object.
+     */
+    @GET(JOBS_URL_SUFFIX + "/{id}/status")
+    Call<JsonNode> getJobStatus(@Path("id") final String jobId);
+
+    /**
+     * Method to send a job kill request to Genie.
+     *
+     * @param jobId The id of the job.
+     * @return A callable object.
+     */
+    @DELETE(JOBS_URL_SUFFIX + "/{id}")
+    Call<Void> killJob(@Path("id") final String jobId);
 }

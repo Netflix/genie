@@ -23,11 +23,13 @@ import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.lang3.StringUtils;
 import retrofit2.Response;
 
 import java.io.File;
@@ -47,9 +49,7 @@ import java.util.Map;
  */
 public class JobClient extends BaseGenieClient {
 
-
     private static final String ATTACHMENTS = "attachment";
-
     private static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
 
     /**
@@ -71,14 +71,17 @@ public class JobClient extends BaseGenieClient {
      * @param jobRequest A job request containing all the details for running a job.
      *
      * @return jobId The id of the job submitted.
-     * @throws IOException If there is any problem.
+     *
+     * @throws GenieException For any other error.
+     * @throws IOException If the response received is not 2xx.
      */
     public String submitJob(
         final JobRequest jobRequest
-        ) throws IOException {
-
-        final Response response = genieService.submitJob(jobRequest).execute();
-        return getIdFromLocation(response.headers().get("location"));
+        ) throws IOException, GenieException {
+        if (jobRequest == null) {
+            throw new GeniePreconditionException("Job Request cannot be null.");
+        }
+        return getIdFromLocation(genieService.submitJob(jobRequest).execute().headers().get("location"));
     }
 
     /**
@@ -88,34 +91,39 @@ public class JobClient extends BaseGenieClient {
      * @param filePaths A list of filesPaths needed to be sent to the server as attachments.
      *
      * @return jobId The id of the job submitted.
-     * @throws IOException If there is any problem.
+     *
+     * @throws GenieException       For any other error.
+     * @throws IOException If the response received is not 2xx.
      */
     public String submitJobWithAttachments(
         final JobRequest jobRequest,
         final List<String> filePaths
-    ) throws IOException {
-            final ArrayList<MultipartBody.Part> attachmentFiles = new ArrayList<>();
+    ) throws IOException, GenieException {
+        if (jobRequest == null) {
+            throw new GeniePreconditionException("Job Request cannot be null.");
+        }
+        final ArrayList<MultipartBody.Part> attachmentFiles = new ArrayList<>();
 
-            for (String path: filePaths) {
-                final String fileName = path.substring(path.lastIndexOf(FILE_PATH_DELIMITER) + 1);
-                final MultipartBody.Part part = MultipartBody.Part.createFormData(
-                    ATTACHMENTS,
-                    fileName,
-                    RequestBody.create(MediaType.parse(APPLICATION_OCTET_STREAM), new File(path)));
+        for (String path: filePaths) {
+            final String fileName = path.substring(path.lastIndexOf(FILE_PATH_DELIMITER) + 1);
+            final MultipartBody.Part part = MultipartBody.Part.createFormData(
+                ATTACHMENTS,
+                fileName,
+                RequestBody.create(MediaType.parse(APPLICATION_OCTET_STREAM), new File(path)));
 
-                attachmentFiles.add(part);
-            }
+            attachmentFiles.add(part);
+        }
 
-            final Response response = genieService.submitJobWithAttachments(jobRequest, attachmentFiles).execute();
-            return getIdFromLocation(response.headers().get("location"));
+        final Response response = genieService.submitJobWithAttachments(jobRequest, attachmentFiles).execute();
+        return getIdFromLocation(response.headers().get("location"));
     }
 
     /**
      * Method to get a list of all the jobs from Genie for the query parameters specified.
      *
      * @return A list of jobs.
-     * @throws GenieException If there is a Genie server issue.
-     * @throws IOException If there is a problem with the request.
+     * @throws GenieException       For any other error.
+     * @throws IOException If the response received is not 2xx.
      */
     public List<Job> getJobs() throws IOException, GenieException {
 
@@ -158,13 +166,16 @@ public class JobClient extends BaseGenieClient {
      *
      * @param jobId The id of the job to get.
      * @return The job details.
-     * @throws IOException If there is any problem.
+     * @throws GenieException       For any other error.
+     * @throws IOException If the response received is not 2xx.
      */
     public Job getJob(
         final String jobId
-    ) throws IOException {
+    ) throws IOException, GenieException {
+        if (StringUtils.isEmpty(jobId)) {
+            throw new GeniePreconditionException("Missing required parameter: jobId.");
+        }
         return genieService.getJob(jobId).execute().body();
-
     }
 
     /**
@@ -173,12 +184,80 @@ public class JobClient extends BaseGenieClient {
      * @param jobId The id of the job whose output is desired.
      *
      * @return An inputstream to the output contents.
-     * @throws IOException If there is any problem.
+     *
+     * @throws GenieException       For any other error.
+     * @throws IOException If the response received is not 2xx.
      */
     public InputStream getJobOutput(
         final String jobId
-    ) throws IOException {
-        // TODO make sure Job is successful before returning stdout
+    ) throws IOException, GenieException {
+        if (!this.getJobStatus(jobId).equals(JobStatus.SUCCEEDED)) {
+            throw new GenieException(400, "Cannot request output of a job whose status is not SUCCEEDED.");
+        }
         return genieService.getJobOutput(jobId).execute().body().byteStream();
+    }
+
+    /**
+     * Method to fetch the status of a job.
+     *
+     * @param jobId The id of the job.
+     *
+     * @return The status of the Job.
+     * @throws GenieException       For any other error.
+     * @throws IOException If the response received is not 2xx.
+     */
+    public JobStatus getJobStatus(
+        final String jobId
+    ) throws IOException, GenieException {
+        final JsonNode jsonNode = genieService.getJobStatus(jobId).execute().body();
+        return JobStatus.parse(jsonNode.get(STATUS).asText());
+    }
+
+    /**
+     * Method to send a kill job request to Genie.
+     *
+     * @param jobId The id of the job.
+     * @throws IOException If there is a problem while sending the request.
+     */
+    public void killJob(final String jobId) throws IOException {
+        genieService.killJob(jobId).execute();
+    }
+
+    /**
+     * Wait for job to complete, until the given timeout.
+     *
+     * @param jobId           the Genie job ID to wait for completion
+     * @param blockTimeout the time to block for (in ms), after which a
+     *                     GenieException will be thrown
+     * @param pollTime     the time to sleep between polling for job status
+     * @return the jobInfo for the job after completion
+     * @throws GenieException       For any other error.
+     * @throws InterruptedException on timeout/thread errors
+     * @throws IOException If the response received is not 2xx.
+     */
+    public JobStatus waitForCompletion(final String jobId, final long blockTimeout, final long pollTime)
+        throws GenieException, InterruptedException, IOException {
+        if (StringUtils.isEmpty(jobId)) {
+            throw new GeniePreconditionException("Missing required parameter: jobId.");
+        }
+
+        final long startTime = System.currentTimeMillis();
+
+        // wait for job to finish
+        while (true) {
+
+            final JobStatus status = this.getJobStatus(jobId);
+
+            if (status == JobStatus.FAILED || status == JobStatus.KILLED || status == JobStatus.SUCCEEDED) {
+                return status;
+            }
+
+            // block until timeout
+            if (System.currentTimeMillis() - startTime < blockTimeout) {
+                Thread.sleep(pollTime);
+            } else {
+                throw new InterruptedException("Timed out waiting for job to finish");
+            }
+        }
     }
 }
