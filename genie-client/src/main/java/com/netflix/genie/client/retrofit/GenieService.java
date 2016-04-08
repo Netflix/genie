@@ -81,5 +81,7 @@ public interface GenieService {
      */
     @Multipart
     @POST(JOBS_URL_SUFFIX)
-    Call<Void> submitJobWithAttachments(@Part("request") JobRequest request, @Part List<MultipartBody.Part> attachments);
+    Call<Void> submitJobWithAttachments(
+        @Part("request") JobRequest request,
+        @Part List<MultipartBody.Part> attachments);
 }

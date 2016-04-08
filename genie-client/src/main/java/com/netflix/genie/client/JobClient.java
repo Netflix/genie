@@ -101,7 +101,8 @@ public class JobClient extends BaseGenieClient {
         try {
 
             final MultipartBody.Part part = MultipartBody.Part.createFormData("attachment", "foo1.txt",
-                    RequestBody.create(MediaType.parse("application/octet-stream"), new File("/Users/amsharma/foo.txt")));
+                    RequestBody.create(MediaType.parse("application/octet-stream"),
+                        new File("/Users/amsharma/foo.txt")));
 
             final MultipartBody.Part part1 = MultipartBody.Part.createFormData("attachment", "foo2.txt",
                 RequestBody.create(MediaType.parse("application/octet-stream"), new File("/Users/amsharma/foo.txt")));
