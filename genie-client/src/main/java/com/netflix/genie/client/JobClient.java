@@ -32,7 +32,6 @@ import retrofit2.Call;
 import retrofit2.Response;
 
 import java.io.File;
-import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +44,11 @@ import java.util.Map;
  * @since 3.0.0
  */
 public class JobClient extends BaseGenieClient {
+
+
+    private static final String ATTACHMENTS = "attachment";
+
+    private static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
 
     /**
      * Constructor.
@@ -89,27 +93,28 @@ public class JobClient extends BaseGenieClient {
      * Submit a job to genie using the jobRequest and attachments provided.
      *
      * @param jobRequest A job request containing all the details for running a job.
-     * @param files A list of uri's to the files needed to be sent to the server.
+     * @param filePaths A list of filesPaths needed to be sent to the server as attachments.
      *
      * @return jobId The id of the job submitted.
      * @throws GenieException If there is any problem.
      */
     public String submitJobWithAttachments(
         final JobRequest jobRequest,
-        final List<URI> files
+        final List<String> filePaths
     ) throws GenieException {
         try {
 
-            final MultipartBody.Part part = MultipartBody.Part.createFormData("attachment", "foo1.txt",
-                    RequestBody.create(MediaType.parse("application/octet-stream"),
-                        new File("/Users/amsharma/foo.txt")));
-
-            final MultipartBody.Part part1 = MultipartBody.Part.createFormData("attachment", "foo2.txt",
-                RequestBody.create(MediaType.parse("application/octet-stream"), new File("/Users/amsharma/foo.txt")));
-
             final ArrayList<MultipartBody.Part> attachmentFiles = new ArrayList<>();
-            attachmentFiles.add(part);
-            attachmentFiles.add(part1);
+
+            for (String path: filePaths) {
+                final String fileName = path.substring(path.lastIndexOf(FILE_PATH_DELIMITER) + 1);
+                final MultipartBody.Part part = MultipartBody.Part.createFormData(
+                    ATTACHMENTS,
+                    fileName,
+                    RequestBody.create(MediaType.parse(APPLICATION_OCTET_STREAM), new File(path)));
+
+                attachmentFiles.add(part);
+            }
 
             final Call<Void> post = genieService.submitJobWithAttachments(jobRequest, attachmentFiles);
 

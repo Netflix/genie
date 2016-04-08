@@ -39,6 +39,8 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
  */
 public abstract class BaseGenieClient {
 
+    protected static final String FILE_PATH_DELIMITER = "/";
+
     private static final String SERVICE_BASE_URL_KEY = "genie.service.base.url";
 
     private static final String GENIE_SECURITY_ENABLED_KEY = "genie.security.enabled";
