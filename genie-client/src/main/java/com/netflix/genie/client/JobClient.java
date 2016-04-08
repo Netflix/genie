@@ -32,6 +32,7 @@ import retrofit2.Response;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -164,5 +165,20 @@ public class JobClient extends BaseGenieClient {
     ) throws IOException {
         return genieService.getJob(jobId).execute().body();
 
+    }
+
+    /**
+     * Method to fetch the stdout of a job from Genie.
+     *
+     * @param jobId The id of the job whose output is desired.
+     *
+     * @return An inputstream to the output contents.
+     * @throws IOException If there is any problem.
+     */
+    public InputStream getJobOutput(
+        final String jobId
+    ) throws IOException {
+        // TODO make sure Job is successful before returning stdout
+        return genieService.getJobOutput(jobId).execute().body().byteStream();
     }
 }
