@@ -105,8 +105,6 @@ subprojects {
          * Compile Dependencies
          *******************************/
 
-        compile("org.apache.commons:commons-lang3")
-
         /*******************************
          * Provided Dependencies
          *******************************/
