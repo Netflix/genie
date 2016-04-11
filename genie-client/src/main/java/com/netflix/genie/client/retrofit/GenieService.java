@@ -30,9 +30,11 @@ import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
+import retrofit2.http.QueryMap;
 import retrofit2.http.Streaming;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * An interface for Retrofit to use and generate all the methods needed for the Genie client implementation.
@@ -50,11 +52,11 @@ public interface GenieService {
     /**
      * Method to get all jobs from Genie.
      *
+     * @param options A map of query parameters to be used to filter the jobs.
      * @return A callable object.
      */
-    // TODO need to add query parameters
     @GET(JOBS_URL_SUFFIX)
-    Call<JsonNode> getJobs();
+    Call<JsonNode> getJobs(@QueryMap final Map<String, String> options);
 
     /**
      * Method to fetch a single job from Genie.

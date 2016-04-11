@@ -38,6 +38,7 @@ import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -118,19 +119,33 @@ public class JobClient extends BaseGenieClient {
         return getIdFromLocation(response.headers().get("location"));
     }
 
+
     /**
-     * Method to get a list of all the jobs from Genie for the query parameters specified.
+     * Method to get a list of all the jobs.
      *
      * @return A list of jobs.
      * @throws GenieException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
     public List<Job> getJobs() throws IOException, GenieException {
+        return this.getJobs(Collections.emptyMap());
+    }
+
+    /**
+     * Method to get a list of all the jobs from Genie for the query parameters specified.
+     *
+     * @param options A list of query options
+     *
+     * @return A list of jobs.
+     * @throws GenieException       For any other error.
+     * @throws IOException If the response received is not 2xx.
+     */
+    public List<Job> getJobs(final Map<String, String> options) throws IOException, GenieException {
 
         try {
             final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-            final Response<JsonNode> response = genieService.getJobs().execute();
+            final Response<JsonNode> response = genieService.getJobs(options).execute();
                 final JsonNode content = response.body();
                 final ObjectMapper mapper = new ObjectMapper();
                 final ArrayList<Map<String, String>> jobs = (ArrayList<Map<String, String>>)
