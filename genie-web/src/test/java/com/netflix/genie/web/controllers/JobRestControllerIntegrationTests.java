@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.controllers;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
@@ -72,6 +73,8 @@ import java.util.UUID;
  */
 @Slf4j
 public class JobRestControllerIntegrationTests extends RestControllerIntegrationTestsBase {
+
+    private static final long SLEEP_TIME = 1000L;
 
     private static final String COMMAND_ARGS_PATH = "$.commandArgs";
     private static final String STATUS_MESSAGE_PATH = "$.statusMsg";
@@ -393,19 +396,16 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
         final String commandArgs = "-c 'echo hello world'";
 
-        final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
         final String clusterTag = "localhost";
-        final ClusterCriteria clusterCriteria = new ClusterCriteria(Sets.newHashSet(clusterTag));
-        clusterCriteriaList.add(clusterCriteria);
+        final List<ClusterCriteria> clusterCriteriaList
+            = Lists.newArrayList(new ClusterCriteria(Sets.newHashSet(clusterTag)));
 
         final String setUpFile = this.resourceLoader.getResource(BASE_DIR + "job" + FILE_DELIMITER + "jobsetupfile")
-            .getFile()
-            .getAbsolutePath();
+            .getFile().getAbsolutePath();
 
-        final Set<String> dependencies = new HashSet<>();
-        final String depFile1 = this.resourceLoader.getResource(BASE_DIR + "job" + FILE_DELIMITER + "dep1").getFile()
-            .getAbsolutePath();
-        dependencies.add(depFile1);
+        final String depFile1
+            = this.resourceLoader.getResource(BASE_DIR + "job" + FILE_DELIMITER + "dep1").getFile().getAbsolutePath();
+        final Set<String> dependencies = Sets.newHashSet(depFile1);
 
         final String commandTag = "bash";
         final Set<String> commandCriteria = Sets.newHashSet(commandTag);
@@ -417,7 +417,9 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             clusterCriteriaList,
             commandCriteria
         )
-            .withDisableLogArchival(true).withSetupFile(setUpFile).withDependencies(dependencies)
+            .withDisableLogArchival(true)
+            .withSetupFile(setUpFile)
+            .withDependencies(dependencies)
             .withDescription(JOB_DESCRIPTION)
             .build();
 
@@ -433,19 +435,22 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andReturn();
 
         final String jobId = this.getIdFromLocation(result.getResponse().getHeader(HttpHeaders.LOCATION));
+        final String endpoint
+            = JOBS_API + JobConstants.FILE_PATH_DELIMITER + jobId + JobConstants.FILE_PATH_DELIMITER + "status";
 
-        int counter = 1;
-        do {
-            counter++;
-            Thread.sleep(1000);
-        } while (
-            this.mvc.perform(MockMvcRequestBuilders.get(
-                JOBS_API + JobConstants.FILE_PATH_DELIMITER + jobId + JobConstants.FILE_PATH_DELIMITER + "status")
-                .accept(MediaType.APPLICATION_JSON))
+        int counter = 0;
+        while (
+            this.mvc
+                .perform(MockMvcRequestBuilders.get(endpoint).accept(MediaType.APPLICATION_JSON))
                 .andReturn()
                 .getResponse()
-                .getContentAsString().contains("RUNNING") && counter < 10
-            );
+                .getContentAsString()
+                .contains("RUNNING") && counter < 10
+            ) {
+            log.info("Iteration {} sleeping for {} ms", counter, SLEEP_TIME);
+            Thread.sleep(SLEEP_TIME);
+            counter++;
+        }
 
         Assert.assertEquals(this.mvc.perform(MockMvcRequestBuilders.get(
             JOBS_API
@@ -565,12 +570,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andExpect(MockMvcResultMatchers.jsonPath("$[1].id", Matchers.is(APP2_ID)));
 
         // check that the generated run.sh is correct
-        final String runShFileName;
-        if (SystemUtils.IS_OS_LINUX) {
-            runShFileName = "linux-runsh.txt";
-        } else {
-            runShFileName = "non-linux-runsh.txt";
-        }
+        final String runShFileName = SystemUtils.IS_OS_LINUX ? "linux-runsh.txt" : "non-linux-runsh.txt";
 
         final String runSHFile = this.resourceLoader.getResource(BASE_DIR + runShFileName).getFile().getAbsolutePath();
         final String runFileContents = new String(Files.readAllBytes(Paths.get(runSHFile)), "UTF-8");
@@ -587,29 +587,18 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         Assert.assertThat(this.jobRepository.count(), Matchers.is(1L));
         Assert.assertThat(this.jobRequestRepository.count(), Matchers.is(1L));
         Assert.assertThat(this.jobExecutionRepository.count(), Matchers.is(1L));
+
+        // Test for conflicts
+        this.testForConflicts(jobId, commandArgs, clusterCriteriaList, commandCriteria);
     }
 
-    /**
-     * Test the job submit method for job already exists.
-     *
-     * @throws Exception If there is a problem.
-     */
-    @Test
-    public void testSubmitJobMethodAlreadyExists() throws Exception {
-        Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
-        final String commandArgs = "-c 'echo hello world'";
-
-        final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
-        final Set<String> clusterTags = new HashSet<>();
-        clusterTags.add("localhost");
-        final ClusterCriteria clusterCriteria = new ClusterCriteria(clusterTags);
-        clusterCriteriaList.add(clusterCriteria);
-
-        final String jobId = UUID.randomUUID().toString();
-
-        final Set<String> commandCriteria = new HashSet<>();
-        commandCriteria.add("bash");
-        final JobRequest jobRequest = new JobRequest.Builder(
+    private void testForConflicts(
+        final String jobId,
+        final String commandArgs,
+        final List<ClusterCriteria> clusterCriteriaList,
+        final Set<String> commandCriteria
+    ) throws Exception {
+        final JobRequest jobConflictRequest = new JobRequest.Builder(
             JOB_NAME,
             JOB_USER,
             JOB_VERSION,
@@ -626,45 +615,10 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                 MockMvcRequestBuilders
                     .post(JOBS_API)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(jobRequest))
-            );
-
-        this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .post(JOBS_API)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(jobRequest))
+                    .content(OBJECT_MAPPER.writeValueAsBytes(jobConflictRequest))
             )
             .andExpect(MockMvcResultMatchers.status().isConflict());
 
-        int counter = 1;
-        do {
-            counter++;
-            Thread.sleep(1000);
-        } while (
-            this.mvc.perform(MockMvcRequestBuilders.get(
-                JOBS_API
-                    + JobConstants.FILE_PATH_DELIMITER
-                    + jobId
-                    + JobConstants.FILE_PATH_DELIMITER
-                    + "status")
-                .accept(MediaType.APPLICATION_JSON))
-                .andReturn()
-                .getResponse()
-                .getContentAsString().contains("RUNNING") && counter < 10
-            );
-
-        Assert.assertEquals(this.mvc.perform(MockMvcRequestBuilders.get(
-            JOBS_API
-                + JobConstants.FILE_PATH_DELIMITER
-                + jobId
-                + JobConstants.FILE_PATH_DELIMITER
-                + "status")
-            .accept(MediaType.APPLICATION_JSON))
-            .andReturn()
-            .getResponse()
-            .getContentAsString(), "{\"status\":\"SUCCEEDED\"}");
     }
 
     /**
@@ -801,22 +755,19 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                     .delete(JOBS_API + "/" + jobId)
             );
 
-        int counter = 1;
-        do {
-            counter++;
-            Thread.sleep(1000);
-        } while (
-            this.mvc.perform(MockMvcRequestBuilders.get(
-                JOBS_API
-                    + JobConstants.FILE_PATH_DELIMITER
-                    + jobId
-                    + JobConstants.FILE_PATH_DELIMITER
-                    + "status")
-                .accept(MediaType.APPLICATION_JSON))
+        final String statusEndpoint
+            = JOBS_API + JobConstants.FILE_PATH_DELIMITER + jobId + JobConstants.FILE_PATH_DELIMITER + "status";
+        int counter = 0;
+        while (
+            this.mvc.perform(MockMvcRequestBuilders.get(statusEndpoint).accept(MediaType.APPLICATION_JSON))
                 .andReturn()
                 .getResponse()
                 .getContentAsString().contains("RUNNING") && counter < 10
-            );
+            ) {
+            log.info("Iteration {} sleeping for {} ms", counter, SLEEP_TIME);
+            Thread.sleep(SLEEP_TIME);
+            counter++;
+        }
 
         this.mvc
             .perform(MockMvcRequestBuilders.get(JOBS_API + "/" + jobId))
@@ -868,23 +819,21 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andReturn();
 
         final String jobId = this.getIdFromLocation(result.getResponse().getHeader(HttpHeaders.LOCATION));
+        final String statusEndpoint
+            = JOBS_API + JobConstants.FILE_PATH_DELIMITER + jobId + JobConstants.FILE_PATH_DELIMITER + "status";
 
-        int counter = 1;
-        do {
-            counter++;
-            Thread.sleep(1000);
-        } while (
-            this.mvc.perform(MockMvcRequestBuilders.get(
-                JOBS_API
-                    + JobConstants.FILE_PATH_DELIMITER
-                    + jobId
-                    + JobConstants.FILE_PATH_DELIMITER
-                    + "status")
-                .accept(MediaType.APPLICATION_JSON))
+        int counter = 0;
+        while (
+            this.mvc
+                .perform(MockMvcRequestBuilders.get(statusEndpoint).accept(MediaType.APPLICATION_JSON))
                 .andReturn()
                 .getResponse()
                 .getContentAsString().contains("RUNNING") && counter < 120
-            );
+            ) {
+            log.info("Iteration {} sleeping for {} ms", counter, SLEEP_TIME);
+            Thread.sleep(SLEEP_TIME);
+            counter++;
+        }
 
         this.mvc
             .perform(MockMvcRequestBuilders.get(JOBS_API + "/" + jobId))
@@ -935,22 +884,19 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andReturn();
 
         final String jobId = this.getIdFromLocation(result.getResponse().getHeader(HttpHeaders.LOCATION));
-        int counter = 1;
-        do {
-            counter++;
-            Thread.sleep(1000);
-        } while (
-            this.mvc.perform(MockMvcRequestBuilders.get(
-                JOBS_API
-                    + JobConstants.FILE_PATH_DELIMITER
-                    + jobId
-                    + JobConstants.FILE_PATH_DELIMITER
-                    + "status")
-                .accept(MediaType.APPLICATION_JSON))
+        final String statusEndpoint
+            = JOBS_API + JobConstants.FILE_PATH_DELIMITER + jobId + JobConstants.FILE_PATH_DELIMITER + "status";
+        int counter = 0;
+        while (
+            this.mvc.perform(MockMvcRequestBuilders.get(statusEndpoint).accept(MediaType.APPLICATION_JSON))
                 .andReturn()
                 .getResponse()
                 .getContentAsString().contains("RUNNING") && counter < 10
-            );
+            ) {
+            log.info("Iteration {} sleeping for {} ms", counter, SLEEP_TIME);
+            Thread.sleep(SLEEP_TIME);
+            counter++;
+        }
 
         Assert.assertEquals(this.mvc.perform(MockMvcRequestBuilders.get(
             JOBS_API
@@ -970,8 +916,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andExpect(MockMvcResultMatchers.jsonPath(ID_PATH, Matchers.is(jobId)))
             .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(JobStatus.FAILED.toString())));
     }
-
-    // TODO: Add tests for getting the job request and job execution
 
     private String getIdFromLocation(final String location) {
         return location.substring(location.lastIndexOf("/") + 1);

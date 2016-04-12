@@ -26,7 +26,7 @@ import com.netflix.genie.core.services.FileTransfer;
 import com.netflix.genie.core.services.impl.S3FileTransferImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -84,7 +84,7 @@ public class AwsS3Config {
      * @return An amazon s3 client object
      */
     @Bean
-    @ConditionalOnClass(AWSCredentialsProvider.class)
+    @ConditionalOnBean(AWSCredentialsProvider.class)
     public AmazonS3Client genieS3Client(
         final AWSCredentialsProvider awsCredentialsProvider
     ) {
@@ -100,7 +100,7 @@ public class AwsS3Config {
      */
     @Bean
     @Order(value = 1)
-    @ConditionalOnClass(AmazonS3Client.class)
+    @ConditionalOnBean(AmazonS3Client.class)
     public FileTransfer s3FileTransferImpl(
         final AmazonS3Client s3Client
     ) throws GenieException {
