@@ -41,5 +41,5 @@ public class AccessToken {
 
     // Time to expire from creation
     @JsonProperty("expires_in")
-    private String expiresIn;
+    private int expiresIn;
 }

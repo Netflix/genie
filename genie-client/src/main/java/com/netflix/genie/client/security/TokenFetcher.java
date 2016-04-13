@@ -20,13 +20,14 @@ package com.netflix.genie.client.security;
 import com.netflix.genie.client.retrofit.TokenService;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import java.net.URL;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -35,8 +36,7 @@ import java.util.HashMap;
  * @author amsharma
  * @since 3.0.0
  */
-@Getter
-@Setter
+@Slf4j
 public class TokenFetcher {
 
     private static final String CLIENT_ID = "client_id";
@@ -52,6 +52,10 @@ public class TokenFetcher {
 
     // The url of the IDP server to get OAuth credentails
     private final String oauthUrl;
+
+    private Date expirationTime = new Date();
+
+    private AccessToken accessToken;
 
     /**
      * Constructor.
@@ -71,6 +75,8 @@ public class TokenFetcher {
         final String grantType,
         final String scope
     ) throws GenieException {
+
+        log.debug("Constructor called.");
 
         try {
             final URL url = new URL(oauthUrl);
@@ -107,12 +113,23 @@ public class TokenFetcher {
 
         // TODO set expiration time here to check it next time
         try {
-            final Response<AccessToken> response = tokenService.getToken(oauthUrl, credentialParams).execute();
-            if (response.isSuccessful()) {
-                return response.body();
+            if (new Date().after(this.expirationTime)) {
+                final Response<AccessToken> response = tokenService.getToken(oauthUrl, credentialParams).execute();
+                if (response.isSuccessful()) {
+                    // Get current date, add expiresIn for the access token with a buffer of 5 minutes
+                    final Calendar cal = Calendar.getInstance();
+                    accessToken = response.body();
+                    cal.add(Calendar.SECOND, accessToken.getExpiresIn() - 300);
+                    this.expirationTime = cal.getTime();
+                    return accessToken;
+                } else {
+                    throw new GenieException(response.code(), "Could not fetch Token");
+                }
             } else {
-                throw new GenieException(response.code(), "Could not fetch Token");
+                return accessToken;
             }
+
+
         } catch (Exception e) {
             throw new GenieServerException("Could not get access tokens", e);
         }
