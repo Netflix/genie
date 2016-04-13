@@ -17,7 +17,7 @@ services:
 git:
   depth: 100
 
-install: "./gradle/installViaTravis.sh"
+install: travis_wait "./gradle/installViaTravis.sh"
 
 # Setup the database for the integration tests
 before_script:
