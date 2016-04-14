@@ -69,15 +69,15 @@ public class DefaultDirectoryWriter implements DirectoryWriter {
 
         // Render the page header
         builder.append("<!DOCTYPE html>");
-        builder.append("<html>\r\n");
-        builder.append("<head>\r\n");
+        builder.append("<html>");
+        builder.append("<head>");
         builder.append("<title>");
         builder.append(directory.getName());
-        builder.append("</title>\r\n");
+        builder.append("</title>");
         builder.append("<style type=\"text/css\"><!--");
         builder.append(DEFAULT_CSS);
         builder.append("--></style> ");
-        builder.append("</head>\r\n");
+        builder.append("</head>");
 
         // Body
         builder.append("<body>");
@@ -85,19 +85,19 @@ public class DefaultDirectoryWriter implements DirectoryWriter {
 
         builder.append("<HR size=\"1\" noshade=\"noshade\">");
 
-        builder.append("<table width=\"100%\" cellspacing=\"0\"" + " cellpadding=\"5\" align=\"center\">\r\n");
+        builder.append("<table width=\"100%\" cellspacing=\"0\"" + " cellpadding=\"5\" align=\"center\">");
 
         // Render the column headings
-        builder.append("<tr>\r\n");
+        builder.append("<tr>");
         builder.append("<td align=\"left\"><font size=\"+1\"><strong>");
         builder.append("Filename");
-        builder.append("</strong></font></td>\r\n");
+        builder.append("</strong></font></td>");
         builder.append("<td align=\"right\"><font size=\"+1\"><strong>");
         builder.append("Size");
-        builder.append("</strong></font></td>\r\n");
+        builder.append("</strong></font></td>");
         builder.append("<td align=\"right\"><font size=\"+1\"><strong>");
         builder.append("Last Modified");
-        builder.append("</strong></font></td>\r\n");
+        builder.append("</strong></font></td>");
         builder.append("</tr>");
 
         // Write parent if necessary
@@ -124,13 +124,13 @@ public class DefaultDirectoryWriter implements DirectoryWriter {
         }
 
         // Render the page footer
-        builder.append("</table>\r\n");
+        builder.append("</table>");
 
         builder.append("<HR size=\"1\" noshade=\"noshade\">");
         // TODO: replace with something related to Genie
         builder.append("<h3>").append(ServerInfo.getServerInfo()).append("</h3>");
-        builder.append("</body>\r\n");
-        builder.append("</html>\r\n");
+        builder.append("</body>");
+        builder.append("</html>");
 
         return builder.toString();
     }
@@ -169,15 +169,17 @@ public class DefaultDirectoryWriter implements DirectoryWriter {
         if (shade) {
             builder.append(" bgcolor=\"#eeeeee\"");
         }
-        builder.append(">\r\n");
+        builder.append(">");
 
-        builder.append("<td align=\"left\">&nbsp;&nbsp;\r\n");
+        builder.append("<td align=\"left\">&nbsp;&nbsp;");
         builder.append("<a href=\"").append(entry.getUrl()).append("\">");
-        builder.append("<tt>").append(entry.getName()).append("</tt></a></td>\r\n");
-        builder.append("<td align=\"right\"><tt>").append(this.renderSize(entry.getSize())).append("</tt></td>\r\n");
+        builder.append("<tt>").append(entry.getName()).append("</tt></a></td>");
+        builder
+            .append("<td align=\"right\"><tt>")
+            .append(this.renderSize(entry.getSize())).append("</tt></td>");
         final String lastModified = ConcurrentDateFormat.formatRfc1123(new Date(entry.getLastModified()));
-        builder.append("<td align=\"right\"><tt>").append(lastModified).append("</tt></td>\r\n");
-        builder.append("</tr>\r\n");
+        builder.append("<td align=\"right\"><tt>").append(lastModified).append("</tt></td>");
+        builder.append("</tr>");
     }
 
     protected Directory getDirectory(final File directory, final String requestUrl, final boolean includeParent) {
