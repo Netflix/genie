@@ -43,7 +43,6 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.DefaultResourceLoader;
@@ -392,7 +391,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
      *
      * @throws Exception If there is a problem.
      */
-    @Ignore
     @Test
     public void testSubmitJobMethodSuccess() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
@@ -628,7 +626,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
      *
      * @throws Exception If there is a problem.
      */
-    @Ignore
     @Test
     public void testSubmitJobMethodMissingCluster() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
@@ -672,7 +669,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
      *
      * @throws Exception If there is a problem.
      */
-    @Ignore
     @Test
     public void testSubmitJobMethodMissingCommand() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
@@ -715,7 +711,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
      *
      * @throws Exception If there is a problem.
      */
-    @Ignore
     @Test
     public void testSubmitJobMethodKill() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
@@ -787,7 +782,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
      *
      * @throws Exception If there is a problem.
      */
-    @Ignore
     @Test
     public void testSubmitJobMethodKillOnTimeout() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
@@ -854,7 +848,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
      *
      * @throws Exception If there is a problem.
      */
-    @Ignore
     @Test
     public void testSubmitJobMethodFailure() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);

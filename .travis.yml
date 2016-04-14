@@ -24,8 +24,8 @@ before_script:
   - mysql -u root -e 'create database genie;'
   - mysql -u root genie < genie-ddl/mysql/3.0.0-schema.mysql.sql
 
-#script: travis_wait 40 "./gradle/buildViaTravis.sh"
-script: "./gradle/buildViaTravis.sh"
+script: travis_wait 40 ./gradle/buildViaTravis.sh
+#script: "./gradle/buildViaTravis.sh"
 
 # https://docs.travis-ci.com/user/languages/java#Caching
 before_cache:
@@ -45,6 +45,6 @@ env:
     - secure: EQtZL4/gipYNu+YoDuElpowOpak7r9BLgUQ1UE6TAWGHepqp76S6pR8drlwWZDzv8YrP7Ze+QrNZqErKFieDneOTVOhoOqc8YAAd0qV3h8hmmo3xUHNR3CdPErc9QvfxHyZ7yO4+mCW6FP77tKzHVRm2VjkjMIhJBqGmA240Mq4=
     - secure: HKTf4wmQwXXMduNACwvQ4PSHMIs8DaE3bOMJoS3hx7WpalhqCKoa9vdcCtId4ZIVaY+KJoXRV4H11IYQNcvcagwJ6q5C7NhpYSu/GohpXFpzseIaB8oCC1RKzJCf0oGCMhs3WnNOGhpg/zFj2I+3PGMMaJIdlBG6D0ObLV7BIQs=
 
-notifications:
-  slack:
-    secure: H5nS+GX6TYTU27ur6YFG5OgrQeUbzXLok5ub6+xcmyYEeVPpnQ1Gg/wKqTAGsP9j6tAkqPpxgYT9i9Do6eyTEplK6bTvQVyhilsEDtxGJbUO8XOE9TSo6jAe/lD3EB5l46gxFID+Hg9IkPii4LwEabP7PVehrB1JfNZ6QDgSRRM=
+#notifications:
+#  slack:
+#    secure: H5nS+GX6TYTU27ur6YFG5OgrQeUbzXLok5ub6+xcmyYEeVPpnQ1Gg/wKqTAGsP9j6tAkqPpxgYT9i9Do6eyTEplK6bTvQVyhilsEDtxGJbUO8XOE9TSo6jAe/lD3EB5l46gxFID+Hg9IkPii4LwEabP7PVehrB1JfNZ6QDgSRRM=
