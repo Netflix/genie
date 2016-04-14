@@ -193,7 +193,11 @@ public class JobCompletionHandler {
 
                 // Create the tar file exluding the run.sh file and everything under the genie directory
                 final String jobWorkingDir = this.baseWorkingDir + JobConstants.FILE_PATH_DELIMITER + jobId;
-                final String localArchiveFile = jobWorkingDir + JobConstants.FILE_PATH_DELIMITER + jobId + ".tar.gz";
+                final String localArchiveFile = jobWorkingDir
+                    + JobConstants.FILE_PATH_DELIMITER
+                    + "genie/logs/"
+                    + jobId
+                    + ".tar.gz";
 
                 final CommandLine commandLine = new CommandLine("tar");
                 commandLine.addArgument("-c");

@@ -104,6 +104,9 @@ public class JobKickoffTask extends GenieBaseTask {
         final List<String> command = new ArrayList<>();
         if (this.isRunAsUserEnabled) {
             changeOwnershipOfDirectory(this.jobWorkingDirectory, this.jobExecEnv.getJobRequest().getUser());
+
+            // This is needed because the genie.log file is still generated as the user running Genie system.
+            makeDirGroupWritable(this.jobWorkingDirectory + "/genie/logs");
             command.add("sudo");
             command.add("-u");
             command.add(this.jobExecEnv.getJobRequest().getUser());
@@ -137,6 +140,21 @@ public class JobKickoffTask extends GenieBaseTask {
             context.put(JobConstants.JOB_EXECUTION_DTO_KEY, jobExecution);
         } catch (IOException ie) {
             throw new GenieServerException("Unable to start command " + String.valueOf(command), ie);
+        }
+    }
+
+    // Helper method to add write permissions to a directory for the group owner
+    private void makeDirGroupWritable(final String dir) throws GenieServerException {
+        log.debug("Adding write permissions for the directory " + dir + " for the group.");
+        final CommandLine commandLIne  = new CommandLine("sudo");
+        commandLIne.addArgument("chmod");
+        commandLIne.addArgument("g+w");
+        commandLIne.addArgument(dir);
+
+        try {
+            this.executor.execute(commandLIne);
+        } catch (IOException ioe) {
+            throw new GenieServerException("Could not make the job working logs directory group writable.");
         }
     }
 
