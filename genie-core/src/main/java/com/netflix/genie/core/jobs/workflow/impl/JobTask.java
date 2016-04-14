@@ -94,6 +94,13 @@ public class JobTask extends GenieBaseTask {
             jobExecEnv.getJobRequest().getId(),
             jobExecEnv.getJobWorkingDir());
 
+        // Print out the current Envrionment to a env file before running the command.
+        writer.write("# Dump the environment to a env.log file" + System.lineSeparator());
+        writer.write("env > " + "${"
+            + JobConstants.GENIE_JOB_DIR_ENV_VAR + "}"
+            + JobConstants.GENIE_ENV_PATH
+            + System.lineSeparator());
+
         // Append new line
         writer.write(System.lineSeparator());
 

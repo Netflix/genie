@@ -158,9 +158,23 @@ public class JobKickoffTask extends GenieBaseTask {
 
         try {
             this.executor.execute(idCheckCommandLine);
-            log.info("User already exists");
+            log.debug("User already exists");
         } catch (IOException ioe) {
-            log.info("User does not exist. Creating it now.");
+            log.debug("User does not exist. Creating it now.");
+
+            // Create the group for the user.
+            final CommandLine groupCreateCommandLine = new CommandLine("sudo");
+            groupCreateCommandLine.addArgument("groupadd");
+            groupCreateCommandLine.addArgument(group);
+
+            // We create the group and ignore the error as it will fail if group already exists.
+            // If the failure is due to some other reason, then user creation will fail and we catch that.
+            try {
+                this.executor.execute(groupCreateCommandLine);
+            } catch (IOException ioexception) {
+                log.debug("Group creation  threw an error as it might already exist");
+            }
+
             final CommandLine userCreateCommandLine = new CommandLine("sudo");
             userCreateCommandLine.addArgument("useradd");
             userCreateCommandLine.addArgument(user);
@@ -191,10 +205,8 @@ public class JobKickoffTask extends GenieBaseTask {
         final String dir,
         final String user) throws GenieException {
 
-        final CommandLine commandLine = new CommandLine("chown");
-        // Don;t need sudo probably as the genie user is the one creating the working directory.
-        //command.add("sudo");
-        //command.add("chown");
+        final CommandLine commandLine = new CommandLine("sudo");
+        commandLine.addArgument("chown");
         commandLine.addArgument("-R");
         commandLine.addArgument(user);
         commandLine.addArgument(dir);
