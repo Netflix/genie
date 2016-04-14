@@ -22,14 +22,10 @@ import com.netflix.genie.client.JobClient;
 import com.netflix.genie.client.impl.GenieConfigurationCommonsConfigImpl;
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.JobRequest;
-import com.netflix.genie.common.exceptions.GenieException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -58,7 +54,6 @@ public final class SampleJobClient {
      *
      * @param args The args to the main application.
      *
-     * @throws GenieException If there is any problem.
      * @throws Exception For all other issues.
      */
     public static void main(final String[] args) throws Exception {
@@ -122,21 +117,21 @@ public final class SampleJobClient {
         //log.info(jobClient.getJobApplications(jobId).toString());
         log.info(jobClient.getJobExecution(jobId).toString());
 
-        final InputStream inputStream1 = jobClient.getJobStdout(jobId);
-        final BufferedReader reader1 = new BufferedReader(new InputStreamReader(inputStream1));
-
-        String line;
-        while ((line = reader1.readLine()) != null) {
-           log.info(line);
-        }
-
-
-        final InputStream inputStream2 = jobClient.getJobStderr(jobId);
-        final BufferedReader reader2 = new BufferedReader(new InputStreamReader(inputStream2));
-
-        while ((line = reader2.readLine()) != null) {
-            log.info(line);
-        }
+//        final InputStream inputStream1 = jobClient.getJobStdout(jobId);
+//        final BufferedReader reader1 = new BufferedReader(new InputStreamReader(inputStream1));
+//
+//        String line;
+//        while ((line = reader1.readLine()) != null) {
+//           log.info(line);
+//        }
+//
+//
+//        final InputStream inputStream2 = jobClient.getJobStderr(jobId);
+//        final BufferedReader reader2 = new BufferedReader(new InputStreamReader(inputStream2));
+//
+//        while ((line = reader2.readLine()) != null) {
+//            log.info(line);
+//        }
 
         final Map<String, String> tagMap = new HashMap<>();
         tagMap.put("tag", "bar,foo");
