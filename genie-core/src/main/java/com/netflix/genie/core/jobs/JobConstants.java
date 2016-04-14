@@ -129,7 +129,10 @@ public final class JobConstants {
      **/
     public static final String GENIE_LOG_PATH = "/genie/logs/genie.log";
 
-
+    /**
+     * Genie env file path.
+     **/
+    public static final String GENIE_ENV_PATH = "/genie/logs/env.log";
 
     /**
      * File Path prefix to be used while creating directories for application files to local dir.

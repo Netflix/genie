@@ -74,7 +74,7 @@ public class JobKickoffTaskUnitTests {
         final String user = "user";
         final String dir = "dir";
         final ArgumentCaptor<CommandLine> argumentCaptor = ArgumentCaptor.forClass(CommandLine.class);
-        final List<String> command = Arrays.asList("chown", "-R", user, dir);
+        final List<String> command = Arrays.asList("sudo", "chown", "-R", user, dir);
 
         this.jobKickoffTask.changeOwnershipOfDirectory(
             dir,
@@ -155,8 +155,8 @@ public class JobKickoffTaskUnitTests {
             log.debug("Ignoring exception to capture arguments.");
         }
 
-        Mockito.verify(this.executor, Mockito.times(2)).execute(argumentCaptor.capture());
-        Assert.assertArrayEquals(command.toArray(), argumentCaptor.getAllValues().get(1).toStrings());
+        Mockito.verify(this.executor, Mockito.times(3)).execute(argumentCaptor.capture());
+        Assert.assertArrayEquals(command.toArray(), argumentCaptor.getAllValues().get(2).toStrings());
     }
 
     /**
