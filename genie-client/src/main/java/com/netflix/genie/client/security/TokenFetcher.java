@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.client.security;
 
-import com.netflix.genie.client.retrofit.TokenService;
+import com.netflix.genie.client.apis.TokenService;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import lombok.extern.slf4j.Slf4j;

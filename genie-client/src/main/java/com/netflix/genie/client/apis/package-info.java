@@ -17,8 +17,9 @@
  */
 
 /**
- * Sample clients that use the Genie client library.
+ * Package containing all the interfaces encapsulating request calls to Genie.
  *
- * @author tgianos
+ * @author amsharma
+ * @since 3.0.0
  */
-package com.netflix.genie.client.sample;
+package com.netflix.genie.client.apis;

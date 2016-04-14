@@ -15,10 +15,10 @@
  *     limitations under the License.
  *
  */
-
 /**
- * Package containing all the interfaces encapsulating request calls to Genie using Retrofit.
+ * Package for implementation of interfaces.
  *
  * @author amsharma
+ * @since 3.0.0
  */
-package com.netflix.genie.client.retrofit;
+package com.netflix.genie.client.impl;

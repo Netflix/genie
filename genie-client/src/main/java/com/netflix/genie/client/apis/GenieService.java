@@ -15,10 +15,14 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.client.retrofit;
+package com.netflix.genie.client.apis;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.netflix.genie.common.dto.Application;
+import com.netflix.genie.common.dto.Cluster;
+import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.Job;
+import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import okhttp3.MultipartBody;
 import okhttp3.ResponseBody;
@@ -37,7 +41,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * An interface for Retrofit to use and generate all the methods needed for the Genie client implementation.
+ * An interface that provides all methods needed for the Genie client implementation.
  *
  * @author amsharma
  * @since 3.0.0
@@ -48,24 +52,6 @@ public interface GenieService {
      * Path to Jobs.
      */
     String JOBS_URL_SUFFIX = "/api/v3/jobs";
-
-    /**
-     * Method to get all jobs from Genie.
-     *
-     * @param options A map of query parameters to be used to filter the jobs.
-     * @return A callable object.
-     */
-    @GET(JOBS_URL_SUFFIX)
-    Call<JsonNode> getJobs(@QueryMap final Map<String, String> options);
-
-    /**
-     * Method to fetch a single job from Genie.
-     *
-     * @param jobId The id of the job to get.
-     * @return A callable object.
-     */
-    @GET(JOBS_URL_SUFFIX + "/{id}")
-    Call<Job> getJob(@Path("id") final String jobId);
 
     /**
      * Method to submit a job to Genie.
@@ -91,14 +77,42 @@ public interface GenieService {
         @Part List<MultipartBody.Part> attachments);
 
     /**
+     * Method to get all jobs from Genie.
+     *
+     * @param options A map of query parameters to be used to filter the jobs.
+     * @return A callable object.
+     */
+    @GET(JOBS_URL_SUFFIX)
+    Call<JsonNode> getJobs(@QueryMap final Map<String, String> options);
+
+    /**
+     * Method to fetch a single job from Genie.
+     *
+     * @param jobId The id of the job to get.
+     * @return A callable object.
+     */
+    @GET(JOBS_URL_SUFFIX + "/{id}")
+    Call<Job> getJob(@Path("id") final String jobId);
+
+    /**
      * Method to fetch the stdout of a job from Genie.
      *
-     * @param jobId The id of the job whose output is desired.
+     * @param jobId The id of the job whose stdout is desired.
      * @return A callable object.
      */
     @Streaming
     @GET(JOBS_URL_SUFFIX + "/{id}/output/stdout")
-    Call<ResponseBody> getJobOutput(@Path("id") final String jobId);
+    Call<ResponseBody> getJobStdout(@Path("id") final String jobId);
+
+    /**
+     * Method to fetch the stderr of a job from Genie.
+     *
+     * @param jobId The id of the job whose stderr is desired.
+     * @return A callable object.
+     */
+    @Streaming
+    @GET(JOBS_URL_SUFFIX + "/{id}/output/stderr")
+    Call<ResponseBody> getJobStderr(@Path("id") final String jobId);
 
     /**
      * Method to get Job status.
@@ -108,6 +122,51 @@ public interface GenieService {
      */
     @GET(JOBS_URL_SUFFIX + "/{id}/status")
     Call<JsonNode> getJobStatus(@Path("id") final String jobId);
+
+    /**
+     * Method to get the cluster information on which a job is run.
+     *
+     * @param jobId The id of the job.
+     * @return A callable object.
+     */
+    @GET(JOBS_URL_SUFFIX + "/{id}/cluster")
+    Call<Cluster> getJobCluster(@Path("id") final String jobId);
+
+    /**
+     * Method to get the command information on which a job is run.
+     *
+     * @param jobId The id of the job.
+     * @return A callable object.
+     */
+    @GET(JOBS_URL_SUFFIX + "/{id}/command")
+    Call<Command> getJobCommand(@Path("id") final String jobId);
+
+    /**
+     * Method to get the JobRequest for a job.
+     *
+     * @param jobId The id of the job.
+     * @return A callable object.
+     */
+    @GET(JOBS_URL_SUFFIX + "/{id}/request")
+    Call<JobRequest> getJobRequest(@Path("id") final String jobId);
+
+    /**
+     * Method to get the execution information for a job.
+     *
+     * @param jobId The id of the job.
+     * @return A callable object.
+     */
+    @GET(JOBS_URL_SUFFIX + "/{id}/execution")
+    Call<JobExecution> getJobExecution(@Path("id") final String jobId);
+
+    /**
+     * Method to get the Applications for a job.
+     *
+     * @param jobId The id of the job.
+     * @return A callable object.
+     */
+    @GET(JOBS_URL_SUFFIX + "/{id}/applications")
+    Call<List<Application>> getJobApplications(@Path("id") final String jobId);
 
     /**
      * Method to send a job kill request to Genie.

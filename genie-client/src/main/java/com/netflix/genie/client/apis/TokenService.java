@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.client.retrofit;
+package com.netflix.genie.client.apis;
 
 import com.netflix.genie.client.security.AccessToken;
 import retrofit2.Call;
@@ -27,7 +27,7 @@ import retrofit2.http.Url;
 import java.util.Map;
 
 /**
- * A retrofit interface to fetch access tokens.
+ * A interface to fetch access tokens.
  *
  * @author amsharma
  * @since 3.0.0
