@@ -22,6 +22,7 @@ import com.netflix.genie.core.events.JobFinishedEvent;
 import com.netflix.genie.core.events.KillJobEvent;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.genie.web.properties.JobOutputMaxProperties;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import com.netflix.spectator.api.Counter;
 import com.netflix.spectator.api.Registry;
@@ -40,6 +41,7 @@ import org.mockito.Mockito;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
@@ -55,16 +57,22 @@ import java.util.UUID;
 public class JobMonitorUnitTests {
 
     private static final long DELAY = 180235L;
+    private static final long MAX_STD_OUT_LENGTH = 108234203L;
+    private static final long MAX_STD_ERR_LENGTH = 18023482L;
 
     private JobMonitor monitor;
     private JobExecution jobExecution;
     private Executor executor;
     private ApplicationEventPublisher publisher;
     private Registry registry;
+    private File stdOut;
+    private File stdErr;
     private Counter successfulCheckRate;
     private Counter timeoutRate;
     private Counter finishedRate;
     private Counter unsuccessfulCheckRate;
+    private Counter stdOutTooLarge;
+    private Counter stdErrTooLarge;
 
     /**
      * Setup for the tests.
@@ -83,7 +91,11 @@ public class JobMonitorUnitTests {
         this.timeoutRate = Mockito.mock(Counter.class);
         this.finishedRate = Mockito.mock(Counter.class);
         this.unsuccessfulCheckRate = Mockito.mock(Counter.class);
+        this.stdOutTooLarge = Mockito.mock(Counter.class);
+        this.stdErrTooLarge = Mockito.mock(Counter.class);
         this.registry = Mockito.mock(Registry.class);
+        this.stdOut = Mockito.mock(File.class);
+        this.stdErr = Mockito.mock(File.class);
         Mockito
             .when(this.registry.counter("genie.jobs.successfulStatusCheck.rate"))
             .thenReturn(this.successfulCheckRate);
@@ -96,8 +108,26 @@ public class JobMonitorUnitTests {
         Mockito
             .when(this.registry.counter("genie.jobs.unsuccessfulStatusCheck.rate"))
             .thenReturn(this.unsuccessfulCheckRate);
+        Mockito
+            .when(this.registry.counter("genie.jobs.stdOutTooLarge.rate"))
+            .thenReturn(this.stdOutTooLarge);
+        Mockito
+            .when(this.registry.counter("genie.jobs.stdErrTooLarge.rate"))
+            .thenReturn(this.stdErrTooLarge);
 
-        this.monitor = new JobMonitor(this.jobExecution, this.executor, this.publisher, this.registry);
+        final JobOutputMaxProperties outputMaxProperties = new JobOutputMaxProperties();
+        outputMaxProperties.setStdOut(MAX_STD_OUT_LENGTH);
+        outputMaxProperties.setStdErr(MAX_STD_ERR_LENGTH);
+
+        this.monitor = new JobMonitor(
+            this.jobExecution,
+            this.stdOut,
+            this.stdErr,
+            this.executor,
+            this.publisher,
+            this.registry,
+            outputMaxProperties
+        );
     }
 
     /**
@@ -107,6 +137,66 @@ public class JobMonitorUnitTests {
     public void cantRunOnWindows() {
         Assume.assumeTrue(SystemUtils.IS_OS_WINDOWS);
         this.monitor.run();
+    }
+
+    /**
+     * Make sure that a process whose std out file has grown too large will attempt to be killed.
+     *
+     * @throws IOException on error
+     */
+    @Test
+    public void canKillProcessOnTooLargeStdOut() throws IOException {
+        Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
+        Mockito
+            .when(this.executor.execute(Mockito.any(CommandLine.class)))
+            .thenReturn(0)
+            .thenReturn(0)
+            .thenReturn(0);
+
+        Mockito.when(this.stdOut.exists()).thenReturn(true);
+        Mockito.when(this.stdOut.length())
+            .thenReturn(MAX_STD_OUT_LENGTH - 1)
+            .thenReturn(MAX_STD_OUT_LENGTH)
+            .thenReturn(MAX_STD_OUT_LENGTH + 1);
+        Mockito.when(this.stdErr.exists()).thenReturn(false);
+
+        for (int i = 0; i < 3; i++) {
+            this.monitor.run();
+        }
+
+        Mockito.verify(this.successfulCheckRate, Mockito.times(2)).increment();
+        Mockito.verify(this.stdOutTooLarge, Mockito.times(1)).increment();
+        Mockito.verify(this.publisher, Mockito.times(1)).publishEvent(Mockito.any(KillJobEvent.class));
+    }
+
+    /**
+     * Make sure that a process whose std err file has grown too large will attempt to be killed.
+     *
+     * @throws IOException on error
+     */
+    @Test
+    public void canKillProcessOnTooLargeStdErr() throws IOException {
+        Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
+        Mockito
+            .when(this.executor.execute(Mockito.any(CommandLine.class)))
+            .thenReturn(0)
+            .thenReturn(0)
+            .thenReturn(0);
+
+        Mockito.when(this.stdOut.exists()).thenReturn(false);
+        Mockito.when(this.stdErr.exists()).thenReturn(true);
+        Mockito.when(this.stdErr.length())
+            .thenReturn(MAX_STD_ERR_LENGTH - 1)
+            .thenReturn(MAX_STD_ERR_LENGTH)
+            .thenReturn(MAX_STD_ERR_LENGTH + 1);
+
+        for (int i = 0; i < 3; i++) {
+            this.monitor.run();
+        }
+
+        Mockito.verify(this.successfulCheckRate, Mockito.times(2)).increment();
+        Mockito.verify(this.stdErrTooLarge, Mockito.times(1)).increment();
+        Mockito.verify(this.publisher, Mockito.times(1)).publishEvent(Mockito.any(KillJobEvent.class));
     }
 
     /**
@@ -122,6 +212,9 @@ public class JobMonitorUnitTests {
             .thenReturn(0)
             .thenThrow(new IOException())
             .thenReturn(0);
+
+        Mockito.when(this.stdOut.exists()).thenReturn(false);
+        Mockito.when(this.stdErr.exists()).thenReturn(false);
 
         for (int i = 0; i < 3; i++) {
             this.monitor.run();
@@ -171,7 +264,15 @@ public class JobMonitorUnitTests {
             .Builder(UUID.randomUUID().toString(), 3808, DELAY, yesterday.getTime())
             .withId(UUID.randomUUID().toString())
             .build();
-        this.monitor = new JobMonitor(this.jobExecution, this.executor, this.publisher, this.registry);
+        this.monitor = new JobMonitor(
+            this.jobExecution,
+            this.stdOut,
+            this.stdErr,
+            this.executor,
+            this.publisher,
+            this.registry,
+            new JobOutputMaxProperties()
+        );
 
         this.monitor.run();
 

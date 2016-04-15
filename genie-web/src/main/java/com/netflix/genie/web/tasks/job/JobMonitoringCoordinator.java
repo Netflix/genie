@@ -21,7 +21,9 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.events.JobFinishedEvent;
 import com.netflix.genie.core.events.JobStartedEvent;
+import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.services.JobSearchService;
+import com.netflix.genie.web.properties.JobOutputMaxProperties;
 import com.netflix.spectator.api.Counter;
 import com.netflix.spectator.api.Registry;
 import lombok.extern.slf4j.Slf4j;
@@ -30,9 +32,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.io.Resource;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -55,18 +60,23 @@ public class JobMonitoringCoordinator {
     private final ApplicationEventPublisher publisher;
     private final Executor executor;
     private final Registry registry;
+    private final File jobsDir;
+    private final JobOutputMaxProperties outputMaxProperties;
 
     private final Counter unableToCancel;
 
     /**
      * Constructor.
      *
-     * @param hostName         The name of the host this Genie process is running on
-     * @param jobSearchService The search service to use to find jobs
-     * @param publisher        The event publisher to use to publish events
-     * @param scheduler        The task scheduler to use to register scheduling of job checkers
-     * @param executor         The executor to use to launch processes
-     * @param registry         The metrics registry
+     * @param hostName            The name of the host this Genie process is running on
+     * @param jobSearchService    The search service to use to find jobs
+     * @param publisher           The event publisher to use to publish events
+     * @param scheduler           The task scheduler to use to register scheduling of job checkers
+     * @param executor            The executor to use to launch processes
+     * @param registry            The metrics registry
+     * @param jobsDir             The directory where job output is stored
+     * @param outputMaxProperties The properties for the maximum length of job output files
+     * @throws IOException on error with the filesystem
      */
     @Autowired
     public JobMonitoringCoordinator(
@@ -75,8 +85,10 @@ public class JobMonitoringCoordinator {
         final ApplicationEventPublisher publisher,
         final TaskScheduler scheduler,
         final Executor executor,
-        final Registry registry
-    ) {
+        final Registry registry,
+        final Resource jobsDir,
+        final JobOutputMaxProperties outputMaxProperties
+    ) throws IOException {
         this.jobMonitors = new HashMap<>();
         this.hostName = hostName;
         this.jobSearchService = jobSearchService;
@@ -84,6 +96,8 @@ public class JobMonitoringCoordinator {
         this.scheduler = scheduler;
         this.executor = executor;
         this.registry = registry;
+        this.jobsDir = jobsDir.getFile();
+        this.outputMaxProperties = outputMaxProperties;
 
         // Automatically track the number of jobs running on this node
         this.registry.mapSize("genie.jobs.running.gauge", this.jobMonitors);
@@ -158,7 +172,18 @@ public class JobMonitoringCoordinator {
     }
 
     private void scheduleMonitor(final JobExecution jobExecution) {
-        final JobMonitor monitor = new JobMonitor(jobExecution, this.executor, this.publisher, this.registry);
+        final File stdOut = new File(this.jobsDir, jobExecution.getId() + "/" + JobConstants.STDOUT_LOG_FILE_NAME);
+        final File stdErr = new File(this.jobsDir, jobExecution.getId() + "/" + JobConstants.STDERR_LOG_FILE_NAME);
+
+        final JobMonitor monitor = new JobMonitor(
+            jobExecution,
+            stdOut,
+            stdErr,
+            this.executor,
+            this.publisher,
+            this.registry,
+            this.outputMaxProperties
+        );
         final ScheduledFuture<?> future;
         switch (monitor.getScheduleType()) {
             case TRIGGER:
