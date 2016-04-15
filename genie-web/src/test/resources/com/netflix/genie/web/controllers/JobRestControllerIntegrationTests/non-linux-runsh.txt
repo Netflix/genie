@@ -77,6 +77,8 @@ source ${GENIE_JOB_DIR}/genie/command/cmd1/setupfile
 # Sourcing setup file specified in job request
 source ${GENIE_JOB_DIR}/jobsetupfile
 
+# Dump the environment to a env.log file
+env > ${GENIE_JOB_DIR}/genie/logs/env.log
 
 # Kick off the command in background mode and wait for it using its pid
 /bin/bash -c 'echo hello world' > stdout 2> stderr &

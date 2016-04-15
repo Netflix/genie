@@ -104,6 +104,9 @@ public class JobKickoffTask extends GenieBaseTask {
         final List<String> command = new ArrayList<>();
         if (this.isRunAsUserEnabled) {
             changeOwnershipOfDirectory(this.jobWorkingDirectory, this.jobExecEnv.getJobRequest().getUser());
+
+            // This is needed because the genie.log file is still generated as the user running Genie system.
+            makeDirGroupWritable(this.jobWorkingDirectory + "/genie/logs");
             command.add("sudo");
             command.add("-u");
             command.add(this.jobExecEnv.getJobRequest().getUser());
@@ -140,6 +143,21 @@ public class JobKickoffTask extends GenieBaseTask {
         }
     }
 
+    // Helper method to add write permissions to a directory for the group owner
+    private void makeDirGroupWritable(final String dir) throws GenieServerException {
+        log.debug("Adding write permissions for the directory " + dir + " for the group.");
+        final CommandLine commandLIne  = new CommandLine("sudo");
+        commandLIne.addArgument("chmod");
+        commandLIne.addArgument("g+w");
+        commandLIne.addArgument(dir);
+
+        try {
+            this.executor.execute(commandLIne);
+        } catch (IOException ioe) {
+            throw new GenieServerException("Could not make the job working logs directory group writable.");
+        }
+    }
+
     /**
      * Create user on the system.
      *
@@ -158,9 +176,23 @@ public class JobKickoffTask extends GenieBaseTask {
 
         try {
             this.executor.execute(idCheckCommandLine);
-            log.info("User already exists");
+            log.debug("User already exists");
         } catch (IOException ioe) {
-            log.info("User does not exist. Creating it now.");
+            log.debug("User does not exist. Creating it now.");
+
+            // Create the group for the user.
+            final CommandLine groupCreateCommandLine = new CommandLine("sudo");
+            groupCreateCommandLine.addArgument("groupadd");
+            groupCreateCommandLine.addArgument(group);
+
+            // We create the group and ignore the error as it will fail if group already exists.
+            // If the failure is due to some other reason, then user creation will fail and we catch that.
+            try {
+                this.executor.execute(groupCreateCommandLine);
+            } catch (IOException ioexception) {
+                log.debug("Group creation  threw an error as it might already exist");
+            }
+
             final CommandLine userCreateCommandLine = new CommandLine("sudo");
             userCreateCommandLine.addArgument("useradd");
             userCreateCommandLine.addArgument(user);
@@ -191,10 +223,8 @@ public class JobKickoffTask extends GenieBaseTask {
         final String dir,
         final String user) throws GenieException {
 
-        final CommandLine commandLine = new CommandLine("chown");
-        // Don;t need sudo probably as the genie user is the one creating the working directory.
-        //command.add("sudo");
-        //command.add("chown");
+        final CommandLine commandLine = new CommandLine("sudo");
+        commandLine.addArgument("chown");
         commandLine.addArgument("-R");
         commandLine.addArgument(user);
         commandLine.addArgument(dir);
