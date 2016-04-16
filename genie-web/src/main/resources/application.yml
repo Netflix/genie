@@ -25,18 +25,26 @@ eureka:
 
 genie:
   jobs:
+    archive:
+      location: base_archival_location_path
     createuser:
       enabled: false
     dir:
       location: file:///tmp/genie/jobs/
     forwarding:
       enabled: true
+    output:
+      max:
+        stdOut: 8589934592
+        stdErr: 8589934592
     runasuser:
       enabled: false
-    archive:
-      location: base_archival_location_path
   leader:
     enabled: false
+  mail:
+    fromAddress: no-reply-genie@geniehost.com
+    #user:
+    #password:
   redis:
     enabled: false
   security:
@@ -54,10 +62,6 @@ genie:
   tasks:
     pool:
       size: 10
-  mail:
-    fromAddress: no-reply-genie@geniehost.com
-    #user:
-    #password:
 
 management:
   context-path: /actuator

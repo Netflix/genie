@@ -23,6 +23,7 @@ import com.netflix.genie.core.events.JobFinishedEvent;
 import com.netflix.genie.core.events.KillJobEvent;
 import com.netflix.genie.core.util.ProcessChecker;
 import com.netflix.genie.core.util.UnixProcessChecker;
+import com.netflix.genie.web.properties.JobOutputMaxProperties;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import com.netflix.genie.web.tasks.node.NodeTask;
 import com.netflix.spectator.api.Counter;
@@ -36,6 +37,7 @@ import org.springframework.scheduling.Trigger;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -53,27 +55,39 @@ public class JobMonitor implements NodeTask {
     private final JobExecution execution;
     private final ProcessChecker processChecker;
     private final ApplicationEventPublisher publisher;
-    private int errorCount;
+    private final File stdOut;
+    private final File stdErr;
+    private final long maxStdOutLength;
+    private final long maxStdErrLength;
 
     // Metrics
     private final Counter successfulCheckRate;
     private final Counter timeoutRate;
     private final Counter finishedRate;
     private final Counter unsuccessfulCheckRate;
+    private final Counter stdOutTooLarge;
+    private final Counter stdErrTooLarge;
+    private int errorCount;
 
     /**
      * Constructor.
      *
-     * @param execution The job execution object including the pid
-     * @param executor  The process executor to use
-     * @param publisher The event publisher to use when a job isn't running anymore
-     * @param registry  The metrics event registry
+     * @param execution           The job execution object including the pid
+     * @param stdOut              The std out output file
+     * @param stdErr              The std err output file
+     * @param executor            The process executor to use
+     * @param publisher           The event publisher to use when a job isn't running anymore
+     * @param registry            The metrics event registry
+     * @param outputMaxProperties The properties which say how long job output files can be at their max
      */
     public JobMonitor(
         @Valid final JobExecution execution,
+        @NotNull final File stdOut,
+        @NotNull final File stdErr,
         @NotNull final Executor executor,
         @NotNull final ApplicationEventPublisher publisher,
-        @NotNull final Registry registry
+        @NotNull final Registry registry,
+        @NotNull final JobOutputMaxProperties outputMaxProperties
     ) {
         if (!SystemUtils.IS_OS_UNIX) {
             throw new UnsupportedOperationException("Genie doesn't currently support " + SystemUtils.OS_NAME);
@@ -83,10 +97,19 @@ public class JobMonitor implements NodeTask {
         this.execution = execution;
         this.publisher = publisher;
         this.processChecker = new UnixProcessChecker(execution.getProcessId(), executor, execution.getTimeout());
+
+        this.stdOut = stdOut;
+        this.stdErr = stdErr;
+
+        this.maxStdOutLength = outputMaxProperties.getStdOut();
+        this.maxStdErrLength = outputMaxProperties.getStdErr();
+
         this.successfulCheckRate = registry.counter("genie.jobs.successfulStatusCheck.rate");
         this.timeoutRate = registry.counter("genie.jobs.timeout.rate");
         this.finishedRate = registry.counter("genie.jobs.finished.rate");
         this.unsuccessfulCheckRate = registry.counter("genie.jobs.unsuccessfulStatusCheck.rate");
+        this.stdOutTooLarge = registry.counter("genie.jobs.stdOutTooLarge.rate");
+        this.stdErrTooLarge = registry.counter("genie.jobs.stdErrTooLarge.rate");
     }
 
     /**
@@ -102,6 +125,19 @@ public class JobMonitor implements NodeTask {
             if (this.errorCount != 0) {
                 this.errorCount = 0;
             }
+
+            if (this.stdOut.exists() && this.stdOut.length() > this.maxStdOutLength) {
+                this.publisher.publishEvent(new KillJobEvent(this.execution.getId(), "Std out length exceeded", this));
+                this.stdOutTooLarge.increment();
+                return;
+            }
+
+            if (this.stdErr.exists() && this.stdErr.length() > this.maxStdErrLength) {
+                this.publisher.publishEvent(new KillJobEvent(this.execution.getId(), "Std err length exceeded", this));
+                this.stdErrTooLarge.increment();
+                return;
+            }
+
             this.successfulCheckRate.increment();
         } catch (final GenieTimeoutException gte) {
             log.info("Job {} has timed out", this.execution.getId(), gte);

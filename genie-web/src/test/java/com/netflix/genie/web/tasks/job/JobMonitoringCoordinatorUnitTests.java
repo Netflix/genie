@@ -25,17 +25,23 @@ import com.netflix.genie.core.events.JobStartedEvent;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.genie.web.properties.JobOutputMaxProperties;
 import com.netflix.spectator.api.Counter;
 import com.netflix.spectator.api.Registry;
 import org.apache.commons.exec.Executor;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.core.io.Resource;
 import org.springframework.scheduling.TaskScheduler;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Set;
@@ -53,6 +59,13 @@ public class JobMonitoringCoordinatorUnitTests {
 
     private static final String HOSTNAME = UUID.randomUUID().toString();
     private static final long DELAY = 38023L;
+
+    /**
+     * Temporary folder that will be deleted at the end of tests.
+     */
+    @Rule
+    public TemporaryFolder folder = new TemporaryFolder();
+
     private TaskScheduler scheduler;
     private JobMonitoringCoordinator coordinator;
     private JobSearchService jobSearchService;
@@ -61,9 +74,11 @@ public class JobMonitoringCoordinatorUnitTests {
 
     /**
      * Setup for the tests.
+     *
+     * @throws IOException on error
      */
     @Before
-    public void setup() {
+    public void setup() throws IOException {
         final Calendar cal = Calendar.getInstance(JobConstants.UTC);
         cal.add(Calendar.DAY_OF_YEAR, 1);
         this.tomorrow = cal.getTime();
@@ -75,13 +90,21 @@ public class JobMonitoringCoordinatorUnitTests {
         this.unableToCancel = Mockito.mock(Counter.class);
         Mockito.when(registry.counter(Mockito.anyString())).thenReturn(this.unableToCancel);
 
+        final File jobsFile = this.folder.newFolder();
+        final Resource jobsDir = Mockito.mock(Resource.class);
+        Mockito.when(jobsDir.getFile()).thenReturn(jobsFile);
+
+        final JobOutputMaxProperties outputMaxProperties = new JobOutputMaxProperties();
+
         this.coordinator = new JobMonitoringCoordinator(
             HOSTNAME,
             this.jobSearchService,
             publisher,
             this.scheduler,
             executor,
-            registry
+            registry,
+            jobsDir,
+            outputMaxProperties
         );
     }
 
