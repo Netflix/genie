@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2015 Netflix, Inc.
+ *  Copyright 2016 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,10 +15,9 @@
  *     limitations under the License.
  *
  */
-
 /**
- * Sample clients that use the Genie client library.
+ * A package that contains all interceptors to be added to modify outgoing requests and incoming responses.
  *
- * @author tgianos
+ * @author amsharma
  */
-package com.netflix.genie.client.sample;
+package com.netflix.genie.client.interceptor;

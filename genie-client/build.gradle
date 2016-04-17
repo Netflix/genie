@@ -6,7 +6,11 @@ dependencies {
      *******************************/
 
     compile project(":genie-common")
-    compile("org.codehaus.groovy:groovy")
+
+    compile("com.squareup.retrofit2:retrofit:2.0.1")
+    compile("com.squareup.retrofit2:converter-jackson:2.0.1")
+    compile("org.apache.commons:commons-configuration2:2.0")
+    compile("commons-beanutils:commons-beanutils:1.9.2")
 
     /*******************************
      * Provided Dependencies

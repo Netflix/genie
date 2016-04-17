@@ -15,10 +15,9 @@
  *     limitations under the License.
  *
  */
-
 /**
- * Client library for Genie.
+ * Package showing samples of how to use Genie Java client.
  *
- * @author tgianos
+ * @author amsharma
  */
-package com.netflix.genie.client;
+package com.netflix.genie.client.sample;

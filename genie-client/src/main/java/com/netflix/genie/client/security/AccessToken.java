@@ -15,10 +15,31 @@
  *     limitations under the License.
  *
  */
+package com.netflix.genie.client.security;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
- * Client library for Genie.
+ * Class that encapsulates the OAuth credentials.
  *
- * @author tgianos
+ * @author amsharma
+ * @since 3.0.0
  */
-package com.netflix.genie.client;
+@Getter
+@Setter
+public class AccessToken {
+
+    // The type of the token
+    @JsonProperty("token_type")
+    private String tokenType;
+
+    // The accessToken
+    @JsonProperty("access_token")
+    private String accessToken;
+
+    // Time to expire from creation
+    @JsonProperty("expires_in")
+    private int expiresIn;
+}

@@ -15,10 +15,10 @@
  *     limitations under the License.
  *
  */
-
 /**
- * Client library for Genie.
+ * Package for implementation of interfaces.
  *
- * @author tgianos
+ * @author amsharma
+ * @since 3.0.0
  */
-package com.netflix.genie.client;
+package com.netflix.genie.client.impl;

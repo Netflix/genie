@@ -17,8 +17,9 @@
  */
 
 /**
- * Client library for Genie.
+ * Package containing all the interfaces encapsulating request calls to Genie.
  *
- * @author tgianos
+ * @author amsharma
+ * @since 3.0.0
  */
-package com.netflix.genie.client;
+package com.netflix.genie.client.apis;

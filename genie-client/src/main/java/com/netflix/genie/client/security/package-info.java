@@ -17,8 +17,9 @@
  */
 
 /**
- * Client library for Genie.
+ * Package containing classes providing security details for the Genie clients.
  *
- * @author tgianos
+ * @author amsharma
+ * @since 3.0.0
  */
-package com.netflix.genie.client;
+package com.netflix.genie.client.security;
