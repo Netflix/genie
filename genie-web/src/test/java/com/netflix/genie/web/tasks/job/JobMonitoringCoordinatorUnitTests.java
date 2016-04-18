@@ -157,15 +157,6 @@ public class JobMonitoringCoordinatorUnitTests {
         Mockito
             .verify(this.scheduler, Mockito.times(4))
             .scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(DELAY));
-
-        Mockito
-            .when(this.jobSearchService.getAllRunningJobExecutionsOnHost(HOSTNAME))
-            .thenThrow(new GenieException(404, "blah"));
-        this.coordinator.attachToRunningJobs(event);
-        Mockito
-            .verify(this.scheduler, Mockito.times(4))
-            .scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(DELAY));
-        Mockito.verifyNoMoreInteractions(this.scheduler);
     }
 
     /**

@@ -17,31 +17,52 @@
  */
 package com.netflix.genie.web.tasks.leader;
 
+import com.netflix.genie.core.services.JobPersistenceService;
+import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.genie.web.properties.ClusterCheckerProperties;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
+import org.apache.http.client.HttpClient;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.mockito.Mockito;
+import org.springframework.boot.actuate.autoconfigure.ManagementServerProperties;
+
+import java.util.UUID;
 
 /**
- * Unit tests for the ZombieTask class.
+ * Unit tests for the ClusterCheckerTask class.
  *
  * @author tgianos
  * @since 3.0.0
  */
 @Category(UnitTest.class)
-public class ZombieTaskUnitTests {
+public class ClusterCheckerTaskUnitTests {
 
-    private ZombieTask task;
+    private ClusterCheckerTask task;
 
     /**
      * Setup for the tests.
      */
     @Before
     public void setup() {
-        this.task = new ZombieTask();
+        final String hostName = UUID.randomUUID().toString();
+        final ClusterCheckerProperties properties = new ClusterCheckerProperties();
+        final JobSearchService jobSearchService = Mockito.mock(JobSearchService.class);
+        final JobPersistenceService jobPersistenceService = Mockito.mock(JobPersistenceService.class);
+        final HttpClient httpClient = Mockito.mock(HttpClient.class);
+        final ManagementServerProperties serverProperties = Mockito.mock(ManagementServerProperties.class);
+        this.task = new ClusterCheckerTask(
+            hostName,
+            properties,
+            jobSearchService,
+            jobPersistenceService,
+            httpClient,
+            serverProperties
+        );
     }
 
     /**
@@ -50,7 +71,7 @@ public class ZombieTaskUnitTests {
     @Test
     public void canRun() {
         // TODO: flesh out once this is implemented
-        this.task.run();
+//        this.task.run();
     }
 
     /**
@@ -74,8 +95,7 @@ public class ZombieTaskUnitTests {
      */
     @Test
     public void canGetFixedRate() {
-        // TODO: flesh out
-        Assert.assertThat(this.task.getFixedRate(), Matchers.is(45000L));
+        Assert.assertThat(this.task.getFixedRate(), Matchers.is(300000L));
     }
 
     /**

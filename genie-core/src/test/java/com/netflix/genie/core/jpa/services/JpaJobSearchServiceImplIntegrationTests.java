@@ -172,6 +172,21 @@ public class JpaJobSearchServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
+     * Make sure we can get the host names of nodes currently running jobs.
+     */
+    @Test
+    public void canFindHostnamesOfRunningJobs() {
+        final String hostA = "a.netflix.com";
+        final String hostB = "b.netflix.com";
+        final String hostC = "c.netflix.com";
+
+        final Set<String> hostNames = this.service.getAllHostsRunningJobs();
+        Assert.assertThat(hostNames.size(), Matchers.is(2));
+        Assert.assertThat(hostNames, Matchers.hasItem(hostA));
+        Assert.assertThat(hostNames, Matchers.hasItem(hostB));
+    }
+
+    /**
      * Make sure the getting job method works.
      *
      * @throws GenieException on error

@@ -84,9 +84,15 @@ public interface JobSearchService {
      *
      * @param hostname The host name to search for. Not null or empty.
      * @return All the jobs running on the host as a set of JobExecution objects
-     * @throws GenieException on error
      */
-    Set<JobExecution> getAllRunningJobExecutionsOnHost(@NotBlank final String hostname) throws GenieException;
+    Set<JobExecution> getAllRunningJobExecutionsOnHost(@NotBlank final String hostname);
+
+    /**
+     * Get a set of host names which are currently running jobs in the Genie system.
+     *
+     * @return The set of hosts with jobs currently in "RUNNING" state
+     */
+    Set<String> getAllHostsRunningJobs();
 
     /**
      * Get job information for given job id.
