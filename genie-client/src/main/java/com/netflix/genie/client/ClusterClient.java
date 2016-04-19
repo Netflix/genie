@@ -18,6 +18,7 @@
 package com.netflix.genie.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.github.fge.jsonpatch.JsonPatch;
 import com.netflix.genie.client.apis.ClusterService;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.exceptions.GenieException;
@@ -99,16 +100,16 @@ public class ClusterClient extends BaseGenieClient {
      * @throws IOException If the response received is not 2xx.
      */
     public List<Cluster> getClusters(final Map<String, String> options) throws IOException, GenieException {
-        final JsonNode jnode =  clusterService.getClusters(options).execute().body()
-            .get("_embedded")
-            .get("clusterList");
 
         final List<Cluster> clusterList = new ArrayList<>();
-        for (final JsonNode objNode : jnode) {
-            final Cluster cluster  = mapper.treeToValue(objNode, Cluster.class);
-            clusterList.add(cluster);
+        final JsonNode jnode =  clusterService.getClusters(options).execute().body()
+            .get("_embedded");
+        if (jnode != null) {
+            for (final JsonNode objNode : jnode.get("clusterList")) {
+                final Cluster cluster  = mapper.treeToValue(objNode, Cluster.class);
+                clusterList.add(cluster);
+            }
         }
-
         return clusterList;
     }
 
@@ -153,6 +154,48 @@ public class ClusterClient extends BaseGenieClient {
         clusterService.deleteAllClusters().execute();
     }
 
+    /**
+     * Method to patch a cluster using json patch instructions.
+     *
+     * @param clusterId The id of the cluster.
+     * @param patch The patch object specifying all the instructions.
+     *
+     * @throws GenieException       For any other error.
+     * @throws IOException If the response received is not 2xx.
+     */
+    public void patchCluster(final String clusterId, final JsonPatch patch) throws IOException, GenieException {
+        if (StringUtils.isEmpty(clusterId)) {
+            throw new GeniePreconditionException("Missing required parameter: clusterId.");
+        }
+
+        if (patch == null) {
+            throw new GeniePreconditionException("Patch cannot be null");
+        }
+
+        clusterService.patchCluster(clusterId, patch).execute();
+    }
+
+    /**
+     * Method to updated a cluster.
+     *
+     * @param clusterId The id of the cluster.
+     * @param cluster The updated cluster object to use.
+     *
+     * @throws GenieException       For any other error.
+     * @throws IOException If the response received is not 2xx.
+     */
+    public void updateCluster(final String clusterId, final Cluster cluster) throws IOException, GenieException {
+        if (StringUtils.isEmpty(clusterId)) {
+            throw new GeniePreconditionException("Missing required parameter: clusterId.");
+        }
+
+        if (cluster == null) {
+            throw new GeniePreconditionException("Patch cannot be null");
+        }
+
+        clusterService.updateCluster(clusterId, cluster).execute();
+    }
+
     /****************** Methods to manipulate configs for a cluster   *********************/
 
     /**
@@ -192,7 +235,7 @@ public class ClusterClient extends BaseGenieClient {
             throw new GeniePreconditionException("Configs cannot be null or empty");
         }
 
-        clusterService.addConfigsToCluster(clusterId, configs);
+        clusterService.addConfigsToCluster(clusterId, configs).execute();
     }
 
     /**
@@ -215,7 +258,7 @@ public class ClusterClient extends BaseGenieClient {
             throw new GeniePreconditionException("Configs cannot be null or empty");
         }
 
-        clusterService.updateConfigsForCluster(clusterId, configs);
+        clusterService.updateConfigsForCluster(clusterId, configs).execute();
     }
 
     /**
@@ -233,7 +276,7 @@ public class ClusterClient extends BaseGenieClient {
             throw new GeniePreconditionException("Missing required parameter: clusterId.");
         }
 
-        clusterService.removeAllConfigsForCluster(clusterId);
+        clusterService.removeAllConfigsForCluster(clusterId).execute();
     }
 
     /****************** Methods to manipulate tags for a cluster   *********************/
@@ -275,7 +318,7 @@ public class ClusterClient extends BaseGenieClient {
             throw new GeniePreconditionException("Tags cannot be null or empty");
         }
 
-        clusterService.addTagsToCluster(clusterId, tags);
+        clusterService.addTagsToCluster(clusterId, tags).execute();
     }
 
     /**
@@ -298,7 +341,7 @@ public class ClusterClient extends BaseGenieClient {
             throw new GeniePreconditionException("Tags cannot be null or empty");
         }
 
-        clusterService.updateTagsForCluster(clusterId, tags);
+        clusterService.updateTagsForCluster(clusterId, tags).execute();
     }
 
     /**
@@ -322,7 +365,7 @@ public class ClusterClient extends BaseGenieClient {
             throw new GeniePreconditionException("Missing required parameter: tag.");
         }
 
-        clusterService.removeTagForCluster(clusterId, tag);
+        clusterService.removeTagForCluster(clusterId, tag).execute();
     }
 
     /**
@@ -340,6 +383,6 @@ public class ClusterClient extends BaseGenieClient {
             throw new GeniePreconditionException("Missing required parameter: clusterId.");
         }
 
-        clusterService.removeAllTagsForCluster(clusterId);
+        clusterService.removeAllTagsForCluster(clusterId).execute();
     }
 }

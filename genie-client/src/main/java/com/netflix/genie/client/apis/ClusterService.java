@@ -18,11 +18,13 @@
 package com.netflix.genie.client.apis;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.github.fge.jsonpatch.JsonPatch;
 import com.netflix.genie.common.dto.Cluster;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
@@ -99,6 +101,17 @@ public interface ClusterService {
      */
     @DELETE(CLUSTER_URL_SUFFIX)
     Call<Void> deleteAllClusters();
+
+    /**
+     * Patch a cluster using JSON Patch.
+     *
+     * @param clusterId    The id of the cluster to patch
+     * @param patch The JSON Patch instructions
+     *
+     * @return A callable object.
+     */
+    @PATCH(CLUSTER_URL_SUFFIX + "/{id}")
+    Call<Void> patchCluster(@Path("id") final String clusterId, @Body final JsonPatch patch);
 
     /****************** Methods to manipulate commands for a cluster   *********************/
 

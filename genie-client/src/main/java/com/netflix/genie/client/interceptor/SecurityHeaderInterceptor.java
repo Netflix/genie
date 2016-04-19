@@ -20,6 +20,7 @@ package com.netflix.genie.client.interceptor;
 import com.netflix.genie.client.security.AccessToken;
 import com.netflix.genie.client.security.TokenFetcher;
 import com.netflix.genie.common.exceptions.GenieException;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -31,6 +32,7 @@ import java.io.IOException;
  *
  * @author amsharma
  */
+@Slf4j
 public class SecurityHeaderInterceptor implements Interceptor {
 
     private final TokenFetcher tokenFetcher;
@@ -43,6 +45,7 @@ public class SecurityHeaderInterceptor implements Interceptor {
     public SecurityHeaderInterceptor(
         final TokenFetcher tokenFetcher
         ) {
+        log.debug("Constructor called.");
         this.tokenFetcher = tokenFetcher;
     }
 
@@ -59,8 +62,7 @@ public class SecurityHeaderInterceptor implements Interceptor {
                 .addHeader("Authorization", accessToken.getTokenType() + " " + accessToken.getAccessToken())
                 .build();
 
-//            System.out.println(String.format("Sending request %s on %s%n%s",
-//                newRequest.url(), chain.connection(), newRequest.headers()));
+            log.debug("Sending request {} on {} {} {}", newRequest.url(), chain.connection(), newRequest.headers());
 
             return chain.proceed(newRequest);
         } catch (GenieException e) {
