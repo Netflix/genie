@@ -18,6 +18,7 @@
 package com.netflix.genie.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.netflix.genie.client.apis.JobService;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
@@ -25,9 +26,9 @@ import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.netflix.genie.common.exceptions.GenieServerException;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -37,8 +38,6 @@ import retrofit2.Response;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -55,6 +54,8 @@ public class JobClient extends BaseGenieClient {
     private static final String ATTACHMENT = "attachment";
     private static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
 
+    private JobService jobService;
+
     /**
      * Constructor.
      *
@@ -66,6 +67,7 @@ public class JobClient extends BaseGenieClient {
         final GenieConfiguration configuration
     ) throws GenieException {
         super(configuration);
+        jobService = retrofit.create(JobService.class);
     }
 
     /**
@@ -84,7 +86,7 @@ public class JobClient extends BaseGenieClient {
         if (jobRequest == null) {
             throw new GeniePreconditionException("Job Request cannot be null.");
         }
-        return getIdFromLocation(genieService.submitJob(jobRequest).execute().headers().get("location"));
+        return getIdFromLocation(jobService.submitJob(jobRequest).execute().headers().get("location"));
     }
 
     /**
@@ -118,7 +120,7 @@ public class JobClient extends BaseGenieClient {
             attachmentFiles.add(part);
         }
 
-        final Response response = genieService.submitJobWithAttachments(jobRequest, attachmentFiles).execute();
+        final Response response = jobService.submitJobWithAttachments(jobRequest, attachmentFiles).execute();
         return getIdFromLocation(response.headers().get("location"));
     }
 
@@ -129,7 +131,7 @@ public class JobClient extends BaseGenieClient {
      * @throws GenieException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
-    public List<Job> getJobs() throws IOException, GenieException {
+    public List<JobSearchResult> getJobs() throws IOException, GenieException {
         return this.getJobs(Collections.emptyMap());
     }
 
@@ -142,35 +144,19 @@ public class JobClient extends BaseGenieClient {
      * @throws GenieException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
-    public List<Job> getJobs(final Map<String, String> options) throws IOException, GenieException {
+    public List<JobSearchResult> getJobs(final Map<String, String> options) throws IOException, GenieException {
 
-        try {
-            final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        final JsonNode jnode =  jobService.getJobs(options).execute().body()
+            .get("_embedded")
+            .get("jobSearchResultList");
 
-            final JsonNode content =  genieService.getJobs(options).execute().body();
-
-            final ArrayList<Job> jobList = new ArrayList<>();
-            for (Map<String, String> job: getListFromHalObject(content, "jobSearchResultList")) {
-                jobList.add(
-                    new Job.Builder(
-                        job.get("name"),
-                        job.get("user"),
-                        job.get("version"),
-                        job.get("commandArgs")
-                    )
-                        .withId(job.get("id"))
-                        .withStatus(JobStatus.parse(job.get("status")))
-                        .withClusterName(job.get("clusterName"))
-                        .withCommandName(job.get("commandName"))
-                        .withStarted(dateFormatter.parse(job.get("started")))
-                        .withFinished(dateFormatter.parse(job.get("finished")))
-                        .build());
-            }
-            return jobList;
-
-        } catch (ParseException e) {
-            throw new GenieServerException("Incorrect Date format returned by Genie server.");
+        final List<JobSearchResult> jobList = new ArrayList<>();
+        for (final JsonNode objNode : jnode) {
+            final JobSearchResult jobSearchResult  = mapper.treeToValue(objNode, JobSearchResult.class);
+            jobList.add(jobSearchResult);
         }
+
+        return jobList;
     }
 
     /**
@@ -187,7 +173,7 @@ public class JobClient extends BaseGenieClient {
         if (StringUtils.isEmpty(jobId)) {
             throw new GeniePreconditionException("Missing required parameter: jobId.");
         }
-        return genieService.getJob(jobId).execute().body();
+        return jobService.getJob(jobId).execute().body();
     }
 
     /**
@@ -204,7 +190,7 @@ public class JobClient extends BaseGenieClient {
         if (StringUtils.isEmpty(jobId)) {
             throw new GeniePreconditionException("Missing required parameter: jobId.");
         }
-        return genieService.getJobCluster(jobId).execute().body();
+        return jobService.getJobCluster(jobId).execute().body();
     }
 
     /**
@@ -221,7 +207,7 @@ public class JobClient extends BaseGenieClient {
         if (StringUtils.isEmpty(jobId)) {
             throw new GeniePreconditionException("Missing required parameter: jobId.");
         }
-        return genieService.getJobCommand(jobId).execute().body();
+        return jobService.getJobCommand(jobId).execute().body();
     }
 
     /**
@@ -238,7 +224,7 @@ public class JobClient extends BaseGenieClient {
         if (StringUtils.isEmpty(jobId)) {
             throw new GeniePreconditionException("Missing required parameter: jobId.");
         }
-        return genieService.getJobRequest(jobId).execute().body();
+        return jobService.getJobRequest(jobId).execute().body();
     }
 
     /**
@@ -255,7 +241,7 @@ public class JobClient extends BaseGenieClient {
         if (StringUtils.isEmpty(jobId)) {
             throw new GeniePreconditionException("Missing required parameter: jobId.");
         }
-        return genieService.getJobExecution(jobId).execute().body();
+        return jobService.getJobExecution(jobId).execute().body();
     }
 
     /**
@@ -272,7 +258,7 @@ public class JobClient extends BaseGenieClient {
         if (StringUtils.isEmpty(jobId)) {
             throw new GeniePreconditionException("Missing required parameter: jobId.");
         }
-        return genieService.getJobApplications(jobId).execute().body();
+        return jobService.getJobApplications(jobId).execute().body();
     }
 
     /**
@@ -291,7 +277,7 @@ public class JobClient extends BaseGenieClient {
         if (!this.getJobStatus(jobId).equals(JobStatus.SUCCEEDED)) {
             throw new GenieException(400, "Cannot request output of a job whose status is not SUCCEEDED.");
         }
-        return genieService.getJobStdout(jobId).execute().body().byteStream();
+        return jobService.getJobStdout(jobId).execute().body().byteStream();
     }
 
     /**
@@ -310,7 +296,7 @@ public class JobClient extends BaseGenieClient {
         if (!this.getJobStatus(jobId).equals(JobStatus.SUCCEEDED)) {
             throw new GenieException(400, "Cannot request output of a job whose status is not SUCCEEDED.");
         }
-        return genieService.getJobStderr(jobId).execute().body().byteStream();
+        return jobService.getJobStderr(jobId).execute().body().byteStream();
     }
 
     /**
@@ -325,7 +311,7 @@ public class JobClient extends BaseGenieClient {
     public JobStatus getJobStatus(
         final String jobId
     ) throws IOException, GenieException {
-        final JsonNode jsonNode = genieService.getJobStatus(jobId).execute().body();
+        final JsonNode jsonNode = jobService.getJobStatus(jobId).execute().body();
         return JobStatus.parse(jsonNode.get(STATUS).asText());
     }
 
@@ -336,7 +322,7 @@ public class JobClient extends BaseGenieClient {
      * @throws IOException If there is a problem while sending the request.
      */
     public void killJob(final String jobId) throws IOException {
-        genieService.killJob(jobId).execute();
+        jobService.killJob(jobId).execute();
     }
 
     /**
