@@ -23,7 +23,7 @@ except ImportError:
 from .exceptions import GenieHTTPError
 
 
-logger = logging.getLogger('com.netflix.genie.utils')
+logger = logging.getLogger('com.netflix.pygenie.utils')
 
 
 USER_AGENT_HEADER = {
@@ -33,6 +33,16 @@ USER_AGENT_HEADER = {
         pkg_resources.get_distribution('nflx-genie-client').version
     ])
 }
+
+
+class DotDict(dict):
+    """
+    Allow dictionary keys to be retrieved as attribtues. Used for the genie2 to
+    genie 3 migration.
+    """
+    __getattr__ = dict.__getitem__
+    __setattr__ = dict.__setitem__
+    __delattr__ = dict.__delitem__
 
 
 def call(url, method='get', headers=None, *args, **kwargs):
@@ -48,6 +58,10 @@ def call(url, method='get', headers=None, *args, **kwargs):
 
     logger.debug('"%s %s"', method.upper(), url)
     logger.debug('headers: %s', headers)
+
+    # TODO: this needs to be replaced by the eureq client configurations
+    if os.getenv('GENIE_TOKEN'):
+        headers['Authorization'] = 'Bearer %s' % os.environ['GENIE_TOKEN']
 
     resp = requests.request(method, url=url, headers=headers, *args, **kwargs)
 

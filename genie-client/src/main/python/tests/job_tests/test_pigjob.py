@@ -6,7 +6,7 @@ import unittest
 from mock import patch
 from nose.tools import assert_equals, assert_raises
 
-import genie
+import pygenie as genie
 
 
 assert_equals.__self__.maxDiff = None

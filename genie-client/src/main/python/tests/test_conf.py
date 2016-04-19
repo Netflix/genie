@@ -10,7 +10,7 @@ from nose.tools import assert_equals
 
 from configurator import Configurator as C
 
-from genie.conf import GenieConf
+from pygenie.conf import GenieConf
 
 
 def reset_environment(func):
