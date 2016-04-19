@@ -17,12 +17,22 @@
  */
 package com.netflix.genie.web.tasks.leader;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import com.netflix.genie.common.dto.JobExecution;
+import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.properties.ClusterCheckerProperties;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
+import com.netflix.spectator.api.Counter;
+import com.netflix.spectator.api.Registry;
+import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -31,6 +41,8 @@ import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
 import org.springframework.boot.actuate.autoconfigure.ManagementServerProperties;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -43,35 +55,120 @@ import java.util.UUID;
 public class ClusterCheckerTaskUnitTests {
 
     private ClusterCheckerTask task;
+    private String hostName;
+    private JobSearchService jobSearchService;
+    private JobPersistenceService jobPersistenceService;
+    private HttpClient httpClient;
+
+    private Counter lostJobCounter;
+    private Counter unableToUpdateJobCounter;
 
     /**
      * Setup for the tests.
      */
     @Before
     public void setup() {
-        final String hostName = UUID.randomUUID().toString();
+        this.hostName = UUID.randomUUID().toString();
         final ClusterCheckerProperties properties = new ClusterCheckerProperties();
-        final JobSearchService jobSearchService = Mockito.mock(JobSearchService.class);
-        final JobPersistenceService jobPersistenceService = Mockito.mock(JobPersistenceService.class);
-        final HttpClient httpClient = Mockito.mock(HttpClient.class);
+        this.jobSearchService = Mockito.mock(JobSearchService.class);
+        this.jobPersistenceService = Mockito.mock(JobPersistenceService.class);
+        this.httpClient = Mockito.mock(HttpClient.class);
         final ManagementServerProperties serverProperties = Mockito.mock(ManagementServerProperties.class);
+        Mockito.when(serverProperties.getContextPath()).thenReturn("/actuator");
+        final Registry registry = Mockito.mock(Registry.class);
+        this.lostJobCounter = Mockito.mock(Counter.class);
+        Mockito.when(registry.counter("genie.tasks.clusterChecker.lostJobs.rate")).thenReturn(this.lostJobCounter);
+        this.unableToUpdateJobCounter = Mockito.mock(Counter.class);
+        Mockito
+            .when(registry.counter("genie.tasks.clusterChecker.unableToUpdateJob.rate"))
+            .thenReturn(this.unableToUpdateJobCounter);
         this.task = new ClusterCheckerTask(
-            hostName,
+            this.hostName,
             properties,
-            jobSearchService,
-            jobPersistenceService,
-            httpClient,
-            serverProperties
+            this.jobSearchService,
+            this.jobPersistenceService,
+            this.httpClient,
+            serverProperties,
+            registry
         );
     }
 
     /**
      * Make sure run method works.
+     *
+     * @throws IOException on error
+     * @throws GenieException on error
      */
     @Test
-    public void canRun() {
-        // TODO: flesh out once this is implemented
-//        this.task.run();
+    public void canRun() throws IOException, GenieException {
+        final String host1 = UUID.randomUUID().toString();
+        final String host2 = UUID.randomUUID().toString();
+        final String host3 = UUID.randomUUID().toString();
+
+        final HttpResponse response1 = Mockito.mock(HttpResponse.class);
+        final StatusLine statusLine1 = Mockito.mock(StatusLine.class);
+        Mockito.when(statusLine1.getStatusCode()).thenReturn(200);
+        Mockito.when(response1.getStatusLine()).thenReturn(statusLine1);
+
+        final HttpResponse response3 = Mockito.mock(HttpResponse.class);
+        final StatusLine statusLine3 = Mockito.mock(StatusLine.class);
+        Mockito.when(statusLine3.getStatusCode()).thenReturn(500);
+        Mockito.when(response3.getStatusLine()).thenReturn(statusLine3);
+
+        // Mock the 9 invocations for 3 calls to run
+        Mockito
+            .when(this.httpClient.execute(Mockito.any(HttpGet.class)))
+            .thenReturn(response1)
+            .thenThrow(new IOException("blah"))
+            .thenReturn(response3)
+            .thenReturn(response1)
+            .thenThrow(new IOException("blah"))
+            .thenReturn(response3)
+            .thenReturn(response1)
+            .thenThrow(new IOException("blah"))
+            .thenReturn(response3);
+
+        final List<String> hostsRunningJobs = Lists.newArrayList(this.hostName, host1, host2, host3);
+        Mockito.when(this.jobSearchService.getAllHostsRunningJobs()).thenReturn(hostsRunningJobs);
+
+        final JobExecution job1 = Mockito.mock(JobExecution.class);
+        final String job1Id = UUID.randomUUID().toString();
+        Mockito.when(job1.getId()).thenReturn(job1Id);
+        final JobExecution job2 = Mockito.mock(JobExecution.class);
+        final String job2Id = UUID.randomUUID().toString();
+        Mockito.when(job2.getId()).thenReturn(job2Id);
+        final JobExecution job3 = Mockito.mock(JobExecution.class);
+        final String job3Id = UUID.randomUUID().toString();
+        Mockito.when(job3.getId()).thenReturn(job3Id);
+        final JobExecution job4 = Mockito.mock(JobExecution.class);
+        final String job4Id = UUID.randomUUID().toString();
+        Mockito.when(job4.getId()).thenReturn(job4Id);
+
+        Mockito
+            .when(this.jobSearchService.getAllRunningJobExecutionsOnHost(host2))
+            .thenReturn(Sets.newHashSet(job1, job2));
+        Mockito
+            .when(this.jobSearchService.getAllRunningJobExecutionsOnHost(host3))
+            .thenReturn(Sets.newHashSet(job3, job4));
+
+        Mockito
+            .doThrow(new GenieServerException("blah"))
+            .when(this.jobPersistenceService)
+            .setExitCode(job1Id, JobExecution.LOST_EXIT_CODE);
+
+        this.task.run();
+        Assert.assertThat(this.task.getErrorCountsSize(), Matchers.is(2));
+        this.task.run();
+        Assert.assertThat(this.task.getErrorCountsSize(), Matchers.is(2));
+        this.task.run();
+        Assert.assertThat(this.task.getErrorCountsSize(), Matchers.is(0));
+
+        Mockito.verify(this.jobPersistenceService, Mockito.times(1)).setExitCode(job1Id, JobExecution.LOST_EXIT_CODE);
+        Mockito.verify(this.jobPersistenceService, Mockito.times(1)).setExitCode(job2Id, JobExecution.LOST_EXIT_CODE);
+        Mockito.verify(this.jobPersistenceService, Mockito.times(1)).setExitCode(job3Id, JobExecution.LOST_EXIT_CODE);
+        Mockito.verify(this.jobPersistenceService, Mockito.times(1)).setExitCode(job4Id, JobExecution.LOST_EXIT_CODE);
+        Mockito.verify(this.lostJobCounter, Mockito.times(3)).increment();
+        Mockito.verify(this.unableToUpdateJobCounter, Mockito.times(1)).increment();
     }
 
     /**

@@ -88,11 +88,11 @@ public interface JobSearchService {
     Set<JobExecution> getAllRunningJobExecutionsOnHost(@NotBlank final String hostname);
 
     /**
-     * Get a set of host names which are currently running jobs in the Genie system.
+     * Get a list of host names which are currently running jobs in the Genie system.
      *
-     * @return The set of hosts with jobs currently in "RUNNING" state
+     * @return The list of hosts with jobs currently in "RUNNING" state
      */
-    Set<String> getAllHostsRunningJobs();
+    List<String> getAllHostsRunningJobs();
 
     /**
      * Get job information for given job id.

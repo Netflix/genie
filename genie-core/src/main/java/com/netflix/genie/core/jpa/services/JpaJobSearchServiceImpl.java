@@ -205,7 +205,7 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
      * {@inheritDoc}
      */
     @Override
-    public Set<String> getAllHostsRunningJobs() {
+    public List<String> getAllHostsRunningJobs() {
         log.debug("Called");
 
         final CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
@@ -215,7 +215,7 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
 
         query.select(root.get(JobExecutionEntity_.hostName)).distinct(true).where(whereClause);
 
-        return this.entityManager.createQuery(query).getResultList().stream().collect(Collectors.toSet());
+        return this.entityManager.createQuery(query).getResultList();
     }
 
     /**

@@ -23,6 +23,8 @@ import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.web.properties.ClusterCheckerProperties;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
+import com.netflix.spectator.api.Counter;
+import com.netflix.spectator.api.Registry;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -64,6 +66,8 @@ public class ClusterCheckerTask extends LeadershipTask {
     private final Map<String, Integer> errorCounts = new HashMap<>();
 
     // TODO: Add metrics
+    private final Counter lostJobsCounter;
+    private final Counter unableToUpdateJobCounter;
 
     /**
      * Constructor.
@@ -74,6 +78,7 @@ public class ClusterCheckerTask extends LeadershipTask {
      * @param jobPersistenceService      The job persistence service to use
      * @param httpClient                 The http client to use to send requests
      * @param managementServerProperties The properties where Spring actuator is running
+     * @param registry                   The spectator registry for getting metrics
      */
     @Autowired
     public ClusterCheckerTask(
@@ -82,7 +87,8 @@ public class ClusterCheckerTask extends LeadershipTask {
         @NotNull final JobSearchService jobSearchService,
         @NotNull final JobPersistenceService jobPersistenceService,
         @NotNull final HttpClient httpClient,
-        @NotNull final ManagementServerProperties managementServerProperties
+        @NotNull final ManagementServerProperties managementServerProperties,
+        @NotNull final Registry registry
     ) {
         this.hostName = hostName;
         this.properties = properties;
@@ -91,6 +97,11 @@ public class ClusterCheckerTask extends LeadershipTask {
         this.httpClient = httpClient;
         this.scheme = this.properties.getScheme() + "://";
         this.healthEndpoint = ":" + this.properties.getPort() + managementServerProperties.getContextPath() + "/health";
+
+        // Keep track of the number of nodes currently unreachable from the the master
+        registry.mapSize("genie.tasks.clusterChecker.errorCounts.gauge", this.errorCounts);
+        this.lostJobsCounter = registry.counter("genie.tasks.clusterChecker.lostJobs.rate");
+        this.unableToUpdateJobCounter = registry.counter("genie.tasks.clusterChecker.unableToUpdateJob.rate");
     }
 
     /**
@@ -150,10 +161,10 @@ public class ClusterCheckerTask extends LeadershipTask {
                         job -> {
                             try {
                                 this.jobPersistenceService.setExitCode(job.getId(), JobExecution.LOST_EXIT_CODE);
-                                // TODO: Metric
+                                this.lostJobsCounter.increment();
                             } catch (final GenieException ge) {
                                 log.error("Unable to update job {} to failed due to exception", job.getId(), ge);
-                                // TODO: Add metric here
+                                this.unableToUpdateJobCounter.increment();
                             }
                         }
                     );
@@ -177,5 +188,14 @@ public class ClusterCheckerTask extends LeadershipTask {
     @Override
     public long getFixedRate() {
         return this.properties.getRate();
+    }
+
+    /**
+     * Get the current size of error counts. Mainly used for testing.
+     *
+     * @return Number of nodes currently in an error state
+     */
+    protected int getErrorCountsSize() {
+        return this.errorCounts.size();
     }
 }

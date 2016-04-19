@@ -178,9 +178,8 @@ public class JpaJobSearchServiceImplIntegrationTests extends DBUnitTestBase {
     public void canFindHostnamesOfRunningJobs() {
         final String hostA = "a.netflix.com";
         final String hostB = "b.netflix.com";
-        final String hostC = "c.netflix.com";
 
-        final Set<String> hostNames = this.service.getAllHostsRunningJobs();
+        final List<String> hostNames = this.service.getAllHostsRunningJobs();
         Assert.assertThat(hostNames.size(), Matchers.is(2));
         Assert.assertThat(hostNames, Matchers.hasItem(hostA));
         Assert.assertThat(hostNames, Matchers.hasItem(hostB));
