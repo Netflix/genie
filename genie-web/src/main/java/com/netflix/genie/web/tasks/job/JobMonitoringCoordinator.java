@@ -18,7 +18,6 @@
 package com.netflix.genie.web.tasks.job;
 
 import com.netflix.genie.common.dto.JobExecution;
-import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.events.JobFinishedEvent;
 import com.netflix.genie.core.events.JobStartedEvent;
 import com.netflix.genie.core.jobs.JobConstants;
@@ -114,26 +113,21 @@ public class JobMonitoringCoordinator {
     @EventListener
     public void attachToRunningJobs(final ApplicationReadyEvent event) {
         log.info("Application is ready according to event {}. Attempting to re-attach to any running jobs", event);
-        try {
-            final Set<JobExecution> executions = this.jobSearchService.getAllRunningJobExecutionsOnHost(this.hostName);
-            if (executions.isEmpty()) {
-                log.info("No jobs currently running on this node.");
-                return;
-            } else {
-                log.info("{} jobs currently running on this node at startup", executions.size());
-            }
+        final Set<JobExecution> executions = this.jobSearchService.getAllRunningJobExecutionsOnHost(this.hostName);
+        if (executions.isEmpty()) {
+            log.info("No jobs currently running on this node.");
+            return;
+        } else {
+            log.info("{} jobs currently running on this node at startup", executions.size());
+        }
 
-            for (final JobExecution execution : executions) {
-                if (this.jobMonitors.containsKey(execution.getId())) {
-                    log.info("Job {} is already being tracked. Ignoring.");
-                } else {
-                    this.scheduleMonitor(execution);
-                    log.info("Re-attached a job monitor to job {}", execution.getId());
-                }
+        for (final JobExecution execution : executions) {
+            if (this.jobMonitors.containsKey(execution.getId())) {
+                log.info("Job {} is already being tracked. Ignoring.");
+            } else {
+                this.scheduleMonitor(execution);
+                log.info("Re-attached a job monitor to job {}", execution.getId());
             }
-        } catch (final GenieException ge) {
-            log.error("Unable to fetch running jobs. Any running jobs will be orphaned", ge);
-            //TODO: log error?
         }
     }
 

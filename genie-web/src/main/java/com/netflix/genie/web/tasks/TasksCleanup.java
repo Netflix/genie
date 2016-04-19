@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.tasks;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.EventListener;
@@ -32,6 +33,7 @@ import javax.validation.constraints.NotNull;
  * @since 3.0.0
  */
 @Component
+@Slf4j
 public class TasksCleanup {
 
     private final ThreadPoolTaskScheduler scheduler;
@@ -53,6 +55,7 @@ public class TasksCleanup {
      */
     @EventListener
     public void onShutdown(final ContextClosedEvent event) {
+        log.info("Shutting down the scheduler due to {}", event);
         this.scheduler.shutdown();
     }
 }

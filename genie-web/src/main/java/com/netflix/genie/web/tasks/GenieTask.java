@@ -25,28 +25,32 @@ import org.springframework.scheduling.Trigger;
  * @author tgianos
  * @since 3.0.0
  */
-public interface GenieTask extends Runnable {
+public abstract class GenieTask implements Runnable {
 
     /**
      * Get the type of scheduling mechanism which should be used to schedule this task.
      *
      * @return The schedule type
      */
-    GenieTaskScheduleType getScheduleType();
+    public abstract GenieTaskScheduleType getScheduleType();
 
     /**
      * Get the Trigger which this task should be scheduled with.
      *
      * @return The trigger
      */
-    Trigger getTrigger();
+    public Trigger getTrigger() {
+        throw new UnsupportedOperationException("This task doesn't support being scheduled via Trigger.");
+    }
 
     /**
      * Get how long the system should wait between invoking the run() method of this task in milliseconds.
      *
      * @return The period to wait between invocations of run for this task
      */
-    long getFixedRate();
+    public long getFixedRate() {
+        throw new UnsupportedOperationException("This task doesn't support being scheduled at a fixed rate.");
+    }
 
     /**
      * Get how long the system should wait between invoking the run() method of this task in milliseconds after the
@@ -54,5 +58,7 @@ public interface GenieTask extends Runnable {
      *
      * @return The time to delay between task completions
      */
-    long getFixedDelay();
+    public long getFixedDelay() {
+        throw new UnsupportedOperationException("This task doesn't support being scheduled at a fixed delay.");
+    }
 }

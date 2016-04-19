@@ -25,5 +25,5 @@ import com.netflix.genie.web.tasks.GenieTask;
  * @author tgianos
  * @since 3.0.0
  */
-public interface LeadershipTask extends GenieTask {
+public abstract class LeadershipTask extends GenieTask {
 }

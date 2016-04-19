@@ -41,6 +41,11 @@ genie:
       enabled: false
   leader:
     enabled: false
+    clusterChecker:
+      scheme: http
+      port: 8080
+      rate: 300000
+      lostThreshold: 3
   mail:
     fromAddress: no-reply-genie@geniehost.com
     #user:

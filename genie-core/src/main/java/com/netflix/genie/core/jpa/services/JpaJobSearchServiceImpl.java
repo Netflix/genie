@@ -34,6 +34,7 @@ import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.entities.JobEntity;
 import com.netflix.genie.core.jpa.entities.JobEntity_;
 import com.netflix.genie.core.jpa.entities.JobExecutionEntity;
+import com.netflix.genie.core.jpa.entities.JobExecutionEntity_;
 import com.netflix.genie.core.jpa.entities.JobRequestEntity;
 import com.netflix.genie.core.jpa.repositories.JpaJobExecutionRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
@@ -191,7 +192,7 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
      * {@inheritDoc}
      */
     @Override
-    public Set<JobExecution> getAllRunningJobExecutionsOnHost(@NotBlank final String hostname) throws GenieException {
+    public Set<JobExecution> getAllRunningJobExecutionsOnHost(@NotBlank final String hostname) {
         log.debug("Called with hostname {}", hostname);
         return this.jobExecutionRepository
             .findByHostNameAndExitCode(hostname, JobExecution.DEFAULT_EXIT_CODE)
@@ -204,9 +205,25 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
      * {@inheritDoc}
      */
     @Override
+    public List<String> getAllHostsRunningJobs() {
+        log.debug("Called");
+
+        final CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
+        final CriteriaQuery<String> query = cb.createQuery(String.class);
+        final Root<JobExecutionEntity> root = query.from(JobExecutionEntity.class);
+        final Predicate whereClause = cb.equal(root.get(JobExecutionEntity_.exitCode), JobExecution.DEFAULT_EXIT_CODE);
+
+        query.select(root.get(JobExecutionEntity_.hostName)).distinct(true).where(whereClause);
+
+        return this.entityManager.createQuery(query).getResultList();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Job getJob(
-        @NotBlank(message = "No id entered. Unable to get job.")
-        final String id
+        @NotBlank(message = "No id entered. Unable to get job.") final String id
     ) throws GenieNotFoundException {
         log.debug("Called with id {}", id);
         final JobEntity jobEntity = this.jobRepository.findOne(id);
