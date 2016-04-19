@@ -33,7 +33,6 @@ import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.lang3.SystemUtils;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.scheduling.Trigger;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -47,7 +46,7 @@ import java.io.IOException;
  * @since 3.0.0
  */
 @Slf4j
-public class JobMonitor implements NodeTask {
+public class JobMonitor extends NodeTask {
 
     // How many error iterations we can handle
     // TODO: Make this a variable
@@ -178,22 +177,6 @@ public class JobMonitor implements NodeTask {
     @Override
     public GenieTaskScheduleType getScheduleType() {
         return GenieTaskScheduleType.FIXED_DELAY;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Trigger getTrigger() {
-        throw new UnsupportedOperationException("Tracking can only currently be scheduled via fixed delay");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public long getFixedRate() {
-        throw new UnsupportedOperationException("Tracking can only currently be scheduled via fixed delay");
     }
 
     /**

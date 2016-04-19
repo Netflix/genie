@@ -49,9 +49,9 @@ public class JobExecution extends BaseDTO {
     public static final int KILLED_EXIT_CODE = 999;
 
     /**
-     * The exit code that will be set to indicate a job is marked as zombie.
+     * The exit code that will be set to indicate a job is has been lost by Genie.
      */
-    public static final int ZOMBIE_EXIT_CODE = 666;
+    public static final int LOST_EXIT_CODE = 666;
 
     /**
      * The exit code that will be set to indicate a job has succeeded.

@@ -153,7 +153,7 @@ subprojects {
     tasks.withType(Test) { task ->
         // set heap size for the test JVM(s)
         minHeapSize = "256m"
-        maxHeapSize = "1g"
+        maxHeapSize = "2g"
 
         // If the project is running on a CI server
         if (System.getenv("CI") != null) {

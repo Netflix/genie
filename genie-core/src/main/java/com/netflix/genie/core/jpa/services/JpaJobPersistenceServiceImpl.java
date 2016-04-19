@@ -348,8 +348,12 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
                     case JobExecution.KILLED_EXIT_CODE:
                         this.updateJobStatus(id, JobStatus.KILLED, "Job killed.");
                         break;
-                    case JobExecution.ZOMBIE_EXIT_CODE:
-                        this.updateJobStatus(id, JobStatus.FAILED, "Job marked as zombie by genie.");
+                    case JobExecution.LOST_EXIT_CODE:
+                        this.updateJobStatus(
+                            id,
+                            JobStatus.FAILED,
+                            "Genie leader can't reach node running job. Assuming node and job are lost."
+                        );
                         break;
                     case JobExecution.SUCCESS_EXIT_CODE:
                         this.updateJobStatus(id, JobStatus.SUCCEEDED, "Job finished successfully.");

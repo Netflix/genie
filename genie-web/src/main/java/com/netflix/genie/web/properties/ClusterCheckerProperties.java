@@ -15,16 +15,26 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.tasks.node;
+package com.netflix.genie.web.properties;
 
-import com.netflix.genie.web.tasks.GenieTask;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 /**
- * Interface that should be implemented by any class that represents a task the Genie system should run periodically
- * on a node.
+ * Properties associated with the cluster checking task.
  *
  * @author tgianos
  * @since 3.0.0
  */
-public abstract class NodeTask extends GenieTask {
+@ConfigurationProperties(prefix = "genie.leader.clusterChecker")
+@Component
+@Getter
+@Setter
+public class ClusterCheckerProperties {
+    private String scheme = "http";
+    private int port = 8080;
+    private long rate = 300000L;
+    private int lostThreshold = 3;
 }
