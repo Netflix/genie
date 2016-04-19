@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Client library for the Cluster Service.
@@ -55,6 +56,8 @@ public class ClusterClient extends BaseGenieClient {
         super(configuration);
         clusterService = retrofit.create(ClusterService.class);
     }
+
+    /******************* CRUD Methods   ***************************/
 
     /**
      * Create a cluster ing genie.
@@ -148,5 +151,195 @@ public class ClusterClient extends BaseGenieClient {
      */
     public void deleteAllClusters() throws IOException, GenieException {
         clusterService.deleteAllClusters().execute();
+    }
+
+    /****************** Methods to manipulate configs for a cluster   *********************/
+
+    /**
+     * Method to get all the configs for a cluster.
+     *
+     * @param clusterId The id of the cluster.
+     *
+     * @return The set of configs for the cluster.
+     * @throws GenieException       For any other error.
+     * @throws IOException If the response received is not 2xx.
+     */
+    public Set<String> getConfigsForCluster(final String clusterId) throws IOException, GenieException {
+        if (StringUtils.isEmpty(clusterId)) {
+            throw new GeniePreconditionException("Missing required parameter: clusterId.");
+        }
+
+        return clusterService.getConfigsForCluster(clusterId).execute().body();
+    }
+
+    /**
+     * Method to add configs to a cluster.
+     *
+     * @param clusterId The id of the cluster.
+     * @param configs The set of configs to add.
+     *
+     * @throws GenieException       For any other error.
+     * @throws IOException If the response received is not 2xx.
+     */
+    public void addConfigsToCluster(
+        final String clusterId, final Set<String> configs
+    ) throws IOException, GenieException {
+        if (StringUtils.isEmpty(clusterId)) {
+            throw new GeniePreconditionException("Missing required parameter: clusterId.");
+        }
+
+        if (configs == null || configs.isEmpty()) {
+            throw new GeniePreconditionException("Configs cannot be null or empty");
+        }
+
+        clusterService.addConfigsToCluster(clusterId, configs);
+    }
+
+    /**
+     * Method to update configs for a cluster.
+     *
+     * @param clusterId The id of the cluster.
+     * @param configs The set of configs to add.
+     *
+     * @throws GenieException       For any other error.
+     * @throws IOException If the response received is not 2xx.
+     */
+    public void updateConfigsForCluster(
+        final String clusterId, final Set<String> configs
+    ) throws IOException, GenieException {
+        if (StringUtils.isEmpty(clusterId)) {
+            throw new GeniePreconditionException("Missing required parameter: clusterId.");
+        }
+
+        if (configs == null || configs.isEmpty()) {
+            throw new GeniePreconditionException("Configs cannot be null or empty");
+        }
+
+        clusterService.updateConfigsForCluster(clusterId, configs);
+    }
+
+    /**
+     * Remove all configs for this cluster.
+     *
+     * @param clusterId The id of the cluster.
+     *
+     * @throws GenieException       For any other error.
+     * @throws IOException If the response received is not 2xx.
+     */
+    public void removeAllConfigsForCluster(
+        final String clusterId
+    ) throws IOException, GenieException {
+        if (StringUtils.isEmpty(clusterId)) {
+            throw new GeniePreconditionException("Missing required parameter: clusterId.");
+        }
+
+        clusterService.removeAllConfigsForCluster(clusterId);
+    }
+
+    /****************** Methods to manipulate tags for a cluster   *********************/
+
+    /**
+     * Method to get all the tags for a cluster.
+     *
+     * @param clusterId The id of the cluster.
+     *
+     * @return The set of configs for the cluster.
+     * @throws GenieException       For any other error.
+     * @throws IOException If the response received is not 2xx.
+     */
+    public Set<String> getTagsForCluster(final String clusterId) throws IOException, GenieException {
+        if (StringUtils.isEmpty(clusterId)) {
+            throw new GeniePreconditionException("Missing required parameter: clusterId.");
+        }
+
+        return clusterService.getTagsForCluster(clusterId).execute().body();
+    }
+
+    /**
+     * Method to add tags to a cluster.
+     *
+     * @param clusterId The id of the cluster.
+     * @param tags The set of tags to add.
+     *
+     * @throws GenieException       For any other error.
+     * @throws IOException If the response received is not 2xx.
+     */
+    public void addTagsToCluster(
+        final String clusterId, final Set<String> tags
+    ) throws IOException, GenieException {
+        if (StringUtils.isEmpty(clusterId)) {
+            throw new GeniePreconditionException("Missing required parameter: clusterId.");
+        }
+
+        if (tags == null || tags.isEmpty()) {
+            throw new GeniePreconditionException("Tags cannot be null or empty");
+        }
+
+        clusterService.addTagsToCluster(clusterId, tags);
+    }
+
+    /**
+     * Method to update tags for a cluster.
+     *
+     * @param clusterId The id of the cluster.
+     * @param tags The set of tags to add.
+     *
+     * @throws GenieException       For any other error.
+     * @throws IOException If the response received is not 2xx.
+     */
+    public void updateTagsForCluster(
+        final String clusterId, final Set<String> tags
+    ) throws IOException, GenieException {
+        if (StringUtils.isEmpty(clusterId)) {
+            throw new GeniePreconditionException("Missing required parameter: clusterId.");
+        }
+
+        if (tags == null || tags.isEmpty()) {
+            throw new GeniePreconditionException("Tags cannot be null or empty");
+        }
+
+        clusterService.updateTagsForCluster(clusterId, tags);
+    }
+
+    /**
+     * Remove a tag from a cluster.
+     *
+     * @param clusterId The id of the cluster.
+     * @param tag The tag to remove.
+     *
+     * @throws GenieException       For any other error.
+     * @throws IOException If the response received is not 2xx.
+     */
+    public void removeTagFromCluster(
+        final String clusterId,
+        final String tag
+    ) throws IOException, GenieException {
+        if (StringUtils.isEmpty(clusterId)) {
+            throw new GeniePreconditionException("Missing required parameter: clusterId.");
+        }
+
+        if (StringUtils.isEmpty(tag)) {
+            throw new GeniePreconditionException("Missing required parameter: tag.");
+        }
+
+        clusterService.removeTagForCluster(clusterId, tag);
+    }
+
+    /**
+     * Remove all tags for this cluster.
+     *
+     * @param clusterId The id of the cluster.
+     *
+     * @throws GenieException       For any other error.
+     * @throws IOException If the response received is not 2xx.
+     */
+    public void removeAllTagsForCluster(
+        final String clusterId
+    ) throws IOException, GenieException {
+        if (StringUtils.isEmpty(clusterId)) {
+            throw new GeniePreconditionException("Missing required parameter: clusterId.");
+        }
+
+        clusterService.removeAllTagsForCluster(clusterId);
     }
 }

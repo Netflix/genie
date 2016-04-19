@@ -24,10 +24,12 @@ import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.QueryMap;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * An interface that provides all methods needed for the Genie cluster client implementation.
@@ -60,7 +62,7 @@ public interface ClusterService {
      * @param cluster The cluster object.
      * @return A callable object.
      */
-    @POST(CLUSTER_URL_SUFFIX + "/{id}")
+    @PUT(CLUSTER_URL_SUFFIX + "/{id}")
     Call<Void> updateCluster(@Path("id") final String clusterId, @Body final Cluster cluster);
 
     /**
@@ -102,5 +104,91 @@ public interface ClusterService {
 
     /****************** Methods to manipulate configs for a cluster   *********************/
 
+    /**
+     * Method to get configs for a cluster in Genie.
+     *
+     * @param clusterId The id of the cluster.
+     * @return A callable object.
+     */
+    @GET(CLUSTER_URL_SUFFIX + "/{id}/configs")
+    Call<Set<String>> getConfigsForCluster(@Path("id") final String clusterId);
+
+    /**
+     * Method to add configs to a cluster in Genie.
+     *
+     * @param clusterId The id of the cluster..
+     * @param configs The configs to be added.
+     * @return A callable object.
+     */
+    @POST(CLUSTER_URL_SUFFIX + "/{id}/configs")
+    Call<Void> addConfigsToCluster(@Path("id") final String clusterId, @Body final Set<String> configs);
+
+    /**
+     * Method to update configs for a cluster in Genie.
+     *
+     * @param clusterId The id of the cluster..
+     * @param configs The configs to be added.
+     * @return A callable object.
+     */
+    @PUT(CLUSTER_URL_SUFFIX + "/{id}/configs")
+    Call<Void> updateConfigsForCluster(@Path("id") final String clusterId, @Body final Set<String> configs);
+
+    /**
+     * Method to delete all configs for a cluster in Genie.
+     *
+     * @param clusterId The id of the cluster.
+     * @return A callable object.
+     */
+    @DELETE(CLUSTER_URL_SUFFIX + "/{id}/configs")
+    Call<Void> removeAllConfigsForCluster(@Path("id") final String clusterId);
+
     /****************** Methods to manipulate tags for a cluster   *********************/
+
+    /**
+     * Method to get tags for a cluster in Genie.
+     *
+     * @param clusterId The id of the cluster.
+     * @return A callable object.
+     */
+    @GET(CLUSTER_URL_SUFFIX + "/{id}/tags")
+    Call<Set<String>> getTagsForCluster(@Path("id") final String clusterId);
+
+    /**
+     * Method to add tags to a cluster in Genie.
+     *
+     * @param clusterId The id of the cluster..
+     * @param tags The tags to be added.
+     * @return A callable object.
+     */
+    @POST(CLUSTER_URL_SUFFIX + "/{id}/tags")
+    Call<Void> addTagsToCluster(@Path("id") final String clusterId, @Body final Set<String> tags);
+
+    /**
+     * Method to update tags for a cluster in Genie.
+     *
+     * @param clusterId The id of the cluster..
+     * @param tags The tags to be added.
+     * @return A callable object.
+     */
+    @PUT(CLUSTER_URL_SUFFIX + "/{id}/tags")
+    Call<Void> updateTagsForCluster(@Path("id") final String clusterId, @Body final Set<String> tags);
+
+    /**
+     * Method to delete a tag for a cluster in Genie.
+     *
+     * @param clusterId The id of the cluster.
+     * @param tag The tag to delete.
+     * @return A callable object.
+     */
+    @DELETE(CLUSTER_URL_SUFFIX + "/{id}/tags/{tag}")
+    Call<Void> removeTagForCluster(@Path("id") final String clusterId, @Path("tag") final String tag);
+
+    /**
+     * Method to delete all tags for a cluster in Genie.
+     *
+     * @param clusterId The id of the cluster.
+     * @return A callable object.
+     */
+    @DELETE(CLUSTER_URL_SUFFIX + "/{id}/tags")
+    Call<Void> removeAllTagsForCluster(@Path("id") final String clusterId);
 }
