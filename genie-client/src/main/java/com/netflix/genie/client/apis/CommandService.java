@@ -19,6 +19,8 @@ package com.netflix.genie.client.apis;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonpatch.JsonPatch;
+import com.netflix.genie.common.dto.Application;
+import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -30,6 +32,7 @@ import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.QueryMap;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -114,6 +117,68 @@ public interface CommandService {
     Call<Void> patchCommand(@Path("id") final String commandId, @Body final JsonPatch patch);
 
     /****************** Methods to manipulate applications and clusters for a command   *********************/
+
+    /**
+     * Method to get applications for a command in Genie.
+     *
+     * @param commandId The id of the command.
+     * @return A callable object.
+     *
+     */
+    @GET(COMMAND_URL_SUFFIX + "/{id}/applications")
+    Call<List<Application>> getApplicationsForCommand(@Path("id") final String commandId);
+
+    /**
+     * Method to get clusters for a command in Genie.
+     *
+     * @param commandId The id of the command.
+     * @return A callable object.
+     *
+     */
+    @GET(COMMAND_URL_SUFFIX + "/{id}/clusters")
+    Call<List<Cluster>> getClustersForCommand(@Path("id") final String commandId);
+
+    /**
+     * Method to add applications to a command in Genie.
+     *
+     * @param commandId The id of the command..
+     * @param applicationIds The application Ids to be added.
+     * @return A callable object.
+     */
+    @POST(COMMAND_URL_SUFFIX + "/{id}/applications")
+    Call<Void> addApplicationsToCommand(@Path("id") final String commandId, @Body final List<String> applicationIds);
+
+    /**
+     * Method to override and set applications for a command in Genie.
+     *
+     * @param commandId The id of the command..
+     * @param applicationIds The application Ids to be added.
+     * @return A callable object.
+     */
+    @PUT(COMMAND_URL_SUFFIX + "/{id}/applications")
+    Call<Void> setApplicationsForCommand(@Path("id") final String commandId, @Body final List<String> applicationIds);
+
+    /**
+     * Method to delete a application for a command in Genie.
+     *
+     * @param commandId The id of the command.
+     * @param applicationId The application to delete.
+     * @return A callable object.
+     */
+    @DELETE(COMMAND_URL_SUFFIX + "/{id}/applications/{applicationId}")
+    Call<Void> removeApplicationForCommand(
+        @Path("id") final String commandId,
+        @Path("applicationId") final String applicationId
+    );
+
+    /**
+     * Method to delete all applications for a command in Genie.
+     *
+     * @param commandId The id of the command.
+     * @return A callable object.
+     */
+    @DELETE(COMMAND_URL_SUFFIX + "/{id}/applications")
+    Call<Void> removeAllApplicationsForCommand(@Path("id") final String commandId);
 
     /****************** Methods to manipulate configs for a command   *********************/
 

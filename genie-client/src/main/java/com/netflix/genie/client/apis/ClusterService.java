@@ -20,6 +20,7 @@ package com.netflix.genie.client.apis;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.netflix.genie.common.dto.Cluster;
+import com.netflix.genie.common.dto.Command;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
@@ -30,6 +31,7 @@ import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.QueryMap;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -60,7 +62,7 @@ public interface ClusterService {
     /**
      * Method to update a cluster in Genie.
      *
-     * @param clusterId The id of the cluster to udpate.
+     * @param clusterId The id of the cluster to update.
      * @param cluster The cluster object.
      * @return A callable object.
      */
@@ -114,6 +116,55 @@ public interface ClusterService {
     Call<Void> patchCluster(@Path("id") final String clusterId, @Body final JsonPatch patch);
 
     /****************** Methods to manipulate commands for a cluster   *********************/
+
+    /**
+     * Method to get commmands for a cluster in Genie.
+     *
+     * @param clusterId The id of the cluster.
+     * @return A callable object.
+     */
+    @GET(CLUSTER_URL_SUFFIX + "/{id}/commands")
+    Call<List<Command>> getCommandsForCluster(@Path("id") final String clusterId);
+
+    /**
+     * Method to add commands to a cluster in Genie.
+     *
+     * @param clusterId The id of the cluster..
+     * @param commandIds The command Ids to be added.
+     * @return A callable object.
+     */
+    @POST(CLUSTER_URL_SUFFIX + "/{id}/commands")
+    Call<Void> addCommandsToCluster(@Path("id") final String clusterId, @Body final List<String> commandIds);
+
+    /**
+     * Method to override and set commands for a cluster in Genie.
+     *
+     * @param clusterId The id of the cluster..
+     * @param commandIds The command Ids to be added.
+     * @return A callable object.
+     */
+    @PUT(CLUSTER_URL_SUFFIX + "/{id}/commands")
+    Call<Void> setCommandsForCluster(@Path("id") final String clusterId, @Body final List<String> commandIds);
+
+    /**
+     * Method to delete a command for a cluster in Genie.
+     *
+     * @param clusterId The id of the cluster.
+     * @param commandId The command to delete.
+     * @return A callable object.
+     */
+    @DELETE(CLUSTER_URL_SUFFIX + "/{id}/commands/{commandId}")
+    Call<Void> removeCommandForCluster(@Path("id") final String clusterId, @Path("commandId") final String commandId);
+
+    /**
+     * Method to delete all commands for a cluster in Genie.
+     *
+     * @param clusterId The id of the cluster.
+     * @return A callable object.
+     */
+    @DELETE(CLUSTER_URL_SUFFIX + "/{id}/commands")
+    Call<Void> removeAllCommandsForCluster(@Path("id") final String clusterId);
+
 
     /****************** Methods to manipulate configs for a cluster   *********************/
 

@@ -20,6 +20,7 @@ package com.netflix.genie.client.apis;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.netflix.genie.common.dto.Application;
+import com.netflix.genie.common.dto.Command;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
@@ -30,6 +31,7 @@ import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.QueryMap;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -113,7 +115,60 @@ public interface ApplicationService {
     @PATCH(APPLICATION_URL_SUFFIX + "/{id}")
     Call<Void> patchApplication(@Path("id") final String applicationId, @Body final JsonPatch patch);
 
-    /****************** Methods to manipulate commands for a application   *********************/
+    /**
+     * Method to get commmands for a application in Genie.
+     *
+     * @param applicationId The id of the application.
+     * @return A callable object.
+     */
+    @GET(APPLICATION_URL_SUFFIX + "/{id}/commands")
+    Call<List<Command>> getCommandsForApplication(@Path("id") final String applicationId);
+
+    /****************** Methods to manipulate dependencies for a application   *********************/
+
+    /**
+     * Method to get dependency files for a application in Genie.
+     *
+     * @param applicationId The id of the application.
+     * @return A callable object.
+     */
+    @GET(APPLICATION_URL_SUFFIX + "/{id}/dependencies")
+    Call<Set<String>> getDependenciesForApplication(@Path("id") final String applicationId);
+
+    /**
+     * Method to add dependencies to a application in Genie.
+     *
+     * @param applicationId The id of the application..
+     * @param dependencies The dependencies to be added.
+     * @return A callable object.
+     */
+    @POST(APPLICATION_URL_SUFFIX + "/{id}/dependencies")
+    Call<Void> addDependenciesToApplication(
+        @Path("id") final String applicationId,
+        @Body final Set<String> dependencies
+    );
+
+    /**
+     * Method to update dependencies for a application in Genie.
+     *
+     * @param applicationId The id of the application..
+     * @param dependencies The dependencies to be added.
+     * @return A callable object.
+     */
+    @PUT(APPLICATION_URL_SUFFIX + "/{id}/dependencies")
+    Call<Void> updateDependenciesForApplication(
+        @Path("id") final String applicationId,
+        @Body final Set<String> dependencies
+    );
+
+    /**
+     * Method to delete all dependencies for a application in Genie.
+     *
+     * @param applicationId The id of the application.
+     * @return A callable object.
+     */
+    @DELETE(APPLICATION_URL_SUFFIX + "/{id}/dependencies")
+    Call<Void> removeAllDependenciesForApplication(@Path("id") final String applicationId);
 
     /****************** Methods to manipulate configs for a application   *********************/
 
