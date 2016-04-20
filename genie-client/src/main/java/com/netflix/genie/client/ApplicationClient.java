@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.netflix.genie.client.apis.ApplicationService;
 import com.netflix.genie.common.dto.Application;
+import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import lombok.extern.slf4j.Slf4j;
@@ -184,7 +185,8 @@ public class ApplicationClient extends BaseGenieClient {
      * @throws GenieException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
-    public void updateApplication(final String applicationId, final Application application) throws IOException, GenieException {
+    public void updateApplication(final String applicationId, final Application application)
+        throws IOException, GenieException {
         if (StringUtils.isEmpty(applicationId)) {
             throw new GeniePreconditionException("Missing required parameter: applicationId.");
         }
@@ -194,6 +196,23 @@ public class ApplicationClient extends BaseGenieClient {
         }
 
         applicationService.updateApplication(applicationId, application).execute();
+    }
+
+    /**
+     * Method to get all the commands for an application.
+     *
+     * @param applicationId The id of the application.
+     *
+     * @return The set of commands for the applications.
+     * @throws GenieException       For any other error.
+     * @throws IOException If the response received is not 2xx.
+     */
+    public List<Command> getCommandsForApplication(final String applicationId) throws IOException, GenieException {
+        if (StringUtils.isEmpty(applicationId)) {
+            throw new GeniePreconditionException("Missing required parameter: applicationId.");
+        }
+
+        return applicationService.getCommandsForApplication(applicationId).execute().body();
     }
 
     /****************** Methods to manipulate configs for a application   *********************/
@@ -277,6 +296,89 @@ public class ApplicationClient extends BaseGenieClient {
         }
 
         applicationService.removeAllConfigsForApplication(applicationId).execute();
+    }
+
+    /****************** Methods to manipulate dependencies for a application   *********************/
+
+    /**
+     * Method to get all the dependency files for an application.
+     *
+     * @param applicationId The id of the application.
+     *
+     * @return The set of dependencies for the application.
+     * @throws GenieException       For any other error.
+     * @throws IOException If the response received is not 2xx.
+     */
+    public Set<String> getDependenciesForApplication(final String applicationId) throws IOException, GenieException {
+        if (StringUtils.isEmpty(applicationId)) {
+            throw new GeniePreconditionException("Missing required parameter: applicationId.");
+        }
+
+        return applicationService.getDependenciesForApplication(applicationId).execute().body();
+    }
+
+    /**
+     * Method to add dependencies to a application.
+     *
+     * @param applicationId The id of the application.
+     * @param dependencies The set of dependencies to add.
+     *
+     * @throws GenieException       For any other error.
+     * @throws IOException If the response received is not 2xx.
+     */
+    public void addDependenciesToApplication(
+        final String applicationId, final Set<String> dependencies
+    ) throws IOException, GenieException {
+        if (StringUtils.isEmpty(applicationId)) {
+            throw new GeniePreconditionException("Missing required parameter: applicationId.");
+        }
+
+        if (dependencies == null || dependencies.isEmpty()) {
+            throw new GeniePreconditionException("Dependencies cannot be null or empty");
+        }
+
+        applicationService.addDependenciesToApplication(applicationId, dependencies).execute();
+    }
+
+    /**
+     * Method to update dependencies for a application.
+     *
+     * @param applicationId The id of the application.
+     * @param dependencies The set of dependencies to add.
+     *
+     * @throws GenieException       For any other error.
+     * @throws IOException If the response received is not 2xx.
+     */
+    public void updateDependenciesForApplication(
+        final String applicationId, final Set<String> dependencies
+    ) throws IOException, GenieException {
+        if (StringUtils.isEmpty(applicationId)) {
+            throw new GeniePreconditionException("Missing required parameter: applicationId.");
+        }
+
+        if (dependencies == null || dependencies.isEmpty()) {
+            throw new GeniePreconditionException("Dependencies cannot be null or empty");
+        }
+
+        applicationService.updateDependenciesForApplication(applicationId, dependencies).execute();
+    }
+
+    /**
+     * Remove all dependencies for this application.
+     *
+     * @param applicationId The id of the application.
+     *
+     * @throws GenieException       For any other error.
+     * @throws IOException If the response received is not 2xx.
+     */
+    public void removeAllDependenciesForApplication(
+        final String applicationId
+    ) throws IOException, GenieException {
+        if (StringUtils.isEmpty(applicationId)) {
+            throw new GeniePreconditionException("Missing required parameter: applicationId.");
+        }
+
+        applicationService.removeAllDependenciesForApplication(applicationId).execute();
     }
 
     /****************** Methods to manipulate tags for a application   *********************/

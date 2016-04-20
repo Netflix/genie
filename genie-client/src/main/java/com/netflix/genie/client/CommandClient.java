@@ -20,6 +20,8 @@ package com.netflix.genie.client;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.netflix.genie.client.apis.CommandService;
+import com.netflix.genie.common.dto.Application;
+import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
@@ -277,6 +279,130 @@ public class CommandClient extends BaseGenieClient {
         }
 
         commandService.removeAllConfigsForCommand(commandId).execute();
+    }
+
+    /****************** Methods to manipulate applications for a command   *********************/
+
+    /**
+     * Method to get all the applications for a command.
+     *
+     * @param commandId The id of the command.
+     *
+     * @return The set of applications for the command.
+     * @throws GenieException       For any other error.
+     * @throws IOException If the response received is not 2xx.
+     */
+    public List<Application> getApplicationsForCommand(final String commandId) throws IOException, GenieException {
+        if (StringUtils.isEmpty(commandId)) {
+            throw new GeniePreconditionException("Missing required parameter: commandId.");
+        }
+
+        return commandService.getApplicationsForCommand(commandId).execute().body();
+    }
+
+    /**
+     * Method to get all the clusters for a command.
+     *
+     * @param commandId The id of the command.
+     *
+     * @return The set of clusters for the command.
+     * @throws GenieException       For any other error.
+     * @throws IOException If the response received is not 2xx.
+     */
+    public List<Cluster> getClustersForCommand(final String commandId) throws IOException, GenieException {
+        if (StringUtils.isEmpty(commandId)) {
+            throw new GeniePreconditionException("Missing required parameter: commandId.");
+        }
+
+        return commandService.getClustersForCommand(commandId).execute().body();
+    }
+
+    /**
+     * Method to add applications to a command.
+     *
+     * @param commandId The id of the command.
+     * @param applicationIds The set of applications ids to add.
+     *
+     * @throws GenieException       For any other error.
+     * @throws IOException If the response received is not 2xx.
+     */
+    public void addApplicationsToCommand(
+        final String commandId, final List<String> applicationIds
+    ) throws IOException, GenieException {
+        if (StringUtils.isEmpty(commandId)) {
+            throw new GeniePreconditionException("Missing required parameter: commandId.");
+        }
+
+        if (applicationIds == null || applicationIds.isEmpty()) {
+            throw new GeniePreconditionException("applicationIds cannot be null or empty");
+        }
+
+        commandService.addApplicationsToCommand(commandId, applicationIds).execute();
+    }
+
+    /**
+     * Method to update applications for a command.
+     *
+     * @param commandId The id of the command.
+     * @param applicationIds The set of application ids to add.
+     *
+     * @throws GenieException       For any other error.
+     * @throws IOException If the response received is not 2xx.
+     */
+    public void updateApplicationsForCommand(
+        final String commandId, final List<String> applicationIds
+    ) throws IOException, GenieException {
+        if (StringUtils.isEmpty(commandId)) {
+            throw new GeniePreconditionException("Missing required parameter: commandId.");
+        }
+
+        if (applicationIds == null || applicationIds.isEmpty()) {
+            throw new GeniePreconditionException("applicationIds cannot be null or empty");
+        }
+
+        commandService.setApplicationsForCommand(commandId, applicationIds).execute();
+    }
+
+    /**
+     * Remove an application from a command.
+     *
+     * @param commandId The id of the command.
+     * @param applicationId The id of the application to remove.
+     *
+     * @throws GenieException       For any other error.
+     * @throws IOException If the response received is not 2xx.
+     */
+    public void removeApplicationFromCommand(
+        final String commandId,
+        final String applicationId
+    ) throws IOException, GenieException {
+        if (StringUtils.isEmpty(commandId)) {
+            throw new GeniePreconditionException("Missing required parameter: commandId.");
+        }
+
+        if (StringUtils.isEmpty(applicationId)) {
+            throw new GeniePreconditionException("Missing required parameter: applicationId.");
+        }
+
+        commandService.removeApplicationForCommand(commandId, applicationId).execute();
+    }
+
+    /**
+     * Remove all applications for this command.
+     *
+     * @param commandId The id of the command.
+     *
+     * @throws GenieException       For any other error.
+     * @throws IOException If the response received is not 2xx.
+     */
+    public void removeAllApplicationsForCommand(
+        final String commandId
+    ) throws IOException, GenieException {
+        if (StringUtils.isEmpty(commandId)) {
+            throw new GeniePreconditionException("Missing required parameter: commandId.");
+        }
+
+        commandService.removeAllApplicationsForCommand(commandId).execute();
     }
 
     /****************** Methods to manipulate tags for a command   *********************/

@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.netflix.genie.client.apis.ClusterService;
 import com.netflix.genie.common.dto.Cluster;
+import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import lombok.extern.slf4j.Slf4j;
@@ -279,6 +280,113 @@ public class ClusterClient extends BaseGenieClient {
         clusterService.removeAllConfigsForCluster(clusterId).execute();
     }
 
+    /****************** Methods to manipulate commands for a cluster   *********************/
+
+    /**
+     * Method to get all the commands for a cluster.
+     *
+     * @param clusterId The id of the cluster.
+     *
+     * @return The set of commands for the cluster.
+     * @throws GenieException       For any other error.
+     * @throws IOException If the response received is not 2xx.
+     */
+    public List<Command> getCommandsForCluster(final String clusterId) throws IOException, GenieException {
+        if (StringUtils.isEmpty(clusterId)) {
+            throw new GeniePreconditionException("Missing required parameter: clusterId.");
+        }
+
+        return clusterService.getCommandsForCluster(clusterId).execute().body();
+    }
+
+    /**
+     * Method to add commands to a cluster.
+     *
+     * @param clusterId The id of the cluster.
+     * @param commandIds The list of commands to add.
+     *
+     * @throws GenieException       For any other error.
+     * @throws IOException If the response received is not 2xx.
+     */
+    public void addCommandsToCluster(
+        final String clusterId, final List<String> commandIds
+    ) throws IOException, GenieException {
+        if (StringUtils.isEmpty(clusterId)) {
+            throw new GeniePreconditionException("Missing required parameter: clusterId.");
+        }
+
+        if (commandIds == null || commandIds.isEmpty()) {
+            throw new GeniePreconditionException("Command Ids cannot be null or empty");
+        }
+
+        clusterService.addCommandsToCluster(clusterId, commandIds).execute();
+    }
+
+    /**
+     * Method to update commands for a cluster.
+     *
+     * @param clusterId The id of the cluster.
+     * @param commandIds The set of commands to add.
+     *
+     * @throws GenieException       For any other error.
+     * @throws IOException If the response received is not 2xx.
+     */
+    public void updateCommandsForCluster(
+        final String clusterId, final List<String> commandIds
+    ) throws IOException, GenieException {
+        if (StringUtils.isEmpty(clusterId)) {
+            throw new GeniePreconditionException("Missing required parameter: clusterId.");
+        }
+
+        if (commandIds == null || commandIds.isEmpty()) {
+            throw new GeniePreconditionException("commandIds cannot be null or empty");
+        }
+
+        clusterService.setCommandsForCluster(clusterId, commandIds).execute();
+    }
+
+    /**
+     * Remove a command from a cluster.
+     *
+     * @param clusterId The id of the cluster.
+     * @param commandId The id of the command to remove.
+     *
+     * @throws GenieException       For any other error.
+     * @throws IOException If the response received is not 2xx.
+     */
+    public void removeCommandFromCluster(
+        final String clusterId,
+        final String commandId
+    ) throws IOException, GenieException {
+        if (StringUtils.isEmpty(clusterId)) {
+            throw new GeniePreconditionException("Missing required parameter: clusterId.");
+        }
+
+        if (StringUtils.isEmpty(commandId)) {
+            throw new GeniePreconditionException("Missing required parameter: commandId.");
+        }
+
+        clusterService.removeCommandForCluster(clusterId, commandId).execute();
+    }
+
+    /**
+     * Remove all commands for this cluster.
+     *
+     * @param clusterId The id of the cluster.
+     *
+     * @throws GenieException       For any other error.
+     * @throws IOException If the response received is not 2xx.
+     */
+    public void removeAllCommandsForCluster(
+        final String clusterId
+    ) throws IOException, GenieException {
+        if (StringUtils.isEmpty(clusterId)) {
+            throw new GeniePreconditionException("Missing required parameter: clusterId.");
+        }
+
+        clusterService.removeAllCommandsForCluster(clusterId).execute();
+    }
+
     /****************** Methods to manipulate tags for a cluster   *********************/
 
     /**
@@ -286,7 +394,7 @@ public class ClusterClient extends BaseGenieClient {
      *
      * @param clusterId The id of the cluster.
      *
-     * @return The set of configs for the cluster.
+     * @return The set of tags for the cluster.
      * @throws GenieException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
