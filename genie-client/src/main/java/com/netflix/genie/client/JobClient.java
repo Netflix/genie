@@ -64,7 +64,7 @@ public class JobClient extends BaseGenieClient {
      * @throws GenieException If there is any problem.
      */
     public JobClient(
-        final GenieConfiguration configuration
+        final GenieClientConfiguration configuration
     ) throws GenieException {
         super(configuration);
         jobService = retrofit.create(JobService.class);

@@ -53,7 +53,7 @@ public class ApplicationClient extends BaseGenieClient {
      * @throws GenieException If there is any problem.
      */
     public ApplicationClient(
-        final GenieConfiguration configuration
+        final GenieClientConfiguration configuration
     ) throws GenieException {
         super(configuration);
         applicationService = retrofit.create(ApplicationService.class);

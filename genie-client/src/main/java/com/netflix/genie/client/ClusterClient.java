@@ -53,7 +53,7 @@ public class ClusterClient extends BaseGenieClient {
      * @throws GenieException If there is any problem.
      */
     public ClusterClient(
-        final GenieConfiguration configuration
+        final GenieClientConfiguration configuration
     ) throws GenieException {
         super(configuration);
         clusterService = retrofit.create(ClusterService.class);

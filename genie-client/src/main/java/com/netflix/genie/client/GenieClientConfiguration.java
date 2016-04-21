@@ -25,7 +25,7 @@ import com.netflix.genie.common.exceptions.GenieException;
  * @author amsharma
  * @since 3.0.0
  */
-public interface GenieConfiguration {
+public interface GenieClientConfiguration {
 
     /**
      * Get the URL for the Genie service.
@@ -66,7 +66,7 @@ public interface GenieConfiguration {
      *
      * @return The URL.
      */
-    String getOauthUrl();
+    String getSecurityOauthUrl();
 
     /**
      * Sets the Url for the OAUth IDP server.
@@ -75,14 +75,14 @@ public interface GenieConfiguration {
      *
      * @throws GenieException In case of any problems.
      */
-    void setOauthUrl(final String url) throws GenieException;
+    void setSecurityOauthUrl(final String url) throws GenieException;
 
     /**
      * Get the clientId for retrieving the OAuth credentials from the server.
      *
      * @return The clientId for the OAuth server.
      */
-    String getClientId();
+    String getSecurityClientId();
 
     /**
      * Sets the clientId to use with the OAuth server.
@@ -91,14 +91,14 @@ public interface GenieConfiguration {
      *
      * @throws GenieException In case of any problems.
      */
-    void setClientId(final String clientId) throws GenieException;
+    void setSecurityClientId(final String clientId) throws GenieException;
 
     /**
      * Get the client secret for retrieving the OAuth credentials from the server.
      *
      * @return The client secret for the OAuth server.
      */
-    String getClientSecret();
+    String getSecurityClientSecret();
 
     /**
      * Sets the client secret to use with the OAuth server.
@@ -107,14 +107,14 @@ public interface GenieConfiguration {
      *
      * @throws GenieException In case of any problems.
      */
-    void setClientSecret(final String clientSecret) throws GenieException;
+    void setSecurityClientSecret(final String clientSecret) throws GenieException;
 
     /**
      * Get the grant Type for retrieving the OAuth credentials from the server.
      *
      * @return The grant type for the OAuth server.
      */
-    String getGrantType();
+    String getSecurityGrantType();
 
     /**
      * Sets the grant type to use with the OAuth server.
@@ -123,14 +123,14 @@ public interface GenieConfiguration {
      *
      * @throws GenieException In case of any problems.
      */
-    void setGrantType(final String grantType) throws GenieException;
+    void setSecurityGrantType(final String grantType) throws GenieException;
 
     /**
      * Get the scope for retrieving the OAuth credentials from the server.
      *
      * @return The scope for the OAuth server.
      */
-    String getScope();
+    String getSecurityScope();
 
     /**
      * Sets the scope to use with the OAuth server.
@@ -139,6 +139,6 @@ public interface GenieConfiguration {
      *
      * @throws GenieException In case of any problems.
      */
-    void setScope(final String scope) throws GenieException;
+    void setSecurityScope(final String scope) throws GenieException;
 }
 

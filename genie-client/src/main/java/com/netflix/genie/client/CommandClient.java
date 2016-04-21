@@ -54,7 +54,7 @@ public class CommandClient extends BaseGenieClient {
      * @throws GenieException If there is any problem.
      */
     public CommandClient(
-        final GenieConfiguration configuration
+        final GenieClientConfiguration configuration
     ) throws GenieException {
         super(configuration);
         commandService = retrofit.create(CommandService.class);

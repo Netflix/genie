@@ -52,7 +52,7 @@ public abstract class BaseGenieClient {
      * @throws GenieException If there is any problem.
      */
     public BaseGenieClient(
-        final GenieConfiguration configuration
+        final GenieClientConfiguration configuration
         ) throws GenieException {
 
         final OkHttpClient.Builder builder = new OkHttpClient.Builder();
@@ -61,11 +61,11 @@ public abstract class BaseGenieClient {
         // and add the SecurityHeaderInterceptor to the request builder.
         if (configuration.isSecurityEnabled()) {
                 this.tokenFetcher = new TokenFetcher(
-                    configuration.getOauthUrl(),
-                    configuration.getClientId(),
-                    configuration.getClientSecret(),
-                    configuration.getGrantType(),
-                    configuration.getScope()
+                    configuration.getSecurityOauthUrl(),
+                    configuration.getSecurityClientId(),
+                    configuration.getSecurityClientSecret(),
+                    configuration.getSecurityGrantType(),
+                    configuration.getSecurityScope()
                 );
 
             builder.interceptors().add(new SecurityHeaderInterceptor(tokenFetcher));

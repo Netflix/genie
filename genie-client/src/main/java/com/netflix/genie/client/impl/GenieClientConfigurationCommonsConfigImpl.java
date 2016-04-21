@@ -17,28 +17,28 @@
  */
 package com.netflix.genie.client.impl;
 
-import com.netflix.genie.client.GenieConfiguration;
+import com.netflix.genie.client.GenieClientConfiguration;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * An implementation of the GenieConfiguration interface using Apache Commons Configuration.
+ * An implementation of the GenieClientConfiguration interface using Apache Commons Configuration.
  *
  * @author amsharma
  * @since 3.0.0
  */
-public class GenieConfigurationCommonsConfigImpl implements GenieConfiguration {
+public class GenieClientConfigurationCommonsConfigImpl implements GenieClientConfiguration {
 
-    private static final String SERVICE_URL_KEY = "genie.service.url";
+    private static final String SERVICE_URL_KEY = "genie.client.serviceUrl";
 
-    private static final String GENIE_SECURITY_ENABLED_KEY = "genie.security.enabled";
-    private static final String GENIE_SECURITY_OAUTH_URL_KEY = "genie.security.oauth.url";
-    private static final String GENIE_SECURITY_OAUTH_CLIENT_ID_KEY = "genie.security.oauth.clientId";
-    private static final String GENIE_SECURITY_OAUTH_CLIENT_SECRET_KEY = "genie.security.oauth.clientSecret";
-    private static final String GENIE_SECURITY_OAUTH_GRANT_TYPE_KEY = "genie.security.oauth.grantType";
-    private static final String GENIE_SECURITY_OAUTH_SCOPE_KEY = "genie.security.oauth.scope";
+    private static final String GENIE_SECURITY_ENABLED_KEY = "genie.client.securityEnabled";
+    private static final String GENIE_SECURITY_OAUTH_URL_KEY = "genie.client.securityOauthUrl";
+    private static final String GENIE_SECURITY_OAUTH_CLIENT_ID_KEY = "genie.client.securityOauthClientId";
+    private static final String GENIE_SECURITY_OAUTH_CLIENT_SECRET_KEY = "genie.client.securityOauthClientSecret";
+    private static final String GENIE_SECURITY_OAUTH_GRANT_TYPE_KEY = "genie.client.securityOauthGrantType";
+    private static final String GENIE_SECURITY_OAUTH_SCOPE_KEY = "genie.client.securityOauthScope";
 
     private final Configuration configuration;
 
@@ -49,7 +49,7 @@ public class GenieConfigurationCommonsConfigImpl implements GenieConfiguration {
      *
      * @throws GenieException If there is a problem.
      */
-    public GenieConfigurationCommonsConfigImpl(
+    public GenieClientConfigurationCommonsConfigImpl(
         final Configuration configuration
         ) throws GenieException {
         if (configuration != null) {
@@ -98,7 +98,7 @@ public class GenieConfigurationCommonsConfigImpl implements GenieConfiguration {
      * {@inheritDoc}
      */
     @Override
-    public String getOauthUrl() {
+    public String getSecurityOauthUrl() {
         return configuration.getString(GENIE_SECURITY_OAUTH_URL_KEY);
     }
 
@@ -106,7 +106,7 @@ public class GenieConfigurationCommonsConfigImpl implements GenieConfiguration {
      * {@inheritDoc}
      */
     @Override
-    public void setOauthUrl(final String url) throws GenieException {
+    public void setSecurityOauthUrl(final String url) throws GenieException {
         if (StringUtils.isBlank(url)) {
             throw new GeniePreconditionException("Url cannot be empty or null");
         }
@@ -117,7 +117,7 @@ public class GenieConfigurationCommonsConfigImpl implements GenieConfiguration {
      * {@inheritDoc}
      */
     @Override
-    public String getClientId() {
+    public String getSecurityClientId() {
         return configuration.getString(GENIE_SECURITY_OAUTH_CLIENT_ID_KEY);
     }
 
@@ -125,7 +125,7 @@ public class GenieConfigurationCommonsConfigImpl implements GenieConfiguration {
      * {@inheritDoc}
      */
     @Override
-    public void setClientId(final String clientId) throws GenieException {
+    public void setSecurityClientId(final String clientId) throws GenieException {
         if (StringUtils.isBlank(clientId)) {
             throw new GeniePreconditionException("ClientId cannot be empty or null");
         }
@@ -136,7 +136,7 @@ public class GenieConfigurationCommonsConfigImpl implements GenieConfiguration {
      * {@inheritDoc}
      */
     @Override
-    public String getClientSecret() {
+    public String getSecurityClientSecret() {
         return configuration.getString(GENIE_SECURITY_OAUTH_CLIENT_SECRET_KEY);
     }
 
@@ -144,7 +144,7 @@ public class GenieConfigurationCommonsConfigImpl implements GenieConfiguration {
      * {@inheritDoc}
      */
     @Override
-    public void setClientSecret(final String clientSecret) throws GenieException {
+    public void setSecurityClientSecret(final String clientSecret) throws GenieException {
         if (StringUtils.isBlank(clientSecret)) {
             throw new GeniePreconditionException("ClientId cannot be empty or null");
         }
@@ -155,7 +155,7 @@ public class GenieConfigurationCommonsConfigImpl implements GenieConfiguration {
      * {@inheritDoc}
      */
     @Override
-    public String getGrantType() {
+    public String getSecurityGrantType() {
         return configuration.getString(GENIE_SECURITY_OAUTH_GRANT_TYPE_KEY);
     }
 
@@ -163,7 +163,7 @@ public class GenieConfigurationCommonsConfigImpl implements GenieConfiguration {
      * {@inheritDoc}
      */
     @Override
-    public void setGrantType(final String grantType) throws GenieException {
+    public void setSecurityGrantType(final String grantType) throws GenieException {
         if (StringUtils.isBlank(grantType)) {
             throw new GeniePreconditionException("Grant Type cannot be empty or null");
         }
@@ -174,7 +174,7 @@ public class GenieConfigurationCommonsConfigImpl implements GenieConfiguration {
      * {@inheritDoc}
      */
     @Override
-    public String getScope() {
+    public String getSecurityScope() {
         return configuration.getString(GENIE_SECURITY_OAUTH_SCOPE_KEY);
     }
 
@@ -182,7 +182,7 @@ public class GenieConfigurationCommonsConfigImpl implements GenieConfiguration {
      * {@inheritDoc}
      */
     @Override
-    public void setScope(final String scope) throws GenieException {
+    public void setSecurityScope(final String scope) throws GenieException {
         if (StringUtils.isBlank(scope)) {
             throw new GeniePreconditionException("Scope cannot be empty or null");
         }
