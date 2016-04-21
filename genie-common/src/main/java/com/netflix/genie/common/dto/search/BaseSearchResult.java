@@ -19,6 +19,8 @@ package com.netflix.genie.common.dto.search;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.hibernate.validator.constraints.NotBlank;
@@ -53,5 +55,20 @@ public class BaseSearchResult implements Serializable {
     ) {
         this.id = id;
         this.name = name;
+    }
+
+    /**
+     * Convert this object to a string representation.
+     *
+     * @return This application data represented as a JSON structure
+     */
+    @Override
+    public String toString() {
+        try {
+            final ObjectMapper mapper = new ObjectMapper();
+            return mapper.writeValueAsString(this);
+        } catch (final JsonProcessingException ioe) {
+            return ioe.getLocalizedMessage();
+        }
     }
 }
