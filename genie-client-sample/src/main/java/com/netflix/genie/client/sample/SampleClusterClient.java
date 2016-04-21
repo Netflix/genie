@@ -18,7 +18,7 @@
 package com.netflix.genie.client.sample;
 
 import com.netflix.genie.client.ClusterClient;
-import com.netflix.genie.client.impl.GenieConfigurationCommonsConfigImpl;
+import com.netflix.genie.client.impl.GenieClientConfigurationCommonsConfigImpl;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
 import lombok.extern.slf4j.Slf4j;
@@ -57,7 +57,7 @@ public final class SampleClusterClient {
         final Configurations configs = new Configurations();
         final Configuration configuration = configs.properties("genie-client.properties");
 
-        final ClusterClient clusterClient = new ClusterClient(new GenieConfigurationCommonsConfigImpl(configuration));
+        final ClusterClient clusterClient = new ClusterClient(new GenieClientConfigurationCommonsConfigImpl(configuration));
 
         // create  new cluster in Genie
 

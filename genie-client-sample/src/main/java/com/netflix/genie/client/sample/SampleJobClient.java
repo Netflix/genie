@@ -19,7 +19,7 @@ package com.netflix.genie.client.sample;
 
 import com.google.common.collect.Sets;
 import com.netflix.genie.client.JobClient;
-import com.netflix.genie.client.impl.GenieConfigurationCommonsConfigImpl;
+import com.netflix.genie.client.impl.GenieClientConfigurationCommonsConfigImpl;
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.JobRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -27,10 +27,8 @@ import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -63,7 +61,7 @@ public final class SampleJobClient {
         final Configurations configs = new Configurations();
         final Configuration configuration = configs.properties("genie-client.properties");
 
-        final JobClient jobClient = new JobClient(new GenieConfigurationCommonsConfigImpl(configuration));
+        final JobClient jobClient = new JobClient(new GenieClientConfigurationCommonsConfigImpl(configuration));
 
         final String commandArgs = "-c 'echo hello world'";
 
@@ -109,32 +107,34 @@ public final class SampleJobClient {
 
         //final String jobId  = jobClient.submitJobWithAttachments(jobRequest, files);
 
-        final String jobId  = jobClient.submitJob(jobRequest);
-        log.info(jobClient.getJob(jobId).toString());
-        log.info(jobClient.getJobRequest(jobId).toString());
-        log.info(jobClient.getJobCluster(jobId).toString());
-        log.info(jobClient.getJobCommand(jobId).toString());
-        //log.info(jobClient.getJobApplications(jobId).toString());
-        log.info(jobClient.getJobExecution(jobId).toString());
-
-//        final InputStream inputStream1 = jobClient.getJobStdout(jobId);
-//        final BufferedReader reader1 = new BufferedReader(new InputStreamReader(inputStream1));
+//        final String jobId  = jobClient.submitJob(jobRequest);
+//        log.info(jobClient.getJob(jobId).toString());
+//        log.info(jobClient.getJobRequest(jobId).toString());
+//        log.info(jobClient.getJobCluster(jobId).toString());
+//        log.info(jobClient.getJobCommand(jobId).toString());
+//        //log.info(jobClient.getJobApplications(jobId).toString());
+//        log.info(jobClient.getJobExecution(jobId).toString());
 //
-//        String line;
-//        while ((line = reader1.readLine()) != null) {
-//           log.info(line);
-//        }
+////        final InputStream inputStream1 = jobClient.getJobStdout(jobId);
+////        final BufferedReader reader1 = new BufferedReader(new InputStreamReader(inputStream1));
+////
+////        String line;
+////        while ((line = reader1.readLine()) != null) {
+////           log.info(line);
+////        }
+////
+////
+////        final InputStream inputStream2 = jobClient.getJobStderr(jobId);
+////        final BufferedReader reader2 = new BufferedReader(new InputStreamReader(inputStream2));
+////
+////        while ((line = reader2.readLine()) != null) {
+////            log.info(line);
+////        }
 //
-//
-//        final InputStream inputStream2 = jobClient.getJobStderr(jobId);
-//        final BufferedReader reader2 = new BufferedReader(new InputStreamReader(inputStream2));
-//
-//        while ((line = reader2.readLine()) != null) {
-//            log.info(line);
-//        }
-
-        final Map<String, String> tagMap = new HashMap<>();
-        tagMap.put("tag", "bar,foo");
-        log.info(jobClient.getJobs(tagMap).toString());
+//        final Map<String, String> tagMap = new HashMap<>();
+//        tagMap.put("tag", "bar,foo");
+//        log.info(jobClient.getJobs(tagMap).toString());
+        jobClient.getJobs().forEach(job -> log.info(job.toString()));
+        //log.info(jobClient.getJobs().toString());
     }
 }
