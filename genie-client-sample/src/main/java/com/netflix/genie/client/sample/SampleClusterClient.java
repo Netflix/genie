@@ -57,7 +57,8 @@ public final class SampleClusterClient {
         final Configurations configs = new Configurations();
         final Configuration configuration = configs.properties("genie-client.properties");
 
-        final ClusterClient clusterClient = new ClusterClient(new GenieClientConfigurationCommonsConfigImpl(configuration));
+        final ClusterClient clusterClient =
+            new ClusterClient(new GenieClientConfigurationCommonsConfigImpl(configuration));
 
         // create  new cluster in Genie
 
