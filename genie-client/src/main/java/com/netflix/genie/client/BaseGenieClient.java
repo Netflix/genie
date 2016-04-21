@@ -18,9 +18,7 @@
 package com.netflix.genie.client;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.netflix.genie.client.apis.GenieService;
 import com.netflix.genie.client.interceptor.ResponseMappingInterceptor;
 import com.netflix.genie.client.interceptor.SecurityHeaderInterceptor;
 import com.netflix.genie.client.security.TokenFetcher;
@@ -28,11 +26,6 @@ import com.netflix.genie.common.exceptions.GenieException;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -46,7 +39,8 @@ public abstract class BaseGenieClient {
     protected static final String FILE_PATH_DELIMITER = "/";
     protected static final String STATUS = "status";
 
-    protected GenieService genieService;
+    protected Retrofit retrofit;
+    protected final ObjectMapper mapper;
 
     private TokenFetcher tokenFetcher;
 
@@ -58,7 +52,7 @@ public abstract class BaseGenieClient {
      * @throws GenieException If there is any problem.
      */
     public BaseGenieClient(
-        final GenieConfiguration configuration
+        final GenieClientConfiguration configuration
         ) throws GenieException {
 
         final OkHttpClient.Builder builder = new OkHttpClient.Builder();
@@ -67,11 +61,11 @@ public abstract class BaseGenieClient {
         // and add the SecurityHeaderInterceptor to the request builder.
         if (configuration.isSecurityEnabled()) {
                 this.tokenFetcher = new TokenFetcher(
-                    configuration.getOauthUrl(),
-                    configuration.getClientId(),
-                    configuration.getClientSecret(),
-                    configuration.getGrantType(),
-                    configuration.getScope()
+                    configuration.getSecurityOauthUrl(),
+                    configuration.getSecurityClientId(),
+                    configuration.getSecurityClientSecret(),
+                    configuration.getSecurityGrantType(),
+                    configuration.getSecurityScope()
                 );
 
             builder.interceptors().add(new SecurityHeaderInterceptor(tokenFetcher));
@@ -83,16 +77,14 @@ public abstract class BaseGenieClient {
 
         final OkHttpClient client = builder.build();
 
-        final ObjectMapper mapper = new ObjectMapper().
+        mapper = new ObjectMapper().
             configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-        final Retrofit retrofit = new Retrofit.Builder()
+        retrofit = new Retrofit.Builder()
             .baseUrl(configuration.getServiceUrl())
             .addConverterFactory(JacksonConverterFactory.create(mapper))
             .client(client)
             .build();
-
-        genieService = retrofit.create(GenieService.class);
     }
 
     /**
@@ -103,24 +95,5 @@ public abstract class BaseGenieClient {
      */
     protected String getIdFromLocation(final String location) {
         return location.substring(location.lastIndexOf("/") + 1);
-    }
-
-    /**
-     * Helper method used to parse out a list of Entities out of the HAL Response received from Genie. It takes the
-     * json node and looks for the appropriate key to get the list.
-     *
-     * @param node A json node root object for the json response.
-     * @param key The key to lookup the list of entities.
-     *
-     * @return A list of entities.
-     * @throws IOException If there is any problem.
-     */
-    protected List<Map<String, String>> getListFromHalObject(
-        final JsonNode node, final String key
-    ) throws IOException {
-        final ObjectMapper mapper = new ObjectMapper();
-        return (ArrayList<Map<String, String>>)
-            mapper.readValue(node.get("_embedded").get(key).toString(),
-                List.class);
     }
 }

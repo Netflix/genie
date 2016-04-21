@@ -41,12 +41,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * An interface that provides all methods needed for the Genie client implementation.
+ * An interface that provides all methods needed for the Genie job client implementation.
  *
  * @author amsharma
  * @since 3.0.0
  */
-public interface GenieService {
+public interface JobService {
 
     /**
      * Path to Jobs.

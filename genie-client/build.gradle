@@ -12,6 +12,9 @@ dependencies {
     compile("org.apache.commons:commons-configuration2:2.0")
     compile("commons-beanutils:commons-beanutils:1.9.2")
 
+    // JSON Patch Support
+    compile("com.github.fge:json-patch")
+
     /*******************************
      * Provided Dependencies
      *******************************/
