@@ -261,7 +261,8 @@ CREATE TABLE `job_requests` (
   `client_host` VARCHAR(255) DEFAULT NULL,
   `applications` VARCHAR(2048) NOT NULL DEFAULT '[]',
   `timeout` INT NOT NULL DEFAULT 604800, # Seven days in seconds
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  INDEX `JOB_REQUESTS_CREATED_INDEX` (`created`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully created the job_requests table.' AS '';
 

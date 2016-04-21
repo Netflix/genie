@@ -321,11 +321,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
     }
 
     /**
-     * Method to set exit code for the job execution.
-     *
-     * @param id       the id of the job to update the exit code
-     * @param exitCode The exit code of the process
-     * @throws GenieException if there is an error
+     * {@inheritDoc}
      */
     @Override
     public synchronized void setExitCode(
@@ -373,5 +369,13 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         } else {
             throw new GenieNotFoundException("No job with id " + id);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long deleteAllJobsCreatedBeforeDate(@NotNull final Date date) {
+        return this.jobRequestRepo.deleteByCreatedBefore(date);
     }
 }

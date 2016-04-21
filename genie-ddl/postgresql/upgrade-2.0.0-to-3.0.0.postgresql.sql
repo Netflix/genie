@@ -282,6 +282,8 @@ CREATE TABLE job_requests (
 );
 SELECT CURRENT_TIMESTAMP, 'Successfully created the job_requests table.';
 
+CREATE INDEX JOB_REQUESTS_CREATED_INDEX ON job_requests (created);
+
 SELECT CURRENT_TIMESTAMP, 'Inserting values into job_requests table from the jobs table...';
 INSERT INTO job_requests (
   id,
