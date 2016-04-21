@@ -46,6 +46,10 @@ genie:
       port: 8080
       rate: 300000
       lostThreshold: 3
+    databaseCleanup:
+      enabled: true
+      expression: 0 0 0 * * *
+      retention: 90
   mail:
     fromAddress: no-reply-genie@geniehost.com
     #user:

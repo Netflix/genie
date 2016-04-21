@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.7.11, for osx10.11 (x86_64)
+-- MySQL dump 10.13  Distrib 5.7.12, for osx10.11 (x86_64)
 --
 -- Host: localhost    Database: genie
 -- ------------------------------------------------------
--- Server version	5.7.11
+-- Server version	5.7.12
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -247,7 +247,8 @@ CREATE TABLE `job_requests` (
   `client_host` varchar(255) DEFAULT NULL,
   `applications` varchar(2048) NOT NULL DEFAULT '[]',
   `timeout` int(11) NOT NULL DEFAULT '604800',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `JOB_REQUESTS_CREATED_INDEX` (`created`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -322,4 +323,4 @@ CREATE TABLE `jobs_applications` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-03-30 13:27:05
+-- Dump completed on 2016-04-21 10:48:30
