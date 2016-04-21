@@ -107,13 +107,13 @@ public final class SampleJobClient {
 
         //final String jobId  = jobClient.submitJobWithAttachments(jobRequest, files);
 
-//        final String jobId  = jobClient.submitJob(jobRequest);
-//        log.info(jobClient.getJob(jobId).toString());
-//        log.info(jobClient.getJobRequest(jobId).toString());
-//        log.info(jobClient.getJobCluster(jobId).toString());
-//        log.info(jobClient.getJobCommand(jobId).toString());
-//        //log.info(jobClient.getJobApplications(jobId).toString());
-//        log.info(jobClient.getJobExecution(jobId).toString());
+        final String jobId  = jobClient.submitJob(jobRequest);
+        log.info(jobClient.getJob(jobId).toString());
+        log.info(jobClient.getJobRequest(jobId).toString());
+        log.info(jobClient.getJobCluster(jobId).toString());
+        log.info(jobClient.getJobCommand(jobId).toString());
+        //log.info(jobClient.getJobApplications(jobId).toString());
+        log.info(jobClient.getJobExecution(jobId).toString());
 //
 ////        final InputStream inputStream1 = jobClient.getJobStdout(jobId);
 ////        final BufferedReader reader1 = new BufferedReader(new InputStreamReader(inputStream1));
