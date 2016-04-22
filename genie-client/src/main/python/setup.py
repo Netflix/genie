@@ -26,13 +26,13 @@ with open(path.join(here, 'DESCRIPTION.rst'), encoding='utf-8') as f:
 setup(
     name='nflx-genie-client',
 
-    version='2.2.0',
+    version='3.0.0',
 
     author='Netflix Inc.',
 
     author_email='genieoss@googlegroups.com',
 
-    packages=['genie2', 'genie2.client', 'genie2.exception', 'genie2.model'],
+    packages=['genie3', 'genie2', 'genie2.client', 'genie2.exception', 'genie2.model'],
 
     scripts=[],
 
