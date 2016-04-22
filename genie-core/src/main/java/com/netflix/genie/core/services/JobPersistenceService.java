@@ -111,7 +111,7 @@ public interface JobPersistenceService {
     void setExitCode(@NotBlank final String id, @NotBlank final int exitCode) throws GenieException;
 
     /**
-     * This method will delete all jobs whose created time is < date.
+     * This method will delete all jobs whose created time is less than date.
      *
      * @param date The date before which all jobs should be deleted
      * @return the number of deleted jobs
