@@ -261,4 +261,30 @@ public class GenieResourceHttpRequestHandlerUnitTests {
 
         this.handler.handleRequest(request, response);
     }
+
+    /**
+     * Make sure we can use the overridden set headers method properly for large file sizes.
+     *
+     * @throws IOException on error
+     */
+    @Test
+    public void canSetHeaders() throws IOException {
+        final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+        final Resource resource = Mockito.mock(Resource.class);
+        final MediaType mediaType = MediaType.APPLICATION_OCTET_STREAM;
+
+        final long justRight = (long) Integer.MAX_VALUE;
+        final long tooLong = (long) Integer.MAX_VALUE + 1;
+        Mockito
+            .when(resource.contentLength())
+            .thenReturn(justRight)
+            .thenReturn(tooLong);
+
+        this.handler.setHeaders(response, resource, mediaType);
+        this.handler.setHeaders(response, resource, null);
+
+        Mockito.verify(response, Mockito.times(1)).setContentLengthLong(justRight);
+        Mockito.verify(response, Mockito.times(1)).setContentLengthLong(tooLong);
+        Mockito.verify(response, Mockito.times(1)).setContentType(Mockito.anyString());
+    }
 }
