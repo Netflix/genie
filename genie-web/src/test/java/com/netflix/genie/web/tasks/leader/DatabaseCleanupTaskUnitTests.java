@@ -22,6 +22,7 @@ import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.properties.DatabaseCleanupProperties;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
+import com.netflix.spectator.api.Registry;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -33,6 +34,7 @@ import org.springframework.scheduling.support.CronTrigger;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Unit tests for DatabaseCleanupTask.
@@ -46,6 +48,7 @@ public class DatabaseCleanupTaskUnitTests {
     private DatabaseCleanupProperties cleanupProperties;
     private JobPersistenceService jobPersistenceService;
     private DatabaseCleanupTask task;
+    private AtomicLong numDeletedJobs;
 
     /**
      * Setup for the tests.
@@ -54,7 +57,16 @@ public class DatabaseCleanupTaskUnitTests {
     public void setup() {
         this.cleanupProperties = Mockito.mock(DatabaseCleanupProperties.class);
         this.jobPersistenceService = Mockito.mock(JobPersistenceService.class);
-        this.task = new DatabaseCleanupTask(this.cleanupProperties, this.jobPersistenceService);
+        this.numDeletedJobs = new AtomicLong();
+        final Registry registry = Mockito.mock(Registry.class);
+        Mockito
+            .when(
+                registry.gauge(
+                    Mockito.eq("genie.tasks.databaseCleanup.numDeletedJobs.gauge"),
+                    Mockito.any(AtomicLong.class)
+                )
+            ).thenReturn(this.numDeletedJobs);
+        this.task = new DatabaseCleanupTask(this.cleanupProperties, this.jobPersistenceService, registry);
     }
 
     /**
@@ -85,11 +97,20 @@ public class DatabaseCleanupTaskUnitTests {
         Mockito.when(this.cleanupProperties.getRetention()).thenReturn(days).thenReturn(negativeDays);
         final ArgumentCaptor<Date> argument = ArgumentCaptor.forClass(Date.class);
 
+        final long deletedCount1 = 6L;
+        final long deletedCount2 = 18L;
+        Mockito
+            .when(this.jobPersistenceService.deleteAllJobsCreatedBeforeDate(Mockito.any(Date.class)))
+            .thenReturn(deletedCount1)
+            .thenReturn(deletedCount2);
+
         // The multiple calendar instances are to protect against running this test when the day flips
         final Calendar before = Calendar.getInstance(JobConstants.UTC);
         this.task.run();
+        Assert.assertThat(this.numDeletedJobs.get(), Matchers.is(deletedCount1));
         this.task.run();
         final Calendar after = Calendar.getInstance(JobConstants.UTC);
+        Assert.assertThat(this.numDeletedJobs.get(), Matchers.is(deletedCount2));
 
         if (before.get(Calendar.DAY_OF_YEAR) == after.get(Calendar.DAY_OF_YEAR)) {
             Mockito

@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
  * @author tgianos
  * @since 3.0.0
  */
-@ConfigurationProperties(prefix = "genie.leader.clusterChecker")
+@ConfigurationProperties(prefix = "genie.tasks.clusterChecker")
 @Component
 @Getter
 @Setter
