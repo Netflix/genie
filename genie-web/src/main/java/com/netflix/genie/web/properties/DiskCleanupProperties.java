@@ -28,12 +28,12 @@ import org.springframework.stereotype.Component;
  * @author tgianos
  * @since 3.0.0
  */
-@ConfigurationProperties(prefix = "genie.tasks.databaseCleanup")
+@ConfigurationProperties(prefix = "genie.tasks.diskCleanup")
 @Component
 @Getter
 @Setter
-public class DatabaseCleanupProperties {
+public class DiskCleanupProperties {
     private boolean enabled;
     private String expression = "0 0 0 * * *";
-    private int retention = 90;
+    private int retention = 3;
 }

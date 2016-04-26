@@ -21,6 +21,8 @@ import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.web.properties.DatabaseCleanupProperties;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
+import com.netflix.genie.web.tasks.TaskUtils;
+import com.netflix.spectator.api.Registry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -33,6 +35,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * A task which will clean up the database of old jobs if desired.
@@ -40,7 +43,7 @@ import java.util.Date;
  * @author tgianos
  * @since 3.0.0
  */
-@ConditionalOnProperty("genie.leader.databaseCleanup.enabled")
+@ConditionalOnProperty("genie.tasks.databaseCleanup.enabled")
 @Component
 @Slf4j
 public class DatabaseCleanupTask extends LeadershipTask {
@@ -49,19 +52,25 @@ public class DatabaseCleanupTask extends LeadershipTask {
     private final DatabaseCleanupProperties cleanupProperties;
     private final JobPersistenceService jobPersistenceService;
 
+    private final AtomicLong numDeletedJobs;
+
     /**
      * Constructor.
      *
      * @param cleanupProperties     The properties to use to configure this task
      * @param jobPersistenceService The persistence service to use to cleanup the data store
+     * @param registry              The metrics registry
      */
     @Autowired
     public DatabaseCleanupTask(
         @NotNull final DatabaseCleanupProperties cleanupProperties,
-        @NotNull final JobPersistenceService jobPersistenceService
+        @NotNull final JobPersistenceService jobPersistenceService,
+        @NotNull final Registry registry
     ) {
         this.cleanupProperties = cleanupProperties;
         this.jobPersistenceService = jobPersistenceService;
+
+        this.numDeletedJobs = registry.gauge("genie.tasks.databaseCleanup.numDeletedJobs.gauge", new AtomicLong());
     }
 
     /**
@@ -85,18 +94,13 @@ public class DatabaseCleanupTask extends LeadershipTask {
      */
     @Override
     public void run() {
-        final Calendar cal = Calendar.getInstance(JobConstants.UTC);
-        // Make sure everything but the year, month, day is 0
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
+        final Calendar cal = TaskUtils.getMidnightUTC();
         // Move the date back the number of days retention is set for
-        final int retention = this.cleanupProperties.getRetention();
-        cal.add(Calendar.DAY_OF_YEAR, retention < 0 ? retention : retention * -1);
+        TaskUtils.subtractDaysFromDate(cal, this.cleanupProperties.getRetention());
         final Date retentionLimit = cal.getTime();
 
         final long numberDeletedJobs = this.jobPersistenceService.deleteAllJobsCreatedBeforeDate(retentionLimit);
         log.info("Deleted {} jobs from before {}", numberDeletedJobs, this.dateFormat.format(retentionLimit));
+        this.numDeletedJobs.set(numberDeletedJobs);
     }
 }
