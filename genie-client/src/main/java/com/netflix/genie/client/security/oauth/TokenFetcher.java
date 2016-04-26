@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.client.security;
+package com.netflix.genie.client.security.oauth;
 
 import com.netflix.genie.client.apis.TokenService;
 import com.netflix.genie.common.exceptions.GenieException;

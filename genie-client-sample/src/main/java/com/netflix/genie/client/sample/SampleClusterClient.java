@@ -18,12 +18,9 @@
 package com.netflix.genie.client.sample;
 
 import com.netflix.genie.client.ClusterClient;
-import com.netflix.genie.client.impl.GenieClientConfigurationCommonsConfigImpl;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.configuration2.Configuration;
-import org.apache.commons.configuration2.builder.fluent.Configurations;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -33,6 +30,7 @@ import java.util.Set;
  * Sample class that exhibits how to use the JobClient class to run and monitor a job.
  *
  * @author amsharma
+ * @since 3.0.0
  */
 @Slf4j
 public final class SampleClusterClient {
@@ -54,11 +52,7 @@ public final class SampleClusterClient {
 
         log.debug("Starting Execution.");
 
-        final Configurations configs = new Configurations();
-        final Configuration configuration = configs.properties("genie-client.properties");
-
-        final ClusterClient clusterClient =
-            new ClusterClient(new GenieClientConfigurationCommonsConfigImpl(configuration));
+        final ClusterClient clusterClient = new ClusterClient("http://localhost:8080");
 
         // create  new cluster in Genie
 

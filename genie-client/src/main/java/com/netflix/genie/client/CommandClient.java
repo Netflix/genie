@@ -20,6 +20,7 @@ package com.netflix.genie.client;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.netflix.genie.client.apis.CommandService;
+import com.netflix.genie.client.security.SecurityInterceptor;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
@@ -49,14 +50,30 @@ public class CommandClient extends BaseGenieClient {
     /**
      * Constructor.
      *
-     * @param configuration The configuration object containing all information for instantiating the client.
+     * @param url The url of the Genie Service.
+     * @param securityInterceptor An implementation of the Security Interceptor.
      *
      * @throws GenieException If there is any problem.
      */
     public CommandClient(
-        final GenieClientConfiguration configuration
+        final String url,
+        final SecurityInterceptor securityInterceptor
     ) throws GenieException {
-        super(configuration);
+        super(url, securityInterceptor);
+        commandService = retrofit.create(CommandService.class);
+    }
+
+    /**
+     * Constructor that takes only the URL.
+     *
+     * @param url The url of the Genie Service.
+     * @throws GenieException If there is any problem.
+     */
+    // TODO Can we get rid of one constructor in either BaseGenieClient or JobClient.
+    public CommandClient(
+        final String url
+    ) throws GenieException {
+        super(url, null);
         commandService = retrofit.create(CommandService.class);
     }
 

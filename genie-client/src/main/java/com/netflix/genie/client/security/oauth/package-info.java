@@ -15,10 +15,11 @@
  *     limitations under the License.
  *
  */
+
 /**
- * Package for implementation of interfaces.
+ * Package containing Oauth security related classes.
  *
  * @author amsharma
  * @since 3.0.0
  */
-package com.netflix.genie.client.impl;
+package com.netflix.genie.client.security.oauth;
