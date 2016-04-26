@@ -20,10 +20,11 @@ package com.netflix.genie.client;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.genie.client.interceptor.ResponseMappingInterceptor;
-import com.netflix.genie.client.interceptor.SecurityHeaderInterceptor;
-import com.netflix.genie.client.security.TokenFetcher;
+import com.netflix.genie.client.security.SecurityInterceptor;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import okhttp3.OkHttpClient;
+import org.apache.commons.lang3.StringUtils;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
@@ -40,48 +41,40 @@ public abstract class BaseGenieClient {
     protected static final String STATUS = "status";
 
     protected Retrofit retrofit;
-    protected final ObjectMapper mapper;
-
-    private TokenFetcher tokenFetcher;
+    protected ObjectMapper mapper;
 
     /**
-     * Constructor.
+     * Constructor that takes the service url and a security interceptor implementation.
      *
-     * @param configuration The configuration to use for instantiating the client.
-     *
-     * @throws GenieException If there is any problem.
+     * @param url The url of the Genie Service.
+     * @param securityInterceptor An implementation of the Security Interceptor.
+     * @throws GenieException If there is any problem creating the constructor.
      */
     public BaseGenieClient(
-        final GenieClientConfiguration configuration
+        final String url,
+        final SecurityInterceptor securityInterceptor
         ) throws GenieException {
 
-        final OkHttpClient.Builder builder = new OkHttpClient.Builder();
-
-        // If security is enabled we instantiate the Token Fetcher object to get credentials when needed
-        // and add the SecurityHeaderInterceptor to the request builder.
-        if (configuration.isSecurityEnabled()) {
-                this.tokenFetcher = new TokenFetcher(
-                    configuration.getSecurityOauthUrl(),
-                    configuration.getSecurityClientId(),
-                    configuration.getSecurityClientSecret(),
-                    configuration.getSecurityGrantType(),
-                    configuration.getSecurityScope()
-                );
-
-            builder.interceptors().add(new SecurityHeaderInterceptor(tokenFetcher));
+        if (StringUtils.isBlank(url)) {
+            throw new GeniePreconditionException("Service URL cannot be empty or null");
         }
+
+        final OkHttpClient.Builder builder = new OkHttpClient.Builder();
+        mapper = new ObjectMapper().
+            configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         // Add the interceptor to map the retrofit response code to corresponding Genie Exceptions in case of
         // 4xx and 5xx errors.
         builder.addInterceptor(new ResponseMappingInterceptor());
 
+        // Add the security interceptor if provided to add credentials to a request.
+        if (securityInterceptor != null) {
+            builder.addInterceptor(securityInterceptor);
+        }
         final OkHttpClient client = builder.build();
 
-        mapper = new ObjectMapper().
-            configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
         retrofit = new Retrofit.Builder()
-            .baseUrl(configuration.getServiceUrl())
+            .baseUrl(url)
             .addConverterFactory(JacksonConverterFactory.create(mapper))
             .client(client)
             .build();

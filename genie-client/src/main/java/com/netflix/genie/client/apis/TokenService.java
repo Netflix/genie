@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.client.apis;
 
-import com.netflix.genie.client.security.AccessToken;
+import com.netflix.genie.client.security.oauth.AccessToken;
 import retrofit2.Call;
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;

@@ -15,13 +15,13 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.client.interceptor;
+package com.netflix.genie.client.security.oauth.impl;
 
-import com.netflix.genie.client.security.AccessToken;
-import com.netflix.genie.client.security.TokenFetcher;
+import com.netflix.genie.client.security.SecurityInterceptor;
+import com.netflix.genie.client.security.oauth.AccessToken;
+import com.netflix.genie.client.security.oauth.TokenFetcher;
 import com.netflix.genie.common.exceptions.GenieException;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
 
@@ -33,20 +33,30 @@ import java.io.IOException;
  * @author amsharma
  */
 @Slf4j
-public class SecurityHeaderInterceptor implements Interceptor {
+public class OAuthSecurityInterceptor implements SecurityInterceptor {
 
     private final TokenFetcher tokenFetcher;
 
     /**
      * Constructor.
      *
-     * @param tokenFetcher An instance of the TokenFetcher class used to fetch OAuth Tokens.
+     * @param url The URL of the IDP server for getting oauth token.
+     * @param clientId The client id to use to fetch credentials.
+     * @param clientSecret The client secret to use to fetch credentials.
+     * @param grantType The grant type for the user.
+     * @param scope The scope of the user permissions.
+     *
+     * @throws GenieException If there is a problem initializing the object.
      */
-    public SecurityHeaderInterceptor(
-        final TokenFetcher tokenFetcher
-        ) {
+    public OAuthSecurityInterceptor(
+        final String url,
+        final String clientId,
+        final String clientSecret,
+        final String grantType,
+        final String scope
+        ) throws GenieException {
         log.debug("Constructor called.");
-        this.tokenFetcher = tokenFetcher;
+        tokenFetcher = new TokenFetcher(url, clientId, clientSecret, grantType, scope);
     }
 
     @Override

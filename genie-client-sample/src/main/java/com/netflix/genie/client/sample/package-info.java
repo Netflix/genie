@@ -19,5 +19,6 @@
  * Package showing samples of how to use Genie Java client.
  *
  * @author amsharma
+ * @since 3.0.0
  */
 package com.netflix.genie.client.sample;

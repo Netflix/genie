@@ -19,12 +19,9 @@ package com.netflix.genie.client.sample;
 
 import com.google.common.collect.Sets;
 import com.netflix.genie.client.JobClient;
-import com.netflix.genie.client.impl.GenieClientConfigurationCommonsConfigImpl;
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.JobRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.configuration2.Configuration;
-import org.apache.commons.configuration2.builder.fluent.Configurations;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -35,6 +32,7 @@ import java.util.Set;
  * Sample class that exhibits how to use the JobClient class to run and monitor a job.
  *
  * @author amsharma
+ * @since 3.0.0
  */
 @Slf4j
 public final class SampleJobClient {
@@ -58,10 +56,7 @@ public final class SampleJobClient {
 
         log.debug("Starting Execution.");
 
-        final Configurations configs = new Configurations();
-        final Configuration configuration = configs.properties("genie-client.properties");
-
-        final JobClient jobClient = new JobClient(new GenieClientConfigurationCommonsConfigImpl(configuration));
+        final JobClient jobClient = new JobClient("http://localhost:8080");
 
         final String commandArgs = "-c 'echo hello world'";
 
@@ -105,7 +100,7 @@ public final class SampleJobClient {
 //        files.add("file path");
 //        files.add("file path");
 
-        //final String jobId  = jobClient.submitJobWithAttachments(jobRequest, files);
+          //final String jobId  = jobClient.submitJobWithAttachments(jobRequest, files);
 
         final String jobId  = jobClient.submitJob(jobRequest);
         log.info(jobClient.getJob(jobId).toString());
@@ -134,7 +129,7 @@ public final class SampleJobClient {
 //        final Map<String, String> tagMap = new HashMap<>();
 //        tagMap.put("tag", "bar,foo");
 //        log.info(jobClient.getJobs(tagMap).toString());
-        jobClient.getJobs().forEach(job -> log.info(job.toString()));
+        //jobClient.getJobs().forEach(job -> log.info(job.toString()));
         //log.info(jobClient.getJobs().toString());
     }
 }

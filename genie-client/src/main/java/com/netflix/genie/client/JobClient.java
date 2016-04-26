@@ -19,6 +19,7 @@ package com.netflix.genie.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.netflix.genie.client.apis.JobService;
+import com.netflix.genie.client.security.SecurityInterceptor;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
@@ -54,19 +55,35 @@ public class JobClient extends BaseGenieClient {
     private static final String ATTACHMENT = "attachment";
     private static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
 
-    private JobService jobService;
+    private final JobService jobService;
 
     /**
      * Constructor.
      *
-     * @param configuration The configuration object containing all information for instantiating the client.
+     * @param url The url of the Genie Service.
+     * @param securityInterceptor An implementation of the Security Interceptor.
      *
      * @throws GenieException If there is any problem.
      */
     public JobClient(
-        final GenieClientConfiguration configuration
+        final String url,
+        final SecurityInterceptor securityInterceptor
     ) throws GenieException {
-        super(configuration);
+        super(url, securityInterceptor);
+        jobService = retrofit.create(JobService.class);
+     }
+
+    /**
+     * Constructor that takes only the URL.
+     *
+     * @param url The url of the Genie Service.
+     * @throws GenieException If there is any problem.
+     */
+    // TODO Can we get rid of one constructor in either BaseGenieClient or JobClient.
+    public JobClient(
+        final String url
+    ) throws GenieException {
+        super(url, null);
         jobService = retrofit.create(JobService.class);
     }
 
