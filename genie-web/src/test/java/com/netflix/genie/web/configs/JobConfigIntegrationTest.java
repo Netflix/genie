@@ -17,11 +17,12 @@
  */
 package com.netflix.genie.web.configs;
 
+import com.google.common.io.Files;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,21 +38,24 @@ import java.io.IOException;
 public class JobConfigIntegrationTest {
 
     /**
-     * Returns the builds directory of the genie-web probject as the resource.
-     *
-     * @param resourceLoader The resource loader to use.
+     * Returns a temporary directory as the jobs resource.
      *
      * @return The job dir as a resource.
-     *
      * @throws IOException If there is a problem.
      */
     @Bean
-    public Resource jobsDir(
-        final ResourceLoader resourceLoader
-    ) throws IOException {
-        final String currentDir = new File(".").getCanonicalPath();
-        final Resource jobsDirResource = resourceLoader.getResource(currentDir + "/build/tmp/genie/");
-        //final Resource jobsDirResource = resourceLoader.getResource("file:///tmp/");
-        return jobsDirResource;
+    public Resource jobsDir() throws IOException {
+        final File jobsDir = Files.createTempDir();
+        if (!jobsDir.exists() && !jobsDir.mkdirs()) {
+            throw new IllegalArgumentException("Unable to create directories: " + jobsDir);
+        }
+
+        String jobsDirPath = jobsDir.getAbsolutePath();
+        final String slash = "/";
+        if (!jobsDirPath.endsWith(slash)) {
+            jobsDirPath = jobsDirPath + slash;
+        }
+
+        return new FileSystemResource(jobsDirPath);
     }
 }

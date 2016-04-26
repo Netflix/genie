@@ -113,7 +113,7 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
      * @param resourceLoader  The resource loader to use
      * @param jobsDirLocation The location of the job dir
      * @return The job dir as a resource
-     * @throws IOException on error reading or creading the directory
+     * @throws IOException on error reading or creating the directory
      */
     @Bean
     @ConditionalOnMissingBean

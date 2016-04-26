@@ -23,18 +23,17 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 /**
- * Properties associated with the cluster checking task.
+ * Properties controlling the behavior of the database cleanup leadership task.
  *
  * @author tgianos
  * @since 3.0.0
  */
-@ConfigurationProperties(prefix = "genie.tasks.clusterChecker")
+@ConfigurationProperties(prefix = "genie.tasks.databaseCleanup")
 @Component
 @Getter
 @Setter
-public class ClusterCheckerProperties {
-    private String scheme = "http";
-    private int port = 8080;
-    private long rate = 300000L;
-    private int lostThreshold = 3;
+public class DatabaseCleanupProperties {
+    private boolean enabled;
+    private String expression = "0 0 0 * * *";
+    private int retention = 90;
 }

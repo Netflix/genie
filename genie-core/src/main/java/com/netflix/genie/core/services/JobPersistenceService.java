@@ -25,6 +25,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -108,4 +109,12 @@ public interface JobPersistenceService {
      * @throws GenieException if there is an error
      */
     void setExitCode(@NotBlank final String id, @NotBlank final int exitCode) throws GenieException;
+
+    /**
+     * This method will delete all jobs whose created time is less than date.
+     *
+     * @param date The date before which all jobs should be deleted
+     * @return the number of deleted jobs
+     */
+    long deleteAllJobsCreatedBeforeDate(@NotNull final Date date);
 }

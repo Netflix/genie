@@ -575,7 +575,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         final String runSHFile = this.resourceLoader.getResource(BASE_DIR + runShFileName).getFile().getAbsolutePath();
         final String runFileContents = new String(Files.readAllBytes(Paths.get(runSHFile)), "UTF-8");
 
-        final String jobWorkingDir = jobDirResource.getFile().getAbsolutePath() + FILE_DELIMITER + jobId;
+        final String jobWorkingDir = this.jobDirResource.getFile().getCanonicalPath() + FILE_DELIMITER + jobId;
         final String expectedRunScriptContent = runFileContents.replace("TEST_GENIE_JOB_WORKING_DIR_PLACEHOLDER",
             jobWorkingDir);
 

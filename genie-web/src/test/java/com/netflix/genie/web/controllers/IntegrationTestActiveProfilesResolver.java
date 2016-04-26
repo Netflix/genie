@@ -21,6 +21,9 @@ import org.springframework.test.context.ActiveProfilesResolver;
 
 /**
  * A class to switch the active profiles for integration tests based on environment variables.
+ *
+ * @author tgianos
+ * @since 3.0.0
  */
 public class IntegrationTestActiveProfilesResolver implements ActiveProfilesResolver {
 
