@@ -255,7 +255,6 @@ public class ServicesConfigUnitTests {
         Assert.assertNotNull(
             this.servicesConfig.jobCoordinatorService(
                 jobPersistenceService,
-                this.jobSearchService,
                 jobSubmitterService,
                 jobKillService,
                 "file:///tmp"
@@ -272,7 +271,8 @@ public class ServicesConfigUnitTests {
             this.servicesConfig.jobKillService(
                 "localhost",
                 this.jobSearchService,
-                Mockito.mock(Executor.class)
+                Mockito.mock(Executor.class),
+                true
             )
         );
     }

@@ -51,8 +51,8 @@ import com.netflix.genie.core.services.impl.MailServiceImpl;
 import com.netflix.genie.core.services.impl.RandomizedClusterLoadBalancerImpl;
 import org.apache.commons.exec.Executor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -81,15 +81,12 @@ public class ServicesConfig {
      * @throws GenieException If there is any problem.
      */
     @Bean
-    @ConditionalOnBean(JavaMailSender.class)
+    @ConditionalOnProperty("spring.mail.host")
     public MailService getJavaMailSenderMailService(
         final JavaMailSender javaMailSender,
-        @Value("${genie.mail.fromAddress}")
-        final String fromAddress,
-        @Value("${genie.mail.user:#{null}}")
-        final String mailUser,
-        @Value("${genie.mail.password:#{null}}")
-        final String mailPassword
+        @Value("${genie.mail.fromAddress}") final String fromAddress,
+        @Value("${genie.mail.user:#{null}}") final String mailUser,
+        @Value("${genie.mail.password:#{null}}") final String mailPassword
     ) throws GenieException {
         return new MailServiceImpl(
             javaMailSender,
@@ -220,15 +217,18 @@ public class ServicesConfig {
      * @param hostName         The name of the host this Genie node is running on.
      * @param jobSearchService The job search service to use to locate job information.
      * @param executor         The executor to use to run system processes.
+     * @param runAsUser        Whether jobs on this instance are run as the user or not
      * @return A job kill service instance.
      */
     @Bean
     public JobKillService jobKillService(
         final String hostName,
         final JobSearchService jobSearchService,
-        final Executor executor
+        final Executor executor,
+        @Value("${genie.jobs.runasuser.enabled:false}")
+        final boolean runAsUser
     ) {
-        return new LocalJobKillServiceImpl(hostName, jobSearchService, executor);
+        return new LocalJobKillServiceImpl(hostName, jobSearchService, executor, runAsUser);
     }
 
     /**
@@ -310,7 +310,6 @@ public class ServicesConfig {
      * Get an instance of the JobCoordinatorService.
      *
      * @param jobPersistenceService implementation of job persistence service interface
-     * @param jobSearchService      implementation of job search service interface
      * @param jobSubmitterService   implementation of the job submitter service
      * @param jobKillService        The job kill service to use
      * @param baseArchiveLocation   The base directory location of where the job dir should be archived
@@ -319,7 +318,6 @@ public class ServicesConfig {
     @Bean
     public JobCoordinatorService jobCoordinatorService(
         final JobPersistenceService jobPersistenceService,
-        final JobSearchService jobSearchService,
         final JobSubmitterService jobSubmitterService,
         final JobKillService jobKillService,
         @Value("${genie.jobs.archive.location}")

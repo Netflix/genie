@@ -48,7 +48,6 @@ public class LocalJobKillServiceImplUnitTests {
     private static final String ID = UUID.randomUUID().toString();
     private static final String HOSTNAME = UUID.randomUUID().toString();
     private static final int PID = 18243;
-    private CommandLine psCommand;
     private CommandLine killCommand;
     private JobSearchService jobSearchService;
     private Executor executor;
@@ -62,14 +61,10 @@ public class LocalJobKillServiceImplUnitTests {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
         this.jobSearchService = Mockito.mock(JobSearchService.class);
         this.executor = Mockito.mock(Executor.class);
-        this.service = new LocalJobKillServiceImpl(HOSTNAME, this.jobSearchService, this.executor);
+        this.service = new LocalJobKillServiceImpl(HOSTNAME, this.jobSearchService, this.executor, false);
 
         this.killCommand = new CommandLine("kill");
         this.killCommand.addArguments(Integer.toString(PID));
-
-        this.psCommand = new CommandLine("ps");
-        this.psCommand.addArgument("-p");
-        this.psCommand.addArgument(Integer.toString(PID));
     }
 
     /**
@@ -178,5 +173,29 @@ public class LocalJobKillServiceImplUnitTests {
         this.service.killJob(ID);
 
         Mockito.verify(this.executor, Mockito.times(2)).execute(Mockito.any(CommandLine.class));
+    }
+
+    /**
+     * Make sure we can kill a job that is running as a user.
+     *
+     * @throws GenieException On any error
+     * @throws IOException    On error in execute
+     */
+    @Test
+    public void canKillJobRunningAsUser() throws GenieException, IOException {
+        this.service = new LocalJobKillServiceImpl(HOSTNAME, this.jobSearchService, this.executor, true);
+
+        final JobExecution jobExecution = Mockito.mock(JobExecution.class);
+        Mockito.when(jobExecution.getExitCode()).thenReturn(JobExecution.DEFAULT_EXIT_CODE);
+        Mockito.when(jobExecution.getHostName()).thenReturn(HOSTNAME);
+        Mockito.when(jobExecution.getProcessId()).thenReturn(PID);
+        Mockito.when(this.jobSearchService.getJobExecution(ID)).thenReturn(jobExecution);
+
+        Mockito.when(this.executor.execute(Mockito.any(CommandLine.class))).thenReturn(0, 0);
+
+        this.service.killJob(ID);
+
+        Mockito.verify(this.executor, Mockito.times(2)).execute(Mockito.any(CommandLine.class));
+        Mockito.verify(this.jobSearchService, Mockito.times(1)).getJobExecution(ID);
     }
 }
