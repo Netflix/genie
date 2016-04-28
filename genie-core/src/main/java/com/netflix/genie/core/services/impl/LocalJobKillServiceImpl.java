@@ -51,6 +51,7 @@ public class LocalJobKillServiceImpl implements JobKillService {
     private final String hostName;
     private final JobSearchService jobSearchService;
     private final Executor executor;
+    private final boolean runAsUser;
 
     /**
      * Constructor.
@@ -58,15 +59,18 @@ public class LocalJobKillServiceImpl implements JobKillService {
      * @param hostName         The name of the host this Genie node is running on
      * @param jobSearchService The job search service to use to locate job information
      * @param executor         The executor to use to run system processes
+     * @param runAsUser        True if jobs are run as the user who submitted the job
      */
     public LocalJobKillServiceImpl(
         @NotBlank final String hostName,
         @NotNull final JobSearchService jobSearchService,
-        @NotNull final Executor executor
+        @NotNull final Executor executor,
+        final boolean runAsUser
     ) {
         this.hostName = hostName;
         this.jobSearchService = jobSearchService;
         this.executor = executor;
+        this.runAsUser = runAsUser;
     }
 
     /**
@@ -98,7 +102,7 @@ public class LocalJobKillServiceImpl implements JobKillService {
             this.killJobOnUnix(jobExecution.getProcessId());
         } else {
             // Windows, etc. May support later
-            throw new java.lang.UnsupportedOperationException("Genie isn't currently suppored on this OS");
+            throw new java.lang.UnsupportedOperationException("Genie isn't currently supported on this OS");
         }
     }
 
@@ -132,15 +136,19 @@ public class LocalJobKillServiceImpl implements JobKillService {
         }
 
         // TODO: Do we need retries?
+        // This means the job client process is still running
         try {
-            // This means the job client process is still running
-            final CommandLine killCommand = new CommandLine("kill");
+            final CommandLine killCommand;
+            if (this.runAsUser) {
+                killCommand = new CommandLine("sudo");
+                killCommand.addArgument("kill");
+            } else {
+                killCommand = new CommandLine("kill");
+            }
             killCommand.addArguments(Integer.toString(pid));
             this.executor.execute(killCommand);
         } catch (final IOException ioe) {
             throw new GenieServerException("Unable to kill process " + pid, ioe);
         }
-
-        // TODO: Should we check the process here to make sure it's really gone?
     }
 }

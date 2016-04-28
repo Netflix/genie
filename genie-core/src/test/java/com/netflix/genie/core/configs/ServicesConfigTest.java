@@ -170,7 +170,7 @@ public class ServicesConfigTest {
         final JobSearchService jobSearchService,
         final Executor executor
     ) {
-        return new LocalJobKillServiceImpl(hostname, jobSearchService, executor);
+        return new LocalJobKillServiceImpl(hostname, jobSearchService, executor, false);
     }
 
     /**
