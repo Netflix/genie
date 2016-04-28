@@ -30,9 +30,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -105,22 +103,44 @@ public class ClusterClient extends BaseGenieClient {
      * @throws IOException If the response received is not 2xx.
      */
     public List<Cluster> getClusters() throws IOException, GenieException {
-        return this.getClusters(Collections.emptyMap());
+        return this.getClusters(
+            null,
+            null,
+            null,
+            null,
+            null
+        );
     }
 
     /**
      * Method to get a list of all the clusters from Genie for the query parameters specified.
      *
-     * @param options A list of query options
+     * @param name The name of the cluster.
+     * @param statusList The list of statuses.
+     * @param tagList The list of tags.
+     * @param minUpdateTime Minimum Time after which cluster was updated.
+     * @param maxUpdateTime Maximum Time before which cluster was updated.
      *
      * @return A list of clusters.
      * @throws GenieException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
-    public List<Cluster> getClusters(final Map<String, String> options) throws IOException, GenieException {
+    public List<Cluster> getClusters(
+        final String name,
+        final List<String> statusList,
+        final List<String> tagList,
+        final Long minUpdateTime,
+        final Long maxUpdateTime
+    ) throws IOException, GenieException {
 
         final List<Cluster> clusterList = new ArrayList<>();
-        final JsonNode jnode =  clusterService.getClusters(options).execute().body()
+        final JsonNode jnode =  clusterService.getClusters(
+            name,
+            statusList,
+            tagList,
+            minUpdateTime,
+            maxUpdateTime
+        ).execute().body()
             .get("_embedded");
         if (jnode != null) {
             for (final JsonNode objNode : jnode.get("clusterList")) {
