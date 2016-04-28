@@ -26,6 +26,9 @@ dependencies {
     /*******************************
      * Test Dependencies
      *******************************/
+
+    testCompile(project(":genie-test"))
+    testCompile(project(":genie-web"))
 }
 
 clean {
