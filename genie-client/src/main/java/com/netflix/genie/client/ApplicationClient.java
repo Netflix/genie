@@ -30,9 +30,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -105,22 +103,38 @@ public class ApplicationClient extends BaseGenieClient {
      * @throws IOException If the response received is not 2xx.
      */
     public List<Application> getApplications() throws IOException, GenieException {
-        return this.getApplications(Collections.emptyMap());
+        return this.getApplications(null, null, null, null, null);
     }
 
     /**
      * Method to get a list of all the applications from Genie for the query parameters specified.
      *
-     * @param options A list of query options
+     * @param name The name of the commands.
+     * @param user The user who created the command.
+     * @param statusList The list of Command statuses.
+     * @param tagList The list of tags.
+     * @param type The type of the application.
      *
      * @return A list of applications.
      * @throws GenieException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
-    public List<Application> getApplications(final Map<String, String> options) throws IOException, GenieException {
+    public List<Application> getApplications(
+        final String name,
+        final String user,
+        final List<String> statusList,
+        final List<String> tagList,
+        final String type
+    ) throws IOException, GenieException {
 
         final List<Application> applicationList = new ArrayList<>();
-        final JsonNode jnode =  applicationService.getApplications(options).execute().body()
+        final JsonNode jnode =  applicationService.getApplications(
+            name,
+            user,
+            statusList,
+            tagList,
+            type
+        ).execute().body()
             .get("_embedded");
         if (jnode != null) {
             for (final JsonNode objNode : jnode.get("applicationList")) {

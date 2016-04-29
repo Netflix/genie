@@ -2,10 +2,11 @@ package com.netflix.genie.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
-import com.netflix.genie.common.dto.Command;
-import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
+import com.netflix.genie.common.dto.Cluster;
+import com.netflix.genie.common.dto.Command;
+import com.netflix.genie.common.dto.CommandStatus;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -480,5 +481,32 @@ public class CommandClientIntegrationTests extends GenieClientsIntegrationTestsB
         commandClient.patchCommand("command1", patch);
 
         Assert.assertEquals(newName, commandClient.getCommand("command1").getName());
+    }
+
+    /**
+     * Test to fetch the clusters to which a command is linked.
+     *
+     * @throws Exception If there is any problem.
+     */
+    @Test
+    public void testCanGetClustersForCommand() throws Exception {
+        final Cluster cluster1 = constructClusterDTO(null);
+        final Cluster cluster2 = constructClusterDTO(null);
+
+        final Command command = constructCommandDTO(null);
+
+        commandClient.createCommand(command);
+
+        clusterClient.createCluster(cluster1);
+        clusterClient.createCluster(cluster2);
+
+        clusterClient.addCommandsToCluster(cluster1.getId(), Arrays.asList(command.getId()));
+        clusterClient.addCommandsToCluster(cluster2.getId(), Arrays.asList(command.getId()));
+
+        final List<Cluster> clusterList = commandClient.getClustersForCommand(command.getId());
+
+        Assert.assertEquals(2, clusterList.size());
+        Assert.assertEquals(cluster1.getId(), clusterList.get(0).getId());
+        Assert.assertEquals(cluster2.getId(), clusterList.get(1).getId());
     }
 }
