@@ -3,6 +3,8 @@ package com.netflix.genie.client;
 import com.netflix.genie.GenieWeb;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
+import com.netflix.genie.common.dto.Command;
+import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.test.categories.IntegrationTest;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.experimental.categories.Category;
@@ -65,5 +67,33 @@ public abstract class GenieClientsIntegrationTestsBase {
             .build();
 
         return cluster;
+    }
+
+    protected Command constructCommandDTO(final String id) {
+
+        final String commandId;
+        if (StringUtils.isBlank(id)) {
+            commandId = UUID.randomUUID().toString();
+        } else {
+            commandId = id;
+        }
+
+        final Set<String> tags = new HashSet<>();
+        tags.add("foo");
+        tags.add("bar");
+
+        final Set<String> configList = new HashSet<>();
+        configList.add("config1");
+        configList.add("configs2");
+
+        final Command command = new Command.Builder("name", "user", "1.0", CommandStatus.ACTIVE, "exec", 1000)
+            .withId(commandId)
+            .withDescription("client Test")
+            .withSetupFile("path to set up file")
+            .withTags(tags)
+            .withConfigs(configList)
+            .build();
+
+        return command;
     }
 }

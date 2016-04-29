@@ -1,5 +1,7 @@
 package com.netflix.genie.client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.fge.jsonpatch.JsonPatch;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
@@ -26,8 +28,8 @@ import java.util.UUID;
  */
 public class ClusterClientIntegrationTests extends GenieClientsIntegrationTestsBase {
 
-    private static ClusterClient clusterClient;
-    private static CommandClient commandClient;
+    private ClusterClient clusterClient;
+    private CommandClient commandClient;
 
     /**
      * Setup for tests.
@@ -259,7 +261,7 @@ public class ClusterClientIntegrationTests extends GenieClientsIntegrationTestsB
      * @throws Exception If there is any problem.
      */
     @Test
-    public void testTagsMethods() throws Exception {
+    public void testClusterTagsMethods() throws Exception {
 
         final Set<String> initialTags = new HashSet<>();
         initialTags.add("foo");
@@ -286,7 +288,7 @@ public class ClusterClientIntegrationTests extends GenieClientsIntegrationTestsB
         Assert.assertEquals(tags.contains("bar"), true);
 
         // Test adding a tag for cluster
-        Set<String> moreTags = new HashSet<>();
+        final Set<String> moreTags = new HashSet<>();
         moreTags.add("pi");
 
         clusterClient.addTagsToCluster("cluster1", moreTags);
@@ -322,7 +324,7 @@ public class ClusterClientIntegrationTests extends GenieClientsIntegrationTestsB
      * @throws Exception If there is any problem.
      */
     @Test
-    public void testConfigsMethods() throws Exception {
+    public void testClusterConfigsMethods() throws Exception {
 
         final Set<String> initialConfigs = new HashSet<>();
         initialConfigs.add("foo");
@@ -344,7 +346,7 @@ public class ClusterClientIntegrationTests extends GenieClientsIntegrationTestsB
         Assert.assertEquals(configs.contains("bar"), true);
 
         // Test adding a config for cluster
-        Set<String> moreConfigs = new HashSet<>();
+        final Set<String> moreConfigs = new HashSet<>();
         moreConfigs.add("pi");
 
         clusterClient.addConfigsToCluster("cluster1", moreConfigs);
@@ -373,7 +375,7 @@ public class ClusterClientIntegrationTests extends GenieClientsIntegrationTestsB
      * @throws Exception If there is any problem.
      */
     @Test
-    public void testCommandsMethods() throws Exception {
+    public void testClusterCommandsMethods() throws Exception {
 
         final Command foo = new Command.Builder(
             "name",
@@ -454,8 +456,32 @@ public class ClusterClientIntegrationTests extends GenieClientsIntegrationTestsB
         Assert.assertEquals("pi", commands.get(1).getId());
 
         // Test delete all commands in a cluster
-        clusterClient.removeAllTagsForCluster("cluster1");
+        clusterClient.removeAllCommandsForCluster("cluster1");
         commands = clusterClient.getCommandsForCluster("cluster1");
         Assert.assertEquals(0, commands.size());
+    }
+
+    /**
+     * Test the cluster patch method.
+     *
+     * @throws Exception If there is any error.
+     */
+    @Test
+    public void testClusterPatchMethod() throws Exception {
+        final ObjectMapper mapper = new ObjectMapper();
+        final String newName = UUID.randomUUID().toString();
+        final String patchString = "[{ \"op\": \"replace\", \"path\": \"/name\", \"value\": \"" + newName + "\" }]";
+        final JsonPatch patch = JsonPatch.fromJson(mapper.readTree(patchString));
+
+        final Cluster cluster = new Cluster.Builder("name", "user", "1.0", ClusterStatus.UP)
+            .withId("cluster1")
+            .withDescription("client Test")
+            .withSetupFile("path to set up file")
+            .build();
+
+        clusterClient.createCluster(cluster);
+        clusterClient.patchCluster("cluster1", patch);
+
+        Assert.assertEquals(newName, clusterClient.getCluster("cluster1").getName());
     }
 }
