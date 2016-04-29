@@ -2,17 +2,19 @@ package com.netflix.genie.client;
 
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
+import com.netflix.genie.common.dto.Command;
+import com.netflix.genie.common.dto.CommandStatus;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -25,6 +27,7 @@ import java.util.UUID;
 public class ClusterClientIntegrationTests extends GenieClientsIntegrationTestsBase {
 
     private static ClusterClient clusterClient;
+    private static CommandClient commandClient;
 
     /**
      * Setup for tests.
@@ -34,6 +37,18 @@ public class ClusterClientIntegrationTests extends GenieClientsIntegrationTestsB
     @Before
     public void setup() throws Exception {
         clusterClient = new ClusterClient(getBaseUrl());
+        commandClient = new CommandClient(getBaseUrl());
+    }
+
+    /**
+     * Delete all clusters and commands between tests.
+     *
+     * @throws Exception If there is any problem.
+     */
+    @After
+    public void cleanUp() throws Exception {
+        clusterClient.deleteAllClusters();
+        commandClient.deleteAllCommands();
     }
 
     /**
@@ -64,6 +79,11 @@ public class ClusterClientIntegrationTests extends GenieClientsIntegrationTestsB
         Assert.assertEquals(cluster.getStatus(), cstr.getStatus());
     }
 
+    /**
+     * Test getting the clusters using the various query parameters.
+     *
+     * @throws Exception If there is any problem.
+     */
     @Test
     public void testGetClustersUsingParams() throws Exception {
         final String cluster1Id = UUID.randomUUID().toString();
@@ -231,5 +251,211 @@ public class ClusterClientIntegrationTests extends GenieClientsIntegrationTestsB
         Assert.assertEquals(null, cluster4.getDescription());
         Assert.assertEquals(Collections.emptySet(), cluster4.getConfigs());
         Assert.assertEquals(cluster4.getTags().contains("foo"), false);
+    }
+
+    /**
+     * Test all the methods that manipulate tags for a cluster in genie.
+     *
+     * @throws Exception If there is any problem.
+     */
+    @Test
+    public void testTagsMethods() throws Exception {
+
+        final Set<String> initialTags = new HashSet<>();
+        initialTags.add("foo");
+        initialTags.add("bar");
+
+        final Set<String> configList = new HashSet<>();
+        configList.add("config1");
+        configList.add("configs2");
+
+        final Cluster cluster = new Cluster.Builder("name", "user", "1.0", ClusterStatus.UP)
+            .withId("cluster1")
+            .withDescription("client Test")
+            .withSetupFile("path to set up file")
+            .withTags(initialTags)
+            .withConfigs(configList)
+            .build();
+
+        clusterClient.createCluster(cluster);
+
+        // Test getTags for cluster
+        Set<String> tags = clusterClient.getTagsForCluster("cluster1");
+        Assert.assertEquals(4, tags.size());
+        Assert.assertEquals(tags.contains("foo"), true);
+        Assert.assertEquals(tags.contains("bar"), true);
+
+        // Test adding a tag for cluster
+        Set<String> moreTags = new HashSet<>();
+        moreTags.add("pi");
+
+        clusterClient.addTagsToCluster("cluster1", moreTags);
+        tags = clusterClient.getTagsForCluster("cluster1");
+        Assert.assertEquals(5, tags.size());
+        Assert.assertEquals(tags.contains("foo"), true);
+        Assert.assertEquals(tags.contains("bar"), true);
+        Assert.assertEquals(tags.contains("pi"), true);
+
+        // Test removing a tag for cluster
+        clusterClient.removeTagFromCluster("cluster1", "bar");
+        tags = clusterClient.getTagsForCluster("cluster1");
+        Assert.assertEquals(4, tags.size());
+        Assert.assertEquals(tags.contains("foo"), true);
+        Assert.assertEquals(tags.contains("pi"), true);
+
+        // Test update tags for a cluster
+        clusterClient.updateTagsForCluster("cluster1", initialTags);
+        tags = clusterClient.getTagsForCluster("cluster1");
+        Assert.assertEquals(4, tags.size());
+        Assert.assertEquals(tags.contains("foo"), true);
+        Assert.assertEquals(tags.contains("bar"), true);
+
+        // Test delete all tags in a cluster
+        clusterClient.removeAllTagsForCluster("cluster1");
+        tags = clusterClient.getTagsForCluster("cluster1");
+        Assert.assertEquals(2, tags.size());
+    }
+
+    /**
+     * Test all the methods that manipulate configs for a cluster in genie.
+     *
+     * @throws Exception If there is any problem.
+     */
+    @Test
+    public void testConfigsMethods() throws Exception {
+
+        final Set<String> initialConfigs = new HashSet<>();
+        initialConfigs.add("foo");
+        initialConfigs.add("bar");
+
+        final Cluster cluster = new Cluster.Builder("name", "user", "1.0", ClusterStatus.UP)
+            .withId("cluster1")
+            .withDescription("client Test")
+            .withSetupFile("path to set up file")
+            .withConfigs(initialConfigs)
+            .build();
+
+        clusterClient.createCluster(cluster);
+
+        // Test getConfigs for cluster
+        Set<String> configs = clusterClient.getConfigsForCluster("cluster1");
+        Assert.assertEquals(2, configs.size());
+        Assert.assertEquals(configs.contains("foo"), true);
+        Assert.assertEquals(configs.contains("bar"), true);
+
+        // Test adding a config for cluster
+        Set<String> moreConfigs = new HashSet<>();
+        moreConfigs.add("pi");
+
+        clusterClient.addConfigsToCluster("cluster1", moreConfigs);
+        configs = clusterClient.getConfigsForCluster("cluster1");
+        Assert.assertEquals(3, configs.size());
+        Assert.assertEquals(configs.contains("foo"), true);
+        Assert.assertEquals(configs.contains("bar"), true);
+        Assert.assertEquals(configs.contains("pi"), true);
+
+        // Test update configs for a cluster
+        clusterClient.updateConfigsForCluster("cluster1", initialConfigs);
+        configs = clusterClient.getConfigsForCluster("cluster1");
+        Assert.assertEquals(2, configs.size());
+        Assert.assertEquals(configs.contains("foo"), true);
+        Assert.assertEquals(configs.contains("bar"), true);
+
+        // Test delete all configs in a cluster
+        clusterClient.removeAllConfigsForCluster("cluster1");
+        configs = clusterClient.getConfigsForCluster("cluster1");
+        Assert.assertEquals(0, configs.size());
+    }
+
+    /**
+     * Test all the methods that manipulate commands for a cluster in genie.
+     *
+     * @throws Exception If there is any problem.
+     */
+    @Test
+    public void testCommandsMethods() throws Exception {
+
+        final Command foo = new Command.Builder(
+            "name",
+            "user",
+            "version",
+            CommandStatus.ACTIVE,
+            "exec",
+            5
+        ).withId("foo")
+            .build();
+
+        commandClient.createCommand(foo);
+
+        final Command bar = new Command.Builder(
+            "name",
+            "user",
+            "version",
+            CommandStatus.ACTIVE,
+            "exec",
+            5
+        ).withId("bar")
+            .build();
+
+        commandClient.createCommand(bar);
+
+
+        final Command pi = new Command.Builder(
+            "name",
+            "user",
+            "version",
+            CommandStatus.ACTIVE,
+            "exec",
+            5
+        ).withId("pi")
+            .build();
+
+        commandClient.createCommand(pi);
+
+        final Cluster cluster = new Cluster.Builder("name", "user", "1.0", ClusterStatus.UP)
+            .withId("cluster1")
+            .withDescription("client Test")
+            .withSetupFile("path to set up file")
+            .build();
+
+        clusterClient.createCluster(cluster);
+
+        // Test add Commands to cluster
+        final List<String> initialCommands = new ArrayList<>();
+        initialCommands.add("foo");
+        initialCommands.add("bar");
+        initialCommands.add("pi");
+
+        clusterClient.addCommandsToCluster("cluster1", initialCommands);
+
+        List<Command> commands = clusterClient.getCommandsForCluster("cluster1");
+        Assert.assertEquals(3, commands.size());
+        Assert.assertEquals("foo", commands.get(0).getId());
+        Assert.assertEquals("bar", commands.get(1).getId());
+        Assert.assertEquals("pi", commands.get(2).getId());
+
+        // Test removing a command for cluster
+        clusterClient.removeCommandFromCluster("cluster1", "pi");
+
+        commands = clusterClient.getCommandsForCluster("cluster1");
+        Assert.assertEquals(2, commands.size());
+        Assert.assertEquals("foo", commands.get(0).getId());
+        Assert.assertEquals("bar", commands.get(1).getId());
+
+        final List<String> updatedCommands = new ArrayList<>();
+        updatedCommands.add("foo");
+        updatedCommands.add("pi");
+
+        // Test update commands for a cluster
+        clusterClient.updateCommandsForCluster("cluster1", updatedCommands);
+        commands = clusterClient.getCommandsForCluster("cluster1");
+        Assert.assertEquals(2, commands.size());
+        Assert.assertEquals("foo", commands.get(0).getId());
+        Assert.assertEquals("pi", commands.get(1).getId());
+
+        // Test delete all commands in a cluster
+        clusterClient.removeAllTagsForCluster("cluster1");
+        commands = clusterClient.getCommandsForCluster("cluster1");
+        Assert.assertEquals(0, commands.size());
     }
 }
