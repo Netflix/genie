@@ -84,6 +84,15 @@ public class JobRequestResourceAssembler implements ResourceAssembler<JobRequest
 //                ).withRel("output")
 //            );
 
+            final String output = "output";
+            jobRequestResource.add(
+                ControllerLinkBuilder
+                    .linkTo(JobRestController.class)
+                    .slash(jobRequest.getId())
+                    .slash(output)
+                    .withRel(output)
+            );
+
             jobRequestResource.add(
                 ControllerLinkBuilder.linkTo(
                     ControllerLinkBuilder
