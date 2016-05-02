@@ -172,6 +172,7 @@ public class ClusterCheckerTask extends LeadershipTask {
             );
         // Remove the fields we just purged
         toRemove.stream().forEach(this.errorCounts::remove);
+        log.info("Finished checking for cluster node health.");
     }
 
     /**
