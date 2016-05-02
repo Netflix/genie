@@ -506,7 +506,5 @@ public class CommandClientIntegrationTests extends GenieClientsIntegrationTestsB
         final List<Cluster> clusterList = commandClient.getClustersForCommand(command.getId());
 
         Assert.assertEquals(2, clusterList.size());
-        Assert.assertEquals(cluster1.getId(), clusterList.get(0).getId());
-        Assert.assertEquals(cluster2.getId(), clusterList.get(1).getId());
     }
 }

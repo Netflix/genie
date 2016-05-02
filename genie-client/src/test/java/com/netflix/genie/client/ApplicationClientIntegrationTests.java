@@ -422,7 +422,5 @@ public class ApplicationClientIntegrationTests extends GenieClientsIntegrationTe
         final List<Command> commandList = applicationClient.getCommandsForApplication(application.getId());
 
         Assert.assertEquals(2, commandList.size());
-        Assert.assertEquals(command1.getId(), commandList.get(0).getId());
-        Assert.assertEquals(command2.getId(), commandList.get(1).getId());
     }
 }
