@@ -30,6 +30,7 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.exceptions.GenieTimeoutException;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -375,7 +376,7 @@ public class JobClient extends BaseGenieClient {
             if (System.currentTimeMillis() - startTime < blockTimeout) {
                 Thread.sleep(pollTime);
             } else {
-                throw new InterruptedException("Timed out waiting for job to finish");
+                throw new GenieTimeoutException("Timed out waiting for job to finish");
             }
         }
     }
