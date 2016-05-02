@@ -84,6 +84,15 @@ public class JobExecutionResourceAssembler implements ResourceAssembler<JobExecu
 //                ).withRel("output")
 //            );
 
+            final String output = "output";
+            jobExecutionResource.add(
+                ControllerLinkBuilder
+                    .linkTo(JobRestController.class)
+                    .slash(jobExecution.getId())
+                    .slash(output)
+                    .withRel(output)
+            );
+
             jobExecutionResource.add(
                 ControllerLinkBuilder.linkTo(
                     ControllerLinkBuilder

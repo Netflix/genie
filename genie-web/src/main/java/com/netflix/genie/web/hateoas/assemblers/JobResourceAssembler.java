@@ -50,14 +50,6 @@ public class JobResourceAssembler implements ResourceAssembler<Job, JobResource>
                 ).withSelfRel()
             );
 
-            jobResource.add(
-                ControllerLinkBuilder.linkTo(
-                    ControllerLinkBuilder
-                        .methodOn(JobRestController.class)
-                        .getJobExecution(job.getId())
-                ).withRel("execution")
-            );
-
             // TODO: https://github.com/spring-projects/spring-hateoas/issues/186 should be fixed in .20 currently .19
 //            jobResource.add(
 //                ControllerLinkBuilder.linkTo(
@@ -76,12 +68,29 @@ public class JobResourceAssembler implements ResourceAssembler<Job, JobResource>
 //                ).withRel("output")
 //            );
 
+            final String output = "output";
+            jobResource.add(
+                ControllerLinkBuilder
+                    .linkTo(JobRestController.class)
+                    .slash(job.getId())
+                    .slash(output)
+                    .withRel(output)
+            );
+
             jobResource.add(
                 ControllerLinkBuilder.linkTo(
                     ControllerLinkBuilder
                         .methodOn(JobRestController.class)
                         .getJobRequest(job.getId())
                 ).withRel("request")
+            );
+
+            jobResource.add(
+                ControllerLinkBuilder.linkTo(
+                    ControllerLinkBuilder
+                        .methodOn(JobRestController.class)
+                        .getJobExecution(job.getId())
+                ).withRel("execution")
             );
 
             jobResource.add(
