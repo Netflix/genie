@@ -180,6 +180,16 @@ public final class JobConstants {
     public static final String GENIE_APPLICATION_DIR_ENV_VAR = "GENIE_APPLICATION_DIR";
 
     /**
+     * Environment variable for Genie Job ID.
+     */
+    public static final String GENIE_JOB_ID_ENV_VAR = "GENIE_JOB_ID";
+
+    /**
+     * Environment variable for Genie Job Name.
+     */
+    public static final String GENIE_JOB_NAME_ENV_VAR = "GENIE_JOB_NAME";
+
+    /**
      * Process ID.
      **/
     public static final String PID = "pid";

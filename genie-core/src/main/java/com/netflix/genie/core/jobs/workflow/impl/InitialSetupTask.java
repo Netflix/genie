@@ -120,6 +120,8 @@ public class InitialSetupTask extends GenieBaseTask {
             + JobConstants.GENIE_PATH_VAR
             + JobConstants.FILE_PATH_DELIMITER
             + JobConstants.COMMAND_PATH_VAR
+            + JobConstants.FILE_PATH_DELIMITER
+            + this.jobExecEnv.getCommand().getId()
             + System.lineSeparator());
 
         // Append new line
@@ -136,6 +138,28 @@ public class InitialSetupTask extends GenieBaseTask {
             + JobConstants.GENIE_PATH_VAR
             + JobConstants.FILE_PATH_DELIMITER
             + JobConstants.CLUSTER_PATH_VAR
+            + JobConstants.FILE_PATH_DELIMITER
+            + this.jobExecEnv.getCluster().getId()
+            + System.lineSeparator());
+
+        // Append new line
+        writer.write(System.lineSeparator());
+
+        // create environment variable for the job id
+        writer.write(JobConstants.EXPORT
+            + JobConstants.GENIE_JOB_ID_ENV_VAR
+            + JobConstants.EQUALS_SYMBOL
+            + this.jobExecEnv.getJobRequest().getId()
+            + System.lineSeparator());
+
+        // Append new line
+        writer.write(System.lineSeparator());
+
+        // create environment variable for the job id
+        writer.write(JobConstants.EXPORT
+            + JobConstants.GENIE_JOB_NAME_ENV_VAR
+            + JobConstants.EQUALS_SYMBOL
+            + this.jobExecEnv.getJobRequest().getName()
             + System.lineSeparator());
 
         // Append new line
