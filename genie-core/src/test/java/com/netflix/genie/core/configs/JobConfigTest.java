@@ -143,9 +143,9 @@ public class JobConfigTest {
     @Order(value = 6)
     @Autowired
     public WorkflowTask jobKickoffTask(
-        @Value("${genie.jobs.runasuser.enabled:false}")
+        @Value("${genie.jobs.runAsUser.enabled:false}")
         final boolean isRunAsUserEnabled,
-        @Value("${genie.jobs.createuser.enabled:false}")
+        @Value("${genie.jobs.createUser.enabled:false}")
         final boolean isUserCreationEnabled,
         final Executor executor,
         final String hostname

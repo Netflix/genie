@@ -576,7 +576,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
 
         final String jobWorkingDir = this.jobDirResource.getFile().getCanonicalPath() + FILE_DELIMITER + jobId;
         final String expectedRunScriptContent = runFileContents.replace("TEST_GENIE_JOB_WORKING_DIR_PLACEHOLDER",
-            jobWorkingDir);
+            jobWorkingDir).replace("JOB_ID_PLACEHOLDER", jobId);
 
         this.mvc
             .perform(MockMvcRequestBuilders.get(JOBS_API + "/" + jobId + "/output/run.sh"))

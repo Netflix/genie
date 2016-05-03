@@ -15,10 +15,11 @@
  *     limitations under the License.
  *
  */
+
 /**
- * Package showing samples of how to use Genie Java client.
+ * Package containing configurations needed by Spring to run Integration tests for clients.
  *
  * @author amsharma
  * @since 3.0.0
  */
-package com.netflix.genie.client.sample;
+package com.netflix.genie.client.configs;

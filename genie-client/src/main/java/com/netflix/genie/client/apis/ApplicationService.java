@@ -29,10 +29,9 @@ import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
-import retrofit2.http.QueryMap;
+import retrofit2.http.Query;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -72,11 +71,22 @@ public interface ApplicationService {
     /**
      * Method to get all applications from Genie.
      *
-     * @param options A map of query parameters to be used to filter the applications.
+     * @param name The name of the commands.
+     * @param user The user who created the command.
+     * @param statusList The list of Command statuses.
+     * @param tagList The list of tags.
+     * @param type The type of the application.
+     *
      * @return A callable object.
      */
     @GET(APPLICATION_URL_SUFFIX)
-    Call<JsonNode> getApplications(@QueryMap final Map<String, String> options);
+    Call<JsonNode> getApplications(
+        @Query("name") final String name,
+        @Query("user") final String user,
+        @Query("status") final List<String> statusList,
+        @Query("tag") final List<String> tagList,
+        @Query("type") final String type
+        );
 
     /**
      * Method to fetch a single job from Genie.

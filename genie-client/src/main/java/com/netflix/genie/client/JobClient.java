@@ -30,6 +30,7 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.exceptions.GenieTimeoutException;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -349,9 +350,9 @@ public class JobClient extends BaseGenieClient {
      * @param blockTimeout the time to block for (in ms), after which a
      *                     GenieException will be thrown
      * @param pollTime     the time to sleep between polling for job status
-     * @return the jobInfo for the job after completion
-     * @throws GenieException       For any other error.
-     * @throws InterruptedException on timeout/thread errors
+     * @return The job status for the job after completion
+     * @throws GenieException       For timeout or other errors.
+     * @throws InterruptedException on thread errors
      * @throws IOException If the response received is not 2xx.
      */
     public JobStatus waitForCompletion(final String jobId, final long blockTimeout, final long pollTime)
@@ -372,11 +373,16 @@ public class JobClient extends BaseGenieClient {
             }
 
             // block until timeout
-            if (System.currentTimeMillis() - startTime < blockTimeout) {
-                Thread.sleep(pollTime);
-            } else {
-                throw new InterruptedException("Timed out waiting for job to finish");
+            try {
+                if (System.currentTimeMillis() - startTime < blockTimeout) {
+                    Thread.sleep(pollTime);
+                } else {
+                    throw new GenieTimeoutException("Timed out waiting for job to finish");
+                }
+            } catch (InterruptedException ie) {
+                throw new IOException("Received interreupted exception from wait thread.");
             }
+
         }
     }
 }

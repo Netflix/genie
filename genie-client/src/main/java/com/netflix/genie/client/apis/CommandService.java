@@ -30,10 +30,9 @@ import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
-import retrofit2.http.QueryMap;
+import retrofit2.http.Query;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -71,13 +70,22 @@ public interface CommandService {
     Call<Void> updateCommand(@Path("id") final String commandId, @Body final Command command);
 
     /**
-     * Method to get all commands from Genie.
+     * Method to get all commands from Genie filtered based on query params.
      *
-     * @param options A map of query parameters to be used to filter the commands.
+     * @param name The name of the commands.
+     * @param user The user who created the command.
+     * @param statusList The list of Command statuses.
+     * @param tagList The list of tags.
+     *
      * @return A callable object.
      */
     @GET(COMMAND_URL_SUFFIX)
-    Call<JsonNode> getCommands(@QueryMap final Map<String, String> options);
+    Call<JsonNode> getCommands(
+        @Query("name") final String name,
+        @Query("user") final String user,
+        @Query("status") final List<String> statusList,
+        @Query("tag") final List<String> tagList
+    );
 
     /**
      * Method to fetch a single job from Genie.

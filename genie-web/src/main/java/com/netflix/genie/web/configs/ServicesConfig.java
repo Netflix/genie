@@ -225,7 +225,7 @@ public class ServicesConfig {
         final String hostName,
         final JobSearchService jobSearchService,
         final Executor executor,
-        @Value("${genie.jobs.runasuser.enabled:false}")
+        @Value("${genie.jobs.runAsUser.enabled:false}")
         final boolean runAsUser
     ) {
         return new LocalJobKillServiceImpl(hostName, jobSearchService, executor, runAsUser);

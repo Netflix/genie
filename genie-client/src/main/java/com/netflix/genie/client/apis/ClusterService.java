@@ -29,10 +29,9 @@ import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
-import retrofit2.http.QueryMap;
+import retrofit2.http.Query;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -70,13 +69,37 @@ public interface ClusterService {
     Call<Void> updateCluster(@Path("id") final String clusterId, @Body final Cluster cluster);
 
     /**
-     * Method to get all clusters from Genie.
+     * Method to get clusters from Genie based on filters specified.
      *
-     * @param options A map of query parameters to be used to filter the clusters.
+     * @param name The name of the cluster.
+     * @param statusList The list of statuses.
+     * @param tagList The list of tags.
+     * @param minUpdateTime Minimum Time after which cluster was updated.
+     * @param maxUpdateTime Maximum Time before which cluster was updated.
+     *
      * @return A callable object.
      */
     @GET(CLUSTER_URL_SUFFIX)
-    Call<JsonNode> getClusters(@QueryMap final Map<String, String> options);
+    Call<JsonNode> getClusters(
+        @Query("name") final String name,
+        @Query("status") final List<String> statusList,
+        @Query("tag") final List<String> tagList,
+        @Query("minUpdateTime") final Long minUpdateTime,
+        @Query("maxUpdateTime") final Long maxUpdateTime
+    );
+
+    /**
+     *  getClusters(
+     @RequestParam(value = "name", required = false) final String name,
+     @RequestParam(value = "status", required = false) final Set<String> statuses,
+     @RequestParam(value = "tag", required = false) final Set<String> tags,
+     @RequestParam(value = "minUpdateTime", required = false) final Long minUpdateTime,
+     @RequestParam(value = "maxUpdateTime", required = false) final Long maxUpdateTime,
+     @PageableDefault(page = 0, size = 64, sort = {"updated"}, direction = Sort.Direction.DESC) final Pageable page,
+     final PagedResourcesAssembler<Cluster> assembler
+     )
+     *
+     */
 
     /**
      * Method to fetch a single job from Genie.

@@ -27,8 +27,10 @@ genie:
   jobs:
     archive:
       location: base_archival_location_path
-    createuser:
+    createUser:
       enabled: false
+    runAsUser:
+          enabled: false
     dir:
       location: file:///tmp/genie/jobs/
     forwarding:
@@ -37,8 +39,6 @@ genie:
       max:
         stdOut: 8589934592
         stdErr: 8589934592
-    runasuser:
-      enabled: false
   leader:
     enabled: false
   mail:

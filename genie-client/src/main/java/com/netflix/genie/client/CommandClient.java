@@ -31,9 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -106,22 +104,35 @@ public class CommandClient extends BaseGenieClient {
      * @throws IOException If the response received is not 2xx.
      */
     public List<Command> getCommands() throws IOException, GenieException {
-        return this.getCommands(Collections.emptyMap());
+        return this.getCommands(null, null, null, null);
     }
 
     /**
      * Method to get a list of all the commands from Genie for the query parameters specified.
      *
-     * @param options A list of query options
+     * @param name The name of the commands.
+     * @param user The user who created the command.
+     * @param statusList The list of Command statuses.
+     * @param tagList The list of tags.
      *
      * @return A list of commands.
      * @throws GenieException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
-    public List<Command> getCommands(final Map<String, String> options) throws IOException, GenieException {
+    public List<Command> getCommands(
+        final String name,
+        final String user,
+        final List<String> statusList,
+        final List<String> tagList
+    ) throws IOException, GenieException {
 
         final List<Command> commandList = new ArrayList<>();
-        final JsonNode jnode =  commandService.getCommands(options).execute().body()
+        final JsonNode jnode =  commandService.getCommands(
+            name,
+            user,
+            statusList,
+            tagList
+        ).execute().body()
             .get("_embedded");
         if (jnode != null) {
             for (final JsonNode objNode : jnode.get("commandList")) {
