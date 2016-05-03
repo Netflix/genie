@@ -139,7 +139,7 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
 
         final String id = jobClient.submitJob(jobRequest);
 
-        final JobStatus jobStatus = jobClient.waitForCompletion(jobId, 600000, 1);
+        final JobStatus jobStatus = jobClient.waitForCompletion(jobId, 600000, 5000);
 
         Assert.assertEquals(JobStatus.SUCCEEDED, jobStatus);
         final Job job = jobClient.getJob(id);
@@ -154,7 +154,6 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
 
         final InputStream inputStream1 = jobClient.getJobStdout(jobId);
         final BufferedReader reader1 = new BufferedReader(new InputStreamReader(inputStream1, "UTF-8"));
-
 
         final StringBuilder sb = new StringBuilder();
         String line;

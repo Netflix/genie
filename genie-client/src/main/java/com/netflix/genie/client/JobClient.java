@@ -350,9 +350,9 @@ public class JobClient extends BaseGenieClient {
      * @param blockTimeout the time to block for (in ms), after which a
      *                     GenieException will be thrown
      * @param pollTime     the time to sleep between polling for job status
-     * @return the jobInfo for the job after completion
+     * @return The job status for the job after completion
      * @throws GenieException       For any other error.
-     * @throws InterruptedException on timeout/thread errors
+     * @throws GenieTimeoutException on timeout/thread errors
      * @throws IOException If the response received is not 2xx.
      */
     public JobStatus waitForCompletion(final String jobId, final long blockTimeout, final long pollTime)
