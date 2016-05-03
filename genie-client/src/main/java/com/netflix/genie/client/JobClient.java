@@ -351,8 +351,8 @@ public class JobClient extends BaseGenieClient {
      *                     GenieException will be thrown
      * @param pollTime     the time to sleep between polling for job status
      * @return The job status for the job after completion
-     * @throws GenieException       For any other error.
-     * @throws GenieTimeoutException on timeout/thread errors
+     * @throws GenieException       For timeout or other errors.
+     * @throws InterruptedException on thread errors
      * @throws IOException If the response received is not 2xx.
      */
     public JobStatus waitForCompletion(final String jobId, final long blockTimeout, final long pollTime)
@@ -373,11 +373,16 @@ public class JobClient extends BaseGenieClient {
             }
 
             // block until timeout
-            if (System.currentTimeMillis() - startTime < blockTimeout) {
-                Thread.sleep(pollTime);
-            } else {
-                throw new GenieTimeoutException("Timed out waiting for job to finish");
+            try {
+                if (System.currentTimeMillis() - startTime < blockTimeout) {
+                    Thread.sleep(pollTime);
+                } else {
+                    throw new GenieTimeoutException("Timed out waiting for job to finish");
+                }
+            } catch (InterruptedException ie) {
+                throw new IOException("Received interreupted exception from wait thread.");
             }
+
         }
     }
 }
