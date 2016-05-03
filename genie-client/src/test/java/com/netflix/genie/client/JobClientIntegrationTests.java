@@ -139,7 +139,7 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
 
         final String id = jobClient.submitJob(jobRequest);
 
-        final JobStatus jobStatus = jobClient.waitForCompletion(jobId, 10000, 1);
+        final JobStatus jobStatus = jobClient.waitForCompletion(jobId, 600000, 1);
 
         Assert.assertEquals(JobStatus.SUCCEEDED, jobStatus);
         final Job job = jobClient.getJob(id);
@@ -163,7 +163,7 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
         }
         reader1.close();
         inputStream1.close();
-        
+
         Assert.assertEquals("HELLO WORLD!!!", sb.toString());
     }
 }
