@@ -6,6 +6,8 @@ This module implements the set of Genie exceptions.
 """
 
 
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import logging
 
 
@@ -16,8 +18,14 @@ class GenieError(Exception):
     """Base exception for Genie."""
     pass
 
+
 class GenieAdapterError(GenieError):
     """Error when trying to construct a JSON payload for a job."""
+    pass
+
+
+class GenieAttachmentError(GenieError):
+    """Error when trying to add an attachment for a job."""
     pass
 
 
@@ -41,13 +49,18 @@ class GenieHTTPError(GenieError):
     """Error when sending a request to the server."""
 
     def __init__(self, response):
-        super(GenieHTTPError, self) \
-            .__init__('{}: {}, {}'.format(response.status_code,
-                                          response.reason,
-                                          response.text))
+        super(GenieHTTPError, self).__init__('{}: {}, {}' \
+                                                 .format(response.status_code,
+                                                         response.reason,
+                                                         response.text))
         self.response = response
 
 
 class GenieJobError(GenieError):
     """A Genie job error occurred."""
+    pass
+
+
+class GenieJobNotFoundError(GenieError):
+    """Error when job is not found."""
     pass

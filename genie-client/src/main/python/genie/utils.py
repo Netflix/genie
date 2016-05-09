@@ -2,13 +2,14 @@
 genie.utils
 
 This module contains utility functions.
+
 """
 
 
-from __future__ import absolute_import, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function, unicode_literals
 
+import datetime
 import logging
-import os
 import pkg_resources
 import six
 import socket
@@ -44,6 +45,10 @@ def call(url, method='get', headers=None, *args, **kwargs):
 
     headers = USER_AGENT_HEADER if headers is None \
         else dict(headers, **USER_AGENT_HEADER)
+
+    logger.debug('"%s %s"', method.upper(), url)
+    logger.debug('headers: %s', headers)
+
     resp = requests.request(method, url=url, headers=headers, *args, **kwargs)
 
     if not resp.ok:
@@ -52,10 +57,11 @@ def call(url, method='get', headers=None, *args, **kwargs):
     return resp
 
 
-def is_file(path):
-    """Checks if path is to an existing file."""
+def dttm_to_epoch(date_str, frmt='%Y-%m-%dT%H:%M:%SZ'):
+    """Convert a date string to epoch seconds."""
 
-    return os.path.isfile(path)
+    return int((datetime.datetime.strptime(date_str, frmt) -
+        datetime.datetime(1970,1,1)).total_seconds())
 
 
 def is_str(string):
