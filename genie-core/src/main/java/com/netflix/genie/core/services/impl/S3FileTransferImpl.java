@@ -25,7 +25,6 @@ import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.services.FileTransfer;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.NotBlank;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.util.regex.Matcher;
@@ -54,7 +53,6 @@ public class S3FileTransferImpl implements FileTransfer {
      * @param amazonS3Client An amazon s3 client object
      * @throws GenieException If there is a problem
      */
-    @Autowired
     public S3FileTransferImpl(
         final AmazonS3Client amazonS3Client
         ) throws GenieException {

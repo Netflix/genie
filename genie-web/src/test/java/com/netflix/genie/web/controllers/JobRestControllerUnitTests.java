@@ -32,6 +32,8 @@ import com.netflix.genie.web.hateoas.assemblers.JobResourceAssembler;
 import com.netflix.genie.web.hateoas.assemblers.JobSearchResultResourceAssembler;
 import com.netflix.genie.web.properties.JobForwardingProperties;
 import com.netflix.genie.web.resources.handlers.GenieResourceHttpRequestHandler;
+import com.netflix.spectator.api.Counter;
+import com.netflix.spectator.api.Registry;
 import org.apache.catalina.ssi.ByteArrayServletOutputStream;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -90,6 +92,10 @@ public class JobRestControllerUnitTests {
         this.genieResourceHttpRequestHandler = Mockito.mock(GenieResourceHttpRequestHandler.class);
         this.jobForwardingProperties = Mockito.mock(JobForwardingProperties.class);
 
+        final Registry registry = Mockito.mock(Registry.class);
+        final Counter counter = Mockito.mock(Counter.class);
+        Mockito.when(registry.counter(Mockito.anyString())).thenReturn(counter);
+
         this.controller = new JobRestController(
             Mockito.mock(JobCoordinatorService.class),
             this.jobSearchService,
@@ -104,7 +110,8 @@ public class JobRestControllerUnitTests {
             this.hostname,
             this.httpClient,
             this.genieResourceHttpRequestHandler,
-            this.jobForwardingProperties
+            this.jobForwardingProperties,
+            registry
         );
     }
 
