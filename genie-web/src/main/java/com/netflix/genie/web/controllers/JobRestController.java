@@ -24,6 +24,7 @@ import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.services.AttachmentService;
@@ -45,6 +46,8 @@ import com.netflix.genie.web.hateoas.resources.JobResource;
 import com.netflix.genie.web.hateoas.resources.JobSearchResultResource;
 import com.netflix.genie.web.properties.JobForwardingProperties;
 import com.netflix.genie.web.resources.handlers.GenieResourceHttpRequestHandler;
+import com.netflix.spectator.api.Counter;
+import com.netflix.spectator.api.Registry;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
@@ -85,7 +88,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.Enumeration;
@@ -123,6 +125,21 @@ public class JobRestController {
     private final GenieResourceHttpRequestHandler resourceHttpRequestHandler;
     private final JobForwardingProperties jobForwardingProperties;
 
+    // Metrics
+    private final Counter submitJobRate;
+    private final Counter submitJobWithoutAttachmentsRate;
+    private final Counter submitJobWithAttachmentsRate;
+    private final Counter getJobRate;
+    private final Counter getJobStatusRate;
+    private final Counter findJobsRate;
+    private final Counter killJobRate;
+    private final Counter getJobRequestRate;
+    private final Counter getJobExecutionRate;
+    private final Counter getJobClusterRate;
+    private final Counter getJobCommandRate;
+    private final Counter getJobApplicationsRate;
+    private final Counter getJobOutputRate;
+
     /**
      * Constructor.
      *
@@ -141,6 +158,7 @@ public class JobRestController {
      * @param resourceHttpRequestHandler       The handler to return requests for static resources on the
      *                                         Genie File System.
      * @param jobForwardingProperties          All the properties associated with job forwarding
+     * @param registry                         The metrics registry to use
      */
     @Autowired
     public JobRestController(
@@ -157,7 +175,8 @@ public class JobRestController {
         final String hostName,
         final HttpClient httpClient,
         final GenieResourceHttpRequestHandler resourceHttpRequestHandler,
-        final JobForwardingProperties jobForwardingProperties
+        final JobForwardingProperties jobForwardingProperties,
+        final Registry registry
     ) {
         this.jobCoordinatorService = jobCoordinatorService;
         this.jobSearchService = jobSearchService;
@@ -173,6 +192,21 @@ public class JobRestController {
         this.httpClient = httpClient;
         this.resourceHttpRequestHandler = resourceHttpRequestHandler;
         this.jobForwardingProperties = jobForwardingProperties;
+
+        // Set up the metrics
+        this.submitJobRate = registry.counter("genie.api.v3.jobs.submitJob.rate");
+        this.submitJobWithoutAttachmentsRate = registry.counter("genie.api.v3.jobs.submitJobWithoutAttachments.rate");
+        this.submitJobWithAttachmentsRate = registry.counter("genie.api.v3.jobs.submitJobWithAttachments.rate");
+        this.getJobRate = registry.counter("genie.api.v3.jobs.getJob.rate");
+        this.getJobStatusRate = registry.counter("genie.api.v3.jobs.getJobStatus.rate");
+        this.findJobsRate = registry.counter("genie.api.v3.jobs.findJobs.rate");
+        this.killJobRate = registry.counter("genie.api.v3.jobs.killJob.rate");
+        this.getJobRequestRate = registry.counter("genie.api.v3.jobs.getJobRequest.rate");
+        this.getJobExecutionRate = registry.counter("genie.api.v3.jobs.getJobExecution.rate");
+        this.getJobClusterRate = registry.counter("genie.api.v3.jobs.getJobCluster.rate");
+        this.getJobCommandRate = registry.counter("genie.api.v3.jobs.getJobCommand.rate");
+        this.getJobApplicationsRate = registry.counter("genie.api.v3.jobs.getJobApplications.rate");
+        this.getJobOutputRate = registry.counter("genie.api.v3.jobs.getJobOutput.rate");
     }
 
     /**
@@ -193,10 +227,12 @@ public class JobRestController {
         final String clientHost,
         final HttpServletRequest httpServletRequest
     ) throws GenieException {
+        log.info("[submitJob] Called json method type to submit job: {}", jobRequest);
+        this.submitJobRate.increment();
+        this.submitJobWithoutAttachmentsRate.increment();
         if (jobRequest == null) {
-            throw new GenieException(HttpURLConnection.HTTP_PRECON_FAILED, "No job entered. Unable to submit.");
+            throw new GeniePreconditionException("No job request entered. Unable to submit.");
         }
-        log.debug("Called json method type to submit job: {}", jobRequest);
 
         return this.submitJob(
             jobRequest,
@@ -227,10 +263,12 @@ public class JobRestController {
         final String clientHost,
         final HttpServletRequest httpServletRequest
     ) throws GenieException {
+        log.info("[submitJob] Called multipart method to submit job: {}", jobRequest);
+        this.submitJobRate.increment();
+        this.submitJobWithAttachmentsRate.increment();
         if (jobRequest == null) {
-            throw new GenieException(HttpURLConnection.HTTP_PRECON_FAILED, "No job entered. Unable to submit.");
+            throw new GeniePreconditionException("No job request entered. Unable to submit.");
         }
-        log.debug("Called multipart method to submit job: {}", jobRequest);
 
         // get client's host from the context
         final String localClientHost;
@@ -304,7 +342,8 @@ public class JobRestController {
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     public JobResource getJob(@PathVariable("id") final String id) throws GenieException {
-        log.debug("called for job with id: {}", id);
+        log.info("[getJob] Called for job with id: {}", id);
+        this.getJobRate.increment();
         return this.jobResourceAssembler.toResource(this.jobSearchService.getJob(id));
     }
 
@@ -317,6 +356,8 @@ public class JobRestController {
      */
     @RequestMapping(value = "/{id}/status", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public JsonNode getJobStatus(@PathVariable("id") final String id) throws GenieException {
+        log.debug("[getJobStatus] Called for job with id: {}", id);
+        this.getJobStatusRate.increment();
         final JsonNodeFactory factory = JsonNodeFactory.instance;
         return factory
             .objectNode()
@@ -346,7 +387,7 @@ public class JobRestController {
      */
     @RequestMapping(method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public PagedResources<JobSearchResultResource> getJobs(
+    public PagedResources<JobSearchResultResource> findJobs(
         @RequestParam(value = "id", required = false) final String id,
         @RequestParam(value = "name", required = false) final String name,
         @RequestParam(value = "user", required = false) final String user,
@@ -363,12 +404,12 @@ public class JobRestController {
         @PageableDefault(sort = {"created"}, direction = Sort.Direction.DESC) final Pageable page,
         final PagedResourcesAssembler<JobSearchResult> assembler
     ) throws GenieException {
-        log.debug(
-            "Called with "
+        log.info(
+            "[getJobs] Called with "
                 + "[id | jobName | user | statuses | clusterName "
                 + "| clusterId | minStarted | maxStarted | minFinished | maxFinished | page]"
         );
-        log.debug(
+        log.info(
             "{} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {}",
             id,
             name,
@@ -385,6 +426,8 @@ public class JobRestController {
             maxFinished,
             page
         );
+        this.findJobsRate.increment();
+
         Set<JobStatus> enumStatuses = null;
         if (statuses != null && !statuses.isEmpty()) {
             enumStatuses = EnumSet.noneOf(JobStatus.class);
@@ -400,7 +443,7 @@ public class JobRestController {
             .linkTo(
                 ControllerLinkBuilder
                     .methodOn(JobRestController.class)
-                    .getJobs(
+                    .findJobs(
                         id,
                         name,
                         user,
@@ -460,7 +503,8 @@ public class JobRestController {
         final HttpServletRequest request,
         final HttpServletResponse response
     ) throws GenieException, IOException, ServletException {
-        log.debug("Called for job id: {}. Forwarded from: {}", id, forwardedFrom);
+        log.info("[killJob] Called for job id: {}. Forwarded from: {}", id, forwardedFrom);
+        this.killJobRate.increment();
 
         // If forwarded from is null this request hasn't been forwarded at all. Check we're on the right node
         if (this.jobForwardingProperties.isEnabled() && forwardedFrom == null) {
@@ -499,7 +543,8 @@ public class JobRestController {
     @RequestMapping(value = "/{id}/request", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public JobRequestResource getJobRequest(@PathVariable("id") final String id) throws GenieException {
-        log.debug("Called for job request with id {}", id);
+        log.info("[getJobRequest] Called for job request with id {}", id);
+        this.getJobRequestRate.increment();
         return this.jobRequestResourceAssembler.toResource(this.jobSearchService.getJobRequest(id));
     }
 
@@ -513,7 +558,8 @@ public class JobRestController {
     @RequestMapping(value = "/{id}/execution", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public JobExecutionResource getJobExecution(@PathVariable("id") final String id) throws GenieException {
-        log.debug("Called for job execution with id {}", id);
+        log.info("[getJobExecution] Called for job execution with id {}", id);
+        this.getJobExecutionRate.increment();
         return this.jobExecutionResourceAssembler.toResource(this.jobSearchService.getJobExecution(id));
     }
 
@@ -527,7 +573,8 @@ public class JobRestController {
     @RequestMapping(value = "/{id}/cluster", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public ClusterResource getJobCluster(@PathVariable("id") final String id) throws GenieException {
-        log.debug("Called for job with id {}", id);
+        log.info("[getJobCluster] Called for job with id {}", id);
+        this.getJobClusterRate.increment();
         return this.clusterResourceAssembler.toResource(this.jobSearchService.getJobCluster(id));
     }
 
@@ -541,7 +588,8 @@ public class JobRestController {
     @RequestMapping(value = "/{id}/command", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public CommandResource getJobCommand(@PathVariable("id") final String id) throws GenieException {
-        log.debug("Called for job with id {}", id);
+        log.info("[getJobCommand] Called for job with id {}", id);
+        this.getJobCommandRate.increment();
         return this.commandResourceAssembler.toResource(this.jobSearchService.getJobCommand(id));
     }
 
@@ -555,7 +603,8 @@ public class JobRestController {
     @RequestMapping(value = "/{id}/applications", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public List<ApplicationResource> getJobApplications(@PathVariable("id") final String id) throws GenieException {
-        log.debug("Called for job with id {}", id);
+        log.info("[getJobApplications] Called for job with id {}", id);
+        this.getJobApplicationsRate.increment();
 
         return this.jobSearchService
             .getJobApplications(id)
@@ -584,13 +633,15 @@ public class JobRestController {
         method = RequestMethod.GET,
         produces = MediaType.ALL_VALUE
     )
-
     public void getJobOutput(
         @PathVariable("id") final String id,
         @RequestHeader(name = JobConstants.GENIE_FORWARDED_FROM_HEADER, required = false) final String forwardedFrom,
         final HttpServletRequest request,
         final HttpServletResponse response
     ) throws IOException, ServletException, GenieException {
+        log.info("[getJobOutput] Called for job with id: {}", id);
+        this.getJobOutputRate.increment();
+
         // if forwarded from isn't null it's already been forwarded to this node. Assume data is on this node.
         if (this.jobForwardingProperties.isEnabled() && forwardedFrom == null) {
             // TODO: It's possible that could use the JobMonitorCoordinator to check this in memory

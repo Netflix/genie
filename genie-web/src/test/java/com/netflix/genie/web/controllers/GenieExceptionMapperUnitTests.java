@@ -17,8 +17,25 @@
  */
 package com.netflix.genie.web.controllers;
 
+import com.netflix.genie.common.exceptions.GenieBadRequestException;
+import com.netflix.genie.common.exceptions.GenieConflictException;
+import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieNotFoundException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
+import com.netflix.genie.common.exceptions.GenieTimeoutException;
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.spectator.api.Counter;
+import com.netflix.spectator.api.Registry;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.mockito.Mockito;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.ConstraintViolationException;
+import java.io.IOException;
 
 /**
  * Tests for the exception mapper.
@@ -26,88 +43,91 @@ import org.junit.experimental.categories.Category;
  * @author tgianos
  */
 @Category(UnitTest.class)
-//TODO: Reimplement tests. May be integration tests due to it being advice.
 public class GenieExceptionMapperUnitTests {
-//    private static final String ERROR_MESSAGE = "Genie error";
-//    private GenieExceptionMapper mapper;
-//
-//    /**
-//     * Setup the tests.
-//     */
-//    @Before
-//    public void setup() {
-//        this.mapper = new GenieExceptionMapper();
-//    }
-//
-//    /**
-//     * Test 400.
-//     */
-//    @Test
-//    public void testGenieBadRequestException() {
-//        final GenieException ge = new GenieBadRequestException(ERROR_MESSAGE);
-//        final Response response = this.mapper.toResponse(ge);
-//        Assert.assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, response.getStatus());
-//        Assert.assertNotNull(response.getEntity());
-//        Assert.assertEquals(ERROR_MESSAGE, response.getEntity());
-//    }
-//
-//    /**
-//     * Test 409.
-//     */
-//    @Test
-//    public void testGenieConflictException() {
-//        final GenieException ge = new GenieConflictException(ERROR_MESSAGE);
-//        final Response response = this.mapper.toResponse(ge);
-//        Assert.assertEquals(HttpURLConnection.HTTP_CONFLICT, response.getStatus());
-//        Assert.assertNotNull(response.getEntity());
-//        Assert.assertEquals(ERROR_MESSAGE, response.getEntity());
-//    }
-//
-//    /**
-//     * Test random exception.
-//     */
-//    @Test
-//    public void testGenieException() {
-//        final GenieException ge = new GenieException(300, ERROR_MESSAGE);
-//        final Response response = this.mapper.toResponse(ge);
-//        Assert.assertEquals(300, response.getStatus());
-//        Assert.assertNotNull(response.getEntity());
-//        Assert.assertEquals(ERROR_MESSAGE, response.getEntity());
-//    }
-//
-//    /**
-//     * Test 404.
-//     */
-//    @Test
-//    public void testGenieNotFoundException() {
-//        final GenieException ge = new GenieNotFoundException(ERROR_MESSAGE);
-//        final Response response = this.mapper.toResponse(ge);
-//        Assert.assertEquals(HttpURLConnection.HTTP_NOT_FOUND, response.getStatus());
-//        Assert.assertNotNull(response.getEntity());
-//        Assert.assertEquals(ERROR_MESSAGE, response.getEntity());
-//    }
-//
-//    /**
-//     * Test 412.
-//     */
-//    @Test
-//    public void testGeniePreconditionException() {
-//        final GenieException ge = new GeniePreconditionException(ERROR_MESSAGE);
-//        final Response response = this.mapper.toResponse(ge);
-//        Assert.assertEquals(HttpURLConnection.HTTP_PRECON_FAILED, response.getStatus());
-//        Assert.assertNotNull(response.getEntity());
-//        Assert.assertEquals(ERROR_MESSAGE, response.getEntity());
-//    }
-//
-//    /**
-//     * Test 500.
-//     */
-//    @Test
-//    public void testGenieServerException() {
-//        final GenieException ge = new GenieServerException(ERROR_MESSAGE);
-//        final Response response = this.mapper.toResponse(ge);
-//        Assert.assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, response.getStatus());
-//        Assert.assertNotNull(response.getEntity());
-//        Assert.assertEquals(ERROR_MESSAGE, response.getEntity());
-//    }
+
+    private Counter badRequestRate;
+    private Counter conflictRate;
+    private Counter notFoundRate;
+    private Counter preconditionRate;
+    private Counter serverRate;
+    private Counter serverUnavailableRate;
+    private Counter timeoutRate;
+    private Counter genieRate;
+    private Counter constraintViolationRate;
+
+    private HttpServletResponse response;
+    private GenieExceptionMapper mapper;
+
+    /**
+     * Setup for the tests.
+     */
+    @Before
+    public void setup() {
+        this.badRequestRate = Mockito.mock(Counter.class);
+        this.conflictRate = Mockito.mock(Counter.class);
+        this.notFoundRate = Mockito.mock(Counter.class);
+        this.preconditionRate = Mockito.mock(Counter.class);
+        this.serverRate = Mockito.mock(Counter.class);
+        this.serverUnavailableRate = Mockito.mock(Counter.class);
+        this.timeoutRate = Mockito.mock(Counter.class);
+        this.genieRate = Mockito.mock(Counter.class);
+        this.constraintViolationRate = Mockito.mock(Counter.class);
+
+        final Registry registry = Mockito.mock(Registry.class);
+        Mockito.when(registry.counter("genie.exceptions.badRequest.rate")).thenReturn(this.badRequestRate);
+        Mockito.when(registry.counter("genie.exceptions.conflict.rate")).thenReturn(this.conflictRate);
+        Mockito.when(registry.counter("genie.exceptions.notFound.rate")).thenReturn(this.notFoundRate);
+        Mockito.when(registry.counter("genie.exceptions.precondition.rate")).thenReturn(this.preconditionRate);
+        Mockito.when(registry.counter("genie.exceptions.server.rate")).thenReturn(this.serverRate);
+        Mockito
+            .when(registry.counter("genie.exceptions.serverUnavailable.rate"))
+            .thenReturn(this.serverUnavailableRate);
+        Mockito.when(registry.counter("genie.exceptions.timeout.rate")).thenReturn(this.timeoutRate);
+        Mockito.when(registry.counter("genie.exceptions.other.rate")).thenReturn(this.genieRate);
+        Mockito
+            .when(registry.counter("genie.exceptions.constraintViolation.rate"))
+            .thenReturn(this.constraintViolationRate);
+
+        this.response = Mockito.mock(HttpServletResponse.class);
+        this.mapper = new GenieExceptionMapper(registry);
+    }
+
+    /**
+     * Test Genie Exceptions.
+     *
+     * @throws IOException on error
+     */
+    @Test
+    public void canHandleGenieExceptions() throws IOException {
+        this.mapper.handleGenieException(response, new GenieBadRequestException("bad"));
+        this.mapper.handleGenieException(response, new GenieConflictException("conflict"));
+        this.mapper.handleGenieException(response, new GenieNotFoundException("Not Found"));
+        this.mapper.handleGenieException(response, new GeniePreconditionException("Precondition"));
+        this.mapper.handleGenieException(response, new GenieServerException("server"));
+        this.mapper.handleGenieException(response, new GenieServerUnavailableException("Server Unavailable"));
+        this.mapper.handleGenieException(response, new GenieTimeoutException("Timeout"));
+        this.mapper.handleGenieException(response, new GenieException(568, "Other"));
+
+        Mockito.verify(this.badRequestRate, Mockito.times(1)).increment();
+        Mockito.verify(this.conflictRate, Mockito.times(1)).increment();
+        Mockito.verify(this.notFoundRate, Mockito.times(1)).increment();
+        Mockito.verify(this.preconditionRate, Mockito.times(1)).increment();
+        Mockito.verify(this.serverRate, Mockito.times(1)).increment();
+        Mockito.verify(this.serverUnavailableRate, Mockito.times(1)).increment();
+        Mockito.verify(this.timeoutRate, Mockito.times(1)).increment();
+        Mockito.verify(this.genieRate, Mockito.times(1)).increment();
+        Mockito.verify(this.response, Mockito.times(8)).sendError(Mockito.anyInt(), Mockito.anyString());
+    }
+
+    /**
+     * Test constraint violation exceptions.
+     *
+     * @throws IOException on error
+     */
+    @Test
+    public void canHandleConstraintViolationExceptions() throws IOException {
+        this.mapper.handleConstraintViolation(response, new ConstraintViolationException("cve", null));
+        Mockito.verify(this.constraintViolationRate, Mockito.times(1)).increment();
+        Mockito.verify(this.response, Mockito.times(1)).sendError(Mockito.anyInt(), Mockito.anyString());
+    }
 }
