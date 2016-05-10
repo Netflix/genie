@@ -47,7 +47,7 @@ public class JsonDateSerializerUnitTests {
      */
     @Before
     public void setup() {
-        this.expectedString = ISO8601Utils.format(DATE);
+        this.expectedString = ISO8601Utils.format(DATE, true);
     }
 
     /**

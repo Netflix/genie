@@ -18,8 +18,13 @@
 package com.netflix.genie.web.resources.writers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.collect.Lists;
+import com.netflix.genie.common.util.JsonDateDeserializer;
+import com.netflix.genie.common.util.JsonDateSerializer;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.apache.catalina.util.ConcurrentDateFormat;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.commons.lang3.StringUtils;
@@ -177,7 +182,7 @@ public class DefaultDirectoryWriter implements DirectoryWriter {
         builder
             .append("<td align=\"right\"><tt>")
             .append(this.renderSize(entry.getSize())).append("</tt></td>");
-        final String lastModified = ConcurrentDateFormat.formatRfc1123(new Date(entry.getLastModified()));
+        final String lastModified = ConcurrentDateFormat.formatRfc1123(entry.getLastModified());
         builder.append("<td align=\"right\"><tt>").append(lastModified).append("</tt></td>");
         builder.append("</tr>");
     }
@@ -202,7 +207,7 @@ public class DefaultDirectoryWriter implements DirectoryWriter {
             parent.setName("../");
             parent.setUrl(url);
             parent.setSize(directory.getParentFile().getAbsoluteFile().length());
-            parent.setLastModified(directory.getParentFile().getAbsoluteFile().lastModified());
+            parent.setLastModified(new Date(directory.getParentFile().getAbsoluteFile().lastModified()));
             dir.setParent(parent);
         }
 
@@ -214,7 +219,7 @@ public class DefaultDirectoryWriter implements DirectoryWriter {
             for (final File file : files) {
                 final Entry entry = new Entry();
                 entry.setSize(file.getAbsoluteFile().length());
-                entry.setLastModified(file.getAbsoluteFile().lastModified());
+                entry.setLastModified(new Date(file.getAbsoluteFile().lastModified()));
                 if (file.isDirectory()) {
                     entry.setName(file.getName() + "/");
                     entry.setUrl(baseURL + file.getName() + "/");
@@ -246,14 +251,35 @@ public class DefaultDirectoryWriter implements DirectoryWriter {
     }
 
     @Data
+    @EqualsAndHashCode(exclude = {"lastModified"})
     protected static class Entry {
         @NotBlank
         private String name;
         @URL
         private String url;
-        @Size(min = 0)
+        @Size
         private long size;
-        @Size(min = 0)
-        private long lastModified;
+        @JsonSerialize(using = JsonDateSerializer.class)
+        @JsonDeserialize(using = JsonDateDeserializer.class)
+        @NotNull
+        private Date lastModified;
+
+        /**
+         * Get the last modified time as a date.
+         *
+         * @return The time this entry was last modified
+         */
+        public Date getLastModified() {
+            return new Date(this.lastModified.getTime());
+        }
+
+        /**
+         * Set the last modified time as a date.
+         *
+         * @param lastModified the new last modified time
+         */
+        public void setLastModified(@NotNull final Date lastModified) {
+            this.lastModified = new Date(lastModified.getTime());
+        }
     }
 }

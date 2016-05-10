@@ -41,20 +41,24 @@ public class BaseSearchResult implements Serializable {
 
     private final String id;
     private final String name;
+    private final String user;
 
     /**
      * Constructor.
      *
      * @param id   The id of the object in the search result.
      * @param name The name of the object in the search result.
+     * @param user The user who created the object.
      */
     @JsonCreator
     public BaseSearchResult(
         @NotBlank @JsonProperty("id") final String id,
-        @NotBlank @JsonProperty("name") final String name
+        @NotBlank @JsonProperty("name") final String name,
+        @NotBlank @JsonProperty("user") final String user
     ) {
         this.id = id;
         this.name = name;
+        this.user = user;
     }
 
     /**

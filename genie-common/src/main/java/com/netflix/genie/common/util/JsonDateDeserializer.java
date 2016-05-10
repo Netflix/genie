@@ -32,6 +32,7 @@ import java.util.Date;
  * Used to de-serialize dates from strings in Json payloads.
  *
  * @author tgianos
+ * @since 2.0.0
  */
 public class JsonDateDeserializer extends JsonDeserializer<Date> {
     /**

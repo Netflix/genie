@@ -49,28 +49,28 @@ public class DefaultDirectoryWriterUnitTests {
     private static final String REQUEST_URL_WITH_PARENT = REQUEST_URL_BASE + "/" + UUID.randomUUID().toString();
 
     private static final long PARENT_SIZE = 3082;
-    private static final long PARENT_LAST_MODIFIED = new Date().getTime();
+    private static final Date PARENT_LAST_MODIFIED = new Date();
     private static final String PARENT_NAME = "../";
     private static final String PARENT_URL = REQUEST_URL_BASE;
 
     private static final long DIR_1_SIZE = 83023;
-    private static final long DIR_1_LAST_MODIFIED = new Date().getTime() + 13142;
+    private static final Date DIR_1_LAST_MODIFIED = new Date(new Date().getTime() + 13142);
     private static final String DIR_1_NAME = UUID.randomUUID().toString();
     private static final String DIR_1_URL = REQUEST_URL_WITH_PARENT + "/" + DIR_1_NAME;
 
 
     private static final long DIR_2_SIZE = 3023;
-    private static final long DIR_2_LAST_MODIFIED = new Date().getTime() - 1830;
+    private static final Date DIR_2_LAST_MODIFIED = new Date(new Date().getTime() - 1830);
     private static final String DIR_2_NAME = UUID.randomUUID().toString();
     private static final String DIR_2_URL = REQUEST_URL_WITH_PARENT + "/" + DIR_2_NAME;
 
     private static final long FILE_1_SIZE = 73522431;
-    private static final long FILE_1_LAST_MODIFIED = new Date().getTime() + 1832430;
+    private static final Date FILE_1_LAST_MODIFIED = new Date(new Date().getTime() + 1832430);
     private static final String FILE_1_NAME = UUID.randomUUID().toString();
     private static final String FILE_1_URL = REQUEST_URL_WITH_PARENT + "/" + FILE_1_NAME;
 
     private static final long FILE_2_SIZE = 735231;
-    private static final long FILE_2_LAST_MODIFIED = new Date().getTime() + 1832443;
+    private static final Date FILE_2_LAST_MODIFIED = new Date(new Date().getTime() + 1832443);
     private static final String FILE_2_NAME = UUID.randomUUID().toString();
     private static final String FILE_2_URL = REQUEST_URL_WITH_PARENT + "/" + FILE_2_NAME;
 
@@ -244,7 +244,7 @@ public class DefaultDirectoryWriterUnitTests {
         final File absoluteParent = Mockito.mock(File.class);
         Mockito.when(parent.getAbsoluteFile()).thenReturn(absoluteParent);
         Mockito.when(absoluteParent.length()).thenReturn(PARENT_SIZE);
-        Mockito.when(absoluteParent.lastModified()).thenReturn(PARENT_LAST_MODIFIED);
+        Mockito.when(absoluteParent.lastModified()).thenReturn(PARENT_LAST_MODIFIED.getTime());
         Mockito.when(parent.getName()).thenReturn(PARENT_NAME);
 
         Mockito.when(this.directory.getParentFile()).thenReturn(parent);
@@ -253,7 +253,7 @@ public class DefaultDirectoryWriterUnitTests {
         final File absoluteDir1 = Mockito.mock(File.class);
         Mockito.when(dir1.getAbsoluteFile()).thenReturn(absoluteDir1);
         Mockito.when(absoluteDir1.length()).thenReturn(DIR_1_SIZE);
-        Mockito.when(absoluteDir1.lastModified()).thenReturn(DIR_1_LAST_MODIFIED);
+        Mockito.when(absoluteDir1.lastModified()).thenReturn(DIR_1_LAST_MODIFIED.getTime());
         Mockito.when(dir1.getName()).thenReturn(DIR_1_NAME);
         Mockito.when(dir1.isDirectory()).thenReturn(true);
 
@@ -261,7 +261,7 @@ public class DefaultDirectoryWriterUnitTests {
         final File absoluteDir2 = Mockito.mock(File.class);
         Mockito.when(dir2.getAbsoluteFile()).thenReturn(absoluteDir2);
         Mockito.when(absoluteDir2.length()).thenReturn(DIR_2_SIZE);
-        Mockito.when(absoluteDir2.lastModified()).thenReturn(DIR_2_LAST_MODIFIED);
+        Mockito.when(absoluteDir2.lastModified()).thenReturn(DIR_2_LAST_MODIFIED.getTime());
         Mockito.when(dir2.getName()).thenReturn(DIR_2_NAME);
         Mockito.when(dir2.isDirectory()).thenReturn(true);
 
@@ -269,7 +269,7 @@ public class DefaultDirectoryWriterUnitTests {
         final File absoluteFile1 = Mockito.mock(File.class);
         Mockito.when(file1.getAbsoluteFile()).thenReturn(absoluteFile1);
         Mockito.when(absoluteFile1.length()).thenReturn(FILE_1_SIZE);
-        Mockito.when(absoluteFile1.lastModified()).thenReturn(FILE_1_LAST_MODIFIED);
+        Mockito.when(absoluteFile1.lastModified()).thenReturn(FILE_1_LAST_MODIFIED.getTime());
         Mockito.when(file1.getName()).thenReturn(FILE_1_NAME);
         Mockito.when(file1.isDirectory()).thenReturn(false);
 
@@ -277,7 +277,7 @@ public class DefaultDirectoryWriterUnitTests {
         final File absoluteFile2 = Mockito.mock(File.class);
         Mockito.when(file2.getAbsoluteFile()).thenReturn(absoluteFile2);
         Mockito.when(absoluteFile2.length()).thenReturn(FILE_2_SIZE);
-        Mockito.when(absoluteFile2.lastModified()).thenReturn(FILE_2_LAST_MODIFIED);
+        Mockito.when(absoluteFile2.lastModified()).thenReturn(FILE_2_LAST_MODIFIED.getTime());
         Mockito.when(file2.getName()).thenReturn(FILE_2_NAME);
         Mockito.when(file2.isDirectory()).thenReturn(false);
 

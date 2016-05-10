@@ -29,6 +29,7 @@ import java.util.Date;
  * Used to serialize dates into json in an expected format.
  *
  * @author tgianos
+ * @since 2.0.0
  */
 public class JsonDateSerializer extends JsonSerializer<Date> {
 
@@ -41,7 +42,7 @@ public class JsonDateSerializer extends JsonSerializer<Date> {
         if (date == null) {
             gen.writeString((String) null);
         } else {
-            gen.writeString(ISO8601Utils.format(date));
+            gen.writeString(ISO8601Utils.format(date, true));
         }
     }
 }

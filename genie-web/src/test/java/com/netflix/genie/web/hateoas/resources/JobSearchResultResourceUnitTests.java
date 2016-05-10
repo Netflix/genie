@@ -39,6 +39,7 @@ public class JobSearchResultResourceUnitTests {
 
     private static final String ID = UUID.randomUUID().toString();
     private static final String NAME = UUID.randomUUID().toString();
+    private static final String USER = UUID.randomUUID().toString();
     private static final Date STARTED = new Date();
 
     private JobSearchResult jobSearchResult;
@@ -48,7 +49,7 @@ public class JobSearchResultResourceUnitTests {
      */
     @Before
     public void setup() {
-        this.jobSearchResult = new JobSearchResult(ID, NAME, JobStatus.RUNNING, STARTED, null, null, null);
+        this.jobSearchResult = new JobSearchResult(ID, NAME, USER, JobStatus.RUNNING, STARTED, null, null, null);
     }
 
     /**
