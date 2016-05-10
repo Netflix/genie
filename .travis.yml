@@ -17,14 +17,14 @@ services:
 git:
   depth: 200
 
-install: "./gradle/installViaTravis.sh"
+install: true
 
 # Setup the database for the integration tests
 before_script:
   - mysql -u root -e 'create database genie;'
   - mysql -u root genie < genie-ddl/mysql/3.0.0-schema.mysql.sql
 
-script: travis_wait 40 ./gradle/buildViaTravis.sh
+script: ./gradle/buildViaTravis.sh
 
 # https://docs.travis-ci.com/user/languages/java#Caching
 before_cache:
