@@ -153,6 +153,7 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
             contentQuery.multiselect(
                 root.get(JobEntity_.id),
                 root.get(JobEntity_.name),
+                root.get(JobEntity_.user),
                 root.get(JobEntity_.status),
                 root.get(JobEntity_.started),
                 root.get(JobEntity_.finished),

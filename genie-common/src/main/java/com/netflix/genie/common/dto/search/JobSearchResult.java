@@ -54,6 +54,7 @@ public class JobSearchResult extends BaseSearchResult {
      *
      * @param id          The id of the job
      * @param name        The name of the job
+     * @param user        The user of the job
      * @param status      The current status of the job
      * @param started     The start time of the job
      * @param finished    The finish time of the job
@@ -64,13 +65,14 @@ public class JobSearchResult extends BaseSearchResult {
     public JobSearchResult(
         @NotBlank @JsonProperty("id") final String id,
         @NotBlank @JsonProperty("name") final String name,
+        @NotBlank @JsonProperty("user") final String user,
         @NotNull @JsonProperty("status") final JobStatus status,
         @JsonProperty("started") final Date started,
         @JsonProperty("finished") final Date finished,
         @JsonProperty("clusterName") final String clusterName,
         @JsonProperty("commandName") final String commandName
     ) {
-        super(id, name);
+        super(id, name, user);
         this.status = status;
         this.started = started == null ? null : new Date(started.getTime());
         this.finished = finished == null ? null : new Date(finished.getTime());

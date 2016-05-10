@@ -42,6 +42,7 @@ public class JobSearchResultResourceAssemblerUnitTests {
 
     private static final String ID = UUID.randomUUID().toString();
     private static final String NAME = UUID.randomUUID().toString();
+    private static final String USER = UUID.randomUUID().toString();
     private static final Date STARTED = new Date();
     private static final Date FINISHED = new Date();
     private static final String CLUSTER_NAME = UUID.randomUUID().toString();
@@ -56,7 +57,7 @@ public class JobSearchResultResourceAssemblerUnitTests {
     @Before
     public void setup() {
         this.jobSearchResult
-            = new JobSearchResult(ID, NAME, JobStatus.SUCCEEDED, STARTED, FINISHED, CLUSTER_NAME, COMMAND_NAME);
+            = new JobSearchResult(ID, NAME, USER, JobStatus.SUCCEEDED, STARTED, FINISHED, CLUSTER_NAME, COMMAND_NAME);
         this.assembler = new JobSearchResultResourceAssembler();
     }
 

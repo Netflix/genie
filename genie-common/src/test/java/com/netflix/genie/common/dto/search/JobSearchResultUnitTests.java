@@ -43,26 +43,29 @@ public class JobSearchResultUnitTests {
     public void canConstruct() {
         final String id = UUID.randomUUID().toString();
         final String name = UUID.randomUUID().toString();
+        final String user = UUID.randomUUID().toString();
         final JobStatus status = JobStatus.FAILED;
         final Date started = new Date();
         final Date finished = new Date();
         final String clusterName = UUID.randomUUID().toString();
         final String commandName = UUID.randomUUID().toString();
         final JobSearchResult searchResult
-            = new JobSearchResult(id, name, status, started, finished, clusterName, commandName);
+            = new JobSearchResult(id, name, user, status, started, finished, clusterName, commandName);
 
         Assert.assertThat(searchResult.getId(), Matchers.is(id));
         Assert.assertThat(searchResult.getName(), Matchers.is(name));
+        Assert.assertThat(searchResult.getUser(), Matchers.is(user));
         Assert.assertThat(searchResult.getStatus(), Matchers.is(status));
         Assert.assertThat(searchResult.getStarted(), Matchers.is(started));
         Assert.assertThat(searchResult.getFinished(), Matchers.is(finished));
         Assert.assertThat(searchResult.getClusterName(), Matchers.is(clusterName));
         Assert.assertThat(searchResult.getCommandName(), Matchers.is(commandName));
 
-        final JobSearchResult searchResult2 = new JobSearchResult(id, name, status, null, null, null, null);
+        final JobSearchResult searchResult2 = new JobSearchResult(id, name, user, status, null, null, null, null);
 
         Assert.assertThat(searchResult2.getId(), Matchers.is(id));
         Assert.assertThat(searchResult2.getName(), Matchers.is(name));
+        Assert.assertThat(searchResult.getUser(), Matchers.is(user));
         Assert.assertThat(searchResult2.getStatus(), Matchers.is(status));
         Assert.assertNull(searchResult2.getStarted());
         Assert.assertNull(searchResult2.getFinished());
