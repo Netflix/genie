@@ -163,10 +163,12 @@ public class JobEntityUnitTests extends EntityTestsBase {
      */
     @Test
     public void testSetGetStarted() {
-        Assert.assertEquals(0L, this.jobEntity.getStarted().getTime());
+        Assert.assertNull(this.jobEntity.getStarted());
         final Date started = new Date(123453L);
         this.jobEntity.setStarted(started);
         Assert.assertEquals(started.getTime(), this.jobEntity.getStarted().getTime());
+        this.jobEntity.setStarted(null);
+        Assert.assertNull(this.jobEntity.getStarted());
     }
 
     /**
@@ -174,10 +176,12 @@ public class JobEntityUnitTests extends EntityTestsBase {
      */
     @Test
     public void testSetGetFinished() {
-        Assert.assertEquals(0L, this.jobEntity.getFinished().getTime());
+        Assert.assertNull(this.jobEntity.getFinished());
         final Date finished = new Date(123453L);
         this.jobEntity.setFinished(finished);
         Assert.assertEquals(finished.getTime(), this.jobEntity.getFinished().getTime());
+        this.jobEntity.setFinished(null);
+        Assert.assertNull(this.jobEntity.getFinished());
     }
 
     /**
@@ -198,41 +202,44 @@ public class JobEntityUnitTests extends EntityTestsBase {
     @Test
     public void testSetJobStatus() {
         final JobEntity localJobEntity = new JobEntity();
-        final Date dt = new Date(0);
 
-        // finish time is 0 on initialization
-        Assert.assertTrue(dt.compareTo(localJobEntity.getFinished()) == 0);
+        // Times are null on initialization
+        Assert.assertNull(localJobEntity.getStarted());
+        Assert.assertNull(localJobEntity.getFinished());
 
         // start time is not zero on INIT, finish time is still 0
         localJobEntity.setJobStatus(JobStatus.INIT);
         Assert.assertNotNull(localJobEntity.getStarted());
-        Assert.assertTrue(dt.compareTo(localJobEntity.getFinished()) == 0);
+        Assert.assertNull(localJobEntity.getFinished());
+        final Date started = localJobEntity.getStarted();
 
         // Shouldn't affect finish time
         localJobEntity.setJobStatus(JobStatus.RUNNING);
-        Assert.assertTrue(dt.compareTo(localJobEntity.getFinished()) == 0);
+        Assert.assertThat(localJobEntity.getStarted(), Matchers.is(started));
+        Assert.assertNull(localJobEntity.getFinished());
 
         // finish time is non-zero on completion
         localJobEntity.setJobStatus(JobStatus.SUCCEEDED);
-        Assert.assertFalse(dt.compareTo(localJobEntity.getFinished()) == 0);
+        Assert.assertThat(localJobEntity.getStarted(), Matchers.is(started));
+        Assert.assertNotNull(localJobEntity.getFinished());
 
         final JobEntity jobEntity2 = new JobEntity();
-        // finish time is 0 on initialization
-        Assert.assertTrue(dt.compareTo(jobEntity2.getFinished()) == 0);
+        // Times are null on initialization
+        Assert.assertNull(jobEntity2.getStarted());
+        Assert.assertNull(jobEntity2.getFinished());
 
         // start time is not zero on INIT, finish time is still 0
         final String initMessage = "We're initializing";
         jobEntity2.setJobStatus(JobStatus.INIT, initMessage);
         Assert.assertNotNull(jobEntity2.getStarted());
+        Assert.assertNull(jobEntity2.getFinished());
         Assert.assertEquals(initMessage, jobEntity2.getStatusMsg());
-        Assert.assertTrue(dt.compareTo(jobEntity2.getStarted()) == -1);
-        Assert.assertTrue(dt.compareTo(jobEntity2.getFinished()) == 0);
 
         // finish time is non-zero on completion
         final String successMessage = "Job Succeeded";
-        jobEntity2.setJobStatus(com.netflix.genie.common.dto.JobStatus.SUCCEEDED, successMessage);
+        jobEntity2.setJobStatus(JobStatus.SUCCEEDED, successMessage);
         Assert.assertEquals(successMessage, jobEntity2.getStatusMsg());
-        Assert.assertFalse(dt.compareTo(jobEntity2.getFinished()) == 0);
+        Assert.assertNotNull(jobEntity2.getFinished());
     }
 
     /**

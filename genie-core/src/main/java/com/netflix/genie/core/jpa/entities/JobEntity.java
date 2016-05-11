@@ -22,6 +22,7 @@ import com.netflix.genie.common.dto.JobStatus;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
 
+import javax.annotation.Nullable;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -79,12 +80,12 @@ public class JobEntity extends CommonFieldsEntity {
     @Basic
     @Column(name = "started")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date started = new Date(0);
+    private Date started;
 
     @Basic
     @Column(name = "finished")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date finished = new Date(0);
+    private Date finished;
 
     @Basic
     @Column(name = "archive_location", length = 1024)
@@ -238,19 +239,19 @@ public class JobEntity extends CommonFieldsEntity {
     /**
      * Gets the start time for this job.
      *
-     * @return startTime : start time in ms
+     * @return startTime as a java.util.Date or null if not yet started
      */
     public Date getStarted() {
-        return new Date(this.started.getTime());
+        return this.started == null ? null : new Date(this.started.getTime());
     }
 
     /**
      * Set the startTime for the job.
      *
-     * @param started epoch time in ms
+     * @param started epoch time as java.util.Date or null
      */
-    public void setStarted(final Date started) {
-        this.started = new Date(started.getTime());
+    public void setStarted(@Nullable final Date started) {
+        this.started = started == null ? null : new Date(started.getTime());
     }
 
     /**
@@ -259,7 +260,7 @@ public class JobEntity extends CommonFieldsEntity {
      * @return finished. The job finish timestamp.
      */
     public Date getFinished() {
-        return new Date(this.finished.getTime());
+        return this.finished == null ? null : new Date(this.finished.getTime());
     }
 
     /**
@@ -267,8 +268,8 @@ public class JobEntity extends CommonFieldsEntity {
      *
      * @param finished The finished time.
      */
-    public void setFinished(final Date finished) {
-        this.finished = new Date(finished.getTime());
+    public void setFinished(@Nullable final Date finished) {
+        this.finished = finished == null ? null : new Date(finished.getTime());
     }
 
     /**
