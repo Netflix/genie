@@ -17,13 +17,16 @@
  */
 package com.netflix.genie.core.jpa.services;
 
+import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.jpa.entities.ClusterEntity;
+import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.test.categories.UnitTest;
@@ -207,6 +210,29 @@ public class JpaClusterServiceImplUnitTests {
     }
 
     /**
+     * Make sure we can't add duplicate commands to the cluster.
+     *
+     * @throws GenieException on error
+     */
+    @Test(expected = GeniePreconditionException.class)
+    public void cantAddDuplicateCommandsToCluster() throws GenieException {
+        final String commandId1 = UUID.randomUUID().toString();
+        final String commandId2 = UUID.randomUUID().toString();
+        final List<String> commandIds = Lists.newArrayList(commandId2);
+        final ClusterEntity clusterEntity = Mockito.mock(ClusterEntity.class);
+        final CommandEntity command1 = Mockito.mock(CommandEntity.class);
+        Mockito.when(command1.getId()).thenReturn(commandId1);
+        final CommandEntity command2 = Mockito.mock(CommandEntity.class);
+        Mockito.when(command2.getId()).thenReturn(commandId2);
+        Mockito.when(clusterEntity.getCommands()).thenReturn(Lists.newArrayList(command1, command2));
+
+        Mockito.when(this.jpaClusterRepository.findOne(Mockito.anyString())).thenReturn(clusterEntity);
+        Mockito.when(this.jpaCommandRepository.findOne(commandId1)).thenReturn(command1);
+        Mockito.when(this.jpaCommandRepository.findOne(commandId2)).thenReturn(command2);
+        this.service.addCommandsForCluster(CLUSTER_1_ID, commandIds);
+    }
+
+    /**
      * Test the Get clusters for cluster function.
      *
      * @throws GenieException For any problem
@@ -245,6 +271,23 @@ public class JpaClusterServiceImplUnitTests {
             = Mockito.mock(ClusterEntity.class);
         Mockito.when(this.jpaClusterRepository.findOne(CLUSTER_1_ID)).thenReturn(cluster);
         Mockito.when(this.jpaCommandRepository.findOne(commandId)).thenReturn(null);
+        this.service.updateCommandsForCluster(CLUSTER_1_ID, commandIds);
+    }
+
+    /**
+     * Make sure we can't update the commands for a cluster if there are duplicate ids in the list of commandIds.
+     *
+     * @throws GenieException On error
+     */
+    @Test(expected = GeniePreconditionException.class)
+    public void cantUpdateCommandsForClusterWithDuplicates() throws GenieException {
+        final String commandId1 = UUID.randomUUID().toString();
+        final String commandId2 = UUID.randomUUID().toString();
+        final List<String> commandIds = Lists.newArrayList(commandId1, commandId2, commandId1);
+        final ClusterEntity cluster = Mockito.mock(ClusterEntity.class);
+        Mockito.when(this.jpaClusterRepository.findOne(CLUSTER_1_ID)).thenReturn(cluster);
+        Mockito.when(this.jpaCommandRepository.findOne(commandId1)).thenReturn(Mockito.mock(CommandEntity.class));
+        Mockito.when(this.jpaCommandRepository.findOne(commandId2)).thenReturn(Mockito.mock(CommandEntity.class));
         this.service.updateCommandsForCluster(CLUSTER_1_ID, commandIds);
     }
 

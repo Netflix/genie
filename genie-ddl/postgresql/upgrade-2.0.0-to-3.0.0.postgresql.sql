@@ -49,6 +49,8 @@ CREATE TABLE commands_applications (
   FOREIGN KEY (command_id) REFERENCES commands (id) ON DELETE CASCADE,
   FOREIGN KEY (application_id) REFERENCES applications (id) ON DELETE RESTRICT
 );
+
+CREATE UNIQUE INDEX COMMAND_APPLICATION_INDEX ON commands_applications (command_id, application_id);
 SELECT CURRENT_TIMESTAMP, 'Successfully created commands_applications table.';
 
 -- Save the values of the current command to application relationship for the new table
@@ -188,6 +190,8 @@ ALTER TABLE clusters_commands ALTER COLUMN commands_order SET NOT NULL;
 ALTER TABLE clusters_commands RENAME COLUMN commands_order TO command_order;
 ALTER TABLE clusters_commands ADD FOREIGN KEY (cluster_id) REFERENCES clusters (id) ON DELETE CASCADE;
 ALTER TABLE clusters_commands ADD FOREIGN KEY (command_id) REFERENCES commands (id) ON DELETE RESTRICT;
+
+CREATE UNIQUE INDEX CLUSTER_COMMAND_INDEX ON clusters_commands (cluster_id, command_id);
 SELECT CURRENT_TIMESTAMP, 'Successfully updated the clusters_commands table.';
 
 SELECT CURRENT_TIMESTAMP, 'Updating the cluster_configs table for 3.0...';

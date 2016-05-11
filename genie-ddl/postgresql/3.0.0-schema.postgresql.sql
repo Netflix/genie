@@ -309,6 +309,13 @@ CREATE INDEX applications_type_index ON applications USING btree (type);
 
 
 --
+-- Name: cluster_command_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX cluster_command_index ON clusters_commands USING btree (cluster_id, command_id);
+
+
+--
 -- Name: clusters_name_index; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -327,6 +334,13 @@ CREATE INDEX clusters_status_index ON clusters USING btree (status);
 --
 
 CREATE INDEX clusters_tag_index ON clusters USING btree (tags);
+
+
+--
+-- Name: command_application_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX command_application_index ON commands_applications USING btree (command_id, application_id);
 
 
 --

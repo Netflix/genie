@@ -392,9 +392,21 @@ public class JpaCommandServiceImpl implements CommandService {
         }
 
         final CommandEntity commandEntity = this.findCommand(id);
-        applicationIds.stream().forEach(
-            applicationId -> commandEntity.getApplications().add(this.appRepo.findOne(applicationId))
-        );
+
+        final Set<String> resultApplicationIds = commandEntity
+            .getApplications()
+            .stream()
+            .map(ApplicationEntity::getId)
+            .collect(Collectors.toSet());
+
+        for (final String applicationId : applicationIds) {
+            if (resultApplicationIds.contains(applicationId)) {
+                throw new GeniePreconditionException("Adding application with id " + id + " would cause duplicate.");
+            }
+
+            commandEntity.getApplications().add(this.appRepo.findOne(applicationId));
+            resultApplicationIds.add(id);
+        }
     }
 
     /**

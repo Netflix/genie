@@ -25,12 +25,14 @@ import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.ClusterStatus;
+import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.jpa.entities.ClusterEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
@@ -52,6 +54,7 @@ import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -389,10 +392,21 @@ public class JpaClusterServiceImpl implements ClusterService {
         final List<String> commandIds
     ) throws GenieException {
         final ClusterEntity clusterEntity = this.findCluster(id);
+
+        final Set<String> resultCommandIds = clusterEntity
+            .getCommands()
+            .stream()
+            .map(CommandEntity::getId)
+            .collect(Collectors.toSet());
+
         for (final String commandId : commandIds) {
+            if (resultCommandIds.contains(commandId)) {
+                throw new GeniePreconditionException("Adding command with id " + commandId + " would cause duplicate.");
+            }
             final CommandEntity cmd = this.commandRepo.findOne(commandId);
             if (cmd != null) {
                 clusterEntity.addCommand(cmd);
+                resultCommandIds.add(commandId);
             } else {
                 throw new GenieNotFoundException("No command with id " + commandId + " exists.");
             }
@@ -404,7 +418,7 @@ public class JpaClusterServiceImpl implements ClusterService {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<com.netflix.genie.common.dto.Command> getCommandsForCluster(
+    public List<Command> getCommandsForCluster(
         @NotBlank(message = "No cluster id entered. Unable to get commands.")
         final String id,
         final Set<CommandStatus> statuses
@@ -433,9 +447,14 @@ public class JpaClusterServiceImpl implements ClusterService {
     ) throws GenieException {
         final ClusterEntity clusterEntity = this.findCluster(id);
         final List<CommandEntity> commandEntities = new ArrayList<>();
+        final Set<String> currentIds = new HashSet<>();
         for (final String commandId : commandIds) {
+            if (currentIds.contains(commandId)) {
+                throw new GeniePreconditionException("Command " + commandId + " cannot be added to cluster twice.");
+            }
             final CommandEntity cmd = this.commandRepo.findOne(commandId);
             if (cmd != null) {
+                currentIds.add(commandId);
                 commandEntities.add(cmd);
             } else {
                 throw new GenieNotFoundException("No command with id " + commandId + " exists.");
