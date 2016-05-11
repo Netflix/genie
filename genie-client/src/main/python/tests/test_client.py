@@ -1,9 +1,5 @@
 """
-Basic unit tests for genie lib. Make me better!
-
-Please note that importing bdp.emr will automatically attempt to authenticate
-against AWS via the bdp.conn lib, therefore you must mock this library out
-before each import.
+Netflix test for pygenie.client.py
 """
 
 import types

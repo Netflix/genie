@@ -4,7 +4,7 @@ import unittest
 
 from nose.tools import assert_equals
 
-from genie.utils import str_to_list
+from pygenie.utils import str_to_list
 
 
 class TestStringToList(unittest.TestCase):
