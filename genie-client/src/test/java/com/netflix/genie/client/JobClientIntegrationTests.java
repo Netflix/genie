@@ -27,11 +27,15 @@ import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
+import com.netflix.genie.common.dto.JobStatus;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -137,9 +141,9 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
 
         final String id = jobClient.submitJob(jobRequest);
 
-//        final JobStatus jobStatus = jobClient.waitForCompletion(jobId, 600000, 5000);
-//
-//        Assert.assertEquals(JobStatus.SUCCEEDED, jobStatus);
+        final JobStatus jobStatus = jobClient.waitForCompletion(jobId, 600000, 5000);
+
+        Assert.assertEquals(JobStatus.SUCCEEDED, jobStatus);
         final Job job = jobClient.getJob(id);
 
         Assert.assertEquals(jobId, job.getId());
@@ -150,17 +154,17 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
         final JobExecution jobExecution = jobClient.getJobExecution(jobId);
         Assert.assertEquals(jobId, jobExecution.getId());
 
-//        final InputStream inputStream1 = jobClient.getJobStdout(jobId);
-//        final BufferedReader reader1 = new BufferedReader(new InputStreamReader(inputStream1, "UTF-8"));
-//
-//        final StringBuilder sb = new StringBuilder();
-//        String line;
-//        while ((line = reader1.readLine()) != null) {
-//           sb.append(line);
-//        }
-//        reader1.close();
-//        inputStream1.close();
-//
-//        Assert.assertEquals("HELLO WORLD!!!", sb.toString());
+        final InputStream inputStream1 = jobClient.getJobStdout(jobId);
+        final BufferedReader reader1 = new BufferedReader(new InputStreamReader(inputStream1, "UTF-8"));
+
+        final StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader1.readLine()) != null) {
+           sb.append(line);
+        }
+        reader1.close();
+        inputStream1.close();
+
+        Assert.assertEquals("HELLO WORLD!!!", sb.toString());
     }
 }

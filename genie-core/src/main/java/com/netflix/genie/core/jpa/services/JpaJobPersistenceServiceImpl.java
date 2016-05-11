@@ -166,11 +166,15 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         jobEntity.setStatus(jobStatus);
         jobEntity.setStatusMsg(statusMsg);
 
-        // If the status is either failed, killed or succeeded then set the finish time of the job as well
-        if (jobStatus.equals(JobStatus.KILLED)
+        if (jobStatus.equals(JobStatus.RUNNING)) {
+            // Status being changed to running so set start date.
+            jobEntity.setStarted(new Date());
+        } else if (jobEntity.getStarted() != null && (jobStatus.equals(JobStatus.KILLED)
             || jobStatus.equals(JobStatus.FAILED)
-            || jobStatus.equals(JobStatus.SUCCEEDED)) {
+            || jobStatus.equals(JobStatus.SUCCEEDED))) {
 
+            // Since start date is set the job was running previously and now has finished
+            // with status killed, failed or succeeded. So we set the job finish time.
             jobEntity.setFinished(new Date());
         }
         this.jobRepo.save(jobEntity);
@@ -299,6 +303,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
             throw new GeniePreconditionException("Cannot create a job execution entry with id blank or null");
         }
 
+        this.updateJobStatus(jobExecution.getId(), JobStatus.RUNNING, "Job is Running.");
         final JobEntity jobEntity = jobRepo.findOne(jobExecution.getId());
         if (jobEntity == null) {
             throw new GenieNotFoundException("Cannot find the job for the id of the jobExecution specified.");
@@ -313,11 +318,6 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         jobExecutionEntity.setTimeout(jobExecution.getTimeout());
 
         jobEntity.setExecution(jobExecutionEntity);
-        jobEntity.setStatus(JobStatus.RUNNING);
-        jobEntity.setStatusMsg("Job is Running");
-
-        // TODO: This is quite a bit (in terms of code) after it actually started...
-        jobEntity.setStarted(new Date());
     }
 
     /**

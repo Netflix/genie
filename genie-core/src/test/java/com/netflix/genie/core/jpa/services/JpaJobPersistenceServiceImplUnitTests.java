@@ -194,12 +194,36 @@ public class JpaJobPersistenceServiceImplUnitTests {
     }
 
     /**
-     * Test the updateJobStatus.
+     * Test the updateJobStatus with status INIT.
      *
      * @throws GenieException For any problem
      */
     @Test
-    public void testUpdateJobStatus() throws GenieException {
+    public void testUpdateJobStatusForStatusInit() throws GenieException {
+        final String id = UUID.randomUUID().toString();
+        final JobEntity jobEntity = new JobEntity();
+        final ArgumentCaptor<JobEntity> argument = ArgumentCaptor.forClass(JobEntity.class);
+
+        Mockito.when(this.jobRepo.findOne(Mockito.eq(id))).thenReturn(jobEntity);
+        this.jobPersistenceService.updateJobStatus(id, JobStatus.INIT, JOB_1_STATUS_MSG);
+
+        Mockito.verify(jobRepo).save(argument.capture());
+
+        Assert.assertEquals(JobStatus.INIT, argument.getValue().getStatus());
+        Assert.assertEquals(JOB_1_STATUS_MSG, argument.getValue().getStatusMsg());
+        Assert.assertEquals(new Date(0), argument.getValue().getFinished());
+
+        // Started should not be null as the status is being set to STARTED
+        Assert.assertEquals(new Date(0), argument.getValue().getStarted());
+    }
+
+    /**
+     * Test the updateJobStatus with status RUNNING.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test
+    public void testUpdateJobStatusForStatusRunning() throws GenieException {
         final String id = UUID.randomUUID().toString();
         final JobEntity jobEntity = new JobEntity();
         final ArgumentCaptor<JobEntity> argument = ArgumentCaptor.forClass(JobEntity.class);
@@ -212,6 +236,81 @@ public class JpaJobPersistenceServiceImplUnitTests {
         Assert.assertEquals(JobStatus.RUNNING, argument.getValue().getStatus());
         Assert.assertEquals(JOB_1_STATUS_MSG, argument.getValue().getStatusMsg());
         Assert.assertEquals(new Date(0), argument.getValue().getFinished());
+
+        // Started should not be null as the status is being set to STARTED
+        Assert.assertNotNull(argument.getValue().getStarted());
+    }
+
+    /**
+     * Test the updateJobStatus with status FAILED.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test
+    public void testUpdateJobStatusForStatusFailed() throws GenieException {
+        final String id = UUID.randomUUID().toString();
+        final JobEntity jobEntity = new JobEntity();
+        final ArgumentCaptor<JobEntity> argument = ArgumentCaptor.forClass(JobEntity.class);
+
+        Mockito.when(this.jobRepo.findOne(Mockito.eq(id))).thenReturn(jobEntity);
+        this.jobPersistenceService.updateJobStatus(id, JobStatus.FAILED, JOB_1_STATUS_MSG);
+
+        Mockito.verify(jobRepo).save(argument.capture());
+
+        Assert.assertEquals(JobStatus.FAILED, argument.getValue().getStatus());
+        Assert.assertEquals(JOB_1_STATUS_MSG, argument.getValue().getStatusMsg());
+        Assert.assertNotNull(argument.getValue().getFinished());
+
+        // Started should be set as the status is being set to FAILED
+        Assert.assertEquals(new Date(0), argument.getValue().getStarted());
+    }
+
+    /**
+     * Test the updateJobStatus with status KILLED.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test
+    public void testUpdateJobStatusForStatusKilled() throws GenieException {
+        final String id = UUID.randomUUID().toString();
+        final JobEntity jobEntity = new JobEntity();
+        final ArgumentCaptor<JobEntity> argument = ArgumentCaptor.forClass(JobEntity.class);
+
+        Mockito.when(this.jobRepo.findOne(Mockito.eq(id))).thenReturn(jobEntity);
+        this.jobPersistenceService.updateJobStatus(id, JobStatus.KILLED, JOB_1_STATUS_MSG);
+
+        Mockito.verify(jobRepo).save(argument.capture());
+
+        Assert.assertEquals(JobStatus.KILLED, argument.getValue().getStatus());
+        Assert.assertEquals(JOB_1_STATUS_MSG, argument.getValue().getStatusMsg());
+        Assert.assertNotNull(argument.getValue().getFinished());
+
+        // Started should be set as the status is being set to FAILED
+        Assert.assertEquals(new Date(0), argument.getValue().getStarted());
+    }
+
+    /**
+     * Test the updateJobStatus with status SUCCEEDED.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test
+    public void testUpdateJobStatusForStatusSucceeded() throws GenieException {
+        final String id = UUID.randomUUID().toString();
+        final JobEntity jobEntity = new JobEntity();
+        final ArgumentCaptor<JobEntity> argument = ArgumentCaptor.forClass(JobEntity.class);
+
+        Mockito.when(this.jobRepo.findOne(Mockito.eq(id))).thenReturn(jobEntity);
+        this.jobPersistenceService.updateJobStatus(id, JobStatus.SUCCEEDED, JOB_1_STATUS_MSG);
+
+        Mockito.verify(jobRepo).save(argument.capture());
+
+        Assert.assertEquals(JobStatus.SUCCEEDED, argument.getValue().getStatus());
+        Assert.assertEquals(JOB_1_STATUS_MSG, argument.getValue().getStatusMsg());
+        Assert.assertNotNull(argument.getValue().getFinished());
+
+        // Started should be set as the status is being set to FAILED
+        Assert.assertEquals(new Date(0), argument.getValue().getStarted());
     }
 
     /**
@@ -438,6 +537,8 @@ public class JpaJobPersistenceServiceImplUnitTests {
 
         Mockito.verify(jobEntity).setExecution(argument.capture());
         Mockito.verify(jobEntity).setStatus(argument1.capture());
+
+        Mockito.verify(jobEntity, Mockito.times(1)).setStarted(Mockito.any());
 
         Assert.assertEquals(hostname, argument.getValue().getHostName());
         Assert.assertEquals(pid, argument.getValue().getProcessId());
