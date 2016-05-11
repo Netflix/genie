@@ -1,3 +1,5 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import os
 import sys
 import unittest
@@ -36,7 +38,7 @@ class TestGenieConf(unittest.TestCase):
     @patch('genie.conf.GenieConf.config_file_home_ini')
     @patch('configurator.configurator.Configurator.initialize')
     def test_load_config_file(self, c_initialize, config_home_ini, config_env):
-        """Test loading a configuration file."""
+        """Test loading configuration file."""
 
         config_env.return_value = None
         config_home_ini.return_value = None
@@ -107,8 +109,7 @@ class TestGenieConf(unittest.TestCase):
             genie_conf.to_dict(),
             {
                 'genie': {
-                    'hostname': 'localhost',
-                    'port': '8080',
+                    'url': 'http://localhost',
                     'username': 'user_ini',
                     'version': '3'
                 },
