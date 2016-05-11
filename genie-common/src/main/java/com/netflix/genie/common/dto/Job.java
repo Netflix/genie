@@ -22,10 +22,12 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.netflix.genie.common.util.JsonDateDeserializer;
 import com.netflix.genie.common.util.JsonDateSerializer;
+import com.netflix.genie.common.util.TimeUtils;
 import lombok.Getter;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.Duration;
 import java.util.Date;
 
 /**
@@ -56,6 +58,8 @@ public class Job extends CommonDTO {
     private final String clusterName;
     @Size(max = 255, message = "Max character length is 255 characters")
     private final String commandName;
+    @NotNull
+    private final Duration runtime;
 
     /**
      * Constructor used by the builder.
@@ -72,6 +76,8 @@ public class Job extends CommonDTO {
         this.archiveLocation = builder.bArchiveLocation;
         this.clusterName = builder.bClusterName;
         this.commandName = builder.bCommandName;
+
+        this.runtime = TimeUtils.getDuration(this.started, this.finished);
     }
 
     /**

@@ -24,6 +24,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import java.time.Duration;
 import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
@@ -64,6 +65,7 @@ public class JobUnitTests {
         Assert.assertThat(job.getId(), Matchers.nullValue());
         Assert.assertThat(job.getTags(), Matchers.empty());
         Assert.assertThat(job.getUpdated(), Matchers.nullValue());
+        Assert.assertThat(job.getRuntime(), Matchers.is(Duration.ZERO));
     }
 
     /**
@@ -129,6 +131,7 @@ public class JobUnitTests {
         Assert.assertThat(job.getId(), Matchers.is(id));
         Assert.assertThat(job.getTags(), Matchers.is(tags));
         Assert.assertThat(job.getUpdated(), Matchers.is(updated));
+        Assert.assertThat(job.getRuntime(), Matchers.is(Duration.ofMillis(finished.getTime() - started.getTime())));
     }
 
     /**
@@ -167,6 +170,7 @@ public class JobUnitTests {
         Assert.assertThat(job.getId(), Matchers.nullValue());
         Assert.assertThat(job.getTags(), Matchers.empty());
         Assert.assertThat(job.getUpdated(), Matchers.nullValue());
+        Assert.assertThat(job.getRuntime(), Matchers.is(Duration.ZERO));
     }
 
     /**
