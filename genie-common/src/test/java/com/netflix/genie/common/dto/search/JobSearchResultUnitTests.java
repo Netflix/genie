@@ -24,6 +24,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import java.time.Duration;
 import java.util.Date;
 import java.util.UUID;
 
@@ -60,6 +61,10 @@ public class JobSearchResultUnitTests {
         Assert.assertThat(searchResult.getFinished(), Matchers.is(finished));
         Assert.assertThat(searchResult.getClusterName(), Matchers.is(clusterName));
         Assert.assertThat(searchResult.getCommandName(), Matchers.is(commandName));
+        Assert.assertThat(
+            searchResult.getRuntime(),
+            Matchers.is(Duration.ofMillis(finished.getTime() - started.getTime()))
+        );
 
         final JobSearchResult searchResult2 = new JobSearchResult(id, name, user, status, null, null, null, null);
 
@@ -71,5 +76,6 @@ public class JobSearchResultUnitTests {
         Assert.assertNull(searchResult2.getFinished());
         Assert.assertNull(searchResult2.getClusterName());
         Assert.assertNull(searchResult2.getCommandName());
+        Assert.assertThat(searchResult2.getRuntime(), Matchers.is(Duration.ZERO));
     }
 }

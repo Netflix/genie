@@ -22,11 +22,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.util.JsonDateSerializer;
+import com.netflix.genie.common.util.TimeUtils;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
+import java.time.Duration;
 import java.util.Date;
 
 /**
@@ -48,6 +50,7 @@ public class JobSearchResult extends BaseSearchResult {
     private final Date finished;
     private final String clusterName;
     private final String commandName;
+    private final Duration runtime;
 
     /**
      * Constructor.
@@ -78,6 +81,8 @@ public class JobSearchResult extends BaseSearchResult {
         this.finished = finished == null ? null : new Date(finished.getTime());
         this.clusterName = clusterName;
         this.commandName = commandName;
+
+        this.runtime = TimeUtils.getDuration(this.started, this.finished);
     }
 
     /**
