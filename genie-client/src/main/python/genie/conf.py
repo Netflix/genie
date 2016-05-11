@@ -14,7 +14,7 @@ Below is the order of loading config values (first = higher priority):
 """
 
 
-from __future__ import absolute_import, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 import json
 import logging
@@ -28,13 +28,13 @@ from .exceptions import GenieConfigOptionError, GenieConfigSectionError
 
 logger = logging.getLogger('com.netflix.genie.conf')
 
-
 CONFIG_HOME_DIR = os.path.join(os.path.expanduser('~'), '.genie')
 CONFIG_FILE_HOME_INI = os.path.join(CONFIG_HOME_DIR, 'genie.ini')
 CONFIG_FILE_ENV = os.environ.get('GENIE_CONFIG')
 
-DEFAULT_GENIE_HOST = 'localhost'
-DEFAULT_GENIE_PORT = '8080'
+BYPASS_HOME_CONFIG_FILE = os.environ.get('GENIE_BYPASS_HOME_CONFIG') is not None
+
+DEFAULT_GENIE_URL = 'http://localhost'
 DEFAULT_GENIE_USERNAME = 'genie_python_client'
 DEFAULT_GENIE_VERSION = '3'
 
@@ -78,7 +78,7 @@ class GenieConfSection(object):
     def set(self, name, value=None):
         """Sets an attribute (option) to the value."""
 
-        logging.debug('setting %s.%s=%s in conf', self.name, name, value)
+        logger.debug('setting config -> %s.%s=%s', self.name, name, value)
         setattr(self, name, value)
 
     def to_dict(self):
@@ -96,7 +96,7 @@ class GenieConf(object):
     """
 
     def __init__(self):
-        self._config_files = []
+        self._config_files = list()
 
         # genie section is first-class section
         self.genie = GenieConfSection(name='genie')
@@ -115,12 +115,24 @@ class GenieConf(object):
                 .format(attr, sorted(self.to_dict().keys())))
         return self.to_dict().get(attr)
 
-    def config_file_env(self):
+    def __repr__(self):
+        return '.'.join(['{}()'.format(self.__class__.__name__)] + \
+            ['load_config_file("{}")'.format(i) for i in self._config_files])
+
+    @staticmethod
+    def config_file_env():
+        """Get config file specified in environment."""
+
         if CONFIG_FILE_ENV and os.path.exists(CONFIG_FILE_ENV):
             return CONFIG_FILE_ENV
 
-    def config_file_home_ini(self):
-        if CONFIG_FILE_HOME_INI and os.path.exists(CONFIG_FILE_HOME_INI):
+    @staticmethod
+    def config_file_home_ini():
+        """Get config file in home dir if exists and want to use."""
+
+        if CONFIG_FILE_HOME_INI \
+                and os.path.exists(CONFIG_FILE_HOME_INI) \
+                and not BYPASS_HOME_CONFIG_FILE:
             return CONFIG_FILE_HOME_INI
 
     def get(self, option, default=None):
@@ -148,7 +160,7 @@ class GenieConf(object):
             'invalid format for option (should be section.option)'
         try:
             return getattr(self, parts[0]).get(parts[1], default=default)
-        except (AttributeError, GenieConfigSectionError):
+        except (AttributeError, GenieConfigSectionError, GenieConfigOptionError):
             return default
 
     def load_config_file(self, config_file):
@@ -160,11 +172,11 @@ class GenieConf(object):
                 and config_file not in self._config_files:
             self._config_files.append(config_file)
         for cfile in self._config_files:
-            logger.debug('adding config file: %s', cfile)
+            logger.info('adding config file: %s', cfile)
             param_list.extend(['--configFile', cfile])
         C.initialize(param_list + self.sys_argv())
         self._load_options()
-        logger.debug('configuration:\n%s', self.to_json())
+        logger.info('configuration:\n%s', self.to_json())
         return self
 
     def _load_options(self):
@@ -173,8 +185,7 @@ class GenieConf(object):
         attributes."""
 
         # explicitly set genie section object
-        self.genie.set('hostname', C.get('genie.hostname', DEFAULT_GENIE_HOST))
-        self.genie.set('port', C.get('genie.port', DEFAULT_GENIE_PORT))
+        self.genie.set('url', C.get('genie.url', DEFAULT_GENIE_URL))
         self.genie.set('username', C.get('genie.username',
                                          os.environ.get('USER',
                                                         DEFAULT_GENIE_USERNAME)))
@@ -192,7 +203,8 @@ class GenieConf(object):
                 gcs.set(option_clean, C.get(section, option))
             setattr(self, section_clean, gcs)
 
-    def sys_argv(self):
+    @staticmethod
+    def sys_argv():
         """Get command line arguments passed to Python script."""
 
         return sys.argv

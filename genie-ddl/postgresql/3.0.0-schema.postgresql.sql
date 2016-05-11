@@ -59,8 +59,8 @@ CREATE TABLE application_dependencies (
 
 CREATE TABLE applications (
     id character varying(255) NOT NULL,
-    created timestamp without time zone DEFAULT now() NOT NULL,
-    updated timestamp without time zone DEFAULT now() NOT NULL,
+    created timestamp(3) without time zone DEFAULT now() NOT NULL,
+    updated timestamp(3) without time zone DEFAULT now() NOT NULL,
     name character varying(255) NOT NULL,
     "user" character varying(255) NOT NULL,
     version character varying(255) NOT NULL,
@@ -89,8 +89,8 @@ CREATE TABLE cluster_configs (
 
 CREATE TABLE clusters (
     id character varying(255) NOT NULL,
-    created timestamp without time zone DEFAULT now() NOT NULL,
-    updated timestamp without time zone DEFAULT now() NOT NULL,
+    created timestamp(3) without time zone DEFAULT now() NOT NULL,
+    updated timestamp(3) without time zone DEFAULT now() NOT NULL,
     name character varying(255) NOT NULL,
     "user" character varying(255) NOT NULL,
     version character varying(255) NOT NULL,
@@ -129,8 +129,8 @@ CREATE TABLE command_configs (
 
 CREATE TABLE commands (
     id character varying(255) NOT NULL,
-    created timestamp without time zone DEFAULT now() NOT NULL,
-    updated timestamp without time zone DEFAULT now() NOT NULL,
+    created timestamp(3) without time zone DEFAULT now() NOT NULL,
+    updated timestamp(3) without time zone DEFAULT now() NOT NULL,
     name character varying(255) NOT NULL,
     "user" character varying(255) NOT NULL,
     version character varying(255) NOT NULL,
@@ -161,8 +161,8 @@ CREATE TABLE commands_applications (
 
 CREATE TABLE job_executions (
     id character varying(255) NOT NULL,
-    created timestamp without time zone DEFAULT now() NOT NULL,
-    updated timestamp without time zone DEFAULT now() NOT NULL,
+    created timestamp(3) without time zone DEFAULT now() NOT NULL,
+    updated timestamp(3) without time zone DEFAULT now() NOT NULL,
     entity_version integer DEFAULT 0 NOT NULL,
     host_name character varying(255) NOT NULL,
     process_id integer NOT NULL,
@@ -178,8 +178,8 @@ CREATE TABLE job_executions (
 
 CREATE TABLE job_requests (
     id character varying(255) NOT NULL,
-    created timestamp without time zone DEFAULT now() NOT NULL,
-    updated timestamp without time zone DEFAULT now() NOT NULL,
+    created timestamp(3) without time zone DEFAULT now() NOT NULL,
+    updated timestamp(3) without time zone DEFAULT now() NOT NULL,
     name character varying(255) NOT NULL,
     "user" character varying(255) NOT NULL,
     version character varying(255) NOT NULL,
@@ -208,8 +208,8 @@ CREATE TABLE job_requests (
 
 CREATE TABLE jobs (
     id character varying(255) NOT NULL,
-    created timestamp without time zone DEFAULT now() NOT NULL,
-    updated timestamp without time zone DEFAULT now() NOT NULL,
+    created timestamp(3) without time zone DEFAULT now() NOT NULL,
+    updated timestamp(3) without time zone DEFAULT now() NOT NULL,
     name character varying(255) NOT NULL,
     "user" character varying(255) NOT NULL,
     version character varying(255) NOT NULL,
@@ -220,8 +220,8 @@ CREATE TABLE jobs (
     description character varying(10000) DEFAULT NULL::character varying,
     cluster_id character varying(255) DEFAULT NULL::character varying,
     cluster_name character varying(255) DEFAULT NULL::character varying,
-    finished timestamp without time zone,
-    started timestamp without time zone,
+    finished timestamp(3) without time zone DEFAULT NULL::timestamp without time zone,
+    started timestamp(3) without time zone DEFAULT NULL::timestamp without time zone,
     status character varying(20) DEFAULT 'INIT'::character varying NOT NULL,
     status_msg character varying(255) NOT NULL,
     entityversion integer DEFAULT 0 NOT NULL,
@@ -386,6 +386,13 @@ CREATE INDEX jobs_command_name_index ON jobs USING btree (command_name);
 
 
 --
+-- Name: jobs_created_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX jobs_created_index ON jobs USING btree (created);
+
+
+--
 -- Name: jobs_finished_index; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -411,13 +418,6 @@ CREATE INDEX jobs_status_index ON jobs USING btree (status);
 --
 
 CREATE INDEX jobs_tags_index ON jobs USING btree (tags);
-
-
---
--- Name: jobs_updated_index; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX jobs_updated_index ON jobs USING btree (updated);
 
 
 --

@@ -41,10 +41,12 @@ public class BaseSearchResultUnitTests {
     public void canConstruct() {
         final String id = UUID.randomUUID().toString();
         final String name = UUID.randomUUID().toString();
-        final BaseSearchResult searchResult = new BaseSearchResult(id, name);
+        final String user = UUID.randomUUID().toString();
+        final BaseSearchResult searchResult = new BaseSearchResult(id, name, user);
 
         Assert.assertThat(searchResult.getId(), Matchers.is(id));
         Assert.assertThat(searchResult.getName(), Matchers.is(name));
+        Assert.assertThat(searchResult.getUser(), Matchers.is(user));
     }
 
     /**
@@ -53,10 +55,15 @@ public class BaseSearchResultUnitTests {
     @Test
     public void canFindEquality() {
         final String id = UUID.randomUUID().toString();
-        final BaseSearchResult searchResult1 = new BaseSearchResult(id, UUID.randomUUID().toString());
-        final BaseSearchResult searchResult2 = new BaseSearchResult(id, UUID.randomUUID().toString());
-        final BaseSearchResult searchResult3
-            = new BaseSearchResult(UUID.randomUUID().toString(), UUID.randomUUID().toString());
+        final BaseSearchResult searchResult1
+            = new BaseSearchResult(id, UUID.randomUUID().toString(), UUID.randomUUID().toString());
+        final BaseSearchResult searchResult2
+            = new BaseSearchResult(id, UUID.randomUUID().toString(), UUID.randomUUID().toString());
+        final BaseSearchResult searchResult3 = new BaseSearchResult(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
+        );
 
         Assert.assertTrue(searchResult1.equals(searchResult2));
         Assert.assertFalse(searchResult1.equals(searchResult3));
@@ -68,10 +75,15 @@ public class BaseSearchResultUnitTests {
     @Test
     public void canUseHashCode() {
         final String id = UUID.randomUUID().toString();
-        final BaseSearchResult searchResult1 = new BaseSearchResult(id, UUID.randomUUID().toString());
-        final BaseSearchResult searchResult2 = new BaseSearchResult(id, UUID.randomUUID().toString());
-        final BaseSearchResult searchResult3
-            = new BaseSearchResult(UUID.randomUUID().toString(), UUID.randomUUID().toString());
+        final BaseSearchResult searchResult1
+            = new BaseSearchResult(id, UUID.randomUUID().toString(), UUID.randomUUID().toString());
+        final BaseSearchResult searchResult2
+            = new BaseSearchResult(id, UUID.randomUUID().toString(), UUID.randomUUID().toString());
+        final BaseSearchResult searchResult3 = new BaseSearchResult(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
+        );
 
         Assert.assertEquals(searchResult1.hashCode(), searchResult2.hashCode());
         Assert.assertNotEquals(searchResult1.hashCode(), searchResult3.hashCode());

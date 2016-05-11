@@ -20,13 +20,16 @@ package com.netflix.genie.common.dto.search;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.util.JsonDateSerializer;
+import com.netflix.genie.common.util.TimeUtils;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
+import java.time.Duration;
 import java.util.Date;
 
 /**
@@ -48,12 +51,15 @@ public class JobSearchResult extends BaseSearchResult {
     private final Date finished;
     private final String clusterName;
     private final String commandName;
+    @JsonSerialize(using = ToStringSerializer.class)
+    private final Duration runtime;
 
     /**
      * Constructor.
      *
      * @param id          The id of the job
      * @param name        The name of the job
+     * @param user        The user of the job
      * @param status      The current status of the job
      * @param started     The start time of the job
      * @param finished    The finish time of the job
@@ -64,18 +70,21 @@ public class JobSearchResult extends BaseSearchResult {
     public JobSearchResult(
         @NotBlank @JsonProperty("id") final String id,
         @NotBlank @JsonProperty("name") final String name,
+        @NotBlank @JsonProperty("user") final String user,
         @NotNull @JsonProperty("status") final JobStatus status,
         @JsonProperty("started") final Date started,
         @JsonProperty("finished") final Date finished,
         @JsonProperty("clusterName") final String clusterName,
         @JsonProperty("commandName") final String commandName
     ) {
-        super(id, name);
+        super(id, name, user);
         this.status = status;
         this.started = started == null ? null : new Date(started.getTime());
         this.finished = finished == null ? null : new Date(finished.getTime());
         this.clusterName = clusterName;
         this.commandName = commandName;
+
+        this.runtime = TimeUtils.getDuration(this.started, this.finished);
     }
 
     /**

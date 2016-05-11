@@ -20,12 +20,15 @@ package com.netflix.genie.common.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.netflix.genie.common.util.JsonDateDeserializer;
 import com.netflix.genie.common.util.JsonDateSerializer;
+import com.netflix.genie.common.util.TimeUtils;
 import lombok.Getter;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.Duration;
 import java.util.Date;
 
 /**
@@ -56,6 +59,9 @@ public class Job extends CommonDTO {
     private final String clusterName;
     @Size(max = 255, message = "Max character length is 255 characters")
     private final String commandName;
+    @NotNull
+    @JsonSerialize(using = ToStringSerializer.class)
+    private final Duration runtime;
 
     /**
      * Constructor used by the builder.
@@ -72,6 +78,8 @@ public class Job extends CommonDTO {
         this.archiveLocation = builder.bArchiveLocation;
         this.clusterName = builder.bClusterName;
         this.commandName = builder.bCommandName;
+
+        this.runtime = TimeUtils.getDuration(this.started, this.finished);
     }
 
     /**
@@ -186,7 +194,6 @@ public class Job extends CommonDTO {
          * @param started The started time of the job
          * @return The builder
          */
-        @JsonDeserialize(using = JsonDateDeserializer.class)
         public Builder withStarted(final Date started) {
             if (started != null) {
                 this.bStarted = new Date(started.getTime());
@@ -200,7 +207,6 @@ public class Job extends CommonDTO {
          * @param finished The time the job finished
          * @return The builder
          */
-        @JsonDeserialize(using = JsonDateDeserializer.class)
         public Builder withFinished(final Date finished) {
             if (finished != null) {
                 this.bFinished = new Date(finished.getTime());
