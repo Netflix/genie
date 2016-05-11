@@ -64,7 +64,7 @@ export GENIE_CLUSTER_DIR="${GENIE_JOB_DIR}/genie/cluster/cluster1"
 
 export GENIE_JOB_ID="JOB_ID_PLACEHOLDER"
 
-export GENIE_JOB_NAME="List Directories bash job"
+export GENIE_JOB_NAME="List * ... Directories bash job"
 
 # Sourcing setup file from Cluster: cluster1
 source ${GENIE_JOB_DIR}/genie/cluster/cluster1/setupfile

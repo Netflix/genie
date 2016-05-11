@@ -103,7 +103,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         = "com/netflix/genie/web/controllers/JobRestControllerIntegrationTests/";
     private static final String FILE_DELIMITER = "/";
 
-    private static final String JOB_NAME = "List Directories bash job";
+    private static final String JOB_NAME = "List * ... Directories bash job";
     private static final String JOB_USER = "genie";
     private static final String JOB_VERSION = "1.0";
     private static final String JOB_DESCRIPTION = "Genie 3 Test Job";
