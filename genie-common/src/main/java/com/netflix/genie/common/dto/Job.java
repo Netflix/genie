@@ -20,6 +20,7 @@ package com.netflix.genie.common.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.netflix.genie.common.util.JsonDateDeserializer;
 import com.netflix.genie.common.util.JsonDateSerializer;
 import com.netflix.genie.common.util.TimeUtils;
@@ -59,6 +60,7 @@ public class Job extends CommonDTO {
     @Size(max = 255, message = "Max character length is 255 characters")
     private final String commandName;
     @NotNull
+    @JsonSerialize(using = ToStringSerializer.class)
     private final Duration runtime;
 
     /**
