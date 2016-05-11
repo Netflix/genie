@@ -194,7 +194,6 @@ public class Job extends CommonDTO {
          * @param started The started time of the job
          * @return The builder
          */
-        @JsonDeserialize(using = JsonDateDeserializer.class)
         public Builder withStarted(final Date started) {
             if (started != null) {
                 this.bStarted = new Date(started.getTime());
@@ -208,7 +207,6 @@ public class Job extends CommonDTO {
          * @param finished The time the job finished
          * @return The builder
          */
-        @JsonDeserialize(using = JsonDateDeserializer.class)
         public Builder withFinished(final Date finished) {
             if (finished != null) {
                 this.bFinished = new Date(finished.getTime());

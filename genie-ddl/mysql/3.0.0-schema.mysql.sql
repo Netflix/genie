@@ -54,8 +54,8 @@ DROP TABLE IF EXISTS `applications`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `applications` (
   `id` varchar(255) NOT NULL,
-  `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `created` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `updated` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
   `name` varchar(255) NOT NULL,
   `user` varchar(255) NOT NULL,
   `version` varchar(255) NOT NULL,
@@ -97,8 +97,8 @@ DROP TABLE IF EXISTS `clusters`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `clusters` (
   `id` varchar(255) NOT NULL,
-  `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `created` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `updated` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
   `name` varchar(255) NOT NULL,
   `user` varchar(255) NOT NULL,
   `version` varchar(255) NOT NULL,
@@ -156,8 +156,8 @@ DROP TABLE IF EXISTS `commands`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `commands` (
   `id` varchar(255) NOT NULL,
-  `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `created` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `updated` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
   `name` varchar(255) NOT NULL,
   `user` varchar(255) NOT NULL,
   `version` varchar(255) NOT NULL,
@@ -202,14 +202,14 @@ DROP TABLE IF EXISTS `job_executions`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `job_executions` (
   `id` varchar(255) NOT NULL,
-  `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `created` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `updated` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
   `entity_version` int(11) NOT NULL DEFAULT '0',
   `host_name` varchar(255) NOT NULL,
   `process_id` int(11) NOT NULL,
   `exit_code` int(11) NOT NULL DEFAULT '-1',
   `check_delay` bigint(20) NOT NULL DEFAULT '10000',
-  `timeout` datetime NOT NULL,
+  `timeout` datetime(3) NOT NULL,
   KEY `id` (`id`),
   KEY `JOB_EXECUTIONS_HOSTNAME_INDEX` (`host_name`),
   KEY `JOB_EXECUTIONS_EXIT_CODE_INDEX` (`exit_code`),
@@ -226,8 +226,8 @@ DROP TABLE IF EXISTS `job_requests`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `job_requests` (
   `id` varchar(255) NOT NULL,
-  `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `created` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `updated` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
   `name` varchar(255) NOT NULL,
   `user` varchar(255) NOT NULL,
   `version` varchar(255) NOT NULL,
@@ -261,8 +261,8 @@ DROP TABLE IF EXISTS `jobs`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `jobs` (
   `id` varchar(255) NOT NULL,
-  `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `created` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `updated` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
   `name` varchar(255) NOT NULL,
   `user` varchar(255) NOT NULL,
   `version` varchar(255) NOT NULL,
@@ -273,8 +273,8 @@ CREATE TABLE `jobs` (
   `description` varchar(10000) DEFAULT NULL,
   `cluster_id` varchar(255) DEFAULT NULL,
   `cluster_name` varchar(255) DEFAULT NULL,
-  `finished` datetime DEFAULT NULL,
-  `started` datetime DEFAULT NULL,
+  `finished` datetime(3) DEFAULT NULL,
+  `started` datetime(3) DEFAULT NULL,
   `status` varchar(20) NOT NULL DEFAULT 'INIT',
   `status_msg` varchar(255) DEFAULT NULL,
   `entity_version` int(11) NOT NULL DEFAULT '0',
@@ -286,7 +286,7 @@ CREATE TABLE `jobs` (
   KEY `JOBS_FINISHED_INDEX` (`finished`),
   KEY `JOBS_STATUS_INDEX` (`status`),
   KEY `JOBS_USER_INDEX` (`user`),
-  KEY `JOBS_UPDATED_INDEX` (`updated`),
+  KEY `JOBS_CREATED_INDEX` (`created`),
   KEY `JOBS_CLUSTER_NAME_INDEX` (`cluster_name`),
   KEY `JOBS_COMMAND_NAME_INDEX` (`command_name`),
   KEY `JOBS_TAGS_INDEX` (`tags`),
@@ -323,4 +323,4 @@ CREATE TABLE `jobs_applications` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-04-21 10:48:30
+-- Dump completed on 2016-05-11 14:13:20
