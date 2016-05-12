@@ -317,7 +317,7 @@ public interface ClusterService {
      *                   commands with. Not null/empty.
      * @throws GenieException if there is an error
      */
-    void updateCommandsForCluster(
+    void setCommandsForCluster(
         @NotBlank(message = "No cluster id entered. Unable to update commands.")
         final String id,
         @NotNull(message = "No command ids entered. Unable to update commands.")

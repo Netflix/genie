@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.core.jpa.entities;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
@@ -28,6 +29,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.mockito.Mockito;
 
 import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
@@ -284,6 +286,84 @@ public class CommandEntityUnitTests extends EntityTestsBase {
         Assert.assertTrue(this.c.getApplications().isEmpty());
         Assert.assertTrue(one.getCommands().isEmpty());
         Assert.assertTrue(two.getCommands().isEmpty());
+    }
+
+    /**
+     * Make sure if a List with duplicate applications is sent in it fails.
+     *
+     * @throws GeniePreconditionException on duplicate applications
+     */
+    @Test(expected = GeniePreconditionException.class)
+    public void cantSetApplicationsIfDuplicates() throws GeniePreconditionException {
+        final ApplicationEntity one = Mockito.mock(ApplicationEntity.class);
+        Mockito.when(one.getId()).thenReturn(UUID.randomUUID().toString());
+        final ApplicationEntity two = Mockito.mock(ApplicationEntity.class);
+        Mockito.when(two.getId()).thenReturn(UUID.randomUUID().toString());
+
+        this.c.setApplications(Lists.newArrayList(one, two, one));
+    }
+
+    /**
+     * Test to make sure we can add an application.
+     *
+     * @throws GeniePreconditionException On error
+     */
+    @Test
+    public void canAddApplication() throws GeniePreconditionException {
+        final String id = UUID.randomUUID().toString();
+        final ApplicationEntity app = new ApplicationEntity();
+        app.setId(id);
+
+        this.c.addApplication(app);
+        Assert.assertThat(this.c.getApplications(), Matchers.hasItem(app));
+        Assert.assertThat(app.getCommands(), Matchers.hasItem(this.c));
+    }
+
+    /**
+     * Test to make sure we can't add an application to a command if it's already in the list.
+     *
+     * @throws GeniePreconditionException on duplicate
+     */
+    @Test(expected = GeniePreconditionException.class)
+    public void cantAddApplicationThatAlreadyIsInList() throws GeniePreconditionException {
+        final String id = UUID.randomUUID().toString();
+        final ApplicationEntity app = new ApplicationEntity();
+        app.setId(id);
+
+        this.c.addApplication(app);
+        this.c.addApplication(app);
+    }
+
+    /**
+     * Test removing an application.
+     *
+     * @throws GeniePreconditionException If any precondition isn't met.
+     */
+    @Test
+    public void canRemoveApplication() throws GeniePreconditionException {
+        final ApplicationEntity one = new ApplicationEntity();
+        one.setId("one");
+        final ApplicationEntity two = new ApplicationEntity();
+        two.setId("two");
+        Assert.assertNotNull(this.c.getApplications());
+        Assert.assertTrue(this.c.getApplications().isEmpty());
+        this.c.addApplication(one);
+        Assert.assertTrue(this.c.getApplications().contains(one));
+        Assert.assertFalse(this.c.getApplications().contains(two));
+        Assert.assertTrue(one.getCommands().contains(this.c));
+        Assert.assertNotNull(two.getCommands());
+        Assert.assertTrue(two.getCommands().isEmpty());
+        this.c.addApplication(two);
+        Assert.assertTrue(this.c.getApplications().contains(one));
+        Assert.assertTrue(this.c.getApplications().contains(two));
+        Assert.assertTrue(one.getCommands().contains(this.c));
+        Assert.assertTrue(two.getCommands().contains(this.c));
+
+        this.c.removeApplication(one);
+        Assert.assertFalse(this.c.getApplications().contains(one));
+        Assert.assertTrue(this.c.getApplications().contains(two));
+        Assert.assertFalse(one.getCommands().contains(this.c));
+        Assert.assertTrue(two.getCommands().contains(this.c));
     }
 
     /**

@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Cluster;
@@ -54,6 +55,7 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -224,25 +226,16 @@ public class JpaCommandServiceImpl implements CommandService {
         final CommandEntity commandEntity = this.findCommand(id);
 
         //Remove the command from the associated Application references
-        final List<ApplicationEntity> applicationEntities = commandEntity.getApplications();
-        if (applicationEntities != null) {
-            applicationEntities.stream()
-                .filter(application -> application.getCommands() != null)
-                .forEach(
-                    application -> {
-                        application.getCommands().remove(commandEntity);
-                        this.appRepo.save(application);
-                    }
-                );
+        final List<ApplicationEntity> originalApps = commandEntity.getApplications();
+        if (originalApps != null) {
+            final List<ApplicationEntity> applicationEntities = Lists.newArrayList(originalApps);
+            applicationEntities.forEach(commandEntity::removeApplication);
         }
         //Remove the command from the associated cluster references
-        final Set<ClusterEntity> clusterEntities = commandEntity.getClusters();
-        for (final ClusterEntity clusterEntity : clusterEntities) {
-            final List<CommandEntity> commandEntities = clusterEntity.getCommands();
-            if (commandEntities != null) {
-                commandEntities.remove(commandEntity);
-            }
-            this.clusterRepo.save(clusterEntity);
+        final Set<ClusterEntity> originalClusters = commandEntity.getClusters();
+        if (originalClusters != null) {
+            final Set<ClusterEntity> clusterEntities = Sets.newHashSet(originalClusters);
+            clusterEntities.forEach(clusterEntity -> clusterEntity.removeCommand(commandEntity));
         }
         this.commandRepo.delete(commandEntity);
     }
@@ -392,20 +385,8 @@ public class JpaCommandServiceImpl implements CommandService {
         }
 
         final CommandEntity commandEntity = this.findCommand(id);
-
-        final Set<String> resultApplicationIds = commandEntity
-            .getApplications()
-            .stream()
-            .map(ApplicationEntity::getId)
-            .collect(Collectors.toSet());
-
-        for (final String applicationId : applicationIds) {
-            if (resultApplicationIds.contains(applicationId)) {
-                throw new GeniePreconditionException("Adding application with id " + id + " would cause duplicate.");
-            }
-
-            commandEntity.getApplications().add(this.appRepo.findOne(applicationId));
-            resultApplicationIds.add(id);
+        for (final String appId : applicationIds) {
+            commandEntity.addApplication(this.appRepo.findOne(appId));
         }
     }
 
@@ -424,10 +405,10 @@ public class JpaCommandServiceImpl implements CommandService {
         }
 
         final CommandEntity commandEntity = this.findCommand(id);
-        commandEntity.getApplications().clear();
-        applicationIds
-            .stream()
-            .forEach(applicationId -> commandEntity.getApplications().add(this.appRepo.findOne(applicationId)));
+        final List<ApplicationEntity> applicationEntities = new ArrayList<>();
+        applicationIds.stream().forEach(appId -> applicationEntities.add(this.appRepo.findOne(appId)));
+
+        commandEntity.setApplications(applicationEntities);
     }
 
     /**

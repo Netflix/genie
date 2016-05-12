@@ -197,13 +197,12 @@ public class JpaClusterServiceImplUnitTests {
      *
      * @throws GenieException For any problem
      */
-    @Test(expected = GenieNotFoundException.class)
+    @Test(expected = GeniePreconditionException.class)
     public void testAddCommandsForClusterCommandDoesntExist() throws GenieException {
         final List<String> commandIds = new ArrayList<>();
         final String commandId = UUID.randomUUID().toString();
         commandIds.add(commandId);
-        final ClusterEntity clusterEntity
-            = Mockito.mock(ClusterEntity.class);
+        final ClusterEntity clusterEntity = Mockito.mock(ClusterEntity.class);
         Mockito.when(this.jpaClusterRepository.findOne(Mockito.anyString())).thenReturn(clusterEntity);
         Mockito.when(this.jpaCommandRepository.findOne(commandId)).thenReturn(null);
         this.service.addCommandsForCluster(CLUSTER_1_ID, commandIds);
@@ -254,7 +253,7 @@ public class JpaClusterServiceImplUnitTests {
     public void testUpdateCommandsForClusterClusterDoesntExist() throws GenieException {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaClusterRepository.findOne(id)).thenReturn(null);
-        this.service.updateCommandsForCluster(id, new ArrayList<>());
+        this.service.setCommandsForCluster(id, new ArrayList<>());
     }
 
     /**
@@ -262,8 +261,8 @@ public class JpaClusterServiceImplUnitTests {
      *
      * @throws GenieException For any problem
      */
-    @Test(expected = GenieNotFoundException.class)
-    public void testUpdateCommandsForClusterCommandDoesntExist() throws GenieException {
+    @Test(expected = GeniePreconditionException.class)
+    public void testSetCommandsForClusterCommandDoesntExist() throws GenieException {
         final List<String> commandIds = new ArrayList<>();
         final String commandId = UUID.randomUUID().toString();
         commandIds.add(commandId);
@@ -271,7 +270,7 @@ public class JpaClusterServiceImplUnitTests {
             = Mockito.mock(ClusterEntity.class);
         Mockito.when(this.jpaClusterRepository.findOne(CLUSTER_1_ID)).thenReturn(cluster);
         Mockito.when(this.jpaCommandRepository.findOne(commandId)).thenReturn(null);
-        this.service.updateCommandsForCluster(CLUSTER_1_ID, commandIds);
+        this.service.setCommandsForCluster(CLUSTER_1_ID, commandIds);
     }
 
     /**
@@ -288,7 +287,7 @@ public class JpaClusterServiceImplUnitTests {
         Mockito.when(this.jpaClusterRepository.findOne(CLUSTER_1_ID)).thenReturn(cluster);
         Mockito.when(this.jpaCommandRepository.findOne(commandId1)).thenReturn(Mockito.mock(CommandEntity.class));
         Mockito.when(this.jpaCommandRepository.findOne(commandId2)).thenReturn(Mockito.mock(CommandEntity.class));
-        this.service.updateCommandsForCluster(CLUSTER_1_ID, commandIds);
+        this.service.setCommandsForCluster(CLUSTER_1_ID, commandIds);
     }
 
     /**

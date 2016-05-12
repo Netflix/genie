@@ -54,7 +54,6 @@ import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -391,25 +390,13 @@ public class JpaClusterServiceImpl implements ClusterService {
         @NotEmpty(message = "No command ids entered. Unable to add commands.")
         final List<String> commandIds
     ) throws GenieException {
+        if (commandIds.size() != commandIds.stream().filter(this.commandRepo::exists).count()) {
+            throw new GeniePreconditionException("All commands need to exist to add to a cluster");
+        }
+
         final ClusterEntity clusterEntity = this.findCluster(id);
-
-        final Set<String> resultCommandIds = clusterEntity
-            .getCommands()
-            .stream()
-            .map(CommandEntity::getId)
-            .collect(Collectors.toSet());
-
         for (final String commandId : commandIds) {
-            if (resultCommandIds.contains(commandId)) {
-                throw new GeniePreconditionException("Adding command with id " + commandId + " would cause duplicate.");
-            }
-            final CommandEntity cmd = this.commandRepo.findOne(commandId);
-            if (cmd != null) {
-                clusterEntity.addCommand(cmd);
-                resultCommandIds.add(commandId);
-            } else {
-                throw new GenieNotFoundException("No command with id " + commandId + " exists.");
-            }
+            clusterEntity.addCommand(this.commandRepo.findOne(commandId));
         }
     }
 
@@ -439,27 +426,19 @@ public class JpaClusterServiceImpl implements ClusterService {
      * {@inheritDoc}
      */
     @Override
-    public void updateCommandsForCluster(
+    public void setCommandsForCluster(
         @NotBlank(message = "No cluster id entered. Unable to update commands.")
         final String id,
         @NotNull(message = "No command ids entered. Unable to update commands.")
         final List<String> commandIds
     ) throws GenieException {
+        if (commandIds.size() != commandIds.stream().filter(this.commandRepo::exists).count()) {
+            throw new GeniePreconditionException("All commands need to exist to add to a cluster");
+        }
         final ClusterEntity clusterEntity = this.findCluster(id);
         final List<CommandEntity> commandEntities = new ArrayList<>();
-        final Set<String> currentIds = new HashSet<>();
-        for (final String commandId : commandIds) {
-            if (currentIds.contains(commandId)) {
-                throw new GeniePreconditionException("Command " + commandId + " cannot be added to cluster twice.");
-            }
-            final CommandEntity cmd = this.commandRepo.findOne(commandId);
-            if (cmd != null) {
-                currentIds.add(commandId);
-                commandEntities.add(cmd);
-            } else {
-                throw new GenieNotFoundException("No command with id " + commandId + " exists.");
-            }
-        }
+        commandIds.stream().forEach(commandId -> commandEntities.add(this.commandRepo.findOne(commandId)));
+
         clusterEntity.setCommands(commandEntities);
     }
 
@@ -471,12 +450,7 @@ public class JpaClusterServiceImpl implements ClusterService {
         @NotBlank(message = "No cluster id entered. Unable to remove commands.")
         final String id
     ) throws GenieException {
-        final ClusterEntity clusterEntity = this.findCluster(id);
-        final List<CommandEntity> commandEntities = new ArrayList<>();
-        commandEntities.addAll(clusterEntity.getCommands());
-        for (final CommandEntity commandEntity : commandEntities) {
-            clusterEntity.removeCommand(commandEntity);
-        }
+        this.findCluster(id).removeAllCommands();
     }
 
     /**

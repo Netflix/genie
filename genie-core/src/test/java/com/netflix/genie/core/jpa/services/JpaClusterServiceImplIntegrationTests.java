@@ -781,7 +781,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         newCommandIds.add(command1Id);
         newCommandIds.add(command2Id);
         Assert.assertEquals(3, this.service.getCommandsForCluster(CLUSTER_1_ID, null).size());
-        this.service.updateCommandsForCluster(CLUSTER_1_ID, newCommandIds);
+        this.service.setCommandsForCluster(CLUSTER_1_ID, newCommandIds);
         final List<Command> commands = this.service.getCommandsForCluster(CLUSTER_1_ID, null);
         Assert.assertEquals(2, commands.size());
         Assert.assertEquals(command1Id, commands.get(0).getId());
@@ -795,7 +795,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testUpdateCommandsForClusterNoId() throws GenieException {
-        this.service.updateCommandsForCluster(null, new ArrayList<>());
+        this.service.setCommandsForCluster(null, new ArrayList<>());
     }
 
     /**
@@ -805,7 +805,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testUpdateCommandsForClusterNoCommands() throws GenieException {
-        this.service.updateCommandsForCluster(UUID.randomUUID().toString(), null);
+        this.service.setCommandsForCluster(UUID.randomUUID().toString(), null);
     }
 
     /**

@@ -125,7 +125,6 @@ CREATE TABLE `clusters_commands` (
   `cluster_id` varchar(255) NOT NULL,
   `command_id` varchar(255) NOT NULL,
   `command_order` int(11) NOT NULL,
-  UNIQUE KEY `CLUSTER_COMMAND_INDEX` (`cluster_id`,`command_id`),
   KEY `command_id` (`command_id`),
   CONSTRAINT `clusters_commands_ibfk_1` FOREIGN KEY (`cluster_id`) REFERENCES `clusters` (`id`) ON DELETE CASCADE,
   CONSTRAINT `clusters_commands_ibfk_2` FOREIGN KEY (`command_id`) REFERENCES `commands` (`id`)
@@ -186,7 +185,6 @@ CREATE TABLE `commands_applications` (
   `command_id` varchar(255) NOT NULL,
   `application_id` varchar(255) NOT NULL,
   `application_order` int(11) NOT NULL,
-  UNIQUE KEY `COMMAND_APPLICATION_INDEX` (`command_id`,`application_id`),
   KEY `application_id` (`application_id`),
   CONSTRAINT `commands_applications_ibfk_1` FOREIGN KEY (`command_id`) REFERENCES `commands` (`id`) ON DELETE CASCADE,
   CONSTRAINT `commands_applications_ibfk_2` FOREIGN KEY (`application_id`) REFERENCES `applications` (`id`)

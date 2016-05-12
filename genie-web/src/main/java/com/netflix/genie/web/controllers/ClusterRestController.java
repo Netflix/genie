@@ -469,7 +469,7 @@ ClusterRestController {
         @RequestBody final List<String> commandIds
     ) throws GenieException {
         log.debug("Called with id {} and commandIds {}", id, commandIds);
-        this.clusterService.updateCommandsForCluster(id, commandIds);
+        this.clusterService.setCommandsForCluster(id, commandIds);
     }
 
     /**

@@ -61,8 +61,7 @@ CREATE TABLE `commands_applications` (
   `application_id` VARCHAR(255) NOT NULL,
   `application_order` INT(11) NOT NULL,
   FOREIGN KEY (`command_id`) REFERENCES `commands` (`id`) ON DELETE CASCADE,
-  FOREIGN KEY (`application_id`) REFERENCES `applications` (`id`) ON DELETE RESTRICT,
-  UNIQUE `COMMAND_APPLICATION_INDEX` (`command_id`, `application_id`)
+  FOREIGN KEY (`application_id`) REFERENCES `applications` (`id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully created commands_applications table.' AS '';
 
@@ -179,8 +178,7 @@ ALTER TABLE `clusters_commands`
   CHANGE `COMMANDS_ID` `command_id` VARCHAR(255) NOT NULL,
   CHANGE `commands_ORDER` `command_order` INT(11) NOT NULL,
   ADD FOREIGN KEY (`cluster_id`) REFERENCES `clusters` (`id`) ON DELETE CASCADE,
-  ADD FOREIGN KEY (`command_id`) REFERENCES `commands` (`id`) ON DELETE RESTRICT,
-  ADD UNIQUE `CLUSTER_COMMAND_INDEX` (`cluster_id`, `command_id`);
+  ADD FOREIGN KEY (`command_id`) REFERENCES `commands` (`id`) ON DELETE RESTRICT;
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully updated the clusters_commands table.' AS '';
 
 SELECT CURRENT_TIMESTAMP AS '', 'Updating the cluster_configs table for 3.0...' AS '';
