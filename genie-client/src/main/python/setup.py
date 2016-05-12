@@ -13,7 +13,8 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 """
-from setuptools import setup  # Always prefer setuptools over distutils
+# Always prefer setuptools over distutils
+from setuptools import setup, find_packages
 from codecs import open  # To use a consistent encoding
 from os import path
 
@@ -25,29 +26,20 @@ with open(path.join(here, 'DESCRIPTION.rst'), encoding='utf-8') as f:
 
 setup(
     name='nflx-genie-client',
-
-    version='2.2.0',
-
+    version='3.0.0',
     author='Netflix Inc.',
-
     author_email='genieoss@googlegroups.com',
-
-    packages=['genie2', 'genie2.client', 'genie2.exception', 'genie2.model'],
-
+    keywords='genie hadoop cloud netflix client bigdata presto',
+    packages=['pygenie', 'genie2', 'genie2.client', 'genie2.exception', 'genie2.model'],
     scripts=[],
-
     url='http://netflix.github.io/genie/',
-
     license='Apache 2.0',
-
     description='Genie Python Client.',
-
     long_description=long_description,
-
+    test_suite='tests',
     install_requires=[
         "python-dateutil >= 2.4",
     ],
-
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
         # How mature is this project? Common values are
@@ -76,6 +68,4 @@ setup(
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 2 :: Only'
     ],
-
-    keywords='genie hadoop cloud netflix client bigdata presto'
 )

@@ -10,7 +10,7 @@ from nose.tools import assert_equals
 
 from configurator import Configurator as C
 
-from genie.conf import GenieConf
+from pygenie.conf import GenieConf
 
 
 def reset_environment(func):
@@ -34,8 +34,8 @@ class TestGenieConf(unittest.TestCase):
         self.config_file = os.path.join(dirname, 'genie.ini')
 
     @reset_environment
-    @patch('genie.conf.GenieConf.config_file_env')
-    @patch('genie.conf.GenieConf.config_file_home_ini')
+    @patch('pygenie.conf.GenieConf.config_file_env')
+    @patch('pygenie.conf.GenieConf.config_file_home_ini')
     @patch('configurator.configurator.Configurator.initialize')
     def test_load_config_file(self, c_initialize, config_home_ini, config_env):
         """Test loading configuration file."""
@@ -50,9 +50,9 @@ class TestGenieConf(unittest.TestCase):
         )
 
     @reset_environment
-    @patch('genie.conf.GenieConf.config_file_env')
-    @patch('genie.conf.GenieConf.config_file_home_ini')
-    @patch('genie.conf.GenieConf.load_config_file')
+    @patch('pygenie.conf.GenieConf.config_file_env')
+    @patch('pygenie.conf.GenieConf.config_file_home_ini')
+    @patch('pygenie.conf.GenieConf.load_config_file')
     def test_load_config_file_order_env(self,
                                         load_config_file,
                                         config_home_ini,
@@ -66,9 +66,9 @@ class TestGenieConf(unittest.TestCase):
         load_config_file.assert_called_once_with(self.config_file)
 
     @reset_environment
-    @patch('genie.conf.GenieConf.config_file_env')
-    @patch('genie.conf.GenieConf.config_file_home_ini')
-    @patch('genie.conf.GenieConf.load_config_file')
+    @patch('pygenie.conf.GenieConf.config_file_env')
+    @patch('pygenie.conf.GenieConf.config_file_home_ini')
+    @patch('pygenie.conf.GenieConf.load_config_file')
     def test_load_config_file_order_homedir(self,
                                             load_config_file,
                                             config_home_ini,
@@ -81,9 +81,9 @@ class TestGenieConf(unittest.TestCase):
         load_config_file.assert_called_once_with(self.config_file)
 
     @reset_environment
-    @patch('genie.conf.GenieConf.config_file_env')
-    @patch('genie.conf.GenieConf.config_file_home_ini')
-    @patch('genie.conf.GenieConf.load_config_file')
+    @patch('pygenie.conf.GenieConf.config_file_env')
+    @patch('pygenie.conf.GenieConf.config_file_home_ini')
+    @patch('pygenie.conf.GenieConf.load_config_file')
     def test_load_config_file_order_multiple_config(self,
                                                     load_config_file,
                                                     config_home_ini,
@@ -96,8 +96,8 @@ class TestGenieConf(unittest.TestCase):
         load_config_file.assert_called_once_with('/from/env/genie.ini')
 
     @reset_environment
-    @patch('genie.conf.GenieConf.config_file_env')
-    @patch('genie.conf.GenieConf.config_file_home_ini')
+    @patch('pygenie.conf.GenieConf.config_file_env')
+    @patch('pygenie.conf.GenieConf.config_file_home_ini')
     def test_to_dict(self, config_home_ini, config_env):
         """Test configuration to_dict()."""
 
@@ -122,9 +122,9 @@ class TestGenieConf(unittest.TestCase):
         )
 
     @reset_environment
-    @patch('genie.conf.GenieConf.config_file_env')
-    @patch('genie.conf.GenieConf.config_file_home_ini')
-    @patch('genie.conf.GenieConf.sys_argv')
+    @patch('pygenie.conf.GenieConf.config_file_env')
+    @patch('pygenie.conf.GenieConf.config_file_home_ini')
+    @patch('pygenie.conf.GenieConf.sys_argv')
     def test_username_command_line(self, sys_argv, config_home_ini, config_env):
         """Test configuration getting user specified from command line."""
 
@@ -138,8 +138,8 @@ class TestGenieConf(unittest.TestCase):
         assert_equals(genie_conf.genie.username, 'user_cmdline_1')
 
     @reset_environment
-    @patch('genie.conf.GenieConf.config_file_env')
-    @patch('genie.conf.GenieConf.config_file_home_ini')
+    @patch('pygenie.conf.GenieConf.config_file_env')
+    @patch('pygenie.conf.GenieConf.config_file_home_ini')
     def test_username_config_file(self, config_home_ini, config_env):
         """Test configuration getting user specified from configuration file."""
 
@@ -152,8 +152,8 @@ class TestGenieConf(unittest.TestCase):
         assert_equals(genie_conf.genie.username, 'user_ini')
 
     @reset_environment
-    @patch('genie.conf.GenieConf.config_file_env')
-    @patch('genie.conf.GenieConf.config_file_home_ini')
+    @patch('pygenie.conf.GenieConf.config_file_env')
+    @patch('pygenie.conf.GenieConf.config_file_home_ini')
     def test_username_environment_variable(self, config_home_ini, config_env):
         """Test configuration getting user specified from GENIE_USERNAME environment variable."""
 
@@ -165,8 +165,8 @@ class TestGenieConf(unittest.TestCase):
         assert_equals(genie_conf.genie.username, 'genie_user_env_3')
 
     @reset_environment
-    @patch('genie.conf.GenieConf.config_file_env')
-    @patch('genie.conf.GenieConf.config_file_home_ini')
+    @patch('pygenie.conf.GenieConf.config_file_env')
+    @patch('pygenie.conf.GenieConf.config_file_home_ini')
     def test_username_os_user(self, config_home_ini, config_env):
         """Test configuration getting user specified from os user (USER environment variable)."""
 

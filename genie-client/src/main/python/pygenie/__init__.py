@@ -18,7 +18,7 @@ them.
 
 
 Run Job Example:
-    >>> import genie
+    >>> import pygenie
 
 """
 

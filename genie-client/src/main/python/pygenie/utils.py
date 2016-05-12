@@ -10,6 +10,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import datetime
 import logging
+import os
 import pkg_resources
 import six
 import socket
@@ -23,7 +24,7 @@ except ImportError:
 from .exceptions import GenieHTTPError
 
 
-logger = logging.getLogger('com.netflix.genie.utils')
+logger = logging.getLogger('com.netflix.pygenie.utils')
 
 
 USER_AGENT_HEADER = {
@@ -35,12 +36,31 @@ USER_AGENT_HEADER = {
 }
 
 
-def call(url, method='get', headers=None, *args, **kwargs):
+class DotDict(dict):
+    """
+    Allow dictionary keys to be retrieved as attribtues. Used for the genie2 to
+    genie 3 migration.
+    """
+    __getattr__ = dict.__getitem__
+    __setattr__ = dict.__setitem__
+    __delattr__ = dict.__delitem__
+
+
+def call(url, method='get', headers=None, raise_not_status=None,
+         none_on_404=False, *args, **kwargs):
     """
     Wrap HTTP request calls to the Genie server.
 
     The request header will be updated to include 'user-agent'. If headers are
     passed in with 'user-agent', it will be overwritten.
+
+    Args:
+        method (str): the HTTP method to make
+        headers (dict): headers to pass in during the request
+        raise_not_status (int): raise GenieHTTPError if this status is not
+            returned by genie.
+        none_on_404 (bool): return None if a 404 if returned instead of raising
+            GenieHTTPError.
     """
 
     headers = USER_AGENT_HEADER if headers is None \
@@ -49,9 +69,21 @@ def call(url, method='get', headers=None, *args, **kwargs):
     logger.debug('"%s %s"', method.upper(), url)
     logger.debug('headers: %s', headers)
 
+    # TODO: this needs to be replaced by the eureq client configurations
+    if os.getenv('GENIE_TOKEN'):
+        headers['Authorization'] = 'Bearer %s' % os.environ['GENIE_TOKEN']
+
     resp = requests.request(method, url=url, headers=headers, *args, **kwargs)
 
+    # Allow us to return None if we receive a 404
+    if resp.status_code == 404 and none_on_404:
+        return None
+
     if not resp.ok:
+        raise GenieHTTPError(resp)
+
+    # Raise GenieHTTPError if a particular status code was not returned
+    if raise_not_status and resp.status_code != raise_not_status:
         raise GenieHTTPError(resp)
 
     return resp
