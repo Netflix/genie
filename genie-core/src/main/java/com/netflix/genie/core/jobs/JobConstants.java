@@ -75,6 +75,11 @@ public final class JobConstants {
     public static final String EQUALS_SYMBOL = "=";
 
     /**
+     * Double Quote symbol.
+     **/
+    public static final String DOUBLE_QUOTE_SYMBOL = "\"";
+
+    /**
      * Bash source command.
      **/
     public static final String SOURCE = "source ";

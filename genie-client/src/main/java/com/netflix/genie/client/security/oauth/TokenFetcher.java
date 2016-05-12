@@ -19,8 +19,10 @@ package com.netflix.genie.client.security.oauth;
 
 import com.netflix.genie.client.apis.TokenService;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
@@ -78,13 +80,33 @@ public class TokenFetcher {
 
         log.debug("Constructor called.");
 
+        if (StringUtils.isBlank(oauthUrl)) {
+            throw new GeniePreconditionException("URL cannot be null or empty");
+        }
+
+        if (StringUtils.isBlank(clientId)) {
+            throw new GeniePreconditionException("Client Id cannot be null or empty");
+        }
+
+        if (StringUtils.isBlank(clientSecret)) {
+            throw new GeniePreconditionException("Client Secret cannot be null or empty");
+        }
+
+        if (StringUtils.isBlank(grantType)) {
+            throw new GeniePreconditionException("Grant Type cannot be null or empty");
+        }
+
+        if (StringUtils.isBlank(scope)) {
+            throw new GeniePreconditionException("Scope cannot be null or empty");
+        }
+
         try {
             final URL url = new URL(oauthUrl);
 
             // Construct the Base path of the type http[s]://serverhost/ for retrofit to work.
-            final String oAuthServer = url.getProtocol() + "://" + url.getHost() + "/";
+            final String oAuthServerUrl = url.getProtocol() + "://" + url.getHost() + "/";
             final Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(oAuthServer)
+                .baseUrl(oAuthServerUrl)
                 .addConverterFactory(JacksonConverterFactory.create())
                 .build();
 
@@ -99,7 +121,7 @@ public class TokenFetcher {
             credentialParams.put(GRANT_TYPE, grantType);
             credentialParams.put(SCOPE, scope);
         } catch (Exception e) {
-           throw new GenieServerException("Could not instantiate Token service to fetch OAuth Token", e);
+           throw new GenieException(400, "Could not instantiate Token Service.", e);
         }
     }
 
@@ -111,7 +133,6 @@ public class TokenFetcher {
      */
     public AccessToken getToken() throws GenieException {
 
-        // TODO set expiration time here to check it next time
         try {
             if (new Date().after(this.expirationTime)) {
                 final Response<AccessToken> response = tokenService.getToken(oauthUrl, credentialParams).execute();
@@ -128,8 +149,6 @@ public class TokenFetcher {
             } else {
                 return accessToken;
             }
-
-
         } catch (Exception e) {
             throw new GenieServerException("Could not get access tokens", e);
         }
