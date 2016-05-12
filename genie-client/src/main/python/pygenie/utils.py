@@ -46,12 +46,21 @@ class DotDict(dict):
     __delattr__ = dict.__delitem__
 
 
-def call(url, method='get', headers=None, *args, **kwargs):
+def call(url, method='get', headers=None, raise_not_status=None,
+         none_on_404=False, *args, **kwargs):
     """
     Wrap HTTP request calls to the Genie server.
 
     The request header will be updated to include 'user-agent'. If headers are
     passed in with 'user-agent', it will be overwritten.
+
+    Args:
+        method (str): the HTTP method to make
+        headers (dict): headers to pass in during the request
+        raise_not_status (int): raise GenieHTTPError if this status is not
+            returned by genie.
+        none_on_404 (bool): return None if a 404 if returned instead of raising
+            GenieHTTPError.
     """
 
     headers = USER_AGENT_HEADER if headers is None \
@@ -66,7 +75,15 @@ def call(url, method='get', headers=None, *args, **kwargs):
 
     resp = requests.request(method, url=url, headers=headers, *args, **kwargs)
 
+    # Allow us to return None if we receive a 404
+    if resp.status_code == 404 and none_on_404:
+        return None
+
     if not resp.ok:
+        raise GenieHTTPError(resp)
+
+    # Raise GenieHTTPError if a particular status code was not returned
+    if raise_not_status and resp.status_code != raise_not_status:
         raise GenieHTTPError(resp)
 
     return resp

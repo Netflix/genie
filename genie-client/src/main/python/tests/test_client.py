@@ -6,22 +6,26 @@ import types
 import unittest
 
 import json
+import os
 import re
 import responses
 
 from nose.tools import assert_equals
 from pygenie.client import Genie
+from pygenie.conf import GenieConf
 
-GENIE = 'http://localhost:8080'
+GENIE_INI = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'genie.ini')
+GENIE_CONF = GenieConf().load_config_file(GENIE_INI)
+GENIE_URL = GENIE_CONF.genie.url
 
 # Used to generate basic responses from genie
 class TestGenie(unittest.TestCase):
     "Test related to the bdp EMR library"
 
     def setUp(self):
-        self.genie = Genie(GENIE)
+        self.genie = Genie(GENIE_URL)
         self.cluster_name = 'test'
-        self.path = re.compile(GENIE + '/api/v3/.*')
+        self.path = re.compile(GENIE_URL + '/api/v3/.*')
 
     def test_properties(self):
         "Testing that relative paths exists as methods"
@@ -62,8 +66,8 @@ class TestGenie(unittest.TestCase):
 class TestCommand(unittest.TestCase):
 
     def setUp(self):
-        self.genie = Genie(GENIE)
-        self.path = re.compile(GENIE + '/api/v3/commands.*')
+        self.genie = Genie(GENIE_URL)
+        self.path = re.compile(GENIE_URL + '/api/v3/commands.*')
         self.command = {
             "id": "test_command",
             "created": "2016-05-09T20:50:56.000Z",
@@ -86,7 +90,7 @@ class TestCommand(unittest.TestCase):
 
     @responses.activate
     def test_create_command(self):
-        location = GENIE + '/' + self.command['id']
+        location = GENIE_URL + '/' + self.command['id']
         responses.add(responses.POST, self.path, status=201,
                       adding_headers={'Location': location})
         new_command_name = self.genie.create_command(self.command)
@@ -105,6 +109,12 @@ class TestCommand(unittest.TestCase):
         responses.add(responses.GET, self.path, body=json.dumps(self.command))
         command = self.genie.get_command(self.command['id'])
         assert_equals(command, self.command)
+
+    @responses.activate
+    def test_get_command_returns_none(self):
+        responses.add(responses.GET, self.path, status=404)
+        cluster = self.genie.get_command('does_not_exist')
+        assert_equals(cluster, None)
 
     @responses.activate
     def test_get_command_with_params(self):
@@ -219,8 +229,8 @@ class TestCommand(unittest.TestCase):
 class TestApplication(unittest.TestCase):
 
     def setUp(self):
-        self.genie = Genie('http://localhost:8080')
-        self.path = re.compile('http://localhost:8080/api/v3/applications.*')
+        self.genie = Genie(GENIE_URL)
+        self.path = re.compile(GENIE_URL + '/api/v3/applications.*')
         self.application = {
             "id": "test",
             "created": "2016-05-10T23:37:24.000Z",
@@ -242,7 +252,7 @@ class TestApplication(unittest.TestCase):
 
     @responses.activate
     def test_create_application(self):
-        location = GENIE + '/' + self.application['id']
+        location = GENIE_URL + '/' + self.application['id']
         responses.add(responses.POST, self.path, status=201,
                       adding_headers={'Location': location})
         app_id = self.genie.create_application(self.application)
@@ -275,6 +285,12 @@ class TestApplication(unittest.TestCase):
         responses.add(responses.GET, self.path, body=json.dumps(self.application))
         app = self.genie.get_application(self.application['id'])
         assert_equals(app, self.application)
+
+    @responses.activate
+    def test_get_application_returns_none(self):
+        responses.add(responses.GET, self.path, status=404)
+        cluster = self.genie.get_application('does_not_exist')
+        assert_equals(cluster, None)
 
     @responses.activate
     def test_tags_for_application(self):
@@ -359,8 +375,8 @@ class TestApplication(unittest.TestCase):
 class TestCluster(unittest.TestCase):
 
     def setUp(self):
-        self.genie = Genie(GENIE)
-        self.path = re.compile(GENIE + '/api/v3/clusters.*')
+        self.genie = Genie(GENIE_URL)
+        self.path = re.compile(GENIE_URL + '/api/v3/clusters.*')
         self.cluster = {
             "id": "presto_test_20160318",
             "created": "2016-04-12T19:52:10.000Z",
@@ -386,10 +402,16 @@ class TestCluster(unittest.TestCase):
         assert_equals(cluster, self.cluster)
 
     @responses.activate
-    def test_get_all_configs_for_cluster(self):
-        responses.add(responses.GET, self.path, body='["conf1", "conf2"]')
-        configs = self.genie.get_all_configs_for_cluster(self.cluster['id'])
-        assert "conf1" in configs, "Did not return correct configs"
+    def test_get_cluster_returns_none(self):
+        responses.add(responses.GET, self.path, status=404)
+        cluster = self.genie.get_cluster(self.cluster['id'])
+        assert_equals(cluster, None)
+
+    @responses.activate
+    def test_get_cluster_returns_none(self):
+        responses.add(responses.GET, self.path, status=404)
+        cluster = self.genie.get_cluster(self.cluster['id'])
+        assert_equals(cluster, None)
 
     @responses.activate
     def test_get_commands_for_cluster(self):
@@ -423,7 +445,7 @@ class TestCluster(unittest.TestCase):
 
     @responses.activate
     def test_create_cluster(self):
-        location = GENIE + '/' + self.cluster['id']
+        location = GENIE_URL + '/' + self.cluster['id']
         responses.add(responses.POST, self.path, status=201,
                       adding_headers={'Location': location})
         cluster_id = self.genie.create_cluster(self.cluster)
@@ -504,8 +526,8 @@ class TestCluster(unittest.TestCase):
 class TestJob(unittest.TestCase):
 
     def setUp(self):
-        self.genie = Genie(GENIE)
-        self.path = re.compile(GENIE + '/api/v3/jobs.*')
+        self.genie = Genie(GENIE_URL)
+        self.path = re.compile(GENIE_URL + '/api/v3/jobs.*')
         self.job = {
             "id": "5afdcab5-16df-11e6-b78d-6003088f363e",
             "created": "2016-05-10T18:45:29.000Z",
@@ -531,6 +553,12 @@ class TestJob(unittest.TestCase):
         responses.add(responses.GET, self.path, body=json.dumps(self.job))
         job = self.genie.get_job(self.job['id'])
         assert_equals(job, self.job)
+
+    @responses.activate
+    def test_get_job_returns_none(self):
+        responses.add(responses.GET, self.path, status=404)
+        cluster = self.genie.get_job('does_not_exist')
+        assert_equals(cluster, None)
 
     @responses.activate
     def test_get_job_applications(self):
@@ -592,7 +620,7 @@ class TestGeniepyAPI(unittest.TestCase):
     "Test that all required APIs are available through geniepy"
 
     def setUp(self):
-        self.genie = Genie(GENIE)
+        self.genie = Genie(GENIE_URL)
         self.required_apis = [
             'add_applications_for_command',
             'add_commands_for_cluster',
