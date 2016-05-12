@@ -25,6 +25,8 @@ import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.core.jpa.entities.ApplicationEntity;
+import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
@@ -35,6 +37,7 @@ import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -208,6 +211,29 @@ public class JpaCommandServiceImplUnitTests {
     }
 
     /**
+     * Make sure we can't add duplicate applications to the cluster.
+     *
+     * @throws GenieException on error
+     */
+    @Test(expected = GeniePreconditionException.class)
+    public void cantAddDuplicateApplicationsToCommand() throws GenieException {
+        final String applicationId1 = UUID.randomUUID().toString();
+        final String applicationId2 = UUID.randomUUID().toString();
+        final List<String> applicationIds = Lists.newArrayList(applicationId2);
+        final CommandEntity commandEntity = Mockito.mock(CommandEntity.class);
+        final ApplicationEntity app1 = Mockito.mock(ApplicationEntity.class);
+        Mockito.when(app1.getId()).thenReturn(applicationId1);
+        final ApplicationEntity app2 = Mockito.mock(ApplicationEntity.class);
+        Mockito.when(app2.getId()).thenReturn(applicationId2);
+        Mockito.when(commandEntity.getApplications()).thenReturn(Lists.newArrayList(app1, app2));
+
+        Mockito.when(this.jpaCommandRepository.findOne(COMMAND_1_ID)).thenReturn(commandEntity);
+        Mockito.when(this.jpaApplicationRepository.findOne(applicationId1)).thenReturn(app1);
+        Mockito.when(this.jpaApplicationRepository.findOne(applicationId2)).thenReturn(app2);
+        this.service.addApplicationsForCommand(COMMAND_1_ID, applicationIds);
+    }
+
+    /**
      * Test setting the applications for a given command.
      *
      * @throws GenieException For any problem
@@ -240,6 +266,23 @@ public class JpaCommandServiceImplUnitTests {
         final String appId = UUID.randomUUID().toString();
         Mockito.when(this.jpaApplicationRepository.exists(appId)).thenReturn(false);
         this.service.setApplicationsForCommand(COMMAND_2_ID, Lists.newArrayList(appId));
+    }
+
+    /**
+     * Make sure we can't update the applications for a command if there are duplicate ids in the list of appIds.
+     *
+     * @throws GenieException On error
+     */
+    @Test(expected = GeniePreconditionException.class)
+    public void cantUpdateApplicationsForCommandWithDuplicates() throws GenieException {
+        final String appId1 = UUID.randomUUID().toString();
+        final String appId2 = UUID.randomUUID().toString();
+        final List<String> appIds = Lists.newArrayList(appId1, appId2, appId1);
+        final CommandEntity command = Mockito.mock(CommandEntity.class);
+        Mockito.when(this.jpaCommandRepository.findOne(COMMAND_1_ID)).thenReturn(command);
+        Mockito.when(this.jpaApplicationRepository.findOne(appId1)).thenReturn(Mockito.mock(ApplicationEntity.class));
+        Mockito.when(this.jpaApplicationRepository.findOne(appId2)).thenReturn(Mockito.mock(ApplicationEntity.class));
+        this.service.setApplicationsForCommand(COMMAND_1_ID, appIds);
     }
 
     /**

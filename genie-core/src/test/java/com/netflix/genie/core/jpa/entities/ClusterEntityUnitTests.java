@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.core.jpa.entities;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
@@ -209,6 +210,21 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
     }
 
     /**
+     * Make sure we can't set commands with duplicates.
+     *
+     * @throws GeniePreconditionException on duplicates
+     */
+    @Test(expected = GeniePreconditionException.class)
+    public void cantSetCommandsWithDuplicates() throws GeniePreconditionException {
+        final CommandEntity one = new CommandEntity();
+        one.setId(UUID.randomUUID().toString());
+        final CommandEntity two = new CommandEntity();
+        two.setId(UUID.randomUUID().toString());
+
+        this.c.setCommands(Lists.newArrayList(one, two, one));
+    }
+
+    /**
      * Test adding a command.
      *
      * @throws GeniePreconditionException If any precondition isn't met.
@@ -225,13 +241,18 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
     }
 
     /**
-     * Test to make sure you can't add a null command.
+     * Make sure we can't add a duplicate command.
      *
-     * @throws GeniePreconditionException If any precondition isn't met.
+     * @throws GeniePreconditionException If the command was already in the list
      */
     @Test(expected = GeniePreconditionException.class)
-    public void testAddNullCommand() throws GeniePreconditionException {
-        this.c.addCommand(null);
+    public void cantAddDuplicateCommand() throws GeniePreconditionException {
+        final CommandEntity entity = new CommandEntity();
+        entity.setId(UUID.randomUUID().toString());
+        this.c.addCommand(entity);
+
+        // Should throw exception here
+        this.c.addCommand(entity);
     }
 
     /**
@@ -264,16 +285,6 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
         Assert.assertTrue(this.c.getCommands().contains(two));
         Assert.assertFalse(one.getClusters().contains(this.c));
         Assert.assertTrue(two.getClusters().contains(this.c));
-    }
-
-    /**
-     * Make sure you can't remove a null command.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
-     */
-    @Test(expected = GeniePreconditionException.class)
-    public void testRemoveNullCommand() throws GeniePreconditionException {
-        this.c.removeCommand(null);
     }
 
     /**

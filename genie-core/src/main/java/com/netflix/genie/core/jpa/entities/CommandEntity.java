@@ -20,6 +20,7 @@ package com.netflix.genie.core.jpa.entities;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
@@ -92,10 +93,10 @@ public class CommandEntity extends SetupFileEntity {
     @JoinTable(
         name = "commands_applications",
         joinColumns = {
-            @JoinColumn(name = "command_id", referencedColumnName = "id", nullable = false)
+            @JoinColumn(name = "command_id", referencedColumnName = "id", nullable = false, updatable = false)
         },
         inverseJoinColumns = {
-            @JoinColumn(name = "application_id", referencedColumnName = "id", nullable = false)
+            @JoinColumn(name = "application_id", referencedColumnName = "id", nullable = false, updatable = false)
         }
     )
     @OrderColumn(name = "application_order", nullable = false)
@@ -197,22 +198,60 @@ public class CommandEntity extends SetupFileEntity {
      * Sets the applications for this command.
      *
      * @param applications The application that this command uses
+     * @throws GeniePreconditionException if the list of applications contains duplicates
      */
-    public void setApplications(final List<ApplicationEntity> applications) {
+    public void setApplications(final List<ApplicationEntity> applications) throws GeniePreconditionException {
+        if (applications != null
+            && applications.stream().map(ApplicationEntity::getId).distinct().count() != applications.size()) {
+            throw new GeniePreconditionException("List of applications to set cannot contain duplicates");
+        }
+
         //Clear references to this command in existing applications
         for (final ApplicationEntity application : this.applications) {
             application.getCommands().remove(this);
         }
-        //set the application for this command
         this.applications.clear();
+
         if (applications != null) {
+            //set the application for this command
             this.applications.addAll(applications);
+
+            //Add the reverse reference in the new applications
+            for (final ApplicationEntity application : this.applications) {
+                application.getCommands().add(this);
+            }
+        }
+    }
+
+    /**
+     * Append an application to the list of applications this command uses.
+     *
+     * @param application The application to add. Not null.
+     * @throws GeniePreconditionException If the application is a duplicate of an existing application
+     */
+    public void addApplication(@NotNull final ApplicationEntity application) throws GeniePreconditionException {
+        if (
+            this.applications
+                .stream()
+                .map(ApplicationEntity::getId)
+                .filter(id -> id.equals(application.getId()))
+                .count() != 0
+            ) {
+            throw new GeniePreconditionException("An application with id " + application.getId() + " is already added");
         }
 
-        //Add the reverse reference in the new applications
-        for (final ApplicationEntity application : this.applications) {
-            application.getCommands().add(this);
-        }
+        this.applications.add(application);
+        application.getCommands().add(this);
+    }
+
+    /**
+     * Remove an application from this command. Manages both sides of relationship.
+     *
+     * @param application The application to remove. Not null.
+     */
+    public void removeApplication(@NotNull final ApplicationEntity application) {
+        this.applications.remove(application);
+        application.getCommands().remove(this);
     }
 
     /**

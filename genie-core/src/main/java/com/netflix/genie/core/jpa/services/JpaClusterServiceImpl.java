@@ -25,12 +25,14 @@ import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.ClusterStatus;
+import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.jpa.entities.ClusterEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
@@ -388,14 +390,13 @@ public class JpaClusterServiceImpl implements ClusterService {
         @NotEmpty(message = "No command ids entered. Unable to add commands.")
         final List<String> commandIds
     ) throws GenieException {
+        if (commandIds.size() != commandIds.stream().filter(this.commandRepo::exists).count()) {
+            throw new GeniePreconditionException("All commands need to exist to add to a cluster");
+        }
+
         final ClusterEntity clusterEntity = this.findCluster(id);
         for (final String commandId : commandIds) {
-            final CommandEntity cmd = this.commandRepo.findOne(commandId);
-            if (cmd != null) {
-                clusterEntity.addCommand(cmd);
-            } else {
-                throw new GenieNotFoundException("No command with id " + commandId + " exists.");
-            }
+            clusterEntity.addCommand(this.commandRepo.findOne(commandId));
         }
     }
 
@@ -404,7 +405,7 @@ public class JpaClusterServiceImpl implements ClusterService {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<com.netflix.genie.common.dto.Command> getCommandsForCluster(
+    public List<Command> getCommandsForCluster(
         @NotBlank(message = "No cluster id entered. Unable to get commands.")
         final String id,
         final Set<CommandStatus> statuses
@@ -425,22 +426,19 @@ public class JpaClusterServiceImpl implements ClusterService {
      * {@inheritDoc}
      */
     @Override
-    public void updateCommandsForCluster(
+    public void setCommandsForCluster(
         @NotBlank(message = "No cluster id entered. Unable to update commands.")
         final String id,
         @NotNull(message = "No command ids entered. Unable to update commands.")
         final List<String> commandIds
     ) throws GenieException {
+        if (commandIds.size() != commandIds.stream().filter(this.commandRepo::exists).count()) {
+            throw new GeniePreconditionException("All commands need to exist to add to a cluster");
+        }
         final ClusterEntity clusterEntity = this.findCluster(id);
         final List<CommandEntity> commandEntities = new ArrayList<>();
-        for (final String commandId : commandIds) {
-            final CommandEntity cmd = this.commandRepo.findOne(commandId);
-            if (cmd != null) {
-                commandEntities.add(cmd);
-            } else {
-                throw new GenieNotFoundException("No command with id " + commandId + " exists.");
-            }
-        }
+        commandIds.stream().forEach(commandId -> commandEntities.add(this.commandRepo.findOne(commandId)));
+
         clusterEntity.setCommands(commandEntities);
     }
 
@@ -452,12 +450,7 @@ public class JpaClusterServiceImpl implements ClusterService {
         @NotBlank(message = "No cluster id entered. Unable to remove commands.")
         final String id
     ) throws GenieException {
-        final ClusterEntity clusterEntity = this.findCluster(id);
-        final List<CommandEntity> commandEntities = new ArrayList<>();
-        commandEntities.addAll(clusterEntity.getCommands());
-        for (final CommandEntity commandEntity : commandEntities) {
-            clusterEntity.removeCommand(commandEntity);
-        }
+        this.findCluster(id).removeAllCommands();
     }
 
     /**
