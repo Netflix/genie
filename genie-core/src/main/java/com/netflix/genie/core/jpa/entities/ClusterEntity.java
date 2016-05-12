@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.core.jpa.entities;
 
+import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.exceptions.GenieException;
@@ -76,10 +77,10 @@ public class ClusterEntity extends SetupFileEntity {
     @JoinTable(
         name = "clusters_commands",
         joinColumns = {
-            @JoinColumn(name = "cluster_id", referencedColumnName = "id", nullable = false)
+            @JoinColumn(name = "cluster_id", referencedColumnName = "id", nullable = false, updatable = false)
         },
         inverseJoinColumns = {
-            @JoinColumn(name = "command_id", referencedColumnName = "id", nullable = false)
+            @JoinColumn(name = "command_id", referencedColumnName = "id", nullable = false, updatable = false)
         }
     )
     @OrderColumn(name = "command_order", nullable = false)
@@ -161,21 +162,28 @@ public class ClusterEntity extends SetupFileEntity {
      * Sets the commands for this cluster.
      *
      * @param commands The commands that this cluster supports
+     * @throws GeniePreconditionException If the commands are already added to the list
      */
-    public void setCommands(final List<CommandEntity> commands) {
+    public void setCommands(final List<CommandEntity> commands) throws GeniePreconditionException {
+        if (commands != null
+            && commands.stream().map(CommandEntity::getId).distinct().count() != commands.size()) {
+            throw new GeniePreconditionException("List of commands to set cannot contain duplicates");
+        }
+
         //Clear references to this cluster in existing commands
         for (final CommandEntity command : this.commands) {
             command.getClusters().remove(this);
         }
-
         this.commands.clear();
-        if (commands != null) {
-            this.commands.addAll(commands);
-        }
 
-        //Add the reference in the new commands
-        for (final CommandEntity command : this.commands) {
-            command.getClusters().add(this);
+        if (commands != null) {
+            // Set the commands for this cluster
+            this.commands.addAll(commands);
+
+            //Add the reference in the new commands
+            for (final CommandEntity command : this.commands) {
+                command.getClusters().add(this);
+            }
         }
     }
 
@@ -183,41 +191,37 @@ public class ClusterEntity extends SetupFileEntity {
      * Add a new command to this cluster. Manages both sides of relationship.
      *
      * @param command The command to add. Not null.
-     * @throws GeniePreconditionException If any precondition isn't met.
+     * @throws GeniePreconditionException If the command is a duplicate of an existing command
      */
-    public void addCommand(final CommandEntity command) throws GeniePreconditionException {
-        if (command == null) {
-            throw new GeniePreconditionException("No command entered unable to add.");
+    public void addCommand(@NotNull final CommandEntity command) throws GeniePreconditionException {
+        if (
+            this.commands
+                .stream()
+                .map(CommandEntity::getId)
+                .filter(id -> id.equals(command.getId()))
+                .count() != 0
+            ) {
+            throw new GeniePreconditionException("A command with id " + command.getId() + " is already added");
         }
         this.commands.add(command);
         command.getClusters().add(this);
     }
 
     /**
-     * Remove an command from this command. Manages both sides of relationship.
+     * Remove a command from this cluster. Manages both sides of relationship.
      *
      * @param command The command to remove. Not null.
-     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    public void removeCommand(final CommandEntity command) throws GeniePreconditionException {
-        if (command == null) {
-            throw new GeniePreconditionException("No command entered unable to remove.");
-        }
+    public void removeCommand(@NotNull final CommandEntity command) {
         this.commands.remove(command);
         command.getClusters().remove(this);
     }
 
     /**
      * Remove all the commands from this application.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
      */
-    public void removeAllCommands() throws GeniePreconditionException {
-        final List<CommandEntity> locCommandEntities = new ArrayList<>();
-        locCommandEntities.addAll(this.commands);
-        for (final CommandEntity command : locCommandEntities) {
-            this.removeCommand(command);
-        }
+    public void removeAllCommands() {
+        Lists.newArrayList(this.commands).forEach(this::removeCommand);
     }
 
     /**

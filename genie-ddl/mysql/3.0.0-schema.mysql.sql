@@ -125,7 +125,6 @@ CREATE TABLE `clusters_commands` (
   `cluster_id` varchar(255) NOT NULL,
   `command_id` varchar(255) NOT NULL,
   `command_order` int(11) NOT NULL,
-  KEY `cluster_id` (`cluster_id`),
   KEY `command_id` (`command_id`),
   CONSTRAINT `clusters_commands_ibfk_1` FOREIGN KEY (`cluster_id`) REFERENCES `clusters` (`id`) ON DELETE CASCADE,
   CONSTRAINT `clusters_commands_ibfk_2` FOREIGN KEY (`command_id`) REFERENCES `commands` (`id`)
@@ -186,7 +185,6 @@ CREATE TABLE `commands_applications` (
   `command_id` varchar(255) NOT NULL,
   `application_id` varchar(255) NOT NULL,
   `application_order` int(11) NOT NULL,
-  KEY `command_id` (`command_id`),
   KEY `application_id` (`application_id`),
   CONSTRAINT `commands_applications_ibfk_1` FOREIGN KEY (`command_id`) REFERENCES `commands` (`id`) ON DELETE CASCADE,
   CONSTRAINT `commands_applications_ibfk_2` FOREIGN KEY (`application_id`) REFERENCES `applications` (`id`)
@@ -323,4 +321,4 @@ CREATE TABLE `jobs_applications` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-05-11 14:13:20
+-- Dump completed on 2016-05-11 14:47:19

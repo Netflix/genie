@@ -579,8 +579,10 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
         final String placeholder = UUID.randomUUID().toString();
         final String applicationId1 = UUID.randomUUID().toString();
         final String applicationId2 = UUID.randomUUID().toString();
+        final String applicationId3 = UUID.randomUUID().toString();
         createApplication(applicationId1, placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE, null);
         createApplication(applicationId2, placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE, null);
+        createApplication(applicationId3, placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE, null);
 
         this.mvc
             .perform(
@@ -616,6 +618,28 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
             .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(applicationId2)))
             .andExpect(MockMvcResultMatchers.jsonPath("$[1].id", Matchers.is(applicationId1)));
+
+        // Should reorder and add a new one
+        this.mvc
+            .perform(
+                MockMvcRequestBuilders
+                    .put(commandApplicationsAPI)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        OBJECT_MAPPER.writeValueAsBytes(
+                            Lists.newArrayList(applicationId1, applicationId2, applicationId3))
+                    )
+            )
+            .andExpect(MockMvcResultMatchers.status().isNoContent());
+
+        this.mvc
+            .perform(MockMvcRequestBuilders.get(commandApplicationsAPI))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(3)))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(applicationId1)))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[1].id", Matchers.is(applicationId2)))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[2].id", Matchers.is(applicationId3)));
 
         //Should clear applications
         this.mvc
