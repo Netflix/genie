@@ -103,3 +103,5 @@ spring:
   mail:
     #host: localhost
     #testConnection: true
+  velocity:
+    enabled: false
