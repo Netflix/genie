@@ -9,12 +9,16 @@ dependencies {
     compile("org.apache.commons:commons-exec:${commons_exec_version}")
     compile("org.apache.httpcomponents:httpclient")
 
+    // Thymeleaf Extras for Spring Security
+    compile("org.thymeleaf.extras:thymeleaf-extras-springsecurity4")
+
     // Spring Libs
     compile("org.springframework.boot:spring-boot-starter-actuator")
     compile("org.springframework.boot:spring-boot-starter-mail")
     compile("org.springframework.boot:spring-boot-starter-hateoas")
     compile("org.springframework.boot:spring-boot-starter-redis")
     compile("org.springframework.boot:spring-boot-starter-security")
+    compile("org.springframework.boot:spring-boot-starter-thymeleaf")
     compile("org.springframework.boot:spring-boot-starter-tomcat")
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.cloud:spring-cloud-cluster-autoconfigure:${spring_cloud_cluster_version}")
