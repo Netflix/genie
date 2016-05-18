@@ -1,3 +1,5 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 plugins {
     id "com.moowork.node" version "0.12"
 }
@@ -69,6 +71,12 @@ jar {
     manifest {
         attributes("Implementation-Version": version)
     }
+}
+
+processResources {
+    filter ReplaceTokens, tokens: [
+            "project.version": project.version.toString()
+    ]
 }
 
 node {
