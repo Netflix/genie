@@ -76,6 +76,10 @@ genie:
     pool:
       size: 10
 
+info:
+  genie:
+    version: @project.version@
+
 management:
   context-path: /actuator
   security:

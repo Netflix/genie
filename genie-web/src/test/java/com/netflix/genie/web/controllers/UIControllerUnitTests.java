@@ -20,8 +20,18 @@ package com.netflix.genie.web.controllers;
 import com.netflix.genie.test.categories.UnitTest;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.servlet.HandlerMapping;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.UUID;
 
 /**
  * Unit tests for UIController class.
@@ -32,12 +42,55 @@ import org.junit.experimental.categories.Category;
 @Category(UnitTest.class)
 public class UIControllerUnitTests {
 
+    private UIController controller;
+
     /**
-     * Make sure the index endpoint returns the right template name.
+     * Setup for the tests.
+     */
+    @Before
+    public void setup() {
+        this.controller = new UIController();
+    }
+
+    /**
+     * Make sure the getIndex endpoint returns the right template name.
      */
     @Test
     public void canGetIndex() {
-        final UIController controller = new UIController();
-        Assert.assertThat(controller.index(), Matchers.is("index"));
+        final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+        final ArgumentCaptor<Cookie> cookieArgumentCaptor = ArgumentCaptor.forClass(Cookie.class);
+        Assert.assertThat(this.controller.getIndex(response, null), Matchers.is("index"));
+        Mockito.verify(response, Mockito.times(1)).addCookie(cookieArgumentCaptor.capture());
+        Assert.assertThat(cookieArgumentCaptor.getValue().getName(), Matchers.is("genie.user"));
+        Assert.assertThat(cookieArgumentCaptor.getValue().getValue(), Matchers.is("Genie User"));
+
+        final Authentication authentication = Mockito.mock(Authentication.class);
+        final String name = UUID.randomUUID().toString();
+        Mockito.when(authentication.getName()).thenReturn(name);
+        Assert.assertThat(this.controller.getIndex(response, authentication), Matchers.is("index"));
+        Mockito.verify(response, Mockito.times(2)).addCookie(cookieArgumentCaptor.capture());
+        Assert.assertThat(cookieArgumentCaptor.getValue().getName(), Matchers.is("genie.user"));
+        Assert.assertThat(cookieArgumentCaptor.getValue().getValue(), Matchers.is(name));
+    }
+
+    /**
+     * Make sure the getOutput method returns the right forward command.
+     */
+    @Test
+    public void canGetOutput() {
+        final String id = UUID.randomUUID().toString();
+        final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+
+        Mockito
+            .when(request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE))
+            .thenReturn("/output/" + id + "/genie/log.out");
+        Mockito
+            .when(request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE))
+            .thenReturn("/output/{id}/**");
+
+        Assert.assertThat(
+            this.controller.getOutput(id, request),
+            Matchers.is("forward:/api/v3/jobs/" + id + "/output/genie/log.out")
+        );
     }
 }
