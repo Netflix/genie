@@ -80,7 +80,6 @@ public class JobClient extends BaseGenieClient {
      * @param url The url of the Genie Service.
      * @throws GenieException If there is any problem.
      */
-    // TODO Can we get rid of one constructor in either BaseGenieClient or JobClient.
     public JobClient(
         final String url
     ) throws GenieException {
@@ -384,5 +383,22 @@ public class JobClient extends BaseGenieClient {
             }
 
         }
+    }
+
+    /**
+     * Wait for job to complete, until the given timeout.
+     *
+     * @param id           the Genie job ID to wait for completion.
+     * @param blockTimeout the time to block for (in ms), after which a
+     *                     GenieException will be thrown.
+     * @return The job status for the job after completion.
+     * @throws GenieException       For timeout or other errors.
+     * @throws InterruptedException on timeout/thread errors.
+     * @throws IOException If the response recieved is not 2xx.
+     */
+    public JobStatus waitForCompletion(final String id, final long blockTimeout)
+        throws GenieException, InterruptedException, IOException {
+        final long pollTime = 10000;
+        return waitForCompletion(id, blockTimeout, pollTime);
     }
 }

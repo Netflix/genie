@@ -30,12 +30,14 @@ import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.ResourceLoader;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -50,6 +52,9 @@ import java.util.UUID;
  */
 public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase {
 
+    private static final String BASE_DIR
+        = "com/netflix/genie/client/JobClientIntegrationTests/";
+
     private static final String JOB_NAME = "List Directories bash job";
     private static final String JOB_USER = "genie";
     private static final String JOB_VERSION = "1.0";
@@ -59,6 +64,7 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
     private CommandClient commandClient;
     //private ApplicationClient applicationClient;
     private JobClient jobClient;
+    private ResourceLoader resourceLoader;
 
     /**
      * Setup for tests.
@@ -67,6 +73,7 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
      */
     @Before
     public void setup() throws Exception {
+        this.resourceLoader = new DefaultResourceLoader();
         clusterClient = new ClusterClient(getBaseUrl());
         commandClient = new CommandClient(getBaseUrl());
         //applicationClient = new ApplicationClient(getBaseUrl());
@@ -78,11 +85,9 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
      *
      * @throws Exception If there is any problem.
      */
-    @Ignore
     @Test
     public void canSubmitJob() throws Exception {
 
-        final String jobId = UUID.randomUUID().toString();
         final Set<String> tags = new HashSet<>();
         tags.add("laptop");
 
@@ -92,10 +97,9 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
             "1.0",
             ClusterStatus.UP
         ).withTags(tags)
-            .withId("cluster")
             .build();
 
-        clusterClient.createCluster(cluster);
+        final String clusterId = clusterClient.createCluster(cluster);
 
         tags.clear();
         tags.add("bash");
@@ -107,19 +111,24 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
             CommandStatus.ACTIVE,
             "bash",
             1000
-        ).withId("command").withTags(tags).build();
+        )
+            .withTags(tags).build();
 
-        commandClient.createCommand(command);
+        final String commandId = commandClient.createCommand(command);
 
-        clusterClient.addCommandsToCluster(cluster.getId(), Arrays.asList(command.getId()));
+        clusterClient.addCommandsToCluster(clusterId, Arrays.asList(commandId));
+
+        final String jobId = UUID.randomUUID().toString();
 
         final String clusterTag = "laptop";
         final List<ClusterCriteria> clusterCriteriaList
             = Lists.newArrayList(new ClusterCriteria(Sets.newHashSet(clusterTag)));
 
-//        final String depFile1
-//            = this.resourceLoader.getResource(BASE_DIR + "job" + FILE_DELIMITER + "dep1").getFile().getAbsolutePath();
-//        final Set<String> dependencies = Sets.newHashSet(depFile1);
+        final String depFile1
+            = this.resourceLoader.getResource("/dep1").getFile().getAbsolutePath();
+        final Set<String> dependencies = Sets.newHashSet(depFile1);
+
+        final String setUpFile = this.resourceLoader.getResource("/setupfile").getFile().getAbsolutePath();
 
         final String commandTag = "bash";
         final Set<String> commandCriteria = Sets.newHashSet(commandTag);
@@ -134,8 +143,8 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
         )
             .withId(jobId)
             .withDisableLogArchival(true)
-//            .withSetupFile(setUpFile)
-//            .withDependencies(dependencies)
+            .withSetupFile(setUpFile)
+            .withDependencies(dependencies)
             .withDescription(JOB_DESCRIPTION)
             .build();
 
@@ -150,6 +159,7 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
 
         final JobRequest jobRequest1 = jobClient.getJobRequest(jobId);
         Assert.assertEquals(jobId, jobRequest1.getId());
+        Assert.assertTrue(jobRequest1.getDependencies().contains(depFile1));
 
         final JobExecution jobExecution = jobClient.getJobExecution(jobId);
         Assert.assertEquals(jobId, jobExecution.getId());
@@ -166,5 +176,82 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
         inputStream1.close();
 
         Assert.assertEquals("HELLO WORLD!!!", sb.toString());
+    }
+
+    /**
+     * Method to test submitting a job using attachments.
+     *
+     * @throws Exception If there is any problem.
+     */
+    @Test
+    public void testJobSubmissionWithAttachments() throws Exception {
+
+        final Set<String> tags = new HashSet<>();
+        tags.add("laptop");
+
+        final Cluster cluster = new Cluster.Builder(
+            "name",
+            "user",
+            "1.0",
+            ClusterStatus.UP
+        ).withTags(tags)
+            .build();
+
+        final String clusterId = clusterClient.createCluster(cluster);
+
+        tags.clear();
+        tags.add("bash");
+
+        final Command command = new Command.Builder(
+            "name",
+            "user",
+            "version",
+            CommandStatus.ACTIVE,
+            "bash",
+            1000
+        )
+            .withTags(tags).build();
+
+        final String commandId = commandClient.createCommand(command);
+
+        clusterClient.addCommandsToCluster(clusterId, Arrays.asList(commandId));
+
+        final String jobId = UUID.randomUUID().toString();
+
+        final String clusterTag = "laptop";
+        final List<ClusterCriteria> clusterCriteriaList
+            = Lists.newArrayList(new ClusterCriteria(Sets.newHashSet(clusterTag)));
+
+
+        final String commandTag = "bash";
+        final Set<String> commandCriteria = Sets.newHashSet(commandTag);
+
+        final JobRequest jobRequest = new JobRequest.Builder(
+            JOB_NAME,
+            JOB_USER,
+            JOB_VERSION,
+            "-c 'echo HELLO WORLD!!!'",
+            clusterCriteriaList,
+            commandCriteria
+        )
+            .withId(jobId)
+            .withDisableLogArchival(true)
+            .build();
+
+        final List<String> attachments = new ArrayList<>();
+        attachments.add(this.resourceLoader.getResource("/setupfile").getFile().getAbsolutePath());
+        attachments.add(this.resourceLoader.getResource("/dep1").getFile().getAbsolutePath());
+
+        final String id = jobClient.submitJobWithAttachments(jobRequest, attachments);
+
+        final JobStatus jobStatus = jobClient.waitForCompletion(jobId, 600000, 5000);
+
+        Assert.assertEquals(JobStatus.SUCCEEDED, jobStatus);
+        final Job job = jobClient.getJob(id);
+
+        Assert.assertEquals(jobId, job.getId());
+
+        final JobRequest jobRequest1 = jobClient.getJobRequest(jobId);
+        Assert.assertEquals(jobId, jobRequest1.getId());
     }
 }
