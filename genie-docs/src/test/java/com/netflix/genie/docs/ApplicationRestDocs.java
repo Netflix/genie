@@ -397,7 +397,7 @@ public class ApplicationRestDocs {
                     .description("The found applications."),
                 PayloadDocumentation
                     .fieldWithPath("_links")
-                    .description("<<resources-getIndex-links,Links>> to other resources."),
+                    .description("<<resources-index-links,Links>> to other resources."),
                 PayloadDocumentation
                     .fieldWithPath("page")
                     .description("The result page information."),
@@ -506,7 +506,7 @@ public class ApplicationRestDocs {
             descriptors.add(
                 PayloadDocumentation
                     .fieldWithPath("_links")
-                    .description("<<resources-getIndex-links,Links>> to other resources")
+                    .description("<<resources-index-links,Links>> to other resources")
             );
         }
 
