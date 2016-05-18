@@ -40,7 +40,8 @@ public class UIController {
             "/applications/**",
             "/clusters/**",
             "/commands/**",
-            "/jobs/**"
+            "/jobs/**",
+            "/genie-jobs/**"
         }
     )
     public String index() {

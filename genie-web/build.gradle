@@ -1,3 +1,7 @@
+plugins {
+    id "com.moowork.node" version "0.12"
+}
+
 dependencies {
     /*******************************
      * Compile Dependencies
@@ -33,17 +37,6 @@ dependencies {
     compile("io.springfox:springfox-swagger2:${springfox_version}")
     compile("io.springfox:springfox-swagger-ui:${springfox_version}")
 
-    // Web Jars
-    compile("org.webjars:bootstrap:${bootstrap_version}")
-    compile("org.webjars:datatables:${datatables_version}")
-    compile("org.webjars:hal-browser")
-    compile("org.webjars:jquery:${jquery_version}")
-    compile("org.webjars:knockout:${knockout_version}")
-    compile("org.webjars:lodash:${lodash_version}")
-    compile("org.webjars:momentjs:${momentjs_version}")
-    compile("org.webjars:requirejs:${requirejs_version}")
-    compile("org.webjars:requirejs-text:${requirejs_text_version}")
-
     /*******************************
      * Provided Dependencies
      *******************************/
@@ -77,3 +70,24 @@ jar {
         attributes("Implementation-Version": version)
     }
 }
+
+node {
+    version = '4.4.0'
+    npmVersion = '3.8.6'
+    download = true
+}
+
+task bundle(type: NpmTask) {
+    args = ['run', 'bundle']
+}
+
+bundle.dependsOn(npm_install)
+
+jar {
+    dependsOn bundle
+
+    from("${project.projectDir}/src/main/resources/static/build") {
+        into 'static'
+    }
+}
+

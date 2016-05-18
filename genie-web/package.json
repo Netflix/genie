@@ -1,0 +1,50 @@
+{
+  "name": "genie-web",
+  "version": "0.1.0",
+  "description": "UI for Genie3 [A federated Job Execution Engine]",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "bundle": "webpack -p --config ./webpack.config.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Netflix/genie.git"
+  },
+  "author": "Netflix",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Netflix/genie"
+  },
+  "dependencies": {
+    "jquery": "^2.2.3",
+    "moment": "^2.13.0",
+    "react": "^15.0.1",
+    "react-cookie": "^0.4.5",
+    "react-dom": "^15.0.1",
+    "react-router": "^2.3.0",
+    "react-select": "^1.0.0-beta13"
+  },
+  "devDependencies": {
+    "babel-eslint": "^6.0.4",
+    "babel-loader": "^6.2.4",
+    "babel-plugin-transform-runtime": "^6.8.0",
+    "babel-preset-es2015": "^6.6.0",
+    "babel-preset-react": "^6.5.0",
+    "babel-preset-stage-0": "^6.5.0",
+    "css-loader": "^0.23.1",
+    "esformatter-jsx": "^5.0.2",
+    "eslint": "^2.9.0",
+    "eslint-config-airbnb": "^9.0.1",
+    "eslint-plugin-import": "^1.8.0",
+    "eslint-plugin-jsx-a11y": "^1.2.0",
+    "eslint-plugin-react": "^5.1.1",
+    "file-loader": "^0.8.5",
+    "install": "^0.6.1",
+    "npm": "^3.8.7",
+    "style-loader": "^0.13.1",
+    "url-loader": "^0.5.7",
+    "webpack": "^1.13.0",
+    "webpack-dev-server": "^1.14.1"
+  }
+}
