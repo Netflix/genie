@@ -1,3 +1,5 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 dependencies {
     /*******************************
      * Compile Dependencies
@@ -76,4 +78,10 @@ jar {
     manifest {
         attributes("Implementation-Version": version)
     }
+}
+
+processResources {
+    filter ReplaceTokens, tokens: [
+            "project.version": project.version.toString()
+    ]
 }

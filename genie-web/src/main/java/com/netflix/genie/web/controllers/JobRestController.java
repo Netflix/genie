@@ -69,7 +69,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.AntPathMatcher;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -675,17 +674,11 @@ public class JobRestController {
             }
         }
 
-        String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        if (path != null) {
-            final String bestMatchPattern
-                = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
-            log.debug("bestMatchPattern = {}", bestMatchPattern);
-            path = new AntPathMatcher().extractPathWithinPattern(bestMatchPattern, path);
-            if (StringUtils.isNotBlank(path)) {
-                request.setAttribute(GenieResourceHttpRequestHandler.GENIE_JOB_IS_ROOT_DIRECTORY, false);
-            } else {
-                request.setAttribute(GenieResourceHttpRequestHandler.GENIE_JOB_IS_ROOT_DIRECTORY, true);
-            }
+        final String path = ControllerUtils.getRemainingPath(request);
+        if (StringUtils.isNotBlank(path)) {
+            request.setAttribute(GenieResourceHttpRequestHandler.GENIE_JOB_IS_ROOT_DIRECTORY, false);
+        } else {
+            request.setAttribute(GenieResourceHttpRequestHandler.GENIE_JOB_IS_ROOT_DIRECTORY, true);
         }
         log.debug("PATH = {}", path);
         request.setAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE, id + "/" + path);
