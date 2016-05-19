@@ -6,12 +6,13 @@ import unittest
 from mock import patch
 from nose.tools import assert_equals, assert_raises
 
-import pygenie as genie
-
 
 assert_equals.__self__.maxDiff = None
 
 os.environ['GENIE_BYPASS_HOME_CONFIG'] = '1'
+
+
+import pygenie
 
 
 def mock_to_attachment(att):
@@ -27,7 +28,7 @@ class TestingHadoopJob(unittest.TestCase):
     def test_default_command_tag(self):
         """Test HadoopJob default command tags."""
 
-        job = genie.jobs.HadoopJob()
+        job = pygenie.jobs.HadoopJob()
 
         assert_equals(
             job.get('default_command_tags'),
@@ -37,7 +38,7 @@ class TestingHadoopJob(unittest.TestCase):
     def test_cmd_args_explicit(self):
         """Test HadoopJob explicit cmd args."""
 
-        job = genie.jobs.HadoopJob() \
+        job = pygenie.jobs.HadoopJob() \
             .command_arguments('explicitly stating command args') \
             .script("""this should not be taken""")
 
@@ -49,7 +50,7 @@ class TestingHadoopJob(unittest.TestCase):
     def test_cmd_args_constructed_script_code(self):
         """Test HadoopJob constructed cmd args for adhoc script."""
 
-        job = genie.jobs.HadoopJob() \
+        job = pygenie.jobs.HadoopJob() \
             .command("fs -ls /test") \
             .property('prop1', 'v1') \
             .property('prop2', 'v2') \
@@ -66,13 +67,13 @@ class TestingHadoopJob(unittest.TestCase):
 class TestingHadoopJobRepr(unittest.TestCase):
     """Test HadoopJob repr."""
 
-    @patch('genie.jobs.core.is_file')
+    @patch('pygenie.jobs.core.is_file')
     def test_repr(self, is_file):
         """Test HadoopJob repr."""
 
         is_file.return_value = True
 
-        job = genie.jobs.HadoopJob() \
+        job = pygenie.jobs.HadoopJob() \
             .applications('hadoop_app_1') \
             .applications('hadoop_app_2') \
             .archive(False) \
@@ -135,14 +136,14 @@ class TestingHadoopJobAdapters(unittest.TestCase):
 
     def setUp(self):
         self.dirname = os.path.dirname(os.path.realpath(__file__))
-        self.genie_2_conf = genie.conf.GenieConf() \
+        self.genie_2_conf = pygenie.conf.GenieConf() \
             .load_config_file(os.path.join(self.dirname, 'genie2.ini'))
-        self.genie_3_conf = genie.conf.GenieConf() \
+        self.genie_3_conf = pygenie.conf.GenieConf() \
             .load_config_file(os.path.join(self.dirname, 'genie3.ini'))
 
-    @patch('genie.jobs.adapter.genie_2.to_attachment')
+    @patch('pygenie.jobs.adapter.genie_2.to_attachment')
     @patch('os.path.isfile')
-    @patch('genie.jobs.pig.is_file')
+    @patch('pygenie.jobs.pig.is_file')
     def test_genie2_payload_file_script(self, is_file, os_isfile, to_att):
         """Test HadoopJob payload for Genie 2 (file script)."""
 
@@ -150,7 +151,7 @@ class TestingHadoopJobAdapters(unittest.TestCase):
         is_file.return_value = True
         to_att.side_effect = mock_to_attachment
 
-        job = genie.jobs.HadoopJob(self.genie_2_conf) \
+        job = pygenie.jobs.HadoopJob(self.genie_2_conf) \
             .applications(['hadoopapp1']) \
             .cluster_tags('type:hadoopcluster1') \
             .command_tags('type:hadoopcmd') \
@@ -168,7 +169,7 @@ class TestingHadoopJobAdapters(unittest.TestCase):
             .job_version('0.0.hadoop-alpha')
 
         assert_equals(
-            genie.jobs.adapter.genie_2.get_payload(job),
+            pygenie.jobs.adapter.genie_2.get_payload(job),
             {
                 u'attachments': [
                     {u'name': u'hadoopfile1', u'data': u'file contents'}
@@ -190,9 +191,9 @@ class TestingHadoopJobAdapters(unittest.TestCase):
             }
         )
 
-    @patch('genie.jobs.adapter.genie_3.open')
+    @patch('pygenie.jobs.adapter.genie_3.open')
     @patch('os.path.isfile')
-    @patch('genie.jobs.pig.is_file')
+    @patch('pygenie.jobs.pig.is_file')
     def test_genie3_payload_file_script(self, is_file, os_isfile, file_open):
         """Test HadoopJob payload for Genie 3 (file script)."""
 
@@ -200,7 +201,7 @@ class TestingHadoopJobAdapters(unittest.TestCase):
         is_file.return_value = True
         file_open.side_effect = lambda f, m: u"open file '{}'".format(f)
 
-        job = genie.jobs.HadoopJob(self.genie_3_conf) \
+        job = pygenie.jobs.HadoopJob(self.genie_3_conf) \
             .applications(['hadoop.app1']) \
             .cluster_tags('type:hadoop.cluster1') \
             .command_tags('type:hadoop.cmd') \
@@ -218,7 +219,7 @@ class TestingHadoopJobAdapters(unittest.TestCase):
             .job_version('0.0.hadoop')
 
         assert_equals(
-            genie.jobs.adapter.genie_3.get_payload(job),
+            pygenie.jobs.adapter.genie_3.get_payload(job),
             {
                 u'applications': [u'hadoop.app1'],
                 u'attachments': [

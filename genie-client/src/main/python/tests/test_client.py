@@ -10,6 +10,8 @@ import os
 import re
 import responses
 
+os.environ['GENIE_BYPASS_HOME_CONFIG'] = '1'
+
 from nose.tools import assert_equals
 from pygenie.client import Genie
 from pygenie.conf import GenieConf

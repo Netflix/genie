@@ -11,6 +11,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import json
 import logging
 import re
+import signal
+import sys
 
 from ..conf import GenieConf
 from ..utils import (is_str,
@@ -151,6 +153,11 @@ class GenieJob(object):
         return str(self.repr_obj)
 
     def _add_dependency(self, dep):
+        """
+        Add a dependency to the job. Will not add if the dependency is already
+        added.
+        """
+
         if dep not in self._dependencies:
             self._dependencies.append(dep)
 
@@ -370,9 +377,6 @@ class GenieJob(object):
         # execute_job imports jobs, jobs need to import execute_job
         running_job = execute_job(self)
 
-        import signal
-        import sys
-
         def sig_handler(signum, frame):
             logger.warning("caught signal %s", signum)
             try:
@@ -383,6 +387,7 @@ class GenieJob(object):
                 pass
             finally:
                 sys.exit(1)
+
         signal.signal(signal.SIGINT, sig_handler)
         signal.signal(signal.SIGTERM, sig_handler)
         signal.signal(signal.SIGABRT, sig_handler)
@@ -524,6 +529,8 @@ class GenieJob(object):
         used to set environment variables before the job is run, etc. This
         should not be used to set job configuration properties via a file (job's
         should have separate interfaces for setting property files).
+
+        The file must be stored externally, or available on the Genie nodes.
 
         Example:
             >>> job = GenieJob() \\
