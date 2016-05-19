@@ -74,9 +74,11 @@ jar {
 }
 
 processResources {
-    filter ReplaceTokens, tokens: [
+    filesNotMatching("**/*.woff2") {
+        filter ReplaceTokens, tokens: [
             "project.version": project.version.toString()
-    ]
+        ]
+    }
 }
 
 node {
