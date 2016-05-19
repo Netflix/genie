@@ -74,22 +74,22 @@ public class UIControllerUnitTests {
     }
 
     /**
-     * Make sure the getOutput method returns the right forward command.
+     * Make sure the getFile method returns the right forward command.
      */
     @Test
-    public void canGetOutput() {
+    public void canGetFile() {
         final String id = UUID.randomUUID().toString();
         final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
 
         Mockito
             .when(request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE))
-            .thenReturn("/output/" + id + "/genie/log.out");
+            .thenReturn("/file/" + id + "/output/genie/log.out");
         Mockito
             .when(request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE))
-            .thenReturn("/output/{id}/**");
+            .thenReturn("/file/{id}/**");
 
         Assert.assertThat(
-            this.controller.getOutput(id, request),
+            this.controller.getFile(id, request),
             Matchers.is("forward:/api/v3/jobs/" + id + "/output/genie/log.out")
         );
     }

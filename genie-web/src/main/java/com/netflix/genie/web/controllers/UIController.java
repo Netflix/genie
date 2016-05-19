@@ -51,7 +51,8 @@ public class UIController {
             "/applications/**",
             "/clusters/**",
             "/commands/**",
-            "/jobs/**"
+            "/jobs/**",
+            "/genie-jobs/**"
         },
         method = RequestMethod.GET
     )
@@ -65,14 +66,14 @@ public class UIController {
     }
 
     /**
-     * Forward the output request to the API.
+     * Forward the file request to the API.
      *
      * @param id The id of the job
      * @param request the servlet request to get path information from
      * @return The forward address to go to at the API endpoint
      */
-    @RequestMapping(value = "/output/{id}/**", method = RequestMethod.GET)
-    public String getOutput(@PathVariable("id") final String id, final HttpServletRequest request) {
-        return "forward:/api/v3/jobs/" + id + "/output/" + ControllerUtils.getRemainingPath(request);
+    @RequestMapping(value = "/file/{id}/**", method = RequestMethod.GET)
+    public String getFile(@PathVariable("id") final String id, final HttpServletRequest request) {
+        return "forward:/api/v3/jobs/" + id + "/" + ControllerUtils.getRemainingPath(request);
     }
 }
