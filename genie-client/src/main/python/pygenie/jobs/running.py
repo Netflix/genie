@@ -260,6 +260,20 @@ class RunningJob(object):
             return 'HIVE'
         return self.info.get('command_name').upper()
 
+    @property
+    def json_link(self):
+        """
+        Get the json link for the job.
+
+        Example:
+            >>> print running_job.json_link
+            'http://localhost/genie/1234-abcd'
+
+        Returns:
+            str: The link to job's json.
+        """
+        return self.info.get('json_link')
+
     def kill(self):
         """
         Kill the job.
@@ -273,7 +287,8 @@ class RunningJob(object):
 
         if self.info.get('kill_uri'):
             resp = self._adapter.kill_job(kill_uri=self.kill_uri)
-        resp = self._adapter.kill_job(job_id=self._job_id)
+        else:
+            resp = self._adapter.kill_job(job_id=self._job_id)
         self.update()
         return resp
 

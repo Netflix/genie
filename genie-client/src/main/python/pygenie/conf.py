@@ -29,7 +29,7 @@ from .exceptions import GenieConfigOptionError, GenieConfigSectionError
 logger = logging.getLogger('com.netflix.genie.conf')
 
 CONFIG_HOME_DIR = os.path.join(os.path.expanduser('~'), '.genie')
-CONFIG_FILE_HOME_INI = os.path.join(CONFIG_HOME_DIR, 'genie.ini')
+CONFIG_FILE_HOME_INI = os.path.join(CONFIG_HOME_DIR, 'pygenie.ini')
 CONFIG_FILE_ENV = os.environ.get('GENIE_CONFIG')
 
 BYPASS_HOME_CONFIG_FILE = os.environ.get('GENIE_BYPASS_HOME_CONFIG') is not None
@@ -43,13 +43,13 @@ class GenieConfSection(object):
     """Represents a section of a configuration."""
 
     def __init__(self, name):
-        self.name = name
+        self.__name = name
 
     def __getattr__(self, attr):
         if attr not in self.to_dict():
             raise GenieConfigOptionError(
                 "'{}' does not exist in loaded options for '{}' section ({})" \
-                .format(attr, self.name, sorted(self.to_dict().keys())))
+                .format(attr, self.__name, sorted(self.to_dict().keys())))
         return self.to_dict().get(attr)
 
     def get(self, option, default=None):
@@ -78,14 +78,14 @@ class GenieConfSection(object):
     def set(self, name, value=None):
         """Sets an attribute (option) to the value."""
 
-        logger.debug('setting config -> %s.%s=%s', self.name, name, value)
+        logger.debug('setting config -> %s.%s=%s', self.__name, name, value)
         setattr(self, name, value)
 
     def to_dict(self):
         """Get a mapping of option names to values for the section."""
 
         _dict = self.__dict__.copy()
-        del _dict['name']
+        del _dict['_GenieConfSection__name']
         return _dict
 
 
@@ -194,13 +194,13 @@ class GenieConf(object):
         # create and set other section objects
         for section in C.config.sections():
             section_clean = section.replace(' ', '_').replace('.', '_')
-            # skip genie section since we handle explicitly
-            if section_clean == 'genie':
-                continue
-            gcs = GenieConfSection(name=section_clean)
+            gcs = self.genie if section_clean == 'genie' \
+                else GenieConfSection(name=section_clean)
             for option in C.config.options(section):
                 option_clean = option.replace(' ', '_').replace('.', '_')
-                gcs.set(option_clean, C.get(section, option))
+                if section_clean != 'genie' \
+                        or option_clean not in {'url', 'username', 'version'}:
+                    gcs.set(option_clean, C.get(section, option))
             setattr(self, section_clean, gcs)
 
     @staticmethod

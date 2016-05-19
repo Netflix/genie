@@ -6,12 +6,13 @@ import unittest
 from mock import patch
 from nose.tools import assert_equals, assert_raises
 
-import pygenie as genie
-
 
 assert_equals.__self__.maxDiff = None
 
 os.environ['GENIE_BYPASS_HOME_CONFIG'] = '1'
+
+
+import pygenie
 
 
 class TestingGenieJob(unittest.TestCase):
@@ -20,7 +21,7 @@ class TestingGenieJob(unittest.TestCase):
     def test_default_command_tag(self):
         """Test GenieJob default command tags."""
 
-        job = genie.jobs.GenieJob()
+        job = pygenie.jobs.GenieJob()
 
         assert_equals(
             job.get('default_command_tags'),
@@ -30,7 +31,7 @@ class TestingGenieJob(unittest.TestCase):
     def test_cmd_args_explicit(self):
         """Test GenieJob explicit cmd args."""
 
-        job = genie.jobs.GenieJob() \
+        job = pygenie.jobs.GenieJob() \
             .command_arguments('explicitly stating command args')
 
         assert_equals(
@@ -41,20 +42,20 @@ class TestingGenieJob(unittest.TestCase):
     def test_cmd_args_constructed(self):
         """Test GenieJob constructed cmd args."""
 
-        with assert_raises(genie.exceptions.GenieJobError) as cm:
-            genie.jobs.GenieJob().cmd_args
+        with assert_raises(pygenie.exceptions.GenieJobError) as cm:
+            pygenie.jobs.GenieJob().cmd_args
 
 
 class TestingGenieJobRepr(unittest.TestCase):
     """Test GenieJob repr."""
 
-    @patch('genie.jobs.core.is_file')
+    @patch('pygenie.jobs.core.is_file')
     def test_repr(self, is_file):
         """Test GenieJob repr."""
 
         is_file.return_value = True
 
-        job = genie.jobs.GenieJob() \
+        job = pygenie.jobs.GenieJob() \
             .applications('app1') \
             .applications('app2') \
             .archive(False) \
@@ -114,10 +115,10 @@ class TestingGenieJobAdapters(unittest.TestCase):
     def test_genie3_payload(self):
         """Test GenieJob payload for Genie 3."""
 
-        genie3_conf = genie.conf.GenieConf() \
+        genie3_conf = pygenie.conf.GenieConf() \
             .load_config_file(os.path.join(self.dirname, 'genie3.ini'))
 
-        job = genie.jobs.GenieJob(genie3_conf) \
+        job = pygenie.jobs.GenieJob(genie3_conf) \
             .applications(['applicationid1']) \
             .cluster_tags('type:cluster1') \
             .command_arguments('command args for geniejob') \
@@ -135,7 +136,7 @@ class TestingGenieJobAdapters(unittest.TestCase):
             .job_version('0.0.1alpha')
 
         assert_equals(
-            genie.jobs.adapter.genie_3.get_payload(job),
+            pygenie.jobs.adapter.genie_3.get_payload(job),
             {
                 u'applications': [u'applicationid1'],
                 u'attachments': [],
