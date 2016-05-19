@@ -51,11 +51,11 @@ export default class JobSearchForm extends React.Component {
     };
 
     return {
-      formFields: formFields,
-      sortOrder: 'desc',
-      sortByFields: this.sortByFields,
-      showAllFormFields: false,
-      linkText: 'more',
+      showAllFormFields : false,
+      sortOrder         : 'desc',
+      linkText          : 'more',
+      formFields        : formFields,
+      sortByFields      : this.sortByFields,
     };
   }
 

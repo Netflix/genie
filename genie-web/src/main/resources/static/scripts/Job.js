@@ -1,6 +1,7 @@
 import React from 'react';
 import { render } from 'react-dom';
 import $ from 'jquery';
+
 import JobSearchForm from './components/JobSearchForm';
 import JobSearchResult from './components/JobSearchResult';
 import NoSearchResult from './components/NoSearchResult';
@@ -48,11 +49,11 @@ export default class Job extends React.Component {
     }).done((data) => {
       if (data.hasOwnProperty('_embedded')) {
         this.setState({
-          jobs           : data._embedded.jobSearchResultList,
-          links          : data._links,
-          page           : data.page,
           noSearchResult : false,
           query          : query,
+          page           : data.page,
+          links          : data._links,
+          jobs           : data._embedded.jobSearchResultList,
         });
       }
       else {

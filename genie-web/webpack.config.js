@@ -27,7 +27,6 @@ var config = {
   resolve: {
       extensions: ['', '.js']
   },
-  devtool: 'source-map',
   module : {
     loaders : [
       {

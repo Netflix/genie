@@ -6,7 +6,7 @@ import $ from 'jquery';
 import TableHeader from './components/TableHeader';
 import SiteHeader from './components/SiteHeader';
 import SiteFooter from './components/SiteFooter';
-import { genieJobsUrl } from './utils';
+import { genieJobsUrl, fileUrl } from './utils';
 
 export default class GenieJobDirectory extends React.Component {
   static defaultProps = {
@@ -22,8 +22,8 @@ export default class GenieJobDirectory extends React.Component {
     super(props);
     this.state = {
       output: {
-        files       : [],
-        directories : [],
+        files: [],
+        directories: [],
       },
       url: '',
     };
@@ -83,7 +83,7 @@ const FileRow = (props) =>
     <td>
       <i className="fa fa-file-o" aria-hidden="true"></i>
       <span className="output-listing">
-        <a target="_blank" href={props.file.url}>{props.file.name}</a>
+        <Link target="_blank" to={fileUrl(props.file.url)}>{props.file.name}</Link>
       </span>
     </td>
     <td>{props.file.size} kb</td>

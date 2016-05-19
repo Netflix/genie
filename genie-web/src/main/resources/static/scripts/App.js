@@ -33,13 +33,20 @@ export default class App extends React.Component {
       },
     ]
   }
+
   constructor(props) {
     super(props);
     this.state = {
       version: '',
-      userId: cookie.load('genie.user'),
+      infos: [
+        {
+          name      : cookie.load('genie.user'),
+          className : ''
+        }
+      ]
     };
   }
+
   componentDidMount() {
     this.loadData();
   }
@@ -53,14 +60,14 @@ export default class App extends React.Component {
       },
       url: '/actuator/info'
     }).done((data) => {
-      this.setState({version: `${data.git.commit.id}-${data.git.branch}`});
+      this.setState({version: data.genie.version});
     });
   }
 
   render() {
     return (
       <div>
-        <SiteHeader headers={this.props.headers} />
+        <SiteHeader headers={this.props.headers} infos={this.state.infos} />
         <div className="container">
           {this.props.children}
         </div>
