@@ -88,50 +88,20 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
     @Test
     public void canSubmitJob() throws Exception {
 
-        final Set<String> tags = new HashSet<>();
-        tags.add("laptop");
-
-        final Cluster cluster = new Cluster.Builder(
-            "name",
-            "user",
-            "1.0",
-            ClusterStatus.UP
-        ).withTags(tags)
-            .build();
-
-        final String clusterId = clusterClient.createCluster(cluster);
-
-        tags.clear();
-        tags.add("bash");
-
-        final Command command = new Command.Builder(
-            "name",
-            "user",
-            "version",
-            CommandStatus.ACTIVE,
-            "bash",
-            1000
-        )
-            .withTags(tags).build();
-
-        final String commandId = commandClient.createCommand(command);
-
-        clusterClient.addCommandsToCluster(clusterId, Arrays.asList(commandId));
+        createClusterAndCommandForTest();
 
         final String jobId = UUID.randomUUID().toString();
 
-        final String clusterTag = "laptop";
         final List<ClusterCriteria> clusterCriteriaList
-            = Lists.newArrayList(new ClusterCriteria(Sets.newHashSet(clusterTag)));
+            = Lists.newArrayList(new ClusterCriteria(Sets.newHashSet("laptop")));
+
+        final Set<String> commandCriteria = Sets.newHashSet("bash");
 
         final String depFile1
             = this.resourceLoader.getResource("/dep1").getFile().getAbsolutePath();
         final Set<String> dependencies = Sets.newHashSet(depFile1);
 
         final String setUpFile = this.resourceLoader.getResource("/setupfile").getFile().getAbsolutePath();
-
-        final String commandTag = "bash";
-        final Set<String> commandCriteria = Sets.newHashSet(commandTag);
 
         final JobRequest jobRequest = new JobRequest.Builder(
             JOB_NAME,
@@ -185,6 +155,130 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
      */
     @Test
     public void testJobSubmissionWithAttachments() throws Exception {
+        createClusterAndCommandForTest();
+        final String jobId = UUID.randomUUID().toString();
+
+        final List<ClusterCriteria> clusterCriteriaList
+            = Lists.newArrayList(new ClusterCriteria(Sets.newHashSet("laptop")));
+
+        final Set<String> commandCriteria = Sets.newHashSet("bash");
+
+        final JobRequest jobRequest = new JobRequest.Builder(
+            JOB_NAME,
+            JOB_USER,
+            JOB_VERSION,
+            "-c 'cat data.txt'",
+            clusterCriteriaList,
+            commandCriteria
+        )
+            .withId(jobId)
+            .withDisableLogArchival(true)
+            .build();
+
+        final List<String> attachments = new ArrayList<>();
+        attachments.add(this.resourceLoader.getResource("/setupfile").getFile().getAbsolutePath());
+        attachments.add(this.resourceLoader.getResource("/data.txt").getFile().getAbsolutePath());
+
+        final String id = jobClient.submitJobWithAttachments(jobRequest, attachments);
+
+        final JobStatus jobStatus = jobClient.waitForCompletion(jobId, 600000, 5000);
+
+        Assert.assertEquals(JobStatus.SUCCEEDED, jobStatus);
+        final Job job = jobClient.getJob(id);
+
+        Assert.assertEquals(jobId, job.getId());
+
+        final JobRequest jobRequest1 = jobClient.getJobRequest(jobId);
+        Assert.assertEquals(jobId, jobRequest1.getId());
+    }
+
+    /**
+     * Method to test killing a job.
+     *
+     * @throws Exception If there is any problem.
+     */
+    @Test
+    public void testJobKill() throws Exception {
+        createClusterAndCommandForTest();
+
+        final List<ClusterCriteria> clusterCriteriaList
+            = Lists.newArrayList(new ClusterCriteria(Sets.newHashSet("laptop")));
+
+        final Set<String> commandCriteria = Sets.newHashSet("bash");
+
+        final JobRequest jobRequest1 = new JobRequest.Builder(
+            JOB_NAME,
+            JOB_USER,
+            JOB_VERSION,
+            "-c 'sleep 60'",
+            clusterCriteriaList,
+            commandCriteria
+        )
+            .withId(UUID.randomUUID().toString())
+            .withDisableLogArchival(true)
+            .build();
+
+        jobClient.submitJob(jobRequest1);
+        jobClient.killJob(jobRequest1.getId());
+
+        final JobStatus jobStatus = jobClient.waitForCompletion(jobRequest1.getId(), 600000, 5000);
+
+        Assert.assertEquals(JobStatus.KILLED, jobStatus);
+    }
+
+    /**
+     * Method to test getJobs function.
+     *
+     * @throws Exception If there is a problem.
+     */
+    @Test
+    public void testCanGetJobs() throws Exception {
+
+        createClusterAndCommandForTest();
+
+        final List<ClusterCriteria> clusterCriteriaList
+            = Lists.newArrayList(new ClusterCriteria(Sets.newHashSet("laptop")));
+
+        final Set<String> commandCriteria = Sets.newHashSet("bash");
+
+        final JobRequest jobRequest1 = new JobRequest.Builder(
+            JOB_NAME,
+            JOB_USER,
+            JOB_VERSION,
+            "-c 'echo HELLO WORLD!!!'",
+            clusterCriteriaList,
+            commandCriteria
+        )
+            .withId(UUID.randomUUID().toString())
+            .withDisableLogArchival(true)
+            .build();
+
+        jobClient.submitJob(jobRequest1);
+
+        final JobRequest jobRequest2 = new JobRequest.Builder(
+            JOB_NAME,
+            JOB_USER,
+            JOB_VERSION,
+            "-c 'echo HELLO WORLD!!!'",
+            clusterCriteriaList,
+            commandCriteria
+        )
+            .withId(UUID.randomUUID().toString())
+            .withDisableLogArchival(true)
+            .build();
+
+        jobClient.submitJob(jobRequest2);
+
+        //final List<JobSearchResult> jobs = jobClient.getJobs();
+        //Assert.assertEquals(2, jobs.size());
+    }
+
+    /**
+     * Helper method to create a cluster/command combination for all tests.
+     *
+     * @throws Exception If it fails to create the cluster/command combination.
+     */
+    private void createClusterAndCommandForTest() throws Exception {
 
         final Set<String> tags = new HashSet<>();
         tags.add("laptop");
@@ -215,43 +309,5 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
         final String commandId = commandClient.createCommand(command);
 
         clusterClient.addCommandsToCluster(clusterId, Arrays.asList(commandId));
-
-        final String jobId = UUID.randomUUID().toString();
-
-        final String clusterTag = "laptop";
-        final List<ClusterCriteria> clusterCriteriaList
-            = Lists.newArrayList(new ClusterCriteria(Sets.newHashSet(clusterTag)));
-
-
-        final String commandTag = "bash";
-        final Set<String> commandCriteria = Sets.newHashSet(commandTag);
-
-        final JobRequest jobRequest = new JobRequest.Builder(
-            JOB_NAME,
-            JOB_USER,
-            JOB_VERSION,
-            "-c 'echo HELLO WORLD!!!'",
-            clusterCriteriaList,
-            commandCriteria
-        )
-            .withId(jobId)
-            .withDisableLogArchival(true)
-            .build();
-
-        final List<String> attachments = new ArrayList<>();
-        attachments.add(this.resourceLoader.getResource("/setupfile").getFile().getAbsolutePath());
-        attachments.add(this.resourceLoader.getResource("/dep1").getFile().getAbsolutePath());
-
-        final String id = jobClient.submitJobWithAttachments(jobRequest, attachments);
-
-        final JobStatus jobStatus = jobClient.waitForCompletion(jobId, 600000, 5000);
-
-        Assert.assertEquals(JobStatus.SUCCEEDED, jobStatus);
-        final Job job = jobClient.getJob(id);
-
-        Assert.assertEquals(jobId, job.getId());
-
-        final JobRequest jobRequest1 = jobClient.getJobRequest(jobId);
-        Assert.assertEquals(jobId, jobRequest1.getId());
     }
 }
