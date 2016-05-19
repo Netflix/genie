@@ -6,12 +6,13 @@ import unittest
 from mock import patch
 from nose.tools import assert_equals, assert_raises
 
-import pygenie as genie
-
 
 assert_equals.__self__.maxDiff = None
 
 os.environ['GENIE_BYPASS_HOME_CONFIG'] = '1'
+
+
+import pygenie
 
 
 def mock_to_attachment(att):
@@ -27,7 +28,7 @@ class TestingPrestoJob(unittest.TestCase):
     def test_default_command_tag(self):
         """Test PrestoJob default command tags."""
 
-        job = genie.jobs.PrestoJob()
+        job = pygenie.jobs.PrestoJob()
 
         assert_equals(
             job.get('default_command_tags'),
@@ -37,7 +38,7 @@ class TestingPrestoJob(unittest.TestCase):
     def test_cmd_args_explicit(self):
         """Test PrestoJob explicit cmd args."""
 
-        job = genie.jobs.PrestoJob() \
+        job = pygenie.jobs.PrestoJob() \
             .command_arguments('explicitly stating command args') \
             .script('select * from something') \
             .option('source', 'tester')
@@ -50,7 +51,7 @@ class TestingPrestoJob(unittest.TestCase):
     def test_cmd_args_constructed_script_code(self):
         """Test PrestoJob constructed cmd args for adhoc script."""
 
-        job = genie.jobs.PrestoJob() \
+        job = pygenie.jobs.PrestoJob() \
             .script('select * from something') \
             .option('source', 'tester') \
             .option('opt1', 'val1') \
@@ -63,13 +64,13 @@ class TestingPrestoJob(unittest.TestCase):
             u'--session s2=v2 --session s1=v1 --debug --source tester --opt1 val1 -f script.presto'
         )
 
-    @patch('genie.jobs.presto.is_file')
+    @patch('pygenie.jobs.presto.is_file')
     def test_cmd_args_constructed_script_file(self, is_file):
         """Test PrestoJob constructed cmd args for file script."""
 
         is_file.return_value = True
 
-        job = genie.jobs.PrestoJob() \
+        job = pygenie.jobs.PrestoJob() \
             .script('/Users/presto/test.presto') \
             .option('source', 'tester') \
             .option('opt1', 'val1') \
@@ -86,13 +87,13 @@ class TestingPrestoJob(unittest.TestCase):
 class TestingPrestoJobRepr(unittest.TestCase):
     """Test PrestoJob repr."""
 
-    @patch('genie.jobs.core.is_file')
+    @patch('pygenie.jobs.core.is_file')
     def test_repr(self, is_file):
         """Test PrestoJob repr."""
 
         is_file.return_value = True
 
-        job = genie.jobs.PrestoJob() \
+        job = pygenie.jobs.PrestoJob() \
             .applications('prestoapp1') \
             .applications('prestoapp2') \
             .archive(False) \
@@ -161,13 +162,13 @@ class TestingPrestoJobAdapters(unittest.TestCase):
 
     def setUp(self):
         self.dirname = os.path.dirname(os.path.realpath(__file__))
-        self.genie_2_conf = genie.conf.GenieConf() \
+        self.genie_2_conf = pygenie.conf.GenieConf() \
             .load_config_file(os.path.join(self.dirname, 'genie2.ini'))
-        self.genie_3_conf = genie.conf.GenieConf() \
+        self.genie_3_conf = pygenie.conf.GenieConf() \
             .load_config_file(os.path.join(self.dirname, 'genie3.ini'))
 
 
-    @patch('genie.jobs.adapter.genie_2.to_attachment')
+    @patch('pygenie.jobs.adapter.genie_2.to_attachment')
     @patch('os.path.isfile')
     def test_genie2_payload_adhoc_script(self, os_isfile, to_att):
         """Test PrestoJob payload for Genie 2 (adhoc script)."""
@@ -175,7 +176,7 @@ class TestingPrestoJobAdapters(unittest.TestCase):
         os_isfile.side_effect = lambda f: f.startswith('/')
         to_att.side_effect = mock_to_attachment
 
-        job = genie.jobs.PrestoJob(self.genie_2_conf) \
+        job = pygenie.jobs.PrestoJob(self.genie_2_conf) \
             .applications(['prestoapplicationid1']) \
             .cluster_tags('type:prestocluster1') \
             .command_tags('type:presto') \
@@ -193,7 +194,7 @@ class TestingPrestoJobAdapters(unittest.TestCase):
             .job_version('0.0.1presto')
 
         assert_equals(
-            genie.jobs.adapter.genie_2.get_payload(job),
+            pygenie.jobs.adapter.genie_2.get_payload(job),
             {
                 u'attachments': [
                     {u'name': u'prestofile1', u'data': u'file contents'},
@@ -217,9 +218,9 @@ class TestingPrestoJobAdapters(unittest.TestCase):
             }
         )
 
-    @patch('genie.jobs.adapter.genie_2.to_attachment')
+    @patch('pygenie.jobs.adapter.genie_2.to_attachment')
     @patch('os.path.isfile')
-    @patch('genie.jobs.presto.is_file')
+    @patch('pygenie.jobs.presto.is_file')
     def test_genie2_payload_file_script(self, presto_is_file, os_isfile, to_att):
         """Test PrestoJob payload for Genie 2 (file script)."""
 
@@ -227,7 +228,7 @@ class TestingPrestoJobAdapters(unittest.TestCase):
         presto_is_file.return_value = True
         to_att.side_effect = mock_to_attachment
 
-        job = genie.jobs.PrestoJob(self.genie_2_conf) \
+        job = pygenie.jobs.PrestoJob(self.genie_2_conf) \
             .applications(['prestoapplicationid1']) \
             .cluster_tags('type:prestocluster1') \
             .command_tags('type:presto') \
@@ -245,7 +246,7 @@ class TestingPrestoJobAdapters(unittest.TestCase):
             .job_version('0.0.1presto')
 
         assert_equals(
-            genie.jobs.adapter.genie_2.get_payload(job),
+            pygenie.jobs.adapter.genie_2.get_payload(job),
             {
                 u'attachments': [
                     {u'name': u'prestofile1', u'data': u'file contents'},
@@ -269,7 +270,7 @@ class TestingPrestoJobAdapters(unittest.TestCase):
             }
         )
 
-    @patch('genie.jobs.adapter.genie_3.open')
+    @patch('pygenie.jobs.adapter.genie_3.open')
     @patch('os.path.isfile')
     def test_genie3_payload_adhoc_script(self, os_isfile, file_open):
         """Test PrestoJob payload for Genie 3 (adhoc script)."""
@@ -277,7 +278,7 @@ class TestingPrestoJobAdapters(unittest.TestCase):
         os_isfile.side_effect = lambda f: f.startswith('/')
         file_open.side_effect = lambda f, m: u"open file '{}'".format(f)
 
-        job = genie.jobs.PrestoJob(self.genie_3_conf) \
+        job = pygenie.jobs.PrestoJob(self.genie_3_conf) \
             .applications(['prestoapplicationid1']) \
             .cluster_tags('type:prestocluster1') \
             .command_tags('type:presto') \
@@ -295,7 +296,7 @@ class TestingPrestoJobAdapters(unittest.TestCase):
             .job_version('0.0.1presto')
 
         assert_equals(
-            genie.jobs.adapter.genie_3.get_payload(job),
+            pygenie.jobs.adapter.genie_3.get_payload(job),
             {
                 u'applications': [u'prestoapplicationid1'],
                 u'attachments': [
@@ -321,9 +322,9 @@ class TestingPrestoJobAdapters(unittest.TestCase):
             }
         )
 
-    @patch('genie.jobs.adapter.genie_3.open')
+    @patch('pygenie.jobs.adapter.genie_3.open')
     @patch('os.path.isfile')
-    @patch('genie.jobs.presto.is_file')
+    @patch('pygenie.jobs.presto.is_file')
     def test_genie3_payload_file_script(self, presto_is_file, os_isfile, file_open):
         """Test PrestoJob payload for Genie 3 (file script)."""
 
@@ -331,7 +332,7 @@ class TestingPrestoJobAdapters(unittest.TestCase):
         presto_is_file.return_value = True
         file_open.side_effect = lambda f, m: u"open file '{}'".format(f)
 
-        job = genie.jobs.PrestoJob(self.genie_3_conf) \
+        job = pygenie.jobs.PrestoJob(self.genie_3_conf) \
             .applications(['prestoapplicationid1']) \
             .cluster_tags('type:prestocluster1') \
             .command_tags('type:presto') \
@@ -349,7 +350,7 @@ class TestingPrestoJobAdapters(unittest.TestCase):
             .job_version('0.0.1presto')
 
         assert_equals(
-            genie.jobs.adapter.genie_3.get_payload(job),
+            pygenie.jobs.adapter.genie_3.get_payload(job),
             {
                 u'applications': [u'prestoapplicationid1'],
                 u'attachments': [

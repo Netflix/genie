@@ -16,16 +16,17 @@ import six
 import socket
 import uuid
 
-try:
-    import eureq as requests
-except ImportError:
-    import requests
+import requests
+
+from .auth import AuthHandler
 
 from .exceptions import GenieHTTPError
 
 
 logger = logging.getLogger('com.netflix.pygenie.utils')
 
+
+AUTH_HANDLER = AuthHandler()
 
 USER_AGENT_HEADER = {
     'user-agent': '/'.join([
@@ -69,11 +70,12 @@ def call(url, method='get', headers=None, raise_not_status=None,
     logger.debug('"%s %s"', method.upper(), url)
     logger.debug('headers: %s', headers)
 
-    # TODO: this needs to be replaced by the eureq client configurations
-    if os.getenv('GENIE_TOKEN'):
-        headers['Authorization'] = 'Bearer %s' % os.environ['GENIE_TOKEN']
-
-    resp = requests.request(method, url=url, headers=headers, *args, **kwargs)
+    resp = requests.request(method,
+                            url=url,
+                            headers=headers,
+                            auth=AUTH_HANDLER.auth,
+                            *args,
+                            **kwargs)
 
     # Allow us to return None if we receive a 404
     if resp.status_code == 404 and none_on_404:

@@ -6,12 +6,12 @@ import unittest
 from mock import patch
 from nose.tools import assert_equals, assert_raises
 
-import pygenie as genie
-
-
 assert_equals.__self__.maxDiff = None
 
 os.environ['GENIE_BYPASS_HOME_CONFIG'] = '1'
+
+
+import pygenie
 
 
 def mock_to_attachment(att):
@@ -27,7 +27,7 @@ class TestingPigJob(unittest.TestCase):
     def test_default_command_tag(self):
         """Test PigJob default command tags."""
 
-        job = genie.jobs.PigJob()
+        job = pygenie.jobs.PigJob()
 
         assert_equals(
             job.get('default_command_tags'),
@@ -37,7 +37,7 @@ class TestingPigJob(unittest.TestCase):
     def test_cmd_args_explicit(self):
         """Test PigJob explicit cmd args."""
 
-        job = genie.jobs.PigJob() \
+        job = pygenie.jobs.PigJob() \
             .command_arguments('explicitly stating command args') \
             .script("""A = LOAD SOMETHING;""") \
             .parameter('foo', 'fizz')
@@ -50,7 +50,7 @@ class TestingPigJob(unittest.TestCase):
     def test_cmd_args_constructed_script_code(self):
         """Test PigJob constructed cmd args for adhoc script."""
 
-        job = genie.jobs.PigJob() \
+        job = pygenie.jobs.PigJob() \
             .script("""B = LOAD B;""") \
             .parameter('p1', 'v1') \
             .parameter('p2', 'v2') \
@@ -70,13 +70,13 @@ class TestingPigJob(unittest.TestCase):
             u'-f script.pig'
         )
 
-    @patch('genie.jobs.pig.is_file')
+    @patch('pygenie.jobs.pig.is_file')
     def test_cmd_args_constructed_script_file(self, is_file):
         """Test PigJob constructed cmd args for file script."""
 
         is_file.return_value = True
 
-        job = genie.jobs.PigJob() \
+        job = pygenie.jobs.PigJob() \
             .script('/Users/pig/test.pig') \
             .parameter('p', 'v') \
             .parameter_file('/Users/pig/p.params') \
@@ -94,13 +94,13 @@ class TestingPigJob(unittest.TestCase):
 class TestingPigJobRepr(unittest.TestCase):
     """Test PigJob repr."""
 
-    @patch('genie.jobs.core.is_file')
+    @patch('pygenie.jobs.core.is_file')
     def test_repr(self, is_file):
         """Test PigJob repr."""
 
         is_file.return_value = True
 
-        job = genie.jobs.PigJob() \
+        job = pygenie.jobs.PigJob() \
             .applications('pig_app_1') \
             .applications('pig_app_2') \
             .archive(False) \
@@ -170,12 +170,12 @@ class TestingPigJobAdapters(unittest.TestCase):
 
     def setUp(self):
         self.dirname = os.path.dirname(os.path.realpath(__file__))
-        self.genie_2_conf = genie.conf.GenieConf() \
+        self.genie_2_conf = pygenie.conf.GenieConf() \
             .load_config_file(os.path.join(self.dirname, 'genie2.ini'))
-        self.genie_3_conf = genie.conf.GenieConf() \
+        self.genie_3_conf = pygenie.conf.GenieConf() \
             .load_config_file(os.path.join(self.dirname, 'genie3.ini'))
 
-    @patch('genie.jobs.adapter.genie_2.to_attachment')
+    @patch('pygenie.jobs.adapter.genie_2.to_attachment')
     @patch('os.path.isfile')
     def test_genie2_payload_adhoc_script(self, os_isfile, to_att):
         """Test PigJob payload for Genie 2 (adhoc script)."""
@@ -183,7 +183,7 @@ class TestingPigJobAdapters(unittest.TestCase):
         os_isfile.side_effect = lambda f: f.startswith('/')
         to_att.side_effect = mock_to_attachment
 
-        job = genie.jobs.PigJob(self.genie_2_conf) \
+        job = pygenie.jobs.PigJob(self.genie_2_conf) \
             .applications(['pig_app_1']) \
             .cluster_tags('type:pig_cluster_1') \
             .command_tags('type:pig') \
@@ -209,7 +209,7 @@ class TestingPigJobAdapters(unittest.TestCase):
             .job_version('0.0.1pig')
 
         assert_equals(
-            genie.jobs.adapter.genie_2.get_payload(job),
+            pygenie.jobs.adapter.genie_2.get_payload(job),
             {
                 u'attachments': [
                     {u'data': u'file contents', u'name': u'pigfile1'},
@@ -242,9 +242,9 @@ class TestingPigJobAdapters(unittest.TestCase):
             }
         )
 
-    @patch('genie.jobs.adapter.genie_2.to_attachment')
+    @patch('pygenie.jobs.adapter.genie_2.to_attachment')
     @patch('os.path.isfile')
-    @patch('genie.jobs.pig.is_file')
+    @patch('pygenie.jobs.pig.is_file')
     def test_genie2_payload_file_script(self, is_file, os_isfile, to_att):
         """Test PigJob payload for Genie 2 (file script)."""
 
@@ -252,7 +252,7 @@ class TestingPigJobAdapters(unittest.TestCase):
         is_file.return_value = True
         to_att.side_effect = mock_to_attachment
 
-        job = genie.jobs.PigJob(self.genie_2_conf) \
+        job = pygenie.jobs.PigJob(self.genie_2_conf) \
             .applications(['pigapp1']) \
             .cluster_tags('type:pigcluster1') \
             .command_tags('type:pigcmd') \
@@ -270,7 +270,7 @@ class TestingPigJobAdapters(unittest.TestCase):
             .job_version('0.0.pig')
 
         assert_equals(
-            genie.jobs.adapter.genie_2.get_payload(job),
+            pygenie.jobs.adapter.genie_2.get_payload(job),
             {
                 u'attachments': [
                     {u'name': u'pigfile1', u'data': u'file contents'},
@@ -293,7 +293,7 @@ class TestingPigJobAdapters(unittest.TestCase):
             }
         )
 
-    @patch('genie.jobs.adapter.genie_3.open')
+    @patch('pygenie.jobs.adapter.genie_3.open')
     @patch('os.path.isfile')
     def test_genie3_payload_adhoc_script(self, os_isfile, file_open):
         """Test PigJob payload for Genie 3 (adhoc script)."""
@@ -301,7 +301,7 @@ class TestingPigJobAdapters(unittest.TestCase):
         os_isfile.side_effect = lambda f: f.startswith('/')
         file_open.side_effect = lambda f, m: u"open file '{}'".format(f)
 
-        job = genie.jobs.PigJob(self.genie_3_conf) \
+        job = pygenie.jobs.PigJob(self.genie_3_conf) \
             .applications(['pig_app_1']) \
             .cluster_tags('type:pig_cluster_1') \
             .command_tags('type:pig') \
@@ -327,7 +327,7 @@ class TestingPigJobAdapters(unittest.TestCase):
             .job_version('0.0.1pig')
 
         assert_equals(
-            genie.jobs.adapter.genie_3.get_payload(job),
+            pygenie.jobs.adapter.genie_3.get_payload(job),
             {
                 u'applications': [u'pig_app_1'],
                 u'attachments': [
@@ -362,9 +362,9 @@ class TestingPigJobAdapters(unittest.TestCase):
             }
         )
 
-    @patch('genie.jobs.adapter.genie_3.open')
+    @patch('pygenie.jobs.adapter.genie_3.open')
     @patch('os.path.isfile')
-    @patch('genie.jobs.pig.is_file')
+    @patch('pygenie.jobs.pig.is_file')
     def test_genie3_payload_file_script(self, is_file, os_isfile, file_open):
         """Test PigJob payload for Genie 3 (file script)."""
 
@@ -372,7 +372,7 @@ class TestingPigJobAdapters(unittest.TestCase):
         is_file.return_value = True
         file_open.side_effect = lambda f, m: u"open file '{}'".format(f)
 
-        job = genie.jobs.PigJob(self.genie_3_conf) \
+        job = pygenie.jobs.PigJob(self.genie_3_conf) \
             .applications(['pigapp1']) \
             .cluster_tags('type:pigcluster1') \
             .command_tags('type:pigcmd') \
@@ -390,7 +390,7 @@ class TestingPigJobAdapters(unittest.TestCase):
             .job_version('0.0.pig')
 
         assert_equals(
-            genie.jobs.adapter.genie_3.get_payload(job),
+            pygenie.jobs.adapter.genie_3.get_payload(job),
             {
                 u'applications': [u'pigapp1'],
                 u'attachments': [
