@@ -1,8 +1,13 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import os
 import unittest
 
 from nose.tools import assert_equals
+
+
+os.environ['GENIE_BYPASS_HOME_CONFIG'] = '1'
+
 
 from pygenie.utils import str_to_list
 

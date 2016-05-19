@@ -10,6 +10,8 @@ from nose.tools import assert_equals
 
 from configurator import Configurator as C
 
+os.environ['GENIE_BYPASS_HOME_CONFIG'] = '1'
+
 from pygenie.conf import GenieConf
 
 
@@ -108,15 +110,15 @@ class TestGenieConf(unittest.TestCase):
         assert_equals(
             genie_conf.to_dict(),
             {
-                'genie': {
-                    'url': 'http://localhost',
-                    'username': 'user_ini',
-                    'version': '3'
+                u'genie': {
+                    u'url': u'http://foo:8080',
+                    u'username': u'user_ini',
+                    u'version': u'3'
                 },
                 'test_genie': {
-                    'from_env': 'from_ini_1',
-                    'from_cmd_line': 'from_ini_2',
-                    'from_ini': 'from_ini_3'
+                    u'from_env': u'from_ini_1',
+                    u'from_cmd_line': u'from_ini_2',
+                    u'from_ini': u'from_ini_3'
                 }
             }
         )
