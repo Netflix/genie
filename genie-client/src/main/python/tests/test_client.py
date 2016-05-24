@@ -25,7 +25,7 @@ class TestGenie(unittest.TestCase):
     "Test related to the bdp EMR library"
 
     def setUp(self):
-        self.genie = Genie(GENIE_URL)
+        self.genie = Genie(GENIE_CONF)
         self.cluster_name = 'test'
         self.path = re.compile(GENIE_URL + '/api/v3/.*')
 
@@ -68,7 +68,7 @@ class TestGenie(unittest.TestCase):
 class TestCommand(unittest.TestCase):
 
     def setUp(self):
-        self.genie = Genie(GENIE_URL)
+        self.genie = Genie(GENIE_CONF)
         self.path = re.compile(GENIE_URL + '/api/v3/commands.*')
         self.command = {
             "id": "test_command",
@@ -231,7 +231,7 @@ class TestCommand(unittest.TestCase):
 class TestApplication(unittest.TestCase):
 
     def setUp(self):
-        self.genie = Genie(GENIE_URL)
+        self.genie = Genie(GENIE_CONF)
         self.path = re.compile(GENIE_URL + '/api/v3/applications.*')
         self.application = {
             "id": "test",
@@ -377,7 +377,7 @@ class TestApplication(unittest.TestCase):
 class TestCluster(unittest.TestCase):
 
     def setUp(self):
-        self.genie = Genie(GENIE_URL)
+        self.genie = Genie(GENIE_CONF)
         self.path = re.compile(GENIE_URL + '/api/v3/clusters.*')
         self.cluster = {
             "id": "presto_test_20160318",
@@ -528,7 +528,7 @@ class TestCluster(unittest.TestCase):
 class TestJob(unittest.TestCase):
 
     def setUp(self):
-        self.genie = Genie(GENIE_URL)
+        self.genie = Genie(GENIE_CONF)
         self.path = re.compile(GENIE_URL + '/api/v3/jobs.*')
         self.job = {
             "id": "5afdcab5-16df-11e6-b78d-6003088f363e",
@@ -622,7 +622,7 @@ class TestGeniepyAPI(unittest.TestCase):
     "Test that all required APIs are available through geniepy"
 
     def setUp(self):
-        self.genie = Genie(GENIE_URL)
+        self.genie = Genie(GENIE_CONF)
         self.required_apis = [
             'add_applications_for_command',
             'add_commands_for_cluster',
