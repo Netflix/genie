@@ -59,12 +59,6 @@ public class ClusterTask extends GenieBaseTask {
             AdminResources.CLUSTER
         );
 
-        // Create the dependencies directory for this id
-        createEntityInstanceDependenciesDirectory(
-            this.jobExecEnv.getCluster().getId(),
-            AdminResources.CLUSTER
-        );
-
         // Get the set up file for cluster and add it to source in launcher script
         final String clusterSetupFile = jobExecEnv.getCluster().getSetupFile();
 

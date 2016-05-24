@@ -39,7 +39,7 @@ public class Application extends ConfigDTO {
     private static final long serialVersionUID = 212266105066344180L;
 
     private final Set<String> dependencies = new HashSet<>();
-    @NotNull
+    @NotNull(message = "An application status is required")
     private final ApplicationStatus status;
     private final String type;
 

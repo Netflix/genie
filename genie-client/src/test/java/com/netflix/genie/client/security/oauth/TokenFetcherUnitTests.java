@@ -20,6 +20,7 @@ package com.netflix.genie.client.security.oauth;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.test.categories.UnitTest;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -94,7 +95,32 @@ public class TokenFetcherUnitTests {
      * @throws GenieException For any problem
      */
     @Test(expected = GenieException.class)
-    public void testWithMalformedUrl() throws GenieException {
+    public void testConstructorWithMalformedUrl() throws GenieException {
         new TokenFetcher("foo", CLIENT_ID, CLIENT_SECRET, GRANT_TYPE, SCOPE);
+    }
+
+    /**
+     * Test the constructor with valid params.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test
+    public void testConstructorWithValidParams() throws GenieException {
+        new TokenFetcher(URL, CLIENT_ID, CLIENT_SECRET, GRANT_TYPE, SCOPE);
+    }
+
+    /**
+     * Test the getToken method for failure.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test
+    public void testGetTokenFailure() throws GenieException {
+        final TokenFetcher tokenFetcher  = new TokenFetcher(URL, CLIENT_ID, CLIENT_SECRET, GRANT_TYPE, SCOPE);
+        try {
+            tokenFetcher.getToken();
+        } catch (GenieException ge) {
+            Assert.assertTrue(ge.getErrorCode() == 500);
+        }
     }
 }

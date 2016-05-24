@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.client.security.oauth.impl;
 
+import com.google.common.net.HttpHeaders;
 import com.netflix.genie.client.security.SecurityInterceptor;
 import com.netflix.genie.client.security.oauth.AccessToken;
 import com.netflix.genie.client.security.oauth.TokenFetcher;
@@ -69,7 +70,7 @@ public class OAuthSecurityInterceptor implements SecurityInterceptor {
             final Request newRequest = chain
                 .request()
                 .newBuilder()
-                .addHeader("Authorization", accessToken.getTokenType() + " " + accessToken.getAccessToken())
+                .addHeader(HttpHeaders.AUTHORIZATION, accessToken.getTokenType() + " " + accessToken.getAccessToken())
                 .build();
 
             log.debug("Sending request {} on {} {} {}", newRequest.url(), chain.connection(), newRequest.headers());

@@ -34,11 +34,11 @@ import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
-import retrofit2.http.QueryMap;
+import retrofit2.http.Query;
 import retrofit2.http.Streaming;
 
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 /**
  * An interface that provides all methods needed for the Genie job client implementation.
@@ -79,11 +79,38 @@ public interface JobService {
     /**
      * Method to get all jobs from Genie.
      *
-     * @param options A map of query parameters to be used to filter the jobs.
+     * @param id          id for job
+     * @param name        name of job (can be a SQL-style pattern such as HIVE%)
+     * @param user        user who submitted job
+     * @param statuses    statuses of jobs to find
+     * @param tags        tags for the job
+     * @param clusterName the name of the cluster
+     * @param clusterId   the id of the cluster
+     * @param commandName the name of the command run by the job
+     * @param commandId   the id of the command run by the job
+     * @param minStarted  The time which the job had to start after in order to be return (inclusive)
+     * @param maxStarted  The time which the job had to start before in order to be returned (exclusive)
+     * @param minFinished The time which the job had to finish after in order to be return (inclusive)
+     * @param maxFinished The time which the job had to finish before in order to be returned (exclusive)
+     *
      * @return A callable object.
      */
     @GET(JOBS_URL_SUFFIX)
-    Call<JsonNode> getJobs(@QueryMap final Map<String, String> options);
+    Call<JsonNode> getJobs(
+        @Query("id") final String id,
+        @Query("name") final String name,
+        @Query("user") final String user,
+        @Query("status") final Set<String> statuses,
+        @Query("tag") final Set<String> tags,
+        @Query("clusterName") final String clusterName,
+        @Query("clusterId") final String clusterId,
+        @Query("commandName") final String commandName,
+        @Query("commandId") final String commandId,
+        @Query("minStarted") final Long minStarted,
+        @Query("maxStarted") final Long maxStarted,
+        @Query("minFinished") final Long minFinished,
+        @Query("maxFinished") final Long maxFinished
+    );
 
     /**
      * Method to fetch a single job from Genie.
