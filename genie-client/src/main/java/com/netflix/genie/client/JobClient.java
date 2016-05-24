@@ -19,7 +19,7 @@ package com.netflix.genie.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.netflix.genie.client.apis.JobService;
-import com.netflix.genie.client.job.JobSearchResult;
+import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.client.security.SecurityInterceptor;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Cluster;
@@ -348,9 +348,6 @@ public class JobClient extends BaseGenieClient {
     public InputStream getJobStderr(
         final String jobId
     ) throws IOException, GenieException {
-        if (!this.getJobStatus(jobId).equals(JobStatus.SUCCEEDED)) {
-            throw new GenieException(400, "Cannot request output of a job whose status is not SUCCEEDED.");
-        }
         return jobService.getJobStderr(jobId).execute().body().byteStream();
     }
 

@@ -28,7 +28,7 @@ import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
-import com.netflix.genie.client.job.JobSearchResult;
+import com.netflix.genie.common.dto.search.JobSearchResult;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,6 +44,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Integration tests for Genie Job Client.
@@ -53,13 +54,12 @@ import java.util.UUID;
  */
 public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase {
 
-    private static final String BASE_DIR
-        = "com/netflix/genie/client/JobClientIntegrationTests/";
-
     private static final String JOB_NAME = "List Directories bash job";
     private static final String JOB_USER = "genie";
     private static final String JOB_VERSION = "1.0";
     private static final String JOB_DESCRIPTION = "Genie 3 Test Job";
+    private static final String CLUSTER_NAME = "Cluster Name";
+    private static final String COMMAND_NAME = "Command Name";
 
     private ClusterClient clusterClient;
     private CommandClient commandClient;
@@ -121,7 +121,7 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
 
         final String id = jobClient.submitJob(jobRequest);
 
-        final JobStatus jobStatus = jobClient.waitForCompletion(jobId, 600000, 5000);
+        final JobStatus jobStatus = jobClient.waitForCompletion(jobId, 600000);
 
         Assert.assertEquals(JobStatus.SUCCEEDED, jobStatus);
         final Job job = jobClient.getJob(id);
@@ -135,18 +135,8 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
         final JobExecution jobExecution = jobClient.getJobExecution(jobId);
         Assert.assertEquals(jobId, jobExecution.getId());
 
-        final InputStream inputStream1 = jobClient.getJobStdout(jobId);
-        final BufferedReader reader1 = new BufferedReader(new InputStreamReader(inputStream1, "UTF-8"));
-
-        final StringBuilder sb = new StringBuilder();
-        String line;
-        while ((line = reader1.readLine()) != null) {
-           sb.append(line);
-        }
-        reader1.close();
-        inputStream1.close();
-
-        Assert.assertEquals("HELLO WORLD!!!", sb.toString());
+        Assert.assertEquals(CLUSTER_NAME, jobClient.getJobCluster(jobId).getName());
+        Assert.assertEquals(COMMAND_NAME, jobClient.getJobCommand(jobId).getName());
     }
 
     /**
@@ -271,9 +261,7 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
         jobClient.submitJob(jobRequest2);
 
         final List<JobSearchResult> jobs = jobClient.getJobs();
-        Assert.assertEquals(2, jobs.size());
-        Assert.assertEquals(jobRequest1.getId(), jobs.get(1).getId());
-        Assert.assertEquals(jobRequest2.getId(), jobs.get(0).getId());
+        Assert.assertTrue(jobs.size() >= 2);
     }
 
     /**
@@ -299,6 +287,7 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
             clusterCriteriaList,
             commandCriteria
         )
+            .withTags(Arrays.stream(new String[]{"foo", "bar"}).collect(Collectors.toSet()))
             .withId(UUID.randomUUID().toString())
             .withDisableLogArchival(true)
             .build();
@@ -309,6 +298,142 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
             "job2",
             "user2",
             JOB_VERSION,
+            "-c 'ls blah'",
+            clusterCriteriaList,
+            commandCriteria
+        )
+            .withTags(Arrays.stream(new String[]{"foo", "pi"}).collect(Collectors.toSet()))
+            .withId(UUID.randomUUID().toString())
+            .withDisableLogArchival(true)
+            .build();
+
+        jobClient.submitJob(jobRequest2);
+
+        jobClient.waitForCompletion(jobRequest1.getId(), 60000, 5000);
+        jobClient.waitForCompletion(jobRequest2.getId(), 60000, 5000);
+
+        // Get jobs using id
+        Assert.assertEquals(jobRequest1.getId(), jobClient.getJobs(
+            jobRequest1.getId(),
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ).get(0).getId());
+
+        // Get jobs using user
+        Assert.assertEquals(jobRequest1.getId(), jobClient.getJobs(
+            null,
+            "job1",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ).get(0).getId());
+
+        // Get jobs using name
+        Assert.assertEquals(jobRequest2.getId(), jobClient.getJobs(
+            null,
+            null,
+            "user2",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ).get(0).getId());
+
+        // Get jobs using status
+        Assert.assertEquals(jobRequest1.getId(), jobClient.getJobs(
+            null,
+            null,
+            null,
+            Arrays.stream(new String[]{"SUCCEEDED"}).collect(Collectors.toSet()),
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ).get(0).getId());
+
+        // Get jobs using status
+        Assert.assertEquals(jobRequest2.getId(), jobClient.getJobs(
+            null,
+            null,
+            null,
+            Arrays.stream(new String[]{"FAILED"}).collect(Collectors.toSet()),
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ).get(0).getId());
+
+        // Get jobs using tags
+        Assert.assertEquals(2, jobClient.getJobs(
+            null,
+            null,
+            null,
+            null,
+            Arrays.stream(new String[]{"foo"}).collect(Collectors.toSet()),
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        ).size());
+    }
+
+    /**
+     * Method to test get stdout function.
+     *
+     * @throws Exception If there is a problem.
+     */
+    @Test
+    public void testCanGetJobStdout() throws Exception {
+
+        createClusterAndCommandForTest();
+
+        final List<ClusterCriteria> clusterCriteriaList
+            = Lists.newArrayList(new ClusterCriteria(Sets.newHashSet("laptop")));
+
+        final Set<String> commandCriteria = Sets.newHashSet("bash");
+
+        final JobRequest jobRequest1 = new JobRequest.Builder(
+            JOB_NAME,
+            JOB_USER,
+            JOB_VERSION,
             "-c 'echo HELLO WORLD!!!'",
             clusterCriteriaList,
             commandCriteria
@@ -317,9 +442,65 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
             .withDisableLogArchival(true)
             .build();
 
-        jobClient.submitJob(jobRequest2);
+        jobClient.submitJob(jobRequest1);
+        jobClient.waitForCompletion(jobRequest1.getId(), 60000, 5000);
 
-        final List<JobSearchResult> jobs = jobClient.getJobs();
+        final InputStream inputStream1 = jobClient.getJobStdout(jobRequest1.getId());
+        final BufferedReader reader1 = new BufferedReader(new InputStreamReader(inputStream1, "UTF-8"));
+        final StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader1.readLine()) != null) {
+           sb.append(line);
+        }
+
+        reader1.close();
+        inputStream1.close();
+
+        Assert.assertEquals("HELLO WORLD!!!", sb.toString());
+    }
+
+    /**
+     * Method to test get stdout function.
+     *
+     * @throws Exception If there is a problem.
+     */
+    @Test
+    public void testCanGetJobStderr() throws Exception {
+
+        createClusterAndCommandForTest();
+
+        final List<ClusterCriteria> clusterCriteriaList
+            = Lists.newArrayList(new ClusterCriteria(Sets.newHashSet("laptop")));
+
+        final Set<String> commandCriteria = Sets.newHashSet("bash");
+
+        final JobRequest jobRequest1 = new JobRequest.Builder(
+            JOB_NAME,
+            JOB_USER,
+            JOB_VERSION,
+            "-c 'ls foo'",
+            clusterCriteriaList,
+            commandCriteria
+        )
+            .withId(UUID.randomUUID().toString())
+            .withDisableLogArchival(true)
+            .build();
+
+        jobClient.submitJob(jobRequest1);
+        jobClient.waitForCompletion(jobRequest1.getId(), 60000, 5000);
+
+        final InputStream inputStream1 = jobClient.getJobStderr(jobRequest1.getId());
+        final BufferedReader reader1 = new BufferedReader(new InputStreamReader(inputStream1, "UTF-8"));
+        final StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader1.readLine()) != null) {
+            sb.append(line);
+        }
+
+        reader1.close();
+        inputStream1.close();
+
+        Assert.assertEquals("ls: foo: No such file or directory", sb.toString());
     }
 
     /**
@@ -333,7 +514,7 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
         tags.add("laptop");
 
         final Cluster cluster = new Cluster.Builder(
-            "name",
+            CLUSTER_NAME,
             "user",
             "1.0",
             ClusterStatus.UP
@@ -346,7 +527,7 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
         tags.add("bash");
 
         final Command command = new Command.Builder(
-            "name",
+            COMMAND_NAME,
             "user",
             "version",
             CommandStatus.ACTIVE,
