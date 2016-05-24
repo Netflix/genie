@@ -31,6 +31,7 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.search.JobSearchResult;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.ResourceLoader;
@@ -52,6 +53,7 @@ import java.util.stream.Collectors;
  * @author amsharma
  * @since 3.0.0
  */
+@Ignore
 public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase {
 
     private static final String JOB_NAME = "List Directories bash job";
