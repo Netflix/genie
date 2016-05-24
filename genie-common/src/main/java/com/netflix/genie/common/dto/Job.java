@@ -45,19 +45,19 @@ public class Job extends CommonDTO {
 
     @Size(min = 1, max = 10000, message = "Command arguments are required and max at 10000 characters")
     private String commandArgs;
-    @NotNull
+    @NotNull(message = "A valid job status is required")
     private final JobStatus status;
-    @Size(max = 255, message = "Max length is 255 characters")
+    @Size(max = 255, message = "Max length of the status message is 255 characters")
     private final String statusMsg;
     @JsonSerialize(using = JsonDateSerializer.class)
     private final Date started;
     @JsonSerialize(using = JsonDateSerializer.class)
     private final Date finished;
-    @Size(max = 1024, message = "Max character length is 1024 characters")
+    @Size(max = 1024, message = "Max character length is 1024 characters for the archive location")
     private final String archiveLocation;
-    @Size(max = 255, message = "Max character length is 255 characters")
+    @Size(max = 255, message = "Max character length is 255 characters for the cluster name")
     private final String clusterName;
-    @Size(max = 255, message = "Max character length is 255 characters")
+    @Size(max = 255, message = "Max character length is 255 characters for the command name")
     private final String commandName;
     @NotNull
     @JsonSerialize(using = ToStringSerializer.class)

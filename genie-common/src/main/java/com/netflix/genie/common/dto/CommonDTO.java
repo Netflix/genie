@@ -38,16 +38,16 @@ public abstract class CommonDTO extends BaseDTO {
 
     private final Set<String> tags = new HashSet<>();
 
-    @NotEmpty
-    @Size(max = 255)
+    @NotEmpty(message = "A version is required and must be at most 255 characters.")
+    @Size(max = 255, message = "The version can be no longer than 255 characters")
     private final String version;
-    @NotEmpty
-    @Size(max = 255)
+    @NotEmpty(message = "A user is required and must be at most 255 characters")
+    @Size(max = 255, message = "The user can be no longer than 255 characters")
     private final String user;
-    @NotEmpty
-    @Size(max = 255)
+    @NotEmpty(message = "A name is required and must be at most 255 characters")
+    @Size(max = 255, message = "The name can be no longer than 255 characters")
     private final String name;
-    @Size(max = 10000)
+    @Size(max = 10000, message = "The maximum length of the description field is 10000 characaters")
     private final String description;
 
     /**
