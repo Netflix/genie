@@ -73,7 +73,7 @@ class GenieConfSection(object):
             str: The option value or the default value specified.
         """
 
-        return getattr(self, option, default)
+        return self.to_dict().get(option, default)
 
     def set(self, name, value=None):
         """Sets an attribute (option) to the value."""
