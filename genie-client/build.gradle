@@ -7,6 +7,9 @@ dependencies {
 
     compile project(":genie-common")
 
+    // http://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310
+    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.7.4'
+
     compile("com.squareup.retrofit2:retrofit:2.0.1")
     compile("com.squareup.retrofit2:converter-jackson:2.0.1")
     compile("org.apache.commons:commons-configuration2:2.0")

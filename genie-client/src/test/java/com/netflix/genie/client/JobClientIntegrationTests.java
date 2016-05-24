@@ -28,6 +28,7 @@ import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.client.job.JobSearchResult;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -269,8 +270,56 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
 
         jobClient.submitJob(jobRequest2);
 
-        //final List<JobSearchResult> jobs = jobClient.getJobs();
-        //Assert.assertEquals(2, jobs.size());
+        final List<JobSearchResult> jobs = jobClient.getJobs();
+        Assert.assertEquals(2, jobs.size());
+        Assert.assertEquals(jobRequest1.getId(), jobs.get(1).getId());
+        Assert.assertEquals(jobRequest2.getId(), jobs.get(0).getId());
+    }
+
+    /**
+     * Method to test getJobs with params function.
+     *
+     * @throws Exception If there is a problem.
+     */
+    @Test
+    public void testCanGetJobsUsingParams() throws Exception {
+
+        createClusterAndCommandForTest();
+
+        final List<ClusterCriteria> clusterCriteriaList
+            = Lists.newArrayList(new ClusterCriteria(Sets.newHashSet("laptop")));
+
+        final Set<String> commandCriteria = Sets.newHashSet("bash");
+
+        final JobRequest jobRequest1 = new JobRequest.Builder(
+            "job1",
+            "user1",
+            JOB_VERSION,
+            "-c 'echo HELLO WORLD!!!'",
+            clusterCriteriaList,
+            commandCriteria
+        )
+            .withId(UUID.randomUUID().toString())
+            .withDisableLogArchival(true)
+            .build();
+
+        jobClient.submitJob(jobRequest1);
+
+        final JobRequest jobRequest2 = new JobRequest.Builder(
+            "job2",
+            "user2",
+            JOB_VERSION,
+            "-c 'echo HELLO WORLD!!!'",
+            clusterCriteriaList,
+            commandCriteria
+        )
+            .withId(UUID.randomUUID().toString())
+            .withDisableLogArchival(true)
+            .build();
+
+        jobClient.submitJob(jobRequest2);
+
+        final List<JobSearchResult> jobs = jobClient.getJobs();
     }
 
     /**

@@ -19,6 +19,7 @@ package com.netflix.genie.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.netflix.genie.client.apis.JobService;
+import com.netflix.genie.client.job.JobSearchResult;
 import com.netflix.genie.client.security.SecurityInterceptor;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Cluster;
@@ -27,7 +28,6 @@ import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
-import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieTimeoutException;
@@ -41,9 +41,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 /**
  * Client library for the Job Service.
@@ -149,30 +148,69 @@ public class JobClient extends BaseGenieClient {
      * @throws IOException If the response received is not 2xx.
      */
     public List<JobSearchResult> getJobs() throws IOException, GenieException {
-        return this.getJobs(Collections.emptyMap());
+        return this.getJobs(null, null, null, null, null, null, null, null, null, null, null, null, null);
     }
 
     /**
      * Method to get a list of all the jobs from Genie for the query parameters specified.
      *
-     * @param options A list of query options
+     * @param id          id for job
+     * @param name        name of job (can be a SQL-style pattern such as HIVE%)
+     * @param user        user who submitted job
+     * @param statuses    statuses of jobs to find
+     * @param tags        tags for the job
+     * @param clusterName the name of the cluster
+     * @param clusterId   the id of the cluster
+     * @param commandName the name of the command run by the job
+     * @param commandId   the id of the command run by the job
+     * @param minStarted  The time which the job had to start after in order to be return (inclusive)
+     * @param maxStarted  The time which the job had to start before in order to be returned (exclusive)
+     * @param minFinished The time which the job had to finish after in order to be return (inclusive)
+     * @param maxFinished The time which the job had to finish before in order to be returned (exclusive)
      *
      * @return A list of jobs.
      * @throws GenieException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
-    public List<JobSearchResult> getJobs(final Map<String, String> options) throws IOException, GenieException {
+    public List<JobSearchResult> getJobs(
+        final String id,
+        final String name,
+        final String user,
+        final Set<String> statuses,
+        final Set<String> tags,
+        final String clusterName,
+        final String clusterId,
+        final String commandName,
+        final String commandId,
+        final Long minStarted,
+        final Long maxStarted,
+        final Long minFinished,
+        final Long maxFinished
+    ) throws IOException, GenieException {
 
-        final JsonNode jnode =  jobService.getJobs(options).execute().body()
+        final JsonNode jnode =  jobService.getJobs(
+            id,
+            name,
+            user,
+            statuses,
+            tags,
+            clusterName,
+            clusterId,
+            commandName,
+            commandId,
+            minStarted,
+            maxStarted,
+            minFinished,
+            maxFinished
+        ).execute().body()
             .get("_embedded")
             .get("jobSearchResultList");
 
         final List<JobSearchResult> jobList = new ArrayList<>();
         for (final JsonNode objNode : jnode) {
-            final JobSearchResult jobSearchResult  = mapper.treeToValue(objNode, JobSearchResult.class);
+            final JobSearchResult jobSearchResult = mapper.treeToValue(objNode, JobSearchResult.class);
             jobList.add(jobSearchResult);
         }
-
         return jobList;
     }
 
