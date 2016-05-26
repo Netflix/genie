@@ -219,7 +219,8 @@ public class JobCompletionHandler {
                     + jobId
                     + ".tar.gz";
 
-                final CommandLine commandLine = new CommandLine("tar");
+                final CommandLine commandLine = new CommandLine("sudo");
+                commandLine.addArgument("tar");
                 commandLine.addArgument("-c");
                 commandLine.addArgument("-z");
                 commandLine.addArgument("-f");
