@@ -1,12 +1,12 @@
 import React from 'react';
 import { render } from 'react-dom';
 import { Link } from 'react-router';
-import $ from 'jquery';
-
+import { fetch } from './utils';
+import moment from 'moment';
 import TableHeader from './components/TableHeader';
 import SiteHeader from './components/SiteHeader';
 import SiteFooter from './components/SiteFooter';
-import { genieJobsUrl, fileUrl } from './utils';
+import { genieJobsUrl, fileUrl, momentFormat } from './utils';
 
 export default class GenieJobDirectory extends React.Component {
   static defaultProps = {
@@ -22,8 +22,8 @@ export default class GenieJobDirectory extends React.Component {
     super(props);
     this.state = {
       output: {
-        files: [],
-        directories: [],
+        files       : [],
+        directories : [],
       },
       url: '',
     };
@@ -40,14 +40,8 @@ export default class GenieJobDirectory extends React.Component {
   }
 
   loadData(url) {
-    $.ajax({
-      global: false,
-      type: 'GET',
-      headers: {
-      'Accept': 'application/json',
-      },
-      url: `/api/v3/jobs/${url}`,
-    }).done((output) => {
+    fetch(`/api/v3/jobs/${url}`)
+    .done((output) => {
       const [jobId, ...others] = url.split('/');
       this.setState({
         output, jobId, url
@@ -87,7 +81,7 @@ const FileRow = (props) =>
       </span>
     </td>
     <td>{props.file.size} kb</td>
-    <td className="col-xs-3">{props.file.lastModified}</td>
+    <td className="col-xs-3">{momentFormat(props.file.lastModified)}</td>
   </tr>;
 
 const DirectoryRow = (props) =>
@@ -99,7 +93,7 @@ const DirectoryRow = (props) =>
       </span>
     </td>
     <td>{props.directory.size} kb</td>
-    <td className="col-xs-3">{props.directory.lastModified}</td>
+    <td className="col-xs-3">{momentFormat(props.directory.lastModified)}</td>
   </tr>;
 
 
@@ -135,7 +129,7 @@ const Navigation = (props) => {
       </div>
     );
   }
-  return <div />;
+  return <div/>;
 };
 
 const DirectoryInfo = (props) =>
@@ -146,7 +140,7 @@ const DirectoryInfo = (props) =>
 const HomeButton = (props) =>
   <div className="row">
     <span className="col-xs-3 fa-home-div">
-      <Link to={`/genie-jobs/${props.jobId}/output`}>
+      <Link to={`/output/${props.jobId}/output`}>
         <i className="fa fa-home fa-2x" aria-hidden="true"></i>
       </Link>
     </span>

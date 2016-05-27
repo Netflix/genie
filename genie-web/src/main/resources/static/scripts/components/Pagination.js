@@ -11,16 +11,44 @@ const Pagination = (props) => {
 
   let pageLinks = [];
   if (props.links.first) {
-    pageLinks.push(<li key="1"><JobLink url={props.links.first.href} text="&laquo;" /></li>);
+    pageLinks.push(
+      <li key="1">
+        <PageLink
+          pageType={props.pageType}
+          url={props.links.first.href}
+          text="&laquo;"
+        />
+      </li>);
   }
   if (props.links.prev) {
-    pageLinks.push(<li key="2"><JobLink url={props.links.prev.href} text="Previous" /></li>);
+    pageLinks.push(
+      <li key="2">
+        <PageLink
+          pageType={props.pageType}
+          url={props.links.prev.href}
+          text="Previous"
+        />
+      </li>);
   }
   if (props.links.next) {
-    pageLinks.push(<li key="3"><JobLink url={props.links.next.href} text="Next" /></li>);
+    pageLinks.push(
+      <li key="3">
+        <PageLink
+          pageType={props.pageType}
+          url={props.links.next.href}
+          text="Next"
+        />
+      </li>);
   }
   if (props.links.last) {
-    pageLinks.push(<li key="4"><JobLink url={props.links.last.href} text="&raquo;" /></li>);
+    pageLinks.push(
+      <li key="4">
+        <PageLink
+          pageType={props.pageType}
+          url={props.links.last.href}
+          text="&raquo;"
+        />
+      </li>);
   }
 
   return (
@@ -35,11 +63,11 @@ const Pagination = (props) => {
   );
 }
 
-const JobLink = (props) => {
-  const jobUrl = (genieLink) => `jobs?${genieLink.substring(genieLink.indexOf('?') + 1)}`;
+const PageLink = (props) => {
+  const constructUrl = (pageType, genieLink) => `${pageType}?${genieLink.substring(genieLink.indexOf('?') + 1)}`;
   return (
     <Link
-      to={jobUrl(props.url)}
+      to={constructUrl(props.pageType, props.url)}
       activeClassName="active"
     >
     {props.text}

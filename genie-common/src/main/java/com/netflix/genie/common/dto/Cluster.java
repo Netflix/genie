@@ -35,7 +35,7 @@ public class Cluster extends ConfigDTO {
 
     private static final long serialVersionUID = 8562447832504925029L;
 
-    @NotNull
+    @NotNull(message = "A valid cluster status is required")
     private final ClusterStatus status;
 
     /**

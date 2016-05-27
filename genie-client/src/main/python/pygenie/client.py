@@ -6,7 +6,7 @@ import json
 import logging
 import os
 
-from .conf import DEFAULT_GENIE_URL
+from .conf import GenieConf
 from .exceptions import GenieHTTPError, GenieError
 from .utils import call, DotDict
 
@@ -87,7 +87,7 @@ class Genie(object):
     Genie client object.
 
     Args:
-        host (str): the genie host to connect
+        conf (optional[object]): custom GenieConf object
 
     Returns:
         object: a genie object
@@ -99,13 +99,19 @@ class Genie(object):
     """
 
 
-    def __init__(self, host=None):
-        self.host = host or DEFAULT_GENIE_URL
-        self.path_application = self.host + '/api/v3/applications'
-        self.path_cluster = self.host + '/api/v3/clusters'
-        self.path_command = self.host + '/api/v3/commands'
-        self.path_job = self.host + '/api/v3/jobs'
-        self.version = "3"
+    def __init__(self, conf=None):
+        self.conf = conf or GenieConf()
+        self.host = self.conf.genie.url
+        self.version = self.conf.genie.version
+
+        self.path_application = self.host \
+            + self.conf.genie.get('application_url', '/api/v3/applications')
+        self.path_cluster = self.host \
+            + self.conf.genie.get('cluster_url', '/api/v3/clusters')
+        self.path_command = self.host \
+            + self.conf.genie.get('command_url', '/api/v3/commands')
+        self.path_job = self.host \
+            + self.conf.genie.get('job_url', '/api/v3/jobs')
 
     def get_applications(self, filters=None):
         """

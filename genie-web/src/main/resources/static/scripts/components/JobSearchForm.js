@@ -1,7 +1,6 @@
 import React from 'react';
 import { render } from 'react-dom';
 import Select from 'react-select';
-import $ from 'jquery';
 
 export default class JobSearchForm extends React.Component {
   static contextTypes = {
@@ -31,7 +30,7 @@ export default class JobSearchForm extends React.Component {
     }
     if (updateState) {
       const formFields = Object.assign(this.getDefaultState().formFields, query);
-      this.setState({ formFields});
+      this.setState({ formFields });
     }
   }
 
@@ -46,8 +45,8 @@ export default class JobSearchForm extends React.Component {
       commandName : '',
       commandId   : '',
       tag         : '',
-      size        : 25,
       sort        : '',
+      size        : 25,
     };
 
     return {
@@ -72,17 +71,18 @@ export default class JobSearchForm extends React.Component {
     this.setState({ formFields, sortOrder });
   }
 
-  toggleFormFields = () => {
+  toggleFormFields = (e) => {
+    e.preventDefault();
     this.setState({
-      showAllFormFields: !this.state.showAllFormFields,
-      linkText: this.state.linkText === 'more' ? 'less' : 'more'
+      linkText          : this.state.linkText === 'more' ? 'less' : 'more',
+      showAllFormFields : !this.state.showAllFormFields,
     });
   }
 
   handleFormFieldChange = (key) => {
     return (e) => {
       let { formFields } = this.state;
-      formFields[`${key}`] = $.trim(e.target.value);
+      formFields[`${key}`] = e.target.value.trim();
       this.setState({ formFields });
     };
   }

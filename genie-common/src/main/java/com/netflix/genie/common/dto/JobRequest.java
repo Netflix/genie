@@ -46,23 +46,23 @@ public class JobRequest extends CommonDTO {
 
     @Size(min = 1, max = 10000, message = "Command arguments are required and max at 10000 characters")
     private final String commandArgs;
-    @NotEmpty
+    @NotEmpty(message = "At least one cluster criteria is required")
     private final List<ClusterCriteria> clusterCriterias = new ArrayList<>();
-    @NotEmpty
+    @NotEmpty(message = "At least one command criteria is required")
     private final Set<String> commandCriteria = new HashSet<>();
-    @Size(max = 255, message = "Max length is 255 characters")
+    @Size(max = 255, message = "Max length of the group is 255 characters")
     private final String group;
-    @Size(max = 1024, message = "Max length is 1024 characters")
+    @Size(max = 1024, message = "Max length of the setup file is 1024 characters")
     private final String setupFile;
     private final boolean disableLogArchival;
-    @Size(max = 255, message = "Max length is 255 characters")
+    @Size(max = 255, message = "Max length of the email 255 characters")
     @Email(message = "Must be a valid email address")
     private final String email;
-    @Min(1)
+    @Min(value = 1, message = "Must have at least 1 CPU")
     private final int cpu;
-    @Min(1)
+    @Min(value = 1, message = "Must have at least 1 MB of memory. Preferably much more.")
     private final int memory;
-    @Min(1)
+    @Min(value = 1, message = "The timeout must be at least 1 second, preferably much more.")
     private final int timeout;
     private final Set<String> dependencies = new HashSet<>();
     private final List<String> applications = new ArrayList<>();

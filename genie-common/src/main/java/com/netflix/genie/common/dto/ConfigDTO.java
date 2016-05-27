@@ -36,7 +36,7 @@ public abstract class ConfigDTO extends CommonDTO {
     private static final long serialVersionUID = 147545317805515362L;
 
     private final Set<String> configs = new HashSet<>();
-    @Size(max = 1024, message = "Max length is 1024 characters")
+    @Size(max = 1024, message = "Max length of the setup file is 1024 characters")
     private final String setupFile;
 
     /**
