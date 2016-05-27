@@ -29,8 +29,6 @@ from .exceptions import GenieHTTPError
 logger = logging.getLogger('com.netflix.pygenie.utils')
 
 
-AUTH_HANDLER = AuthHandler()
-
 USER_AGENT_HEADER = {
     'user-agent': '/'.join([
         socket.getfqdn(),
@@ -51,7 +49,7 @@ class DotDict(dict):
 
 
 def call(url, method='get', headers=None, raise_not_status=None,
-         none_on_404=False, *args, **kwargs):
+         none_on_404=False, auth_handler=None, *args, **kwargs):
     """
     Wrap HTTP request calls to the Genie server.
 
@@ -67,6 +65,8 @@ def call(url, method='get', headers=None, raise_not_status=None,
             GenieHTTPError.
     """
 
+    auth_handler = auth_handler or AuthHandler()
+
     headers = USER_AGENT_HEADER if headers is None \
         else dict(headers, **USER_AGENT_HEADER)
 
@@ -76,7 +76,7 @@ def call(url, method='get', headers=None, raise_not_status=None,
     resp = requests.request(method,
                             url=url,
                             headers=headers,
-                            auth=AUTH_HANDLER.auth,
+                            auth=auth_handler.auth,
                             *args,
                             **kwargs)
 

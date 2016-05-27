@@ -15,6 +15,7 @@ import os
 from functools import wraps
 from multipledispatch import dispatch
 
+from ...auth import AuthHandler
 from ...utils import (call,
                       is_str)
 
@@ -101,12 +102,17 @@ class Genie3Adapter(GenieBaseAdapter):
 
     def __init__(self, conf=None):
         super(Genie3Adapter, self).__init__(conf=conf)
+        self.auth_handler = AuthHandler(conf=conf)
 
     def __get_log(self, job_id, log, iterator=False, **kwargs):
         url = '{}/output/{}'.format(self.__url_for_job(job_id), log)
 
         try:
-            response = call(method='get', url=url, stream=iterator, **kwargs)
+            response = call(method='get',
+                            url=url,
+                            stream=iterator,
+                            auth_handler=self.auth_handler,
+                            **kwargs)
             return response.iter_lines() if iterator else response.text
         except GenieHTTPError as err:
             if err.response.status_code == 404:
@@ -179,7 +185,9 @@ class Genie3Adapter(GenieBaseAdapter):
             url = '{}/{}'.format(url, path.lstrip('/'))
 
         try:
-            return call(method='get', url=url).json()
+            return call(method='get',
+                        url=url,
+                        auth_handler=self.auth_handler).json()
         except GenieHTTPError as err:
             if err.response.status_code == 404:
                 raise GenieJobNotFoundError("job id '{}' not found at {}." \
@@ -259,7 +267,7 @@ class Genie3Adapter(GenieBaseAdapter):
         url = kill_uri if kill_uri is not None else self.__url_for_job(job_id)
 
         try:
-            return call(method='delete', url=url)
+            return call(method='delete',url=url, auth_handler=self.auth_handler)
         except GenieHTTPError as err:
             if err.response.status_code == 404:
                 raise GenieJobNotFoundError("job id '{}' not found at {}." \
@@ -296,7 +304,8 @@ class Genie3Adapter(GenieBaseAdapter):
             call(method='post',
                  url='{}/{}'.format(job.conf.genie.url,
                                     Genie3Adapter.JOBS_ENDPOINT),
-                 files=files)
+                 files=files,
+                 auth_handler=self.auth_handler)
         except GenieHTTPError as err:
             if err.response.status_code == 409:
                 logger.debug("reattaching to job id '%s'", job.get('job_id'))
