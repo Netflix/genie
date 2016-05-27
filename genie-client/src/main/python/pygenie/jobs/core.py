@@ -122,7 +122,11 @@ class GenieJob(object):
 
         self.conf = conf if conf else GenieConf()
         self.default_command_tags = str_to_list(
-            self.conf.get('default_command_tags.{}'.format(cls),
+            self.conf.get('genie_default_command_tags.{}'.format(cls),
+                          ['type:{}'.format(job_type)])
+        )
+        self.default_cluster_tags = str_to_list(
+            self.conf.get('genie_default_cluster_tags.{}'.format(cls),
                           ['type:{}'.format(job_type)])
         )
         self.repr_obj = Repr(self.__class__.__name__)
