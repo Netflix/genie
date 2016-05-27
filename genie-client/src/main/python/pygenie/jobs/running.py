@@ -9,6 +9,7 @@ This module implements the RunningJob model.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import logging
+import re
 import sys
 import time
 
@@ -53,6 +54,15 @@ class RunningJob(object):
             job_id=self._job_id,
             adapter=self._adapter
         )
+
+    def __convert_dttm_to_epoch(self, info_key):
+        epoch = 0
+        dttm = self.info.get(info_key, '1970-01-01T00:00:00Z')
+        if dttm is not None and re.search(r'\.\d\d\dZ', dttm):
+            epoch = dttm_to_epoch(dttm, frmt='%Y-%m-%dT%H:%M:%S.%fZ')
+        elif dttm is not None:
+            epoch = dttm_to_epoch(dttm)
+        return epoch * 1000
 
     @property
     def cluster_name(self):
@@ -147,7 +157,7 @@ class RunningJob(object):
             int: The finish time in epoch (milliseconds).
         """
 
-        return dttm_to_epoch(self.info.get('finished', '1970-01-01T00:00:00Z')) * 1000
+        return self.__convert_dttm_to_epoch('finished')
 
     def genie_log(self, iterator=False):
         """
@@ -192,7 +202,7 @@ class RunningJob(object):
             boolean: True if the job is done, False if still running.
         """
 
-        if self.finish_time == 0:
+        if self.finish_time is None or self.finish_time == 0:
             self.update()
         return self.finish_time > 0
 
@@ -319,7 +329,7 @@ class RunningJob(object):
             int: The start time in epoch (milliseconds).
         """
 
-        return dttm_to_epoch(self.info.get('started', '1970-01-01T00:00:00Z')) * 1000
+        return self.__convert_dttm_to_epoch('started')
 
     @property
     def status(self):
@@ -428,8 +438,7 @@ class RunningJob(object):
             int: The update time in epoch (milliseconds).
         """
 
-        return dttm_to_epoch(self.info.get('updated', '1970-01-01T00:00:00Z')) \
-            * 1000
+        return self.__convert_dttm_to_epoch('updated')
 
     @property
     def username(self):

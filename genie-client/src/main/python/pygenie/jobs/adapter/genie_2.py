@@ -167,8 +167,14 @@ class Genie2Adapter(GenieBaseAdapter):
             'version': job.get('job_version')
         }
 
+        # command tags not set, use default
         if not payload.get('commandCriteria'):
             payload['commandCriteria'] = job.default_command_tags
+
+        # cluster tags not set, use default
+        if not [c.get('tags') for c in payload.get('clusterCriterias', []) \
+                if len(c.get('tags', [])) > 0]:
+            payload['clusterCriterias'] = [{'tags': job.default_cluster_tags}]
 
         return payload
 
@@ -201,8 +207,10 @@ class Genie2Adapter(GenieBaseAdapter):
             'archive_location': data.get('archiveLocation'),
             'attachments': data.get('attachments'),
             'client_host': data.get('clientHost'),
+            'cluster_id': data.get('executionClusterId'),
             'cluster_name': data.get('executionClusterName'),
             'command_args': data.get('commandArgs'),
+            'command_id': data.get('commandId'),
             'command_name': data.get('commandName'),
             'created': data.get('created'),
             'description': data.get('description'),

@@ -160,8 +160,14 @@ class Genie3Adapter(GenieBaseAdapter):
             'version': job.get('job_version')
         }
 
+        # command tags not set, use default
         if not payload.get('commandCriteria'):
             payload['commandCriteria'] = job.default_command_tags
+
+        # cluster tags not set, use default
+        if not [c.get('tags') for c in payload.get('clusterCriterias', []) \
+                if len(c.get('tags', [])) > 0]:
+            payload['clusterCriterias'] = [{'tags': job.default_cluster_tags}]
 
         return payload
 
@@ -186,20 +192,24 @@ class Genie3Adapter(GenieBaseAdapter):
         """
 
         data = self.get(job_id)
-        applications = self.get(job_id, path='applications')
+        application_data = self.get(job_id, path='applications')
+        cluster_data = self.get(job_id, path='cluster')
+        command_data = self.get(job_id, path='command')
         execution_data = self.get(job_id, path='execution')
         request_data = self.get(job_id, path='request')
 
         link = data.get('_links', {}).get('self', {}).get('href')
 
         return {
-            'application_name': ','.join(a.get('id') for a in applications),
+            'application_name': ','.join(a.get('id') for a in application_data),
             'archive_location': data.get('archiveLocation'),
             'attachments': None,
             'client_host': execution_data.get('hostName'),
-            'cluster_name': data.get('clusterName'),
+            'cluster_id': cluster_data.get('id'),
+            'cluster_name': cluster_data.get('name'),
             'command_args': data.get('commandArgs'),
-            'command_name': data.get('commandName'),
+            'command_id': command_data.get('id'),
+            'command_name': command_data.get('name'),
             'created': data.get('created'),
             'description': data.get('description'),
             'disable_archive': request_data.get('disableLogArchival'),
