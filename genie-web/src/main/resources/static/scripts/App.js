@@ -2,6 +2,8 @@ import React from 'react';
 import { render } from 'react-dom';
 import $ from 'jquery';
 
+import { fetch } from './utils';
+
 import cookie from 'react-cookie';
 
 import SiteHeader from './components/SiteHeader';
@@ -40,8 +42,8 @@ export default class App extends React.Component {
       version: '',
       infos: [
         {
+          className : '',
           name      : cookie.load('genie.user'),
-          className : ''
         }
       ]
     };
@@ -56,7 +58,7 @@ export default class App extends React.Component {
       global: false,
       type: 'GET',
       headers: {
-          'Accept': 'application/json'
+        'Accept': 'application/json'
       },
       url: '/actuator/info'
     }).done((data) => {
