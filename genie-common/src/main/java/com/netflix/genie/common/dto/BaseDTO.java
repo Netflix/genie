@@ -42,7 +42,7 @@ public abstract class BaseDTO implements Serializable {
 
     private static final long serialVersionUID = 9093424855934127120L;
 
-    @Size(max = 255, message = "Max length is 255 characters")
+    @Size(max = 255, message = "Max length for the ID is 255 characters")
     private final String id;
     @JsonSerialize(using = JsonDateSerializer.class)
     private final Date created;

@@ -19,8 +19,10 @@ package com.netflix.genie.common.dto.search;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.fasterxml.jackson.datatype.jsr310.deser.DurationDeserializer;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.util.JsonDateSerializer;
 import com.netflix.genie.common.util.TimeUtils;
@@ -52,6 +54,7 @@ public class JobSearchResult extends BaseSearchResult {
     private final String clusterName;
     private final String commandName;
     @JsonSerialize(using = ToStringSerializer.class)
+    @JsonDeserialize(using = DurationDeserializer.class)
     private final Duration runtime;
 
     /**

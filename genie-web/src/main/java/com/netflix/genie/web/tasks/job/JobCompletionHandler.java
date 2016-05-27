@@ -30,6 +30,8 @@ import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.MailService;
 import com.netflix.genie.core.services.impl.GenieFileTransferService;
+import com.netflix.spectator.api.Counter;
+import com.netflix.spectator.api.Registry;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
@@ -61,6 +63,13 @@ public class JobCompletionHandler {
     private final MailService mailServiceImpl;
     private final Executor executor;
 
+    // Metrics
+    private final Counter emailFailureRate;
+    private final Counter archivalFailureRate;
+    private final Counter doneFileProcessingFailureRate;
+    private final Counter finalStatusUpdateFailureRate;
+    private final Counter processGroupCleanupFailureRate;
+
     /**
      * Constructor.
      *
@@ -69,6 +78,8 @@ public class JobCompletionHandler {
      * @param genieFileTransferService An implementation of the Genie File Transfer service.
      * @param genieWorkingDir          The working directory where all job directories are created.
      * @param mailServiceImpl          An implementation of the mail service.
+     * @param registry                 The metrics registry to use
+     *
      * @throws GenieException if there is a problem
      */
     @Autowired
@@ -77,7 +88,8 @@ public class JobCompletionHandler {
         final JobSearchService jobSearchService,
         final GenieFileTransferService genieFileTransferService,
         final Resource genieWorkingDir,
-        final MailService mailServiceImpl
+        final MailService mailServiceImpl,
+        final Registry registry
     ) throws GenieException {
         this.jobPersistenceService = jobPersistenceService;
         this.jobSearchService = jobSearchService;
@@ -91,6 +103,13 @@ public class JobCompletionHandler {
         } catch (IOException gse) {
             throw new GenieServerException("Could not load the base path from resource");
         }
+
+        // Set up the metrics
+        this.emailFailureRate = registry.counter("genie.jobs.emailFailure.rate");
+        this.archivalFailureRate = registry.counter("genie.jobs.archivalFailure.rate");
+        this.doneFileProcessingFailureRate = registry.counter("genie.jobs.doneFileProcessingFailure.rate");
+        this.finalStatusUpdateFailureRate = registry.counter("genie.jobs.finalStatusUpdateFailure.rate");
+        this.processGroupCleanupFailureRate = registry.counter("genie.jobs.processGroupCleanupFailure.rate");
     }
 
     /**
@@ -106,7 +125,7 @@ public class JobCompletionHandler {
 
         final String jobId = event.getJobExecution().getId();
 
-        updateExitCode(jobId);
+        updateFinalStatusForJob(jobId);
         cleanupProcesses(event.getJobExecution().getProcessId());
         archivedJobDir(jobId);
         sendEmail(jobId);
@@ -128,14 +147,13 @@ public class JobCompletionHandler {
             commandLine.addArgument(Integer.toString(pid));
             executor.execute(commandLine);
 
+            // The process group should not exist and the above code should always throw and exception. If it does
+            // not then the bash script is not cleaning up stuff well during kills or the script is done but
+            // child processes are still remaining. This metric tracks all that.
+            this.processGroupCleanupFailureRate.increment();
         } catch (Exception e) {
-            // TODO create a metric for this error
-            // Remove the below debug message once metric is added.This is will mostly fail for all jobs
-            // as the process group will not be there any more by the time this command is called. Log statement
-            // is a placeholder for not hitting a findbugs empty catch block error in the build.
-            log.debug("Clean up process failed.", e);
+            log.debug("Received expected exception. Ignoring.");
         }
-
     }
 
     /**
@@ -144,7 +162,7 @@ public class JobCompletionHandler {
      * @param jobId The job id.
      * @throws GenieException If there is any problem
      */
-    public void updateExitCode(
+    public void updateFinalStatusForJob(
         final String jobId
     ) throws GenieException {
         try {
@@ -157,9 +175,11 @@ public class JobCompletionHandler {
                 final JobDoneFile jobDoneFile = objectMapper
                     .readValue(new File(baseWorkingDir + "/" + jobId + "/genie/genie.done"), JobDoneFile.class);
                 final int exitCode = jobDoneFile.getExitCode();
+
+                // This method internally also updates the status according to the exit code.
                 this.jobPersistenceService.setExitCode(jobId, exitCode);
             } catch (final IOException ioe) {
-                // TODO create a metric for this event
+                this.doneFileProcessingFailureRate.increment();
                 // The run.sh should theoretically ALWAYS generate a done file so we should never hit this code.
                 // But if we do handle it generate a metric for it which we can track
                 log.error("Could not load the done file for job {}. Marking it as failed.", jobId);
@@ -170,8 +190,8 @@ public class JobCompletionHandler {
                 );
             }
         } catch (Exception e) {
-            // TODO create a metric for this error
-            log.debug("Could not update the exit code and status for job: {}", jobId, e);
+            log.error("Could not update the exit code and status for job: {}", jobId, e);
+            this.finalStatusUpdateFailureRate.increment();
         }
     }
 
@@ -199,7 +219,8 @@ public class JobCompletionHandler {
                     + jobId
                     + ".tar.gz";
 
-                final CommandLine commandLine = new CommandLine("tar");
+                final CommandLine commandLine = new CommandLine("sudo");
+                commandLine.addArgument("tar");
                 commandLine.addArgument("-c");
                 commandLine.addArgument("-z");
                 commandLine.addArgument("-f");
@@ -213,8 +234,8 @@ public class JobCompletionHandler {
                 this.genieFileTransferService.putFile(localArchiveFile, job.getArchiveLocation());
             }
         } catch (Exception e) {
-            // TODO create a metric for this error
-            log.debug("Could not archive directory for job: {}", jobId, e);
+            log.error("Could not archive directory for job: {}", jobId, e);
+            this.archivalFailureRate.increment();
         }
     }
 
@@ -247,8 +268,8 @@ public class JobCompletionHandler {
                 );
             }
         } catch (Exception e) {
-            // TODO create a metric for this error
-            log.debug("Could not send email for job: {}", jobId, e);
+            log.error("Could not send email for job: {}", jobId, e);
+            this.emailFailureRate.increment();
         }
     }
 }

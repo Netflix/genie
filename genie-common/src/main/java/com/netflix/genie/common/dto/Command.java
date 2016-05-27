@@ -44,9 +44,9 @@ public class Command extends ConfigDTO {
 
     private static final long serialVersionUID = -3559641165667609041L;
 
-    @NotNull
+    @NotNull(message = "A valid command status is required")
     private final CommandStatus status;
-    @NotEmpty
+    @NotEmpty(message = "An executable is required")
     @Size(max = 255, message = "Executable path can't be longer than 255 characters")
     private final String executable;
     @Min(

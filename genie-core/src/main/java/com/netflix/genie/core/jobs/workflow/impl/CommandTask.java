@@ -59,13 +59,7 @@ public class CommandTask extends GenieBaseTask {
             this.jobExecEnv.getCommand().getId(),
             AdminResources.COMMAND
         );
-
-        // Create the dependencies directory for this id
-        createEntityInstanceDependenciesDirectory(
-            this.jobExecEnv.getCommand().getId(),
-            AdminResources.COMMAND
-        );
-
+        
         // Get the setup file if specified and add it as source command in launcher script
         final String commandSetupFile = jobExecEnv.getCommand().getSetupFile();
         if (commandSetupFile != null && StringUtils.isNotBlank(commandSetupFile)) {
