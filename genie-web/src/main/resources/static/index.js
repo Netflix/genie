@@ -1,6 +1,6 @@
 import React from 'react';
 import {render} from 'react-dom';
-import { Router, Route, browserHistory, Redirect } from 'react-router';
+import { Router, Route, browserHistory, IndexRedirect } from 'react-router';
 
 import App from './scripts/App';
 import Job from './scripts/Job';
@@ -16,11 +16,12 @@ import './styles/genie.css';
 render((
   <Router history={browserHistory}>
     <Route path="/" component={App}>
+      <IndexRedirect to="/jobs" />
     	<Route path="/jobs" component={Job}></Route>
     	<Route path="/clusters" component={Cluster}></Route>
     	<Route path="/commands" component={Command}></Route>
     	<Route path="/applications" component={Application}></Route>
     </Route>
-    <Route path="/genie-jobs/*" component={GenieJobDirectory}></Route>
+    <Route path="/output/*" component={GenieJobDirectory}></Route>
   </Router>
 ), document.getElementById('root'));

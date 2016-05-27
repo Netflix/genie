@@ -52,7 +52,7 @@ public class UIController {
             "/clusters/**",
             "/commands/**",
             "/jobs/**",
-            "/genie-jobs/**"
+            "/output/**"
         },
         method = RequestMethod.GET
     )

@@ -1,21 +1,30 @@
 import React from 'react';
 import { render } from 'react-dom';
-import $ from 'jquery';
 
-import JobSearchForm from './components/JobSearchForm';
-import JobSearchResult from './components/JobSearchResult';
+import SearchResult from './components/SearchResult';
 import NoSearchResult from './components/NoSearchResult';
+import JobSearchForm from './components/JobSearchForm';
 import SearchBar from './components/SearchBar';
+
+import JobTableBody from './components/JobTableBody';
+import TableHeader from './components/TableHeader';
+
+import { fetch, hasChanged } from './utils';
+import $ from 'jquery';
 
 export default class Job extends React.Component {
 
-  constructor(props) {
-    super(props);
-    this.state = this.getDefaultState();
+  static childContextTypes = {
+    location: React.PropTypes.object.isRequired
   }
 
-  getDefaultState() {
-    return {
+  getChildContext() {
+    return { location: this.props.location }
+  }
+
+  constructor(props) {
+    super(props);
+    this.state = {
       jobs           : [],
       links          : {},
       page           : {},
@@ -30,23 +39,19 @@ export default class Job extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     const { query } = nextProps.location;
-    this.loadData(query);
+    if (hasChanged(query,
+                   this.props.location.query)) {
+      this.loadData(query);
+    }
   }
 
   loadData(query) {
     if ($.isEmptyObject(query)) {
-      query = { size: 25 };
+      query = {size: 25}
     }
 
-    $.ajax({
-      global: false,
-      type: 'GET',
-      headers: {
-      'Accept': 'application/hal+json',
-      },
-      url: '/api/v3/jobs',
-      data: query,
-    }).done((data) => {
+    fetch('/api/v3/jobs', query)
+    .done((data) => {
       if (data.hasOwnProperty('_embedded')) {
         this.setState({
           noSearchResult : false,
@@ -59,7 +64,7 @@ export default class Job extends React.Component {
       else {
         this.setState({
           query : query,
-          jobs  : []
+          jobs  : [],
         });
       }
     });
@@ -70,22 +75,26 @@ export default class Job extends React.Component {
   }
 
   render() {
-    let jobSearchResult = this.state.jobs.length > 0 ?
-                          <JobSearchResult
-                            jobs={this.state.jobs}
-                            links={this.state.links}
-                            page={this.state.page}
-                            headers={['Id', 'Name', 'User', 'Status', 'Cluser', 'Output', 'Started', 'Finished', 'Run Time']}
-                            showSearchForm={this.state.showSearchForm}
-                          />:
-                          <NoSearchResult />;
-
     let jobSearch = this.state.showSearchForm ?
                     <JobSearchForm
                       query={this.state.query}
                       toggleSearchForm={this.toggleSearchForm}
                     />:
                     <SearchBar toggleSearchForm={this.toggleSearchForm} />;
+
+    let jobSearchResult = this.state.jobs.length > 0 ?
+                          <SearchResult
+                            data={this.state.jobs}
+                            links={this.state.links}
+                            page={this.state.page}
+                            pageType="jobs"
+                            headers={['Id', 'Name', 'User', 'Status', 'Cluster', 'Output', 'Started', 'Finished', 'Run Time']}
+                            showSearchForm={this.state.showSearchForm}
+                            TableBody={JobTableBody}
+                            TableHeader={TableHeader}
+                          />:
+                          <NoSearchResult />;
+
 
   return (
     <div className="row" >
