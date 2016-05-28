@@ -56,8 +56,8 @@ class TestingAuthHandler(unittest.TestCase):
 
         request.side_effect = check_request_auth_kwargs
 
-        pygenie.utils.AUTH_HANDLER = pygenie.auth.AuthHandler(conf=self.conf)
-        pygenie.utils.call('http://localhost')
+        pygenie.utils.call('http://localhost',
+                           auth_handler=pygenie.auth.AuthHandler(conf=self.conf))
 
         if patcher:
             patcher.stop()

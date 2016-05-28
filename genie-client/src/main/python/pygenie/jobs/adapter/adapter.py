@@ -28,9 +28,9 @@ def get_adapter_for_version(version):
 
     major_version = str(version).split('.', 1)[0]
     if major_version == '2':
-        return Genie2Adapter()
+        return Genie2Adapter
     elif major_version == '3':
-        return Genie3Adapter()
+        return Genie3Adapter
     raise GenieAdapterError("no adapter for version '{}'".format(version))
 
 
@@ -44,11 +44,11 @@ def execute_job(job):
     """
 
     version = job.conf.get('genie.version')
-    adapter = get_adapter_for_version(version)
+    adapter = get_adapter_for_version(version)(conf=job.conf)
     if adapter is not None:
         try:
             adapter.submit_job(job)
-            return RunningJob(job.get('job_id'), adapter=adapter)
+            return RunningJob(job.get('job_id'), adapter=adapter, conf=job.conf)
         except NotImplementedError:
             pass
     raise GenieAdapterError("no adapter for '{}' to version '{}'" \

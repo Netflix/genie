@@ -26,7 +26,7 @@ class RunningJob(object):
     def __init__(self, job_id, adapter=None, conf=None):
         self.__cached_genie_log = None
         self.__cached_stderr = None
-        self.__conf = conf if conf is not None else GenieConf()
+        self.__conf = conf or GenieConf()
         self.__sys_stream = None
 
         self._cached_genie_log = None
@@ -35,8 +35,8 @@ class RunningJob(object):
         self._job_id = job_id
 
         # get_adapter_version is set in main __init__.py to get around circular imports
-        self._adapter = adapter if adapter is not None \
-            else get_adapter_for_version(self.__conf.genie.version)
+        self._adapter = adapter \
+            or get_adapter_for_version(self.__conf.genie.version)(conf=self.__conf)
 
         stream = self.__conf.get('genie.progress_stream', 'stdout').lower()
         if stream in {'stderr', 'stdout'}:
