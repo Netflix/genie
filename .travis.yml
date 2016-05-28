@@ -3,44 +3,33 @@ dist: trusty
 addons:
   apt:
     packages:
-      - mysql-server-5.6
-      - mysql-client-core-5.6
-      - mysql-client-5.6
-
+    - mysql-server-5.6
+    - mysql-client-core-5.6
+    - mysql-client-5.6
 language: java
 jdk:
-  - oraclejdk8
-
+- oraclejdk8
 services:
-  - mysql
-
+- mysql
 git:
   depth: 200
-
 install: true
-
-# Setup the database for the integration tests
 before_script:
-  - mysql -u root -e 'create database genie;'
-  - mysql -u root genie < genie-ddl/mysql/3.0.0-schema.mysql.sql
-
+- mysql -u root -e 'create database genie;'
+- mysql -u root genie < genie-ddl/mysql/3.0.0-schema.mysql.sql
 script: ./gradle/buildViaTravis.sh
-
-# https://docs.travis-ci.com/user/languages/java#Caching
 before_cache:
-  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+- rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
 cache:
   directories:
-    - "$HOME/.gradle/caches/"
-    - "$HOME/.gradle/wrapper/"
-
+  - $HOME/.gradle/caches/
+  - $HOME/.gradle/wrapper/
 env:
   global:
-    - secure: K9TGSpk8MKEoqZcscIHNt9M1JwDA9DQvGVTsb/LiFg8OB+TzJePYhNFAflU7tDpgOhx/ukxAmrWrsB18d3ujpC/PzUM5qv00YUTuoZaoKU0FRtTVbVL+S8E1lHaEfN8/w1lC0kjun2lUAJ2U5FJrdZF0mbzy2YeDNNroALVW4FM=
-    - secure: N59KYsMMJaVz0QEJ9UK8bvb2OCB8Fu1aYBnJt5wwfQlopIZFSByeJahvtDaJW8r9Ae0dPQNP4XR0Ps7nxRYe6yMdX3yr+ptpa8x+eIAX+bpR8hmHnsmpS3XmBMxZBrRZSFwd4N9GET+WVhRDdubcKnwwSyiGRpPkmxz71IWTgqQ=
-    - secure: EQtZL4/gipYNu+YoDuElpowOpak7r9BLgUQ1UE6TAWGHepqp76S6pR8drlwWZDzv8YrP7Ze+QrNZqErKFieDneOTVOhoOqc8YAAd0qV3h8hmmo3xUHNR3CdPErc9QvfxHyZ7yO4+mCW6FP77tKzHVRm2VjkjMIhJBqGmA240Mq4=
-    - secure: HKTf4wmQwXXMduNACwvQ4PSHMIs8DaE3bOMJoS3hx7WpalhqCKoa9vdcCtId4ZIVaY+KJoXRV4H11IYQNcvcagwJ6q5C7NhpYSu/GohpXFpzseIaB8oCC1RKzJCf0oGCMhs3WnNOGhpg/zFj2I+3PGMMaJIdlBG6D0ObLV7BIQs=
-
+  - secure: fDTw7flEHvAMikDBMr9g5itVC9pHxW1To2tnZKQnP+FO0CDkFBYctSHxRzhahPYryWiKtSSsFVslpCaKXs2Q6vFuTJE7GW1ZhGMtP7oxtOMWLUWL/yK8YHsG7M+ReEn/oBF4jtrkBFJPF3FXzjLa5MiK1+eSnEe6u5V2xiLrbHY=
+  - secure: g8oRT4YUr2VyO6h8+Pm+MvSgPyfEtd+ndCxF70F0SUj5eNV9SFt7yYOn6V6Mxx9eEyZMQSdPed+70+94Nd8yD+cjIGHNnlvKt6V/Q4i09XxhT3/ZiM8B9qRd1eGON0mEaU5Bl+918CGEIVCVsfLPGLVpItaSz2Tda46EDOdRHO8=
+  - secure: c0LFCj1KBTEIFSWlpRGgaei86bfrpnSr8qmMOu/S4dl2JRnCnW9AHmrmQzYhd5NlNPugOAncYk9lnkxA7xqtDlv/Ih4YKBaeP924hwLWO//0tKgxhF1dr0dHI+bRKURvcSyLXFDNFjuXUrw4SalBLbZCmiNFzJLMmy2Lvs9UTso=
+  - secure: Nv1mMLy2XX+bYziq536KbNg/mAVDTaLw3q3bKP2Mil3JVicXxYVbkEo+DK2O4rsuT7JNbyroN6/3x7xT9qBo4X7vzCjU91QUAxq5t0SmG0FW+oAIApHWTum307b5XS2UyqV/88gg1O6g9or3bKmDLUsJ1A/+fsASozA207a7zls=
 notifications:
   slack:
     secure: H5nS+GX6TYTU27ur6YFG5OgrQeUbzXLok5ub6+xcmyYEeVPpnQ1Gg/wKqTAGsP9j6tAkqPpxgYT9i9Do6eyTEplK6bTvQVyhilsEDtxGJbUO8XOE9TSo6jAe/lD3EB5l46gxFID+Hg9IkPii4LwEabP7PVehrB1JfNZ6QDgSRRM=
