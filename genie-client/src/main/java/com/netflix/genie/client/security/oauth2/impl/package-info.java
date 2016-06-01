@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2015 Netflix, Inc.
+ *  Copyright 2016 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
  *
  */
 /**
- * Package containing tests for classes in the  com.netflix.genie.client.security.oauth package.
+ * Package containing implementations of interfaces defined in the oauth package.
  *
  * @author amsharma
  * @since 3.0.0
  */
-package com.netflix.genie.client.security.oauth;
+package com.netflix.genie.client.security.oauth2.impl;

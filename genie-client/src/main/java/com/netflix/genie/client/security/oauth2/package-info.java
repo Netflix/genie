@@ -22,4 +22,4 @@
  * @author amsharma
  * @since 3.0.0
  */
-package com.netflix.genie.client.security.oauth;
+package com.netflix.genie.client.security.oauth2;

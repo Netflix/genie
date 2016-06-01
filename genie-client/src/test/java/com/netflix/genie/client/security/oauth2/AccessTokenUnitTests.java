@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.client.security.oauth;
+package com.netflix.genie.client.security.oauth2;
 
 import com.netflix.genie.test.categories.UnitTest;
 import groovy.lang.Category;
@@ -68,7 +68,7 @@ public class AccessTokenUnitTests {
      */
     @Test
     public void canSetExpiresIn() {
-        final int expiresIn =  3600;
+        final int expiresIn = 3600;
         this.accessToken.setExpiresIn(expiresIn);
         Assert.assertThat(this.accessToken.getExpiresIn(), Matchers.is(expiresIn));
     }

@@ -15,12 +15,12 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.client.security.oauth.impl;
+package com.netflix.genie.client.security.oauth2.impl;
 
 import com.google.common.net.HttpHeaders;
 import com.netflix.genie.client.security.SecurityInterceptor;
-import com.netflix.genie.client.security.oauth.AccessToken;
-import com.netflix.genie.client.security.oauth.TokenFetcher;
+import com.netflix.genie.client.security.oauth2.AccessToken;
+import com.netflix.genie.client.security.oauth2.TokenFetcher;
 import com.netflix.genie.common.exceptions.GenieException;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Request;
@@ -34,28 +34,27 @@ import java.io.IOException;
  * @author amsharma
  */
 @Slf4j
-public class OAuthSecurityInterceptor implements SecurityInterceptor {
+public class OAuth2SecurityInterceptor implements SecurityInterceptor {
 
     private final TokenFetcher tokenFetcher;
 
     /**
      * Constructor.
      *
-     * @param url The URL of the IDP server for getting oauth token.
-     * @param clientId The client id to use to fetch credentials.
+     * @param url          The URL of the IDP server for getting oauth token.
+     * @param clientId     The client id to use to fetch credentials.
      * @param clientSecret The client secret to use to fetch credentials.
-     * @param grantType The grant type for the user.
-     * @param scope The scope of the user permissions.
-     *
+     * @param grantType    The grant type for the user.
+     * @param scope        The scope of the user permissions.
      * @throws GenieException If there is a problem initializing the object.
      */
-    public OAuthSecurityInterceptor(
+    public OAuth2SecurityInterceptor(
         final String url,
         final String clientId,
         final String clientSecret,
         final String grantType,
         final String scope
-        ) throws GenieException {
+    ) throws GenieException {
         log.debug("Constructor called.");
         tokenFetcher = new TokenFetcher(url, clientId, clientSecret, grantType, scope);
     }

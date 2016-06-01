@@ -16,9 +16,9 @@
  *
  */
 /**
- * Package containing implementations of interfaces defined in the oauth package.
+ * Package containing tests for the oauth security impl package.
  *
  * @author amsharma
  * @since 3.0.0
  */
-package com.netflix.genie.client.security.oauth.impl;
+package com.netflix.genie.client.security.oauth2.impl;

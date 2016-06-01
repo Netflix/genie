@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.client.security.oauth;
+package com.netflix.genie.client.security.oauth2;
 
 import com.netflix.genie.client.apis.TokenService;
 import com.netflix.genie.common.exceptions.GenieException;
@@ -62,12 +62,11 @@ public class TokenFetcher {
     /**
      * Constructor.
      *
-     * @param oauthUrl The url of the IDP from where to get the credentials.
-     * @param clientId The clientId to use to get the credentials.
+     * @param oauthUrl     The url of the IDP from where to get the credentials.
+     * @param clientId     The clientId to use to get the credentials.
      * @param clientSecret The clientSecret to use to get the credentials.
-     * @param grantType The type of the grant.
-     * @param scope The scope of the credentials returned.
-     *
+     * @param grantType    The type of the grant.
+     * @param scope        The scope of the credentials returned.
      * @throws GenieException If there is any problem.
      */
     public TokenFetcher(
@@ -121,7 +120,7 @@ public class TokenFetcher {
             credentialParams.put(GRANT_TYPE, grantType);
             credentialParams.put(SCOPE, scope);
         } catch (Exception e) {
-           throw new GenieException(400, "Could not instantiate Token Service.", e);
+            throw new GenieException(400, "Could not instantiate Token Service.", e);
         }
     }
 
