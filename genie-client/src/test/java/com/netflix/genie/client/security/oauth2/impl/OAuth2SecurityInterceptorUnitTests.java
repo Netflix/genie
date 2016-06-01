@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.client.security.oauth.impl;
+package com.netflix.genie.client.security.oauth2.impl;
 
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.test.categories.UnitTest;
@@ -27,18 +27,18 @@ import org.mockito.Mockito;
 import java.io.IOException;
 
 /**
- * Unit Tests for OAuthSecurityInterceptory Class.
+ * Unit Tests for OAuth2SecurityInterceptor Class.
  *
  * @author amsharma
  * @since 3.0.0
  */
 @Category(UnitTest.class)
-public class OAuthSecurityInterceptorUnitTests {
+public class OAuth2SecurityInterceptorUnitTests {
 
     private static final String URL = "http://localhost/foo";
     private static final String CLIENT_ID = "client_id";
     private static final String CLIENT_SECRET = "client_secret";
-    private static final String GRANT_TYPE  = "grant_type";
+    private static final String GRANT_TYPE = "grant_type";
     private static final String SCOPE = "scope";
 
     /**
@@ -48,8 +48,7 @@ public class OAuthSecurityInterceptorUnitTests {
      */
     @Test
     public void testCanConstruct() throws GenieException {
-
-        new OAuthSecurityInterceptor(URL, CLIENT_ID, CLIENT_SECRET, GRANT_TYPE, SCOPE);
+        new OAuth2SecurityInterceptor(URL, CLIENT_ID, CLIENT_SECRET, GRANT_TYPE, SCOPE);
     }
 
     /**
@@ -61,7 +60,7 @@ public class OAuthSecurityInterceptorUnitTests {
     public void testTokenFetchFailure() throws Exception {
 
         final Interceptor.Chain chain = Mockito.mock(Interceptor.Chain.class);
-        final OAuthSecurityInterceptor oAuthSecurityInterceptor  = new OAuthSecurityInterceptor(
+        final OAuth2SecurityInterceptor oAuth2SecurityInterceptor = new OAuth2SecurityInterceptor(
             URL,
             CLIENT_ID,
             CLIENT_SECRET,
@@ -69,6 +68,6 @@ public class OAuthSecurityInterceptorUnitTests {
             SCOPE
         );
 
-        oAuthSecurityInterceptor.intercept(chain);
+        oAuth2SecurityInterceptor.intercept(chain);
     }
 }

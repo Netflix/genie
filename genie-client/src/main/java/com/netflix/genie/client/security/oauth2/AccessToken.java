@@ -15,10 +15,31 @@
  *     limitations under the License.
  *
  */
+package com.netflix.genie.client.security.oauth2;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
+
 /**
- * Package containing tests for the oauth security impl package.
+ * Class that encapsulates the OAuth credentials.
  *
  * @author amsharma
  * @since 3.0.0
  */
-package com.netflix.genie.client.security.oauth.impl;
+@Getter
+@Setter
+public class AccessToken {
+
+    // The type of the token
+    @JsonProperty("token_type")
+    private String tokenType;
+
+    // The accessToken
+    @JsonProperty("access_token")
+    private String accessToken;
+
+    // Time to expire from creation
+    @JsonProperty("expires_in")
+    private int expiresIn;
+}

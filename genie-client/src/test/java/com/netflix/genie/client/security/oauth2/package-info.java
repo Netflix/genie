@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2016 Netflix, Inc.
+ *  Copyright 2015 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,31 +15,10 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.client.security.oauth;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Getter;
-import lombok.Setter;
-
 /**
- * Class that encapsulates the OAuth credentials.
+ * Package containing tests for classes in the  com.netflix.genie.client.security.oauth package.
  *
  * @author amsharma
  * @since 3.0.0
  */
-@Getter
-@Setter
-public class AccessToken {
-
-    // The type of the token
-    @JsonProperty("token_type")
-    private String tokenType;
-
-    // The accessToken
-    @JsonProperty("access_token")
-    private String accessToken;
-
-    // Time to expire from creation
-    @JsonProperty("expires_in")
-    private int expiresIn;
-}
+package com.netflix.genie.client.security.oauth2;
