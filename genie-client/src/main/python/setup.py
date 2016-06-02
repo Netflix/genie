@@ -38,7 +38,13 @@ setup(
     long_description=long_description,
     test_suite='tests',
     install_requires=[
+        "decorator",
+        "multipledispatch",
+        "pyconfigurator",
+        "pystache",
         "python-dateutil >= 2.4",
+        "requests",
+        "six"
     ],
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
