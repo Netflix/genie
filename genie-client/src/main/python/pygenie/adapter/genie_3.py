@@ -15,27 +15,27 @@ import os
 from functools import wraps
 from multipledispatch import dispatch
 
-from ...auth import AuthHandler
-from ...utils import (call,
-                      is_str)
+from ..auth import AuthHandler
+from ..utils import (call,
+                     is_str)
 
-from ..utils import (is_attachment,
-                     is_file)
+from ..jobs.utils import (is_attachment,
+                          is_file)
 
 from .genie_x import (GenieBaseAdapter,
                       substitute)
 
-from ...exceptions import (GenieAttachmentError,
-                           GenieHTTPError,
-                           GenieJobError,
-                           GenieJobNotFoundError)
+from ..exceptions import (GenieAttachmentError,
+                          GenieHTTPError,
+                          GenieJobError,
+                          GenieJobNotFoundError)
 
 #jobs
-from ..core import GenieJob
-from ..hadoop import HadoopJob
-from ..hive import HiveJob
-from ..pig import PigJob
-from ..presto import PrestoJob
+from ..jobs.core import GenieJob
+from ..jobs.hadoop import HadoopJob
+from ..jobs.hive import HiveJob
+from ..jobs.pig import PigJob
+from ..jobs.presto import PrestoJob
 
 
 logger = logging.getLogger('com.netflix.genie.jobs.adapter.genie_3')

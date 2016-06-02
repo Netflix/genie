@@ -28,8 +28,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import logging
 import pkg_resources
 
-from .jobs.adapter.adapter import (execute_job,
-                                   get_adapter_for_version)
+from .adapter.adapter import (execute_job,
+                              get_adapter_for_version)
 from .jobs import core
 from .jobs import running
 

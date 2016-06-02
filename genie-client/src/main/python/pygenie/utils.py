@@ -10,7 +10,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import datetime
 import logging
-import os
 import pkg_resources
 import six
 import socket
@@ -98,7 +97,7 @@ def dttm_to_epoch(date_str, frmt='%Y-%m-%dT%H:%M:%SZ'):
     """Convert a date string to epoch seconds."""
 
     return int((datetime.datetime.strptime(date_str, frmt) -
-        datetime.datetime(1970,1,1)).total_seconds())
+                datetime.datetime(1970, 1, 1)).total_seconds())
 
 
 def is_str(string):

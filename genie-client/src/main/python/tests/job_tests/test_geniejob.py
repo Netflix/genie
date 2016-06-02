@@ -136,7 +136,7 @@ class TestingGenieJobAdapters(unittest.TestCase):
             .job_version('0.0.1alpha')
 
         assert_equals(
-            pygenie.jobs.adapter.genie_3.get_payload(job),
+            pygenie.adapter.genie_3.get_payload(job),
             {
                 u'applications': [u'applicationid1'],
                 u'attachments': [],

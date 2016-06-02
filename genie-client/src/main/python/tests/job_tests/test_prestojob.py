@@ -168,7 +168,7 @@ class TestingPrestoJobAdapters(unittest.TestCase):
             .load_config_file(os.path.join(self.dirname, 'genie3.ini'))
 
 
-    @patch('pygenie.jobs.adapter.genie_2.to_attachment')
+    @patch('pygenie.adapter.genie_2.to_attachment')
     @patch('os.path.isfile')
     def test_genie2_payload_adhoc_script(self, os_isfile, to_att):
         """Test PrestoJob payload for Genie 2 (adhoc script)."""
@@ -194,7 +194,7 @@ class TestingPrestoJobAdapters(unittest.TestCase):
             .job_version('0.0.1presto')
 
         assert_equals(
-            pygenie.jobs.adapter.genie_2.get_payload(job),
+            pygenie.adapter.genie_2.get_payload(job),
             {
                 u'attachments': [
                     {u'name': u'prestofile1', u'data': u'file contents'},
@@ -218,7 +218,7 @@ class TestingPrestoJobAdapters(unittest.TestCase):
             }
         )
 
-    @patch('pygenie.jobs.adapter.genie_2.to_attachment')
+    @patch('pygenie.adapter.genie_2.to_attachment')
     @patch('os.path.isfile')
     @patch('pygenie.jobs.presto.is_file')
     def test_genie2_payload_file_script(self, presto_is_file, os_isfile, to_att):
@@ -246,7 +246,7 @@ class TestingPrestoJobAdapters(unittest.TestCase):
             .job_version('0.0.1presto')
 
         assert_equals(
-            pygenie.jobs.adapter.genie_2.get_payload(job),
+            pygenie.adapter.genie_2.get_payload(job),
             {
                 u'attachments': [
                     {u'name': u'prestofile1', u'data': u'file contents'},
@@ -270,7 +270,7 @@ class TestingPrestoJobAdapters(unittest.TestCase):
             }
         )
 
-    @patch('pygenie.jobs.adapter.genie_3.open')
+    @patch('pygenie.adapter.genie_3.open')
     @patch('os.path.isfile')
     def test_genie3_payload_adhoc_script(self, os_isfile, file_open):
         """Test PrestoJob payload for Genie 3 (adhoc script)."""
@@ -296,7 +296,7 @@ class TestingPrestoJobAdapters(unittest.TestCase):
             .job_version('0.0.1presto')
 
         assert_equals(
-            pygenie.jobs.adapter.genie_3.get_payload(job),
+            pygenie.adapter.genie_3.get_payload(job),
             {
                 u'applications': [u'prestoapplicationid1'],
                 u'attachments': [
@@ -322,7 +322,7 @@ class TestingPrestoJobAdapters(unittest.TestCase):
             }
         )
 
-    @patch('pygenie.jobs.adapter.genie_3.open')
+    @patch('pygenie.adapter.genie_3.open')
     @patch('os.path.isfile')
     @patch('pygenie.jobs.presto.is_file')
     def test_genie3_payload_file_script(self, presto_is_file, os_isfile, file_open):
@@ -350,7 +350,7 @@ class TestingPrestoJobAdapters(unittest.TestCase):
             .job_version('0.0.1presto')
 
         assert_equals(
-            pygenie.jobs.adapter.genie_3.get_payload(job),
+            pygenie.adapter.genie_3.get_payload(job),
             {
                 u'applications': [u'prestoapplicationid1'],
                 u'attachments': [

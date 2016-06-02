@@ -174,7 +174,7 @@ class TestingHiveJobAdapters(unittest.TestCase):
             .load_config_file(os.path.join(self.dirname, 'genie3.ini'))
 
 
-    @patch('pygenie.jobs.adapter.genie_2.to_attachment')
+    @patch('pygenie.adapter.genie_2.to_attachment')
     @patch('os.path.isfile')
     def test_genie2_payload_adhoc_script(self, os_isfile, to_att):
         """Test HiveJob payload for Genie 2 (adhoc script)."""
@@ -202,7 +202,7 @@ class TestingHiveJobAdapters(unittest.TestCase):
             .script('SELECT * FROM DUAL')
 
         assert_equals(
-            pygenie.jobs.adapter.genie_2.get_payload(job),
+            pygenie.adapter.genie_2.get_payload(job),
             {
                 u'attachments': [
                     {u'name': u'hive.file1', u'data': u'file contents'},
@@ -226,7 +226,7 @@ class TestingHiveJobAdapters(unittest.TestCase):
             }
         )
 
-    @patch('pygenie.jobs.adapter.genie_2.to_attachment')
+    @patch('pygenie.adapter.genie_2.to_attachment')
     @patch('os.path.isfile')
     @patch('pygenie.jobs.hive.is_file')
     def test_genie2_payload_file_script(self, presto_is_file, os_isfile, to_att):
@@ -257,7 +257,7 @@ class TestingHiveJobAdapters(unittest.TestCase):
             .script('/hive/script.hql')
 
         assert_equals(
-            pygenie.jobs.adapter.genie_2.get_payload(job),
+            pygenie.adapter.genie_2.get_payload(job),
             {
                 u'attachments': [
                     {u'name': u'hive.file1', u'data': u'file contents'},
@@ -281,7 +281,7 @@ class TestingHiveJobAdapters(unittest.TestCase):
             }
         )
 
-    @patch('pygenie.jobs.adapter.genie_3.open')
+    @patch('pygenie.adapter.genie_3.open')
     @patch('os.path.isfile')
     def test_genie3_payload_adhoc_script(self, os_isfile, file_open):
         """Test HiveJob payload for Genie 3 (adhoc script)."""
@@ -313,7 +313,7 @@ class TestingHiveJobAdapters(unittest.TestCase):
             .script('SELECT * FROM DUAL')
 
         assert_equals(
-            pygenie.jobs.adapter.genie_3.get_payload(job),
+            pygenie.adapter.genie_3.get_payload(job),
             {
                 u'applications': [u'hive.app'],
                 u'attachments': [
@@ -341,7 +341,7 @@ class TestingHiveJobAdapters(unittest.TestCase):
             }
         )
 
-    @patch('pygenie.jobs.adapter.genie_3.open')
+    @patch('pygenie.adapter.genie_3.open')
     @patch('os.path.isfile')
     @patch('pygenie.jobs.hive.is_file')
     def test_genie3_payload_file_script(self, presto_is_file, os_isfile, file_open):
@@ -375,7 +375,7 @@ class TestingHiveJobAdapters(unittest.TestCase):
             .script('/script.hql')
 
         assert_equals(
-            pygenie.jobs.adapter.genie_3.get_payload(job),
+            pygenie.adapter.genie_3.get_payload(job),
             {
                 u'applications': [u'hive.app'],
                 u'attachments': [
