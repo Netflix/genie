@@ -170,7 +170,9 @@ def is_attachment(dependency):
     """Return True if the dependency should be handled as an attachment."""
 
     return dependency is not None and \
-        (isinstance(dependency, dict) or os.path.isfile(dependency))
+        (isinstance(dependency, dict) \
+            or os.path.isfile(dependency) \
+            or os.path.isdir(dependency))
 
 
 def is_file(path):
