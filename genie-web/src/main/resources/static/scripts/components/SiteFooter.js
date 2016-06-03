@@ -1,6 +1,4 @@
 import React from 'react';
-import { render } from 'react-dom';
-import { Link } from 'react-router';
 
 const SiteFooter = (props) =>
   <div className="site-footer">
@@ -8,5 +6,9 @@ const SiteFooter = (props) =>
       <p>{props.version}</p>
     </footer>
   </div>;
+
+SiteFooter.propTypes = {
+  version: React.PropTypes.string,
+};
 
 export default SiteFooter;

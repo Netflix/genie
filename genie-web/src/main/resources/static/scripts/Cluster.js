@@ -1,8 +1,6 @@
 import React from 'react';
-import { render } from 'react-dom';
-import $ from 'jquery';
-import { fetch, hasChanged } from './utils';
 
+import BasePage from './BasePage';
 import SearchResult from './components/SearchResult';
 import NoSearchResult from './components/NoSearchResult';
 import SearchBar from './components/SearchBar';
@@ -11,14 +9,9 @@ import SearchForm from './components/SearchForm';
 import TableBody from './components/ClusterTableBody';
 import TableHeader from './components/TableHeader';
 
-export default class Cluster extends React.Component {
-  static childContextTypes = {
-    location: React.PropTypes.object.isRequired
-  }
+import { fetch } from './utils';
 
-  getChildContext() {
-    return { location: this.props.location }
-  }
+export default class Cluster extends BasePage {
 
   constructor(props) {
     super(props);
@@ -30,102 +23,82 @@ export default class Cluster extends React.Component {
     };
   }
 
-  componentDidMount() {
-    const { query } = this.props.location;
-    this.loadData(query);
-  }
-
-  componentWillReceiveProps(nextProps) {
-    const { query } = nextProps.location;
-
-    if (hasChanged(query,
-                   this.props.location.query)) {
-      this.loadData(query);
-    }
-  }
-
-  loadData(query={size: 25}) {
+  loadData(query) {
     fetch('/api/v3/clusters', query)
     .done((data) => {
       if (data.hasOwnProperty('_embedded')) {
         this.setState({
+          query,
           noSearchResult : false,
-          query          : query,
           page           : data.page,
           links          : data._links,
           clusters       : data._embedded.clusterList,
         });
-      }
-      else {
+      } else {
         this.setState({
-          query : query,
+          query,
           clusters  : [],
         });
       }
     });
   }
 
-  toggleSearchForm = () => {
-    this.setState({showSearchForm: !this.state.showSearchForm});
-  }
-
   render() {
     let search = this.state.showSearchForm ?
-                  <SearchForm
-                    query={this.state.query}
-                    toggleSearchForm={this.toggleSearchForm}
-                    formFields={[
-                      {
-                        label : 'Name',
-                        name  : 'name',
-                        value : '',
-                        type  : 'input'
-                      }, {
-                        label : 'Status',
-                        name  : "status",
-                        value : '',
-                        type  : 'input'
-                      }, {
-                        label : 'Tag',
-                        name  : 'tag',
-                        value : '',
-                        type  : 'input'
-                      }, {
-                        label : 'Sort By',
-                        name  : 'sort',
-                        value : '',
-                        type  : 'select',
-                        selectFields: ["name", "status", "tag"].map((field) => {
-                              return {
-                                value: field,
-                                label: field
-                              }
-                        }),
-                      },
-                    ]}
-                    searchPath="clusters"
-                  />:
-                  <SearchBar toggleSearchForm={this.toggleSearchForm} />;
+      <SearchForm
+        query={this.state.query}
+        toggleSearchForm={this.toggleSearchForm}
+        formFields={[
+          {
+            label : 'Name',
+            name  : 'name',
+            value : '',
+            type  : 'input',
+          }, {
+            label : 'Status',
+            name  : 'status',
+            value : '',
+            type  : 'input',
+          }, {
+            label : 'Tag',
+            name  : 'tag',
+            value : '',
+            type  : 'input',
+          }, {
+            label : 'Sort By',
+            name  : 'sort',
+            value : '',
+            type  : 'select',
+            selectFields: ['name', 'status', 'tag'].map(field => {
+              return {
+                value: field,
+                label: field,
+              };
+            }),
+          },
+        ]}
+        searchPath="clusters"
+      /> :
+      <SearchBar toggleSearchForm={this.toggleSearchForm} />;
 
     let searchResult = this.state.clusters.length > 0 ?
-                        <SearchResult
-                          data={this.state.clusters}
-                          links={this.state.links}
-                          page={this.state.page}
-                          pageType="clusters"
-                          headers={['Id', 'Name', 'User', 'Status', 'Version', 'Tags', 'Created', 'Updated']}
-                          showSearchForm={this.state.showSearchForm}
-                          TableBody={TableBody}
-                          TableHeader={TableHeader}
-                        />:
-                        <NoSearchResult />;
+      <SearchResult
+        data={this.state.clusters}
+        links={this.state.links}
+        page={this.state.page}
+        pageType="clusters"
+        headers={['Id', 'Name', 'User', 'Status', 'Version', 'Tags', 'Created', 'Updated']}
+        showSearchForm={this.state.showSearchForm}
+        TableBody={TableBody}
+        TableHeader={TableHeader}
+      /> :
+      <NoSearchResult />;
 
-
-  return (
-    <div className="row" >
-      {search}
-      {searchResult}
-    </div>
-  );
+    return (
+      <div className="row" >
+        {search}
+        {searchResult}
+      </div>
+    );
   }
 }
