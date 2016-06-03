@@ -9,12 +9,11 @@ from nose.tools import assert_equals, assert_raises
 
 assert_equals.__self__.maxDiff = None
 
-os.environ['GENIE_BYPASS_HOME_CONFIG'] = '1'
-
 
 import pygenie
 
 
+@patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'})
 class TestingGenieJob(unittest.TestCase):
     """Test GenieJob."""
 
@@ -46,6 +45,7 @@ class TestingGenieJob(unittest.TestCase):
             pygenie.jobs.GenieJob().cmd_args
 
 
+@patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'})
 class TestingGenieJobRepr(unittest.TestCase):
     """Test GenieJob repr."""
 
@@ -69,6 +69,7 @@ class TestingGenieJobRepr(unittest.TestCase):
             .description('description') \
             .disable_archive() \
             .email('jsmith@email.com') \
+            .genie_url('http://asdfasdf') \
             .group('group1') \
             .job_id('geniejob_repr') \
             .job_name('geniejob_repr') \
@@ -94,6 +95,7 @@ class TestingGenieJobRepr(unittest.TestCase):
             u'.dependencies("/dep2")'
             u'.description("description")'
             u'.email("jsmith@email.com")'
+            u'.genie_url("http://asdfasdf")'
             u'.group("group1")'
             u'.job_id("geniejob_repr")'
             u'.job_name("geniejob_repr")'
@@ -106,6 +108,7 @@ class TestingGenieJobRepr(unittest.TestCase):
         )
 
 
+@patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'})
 class TestingGenieJobAdapters(unittest.TestCase):
     """Test adapting GenieJob to different clients."""
 
@@ -115,8 +118,9 @@ class TestingGenieJobAdapters(unittest.TestCase):
     def test_genie3_payload(self):
         """Test GenieJob payload for Genie 3."""
 
-        genie3_conf = pygenie.conf.GenieConf() \
-            .load_config_file(os.path.join(self.dirname, 'genie3.ini'))
+        with patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'}):
+            genie3_conf = pygenie.conf.GenieConf() \
+                .load_config_file(os.path.join(self.dirname, 'genie3.ini'))
 
         job = pygenie.jobs.GenieJob(genie3_conf) \
             .applications(['applicationid1']) \
@@ -127,6 +131,7 @@ class TestingGenieJobAdapters(unittest.TestCase):
             .description('this job is to test geniejob adapter') \
             .archive(False) \
             .email('jdoe@email.com') \
+            .genie_url('http://fdsafdsa') \
             .group('geniegroup1') \
             .job_id('geniejob1') \
             .job_name('testing_adapting_geniejob') \
