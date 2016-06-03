@@ -32,9 +32,9 @@ const TableRow = (props) =>
       </Link>
     </td>
 
-    <td className="col-xs-2">{momentFormat(props.row.started)}</td>
-    <td className="col-xs-2">{momentFormat(props.row.finished)}</td>
-    <td className="col-xs-1">{props.status !== 'RUNNING' ? moment.duration(props.row.runtime).humanize() : 'NA'}</td>
+    <td className="col-xs-2">{props.row.started ? momentFormat(props.row.started) : 'NA'}</td>
+    <td className="col-xs-2">{props.row.finished ? momentFormat(props.row.finished) : 'NA'}</td>
+    <td className="col-xs-1">{props.row.started ? moment.duration(props.row.runtime).humanize() : 'NA'}</td>
   </tr>;
 
 TableRow.propTypes = {
