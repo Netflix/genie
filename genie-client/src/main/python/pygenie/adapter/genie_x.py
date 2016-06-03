@@ -12,7 +12,7 @@ import logging
 
 from functools import wraps
 
-from ...conf import GenieConf
+from ..conf import GenieConf
 
 
 logger = logging.getLogger('com.netflix.genie.jobs.adapter.genie_x')

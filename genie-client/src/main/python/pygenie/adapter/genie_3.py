@@ -15,27 +15,27 @@ import os
 from functools import wraps
 from multipledispatch import dispatch
 
-from ...auth import AuthHandler
-from ...utils import (call,
-                      is_str)
+from ..auth import AuthHandler
+from ..utils import (call,
+                     is_str)
 
-from ..utils import (is_attachment,
-                     is_file)
+from ..jobs.utils import (is_attachment,
+                          is_file)
 
 from .genie_x import (GenieBaseAdapter,
                       substitute)
 
-from ...exceptions import (GenieAttachmentError,
-                           GenieHTTPError,
-                           GenieJobError,
-                           GenieJobNotFoundError)
+from ..exceptions import (GenieAttachmentError,
+                          GenieHTTPError,
+                          GenieJobError,
+                          GenieJobNotFoundError)
 
 #jobs
-from ..core import GenieJob
-from ..hadoop import HadoopJob
-from ..hive import HiveJob
-from ..pig import PigJob
-from ..presto import PrestoJob
+from ..jobs.core import GenieJob
+from ..jobs.hadoop import HadoopJob
+from ..jobs.hive import HiveJob
+from ..jobs.pig import PigJob
+from ..jobs.presto import PrestoJob
 
 
 logger = logging.getLogger('com.netflix.genie.jobs.adapter.genie_3')
@@ -85,6 +85,16 @@ def set_jobname(func):
 def to_attachment(att):
     if is_str(att) and os.path.isfile(att):
         return (unicode(os.path.basename(att)), open(att, 'rb'))
+    elif is_str(att) and os.path.isdir(att):
+        _files = list()
+        for local_file in [os.path.join(att, d) for d in os.listdir(att)]:
+            if os.path.isfile(local_file) and \
+                    os.path.getsize(local_file) > 0 and \
+                    not os.path.basename(local_file).startswith('.'):
+                _files.append(
+                    (unicode(os.path.basename(local_file)), open(local_file, 'rb'))
+                )
+        return _files
     elif isinstance(att, dict):
         try:
             return (unicode(att['name']), unicode(att['data']))
@@ -140,7 +150,11 @@ class Genie3Adapter(GenieBaseAdapter):
                         and hasattr(job, 'DEFAULT_SCRIPT_NAME') \
                         and dep.get('name') == job.DEFAULT_SCRIPT_NAME:
                     dep['data'] = substitute(dep['data'], job.get('parameters'))
-                attachments.append(to_attachment(dep))
+                att = to_attachment(dep)
+                if isinstance(att, list):
+                    attachments.extend(att)
+                else:
+                    attachments.append(att)
             else:
                 dependencies.append(dep)
 
@@ -293,7 +307,7 @@ class Genie3Adapter(GenieBaseAdapter):
 
         for att in attachments:
             files.append(('attachment', att))
-            logger.debug('adding attacment: %s', att)
+            logger.debug('adding attachment: %s', att)
 
         try:
             logger.debug('payload to genie 3:')

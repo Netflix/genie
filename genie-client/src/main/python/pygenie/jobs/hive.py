@@ -79,6 +79,21 @@ class HiveJob(GenieJob):
                     params=params_str) \
             .strip()
 
+    def headers(self):
+        """
+        Sets hive.cli.print.header so that if the hive query is outputing
+        to stdout it will append headers to the result.
+
+        Example:
+            >>> job = HIveJob() \\
+            ...     .headers()
+
+        Returns:
+            :py:class:`HiveJob`: self
+        """
+        self.tags('headers')
+        return self.property('hive.cli.print.header', 'true')
+
     def hiveconf(self, name, value):
         """Alias for :py:meth:`HiveJob.property`"""
         return self.property(name, value)
