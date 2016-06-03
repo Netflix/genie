@@ -1,7 +1,4 @@
 import React from 'react';
-import { render } from 'react-dom';
-import $ from 'jquery';
-
 import { fetch } from './utils';
 
 import cookie from 'react-cookie';
@@ -10,9 +7,13 @@ import SiteHeader from './components/SiteHeader';
 import SiteFooter from './components/SiteFooter';
 
 export default class App extends React.Component {
+  static propTypes = {
+    headers  : React.PropTypes.array,
+    children : React.PropTypes.element.isRequired,
+  }
 
   static defaultProps = {
-    headers : [
+    headers: [
       { url       : '/jobs',
         name      : 'GENIE',
         className : 'supress',
@@ -33,7 +34,7 @@ export default class App extends React.Component {
         name      : 'Applications',
         className : 'active',
       },
-    ]
+    ],
   }
 
   constructor(props) {
@@ -44,8 +45,8 @@ export default class App extends React.Component {
         {
           className : '',
           name      : cookie.load('genie.user'),
-        }
-      ]
+        },
+      ],
     };
   }
 
@@ -54,15 +55,9 @@ export default class App extends React.Component {
   }
 
   loadData() {
-    $.ajax({
-      global: false,
-      type: 'GET',
-      headers: {
-        'Accept': 'application/json'
-      },
-      url: '/actuator/info'
-    }).done((data) => {
-      this.setState({version: data.genie.version});
+    fetch('/actuator/info', null, 'GET', 'application/json')
+    .done((data) => {
+      this.setState({ version: data.genie.version });
     });
   }
 

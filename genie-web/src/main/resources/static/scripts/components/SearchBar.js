@@ -1,5 +1,4 @@
-import React from 'react';
-import { render } from 'react-dom';
+import React, { PropTypes } from 'react';
 
 const SearchBar = (props) =>
   <div className="side-menu">
@@ -7,5 +6,9 @@ const SearchBar = (props) =>
       <i className="fa fa-search fa-lg" aria-hidden="true"></i>
     </a>
   </div>;
+
+SearchBar.propTypes = {
+  toggleSearchForm: PropTypes.func.isRequired,
+};
 
 export default SearchBar;

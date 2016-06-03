@@ -1,5 +1,5 @@
-import React from 'react';
-import { render } from 'react-dom';
+import React, { PropTypes } from 'react';
+
 import { Link } from 'react-router';
 
 const Pagination = (props) => {
@@ -26,7 +26,7 @@ const Pagination = (props) => {
         <PageLink
           pageType={props.pageType}
           url={props.links.prev.href}
-          text="Previous"
+          text="&larr; Previous"
         />
       </li>);
   }
@@ -36,7 +36,7 @@ const Pagination = (props) => {
         <PageLink
           pageType={props.pageType}
           url={props.links.next.href}
-          text="Next"
+          text="Next &rarr;"
         />
       </li>);
   }
@@ -61,7 +61,24 @@ const Pagination = (props) => {
       </nav>
     </div>
   );
-}
+};
+
+Pagination.propTypes = {
+  page: PropTypes.shape({
+    size          : PropTypes.number,
+    totalElements : PropTypes.number,
+    totalPages    : PropTypes.number,
+    number        : PropTypes.number,
+  }),
+  pageType: PropTypes.string,
+  links: PropTypes.shape({
+    first : PropTypes.objectOf(PropTypes.string),
+    self  : PropTypes.objectOf(PropTypes.string),
+    last  : PropTypes.objectOf(PropTypes.string),
+    prev  : PropTypes.objectOf(PropTypes.string),
+    next  : PropTypes.objectOf(PropTypes.string),
+  }),
+};
 
 const PageLink = (props) => {
   const constructUrl = (pageType, genieLink) => `${pageType}?${genieLink.substring(genieLink.indexOf('?') + 1)}`;
@@ -73,6 +90,12 @@ const PageLink = (props) => {
     {props.text}
     </Link>
   );
+};
+
+PageLink.propTypes = {
+  pageType : PropTypes.string,
+  text     : PropTypes.string,
+  url      : PropTypes.string,
 };
 
 export default Pagination;

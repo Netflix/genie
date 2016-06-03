@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
 
 const SiteHeader = (props) =>
@@ -15,11 +15,16 @@ const SiteHeader = (props) =>
         <ul className="nav navbar-nav navbar-right site-header-info">
           {props.infos ? props.infos.map((info, index) =>
             <li key={index} className={info.className}><span>{info.name}</span></li>)
-           :<li></li>
+           : null
           }
         </ul>
       </div>
     </nav>
   </div>;
+
+SiteHeader.propTypes = {
+  headers : PropTypes.arrayOf(PropTypes.object),
+  infos   : PropTypes.arrayOf(PropTypes.object),
+};
 
 export default SiteHeader;

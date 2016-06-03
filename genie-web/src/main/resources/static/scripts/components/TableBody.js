@@ -1,15 +1,18 @@
-import React from 'react';
-import { render } from 'react-dom';
+import React, { PropTypes } from 'react';
 
 export default class TableBody extends React.Component {
-  static contextTypes = {
-    location : React.PropTypes.object.isRequired,
-    router   : React.PropTypes.object.isRequired,
+  static propTypes = {
+    rows : PropTypes.arrayOf(PropTypes.object),
   }
 
-  constructor(props){
+  static contextTypes = {
+    location : PropTypes.object.isRequired,
+    router   : PropTypes.object.isRequired,
+  }
+
+  constructor(props) {
     super(props);
-    this.state = this.defaultState();
+    this.state = this.defaultState;
   }
 
   componentDidMount() {
@@ -17,7 +20,7 @@ export default class TableBody extends React.Component {
     if (query.showDetails) {
       this.showDetails(query.showDetails);
     } else {
-      this.setState(this.defaultState());
+      this.setState(this.defaultState);
     }
   }
 
@@ -26,30 +29,30 @@ export default class TableBody extends React.Component {
     if (query.showDetails) {
       this.showDetails(query.showDetails);
     } else {
-      this.setState(this.defaultState());
-    }
-  }
-
-  defaultState() {
-    return {
-      row         : {},
-      index       : -1,
-      showDetails : false,
+      this.setState(this.defaultState);
     }
   }
 
   setShowDetails = (id) => {
     const { query, pathname } = this.context.location;
-    query.showDetails = `${id}`; //TODO: Use immutable DS
+    query.showDetails = `${id}`; // TODO: Use immutable DS
     this.context.router.push({
       query,
       pathname,
     });
   }
 
+  get defaultState() {
+    return {
+      row         : {},
+      index       : -1,
+      showDetails : false,
+    };
+  }
+
   hideDetails = () => {
     const { query, pathname } = this.context.location;
-    delete query.showDetails; //TODO: Use immutable DS
+    delete query.showDetails; // TODO: Use immutable DS
     this.context.router.push({
       query,
       pathname,
@@ -60,22 +63,22 @@ export default class TableBody extends React.Component {
     const row = this.props.rows.find((row) => row.id === id);
     const index = this.props.rows.findIndex((row) => row.id === id);
     this.setState({
+      row,
+      index,
       showDetails : true,
-      row         : row,
-      index       : index,
     });
   }
 
   construct = (TableRow) => {
-    let tableRows = this.props.rows.map((row, index) => {
+    const tableRows = this.props.rows.map((row, index) => {
       return (
         <TableRow
-          key={row.id}
+          key={index}
           row={row}
           setShowDetails={this.setShowDetails}
         />
       );
-      });
+    });
 
     return tableRows;
   }

@@ -1,10 +1,17 @@
-import React from 'react';
-import { render } from 'react-dom';
+import React, { PropTypes } from 'react';
+
 import Select from 'react-select';
 
 export default class JobSearchForm extends React.Component {
+  static propTypes = {
+    formFields       : PropTypes.arrayOf(PropTypes.object),
+    query            : PropTypes.object,
+    searchPath       : PropTypes.string,
+    toggleSearchForm : PropTypes.func,
+  }
+
   static contextTypes = {
-    router: React.PropTypes.object.isRequired
+    router: React.PropTypes.object.isRequired,
   }
 
   constructor(props, context) {
@@ -29,7 +36,14 @@ export default class JobSearchForm extends React.Component {
       }
     }
     if (updateState) {
-      const formFields = Object.assign(this.getDefaultState().formFields, query);
+      const formFields = {};
+      for(const field of Object.keys(this.getDefaultState().formFields)){
+        if(query[field]) {
+          formFields[field] = query[field]
+        } else {
+          formFields[field] = this.getDefaultState().formFields[field]
+        }
+      }
       this.setState({ formFields });
     }
   }
@@ -50,10 +64,10 @@ export default class JobSearchForm extends React.Component {
     };
 
     return {
+      formFields,
       showAllFormFields : false,
       sortOrder         : 'desc',
       linkText          : 'more',
-      formFields        : formFields,
       sortByFields      : this.sortByFields,
     };
   }
@@ -81,7 +95,7 @@ export default class JobSearchForm extends React.Component {
 
   handleFormFieldChange = (key) => {
     return (e) => {
-      let { formFields } = this.state;
+      const { formFields } = this.state;
       formFields[`${key}`] = e.target.value.trim();
       this.setState({ formFields });
     };
@@ -89,18 +103,18 @@ export default class JobSearchForm extends React.Component {
 
   handleSearch = (e) => {
     e.preventDefault();
-    let query = {};
+    const query = {};
     for (const field of Object.keys(this.state.formFields)) {
       if (this.state.formFields[field] !== '') {
-        if(field === 'sort') {
-          let values = this.state.formFields[field].split(",");
+        if (field === 'sort') {
+          const values = this.state.formFields[field].split(',');
           let spliceIndex = 0;
-          let start = values.length
+          let start = values.length;
           if (values.includes('asc') || values.includes('desc')) {
             spliceIndex = 1;
             start = values.length - 1;
           }
-          values.splice(start, spliceIndex, this.state.sortOrder)
+          values.splice(start, spliceIndex, this.state.sortOrder);
           query[field] = values.join();
         } else {
           query[field] = this.state.formFields[field];
@@ -109,7 +123,7 @@ export default class JobSearchForm extends React.Component {
     }
 
     this.context.router.push({
-      query    : query,
+      query,
       pathname : 'jobs',
     });
   }
