@@ -11,9 +11,9 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import logging
 
-from ..running import RunningJob
+from ..jobs.running import RunningJob
 
-from ...exceptions import GenieAdapterError
+from ..exceptions import GenieAdapterError
 
 # available adapters
 from .genie_2 import Genie2Adapter

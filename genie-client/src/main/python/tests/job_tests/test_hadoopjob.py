@@ -141,7 +141,7 @@ class TestingHadoopJobAdapters(unittest.TestCase):
         self.genie_3_conf = pygenie.conf.GenieConf() \
             .load_config_file(os.path.join(self.dirname, 'genie3.ini'))
 
-    @patch('pygenie.jobs.adapter.genie_2.to_attachment')
+    @patch('pygenie.adapter.genie_2.to_attachment')
     @patch('os.path.isfile')
     @patch('pygenie.jobs.pig.is_file')
     def test_genie2_payload_file_script(self, is_file, os_isfile, to_att):
@@ -169,7 +169,7 @@ class TestingHadoopJobAdapters(unittest.TestCase):
             .job_version('0.0.hadoop-alpha')
 
         assert_equals(
-            pygenie.jobs.adapter.genie_2.get_payload(job),
+            pygenie.adapter.genie_2.get_payload(job),
             {
                 u'attachments': [
                     {u'name': u'hadoopfile1', u'data': u'file contents'}
@@ -191,7 +191,7 @@ class TestingHadoopJobAdapters(unittest.TestCase):
             }
         )
 
-    @patch('pygenie.jobs.adapter.genie_3.open')
+    @patch('pygenie.adapter.genie_3.open')
     @patch('os.path.isfile')
     @patch('pygenie.jobs.pig.is_file')
     def test_genie3_payload_file_script(self, is_file, os_isfile, file_open):
@@ -219,7 +219,7 @@ class TestingHadoopJobAdapters(unittest.TestCase):
             .job_version('0.0.hadoop')
 
         assert_equals(
-            pygenie.jobs.adapter.genie_3.get_payload(job),
+            pygenie.adapter.genie_3.get_payload(job),
             {
                 u'applications': [u'hadoop.app1'],
                 u'attachments': [
