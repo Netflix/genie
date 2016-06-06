@@ -29,6 +29,7 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.search.JobSearchResult;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -37,12 +38,15 @@ import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.ResourceLoader;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -53,6 +57,7 @@ import java.util.stream.Collectors;
  * @author amsharma
  * @since 3.0.0
  */
+@Slf4j
 @Ignore
 public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase {
 
@@ -147,7 +152,60 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
      * @throws Exception If there is any problem.
      */
     @Test
-    public void testJobSubmissionWithAttachments() throws Exception {
+    public void testJobSubmissionWithAttachmentsFiles() throws Exception {
+
+        try (
+            final InputStream att1 = new FileInputStream(this.resourceLoader.getResource("/setupfile")
+                .getFile().getAbsolutePath());
+            final InputStream att2 = new FileInputStream(this.resourceLoader.getResource("/data.txt")
+                .getFile().getAbsolutePath());
+        ) {
+
+            createClusterAndCommandForTest();
+            final String jobId = UUID.randomUUID().toString();
+
+            final List<ClusterCriteria> clusterCriteriaList
+                = Lists.newArrayList(new ClusterCriteria(Sets.newHashSet("laptop")));
+
+            final Set<String> commandCriteria = Sets.newHashSet("bash");
+
+            final JobRequest jobRequest = new JobRequest.Builder(
+                JOB_NAME,
+                JOB_USER,
+                JOB_VERSION,
+                "-c 'cat data.txt'",
+                clusterCriteriaList,
+                commandCriteria
+            )
+                .withId(jobId)
+                .withDisableLogArchival(true)
+                .build();
+
+            final Map<String, InputStream> attachments = new HashMap<>();
+            attachments.put("setupfile", att1);
+            attachments.put("data.txt", att2);
+            final String id = jobClient.submitJobWithAttachments(jobRequest, attachments);
+
+            final JobStatus jobStatus = jobClient.waitForCompletion(jobId, 600000, 5000);
+
+            Assert.assertEquals(JobStatus.SUCCEEDED, jobStatus);
+            final Job job = jobClient.getJob(id);
+
+            Assert.assertEquals(jobId, job.getId());
+
+            final JobRequest jobRequest1 = jobClient.getJobRequest(jobId);
+            Assert.assertEquals(jobId, jobRequest1.getId());
+        }
+    }
+
+    /**
+     * Method to test submitting a job using attachments.
+     *
+     * @throws Exception If there is any problem.
+     */
+    @Test
+    public void testJobSubmissionWithAttachmentsByteArray() throws Exception {
+
         createClusterAndCommandForTest();
         final String jobId = UUID.randomUUID().toString();
 
@@ -160,7 +218,7 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
             JOB_NAME,
             JOB_USER,
             JOB_VERSION,
-            "-c 'cat data.txt'",
+            "-c 'cat attachmentfile.txt'",
             clusterCriteriaList,
             commandCriteria
         )
@@ -168,21 +226,31 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
             .withDisableLogArchival(true)
             .build();
 
-        final List<String> attachments = new ArrayList<>();
-        attachments.add(this.resourceLoader.getResource("/setupfile").getFile().getAbsolutePath());
-        attachments.add(this.resourceLoader.getResource("/data.txt").getFile().getAbsolutePath());
+        try (final ByteArrayInputStream bis = new ByteArrayInputStream("ATTACHMENT DATA".getBytes("UTF-8"))) {
+            final Map<String, InputStream> attachments = new HashMap<>();
 
-        final String id = jobClient.submitJobWithAttachments(jobRequest, attachments);
+            attachments.put("attachmentfile.txt", bis);
+            jobClient.submitJobWithAttachments(jobRequest, attachments);
+        }
 
         final JobStatus jobStatus = jobClient.waitForCompletion(jobId, 600000, 5000);
-
         Assert.assertEquals(JobStatus.SUCCEEDED, jobStatus);
-        final Job job = jobClient.getJob(id);
+        final Job job = jobClient.getJob(jobId);
 
         Assert.assertEquals(jobId, job.getId());
 
-        final JobRequest jobRequest1 = jobClient.getJobRequest(jobId);
-        Assert.assertEquals(jobId, jobRequest1.getId());
+        final InputStream inputStream1 = jobClient.getJobStdout(jobRequest.getId());
+        final BufferedReader reader1 = new BufferedReader(new InputStreamReader(inputStream1, "UTF-8"));
+        final StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader1.readLine()) != null) {
+            sb.append(line);
+        }
+
+        reader1.close();
+        inputStream1.close();
+
+        Assert.assertEquals("ATTACHMENT DATA", sb.toString());
     }
 
     /**
