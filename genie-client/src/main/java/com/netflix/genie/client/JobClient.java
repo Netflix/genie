@@ -111,7 +111,7 @@ public class JobClient extends BaseGenieClient {
      * Submit a job to genie using the jobRequest and attachments provided.
      *
      * @param jobRequest A job request containing all the details for running a job.
-     * @param attachmentStreams A map of filenames/input-streams needed to be sent to the server as attachments.
+     * @param attachments A map of filenames/input-streams needed to be sent to the server as attachments.
      *
      * @return jobId The id of the job submitted.
      *
@@ -120,7 +120,7 @@ public class JobClient extends BaseGenieClient {
      */
     public String submitJobWithAttachments(
         final JobRequest jobRequest,
-        final Map<String, InputStream> attachmentStreams
+        final Map<String, InputStream> attachments
     ) throws IOException, GenieException {
         if (jobRequest == null) {
             throw new GeniePreconditionException("Job Request cannot be null.");
@@ -129,7 +129,7 @@ public class JobClient extends BaseGenieClient {
         final MediaType attachmentMediaType = MediaType.parse(APPLICATION_OCTET_STREAM);
         final ArrayList<MultipartBody.Part> attachmentFiles = new ArrayList<>();
 
-        for (Map.Entry<String, InputStream> entry : attachmentStreams.entrySet()) {
+        for (Map.Entry<String, InputStream> entry : attachments.entrySet()) {
 
             // create a request body from the input stream provided
             final RequestBody requestBody = new RequestBody() {
