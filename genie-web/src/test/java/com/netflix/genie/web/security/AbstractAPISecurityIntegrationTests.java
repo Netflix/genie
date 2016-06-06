@@ -184,7 +184,7 @@ public abstract class AbstractAPISecurityIntegrationTests {
         this.get(JOBS_API + "/" + UUID.randomUUID().toString(), NOT_FOUND);
         this.delete(JOBS_API + "/" + UUID.randomUUID().toString(), NOT_FOUND);
 
-        this.checkActuatorEndpoints(FORBIDDEN);
+        this.checkActuatorEndpoints(OK);
     }
 
     /**
