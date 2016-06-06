@@ -18,8 +18,8 @@
 package com.netflix.genie.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.io.ByteStreams;
 import com.netflix.genie.client.apis.JobService;
-import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.client.security.SecurityInterceptor;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Cluster;
@@ -28,20 +28,22 @@ import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieTimeoutException;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import okio.BufferedSink;
 import org.apache.commons.lang3.StringUtils;
 import retrofit2.Response;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -109,7 +111,7 @@ public class JobClient extends BaseGenieClient {
      * Submit a job to genie using the jobRequest and attachments provided.
      *
      * @param jobRequest A job request containing all the details for running a job.
-     * @param filePaths A list of filesPaths needed to be sent to the server as attachments.
+     * @param attachments A map of filenames/input-streams needed to be sent to the server as attachments.
      *
      * @return jobId The id of the job submitted.
      *
@@ -118,20 +120,34 @@ public class JobClient extends BaseGenieClient {
      */
     public String submitJobWithAttachments(
         final JobRequest jobRequest,
-        final List<String> filePaths
+        final Map<String, InputStream> attachments
     ) throws IOException, GenieException {
         if (jobRequest == null) {
             throw new GeniePreconditionException("Job Request cannot be null.");
         }
 
+        final MediaType attachmentMediaType = MediaType.parse(APPLICATION_OCTET_STREAM);
         final ArrayList<MultipartBody.Part> attachmentFiles = new ArrayList<>();
 
-        for (String path: filePaths) {
-            final String fileName = path.substring(path.lastIndexOf(FILE_PATH_DELIMITER) + 1);
+        for (Map.Entry<String, InputStream> entry : attachments.entrySet()) {
+
+            // create a request body from the input stream provided
+            final RequestBody requestBody = new RequestBody() {
+                @Override
+                public MediaType contentType() {
+                    return attachmentMediaType;
+                }
+
+                @Override
+                public void writeTo(final BufferedSink sink) throws IOException {
+                    ByteStreams.copy(entry.getValue(), sink.outputStream());
+                }
+            };
+
             final MultipartBody.Part part = MultipartBody.Part.createFormData(
                 ATTACHMENT,
-                fileName,
-                RequestBody.create(MediaType.parse(APPLICATION_OCTET_STREAM), new File(path)));
+                entry.getKey(),
+                requestBody);
 
             attachmentFiles.add(part);
         }

@@ -172,11 +172,11 @@ class GenieConf(object):
                 and config_file not in self._config_files:
             self._config_files.append(config_file)
         for cfile in self._config_files:
-            logger.info('adding config file: %s', cfile)
+            logger.debug('adding config file: %s', cfile)
             param_list.extend(['--configFile', cfile])
         C.initialize(param_list + self.sys_argv())
         self._load_options()
-        logger.info('configuration:\n%s', self.to_json())
+        logger.debug('configuration:\n%s', self.to_json())
         return self
 
     def _load_options(self):
