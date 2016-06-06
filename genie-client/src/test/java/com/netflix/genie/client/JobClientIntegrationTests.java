@@ -206,37 +206,38 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
     @Test
     public void testJobSubmissionWithAttachmentsByteArray() throws Exception {
 
-            createClusterAndCommandForTest();
-            final String jobId = UUID.randomUUID().toString();
+        createClusterAndCommandForTest();
+        final String jobId = UUID.randomUUID().toString();
 
-            final List<ClusterCriteria> clusterCriteriaList
-                = Lists.newArrayList(new ClusterCriteria(Sets.newHashSet("laptop")));
+        final List<ClusterCriteria> clusterCriteriaList
+            = Lists.newArrayList(new ClusterCriteria(Sets.newHashSet("laptop")));
 
-            final Set<String> commandCriteria = Sets.newHashSet("bash");
+        final Set<String> commandCriteria = Sets.newHashSet("bash");
 
-            final JobRequest jobRequest = new JobRequest.Builder(
-                JOB_NAME,
-                JOB_USER,
-                JOB_VERSION,
-                "-c 'cat attachmentfile.txt'",
-                clusterCriteriaList,
-                commandCriteria
-            )
-                .withId(jobId)
-                .withDisableLogArchival(true)
-                .build();
+        final JobRequest jobRequest = new JobRequest.Builder(
+            JOB_NAME,
+            JOB_USER,
+            JOB_VERSION,
+            "-c 'cat attachmentfile.txt'",
+            clusterCriteriaList,
+            commandCriteria
+        )
+            .withId(jobId)
+            .withDisableLogArchival(true)
+            .build();
 
+        try (final ByteArrayInputStream bis = new ByteArrayInputStream("ATTACHMENT DATA".getBytes("UTF-8"))) {
             final Map<String, InputStream> attachments = new HashMap<>();
 
-            attachments.put("attachmentfile.txt", new ByteArrayInputStream("ATTACHMENT DATA".getBytes()));
-            final String id = jobClient.submitJobWithAttachments(jobRequest, attachments);
+            attachments.put("attachmentfile.txt", bis);
+            jobClient.submitJobWithAttachments(jobRequest, attachments);
+        }
 
-            final JobStatus jobStatus = jobClient.waitForCompletion(jobId, 600000, 5000);
+        final JobStatus jobStatus = jobClient.waitForCompletion(jobId, 600000, 5000);
+        Assert.assertEquals(JobStatus.SUCCEEDED, jobStatus);
+        final Job job = jobClient.getJob(jobId);
 
-            Assert.assertEquals(JobStatus.SUCCEEDED, jobStatus);
-            final Job job = jobClient.getJob(id);
-
-            Assert.assertEquals(jobId, job.getId());
+        Assert.assertEquals(jobId, job.getId());
 
         final InputStream inputStream1 = jobClient.getJobStdout(jobRequest.getId());
         final BufferedReader reader1 = new BufferedReader(new InputStreamReader(inputStream1, "UTF-8"));
@@ -249,7 +250,7 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
         reader1.close();
         inputStream1.close();
 
-        Assert.assertEquals("HELLO WORLD!!!", sb.toString());
+        Assert.assertEquals("ATTACHMENT DATA", sb.toString());
     }
 
     /**
