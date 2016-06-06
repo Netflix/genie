@@ -8,7 +8,6 @@ dependencies {
     compile("com.google.guava:guava")
     compile("org.apache.commons:commons-lang3")
     compile("org.hibernate:hibernate-validator")
-    compile("org.springframework.boot:spring-boot-starter-logging")
 
     /*******************************
      * Provided Dependencies
