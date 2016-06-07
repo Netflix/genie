@@ -74,7 +74,6 @@ public final class SecurityUtils {
                     .regexMatchers(HttpMethod.PATCH, COMMANDS_API_REGEX).hasRole(ADMIN_ROLE)
                     .regexMatchers(HttpMethod.POST, COMMANDS_API_REGEX).hasRole(ADMIN_ROLE)
                     .regexMatchers(HttpMethod.PUT, COMMANDS_API_REGEX).hasRole(ADMIN_ROLE)
-                    .regexMatchers(actuatorEndpoint + "/.*").hasRole(ADMIN_ROLE)
                     .anyRequest().hasRole(USER_ROLE)
             .and()
                 .x509().authenticationUserDetailsService(x509UserDetailsService)

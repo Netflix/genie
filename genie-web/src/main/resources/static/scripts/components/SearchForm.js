@@ -1,17 +1,16 @@
-import React from 'react';
-import { render } from 'react-dom';
+import React, { PropTypes } from 'react';
 import Select from 'react-select';
 
 export default class SearchForm extends React.Component {
   static contextTypes = {
-    router: React.PropTypes.object.isRequired
+    router: PropTypes.object.isRequired,
   }
 
   static propTypes = {
-    formFields       : React.PropTypes.array,
-    query            : React.PropTypes.object,
-    searchPath       : React.PropTypes.string,
-    toggleSearchForm : React.PropTypes.func,
+    formFields       : PropTypes.arrayOf(PropTypes.object),
+    query            : PropTypes.object,
+    searchPath       : PropTypes.string,
+    toggleSearchForm : PropTypes.func,
   }
 
   constructor(props, context) {
@@ -29,26 +28,33 @@ export default class SearchForm extends React.Component {
       }
     }
     if (updateState) {
-      const formFields = Object.assign(this.getFormState(nextProps).formFields, query);
+      const formFields = {};
+      for(const field of Object.keys(this.getFormState(nextProps).formFields)){
+        if(query[field]) {
+          formFields[field] = query[field]
+        } else {
+          formFields[field] = this.getFormState(nextProps).formFields[field]
+        }
+      }
       this.setState({ formFields });
     }
   }
 
   getFormState(props) {
-    const formFields = {}
-    for(let field of props.formFields) {
+    const formFields = {};
+    for (const field of props.formFields) {
       formFields[field.name] = field.value;
     }
 
     return {
-      formFields   : formFields,
-      sortOrder    : 'desc',
+      formFields,
+      sortOrder: 'desc',
     };
   }
 
   handleFormFieldChange = (key) => {
     return (e) => {
-      let { formFields } = this.state;
+      const { formFields } = this.state;
       formFields[`${key}`] = e.target.value.trim();
       this.setState({ formFields });
     };
@@ -69,18 +75,18 @@ export default class SearchForm extends React.Component {
 
   handleSearch = (e) => {
     e.preventDefault();
-    let query = {};
+    const query = {};
     for (const field of Object.keys(this.state.formFields)) {
       if (this.state.formFields[field] !== '') {
-        if(field === 'sort') {
-          let values = this.state.formFields[field].split(",");
+        if (field === 'sort') {
+          const values = this.state.formFields[field].split(',');
           let spliceIndex = 0;
-          let start = values.length
+          let start = values.length;
           if (values.includes('asc') || values.includes('desc')) {
             spliceIndex = 1;
             start = values.length - 1;
           }
-          values.splice(start, spliceIndex, this.state.sortOrder)
+          values.splice(start, spliceIndex, this.state.sortOrder);
           query[field] = values.join();
         } else {
           query[field] = this.state.formFields[field];
@@ -89,14 +95,14 @@ export default class SearchForm extends React.Component {
     }
 
     this.context.router.push({
-      query    : query,
+      query,
       pathname : this.props.searchPath,
     });
   }
 
   resetFormFields = (e) => {
     e.preventDefault();
-    this.setState({formFields: this.getFormState(this.props).formFields});
+    this.setState({ formFields: this.getFormState(this.props).formFields });
   }
 
   render() {
@@ -113,16 +119,16 @@ export default class SearchForm extends React.Component {
               switch (field.type) {
                 case 'input':
                   return (
-                   <div key={`${index}-div`} className="form-group">
-                    <label key={`${index}-label`} className="form-label">{field.label}:</label>
-                    <input
-                      key={index}
-                      type="text"
-                      value={this.state.formFields[field.name]}
-                      onChange={this.handleFormFieldChange(field.name)}
-                      className="form-control"
-                    />
-                  </div>
+                    <div key={`${index}-div`} className="form-group">
+                      <label key={`${index}-label`} className="form-label">{field.label}:</label>
+                      <input
+                        key={index}
+                        type="text"
+                        value={this.state.formFields[field.name]}
+                        onChange={this.handleFormFieldChange(field.name)}
+                        className="form-control"
+                      />
+                    </div>
                 );
                 case 'select':
                   return (
@@ -137,6 +143,8 @@ export default class SearchForm extends React.Component {
                       />
                     </div>
                   );
+                default:
+                  return null;
               }
             }
             )}

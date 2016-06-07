@@ -1,14 +1,19 @@
-import React from 'react';
-import { render } from 'react-dom';
+import React, { PropTypes } from 'react';
 import { Link } from 'react-router';
-import { fetch } from './utils';
-import moment from 'moment';
+
 import TableHeader from './components/TableHeader';
 import SiteHeader from './components/SiteHeader';
 import SiteFooter from './components/SiteFooter';
-import { genieJobsUrl, fileUrl, momentFormat } from './utils';
 
-export default class GenieJobDirectory extends React.Component {
+import { genieJobsUrl, fileUrl, momentFormat, fetch } from './utils';
+
+export default class OutputDirectory extends React.Component {
+
+  static propTypes = {
+    headers : PropTypes.array,
+    params  : PropTypes.object,
+  }
+
   static defaultProps = {
     headers: [
       { url       : '#',
@@ -42,30 +47,41 @@ export default class GenieJobDirectory extends React.Component {
   loadData(url) {
     fetch(`/api/v3/jobs/${url}`)
     .done((output) => {
-      const [jobId, ...others] = url.split('/');
+      const [jobId, ...ignored] = url.split('/');
       this.setState({
-        output, jobId, url
+        output, jobId, url,
       });
     });
   }
 
   render() {
+    const infos = [{
+      className: '',
+      name: `Job Id: ${this.state.jobId ? this.state.jobId : 'NA'}`,
+    }]
+
     return (
       <div>
-        <SiteHeader headers={this.props.headers} />
+        <SiteHeader headers={this.props.headers} infos={infos} />
         <div className="container job-output-directory">
-          <HomeButton jobId={this.state.jobId} />
-          <Table
-            headers={['Name', 'Size', 'Last Modified']}
-            output={this.state.output}
-          />
-          <DirectoryInfo output={this.state.output} />
-          <Navigation
-            url={this.state.url}
-            parent={this.state.output.parent}
-          />
+          {
+            this.state.output.files.length === 0 &&
+              this.state.output.directories.length === 0 ?
+              <div>No Output found </div> :
+              <div>
+                <HomeButton jobId={this.state.jobId} />
+                <Table
+                  headers={['Name', 'Size', 'Last Modified']}
+                  output={this.state.output}
+                />
+                <DirectoryInfo output={this.state.output} />
+                <Navigation
+                  url={this.state.url}
+                  parent={this.state.output.parent}
+                />
+              </div>
+          }
         </div>
-        <div className='pull-right job-id-directory-info'>Job Id: {this.state.jobId}</div>
         <SiteFooter />
       </div>
     );
@@ -84,6 +100,15 @@ const FileRow = (props) =>
     <td className="col-xs-3">{momentFormat(props.file.lastModified)}</td>
   </tr>;
 
+FileRow.propTypes = {
+  file: PropTypes.shape({
+    name         : PropTypes.string,
+    size         : PropTypes.number,
+    url          : PropTypes.string,
+    lastModified : PropTypes.string,
+  }),
+};
+
 const DirectoryRow = (props) =>
   <tr>
     <td>
@@ -96,12 +121,28 @@ const DirectoryRow = (props) =>
     <td className="col-xs-3">{momentFormat(props.directory.lastModified)}</td>
   </tr>;
 
+DirectoryRow.propTypes = {
+  directory: PropTypes.shape({
+    name         : PropTypes.string,
+    size         : PropTypes.number,
+    url          : PropTypes.string,
+    lastModified : PropTypes.string,
+  }),
+};
 
 const Table = (props) =>
   <table className="table">
     <TableHeader headers={props.headers} />
     <TableBody output={props.output} />
   </table>;
+
+Table.propTypes = {
+  headers: PropTypes.array,
+  output : PropTypes.shape({
+    files       : PropTypes.array,
+    directories : PropTypes.array,
+  }),
+};
 
 const TableBody = (props) =>
   <tbody>
@@ -119,6 +160,13 @@ const TableBody = (props) =>
     )}
   </tbody>;
 
+TableBody.propTypes = {
+  output: PropTypes.shape({
+    files       : PropTypes.array,
+    directories : PropTypes.array,
+  }),
+};
+
 const Navigation = (props) => {
   if (props.url.split('/').length > 2) {
     return (
@@ -129,13 +177,27 @@ const Navigation = (props) => {
       </div>
     );
   }
-  return <div/>;
+  return <div />;
+};
+
+Navigation.propTypes = {
+  url    : PropTypes.string,
+  parent : PropTypes.shape({
+    url  : PropTypes.string,
+  }),
 };
 
 const DirectoryInfo = (props) =>
   <div className="pull-right directory-info">
     {`${props.output.files.length} File(s), ${props.output.directories.length} Folder(s)`}
   </div>;
+
+DirectoryInfo.propTypes = {
+  output: PropTypes.shape({
+    files       : PropTypes.array,
+    directories : PropTypes.array,
+  }),
+};
 
 const HomeButton = (props) =>
   <div className="row">
@@ -145,3 +207,7 @@ const HomeButton = (props) =>
       </Link>
     </span>
   </div>;
+
+HomeButton.propTypes = {
+  jobId: PropTypes.string,
+};

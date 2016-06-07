@@ -1,5 +1,4 @@
-import React from 'react';
-import { render } from 'react-dom';
+import React, { PropTypes } from 'react';
 
 const TableHeader = (props) =>
   <thead>
@@ -10,4 +9,7 @@ const TableHeader = (props) =>
     </tr>
   </thead>;
 
+TableHeader.propTypes = {
+  headers: PropTypes.arrayOf(PropTypes.string),
+};
 export default TableHeader;

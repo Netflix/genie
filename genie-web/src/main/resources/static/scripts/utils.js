@@ -2,29 +2,30 @@ import $ from 'jquery';
 import moment from 'moment';
 
 export const genieJobsUrl = (url) => {
-  let [_, path] = url.split('/api/v3/jobs', 2)
+  const [ignored, path] = url.split('/api/v3/jobs', 2);
   return `/output${path}`;
-}
+};
 
 export const fileUrl = (url) => {
-  let [_, path] = url.split('/api/v3/jobs', 2)
-    return `/file${path}`;
-}
+  const [ignored, path] = url.split('/api/v3/jobs', 2);
+  return `/file${path}`;
+};
 
-export const fetch = (url, data=null, type='GET', headers='application/hal+json') => {
+export const fetch = (url, data = null, type = 'GET', headers = 'application/hal+json') => {
   return $.ajax({
     global: false,
-    type: type,
+    type,
     headers: {
-      'Accept': headers
+      Accept: headers,
     },
-    url: url,
-    data:data,
+    url,
+    data,
   });
-}
+};
 
 export const hasChanged = (o1, o2) => {
   let changed = false;
+  // Clean up this Hack
   for (const key of Object.keys(o1)) {
     if (key !== 'showDetails' && (!o2 || o1[key] !== o2[key])) {
       changed = true;
@@ -37,9 +38,9 @@ export const hasChanged = (o1, o2) => {
       break;
     }
   }
-  return changed
-}
+  return changed;
+};
 
-export const momentFormat = (dateStr, format='MM/DD/YYYY, h:mm:ss') =>
-  moment(dateStr).format(format)
+export const momentFormat = (dateStr, format = 'MM/DD/YYYY, h:mm:ss') =>
+  moment(dateStr).format(format);
 
