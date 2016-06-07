@@ -39,7 +39,9 @@ setup(
     test_suite='tests',
     install_requires=[
         "decorator",
+        "mock",
         "multipledispatch",
+        "nose",
         "pyconfigurator",
         "pystache",
         "python-dateutil >= 2.4",
