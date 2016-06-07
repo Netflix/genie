@@ -10,8 +10,6 @@ from nose.tools import assert_equals
 
 from configurator import Configurator as C
 
-os.environ['GENIE_BYPASS_HOME_CONFIG'] = '1'
-
 from pygenie.conf import GenieConf
 
 
@@ -28,6 +26,7 @@ def reset_environment(func):
     return wrapper
 
 
+@patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'})
 class TestGenieConf(unittest.TestCase):
     """Test GenieConf."""
 

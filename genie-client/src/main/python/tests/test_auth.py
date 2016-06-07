@@ -13,7 +13,6 @@ from .utils import fake_response
 
 assert_equals.__self__.maxDiff = None
 
-os.environ['GENIE_BYPASS_HOME_CONFIG'] = '1'
 
 DIRNAME = os.path.dirname(os.path.realpath(__file__))
 
@@ -29,12 +28,14 @@ def check_request_auth_kwargs(*args, **kwargs):
     return fake_response('content')
 
 
+@patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'})
 class TestingAuthHandler(unittest.TestCase):
     """Test Auth Handler."""
 
     def setUp(self):
-        self.conf = pygenie.conf.GenieConf() \
-            .load_config_file(os.path.join(DIRNAME, 'genie_auth.ini'))
+        with patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'}):
+            self.conf = pygenie.conf.GenieConf() \
+                .load_config_file(os.path.join(DIRNAME, 'genie_auth.ini'))
 
     def test_init_auth_object(self):
         """Test initializing auth object specified in configuration."""

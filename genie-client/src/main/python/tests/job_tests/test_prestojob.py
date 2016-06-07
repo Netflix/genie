@@ -6,13 +6,10 @@ import unittest
 from mock import patch
 from nose.tools import assert_equals, assert_raises
 
+import pygenie
+
 
 assert_equals.__self__.maxDiff = None
-
-os.environ['GENIE_BYPASS_HOME_CONFIG'] = '1'
-
-
-import pygenie
 
 
 def mock_to_attachment(att):
@@ -22,6 +19,7 @@ def mock_to_attachment(att):
         return {u'name': os.path.basename(att), u'data': u'file contents'}
 
 
+@patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'})
 class TestingPrestoJob(unittest.TestCase):
     """Test PrestoJob."""
 
@@ -84,6 +82,7 @@ class TestingPrestoJob(unittest.TestCase):
         )
 
 
+@patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'})
 class TestingPrestoJobRepr(unittest.TestCase):
     """Test PrestoJob repr."""
 
@@ -157,15 +156,17 @@ class TestingPrestoJobRepr(unittest.TestCase):
         )
 
 
+@patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'})
 class TestingPrestoJobAdapters(unittest.TestCase):
     """Test adapting PrestoJob to different clients."""
 
     def setUp(self):
         self.dirname = os.path.dirname(os.path.realpath(__file__))
-        self.genie_2_conf = pygenie.conf.GenieConf() \
-            .load_config_file(os.path.join(self.dirname, 'genie2.ini'))
-        self.genie_3_conf = pygenie.conf.GenieConf() \
-            .load_config_file(os.path.join(self.dirname, 'genie3.ini'))
+        with patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'}):
+            self.genie_2_conf = pygenie.conf.GenieConf() \
+                .load_config_file(os.path.join(self.dirname, 'genie2.ini'))
+            self.genie_3_conf = pygenie.conf.GenieConf() \
+                .load_config_file(os.path.join(self.dirname, 'genie3.ini'))
 
 
     @patch('pygenie.adapter.genie_2.to_attachment')

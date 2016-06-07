@@ -10,8 +10,7 @@ import os
 import re
 import responses
 
-os.environ['GENIE_BYPASS_HOME_CONFIG'] = '1'
-
+from mock import patch
 from nose.tools import assert_equals
 from pygenie.client import Genie
 from pygenie.conf import GenieConf
@@ -21,6 +20,7 @@ GENIE_CONF = GenieConf().load_config_file(GENIE_INI)
 GENIE_URL = GENIE_CONF.genie.url
 
 # Used to generate basic responses from genie
+@patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'})
 class TestGenie(unittest.TestCase):
     "Test related to the bdp EMR library"
 
@@ -65,6 +65,7 @@ class TestGenie(unittest.TestCase):
         assert isinstance(commands, types.GeneratorType), "Did not return a generator"
 
 
+@patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'})
 class TestCommand(unittest.TestCase):
 
     def setUp(self):
@@ -228,6 +229,8 @@ class TestCommand(unittest.TestCase):
         responses.add(responses.PUT, self.path, status=204)
         self.genie.update_tags_for_command('test', ['tag:test', 'tag2:test2'])
 
+
+@patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'})
 class TestApplication(unittest.TestCase):
 
     def setUp(self):
@@ -374,6 +377,7 @@ class TestApplication(unittest.TestCase):
         assert_equals(deps, dependencies)
 
 
+@patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'})
 class TestCluster(unittest.TestCase):
 
     def setUp(self):
@@ -525,6 +529,7 @@ class TestCluster(unittest.TestCase):
         self.genie.update_tags_for_cluster(self.cluster['id'], tags)
 
 
+@patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'})
 class TestJob(unittest.TestCase):
 
     def setUp(self):
@@ -618,6 +623,8 @@ class TestJob(unittest.TestCase):
         responses.add(responses.PATCH, self.path)
         self.genie.patch_job(self.job['id'], [patch1, patch2])
 
+
+@patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'})
 class TestGeniepyAPI(unittest.TestCase):
     "Test that all required APIs are available through geniepy"
 

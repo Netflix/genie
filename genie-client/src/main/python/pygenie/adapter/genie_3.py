@@ -191,8 +191,21 @@ class Genie3Adapter(GenieBaseAdapter):
 
         return payload
 
-    def get(self, job_id, path=None):
-        """Get information."""
+    def get(self, job_id, path=None, if_not_found=None):
+        """
+        Get information for a job.
+
+        Args:
+            job_id (str): The job id.
+            path (str, optional): Path to more job information (cluster, requests,
+                etc)
+            if_not_found (optional): If the job id is to a job that cannot be
+                found, if if_not_found is not None will return if_not_found
+                instead of raising error.
+
+        Returns:
+            json: JSON response data.
+        """
 
         url = self.__url_for_job(job_id)
         if path:
@@ -204,8 +217,11 @@ class Genie3Adapter(GenieBaseAdapter):
                         auth_handler=self.auth_handler).json()
         except GenieHTTPError as err:
             if err.response.status_code == 404:
-                raise GenieJobNotFoundError("job id '{}' not found at {}." \
-                    .format(job_id, url))
+                msg = "job id '{}' not found at {}.".format(job_id, url)
+                if if_not_found is not None:
+                    logger.warning(msg)
+                    return if_not_found
+                raise GenieJobNotFoundError(msg)
             raise
 
     def get_info_for_rj(self, job_id, *args, **kwargs):
@@ -214,11 +230,19 @@ class Genie3Adapter(GenieBaseAdapter):
         """
 
         data = self.get(job_id)
-        application_data = self.get(job_id, path='applications')
-        cluster_data = self.get(job_id, path='cluster')
-        command_data = self.get(job_id, path='command')
-        execution_data = self.get(job_id, path='execution')
         request_data = self.get(job_id, path='request')
+        application_data = self.get(job_id,
+                                    path='applications',
+                                    if_not_found=list())
+        cluster_data = self.get(job_id,
+                                path='cluster',
+                                if_not_found=dict())
+        command_data = self.get(job_id,
+                                path='command',
+                                if_not_found=dict())
+        execution_data = self.get(job_id,
+                                  path='execution',
+                                  if_not_found=dict())
 
         link = data.get('_links', {}).get('self', {}).get('href')
 

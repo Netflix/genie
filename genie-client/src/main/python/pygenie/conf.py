@@ -32,8 +32,6 @@ CONFIG_HOME_DIR = os.path.join(os.path.expanduser('~'), '.genie')
 CONFIG_FILE_HOME_INI = os.path.join(CONFIG_HOME_DIR, 'pygenie.ini')
 CONFIG_FILE_ENV = os.environ.get('GENIE_CONFIG')
 
-BYPASS_HOME_CONFIG_FILE = os.environ.get('GENIE_BYPASS_HOME_CONFIG') is not None
-
 DEFAULT_GENIE_URL = 'http://localhost'
 DEFAULT_GENIE_USERNAME = 'genie_python_client'
 DEFAULT_GENIE_VERSION = '3'
@@ -132,7 +130,7 @@ class GenieConf(object):
 
         if CONFIG_FILE_HOME_INI \
                 and os.path.exists(CONFIG_FILE_HOME_INI) \
-                and not BYPASS_HOME_CONFIG_FILE:
+                and os.environ.get('GENIE_BYPASS_HOME_CONFIG') is None:
             return CONFIG_FILE_HOME_INI
 
     def get(self, option, default=None):
