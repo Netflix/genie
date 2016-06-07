@@ -46,6 +46,7 @@ setup(
         "pystache",
         "python-dateutil >= 2.4",
         "requests",
+        "responses",
         "six"
     ],
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
