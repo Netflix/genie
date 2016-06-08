@@ -20,11 +20,15 @@ package com.netflix.genie.core.jobs.workflow.impl;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.jobs.AdminResources;
 import com.netflix.genie.core.jobs.FileType;
+import com.netflix.genie.core.jobs.JobConstants;
+import com.netflix.genie.core.jobs.JobExecutionEnvironment;
+import com.netflix.genie.core.services.impl.GenieFileTransferService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.Map;
 
 /**
@@ -45,17 +49,27 @@ public class ClusterTask extends GenieBaseTask {
     ) throws GenieException, IOException {
         log.debug("Executing Cluster Task in the workflow.");
 
-        super.executeTask(context);
+        final GenieFileTransferService fts =
+            (GenieFileTransferService) context.get(JobConstants.FILE_TRANSFER_SERVICE_KEY);
+        final JobExecutionEnvironment jobExecEnv =
+            (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
+        final String jobWorkingDirectory = jobExecEnv.getJobWorkingDir().getCanonicalPath();
+        final String genieDir = jobWorkingDirectory
+            + JobConstants.FILE_PATH_DELIMITER
+            + JobConstants.GENIE_PATH_VAR;
+        final Writer writer = (Writer) context.get(JobConstants.WRITER_KEY);
 
         // Create the directory for this application under applications in the cwd
         createEntityInstanceDirectory(
-            this.jobExecEnv.getCluster().getId(),
+            genieDir,
+            jobExecEnv.getCluster().getId(),
             AdminResources.CLUSTER
         );
 
         // Create the config directory for this id
         createEntityInstanceConfigDirectory(
-            this.jobExecEnv.getCluster().getId(),
+            genieDir,
+            jobExecEnv.getCluster().getId(),
             AdminResources.CLUSTER
         );
 
@@ -64,7 +78,7 @@ public class ClusterTask extends GenieBaseTask {
 
         if (clusterSetupFile != null && StringUtils.isNotBlank(clusterSetupFile)) {
             final String localPath = super.buildLocalFilePath(
-                this.jobWorkingDirectory,
+                jobWorkingDirectory,
                 jobExecEnv.getCluster().getId(),
                 clusterSetupFile,
                 FileType.SETUP,
@@ -76,19 +90,21 @@ public class ClusterTask extends GenieBaseTask {
             super.generateSetupFileSourceSnippet(
                 jobExecEnv.getCluster().getId(),
                 "Cluster:",
-                localPath);
+                localPath,
+                writer,
+                jobWorkingDirectory);
         }
 
         // Iterate over and get all configuration files
         for (final String configFile: jobExecEnv.getCluster().getConfigs()) {
             final String localPath = super.buildLocalFilePath(
-                this.jobWorkingDirectory,
+                jobWorkingDirectory,
                 jobExecEnv.getCluster().getId(),
                 configFile,
                 FileType.CONFIG,
                 AdminResources.CLUSTER
             );
-            this.fts.getFile(configFile, localPath);
+            fts.getFile(configFile, localPath);
         }
     }
 }

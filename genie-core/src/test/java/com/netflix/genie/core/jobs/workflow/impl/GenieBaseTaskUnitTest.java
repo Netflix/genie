@@ -18,7 +18,6 @@
 package com.netflix.genie.core.jobs.workflow.impl;
 
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.jobs.AdminResources;
 import com.netflix.genie.core.jobs.FileType;
 import com.netflix.genie.test.categories.UnitTest;
@@ -27,10 +26,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Tests for GenieBaseTask.
@@ -212,17 +207,5 @@ public class GenieBaseTaskUnitTest {
         );
 
         Assert.assertEquals("dirpath/genie/cluster/id/dependencies/filename", localPath);
-    }
-
-    /**
-     * Tests the execute method when no JobExecutionEnvironment present in the map.
-     *
-     * @throws GenieException If there is any problem.
-     * @throws IOException For file system related issues.
-     */
-    @Test(expected = GeniePreconditionException.class)
-    public void testExecuteMethodNoJobExecution() throws GenieException, IOException {
-        final Map<String, Object> context = new HashMap<>();
-        this.genieBaseTask.executeTask(context);
     }
 }
