@@ -117,7 +117,7 @@ public class JobKickoffTask extends GenieBaseTask {
         if (SystemUtils.IS_OS_LINUX) {
             command.add("setsid");
         }
-        command.add("bash");
+        //command.add("bash");
         command.add(runScript);
 
         // Cannot convert to executor because it does not provide an api to get process id.

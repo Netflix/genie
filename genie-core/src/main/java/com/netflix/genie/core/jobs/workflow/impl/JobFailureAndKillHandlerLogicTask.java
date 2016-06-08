@@ -32,7 +32,7 @@ import java.util.Map;
  * @since 3.0.0
  */
 @Slf4j
-public class JobKillLogicTask extends GenieBaseTask {
+public class JobFailureAndKillHandlerLogicTask extends GenieBaseTask {
     /**
      * {@inheritDoc}
      */
@@ -46,6 +46,6 @@ public class JobKillLogicTask extends GenieBaseTask {
         super.executeTask(context);
 
         // Append logic for handling job kill signal
-        writer.write(JobConstants.JOB_KILL_HANDLER_LOGIC + System.lineSeparator());
+        writer.write(JobConstants.JOB_FAILURE_AND_KILL_HANDLER_LOGIC + System.lineSeparator());
     }
 }

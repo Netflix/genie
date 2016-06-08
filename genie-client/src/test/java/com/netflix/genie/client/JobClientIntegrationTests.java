@@ -58,7 +58,6 @@ import java.util.stream.Collectors;
  * @since 3.0.0
  */
 @Slf4j
-@Ignore
 public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase {
 
     private static final String JOB_NAME = "List Directories bash job";
@@ -280,6 +279,7 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
             .build();
 
         jobClient.submitJob(jobRequest1);
+        Thread.sleep(2000);
         jobClient.killJob(jobRequest1.getId());
 
         final JobStatus jobStatus = jobClient.waitForCompletion(jobRequest1.getId(), 600000, 5000);
@@ -571,6 +571,36 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
         inputStream1.close();
 
         Assert.assertEquals("ls: foo: No such file or directory", sb.toString());
+    }
+
+    /**
+     * Method to test get stdout function.
+     *
+     * @throws Exception If there is a problem.
+     */
+    @Test
+    @Ignore
+    public void testPreconditionFailedException() throws Exception {
+
+        createClusterAndCommandForTest();
+
+        final List<ClusterCriteria> clusterCriteriaList
+            = Lists.newArrayList(new ClusterCriteria(Sets.newHashSet("foo")));
+
+        final Set<String> commandCriteria = Sets.newHashSet("bash");
+
+        final JobRequest jobRequest1 = new JobRequest.Builder(
+            JOB_NAME,
+            JOB_USER,
+            JOB_VERSION,
+            "-c 'ls foo'",
+            clusterCriteriaList,
+            commandCriteria
+        )
+            .withDisableLogArchival(true)
+            .build();
+
+        jobClient.submitJob(jobRequest1);
     }
 
     /**
