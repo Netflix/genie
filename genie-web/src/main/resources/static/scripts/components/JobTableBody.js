@@ -1,20 +1,18 @@
-import React, { PropTypes } from 'react';
+import React, { PropTypes as T } from 'react';
 import { Link } from 'react-router';
 
-import { momentFormat, fetch } from '../utils';
+import { momentFormat } from '../utils';
 import moment from 'moment';
 
-import TableBody from './TableBody';
 import JobDetails from './JobDetails';
 
 const TableRow = (props) =>
   <tr>
     <td>
       <a
-        target="_blank"
         href="javascript:void(0)"
         value={props.row.id}
-        onClick={() => props.setShowDetails(props.row.id)}
+        onClick={() => props.setRowId(props.row.id)}
       >
         {props.row.id}
       </a>
@@ -38,52 +36,60 @@ const TableRow = (props) =>
   </tr>;
 
 TableRow.propTypes = {
-  row: PropTypes.shape({
-    id          : PropTypes.string,
-    name        : PropTypes.string,
-    user        : PropTypes.string,
-    status      : PropTypes.string,
-    clusterName : PropTypes.string,
-    started     : PropTypes.string,
-    finished    : PropTypes.string,
-    runtime     : PropTypes.string,
+  row: T.shape({
+    id          : T.string,
+    name        : T.string,
+    user        : T.string,
+    status      : T.string,
+    clusterName : T.string,
+    started     : T.string,
+    finished    : T.string,
+    runtime     : T.string,
   }),
 };
 
-export default class JobTableBody extends TableBody {
-
-  killJob = (jobId) => {
-    fetch(`/api/v3/jobs/${jobId}`, null, 'DELETE')
-      .done(() => {
-        const { query, pathname } = this.context.location;
-        this.context.router.push({
-          query,
-          pathname,
-        });
-      });
-  }
-
-  render() {
-    let tableRows = this.construct(TableRow);
-
-    if (this.state.showDetails) {
-      tableRows.splice(
-        this.state.index + 1,
-        0,
-        <JobDetails
-          jobUrl={this.state.row._links.self.href}
-          key="`${jobId}-details`"
-          hideDetails={this.hideDetails}
-          killJob={this.killJob}
-        />
-      );
-    }
-
+const JobTableBody = (props) => {
+  const tableRows = props.rows.map((row, index) => {
     return (
-      <tbody>
-        {tableRows}
-      </tbody>
+      <TableRow
+        key={index}
+        row={row}
+        setRowId={props.setRowId}
+      />
+    );
+  });
+
+  if (props.rowId) {
+    const filteredRow = props.rows.find((row) => row.id === props.rowId);
+    const index = props.rows.findIndex((row) => row.id === props.rowId);
+
+    tableRows.splice(
+      index + 1,
+      0,
+      <JobDetails
+        row={filteredRow}
+        key={`rowIndex-${index}`}
+        hideDetails={props.hideDetails}
+        killJob={props.killJob}
+        killJobRequestSent={props.killJobRequestSent}
+      />
     );
   }
-}
+
+  return (
+    <tbody>
+      {tableRows}
+    </tbody>
+  );
+};
+
+JobTableBody.propTypes = {
+  rows        : T.arrayOf(T.object).isRequired,
+  rowId       : T.string,
+  hideDetails : T.func.isRequired,
+  setRowId    : T.func.isRequired,
+  killJob     : T.func.isRequired,
+};
+
+export default JobTableBody;
 

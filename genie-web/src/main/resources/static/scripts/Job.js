@@ -1,74 +1,129 @@
 import React from 'react';
 
-import BasePage from './BasePage';
-import SearchResult from './components/SearchResult';
-import NoSearchResult from './components/NoSearchResult';
-import JobSearchForm from './components/JobSearchForm';
-import SearchBar from './components/SearchBar';
+import Page from './Page';
 
+import JobDetails from './components/JobDetails';
 import JobTableBody from './components/JobTableBody';
 import TableHeader from './components/TableHeader';
 
 import { fetch } from './utils';
 
-export default class Job extends BasePage {
+export default class Job extends Page {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      jobs           : [],
-      links          : {},
-      page           : {},
-      showSearchForm : true,
-    };
+  get url() {
+    return '/api/v3/jobs';
   }
 
-  loadData(query) {
-    fetch('/api/v3/jobs', query)
-    .done((data) => {
-      if (data.hasOwnProperty('_embedded')) {
-        this.setState({
-          query,
-          noSearchResult : false,
-          page           : data.page,
-          links          : data._links,
-          jobs           : data._embedded.jobSearchResultList,
-        });
-      } else {
-        this.setState({
-          query,
-          jobs  : [],
-        });
-      }
-    });
+  get dataKey() {
+    return 'jobSearchResultList';
   }
 
-  render() {
-    let jobSearch = this.state.showSearchForm ?
-      <JobSearchForm
-        query={this.state.query}
-        toggleSearchForm={this.toggleSearchForm}
-      /> :
-      <SearchBar toggleSearchForm={this.toggleSearchForm} />;
+  get formFields() {
+    return [
+      {
+        label : 'User Name',
+        name  : 'user',
+        value : '',
+        type  : 'input',
+      }, {
+        label : 'Job Id',
+        name  : 'id',
+        value : '',
+        type  : 'input',
+      }, {
+        label : 'Job Name',
+        name  : 'name',
+        value : '',
+        type  : 'input',
+      }, {
+        label : 'Status',
+        name  : 'status',
+        value : '',
+        type  : 'option',
+        optionValues: ['', 'RUNNING', 'SUCCEEDED', 'FAILED', 'KILLED'],
+      }, {
+        label : 'Size',
+        name  : 'size',
+        value : 25,
+        type  : 'option',
+        optionValues: [10, 25, 50, 100],
+      }, {
+        label : 'Sort By',
+        name  : 'sort',
+        value : '',
+        type  : 'select',
+        selectFields: ['user', 'created', 'id', 'name', 'status', 'clusterName', 'cluserId'].map((field) => {
+          return {
+            value: field,
+            label: field,
+          };
+        }),
+      },
+    ];
+  }
 
-    let jobSearchResult = this.state.jobs.length > 0 ?
-      <SearchResult
-        data={this.state.jobs}
-        links={this.state.links}
-        page={this.state.page}
-        pageType="jobs"
-        headers={['Id', 'Name', 'User', 'Status', 'Cluster', 'Output', 'Started', 'Finished', 'Run Time']}
-        showSearchForm={this.state.showSearchForm}
-        TableBody={JobTableBody}
-        TableHeader={TableHeader}
-      /> :
-      <NoSearchResult />;
+  get hiddenFormFields() {
+    return [
+      {
+        label : 'Tags',
+        name  : 'tag',
+        value : '',
+        type  : 'input',
+      }, {
+        label : 'Cluster Name',
+        name  : 'clusterName',
+        value : '',
+        type  : 'input',
+      }, {
+        label : 'Cluster ID',
+        name  : 'cluserId',
+        value : '',
+        type  : 'input',
+      }, {
+        label : 'Command Name',
+        name  : 'commandName',
+        value : '',
+        type  : 'input',
+      }, {
+        label : 'Command ID',
+        name  : 'commandId',
+        value : '',
+        type  : 'input',
+      },
+    ];
+  }
 
+  get searchPath() {
+    return 'jobs';
+  }
+
+  get tableHeader() {
     return (
-      <div className="row" >
-        {jobSearch}
-        {jobSearchResult}
-      </div>
+      <TableHeader
+        headers={['Id', 'Name', 'User', 'Status', 'Cluster', 'Output', 'Started', 'Finished', 'Run Time']}
+      />
+    );
+  }
+
+  killJob = (jobId) => {
+    fetch(`/api/v3/jobs/${jobId}`, null, 'DELETE')
+      .done(() => {
+        this.setState({ killJobRequestSent: true });
+      });
+  }
+
+  get tableBody() {
+    const { showDetails } = this.props.location.query;
+    return (
+      <JobTableBody
+        rows={this.state.data}
+        rowId={showDetails}
+        setRowId={this.setRowId}
+        detailsTable={JobDetails}
+        killJob={this.killJob}
+        killJobRequestSent={this.state.killJobRequestSent}
+        hideDetails={this.hideDetails}
+      />
     );
   }
 }

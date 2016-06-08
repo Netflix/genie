@@ -1,13 +1,13 @@
-import React, { PropTypes } from 'react';
+import React, { PropTypes as T } from 'react';
 
 import { fetch } from '../utils';
 
 export default class JobDetails extends React.Component {
 
   static propTypes = {
-    jobUrl      : PropTypes.string.isRequired,
-    killJob     : PropTypes.func.isRequired,
-    hideDetails : PropTypes.func.isRequired,
+    row         : T.object.isRequired,
+    killJob     : T.func.isRequired,
+    hideDetails : T.func.isRequired,
   }
 
   constructor(props) {
@@ -27,15 +27,17 @@ export default class JobDetails extends React.Component {
   }
 
   componentDidMount() {
-    this.loadData(this.props.jobUrl);
+    this.loadData(this.props);
   }
 
   componentWillReceiveProps(nextProps) {
-    const { jobUrl } = nextProps;
-    this.loadData(jobUrl);
+    this.loadData(nextProps);
   }
 
-  loadData(url) {
+  loadData(props) {
+    const { row } = props;
+    const url = row._links.self.href;
+
     fetch(url).done((job) => {
       this.setState({ job });
     });
@@ -103,19 +105,24 @@ export default class JobDetails extends React.Component {
                     </ul>
                   </td>
                 </tr>
-                {this.state.job.status === 'RUNNING' ?
+                {this.state.job.status === 'RUNNING' && !this.props.killJobRequestSent ?
                   <tr>
                     <td>
                       <button
                         type="button"
                         className="btn btn-danger"
                         onClick={() => this.props.killJob(this.state.job.id)}
-                      >Kill</button>
+                      >Send Kill Request</button>
                     </td>
-                  </tr> : null
+                </tr> : null
                 }
+
               </tbody>
             </table>
+            { this.props.killJobRequestSent ?
+                <small>*Request accepted. Please refresh the page in a few seconds to see status change.</small> :
+              null
+            }
           </div>
         </td>
       </tr>
