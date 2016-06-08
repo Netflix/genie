@@ -251,6 +251,10 @@ public class LocalJobRunner implements JobSubmitterService {
             }
 
             try (final Writer writer = new OutputStreamWriter(new FileOutputStream(runScript), "UTF-8")) {
+
+                final File file = new File(runScript);
+                file.setExecutable(true);
+
                 context.put(JobConstants.WRITER_KEY, writer);
 
                 for (WorkflowTask workflowTask : this.jobWorkflowTasks) {

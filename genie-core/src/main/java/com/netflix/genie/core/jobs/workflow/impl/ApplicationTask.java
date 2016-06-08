@@ -21,11 +21,15 @@ import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.jobs.AdminResources;
 import com.netflix.genie.core.jobs.FileType;
+import com.netflix.genie.core.jobs.JobConstants;
+import com.netflix.genie.core.jobs.JobExecutionEnvironment;
+import com.netflix.genie.core.services.impl.GenieFileTransferService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.Map;
 
 /**
@@ -46,25 +50,38 @@ public class ApplicationTask extends GenieBaseTask {
         final Map<String, Object> context
     ) throws GenieException, IOException {
         log.debug("Executing Application Task in the workflow.");
-        super.executeTask(context);
 
-        if (this.jobExecEnv.getApplications() != null) {
-            for (Application application : this.jobExecEnv.getApplications()) {
+        final GenieFileTransferService fts =
+            (GenieFileTransferService) context.get(JobConstants.FILE_TRANSFER_SERVICE_KEY);
+        final JobExecutionEnvironment jobExecEnv =
+            (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
+        final String jobWorkingDirectory = jobExecEnv.getJobWorkingDir().getCanonicalPath();
+        final String genieDir = jobWorkingDirectory
+            + JobConstants.FILE_PATH_DELIMITER
+            + JobConstants.GENIE_PATH_VAR;
+        final Writer writer = (Writer) context.get(JobConstants.WRITER_KEY);
+
+
+        if (jobExecEnv.getApplications() != null) {
+            for (Application application : jobExecEnv.getApplications()) {
 
                 // Create the directory for this application under applications in the cwd
                 createEntityInstanceDirectory(
+                    genieDir,
                     application.getId(),
                     AdminResources.APPLICATION
                 );
 
                 // Create the config directory for this id
                 createEntityInstanceConfigDirectory(
+                    genieDir,
                     application.getId(),
                     AdminResources.APPLICATION
                 );
 
                 // Create the dependencies directory for this id
                 createEntityInstanceDependenciesDirectory(
+                    genieDir,
                     application.getId(),
                     AdminResources.APPLICATION
                 );
@@ -73,42 +90,44 @@ public class ApplicationTask extends GenieBaseTask {
                 final String applicationSetupFile = application.getSetupFile();
                 if (applicationSetupFile != null && StringUtils.isNotBlank(applicationSetupFile)) {
                     final String localPath = super.buildLocalFilePath(
-                        this.jobWorkingDirectory,
+                        jobWorkingDirectory,
                         application.getId(),
                         applicationSetupFile,
                         FileType.SETUP,
                         AdminResources.APPLICATION
                     );
-                    this.fts.getFile(applicationSetupFile, localPath);
+                    fts.getFile(applicationSetupFile, localPath);
 
                     super.generateSetupFileSourceSnippet(
                         application.getId(),
                         "Application:",
-                        localPath);
+                        localPath,
+                        writer,
+                        jobWorkingDirectory);
                 }
 
                 // Iterate over and get all dependencies
                 for (final String dependencyFile: application.getDependencies()) {
                     final String localPath = super.buildLocalFilePath(
-                        this.jobWorkingDirectory,
+                        jobWorkingDirectory,
                         application.getId(),
                         dependencyFile,
                         FileType.DEPENDENCIES,
                         AdminResources.APPLICATION
                     );
-                    this.fts.getFile(dependencyFile, localPath);
+                    fts.getFile(dependencyFile, localPath);
                 }
 
                 // Iterate over and get all configuration files
                 for (final String configFile: application.getConfigs()) {
                     final String localPath = super.buildLocalFilePath(
-                        this.jobWorkingDirectory,
+                        jobWorkingDirectory,
                         application.getId(),
                         configFile,
                         FileType.CONFIG,
                         AdminResources.APPLICATION
                     );
-                    this.fts.getFile(configFile, localPath);
+                    fts.getFile(configFile, localPath);
                 }
             }
         }

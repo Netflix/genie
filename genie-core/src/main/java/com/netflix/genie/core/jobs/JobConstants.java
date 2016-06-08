@@ -53,7 +53,7 @@ public final class JobConstants {
     /**
      * The launcher script name that genie creates to setup a job for running.
      **/
-    public static final String GENIE_JOB_LAUNCHER_SCRIPT = "run.sh";
+    public static final String GENIE_JOB_LAUNCHER_SCRIPT = "run";
 
     /**
      * Delimiter to be used while creating file paths.
@@ -232,13 +232,20 @@ public final class JobConstants {
     /**
      * An object the encapsulates the kill handling logic to be added to the run.sh for each job.
      */
-    public static final String JOB_KILL_HANDLER_LOGIC = new StringBuilder()
+    public static final String JOB_FAILURE_AND_KILL_HANDLER_LOGIC = new StringBuilder()
+        .append("#!/usr/bin/env bash\n\n")
+        .append("set -o nounset -o pipefail\n\n")
         .append("# Set function in case any of the exports or source commands cause an error\n")
-        .append("trap \"handle_failure\" ERR\n")
+        .append("trap \"handle_failure\" ERR EXIT\n\n")
         .append("function handle_failure {\n")
         .append("    ERROR_CODE=$?\n")
+        .append("    # Good exit\n")
+        .append("    if [[ ${ERROR_CODE} -eq 0 ]]; then\n")
+        .append("        exit 0\n")
+        .append("    fi\n")
+        .append("    # Bad exit\n")
         .append("    printf '{\"exitCode\": \"%s\"}\\n' \"${ERROR_CODE}\" > ./genie/genie.done\n")
-        .append("    exit\n")
+        .append("    exit \"${ERROR_CODE}\"\n")
         .append("}\n")
         .append("\n")
         .append("# Set function for handling kill signal from the job kill service\n")
@@ -293,7 +300,8 @@ public final class JobConstants {
         .append("    echo \"Done\"\n")
         .append("}\n")
         .append("\n")
-        .append("SELF_PID=$$\n")
+        .append("SELF_PID=$$\n\n")
+        .append("echo \"Start run execution\"\n")
         .toString();
 
     /**

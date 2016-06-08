@@ -498,7 +498,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andExpect(MockMvcResultMatchers.jsonPath("$.directories[0].name", Matchers.is("genie/")))
             .andExpect(MockMvcResultMatchers.jsonPath("$.files[0].name", Matchers.is("dep1")))
             .andExpect(MockMvcResultMatchers.jsonPath("$.files[1].name", Matchers.is("jobsetupfile")))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.files[2].name", Matchers.is("run.sh")))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.files[2].name", Matchers.is("run")))
             .andExpect(MockMvcResultMatchers.jsonPath("$.files[3].name", Matchers.is("stderr")))
             .andExpect(MockMvcResultMatchers.jsonPath("$.files[4].name", Matchers.is("stdout")));
 
@@ -568,7 +568,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(APP1_ID)))
             .andExpect(MockMvcResultMatchers.jsonPath("$[1].id", Matchers.is(APP2_ID)));
 
-        // check that the generated run.sh is correct
+        // check that the generated run file is correct
         final String runShFileName = SystemUtils.IS_OS_LINUX ? "linux-runsh.txt" : "non-linux-runsh.txt";
 
         final String runSHFile = this.resourceLoader.getResource(BASE_DIR + runShFileName).getFile().getAbsolutePath();
@@ -579,7 +579,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             jobWorkingDir).replace("JOB_ID_PLACEHOLDER", jobId);
 
         this.mvc
-            .perform(MockMvcRequestBuilders.get(JOBS_API + "/" + jobId + "/output/run.sh"))
+            .perform(MockMvcRequestBuilders.get(JOBS_API + "/" + jobId + "/output/run"))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().string(expectedRunScriptContent));
 
@@ -746,6 +746,8 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andReturn();
 
         final String jobId = this.getIdFromLocation(result.getResponse().getHeader(HttpHeaders.LOCATION));
+
+        Thread.sleep(20000);
 
         // Send a kill request to the job.
         this.mvc

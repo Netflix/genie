@@ -19,12 +19,15 @@ package com.netflix.genie.core.jobs.workflow.impl;
 
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.jobs.JobConstants;
+import com.netflix.genie.core.jobs.JobExecutionEnvironment;
 import com.netflix.genie.core.services.AttachmentService;
+import com.netflix.genie.core.services.impl.GenieFileTransferService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.Map;
 
 /**
@@ -58,22 +61,28 @@ public class JobTask extends GenieBaseTask {
         final Map<String, Object> context
     ) throws GenieException, IOException {
         log.debug("Execution Job Task in the workflow.");
-        super.executeTask(context);
+
+        final GenieFileTransferService fts =
+            (GenieFileTransferService) context.get(JobConstants.FILE_TRANSFER_SERVICE_KEY);
+        final JobExecutionEnvironment jobExecEnv =
+            (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
+        final String jobWorkingDirectory = jobExecEnv.getJobWorkingDir().getCanonicalPath();
+        final Writer writer = (Writer) context.get(JobConstants.WRITER_KEY);
 
         final String jobSetupFile = jobExecEnv.getJobRequest().getSetupFile();
 
         if (jobSetupFile != null && StringUtils.isNotBlank(jobSetupFile)) {
             final String localPath =
-                this.jobWorkingDirectory
+                jobWorkingDirectory
                     + JobConstants.FILE_PATH_DELIMITER
                     + jobSetupFile.substring(jobSetupFile.lastIndexOf(JobConstants.FILE_PATH_DELIMITER) + 1);
 
-            this.fts.getFile(jobSetupFile, localPath);
+            fts.getFile(jobSetupFile, localPath);
 
             writer.write("# Sourcing setup file specified in job request" + System.lineSeparator());
             writer.write(
                 JobConstants.SOURCE
-                    + localPath.replace(this.jobWorkingDirectory, "${" + JobConstants.GENIE_JOB_DIR_ENV_VAR + "}")
+                    + localPath.replace(jobWorkingDirectory, "${" + JobConstants.GENIE_JOB_DIR_ENV_VAR + "}")
                     + System.lineSeparator());
 
             // Append new line
@@ -82,11 +91,11 @@ public class JobTask extends GenieBaseTask {
 
         // Iterate over and get all dependencies
         for (final String dependencyFile: jobExecEnv.getJobRequest().getDependencies()) {
-            final String localPath = this.jobWorkingDirectory
+            final String localPath = jobWorkingDirectory
                 + JobConstants.FILE_PATH_DELIMITER
                 + dependencyFile.substring(dependencyFile.lastIndexOf(JobConstants.FILE_PATH_DELIMITER) + 1);
 
-            this.fts.getFile(dependencyFile, localPath);
+            fts.getFile(dependencyFile, localPath);
         }
 
         // Copy down the attachments if any to the current working directory

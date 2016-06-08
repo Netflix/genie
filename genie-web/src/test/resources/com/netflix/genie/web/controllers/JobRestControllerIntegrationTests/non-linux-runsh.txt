@@ -1,9 +1,19 @@
+#!/usr/bin/env bash
+
+set -o nounset -o pipefail
+
 # Set function in case any of the exports or source commands cause an error
-trap "handle_failure" ERR
+trap "handle_failure" ERR EXIT
+
 function handle_failure {
     ERROR_CODE=$?
+    # Good exit
+    if [[ ${ERROR_CODE} -eq 0 ]]; then
+        exit 0
+    fi
+    # Bad exit
     printf '{"exitCode": "%s"}\n' "${ERROR_CODE}" > ./genie/genie.done
-    exit
+    exit "${ERROR_CODE}"
 }
 
 # Set function for handling kill signal from the job kill service
@@ -53,6 +63,8 @@ function handle_kill_request {
 }
 
 SELF_PID=$$
+
+echo "Start run execution"
 
 export GENIE_JOB_DIR="TEST_GENIE_JOB_WORKING_DIR_PLACEHOLDER"
 

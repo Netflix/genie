@@ -24,7 +24,7 @@ import com.netflix.genie.core.jobs.workflow.impl.ClusterTask;
 import com.netflix.genie.core.jobs.workflow.impl.CommandTask;
 import com.netflix.genie.core.jobs.workflow.impl.InitialSetupTask;
 import com.netflix.genie.core.jobs.workflow.impl.JobKickoffTask;
-import com.netflix.genie.core.jobs.workflow.impl.JobKillLogicTask;
+import com.netflix.genie.core.jobs.workflow.impl.JobFailureAndKillHandlerLogicTask;
 import com.netflix.genie.core.jobs.workflow.impl.JobTask;
 import com.netflix.genie.core.services.AttachmentService;
 import com.netflix.genie.core.services.FileTransfer;
@@ -63,7 +63,7 @@ public class JobConfig {
     @Bean
     @Order(value = 0)
     public WorkflowTask jobKillLogicTask() {
-        return new JobKillLogicTask();
+        return new JobFailureAndKillHandlerLogicTask();
     }
 
     /**

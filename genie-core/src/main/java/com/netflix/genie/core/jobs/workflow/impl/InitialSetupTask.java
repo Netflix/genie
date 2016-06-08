@@ -19,10 +19,12 @@ package com.netflix.genie.core.jobs.workflow.impl;
 
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.jobs.JobConstants;
+import com.netflix.genie.core.jobs.JobExecutionEnvironment;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.Map;
 
 /**
@@ -44,38 +46,43 @@ public class InitialSetupTask extends GenieBaseTask {
     ) throws GenieException, IOException {
         log.debug("Executing Initial setup Task in the workflow.");
 
-        super.executeTask(context);
+        final JobExecutionEnvironment jobExecEnv =
+            (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
+        final String jobWorkingDirectory = jobExecEnv.getJobWorkingDir().getCanonicalPath();
+        final Writer writer = (Writer) context.get(JobConstants.WRITER_KEY);
+
+        //super.executeTask(context);
 
         /** create top level directory structure for the job **/
 
         // Genie Directory {basedir/genie}
-        super.createDirectory(this.jobWorkingDirectory
+        super.createDirectory(jobWorkingDirectory
             + JobConstants.FILE_PATH_DELIMITER
             + JobConstants.GENIE_PATH_VAR);
 
         // Genie Logs directory {basedir/genie/logs}
-        super.createDirectory(this.jobWorkingDirectory
+        super.createDirectory(jobWorkingDirectory
             + JobConstants.FILE_PATH_DELIMITER
             + JobConstants.GENIE_PATH_VAR
             + JobConstants.FILE_PATH_DELIMITER
             + JobConstants.LOGS_PATH_VAR);
 
         // Genie applications directory {basedir/genie/applications}
-        super.createDirectory(this.jobWorkingDirectory
+        super.createDirectory(jobWorkingDirectory
             + JobConstants.FILE_PATH_DELIMITER
             + JobConstants.GENIE_PATH_VAR
             + JobConstants.FILE_PATH_DELIMITER
             + JobConstants.APPLICATION_PATH_VAR);
 
         // Genie command directory {basedir/genie/command}
-        super.createDirectory(this.jobWorkingDirectory
+        super.createDirectory(jobWorkingDirectory
             + JobConstants.FILE_PATH_DELIMITER
             + JobConstants.GENIE_PATH_VAR
             + JobConstants.FILE_PATH_DELIMITER
             + JobConstants.COMMAND_PATH_VAR);
 
         // Genie cluster directory {basedir/genie/cluster}
-        super.createDirectory(this.jobWorkingDirectory
+        super.createDirectory(jobWorkingDirectory
             + JobConstants.FILE_PATH_DELIMITER
             + JobConstants.GENIE_PATH_VAR
             + JobConstants.FILE_PATH_DELIMITER
@@ -88,7 +95,7 @@ public class InitialSetupTask extends GenieBaseTask {
             + JobConstants.GENIE_JOB_DIR_ENV_VAR
             + JobConstants.EQUALS_SYMBOL
             + JobConstants.DOUBLE_QUOTE_SYMBOL
-            + this.jobWorkingDirectory
+            + jobWorkingDirectory
             + JobConstants.DOUBLE_QUOTE_SYMBOL
             + System.lineSeparator());
 
@@ -126,7 +133,7 @@ public class InitialSetupTask extends GenieBaseTask {
             + JobConstants.FILE_PATH_DELIMITER
             + JobConstants.COMMAND_PATH_VAR
             + JobConstants.FILE_PATH_DELIMITER
-            + this.jobExecEnv.getCommand().getId()
+            + jobExecEnv.getCommand().getId()
             + JobConstants.DOUBLE_QUOTE_SYMBOL
             + System.lineSeparator());
 
@@ -146,7 +153,7 @@ public class InitialSetupTask extends GenieBaseTask {
             + JobConstants.FILE_PATH_DELIMITER
             + JobConstants.CLUSTER_PATH_VAR
             + JobConstants.FILE_PATH_DELIMITER
-            + this.jobExecEnv.getCluster().getId()
+            + jobExecEnv.getCluster().getId()
             + JobConstants.DOUBLE_QUOTE_SYMBOL
             + System.lineSeparator());
 
@@ -158,7 +165,7 @@ public class InitialSetupTask extends GenieBaseTask {
             + JobConstants.GENIE_JOB_ID_ENV_VAR
             + JobConstants.EQUALS_SYMBOL
             + JobConstants.DOUBLE_QUOTE_SYMBOL
-            + this.jobExecEnv.getJobRequest().getId()
+            + jobExecEnv.getJobRequest().getId()
             + JobConstants.DOUBLE_QUOTE_SYMBOL
             + System.lineSeparator());
 
@@ -170,7 +177,7 @@ public class InitialSetupTask extends GenieBaseTask {
             + JobConstants.GENIE_JOB_NAME_ENV_VAR
             + JobConstants.EQUALS_SYMBOL
             + JobConstants.DOUBLE_QUOTE_SYMBOL
-            + this.jobExecEnv.getJobRequest().getName()
+            + jobExecEnv.getJobRequest().getName()
             + JobConstants.DOUBLE_QUOTE_SYMBOL
             + System.lineSeparator());
 

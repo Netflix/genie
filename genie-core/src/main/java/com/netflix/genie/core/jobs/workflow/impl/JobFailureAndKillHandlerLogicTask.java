@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.Map;
 
 /**
@@ -32,7 +33,7 @@ import java.util.Map;
  * @since 3.0.0
  */
 @Slf4j
-public class JobKillLogicTask extends GenieBaseTask {
+public class JobFailureAndKillHandlerLogicTask extends GenieBaseTask {
     /**
      * {@inheritDoc}
      */
@@ -43,9 +44,10 @@ public class JobKillLogicTask extends GenieBaseTask {
     ) throws GenieException, IOException {
 
         log.debug("Executing JobKillLogic Task in the workflow.");
-        super.executeTask(context);
+
+        final Writer writer = (Writer) context.get(JobConstants.WRITER_KEY);
 
         // Append logic for handling job kill signal
-        writer.write(JobConstants.JOB_KILL_HANDLER_LOGIC + System.lineSeparator());
+        writer.write(JobConstants.JOB_FAILURE_AND_KILL_HANDLER_LOGIC + System.lineSeparator());
     }
 }

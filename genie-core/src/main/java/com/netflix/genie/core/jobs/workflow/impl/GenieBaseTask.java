@@ -18,14 +18,11 @@
 package com.netflix.genie.core.jobs.workflow.impl;
 
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.jobs.AdminResources;
 import com.netflix.genie.core.jobs.FileType;
 import com.netflix.genie.core.jobs.JobConstants;
-import com.netflix.genie.core.jobs.JobExecutionEnvironment;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
-import com.netflix.genie.core.services.impl.GenieFileTransferService;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -33,7 +30,6 @@ import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Map;
 
 /**
  * An abstract class that all classes that implement a workflow task should inherit from. Provides some
@@ -44,44 +40,6 @@ import java.util.Map;
  */
 @Slf4j
 public abstract class GenieBaseTask implements WorkflowTask {
-
-    protected GenieFileTransferService fts;
-    protected JobExecutionEnvironment jobExecEnv;
-    protected String jobWorkingDirectory;
-    protected String genieDir;
-    protected Writer writer;
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void executeTask(
-        @NotNull
-        final Map<String, Object> context
-    ) throws GenieException, IOException {
-        log.debug("called");
-
-        this.jobExecEnv =
-            (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
-
-        if (this.jobExecEnv == null) {
-            throw new GeniePreconditionException("Cannot run application task as jobExecutionEnvironment is null");
-        }
-
-        this.fts = (GenieFileTransferService) context.get(JobConstants.FILE_TRANSFER_SERVICE_KEY);
-
-        try {
-            this.jobWorkingDirectory = this.jobExecEnv.getJobWorkingDir().getCanonicalPath();
-        } catch (IOException ioe) {
-            throw new GenieServerException("Could not get base job working directory due to " + ioe);
-        }
-
-        this.writer = (Writer) context.get(JobConstants.WRITER_KEY);
-
-        this.genieDir = this.jobWorkingDirectory
-            + JobConstants.FILE_PATH_DELIMITER
-            + JobConstants.GENIE_PATH_VAR;
-    }
 
     /**
      * Helper Function to fetch file to local dir.
@@ -166,12 +124,15 @@ public abstract class GenieBaseTask implements WorkflowTask {
      * Helper method to create the directory for a particular application, cluster or command in the
      * current working directory for the job.
      *
+     * @param genieDir The genie directory in the cwd for the job
      * @param id The id of entity instance
      * @param adminResources The type of entity Application, Cluster or Command
      *
      * @throws GenieException If there is any problem
      */
     public void createEntityInstanceDirectory(
+        @NotBlank
+        final String genieDir,
         @NotBlank
         final String id,
         @NotNull
@@ -194,7 +155,7 @@ public abstract class GenieBaseTask implements WorkflowTask {
         }
 
         this.createDirectory(
-            this.genieDir
+            genieDir
                 + JobConstants.FILE_PATH_DELIMITER
                 + entityPathVar
                 + JobConstants.FILE_PATH_DELIMITER
@@ -205,12 +166,15 @@ public abstract class GenieBaseTask implements WorkflowTask {
      * Helper method to create the config directory for a particular application, cluster or command in the
      * current working directory for the job.
      *
+     * @param genieDir The genie directory in the cwd for the job
      * @param id The id of entity instance
      * @param adminResources The type of entity Application, Cluster or Command
      *
      * @throws GenieException If there is any problem
      */
     public void createEntityInstanceConfigDirectory(
+        @NotBlank
+        final String genieDir,
         @NotBlank
         final String id,
         @NotNull
@@ -233,7 +197,7 @@ public abstract class GenieBaseTask implements WorkflowTask {
         }
 
         this.createDirectory(
-            this.genieDir
+            genieDir
                 + JobConstants.FILE_PATH_DELIMITER
                 + entityPathVar
                 + JobConstants.FILE_PATH_DELIMITER
@@ -246,12 +210,15 @@ public abstract class GenieBaseTask implements WorkflowTask {
      * Helper method to create the dependency directory for a particular application, cluster or command in the
      * current working directory for the job.
      *
+     * @param genieDir The genie directory in the cwd for the job
      * @param id The id of entity instance
      * @param adminResources The type of entity Application, Cluster or Command
      *
      * @throws GenieException If there is any problem
      */
     public void createEntityInstanceDependenciesDirectory(
+        @NotBlank
+        final String genieDir,
         @NotBlank
         final String id,
         @NotNull
@@ -274,7 +241,7 @@ public abstract class GenieBaseTask implements WorkflowTask {
         }
 
         this.createDirectory(
-            this.genieDir
+            genieDir
                 + JobConstants.FILE_PATH_DELIMITER
                 + entityPathVar
                 + JobConstants.FILE_PATH_DELIMITER
@@ -302,13 +269,15 @@ public abstract class GenieBaseTask implements WorkflowTask {
     protected void generateSetupFileSourceSnippet(
         final String id,
         final String type,
-        final String filePath
+        final String filePath,
+        final Writer writer,
+        final String jobWorkingDirectory
     ) throws IOException {
         writer.write("# Sourcing setup file from " + type + " " + id + System.lineSeparator());
 
         writer.write(
             JobConstants.SOURCE
-                + filePath.replace(this.jobWorkingDirectory, "${" + JobConstants.GENIE_JOB_DIR_ENV_VAR + "}")
+                + filePath.replace(jobWorkingDirectory, "${" + JobConstants.GENIE_JOB_DIR_ENV_VAR + "}")
                 + System.lineSeparator());
 
         // Append new line

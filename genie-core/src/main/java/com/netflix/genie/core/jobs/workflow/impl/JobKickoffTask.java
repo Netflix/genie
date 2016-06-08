@@ -22,6 +22,7 @@ import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.jobs.JobConstants;
+import com.netflix.genie.core.jobs.JobExecutionEnvironment;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.Executor;
@@ -31,6 +32,7 @@ import org.apache.commons.lang3.SystemUtils;
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
+import java.io.Writer;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -82,7 +84,11 @@ public class JobKickoffTask extends GenieBaseTask {
         final Map<String, Object> context
     ) throws GenieException, IOException {
         log.info("Executing Job Kickoff Task in the workflow.");
-        super.executeTask(context);
+
+        final JobExecutionEnvironment jobExecEnv =
+            (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
+        final String jobWorkingDirectory = jobExecEnv.getJobWorkingDir().getCanonicalPath();
+        final Writer writer = (Writer) context.get(JobConstants.WRITER_KEY);
 
         // At this point all contents are written to the run script and we call an explicit flush and close to write
         // the contents to the file before we execute it.
@@ -93,23 +99,23 @@ public class JobKickoffTask extends GenieBaseTask {
             throw new GenieServerException("Failed to execute job with exception." + e);
         }
 
-        final String runScript = this.jobWorkingDirectory
+        final String runScript = jobWorkingDirectory
             + JobConstants.FILE_PATH_DELIMITER
             + JobConstants.GENIE_JOB_LAUNCHER_SCRIPT;
 
         if (this.isUserCreationEnabled) {
-            createUser(this.jobExecEnv.getJobRequest().getUser(), this.jobExecEnv.getJobRequest().getGroup());
+            createUser(jobExecEnv.getJobRequest().getUser(), jobExecEnv.getJobRequest().getGroup());
         }
 
         final List<String> command = new ArrayList<>();
         if (this.isRunAsUserEnabled) {
-            changeOwnershipOfDirectory(this.jobWorkingDirectory, this.jobExecEnv.getJobRequest().getUser());
+            changeOwnershipOfDirectory(jobWorkingDirectory, jobExecEnv.getJobRequest().getUser());
 
             // This is needed because the genie.log file is still generated as the user running Genie system.
-            makeDirGroupWritable(this.jobWorkingDirectory + "/genie/logs");
+            makeDirGroupWritable(jobWorkingDirectory + "/genie/logs");
             command.add("sudo");
             command.add("-u");
-            command.add(this.jobExecEnv.getJobRequest().getUser());
+            command.add(jobExecEnv.getJobRequest().getUser());
         }
 
         // If the OS is linux use setsid to launch the process so that the entire process tree
@@ -117,24 +123,24 @@ public class JobKickoffTask extends GenieBaseTask {
         if (SystemUtils.IS_OS_LINUX) {
             command.add("setsid");
         }
-        command.add("bash");
+        //command.add("bash");
         command.add(runScript);
 
         // Cannot convert to executor because it does not provide an api to get process id.
         final ProcessBuilder pb = new ProcessBuilder(command);
-        pb.directory(this.jobExecEnv.getJobWorkingDir());
-        pb.redirectOutput(new File(this.jobExecEnv.getJobWorkingDir() + JobConstants.GENIE_LOG_PATH));
-        pb.redirectError(new File(this.jobExecEnv.getJobWorkingDir() + JobConstants.GENIE_LOG_PATH));
+        pb.directory(jobExecEnv.getJobWorkingDir());
+        pb.redirectOutput(new File(jobExecEnv.getJobWorkingDir() + JobConstants.GENIE_LOG_PATH));
+        pb.redirectError(new File(jobExecEnv.getJobWorkingDir() + JobConstants.GENIE_LOG_PATH));
 
         try {
             final Process process = pb.start();
-            final int processId = this.getProcessId(process);
-            final JobRequest request = this.jobExecEnv.getJobRequest();
+            final int processId = getProcessId(process);
+            final JobRequest request = jobExecEnv.getJobRequest();
             final Calendar calendar = Calendar.getInstance(UTC);
 //            context.put(JobConstants.JOB_STARTED_KEY, new Date(calendar.getTime().getTime()));
             calendar.add(Calendar.SECOND, request.getTimeout());
             final JobExecution jobExecution = new JobExecution
-                .Builder(this.hostname, processId, this.jobExecEnv.getCommand().getCheckDelay(), calendar.getTime())
+                .Builder(this.hostname, processId, jobExecEnv.getCommand().getCheckDelay(), calendar.getTime())
                 .withId(request.getId())
                 .build();
             context.put(JobConstants.JOB_EXECUTION_DTO_KEY, jobExecution);
