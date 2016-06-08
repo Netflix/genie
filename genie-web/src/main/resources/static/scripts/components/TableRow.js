@@ -5,7 +5,6 @@ const TableRow = (props) =>
   <tr>
     <td>
       <a
-        target="_blank"
         href="javascript:void(0)"
         value={props.row.id}
         onClick={() => props.setRowId(props.row.id)}

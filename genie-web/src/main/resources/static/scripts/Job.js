@@ -108,7 +108,6 @@ export default class Job extends Page {
   killJob = (jobId) => {
     fetch(`/api/v3/jobs/${jobId}`, null, 'DELETE')
       .done(() => {
-        const { query, pathname } = this.props.location;
         this.setState({ killJobRequestSent: true });
       });
   }
