@@ -77,7 +77,9 @@ jar {
 }
 
 processResources {
-    filesNotMatching("**/*.woff2") {
+    from('src/main/resources') {
+        include '**/*.properties'
+        include '**/*.yml'
         filter ReplaceTokens, tokens: [
             "project.version": project.version.toString()
         ]

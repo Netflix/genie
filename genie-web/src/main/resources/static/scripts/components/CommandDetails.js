@@ -31,7 +31,11 @@ export default class CommandDetails extends React.Component {
   }
 
   loadData(props) {
-    const { commandUrl, clustersUrl, applicationsUrl } = props;
+    const { row } = props;
+    const commandUrl = row._links.self.href;
+    const clustersUrl = row._links.clusters.href;
+    const applicationsUrl = row._links.applications.href;
+
     $.when(fetch(commandUrl), fetch(clustersUrl), fetch(applicationsUrl))
       .done((command, clusters, applications) => {
         this.setState({

@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react';
+import React, { PropTypes as T } from 'react';
 import { Link } from 'react-router';
 
 const SiteHeader = (props) =>
@@ -23,8 +23,8 @@ const SiteHeader = (props) =>
   </div>;
 
 SiteHeader.propTypes = {
-  headers : PropTypes.arrayOf(PropTypes.object),
-  infos   : PropTypes.arrayOf(PropTypes.object),
+  headers : T.arrayOf(T.object),
+  infos   : T.arrayOf(T.object),
 };
 
 export default SiteHeader;

@@ -1,16 +1,21 @@
-import React, { PropTypes } from 'react';
+import React, { PropTypes as T } from 'react';
 import Select from 'react-select';
 
 export default class SearchForm extends React.Component {
   static contextTypes = {
-    router: PropTypes.object.isRequired,
+    router: T.object.isRequired,
   }
 
   static propTypes = {
-    formFields       : PropTypes.arrayOf(PropTypes.object),
-    query            : PropTypes.object,
-    searchPath       : PropTypes.string,
-    toggleSearchForm : PropTypes.func,
+    formFields       : T.arrayOf(T.object).isRequired,
+    hiddenFormFields : T.arrayOf(T.object),
+    query            : T.object,
+    searchPath       : T.string,
+    toggleSearchForm : T.func,
+  }
+
+  static defaultProps = {
+    hiddenFormFields: [],
   }
 
   constructor(props, context) {
@@ -29,11 +34,11 @@ export default class SearchForm extends React.Component {
     }
     if (updateState) {
       const formFields = {};
-      for(const field of Object.keys(this.getFormState(nextProps).formFields)){
-        if(query[field]) {
-          formFields[field] = query[field]
+      for (const field of Object.keys(this.getFormState(nextProps).formFields)) {
+        if (query[field]) {
+          formFields[field] = query[field];
         } else {
-          formFields[field] = this.getFormState(nextProps).formFields[field]
+          formFields[field] = this.getFormState(nextProps).formFields[field];
         }
       }
       this.setState({ formFields });
@@ -46,9 +51,16 @@ export default class SearchForm extends React.Component {
       formFields[field.name] = field.value;
     }
 
+    for (const field of props.hiddenFormFields) {
+      formFields[field.name] = field.value;
+    }
+
     return {
       formFields,
       sortOrder: 'desc',
+      linkText: 'more',
+      showAllFormFields : false,
+      hasHiddenFormFields: props.hiddenFormFields.length > 0,
     };
   }
 
@@ -73,9 +85,17 @@ export default class SearchForm extends React.Component {
     this.setState({ formFields, sortOrder });
   }
 
+  toggleFormFields = (e) => {
+    e.preventDefault();
+    this.setState({
+      linkText          : this.state.linkText === 'more' ? 'less' : 'more',
+      showAllFormFields : !this.state.showAllFormFields,
+    });
+  }
+
   handleSearch = (e) => {
     e.preventDefault();
-    const query = {};
+    const query = { src: 'btn' };
     for (const field of Object.keys(this.state.formFields)) {
       if (this.state.formFields[field] !== '') {
         if (field === 'sort') {
@@ -102,7 +122,7 @@ export default class SearchForm extends React.Component {
 
   resetFormFields = (e) => {
     e.preventDefault();
-    this.setState({ formFields: this.getFormState(this.props).formFields });
+    this.setState(this.getFormState(this.props));
   }
 
   render() {
@@ -143,7 +163,25 @@ export default class SearchForm extends React.Component {
                       />
                     </div>
                   );
-                default:
+                case 'option':
+                  return (
+                    <div key={`${index}-div`} className="form-group">
+                      <label key={`${index}-label`} className="form-label">{field.label}:</label>
+                      <select
+                        className="form-control"
+                        value={this.state.formFields[field.name]}
+                        onChange={this.handleFormFieldChange(field.name)}
+                      >
+                        {field.optionValues.map((value, idx) => {
+                          return (
+                            <option key={idx} value={value}>{value}</option>
+                          );
+                        })
+                        }
+                      </select>
+                    </div>
+                  );
+                default :
                   return null;
               }
             }
@@ -161,6 +199,28 @@ export default class SearchForm extends React.Component {
                 </select>
               </div>
             </div>
+            <div className={this.state.showAllFormFields ? '' : 'hidden'}>
+              {this.props.hiddenFormFields.map((field, index) => {
+                return (
+                  <div key={`${index}-div`} className="form-group">
+                    <label key={`${index}-label`} className="form-label">{field.label}:</label>
+                    <input
+                      key={index}
+                      type="text"
+                      value={this.state.formFields[field.name]}
+                      onChange={this.handleFormFieldChange(field.name)}
+                      className="form-control"
+                    />
+                  </div>
+                );
+              })
+              }
+            </div>
+            {this.state.hasHiddenFormFields ?
+              <div className="form-group">
+                <a href="javascript:void(0)" onClick={this.toggleFormFields}>Show {this.state.linkText}</a>
+              </div> : null
+            }
             <div className="form-group">
               <button type="submit" className="btn btn-primary" onClick={this.handleSearch}>Search</button>
               <a href="javascript:void(0)" onClick={this.resetFormFields} className="reset-link">reset</a>

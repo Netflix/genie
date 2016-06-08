@@ -58,7 +58,7 @@ export default class OutputDirectory extends React.Component {
     const infos = [{
       className: '',
       name: `Job Id: ${this.state.jobId ? this.state.jobId : 'NA'}`,
-    }]
+    }];
 
     return (
       <div>
