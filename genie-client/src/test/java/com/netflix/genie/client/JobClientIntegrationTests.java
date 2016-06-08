@@ -58,6 +58,7 @@ import java.util.stream.Collectors;
  * @since 3.0.0
  */
 @Slf4j
+@Ignore
 public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase {
 
     private static final String JOB_NAME = "List Directories bash job";
