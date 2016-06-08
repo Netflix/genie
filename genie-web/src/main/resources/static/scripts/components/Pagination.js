@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react';
+import React, { PropTypes as T } from 'react';
 
 import { Link } from 'react-router';
 
@@ -64,19 +64,19 @@ const Pagination = (props) => {
 };
 
 Pagination.propTypes = {
-  page: PropTypes.shape({
-    size          : PropTypes.number,
-    totalElements : PropTypes.number,
-    totalPages    : PropTypes.number,
-    number        : PropTypes.number,
+  page: T.shape({
+    size          : T.number,
+    totalElements : T.number,
+    totalPages    : T.number,
+    number        : T.number,
   }),
-  pageType: PropTypes.string,
-  links: PropTypes.shape({
-    first : PropTypes.objectOf(PropTypes.string),
-    self  : PropTypes.objectOf(PropTypes.string),
-    last  : PropTypes.objectOf(PropTypes.string),
-    prev  : PropTypes.objectOf(PropTypes.string),
-    next  : PropTypes.objectOf(PropTypes.string),
+  pageType: T.string,
+  links: T.shape({
+    first : T.objectOf(T.string),
+    self  : T.objectOf(T.string),
+    last  : T.objectOf(T.string),
+    prev  : T.objectOf(T.string),
+    next  : T.objectOf(T.string),
   }),
 };
 
@@ -93,9 +93,9 @@ const PageLink = (props) => {
 };
 
 PageLink.propTypes = {
-  pageType : PropTypes.string,
-  text     : PropTypes.string,
-  url      : PropTypes.string,
+  pageType : T.string,
+  text     : T.string,
+  url      : T.string,
 };
 
 export default Pagination;

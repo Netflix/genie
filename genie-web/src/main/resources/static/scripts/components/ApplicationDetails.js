@@ -31,7 +31,10 @@ export default class ApplicationDetails extends React.Component {
   }
 
   loadData(props) {
-    const { applicationUrl, commandsUrl } = props;
+    const { row } = props;
+    const applicationUrl = row._links.self.href;
+    const commandsUrl = row._links.commands.href;
+
     $.when(fetch(applicationUrl), fetch(commandsUrl)).done((application, commands) => {
       this.setState({
         application: application[0],

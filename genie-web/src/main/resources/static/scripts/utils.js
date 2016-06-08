@@ -25,19 +25,24 @@ export const fetch = (url, data = null, type = 'GET', headers = 'application/hal
 
 export const hasChanged = (o1, o2) => {
   let changed = false;
-  // Clean up this Hack
+  // Clean up
   for (const key of Object.keys(o1)) {
-    if (key !== 'showDetails' && (!o2 || o1[key] !== o2[key])) {
+    if ((key === 'src' && o1[key] === 'btn') ||
+        (key !== 'showDetails' && (!o2 || o1[key] !== o2[key]))) {
       changed = true;
       break;
     }
   }
-  for (const key of Object.keys(o2)) {
-    if (key !== 'showDetails' && (!o1 || o1[key] !== o2[key])) {
-      changed = true;
-      break;
+
+  if (!changed) {
+    for (const key of Object.keys(o2)) {
+      if (key !== 'showDetails' && (!o1 || o1[key] !== o2[key])) {
+        changed = true;
+        break;
+      }
     }
   }
+
   return changed;
 };
 

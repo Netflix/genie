@@ -31,7 +31,10 @@ export default class ClusterDetails extends React.Component {
   }
 
   loadData(props) {
-    const { clusterUrl, commandsUrl } = props;
+    const { row } = props;
+    const clusterUrl = row._links.self.href;
+    const commandsUrl = row._links.commands.href;
+
     $.when(fetch(clusterUrl), fetch(commandsUrl)).done((cluster, commands) => {
       this.setState({
         cluster: cluster[0],

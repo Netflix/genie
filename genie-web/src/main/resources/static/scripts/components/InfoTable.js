@@ -12,15 +12,15 @@ const InfoTable = (props) =>
     <tbody>
       {props.data.map((info, index) =>
         <tr key={index}>
-          <td>{info.id}</td>
           <td>
             <Link
               target="_blank"
               to={`${props.type}?name=${info.name}&showDetails=${info.id}`}
             >
-              {info.name}
+              {info.id}
             </Link>
           </td>
+          <td>{info.name}</td>
         </tr>
       )}
     </tbody>

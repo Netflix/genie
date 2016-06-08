@@ -1,14 +1,13 @@
-import React, { PropTypes } from 'react';
+import React, { PropTypes as T } from 'react';
 import { momentFormat } from '../utils';
 
 const TableRow = (props) =>
   <tr>
     <td>
       <a
-        target="_blank"
         href="javascript:void(0)"
         value={props.row.id}
-        onClick={() => props.setShowDetails(props.row.id)}
+        onClick={() => props.setRowId(props.row.id)}
       >
         {props.row.id}
       </a>
@@ -29,15 +28,16 @@ const TableRow = (props) =>
   </tr>;
 
 TableRow.propTypes = {
-  row: PropTypes.shape({
-    id      : PropTypes.string,
-    name    : PropTypes.string,
-    user    : PropTypes.string,
-    status  : PropTypes.string,
-    version : PropTypes.string,
-    tags    : PropTypes.arrayOf(PropTypes.string),
-    created : PropTypes.string,
-    updated : PropTypes.string,
+  setRowId: T.func,
+  row: T.shape({
+    id      : T.string,
+    name    : T.string,
+    user    : T.string,
+    status  : T.string,
+    version : T.string,
+    tags    : T.arrayOf(T.string),
+    created : T.string,
+    updated : T.string,
   }),
 };
 

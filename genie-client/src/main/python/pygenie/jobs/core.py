@@ -120,7 +120,7 @@ class GenieJob(object):
         job_type = cls.rsplit('Job', 1)[0].lower() if cls.endswith('Job') \
             else cls.lower()
 
-        self.conf = conf if conf else GenieConf()
+        self.conf = conf or GenieConf()
         self.default_command_tags = str_to_list(
             self.conf.get('genie_default_command_tags.{}'.format(cls),
                           ['type:{}'.format(job_type)])
@@ -397,6 +397,26 @@ class GenieJob(object):
         signal.signal(signal.SIGABRT, sig_handler)
 
         return running_job
+
+    @add_to_repr('overwrite')
+    def genie_url(self, url):
+        """
+        Set the Genie url to use when submitting the job.
+
+        Example:
+            >>> job = GenieJob() \\
+            ...     .genie_url('http://....')
+
+        Args:
+            url (str): The Genie url to use when submitting the job.
+
+        Returns:
+            :py:class:`GenieJob`: self
+        """
+
+        self.conf.genie.url = url
+
+        return self
 
     def get(self, attr, default=None):
         """

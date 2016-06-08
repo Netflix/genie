@@ -202,9 +202,9 @@ class RunningJob(object):
             boolean: True if the job is done, False if still running.
         """
 
-        if self.finish_time is None or self.finish_time == 0:
+        if self.status == 'RUNNING':
             self.update()
-        return self.finish_time > 0
+        return self.status != 'RUNNING'
 
     @property
     def is_successful(self):
@@ -344,7 +344,9 @@ class RunningJob(object):
             str: Job status.
         """
 
-        return self.info.get('status')
+        status = self.info.get('status')
+
+        return status.upper() if status else None
 
     def stderr(self, iterator=False):
         """

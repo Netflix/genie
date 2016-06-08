@@ -1,104 +1,77 @@
 import React from 'react';
 
-import BasePage from './BasePage';
-import SearchResult from './components/SearchResult';
-import NoSearchResult from './components/NoSearchResult';
-import SearchBar from './components/SearchBar';
-import SearchForm from './components/SearchForm';
+import Page from './Page';
 
-import TableBody from './components/ClusterTableBody';
 import TableHeader from './components/TableHeader';
+import TableBody from './components/TableBody';
 
-import { fetch } from './utils';
+import ClusterDetails from './components/ClusterDetails';
 
-export default class Cluster extends BasePage {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      clusters       : [],
-      links          : {},
-      page           : {},
-      showSearchForm : true,
-    };
+export default class Cluster extends Page {
+
+  get url() {
+    return '/api/v3/clusters';
   }
 
-  loadData(query) {
-    fetch('/api/v3/clusters', query)
-    .done((data) => {
-      if (data.hasOwnProperty('_embedded')) {
-        this.setState({
-          query,
-          noSearchResult : false,
-          page           : data.page,
-          links          : data._links,
-          clusters       : data._embedded.clusterList,
-        });
-      } else {
-        this.setState({
-          query,
-          clusters  : [],
-        });
-      }
-    });
+  get dataKey() {
+    return 'clusterList';
   }
 
-  render() {
-    let search = this.state.showSearchForm ?
-      <SearchForm
-        query={this.state.query}
-        toggleSearchForm={this.toggleSearchForm}
-        formFields={[
-          {
-            label : 'Name',
-            name  : 'name',
-            value : '',
-            type  : 'input',
-          }, {
-            label : 'Status',
-            name  : 'status',
-            value : '',
-            type  : 'input',
-          }, {
-            label : 'Tag',
-            name  : 'tag',
-            value : '',
-            type  : 'input',
-          }, {
-            label : 'Sort By',
-            name  : 'sort',
-            value : '',
-            type  : 'select',
-            selectFields: ['name', 'status', 'tag'].map(field => {
-              return {
-                value: field,
-                label: field,
-              };
-            }),
-          },
-        ]}
-        searchPath="clusters"
-      /> :
-      <SearchBar toggleSearchForm={this.toggleSearchForm} />;
+  get formFields() {
+    return [
+      {
+        label : 'Name',
+        name  : 'name',
+        value : '',
+        type  : 'input',
+      }, {
+        label : 'Status',
+        name  : 'status',
+        value : '',
+        type  : 'input',
+      }, {
+        label : 'Tag',
+        name  : 'tag',
+        value : '',
+        type  : 'input',
+      }, {
+        label : 'Sort By',
+        name  : 'sort',
+        value : '',
+        type  : 'select',
+        selectFields: ['name', 'status', 'tag'].map(field => {
+          return {
+            value: field,
+            label: field,
+          };
+        }),
+      },
+    ];
+  }
 
-    let searchResult = this.state.clusters.length > 0 ?
-      <SearchResult
-        data={this.state.clusters}
-        links={this.state.links}
-        page={this.state.page}
-        pageType="clusters"
-        headers={['Id', 'Name', 'User', 'Status', 'Version', 'Tags', 'Created', 'Updated']}
-        showSearchForm={this.state.showSearchForm}
-        TableBody={TableBody}
-        TableHeader={TableHeader}
-      /> :
-      <NoSearchResult />;
+  get searchPath() {
+    return 'clusters';
+  }
 
+  get tableHeader() {
     return (
-      <div className="row" >
-        {search}
-        {searchResult}
-      </div>
+      <TableHeader
+        headers={['Id', 'Name', 'User', 'Status', 'Version', 'Tags', 'Created', 'Updated']}
+      />
+    );
+  }
+
+  get tableBody() {
+    const { showDetails } = this.props.location.query;
+    return (
+      <TableBody
+        rows={this.state.data}
+        rowId={showDetails}
+        setRowId={this.setRowId}
+        detailsTable={ClusterDetails}
+        hideDetails={this.hideDetails}
+      />
     );
   }
 }

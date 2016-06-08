@@ -3,15 +3,13 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import os
 import unittest
 
+from mock import patch
 from nose.tools import assert_equals
-
-
-os.environ['GENIE_BYPASS_HOME_CONFIG'] = '1'
-
 
 from pygenie.utils import str_to_list
 
 
+@patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'})
 class TestStringToList(unittest.TestCase):
     """Test converting string to list."""
 

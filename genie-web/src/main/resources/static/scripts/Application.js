@@ -1,108 +1,81 @@
 import React from 'react';
-import { fetch } from './utils';
 
-import BasePage from './BasePage';
-import SearchResult from './components/SearchResult';
-import NoSearchResult from './components/NoSearchResult';
-import SearchBar from './components/SearchBar';
-import SearchForm from './components/SearchForm';
+import Page from './Page';
 
-import ApplicationTableBody from './components/ApplicationTableBody';
 import TableHeader from './components/TableHeader';
+import TableBody from './components/TableBody';
 
-export default class Application extends BasePage {
+import ApplicationDetails from './components/ApplicationDetails';
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      applications   : [],
-      links          : {},
-      page           : {},
-      showSearchForm : true,
-    };
+export default class Application extends Page {
+
+  get url() {
+    return '/api/v3/applications';
   }
 
-  loadData(query) {
-    fetch('/api/v3/applications', query)
-    .done((data) => {
-      if (data.hasOwnProperty('_embedded')) {
-        this.setState({
-          query,
-          noSearchResult : false,
-          page           : data.page,
-          links          : data._links,
-          applications   : data._embedded.applicationList,
-        });
-      } else {
-        this.setState({
-          query,
-          applications  : [],
-        });
-      }
-    });
+  get dataKey() {
+    return 'applicationList';
   }
 
-  render() {
-    let search = this.state.showSearchForm ?
-      <SearchForm
-        query={this.state.query}
-        toggleSearchForm={this.toggleSearchForm}
-        formFields={[
-          {
-            label : 'Name',
-            name  : 'name',
-            value : '',
-            type  : 'input',
-          }, {
-            label : 'Status',
-            name  : 'status',
-            value : '',
-            type  : 'input',
-          }, {
-            label : 'Tag',
-            name  : 'tag',
-            value : '',
-            type  : 'input',
-          }, {
-            label : 'Type',
-            name  : 'type',
-            value : '',
-            type  : 'input',
-          }, {
-            label : 'Sort By',
-            name  : 'sort',
-            value : '',
-            type  : 'select',
-            selectFields: ['name', 'status', 'tag'].map((field) => {
-              return {
-                value: field,
-                label: field,
-              };
-            }),
-          },
-        ]}
-        searchPath="applications"
-      /> :
-      <SearchBar toggleSearchForm={this.toggleSearchForm} />;
+  get formFields() {
+    return [
+      {
+        label : 'Name',
+        name  : 'name',
+        value : '',
+        type  : 'input',
+      }, {
+        label : 'Status',
+        name  : 'status',
+        value : '',
+        type  : 'input',
+      }, {
+        label : 'Tag',
+        name  : 'tag',
+        value : '',
+        type  : 'input',
+      }, {
+        label : 'Type',
+        name  : 'type',
+        value : '',
+        type  : 'input',
+      }, {
+        label : 'Sort By',
+        name  : 'sort',
+        value : '',
+        type  : 'select',
+        selectFields: ['name', 'status', 'tag'].map((field) => {
+          return {
+            value: field,
+            label: field,
+          };
+        }),
+      },
+    ];
+  }
 
-    let searchResult = this.state.applications.length > 0 ?
-      <SearchResult
-        data={this.state.applications}
-        links={this.state.links}
-        page={this.state.page}
-        pageType="applications"
-        headers={['Id', 'Name', 'User', 'Status', 'Version', 'Tags', 'Created', 'Updated']}
-        showSearchForm={this.state.showSearchForm}
-        TableBody={ApplicationTableBody}
-        TableHeader={TableHeader}
-      /> :
-      <NoSearchResult />;
+  get searchPath() {
+    return 'applications';
+  }
 
+  get tableHeader() {
     return (
-      <div className="row" >
-        {search}
-        {searchResult}
-      </div>
+      <TableHeader
+        headers={['Id', 'Name', 'User', 'Status', 'Version', 'Tags', 'Created', 'Updated']}
+      />
+    );
+  }
+
+  get tableBody() {
+    const { showDetails } = this.props.location.query;
+    return (
+      <TableBody
+        rows={this.state.data}
+        rowId={showDetails}
+        setRowId={this.setRowId}
+        detailsTable={ApplicationDetails}
+        hideDetails={this.hideDetails}
+      />
     );
   }
 }
