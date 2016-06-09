@@ -194,7 +194,8 @@ public class ApplicationClient extends BaseGenieClient {
      * @throws GenieClientException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
-    public void patchApplication(final String applicationId, final JsonPatch patch) throws IOException, GenieClientException {
+    public void patchApplication(final String applicationId, final JsonPatch patch)
+        throws IOException, GenieClientException {
         if (StringUtils.isEmpty(applicationId)) {
             throw new GenieClientException("Missing required parameter: applicationId.");
         }
@@ -237,7 +238,8 @@ public class ApplicationClient extends BaseGenieClient {
      * @throws GenieClientException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
-    public List<Command> getCommandsForApplication(final String applicationId) throws IOException, GenieClientException {
+    public List<Command> getCommandsForApplication(final String applicationId)
+        throws IOException, GenieClientException {
         if (StringUtils.isEmpty(applicationId)) {
             throw new GenieClientException("Missing required parameter: applicationId.");
         }

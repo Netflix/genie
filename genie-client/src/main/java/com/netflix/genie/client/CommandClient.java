@@ -319,7 +319,8 @@ public class CommandClient extends BaseGenieClient {
      * @throws GenieClientException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
-    public List<Application> getApplicationsForCommand(final String commandId) throws IOException, GenieClientException {
+    public List<Application> getApplicationsForCommand(final String commandId)
+        throws IOException, GenieClientException {
         if (StringUtils.isEmpty(commandId)) {
             throw new GenieClientException("Missing required parameter: commandId.");
         }
