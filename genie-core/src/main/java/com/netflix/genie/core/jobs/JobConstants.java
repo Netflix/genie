@@ -230,7 +230,7 @@ public final class JobConstants {
     public static final TimeZone UTC = TimeZone.getTimeZone("UTC");
 
     /**
-     * An object the encapsulates the kill handling logic to be added to the run.sh for each job.
+     * An object the encapsulates the kill handling logic to be added to the for each job.
      */
     public static final String JOB_FAILURE_AND_KILL_HANDLER_LOGIC = new StringBuilder()
         .append("#!/usr/bin/env bash\n\n")

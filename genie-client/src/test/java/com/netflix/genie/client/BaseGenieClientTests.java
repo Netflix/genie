@@ -97,41 +97,41 @@ public class BaseGenieClientTests {
 //    /**
 //     * Test to make sure http request is never sent if no return type is entered.
 //     *
-//     * @throws GenieException Random issues.
+//     * @throws GenieClientException Random issues.
 //     */
 //    @Test(expected = GeniePreconditionException.class)
-//    public void testExecuteRequestNoReturnTypeEntered() throws GenieException {
+//    public void testExecuteRequestNoReturnTypeEntered() throws GenieClientException {
 //        this.client.executeRequest(this.request, null, null);
 //    }
 //
 //    /**
 //     * Test to make sure http request is never sent if no entity class is entered along with a collection.
 //     *
-//     * @throws GenieException Random issues.
+//     * @throws GenieClientException Random issues.
 //     */
 //    @Test(expected = GeniePreconditionException.class)
-//    public void testExecuteRequestNoEntityClassEnteredForCollection() throws GenieException {
+//    public void testExecuteRequestNoEntityClassEnteredForCollection() throws GenieClientException {
 //        this.client.executeRequest(this.request, Set.class, null);
 //    }
 //
 //    /**
 //     * Test to make sure http request is never sent if no http request is entered.
 //     *
-//     * @throws GenieException Random issues.
+//     * @throws GenieClientException Random issues.
 //     */
 //    @Test(expected = GeniePreconditionException.class)
-//    public void testExecuteRequestNoRequestEntered() throws GenieException {
+//    public void testExecuteRequestNoRequestEntered() throws GenieClientException {
 //        this.client.executeRequest(null, Set.class, String.class);
 //    }
 //
 //    /**
 //     * Test to make sure if response is null a genie exception is thrown not a NPE.
 //     *
-//     * @throws GenieException  Random issues.
+//     * @throws GenieClientException  Random issues.
 //     * @throws ClientException Some http request failed.
 //     */
-//    @Test(expected = GenieServerException.class)
-//    public void testExecuteRequestNoResponseReturned() throws GenieException, ClientException {
+//    @Test(expected = GenieClientException.class)
+//    public void testExecuteRequestNoResponseReturned() throws GenieClientException, ClientException {
 //        Mockito.when(this.restClient.executeWithLoadBalancer(this.request)).thenReturn(null);
 //        this.client.executeRequest(this.request, Set.class, String.class);
 //    }
@@ -141,7 +141,7 @@ public class BaseGenieClientTests {
 //     *
 //     * @throws Exception For any problems
 //     */
-//    @Test(expected = GenieException.class)
+//    @Test(expected = GenieClientException.class)
 //    public void testExecuteRequestNotSuccessful() throws Exception {
 //        Mockito.when(this.response.isSuccess()).thenReturn(false);
 //        Mockito.when(this.response.getStatus()).thenReturn(500);
@@ -153,12 +153,12 @@ public class BaseGenieClientTests {
 //    /**
 //     * Test to make sure if response is successful entity is returned.
 //     *
-//     * @throws GenieException  Random issues.
+//     * @throws GenieClientException  Random issues.
 //     * @throws ClientException A http client.
 //     * @throws IOException     IOException.
 //     */
 //    @Test
-//    public void testExecuteRequestSuccessSingleEntity() throws GenieException, ClientException, IOException {
+//    public void testExecuteRequestSuccessSingleEntity() throws GenieClientException, ClientException, IOException {
 //        Mockito.when(this.response.isSuccess()).thenReturn(true);
 //
 //        final ObjectMapper mapper = new ObjectMapper();
@@ -185,12 +185,12 @@ public class BaseGenieClientTests {
 //    /**
 //     * Test to make sure if response is successful collection is returned.
 //     *
-//     * @throws GenieException             Random issues.
+//     * @throws GenieClientException             Random issues.
 //     * @throws ClientException            A http client.
 //     * @throws IOException                IOException.
 //     */
 //    @Test
-//    public void testExecuteRequestSuccessCollection() throws GenieException, ClientException, IOException {
+//    public void testExecuteRequestSuccessCollection() throws GenieClientException, ClientException, IOException {
 //        Mockito.when(this.response.isSuccess()).thenReturn(true);
 //
 //        final List<Command> commands = new ArrayList<>();
@@ -236,80 +236,80 @@ public class BaseGenieClientTests {
 //    /**
 //     * Test to make sure when you build a request and pass in null for the verb it doesn't work.
 //     *
-//     * @throws GenieException On any error.
+//     * @throws GenieClientException On any error.
 //     */
 //    @Test(expected = GeniePreconditionException.class)
-//    public void testBuildRequestNoVerb() throws GenieException {
+//    public void testBuildRequestNoVerb() throws GenieClientException {
 //        BaseGenieClient.buildRequest(null, "blah", null, null);
 //    }
 //
 //    /**
 //     * Test to make sure when you build a request and don't pass in entity with post it fails.
 //     *
-//     * @throws GenieException On any error.
+//     * @throws GenieClientException On any error.
 //     */
 //    @Test(expected = GeniePreconditionException.class)
-//    public void testBuildRequestNullEntityForPost() throws GenieException {
+//    public void testBuildRequestNullEntityForPost() throws GenieClientException {
 //        BaseGenieClient.buildRequest(HttpRequest.Verb.POST, null, null, null);
 //    }
 //
 //    /**
 //     * Test to make sure when you build a request and don't pass in entity with post it fails.
 //     *
-//     * @throws GenieException On any error.
+//     * @throws GenieClientException On any error.
 //     */
 //    @Test(expected = GeniePreconditionException.class)
-//    public void testBuildRequestNullEntityForPut() throws GenieException {
+//    public void testBuildRequestNullEntityForPut() throws GenieClientException {
 //        BaseGenieClient.buildRequest(HttpRequest.Verb.PUT, null, null, null);
 //    }
 //
 //    /**
 //     * Test to make sure when you build a request and don't pass URI it fails.
 //     *
-//     * @throws GenieException On any error.
+//     * @throws GenieClientException On any error.
 //     */
 //    @Test(expected = GeniePreconditionException.class)
-//    public void testBuildRequestNullRequestUri() throws GenieException {
+//    public void testBuildRequestNullRequestUri() throws GenieClientException {
 //        BaseGenieClient.buildRequest(HttpRequest.Verb.PUT, null, null, new Job());
 //    }
 //
 //    /**
 //     * Test to make sure when you build a request and don't pass URI it fails.
 //     *
-//     * @throws GenieException On any error.
+//     * @throws GenieClientException On any error.
 //     */
 //    @Test(expected = GeniePreconditionException.class)
-//    public void testBuildRequestEmptyRequestUri() throws GenieException {
+//    public void testBuildRequestEmptyRequestUri() throws GenieClientException {
 //        BaseGenieClient.buildRequest(HttpRequest.Verb.PUT, "", null, new Job());
 //    }
 //
 //    /**
 //     * Test to make sure when you build a request and don't pass URI it fails.
 //     *
-//     * @throws GenieException On any error.
+//     * @throws GenieClientException On any error.
 //     */
 //    @Test(expected = GeniePreconditionException.class)
-//    public void testBuildRequestBlankRequestUri() throws GenieException {
+//    public void testBuildRequestBlankRequestUri() throws GenieClientException {
 //        BaseGenieClient.buildRequest(HttpRequest.Verb.PUT, "   ", null, new Job());
 //    }
 //
 //    /**
 //     * Test to make sure when you send a bad URI.
 //     *
-//     * @throws GenieException On any error.
+//     * @throws GenieClientException On any error.
 //     */
-//    @Test(expected = GenieException.class)
-//    public void testBuildRequestBadUri() throws GenieException {
+//    @Test(expected = GenieClientException.class)
+//    public void testBuildRequestBadUri() throws GenieClientException {
 //        BaseGenieClient.buildRequest(HttpRequest.Verb.PUT, "I am not a valid URI", null, new Job());
 //    }
 //
 //    /**
 //     * Test to make sure builds a valid post request.
 //     *
-//     * @throws GenieException On any error.
+//     * @throws GenieClientException On any error.
 //     */
 //    @Test
-//    public void testBuildRequestValidPost() throws GenieException {
+//    public void testBuildRequestValidPost() throws GenieClientException {
 //        final String uri = "http://localhost:7001/genie/v2/jobs";
 //        final Job job = new Job();
 //        final HttpRequest validRequest = BaseGenieClient.buildRequest(
@@ -330,10 +330,10 @@ public class BaseGenieClientTests {
 //    /**
 //     * Test to make sure builds a valid get request with no query parameters.
 //     *
-//     * @throws GenieException On any error.
+//     * @throws GenieClientException On any error.
 //     */
 //    @Test
-//    public void testBuildRequestValidGetEmptyQueryParams() throws GenieException {
+//    public void testBuildRequestValidGetEmptyQueryParams() throws GenieClientException {
 //        final String uri = "http://localhost:7001/genie/v2/jobs";
 //        final Multimap<String, String> queryParams = ArrayListMultimap.create();
 //        final HttpRequest validRequest = BaseGenieClient.buildRequest(
@@ -354,10 +354,10 @@ public class BaseGenieClientTests {
 //    /**
 //     * Test to make sure builds a valid get request with no query parameters.
 //     *
-//     * @throws GenieException On any error.
+//     * @throws GenieClientException On any error.
 //     */
 //    @Test
-//    public void testBuildRequestValidGetWithSomeQueryParams() throws GenieException {
+//    public void testBuildRequestValidGetWithSomeQueryParams() throws GenieClientException {
 //        final String uri = "http://localhost:7001/genie/v2/jobs";
 //        final Multimap<String, String> queryParams = ArrayListMultimap.create();
 //        queryParams.put("key1", "value1");

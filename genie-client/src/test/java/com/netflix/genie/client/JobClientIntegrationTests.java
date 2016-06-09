@@ -19,6 +19,7 @@ package com.netflix.genie.client;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.netflix.genie.client.exceptions.GenieClientException;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.ClusterStatus;
@@ -579,8 +580,7 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
      *
      * @throws Exception If there is a problem.
      */
-    @Test
-    @Ignore
+    @Test(expected = GenieClientException.class)
     public void testPreconditionFailedException() throws Exception {
 
         createClusterAndCommandForTest();
