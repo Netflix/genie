@@ -339,7 +339,8 @@ public class ApplicationClient extends BaseGenieClient {
      * @throws GenieClientException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
-    public Set<String> getDependenciesForApplication(final String applicationId) throws IOException, GenieClientException {
+    public Set<String> getDependenciesForApplication(final String applicationId) throws IOException,
+        GenieClientException {
         if (StringUtils.isEmpty(applicationId)) {
             throw new GenieClientException("Missing required parameter: applicationId.");
         }
