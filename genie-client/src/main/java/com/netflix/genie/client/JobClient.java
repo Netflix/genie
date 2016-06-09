@@ -20,7 +20,7 @@ package com.netflix.genie.client;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.io.ByteStreams;
 import com.netflix.genie.client.apis.JobService;
-import com.netflix.genie.client.exceptions.GenieException;
+import com.netflix.genie.client.exceptions.GenieClientException;
 import com.netflix.genie.client.security.SecurityInterceptor;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Cluster;
@@ -64,12 +64,12 @@ public class JobClient extends BaseGenieClient {
      * @param url The url of the Genie Service.
      * @param securityInterceptor An implementation of the Security Interceptor.
      *
-     * @throws GenieException If there is any problem.
+     * @throws GenieClientException If there is any problem.
      */
     public JobClient(
         final String url,
         final SecurityInterceptor securityInterceptor
-    ) throws GenieException {
+    ) throws GenieClientException {
         super(url, securityInterceptor);
         jobService = retrofit.create(JobService.class);
      }
@@ -78,11 +78,11 @@ public class JobClient extends BaseGenieClient {
      * Constructor that takes only the URL.
      *
      * @param url The url of the Genie Service.
-     * @throws GenieException If there is any problem.
+     * @throws GenieClientException If there is any problem.
      */
     public JobClient(
         final String url
-    ) throws GenieException {
+    ) throws GenieClientException {
         super(url, null);
         jobService = retrofit.create(JobService.class);
     }
@@ -94,14 +94,14 @@ public class JobClient extends BaseGenieClient {
      *
      * @return jobId The id of the job submitted.
      *
-     * @throws GenieException For any other error.
+     * @throws GenieClientException For any other error.
      * @throws IOException If the response received is not 2xx.
      */
     public String submitJob(
         final JobRequest jobRequest
-    ) throws IOException, GenieException {
+    ) throws IOException, GenieClientException {
         if (jobRequest == null) {
-            throw new GenieException("Job Request cannot be null.");
+            throw new GenieClientException("Job Request cannot be null.");
         }
         return getIdFromLocation(jobService.submitJob(jobRequest).execute().headers().get("location"));
     }
@@ -114,15 +114,15 @@ public class JobClient extends BaseGenieClient {
      *
      * @return jobId The id of the job submitted.
      *
-     * @throws GenieException       For any other error.
+     * @throws GenieClientException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
     public String submitJobWithAttachments(
         final JobRequest jobRequest,
         final Map<String, InputStream> attachments
-    ) throws IOException, GenieException {
+    ) throws IOException, GenieClientException {
         if (jobRequest == null) {
-            throw new GenieException("Job Request cannot be null.");
+            throw new GenieClientException("Job Request cannot be null.");
         }
 
         final MediaType attachmentMediaType = MediaType.parse(APPLICATION_OCTET_STREAM);
@@ -159,10 +159,10 @@ public class JobClient extends BaseGenieClient {
      * Method to get a list of all the jobs.
      *
      * @return A list of jobs.
-     * @throws GenieException       For any other error.
+     * @throws GenieClientException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
-    public List<JobSearchResult> getJobs() throws IOException, GenieException {
+    public List<JobSearchResult> getJobs() throws IOException, GenieClientException {
         return this.getJobs(null, null, null, null, null, null, null, null, null, null, null, null, null);
     }
 
@@ -184,7 +184,7 @@ public class JobClient extends BaseGenieClient {
      * @param maxFinished The time which the job had to finish before in order to be returned (exclusive)
      *
      * @return A list of jobs.
-     * @throws GenieException       For any other error.
+     * @throws GenieClientException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
     public List<JobSearchResult> getJobs(
@@ -201,7 +201,7 @@ public class JobClient extends BaseGenieClient {
         final Long maxStarted,
         final Long minFinished,
         final Long maxFinished
-    ) throws IOException, GenieException {
+    ) throws IOException, GenieClientException {
 
         final JsonNode jnode =  jobService.getJobs(
             id,
@@ -234,14 +234,14 @@ public class JobClient extends BaseGenieClient {
      *
      * @param jobId The id of the job to get.
      * @return The job details.
-     * @throws GenieException       For any other error.
+     * @throws GenieClientException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
     public Job getJob(
         final String jobId
-    ) throws IOException, GenieException {
+    ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(jobId)) {
-            throw new GenieException("Missing required parameter: jobId.");
+            throw new GenieClientException("Missing required parameter: jobId.");
         }
         return jobService.getJob(jobId).execute().body();
     }
@@ -251,14 +251,14 @@ public class JobClient extends BaseGenieClient {
      *
      * @param jobId The id of the job.
      * @return The cluster object.
-     * @throws GenieException       For any other error.
+     * @throws GenieClientException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
     public Cluster getJobCluster(
         final String jobId
-    ) throws IOException, GenieException {
+    ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(jobId)) {
-            throw new GenieException("Missing required parameter: jobId.");
+            throw new GenieClientException("Missing required parameter: jobId.");
         }
         return jobService.getJobCluster(jobId).execute().body();
     }
@@ -268,14 +268,14 @@ public class JobClient extends BaseGenieClient {
      *
      * @param jobId The id of the job.
      * @return The command object.
-     * @throws GenieException       For any other error.
+     * @throws GenieClientException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
     public Command getJobCommand(
         final String jobId
-    ) throws IOException, GenieException {
+    ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(jobId)) {
-            throw new GenieException("Missing required parameter: jobId.");
+            throw new GenieClientException("Missing required parameter: jobId.");
         }
         return jobService.getJobCommand(jobId).execute().body();
     }
@@ -285,14 +285,14 @@ public class JobClient extends BaseGenieClient {
      *
      * @param jobId The id of the job.
      * @return The command object.
-     * @throws GenieException       For any other error.
+     * @throws GenieClientException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
     public JobRequest getJobRequest(
         final String jobId
-    ) throws IOException, GenieException {
+    ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(jobId)) {
-            throw new GenieException("Missing required parameter: jobId.");
+            throw new GenieClientException("Missing required parameter: jobId.");
         }
         return jobService.getJobRequest(jobId).execute().body();
     }
@@ -302,14 +302,14 @@ public class JobClient extends BaseGenieClient {
      *
      * @param jobId The id of the job.
      * @return The command object.
-     * @throws GenieException       For any other error.
+     * @throws GenieClientException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
     public JobExecution getJobExecution(
         final String jobId
-    ) throws IOException, GenieException {
+    ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(jobId)) {
-            throw new GenieException("Missing required parameter: jobId.");
+            throw new GenieClientException("Missing required parameter: jobId.");
         }
         return jobService.getJobExecution(jobId).execute().body();
     }
@@ -319,14 +319,14 @@ public class JobClient extends BaseGenieClient {
      *
      * @param jobId The id of the job.
      * @return The list of Applications.
-     * @throws GenieException       For any other error.
+     * @throws GenieClientException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
     public List<Application> getJobApplications(
         final String jobId
-    ) throws IOException, GenieException {
+    ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(jobId)) {
-            throw new GenieException("Missing required parameter: jobId.");
+            throw new GenieClientException("Missing required parameter: jobId.");
         }
         return jobService.getJobApplications(jobId).execute().body();
     }
@@ -338,14 +338,14 @@ public class JobClient extends BaseGenieClient {
      *
      * @return An inputstream to the output contents.
      *
-     * @throws GenieException       For any other error.
+     * @throws GenieClientException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
     public InputStream getJobStdout(
         final String jobId
-    ) throws IOException, GenieException {
+    ) throws IOException, GenieClientException {
         if (!this.getJobStatus(jobId).equals(JobStatus.SUCCEEDED)) {
-            throw new GenieException(400, "Cannot request output of a job whose status is not SUCCEEDED.");
+            throw new GenieClientException(400, "Cannot request output of a job whose status is not SUCCEEDED.");
         }
         return jobService.getJobStdout(jobId).execute().body().byteStream();
     }
@@ -357,12 +357,12 @@ public class JobClient extends BaseGenieClient {
      *
      * @return An inputstream to the stderr contents.
      *
-     * @throws GenieException       For any other error.
+     * @throws GenieClientException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
     public InputStream getJobStderr(
         final String jobId
-    ) throws IOException, GenieException {
+    ) throws IOException, GenieClientException {
         return jobService.getJobStderr(jobId).execute().body().byteStream();
     }
 
@@ -372,17 +372,17 @@ public class JobClient extends BaseGenieClient {
      * @param jobId The id of the job.
      *
      * @return The status of the Job.
-     * @throws GenieException       For any other error.
+     * @throws GenieClientException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
     public JobStatus getJobStatus(
         final String jobId
-    ) throws IOException, GenieException {
+    ) throws IOException, GenieClientException {
         final JsonNode jsonNode = jobService.getJobStatus(jobId).execute().body();
         try {
             return JobStatus.parse(jsonNode.get(STATUS).asText());
         } catch (GeniePreconditionException ge) {
-            throw new GenieException(ge.getMessage());
+            throw new GenieClientException(ge.getMessage());
         }
 
     }
@@ -402,17 +402,17 @@ public class JobClient extends BaseGenieClient {
      *
      * @param jobId           the Genie job ID to wait for completion
      * @param blockTimeout the time to block for (in ms), after which a
-     *                     GenieException will be thrown
+     *                     GenieClientException will be thrown
      * @param pollTime     the time to sleep between polling for job status
      * @return The job status for the job after completion
-     * @throws GenieException       For timeout or other errors.
+     * @throws GenieClientException       For timeout or other errors.
      * @throws InterruptedException on thread errors
      * @throws IOException If the response received is not 2xx.
      */
     public JobStatus waitForCompletion(final String jobId, final long blockTimeout, final long pollTime)
-        throws GenieException, InterruptedException, IOException {
+        throws GenieClientException, InterruptedException, IOException {
         if (StringUtils.isEmpty(jobId)) {
-            throw new GenieException("Missing required parameter: jobId.");
+            throw new GenieClientException("Missing required parameter: jobId.");
         }
 
         final long startTime = System.currentTimeMillis();
@@ -431,7 +431,7 @@ public class JobClient extends BaseGenieClient {
                 if (System.currentTimeMillis() - startTime < blockTimeout) {
                     Thread.sleep(pollTime);
                 } else {
-                    throw new GenieException("Timed out waiting for job to finish");
+                    throw new GenieClientException("Timed out waiting for job to finish");
                 }
             } catch (InterruptedException ie) {
                 throw new IOException("Received interreupted exception from wait thread.");
@@ -445,14 +445,14 @@ public class JobClient extends BaseGenieClient {
      *
      * @param id           the Genie job ID to wait for completion.
      * @param blockTimeout the time to block for (in ms), after which a
-     *                     GenieException will be thrown.
+     *                     GenieClientException will be thrown.
      * @return The job status for the job after completion.
-     * @throws GenieException       For timeout or other errors.
+     * @throws GenieClientException       For timeout or other errors.
      * @throws InterruptedException on timeout/thread errors.
      * @throws IOException If the response recieved is not 2xx.
      */
     public JobStatus waitForCompletion(final String id, final long blockTimeout)
-        throws GenieException, InterruptedException, IOException {
+        throws GenieClientException, InterruptedException, IOException {
         final long pollTime = 10000;
         return waitForCompletion(id, blockTimeout, pollTime);
     }

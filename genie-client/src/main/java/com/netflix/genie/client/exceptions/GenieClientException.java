@@ -27,7 +27,7 @@ import java.io.IOException;
  * @author amsharma
  * @since 3.0.0
  */
-public class GenieException extends IOException {
+public class GenieClientException extends IOException {
 
     /* the HTTP error code received from the server. -1 if the error is on the client side only.*/
     private final int errorCode;
@@ -38,7 +38,7 @@ public class GenieException extends IOException {
      * @param errorCode the HTTP status code for this exception
      * @param msg human readable message
      */
-    public GenieException(final int errorCode, final String msg) {
+    public GenieClientException(final int errorCode, final String msg) {
         super(msg);
         this.errorCode = errorCode;
     }
@@ -48,7 +48,7 @@ public class GenieException extends IOException {
      *
      * @param msg human readable message
      */
-    public GenieException(final String msg) {
+    public GenieClientException(final String msg) {
         super(msg);
         this.errorCode = -1;
     }

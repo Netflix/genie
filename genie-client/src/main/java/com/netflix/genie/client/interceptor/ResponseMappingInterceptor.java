@@ -19,7 +19,7 @@ package com.netflix.genie.client.interceptor;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.netflix.genie.client.exceptions.GenieException;
+import com.netflix.genie.client.exceptions.GenieClientException;
 import okhttp3.Interceptor;
 import okhttp3.Response;
 
@@ -53,7 +53,7 @@ public class ResponseMappingInterceptor implements Interceptor {
             return response;
         } else {
             final JsonNode responseBody = mapper.readTree(response.body().string());
-            throw new GenieException(response.code(), response.message() + " : " + responseBody.get("message"));
+            throw new GenieClientException(response.code(), response.message() + " : " + responseBody.get("message"));
         }
     }
 }

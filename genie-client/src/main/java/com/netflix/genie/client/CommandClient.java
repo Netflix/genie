@@ -20,8 +20,8 @@ package com.netflix.genie.client;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.netflix.genie.client.apis.CommandService;
+import com.netflix.genie.client.exceptions.GenieClientException;
 import com.netflix.genie.client.security.SecurityInterceptor;
-import com.netflix.genie.client.exceptions.GenieException;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
@@ -50,12 +50,12 @@ public class CommandClient extends BaseGenieClient {
      * @param url The url of the Genie Service.
      * @param securityInterceptor An implementation of the Security Interceptor.
      *
-     * @throws GenieException If there is any problem.
+     * @throws GenieClientException If there is any problem.
      */
     public CommandClient(
         final String url,
         final SecurityInterceptor securityInterceptor
-    ) throws GenieException {
+    ) throws GenieClientException {
         super(url, securityInterceptor);
         commandService = retrofit.create(CommandService.class);
     }
@@ -64,12 +64,12 @@ public class CommandClient extends BaseGenieClient {
      * Constructor that takes only the URL.
      *
      * @param url The url of the Genie Service.
-     * @throws GenieException If there is any problem.
+     * @throws GenieClientException If there is any problem.
      */
     // TODO Can we get rid of one constructor in either BaseGenieClient or JobClient.
     public CommandClient(
         final String url
-    ) throws GenieException {
+    ) throws GenieClientException {
         super(url, null);
         commandService = retrofit.create(CommandService.class);
     }
@@ -83,14 +83,14 @@ public class CommandClient extends BaseGenieClient {
      *
      * @return The id of the command created.
      *
-     * @throws GenieException For any other error.
+     * @throws GenieClientException For any other error.
      * @throws IOException If the response received is not 2xx.
      */
     public String createCommand(
         final Command command
-    ) throws IOException, GenieException {
+    ) throws IOException, GenieClientException {
         if (command == null) {
-            throw new GenieException("Command cannot be null.");
+            throw new GenieClientException("Command cannot be null.");
         }
         return getIdFromLocation(commandService.createCommand(command).execute().headers().get("location"));
     }
@@ -99,10 +99,10 @@ public class CommandClient extends BaseGenieClient {
      * Method to get a list of all the commands.
      *
      * @return A list of commands.
-     * @throws GenieException       For any other error.
+     * @throws GenieClientException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
-    public List<Command> getCommands() throws IOException, GenieException {
+    public List<Command> getCommands() throws IOException, GenieClientException {
         return this.getCommands(null, null, null, null);
     }
 
@@ -115,7 +115,7 @@ public class CommandClient extends BaseGenieClient {
      * @param tagList The list of tags.
      *
      * @return A list of commands.
-     * @throws GenieException       For any other error.
+     * @throws GenieClientException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
     public List<Command> getCommands(
@@ -123,7 +123,7 @@ public class CommandClient extends BaseGenieClient {
         final String user,
         final List<String> statusList,
         final List<String> tagList
-    ) throws IOException, GenieException {
+    ) throws IOException, GenieClientException {
 
         final List<Command> commandList = new ArrayList<>();
         final JsonNode jnode =  commandService.getCommands(
@@ -147,14 +147,14 @@ public class CommandClient extends BaseGenieClient {
      *
      * @param commandId The id of the command to get.
      * @return The command details.
-     * @throws GenieException       For any other error.
+     * @throws GenieClientException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
     public Command getCommand(
         final String commandId
-    ) throws IOException, GenieException {
+    ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(commandId)) {
-            throw new GenieException("Missing required parameter: commandId.");
+            throw new GenieClientException("Missing required parameter: commandId.");
         }
         return commandService.getCommand(commandId).execute().body();
     }
@@ -163,12 +163,12 @@ public class CommandClient extends BaseGenieClient {
      * Method to delete a command from Genie.
      *
      * @param commandId The id of the command.
-     * @throws GenieException       For any other error.
+     * @throws GenieClientException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
-    public void deleteCommand(final String commandId) throws IOException, GenieException {
+    public void deleteCommand(final String commandId) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(commandId)) {
-            throw new GenieException("Missing required parameter: commandId.");
+            throw new GenieClientException("Missing required parameter: commandId.");
         }
         commandService.deleteCommand(commandId).execute();
     }
@@ -176,10 +176,10 @@ public class CommandClient extends BaseGenieClient {
     /**
      * Method to delete all commands from Genie.
      *
-     * @throws GenieException       For any other error.
+     * @throws GenieClientException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
-    public void deleteAllCommands() throws IOException, GenieException {
+    public void deleteAllCommands() throws IOException, GenieClientException {
         commandService.deleteAllCommands().execute();
     }
 
@@ -189,16 +189,16 @@ public class CommandClient extends BaseGenieClient {
      * @param commandId The id of the command.
      * @param patch The patch object specifying all the instructions.
      *
-     * @throws GenieException       For any other error.
+     * @throws GenieClientException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
-    public void patchCommand(final String commandId, final JsonPatch patch) throws IOException, GenieException {
+    public void patchCommand(final String commandId, final JsonPatch patch) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(commandId)) {
-            throw new GenieException("Missing required parameter: commandId.");
+            throw new GenieClientException("Missing required parameter: commandId.");
         }
 
         if (patch == null) {
-            throw new GenieException("Patch cannot be null");
+            throw new GenieClientException("Patch cannot be null");
         }
 
         commandService.patchCommand(commandId, patch).execute();
@@ -210,16 +210,16 @@ public class CommandClient extends BaseGenieClient {
      * @param commandId The id of the command.
      * @param command The updated command object to use.
      *
-     * @throws GenieException       For any other error.
+     * @throws GenieClientException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
-    public void updateCommand(final String commandId, final Command command) throws IOException, GenieException {
+    public void updateCommand(final String commandId, final Command command) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(commandId)) {
-            throw new GenieException("Missing required parameter: commandId.");
+            throw new GenieClientException("Missing required parameter: commandId.");
         }
 
         if (command == null) {
-            throw new GenieException("Patch cannot be null");
+            throw new GenieClientException("Patch cannot be null");
         }
 
         commandService.updateCommand(commandId, command).execute();
@@ -233,12 +233,12 @@ public class CommandClient extends BaseGenieClient {
      * @param commandId The id of the command.
      *
      * @return The set of configs for the command.
-     * @throws GenieException       For any other error.
+     * @throws GenieClientException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
-    public Set<String> getConfigsForCommand(final String commandId) throws IOException, GenieException {
+    public Set<String> getConfigsForCommand(final String commandId) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(commandId)) {
-            throw new GenieException("Missing required parameter: commandId.");
+            throw new GenieClientException("Missing required parameter: commandId.");
         }
 
         return commandService.getConfigsForCommand(commandId).execute().body();
@@ -250,18 +250,18 @@ public class CommandClient extends BaseGenieClient {
      * @param commandId The id of the command.
      * @param configs The set of configs to add.
      *
-     * @throws GenieException       For any other error.
+     * @throws GenieClientException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
     public void addConfigsToCommand(
         final String commandId, final Set<String> configs
-    ) throws IOException, GenieException {
+    ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(commandId)) {
-            throw new GenieException("Missing required parameter: commandId.");
+            throw new GenieClientException("Missing required parameter: commandId.");
         }
 
         if (configs == null || configs.isEmpty()) {
-            throw new GenieException("Configs cannot be null or empty");
+            throw new GenieClientException("Configs cannot be null or empty");
         }
 
         commandService.addConfigsToCommand(commandId, configs).execute();
@@ -273,18 +273,18 @@ public class CommandClient extends BaseGenieClient {
      * @param commandId The id of the command.
      * @param configs The set of configs to add.
      *
-     * @throws GenieException       For any other error.
+     * @throws GenieClientException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
     public void updateConfigsForCommand(
         final String commandId, final Set<String> configs
-    ) throws IOException, GenieException {
+    ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(commandId)) {
-            throw new GenieException("Missing required parameter: commandId.");
+            throw new GenieClientException("Missing required parameter: commandId.");
         }
 
         if (configs == null || configs.isEmpty()) {
-            throw new GenieException("Configs cannot be null or empty");
+            throw new GenieClientException("Configs cannot be null or empty");
         }
 
         commandService.updateConfigsForCommand(commandId, configs).execute();
@@ -295,14 +295,14 @@ public class CommandClient extends BaseGenieClient {
      *
      * @param commandId The id of the command.
      *
-     * @throws GenieException       For any other error.
+     * @throws GenieClientException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
     public void removeAllConfigsForCommand(
         final String commandId
-    ) throws IOException, GenieException {
+    ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(commandId)) {
-            throw new GenieException("Missing required parameter: commandId.");
+            throw new GenieClientException("Missing required parameter: commandId.");
         }
 
         commandService.removeAllConfigsForCommand(commandId).execute();
@@ -316,12 +316,12 @@ public class CommandClient extends BaseGenieClient {
      * @param commandId The id of the command.
      *
      * @return The set of applications for the command.
-     * @throws GenieException       For any other error.
+     * @throws GenieClientException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
-    public List<Application> getApplicationsForCommand(final String commandId) throws IOException, GenieException {
+    public List<Application> getApplicationsForCommand(final String commandId) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(commandId)) {
-            throw new GenieException("Missing required parameter: commandId.");
+            throw new GenieClientException("Missing required parameter: commandId.");
         }
 
         return commandService.getApplicationsForCommand(commandId).execute().body();
@@ -333,12 +333,12 @@ public class CommandClient extends BaseGenieClient {
      * @param commandId The id of the command.
      *
      * @return The set of clusters for the command.
-     * @throws GenieException       For any other error.
+     * @throws GenieClientException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
-    public List<Cluster> getClustersForCommand(final String commandId) throws IOException, GenieException {
+    public List<Cluster> getClustersForCommand(final String commandId) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(commandId)) {
-            throw new GenieException("Missing required parameter: commandId.");
+            throw new GenieClientException("Missing required parameter: commandId.");
         }
 
         return commandService.getClustersForCommand(commandId).execute().body();
@@ -350,18 +350,18 @@ public class CommandClient extends BaseGenieClient {
      * @param commandId The id of the command.
      * @param applicationIds The set of applications ids to add.
      *
-     * @throws GenieException       For any other error.
+     * @throws GenieClientException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
     public void addApplicationsToCommand(
         final String commandId, final List<String> applicationIds
-    ) throws IOException, GenieException {
+    ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(commandId)) {
-            throw new GenieException("Missing required parameter: commandId.");
+            throw new GenieClientException("Missing required parameter: commandId.");
         }
 
         if (applicationIds == null || applicationIds.isEmpty()) {
-            throw new GenieException("applicationIds cannot be null or empty");
+            throw new GenieClientException("applicationIds cannot be null or empty");
         }
 
         commandService.addApplicationsToCommand(commandId, applicationIds).execute();
@@ -373,18 +373,18 @@ public class CommandClient extends BaseGenieClient {
      * @param commandId The id of the command.
      * @param applicationIds The set of application ids to add.
      *
-     * @throws GenieException       For any other error.
+     * @throws GenieClientException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
     public void updateApplicationsForCommand(
         final String commandId, final List<String> applicationIds
-    ) throws IOException, GenieException {
+    ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(commandId)) {
-            throw new GenieException("Missing required parameter: commandId.");
+            throw new GenieClientException("Missing required parameter: commandId.");
         }
 
         if (applicationIds == null || applicationIds.isEmpty()) {
-            throw new GenieException("applicationIds cannot be null or empty");
+            throw new GenieClientException("applicationIds cannot be null or empty");
         }
 
         commandService.setApplicationsForCommand(commandId, applicationIds).execute();
@@ -396,19 +396,19 @@ public class CommandClient extends BaseGenieClient {
      * @param commandId The id of the command.
      * @param applicationId The id of the application to remove.
      *
-     * @throws GenieException       For any other error.
+     * @throws GenieClientException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
     public void removeApplicationFromCommand(
         final String commandId,
         final String applicationId
-    ) throws IOException, GenieException {
+    ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(commandId)) {
-            throw new GenieException("Missing required parameter: commandId.");
+            throw new GenieClientException("Missing required parameter: commandId.");
         }
 
         if (StringUtils.isEmpty(applicationId)) {
-            throw new GenieException("Missing required parameter: applicationId.");
+            throw new GenieClientException("Missing required parameter: applicationId.");
         }
 
         commandService.removeApplicationForCommand(commandId, applicationId).execute();
@@ -419,14 +419,14 @@ public class CommandClient extends BaseGenieClient {
      *
      * @param commandId The id of the command.
      *
-     * @throws GenieException       For any other error.
+     * @throws GenieClientException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
     public void removeAllApplicationsForCommand(
         final String commandId
-    ) throws IOException, GenieException {
+    ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(commandId)) {
-            throw new GenieException("Missing required parameter: commandId.");
+            throw new GenieClientException("Missing required parameter: commandId.");
         }
 
         commandService.removeAllApplicationsForCommand(commandId).execute();
@@ -440,12 +440,12 @@ public class CommandClient extends BaseGenieClient {
      * @param commandId The id of the command.
      *
      * @return The set of configs for the command.
-     * @throws GenieException       For any other error.
+     * @throws GenieClientException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
-    public Set<String> getTagsForCommand(final String commandId) throws IOException, GenieException {
+    public Set<String> getTagsForCommand(final String commandId) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(commandId)) {
-            throw new GenieException("Missing required parameter: commandId.");
+            throw new GenieClientException("Missing required parameter: commandId.");
         }
 
         return commandService.getTagsForCommand(commandId).execute().body();
@@ -457,18 +457,18 @@ public class CommandClient extends BaseGenieClient {
      * @param commandId The id of the command.
      * @param tags The set of tags to add.
      *
-     * @throws GenieException       For any other error.
+     * @throws GenieClientException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
     public void addTagsToCommand(
         final String commandId, final Set<String> tags
-    ) throws IOException, GenieException {
+    ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(commandId)) {
-            throw new GenieException("Missing required parameter: commandId.");
+            throw new GenieClientException("Missing required parameter: commandId.");
         }
 
         if (tags == null || tags.isEmpty()) {
-            throw new GenieException("Tags cannot be null or empty");
+            throw new GenieClientException("Tags cannot be null or empty");
         }
 
         commandService.addTagsToCommand(commandId, tags).execute();
@@ -480,18 +480,18 @@ public class CommandClient extends BaseGenieClient {
      * @param commandId The id of the command.
      * @param tags The set of tags to add.
      *
-     * @throws GenieException       For any other error.
+     * @throws GenieClientException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
     public void updateTagsForCommand(
         final String commandId, final Set<String> tags
-    ) throws IOException, GenieException {
+    ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(commandId)) {
-            throw new GenieException("Missing required parameter: commandId.");
+            throw new GenieClientException("Missing required parameter: commandId.");
         }
 
         if (tags == null || tags.isEmpty()) {
-            throw new GenieException("Tags cannot be null or empty");
+            throw new GenieClientException("Tags cannot be null or empty");
         }
 
         commandService.updateTagsForCommand(commandId, tags).execute();
@@ -503,19 +503,19 @@ public class CommandClient extends BaseGenieClient {
      * @param commandId The id of the command.
      * @param tag The tag to remove.
      *
-     * @throws GenieException       For any other error.
+     * @throws GenieClientException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
     public void removeTagFromCommand(
         final String commandId,
         final String tag
-    ) throws IOException, GenieException {
+    ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(commandId)) {
-            throw new GenieException("Missing required parameter: commandId.");
+            throw new GenieClientException("Missing required parameter: commandId.");
         }
 
         if (StringUtils.isEmpty(tag)) {
-            throw new GenieException("Missing required parameter: tag.");
+            throw new GenieClientException("Missing required parameter: tag.");
         }
 
         commandService.removeTagForCommand(commandId, tag).execute();
@@ -526,14 +526,14 @@ public class CommandClient extends BaseGenieClient {
      *
      * @param commandId The id of the command.
      *
-     * @throws GenieException       For any other error.
+     * @throws GenieClientException       For any other error.
      * @throws IOException If the response received is not 2xx.
      */
     public void removeAllTagsForCommand(
         final String commandId
-    ) throws IOException, GenieException {
+    ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(commandId)) {
-            throw new GenieException("Missing required parameter: commandId.");
+            throw new GenieClientException("Missing required parameter: commandId.");
         }
 
         commandService.removeAllTagsForCommand(commandId).execute();
