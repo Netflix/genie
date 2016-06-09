@@ -20,6 +20,7 @@ package com.netflix.genie.client;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.io.ByteStreams;
 import com.netflix.genie.client.apis.JobService;
+import com.netflix.genie.client.exceptions.GenieException;
 import com.netflix.genie.client.security.SecurityInterceptor;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Cluster;
@@ -29,9 +30,7 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.search.JobSearchResult;
-import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.netflix.genie.common.exceptions.GenieTimeoutException;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -102,7 +101,7 @@ public class JobClient extends BaseGenieClient {
         final JobRequest jobRequest
     ) throws IOException, GenieException {
         if (jobRequest == null) {
-            throw new GeniePreconditionException("Job Request cannot be null.");
+            throw new GenieException("Job Request cannot be null.");
         }
         return getIdFromLocation(jobService.submitJob(jobRequest).execute().headers().get("location"));
     }
@@ -123,7 +122,7 @@ public class JobClient extends BaseGenieClient {
         final Map<String, InputStream> attachments
     ) throws IOException, GenieException {
         if (jobRequest == null) {
-            throw new GeniePreconditionException("Job Request cannot be null.");
+            throw new GenieException("Job Request cannot be null.");
         }
 
         final MediaType attachmentMediaType = MediaType.parse(APPLICATION_OCTET_STREAM);
@@ -242,7 +241,7 @@ public class JobClient extends BaseGenieClient {
         final String jobId
     ) throws IOException, GenieException {
         if (StringUtils.isEmpty(jobId)) {
-            throw new GeniePreconditionException("Missing required parameter: jobId.");
+            throw new GenieException("Missing required parameter: jobId.");
         }
         return jobService.getJob(jobId).execute().body();
     }
@@ -259,7 +258,7 @@ public class JobClient extends BaseGenieClient {
         final String jobId
     ) throws IOException, GenieException {
         if (StringUtils.isEmpty(jobId)) {
-            throw new GeniePreconditionException("Missing required parameter: jobId.");
+            throw new GenieException("Missing required parameter: jobId.");
         }
         return jobService.getJobCluster(jobId).execute().body();
     }
@@ -276,7 +275,7 @@ public class JobClient extends BaseGenieClient {
         final String jobId
     ) throws IOException, GenieException {
         if (StringUtils.isEmpty(jobId)) {
-            throw new GeniePreconditionException("Missing required parameter: jobId.");
+            throw new GenieException("Missing required parameter: jobId.");
         }
         return jobService.getJobCommand(jobId).execute().body();
     }
@@ -293,7 +292,7 @@ public class JobClient extends BaseGenieClient {
         final String jobId
     ) throws IOException, GenieException {
         if (StringUtils.isEmpty(jobId)) {
-            throw new GeniePreconditionException("Missing required parameter: jobId.");
+            throw new GenieException("Missing required parameter: jobId.");
         }
         return jobService.getJobRequest(jobId).execute().body();
     }
@@ -310,7 +309,7 @@ public class JobClient extends BaseGenieClient {
         final String jobId
     ) throws IOException, GenieException {
         if (StringUtils.isEmpty(jobId)) {
-            throw new GeniePreconditionException("Missing required parameter: jobId.");
+            throw new GenieException("Missing required parameter: jobId.");
         }
         return jobService.getJobExecution(jobId).execute().body();
     }
@@ -327,7 +326,7 @@ public class JobClient extends BaseGenieClient {
         final String jobId
     ) throws IOException, GenieException {
         if (StringUtils.isEmpty(jobId)) {
-            throw new GeniePreconditionException("Missing required parameter: jobId.");
+            throw new GenieException("Missing required parameter: jobId.");
         }
         return jobService.getJobApplications(jobId).execute().body();
     }
@@ -380,7 +379,12 @@ public class JobClient extends BaseGenieClient {
         final String jobId
     ) throws IOException, GenieException {
         final JsonNode jsonNode = jobService.getJobStatus(jobId).execute().body();
-        return JobStatus.parse(jsonNode.get(STATUS).asText());
+        try {
+            return JobStatus.parse(jsonNode.get(STATUS).asText());
+        } catch (GeniePreconditionException ge) {
+            throw new GenieException(ge.getMessage());
+        }
+
     }
 
     /**
@@ -408,7 +412,7 @@ public class JobClient extends BaseGenieClient {
     public JobStatus waitForCompletion(final String jobId, final long blockTimeout, final long pollTime)
         throws GenieException, InterruptedException, IOException {
         if (StringUtils.isEmpty(jobId)) {
-            throw new GeniePreconditionException("Missing required parameter: jobId.");
+            throw new GenieException("Missing required parameter: jobId.");
         }
 
         final long startTime = System.currentTimeMillis();
@@ -427,7 +431,7 @@ public class JobClient extends BaseGenieClient {
                 if (System.currentTimeMillis() - startTime < blockTimeout) {
                     Thread.sleep(pollTime);
                 } else {
-                    throw new GenieTimeoutException("Timed out waiting for job to finish");
+                    throw new GenieException("Timed out waiting for job to finish");
                 }
             } catch (InterruptedException ie) {
                 throw new IOException("Received interreupted exception from wait thread.");

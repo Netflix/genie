@@ -23,8 +23,8 @@ import com.netflix.genie.client.apis.ClusterService;
 import com.netflix.genie.client.security.SecurityInterceptor;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
-import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.client.exceptions.GenieException;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -90,7 +90,7 @@ public class ClusterClient extends BaseGenieClient {
         final Cluster cluster
     ) throws IOException, GenieException {
         if (cluster == null) {
-            throw new GeniePreconditionException("Cluster cannot be null.");
+            throw new GenieException("Cluster cannot be null.");
         }
         return getIdFromLocation(clusterService.createCluster(cluster).execute().headers().get("location"));
     }
@@ -163,7 +163,7 @@ public class ClusterClient extends BaseGenieClient {
         final String clusterId
     ) throws IOException, GenieException {
         if (StringUtils.isEmpty(clusterId)) {
-            throw new GeniePreconditionException("Missing required parameter: clusterId.");
+            throw new GenieException("Missing required parameter: clusterId.");
         }
         return clusterService.getCluster(clusterId).execute().body();
     }
@@ -177,7 +177,7 @@ public class ClusterClient extends BaseGenieClient {
      */
     public void deleteCluster(final String clusterId) throws IOException, GenieException {
         if (StringUtils.isEmpty(clusterId)) {
-            throw new GeniePreconditionException("Missing required parameter: clusterId.");
+            throw new GenieException("Missing required parameter: clusterId.");
         }
         clusterService.deleteCluster(clusterId).execute();
     }
@@ -203,11 +203,11 @@ public class ClusterClient extends BaseGenieClient {
      */
     public void patchCluster(final String clusterId, final JsonPatch patch) throws IOException, GenieException {
         if (StringUtils.isEmpty(clusterId)) {
-            throw new GeniePreconditionException("Missing required parameter: clusterId.");
+            throw new GenieException("Missing required parameter: clusterId.");
         }
 
         if (patch == null) {
-            throw new GeniePreconditionException("Patch cannot be null");
+            throw new GenieException("Patch cannot be null");
         }
 
         clusterService.patchCluster(clusterId, patch).execute();
@@ -224,11 +224,11 @@ public class ClusterClient extends BaseGenieClient {
      */
     public void updateCluster(final String clusterId, final Cluster cluster) throws IOException, GenieException {
         if (StringUtils.isEmpty(clusterId)) {
-            throw new GeniePreconditionException("Missing required parameter: clusterId.");
+            throw new GenieException("Missing required parameter: clusterId.");
         }
 
         if (cluster == null) {
-            throw new GeniePreconditionException("Patch cannot be null");
+            throw new GenieException("Patch cannot be null");
         }
 
         clusterService.updateCluster(clusterId, cluster).execute();
@@ -247,7 +247,7 @@ public class ClusterClient extends BaseGenieClient {
      */
     public Set<String> getConfigsForCluster(final String clusterId) throws IOException, GenieException {
         if (StringUtils.isEmpty(clusterId)) {
-            throw new GeniePreconditionException("Missing required parameter: clusterId.");
+            throw new GenieException("Missing required parameter: clusterId.");
         }
 
         return clusterService.getConfigsForCluster(clusterId).execute().body();
@@ -266,11 +266,11 @@ public class ClusterClient extends BaseGenieClient {
         final String clusterId, final Set<String> configs
     ) throws IOException, GenieException {
         if (StringUtils.isEmpty(clusterId)) {
-            throw new GeniePreconditionException("Missing required parameter: clusterId.");
+            throw new GenieException("Missing required parameter: clusterId.");
         }
 
         if (configs == null || configs.isEmpty()) {
-            throw new GeniePreconditionException("Configs cannot be null or empty");
+            throw new GenieException("Configs cannot be null or empty");
         }
 
         clusterService.addConfigsToCluster(clusterId, configs).execute();
@@ -289,11 +289,11 @@ public class ClusterClient extends BaseGenieClient {
         final String clusterId, final Set<String> configs
     ) throws IOException, GenieException {
         if (StringUtils.isEmpty(clusterId)) {
-            throw new GeniePreconditionException("Missing required parameter: clusterId.");
+            throw new GenieException("Missing required parameter: clusterId.");
         }
 
         if (configs == null || configs.isEmpty()) {
-            throw new GeniePreconditionException("Configs cannot be null or empty");
+            throw new GenieException("Configs cannot be null or empty");
         }
 
         clusterService.updateConfigsForCluster(clusterId, configs).execute();
@@ -311,7 +311,7 @@ public class ClusterClient extends BaseGenieClient {
         final String clusterId
     ) throws IOException, GenieException {
         if (StringUtils.isEmpty(clusterId)) {
-            throw new GeniePreconditionException("Missing required parameter: clusterId.");
+            throw new GenieException("Missing required parameter: clusterId.");
         }
 
         clusterService.removeAllConfigsForCluster(clusterId).execute();
@@ -330,7 +330,7 @@ public class ClusterClient extends BaseGenieClient {
      */
     public List<Command> getCommandsForCluster(final String clusterId) throws IOException, GenieException {
         if (StringUtils.isEmpty(clusterId)) {
-            throw new GeniePreconditionException("Missing required parameter: clusterId.");
+            throw new GenieException("Missing required parameter: clusterId.");
         }
 
         return clusterService.getCommandsForCluster(clusterId).execute().body();
@@ -349,11 +349,11 @@ public class ClusterClient extends BaseGenieClient {
         final String clusterId, final List<String> commandIds
     ) throws IOException, GenieException {
         if (StringUtils.isEmpty(clusterId)) {
-            throw new GeniePreconditionException("Missing required parameter: clusterId.");
+            throw new GenieException("Missing required parameter: clusterId.");
         }
 
         if (commandIds == null || commandIds.isEmpty()) {
-            throw new GeniePreconditionException("Command Ids cannot be null or empty");
+            throw new GenieException("Command Ids cannot be null or empty");
         }
 
         clusterService.addCommandsToCluster(clusterId, commandIds).execute();
@@ -372,11 +372,11 @@ public class ClusterClient extends BaseGenieClient {
         final String clusterId, final List<String> commandIds
     ) throws IOException, GenieException {
         if (StringUtils.isEmpty(clusterId)) {
-            throw new GeniePreconditionException("Missing required parameter: clusterId.");
+            throw new GenieException("Missing required parameter: clusterId.");
         }
 
         if (commandIds == null || commandIds.isEmpty()) {
-            throw new GeniePreconditionException("commandIds cannot be null or empty");
+            throw new GenieException("commandIds cannot be null or empty");
         }
 
         clusterService.setCommandsForCluster(clusterId, commandIds).execute();
@@ -396,11 +396,11 @@ public class ClusterClient extends BaseGenieClient {
         final String commandId
     ) throws IOException, GenieException {
         if (StringUtils.isEmpty(clusterId)) {
-            throw new GeniePreconditionException("Missing required parameter: clusterId.");
+            throw new GenieException("Missing required parameter: clusterId.");
         }
 
         if (StringUtils.isEmpty(commandId)) {
-            throw new GeniePreconditionException("Missing required parameter: commandId.");
+            throw new GenieException("Missing required parameter: commandId.");
         }
 
         clusterService.removeCommandForCluster(clusterId, commandId).execute();
@@ -418,7 +418,7 @@ public class ClusterClient extends BaseGenieClient {
         final String clusterId
     ) throws IOException, GenieException {
         if (StringUtils.isEmpty(clusterId)) {
-            throw new GeniePreconditionException("Missing required parameter: clusterId.");
+            throw new GenieException("Missing required parameter: clusterId.");
         }
 
         clusterService.removeAllCommandsForCluster(clusterId).execute();
@@ -437,7 +437,7 @@ public class ClusterClient extends BaseGenieClient {
      */
     public Set<String> getTagsForCluster(final String clusterId) throws IOException, GenieException {
         if (StringUtils.isEmpty(clusterId)) {
-            throw new GeniePreconditionException("Missing required parameter: clusterId.");
+            throw new GenieException("Missing required parameter: clusterId.");
         }
 
         return clusterService.getTagsForCluster(clusterId).execute().body();
@@ -456,11 +456,11 @@ public class ClusterClient extends BaseGenieClient {
         final String clusterId, final Set<String> tags
     ) throws IOException, GenieException {
         if (StringUtils.isEmpty(clusterId)) {
-            throw new GeniePreconditionException("Missing required parameter: clusterId.");
+            throw new GenieException("Missing required parameter: clusterId.");
         }
 
         if (tags == null || tags.isEmpty()) {
-            throw new GeniePreconditionException("Tags cannot be null or empty");
+            throw new GenieException("Tags cannot be null or empty");
         }
 
         clusterService.addTagsToCluster(clusterId, tags).execute();
@@ -479,11 +479,11 @@ public class ClusterClient extends BaseGenieClient {
         final String clusterId, final Set<String> tags
     ) throws IOException, GenieException {
         if (StringUtils.isEmpty(clusterId)) {
-            throw new GeniePreconditionException("Missing required parameter: clusterId.");
+            throw new GenieException("Missing required parameter: clusterId.");
         }
 
         if (tags == null || tags.isEmpty()) {
-            throw new GeniePreconditionException("Tags cannot be null or empty");
+            throw new GenieException("Tags cannot be null or empty");
         }
 
         clusterService.updateTagsForCluster(clusterId, tags).execute();
@@ -503,11 +503,11 @@ public class ClusterClient extends BaseGenieClient {
         final String tag
     ) throws IOException, GenieException {
         if (StringUtils.isEmpty(clusterId)) {
-            throw new GeniePreconditionException("Missing required parameter: clusterId.");
+            throw new GenieException("Missing required parameter: clusterId.");
         }
 
         if (StringUtils.isEmpty(tag)) {
-            throw new GeniePreconditionException("Missing required parameter: tag.");
+            throw new GenieException("Missing required parameter: tag.");
         }
 
         clusterService.removeTagForCluster(clusterId, tag).execute();
@@ -525,7 +525,7 @@ public class ClusterClient extends BaseGenieClient {
         final String clusterId
     ) throws IOException, GenieException {
         if (StringUtils.isEmpty(clusterId)) {
-            throw new GeniePreconditionException("Missing required parameter: clusterId.");
+            throw new GenieException("Missing required parameter: clusterId.");
         }
 
         clusterService.removeAllTagsForCluster(clusterId).execute();

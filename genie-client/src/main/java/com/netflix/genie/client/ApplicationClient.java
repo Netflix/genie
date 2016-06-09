@@ -23,8 +23,7 @@ import com.netflix.genie.client.apis.ApplicationService;
 import com.netflix.genie.client.security.SecurityInterceptor;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Command;
-import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.client.exceptions.GenieException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -90,7 +89,7 @@ public class ApplicationClient extends BaseGenieClient {
         final Application application
     ) throws IOException, GenieException {
         if (application == null) {
-            throw new GeniePreconditionException("Application cannot be null.");
+            throw new GenieException("Application cannot be null.");
         }
         return getIdFromLocation(applicationService.createApplication(application).execute().headers().get("location"));
     }
@@ -157,7 +156,7 @@ public class ApplicationClient extends BaseGenieClient {
         final String applicationId
     ) throws IOException, GenieException {
         if (StringUtils.isEmpty(applicationId)) {
-            throw new GeniePreconditionException("Missing required parameter: applicationId.");
+            throw new GenieException("Missing required parameter: applicationId.");
         }
         return applicationService.getApplication(applicationId).execute().body();
     }
@@ -171,7 +170,7 @@ public class ApplicationClient extends BaseGenieClient {
      */
     public void deleteApplication(final String applicationId) throws IOException, GenieException {
         if (StringUtils.isEmpty(applicationId)) {
-            throw new GeniePreconditionException("Missing required parameter: applicationId.");
+            throw new GenieException("Missing required parameter: applicationId.");
         }
         applicationService.deleteApplication(applicationId).execute();
     }
@@ -197,11 +196,11 @@ public class ApplicationClient extends BaseGenieClient {
      */
     public void patchApplication(final String applicationId, final JsonPatch patch) throws IOException, GenieException {
         if (StringUtils.isEmpty(applicationId)) {
-            throw new GeniePreconditionException("Missing required parameter: applicationId.");
+            throw new GenieException("Missing required parameter: applicationId.");
         }
 
         if (patch == null) {
-            throw new GeniePreconditionException("Patch cannot be null");
+            throw new GenieException("Patch cannot be null");
         }
 
         applicationService.patchApplication(applicationId, patch).execute();
@@ -219,11 +218,11 @@ public class ApplicationClient extends BaseGenieClient {
     public void updateApplication(final String applicationId, final Application application)
         throws IOException, GenieException {
         if (StringUtils.isEmpty(applicationId)) {
-            throw new GeniePreconditionException("Missing required parameter: applicationId.");
+            throw new GenieException("Missing required parameter: applicationId.");
         }
 
         if (application == null) {
-            throw new GeniePreconditionException("Patch cannot be null");
+            throw new GenieException("Patch cannot be null");
         }
 
         applicationService.updateApplication(applicationId, application).execute();
@@ -240,7 +239,7 @@ public class ApplicationClient extends BaseGenieClient {
      */
     public List<Command> getCommandsForApplication(final String applicationId) throws IOException, GenieException {
         if (StringUtils.isEmpty(applicationId)) {
-            throw new GeniePreconditionException("Missing required parameter: applicationId.");
+            throw new GenieException("Missing required parameter: applicationId.");
         }
 
         return applicationService.getCommandsForApplication(applicationId).execute().body();
@@ -259,7 +258,7 @@ public class ApplicationClient extends BaseGenieClient {
      */
     public Set<String> getConfigsForApplication(final String applicationId) throws IOException, GenieException {
         if (StringUtils.isEmpty(applicationId)) {
-            throw new GeniePreconditionException("Missing required parameter: applicationId.");
+            throw new GenieException("Missing required parameter: applicationId.");
         }
 
         return applicationService.getConfigsForApplication(applicationId).execute().body();
@@ -278,11 +277,11 @@ public class ApplicationClient extends BaseGenieClient {
         final String applicationId, final Set<String> configs
     ) throws IOException, GenieException {
         if (StringUtils.isEmpty(applicationId)) {
-            throw new GeniePreconditionException("Missing required parameter: applicationId.");
+            throw new GenieException("Missing required parameter: applicationId.");
         }
 
         if (configs == null || configs.isEmpty()) {
-            throw new GeniePreconditionException("Configs cannot be null or empty");
+            throw new GenieException("Configs cannot be null or empty");
         }
 
         applicationService.addConfigsToApplication(applicationId, configs).execute();
@@ -301,11 +300,11 @@ public class ApplicationClient extends BaseGenieClient {
         final String applicationId, final Set<String> configs
     ) throws IOException, GenieException {
         if (StringUtils.isEmpty(applicationId)) {
-            throw new GeniePreconditionException("Missing required parameter: applicationId.");
+            throw new GenieException("Missing required parameter: applicationId.");
         }
 
         if (configs == null || configs.isEmpty()) {
-            throw new GeniePreconditionException("Configs cannot be null or empty");
+            throw new GenieException("Configs cannot be null or empty");
         }
 
         applicationService.updateConfigsForApplication(applicationId, configs).execute();
@@ -323,7 +322,7 @@ public class ApplicationClient extends BaseGenieClient {
         final String applicationId
     ) throws IOException, GenieException {
         if (StringUtils.isEmpty(applicationId)) {
-            throw new GeniePreconditionException("Missing required parameter: applicationId.");
+            throw new GenieException("Missing required parameter: applicationId.");
         }
 
         applicationService.removeAllConfigsForApplication(applicationId).execute();
@@ -342,7 +341,7 @@ public class ApplicationClient extends BaseGenieClient {
      */
     public Set<String> getDependenciesForApplication(final String applicationId) throws IOException, GenieException {
         if (StringUtils.isEmpty(applicationId)) {
-            throw new GeniePreconditionException("Missing required parameter: applicationId.");
+            throw new GenieException("Missing required parameter: applicationId.");
         }
 
         return applicationService.getDependenciesForApplication(applicationId).execute().body();
@@ -361,11 +360,11 @@ public class ApplicationClient extends BaseGenieClient {
         final String applicationId, final Set<String> dependencies
     ) throws IOException, GenieException {
         if (StringUtils.isEmpty(applicationId)) {
-            throw new GeniePreconditionException("Missing required parameter: applicationId.");
+            throw new GenieException("Missing required parameter: applicationId.");
         }
 
         if (dependencies == null || dependencies.isEmpty()) {
-            throw new GeniePreconditionException("Dependencies cannot be null or empty");
+            throw new GenieException("Dependencies cannot be null or empty");
         }
 
         applicationService.addDependenciesToApplication(applicationId, dependencies).execute();
@@ -384,11 +383,11 @@ public class ApplicationClient extends BaseGenieClient {
         final String applicationId, final Set<String> dependencies
     ) throws IOException, GenieException {
         if (StringUtils.isEmpty(applicationId)) {
-            throw new GeniePreconditionException("Missing required parameter: applicationId.");
+            throw new GenieException("Missing required parameter: applicationId.");
         }
 
         if (dependencies == null || dependencies.isEmpty()) {
-            throw new GeniePreconditionException("Dependencies cannot be null or empty");
+            throw new GenieException("Dependencies cannot be null or empty");
         }
 
         applicationService.updateDependenciesForApplication(applicationId, dependencies).execute();
@@ -406,7 +405,7 @@ public class ApplicationClient extends BaseGenieClient {
         final String applicationId
     ) throws IOException, GenieException {
         if (StringUtils.isEmpty(applicationId)) {
-            throw new GeniePreconditionException("Missing required parameter: applicationId.");
+            throw new GenieException("Missing required parameter: applicationId.");
         }
 
         applicationService.removeAllDependenciesForApplication(applicationId).execute();
@@ -425,7 +424,7 @@ public class ApplicationClient extends BaseGenieClient {
      */
     public Set<String> getTagsForApplication(final String applicationId) throws IOException, GenieException {
         if (StringUtils.isEmpty(applicationId)) {
-            throw new GeniePreconditionException("Missing required parameter: applicationId.");
+            throw new GenieException("Missing required parameter: applicationId.");
         }
 
         return applicationService.getTagsForApplication(applicationId).execute().body();
@@ -444,11 +443,11 @@ public class ApplicationClient extends BaseGenieClient {
         final String applicationId, final Set<String> tags
     ) throws IOException, GenieException {
         if (StringUtils.isEmpty(applicationId)) {
-            throw new GeniePreconditionException("Missing required parameter: applicationId.");
+            throw new GenieException("Missing required parameter: applicationId.");
         }
 
         if (tags == null || tags.isEmpty()) {
-            throw new GeniePreconditionException("Tags cannot be null or empty");
+            throw new GenieException("Tags cannot be null or empty");
         }
 
         applicationService.addTagsToApplication(applicationId, tags).execute();
@@ -467,11 +466,11 @@ public class ApplicationClient extends BaseGenieClient {
         final String applicationId, final Set<String> tags
     ) throws IOException, GenieException {
         if (StringUtils.isEmpty(applicationId)) {
-            throw new GeniePreconditionException("Missing required parameter: applicationId.");
+            throw new GenieException("Missing required parameter: applicationId.");
         }
 
         if (tags == null || tags.isEmpty()) {
-            throw new GeniePreconditionException("Tags cannot be null or empty");
+            throw new GenieException("Tags cannot be null or empty");
         }
 
         applicationService.updateTagsForApplication(applicationId, tags).execute();
@@ -491,11 +490,11 @@ public class ApplicationClient extends BaseGenieClient {
         final String tag
     ) throws IOException, GenieException {
         if (StringUtils.isEmpty(applicationId)) {
-            throw new GeniePreconditionException("Missing required parameter: applicationId.");
+            throw new GenieException("Missing required parameter: applicationId.");
         }
 
         if (StringUtils.isEmpty(tag)) {
-            throw new GeniePreconditionException("Missing required parameter: tag.");
+            throw new GenieException("Missing required parameter: tag.");
         }
 
         applicationService.removeTagForApplication(applicationId, tag).execute();
@@ -513,7 +512,7 @@ public class ApplicationClient extends BaseGenieClient {
         final String applicationId
     ) throws IOException, GenieException {
         if (StringUtils.isEmpty(applicationId)) {
-            throw new GeniePreconditionException("Missing required parameter: applicationId.");
+            throw new GenieException("Missing required parameter: applicationId.");
         }
 
         applicationService.removeAllTagsForApplication(applicationId).execute();

@@ -130,7 +130,7 @@ public class BaseGenieClientTests {
 //     * @throws GenieException  Random issues.
 //     * @throws ClientException Some http request failed.
 //     */
-//    @Test(expected = GenieServerException.class)
+//    @Test(expected = GenieException.class)
 //    public void testExecuteRequestNoResponseReturned() throws GenieException, ClientException {
 //        Mockito.when(this.restClient.executeWithLoadBalancer(this.request)).thenReturn(null);
 //        this.client.executeRequest(this.request, Set.class, String.class);

@@ -21,13 +21,11 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.genie.client.interceptor.ResponseMappingInterceptor;
 import com.netflix.genie.client.security.SecurityInterceptor;
-import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.client.exceptions.GenieException;
 import okhttp3.OkHttpClient;
 import org.apache.commons.lang3.StringUtils;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
-
 
 /**
  * Base class for the clients for Genie Services.
@@ -37,7 +35,6 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
  */
 public abstract class BaseGenieClient {
 
-    protected static final String FILE_PATH_DELIMITER = "/";
     protected static final String STATUS = "status";
 
     protected Retrofit retrofit;
@@ -56,7 +53,7 @@ public abstract class BaseGenieClient {
         ) throws GenieException {
 
         if (StringUtils.isBlank(url)) {
-            throw new GeniePreconditionException("Service URL cannot be empty or null");
+            throw new GenieException("Service URL cannot be empty or null");
         }
 
         final OkHttpClient.Builder builder = new OkHttpClient.Builder();
