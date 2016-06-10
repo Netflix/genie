@@ -37,9 +37,9 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 
 /**
@@ -88,7 +88,7 @@ public class JobMonitoringCoordinator {
         final Resource jobsDir,
         final JobOutputMaxProperties outputMaxProperties
     ) throws IOException {
-        this.jobMonitors = new HashMap<>();
+        this.jobMonitors = new ConcurrentHashMap<>();
         this.hostName = hostName;
         this.jobSearchService = jobSearchService;
         this.publisher = publisher;
@@ -163,6 +163,15 @@ public class JobMonitoringCoordinator {
                 this.unableToCancel.increment();
             }
         }
+    }
+
+    /**
+     * Get the number of jobs currently running on this node.
+     *
+     * @return the number of jobs currently running on this node
+     */
+    public int getNumRunningJobs() {
+        return this.jobMonitors.size();
     }
 
     private void scheduleMonitor(final JobExecution jobExecution) {
