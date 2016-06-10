@@ -39,6 +39,7 @@ import org.apache.commons.exec.Executor;
 import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -62,6 +63,7 @@ public class JobCompletionHandler {
     private final String baseWorkingDir;
     private final MailService mailServiceImpl;
     private final Executor executor;
+    private final boolean deleteArchiveFile;
 
     // Metrics
     private final Counter emailFailureRate;
@@ -69,6 +71,7 @@ public class JobCompletionHandler {
     private final Counter doneFileProcessingFailureRate;
     private final Counter finalStatusUpdateFailureRate;
     private final Counter processGroupCleanupFailureRate;
+    private final Counter archiveFileDeletionFailure;
 
     /**
      * Constructor.
@@ -79,6 +82,7 @@ public class JobCompletionHandler {
      * @param genieWorkingDir          The working directory where all job directories are created.
      * @param mailServiceImpl          An implementation of the mail service.
      * @param registry                 The metrics registry to use
+     * @param deleteArchiveFile        Flag that determines if the job archive file will be deleted after upload.
      *
      * @throws GenieException if there is a problem
      */
@@ -89,12 +93,15 @@ public class JobCompletionHandler {
         final GenieFileTransferService genieFileTransferService,
         final Resource genieWorkingDir,
         final MailService mailServiceImpl,
-        final Registry registry
+        final Registry registry,
+        @Value("${genie.jobs.deleteArchiveFile.enabled:true}")
+        final boolean deleteArchiveFile
     ) throws GenieException {
         this.jobPersistenceService = jobPersistenceService;
         this.jobSearchService = jobSearchService;
         this.genieFileTransferService = genieFileTransferService;
         this.mailServiceImpl = mailServiceImpl;
+        this.deleteArchiveFile = deleteArchiveFile;
         this.executor = new DefaultExecutor();
         executor.setStreamHandler(new PumpStreamHandler(null, null));
 
@@ -110,6 +117,7 @@ public class JobCompletionHandler {
         this.doneFileProcessingFailureRate = registry.counter("genie.jobs.doneFileProcessingFailure.rate");
         this.finalStatusUpdateFailureRate = registry.counter("genie.jobs.finalStatusUpdateFailure.rate");
         this.processGroupCleanupFailureRate = registry.counter("genie.jobs.processGroupCleanupFailure.rate");
+        this.archiveFileDeletionFailure = registry.counter("genie.jobs.archiveFileDeletionFailure.rate");
     }
 
     /**
@@ -211,7 +219,7 @@ public class JobCompletionHandler {
 
             if (StringUtils.isNotBlank(job.getArchiveLocation())) {
 
-                // Create the tar file exluding the run.sh file and everything under the genie directory
+                // Create the tar file
                 final String jobWorkingDir = this.baseWorkingDir + JobConstants.FILE_PATH_DELIMITER + jobId;
                 final String localArchiveFile = jobWorkingDir
                     + JobConstants.FILE_PATH_DELIMITER
@@ -232,6 +240,17 @@ public class JobCompletionHandler {
 
                 // Upload the tar file to remote location
                 this.genieFileTransferService.putFile(localArchiveFile, job.getArchiveLocation());
+
+                // At this point the archive file is successfully uploaded to archvie location specified in the job.
+                // Now we can delete it from local disk to save space if enabled.
+                if (deleteArchiveFile) {
+                    try {
+                        new File(localArchiveFile).delete();
+                    } catch (Exception e) {
+                        log.error("Failed to delete archive file for job: {}", jobId, e);
+                        this.archiveFileDeletionFailure.increment();
+                    }
+                }
             }
         } catch (Exception e) {
             log.error("Could not archive directory for job: {}", jobId, e);
