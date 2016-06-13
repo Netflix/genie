@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react';
+import React, { PropTypes as T } from 'react';
 import { Link } from 'react-router';
 
 import TableHeader from './components/TableHeader';
@@ -10,8 +10,8 @@ import { genieJobsUrl, fileUrl, momentFormat, fetch } from './utils';
 export default class OutputDirectory extends React.Component {
 
   static propTypes = {
-    headers : PropTypes.array,
-    params  : PropTypes.object,
+    headers : T.array,
+    params  : T.object,
   }
 
   static defaultProps = {
@@ -101,11 +101,11 @@ const FileRow = (props) =>
   </tr>;
 
 FileRow.propTypes = {
-  file: PropTypes.shape({
-    name         : PropTypes.string,
-    size         : PropTypes.number,
-    url          : PropTypes.string,
-    lastModified : PropTypes.string,
+  file: T.shape({
+    name         : T.string,
+    size         : T.number,
+    url          : T.string,
+    lastModified : T.string,
   }),
 };
 
@@ -122,11 +122,11 @@ const DirectoryRow = (props) =>
   </tr>;
 
 DirectoryRow.propTypes = {
-  directory: PropTypes.shape({
-    name         : PropTypes.string,
-    size         : PropTypes.number,
-    url          : PropTypes.string,
-    lastModified : PropTypes.string,
+  directory: T.shape({
+    name         : T.string,
+    size         : T.number,
+    url          : T.string,
+    lastModified : T.string,
   }),
 };
 
@@ -137,10 +137,10 @@ const Table = (props) =>
   </table>;
 
 Table.propTypes = {
-  headers: PropTypes.array,
-  output : PropTypes.shape({
-    files       : PropTypes.array,
-    directories : PropTypes.array,
+  headers: T.array,
+  output : T.shape({
+    files       : T.array,
+    directories : T.array,
   }),
 };
 
@@ -161,9 +161,9 @@ const TableBody = (props) =>
   </tbody>;
 
 TableBody.propTypes = {
-  output: PropTypes.shape({
-    files       : PropTypes.array,
-    directories : PropTypes.array,
+  output: T.shape({
+    files       : T.array,
+    directories : T.array,
   }),
 };
 
@@ -181,9 +181,9 @@ const Navigation = (props) => {
 };
 
 Navigation.propTypes = {
-  url    : PropTypes.string,
-  parent : PropTypes.shape({
-    url  : PropTypes.string,
+  url    : T.string,
+  parent : T.shape({
+    url  : T.string,
   }),
 };
 
@@ -193,9 +193,9 @@ const DirectoryInfo = (props) =>
   </div>;
 
 DirectoryInfo.propTypes = {
-  output: PropTypes.shape({
-    files       : PropTypes.array,
-    directories : PropTypes.array,
+  output: T.shape({
+    files       : T.array,
+    directories : T.array,
   }),
 };
 
@@ -209,5 +209,5 @@ const HomeButton = (props) =>
   </div>;
 
 HomeButton.propTypes = {
-  jobId: PropTypes.string,
+  jobId: T.string,
 };

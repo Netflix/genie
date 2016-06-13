@@ -55,7 +55,7 @@ export default class Command extends Page {
   }
 
   get searchPath() {
-    return 'clusters';
+    return 'commands';
   }
 
   get tableHeader() {
@@ -72,7 +72,7 @@ export default class Command extends Page {
       <TableBody
         rows={this.state.data}
         rowId={showDetails}
-        setRowId={this.setRowId}
+        searchPath={this.searchPath}
         detailsTable={CommandDetails}
         hideDetails={this.hideDetails}
       />

@@ -68,7 +68,7 @@ export default class Cluster extends Page {
       <TableBody
         rows={this.state.data}
         rowId={showDetails}
-        setRowId={this.setRowId}
+        searchPath={this.searchPath}
         detailsTable={ClusterDetails}
         hideDetails={this.hideDetails}
       />

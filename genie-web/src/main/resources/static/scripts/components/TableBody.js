@@ -8,7 +8,7 @@ const TableBody = (props) => {
       <TableRow
         key={index}
         row={row}
-        setRowId={props.setRowId}
+        searchPath={props.searchPath}
       />
     );
   });
@@ -39,7 +39,7 @@ TableBody.propTypes = {
   rows        : T.arrayOf(T.object).isRequired,
   rowId       : T.string,
   hideDetails : T.func.isRequired,
-  setRowId    : T.func.isRequired,
+  searchPath  : T.string.isRequired,
 };
 
 export default TableBody;

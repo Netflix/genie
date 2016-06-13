@@ -72,7 +72,7 @@ export default class Application extends Page {
       <TableBody
         rows={this.state.data}
         rowId={showDetails}
-        setRowId={this.setRowId}
+        searchPath={this.searchPath}
         detailsTable={ApplicationDetails}
         hideDetails={this.hideDetails}
       />
