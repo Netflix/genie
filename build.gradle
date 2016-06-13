@@ -23,16 +23,6 @@ plugins {
 
 ext.githubProjectName = rootProject.name
 
-release {
-    tagStrategy {
-        prefixNameWithV = false
-    }
-}
-
-nebulaRelease {
-    addReleaseBranchPattern(/(release(-|\/))?\d+(\.\d+)?\.(x|\d+)/)
-}
-
 allprojects {
     apply plugin: 'jacoco'
     apply plugin: 'idea'

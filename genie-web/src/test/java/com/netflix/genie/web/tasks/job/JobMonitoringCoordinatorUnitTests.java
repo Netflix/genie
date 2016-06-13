@@ -29,6 +29,8 @@ import com.netflix.genie.web.properties.JobOutputMaxProperties;
 import com.netflix.spectator.api.Counter;
 import com.netflix.spectator.api.Registry;
 import org.apache.commons.exec.Executor;
+import org.hamcrest.Matchers;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -192,11 +194,17 @@ public class JobMonitoringCoordinatorUnitTests {
             this.scheduler.scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(DELAY))
         ).thenReturn(future);
 
+        Assert.assertThat(this.coordinator.getNumRunningJobs(), Matchers.is(0));
         this.coordinator.onJobStarted(event1);
+        Assert.assertThat(this.coordinator.getNumRunningJobs(), Matchers.is(1));
         this.coordinator.onJobStarted(event2);
+        Assert.assertThat(this.coordinator.getNumRunningJobs(), Matchers.is(2));
         this.coordinator.onJobStarted(event3);
+        Assert.assertThat(this.coordinator.getNumRunningJobs(), Matchers.is(3));
         this.coordinator.onJobStarted(event4);
+        Assert.assertThat(this.coordinator.getNumRunningJobs(), Matchers.is(4));
         this.coordinator.onJobStarted(event5);
+        Assert.assertThat(this.coordinator.getNumRunningJobs(), Matchers.is(4));
 
         Mockito
             .verify(this.scheduler, Mockito.times(4))
@@ -232,16 +240,23 @@ public class JobMonitoringCoordinatorUnitTests {
             this.scheduler.scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(DELAY))
         ).thenReturn(future1, future2);
 
+        Assert.assertThat(this.coordinator.getNumRunningJobs(), Matchers.is(0));
         this.coordinator.onJobStarted(startedEvent1);
+        Assert.assertThat(this.coordinator.getNumRunningJobs(), Matchers.is(1));
         this.coordinator.onJobStarted(startedEvent2);
+        Assert.assertThat(this.coordinator.getNumRunningJobs(), Matchers.is(2));
 
         Mockito
             .verify(this.scheduler, Mockito.times(2))
             .scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(DELAY));
 
+        Assert.assertThat(this.coordinator.getNumRunningJobs(), Matchers.is(2));
         this.coordinator.onJobFinished(finishedEvent1);
+        Assert.assertThat(this.coordinator.getNumRunningJobs(), Matchers.is(1));
         this.coordinator.onJobFinished(finishedEvent2);
+        Assert.assertThat(this.coordinator.getNumRunningJobs(), Matchers.is(1));
         this.coordinator.onJobFinished(finishedEvent1);
+        Assert.assertThat(this.coordinator.getNumRunningJobs(), Matchers.is(1));
 
         Mockito.verify(future1, Mockito.times(1)).cancel(true);
         Mockito.verify(future2, Mockito.times(1)).cancel(true);
