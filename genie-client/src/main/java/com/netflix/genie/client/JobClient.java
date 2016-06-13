@@ -20,6 +20,7 @@ package com.netflix.genie.client;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.io.ByteStreams;
 import com.netflix.genie.client.apis.JobService;
+import com.netflix.genie.client.config.GenieNetworkConfiguration;
 import com.netflix.genie.client.exceptions.GenieClientException;
 import com.netflix.genie.client.security.SecurityInterceptor;
 import com.netflix.genie.common.dto.Application;
@@ -59,6 +60,19 @@ public class JobClient extends BaseGenieClient {
     private final JobService jobService;
 
     /**
+     * Constructor that takes only the URL.
+     *
+     * @param url The url of the Genie Service.
+     * @throws GenieClientException If there is any problem.
+     */
+    public JobClient(
+        final String url
+    ) throws GenieClientException {
+        super(url, null, null);
+        jobService = retrofit.create(JobService.class);
+    }
+
+    /**
      * Constructor.
      *
      * @param url The url of the Genie Service.
@@ -70,20 +84,41 @@ public class JobClient extends BaseGenieClient {
         final String url,
         final SecurityInterceptor securityInterceptor
     ) throws GenieClientException {
-        super(url, securityInterceptor);
+        super(url, securityInterceptor, null);
         jobService = retrofit.create(JobService.class);
-     }
+    }
 
     /**
-     * Constructor that takes only the URL.
+     * Constructor.
      *
      * @param url The url of the Genie Service.
+     * @param genieNetworkConfiguration A configuration object that provides network settings for HTTP calls.
+     *
      * @throws GenieClientException If there is any problem.
      */
     public JobClient(
-        final String url
+        final String url,
+        final GenieNetworkConfiguration genieNetworkConfiguration
     ) throws GenieClientException {
-        super(url, null);
+        super(url, null, genieNetworkConfiguration);
+        jobService = retrofit.create(JobService.class);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param url The url of the Genie Service.
+     * @param securityInterceptor An implementation of the Security Interceptor.
+     * @param genieNetworkConfiguration A configuration object that provides network settings for HTTP calls.
+     *
+     * @throws GenieClientException If there is any problem.
+     */
+    public JobClient(
+        final String url,
+        final SecurityInterceptor securityInterceptor,
+        final GenieNetworkConfiguration genieNetworkConfiguration
+        ) throws GenieClientException {
+        super(url, securityInterceptor, genieNetworkConfiguration);
         jobService = retrofit.create(JobService.class);
     }
 
