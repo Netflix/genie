@@ -15,10 +15,7 @@ import six
 import socket
 import uuid
 
-try:
-    import eureq as requests
-except ImportError:
-    import requests
+import requests
 
 from .auth import AuthHandler
 
