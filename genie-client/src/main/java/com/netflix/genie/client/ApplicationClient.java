@@ -81,14 +81,14 @@ public class ApplicationClient extends BaseGenieClient {
      *
      * @return The id of the application created.
      *
-     * @throws GenieClientException For any other error.
-     * @throws IOException If the response received is not 2xx.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues
      */
     public String createApplication(
         final Application application
     ) throws IOException, GenieClientException {
         if (application == null) {
-            throw new GenieClientException("Application cannot be null.");
+            throw new IllegalArgumentException("Application cannot be null.");
         }
         return getIdFromLocation(applicationService.createApplication(application).execute().headers().get("location"));
     }
@@ -97,8 +97,9 @@ public class ApplicationClient extends BaseGenieClient {
      * Method to get a list of all the applications.
      *
      * @return A list of applications.
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     *
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues
      */
     public List<Application> getApplications() throws IOException, GenieClientException {
         return this.getApplications(null, null, null, null, null);
@@ -114,8 +115,9 @@ public class ApplicationClient extends BaseGenieClient {
      * @param type The type of the application.
      *
      * @return A list of applications.
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     *
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues
      */
     public List<Application> getApplications(
         final String name,
@@ -148,14 +150,15 @@ public class ApplicationClient extends BaseGenieClient {
      *
      * @param applicationId The id of the application to get.
      * @return The application details.
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     *
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues
      */
     public Application getApplication(
         final String applicationId
     ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(applicationId)) {
-            throw new GenieClientException("Missing required parameter: applicationId.");
+            throw new IllegalArgumentException("Missing required parameter: applicationId.");
         }
         return applicationService.getApplication(applicationId).execute().body();
     }
@@ -164,12 +167,13 @@ public class ApplicationClient extends BaseGenieClient {
      * Method to delete a application from Genie.
      *
      * @param applicationId The id of the application.
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     *
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues
      */
     public void deleteApplication(final String applicationId) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(applicationId)) {
-            throw new GenieClientException("Missing required parameter: applicationId.");
+            throw new IllegalArgumentException("Missing required parameter: applicationId.");
         }
         applicationService.deleteApplication(applicationId).execute();
     }
@@ -177,8 +181,8 @@ public class ApplicationClient extends BaseGenieClient {
     /**
      * Method to delete all applications from Genie.
      *
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues
      */
     public void deleteAllApplications() throws IOException, GenieClientException {
         applicationService.deleteAllApplications().execute();
@@ -196,11 +200,11 @@ public class ApplicationClient extends BaseGenieClient {
     public void patchApplication(final String applicationId, final JsonPatch patch)
         throws IOException, GenieClientException {
         if (StringUtils.isEmpty(applicationId)) {
-            throw new GenieClientException("Missing required parameter: applicationId.");
+            throw new IllegalArgumentException("Missing required parameter: applicationId.");
         }
 
         if (patch == null) {
-            throw new GenieClientException("Patch cannot be null");
+            throw new IllegalArgumentException("Patch cannot be null");
         }
 
         applicationService.patchApplication(applicationId, patch).execute();
@@ -212,17 +216,17 @@ public class ApplicationClient extends BaseGenieClient {
      * @param applicationId The id of the application.
      * @param application The updated application object to use.
      *
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues
      */
     public void updateApplication(final String applicationId, final Application application)
         throws IOException, GenieClientException {
         if (StringUtils.isEmpty(applicationId)) {
-            throw new GenieClientException("Missing required parameter: applicationId.");
+            throw new IllegalArgumentException("Missing required parameter: applicationId.");
         }
 
         if (application == null) {
-            throw new GenieClientException("Patch cannot be null");
+            throw new IllegalArgumentException("Patch cannot be null");
         }
 
         applicationService.updateApplication(applicationId, application).execute();
@@ -234,13 +238,14 @@ public class ApplicationClient extends BaseGenieClient {
      * @param applicationId The id of the application.
      *
      * @return The set of commands for the applications.
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     *
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues
      */
     public List<Command> getCommandsForApplication(final String applicationId)
         throws IOException, GenieClientException {
         if (StringUtils.isEmpty(applicationId)) {
-            throw new GenieClientException("Missing required parameter: applicationId.");
+            throw new IllegalArgumentException("Missing required parameter: applicationId.");
         }
 
         return applicationService.getCommandsForApplication(applicationId).execute().body();
@@ -254,12 +259,13 @@ public class ApplicationClient extends BaseGenieClient {
      * @param applicationId The id of the application.
      *
      * @return The set of configs for the application.
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     *
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues
      */
     public Set<String> getConfigsForApplication(final String applicationId) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(applicationId)) {
-            throw new GenieClientException("Missing required parameter: applicationId.");
+            throw new IllegalArgumentException("Missing required parameter: applicationId.");
         }
 
         return applicationService.getConfigsForApplication(applicationId).execute().body();
@@ -271,18 +277,18 @@ public class ApplicationClient extends BaseGenieClient {
      * @param applicationId The id of the application.
      * @param configs The set of configs to add.
      *
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues
      */
     public void addConfigsToApplication(
         final String applicationId, final Set<String> configs
     ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(applicationId)) {
-            throw new GenieClientException("Missing required parameter: applicationId.");
+            throw new IllegalArgumentException("Missing required parameter: applicationId.");
         }
 
         if (configs == null || configs.isEmpty()) {
-            throw new GenieClientException("Configs cannot be null or empty");
+            throw new IllegalArgumentException("Configs cannot be null or empty");
         }
 
         applicationService.addConfigsToApplication(applicationId, configs).execute();
@@ -294,18 +300,18 @@ public class ApplicationClient extends BaseGenieClient {
      * @param applicationId The id of the application.
      * @param configs The set of configs to add.
      *
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues
      */
     public void updateConfigsForApplication(
         final String applicationId, final Set<String> configs
     ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(applicationId)) {
-            throw new GenieClientException("Missing required parameter: applicationId.");
+            throw new IllegalArgumentException("Missing required parameter: applicationId.");
         }
 
         if (configs == null || configs.isEmpty()) {
-            throw new GenieClientException("Configs cannot be null or empty");
+            throw new IllegalArgumentException("Configs cannot be null or empty");
         }
 
         applicationService.updateConfigsForApplication(applicationId, configs).execute();
@@ -316,14 +322,14 @@ public class ApplicationClient extends BaseGenieClient {
      *
      * @param applicationId The id of the application.
      *
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues
      */
     public void removeAllConfigsForApplication(
         final String applicationId
     ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(applicationId)) {
-            throw new GenieClientException("Missing required parameter: applicationId.");
+            throw new IllegalArgumentException("Missing required parameter: applicationId.");
         }
 
         applicationService.removeAllConfigsForApplication(applicationId).execute();
@@ -337,13 +343,14 @@ public class ApplicationClient extends BaseGenieClient {
      * @param applicationId The id of the application.
      *
      * @return The set of dependencies for the application.
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     *
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues
      */
     public Set<String> getDependenciesForApplication(final String applicationId) throws IOException,
         GenieClientException {
         if (StringUtils.isEmpty(applicationId)) {
-            throw new GenieClientException("Missing required parameter: applicationId.");
+            throw new IllegalArgumentException("Missing required parameter: applicationId.");
         }
 
         return applicationService.getDependenciesForApplication(applicationId).execute().body();
@@ -355,18 +362,18 @@ public class ApplicationClient extends BaseGenieClient {
      * @param applicationId The id of the application.
      * @param dependencies The set of dependencies to add.
      *
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues
      */
     public void addDependenciesToApplication(
         final String applicationId, final Set<String> dependencies
     ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(applicationId)) {
-            throw new GenieClientException("Missing required parameter: applicationId.");
+            throw new IllegalArgumentException("Missing required parameter: applicationId.");
         }
 
         if (dependencies == null || dependencies.isEmpty()) {
-            throw new GenieClientException("Dependencies cannot be null or empty");
+            throw new IllegalArgumentException("Dependencies cannot be null or empty");
         }
 
         applicationService.addDependenciesToApplication(applicationId, dependencies).execute();
@@ -378,18 +385,18 @@ public class ApplicationClient extends BaseGenieClient {
      * @param applicationId The id of the application.
      * @param dependencies The set of dependencies to add.
      *
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues
      */
     public void updateDependenciesForApplication(
         final String applicationId, final Set<String> dependencies
     ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(applicationId)) {
-            throw new GenieClientException("Missing required parameter: applicationId.");
+            throw new IllegalArgumentException("Missing required parameter: applicationId.");
         }
 
         if (dependencies == null || dependencies.isEmpty()) {
-            throw new GenieClientException("Dependencies cannot be null or empty");
+            throw new IllegalArgumentException("Dependencies cannot be null or empty");
         }
 
         applicationService.updateDependenciesForApplication(applicationId, dependencies).execute();
@@ -400,14 +407,14 @@ public class ApplicationClient extends BaseGenieClient {
      *
      * @param applicationId The id of the application.
      *
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues
      */
     public void removeAllDependenciesForApplication(
         final String applicationId
     ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(applicationId)) {
-            throw new GenieClientException("Missing required parameter: applicationId.");
+            throw new IllegalArgumentException("Missing required parameter: applicationId.");
         }
 
         applicationService.removeAllDependenciesForApplication(applicationId).execute();
@@ -421,12 +428,13 @@ public class ApplicationClient extends BaseGenieClient {
      * @param applicationId The id of the application.
      *
      * @return The set of configs for the application.
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     *
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues
      */
     public Set<String> getTagsForApplication(final String applicationId) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(applicationId)) {
-            throw new GenieClientException("Missing required parameter: applicationId.");
+            throw new IllegalArgumentException("Missing required parameter: applicationId.");
         }
 
         return applicationService.getTagsForApplication(applicationId).execute().body();
@@ -438,18 +446,18 @@ public class ApplicationClient extends BaseGenieClient {
      * @param applicationId The id of the application.
      * @param tags The set of tags to add.
      *
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues
      */
     public void addTagsToApplication(
         final String applicationId, final Set<String> tags
     ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(applicationId)) {
-            throw new GenieClientException("Missing required parameter: applicationId.");
+            throw new IllegalArgumentException("Missing required parameter: applicationId.");
         }
 
         if (tags == null || tags.isEmpty()) {
-            throw new GenieClientException("Tags cannot be null or empty");
+            throw new IllegalArgumentException("Tags cannot be null or empty");
         }
 
         applicationService.addTagsToApplication(applicationId, tags).execute();
@@ -461,18 +469,18 @@ public class ApplicationClient extends BaseGenieClient {
      * @param applicationId The id of the application.
      * @param tags The set of tags to add.
      *
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues
      */
     public void updateTagsForApplication(
         final String applicationId, final Set<String> tags
     ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(applicationId)) {
-            throw new GenieClientException("Missing required parameter: applicationId.");
+            throw new IllegalArgumentException("Missing required parameter: applicationId.");
         }
 
         if (tags == null || tags.isEmpty()) {
-            throw new GenieClientException("Tags cannot be null or empty");
+            throw new IllegalArgumentException("Tags cannot be null or empty");
         }
 
         applicationService.updateTagsForApplication(applicationId, tags).execute();
@@ -484,19 +492,19 @@ public class ApplicationClient extends BaseGenieClient {
      * @param applicationId The id of the application.
      * @param tag The tag to remove.
      *
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues
      */
     public void removeTagFromApplication(
         final String applicationId,
         final String tag
     ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(applicationId)) {
-            throw new GenieClientException("Missing required parameter: applicationId.");
+            throw new IllegalArgumentException("Missing required parameter: applicationId.");
         }
 
         if (StringUtils.isEmpty(tag)) {
-            throw new GenieClientException("Missing required parameter: tag.");
+            throw new IllegalArgumentException("Missing required parameter: tag.");
         }
 
         applicationService.removeTagForApplication(applicationId, tag).execute();
@@ -507,14 +515,14 @@ public class ApplicationClient extends BaseGenieClient {
      *
      * @param applicationId The id of the application.
      *
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues
      */
     public void removeAllTagsForApplication(
         final String applicationId
     ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(applicationId)) {
-            throw new GenieClientException("Missing required parameter: applicationId.");
+            throw new IllegalArgumentException("Missing required parameter: applicationId.");
         }
 
         applicationService.removeAllTagsForApplication(applicationId).execute();
