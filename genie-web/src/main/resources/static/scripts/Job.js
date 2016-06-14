@@ -100,7 +100,7 @@ export default class Job extends Page {
   get tableHeader() {
     return (
       <TableHeader
-        headers={['Id', 'Name', 'User', 'Status', 'Cluster', 'Output', 'Started', 'Finished', 'Run Time']}
+        headers={['Id', 'Name', 'Output', 'User', 'Status', 'Cluster', 'Started', 'Finished', 'Run Time']}
       />
     );
   }

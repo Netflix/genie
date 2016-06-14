@@ -9,18 +9,14 @@ import JobDetails from './JobDetails';
 const TableRow = (props) =>
   <tr>
     <td>
-      <a
-        href="javascript:void(0)"
-        value={props.row.id}
-        onClick={() => props.setRowId(props.row.id)}
+      <Link
+        target="_blank"
+        to={`jobs?id=${props.row.id}&showDetails=${props.row.id}`}
       >
         {props.row.id}
-      </a>
+      </Link>
     </td>
     <td>{props.row.name}</td>
-    <td>{props.row.user}</td>
-    <td>{props.row.status}</td>
-    <td>{props.row.clusterName}</td>
     <td>
       <Link
         target="_blank"
@@ -29,7 +25,9 @@ const TableRow = (props) =>
         <i className="fa fa-lg fa-folder" aria-hidden="true"></i>
       </Link>
     </td>
-
+    <td>{props.row.user}</td>
+    <td>{props.row.status}</td>
+    <td>{props.row.clusterName}</td>
     <td className="col-xs-2">{props.row.started ? momentFormat(props.row.started) : 'NA'}</td>
     <td className="col-xs-2">{props.row.finished ? momentFormat(props.row.finished) : 'NA'}</td>
     <td className="col-xs-1">{props.row.started ? moment.duration(props.row.runtime).humanize() : 'NA'}</td>
@@ -92,4 +90,3 @@ JobTableBody.propTypes = {
 };
 
 export default JobTableBody;
-

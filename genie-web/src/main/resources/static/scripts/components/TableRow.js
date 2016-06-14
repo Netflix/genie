@@ -1,16 +1,17 @@
 import React, { PropTypes as T } from 'react';
 import { momentFormat } from '../utils';
 
+import { Link } from 'react-router';
+
 const TableRow = (props) =>
   <tr>
     <td>
-      <a
-        href="javascript:void(0)"
-        value={props.row.id}
-        onClick={() => props.setRowId(props.row.id)}
+      <Link
+        target="_blank"
+        to={`${props.searchPath}?name=${props.row.name}&showDetails=${props.row.id}`}
       >
         {props.row.id}
-      </a>
+      </Link>
     </td>
     <td>{props.row.name}</td>
     <td>{props.row.user}</td>
@@ -28,7 +29,7 @@ const TableRow = (props) =>
   </tr>;
 
 TableRow.propTypes = {
-  setRowId: T.func,
+  searchPath: T.string.isRequired,
   row: T.shape({
     id      : T.string,
     name    : T.string,
