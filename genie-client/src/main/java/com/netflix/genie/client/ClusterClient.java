@@ -24,7 +24,6 @@ import com.netflix.genie.client.exceptions.GenieClientException;
 import com.netflix.genie.client.security.SecurityInterceptor;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -43,7 +42,6 @@ import java.util.Set;
 public class ClusterClient extends BaseGenieClient {
 
     private ClusterService clusterService;
-
     /**
      * Constructor.
      *
@@ -56,7 +54,7 @@ public class ClusterClient extends BaseGenieClient {
         final String url,
         final SecurityInterceptor securityInterceptor
     ) throws GenieClientException {
-        super(url, securityInterceptor);
+        super(url, securityInterceptor, null);
         clusterService = retrofit.create(ClusterService.class);
     }
 
@@ -66,11 +64,10 @@ public class ClusterClient extends BaseGenieClient {
      * @param url The url of the Genie Service.
      * @throws GenieClientException If there is any problem.
      */
-    // TODO Can we get rid of one constructor in either BaseGenieClient or JobClient.
     public ClusterClient(
         final String url
     ) throws GenieClientException {
-        super(url, null);
+        super(url, null, null);
         clusterService = retrofit.create(ClusterService.class);
     }
 

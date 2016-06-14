@@ -19,6 +19,7 @@ package com.netflix.genie.client;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.netflix.genie.client.config.GenieNetworkConfiguration;
 import com.netflix.genie.client.interceptor.ResponseMappingInterceptor;
 import com.netflix.genie.client.security.SecurityInterceptor;
 import com.netflix.genie.client.exceptions.GenieClientException;
@@ -26,6 +27,8 @@ import okhttp3.OkHttpClient;
 import org.apache.commons.lang3.StringUtils;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * Base class for the clients for Genie Services.
@@ -45,18 +48,24 @@ public abstract class BaseGenieClient {
      *
      * @param url The url of the Genie Service.
      * @param securityInterceptor An implementation of the Security Interceptor.
+     * @param genieNetworkConfiguration  A configuration object that provides network settings for HTTP calls.
      * @throws GenieClientException If there is any problem creating the constructor.
      */
     public BaseGenieClient(
         final String url,
-        final SecurityInterceptor securityInterceptor
-        ) throws GenieClientException {
+        final SecurityInterceptor securityInterceptor,
+        final GenieNetworkConfiguration genieNetworkConfiguration) throws GenieClientException {
 
         if (StringUtils.isBlank(url)) {
             throw new GenieClientException("Service URL cannot be empty or null");
         }
 
         final OkHttpClient.Builder builder = new OkHttpClient.Builder();
+
+        if (genieNetworkConfiguration != null) {
+            addConfigParamsFromConfig(builder, genieNetworkConfiguration);
+        }
+
         mapper = new ObjectMapper().
             configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
@@ -75,6 +84,26 @@ public abstract class BaseGenieClient {
             .addConverterFactory(JacksonConverterFactory.create(mapper))
             .client(client)
             .build();
+    }
+
+    // Private helper method to add network configurations to oktthp builder
+    private void addConfigParamsFromConfig(
+        final OkHttpClient.Builder builder,
+        final GenieNetworkConfiguration genieNetworkConfiguration) {
+
+        if (genieNetworkConfiguration.getConnectTimeout() != 0) {
+            builder.connectTimeout(genieNetworkConfiguration.getConnectTimeout(), TimeUnit.MILLISECONDS);
+        }
+
+        if (genieNetworkConfiguration.getReadTimeout() != 0) {
+            builder.readTimeout(genieNetworkConfiguration.getReadTimeout(), TimeUnit.MILLISECONDS);
+        }
+
+        if (genieNetworkConfiguration.getWriteTimeout() != 0) {
+            builder.writeTimeout(genieNetworkConfiguration.getWriteTimeout(), TimeUnit.MILLISECONDS);
+        }
+
+        builder.retryOnConnectionFailure(genieNetworkConfiguration.isRetryOnConnectionFailure());
     }
 
     /**

@@ -35,7 +35,6 @@ import com.netflix.spectator.api.Registry;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.lang.StringUtils;
@@ -86,6 +85,7 @@ public class JobCompletionHandler {
      * @param mailServiceImpl          An implementation of the mail service.
      * @param registry                 The metrics registry to use
      * @param deleteArchiveFile        Flag that determines if the job archive file will be deleted after upload.
+     * @param deleteDependencies       Flag that determines if the job dependencies will be deleted after job is done.
      *
      * @throws GenieException if there is a problem
      */
@@ -97,9 +97,9 @@ public class JobCompletionHandler {
         final Resource genieWorkingDir,
         final MailService mailServiceImpl,
         final Registry registry,
-        @Value("${genie.jobs.cleanup.deleteArchiveFile.enabled:true}"),
+        @Value("${genie.jobs.cleanup.deleteArchiveFile.enabled:true}")
         final boolean deleteArchiveFile,
-        @Value("${genie.jobs.cleanup.deleteDependencies.enabled:true}"),
+        @Value("${genie.jobs.cleanup.deleteDependencies.enabled:true}")
         final boolean deleteDependencies
         ) throws GenieException {
         this.jobPersistenceService = jobPersistenceService;
@@ -273,8 +273,11 @@ public class JobCompletionHandler {
                     deleteCommand.addArgument("-rf");
                     deleteCommand.addArgument(applicationsDependenciesRegex);
 
+                    //final PumpStreamHandler deleteCommandStreamHandler = new PumpStreamHandler();
+                    //deleteCommandStreamHandler.
                     executor.execute(deleteCommand);
-                } catch (ExecuteException e) {
+                } catch (Exception e) {
+
                     log.error("Could not delete job dependencies after completion for job: {} due to error {}",
                         jobId, e);
                     this.deleteDependenciesFailure.increment();

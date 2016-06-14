@@ -56,7 +56,7 @@ public class CommandClient extends BaseGenieClient {
         final String url,
         final SecurityInterceptor securityInterceptor
     ) throws GenieClientException {
-        super(url, securityInterceptor);
+        super(url, securityInterceptor, null);
         commandService = retrofit.create(CommandService.class);
     }
 
@@ -66,11 +66,10 @@ public class CommandClient extends BaseGenieClient {
      * @param url The url of the Genie Service.
      * @throws GenieClientException If there is any problem.
      */
-    // TODO Can we get rid of one constructor in either BaseGenieClient or JobClient.
     public CommandClient(
         final String url
     ) throws GenieClientException {
-        super(url, null);
+        super(url, null, null);
         commandService = retrofit.create(CommandService.class);
     }
 
