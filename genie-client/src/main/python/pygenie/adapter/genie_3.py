@@ -14,6 +14,7 @@ import os
 
 from functools import wraps
 from multipledispatch import dispatch
+from urlparse import urlparse
 
 from ..auth import AuthHandler
 from ..utils import (call,
@@ -245,6 +246,17 @@ class Genie3Adapter(GenieBaseAdapter):
                                   if_not_found=dict())
 
         link = data.get('_links', {}).get('self', {}).get('href')
+        link_parts = urlparse(link)
+
+        output_link = '{scheme}://{netloc}/output/{job_id}/output' \
+            .format(scheme=link_parts.scheme,
+                    netloc=link_parts.netloc,
+                    job_id=data.get('id'))
+
+        job_link = '{scheme}://{netloc}/jobs?id={job_id}&showDetails={job_id}' \
+            .format(scheme=link_parts.scheme,
+                    netloc=link_parts.netloc,
+                    job_id=data.get('id'))
 
         return {
             'application_name': ','.join(a.get('id') for a in application_data),
@@ -264,10 +276,10 @@ class Genie3Adapter(GenieBaseAdapter):
             'finished': data.get('finished'),
             'group': request_data.get('group'),
             'id': data.get('id'),
-            'json_link': link,
+            'job_link': job_link,
             'kill_uri': link,
             'name': data.get('name'),
-            'output_uri': data.get('_links', {}).get('output', {}).get('href'),
+            'output_uri': output_link,
             'setup_file': request_data.get('setupFile'),
             'started': data.get('started'),
             'status': data.get('status'),
@@ -277,7 +289,6 @@ class Genie3Adapter(GenieBaseAdapter):
             'user': data.get('user'),
             'version': data.get('version')
         }
-
 
     def get_genie_log(self, job_id, **kwargs):
         """Get a genie log for a job."""
@@ -333,22 +344,15 @@ class Genie3Adapter(GenieBaseAdapter):
             files.append(('attachment', att))
             logger.debug('adding attachment: %s', att)
 
-        try:
-            logger.debug('payload to genie 3:')
-            logger.debug(json.dumps(payload,
-                                    sort_keys=True,
-                                    indent=4,
-                                    separators=(',', ': ')))
-            call(method='post',
-                 url='{}/{}'.format(job.conf.genie.url,
-                                    Genie3Adapter.JOBS_ENDPOINT),
-                 files=files,
-                 auth_handler=self.auth_handler)
-        except GenieHTTPError as err:
-            if err.response.status_code == 409:
-                logger.debug("reattaching to job id '%s'", job.get('job_id'))
-            else:
-                raise
+        logger.debug('payload to genie 3:')
+        logger.debug(json.dumps(payload,
+                                sort_keys=True,
+                                indent=4,
+                                separators=(',', ': ')))
+        call(method='post',
+             url='{}/{}'.format(job.conf.genie.url, Genie3Adapter.JOBS_ENDPOINT),
+             files=files,
+             auth_handler=self.auth_handler)
 
 
 @dispatch(GenieJob, namespace=dispatch_ns)

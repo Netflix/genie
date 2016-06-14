@@ -13,7 +13,8 @@ import logging
 
 from ..jobs.running import RunningJob
 
-from ..exceptions import GenieAdapterError
+from ..exceptions import (GenieAdapterError,
+                          GenieHTTPError)
 
 # available adapters
 from .genie_2 import Genie2Adapter
@@ -48,8 +49,13 @@ def execute_job(job):
     if adapter is not None:
         try:
             adapter.submit_job(job)
-            return RunningJob(job.get('job_id'), adapter=adapter, conf=job.conf)
+        except GenieHTTPError as err:
+            if err.response.status_code == 409:
+                logger.debug("reattaching to job id '%s'", job.get('job_id'))
+            else:
+                raise
         except NotImplementedError:
             pass
+        return RunningJob(job.get('job_id'), adapter=adapter, conf=job.conf)
     raise GenieAdapterError("no adapter for '{}' to version '{}'" \
         .format(job.__class__.__name__, version))
