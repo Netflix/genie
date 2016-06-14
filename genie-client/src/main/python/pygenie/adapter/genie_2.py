@@ -221,7 +221,7 @@ class Genie2Adapter(GenieBaseAdapter):
             'finished': data.get('finished'),
             'group': data.get('group'),
             'id': data.get('id'),
-            'json_link': data.get('killURI'),
+            'job_link': data.get('killURI'),
             'kill_uri': data.get('killURI'),
             'name': data.get('name'),
             'output_uri': data.get('outputURI'),
@@ -283,22 +283,15 @@ class Genie2Adapter(GenieBaseAdapter):
         if payload.get('fileDependencies'):
             payload['fileDependencies'] = ','.join(payload['fileDependencies'])
 
-        try:
-            logger.debug('payload to genie 2:')
-            logger.debug(json.dumps(payload,
-                                    sort_keys=True,
-                                    indent=4,
-                                    separators=(',', ': ')))
-            call(method='post',
-                 url='{}/{}'.format(job.conf.genie.url,
-                                    Genie2Adapter.JOBS_ENDPOINT),
-                 data=json.dumps(payload),
-                 headers=JSON_HEADERS)
-        except GenieHTTPError as err:
-            if err.response.status_code == 409:
-                logger.debug("reattaching to job id '%s'", job.get('job_id'))
-            else:
-                raise
+        logger.debug('payload to genie 2:')
+        logger.debug(json.dumps(payload,
+                                sort_keys=True,
+                                indent=4,
+                                separators=(',', ': ')))
+        call(method='post',
+             url='{}/{}'.format(job.conf.genie.url, Genie2Adapter.JOBS_ENDPOINT),
+             data=json.dumps(payload),
+             headers=JSON_HEADERS)
 
 
 @dispatch(GenieJob, namespace=dispatch_ns)
