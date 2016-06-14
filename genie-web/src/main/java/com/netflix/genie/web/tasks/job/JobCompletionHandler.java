@@ -225,9 +225,33 @@ public class JobCompletionHandler {
             final Job job = this.jobSearchService.getJob(jobId);
             final String jobWorkingDir = this.baseWorkingDir + JobConstants.FILE_PATH_DELIMITER + jobId;
 
+            // Delete the dependencies for all applications if enabled
+            if (deleteDependencies) {
+                try {
+                    log.debug("Deleting dependencies.");
+                    final String applicationsDependenciesRegex = jobWorkingDir
+                        + JobConstants.FILE_PATH_DELIMITER
+                        + "genie/applications/*/dependencies/*";
+
+                    final CommandLine deleteCommand = new CommandLine("sudo");
+                    deleteCommand.addArgument("rm");
+                    deleteCommand.addArgument("-rf");
+                    deleteCommand.addArgument(applicationsDependenciesRegex);
+
+                    log.debug("Delete command : []", deleteCommand.toString());
+                    executor.execute(deleteCommand);
+                } catch (Exception e) {
+
+                    log.error("Could not delete job dependencies after completion for job: {} due to error {}",
+                        jobId, e);
+                    this.deleteDependenciesFailure.increment();
+                }
+            }
+
             // If archive location is provided create a tar and upload it
             if (StringUtils.isNotBlank(job.getArchiveLocation())) {
 
+                log.debug("Archiving job directory");
                 // Create the tar file
                 final String localArchiveFile = jobWorkingDir
                     + JobConstants.FILE_PATH_DELIMITER
@@ -244,6 +268,8 @@ public class JobCompletionHandler {
                 commandLine.addArgument("./");
 
                 executor.setWorkingDirectory(new File(jobWorkingDir));
+
+                log.debug("Archive command : []", commandLine.toString());
                 executor.execute(commandLine);
 
                 // Upload the tar file to remote location
@@ -252,35 +278,13 @@ public class JobCompletionHandler {
                 // At this point the archive file is successfully uploaded to archvie location specified in the job.
                 // Now we can delete it from local disk to save space if enabled.
                 if (deleteArchiveFile) {
+                    log.debug("Deleting archive file");
                     try {
                         new File(localArchiveFile).delete();
                     } catch (Exception e) {
                         log.error("Failed to delete archive file for job: {}", jobId, e);
                         this.archiveFileDeletionFailure.increment();
                     }
-                }
-            }
-
-            // Delete the dependencies for all applications if enabled
-            if (deleteDependencies) {
-                try {
-                    final String applicationsDependenciesRegex = jobWorkingDir
-                        + JobConstants.FILE_PATH_DELIMITER
-                        + "genie/applications/*/dependencies*";
-
-                    final CommandLine deleteCommand = new CommandLine("sudo");
-                    deleteCommand.addArgument("rm");
-                    deleteCommand.addArgument("-rf");
-                    deleteCommand.addArgument(applicationsDependenciesRegex);
-
-                    //final PumpStreamHandler deleteCommandStreamHandler = new PumpStreamHandler();
-                    //deleteCommandStreamHandler.
-                    executor.execute(deleteCommand);
-                } catch (Exception e) {
-
-                    log.error("Could not delete job dependencies after completion for job: {} due to error {}",
-                        jobId, e);
-                    this.deleteDependenciesFailure.increment();
                 }
             }
         } catch (Exception e) {

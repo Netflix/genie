@@ -30,14 +30,19 @@ import lombok.Setter;
 @Setter
 public class GenieNetworkConfiguration {
 
+    /**
+     * Default network timeout value if not specified.
+     */
+    public static final long DEFAULT_TIMEOUT = -1;
+
     // The default read timeout for new connections.
-    private long readTimeout;
+    private long readTimeout = DEFAULT_TIMEOUT;
 
     // The default write timeout for new connections.
-    private long writeTimeout;
+    private long writeTimeout = DEFAULT_TIMEOUT;
 
     // Default connection timeout in milliseconds for new connections.
-    private long connectTimeout;
+    private long connectTimeout = DEFAULT_TIMEOUT;
 
     // Decides if genie should retry or not when a connectivity problem is encountered.
     private boolean retryOnConnectionFailure;
