@@ -37,6 +37,24 @@ clean {
     delete "src/main/python/dist"
 }
 
+task installPythonDependencies(type: Exec) {
+    dependsOn clean
+    workingDir "src/main/python"
+    commandLine "sudo", "pip", "install", "-U", "pip", "setuptools", "twine"
+}
+
+task installPythonPackage(type: Exec) {
+    dependsOn installPythonDependencies
+    workingDir "src/main/python"
+    commandLine "sudo", "pip", "install", "-U", "-e", "."
+}
+
+task testPythonPackage(type: Exec) {
+    dependsOn installPythonPackage
+    workingDir "src/main/python"
+    commandLine "sh", "-c", "nosetests"
+}
+
 task buildPythonPackage(type: Exec) {
     dependsOn clean
     workingDir "src/main/python"
