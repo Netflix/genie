@@ -271,18 +271,18 @@ class RunningJob(object):
         return self.info.get('command_name').upper()
 
     @property
-    def json_link(self):
+    def job_link(self):
         """
-        Get the json link for the job.
+        Get the link for the job.
 
         Example:
-            >>> print running_job.json_link
+            >>> print running_job.job_link
             'http://localhost/genie/1234-abcd'
 
         Returns:
-            str: The link to job's json.
+            str: The link to the job.
         """
-        return self.info.get('json_link')
+        return self.info.get('job_link')
 
     def kill(self):
         """
