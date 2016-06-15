@@ -36,6 +36,7 @@ from ..jobs.hadoop import HadoopJob
 from ..jobs.hive import HiveJob
 from ..jobs.pig import PigJob
 from ..jobs.presto import PrestoJob
+from ..jobs.sqoop import SqoopJob
 
 
 logger = logging.getLogger('com.netflix.genie.jobs.adapter.genie_2')
@@ -78,7 +79,7 @@ def set_jobname(func):
         script = job.get('script')
 
         # handle job name if not set
-        if not job.get('job_name'):
+        if not job.get('job_name') and script:
             payload['name'] = os.path.basename(script) if is_file(script) \
                 else script.replace('\n', ' ')[:40].strip()
 
@@ -315,6 +316,13 @@ def get_payload(job):
 @set_jobname
 @assert_script
 def get_payload(job):
-    """Construct payload for PigJob -> Genie 2."""
+    """Construct payload for jobs -> Genie 2."""
+
+    return Genie2Adapter.construct_base_payload(job)
+
+
+@dispatch((SqoopJob), namespace=dispatch_ns)
+def get_payload(job):
+    """Construct payload for SqoopJob -> Genie 2."""
 
     return Genie2Adapter.construct_base_payload(job)
