@@ -6,6 +6,8 @@ addons:
     - mysql-server-5.6
     - mysql-client-core-5.6
     - mysql-client-5.6
+    - python-dev
+    - python-pip
 language: java
 jdk:
 - oraclejdk8

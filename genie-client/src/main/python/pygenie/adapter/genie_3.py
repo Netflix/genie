@@ -37,6 +37,7 @@ from ..jobs.hadoop import HadoopJob
 from ..jobs.hive import HiveJob
 from ..jobs.pig import PigJob
 from ..jobs.presto import PrestoJob
+from ..jobs.sqoop import SqoopJob
 
 
 logger = logging.getLogger('com.netflix.genie.jobs.adapter.genie_3')
@@ -376,6 +377,13 @@ def get_payload(job):
 @set_jobname
 @assert_script
 def get_payload(job):
-    """Construct payload for PigJob -> Genie 3."""
+    """Construct payload for jobs -> Genie 3."""
+
+    return Genie3Adapter.construct_base_payload(job)
+
+
+@dispatch((SqoopJob), namespace=dispatch_ns)
+def get_payload(job):
+    """Construct payload for SqoopJob -> Genie 3."""
 
     return Genie3Adapter.construct_base_payload(job)
