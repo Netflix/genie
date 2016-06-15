@@ -50,15 +50,18 @@ public class ResponseMappingInterceptor implements Interceptor {
     @Override
     public Response intercept(final Chain chain) throws IOException {
         final Response response = chain.proceed(chain.request());
+
         if (response.isSuccessful()) {
             return response;
         } else {
+            final String bodyContent = response.body().string();
+
             try {
-                final JsonNode responseBody = mapper.readTree(response.body().string());
+                final JsonNode responseBody = mapper.readTree(bodyContent);
                 throw new GenieClientException(response.code(), response.message()
                     + " : " + responseBody.get("message"));
             } catch (JsonProcessingException jpe) {
-                throw new GenieClientException(response.code(), response.message() + response.body().toString());
+                throw new GenieClientException(response.code(), response.message() + bodyContent);
             }
         }
     }
