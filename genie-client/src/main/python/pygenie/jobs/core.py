@@ -98,6 +98,8 @@ class Repr(object):
 
         assert regex_filter is not None, 'must specify a regular expression filter'
 
+        regex_filter = regex_filter.replace('-', '\-')
+
         self.__repr_list = [i for i in self.__repr_list \
             if not re.search(regex_filter, i, flags=flags) and regex_filter != i]
         return self

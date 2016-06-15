@@ -85,7 +85,7 @@ class HiveJob(GenieJob):
         to stdout it will append headers to the result.
 
         Example:
-            >>> job = HIveJob() \\
+            >>> job = HiveJob() \\
             ...     .headers()
 
         Returns:
