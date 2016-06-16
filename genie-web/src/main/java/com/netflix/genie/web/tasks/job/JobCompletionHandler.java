@@ -68,6 +68,7 @@ public class JobCompletionHandler {
     private final Executor executor;
     private final boolean deleteArchiveFile;
     private final boolean deleteDependencies;
+    private final boolean isRunAsUserEnabled;
 
     // Metrics
     private final Counter emailFailureRate;
@@ -89,6 +90,7 @@ public class JobCompletionHandler {
      * @param registry                 The metrics registry to use
      * @param deleteArchiveFile        Flag that determines if the job archive file will be deleted after upload.
      * @param deleteDependencies       Flag that determines if the job dependencies will be deleted after job is done.
+     * @param isRunAsUserEnabled       Flag that decides where jobs are run as user themselves or genie user.
      *
      * @throws GenieException if there is a problem
      */
@@ -103,7 +105,9 @@ public class JobCompletionHandler {
         @Value("${genie.jobs.cleanup.deleteArchiveFile.enabled:true}")
         final boolean deleteArchiveFile,
         @Value("${genie.jobs.cleanup.deleteDependencies.enabled:true}")
-        final boolean deleteDependencies
+        final boolean deleteDependencies,
+        @Value("${genie.jobs.runAsUser.enabled:false}")
+        final boolean isRunAsUserEnabled
         ) throws GenieException {
         this.jobPersistenceService = jobPersistenceService;
         this.jobSearchService = jobSearchService;
@@ -111,6 +115,8 @@ public class JobCompletionHandler {
         this.mailServiceImpl = mailServiceImpl;
         this.deleteArchiveFile = deleteArchiveFile;
         this.deleteDependencies = deleteDependencies;
+        this.isRunAsUserEnabled = isRunAsUserEnabled;
+
         this.executor = new DefaultExecutor();
         executor.setStreamHandler(new PumpStreamHandler(null, null));
 
@@ -247,8 +253,14 @@ public class JobCompletionHandler {
                         + JobConstants.FILE_PATH_DELIMITER
                         + JobConstants.DEPENDENCY_FILE_PATH_PREFIX;
 
-                    final CommandLine  deleteCommand = new CommandLine("sudo");
-                    deleteCommand.addArgument("rm");
+                    final CommandLine  deleteCommand;
+                    if (isRunAsUserEnabled) {
+                        deleteCommand = new CommandLine("sudo");
+                        deleteCommand.addArgument("rm");
+                    } else {
+                        deleteCommand = new CommandLine("rm");
+                    }
+
                     deleteCommand.addArgument("-rf");
                     deleteCommand.addArgument(applicationDependencyFolder);
 

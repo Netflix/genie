@@ -19,6 +19,7 @@ package com.netflix.genie.client;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.netflix.genie.client.config.GenieNetworkConfiguration;
 import com.netflix.genie.client.exceptions.GenieClientException;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterCriteria;
@@ -33,7 +34,6 @@ import com.netflix.genie.common.dto.search.JobSearchResult;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.ResourceLoader;
@@ -59,7 +59,6 @@ import java.util.stream.Collectors;
  * @since 3.0.0
  */
 @Slf4j
-@Ignore
 public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase {
 
     private static final String JOB_NAME = "List Directories bash job";
@@ -86,7 +85,9 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
         clusterClient = new ClusterClient(getBaseUrl());
         commandClient = new CommandClient(getBaseUrl());
         //applicationClient = new ApplicationClient(getBaseUrl());
-        jobClient = new JobClient(getBaseUrl());
+        final GenieNetworkConfiguration genieNetworkConfiguration = new GenieNetworkConfiguration();
+        genieNetworkConfiguration.setReadTimeout(20000);
+        jobClient = new JobClient(getBaseUrl(), genieNetworkConfiguration);
     }
 
     /**
