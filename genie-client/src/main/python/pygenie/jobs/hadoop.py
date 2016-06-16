@@ -52,7 +52,7 @@ class HadoopJob(GenieJob):
         return '{prop_file} {props} {cmd}' \
             .format(prop_file=prop_file_str,
                     props=props_str,
-                    cmd=self._script) \
+                    cmd=self._script or '') \
             .strip()
 
     def command(self, script):

@@ -45,10 +45,16 @@ class GenieConfSection(object):
 
     def __getattr__(self, attr):
         if attr not in self.to_dict():
+            env = self.__get_env(attr)
+            if env is not None:
+                return env
             raise GenieConfigOptionError(
                 "'{}' does not exist in loaded options for '{}' section ({})" \
                 .format(attr, self.__name, sorted(self.to_dict().keys())))
         return self.to_dict().get(attr)
+
+    def __get_env(self, attr):
+        return os.environ.get('{}_{}'.format(self.__name, attr))
 
     def get(self, option, default=None):
         """
@@ -71,7 +77,7 @@ class GenieConfSection(object):
             str: The option value or the default value specified.
         """
 
-        return self.to_dict().get(option, default)
+        return self.to_dict().get(option, self.__get_env(option) or default)
 
     def set(self, name, value=None):
         """Sets an attribute (option) to the value."""
@@ -108,9 +114,7 @@ class GenieConf(object):
 
     def __getattr__(self, attr):
         if attr not in self.to_dict():
-            raise GenieConfigSectionError(
-                "'{}' does not exist in loaded sections ({})" \
-                .format(attr, sorted(self.to_dict().keys())))
+            return GenieConfSection(attr)
         return self.to_dict().get(attr)
 
     def __repr__(self):
@@ -165,9 +169,7 @@ class GenieConf(object):
         """Load a configuration file (ini)."""
 
         param_list = []
-        if config_file is not None \
-                and os.path.exists(config_file) \
-                and config_file not in self._config_files:
+        if config_file is not None and os.path.exists(config_file):
             self._config_files.append(config_file)
         for cfile in self._config_files:
             logger.debug('adding config file: %s', cfile)
