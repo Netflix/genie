@@ -102,8 +102,6 @@ public abstract class BaseGenieClient {
         if (genieNetworkConfiguration.getWriteTimeout() != GenieNetworkConfiguration.DEFAULT_TIMEOUT) {
             builder.writeTimeout(genieNetworkConfiguration.getWriteTimeout(), TimeUnit.MILLISECONDS);
         }
-
-        builder.retryOnConnectionFailure(genieNetworkConfiguration.isRetryOnConnectionFailure());
     }
 
     /**

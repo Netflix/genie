@@ -17,8 +17,7 @@
  */
 package com.netflix.genie.client.security.oauth2;
 
-import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.client.exceptions.GenieClientException;
 import com.netflix.genie.test.categories.UnitTest;
 import org.junit.Assert;
 import org.junit.Test;
@@ -42,85 +41,85 @@ public class TokenFetcherUnitTests {
     /**
      * Test the constructor with URL missing.
      *
-     * @throws GenieException For any problem
+     * @throws GenieClientException For any problem
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void testConstructorWithEmptyUrl() throws GenieException {
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithEmptyUrl() throws GenieClientException {
         new TokenFetcher(null, CLIENT_ID, CLIENT_SECRET, GRANT_TYPE, SCOPE);
     }
 
     /**
      * Test the constructor with client id missing.
      *
-     * @throws GenieException For any problem
+     * @throws GenieClientException For any problem
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void testConstructorWithEmptyClientIdl() throws GenieException {
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithEmptyClientIdl() throws GenieClientException {
         new TokenFetcher(URL, null, CLIENT_SECRET, GRANT_TYPE, SCOPE);
     }
 
     /**
      * Test the constructor with client secret missing.
      *
-     * @throws GenieException For any problem
+     * @throws GenieClientException For any problem
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void testConstructorWithEmptyClientSecret() throws GenieException {
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithEmptyClientSecret() throws GenieClientException {
         new TokenFetcher(URL, CLIENT_ID, null, GRANT_TYPE, SCOPE);
     }
 
     /**
      * Test the constructor with grant type missing.
      *
-     * @throws GenieException For any problem
+     * @throws GenieClientException For any problem
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void testConstructorWithEmptyGrantType() throws GenieException {
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithEmptyGrantType() throws GenieClientException {
         new TokenFetcher(URL, CLIENT_ID, CLIENT_SECRET, null, SCOPE);
     }
 
     /**
      * Test the constructor with scope missing.
      *
-     * @throws GenieException For any problem
+     * @throws GenieClientException For any problem
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void testConstructorWithEmptyScope() throws GenieException {
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorWithEmptyScope() throws GenieClientException {
         new TokenFetcher(URL, CLIENT_ID, CLIENT_SECRET, GRANT_TYPE, null);
     }
 
     /**
      * Test the constructor with malformed url.
      *
-     * @throws GenieException For any problem
+     * @throws GenieClientException For any problem
      */
-    @Test(expected = GenieException.class)
-    public void testConstructorWithMalformedUrl() throws GenieException {
+    @Test(expected = GenieClientException.class)
+    public void testConstructorWithMalformedUrl() throws GenieClientException {
         new TokenFetcher("foo", CLIENT_ID, CLIENT_SECRET, GRANT_TYPE, SCOPE);
     }
 
     /**
      * Test the constructor with valid params.
      *
-     * @throws GenieException For any problem
+     * @throws GenieClientException For any problem
      */
     @Test
-    public void testConstructorWithValidParams() throws GenieException {
+    public void testConstructorWithValidParams() throws GenieClientException {
         new TokenFetcher(URL, CLIENT_ID, CLIENT_SECRET, GRANT_TYPE, SCOPE);
     }
 
     /**
      * Test the getToken method for failure.
      *
-     * @throws GenieException For any problem
+     * @throws GenieClientException For any problem
      */
     @Test
-    public void testGetTokenFailure() throws GenieException {
+    public void testGetTokenFailure() throws GenieClientException {
         final TokenFetcher tokenFetcher  = new TokenFetcher(URL, CLIENT_ID, CLIENT_SECRET, GRANT_TYPE, SCOPE);
         try {
             tokenFetcher.getToken();
-        } catch (GenieException ge) {
-            Assert.assertTrue(ge.getErrorCode() == 500);
+        } catch (GenieClientException ge) {
+            Assert.assertTrue(ge.getErrorCode() == -1);
         }
     }
 }

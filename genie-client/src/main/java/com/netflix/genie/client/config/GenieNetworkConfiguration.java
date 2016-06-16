@@ -43,7 +43,4 @@ public class GenieNetworkConfiguration {
 
     // Default connection timeout in milliseconds for new connections.
     private long connectTimeout = DEFAULT_TIMEOUT;
-
-    // Decides if genie should retry or not when a connectivity problem is encountered.
-    private boolean retryOnConnectionFailure;
 }

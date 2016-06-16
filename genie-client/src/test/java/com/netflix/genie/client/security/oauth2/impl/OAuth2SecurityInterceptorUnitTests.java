@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.client.security.oauth2.impl;
 
-import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.client.exceptions.GenieClientException;
 import com.netflix.genie.test.categories.UnitTest;
 import groovy.lang.Category;
 import okhttp3.Interceptor;
@@ -44,10 +44,10 @@ public class OAuth2SecurityInterceptorUnitTests {
     /**
      * Test to make sure we can construct the object using the constructor.
      *
-     * @throws GenieException If there is any problem.
+     * @throws GenieClientException If there is any problem.
      */
     @Test
-    public void testCanConstruct() throws GenieException {
+    public void testCanConstruct() throws GenieClientException {
         new OAuth2SecurityInterceptor(URL, CLIENT_ID, CLIENT_SECRET, GRANT_TYPE, SCOPE);
     }
 
