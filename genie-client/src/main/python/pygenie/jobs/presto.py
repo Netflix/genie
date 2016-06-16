@@ -50,9 +50,7 @@ class PrestoJob(GenieJob):
         super(PrestoJob, self).__init__(conf=conf)
 
         self._filename = PrestoJob.DEFAULT_SCRIPT_NAME
-        self._options = dict()
         self._script = None
-        self._sessions = dict()
 
     @property
     def cmd_args(self):
@@ -65,14 +63,16 @@ class PrestoJob(GenieJob):
         if self._command_arguments is not None:
             return self._command_arguments
 
-        options_str = ' '.join(['--{name}{space}{value}' \
+        options_str = ' '.join([
+            '--{name}{space}{value}' \
                 .format(name=k,
                         value=v if v is not None else '',
                         space=' ' if v is not None else '') \
-            for k, v in self._options.iteritems()])
+            for k, v in self._command_options.get('--', {}).items()])
 
-        sessions_str = ' '.join(['--session {}={}'.format(k, v) \
-            for k, v in self._sessions.iteritems()])
+        sessions_str = ' '.join([
+            '--session {}={}'.format(k, v) \
+            for k, v in self._command_options.get('--session', {}).items()])
 
         return '{sessions} {options} -f {filename}' \
             .format(sessions=sessions_str,
@@ -121,7 +121,7 @@ class PrestoJob(GenieJob):
             :py:class:`PrestoJob`: self
         """
 
-        self._options[name.lstrip('-')] = value
+        self._set_command_option('--', name.lstrip('-'), value)
 
         return self
 
@@ -183,6 +183,6 @@ class PrestoJob(GenieJob):
             :py:class:`PrestoJob`: self
         """
 
-        self._sessions[name] = value
+        self._set_command_option('--session', name, value)
 
         return self

@@ -66,16 +66,21 @@ class TestingSqoopJob(unittest.TestCase):
 
         assert_equals(
             job.cmd_args,
-            u'export ' \
-            u'-Dprop1=value1 -X prop2=value2 ' \
-            u'--option2 value2 --option3 value3 --option1 value1 ' \
-            u'--verbose  ' \
-            u'--connect jdbc://test ' \
-            u'--table mytable ' \
-            u'--target-dir /path/to/output ' \
-            u'--username jtest ' \
-            u'--split-by col1 ' \
-            u'--password passw0rd'
+            u' '.join([
+                u'export',
+                u'-Dprop1=value1',
+                u'--username jtest',
+                u'--verbose',
+                u'--target-dir /path/to/output',
+                u'--split-by col1',
+                u'--connect jdbc://test',
+                u'--table mytable',
+                u'--password passw0rd',
+                u'--option2 value2',
+                u'--option3 value3',
+                u'--option1 value1',
+                u'-Xprop2 value2'
+            ])
         )
 
 
@@ -176,12 +181,13 @@ class TestingSqoopJobAdapters(unittest.TestCase):
                     {u'name': u'sqoopfile2', u'data': u'file contents'}
                 ],
                 u'clusterCriterias': [{u'tags': [u'type:sqoopcluster1']}],
-                u'commandArgs': u'test-export '
-                                u'-Dprop1=pval1 '
-                                u'--opt1 val1 '
-                                u'--password t3st '
-                                u'--username jsqoop '
-                                u'--connect jdbc://test',
+                u'commandArgs': u' '.join([
+                    u'test-export',
+                    u'-Dprop1=pval1',
+                    u'--username jsqoop',
+                    u'--password t3st',
+                    u'--opt1 val1',
+                    u'--connect jdbc://test']),
                 u'commandCriteria': [u'type:sqoop-test'],
                 u'description': u'this job is to test sqoopjob adapter',
                 u'disableLogArchival': True,
@@ -236,7 +242,7 @@ class TestingSqoopJobAdapters(unittest.TestCase):
                     (u'sqoopfile2b', u"open file '/sqoopfile2b'")
                 ],
                 u'clusterCriterias': [{u'tags': [u'type:sqoop-cluster-1']}],
-                u'commandArgs': u'test-export-g3 -Dprop1-g3=pval1-g3 --opt1-g3 val1-g3 --password t3st-g3 --username jsqoop-g3 --connect jdbc://test-g3',
+                u'commandArgs': u'test-export-g3 -Dprop1-g3=pval1-g3 --username jsqoop-g3 --password t3st-g3 --opt1-g3 val1-g3 --connect jdbc://test-g3',
                 u'commandCriteria': [u'type:sqoop-test-1'],
                 u'dependencies': [],
                 u'description': u'this job is to test sqoopjob adapter for genie 3',

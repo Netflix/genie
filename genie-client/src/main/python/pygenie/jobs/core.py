@@ -14,6 +14,8 @@ import re
 import signal
 import sys
 
+from collections import defaultdict
+
 from ..conf import GenieConf
 from ..utils import (is_str,
                      str_to_list,
@@ -85,7 +87,7 @@ class Repr(object):
                 .format(key=key,
                         val=val,
                         qu=self.__quote(val) if is_str(val) else '')
-            for key, val in kwargs.iteritems()
+            for key, val in kwargs.items()
         ]) if kwargs is not None else ''
 
     def pop(self):
@@ -137,6 +139,7 @@ class GenieJob(object):
         self._archive = True
         self._cluster_tags = list()
         self._command_arguments = None
+        self._command_options = defaultdict(dict)
         self._command_tags = list()
         self._dependencies = list()
         self._description = None
@@ -166,6 +169,19 @@ class GenieJob(object):
 
         if dep not in self._dependencies:
             self._dependencies.append(dep)
+
+    def _set_command_option(self, flag, name, value=None):
+        """
+        Convenience method for storing an option which can later be used
+        when constructing the command line.
+
+        Args:
+            flag (str): The option flag.
+            name (str): The option name.
+            value (str, optional): The option value.
+        """
+
+        self._command_options[flag][name] = value
 
     @arg_list
     @add_to_repr('append')
@@ -640,7 +656,7 @@ class GenieJob(object):
         del _dict['repr_obj']
         return {
             attr_name.lstrip('_'): attr_val \
-            for attr_name, attr_val in _dict.iteritems()
+            for attr_name, attr_val in _dict.items()
             if not attr_name.startswith('_{}__'.format(self.__class__.__name__))
         }
 
