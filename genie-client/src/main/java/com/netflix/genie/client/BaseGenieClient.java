@@ -61,6 +61,7 @@ public abstract class BaseGenieClient {
         }
 
         final OkHttpClient.Builder builder = new OkHttpClient.Builder();
+        builder.retryOnConnectionFailure(false);
 
         if (genieNetworkConfiguration != null) {
             this.addConfigParamsFromConfig(builder, genieNetworkConfiguration);
