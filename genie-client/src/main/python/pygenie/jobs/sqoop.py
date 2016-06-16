@@ -70,8 +70,6 @@ class SqoopJob(GenieJob):
                 for k, v in self._command_options[flag].items()
             ]))
 
-        print(' '.join(opts_list))
-
         return '{cmd} {hadoop_opts} {options}' \
             .format(cmd=self._cmd,
                     hadoop_opts=hadoop_opts,
