@@ -80,14 +80,14 @@ public class ClusterClient extends BaseGenieClient {
      *
      * @return The id of the cluster created.
      *
-     * @throws GenieClientException For any other error.
-     * @throws IOException If the response received is not 2xx.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues.
      */
     public String createCluster(
         final Cluster cluster
     ) throws IOException, GenieClientException {
         if (cluster == null) {
-            throw new GenieClientException("Cluster cannot be null.");
+            throw new IllegalArgumentException("Cluster cannot be null.");
         }
         return getIdFromLocation(clusterService.createCluster(cluster).execute().headers().get("location"));
     }
@@ -96,8 +96,9 @@ public class ClusterClient extends BaseGenieClient {
      * Method to get a list of all the clusters.
      *
      * @return A list of clusters.
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     *
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues.
      */
     public List<Cluster> getClusters() throws IOException, GenieClientException {
         return this.getClusters(
@@ -119,8 +120,9 @@ public class ClusterClient extends BaseGenieClient {
      * @param maxUpdateTime Maximum Time before which cluster was updated.
      *
      * @return A list of clusters.
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     *
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues.
      */
     public List<Cluster> getClusters(
         final String name,
@@ -153,14 +155,15 @@ public class ClusterClient extends BaseGenieClient {
      *
      * @param clusterId The id of the cluster to get.
      * @return The cluster details.
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     *
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues.
      */
     public Cluster getCluster(
         final String clusterId
     ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(clusterId)) {
-            throw new GenieClientException("Missing required parameter: clusterId.");
+            throw new IllegalArgumentException("Missing required parameter: clusterId.");
         }
         return clusterService.getCluster(clusterId).execute().body();
     }
@@ -169,12 +172,13 @@ public class ClusterClient extends BaseGenieClient {
      * Method to delete a cluster from Genie.
      *
      * @param clusterId The id of the cluster.
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     *
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues.
      */
     public void deleteCluster(final String clusterId) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(clusterId)) {
-            throw new GenieClientException("Missing required parameter: clusterId.");
+            throw new IllegalArgumentException("Missing required parameter: clusterId.");
         }
         clusterService.deleteCluster(clusterId).execute();
     }
@@ -182,8 +186,9 @@ public class ClusterClient extends BaseGenieClient {
     /**
      * Method to delete all clusters from Genie.
      *
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues.
      */
     public void deleteAllClusters() throws IOException, GenieClientException {
         clusterService.deleteAllClusters().execute();
@@ -195,16 +200,16 @@ public class ClusterClient extends BaseGenieClient {
      * @param clusterId The id of the cluster.
      * @param patch The patch object specifying all the instructions.
      *
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues.
      */
     public void patchCluster(final String clusterId, final JsonPatch patch) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(clusterId)) {
-            throw new GenieClientException("Missing required parameter: clusterId.");
+            throw new IllegalArgumentException("Missing required parameter: clusterId.");
         }
 
         if (patch == null) {
-            throw new GenieClientException("Patch cannot be null");
+            throw new IllegalArgumentException("Patch cannot be null");
         }
 
         clusterService.patchCluster(clusterId, patch).execute();
@@ -216,16 +221,16 @@ public class ClusterClient extends BaseGenieClient {
      * @param clusterId The id of the cluster.
      * @param cluster The updated cluster object to use.
      *
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues.
      */
     public void updateCluster(final String clusterId, final Cluster cluster) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(clusterId)) {
-            throw new GenieClientException("Missing required parameter: clusterId.");
+            throw new IllegalArgumentException("Missing required parameter: clusterId.");
         }
 
         if (cluster == null) {
-            throw new GenieClientException("Patch cannot be null");
+            throw new IllegalArgumentException("Patch cannot be null");
         }
 
         clusterService.updateCluster(clusterId, cluster).execute();
@@ -239,12 +244,13 @@ public class ClusterClient extends BaseGenieClient {
      * @param clusterId The id of the cluster.
      *
      * @return The set of configs for the cluster.
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     *
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues.
      */
     public Set<String> getConfigsForCluster(final String clusterId) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(clusterId)) {
-            throw new GenieClientException("Missing required parameter: clusterId.");
+            throw new IllegalArgumentException("Missing required parameter: clusterId.");
         }
 
         return clusterService.getConfigsForCluster(clusterId).execute().body();
@@ -256,18 +262,18 @@ public class ClusterClient extends BaseGenieClient {
      * @param clusterId The id of the cluster.
      * @param configs The set of configs to add.
      *
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues.
      */
     public void addConfigsToCluster(
         final String clusterId, final Set<String> configs
     ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(clusterId)) {
-            throw new GenieClientException("Missing required parameter: clusterId.");
+            throw new IllegalArgumentException("Missing required parameter: clusterId.");
         }
 
         if (configs == null || configs.isEmpty()) {
-            throw new GenieClientException("Configs cannot be null or empty");
+            throw new IllegalArgumentException("Configs cannot be null or empty");
         }
 
         clusterService.addConfigsToCluster(clusterId, configs).execute();
@@ -279,18 +285,18 @@ public class ClusterClient extends BaseGenieClient {
      * @param clusterId The id of the cluster.
      * @param configs The set of configs to add.
      *
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues.
      */
     public void updateConfigsForCluster(
         final String clusterId, final Set<String> configs
     ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(clusterId)) {
-            throw new GenieClientException("Missing required parameter: clusterId.");
+            throw new IllegalArgumentException("Missing required parameter: clusterId.");
         }
 
         if (configs == null || configs.isEmpty()) {
-            throw new GenieClientException("Configs cannot be null or empty");
+            throw new IllegalArgumentException("Configs cannot be null or empty");
         }
 
         clusterService.updateConfigsForCluster(clusterId, configs).execute();
@@ -301,14 +307,14 @@ public class ClusterClient extends BaseGenieClient {
      *
      * @param clusterId The id of the cluster.
      *
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues.
      */
     public void removeAllConfigsForCluster(
         final String clusterId
     ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(clusterId)) {
-            throw new GenieClientException("Missing required parameter: clusterId.");
+            throw new IllegalArgumentException("Missing required parameter: clusterId.");
         }
 
         clusterService.removeAllConfigsForCluster(clusterId).execute();
@@ -322,12 +328,13 @@ public class ClusterClient extends BaseGenieClient {
      * @param clusterId The id of the cluster.
      *
      * @return The set of commands for the cluster.
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     *
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues.
      */
     public List<Command> getCommandsForCluster(final String clusterId) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(clusterId)) {
-            throw new GenieClientException("Missing required parameter: clusterId.");
+            throw new IllegalArgumentException("Missing required parameter: clusterId.");
         }
 
         return clusterService.getCommandsForCluster(clusterId).execute().body();
@@ -339,18 +346,18 @@ public class ClusterClient extends BaseGenieClient {
      * @param clusterId The id of the cluster.
      * @param commandIds The list of commands to add.
      *
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues.
      */
     public void addCommandsToCluster(
         final String clusterId, final List<String> commandIds
     ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(clusterId)) {
-            throw new GenieClientException("Missing required parameter: clusterId.");
+            throw new IllegalArgumentException("Missing required parameter: clusterId.");
         }
 
         if (commandIds == null || commandIds.isEmpty()) {
-            throw new GenieClientException("Command Ids cannot be null or empty");
+            throw new IllegalArgumentException("Command Ids cannot be null or empty");
         }
 
         clusterService.addCommandsToCluster(clusterId, commandIds).execute();
@@ -362,18 +369,18 @@ public class ClusterClient extends BaseGenieClient {
      * @param clusterId The id of the cluster.
      * @param commandIds The set of commands to add.
      *
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues.
      */
     public void updateCommandsForCluster(
         final String clusterId, final List<String> commandIds
     ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(clusterId)) {
-            throw new GenieClientException("Missing required parameter: clusterId.");
+            throw new IllegalArgumentException("Missing required parameter: clusterId.");
         }
 
         if (commandIds == null || commandIds.isEmpty()) {
-            throw new GenieClientException("commandIds cannot be null or empty");
+            throw new IllegalArgumentException("commandIds cannot be null or empty");
         }
 
         clusterService.setCommandsForCluster(clusterId, commandIds).execute();
@@ -385,19 +392,19 @@ public class ClusterClient extends BaseGenieClient {
      * @param clusterId The id of the cluster.
      * @param commandId The id of the command to remove.
      *
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues.
      */
     public void removeCommandFromCluster(
         final String clusterId,
         final String commandId
     ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(clusterId)) {
-            throw new GenieClientException("Missing required parameter: clusterId.");
+            throw new IllegalArgumentException("Missing required parameter: clusterId.");
         }
 
         if (StringUtils.isEmpty(commandId)) {
-            throw new GenieClientException("Missing required parameter: commandId.");
+            throw new IllegalArgumentException("Missing required parameter: commandId.");
         }
 
         clusterService.removeCommandForCluster(clusterId, commandId).execute();
@@ -408,14 +415,14 @@ public class ClusterClient extends BaseGenieClient {
      *
      * @param clusterId The id of the cluster.
      *
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues.
      */
     public void removeAllCommandsForCluster(
         final String clusterId
     ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(clusterId)) {
-            throw new GenieClientException("Missing required parameter: clusterId.");
+            throw new IllegalArgumentException("Missing required parameter: clusterId.");
         }
 
         clusterService.removeAllCommandsForCluster(clusterId).execute();
@@ -429,12 +436,13 @@ public class ClusterClient extends BaseGenieClient {
      * @param clusterId The id of the cluster.
      *
      * @return The set of tags for the cluster.
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     *
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues.
      */
     public Set<String> getTagsForCluster(final String clusterId) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(clusterId)) {
-            throw new GenieClientException("Missing required parameter: clusterId.");
+            throw new IllegalArgumentException("Missing required parameter: clusterId.");
         }
 
         return clusterService.getTagsForCluster(clusterId).execute().body();
@@ -446,18 +454,18 @@ public class ClusterClient extends BaseGenieClient {
      * @param clusterId The id of the cluster.
      * @param tags The set of tags to add.
      *
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues.
      */
     public void addTagsToCluster(
         final String clusterId, final Set<String> tags
     ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(clusterId)) {
-            throw new GenieClientException("Missing required parameter: clusterId.");
+            throw new IllegalArgumentException("Missing required parameter: clusterId.");
         }
 
         if (tags == null || tags.isEmpty()) {
-            throw new GenieClientException("Tags cannot be null or empty");
+            throw new IllegalArgumentException("Tags cannot be null or empty");
         }
 
         clusterService.addTagsToCluster(clusterId, tags).execute();
@@ -469,18 +477,18 @@ public class ClusterClient extends BaseGenieClient {
      * @param clusterId The id of the cluster.
      * @param tags The set of tags to add.
      *
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues.
      */
     public void updateTagsForCluster(
         final String clusterId, final Set<String> tags
     ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(clusterId)) {
-            throw new GenieClientException("Missing required parameter: clusterId.");
+            throw new IllegalArgumentException("Missing required parameter: clusterId.");
         }
 
         if (tags == null || tags.isEmpty()) {
-            throw new GenieClientException("Tags cannot be null or empty");
+            throw new IllegalArgumentException("Tags cannot be null or empty");
         }
 
         clusterService.updateTagsForCluster(clusterId, tags).execute();
@@ -492,19 +500,19 @@ public class ClusterClient extends BaseGenieClient {
      * @param clusterId The id of the cluster.
      * @param tag The tag to remove.
      *
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues.
      */
     public void removeTagFromCluster(
         final String clusterId,
         final String tag
     ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(clusterId)) {
-            throw new GenieClientException("Missing required parameter: clusterId.");
+            throw new IllegalArgumentException("Missing required parameter: clusterId.");
         }
 
         if (StringUtils.isEmpty(tag)) {
-            throw new GenieClientException("Missing required parameter: tag.");
+            throw new IllegalArgumentException("Missing required parameter: tag.");
         }
 
         clusterService.removeTagForCluster(clusterId, tag).execute();
@@ -515,14 +523,14 @@ public class ClusterClient extends BaseGenieClient {
      *
      * @param clusterId The id of the cluster.
      *
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException For Network and other IO issues.
      */
     public void removeAllTagsForCluster(
         final String clusterId
     ) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(clusterId)) {
-            throw new GenieClientException("Missing required parameter: clusterId.");
+            throw new IllegalArgumentException("Missing required parameter: clusterId.");
         }
 
         clusterService.removeAllTagsForCluster(clusterId).execute();

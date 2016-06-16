@@ -63,7 +63,7 @@ public abstract class BaseGenieClient {
         final OkHttpClient.Builder builder = new OkHttpClient.Builder();
 
         if (genieNetworkConfiguration != null) {
-            addConfigParamsFromConfig(builder, genieNetworkConfiguration);
+            this.addConfigParamsFromConfig(builder, genieNetworkConfiguration);
         }
 
         mapper = new ObjectMapper().
@@ -91,15 +91,15 @@ public abstract class BaseGenieClient {
         final OkHttpClient.Builder builder,
         final GenieNetworkConfiguration genieNetworkConfiguration) {
 
-        if (genieNetworkConfiguration.getConnectTimeout() != 0) {
+        if (genieNetworkConfiguration.getConnectTimeout() != GenieNetworkConfiguration.DEFAULT_TIMEOUT) {
             builder.connectTimeout(genieNetworkConfiguration.getConnectTimeout(), TimeUnit.MILLISECONDS);
         }
 
-        if (genieNetworkConfiguration.getReadTimeout() != 0) {
+        if (genieNetworkConfiguration.getReadTimeout() != GenieNetworkConfiguration.DEFAULT_TIMEOUT) {
             builder.readTimeout(genieNetworkConfiguration.getReadTimeout(), TimeUnit.MILLISECONDS);
         }
 
-        if (genieNetworkConfiguration.getWriteTimeout() != 0) {
+        if (genieNetworkConfiguration.getWriteTimeout() != GenieNetworkConfiguration.DEFAULT_TIMEOUT) {
             builder.writeTimeout(genieNetworkConfiguration.getWriteTimeout(), TimeUnit.MILLISECONDS);
         }
 

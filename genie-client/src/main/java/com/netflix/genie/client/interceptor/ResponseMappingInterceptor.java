@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.client.interceptor;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.genie.client.exceptions.GenieClientException;
@@ -49,11 +50,19 @@ public class ResponseMappingInterceptor implements Interceptor {
     @Override
     public Response intercept(final Chain chain) throws IOException {
         final Response response = chain.proceed(chain.request());
+
         if (response.isSuccessful()) {
             return response;
         } else {
-            final JsonNode responseBody = mapper.readTree(response.body().string());
-            throw new GenieClientException(response.code(), response.message() + " : " + responseBody.get("message"));
+            final String bodyContent = response.body().string();
+
+            try {
+                final JsonNode responseBody = mapper.readTree(bodyContent);
+                throw new GenieClientException(response.code(), response.message()
+                    + " : " + responseBody.get("message"));
+            } catch (JsonProcessingException jpe) {
+                throw new GenieClientException(response.code(), response.message() + bodyContent);
+            }
         }
     }
 }

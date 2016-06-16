@@ -18,6 +18,7 @@
 package com.netflix.genie.web.tasks.job;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
@@ -46,6 +47,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * A class that has the methods to perform various tasks when a job completes.
@@ -219,15 +222,51 @@ public class JobCompletionHandler {
     public void processJobDir(
         final String jobId
     ) throws GenieException {
+        log.debug("Got a job finished event. Will process job directory.");
+
+        final Job job = this.jobSearchService.getJob(jobId);
+        final String jobWorkingDir = this.baseWorkingDir + JobConstants.FILE_PATH_DELIMITER + jobId;
+
+        if (deleteDependencies) {
+            log.debug("Deleting dependencies as its enabled.");
+            try {
+                final List<String> appIds = jobSearchService
+                    .getJobApplications(jobId)
+                    .stream()
+                    .map(Application::getId)
+                    .collect(Collectors.toList());
+
+                for (String appId : appIds) {
+                    final String applicationDependencyFolder = jobWorkingDir
+                        + JobConstants.FILE_PATH_DELIMITER
+                        + JobConstants.GENIE_PATH_VAR
+                        + JobConstants.FILE_PATH_DELIMITER
+                        + JobConstants.APPLICATION_PATH_VAR
+                        + JobConstants.FILE_PATH_DELIMITER
+                        + appId
+                        + JobConstants.FILE_PATH_DELIMITER
+                        + JobConstants.DEPENDENCY_FILE_PATH_PREFIX;
+
+                    final CommandLine  deleteCommand = new CommandLine("sudo");
+                    deleteCommand.addArgument("rm");
+                    deleteCommand.addArgument("-rf");
+                    deleteCommand.addArgument(applicationDependencyFolder);
+
+                    log.debug("Delete command is {}", deleteCommand.toString());
+                    executor.execute(deleteCommand);
+                }
+            } catch (Exception e) {
+                log.error("Could not delete job dependencies after completion for job: {} due to error {}",
+                    jobId, e);
+                this.deleteDependenciesFailure.increment();
+            }
+        }
+
         try {
-            log.debug("Got a job finished event. Will archive job directory if enabled.");
-
-            final Job job = this.jobSearchService.getJob(jobId);
-            final String jobWorkingDir = this.baseWorkingDir + JobConstants.FILE_PATH_DELIMITER + jobId;
-
             // If archive location is provided create a tar and upload it
             if (StringUtils.isNotBlank(job.getArchiveLocation())) {
 
+                log.debug("Archiving job directory");
                 // Create the tar file
                 final String localArchiveFile = jobWorkingDir
                     + JobConstants.FILE_PATH_DELIMITER
@@ -244,6 +283,8 @@ public class JobCompletionHandler {
                 commandLine.addArgument("./");
 
                 executor.setWorkingDirectory(new File(jobWorkingDir));
+
+                log.debug("Archive command : {}", commandLine.toString());
                 executor.execute(commandLine);
 
                 // Upload the tar file to remote location
@@ -252,35 +293,13 @@ public class JobCompletionHandler {
                 // At this point the archive file is successfully uploaded to archvie location specified in the job.
                 // Now we can delete it from local disk to save space if enabled.
                 if (deleteArchiveFile) {
+                    log.debug("Deleting archive file");
                     try {
                         new File(localArchiveFile).delete();
                     } catch (Exception e) {
                         log.error("Failed to delete archive file for job: {}", jobId, e);
                         this.archiveFileDeletionFailure.increment();
                     }
-                }
-            }
-
-            // Delete the dependencies for all applications if enabled
-            if (deleteDependencies) {
-                try {
-                    final String applicationsDependenciesRegex = jobWorkingDir
-                        + JobConstants.FILE_PATH_DELIMITER
-                        + "genie/applications/*/dependencies*";
-
-                    final CommandLine deleteCommand = new CommandLine("sudo");
-                    deleteCommand.addArgument("rm");
-                    deleteCommand.addArgument("-rf");
-                    deleteCommand.addArgument(applicationsDependenciesRegex);
-
-                    //final PumpStreamHandler deleteCommandStreamHandler = new PumpStreamHandler();
-                    //deleteCommandStreamHandler.
-                    executor.execute(deleteCommand);
-                } catch (Exception e) {
-
-                    log.error("Could not delete job dependencies after completion for job: {} due to error {}",
-                        jobId, e);
-                    this.deleteDependenciesFailure.increment();
                 }
             }
         } catch (Exception e) {
