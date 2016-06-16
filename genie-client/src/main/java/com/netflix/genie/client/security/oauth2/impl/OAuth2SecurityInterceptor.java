@@ -18,10 +18,10 @@
 package com.netflix.genie.client.security.oauth2.impl;
 
 import com.google.common.net.HttpHeaders;
+import com.netflix.genie.client.exceptions.GenieClientException;
 import com.netflix.genie.client.security.SecurityInterceptor;
 import com.netflix.genie.client.security.oauth2.AccessToken;
 import com.netflix.genie.client.security.oauth2.TokenFetcher;
-import com.netflix.genie.common.exceptions.GenieException;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -46,7 +46,8 @@ public class OAuth2SecurityInterceptor implements SecurityInterceptor {
      * @param clientSecret The client secret to use to fetch credentials.
      * @param grantType    The grant type for the user.
      * @param scope        The scope of the user permissions.
-     * @throws GenieException If there is a problem initializing the object.
+     *
+     * @throws GenieClientException If there is a problem initializing the object.
      */
     public OAuth2SecurityInterceptor(
         final String url,
@@ -54,7 +55,7 @@ public class OAuth2SecurityInterceptor implements SecurityInterceptor {
         final String clientSecret,
         final String grantType,
         final String scope
-    ) throws GenieException {
+    ) throws GenieClientException {
         log.debug("Constructor called.");
         tokenFetcher = new TokenFetcher(url, clientId, clientSecret, grantType, scope);
     }
@@ -63,7 +64,6 @@ public class OAuth2SecurityInterceptor implements SecurityInterceptor {
     public Response intercept(
         final Chain chain
     ) throws IOException {
-        try {
             final AccessToken accessToken = this.tokenFetcher.getToken();
 
             final Request newRequest = chain
@@ -75,8 +75,5 @@ public class OAuth2SecurityInterceptor implements SecurityInterceptor {
             log.debug("Sending request {} on {} {} {}", newRequest.url(), chain.connection(), newRequest.headers());
 
             return chain.proceed(newRequest);
-        } catch (GenieException e) {
-            throw new IOException("Genie client could not add Authorization Headers to outgoing request.");
-        }
     }
 }

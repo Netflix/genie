@@ -18,9 +18,7 @@
 package com.netflix.genie.client.security.oauth2;
 
 import com.netflix.genie.client.apis.TokenService;
-import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.client.exceptions.GenieClientException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import retrofit2.Response;
@@ -67,7 +65,7 @@ public class TokenFetcher {
      * @param clientSecret The clientSecret to use to get the credentials.
      * @param grantType    The type of the grant.
      * @param scope        The scope of the credentials returned.
-     * @throws GenieException If there is any problem.
+     * @throws GenieClientException If there is any problem.
      */
     public TokenFetcher(
         final String oauthUrl,
@@ -75,28 +73,28 @@ public class TokenFetcher {
         final String clientSecret,
         final String grantType,
         final String scope
-    ) throws GenieException {
+    ) throws GenieClientException {
 
         log.debug("Constructor called.");
 
         if (StringUtils.isBlank(oauthUrl)) {
-            throw new GeniePreconditionException("URL cannot be null or empty");
+            throw new IllegalArgumentException("URL cannot be null or empty");
         }
 
         if (StringUtils.isBlank(clientId)) {
-            throw new GeniePreconditionException("Client Id cannot be null or empty");
+            throw new IllegalArgumentException("Client Id cannot be null or empty");
         }
 
         if (StringUtils.isBlank(clientSecret)) {
-            throw new GeniePreconditionException("Client Secret cannot be null or empty");
+            throw new IllegalArgumentException("Client Secret cannot be null or empty");
         }
 
         if (StringUtils.isBlank(grantType)) {
-            throw new GeniePreconditionException("Grant Type cannot be null or empty");
+            throw new IllegalArgumentException("Grant Type cannot be null or empty");
         }
 
         if (StringUtils.isBlank(scope)) {
-            throw new GeniePreconditionException("Scope cannot be null or empty");
+            throw new IllegalArgumentException("Scope cannot be null or empty");
         }
 
         try {
@@ -120,7 +118,7 @@ public class TokenFetcher {
             credentialParams.put(GRANT_TYPE, grantType);
             credentialParams.put(SCOPE, scope);
         } catch (Exception e) {
-            throw new GenieException(400, "Could not instantiate Token Service.", e);
+            throw new GenieClientException("Could not instantiate Token Service due to exception " + e);
         }
     }
 
@@ -128,9 +126,9 @@ public class TokenFetcher {
      * Method that returns the OAuth credentials.
      *
      * @return An access token object.
-     * @throws GenieException If there is any problem.
+     * @throws GenieClientException If there is any problem.
      */
-    public AccessToken getToken() throws GenieException {
+    public AccessToken getToken() throws GenieClientException {
 
         try {
             if (new Date().after(this.expirationTime)) {
@@ -143,13 +141,13 @@ public class TokenFetcher {
                     this.expirationTime = cal.getTime();
                     return accessToken;
                 } else {
-                    throw new GenieException(response.code(), "Could not fetch Token");
+                    throw new GenieClientException(response.code(), "Could not fetch Token");
                 }
             } else {
                 return accessToken;
             }
         } catch (Exception e) {
-            throw new GenieServerException("Could not get access tokens", e);
+            throw new GenieClientException("Could not get access tokens" + e);
         }
     }
 }
