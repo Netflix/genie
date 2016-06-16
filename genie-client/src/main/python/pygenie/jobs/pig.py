@@ -44,7 +44,6 @@ class PigJob(GenieJob):
 
         self._filename = PigJob.DEFAULT_SCRIPT_NAME
         self._parameter_files = list()
-        self._properties = dict()
         self._property_file = None
         self._script = None
 
@@ -67,12 +66,12 @@ class PigJob(GenieJob):
         params_str = ' '.join([
             '-p {qu}{name}={value}{qu}' \
                 .format(name=k, value=v, qu='"' if ' ' in str(v) else '') \
-            for k, v in self._parameters.iteritems()
+            for k, v in self._parameters.items()
         ])
 
         props_str = ' '.join([
             '-D{name}={value}'.format(name=k, value=v) \
-            for k, v in self._properties.iteritems()
+            for k, v in self._command_options.get('-D', {}).items()
         ])
 
         prop_file_str = '-P {}'.format(os.path.basename(self._property_file)) \
@@ -137,7 +136,7 @@ class PigJob(GenieJob):
             :py:class:`PigJob`: self
         """
 
-        self._properties[name] = value
+        self._set_command_option('-D', name, value)
 
         return self
 

@@ -42,7 +42,6 @@ class HiveJob(GenieJob):
 
         self._filename = HiveJob.DEFAULT_SCRIPT_NAME
         self._parameters = dict()
-        self._properties = dict()
         self._property_file = None
         self._script = None
 
@@ -60,12 +59,12 @@ class HiveJob(GenieJob):
         params_str = ' '.join([
             '-d {qu}{name}={value}{qu}' \
                 .format(name=k, value=v, qu='"' if ' ' in str(v) else '') \
-            for k, v in self._parameters.iteritems()
+            for k, v in self._parameters.items()
         ])
 
         props_str = ' '.join([
             '--hiveconf {name}={value}'.format(name=k, value=v) \
-            for k, v in self._properties.iteritems()
+            for k, v in self._command_options.get('--hiveconf', {}).items()
         ])
 
         prop_file_str = '-i {}'.format(os.path.basename(self._property_file)) \
@@ -91,21 +90,18 @@ class HiveJob(GenieJob):
         Returns:
             :py:class:`HiveJob`: self
         """
-        self.tags('headers')
-        return self.property('hive.cli.print.header', 'true')
 
-    def hiveconf(self, name, value):
-        """Alias for :py:meth:`HiveJob.property`"""
-        return self.property(name, value)
+        self.tags('headers')
+        return self.hiveconf('hive.cli.print.header', 'true')
 
     @add_to_repr('append')
-    def property(self, name, value):
+    def hiveconf(self, name, value):
         """
         Sets a property for the job.
 
         Using the name and value passed in, the following will be constructed for
         the command-line when executing:
-        '-Dname=value'
+        '--hiveconf name=value'
 
         Example:
             >>> # hive --hiveconf mapred.foo=fizz --hiveconf mapred.bar=buzz
@@ -121,9 +117,13 @@ class HiveJob(GenieJob):
             :py:class:`HiveJob`: self
         """
 
-        self._properties[name] = value
+        self._set_command_option('--hiveconf', name, value)
 
         return self
+
+    def property(self, name, value):
+        """Alias for :py:meth:`HiveJob.hiveconf`"""
+        return self.hiveconf(name, value)
 
     @arg_string
     @add_to_repr('overwrite')
