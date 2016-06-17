@@ -11,8 +11,8 @@ export const fileUrl = (url) => {
   return `/file${path}`;
 };
 
-export const fetch = (url, data = null, type = 'GET', headers = 'application/hal+json') => {
-  return $.ajax({
+export const fetch = (url, data = null, type = 'GET', headers = 'application/hal+json') => (
+  $.ajax({
     global: false,
     type,
     headers: {
@@ -20,8 +20,8 @@ export const fetch = (url, data = null, type = 'GET', headers = 'application/hal
     },
     url,
     data,
-  });
-};
+  })
+);
 
 export const hasChanged = (o1, o2) => {
   let changed = false;

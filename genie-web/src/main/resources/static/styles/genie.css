@@ -133,6 +133,18 @@ div .container {
     color: #444;
 }
 
+.link {
+  color: #337ab7;
+}
+
+.job-table-row:hover {
+  cursor: pointer;
+}
+
+.copied-text {
+  padding-top: 11px;
+  font-size: 10px;
+}
 /*
 a {
     text-decoration: none;

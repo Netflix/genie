@@ -1,10 +1,5 @@
-import React from 'react';
-
 import Page from './Page';
-
-import TableHeader from './components/TableHeader';
-import TableBody from './components/TableBody';
-
+import TableRow from './components/TableRow';
 import ApplicationDetails from './components/ApplicationDetails';
 
 export default class Application extends Page {
@@ -44,12 +39,12 @@ export default class Application extends Page {
         name  : 'sort',
         value : '',
         type  : 'select',
-        selectFields: ['name', 'status', 'tag'].map((field) => {
-          return {
+        selectFields: ['name', 'status', 'tag'].map(field => (
+          {
             value: field,
             label: field,
-          };
-        }),
+          }
+        )),
       },
     ];
   }
@@ -58,24 +53,17 @@ export default class Application extends Page {
     return 'applications';
   }
 
+  get rowType() {
+    return TableRow;
+  }
+
   get tableHeader() {
     return (
-      <TableHeader
-        headers={['Id', 'Name', 'User', 'Status', 'Version', 'Tags', 'Created', 'Updated']}
-      />
+      ['Id', 'Name', 'User', 'Status', 'Version', 'Tags', 'Created', 'Updated']
     );
   }
 
-  get tableBody() {
-    const { showDetails } = this.props.location.query;
-    return (
-      <TableBody
-        rows={this.state.data}
-        rowId={showDetails}
-        searchPath={this.searchPath}
-        detailsTable={ApplicationDetails}
-        hideDetails={this.hideDetails}
-      />
-    );
+  get detailsTable() {
+    return ApplicationDetails;
   }
 }

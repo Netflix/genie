@@ -6,7 +6,10 @@ import NoSearchResult from './components/NoSearchResult';
 import Loading from './components/Loading';
 import SearchBar from './components/SearchBar';
 import Pagination from './components/Pagination';
+
 import Table from './components/Table';
+import TableHeader from './components/TableHeader';
+import TableBody from './components/TableBody';
 
 import { fetch, hasChanged } from './utils';
 
@@ -25,7 +28,6 @@ export default class Page extends React.Component {
       data           : [],
       links          : {},
       page           : {},
-      showSearchForm : true,
       noSearchResult : false,
     };
   }
@@ -43,30 +45,33 @@ export default class Page extends React.Component {
     }
   }
 
-  setRowId = (id) => {
-    const { query, pathname } = this.props.location;
-    query.showDetails = `${id}`;
-    query.src = 'link';
-    this.context.router.push({
-      query,
-      pathname,
+  toggleRowDetails = (id) => {
+    this.setState({
+      rowId: this.state.rowId === id ? null : `${id}`,
     });
+  }
+
+  toggleSearchForm = () => {
+    this.setState({ showSearchForm: !this.state.showSearchForm });
   }
 
   loadPageData(query) {
     if ($.isEmptyObject(query)) {
       query = { size: 25 };
     }
+    const { rowId = null, showSearchForm = 'true' } = query;
 
     fetch(this.url, query)
     .done((data) => {
       if (data.hasOwnProperty('_embedded')) {
         this.setState({
           query,
+          rowId,
           noSearchResult : false,
           page           : data.page,
           links          : data._links,
           data           : data._embedded[this.dataKey],
+          showSearchForm : $.parseJSON(showSearchForm),
         });
       } else {
         this.setState({
@@ -76,29 +81,6 @@ export default class Page extends React.Component {
         });
       }
     });
-  }
-
-  toggleSearchForm = () => {
-    this.setState({ showSearchForm: !this.state.showSearchForm });
-  }
-
-  hideDetails = () => {
-    const { query, pathname } = this.props.location;
-    delete query.showDetails;
-    delete query.src;
-    this.context.router.push({
-      query,
-      pathname,
-    });
-  }
-
-  get searchResultsTable() {
-    return (
-      <Table
-        header={this.tableHeader}
-        body={this.tableBody}
-      />
-    );
   }
 
   render() {
@@ -114,7 +96,16 @@ export default class Page extends React.Component {
 
     const searchResult = this.state.data.length > 0 ?
       <div className={this.state.showSearchForm ? 'col-md-10' : 'col-md-12'}>
-        {this.searchResultsTable}
+        <Table>
+          <TableHeader headers={this.tableHeader} />
+          <TableBody
+            rows={this.state.data}
+            rowId={this.state.rowId}
+            rowType={this.rowType}
+            detailsTable={this.detailsTable}
+            toggleRowDetails={this.toggleRowDetails}
+          />
+        </Table>
         <Pagination
           page={this.state.page}
           pageType={this.searchPath}
