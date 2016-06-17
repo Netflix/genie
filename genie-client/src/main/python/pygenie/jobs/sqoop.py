@@ -41,8 +41,6 @@ class SqoopJob(GenieJob):
         super(SqoopJob, self).__init__(conf=conf)
 
         self._cmd = None
-        self.__options = {}
-        self.__properties = defaultdict(dict)
 
         self.cmd('import')
 
@@ -57,27 +55,25 @@ class SqoopJob(GenieJob):
         if self._command_arguments is not None:
             return self._command_arguments
 
-        options_str = ' '.join([
-            '{} {}'.format(k, v if v is not None else "") \
-            for k, v in self.__options.items()
-        ])
+        hadoop_opts = ' '.join([
+            '-D{name}={value}'.format(name=name, value=value)
+            for name, value in self._command_options.get('-D', {}).items()])
 
-        props_list = list()
-
-        for flag, props in self.__properties.items():
-            props_list.append(' '.join([
-                '{flag}{space}{name}={value}' \
+        opts_list = list()
+        for flag in [f for f in self._command_options.keys() if f != '-D']:
+            opts_list.append(' '.join([
+                '{flag}{name} {value}' \
                     .format(flag=flag,
-                            space='' if flag in ['-D', '--'] else ' ',
                             name=k,
-                            value=v)
-                for k, v in props.items()
+                            value=v if v is not None else '') \
+                    .strip()
+                for k, v in self._command_options[flag].items()
             ]))
 
-        return '{cmd} {properties} {options}' \
+        return '{cmd} {hadoop_opts} {options}' \
             .format(cmd=self._cmd,
-                    properties=' '.join(props_list),
-                    options=options_str) \
+                    hadoop_opts=hadoop_opts,
+                    options=' '.join(opts_list)) \
             .strip()
 
     @add_to_repr('overwrite')
@@ -122,15 +118,15 @@ class SqoopJob(GenieJob):
             :py:class:`SqoopJob`: self
         """
 
-        if not name.startswith('-'):
-            name = '-{}'.format(name) if len(name) == 1 else '--{}'.format(name)
+        name = name.lstrip('-')
+        flag = '-' if len(name) == 1 else '--'
 
-        self.__options[name] = value
+        self._set_command_option(flag, name, value)
 
         return self
 
     @add_to_repr('append')
-    def property(self, prop, value, flag='-D'):
+    def property(self, name, value, flag='-D'):
         """
         Sets configuration and Hadoop server settings.
 
@@ -141,7 +137,7 @@ class SqoopJob(GenieJob):
             ...     .property('hello', 'world', flag='--someflag')
 
         Args:
-            prop (str): The property to set.
+            name (str): The property to set.
             value (str): The value for the property.
             flag (str, optional): The command line flag for the property
                 (default: '-D').
@@ -150,7 +146,7 @@ class SqoopJob(GenieJob):
             :py:class:`SqoopJob`: self
         """
 
-        self.__properties[flag][prop] = value
+        self._set_command_option(flag, name, value)
 
         return self
 
