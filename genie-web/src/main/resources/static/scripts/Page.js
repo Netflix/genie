@@ -29,6 +29,7 @@ export default class Page extends React.Component {
       links          : {},
       page           : {},
       noSearchResult : false,
+      showSearchForm : true,
     };
   }
 

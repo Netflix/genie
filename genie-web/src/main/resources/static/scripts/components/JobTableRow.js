@@ -30,7 +30,7 @@ export default class TableRow extends React.Component {
   }
 
   get jobsUrl() {
-    return `${window.location.protocol}//${window.location.hostname}:3000/jobs`;
+    return `${window.location.protocol}//${window.location.hostname}/jobs`;
   }
 
   render() {
@@ -51,7 +51,7 @@ export default class TableRow extends React.Component {
         <td onMouseMove={() => { this.setState({ copied: false }); }}>
           <CopyToClipboard
             onCopy={() => this.setState({ copied: true })}
-            text={`${this.jobsUrl}?id=${this.props.row.id}&rowId=${this.props.row.id}&showSearchForm=false`}
+            text={`${this.jobsUrl}?id=${this.props.row.id}&rowId=${this.props.row.id}`}
           >
             <button className="btn btn-default btn-xs">
               <i className="fa fa-share-alt" aria-hidden="true"></i>

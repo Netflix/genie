@@ -23,7 +23,8 @@ export default class Application extends Page {
         label : 'Status',
         name  : 'status',
         value : '',
-        type  : 'input',
+        type  : 'option',
+        optionValues : ['', 'ACTIVE', 'DEPRECATED', 'INACTIVE'],
       }, {
         label : 'Tag',
         name  : 'tag',

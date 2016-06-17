@@ -15,7 +15,7 @@ const InfoTable = (props) =>
           <td>
             <Link
               target="_blank"
-              to={`${props.type}?name=${info.name}&rowId=${info.id}&showSearchForm=false`}
+              to={`${props.type}?name=${info.name}&rowId=${info.id}`}
             >
               {info.id}
             </Link>

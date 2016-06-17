@@ -24,7 +24,8 @@ export default class Cluster extends Page {
         label : 'Status',
         name  : 'status',
         value : '',
-        type  : 'input',
+        type  : 'option',
+        optionValues : ['', 'UP', 'OUT_OF_SERVICE', 'TERMINATED'],
       }, {
         label : 'Tag',
         name  : 'tag',
