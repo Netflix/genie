@@ -75,7 +75,7 @@ def set_jobname(func):
         script = job.get('script')
 
         # handle job name if not set
-        if not job.get('job_name'):
+        if not job.get('job_name') and script:
             payload['name'] = os.path.basename(script) if is_file(script) \
                 else script.replace('\n', ' ')[:40].strip()
 
