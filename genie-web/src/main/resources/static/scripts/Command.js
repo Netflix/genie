@@ -1,10 +1,5 @@
-import React from 'react';
-
 import Page from './Page';
-
-import TableHeader from './components/TableHeader';
-import TableBody from './components/TableBody';
-
+import TableRow from './components/TableRow';
 import CommandDetails from './components/CommandDetails';
 
 export default class Command extends Page {
@@ -33,7 +28,8 @@ export default class Command extends Page {
         label : 'Status',
         name  : 'status',
         value : '',
-        type  : 'input',
+        type  : 'option',
+        optionValues : ['', 'ACTIVE', 'DEPRECATED', 'INACTIVE'],
       }, {
         label : 'Tag',
         name  : 'tag',
@@ -44,12 +40,12 @@ export default class Command extends Page {
         name  : 'sort',
         value : '',
         type  : 'select',
-        selectFields: ['name', 'user', 'status', 'tag'].map(field => {
-          return {
+        selectFields: ['name', 'user', 'status', 'tag'].map(field => (
+          {
             value: field,
             label: field,
-          };
-        }),
+          }
+        )),
       },
     ];
   }
@@ -58,25 +54,18 @@ export default class Command extends Page {
     return 'commands';
   }
 
+  get rowType() {
+    return TableRow;
+  }
+
   get tableHeader() {
     return (
-      <TableHeader
-        headers={['Id', 'Name', 'User', 'Status', 'Version', 'Tags', 'Created', 'Updated']}
-      />
+      ['Id', 'Name', 'User', 'Status', 'Version', 'Tags', 'Created', 'Updated']
     );
   }
 
-  get tableBody() {
-    const { showDetails } = this.props.location.query;
-    return (
-      <TableBody
-        rows={this.state.data}
-        rowId={showDetails}
-        searchPath={this.searchPath}
-        detailsTable={CommandDetails}
-        hideDetails={this.hideDetails}
-      />
-    );
+  get detailsTable() {
+    return CommandDetails;
   }
 }
 

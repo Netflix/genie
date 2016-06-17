@@ -1,6 +1,6 @@
 {
   "name": "genie-web",
-  "version": "0.1.0",
+  "version": "3.0.0",
   "description": "UI for Genie3 [A federated Job Execution Engine]",
   "main": "index.js",
   "scripts": {
@@ -14,13 +14,14 @@
   "author": "Netflix",
   "license": "Apache License, Version 2.0",
   "bugs": {
-    "url": "https://github.com/Netflix/genie"
+    "url": "https://github.com/Netflix/genie/issues"
   },
   "dependencies": {
     "jquery": "^2.2.3",
     "moment": "^2.13.0",
-    "react": "^15.0.1",
+    "react": "^15.1.0",
     "react-cookie": "^0.4.5",
+    "react-copy-to-clipboard": "^4.1.0",
     "react-dom": "^15.0.1",
     "react-router": "^2.3.0",
     "react-select": "^1.0.0-beta13"
