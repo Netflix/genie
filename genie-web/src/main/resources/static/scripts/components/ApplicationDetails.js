@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react';
+import React, { PropTypes as T } from 'react';
 
 import { fetch } from '../utils';
 import $ from 'jquery';
@@ -8,7 +8,7 @@ import InfoTable from './InfoTable';
 export default class ApplicationDetails extends React.Component {
 
   static propTypes = {
-    hideDetails : PropTypes.func.isRequired,
+    row : T.object.isRequired,
   }
 
   constructor(props) {
@@ -47,14 +47,7 @@ export default class ApplicationDetails extends React.Component {
     return (
       <tr>
         <td colSpan="12">
-          <button
-            type="button"
-            className="close pull-left"
-            onClick={() => this.props.hideDetails()}
-            aria-label="Close"
-          >
-            <i className="fa fa-times" aria-hidden="true"></i>
-          </button>
+          <i className="fa fa-sort-desc" aria-hidden="true"></i>
           <div className="job-detail-row">
             <table className="table job-detail-table">
               <tbody>

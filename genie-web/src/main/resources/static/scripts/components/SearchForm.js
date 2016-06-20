@@ -64,13 +64,13 @@ export default class SearchForm extends React.Component {
     };
   }
 
-  handleFormFieldChange = (key) => {
-    return (e) => {
+  handleFormFieldChange = (key) => (
+    (e) => {
       const { formFields } = this.state;
       formFields[`${key}`] = e.target.value.trim();
       this.setState({ formFields });
-    };
-  }
+    }
+  )
 
   handleSelectChange = (val) => {
     const { formFields } = this.state;
@@ -172,11 +172,9 @@ export default class SearchForm extends React.Component {
                         value={this.state.formFields[field.name]}
                         onChange={this.handleFormFieldChange(field.name)}
                       >
-                        {field.optionValues.map((value, idx) => {
-                          return (
-                            <option key={idx} value={value}>{value}</option>
-                          );
-                        })
+                        {field.optionValues.map((value, idx) => (
+                          <option key={idx} value={value}>{value}</option>
+                          ))
                         }
                       </select>
                     </div>
@@ -200,20 +198,18 @@ export default class SearchForm extends React.Component {
               </div>
             </div>
             <div className={this.state.showAllFormFields ? '' : 'hidden'}>
-              {this.props.hiddenFormFields.map((field, index) => {
-                return (
-                  <div key={`${index}-div`} className="form-group">
-                    <label key={`${index}-label`} className="form-label">{field.label}:</label>
-                    <input
-                      key={index}
-                      type="text"
-                      value={this.state.formFields[field.name]}
-                      onChange={this.handleFormFieldChange(field.name)}
-                      className="form-control"
-                    />
-                  </div>
-                );
-              })
+              {this.props.hiddenFormFields.map((field, index) => (
+                <div key={`${index}-div`} className="form-group">
+                  <label key={`${index}-label`} className="form-label">{field.label}:</label>
+                  <input
+                    key={index}
+                    type="text"
+                    value={this.state.formFields[field.name]}
+                    onChange={this.handleFormFieldChange(field.name)}
+                    className="form-control"
+                  />
+                </div>
+              ))
               }
             </div>
             {this.state.hasHiddenFormFields ?

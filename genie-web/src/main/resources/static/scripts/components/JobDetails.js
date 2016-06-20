@@ -5,14 +5,13 @@ import { fetch } from '../utils';
 export default class JobDetails extends React.Component {
 
   static propTypes = {
-    row         : T.object.isRequired,
-    killJob     : T.func.isRequired,
-    hideDetails : T.func.isRequired,
+    row : T.object.isRequired,
   }
 
   constructor(props) {
     super(props);
     this.state = {
+      killJobRequestSent: false,
       job: {
         id: '',
         _links: {
@@ -43,18 +42,18 @@ export default class JobDetails extends React.Component {
     });
   }
 
+  killJob = (jobId) => {
+    fetch(`/api/v3/jobs/${jobId}`, null, 'DELETE')
+      .done(() => {
+        this.setState({ killJobRequestSent: true });
+      });
+  }
+
   render() {
     return (
       <tr>
         <td colSpan="12">
-          <button
-            type="button"
-            className="close pull-left"
-            onClick={() => this.props.hideDetails()}
-            aria-label="Close"
-          >
-            <i className="fa fa-times" aria-hidden="true"></i>
-          </button>
+          <i className="fa fa-sort-desc" aria-hidden="true"></i>
           <div className="job-detail-row">
             <table className="table job-detail-table">
               <tbody>
@@ -105,23 +104,22 @@ export default class JobDetails extends React.Component {
                     </ul>
                   </td>
                 </tr>
-                {this.state.job.status === 'RUNNING' && !this.props.killJobRequestSent ?
+                {this.state.job.status === 'RUNNING' && !this.state.killJobRequestSent ?
                   <tr>
                     <td>
                       <button
                         type="button"
                         className="btn btn-danger"
-                        onClick={() => this.props.killJob(this.state.job.id)}
+                        onClick={() => this.killJob(this.state.job.id)}
                       >Send Kill Request</button>
                     </td>
-                </tr> : null
+                  </tr> : null
                 }
 
               </tbody>
             </table>
-            { this.props.killJobRequestSent ?
-                <small>*Request accepted. Please refresh the page in a few seconds to see status change.</small> :
-              null
+            {this.state.killJobRequestSent ?
+              <small>*Request accepted. Please refresh the page in a few seconds to see status change.</small> : null
             }
           </div>
         </td>
