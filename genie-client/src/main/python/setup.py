@@ -30,7 +30,10 @@ setup(
     author='Netflix Inc.',
     author_email='genieoss@googlegroups.com',
     keywords='genie hadoop cloud netflix client bigdata presto',
-    packages=['pygenie'],
+    packages=['pygenie', 'pygenie.adapter', 'pygenie.jobs'],
+    package_data={
+        'pygenie': ['genie.ini']
+    },
     scripts=[],
     url='http://netflix.github.io/genie/',
     license='Apache 2.0',
