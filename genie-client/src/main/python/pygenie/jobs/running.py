@@ -23,7 +23,7 @@ logger = logging.getLogger('com.netflix.genie.jobs.running')
 class RunningJob(object):
     """RunningJob."""
 
-    def __init__(self, job_id, adapter=None, conf=None):
+    def __init__(self, job_id, adapter=None, conf=None, info=None):
         self.__cached_genie_log = None
         self.__cached_stderr = None
         self.__conf = conf or GenieConf()
@@ -31,7 +31,7 @@ class RunningJob(object):
 
         self._cached_genie_log = None
         self._cached_stderr = None
-        self._info = dict()
+        self._info = info or dict()
         self._job_id = job_id
 
         # get_adapter_version is set in main __init__.py to get around circular imports
@@ -41,6 +41,8 @@ class RunningJob(object):
         stream = self.__conf.get('genie.progress_stream', 'stdout').lower()
         if stream in {'stderr', 'stdout'}:
             self.__sys_stream = getattr(sys, stream)
+
+        self.update(info=info)
 
     def __getattr__(self, attr):
         if attr in self.info:
