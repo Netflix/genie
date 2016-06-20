@@ -11,8 +11,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import json
 import logging
 import re
-import signal
-import sys
 
 from collections import defaultdict
 
@@ -397,24 +395,7 @@ class GenieJob(object):
 
         # execute_job is set in main __init__.py to get around circular imports
         # execute_job imports jobs, jobs need to import execute_job
-        running_job = execute_job(self)
-
-        def sig_handler(signum, frame):
-            logger.warning("caught signal %s", signum)
-            try:
-                if running_job.job_id:
-                    logger.warning("killing job id %s", running_job.job_id)
-                    running_job.kill()
-            except Exception:
-                pass
-            finally:
-                sys.exit(1)
-
-        signal.signal(signal.SIGINT, sig_handler)
-        signal.signal(signal.SIGTERM, sig_handler)
-        signal.signal(signal.SIGABRT, sig_handler)
-
-        return running_job
+        return execute_job(self)
 
     @add_to_repr('overwrite')
     def genie_url(self, url):

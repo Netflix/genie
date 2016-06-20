@@ -75,7 +75,7 @@ def set_jobname(func):
         script = job.get('script')
 
         # handle job name if not set
-        if not job.get('job_name'):
+        if not job.get('job_name') and script:
             payload['name'] = os.path.basename(script) if is_file(script) \
                 else script.replace('\n', ' ')[:40].strip()
 
@@ -164,10 +164,10 @@ class Genie3Adapter(GenieBaseAdapter):
             'applications': job.get('application_ids'),
             'attachments': attachments,
             'clusterCriterias': [
-                {'tags': job.get('cluster_tags')}
+                {'tags': job.get('cluster_tags') or job.default_cluster_tags}
             ],
             'commandArgs': job.get('command_arguments') or job.cmd_args,
-            'commandCriteria': job.get('command_tags'),
+            'commandCriteria': job.get('command_tags') or job.default_command_tags,
             'dependencies': dependencies,
             'description': job.get('description'),
             'disableLogArchival': not job.get('archive'),
@@ -181,15 +181,6 @@ class Genie3Adapter(GenieBaseAdapter):
             'user': job.get('username'),
             'version': job.get('job_version')
         }
-
-        # command tags not set, use default
-        if not payload.get('commandCriteria'):
-            payload['commandCriteria'] = job.default_command_tags
-
-        # cluster tags not set, use default
-        if not [c.get('tags') for c in payload.get('clusterCriterias', []) \
-                if len(c.get('tags', [])) > 0]:
-            payload['clusterCriterias'] = [{'tags': job.default_cluster_tags}]
 
         return payload
 
