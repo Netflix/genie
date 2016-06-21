@@ -45,23 +45,6 @@ logger = logging.getLogger('com.netflix.genie.jobs.adapter.genie_3')
 dispatch_ns = dict()
 
 
-def assert_script(func):
-    """Decorator to enforce script is set on a job."""
-
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        """Wraps func."""
-
-        job = args[0]
-        if job.get('script') is None:
-            raise GenieJobError('cannot run {} without specifying script' \
-                .format(job.__class__.__name__))
-
-        return func(*args, **kwargs)
-
-    return wrapper
-
-
 def set_jobname(func):
     """Decorator to update job name with script."""
 
@@ -366,7 +349,6 @@ def get_payload(job):
 
 @dispatch((HadoopJob, HiveJob, PigJob, PrestoJob), namespace=dispatch_ns)
 @set_jobname
-@assert_script
 def get_payload(job):
     """Construct payload for jobs -> Genie 3."""
 
