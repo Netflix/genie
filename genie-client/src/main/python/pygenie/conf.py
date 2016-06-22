@@ -189,23 +189,33 @@ class GenieConf(object):
         sections with options set to the :py:class:`GenieConfSection` object's
         attributes."""
 
+        # this is work-around for when config values are loaded as a list when
+        # execution is threaded (still need to look closer into why this is
+        # happening)
+        def unlist(value):
+            return value[0] if isinstance(value, list) else value
+
         # explicitly set genie section object
-        self.genie.set('url', C.get('genie.url', DEFAULT_GENIE_URL))
-        self.genie.set('username', C.get('genie.username',
-                                         os.environ.get('USER',
-                                                        DEFAULT_GENIE_USERNAME)))
-        self.genie.set('version', C.get('genie.version', DEFAULT_GENIE_VERSION))
+        default_username = os.environ.get('USER', DEFAULT_GENIE_USERNAME)
+        self.genie.set('url',
+                       unlist(C.get('genie.url', DEFAULT_GENIE_URL)))
+        self.genie.set('username',
+                       unlist(C.get('genie.username', default_username)))
+        self.genie.set('version',
+                       unlist(C.get('genie.version', DEFAULT_GENIE_VERSION)))
 
         # create and set other section objects
         for section in C.config.sections():
             section_clean = section.replace(' ', '_').replace('.', '_')
             gcs = self.genie if section_clean == 'genie' \
                 else GenieConfSection(name=section_clean)
+
             for option in C.config.options(section):
                 option_clean = option.replace(' ', '_').replace('.', '_')
                 if section_clean != 'genie' \
                         or option_clean not in {'url', 'username', 'version'}:
-                    gcs.set(option_clean, C.get(section, option))
+                    gcs.set(option_clean, unlist(C.get(section, option)))
+
             setattr(self, section_clean, gcs)
 
     def to_dict(self):
