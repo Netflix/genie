@@ -26,7 +26,7 @@ with open(path.join(here, 'DESCRIPTION.rst'), encoding='utf-8') as f:
 
 setup(
     name='nflx-genie-client',
-    version='3.0.5',
+    version='3.0.6',
     author='Netflix Inc.',
     author_email='genieoss@googlegroups.com',
     keywords='genie hadoop cloud netflix client bigdata presto',
@@ -52,7 +52,6 @@ setup(
         "multipledispatch",
         "nose",
         "pyconfigurator",
-        "pystache",
         "python-dateutil >= 2.4",
         "requests",
         "responses",
