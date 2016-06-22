@@ -83,7 +83,7 @@ def add_to_repr(mode):
 
             if repr_obj:
                 if mode in REPR_OVERWRITE_MODES:
-                    repr_obj.remove(r'{}\('.format(func.__name__))
+                    repr_obj.remove(r'{}('.format(func.__name__))
                 repr_obj.append(func_name=func.__name__,
                                 args=args[1:],
                                 kwargs=kwargs)
