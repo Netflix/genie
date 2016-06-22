@@ -37,18 +37,15 @@ class TestGenieConf(unittest.TestCase):
     @reset_environment
     @patch('pygenie.conf.GenieConf.config_file_env')
     @patch('pygenie.conf.GenieConf.config_file_home_ini')
-    @patch('configurator.configurator.Configurator.initialize')
-    def test_load_config_file(self, c_initialize, config_home_ini, config_env):
+    @patch('configurator.configurator.Configurator.addOptionFile')
+    def test_load_config_file(self, c_addoptionfile, config_home_ini, config_env):
         """Test loading configuration file."""
 
         config_env.return_value = None
         config_home_ini.return_value = None
         genie_config = GenieConf()
         genie_config.load_config_file(self.config_file)
-        c_initialize.assert_called_once_with(
-            [u'--configFile', self.config_file] +
-            sys.argv
-        )
+        c_addoptionfile.assert_called_once_with(self.config_file)
 
     @reset_environment
     @patch('pygenie.conf.GenieConf.config_file_env')
@@ -125,18 +122,17 @@ class TestGenieConf(unittest.TestCase):
     @reset_environment
     @patch('pygenie.conf.GenieConf.config_file_env')
     @patch('pygenie.conf.GenieConf.config_file_home_ini')
-    @patch('pygenie.conf.GenieConf.sys_argv')
-    def test_username_command_line(self, sys_argv, config_home_ini, config_env):
+    def test_username_command_line(self, config_home_ini, config_env):
         """Test configuration getting user specified from command line."""
 
-        config_env.return_value = None
-        config_home_ini.return_value = None
-        sys_argv.return_value = ['--config', 'genie.username=user_cmdline_1']
-        os.environ['USER'] = 'os_user_env_1'
-        os.environ['genie_username'] = 'genie_user_env_1'
-        genie_conf = GenieConf()
-        genie_conf.load_config_file(self.config_file)
-        assert_equals(genie_conf.genie.username, 'user_cmdline_1')
+        with patch.object(sys, 'argv', ['--config', 'genie.username=user_cmdline_1']):
+            config_env.return_value = None
+            config_home_ini.return_value = None
+            os.environ['USER'] = 'os_user_env_1'
+            os.environ['genie_username'] = 'genie_user_env_1'
+            genie_conf = GenieConf()
+            genie_conf.load_config_file(self.config_file)
+            assert_equals(genie_conf.genie.username, 'user_cmdline_1')
 
     @reset_environment
     @patch('pygenie.conf.GenieConf.config_file_env')
