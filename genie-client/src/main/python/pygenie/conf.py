@@ -7,9 +7,9 @@ jobs, etc).
 Below is the order of loading config values (first = higher priority):
     1. Command line (--config SECTION.OPTION=, --configFile=/path/to/config_file).
     2. Additionally loaded config files.
-    3. Environment config file (export GENIE_CONFIG=/path/to/config.ini).
-    4. Home config file (~/.genie/genie.ini).
-    5. Environment variable.
+    3a. Environment config file (export GENIE_CONFIG=/path/to/config.ini) OR
+    3b. Home config file (~/.genie/genie.ini).
+    4. Environment variable.
 
 """
 
@@ -168,15 +168,20 @@ class GenieConf(object):
     def load_config_file(self, config_file):
         """Load a configuration file (ini)."""
 
-        param_list = []
         if config_file is not None and os.path.exists(config_file):
+            logger.debug('adding config file: %s', config_file)
             self._config_files.append(config_file)
-        for cfile in self._config_files:
-            logger.debug('adding config file: %s', cfile)
-            param_list.extend(['--configFile', cfile])
-        C.initialize(param_list + self.sys_argv())
-        self._load_options()
-        logger.debug('configuration:\n%s', self.to_json())
+            C.addOptionFile(config_file)
+
+            # options specified via cmd line should always override config files
+            sys_argv_configs = [sys.argv[i + 1] for i, arg in enumerate(sys.argv) \
+                if arg == '--config']
+            for option in sys_argv_configs:
+                C.addOption(option)
+
+            self._load_options()
+            logger.debug('configuration:\n%s', self.to_json())
+
         return self
 
     def _load_options(self):
@@ -202,12 +207,6 @@ class GenieConf(object):
                         or option_clean not in {'url', 'username', 'version'}:
                     gcs.set(option_clean, C.get(section, option))
             setattr(self, section_clean, gcs)
-
-    @staticmethod
-    def sys_argv():
-        """Get command line arguments passed to Python script."""
-
-        return sys.argv
 
     def to_dict(self):
         """
