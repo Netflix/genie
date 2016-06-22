@@ -27,11 +27,21 @@ def raise_not_implemented(func):
 
 
 def substitute(template, context):
-    import pystache
-    for delim in [(u'{{', u'}}'), (u'${', u'}')]:
-        pystache.defaults.DELIMITERS = delim
-        template = pystache.render(template, context)
-    return template.encode('utf-8')
+    """
+    Performs string substitution.
+
+    Args:
+        template (str): The string to perform the substitution on.
+        context (dict): A mapping of keys to values for substitution.
+
+    Returns:
+        str: The substituted string.
+    """
+
+    from string import Template
+    template = Template(template)
+
+    return template.safe_substitute(context)
 
 
 class GenieBaseAdapter(object):
