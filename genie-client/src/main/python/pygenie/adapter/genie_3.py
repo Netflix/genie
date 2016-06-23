@@ -29,7 +29,8 @@ from .genie_x import (GenieBaseAdapter,
 from ..exceptions import (GenieAttachmentError,
                           GenieHTTPError,
                           GenieJobError,
-                          GenieJobNotFoundError)
+                          GenieJobNotFoundError,
+                          GenieLogNotFoundError)
 
 #jobs
 from ..jobs.core import GenieJob
@@ -84,9 +85,7 @@ def to_attachment(att):
         try:
             return (unicode(att['name']), unicode(att['data']))
         except KeyError:
-            raise GenieAttachmentError(
-                "in-line attachment is missing " \
-                "required keys ('name', 'data') ({})".format(att))
+            raise GenieAttachmentError("in-line attachment is missing required keys ('name', 'data') ({})".format(att))
     raise GenieAttachmentError("cannot handle attachment '{}'".format(att))
 
 
@@ -111,8 +110,7 @@ class Genie3Adapter(GenieBaseAdapter):
             return response.iter_lines() if iterator else response.text
         except GenieHTTPError as err:
             if err.response.status_code == 404:
-                raise GenieJobNotFoundError("job id '{}' not found at {}." \
-                    .format(job_id, url))
+                raise GenieLogNotFoundError("log not found at {}".format(url))
             raise
 
     def __url_for_job(self, job_id):
@@ -193,7 +191,7 @@ class Genie3Adapter(GenieBaseAdapter):
                         auth_handler=self.auth_handler).json()
         except GenieHTTPError as err:
             if err.response.status_code == 404:
-                msg = "job id '{}' not found at {}.".format(job_id, url)
+                msg = "job not found at {}".format(url)
                 if if_not_found is not None:
                     logger.warning(msg)
                     return if_not_found
@@ -294,8 +292,7 @@ class Genie3Adapter(GenieBaseAdapter):
             return call(method='delete',url=url, auth_handler=self.auth_handler)
         except GenieHTTPError as err:
             if err.response.status_code == 404:
-                raise GenieJobNotFoundError("job id '{}' not found at {}." \
-                    .format(job_id, url))
+                raise GenieJobNotFoundError("job not found at {}".format(url))
             raise
 
     def submit_job(self, job):
@@ -341,8 +338,7 @@ def get_payload(job):
                             'command line arguments (use .command_arguments())')
 
     if not payload.get('commandCriteria'):
-        raise GenieJobError('trying to run GenieJob without specifying' \
-                            'command tags')
+        raise GenieJobError('trying to run GenieJob without specifying command tags')
 
     return payload
 

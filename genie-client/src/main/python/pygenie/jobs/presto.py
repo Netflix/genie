@@ -14,6 +14,7 @@ Example:
     ...     .option('source', 'genie') \\
     ...     .session('hive.max_initial_split_size', '4MB')
     >>> running_job = job.execute()
+
 """
 
 

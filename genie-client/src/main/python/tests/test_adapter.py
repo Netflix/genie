@@ -3,9 +3,14 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import unittest
 
 from mock import patch
-from nose.tools import assert_equals
+from nose.tools import (assert_equals,
+                        assert_raises)
 
 from pygenie.adapter.genie_x import substitute
+from pygenie.adapter.genie_3 import Genie3Adapter
+from pygenie.exceptions import GenieLogNotFoundError
+
+from .utils import fake_response
 
 
 @patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'})
@@ -47,3 +52,19 @@ class TestStringSubstitution(unittest.TestCase):
                        dict(name='tester4')),
             'hello tester4, goodbye ${last}'
         )
+
+
+@patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'})
+class TestGenie3Adapter(unittest.TestCase):
+    """Test Genie 3 adapter."""
+
+    @patch('pygenie.utils.requests.request')
+    def test_stderr_log_not_found(self, request):
+        """Test Genie 3 adapter getting stderr log which does not exist."""
+
+        request.return_value = fake_response(None, status_code=404)
+
+        adapter = Genie3Adapter()
+
+        with assert_raises(GenieLogNotFoundError):
+            adapter.get_stderr('job_id_dne')
