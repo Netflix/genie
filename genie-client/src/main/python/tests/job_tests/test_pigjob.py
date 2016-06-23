@@ -63,11 +63,14 @@ class TestingPigJob(unittest.TestCase):
 
         assert_equals(
             job.cmd_args,
-            u'-P props.conf -Dprop1=v1 -Dprop2=v2 ' \
-            u'-param_file params1.param ' \
-            u'-param_file params2.param ' \
-            u'-p p2=v2 -p "p3=with space" -p p1=v1 ' \
-            u'-f script.pig'
+            u' '.join([
+                u'-Dprop1=v1 -Dprop2=v2',
+                u'-P props.conf',
+                u'-param_file params1.param',
+                u'-param_file params2.param',
+                u'-p p2=v2 -p "p3=with space" -p p1=v1',
+                u'-f script.pig'
+            ])
         )
 
     @patch('pygenie.jobs.pig.is_file')
@@ -86,8 +89,13 @@ class TestingPigJob(unittest.TestCase):
 
         assert_equals(
             job.cmd_args,
-            u'-P p.conf -Dp2=v2 -Dp1=v1 ' \
-            u'-param_file p.params -p p=v -f test.pig'
+            u' '.join([
+                u'-Dp2=v2 -Dp1=v1',
+                u'-P p.conf',
+                u'-param_file p.params',
+                u'-p p=v',
+                u'-f test.pig'
+            ])
         )
 
 
@@ -222,11 +230,13 @@ class TestingPigJobAdapters(unittest.TestCase):
                     {u'data': u'A = LOAD;', u'name': u'script.pig'}
                 ],
                 u'clusterCriterias': [{u'tags': [u'type:pig_cluster_1']}],
-                u'commandArgs': u'-P my_properties.conf ' \
-                                u'-Dmr.p1=a -Dmr.p2=b ' \
-                                u'-param_file pig_param1.params -param_file pig_param2.params '\
-                                u'-p param2=2 -p param1=1 '\
-                                u'-f script.pig',
+                u'commandArgs': u' '.join([
+                    u'-Dmr.p1=a -Dmr.p2=b',
+                    u'-P my_properties.conf',
+                    u'-param_file pig_param1.params -param_file pig_param2.params',
+                    u'-p param2=2 -p param1=1',
+                    u'-f script.pig'
+                ]),
                 u'commandCriteria': [u'type:pig'],
                 u'description': u'this job is to test pigjob adapter',
                 u'disableLogArchival': True,
@@ -341,11 +351,14 @@ class TestingPigJobAdapters(unittest.TestCase):
                     (u'script.pig', u'A = LOAD;')
                 ],
                 u'clusterCriterias': [{u'tags': [u'type:pig_cluster_1']}],
-                u'commandArgs': u'-P my_properties.conf -Dmr.p1=a -Dmr.p2=b ' \
-                                u'-param_file pig_param1.params ' \
-                                u'-param_file pig_param2.params ' \
-                                u'-p param2=2 -p param1=1 ' \
-                                u'-f script.pig',
+                u'commandArgs': u' '.join([
+                    u'-Dmr.p1=a -Dmr.p2=b',
+                    u'-P my_properties.conf',
+                    u'-param_file pig_param1.params',
+                    u'-param_file pig_param2.params',
+                    u'-p param2=2 -p param1=1',
+                    u'-f script.pig'
+                ]),
                 u'commandCriteria': [u'type:pig'],
                 u'dependencies': [
                     u'x://externalfile',

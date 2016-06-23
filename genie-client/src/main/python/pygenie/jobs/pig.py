@@ -78,7 +78,7 @@ class PigJob(GenieJob):
             if self._property_file \
             else ''
 
-        return '{prop_file} {props} {param_files} {params} -f {filename}' \
+        return '{props} {prop_file} {param_files} {params} -f {filename}' \
             .format(prop_file=prop_file_str,
                     props=props_str,
                     filename=self._filename,
