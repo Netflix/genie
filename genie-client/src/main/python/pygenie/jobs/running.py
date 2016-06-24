@@ -281,7 +281,23 @@ class RunningJob(object):
         Returns:
             str: The link to the job.
         """
+
         return self.info.get('job_link')
+
+    @property
+    def json_link(self):
+        """
+        Get the link for the job json.
+
+        Example:
+            >>> print running_job.json_link
+            'http://localhost/api/v3/jobs/1234-abcd'
+
+        Returns:
+            str: The link to the job json.
+        """
+
+        return self.info.get('json_link')
 
     @property
     def kill_uri(self):
@@ -387,6 +403,14 @@ class RunningJob(object):
                 return self._cached_stderr.split('\n') if iterator \
                     else self._cached_stderr
         return self._adapter.get_stderr(self._job_id, iterator=iterator)
+
+    @property
+    def stdout_url(self):
+        """
+        Returns a url for the stdout of the job.
+        """
+
+        return '{}/stdout'.format(self.output_uri.replace('/output/', '/file/', 1))
 
     def stdout(self, iterator=False):
         """
