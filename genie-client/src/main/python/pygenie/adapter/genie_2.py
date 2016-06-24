@@ -28,7 +28,8 @@ from .genie_x import (GenieBaseAdapter,
 from ..exceptions import (GenieAttachmentError,
                           GenieHTTPError,
                           GenieJobError,
-                          GenieJobNotFoundError)
+                          GenieJobNotFoundError,
+                          GenieLogNotFoundError)
 
 #jobs
 from ..jobs.core import GenieJob
@@ -59,7 +60,7 @@ def assert_script(func):
         job = args[0]
         if job.get('script') is None:
             raise GenieJobError('cannot run {} without specifying script' \
-                .format(job.__class__.__name__))
+                                    .format(job.__class__.__name__))
 
         return func(*args, **kwargs)
 
@@ -97,9 +98,7 @@ def to_attachment(att):
         try:
             return dict(name=att['name'], data=base64.b64encode(att['data']))
         except KeyError:
-            raise GenieAttachmentError(
-                "in-line attachment is missing " \
-                "required keys ('name', 'data') ({})".format(att))
+            raise GenieAttachmentError("in-line attachment is missing required keys ('name', 'data') ({})".format(att))
     raise GenieAttachmentError("cannot handle attachment '{}'".format(att))
 
 
@@ -120,8 +119,7 @@ class Genie2Adapter(GenieBaseAdapter):
             return response.iter_lines() if iterator else response.text
         except GenieHTTPError as err:
             if err.response.status_code == 404:
-                raise GenieJobNotFoundError("job id '{}' not found at {}." \
-                    .format(job_id, url))
+                raise GenieLogNotFoundError("log not found at {}".format(url))
             raise
 
     def __url_for_job(self, job_id):
@@ -190,8 +188,7 @@ class Genie2Adapter(GenieBaseAdapter):
             return call(method='get', url=url).json()
         except GenieHTTPError as err:
             if err.response.status_code == 404:
-                raise GenieJobNotFoundError("job id '{}' not found at {}." \
-                    .format(job_id, url))
+                raise GenieJobNotFoundError("job not found at {}".format(url))
             raise
 
     def get_info_for_rj(self, job_id, *args, **kwargs):
@@ -266,8 +263,7 @@ class Genie2Adapter(GenieBaseAdapter):
             return call(method='delete', url=url)
         except GenieHTTPError as err:
             if err.response.status_code == 404:
-                raise GenieJobNotFoundError("job id '{}' not found at {}." \
-                    .format(job_id, url))
+                raise GenieJobNotFoundError("job not found at {}".format(url))
             raise
 
     def submit_job(self, job):
@@ -302,12 +298,11 @@ def get_payload(job):
     try:
         payload = Genie2Adapter.construct_base_payload(job)
     except GenieJobError:
-        raise GenieJobError('trying to run GenieJob without explicitly setting ' \
-                            'command line arguments (use .command_arguments())')
+        raise GenieJobError(
+            'trying to run GenieJob without explicitly setting command line arguments (use .command_arguments())')
 
     if not payload.get('commandCriteria'):
-        raise GenieJobError('trying to run GenieJob without specifying' \
-                            'command tags')
+        raise GenieJobError('trying to run GenieJob without specifying command tags')
 
     return payload
 

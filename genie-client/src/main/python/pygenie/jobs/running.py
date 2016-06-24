@@ -24,23 +24,20 @@ class RunningJob(object):
     """RunningJob."""
 
     def __init__(self, job_id, adapter=None, conf=None, info=None):
-        self.__cached_genie_log = None
-        self.__cached_stderr = None
-        self.__conf = conf or GenieConf()
-        self.__sys_stream = None
-
         self._cached_genie_log = None
         self._cached_stderr = None
+        self._conf = conf or GenieConf()
         self._info = info or dict()
         self._job_id = job_id
+        self._sys_stream = None
 
         # get_adapter_version is set in main __init__.py to get around circular imports
         self._adapter = adapter \
-            or get_adapter_for_version(self.__conf.genie.version)(conf=self.__conf)
+            or get_adapter_for_version(self._conf.genie.version)(conf=self._conf)
 
-        stream = self.__conf.get('genie.progress_stream', 'stdout').lower()
+        stream = self._conf.get('genie.progress_stream', 'stdout').lower()
         if stream in {'stderr', 'stdout'}:
-            self.__sys_stream = getattr(sys, stream)
+            self._sys_stream = getattr(sys, stream)
 
         self.update(info=info)
 
@@ -179,10 +176,10 @@ class RunningJob(object):
         """
 
         if self.is_done:
-            if not self.__cached_genie_log:
-                self.__cached_genie_log = self._adapter.get_genie_log(self._job_id)
-                return self.__cached_genie_log.split('\n') if iterator \
-                    else self.__cached_genie_log
+            if not self._cached_genie_log:
+                self._cached_genie_log = self._adapter.get_genie_log(self._job_id)
+                return self._cached_genie_log.split('\n') if iterator \
+                    else self._cached_genie_log
         return self._adapter.get_genie_log(self._job_id, iterator=iterator)
 
     @property
@@ -286,6 +283,23 @@ class RunningJob(object):
         """
         return self.info.get('job_link')
 
+    @property
+    def kill_uri(self):
+        """
+        Get the uri to kill the job.
+
+        Sending a DELETE request to this uri will kill the job.
+
+        Example:
+            >>> print running_job.kill_uri
+            'http://localhost/genie/1234-abcd'
+
+        Returns:
+            str: The kill URI.
+        """
+
+        return self.info.get('kill_uri')
+
     def kill(self):
         """
         Kill the job.
@@ -368,10 +382,10 @@ class RunningJob(object):
         """
 
         if self.is_done:
-            if not self.__cached_stderr:
-                self.__cached_stderr = self._adapter.get_stderr(self._job_id)
-                return self.__cached_stderr.split('\n') if iterator \
-                    else self.__cached_stderr
+            if not self._cached_stderr:
+                self._cached_stderr = self._adapter.get_stderr(self._job_id)
+                return self._cached_stderr.split('\n') if iterator \
+                    else self._cached_stderr
         return self._adapter.get_stderr(self._job_id, iterator=iterator)
 
     def stdout(self, iterator=False):
@@ -495,6 +509,6 @@ class RunningJob(object):
     def _write_to_stream(self, msg):
         """Writes message to the configured sys stream."""
 
-        if self.__sys_stream is not None:
-            self.__sys_stream.write(msg)
-            self.__sys_stream.flush()
+        if self._sys_stream is not None:
+            self._sys_stream.write(msg)
+            self._sys_stream.flush()

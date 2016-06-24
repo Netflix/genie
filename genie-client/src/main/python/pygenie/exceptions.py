@@ -64,3 +64,8 @@ class GenieJobError(GenieError):
 class GenieJobNotFoundError(GenieError):
     """Error when job is not found."""
     pass
+
+
+class GenieLogNotFoundError(GenieError):
+    """Error when a log is not found."""
+    pass
