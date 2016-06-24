@@ -220,6 +220,7 @@ class Genie2Adapter(GenieBaseAdapter):
             'group': data.get('group'),
             'id': data.get('id'),
             'job_link': data.get('killURI'),
+            'json_link': data.get('killURI'),
             'kill_uri': data.get('killURI'),
             'name': data.get('name'),
             'output_uri': data.get('outputURI'),

@@ -250,6 +250,7 @@ class Genie3Adapter(GenieBaseAdapter):
             'group': request_data.get('group'),
             'id': data.get('id'),
             'job_link': job_link,
+            'json_link': link,
             'kill_uri': link,
             'name': data.get('name'),
             'output_uri': output_link,
