@@ -283,6 +283,23 @@ class RunningJob(object):
         """
         return self.info.get('job_link')
 
+    @property
+    def kill_uri(self):
+        """
+        Get the uri to kill the job.
+
+        Sending a DELETE request to this uri will kill the job.
+
+        Example:
+            >>> print running_job.kill_uri
+            'http://localhost/genie/1234-abcd'
+
+        Returns:
+            str: The kill URI.
+        """
+
+        return self.info.get('kill_uri')
+
     def kill(self):
         """
         Kill the job.
