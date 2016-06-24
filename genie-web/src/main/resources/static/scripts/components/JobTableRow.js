@@ -30,7 +30,8 @@ export default class TableRow extends React.Component {
   }
 
   get jobsUrl() {
-    return `${window.location.protocol}//${window.location.hostname}/jobs`;
+    const {protocol, hostname, pathname} = window.location;
+    return `${protocol}//${hostname}${pathname}`;
   }
 
   render() {
@@ -74,5 +75,4 @@ export default class TableRow extends React.Component {
       </tr>
     );
   }
-
 }
