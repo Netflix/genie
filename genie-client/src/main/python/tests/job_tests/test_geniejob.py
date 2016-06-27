@@ -74,6 +74,9 @@ class TestingGenieJobRepr(unittest.TestCase):
             .job_id('geniejob_repr') \
             .job_name('geniejob_repr') \
             .job_version('1.1.1') \
+            .parameter('param1', 'pval1') \
+            .parameter('param2', 'pval2') \
+            .parameters(param3='pval3', param4='pval4') \
             .setup_file('/setup.sh') \
             .tags('tag1') \
             .tags('tag2') \
@@ -82,29 +85,35 @@ class TestingGenieJobRepr(unittest.TestCase):
 
         assert_equals(
             str(job),
-            u'GenieJob()'
-            u'.applications("app1")'
-            u'.applications("app2")'
-            u'.archive(False)'
-            u'.cluster_tags("cluster1")'
-            u'.cluster_tags("cluster2")'
-            u'.command_arguments("genie job repr args")'
-            u'.command_tags("cmd1")'
-            u'.command_tags("cmd2")'
-            u'.dependencies("/dep1")'
-            u'.dependencies("/dep2")'
-            u'.description("description")'
-            u'.email("jsmith@email.com")'
-            u'.genie_url("http://asdfasdf")'
-            u'.group("group1")'
-            u'.job_id("geniejob_repr")'
-            u'.job_name("geniejob_repr")'
-            u'.job_version("1.1.1")'
-            u'.setup_file("/setup.sh")'
-            u'.tags("tag1")'
-            u'.tags("tag2")'
-            u'.timeout(999)'
-            u'.username("jsmith")'
+            '.'.join([
+                u'GenieJob()',
+                u'applications("app1")',
+                u'applications("app2")',
+                u'archive(False)',
+                u'cluster_tags("cluster1")',
+                u'cluster_tags("cluster2")',
+                u'command_arguments("genie job repr args")',
+                u'command_tags("cmd1")',
+                u'command_tags("cmd2")',
+                u'dependencies("/dep1")',
+                u'dependencies("/dep2")',
+                u'description("description")',
+                u'email("jsmith@email.com")',
+                u'genie_url("http://asdfasdf")',
+                u'group("group1")',
+                u'job_id("geniejob_repr")',
+                u'job_name("geniejob_repr")',
+                u'job_version("1.1.1")',
+                u'parameter("param1", "pval1")',
+                u'parameter("param2", "pval2")',
+                u'parameter("param3", "pval3")',
+                u'parameter("param4", "pval4")',
+                u'setup_file("/setup.sh")',
+                u'tags("tag1")',
+                u'tags("tag2")',
+                u'timeout(999)',
+                u'username("jsmith")'
+            ])
         )
 
 
