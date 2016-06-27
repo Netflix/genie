@@ -188,6 +188,7 @@ class Genie3Adapter(GenieBaseAdapter):
         try:
             return call(method='get',
                         url=url,
+                        timeout=60,
                         auth_handler=self.auth_handler).json()
         except GenieHTTPError as err:
             if err.response.status_code == 404:
@@ -290,7 +291,10 @@ class Genie3Adapter(GenieBaseAdapter):
         url = kill_uri if kill_uri is not None else self.__url_for_job(job_id)
 
         try:
-            return call(method='delete',url=url, auth_handler=self.auth_handler)
+            return call(method='delete',
+                        url=url,
+                        timeout=10,
+                        auth_handler=self.auth_handler)
         except GenieHTTPError as err:
             if err.response.status_code == 404:
                 raise GenieJobNotFoundError("job not found at {}".format(url))
@@ -325,6 +329,7 @@ class Genie3Adapter(GenieBaseAdapter):
         call(method='post',
              url='{}/{}'.format(job.conf.genie.url, Genie3Adapter.JOBS_ENDPOINT),
              files=files,
+             timeout=300,
              auth_handler=self.auth_handler)
 
 
