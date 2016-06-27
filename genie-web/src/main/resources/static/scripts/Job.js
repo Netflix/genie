@@ -34,7 +34,7 @@ export default class Job extends Page {
         name  : 'status',
         value : '',
         type  : 'option',
-        optionValues: ['', 'RUNNING', 'SUCCEEDED', 'FAILED', 'KILLED'],
+        optionValues: ['', 'INIT', 'RUNNING', 'SUCCEEDED', 'FAILED', 'KILLED', 'INVALID'],
       }, {
         label : 'Size',
         name  : 'size',
