@@ -543,6 +543,27 @@ class GenieJob(object):
 
         return self
 
+    def parameters(self, **kwargs):
+        """
+        Convenience method for setting multiple parameters using kwargs.
+
+        Example:
+            >>> #For pig: -p foo=1 -p bar=2
+            >>> job = PigJob() \\
+            ...     .parameters(foo='1', bar='2')
+
+        Args:
+            **kwargs: Keyword arguments for each parameter.
+
+        Returns:
+            :py:class:`GenieJob`: self
+        """
+
+        for name, value in kwargs.items():
+            self.parameter(name, value)
+
+        return self
+
     @add_to_repr('overwrite')
     def setup_file(self, setup_file):
         """
