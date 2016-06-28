@@ -185,7 +185,7 @@ class Genie2Adapter(GenieBaseAdapter):
             url = '{}/{}'.format(url, path.lstrip('/'))
 
         try:
-            return call(method='get', url=url).json()
+            return call(method='get', url=url, timeout=10).json()
         except GenieHTTPError as err:
             if err.response.status_code == 404:
                 raise GenieJobNotFoundError("job not found at {}".format(url))
@@ -261,7 +261,7 @@ class Genie2Adapter(GenieBaseAdapter):
         url = kill_uri if kill_uri is not None else self.__url_for_job(job_id)
 
         try:
-            return call(method='delete', url=url)
+            return call(method='delete', url=url, timeout=10)
         except GenieHTTPError as err:
             if err.response.status_code == 404:
                 raise GenieJobNotFoundError("job not found at {}".format(url))
@@ -288,6 +288,7 @@ class Genie2Adapter(GenieBaseAdapter):
                                 separators=(',', ': ')))
         call(method='post',
              url='{}/{}'.format(job.conf.genie.url, Genie2Adapter.JOBS_ENDPOINT),
+             timeout=30,
              data=json.dumps(payload),
              headers=JSON_HEADERS)
 
