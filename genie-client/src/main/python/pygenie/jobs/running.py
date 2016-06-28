@@ -340,13 +340,29 @@ class RunningJob(object):
         Get the output uri for the job.
 
         Example:
-            >>> print running_job.output_uri
+            >>> running_job.output_uri
             'http://localhost/genie/1234-abcd/output'
 
         Returns:
             str: The output URI.
         """
+
         return self.info.get('output_uri')
+
+    @property
+    def request_data(self):
+        """
+        Get the JSON of the job submission request sent to Genie.
+
+        Example:
+            >>> running_job.request_data
+            {...}
+
+        Returns:
+            dict: JSON of the job submission request.
+        """
+
+        return self.info.get('request_data')
 
     @property
     def start_time(self):
