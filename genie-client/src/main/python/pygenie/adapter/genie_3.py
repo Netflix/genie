@@ -165,7 +165,7 @@ class Genie3Adapter(GenieBaseAdapter):
 
         return payload
 
-    def get(self, job_id, path=None, if_not_found=None):
+    def get(self, job_id, path=None, if_not_found=None, **kwargs):
         """
         Get information for a job.
 
@@ -188,8 +188,9 @@ class Genie3Adapter(GenieBaseAdapter):
         try:
             return call(method='get',
                         url=url,
-                        timeout=60,
-                        auth_handler=self.auth_handler).json()
+                        auth_handler=self.auth_handler,
+                        **kwargs) \
+                   .json()
         except GenieHTTPError as err:
             if err.response.status_code == 404:
                 msg = "job not found at {}".format(url)
@@ -204,20 +205,24 @@ class Genie3Adapter(GenieBaseAdapter):
         Get information for RunningJob object.
         """
 
-        data = self.get(job_id)
-        request_data = self.get(job_id, path='request')
+        data = self.get(job_id, timeout=60)
+        request_data = self.get(job_id, path='request', timeout=60)
         application_data = self.get(job_id,
                                     path='applications',
-                                    if_not_found=list())
+                                    if_not_found=list(),
+                                    timeout=60)
         cluster_data = self.get(job_id,
                                 path='cluster',
-                                if_not_found=dict())
+                                if_not_found=dict(),
+                                timeout=60)
         command_data = self.get(job_id,
                                 path='command',
-                                if_not_found=dict())
+                                if_not_found=dict(),
+                                timeout=60)
         execution_data = self.get(job_id,
                                   path='execution',
-                                  if_not_found=dict())
+                                  if_not_found=dict(),
+                                  timeout=60)
 
         link = data.get('_links', {}).get('self', {}).get('href')
         link_parts = urlparse(link)
@@ -255,6 +260,7 @@ class Genie3Adapter(GenieBaseAdapter):
             'kill_uri': link,
             'name': data.get('name'),
             'output_uri': output_link,
+            'request_data': request_data,
             'setup_file': request_data.get('setupFile'),
             'started': data.get('started'),
             'status': data.get('status'),
@@ -273,7 +279,7 @@ class Genie3Adapter(GenieBaseAdapter):
     def get_status(self, job_id):
         """Get job status."""
 
-        return self.get(job_id, path='status').get('status')
+        return self.get(job_id, path='status', timeout=10).get('status')
 
     def get_stderr(self, job_id, **kwargs):
         """Get a stderr log for a job."""

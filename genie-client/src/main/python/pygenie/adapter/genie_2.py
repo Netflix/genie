@@ -177,7 +177,7 @@ class Genie2Adapter(GenieBaseAdapter):
 
         return payload
 
-    def get(self, job_id, path=None):
+    def get(self, job_id, path=None, **kwargs):
         """Get information."""
 
         url = self.__url_for_job(job_id)
@@ -185,7 +185,7 @@ class Genie2Adapter(GenieBaseAdapter):
             url = '{}/{}'.format(url, path.lstrip('/'))
 
         try:
-            return call(method='get', url=url, timeout=10).json()
+            return call(method='get', url=url, **kwargs).json()
         except GenieHTTPError as err:
             if err.response.status_code == 404:
                 raise GenieJobNotFoundError("job not found at {}".format(url))
@@ -196,7 +196,7 @@ class Genie2Adapter(GenieBaseAdapter):
         Get information for RunningJob object.
         """
 
-        data = self.get(job_id)
+        data = self.get(job_id, timeout=10)
 
         file_dependencies = data.get('fileDependencies')
 
@@ -224,6 +224,7 @@ class Genie2Adapter(GenieBaseAdapter):
             'kill_uri': data.get('killURI'),
             'name': data.get('name'),
             'output_uri': data.get('outputURI'),
+            'request_data': dict(),
             'setup_file': data.get('envPropFile'),
             'started': data.get('started'),
             'status': data.get('status'),
@@ -243,7 +244,7 @@ class Genie2Adapter(GenieBaseAdapter):
     def get_status(self, job_id):
         """Get job status."""
 
-        return self.get(job_id, path='status').get('status')
+        return self.get(job_id, path='status', timeout=10).get('status')
 
     def get_stderr(self, job_id, **kwargs):
         """Get a stderr log for a job."""
