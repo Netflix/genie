@@ -21,9 +21,12 @@ from ..utils import (is_str,
 from .utils import (add_to_repr,
                     arg_list,
                     arg_string,
-                    is_file)
+                    generate_job_id,
+                    is_file,
+                    reattach_job)
 
-from ..exceptions import GenieJobError
+from ..exceptions import (GenieJobError,
+                          GenieJobNotFoundError)
 
 
 logger = logging.getLogger('com.netflix.genie.jobs.core')
@@ -382,20 +385,69 @@ class GenieJob(object):
             :py:class:`GenieJob`: self
         """
 
-    def execute(self):
+    def execute(self, retry=False, force=False, catch_signal=False):
         """
         Send the job to Genie and execute.
 
         Example:
             >>> running_job = GenieJob().execute()
 
+        Args:
+            retry (bool, optional): If True, will check to see if a previous job
+                with the same job id has previously executed and generate a new
+                job id until finds a job id to a running job, a successful job, or
+                a brand new job (Default: False).
+            force (bool, optional): If True, will do the same thing as
+                retry=True, but will generate a new job id even if there is
+                a successful execution (Default: False).
+            catch_signal (bool, optional): If True, will add signal handlers to
+                kill the running job for SIGINT, SIGTERM, and SIGABRT
+                (Default: False).
+
         Returns:
             :py:class:`RunningJob`: A running job object.
         """
 
+        if catch_signal:
+            import signal
+            import sys
+            def sig_handler(signum, frame):
+                logger.warning("caught signal %s", signum)
+                try:
+                    if running_job.job_id:
+                        logger.warning("killing job id %s", running_job.job_id)
+                        response = running_job.kill()
+                        response.raise_for_status()
+                except Exception:
+                    pass
+                finally:
+                    sys.exit(1)
+            signal.signal(signal.SIGINT, sig_handler)
+            signal.signal(signal.SIGTERM, sig_handler)
+            signal.signal(signal.SIGABRT, sig_handler)
+
+        if retry or force:
+            uid = self._job_id
+            try:
+                # below uid should be uid of job with one of following status:
+                #     - new
+                #     - running
+                #     - (if force=False) successful
+                uid = generate_job_id(uid,
+                                      return_success=not force,
+                                      conf=self.conf)
+                # new uid will raise and be handled in the except block
+                # assigning to running_job variable for killing on signal
+                running_job = reattach_job(uid, conf=self.conf)
+                return running_job
+            except GenieJobNotFoundError:
+                self.job_id(uid)
+
         # execute_job is set in main __init__.py to get around circular imports
         # execute_job imports jobs, jobs need to import execute_job
-        return execute_job(self)
+        # assigning to running_job variable for killing on signal
+        running_job = execute_job(self)
+        return running_job
 
     @add_to_repr('overwrite')
     def genie_url(self, url):

@@ -30,6 +30,9 @@ import pkg_resources
 
 __version__ = pkg_resources.get_distribution('nflx-genie-client').version
 
+from .jobs.utils import (generate_job_id,
+                         reattach_job)
+
 # get around circular imports
 # adapter imports jobs, jobs need to import execute_job
 # adapter imports RunningJob, RunningJob needs to import get_adapter_for_version
