@@ -60,7 +60,8 @@ public final class SecurityUtils {
     ) throws Exception {
         // @formatter:off
         http
-            .regexMatcher("(/api/.*)|(" + actuatorEndpoint + ")/(?!health).*")
+//            .regexMatcher("(/api/.*)|(" + actuatorEndpoint + ")/(?!health).*")
+            .regexMatcher("(/api/.*)")
                 .authorizeRequests()
                     .regexMatchers(HttpMethod.DELETE, APPLICATIONS_API_REGEX).hasRole(ADMIN_ROLE)
                     .regexMatchers(HttpMethod.PATCH, APPLICATIONS_API_REGEX).hasRole(ADMIN_ROLE)

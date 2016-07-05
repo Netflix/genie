@@ -150,7 +150,7 @@ public abstract class AbstractAPISecurityIntegrationTests {
         this.get(CLUSTERS_API, expectedUnauthenticatedStatus);
         this.get(COMMANDS_API, expectedUnauthenticatedStatus);
         this.get(JOBS_API, expectedUnauthenticatedStatus);
-        this.checkActuatorEndpoints(expectedUnauthenticatedStatus);
+        this.checkActuatorEndpoints(OK);
     }
 
     /**
