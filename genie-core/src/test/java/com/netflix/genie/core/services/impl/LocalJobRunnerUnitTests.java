@@ -34,7 +34,6 @@ import com.netflix.genie.core.services.ClusterLoadBalancer;
 import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;
 import com.netflix.genie.core.services.JobPersistenceService;
-import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobSubmitterService;
 import com.netflix.genie.test.categories.UnitTest;
 import org.hamcrest.Matchers;
@@ -86,7 +85,6 @@ public class LocalJobRunnerUnitTests {
      */
     @Before
     public void setup() {
-        final JobSearchService jobSearchService = Mockito.mock(JobSearchService.class);
         this.jobPersistenceService = Mockito.mock(JobPersistenceService.class);
         this.applicationService = Mockito.mock(ApplicationService.class);
         this.clusterService = Mockito.mock(ClusterService.class);
@@ -104,7 +102,6 @@ public class LocalJobRunnerUnitTests {
         final Resource baseWorkingDirResource = new DefaultResourceLoader().getResource(BASE_WORKING_DIR);
 
         this.jobSubmitterService = new LocalJobRunner(
-            jobSearchService,
             this.jobPersistenceService,
             this.applicationService,
             this.clusterService,
@@ -113,9 +110,7 @@ public class LocalJobRunnerUnitTests {
             fileTransferService,
             applicationEventPublisher,
             jobWorkflowTasks,
-            baseWorkingDirResource,
-            null,
-            0
+            baseWorkingDirResource
         );
     }
 

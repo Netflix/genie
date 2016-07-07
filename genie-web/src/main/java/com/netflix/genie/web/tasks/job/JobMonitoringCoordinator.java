@@ -21,6 +21,7 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.core.events.JobFinishedEvent;
 import com.netflix.genie.core.events.JobStartedEvent;
 import com.netflix.genie.core.jobs.JobConstants;
+import com.netflix.genie.core.services.JobCountService;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.web.properties.JobOutputMaxProperties;
 import com.netflix.spectator.api.Counter;
@@ -37,9 +38,10 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 
 /**
@@ -50,9 +52,9 @@ import java.util.concurrent.ScheduledFuture;
  */
 @Component
 @Slf4j
-public class JobMonitoringCoordinator {
+public class JobMonitoringCoordinator implements JobCountService {
 
-    private final Map<String, ScheduledFuture<?>> jobMonitors;
+    private final Map<String, ScheduledFuture<?>> jobMonitors = Collections.synchronizedMap(new HashMap<>());
     private final String hostName;
     private final JobSearchService jobSearchService;
     private final TaskScheduler scheduler;
@@ -88,7 +90,6 @@ public class JobMonitoringCoordinator {
         final Resource jobsDir,
         final JobOutputMaxProperties outputMaxProperties
     ) throws IOException {
-        this.jobMonitors = new ConcurrentHashMap<>();
         this.hostName = hostName;
         this.jobSearchService = jobSearchService;
         this.publisher = publisher;

@@ -36,6 +36,7 @@ import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobSubmitterService;
 import com.netflix.genie.core.services.impl.GenieFileTransferService;
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.genie.web.tasks.job.JobMonitoringCoordinator;
 import org.apache.commons.exec.Executor;
 import org.junit.Assert;
 import org.junit.Before;
@@ -226,7 +227,6 @@ public class ServicesConfigUnitTests {
 
         Assert.assertNotNull(
             this.servicesConfig.jobSubmitterService(
-                this.jobSearchService,
                 jobPersistenceService,
                 applicationService,
                 clusterService,
@@ -235,9 +235,7 @@ public class ServicesConfigUnitTests {
                 genieFileTransferService,
                 applicationEventPublisher,
                 workflowTasks,
-                resource,
-                "localhost",
-                5
+                resource
             )
         );
     }
@@ -251,13 +249,16 @@ public class ServicesConfigUnitTests {
         final JobPersistenceService jobPersistenceService = Mockito.mock(JobPersistenceService.class);
         final JobSubmitterService jobSubmitterService = Mockito.mock(JobSubmitterService.class);
         final JobKillService jobKillService = Mockito.mock(JobKillService.class);
+        final JobMonitoringCoordinator jobCountService = Mockito.mock(JobMonitoringCoordinator.class);
 
         Assert.assertNotNull(
             this.servicesConfig.jobCoordinatorService(
                 jobPersistenceService,
                 jobSubmitterService,
                 jobKillService,
-                "file:///tmp"
+                jobCountService,
+                "file:///tmp",
+                2
             )
         );
     }

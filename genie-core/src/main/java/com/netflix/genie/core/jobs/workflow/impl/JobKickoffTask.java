@@ -165,13 +165,13 @@ public class JobKickoffTask extends GenieBaseTask {
     }
 
     /**
-     * Create user on the system.
+     * Create user on the system. Synchronized to prevent multiple threads from trying to create user at the same time.
      *
      * @param user user id
      * @param group group id
      * @throws GenieException If there is any problem.
      */
-    public void createUser(
+    protected synchronized void createUser(
         final String user,
         final String group) throws GenieException {
 
@@ -183,7 +183,7 @@ public class JobKickoffTask extends GenieBaseTask {
         try {
             this.executor.execute(idCheckCommandLine);
             log.debug("User already exists");
-        } catch (IOException ioe) {
+        } catch (final IOException ioe) {
             log.debug("User does not exist. Creating it now.");
 
             // Create the group for the user.
@@ -225,7 +225,7 @@ public class JobKickoffTask extends GenieBaseTask {
      * @param user Userid of the user.
      * @throws GenieException If there is a problem.
      */
-    public void changeOwnershipOfDirectory(
+    protected void changeOwnershipOfDirectory(
         final String dir,
         final String user) throws GenieException {
 

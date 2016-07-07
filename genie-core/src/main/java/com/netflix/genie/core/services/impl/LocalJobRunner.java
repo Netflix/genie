@@ -27,7 +27,6 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
-import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
 import com.netflix.genie.core.events.JobStartedEvent;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
@@ -37,7 +36,6 @@ import com.netflix.genie.core.services.ClusterLoadBalancer;
 import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;
 import com.netflix.genie.core.services.JobPersistenceService;
-import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobSubmitterService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.extern.slf4j.Slf4j;
@@ -69,7 +67,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class LocalJobRunner implements JobSubmitterService {
 
-    private final JobSearchService jobSearchService;
     private final JobPersistenceService jobPersistenceService;
     private final ApplicationService applicationService;
     private final ClusterService clusterService;
@@ -79,13 +76,10 @@ public class LocalJobRunner implements JobSubmitterService {
     private final Resource baseWorkingDirPath;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final GenieFileTransferService fileTransferService;
-    private final String hostname;
-    private final int maxRunningJobs;
 
     /**
      * Constructor create the object.
      *
-     * @param jobSearchService          Implementation of the jobSearchService
      * @param jobPersistenceService     Implementation of the job persistence service
      * @param applicationService        Implementation of application service interface
      * @param clusterService            Implementation of cluster service interface
@@ -95,24 +89,18 @@ public class LocalJobRunner implements JobSubmitterService {
      * @param applicationEventPublisher Instance of the event publisher
      * @param workflowTasks             List of all the workflow tasks to be executed
      * @param genieWorkingDir           Working directory for genie where it creates jobs directories
-     * @param hostname                  Hostname of this host
-     * @param maxRunningJobs            Maximum number of jobs allowed to run on this host
      */
     public LocalJobRunner(
-        final JobSearchService jobSearchService,
-        final JobPersistenceService jobPersistenceService,
-        final ApplicationService applicationService,
-        final ClusterService clusterService,
-        final CommandService commandService,
-        final ClusterLoadBalancer clusterLoadBalancer,
-        final GenieFileTransferService fileTransferService,
-        final ApplicationEventPublisher applicationEventPublisher,
-        final List<WorkflowTask> workflowTasks,
-        final Resource genieWorkingDir,
-        final String hostname,
-        final int maxRunningJobs
+        @NotNull final JobPersistenceService jobPersistenceService,
+        @NotNull final ApplicationService applicationService,
+        @NotNull final ClusterService clusterService,
+        @NotNull final CommandService commandService,
+        @NotNull final ClusterLoadBalancer clusterLoadBalancer,
+        @NotNull final GenieFileTransferService fileTransferService,
+        @NotNull final ApplicationEventPublisher applicationEventPublisher,
+        @NotNull final List<WorkflowTask> workflowTasks,
+        @NotNull final Resource genieWorkingDir
     ) {
-        this.jobSearchService = jobSearchService;
         this.jobPersistenceService = jobPersistenceService;
         this.applicationService = applicationService;
         this.clusterService = clusterService;
@@ -122,8 +110,6 @@ public class LocalJobRunner implements JobSubmitterService {
         this.baseWorkingDirPath = genieWorkingDir;
         this.fileTransferService = fileTransferService;
         this.applicationEventPublisher = applicationEventPublisher;
-        this.hostname = hostname;
-        this.maxRunningJobs = maxRunningJobs;
     }
 
     /**
@@ -146,10 +132,6 @@ public class LocalJobRunner implements JobSubmitterService {
         final String id = jobRequest.getId();
 
         try {
-            if (this.jobSearchService.getAllRunningJobExecutionsOnHost(this.hostname).size() > this.maxRunningJobs) {
-                throw new GenieServerUnavailableException("Reached max running jobs on this host. Rejecting request");
-            }
-
             final File jobWorkingDir;
 
             try {

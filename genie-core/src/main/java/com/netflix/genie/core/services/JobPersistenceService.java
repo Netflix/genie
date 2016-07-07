@@ -77,21 +77,13 @@ public interface JobPersistenceService {
     /**
      * Save the jobRequest object in the data store.
      *
-     * @param jobRequest the Job object to save
+     * @param jobRequest the Job request object to save. Not null
+     * @param clientHost the host of the client that sent the request. Can be null.
      *
      * @return The job request object that was created
      * @throws GenieException if there is an error
      */
-    JobRequest createJobRequest(@NotNull final JobRequest jobRequest) throws GenieException;
-
-    /**
-     * Add the information of client host to jobRequest.
-     *
-     * @param id The id of the job request
-     * @param clientHost Host of the client that sent the request.
-     * @throws GenieException If there is an error
-     */
-    void addClientHostToJobRequest(@NotNull final String id, @NotBlank final String clientHost) throws GenieException;
+    JobRequest createJobRequest(@NotNull final JobRequest jobRequest, final String clientHost) throws GenieException;
 
     /**
      * Save the jobExecution object in the data store.

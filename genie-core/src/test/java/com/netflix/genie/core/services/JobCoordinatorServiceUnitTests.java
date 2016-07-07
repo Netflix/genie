@@ -21,8 +21,10 @@ import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.test.categories.UnitTest;
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,6 +45,7 @@ import java.util.UUID;
 @Category(UnitTest.class)
 public class JobCoordinatorServiceUnitTests {
 
+    private static final int MAX_RUNNING_JOBS = 2;
     private static final String JOB_1_ID = "job1";
     private static final String JOB_1_NAME = "relativity";
     private static final String JOB_1_USER = "einstien";
@@ -53,6 +56,7 @@ public class JobCoordinatorServiceUnitTests {
     private JobPersistenceService jobPersistenceService;
     private JobSubmitterService jobSubmitterService;
     private JobKillService jobKillService;
+    private JobCountService jobCountService;
 
     /**
      * Setup for the tests.
@@ -62,12 +66,15 @@ public class JobCoordinatorServiceUnitTests {
         this.jobPersistenceService = Mockito.mock(JobPersistenceService.class);
         this.jobSubmitterService = Mockito.mock(JobSubmitterService.class);
         this.jobKillService = Mockito.mock(JobKillService.class);
+        this.jobCountService = Mockito.mock(JobCountService.class);
 
         this.jobCoordinatorService = new JobCoordinatorService(
             this.jobPersistenceService,
             this.jobSubmitterService,
             this.jobKillService,
-            BASE_ARCHIVE_LOCATION
+            this.jobCountService,
+            BASE_ARCHIVE_LOCATION,
+            MAX_RUNNING_JOBS
         );
     }
 
@@ -109,12 +116,11 @@ public class JobCoordinatorServiceUnitTests {
             .withDisableLogArchival(true)
             .build();
 
-        Mockito.when(this.jobPersistenceService.createJobRequest(Mockito.eq(jobRequest))).thenReturn(jobRequest);
+        Mockito.when(this.jobPersistenceService.createJobRequest(jobRequest, clientHost)).thenReturn(jobRequest);
         final ArgumentCaptor<Job> argument = ArgumentCaptor.forClass(Job.class);
 
         this.jobCoordinatorService.coordinateJob(jobRequest, clientHost);
 
-        Mockito.verify(this.jobPersistenceService, Mockito.times(1)).addClientHostToJobRequest(JOB_1_ID, clientHost);
         Mockito.verify(this.jobSubmitterService, Mockito.times(1)).submitJob(jobRequest);
 
         Mockito.verify(this.jobPersistenceService).createJob(argument.capture());
@@ -134,7 +140,6 @@ public class JobCoordinatorServiceUnitTests {
      */
     @Test
     public void testCoordinateJobArchiveLocationEnabled() throws GenieException {
-
         final String clientHost = "localhost";
         final JobRequest jobRequest = new JobRequest.Builder(
             JOB_1_NAME,
@@ -147,7 +152,8 @@ public class JobCoordinatorServiceUnitTests {
             .withId(JOB_1_ID)
             .build();
 
-        Mockito.when(this.jobPersistenceService.createJobRequest(Mockito.eq(jobRequest))).thenReturn(jobRequest);
+        Mockito.when(this.jobPersistenceService.createJobRequest(jobRequest, clientHost)).thenReturn(jobRequest);
+        Mockito.when(this.jobCountService.getNumRunningJobs()).thenReturn(MAX_RUNNING_JOBS - 1);
         final ArgumentCaptor<Job> argument = ArgumentCaptor.forClass(Job.class);
         this.jobCoordinatorService.coordinateJob(jobRequest, clientHost);
         Mockito.verify(this.jobPersistenceService).createJob(argument.capture());
@@ -178,11 +184,39 @@ public class JobCoordinatorServiceUnitTests {
             .withId(JOB_1_ID)
             .build();
 
-        Mockito.when(this.jobPersistenceService.createJobRequest(Mockito.eq(jobRequest))).thenReturn(jobRequest);
+        Mockito.when(this.jobPersistenceService.createJobRequest(jobRequest, clientHost)).thenReturn(jobRequest);
+        Mockito.when(this.jobCountService.getNumRunningJobs()).thenReturn(MAX_RUNNING_JOBS - 1);
         final ArgumentCaptor<Job> argument = ArgumentCaptor.forClass(Job.class);
         this.jobCoordinatorService.coordinateJob(jobRequest, clientHost);
         Mockito.verify(this.jobPersistenceService).createJob(argument.capture());
         Assert.assertNull(argument.getValue().getArchiveLocation());
+    }
+
+    /**
+     * Make sure if there are already the max running number of jobs running on the node the job is rejected.
+     *
+     * @throws GenieException On error
+     */
+    @Test(expected = GenieServerUnavailableException.class)
+    public void cantRunJobIfFull() throws GenieException {
+        final String clientHost = "localhost";
+        final JobRequest jobRequest = new JobRequest.Builder(
+            JOB_1_NAME,
+            JOB_1_USER,
+            JOB_1_VERSION,
+            null,
+            null,
+            null
+        ).withDisableLogArchival(true)
+            .withId(JOB_1_ID)
+            .build();
+
+        Mockito.when(this.jobPersistenceService.createJobRequest(jobRequest, clientHost)).thenReturn(jobRequest);
+        Mockito.when(this.jobCountService.getNumRunningJobs()).thenReturn(MAX_RUNNING_JOBS);
+        final ArgumentCaptor<Job> argument = ArgumentCaptor.forClass(Job.class);
+        this.jobCoordinatorService.coordinateJob(jobRequest, clientHost);
+        Mockito.verify(this.jobPersistenceService).createJob(argument.capture());
+        Assert.assertThat(argument.getValue().getStatus(), Matchers.is(JobStatus.FAILED));
     }
 
     /**

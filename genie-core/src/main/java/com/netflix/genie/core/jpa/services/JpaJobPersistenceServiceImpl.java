@@ -233,9 +233,10 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
     @Override
     public JobRequest createJobRequest(
         @NotNull(message = "Job Request is null so cannot be saved")
-        final JobRequest jobRequest
+        final JobRequest jobRequest,
+        final String clientHost
     ) throws GenieException {
-        log.debug("Called with jobRequest: {}", jobRequest);
+        log.debug("Called with jobRequest: {} and client host: {}", jobRequest, clientHost);
 
         if (jobRequest.getId() != null && this.jobRequestRepo.exists(jobRequest.getId())) {
             throw new GenieConflictException("A job with id " + jobRequest.getId() + " already exists");
@@ -262,29 +263,12 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         jobRequestEntity.setApplicationsFromList(jobRequest.getApplications());
         jobRequestEntity.setTimeout(jobRequest.getTimeout());
 
-        this.jobRequestRepo.save(jobRequestEntity);
-        return jobRequestEntity.getDTO();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void addClientHostToJobRequest(
-        @NotNull(message = "job request id not provided.")
-        final String id,
-        @NotBlank(message = "client host cannot be null")
-        final String clientHost)
-        throws GenieException {
-
-        log.debug("Called with id: {} and client host: {}", id, clientHost);
-
-        final JobRequestEntity jobRequestEntity = this.jobRequestRepo.findOne(id);
-        if (jobRequestEntity == null) {
-            throw new GenieNotFoundException("Cannot find the job request for id: " + id);
+        if (StringUtils.isNotBlank(clientHost)) {
+            jobRequestEntity.setClientHost(clientHost);
         }
 
-        jobRequestEntity.setClientHost(clientHost);
+        this.jobRequestRepo.save(jobRequestEntity);
+        return jobRequestEntity.getDTO();
     }
 
     /**
