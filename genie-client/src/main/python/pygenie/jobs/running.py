@@ -13,11 +13,32 @@ import re
 import sys
 import time
 
+from functools import wraps
+
 from ..conf import GenieConf
 from ..utils import dttm_to_epoch
 
 
 logger = logging.getLogger('com.netflix.genie.jobs.running')
+
+
+def update_info(func):
+    """
+    Update information about the job.
+    """
+
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        """Wraps func."""
+
+        self = args[0]
+        status = self._info.get('status')
+        if status is None or status.upper() == 'RUNNING':
+            self.update()
+
+        return func(*args, **kwargs)
+
+    return wrapper
 
 
 class RunningJob(object):
@@ -143,6 +164,7 @@ class RunningJob(object):
         return self.info.get('file_dependencies')
 
     @property
+    @update_info
     def finish_time(self):
         """
         Get the job's finish epoch time (milliseconds). 0 means the job is still
@@ -201,8 +223,6 @@ class RunningJob(object):
             boolean: True if the job is done, False if still running.
         """
 
-        if self.status == 'RUNNING':
-            self.update()
         return self.status != 'RUNNING'
 
     @property
@@ -218,8 +238,6 @@ class RunningJob(object):
             boolean: True if job completed successfully, False otherwise.
         """
 
-        if not self.is_done:
-            self.update()
         return self.status == 'SUCCEEDED'
 
     @property
@@ -365,6 +383,7 @@ class RunningJob(object):
         return self.info.get('request_data')
 
     @property
+    @update_info
     def start_time(self):
         """
         Get the job's start epoch time (milliseconds).
@@ -380,6 +399,7 @@ class RunningJob(object):
         return self.__convert_dttm_to_epoch('started')
 
     @property
+    @update_info
     def status(self):
         """
         Get the job's status.
@@ -448,6 +468,7 @@ class RunningJob(object):
         return self._adapter.get_stdout(self._job_id, iterator=iterator)
 
     @property
+    @update_info
     def status_msg(self):
         """
         Get the job's status message.
@@ -484,6 +505,7 @@ class RunningJob(object):
             else self._adapter.get_info_for_rj(self._job_id)
 
     @property
+    @update_info
     def update_time(self):
         """
         Get the last update time for the job in epoch time (milliseconds).

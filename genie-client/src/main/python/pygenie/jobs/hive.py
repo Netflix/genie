@@ -106,8 +106,8 @@ class HiveJob(GenieJob):
         Example:
             >>> # hive --hiveconf mapred.foo=fizz --hiveconf mapred.bar=buzz
             >>> job = HiveJob() \\
-            ...     .property('mapred.foo', 'fizz') \\
-            ...     .property('mapred.bar', 'buzz')
+            ...     .hiveconf('mapred.foo', 'fizz') \\
+            ...     .hiveconf('mapred.bar', 'buzz')
 
         Args:
             name (str): The property name.
