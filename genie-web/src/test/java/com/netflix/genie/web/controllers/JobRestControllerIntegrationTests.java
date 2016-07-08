@@ -575,8 +575,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         final String runFileContents = new String(Files.readAllBytes(Paths.get(runSHFile)), "UTF-8");
 
         final String jobWorkingDir = this.jobDirResource.getFile().getCanonicalPath() + FILE_DELIMITER + jobId;
-        final String expectedRunScriptContent = runFileContents.replace("TEST_GENIE_JOB_WORKING_DIR_PLACEHOLDER",
-            jobWorkingDir).replace("JOB_ID_PLACEHOLDER", jobId);
+        final String expectedRunScriptContent = getExpectedRunContents(runFileContents, jobWorkingDir, jobId);
 
         this.mvc
             .perform(MockMvcRequestBuilders.get(JOBS_API + "/" + jobId + "/output/run"))
@@ -920,5 +919,19 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
 
     private String getIdFromLocation(final String location) {
         return location.substring(location.lastIndexOf("/") + 1);
+    }
+
+    private String getExpectedRunContents(
+        final String runFileContents,
+        final String jobWorkingDir,
+        final String jobId
+    ) {
+        return runFileContents
+            .replace("TEST_GENIE_JOB_WORKING_DIR_PLACEHOLDER", jobWorkingDir)
+            .replace("JOB_ID_PLACEHOLDER", jobId)
+            .replace("COMMAND_ID_PLACEHOLDER", CMD1_ID)
+            .replace("COMMAND_NAME_PLACEHOLDER", CMD1_NAME)
+            .replace("CLUSTER_ID_PLACEHOLDER", CLUSTER1_ID)
+            .replace("CLUSTER_NAME_PLACEHOLDER", CLUSTER1_NAME);
     }
 }

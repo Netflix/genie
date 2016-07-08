@@ -175,9 +175,29 @@ public final class JobConstants {
     public static final String GENIE_CLUSTER_DIR_ENV_VAR = "GENIE_CLUSTER_DIR";
 
     /**
+     * Environment variable for Genie cluster id.
+     */
+    public static final String GENIE_CLUSTER_ID_ENV_VAR = "GENIE_CLUSTER_ID";
+
+    /**
+     * Environment variable for the Genie cluster name.
+     */
+    public static final String GENIE_CLUSTER_NAME_ENV_VAR = "GENIE_CLUSTER_NAME";
+
+    /**
      * Environment variable for Genie command directory.
      **/
     public static final String GENIE_COMMAND_DIR_ENV_VAR = "GENIE_COMMAND_DIR";
+
+    /**
+     * Environment variable for Genie command id.
+     */
+    public static final String GENIE_COMMAND_ID_ENV_VAR = "GENIE_COMMAND_ID";
+
+    /**
+     * Environment variable for the Genie command name.
+     */
+    public static final String GENIE_COMMAND_NAME_ENV_VAR = "GENIE_COMMAND_NAME";
 
     /**
      * Environment variable for Genie application directory.
