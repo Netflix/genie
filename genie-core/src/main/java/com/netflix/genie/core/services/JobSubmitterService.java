@@ -20,8 +20,9 @@ package com.netflix.genie.core.services;
 
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
-import javax.validation.constraints.NotNull;
+
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 /**
  * Interface to handoff job execution based on different environments.

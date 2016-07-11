@@ -18,12 +18,14 @@
 package com.netflix.genie.web.configs;
 
 import com.google.common.io.Files;
+import org.apache.commons.io.FileUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
+import javax.annotation.PreDestroy;
 import java.io.File;
 import java.io.IOException;
 
@@ -37,6 +39,8 @@ import java.io.IOException;
 @Profile("integration")
 public class JobConfigIntegrationTest {
 
+    private File jobsDir;
+
     /**
      * Returns a temporary directory as the jobs resource.
      *
@@ -45,17 +49,29 @@ public class JobConfigIntegrationTest {
      */
     @Bean
     public Resource jobsDir() throws IOException {
-        final File jobsDir = Files.createTempDir();
-        if (!jobsDir.exists() && !jobsDir.mkdirs()) {
-            throw new IllegalArgumentException("Unable to create directories: " + jobsDir);
+        this.jobsDir = Files.createTempDir();
+        if (!this.jobsDir.exists() && !this.jobsDir.mkdirs()) {
+            throw new IllegalArgumentException("Unable to create directories: " + this.jobsDir);
         }
 
-        String jobsDirPath = jobsDir.getAbsolutePath();
+        String jobsDirPath = this.jobsDir.getAbsolutePath();
         final String slash = "/";
         if (!jobsDirPath.endsWith(slash)) {
             jobsDirPath = jobsDirPath + slash;
         }
 
         return new FileSystemResource(jobsDirPath);
+    }
+
+    /**
+     * Get rid of the directories created by the system temporarily.
+     *
+     * @throws IOException when unable to delete directory
+     */
+    @PreDestroy
+    public void cleanup() throws IOException {
+        if (this.jobsDir != null) {
+            FileUtils.deleteDirectory(this.jobsDir);
+        }
     }
 }

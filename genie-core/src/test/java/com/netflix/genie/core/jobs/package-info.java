@@ -17,9 +17,9 @@
  */
 
 /**
- *  Package for Genie core jobs workflow tests.
+ * Tests for the jobs related classes.
  *
- * @author amsharma
+ * @author tgianos
  * @since 3.0.0
  */
-package com.netflix.genie.core.jobs.workflow;
+package com.netflix.genie.core.jobs;

@@ -43,7 +43,7 @@ public class RandomizedClusterLoadBalancerImpl implements ClusterLoadBalancer {
         log.debug("called");
 
         if (clusters == null || clusters.isEmpty()) {
-            final String msg = "No cluster configuration found to match user params";
+            final String msg = "No cluster configuration found for supplied cluster criteria";
             log.error(msg);
             throw new GeniePreconditionException(msg);
         }

@@ -17,6 +17,8 @@
  */
 package com.netflix.genie.core.jobs.workflow.impl;
 
+import com.netflix.genie.common.dto.Cluster;
+import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
@@ -46,6 +48,7 @@ public class InitialSetupTask extends GenieBaseTask {
     ) throws GenieException, IOException {
         log.debug("Executing Initial setup Task in the workflow.");
 
+        final String lineSeperator = System.lineSeparator();
         final JobExecutionEnvironment jobExecEnv =
             (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
         final String jobWorkingDirectory = jobExecEnv.getJobWorkingDir().getCanonicalPath();
@@ -97,10 +100,10 @@ public class InitialSetupTask extends GenieBaseTask {
             + JobConstants.DOUBLE_QUOTE_SYMBOL
             + jobWorkingDirectory
             + JobConstants.DOUBLE_QUOTE_SYMBOL
-            + System.lineSeparator());
+            + lineSeperator);
 
         // Append new line
-        writer.write(System.lineSeparator());
+        writer.write(lineSeperator);
 
         // create environment variable for the application directory
         writer.write(JobConstants.EXPORT
@@ -115,12 +118,14 @@ public class InitialSetupTask extends GenieBaseTask {
             + JobConstants.FILE_PATH_DELIMITER
             + JobConstants.APPLICATION_PATH_VAR
             + JobConstants.DOUBLE_QUOTE_SYMBOL
-            + System.lineSeparator());
+            + lineSeperator);
 
         // Append new line
-        writer.write(System.lineSeparator());
+        writer.write(lineSeperator);
 
-        // create environment variable for the command directory
+        // create environment variables for the command
+        final Command command = jobExecEnv.getCommand();
+
         writer.write(JobConstants.EXPORT
             + JobConstants.GENIE_COMMAND_DIR_ENV_VAR
             + JobConstants.EQUALS_SYMBOL
@@ -133,14 +138,42 @@ public class InitialSetupTask extends GenieBaseTask {
             + JobConstants.FILE_PATH_DELIMITER
             + JobConstants.COMMAND_PATH_VAR
             + JobConstants.FILE_PATH_DELIMITER
-            + jobExecEnv.getCommand().getId()
+            + command.getId()
             + JobConstants.DOUBLE_QUOTE_SYMBOL
-            + System.lineSeparator());
+            + lineSeperator);
+
+        // Append new line
+        writer.write(lineSeperator);
+
+        writer.write(
+            JobConstants.EXPORT
+                + JobConstants.GENIE_COMMAND_ID_ENV_VAR
+            + JobConstants.EQUALS_SYMBOL
+            + JobConstants.DOUBLE_QUOTE_SYMBOL
+            + command.getId()
+            + JobConstants.DOUBLE_QUOTE_SYMBOL
+            + lineSeperator
+        );
 
         // Append new line
         writer.write(System.lineSeparator());
 
-        // create environment variable for the cluster directory
+        writer.write(
+            JobConstants.EXPORT
+                + JobConstants.GENIE_COMMAND_NAME_ENV_VAR
+                + JobConstants.EQUALS_SYMBOL
+                + JobConstants.DOUBLE_QUOTE_SYMBOL
+                + command.getName()
+                + JobConstants.DOUBLE_QUOTE_SYMBOL
+                + lineSeperator
+        );
+
+        // Append new line
+        writer.write(System.lineSeparator());
+
+        // create environment variables for the cluster
+        final Cluster cluster = jobExecEnv.getCluster();
+
         writer.write(JobConstants.EXPORT
             + JobConstants.GENIE_CLUSTER_DIR_ENV_VAR
             + JobConstants.EQUALS_SYMBOL
@@ -153,9 +186,35 @@ public class InitialSetupTask extends GenieBaseTask {
             + JobConstants.FILE_PATH_DELIMITER
             + JobConstants.CLUSTER_PATH_VAR
             + JobConstants.FILE_PATH_DELIMITER
-            + jobExecEnv.getCluster().getId()
+            + cluster.getId()
             + JobConstants.DOUBLE_QUOTE_SYMBOL
             + System.lineSeparator());
+
+        // Append new line
+        writer.write(System.lineSeparator());
+
+        writer.write(
+            JobConstants.EXPORT
+                + JobConstants.GENIE_CLUSTER_ID_ENV_VAR
+                + JobConstants.EQUALS_SYMBOL
+                + JobConstants.DOUBLE_QUOTE_SYMBOL
+                + cluster.getId()
+                + JobConstants.DOUBLE_QUOTE_SYMBOL
+                + lineSeperator
+        );
+
+        // Append new line
+        writer.write(System.lineSeparator());
+
+        writer.write(
+            JobConstants.EXPORT
+                + JobConstants.GENIE_CLUSTER_NAME_ENV_VAR
+                + JobConstants.EQUALS_SYMBOL
+                + JobConstants.DOUBLE_QUOTE_SYMBOL
+                + cluster.getName()
+                + JobConstants.DOUBLE_QUOTE_SYMBOL
+                + lineSeperator
+        );
 
         // Append new line
         writer.write(System.lineSeparator());

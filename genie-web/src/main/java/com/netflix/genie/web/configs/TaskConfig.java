@@ -29,7 +29,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import java.util.Collection;
@@ -62,10 +64,23 @@ public class TaskConfig {
      * @return The task scheduler
      */
     @Bean
-    public ThreadPoolTaskScheduler taskScheduler(@Value("${genie.tasks.pool.size:1}") final int poolSize) {
+    public TaskScheduler taskScheduler(@Value("${genie.tasks.pool.size:1}") final int poolSize) {
         final ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
         scheduler.setPoolSize(poolSize);
         return scheduler;
+    }
+
+    /**
+     * Get a task executor for executing tasks asynchronously that don't need to be scheduled at a recurring rate.
+     *
+     * @param maxRunningJobs The maximum number of jobs that can run on this node
+     * @return The task executor the system to use
+     */
+    @Bean
+    public TaskExecutor taskExecutor(@Value("${genie.jobs.max.running:2}") final int maxRunningJobs) {
+        final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setMaxPoolSize(maxRunningJobs);
+        return executor;
     }
 
     /**

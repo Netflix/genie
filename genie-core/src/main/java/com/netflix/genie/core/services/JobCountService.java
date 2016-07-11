@@ -15,11 +15,19 @@
  *     limitations under the License.
  *
  */
+package com.netflix.genie.core.services;
 
 /**
- *  Package for Genie core jobs workflow tests.
+ * A service which returns counts for various jobs.
  *
- * @author amsharma
+ * @author tgianos
  * @since 3.0.0
  */
-package com.netflix.genie.core.jobs.workflow;
+public interface JobCountService {
+    /**
+     * Get the number of jobs running on this node.
+     *
+     * @return The number of jobs currently running on this node
+     */
+    int getNumRunningJobs();
+}

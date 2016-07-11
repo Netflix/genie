@@ -15,11 +15,27 @@
  *     limitations under the License.
  *
  */
+package com.netflix.genie.core.util;
+
+import com.netflix.genie.test.categories.UnitTest;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 /**
- *  Package for Genie core jobs workflow tests.
+ * Tests for the metrics constants class.
  *
- * @author amsharma
+ * @author tgianos
  * @since 3.0.0
  */
-package com.netflix.genie.core.jobs.workflow;
+@Category(UnitTest.class)
+public class MetricsConstantsUnitTests {
+
+    /**
+     * Dummy test.
+     */
+    @Test
+    public void canConstruct() {
+        Assert.assertNotNull(new MetricsConstants());
+    }
+}
