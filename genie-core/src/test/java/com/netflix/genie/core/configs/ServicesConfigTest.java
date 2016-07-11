@@ -46,12 +46,16 @@ import com.netflix.genie.core.services.impl.JobCountServiceImpl;
 import com.netflix.genie.core.services.impl.LocalJobKillServiceImpl;
 import com.netflix.genie.core.services.impl.LocalJobRunner;
 import com.netflix.genie.core.services.impl.RandomizedClusterLoadBalancerImpl;
+import com.netflix.spectator.api.DefaultRegistry;
+import com.netflix.spectator.api.Registry;
 import org.apache.commons.exec.Executor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.List;
 
@@ -253,18 +257,41 @@ public class ServicesConfigTest {
     }
 
     /**
+     * The task executor to use.
+     *
+     * @return The task executor to for launching jobs
+     */
+    @Bean
+    public TaskExecutor taskExecutor() {
+        return new ThreadPoolTaskExecutor();
+    }
+
+    /**
+     * Registry bean.
+     *
+     * @return a default registry
+     */
+    @Bean
+    public Registry registry() {
+        return new DefaultRegistry();
+    }
+
+    /**
      * Get an instance of the JobCoordinatorService.
      *
+     * @param taskExecutor          implementation of the task executor interface to use
      * @param jobPersistenceService implementation of job persistence service interface.
      * @param jobSubmitterService   implementation of the job submitter service.
      * @param jobCountService       implementation of job count service interface
      * @param jobKillService        The job kill service to use.
      * @param baseArchiveLocation   The base directory location of where the job dir should be archived.
      * @param maxRunningJobs        The maximum number of running jobs on system
+     * @param registry              The registry to use
      * @return An instance of the JobCoordinatorService.
      */
     @Bean
     public JobCoordinatorService jobCoordinatorService(
+        final TaskExecutor taskExecutor,
         final JobPersistenceService jobPersistenceService,
         final JobSubmitterService jobSubmitterService,
         final JobKillService jobKillService,
@@ -272,15 +299,18 @@ public class ServicesConfigTest {
         @Value("${genie.jobs.archive.location}")
         final String baseArchiveLocation,
         @Value("${genie.jobs.max.running:2}")
-        final int maxRunningJobs
+        final int maxRunningJobs,
+        final Registry registry
     ) {
         return new JobCoordinatorService(
+            taskExecutor,
             jobPersistenceService,
             jobSubmitterService,
             jobKillService,
             jobCountService,
             baseArchiveLocation,
-            maxRunningJobs
+            maxRunningJobs,
+            registry
         );
     }
 }

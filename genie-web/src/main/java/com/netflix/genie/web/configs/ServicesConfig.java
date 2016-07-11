@@ -50,6 +50,7 @@ import com.netflix.genie.core.services.impl.LocalJobKillServiceImpl;
 import com.netflix.genie.core.services.impl.LocalJobRunner;
 import com.netflix.genie.core.services.impl.MailServiceImpl;
 import com.netflix.genie.core.services.impl.RandomizedClusterLoadBalancerImpl;
+import com.netflix.spectator.api.Registry;
 import org.apache.commons.exec.Executor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -59,6 +60,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.mail.javamail.JavaMailSender;
 
 import java.util.List;
@@ -299,16 +301,19 @@ public class ServicesConfig {
     /**
      * Get an instance of the JobCoordinatorService.
      *
+     * @param taskExecutor          The task executor to use
      * @param jobPersistenceService implementation of job persistence service interface
      * @param jobSubmitterService   implementation of the job submitter service
      * @param jobKillService        The job kill service to use
      * @param jobCountService       The job count service to use
      * @param baseArchiveLocation   The base directory location of where the job dir should be archived
      * @param maxRunningJobs        The maximum number of jobs that can run on this node
+     * @param registry              The metrics registry to use
      * @return An instance of the JobCoordinatorService.
      */
     @Bean
     public JobCoordinatorService jobCoordinatorService(
+        final TaskExecutor taskExecutor,
         final JobPersistenceService jobPersistenceService,
         final JobSubmitterService jobSubmitterService,
         final JobKillService jobKillService,
@@ -317,14 +322,18 @@ public class ServicesConfig {
         @Value("${genie.jobs.archive.location}")
         final String baseArchiveLocation,
         @Value("${genie.jobs.max.running:2}")
-        final int maxRunningJobs
-    ) {
+        final int maxRunningJobs,
+        final Registry registry
+        ) {
         return new JobCoordinatorService(
+            taskExecutor,
             jobPersistenceService,
             jobSubmitterService,
             jobKillService,
             jobCountService,
             baseArchiveLocation,
-            maxRunningJobs);
+            maxRunningJobs,
+            registry
+        );
     }
 }

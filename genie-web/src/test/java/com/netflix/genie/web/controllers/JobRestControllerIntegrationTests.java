@@ -171,9 +171,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         linkAllEntities();
     }
 
-    private void linkAllEntities(
-    ) throws Exception {
-
+    private void linkAllEntities() throws Exception {
         final List<String> apps = new ArrayList<>();
         apps.add(APP1_ID);
         apps.add(APP2_ID);
@@ -199,11 +197,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andExpect(MockMvcResultMatchers.status().isNoContent());
     }
 
-    private void createAnApplication(
-        final String id,
-        final String app1Name
-    ) throws Exception {
-
+    private void createAnApplication(final String id, final String appName) throws Exception {
         final String setUpFile = this.resourceLoader.getResource(
             BASE_DIR
                 + id
@@ -244,7 +238,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         app1Configs.add(configFile2);
 
         final Application app = new Application.Builder(
-            app1Name,
+            appName,
             APP1_USER,
             APP1_VERSION,
             ApplicationStatus.ACTIVE)
@@ -267,26 +261,16 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     }
 
     private void createAllClusters() throws Exception {
-
         final String setUpFile = this.resourceLoader.getResource(
-            BASE_DIR
-                + CLUSTER1_ID
-                + FILE_DELIMITER
-                + "setupfile"
+            BASE_DIR + CLUSTER1_ID + FILE_DELIMITER + "setupfile"
         ).getFile().getAbsolutePath();
 
         final Set<String> configs = new HashSet<>();
         final String configFile1 = this.resourceLoader.getResource(
-            BASE_DIR
-                + CLUSTER1_ID
-                + FILE_DELIMITER
-                + "config1"
+            BASE_DIR + CLUSTER1_ID + FILE_DELIMITER + "config1"
         ).getFile().getAbsolutePath();
         final String configFile2 = this.resourceLoader.getResource(
-            BASE_DIR
-                + CLUSTER1_ID
-                + FILE_DELIMITER
-                + "config2"
+            BASE_DIR + CLUSTER1_ID + FILE_DELIMITER + "config2"
         ).getFile().getAbsolutePath();
         configs.add(configFile1);
         configs.add(configFile2);
@@ -319,26 +303,16 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     }
 
     private void createAllCommands() throws Exception {
-
         final String setUpFile = this.resourceLoader.getResource(
-            BASE_DIR
-                + CMD1_ID
-                + FILE_DELIMITER
-                + "setupfile"
+            BASE_DIR + CMD1_ID + FILE_DELIMITER + "setupfile"
         ).getFile().getAbsolutePath();
 
         final Set<String> configs = new HashSet<>();
         final String configFile1 = this.resourceLoader.getResource(
-            BASE_DIR
-                + CMD1_ID
-                + FILE_DELIMITER
-                + "config1"
+            BASE_DIR + CMD1_ID + FILE_DELIMITER + "config1"
         ).getFile().getAbsolutePath();
         final String configFile2 = this.resourceLoader.getResource(
-            BASE_DIR
-                + CMD1_ID
-                + FILE_DELIMITER
-                + "config2"
+            BASE_DIR + CMD1_ID + FILE_DELIMITER + "config2"
         ).getFile().getAbsolutePath();
         configs.add(configFile1);
         configs.add(configFile2);
@@ -434,32 +408,11 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andReturn();
 
         final String jobId = this.getIdFromLocation(result.getResponse().getHeader(HttpHeaders.LOCATION));
-        final String endpoint
+        final String jobStatusEndpoint
             = JOBS_API + JobConstants.FILE_PATH_DELIMITER + jobId + JobConstants.FILE_PATH_DELIMITER + "status";
 
-        int counter = 0;
-        while (
-            this.mvc
-                .perform(MockMvcRequestBuilders.get(endpoint).accept(MediaType.APPLICATION_JSON))
-                .andReturn()
-                .getResponse()
-                .getContentAsString()
-                .contains("RUNNING") && counter < 10
-            ) {
-            log.info("Iteration {} sleeping for {} ms", counter, SLEEP_TIME);
-            Thread.sleep(SLEEP_TIME);
-            counter++;
-        }
-
-        Assert.assertEquals(this.mvc.perform(MockMvcRequestBuilders.get(
-            JOBS_API
-                + JobConstants.FILE_PATH_DELIMITER + jobId
-                + JobConstants.FILE_PATH_DELIMITER
-                + "status")
-            .accept(MediaType.APPLICATION_JSON))
-            .andReturn()
-            .getResponse()
-            .getContentAsString(), "{\"status\":\"SUCCEEDED\"}");
+        this.waitForDone(jobStatusEndpoint);
+        Assert.assertThat(this.getStatus(jobStatusEndpoint), Matchers.is("{\"status\":\"SUCCEEDED\"}"));
 
         // Check if all the fields are created right in the database
         this.mvc
@@ -659,7 +612,11 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                     .content(OBJECT_MAPPER.writeValueAsBytes(jobRequest))
                     .accept(MediaType.APPLICATION_JSON)
             )
-            .andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
+            .andExpect(MockMvcResultMatchers.status().isAccepted());
+
+        final String statusEndpoint = JOBS_API + "/" + jobId + "/status";
+        this.waitForDone(statusEndpoint);
+        Assert.assertThat(this.getStatus(statusEndpoint), Matchers.is("{\"status\":\"INVALID\"}"));
     }
 
     /**
@@ -701,7 +658,11 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(OBJECT_MAPPER.writeValueAsBytes(jobRequest))
             )
-            .andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
+            .andExpect(MockMvcResultMatchers.status().isAccepted());
+
+        final String statusEndpoint = JOBS_API + "/" + jobId + "/status";
+        this.waitForDone(statusEndpoint);
+        Assert.assertThat(this.getStatus(statusEndpoint), Matchers.is("{\"status\":\"INVALID\"}"));
     }
 
     /**
@@ -745,29 +706,18 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andReturn();
 
         final String jobId = this.getIdFromLocation(result.getResponse().getHeader(HttpHeaders.LOCATION));
+        final String statusEndpoint = JOBS_API + "/" + jobId + "/status";
+        this.waitForRunning(statusEndpoint);
 
-        Thread.sleep(20000);
+        // Let it run for a couple of seconds
+        Thread.sleep(2000);
 
         // Send a kill request to the job.
         this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .delete(JOBS_API + "/" + jobId)
-            );
+            .perform(MockMvcRequestBuilders.delete(JOBS_API + "/" + jobId))
+            .andExpect(MockMvcResultMatchers.status().isAccepted());
 
-        final String statusEndpoint
-            = JOBS_API + JobConstants.FILE_PATH_DELIMITER + jobId + JobConstants.FILE_PATH_DELIMITER + "status";
-        int counter = 0;
-        while (
-            this.mvc.perform(MockMvcRequestBuilders.get(statusEndpoint).accept(MediaType.APPLICATION_JSON))
-                .andReturn()
-                .getResponse()
-                .getContentAsString().contains("RUNNING") && counter < 10
-            ) {
-            log.info("Iteration {} sleeping for {} ms", counter, SLEEP_TIME);
-            Thread.sleep(SLEEP_TIME);
-            counter++;
-        }
+        this.waitForDone(statusEndpoint);
 
         this.mvc
             .perform(MockMvcRequestBuilders.get(JOBS_API + "/" + jobId))
@@ -819,21 +769,9 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andReturn();
 
         final String jobId = this.getIdFromLocation(result.getResponse().getHeader(HttpHeaders.LOCATION));
-        final String statusEndpoint
-            = JOBS_API + JobConstants.FILE_PATH_DELIMITER + jobId + JobConstants.FILE_PATH_DELIMITER + "status";
+        final String statusEndpoint = JOBS_API + "/" + jobId + "/status";
 
-        int counter = 0;
-        while (
-            this.mvc
-                .perform(MockMvcRequestBuilders.get(statusEndpoint).accept(MediaType.APPLICATION_JSON))
-                .andReturn()
-                .getResponse()
-                .getContentAsString().contains("RUNNING") && counter < 120
-            ) {
-            log.info("Iteration {} sleeping for {} ms", counter, SLEEP_TIME);
-            Thread.sleep(SLEEP_TIME);
-            counter++;
-        }
+        this.waitForDone(statusEndpoint);
 
         this.mvc
             .perform(MockMvcRequestBuilders.get(JOBS_API + "/" + jobId))
@@ -886,28 +824,10 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         final String jobId = this.getIdFromLocation(result.getResponse().getHeader(HttpHeaders.LOCATION));
         final String statusEndpoint
             = JOBS_API + JobConstants.FILE_PATH_DELIMITER + jobId + JobConstants.FILE_PATH_DELIMITER + "status";
-        int counter = 0;
-        while (
-            this.mvc.perform(MockMvcRequestBuilders.get(statusEndpoint).accept(MediaType.APPLICATION_JSON))
-                .andReturn()
-                .getResponse()
-                .getContentAsString().contains("RUNNING") && counter < 10
-            ) {
-            log.info("Iteration {} sleeping for {} ms", counter, SLEEP_TIME);
-            Thread.sleep(SLEEP_TIME);
-            counter++;
-        }
 
-        Assert.assertEquals(this.mvc.perform(MockMvcRequestBuilders.get(
-            JOBS_API
-                + JobConstants.FILE_PATH_DELIMITER
-                + jobId
-                + JobConstants.FILE_PATH_DELIMITER
-                + "status")
-            .accept(MediaType.APPLICATION_JSON))
-            .andReturn()
-            .getResponse()
-            .getContentAsString(), "{\"status\":\"FAILED\"}");
+        this.waitForDone(statusEndpoint);
+
+        Assert.assertEquals(this.getStatus(statusEndpoint), "{\"status\":\"FAILED\"}");
 
         this.mvc
             .perform(MockMvcRequestBuilders.get(JOBS_API + "/" + jobId))
@@ -933,5 +853,42 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .replace("COMMAND_NAME_PLACEHOLDER", CMD1_NAME)
             .replace("CLUSTER_ID_PLACEHOLDER", CLUSTER1_ID)
             .replace("CLUSTER_NAME_PLACEHOLDER", CLUSTER1_NAME);
+    }
+
+    private String getStatus(final String endpoint) throws Exception {
+        return this.mvc
+            .perform(MockMvcRequestBuilders.get(endpoint))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+    }
+
+    private void waitForDone(final String statusEndpoint) throws Exception {
+        int counter = 0;
+        while (true) {
+            final String statusString = this.getStatus(statusEndpoint);
+            if (statusString.contains("INIT") || statusString.contains("RUNNING")) {
+                log.info("Iteration {} sleeping for {} ms", counter, SLEEP_TIME);
+                Thread.sleep(SLEEP_TIME);
+                counter++;
+            } else {
+                break;
+            }
+        }
+    }
+
+    private void waitForRunning(final String statusEndpoint) throws Exception {
+        int counter = 0;
+        while (true) {
+            final String statusString = this.getStatus(statusEndpoint);
+            if (statusString.contains("INIT")) {
+                log.info("Iteration {} sleeping for {} ms", counter, SLEEP_TIME);
+                Thread.sleep(SLEEP_TIME);
+                counter++;
+            } else {
+                break;
+            }
+        }
     }
 }

@@ -23,7 +23,9 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
 import com.netflix.genie.core.jobs.JobConstants;
+import com.netflix.genie.core.jobs.JobLauncher;
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.spectator.api.Registry;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -31,6 +33,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.springframework.core.task.TaskExecutor;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -52,9 +55,9 @@ public class JobCoordinatorServiceUnitTests {
     private static final String JOB_1_VERSION = "1.0";
     private static final String BASE_ARCHIVE_LOCATION = "file://baselocation";
 
+    private TaskExecutor taskExecutor;
     private JobCoordinatorService jobCoordinatorService;
     private JobPersistenceService jobPersistenceService;
-    private JobSubmitterService jobSubmitterService;
     private JobKillService jobKillService;
     private JobCountService jobCountService;
 
@@ -63,18 +66,20 @@ public class JobCoordinatorServiceUnitTests {
      */
     @Before
     public void setup() {
+        this.taskExecutor = Mockito.mock(TaskExecutor.class);
         this.jobPersistenceService = Mockito.mock(JobPersistenceService.class);
-        this.jobSubmitterService = Mockito.mock(JobSubmitterService.class);
         this.jobKillService = Mockito.mock(JobKillService.class);
         this.jobCountService = Mockito.mock(JobCountService.class);
 
         this.jobCoordinatorService = new JobCoordinatorService(
+            this.taskExecutor,
             this.jobPersistenceService,
-            this.jobSubmitterService,
+            Mockito.mock(JobSubmitterService.class),
             this.jobKillService,
             this.jobCountService,
             BASE_ARCHIVE_LOCATION,
-            MAX_RUNNING_JOBS
+            MAX_RUNNING_JOBS,
+            Mockito.mock(Registry.class)
         );
     }
 
@@ -117,12 +122,12 @@ public class JobCoordinatorServiceUnitTests {
             .build();
 
         Mockito.when(this.jobPersistenceService.createJobRequest(jobRequest, clientHost)).thenReturn(jobRequest);
-        final ArgumentCaptor<Job> argument = ArgumentCaptor.forClass(Job.class);
 
         this.jobCoordinatorService.coordinateJob(jobRequest, clientHost);
 
-        Mockito.verify(this.jobSubmitterService, Mockito.times(1)).submitJob(jobRequest);
+        Mockito.verify(this.taskExecutor, Mockito.times(1)).execute(Mockito.any(JobLauncher.class));
 
+        final ArgumentCaptor<Job> argument = ArgumentCaptor.forClass(Job.class);
         Mockito.verify(this.jobPersistenceService).createJob(argument.capture());
 
         Assert.assertEquals(JOB_1_ID, argument.getValue().getId());

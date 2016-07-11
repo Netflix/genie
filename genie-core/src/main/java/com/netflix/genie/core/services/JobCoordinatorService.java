@@ -24,9 +24,13 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
 import com.netflix.genie.core.jobs.JobConstants;
+import com.netflix.genie.core.jobs.JobLauncher;
+import com.netflix.spectator.api.Registry;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.core.task.TaskRejectedException;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -42,37 +46,45 @@ import javax.validation.constraints.NotNull;
 @Slf4j
 public class JobCoordinatorService {
 
+    private final TaskExecutor taskExecutor;
     private final JobPersistenceService jobPersistenceService;
     private final JobSubmitterService jobSubmitterService;
     private final JobKillService jobKillService;
     private final JobCountService jobCountService;
     private final int maxRunningJobs;
-    private String baseArchiveLocation;
+    private final String baseArchiveLocation;
+    private final Registry registry;
 
     /**
      * Constructor.
      *
+     * @param taskExecutor          The executor to use to launch jobs
      * @param jobPersistenceService implementation of job persistence service interface
      * @param jobSubmitterService   implementation of the job submitter service
      * @param jobKillService        The job kill service to use
      * @param jobCountService       The service which will return the number of running jobs on this host
      * @param baseArchiveLocation   The base directory location of where the job dir should be archived
      * @param maxRunningJobs        The maximum number of jobs that can run on this host at any time
+     * @param registry              The registry to use for metrics
      */
     public JobCoordinatorService(
+        @NotNull final TaskExecutor taskExecutor,
         @NotNull final JobPersistenceService jobPersistenceService,
         @NotNull final JobSubmitterService jobSubmitterService,
         @NotNull final JobKillService jobKillService,
         @NotNull final JobCountService jobCountService,
         @NotNull final String baseArchiveLocation,
-        final int maxRunningJobs
+        final int maxRunningJobs,
+        @NotNull final Registry registry
     ) {
+        this.taskExecutor = taskExecutor;
         this.jobPersistenceService = jobPersistenceService;
         this.jobSubmitterService = jobSubmitterService;
         this.jobKillService = jobKillService;
         this.jobCountService = jobCountService;
         this.baseArchiveLocation = baseArchiveLocation;
         this.maxRunningJobs = maxRunningJobs;
+        this.registry = registry;
     }
 
     /**
@@ -121,8 +133,15 @@ public class JobCoordinatorService {
             jobBuilder
                 .withStatus(JobStatus.INIT)
                 .withStatusMsg("Job Accepted and in initialization phase.");
+            // TODO: if this throws exception the job will never be marked failed
             this.jobPersistenceService.createJob(jobBuilder.build());
-            this.jobSubmitterService.submitJob(jobRequest);
+            try {
+                this.taskExecutor.execute(new JobLauncher(this.jobSubmitterService, jobRequest, this.registry));
+            } catch (final TaskRejectedException e) {
+                final String errorMsg = "Unable to launch job due to exception: " + e.getMessage();
+                this.jobPersistenceService.updateJobStatus(jobRequest.getId(), JobStatus.FAILED, errorMsg);
+                throw new GenieServerException(errorMsg, e);
+            }
             return jobRequest.getId();
         } else {
             jobBuilder

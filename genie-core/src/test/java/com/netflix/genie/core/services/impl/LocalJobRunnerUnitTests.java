@@ -39,14 +39,17 @@ import com.netflix.genie.test.categories.UnitTest;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.rules.TemporaryFolder;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -62,7 +65,6 @@ import java.util.UUID;
 @Category(UnitTest.class)
 public class LocalJobRunnerUnitTests {
 
-    private static final String BASE_WORKING_DIR = "file://workingdir";
     private static final String JOB_1_ID = "job1";
     private static final String JOB_1_NAME = "relativity";
     private static final String USER = "einstien";
@@ -74,17 +76,26 @@ public class LocalJobRunnerUnitTests {
     private static final String COMMAND_ID = "commandid";
     private static final String COMMAND_NAME = "commandname";
 
+    /**
+     * Temporary directory for these tests.
+     */
+    @Rule
+    public TemporaryFolder folder = new TemporaryFolder();
+
     private JobPersistenceService jobPersistenceService;
     private ClusterService clusterService;
     private ClusterLoadBalancer clusterLoadBalancer;
     private JobSubmitterService jobSubmitterService;
     private ApplicationService applicationService;
+    private WorkflowTask task2;
 
     /**
      * Setup for the tests.
+     *
+     * @throws IOException on error creating temporary dir
      */
     @Before
-    public void setup() {
+    public void setup() throws IOException {
         this.jobPersistenceService = Mockito.mock(JobPersistenceService.class);
         this.applicationService = Mockito.mock(ApplicationService.class);
         this.clusterService = Mockito.mock(ClusterService.class);
@@ -93,13 +104,15 @@ public class LocalJobRunnerUnitTests {
         final ApplicationEventPublisher applicationEventPublisher = Mockito.mock(ApplicationEventPublisher.class);
         final GenieFileTransferService fileTransferService = Mockito.mock(GenieFileTransferService.class);
         final WorkflowTask task1 = Mockito.mock(WorkflowTask.class);
-        final WorkflowTask task2 = Mockito.mock(WorkflowTask.class);
+        this.task2 = Mockito.mock(WorkflowTask.class);
 
         final List<WorkflowTask> jobWorkflowTasks = new ArrayList<>();
         jobWorkflowTasks.add(task1);
-        jobWorkflowTasks.add(task2);
+        jobWorkflowTasks.add(this.task2);
 
-        final Resource baseWorkingDirResource = new DefaultResourceLoader().getResource(BASE_WORKING_DIR);
+        final File tmpFolder = this.folder.newFolder();
+        final Resource baseWorkingDirResource = Mockito.mock(Resource.class);
+        Mockito.when(baseWorkingDirResource.getFile()).thenReturn(tmpFolder);
 
         this.jobSubmitterService = new LocalJobRunner(
             this.jobPersistenceService,
@@ -135,7 +148,7 @@ public class LocalJobRunnerUnitTests {
 
         final List<Cluster> emptyList = new ArrayList<>();
 
-        Mockito.when(this.clusterService.chooseClusterForJobRequest(Mockito.eq(jobRequest))).thenReturn(emptyList);
+        Mockito.when(this.clusterService.chooseClusterForJobRequest(jobRequest)).thenReturn(emptyList);
 
         Mockito.when(this.clusterLoadBalancer.selectCluster(emptyList)).thenThrow(GeniePreconditionException.class);
 
@@ -194,10 +207,11 @@ public class LocalJobRunnerUnitTests {
      * workflow executor returns false.
      *
      * @throws GenieException If there is any problem.
+     * @throws IOException    when there is any IO problem
      */
     @SuppressWarnings("unchecked")
     @Test(expected = GenieServerException.class)
-    public void testSubmitJob() throws GenieException {
+    public void testSubmitJob() throws GenieException, IOException {
 
         final Set<CommandStatus> enumStatuses = EnumSet.noneOf(CommandStatus.class);
         enumStatuses.add(CommandStatus.ACTIVE);
@@ -274,6 +288,7 @@ public class LocalJobRunnerUnitTests {
         Mockito
             .when(this.clusterService.getCommandsForCluster(CLUSTER_ID, enumStatuses))
             .thenReturn(commandList);
+        Mockito.doThrow(new IOException("something bad")).when(this.task2).executeTask(Mockito.anyMap());
 
         final ArgumentCaptor<String> jobId1 = ArgumentCaptor.forClass(String.class);
         final ArgumentCaptor<String> clusterId = ArgumentCaptor.forClass(String.class);
