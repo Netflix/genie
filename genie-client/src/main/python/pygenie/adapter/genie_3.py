@@ -195,7 +195,6 @@ class Genie3Adapter(GenieBaseAdapter):
             if err.response.status_code == 404:
                 msg = "job not found at {}".format(url)
                 if if_not_found is not None:
-                    logger.warning(msg)
                     return if_not_found
                 raise GenieJobNotFoundError(msg)
             raise

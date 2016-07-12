@@ -33,7 +33,7 @@ def update_info(func):
 
         self = args[0]
         status = self._info.get('status')
-        if status is None or status.upper() == 'RUNNING':
+        if status is None or status.upper() in {'INIT', 'RUNNING'}:
             self.update()
 
         return func(*args, **kwargs)
@@ -555,7 +555,7 @@ class RunningJob(object):
 
         i = 0
 
-        while self._adapter.get_status(self._job_id).upper() == 'RUNNING':
+        while self._adapter.get_status(self._job_id).upper() in {'INIT', 'RUNNING'}:
             if i % 3 == 0 and not suppress_stream:
                 self._write_to_stream('.')
             time.sleep(sleep_seconds)
