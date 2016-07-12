@@ -21,6 +21,13 @@ from ..utils import dttm_to_epoch
 
 logger = logging.getLogger('com.netflix.genie.jobs.running')
 
+RUNNING_STATUSES = {
+    'INIT',
+    'RUNNING',
+    'init',
+    'running'
+}
+
 
 def update_info(func):
     """
@@ -33,7 +40,7 @@ def update_info(func):
 
         self = args[0]
         status = self._info.get('status')
-        if status is None or status.upper() in {'INIT', 'RUNNING'}:
+        if status is None or status.upper() in RUNNING_STATUSES:
             self.update()
 
         return func(*args, **kwargs)
@@ -223,7 +230,7 @@ class RunningJob(object):
             boolean: True if the job is done, False if still running.
         """
 
-        return self.status != 'RUNNING'
+        return self.status not in RUNNING_STATUSES
 
     @property
     def is_successful(self):
@@ -555,7 +562,7 @@ class RunningJob(object):
 
         i = 0
 
-        while self._adapter.get_status(self._job_id).upper() in {'INIT', 'RUNNING'}:
+        while self._adapter.get_status(self._job_id).upper() in RUNNING_STATUSES:
             if i % 3 == 0 and not suppress_stream:
                 self._write_to_stream('.')
             time.sleep(sleep_seconds)
