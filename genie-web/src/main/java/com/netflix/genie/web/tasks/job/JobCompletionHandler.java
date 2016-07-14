@@ -184,10 +184,10 @@ public class JobCompletionHandler {
                 this.updateFinalStatusForJob(jobId);
                 this.cleanupProcesses(jobId);
                 this.processJobDir(jobId);
+                this.sendEmail(jobId);
             }
 
             // Things that should be done either way
-            this.sendEmail(jobId);
         }
     }
 
