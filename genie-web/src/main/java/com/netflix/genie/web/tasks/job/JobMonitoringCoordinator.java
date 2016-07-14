@@ -19,6 +19,7 @@ package com.netflix.genie.web.tasks.job;
 
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.core.events.JobFinishedEvent;
+import com.netflix.genie.core.events.JobScheduledEvent;
 import com.netflix.genie.core.events.JobStartedEvent;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.services.JobCountService;
@@ -42,6 +43,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledFuture;
 
 /**
@@ -55,6 +57,7 @@ import java.util.concurrent.ScheduledFuture;
 public class JobMonitoringCoordinator implements JobCountService {
 
     private final Map<String, ScheduledFuture<?>> jobMonitors = Collections.synchronizedMap(new HashMap<>());
+    private final Map<String, Future<?>> scheduledJobs = Collections.synchronizedMap(new HashMap<>());
     private final String hostName;
     private final JobSearchService jobSearchService;
     private final TaskScheduler scheduler;
@@ -101,6 +104,8 @@ public class JobMonitoringCoordinator implements JobCountService {
 
         // Automatically track the number of jobs running on this node
         this.registry.mapSize("genie.jobs.running.gauge", this.jobMonitors);
+        this.registry.mapSize("genie.jobs.scheduled.gauge", this.scheduledJobs);
+        this.registry.methodValue("genie.jobs.active.gauge", this, "getNumJobs");
         this.unableToCancel = registry.counter("genie.jobs.unableToCancel.rate");
     }
 
@@ -133,13 +138,26 @@ public class JobMonitoringCoordinator implements JobCountService {
     }
 
     /**
+     * This event is fired when a job is scheduled to run on this Genie node. We'll track the future here in case
+     * it needs to be killed while still in INIT state. Once it's running the onJobStarted event will clear it out.
+     *
+     * @param event The job scheduled event with information for tracking the job through the INIT stage
+     */
+    @EventListener
+    public synchronized void onJobScheduled(final JobScheduledEvent event) {
+        this.scheduledJobs.put(event.getId(), event.getTask());
+    }
+
+    /**
      * This event is fired when a job is started on this Genie node. Will create a JobMonitor and schedule it
      * for monitoring.
      *
      * @param event The event of the started job
      */
     @EventListener
-    public void onJobStarted(final JobStartedEvent event) {
+    public synchronized void onJobStarted(final JobStartedEvent event) {
+        final String jobId = event.getJobExecution().getId();
+        this.scheduledJobs.remove(jobId);
         if (!this.jobMonitors.containsKey(event.getJobExecution().getId())) {
             this.scheduleMonitor(event.getJobExecution());
         }
@@ -151,18 +169,30 @@ public class JobMonitoringCoordinator implements JobCountService {
      * @param event the event of the finished job
      */
     @EventListener
-    public void onJobFinished(final JobFinishedEvent event) {
-        final String jobId = event.getJobExecution().getId();
+    public synchronized void onJobFinished(final JobFinishedEvent event) {
+        final String jobId = event.getId();
         if (this.jobMonitors.containsKey(jobId)) {
-            final ScheduledFuture<?> future = this.jobMonitors.get(jobId);
             //TODO: should we add back off it is unable to cancel?
-            if (future.cancel(true)) {
+            if (this.jobMonitors.get(jobId).cancel(true)) {
                 log.debug("Successfully cancelled task monitoring job {}", jobId);
-                this.jobMonitors.remove(jobId);
             } else {
                 log.error("Unable to cancel task monitoring job {}", jobId);
                 this.unableToCancel.increment();
             }
+            this.jobMonitors.remove(jobId);
+        } else if (this.scheduledJobs.containsKey(jobId)) {
+            final Future<?> task = this.scheduledJobs.get(jobId);
+            // If this job setup isn't actually done try killing it
+            // TODO: If we can't kill should we have back-off?
+            if (!task.isDone()) {
+                if (task.cancel(true)) {
+                    log.debug("Successfully cancelled job init task for job {}", jobId);
+                } else {
+                    log.error("Unable to cancel job init task for job {}", jobId);
+                    this.unableToCancel.increment();
+                }
+            }
+            this.scheduledJobs.remove(jobId);
         }
     }
 
@@ -171,8 +201,8 @@ public class JobMonitoringCoordinator implements JobCountService {
      *
      * @return the number of jobs currently running on this node
      */
-    public int getNumRunningJobs() {
-        return this.jobMonitors.size();
+    public int getNumJobs() {
+        return this.jobMonitors.size() + this.scheduledJobs.size();
     }
 
     private void scheduleMonitor(final JobExecution jobExecution) {

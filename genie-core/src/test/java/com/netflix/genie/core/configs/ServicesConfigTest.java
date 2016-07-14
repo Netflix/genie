@@ -54,7 +54,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
-import org.springframework.core.task.TaskExecutor;
+import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.List;
@@ -168,15 +168,17 @@ public class ServicesConfigTest {
      * @param hostname         The name of the host this Genie node is running on.
      * @param jobSearchService The job search service to use to locate job information.
      * @param executor         The executor to use to run system processes.
+     * @param eventPublisher   The event publisher to use
      * @return A job kill service instance.
      */
     @Bean
     public JobKillService jobKillService(
         final String hostname,
         final JobSearchService jobSearchService,
-        final Executor executor
+        final Executor executor,
+        final ApplicationEventPublisher eventPublisher
     ) {
-        return new LocalJobKillServiceImpl(hostname, jobSearchService, executor, false);
+        return new LocalJobKillServiceImpl(hostname, jobSearchService, executor, false, eventPublisher);
     }
 
     /**
@@ -185,9 +187,7 @@ public class ServicesConfigTest {
      * @return A randomized cluster load balancer instance.
      */
     @Bean
-    public ClusterLoadBalancer clusterLoadBalancer(
-
-    ) {
+    public ClusterLoadBalancer clusterLoadBalancer() {
         return new RandomizedClusterLoadBalancerImpl();
     }
 
@@ -262,7 +262,7 @@ public class ServicesConfigTest {
      * @return The task executor to for launching jobs
      */
     @Bean
-    public TaskExecutor taskExecutor() {
+    public AsyncTaskExecutor taskExecutor() {
         return new ThreadPoolTaskExecutor();
     }
 
@@ -279,7 +279,7 @@ public class ServicesConfigTest {
     /**
      * Get an instance of the JobCoordinatorService.
      *
-     * @param taskExecutor          implementation of the task executor interface to use
+     * @param taskExecutor          implementation of the async task executor interface to use
      * @param jobPersistenceService implementation of job persistence service interface.
      * @param jobSubmitterService   implementation of the job submitter service.
      * @param jobCountService       implementation of job count service interface
@@ -287,11 +287,12 @@ public class ServicesConfigTest {
      * @param baseArchiveLocation   The base directory location of where the job dir should be archived.
      * @param maxRunningJobs        The maximum number of running jobs on system
      * @param registry              The registry to use
+     * @param eventPublisher        The system event publisher
      * @return An instance of the JobCoordinatorService.
      */
     @Bean
     public JobCoordinatorService jobCoordinatorService(
-        final TaskExecutor taskExecutor,
+        final AsyncTaskExecutor taskExecutor,
         final JobPersistenceService jobPersistenceService,
         final JobSubmitterService jobSubmitterService,
         final JobKillService jobKillService,
@@ -300,7 +301,8 @@ public class ServicesConfigTest {
         final String baseArchiveLocation,
         @Value("${genie.jobs.max.running:2}")
         final int maxRunningJobs,
-        final Registry registry
+        final Registry registry,
+        final ApplicationEventPublisher eventPublisher
     ) {
         return new JobCoordinatorService(
             taskExecutor,
@@ -310,7 +312,8 @@ public class ServicesConfigTest {
             jobCountService,
             baseArchiveLocation,
             maxRunningJobs,
-            registry
+            registry,
+            eventPublisher
         );
     }
 }

@@ -21,35 +21,32 @@ import lombok.Getter;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
+import java.util.concurrent.Future;
 
 /**
- * An event thrown when a job is completed.
+ * Event when a job is scheduled to be executed.
  *
  * @author tgianos
  * @since 3.0.0
  */
 @Getter
-public class JobFinishedEvent extends BaseJobEvent {
+public class JobScheduledEvent extends BaseJobEvent {
 
-    private final JobFinishedReason reason;
-    private final String message;
+    private Future<?> task;
 
     /**
      * Constructor.
      *
-     * @param id      The id of the job that just finished
-     * @param reason  The reason this job has finished
-     * @param message Any message for why the job completed which should be saved
-     * @param source  The source which created the event.
+     * @param id     The id of the job that was scheduled
+     * @param task   The future representing the thread that will setup and run the job
+     * @param source The source object which generated this event
      */
-    public JobFinishedEvent(
+    public JobScheduledEvent(
         @NotEmpty final String id,
-        @NotNull final JobFinishedReason reason,
-        @NotEmpty final String message,
+        @NotNull final Future<?> task,
         @NotNull final Object source
     ) {
         super(id, source);
-        this.reason = reason;
-        this.message = message;
+        this.task = task;
     }
 }

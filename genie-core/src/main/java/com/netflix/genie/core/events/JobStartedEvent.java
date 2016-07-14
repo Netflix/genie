@@ -19,7 +19,6 @@ package com.netflix.genie.core.events;
 
 import com.netflix.genie.common.dto.JobExecution;
 import lombok.Getter;
-import org.springframework.context.ApplicationEvent;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -31,9 +30,7 @@ import javax.validation.constraints.NotNull;
  * @since 3.0.0
  */
 @Getter
-public class JobStartedEvent extends ApplicationEvent {
-
-    private static final long serialVersionUID = -8417875991681866646L;
+public class JobStartedEvent extends BaseJobEvent {
 
     private final JobExecution jobExecution;
 
@@ -44,7 +41,7 @@ public class JobStartedEvent extends ApplicationEvent {
      * @param source       The source which threw this event
      */
     public JobStartedEvent(@NotNull @Valid final JobExecution jobExecution, @NotNull final Object source) {
-        super(source);
+        super(jobExecution.getId(), source);
         this.jobExecution = jobExecution;
     }
 }
