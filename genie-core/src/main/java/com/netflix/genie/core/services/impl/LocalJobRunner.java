@@ -27,7 +27,6 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
-import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
 import com.netflix.genie.core.events.JobStartedEvent;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
@@ -37,7 +36,6 @@ import com.netflix.genie.core.services.ClusterLoadBalancer;
 import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;
 import com.netflix.genie.core.services.JobPersistenceService;
-import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobSubmitterService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.extern.slf4j.Slf4j;
@@ -69,7 +67,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class LocalJobRunner implements JobSubmitterService {
 
-    private final JobSearchService jobSearchService;
     private final JobPersistenceService jobPersistenceService;
     private final ApplicationService applicationService;
     private final ClusterService clusterService;
@@ -79,13 +76,13 @@ public class LocalJobRunner implements JobSubmitterService {
     private final Resource baseWorkingDirPath;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final GenieFileTransferService fileTransferService;
-    private final String hostname;
-    private final int maxRunningJobs;
+
+    // For reuse in queries
+    private final Set<CommandStatus> enumStatuses;
 
     /**
      * Constructor create the object.
      *
-     * @param jobSearchService          Implementation of the jobSearchService
      * @param jobPersistenceService     Implementation of the job persistence service
      * @param applicationService        Implementation of application service interface
      * @param clusterService            Implementation of cluster service interface
@@ -95,24 +92,18 @@ public class LocalJobRunner implements JobSubmitterService {
      * @param applicationEventPublisher Instance of the event publisher
      * @param workflowTasks             List of all the workflow tasks to be executed
      * @param genieWorkingDir           Working directory for genie where it creates jobs directories
-     * @param hostname                  Hostname of this host
-     * @param maxRunningJobs            Maximum number of jobs allowed to run on this host
      */
     public LocalJobRunner(
-        final JobSearchService jobSearchService,
-        final JobPersistenceService jobPersistenceService,
-        final ApplicationService applicationService,
-        final ClusterService clusterService,
-        final CommandService commandService,
-        final ClusterLoadBalancer clusterLoadBalancer,
-        final GenieFileTransferService fileTransferService,
-        final ApplicationEventPublisher applicationEventPublisher,
-        final List<WorkflowTask> workflowTasks,
-        final Resource genieWorkingDir,
-        final String hostname,
-        final int maxRunningJobs
+        @NotNull final JobPersistenceService jobPersistenceService,
+        @NotNull final ApplicationService applicationService,
+        @NotNull final ClusterService clusterService,
+        @NotNull final CommandService commandService,
+        @NotNull final ClusterLoadBalancer clusterLoadBalancer,
+        @NotNull final GenieFileTransferService fileTransferService,
+        @NotNull final ApplicationEventPublisher applicationEventPublisher,
+        @NotNull final List<WorkflowTask> workflowTasks,
+        @NotNull final Resource genieWorkingDir
     ) {
-        this.jobSearchService = jobSearchService;
         this.jobPersistenceService = jobPersistenceService;
         this.applicationService = applicationService;
         this.clusterService = clusterService;
@@ -122,8 +113,10 @@ public class LocalJobRunner implements JobSubmitterService {
         this.baseWorkingDirPath = genieWorkingDir;
         this.fileTransferService = fileTransferService;
         this.applicationEventPublisher = applicationEventPublisher;
-        this.hostname = hostname;
-        this.maxRunningJobs = maxRunningJobs;
+
+        // We'll only care about active statuses
+        this.enumStatuses = EnumSet.noneOf(CommandStatus.class);
+        this.enumStatuses.add(CommandStatus.ACTIVE);
     }
 
     /**
@@ -146,66 +139,16 @@ public class LocalJobRunner implements JobSubmitterService {
         final String id = jobRequest.getId();
 
         try {
-            if (this.jobSearchService.getAllRunningJobExecutionsOnHost(this.hostname).size() > this.maxRunningJobs) {
-                throw new GenieServerUnavailableException("Reached max running jobs on this host. Rejecting request");
-            }
+            final File jobWorkingDir = this.createJobWorkingDirectory(id);
+            final File runScript = this.createRunScript(jobWorkingDir);
 
-            final File jobWorkingDir;
-
-            try {
-                jobWorkingDir = new File(baseWorkingDirPath.getFile(), "/" + id);
-            } catch (final IOException ioe) {
-                throw new GenieServerException("Could not resolve job working directory due to exception", ioe);
-            }
-
-            // Resolve the cluster for the job request based on the tags specified
             //TODO: Combine the cluster and command selection into a single method/database query for efficiency
-            final Cluster cluster;
-            try {
-                cluster =
-                    this.clusterLoadBalancer.selectCluster(this.clusterService.chooseClusterForJobRequest(jobRequest));
-            } catch (GeniePreconditionException gpe) {
-                log.error(gpe.getLocalizedMessage(), gpe);
-                this.jobPersistenceService.updateJobStatus(
-                    id,
-                    JobStatus.INVALID,
-                    "No cluster found for tags specified.");
-                throw gpe;
-            }
-
-
+            // Resolve the cluster for the job request based on the tags specified
+            final Cluster cluster = this.getCluster(jobRequest);
             // Resolve the command for the job request based on command tags and cluster chosen
-            final Set<CommandStatus> enumStatuses = EnumSet.noneOf(CommandStatus.class);
-            enumStatuses.add(CommandStatus.ACTIVE);
-            Command command = null;
-
-            // TODO: what happens if the get method throws an error we don't mark the job failed here
-            for (final Command cmd : this.clusterService.getCommandsForCluster(cluster.getId(), enumStatuses)) {
-                if (cmd.getTags().containsAll(jobRequest.getCommandCriteria())) {
-                    command = cmd;
-                    break;
-                }
-            }
-
-            if (command == null) {
-                this.jobPersistenceService.updateJobStatus(
-                    id,
-                    JobStatus.INVALID,
-                    "No command found for tags specified.");
-                throw new GeniePreconditionException(
-                    "No command found matching all command criteria on cluster. Unable to continue."
-                );
-            }
-
-            // TODO: What do we do about application status? Should probably check here
-            final List<Application> applications = new ArrayList<>();
-            if (jobRequest.getApplications().isEmpty()) {
-                applications.addAll(this.commandService.getApplicationsForCommand(command.getId()));
-            } else {
-                for (final String applicationId : jobRequest.getApplications()) {
-                    applications.add(this.applicationService.getApplication(applicationId));
-                }
-            }
+            final Command command = this.getCommand(jobRequest, cluster);
+            // Resolve the applications to use based on the command that was selected
+            final List<Application> applications = this.getApplications(jobRequest, command);
 
             // Job can be run as there is a valid set of cluster, command and applications
             // Save all the runtime environment information for the job
@@ -216,55 +159,12 @@ public class LocalJobRunner implements JobSubmitterService {
                 applications.stream().map(Application::getId).collect(Collectors.toList())
             );
 
-            // construct the job execution environment object for this job request
-            final JobExecutionEnvironment jee = new JobExecutionEnvironment.Builder(
-                jobRequest,
-                cluster,
-                command,
-                jobWorkingDir
-            )
-                .withApplications(applications)
-                .build();
-
             // The map object stores the context for all the workflow tasks
-            final Map<String, Object> context = new HashMap<>();
+            final Map<String, Object> context
+                = this.createJobContext(jobRequest, cluster, command, applications, jobWorkingDir);
 
-            context.put(JobConstants.JOB_EXECUTION_ENV_KEY, jee);
-            context.put(JobConstants.FILE_TRANSFER_SERVICE_KEY, this.fileTransferService);
-
-            final String runScript;
-            try {
-                // Create the job working directory
-                final File dir = new File(jobWorkingDir.getCanonicalPath());
-                if (!dir.mkdirs()) {
-                    throw new GenieServerException("Could not create job working directory directory: "
-                        + jobWorkingDir.getCanonicalPath());
-                }
-
-                // Run script path for this job like basedir/jobId/run.sh
-                runScript = jobWorkingDir.getCanonicalPath()
-                    + JobConstants.FILE_PATH_DELIMITER
-                    + JobConstants.GENIE_JOB_LAUNCHER_SCRIPT;
-
-            } catch (final IOException e) {
-                throw new GenieServerException("Job submission failed.", e);
-            }
-
-            try (final Writer writer = new OutputStreamWriter(new FileOutputStream(runScript), "UTF-8")) {
-
-                final File file = new File(runScript);
-                file.setExecutable(true);
-
-                context.put(JobConstants.WRITER_KEY, writer);
-
-                for (WorkflowTask workflowTask : this.jobWorkflowTasks) {
-                    workflowTask.executeTask(context);
-                }
-            } catch (final IOException ioe) {
-                throw new GenieServerException("Failed to execute job", ioe);
-            }
-
-            final JobExecution jobExecution = (JobExecution) context.get(JobConstants.JOB_EXECUTION_DTO_KEY);
+            // Execute the job
+            final JobExecution jobExecution = this.executeJob(context, runScript);
 
             // Job Execution will be null in local mode.
             if (jobExecution != null) {
@@ -274,10 +174,122 @@ public class LocalJobRunner implements JobSubmitterService {
                 // Publish a job start Event
                 this.applicationEventPublisher.publishEvent(new JobStartedEvent(jobExecution, this));
             }
+        } catch (final GeniePreconditionException gpe) {
+            log.error(gpe.getMessage(), gpe);
+            this.jobPersistenceService.updateJobStatus(id, JobStatus.INVALID, gpe.getMessage());
+            throw gpe;
         } catch (final Exception e) {
-            log.error(e.getLocalizedMessage(), e);
-            this.jobPersistenceService.updateJobStatus(id, JobStatus.FAILED, e.getLocalizedMessage());
+            log.error(e.getMessage(), e);
+            this.jobPersistenceService.updateJobStatus(id, JobStatus.FAILED, e.getMessage());
             throw e;
         }
+    }
+
+    private File createJobWorkingDirectory(final String id) throws GenieException {
+        try {
+            final File jobDir = new File(this.baseWorkingDirPath.getFile(), id);
+            if (!jobDir.mkdirs()) {
+                throw new GenieServerException(
+                    "Could not create job working directory directory: " + jobDir.getCanonicalPath()
+                );
+            }
+            return jobDir;
+        } catch (final IOException ioe) {
+            throw new GenieServerException("Could not resolve job working directory due to exception", ioe);
+        }
+    }
+
+    private File createRunScript(final File jobWorkingDir) throws GenieException {
+        final File runScript = new File(jobWorkingDir, JobConstants.GENIE_JOB_LAUNCHER_SCRIPT);
+        if (!runScript.exists()) {
+            try {
+                if (!runScript.createNewFile()) {
+                    throw new GenieServerException("Unable to create run script file due to unknown reason.");
+                }
+            } catch (final IOException ioe) {
+                throw new GenieServerException("Unable to create run script file due to IOException.", ioe);
+            }
+        }
+        if (!runScript.setExecutable(true)) {
+            throw new GenieServerException("Unable to make run script executable");
+        }
+        return runScript;
+    }
+
+    private Cluster getCluster(final JobRequest jobRequest) throws GenieException {
+        return this.clusterLoadBalancer.selectCluster(this.clusterService.chooseClusterForJobRequest(jobRequest));
+    }
+
+    private Command getCommand(final JobRequest jobRequest, final Cluster cluster) throws GenieException {
+        final Set<String> commandCriteria = jobRequest.getCommandCriteria();
+        // TODO: what happens if the get method throws an error we don't mark the job failed here
+        for (final Command command : this.clusterService.getCommandsForCluster(cluster.getId(), this.enumStatuses)) {
+            if (command.getTags().containsAll(jobRequest.getCommandCriteria())) {
+                return command;
+            }
+        }
+
+        throw new GeniePreconditionException(
+            "No command found matching all command criteria ["
+                + commandCriteria
+                + "] attached to cluster with id: "
+                + cluster.getId()
+        );
+    }
+
+    private List<Application> getApplications(
+        final JobRequest jobRequest,
+        final Command command
+    ) throws GenieException {
+        // TODO: What do we do about application status? Should probably check here
+        final List<Application> applications = new ArrayList<>();
+        if (jobRequest.getApplications().isEmpty()) {
+            applications.addAll(this.commandService.getApplicationsForCommand(command.getId()));
+        } else {
+            for (final String applicationId : jobRequest.getApplications()) {
+                applications.add(this.applicationService.getApplication(applicationId));
+            }
+        }
+        return applications;
+    }
+
+    private Map<String, Object> createJobContext(
+        final JobRequest jobRequest,
+        final Cluster cluster,
+        final Command command,
+        final List<Application> applications,
+        final File jobWorkingDir
+    ) throws GenieException {
+        // construct the job execution environment object for this job request
+        final JobExecutionEnvironment jee = new JobExecutionEnvironment.Builder(
+            jobRequest,
+            cluster,
+            command,
+            jobWorkingDir
+        )
+            .withApplications(applications)
+            .build();
+
+        // The map object stores the context for all the workflow tasks
+        final Map<String, Object> context = new HashMap<>();
+
+        context.put(JobConstants.JOB_EXECUTION_ENV_KEY, jee);
+        context.put(JobConstants.FILE_TRANSFER_SERVICE_KEY, this.fileTransferService);
+
+        return context;
+    }
+
+    private JobExecution executeJob(final Map<String, Object> context, final File runScript) throws GenieException {
+        try (final Writer writer = new OutputStreamWriter(new FileOutputStream(runScript), "UTF-8")) {
+            context.put(JobConstants.WRITER_KEY, writer);
+
+            for (WorkflowTask workflowTask : this.jobWorkflowTasks) {
+                workflowTask.executeTask(context);
+            }
+        } catch (final IOException ioe) {
+            throw new GenieServerException("Failed to execute job due to: " + ioe.getMessage(), ioe);
+        }
+
+        return (JobExecution) context.get(JobConstants.JOB_EXECUTION_DTO_KEY);
     }
 }

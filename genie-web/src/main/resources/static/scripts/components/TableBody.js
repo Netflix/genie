@@ -1,17 +1,13 @@
 import React, { PropTypes as T } from 'react';
 
-import TableRow from './TableRow';
-
 const TableBody = (props) => {
-  const tableRows = props.rows.map((row, index) => {
-    return (
-      <TableRow
-        key={index}
-        row={row}
-        setRowId={props.setRowId}
-      />
-    );
-  });
+  const tableRows = props.rows.map((row, index) => (
+    <props.rowType
+      key={index}
+      row={row}
+      toggleRowDetails={props.toggleRowDetails}
+    />)
+  );
 
   if (props.rowId) {
     const filteredRow = props.rows.find((row) => row.id === props.rowId);
@@ -21,9 +17,9 @@ const TableBody = (props) => {
       index + 1,
       0,
       <props.detailsTable
-        row={filteredRow}
         key={`rowIndex-${index}`}
-        hideDetails={props.hideDetails}
+        row={filteredRow}
+        toggleRowDetails={props.toggleRowDetails}
       />
     );
   }
@@ -36,10 +32,11 @@ const TableBody = (props) => {
 };
 
 TableBody.propTypes = {
-  rows        : T.arrayOf(T.object).isRequired,
-  rowId       : T.string,
-  hideDetails : T.func.isRequired,
-  setRowId    : T.func.isRequired,
+  rows             : T.arrayOf(T.object).isRequired,
+  rowId            : T.string,
+  rowType          : T.func.isRequired,
+  detailsTable     : T.func.isRequired,
+  toggleRowDetails : T.func.isRequired,
 };
 
 export default TableBody;

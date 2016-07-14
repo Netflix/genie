@@ -1,10 +1,5 @@
-import React from 'react';
-
 import Page from './Page';
-
-import TableHeader from './components/TableHeader';
-import TableBody from './components/TableBody';
-
+import TableRow from './components/TableRow';
 import ClusterDetails from './components/ClusterDetails';
 
 
@@ -29,7 +24,8 @@ export default class Cluster extends Page {
         label : 'Status',
         name  : 'status',
         value : '',
-        type  : 'input',
+        type  : 'option',
+        optionValues : ['', 'UP', 'OUT_OF_SERVICE', 'TERMINATED'],
       }, {
         label : 'Tag',
         name  : 'tag',
@@ -40,12 +36,12 @@ export default class Cluster extends Page {
         name  : 'sort',
         value : '',
         type  : 'select',
-        selectFields: ['name', 'status', 'tag'].map(field => {
-          return {
+        selectFields: ['name', 'status', 'tag'].map(field => (
+          {
             value: field,
             label: field,
-          };
-        }),
+          }
+        )),
       },
     ];
   }
@@ -54,24 +50,17 @@ export default class Cluster extends Page {
     return 'clusters';
   }
 
+  get rowType() {
+    return TableRow;
+  }
+
   get tableHeader() {
     return (
-      <TableHeader
-        headers={['Id', 'Name', 'User', 'Status', 'Version', 'Tags', 'Created', 'Updated']}
-      />
+        ['Id', 'Name', 'Copy Link', 'User', 'Status', 'Version', 'Tags', 'Created', 'Updated']
     );
   }
 
-  get tableBody() {
-    const { showDetails } = this.props.location.query;
-    return (
-      <TableBody
-        rows={this.state.data}
-        rowId={showDetails}
-        setRowId={this.setRowId}
-        detailsTable={ClusterDetails}
-        hideDetails={this.hideDetails}
-      />
-    );
+  get detailsTable() {
+    return ClusterDetails;
   }
 }

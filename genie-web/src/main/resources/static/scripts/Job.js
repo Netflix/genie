@@ -1,12 +1,6 @@
-import React from 'react';
-
 import Page from './Page';
-
+import TableRow from './components/JobTableRow';
 import JobDetails from './components/JobDetails';
-import JobTableBody from './components/JobTableBody';
-import TableHeader from './components/TableHeader';
-
-import { fetch } from './utils';
 
 export default class Job extends Page {
 
@@ -40,7 +34,7 @@ export default class Job extends Page {
         name  : 'status',
         value : '',
         type  : 'option',
-        optionValues: ['', 'RUNNING', 'SUCCEEDED', 'FAILED', 'KILLED'],
+        optionValues: ['', 'INIT', 'RUNNING', 'SUCCEEDED', 'FAILED', 'KILLED', 'INVALID'],
       }, {
         label : 'Size',
         name  : 'size',
@@ -52,12 +46,12 @@ export default class Job extends Page {
         name  : 'sort',
         value : '',
         type  : 'select',
-        selectFields: ['user', 'created', 'id', 'name', 'status', 'clusterName', 'cluserId'].map((field) => {
-          return {
+        selectFields: ['user', 'created', 'id', 'name', 'status', 'clusterName', 'cluserId'].map(field => (
+          {
             value: field,
             label: field,
-          };
-        }),
+          }
+        )),
       },
     ];
   }
@@ -97,33 +91,17 @@ export default class Job extends Page {
     return 'jobs';
   }
 
+  get rowType() {
+    return TableRow;
+  }
+
   get tableHeader() {
     return (
-      <TableHeader
-        headers={['Id', 'Name', 'User', 'Status', 'Cluster', 'Output', 'Started', 'Finished', 'Run Time']}
-      />
+        ['Id', 'Name', 'Output', 'Copy Link', 'User', 'Status', 'Cluster', 'Started', 'Finished', 'Run Time']
     );
   }
 
-  killJob = (jobId) => {
-    fetch(`/api/v3/jobs/${jobId}`, null, 'DELETE')
-      .done(() => {
-        this.setState({ killJobRequestSent: true });
-      });
-  }
-
-  get tableBody() {
-    const { showDetails } = this.props.location.query;
-    return (
-      <JobTableBody
-        rows={this.state.data}
-        rowId={showDetails}
-        setRowId={this.setRowId}
-        detailsTable={JobDetails}
-        killJob={this.killJob}
-        killJobRequestSent={this.state.killJobRequestSent}
-        hideDetails={this.hideDetails}
-      />
-    );
+  get detailsTable() {
+    return JobDetails;
   }
 }

@@ -15,8 +15,12 @@ import os
 from decorator import decorator
 from functools import wraps
 
+from .running import RunningJob
+
 from ..utils import (is_str,
                      str_to_list)
+
+from ..exceptions import GenieJobNotFoundError
 
 
 logger = logging.getLogger('com.netflix.genie.jobs.utils')
@@ -83,7 +87,7 @@ def add_to_repr(mode):
 
             if repr_obj:
                 if mode in REPR_OVERWRITE_MODES:
-                    repr_obj.remove(r'{}\('.format(func.__name__))
+                    repr_obj.remove(r'{}('.format(func.__name__))
                 repr_obj.append(func_name=func.__name__,
                                 args=args[1:],
                                 kwargs=kwargs)
@@ -166,6 +170,45 @@ def arg_string(func):
     return decorator(wrapper, func)
 
 
+def generate_job_id(job_id, return_success=True, conf=None):
+    """
+    Generate a new job id.
+
+    By default, will continue to generate an id until either
+    1) the generated id is for a job that is running or successful
+    2) the generated id is completely new
+
+    If return_success is False, will continue to generate an id until either
+    1) the generated id is for a job that is running
+    2) the generated id is completely new
+    """
+
+    while True:
+        try:
+            running_job = reattach_job(job_id, conf=conf)
+            logger.debug("job id '%s' exists with status '%s'",
+                         job_id,
+                         running_job.status)
+            if not running_job.is_done \
+                    or (running_job.is_done \
+                        and running_job.is_successful \
+                        and return_success):
+                logger.info("returning job id '%s' with status '%s'",
+                            running_job.job_id,
+                            running_job.status)
+                return running_job.job_id
+            id_parts = running_job.job_id.split('-')
+            if id_parts[-1].isdigit():
+                id_parts[-1] = str(int(id_parts[-1]) + 1)
+            else:
+                id_parts.append('1')
+            job_id = '-'.join(id_parts)
+            logger.debug("trying new job id '%s'", job_id)
+        except GenieJobNotFoundError:
+            logger.info("returning new job id '%s'", job_id)
+            return job_id
+
+
 def is_attachment(dependency):
     """Return True if the dependency should be handled as an attachment."""
 
@@ -182,3 +225,20 @@ def is_file(path):
         (os.path.isfile(path) \
          or path.startswith('s3://') \
          or path.startswith('s3n://'))
+
+
+def reattach_job(job_id, conf=None):
+    """
+    Reattach to a running job.
+
+    Search for a job (by job id). If found, return :py:class:`RunningJob` object.
+
+    Args:
+        job_id (str): The id of the job to reattach.
+        conf (GenieConf, optional): The conf object to use for the RunningJob.
+
+    Returns:
+        :py:class:`RunningJob` object.
+    """
+
+    return RunningJob(job_id, conf=conf)

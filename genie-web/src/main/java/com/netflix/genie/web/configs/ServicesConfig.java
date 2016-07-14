@@ -38,6 +38,7 @@ import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;
 import com.netflix.genie.core.services.FileTransfer;
 import com.netflix.genie.core.services.JobCoordinatorService;
+import com.netflix.genie.core.services.JobCountService;
 import com.netflix.genie.core.services.JobKillService;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
@@ -49,7 +50,9 @@ import com.netflix.genie.core.services.impl.LocalJobKillServiceImpl;
 import com.netflix.genie.core.services.impl.LocalJobRunner;
 import com.netflix.genie.core.services.impl.MailServiceImpl;
 import com.netflix.genie.core.services.impl.RandomizedClusterLoadBalancerImpl;
+import com.netflix.spectator.api.Registry;
 import org.apache.commons.exec.Executor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -57,6 +60,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.mail.javamail.JavaMailSender;
 
 import java.util.List;
@@ -237,9 +241,7 @@ public class ServicesConfig {
      * @return A randomized cluster load balancer instance.
      */
     @Bean
-    public ClusterLoadBalancer clusterLoadBalancer(
-
-    ) {
+    public ClusterLoadBalancer clusterLoadBalancer() {
         return new RandomizedClusterLoadBalancerImpl();
     }
 
@@ -260,7 +262,6 @@ public class ServicesConfig {
     /**
      * Get a implementation of the JobSubmitterService that runs jobs locally.
      *
-     * @param jss                 Implementaion of the jobSearchService.
      * @param jps                 Implementation of the job persistence service.
      * @param applicationService  Implementation of application service interface.
      * @param clusterService      Implementation of cluster service interface.
@@ -270,13 +271,10 @@ public class ServicesConfig {
      * @param aep                 Instance of the event publisher.
      * @param workflowTasks       List of all the workflow tasks to be executed.
      * @param genieWorkingDir     Working directory for genie where it creates jobs directories.
-     * @param hostName            Hostname of this host.
-     * @param maxRunningJobs      Maximum number of jobs allowed to run on this host.
      * @return An instance of the JobSubmitterService.
      */
     @Bean
     public JobSubmitterService jobSubmitterService(
-        final JobSearchService jss,
         final JobPersistenceService jps,
         final ApplicationService applicationService,
         final ClusterService clusterService,
@@ -285,13 +283,9 @@ public class ServicesConfig {
         final GenieFileTransferService fts,
         final ApplicationEventPublisher aep,
         final List<WorkflowTask> workflowTasks,
-        final Resource genieWorkingDir,
-        final String hostName,
-        @Value("${genie.jobs.max.running:2}")
-        final int maxRunningJobs
+        final Resource genieWorkingDir
     ) {
         return new LocalJobRunner(
-            jss,
             jps,
             applicationService,
             clusterService,
@@ -300,33 +294,46 @@ public class ServicesConfig {
             fts,
             aep,
             workflowTasks,
-            genieWorkingDir,
-            hostName,
-            maxRunningJobs
+            genieWorkingDir
         );
     }
 
     /**
      * Get an instance of the JobCoordinatorService.
      *
+     * @param taskExecutor          The task executor to use
      * @param jobPersistenceService implementation of job persistence service interface
      * @param jobSubmitterService   implementation of the job submitter service
      * @param jobKillService        The job kill service to use
+     * @param jobCountService       The job count service to use
      * @param baseArchiveLocation   The base directory location of where the job dir should be archived
+     * @param maxRunningJobs        The maximum number of jobs that can run on this node
+     * @param registry              The metrics registry to use
      * @return An instance of the JobCoordinatorService.
      */
     @Bean
     public JobCoordinatorService jobCoordinatorService(
+        final TaskExecutor taskExecutor,
         final JobPersistenceService jobPersistenceService,
         final JobSubmitterService jobSubmitterService,
         final JobKillService jobKillService,
+        @Qualifier("jobMonitoringCoordinator")
+        final JobCountService jobCountService,
         @Value("${genie.jobs.archive.location}")
-        final String baseArchiveLocation
-    ) {
+        final String baseArchiveLocation,
+        @Value("${genie.jobs.max.running:2}")
+        final int maxRunningJobs,
+        final Registry registry
+        ) {
         return new JobCoordinatorService(
+            taskExecutor,
             jobPersistenceService,
             jobSubmitterService,
             jobKillService,
-            baseArchiveLocation);
+            jobCountService,
+            baseArchiveLocation,
+            maxRunningJobs,
+            registry
+        );
     }
 }

@@ -26,11 +26,20 @@ with open(path.join(here, 'DESCRIPTION.rst'), encoding='utf-8') as f:
 
 setup(
     name='nflx-genie-client',
-    version='3.0.0',
+    version='3.0.15',
     author='Netflix Inc.',
     author_email='genieoss@googlegroups.com',
     keywords='genie hadoop cloud netflix client bigdata presto',
-    packages=['pygenie'],
+    packages=['pygenie',
+              'pygenie.adapter',
+              'pygenie.jobs',
+              'genie2',
+              'genie2.client',
+              'genie2.exception',
+              'genie2.model'],
+    package_data={
+        'pygenie': ['genie.ini']
+    },
     scripts=[],
     url='http://netflix.github.io/genie/',
     license='Apache 2.0',
@@ -43,7 +52,6 @@ setup(
         "multipledispatch",
         "nose",
         "pyconfigurator",
-        "pystache",
         "python-dateutil >= 2.4",
         "requests",
         "responses",

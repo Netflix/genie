@@ -7,9 +7,9 @@ jobs, etc).
 Below is the order of loading config values (first = higher priority):
     1. Command line (--config SECTION.OPTION=, --configFile=/path/to/config_file).
     2. Additionally loaded config files.
-    3. Environment config file (export GENIE_CONFIG=/path/to/config.ini).
-    4. Home config file (~/.genie/genie.ini).
-    5. Environment variable.
+    3a. Environment config file (export GENIE_CONFIG=/path/to/config.ini) OR
+    3b. Home config file (~/.genie/genie.ini).
+    4. Environment variable.
 
 """
 
@@ -45,10 +45,16 @@ class GenieConfSection(object):
 
     def __getattr__(self, attr):
         if attr not in self.to_dict():
+            env = self.__get_env(attr)
+            if env is not None:
+                return env
             raise GenieConfigOptionError(
                 "'{}' does not exist in loaded options for '{}' section ({})" \
                 .format(attr, self.__name, sorted(self.to_dict().keys())))
         return self.to_dict().get(attr)
+
+    def __get_env(self, attr):
+        return os.environ.get('{}_{}'.format(self.__name, attr))
 
     def get(self, option, default=None):
         """
@@ -71,7 +77,7 @@ class GenieConfSection(object):
             str: The option value or the default value specified.
         """
 
-        return self.to_dict().get(option, default)
+        return self.to_dict().get(option, self.__get_env(option) or default)
 
     def set(self, name, value=None):
         """Sets an attribute (option) to the value."""
@@ -108,9 +114,7 @@ class GenieConf(object):
 
     def __getattr__(self, attr):
         if attr not in self.to_dict():
-            raise GenieConfigSectionError(
-                "'{}' does not exist in loaded sections ({})" \
-                .format(attr, sorted(self.to_dict().keys())))
+            return GenieConfSection(attr)
         return self.to_dict().get(attr)
 
     def __repr__(self):
@@ -164,17 +168,20 @@ class GenieConf(object):
     def load_config_file(self, config_file):
         """Load a configuration file (ini)."""
 
-        param_list = []
-        if config_file is not None \
-                and os.path.exists(config_file) \
-                and config_file not in self._config_files:
+        if config_file is not None and os.path.exists(config_file):
+            logger.debug('adding config file: %s', config_file)
             self._config_files.append(config_file)
-        for cfile in self._config_files:
-            logger.debug('adding config file: %s', cfile)
-            param_list.extend(['--configFile', cfile])
-        C.initialize(param_list + self.sys_argv())
-        self._load_options()
-        logger.debug('configuration:\n%s', self.to_json())
+            C.addOptionFile(config_file)
+
+            # options specified via cmd line should always override config files
+            sys_argv_configs = [sys.argv[i + 1] for i, arg in enumerate(sys.argv) \
+                if arg == '--config']
+            for option in sys_argv_configs:
+                C.addOption(option)
+
+            self._load_options()
+            logger.debug('configuration:\n%s', self.to_json())
+
         return self
 
     def _load_options(self):
@@ -182,30 +189,34 @@ class GenieConf(object):
         sections with options set to the :py:class:`GenieConfSection` object's
         attributes."""
 
+        # this is work-around for when config values are loaded as a list when
+        # execution is threaded (still need to look closer into why this is
+        # happening)
+        def unlist(value):
+            return value[0] if isinstance(value, list) else value
+
         # explicitly set genie section object
-        self.genie.set('url', C.get('genie.url', DEFAULT_GENIE_URL))
-        self.genie.set('username', C.get('genie.username',
-                                         os.environ.get('USER',
-                                                        DEFAULT_GENIE_USERNAME)))
-        self.genie.set('version', C.get('genie.version', DEFAULT_GENIE_VERSION))
+        default_username = os.environ.get('USER', DEFAULT_GENIE_USERNAME)
+        self.genie.set('url',
+                       unlist(C.get('genie.url', DEFAULT_GENIE_URL)))
+        self.genie.set('username',
+                       unlist(C.get('genie.username', default_username)))
+        self.genie.set('version',
+                       unlist(C.get('genie.version', DEFAULT_GENIE_VERSION)))
 
         # create and set other section objects
         for section in C.config.sections():
             section_clean = section.replace(' ', '_').replace('.', '_')
             gcs = self.genie if section_clean == 'genie' \
                 else GenieConfSection(name=section_clean)
+
             for option in C.config.options(section):
                 option_clean = option.replace(' ', '_').replace('.', '_')
                 if section_clean != 'genie' \
                         or option_clean not in {'url', 'username', 'version'}:
-                    gcs.set(option_clean, C.get(section, option))
+                    gcs.set(option_clean, unlist(C.get(section, option)))
+
             setattr(self, section_clean, gcs)
-
-    @staticmethod
-    def sys_argv():
-        """Get command line arguments passed to Python script."""
-
-        return sys.argv
 
     def to_dict(self):
         """

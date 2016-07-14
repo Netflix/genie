@@ -19,6 +19,7 @@ package com.netflix.genie.client;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.netflix.genie.client.config.GenieNetworkConfiguration;
 import com.netflix.genie.client.exceptions.GenieClientException;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterCriteria;
@@ -86,7 +87,9 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
         clusterClient = new ClusterClient(getBaseUrl());
         commandClient = new CommandClient(getBaseUrl());
         //applicationClient = new ApplicationClient(getBaseUrl());
-        jobClient = new JobClient(getBaseUrl());
+        final GenieNetworkConfiguration genieNetworkConfiguration = new GenieNetworkConfiguration();
+        genieNetworkConfiguration.setReadTimeout(20000);
+        jobClient = new JobClient(getBaseUrl(), genieNetworkConfiguration);
     }
 
     /**

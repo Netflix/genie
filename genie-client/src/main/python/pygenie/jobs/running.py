@@ -13,34 +13,61 @@ import re
 import sys
 import time
 
+from functools import wraps
+
 from ..conf import GenieConf
 from ..utils import dttm_to_epoch
 
 
 logger = logging.getLogger('com.netflix.genie.jobs.running')
 
+RUNNING_STATUSES = {
+    'INIT',
+    'RUNNING',
+    'init',
+    'running'
+}
+
+
+def update_info(func):
+    """
+    Update information about the job.
+    """
+
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        """Wraps func."""
+
+        self = args[0]
+        status = self._info.get('status')
+        if status is None or status.upper() in RUNNING_STATUSES:
+            self.update()
+
+        return func(*args, **kwargs)
+
+    return wrapper
+
 
 class RunningJob(object):
     """RunningJob."""
 
-    def __init__(self, job_id, adapter=None, conf=None):
-        self.__cached_genie_log = None
-        self.__cached_stderr = None
-        self.__conf = conf or GenieConf()
-        self.__sys_stream = None
-
+    def __init__(self, job_id, adapter=None, conf=None, info=None):
         self._cached_genie_log = None
         self._cached_stderr = None
-        self._info = dict()
+        self._conf = conf or GenieConf()
+        self._info = info or dict()
         self._job_id = job_id
+        self._sys_stream = None
 
         # get_adapter_version is set in main __init__.py to get around circular imports
         self._adapter = adapter \
-            or get_adapter_for_version(self.__conf.genie.version)(conf=self.__conf)
+            or get_adapter_for_version(self._conf.genie.version)(conf=self._conf)
 
-        stream = self.__conf.get('genie.progress_stream', 'stdout').lower()
+        stream = self._conf.get('genie.progress_stream', 'stdout').lower()
         if stream in {'stderr', 'stdout'}:
-            self.__sys_stream = getattr(sys, stream)
+            self._sys_stream = getattr(sys, stream)
+
+        self.update(info=info)
 
     def __getattr__(self, attr):
         if attr in self.info:
@@ -144,6 +171,7 @@ class RunningJob(object):
         return self.info.get('file_dependencies')
 
     @property
+    @update_info
     def finish_time(self):
         """
         Get the job's finish epoch time (milliseconds). 0 means the job is still
@@ -177,10 +205,10 @@ class RunningJob(object):
         """
 
         if self.is_done:
-            if not self.__cached_genie_log:
-                self.__cached_genie_log = self._adapter.get_genie_log(self._job_id)
-                return self.__cached_genie_log.split('\n') if iterator \
-                    else self.__cached_genie_log
+            if not self._cached_genie_log:
+                self._cached_genie_log = self._adapter.get_genie_log(self._job_id)
+                return self._cached_genie_log.split('\n') if iterator \
+                    else self._cached_genie_log
         return self._adapter.get_genie_log(self._job_id, iterator=iterator)
 
     @property
@@ -202,9 +230,7 @@ class RunningJob(object):
             boolean: True if the job is done, False if still running.
         """
 
-        if self.status == 'RUNNING':
-            self.update()
-        return self.status != 'RUNNING'
+        return self.status not in RUNNING_STATUSES
 
     @property
     def is_successful(self):
@@ -219,8 +245,6 @@ class RunningJob(object):
             boolean: True if job completed successfully, False otherwise.
         """
 
-        if not self.is_done:
-            self.update()
         return self.status == 'SUCCEEDED'
 
     @property
@@ -271,18 +295,51 @@ class RunningJob(object):
         return self.info.get('command_name').upper()
 
     @property
-    def json_link(self):
+    def job_link(self):
         """
-        Get the json link for the job.
+        Get the link for the job.
 
         Example:
-            >>> print running_job.json_link
+            >>> print running_job.job_link
             'http://localhost/genie/1234-abcd'
 
         Returns:
-            str: The link to job's json.
+            str: The link to the job.
         """
+
+        return self.info.get('job_link')
+
+    @property
+    def json_link(self):
+        """
+        Get the link for the job json.
+
+        Example:
+            >>> print running_job.json_link
+            'http://localhost/api/v3/jobs/1234-abcd'
+
+        Returns:
+            str: The link to the job json.
+        """
+
         return self.info.get('json_link')
+
+    @property
+    def kill_uri(self):
+        """
+        Get the uri to kill the job.
+
+        Sending a DELETE request to this uri will kill the job.
+
+        Example:
+            >>> print running_job.kill_uri
+            'http://localhost/genie/1234-abcd'
+
+        Returns:
+            str: The kill URI.
+        """
+
+        return self.info.get('kill_uri')
 
     def kill(self):
         """
@@ -308,15 +365,32 @@ class RunningJob(object):
         Get the output uri for the job.
 
         Example:
-            >>> print running_job.output_uri
+            >>> running_job.output_uri
             'http://localhost/genie/1234-abcd/output'
 
         Returns:
             str: The output URI.
         """
+
         return self.info.get('output_uri')
 
     @property
+    def request_data(self):
+        """
+        Get the JSON of the job submission request sent to Genie.
+
+        Example:
+            >>> running_job.request_data
+            {...}
+
+        Returns:
+            dict: JSON of the job submission request.
+        """
+
+        return self.info.get('request_data')
+
+    @property
+    @update_info
     def start_time(self):
         """
         Get the job's start epoch time (milliseconds).
@@ -332,6 +406,7 @@ class RunningJob(object):
         return self.__convert_dttm_to_epoch('started')
 
     @property
+    @update_info
     def status(self):
         """
         Get the job's status.
@@ -366,11 +441,19 @@ class RunningJob(object):
         """
 
         if self.is_done:
-            if not self.__cached_stderr:
-                self.__cached_stderr = self._adapter.get_stderr(self._job_id)
-                return self.__cached_stderr.split('\n') if iterator \
-                    else self.__cached_stderr
+            if not self._cached_stderr:
+                self._cached_stderr = self._adapter.get_stderr(self._job_id)
+                return self._cached_stderr.split('\n') if iterator \
+                    else self._cached_stderr
         return self._adapter.get_stderr(self._job_id, iterator=iterator)
+
+    @property
+    def stdout_url(self):
+        """
+        Returns a url for the stdout of the job.
+        """
+
+        return '{}/stdout'.format(self.output_uri.replace('/output/', '/file/', 1))
 
     def stdout(self, iterator=False):
         """
@@ -392,6 +475,7 @@ class RunningJob(object):
         return self._adapter.get_stdout(self._job_id, iterator=iterator)
 
     @property
+    @update_info
     def status_msg(self):
         """
         Get the job's status message.
@@ -428,6 +512,7 @@ class RunningJob(object):
             else self._adapter.get_info_for_rj(self._job_id)
 
     @property
+    @update_info
     def update_time(self):
         """
         Get the last update time for the job in epoch time (milliseconds).
@@ -477,7 +562,7 @@ class RunningJob(object):
 
         i = 0
 
-        while self._adapter.get_status(self._job_id).upper() == 'RUNNING':
+        while self._adapter.get_status(self._job_id).upper() in RUNNING_STATUSES:
             if i % 3 == 0 and not suppress_stream:
                 self._write_to_stream('.')
             time.sleep(sleep_seconds)
@@ -493,6 +578,6 @@ class RunningJob(object):
     def _write_to_stream(self, msg):
         """Writes message to the configured sys stream."""
 
-        if self.__sys_stream is not None:
-            self.__sys_stream.write(msg)
-            self.__sys_stream.flush()
+        if self._sys_stream is not None:
+            self._sys_stream.write(msg)
+            self._sys_stream.flush()

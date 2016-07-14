@@ -25,7 +25,6 @@ class HadoopJob(GenieJob):
     def __init__(self, conf=None):
         super(HadoopJob, self).__init__(conf=conf)
 
-        self._properties = dict()
         self._property_file = None
         self._script = None
 
@@ -42,7 +41,7 @@ class HadoopJob(GenieJob):
 
         props_str = ' '.join([
             '-D{name}={value}'.format(name=k, value=v) \
-            for k, v in self._properties.iteritems()
+            for k, v in self._command_options.get('-D', {}).items()
         ])
 
         prop_file_str = '-conf {}'.format(os.path.basename(self._property_file)) \
@@ -52,7 +51,7 @@ class HadoopJob(GenieJob):
         return '{prop_file} {props} {cmd}' \
             .format(prop_file=prop_file_str,
                     props=props_str,
-                    cmd=self._script) \
+                    cmd=self._script or '') \
             .strip()
 
     def command(self, script):
@@ -82,7 +81,7 @@ class HadoopJob(GenieJob):
             :py:class:`HadoopJob`: self
         """
 
-        self._properties[name] = value
+        self._set_command_option('-D', name, value)
 
         return self
 

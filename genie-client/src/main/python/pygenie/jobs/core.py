@@ -11,8 +11,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import json
 import logging
 import re
-import signal
-import sys
+
+from collections import defaultdict
 
 from ..conf import GenieConf
 from ..utils import (is_str,
@@ -21,9 +21,12 @@ from ..utils import (is_str,
 from .utils import (add_to_repr,
                     arg_list,
                     arg_string,
-                    is_file)
+                    generate_job_id,
+                    is_file,
+                    reattach_job)
 
-from ..exceptions import GenieJobError
+from ..exceptions import (GenieJobError,
+                          GenieJobNotFoundError)
 
 
 logger = logging.getLogger('com.netflix.genie.jobs.core')
@@ -85,7 +88,7 @@ class Repr(object):
                 .format(key=key,
                         val=val,
                         qu=self.__quote(val) if is_str(val) else '')
-            for key, val in kwargs.iteritems()
+            for key, val in kwargs.items()
         ]) if kwargs is not None else ''
 
     def pop(self):
@@ -97,6 +100,8 @@ class Repr(object):
         """Remove call string from the repr list based on a regex filter."""
 
         assert regex_filter is not None, 'must specify a regular expression filter'
+
+        regex_filter = re.escape(regex_filter)
 
         self.__repr_list = [i for i in self.__repr_list \
             if not re.search(regex_filter, i, flags=flags) and regex_filter != i]
@@ -122,11 +127,11 @@ class GenieJob(object):
 
         self.conf = conf or GenieConf()
         self.default_command_tags = str_to_list(
-            self.conf.get('genie_default_command_tags.{}'.format(cls),
+            self.conf.get('{}.default_command_tags'.format(cls),
                           ['type:{}'.format(job_type)])
         )
         self.default_cluster_tags = str_to_list(
-            self.conf.get('genie_default_cluster_tags.{}'.format(cls),
+            self.conf.get('{}.default_cluster_tags'.format(cls),
                           ['type:{}'.format(job_type)])
         )
         self.repr_obj = Repr(self.__class__.__name__)
@@ -135,6 +140,7 @@ class GenieJob(object):
         self._archive = True
         self._cluster_tags = list()
         self._command_arguments = None
+        self._command_options = defaultdict(dict)
         self._command_tags = list()
         self._dependencies = list()
         self._description = None
@@ -164,6 +170,19 @@ class GenieJob(object):
 
         if dep not in self._dependencies:
             self._dependencies.append(dep)
+
+    def _set_command_option(self, flag, name, value=None):
+        """
+        Convenience method for storing an option which can later be used
+        when constructing the command line.
+
+        Args:
+            flag (str): The option flag.
+            name (str): The option name.
+            value (str, optional): The option value.
+        """
+
+        self._command_options[flag][name] = value
 
     @arg_list
     @add_to_repr('append')
@@ -366,36 +385,68 @@ class GenieJob(object):
             :py:class:`GenieJob`: self
         """
 
-    def execute(self):
+    def execute(self, retry=False, force=False, catch_signal=False):
         """
         Send the job to Genie and execute.
 
         Example:
             >>> running_job = GenieJob().execute()
 
+        Args:
+            retry (bool, optional): If True, will check to see if a previous job
+                with the same job id has previously executed and generate a new
+                job id until finds a job id to a running job, a successful job, or
+                a brand new job (Default: False).
+            force (bool, optional): If True, will do the same thing as
+                retry=True, but will generate a new job id even if there is
+                a successful execution (Default: False).
+            catch_signal (bool, optional): If True, will add signal handlers to
+                kill the running job for SIGINT, SIGTERM, and SIGABRT
+                (Default: False).
+
         Returns:
             :py:class:`RunningJob`: A running job object.
         """
 
+        if catch_signal:
+            import signal
+            import sys
+            def sig_handler(signum, frame):
+                logger.warning("caught signal %s", signum)
+                try:
+                    if running_job.job_id:
+                        logger.warning("killing job id %s", running_job.job_id)
+                        response = running_job.kill()
+                        response.raise_for_status()
+                except Exception:
+                    pass
+                finally:
+                    sys.exit(1)
+            signal.signal(signal.SIGINT, sig_handler)
+            signal.signal(signal.SIGTERM, sig_handler)
+            signal.signal(signal.SIGABRT, sig_handler)
+
+        if retry or force:
+            uid = self._job_id
+            try:
+                # below uid should be uid of job with one of following status:
+                #     - new
+                #     - running
+                #     - (if force=False) successful
+                uid = generate_job_id(uid,
+                                      return_success=not force,
+                                      conf=self.conf)
+                # new uid will raise and be handled in the except block
+                # assigning to running_job variable for killing on signal
+                running_job = reattach_job(uid, conf=self.conf)
+                return running_job
+            except GenieJobNotFoundError:
+                self.job_id(uid)
+
         # execute_job is set in main __init__.py to get around circular imports
         # execute_job imports jobs, jobs need to import execute_job
+        # assigning to running_job variable for killing on signal
         running_job = execute_job(self)
-
-        def sig_handler(signum, frame):
-            logger.warning("caught signal %s", signum)
-            try:
-                if running_job.job_id:
-                    logger.warning("killing job id %s", running_job.job_id)
-                    running_job.kill()
-            except Exception:
-                pass
-            finally:
-                sys.exit(1)
-
-        signal.signal(signal.SIGINT, sig_handler)
-        signal.signal(signal.SIGTERM, sig_handler)
-        signal.signal(signal.SIGABRT, sig_handler)
-
         return running_job
 
     @add_to_repr('overwrite')
@@ -544,6 +595,27 @@ class GenieJob(object):
 
         return self
 
+    def parameters(self, **kwargs):
+        """
+        Convenience method for setting multiple parameters using kwargs.
+
+        Example:
+            >>> #For pig: -p foo=1 -p bar=2
+            >>> job = PigJob() \\
+            ...     .parameters(foo='1', bar='2')
+
+        Args:
+            **kwargs: Keyword arguments for each parameter.
+
+        Returns:
+            :py:class:`GenieJob`: self
+        """
+
+        for name, value in kwargs.items():
+            self.parameter(name, value)
+
+        return self
+
     @add_to_repr('overwrite')
     def setup_file(self, setup_file):
         """
@@ -638,7 +710,7 @@ class GenieJob(object):
         del _dict['repr_obj']
         return {
             attr_name.lstrip('_'): attr_val \
-            for attr_name, attr_val in _dict.iteritems()
+            for attr_name, attr_val in _dict.items()
             if not attr_name.startswith('_{}__'.format(self.__class__.__name__))
         }
 

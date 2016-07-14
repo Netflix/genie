@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react';
+import React, { PropTypes as T } from 'react';
 import { Link } from 'react-router';
 
 const InfoTable = (props) =>
@@ -15,7 +15,7 @@ const InfoTable = (props) =>
           <td>
             <Link
               target="_blank"
-              to={`${props.type}?name=${info.name}&showDetails=${info.id}`}
+              to={`${props.type}?name=${info.name}&rowId=${info.id}`}
             >
               {info.id}
             </Link>
@@ -27,10 +27,10 @@ const InfoTable = (props) =>
   </table>;
 
 InfoTable.propTypes = {
-  type : PropTypes.string,
-  data: PropTypes.arrayOf(PropTypes.shape({
-    id   : PropTypes.string,
-    name : PropTypes.string,
+  type : T.string,
+  data: T.arrayOf(T.shape({
+    id   : T.string,
+    name : T.string,
   })),
 };
 

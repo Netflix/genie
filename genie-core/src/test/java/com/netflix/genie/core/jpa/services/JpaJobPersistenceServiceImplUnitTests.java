@@ -418,7 +418,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
             .build();
 
         Mockito.when(this.jobRequestRepo.exists(Mockito.eq(JOB_1_ID))).thenReturn(true);
-        this.jobPersistenceService.createJobRequest(jobRequest);
+        this.jobPersistenceService.createJobRequest(jobRequest, null);
     }
 
     /**
@@ -456,7 +456,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
             .withTags(tags)
             .build();
         final ArgumentCaptor<JobRequestEntity> argument = ArgumentCaptor.forClass(JobRequestEntity.class);
-        this.jobPersistenceService.createJobRequest(jobRequest);
+        this.jobPersistenceService.createJobRequest(jobRequest, UUID.randomUUID().toString());
         Mockito.verify(this.jobRequestRepo).save(argument.capture());
         // Make sure id supplied is used to create the JobRequest
         Assert.assertEquals(JOB_1_ID, argument.getValue().getId());
@@ -471,18 +471,6 @@ public class JpaJobPersistenceServiceImplUnitTests {
         Assert.assertEquals(tags, argument.getValue().getTags());
         Assert.assertEquals(description, argument.getValue().getDescription());
         Assert.assertThat(argument.getValue().getApplicationsAsList(), Matchers.empty());
-    }
-
-    /**
-     * Test the addClientHostToJobRequest method.
-     *
-     * @throws GenieException For any problem.
-     */
-    @Test(expected = GenieNotFoundException.class)
-    public void testAddClientHostToJobRequestDoesNotExist() throws GenieException {
-        Mockito.when(this.jobRequestRepo.exists(Mockito.eq(JOB_1_ID))).thenReturn(false);
-        this.jobPersistenceService.addClientHostToJobRequest(JOB_1_ID, "foo");
-
     }
 
     /******* Unit Tests for Job Execution methods ********/

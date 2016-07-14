@@ -25,6 +25,7 @@ import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
 import com.netflix.genie.common.exceptions.GenieTimeoutException;
+import com.netflix.genie.core.util.MetricsConstants;
 import com.netflix.spectator.api.Counter;
 import com.netflix.spectator.api.Registry;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,15 +66,15 @@ public class GenieExceptionMapper {
      */
     @Autowired
     public GenieExceptionMapper(final Registry registry) {
-        this.badRequestRate = registry.counter("genie.exceptions.badRequest.rate");
-        this.conflictRate = registry.counter("genie.exceptions.conflict.rate");
-        this.notFoundRate = registry.counter("genie.exceptions.notFound.rate");
-        this.preconditionRate = registry.counter("genie.exceptions.precondition.rate");
-        this.serverRate = registry.counter("genie.exceptions.server.rate");
-        this.serverUnavailableRate = registry.counter("genie.exceptions.serverUnavailable.rate");
-        this.timeoutRate = registry.counter("genie.exceptions.timeout.rate");
-        this.genieRate = registry.counter("genie.exceptions.other.rate");
-        this.constraintViolationRate = registry.counter("genie.exceptions.constraintViolation.rate");
+        this.badRequestRate = registry.counter(MetricsConstants.GENIE_EXCEPTIONS_BAD_REQUEST_RATE);
+        this.conflictRate = registry.counter(MetricsConstants.GENIE_EXCEPTIONS_CONFLICT_RATE);
+        this.notFoundRate = registry.counter(MetricsConstants.GENIE_EXCEPTIONS_NOT_FOUND_RATE);
+        this.preconditionRate = registry.counter(MetricsConstants.GENIE_EXCEPTIONS_PRECONDITION_RATE);
+        this.serverRate = registry.counter(MetricsConstants.GENIE_EXCEPTIONS_SERVER_RATE);
+        this.serverUnavailableRate = registry.counter(MetricsConstants.GENIE_EXCEPTIONS_SERVER_UNAVAILABLE_RATE);
+        this.timeoutRate = registry.counter(MetricsConstants.GENIE_EXCEPTIONS_TIMEOUT_RATE);
+        this.genieRate = registry.counter(MetricsConstants.GENIE_EXCEPTIONS_OTHER_RATE);
+        this.constraintViolationRate = registry.counter(MetricsConstants.GENIE_EXCEPTIONS_CONSTRAINT_VIOLATION_RATE);
     }
 
     /**

@@ -18,6 +18,7 @@
 package com.netflix.genie.web.tasks.job;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
@@ -39,12 +40,15 @@ import org.apache.commons.exec.Executor;
 import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * A class that has the methods to perform various tasks when a job completes.
@@ -62,6 +66,9 @@ public class JobCompletionHandler {
     private final String baseWorkingDir;
     private final MailService mailServiceImpl;
     private final Executor executor;
+    private final boolean deleteArchiveFile;
+    private final boolean deleteDependencies;
+    private final boolean isRunAsUserEnabled;
 
     // Metrics
     private final Counter emailFailureRate;
@@ -69,6 +76,8 @@ public class JobCompletionHandler {
     private final Counter doneFileProcessingFailureRate;
     private final Counter finalStatusUpdateFailureRate;
     private final Counter processGroupCleanupFailureRate;
+    private final Counter archiveFileDeletionFailure;
+    private final Counter deleteDependenciesFailure;
 
     /**
      * Constructor.
@@ -79,6 +88,9 @@ public class JobCompletionHandler {
      * @param genieWorkingDir          The working directory where all job directories are created.
      * @param mailServiceImpl          An implementation of the mail service.
      * @param registry                 The metrics registry to use
+     * @param deleteArchiveFile        Flag that determines if the job archive file will be deleted after upload.
+     * @param deleteDependencies       Flag that determines if the job dependencies will be deleted after job is done.
+     * @param isRunAsUserEnabled       Flag that decides where jobs are run as user themselves or genie user.
      *
      * @throws GenieException if there is a problem
      */
@@ -89,12 +101,22 @@ public class JobCompletionHandler {
         final GenieFileTransferService genieFileTransferService,
         final Resource genieWorkingDir,
         final MailService mailServiceImpl,
-        final Registry registry
-    ) throws GenieException {
+        final Registry registry,
+        @Value("${genie.jobs.cleanup.deleteArchiveFile.enabled:true}")
+        final boolean deleteArchiveFile,
+        @Value("${genie.jobs.cleanup.deleteDependencies.enabled:true}")
+        final boolean deleteDependencies,
+        @Value("${genie.jobs.runAsUser.enabled:false}")
+        final boolean isRunAsUserEnabled
+        ) throws GenieException {
         this.jobPersistenceService = jobPersistenceService;
         this.jobSearchService = jobSearchService;
         this.genieFileTransferService = genieFileTransferService;
         this.mailServiceImpl = mailServiceImpl;
+        this.deleteArchiveFile = deleteArchiveFile;
+        this.deleteDependencies = deleteDependencies;
+        this.isRunAsUserEnabled = isRunAsUserEnabled;
+
         this.executor = new DefaultExecutor();
         executor.setStreamHandler(new PumpStreamHandler(null, null));
 
@@ -110,6 +132,8 @@ public class JobCompletionHandler {
         this.doneFileProcessingFailureRate = registry.counter("genie.jobs.doneFileProcessingFailure.rate");
         this.finalStatusUpdateFailureRate = registry.counter("genie.jobs.finalStatusUpdateFailure.rate");
         this.processGroupCleanupFailureRate = registry.counter("genie.jobs.processGroupCleanupFailure.rate");
+        this.archiveFileDeletionFailure = registry.counter("genie.jobs.archiveFileDeletionFailure.rate");
+        this.deleteDependenciesFailure = registry.counter("genie.jobs.deleteDependenciesFailure.rate");
     }
 
     /**
@@ -127,7 +151,7 @@ public class JobCompletionHandler {
 
         updateFinalStatusForJob(jobId);
         cleanupProcesses(event.getJobExecution().getProcessId());
-        archivedJobDir(jobId);
+        processJobDir(jobId);
         sendEmail(jobId);
     }
 
@@ -201,18 +225,61 @@ public class JobCompletionHandler {
      * @param jobId The job id.
      * @throws GenieException if there is any problem
      */
-    public void archivedJobDir(
+    public void processJobDir(
         final String jobId
     ) throws GenieException {
+        log.debug("Got a job finished event. Will process job directory.");
+
+        final Job job = this.jobSearchService.getJob(jobId);
+        final String jobWorkingDir = this.baseWorkingDir + JobConstants.FILE_PATH_DELIMITER + jobId;
+
+        if (deleteDependencies) {
+            log.debug("Deleting dependencies as its enabled.");
+            try {
+                final List<String> appIds = jobSearchService
+                    .getJobApplications(jobId)
+                    .stream()
+                    .map(Application::getId)
+                    .collect(Collectors.toList());
+
+                for (String appId : appIds) {
+                    final String applicationDependencyFolder = jobWorkingDir
+                        + JobConstants.FILE_PATH_DELIMITER
+                        + JobConstants.GENIE_PATH_VAR
+                        + JobConstants.FILE_PATH_DELIMITER
+                        + JobConstants.APPLICATION_PATH_VAR
+                        + JobConstants.FILE_PATH_DELIMITER
+                        + appId
+                        + JobConstants.FILE_PATH_DELIMITER
+                        + JobConstants.DEPENDENCY_FILE_PATH_PREFIX;
+
+                    final CommandLine  deleteCommand;
+                    if (isRunAsUserEnabled) {
+                        deleteCommand = new CommandLine("sudo");
+                        deleteCommand.addArgument("rm");
+                    } else {
+                        deleteCommand = new CommandLine("rm");
+                    }
+
+                    deleteCommand.addArgument("-rf");
+                    deleteCommand.addArgument(applicationDependencyFolder);
+
+                    log.debug("Delete command is {}", deleteCommand.toString());
+                    executor.execute(deleteCommand);
+                }
+            } catch (Exception e) {
+                log.error("Could not delete job dependencies after completion for job: {} due to error {}",
+                    jobId, e);
+                this.deleteDependenciesFailure.increment();
+            }
+        }
+
         try {
-            log.debug("Got a job finished event. Will archive job directory if enabled.");
-
-            final Job job = this.jobSearchService.getJob(jobId);
-
+            // If archive location is provided create a tar and upload it
             if (StringUtils.isNotBlank(job.getArchiveLocation())) {
 
-                // Create the tar file exluding the run.sh file and everything under the genie directory
-                final String jobWorkingDir = this.baseWorkingDir + JobConstants.FILE_PATH_DELIMITER + jobId;
+                log.debug("Archiving job directory");
+                // Create the tar file
                 final String localArchiveFile = jobWorkingDir
                     + JobConstants.FILE_PATH_DELIMITER
                     + "genie/logs/"
@@ -228,10 +295,24 @@ public class JobCompletionHandler {
                 commandLine.addArgument("./");
 
                 executor.setWorkingDirectory(new File(jobWorkingDir));
+
+                log.debug("Archive command : {}", commandLine.toString());
                 executor.execute(commandLine);
 
                 // Upload the tar file to remote location
                 this.genieFileTransferService.putFile(localArchiveFile, job.getArchiveLocation());
+
+                // At this point the archive file is successfully uploaded to archvie location specified in the job.
+                // Now we can delete it from local disk to save space if enabled.
+                if (deleteArchiveFile) {
+                    log.debug("Deleting archive file");
+                    try {
+                        new File(localArchiveFile).delete();
+                    } catch (Exception e) {
+                        log.error("Failed to delete archive file for job: {}", jobId, e);
+                        this.archiveFileDeletionFailure.increment();
+                    }
+                }
             }
         } catch (Exception e) {
             log.error("Could not archive directory for job: {}", jobId, e);

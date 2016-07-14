@@ -95,6 +95,7 @@ public abstract class AbstractAPISecurityIntegrationTests {
     private static final String JOBS_API = "/api/v3/jobs";
 
     private static final ResultMatcher OK = MockMvcResultMatchers.status().isOk();
+    private static final ResultMatcher ACCEPTED = MockMvcResultMatchers.status().isAccepted();
     private static final ResultMatcher CREATED = MockMvcResultMatchers.status().isCreated();
     private static final ResultMatcher NO_CONTENT = MockMvcResultMatchers.status().isNoContent();
     private static final ResultMatcher PRECONDITION_FAILED = MockMvcResultMatchers.status().isPreconditionFailed();
@@ -150,7 +151,7 @@ public abstract class AbstractAPISecurityIntegrationTests {
         this.get(CLUSTERS_API, expectedUnauthenticatedStatus);
         this.get(COMMANDS_API, expectedUnauthenticatedStatus);
         this.get(JOBS_API, expectedUnauthenticatedStatus);
-        this.checkActuatorEndpoints(expectedUnauthenticatedStatus);
+        this.checkActuatorEndpoints(OK);
     }
 
     /**
@@ -180,7 +181,7 @@ public abstract class AbstractAPISecurityIntegrationTests {
         this.put(COMMANDS_API + "/" + UUID.randomUUID().toString(), COMMAND, FORBIDDEN);
 
         this.get(JOBS_API, OK);
-        this.post(JOBS_API, JOB_REQUEST, PRECONDITION_FAILED);
+        this.post(JOBS_API, JOB_REQUEST, ACCEPTED);
         this.get(JOBS_API + "/" + UUID.randomUUID().toString(), NOT_FOUND);
         this.delete(JOBS_API + "/" + UUID.randomUUID().toString(), NOT_FOUND);
 
@@ -214,7 +215,7 @@ public abstract class AbstractAPISecurityIntegrationTests {
         this.put(COMMANDS_API + "/" + UUID.randomUUID().toString(), COMMAND, NOT_FOUND);
 
         this.get(JOBS_API, OK);
-        this.post(JOBS_API, JOB_REQUEST, PRECONDITION_FAILED);
+        this.post(JOBS_API, JOB_REQUEST, ACCEPTED);
         this.get(JOBS_API + "/" + UUID.randomUUID().toString(), NOT_FOUND);
         this.delete(JOBS_API + "/" + UUID.randomUUID().toString(), NOT_FOUND);
 

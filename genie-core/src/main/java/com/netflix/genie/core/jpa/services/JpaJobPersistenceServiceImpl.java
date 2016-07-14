@@ -147,7 +147,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
      * {@inheritDoc}
      */
     @Override
-    public void updateJobStatus(
+    public synchronized void updateJobStatus(
         @NotBlank(message = "No job id entered. Unable to update.")
         final String id,
         @NotNull(message = "Status cannot be null.")
@@ -155,7 +155,6 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         @NotBlank(message = "Status message cannot be empty.")
         final String statusMsg
     ) throws GenieException {
-
         log.debug("Called to update job with id {}, status {} and statusMsg \"{}\"", id, jobStatus, statusMsg);
 
         final JobEntity jobEntity = this.jobRepo.findOne(id);
@@ -163,21 +162,25 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
             throw new GenieNotFoundException("No job exists for the id specified");
         }
 
-        jobEntity.setStatus(jobStatus);
-        jobEntity.setStatusMsg(statusMsg);
+        final JobStatus status = jobEntity.getStatus();
+        // Only change the status if the entity isn't already in a terminal state
+        if (status != JobStatus.FAILED && status != JobStatus.KILLED && status != JobStatus.SUCCEEDED) {
+            jobEntity.setStatus(jobStatus);
+            jobEntity.setStatusMsg(statusMsg);
 
-        if (jobStatus.equals(JobStatus.RUNNING)) {
-            // Status being changed to running so set start date.
-            jobEntity.setStarted(new Date());
-        } else if (jobEntity.getStarted() != null && (jobStatus.equals(JobStatus.KILLED)
-            || jobStatus.equals(JobStatus.FAILED)
-            || jobStatus.equals(JobStatus.SUCCEEDED))) {
+            if (jobStatus.equals(JobStatus.RUNNING)) {
+                // Status being changed to running so set start date.
+                jobEntity.setStarted(new Date());
+            } else if (jobEntity.getStarted() != null && (jobStatus.equals(JobStatus.KILLED)
+                || jobStatus.equals(JobStatus.FAILED)
+                || jobStatus.equals(JobStatus.SUCCEEDED))) {
 
-            // Since start date is set the job was running previously and now has finished
-            // with status killed, failed or succeeded. So we set the job finish time.
-            jobEntity.setFinished(new Date());
+                // Since start date is set the job was running previously and now has finished
+                // with status killed, failed or succeeded. So we set the job finish time.
+                jobEntity.setFinished(new Date());
+            }
+            this.jobRepo.save(jobEntity);
         }
-        this.jobRepo.save(jobEntity);
     }
 
     /**
@@ -233,9 +236,10 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
     @Override
     public JobRequest createJobRequest(
         @NotNull(message = "Job Request is null so cannot be saved")
-        final JobRequest jobRequest
+        final JobRequest jobRequest,
+        final String clientHost
     ) throws GenieException {
-        log.debug("Called with jobRequest: {}", jobRequest);
+        log.debug("Called with jobRequest: {} and client host: {}", jobRequest, clientHost);
 
         if (jobRequest.getId() != null && this.jobRequestRepo.exists(jobRequest.getId())) {
             throw new GenieConflictException("A job with id " + jobRequest.getId() + " already exists");
@@ -262,29 +266,12 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         jobRequestEntity.setApplicationsFromList(jobRequest.getApplications());
         jobRequestEntity.setTimeout(jobRequest.getTimeout());
 
-        this.jobRequestRepo.save(jobRequestEntity);
-        return jobRequestEntity.getDTO();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void addClientHostToJobRequest(
-        @NotNull(message = "job request id not provided.")
-        final String id,
-        @NotBlank(message = "client host cannot be null")
-        final String clientHost)
-        throws GenieException {
-
-        log.debug("Called with id: {} and client host: {}", id, clientHost);
-
-        final JobRequestEntity jobRequestEntity = this.jobRequestRepo.findOne(id);
-        if (jobRequestEntity == null) {
-            throw new GenieNotFoundException("Cannot find the job request for id: " + id);
+        if (StringUtils.isNotBlank(clientHost)) {
+            jobRequestEntity.setClientHost(clientHost);
         }
 
-        jobRequestEntity.setClientHost(clientHost);
+        this.jobRequestRepo.save(jobRequestEntity);
+        return jobRequestEntity.getDTO();
     }
 
     /**

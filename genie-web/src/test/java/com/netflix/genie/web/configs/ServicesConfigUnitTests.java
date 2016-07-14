@@ -30,12 +30,14 @@ import com.netflix.genie.core.services.ClusterLoadBalancer;
 import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;
 import com.netflix.genie.core.services.FileTransfer;
+import com.netflix.genie.core.services.JobCountService;
 import com.netflix.genie.core.services.JobKillService;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobSubmitterService;
 import com.netflix.genie.core.services.impl.GenieFileTransferService;
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.spectator.api.Registry;
 import org.apache.commons.exec.Executor;
 import org.junit.Assert;
 import org.junit.Before;
@@ -44,6 +46,7 @@ import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.Resource;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.mail.javamail.JavaMailSender;
 
 import java.util.ArrayList;
@@ -226,7 +229,6 @@ public class ServicesConfigUnitTests {
 
         Assert.assertNotNull(
             this.servicesConfig.jobSubmitterService(
-                this.jobSearchService,
                 jobPersistenceService,
                 applicationService,
                 clusterService,
@@ -235,9 +237,7 @@ public class ServicesConfigUnitTests {
                 genieFileTransferService,
                 applicationEventPublisher,
                 workflowTasks,
-                resource,
-                "localhost",
-                5
+                resource
             )
         );
     }
@@ -247,17 +247,16 @@ public class ServicesConfigUnitTests {
      */
     @Test
     public void canGetJobCoordinatorServiceBean() {
-
-        final JobPersistenceService jobPersistenceService = Mockito.mock(JobPersistenceService.class);
-        final JobSubmitterService jobSubmitterService = Mockito.mock(JobSubmitterService.class);
-        final JobKillService jobKillService = Mockito.mock(JobKillService.class);
-
         Assert.assertNotNull(
             this.servicesConfig.jobCoordinatorService(
-                jobPersistenceService,
-                jobSubmitterService,
-                jobKillService,
-                "file:///tmp"
+                Mockito.mock(TaskExecutor.class),
+                Mockito.mock(JobPersistenceService.class),
+                Mockito.mock(JobSubmitterService.class),
+                Mockito.mock(JobKillService.class),
+                Mockito.mock(JobCountService.class),
+                "file:///tmp",
+                2,
+                Mockito.mock(Registry.class)
             )
         );
     }

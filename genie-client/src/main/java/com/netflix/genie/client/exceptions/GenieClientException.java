@@ -39,7 +39,7 @@ public class GenieClientException extends IOException {
      * @param msg human readable message
      */
     public GenieClientException(final int errorCode, final String msg) {
-        super(msg);
+        super(errorCode + ": " + msg);
         this.errorCode = errorCode;
     }
 

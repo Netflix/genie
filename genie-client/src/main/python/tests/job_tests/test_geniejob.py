@@ -6,11 +6,12 @@ import unittest
 from mock import patch
 from nose.tools import assert_equals, assert_raises
 
+import pygenie
+
+from ..utils import FakeRunningJob
+
 
 assert_equals.__self__.maxDiff = None
-
-
-import pygenie
 
 
 @patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'})
@@ -74,6 +75,9 @@ class TestingGenieJobRepr(unittest.TestCase):
             .job_id('geniejob_repr') \
             .job_name('geniejob_repr') \
             .job_version('1.1.1') \
+            .parameter('param1', 'pval1') \
+            .parameter('param2', 'pval2') \
+            .parameters(param3='pval3', param4='pval4') \
             .setup_file('/setup.sh') \
             .tags('tag1') \
             .tags('tag2') \
@@ -82,29 +86,35 @@ class TestingGenieJobRepr(unittest.TestCase):
 
         assert_equals(
             str(job),
-            u'GenieJob()'
-            u'.applications("app1")'
-            u'.applications("app2")'
-            u'.archive(False)'
-            u'.cluster_tags("cluster1")'
-            u'.cluster_tags("cluster2")'
-            u'.command_arguments("genie job repr args")'
-            u'.command_tags("cmd1")'
-            u'.command_tags("cmd2")'
-            u'.dependencies("/dep1")'
-            u'.dependencies("/dep2")'
-            u'.description("description")'
-            u'.email("jsmith@email.com")'
-            u'.genie_url("http://asdfasdf")'
-            u'.group("group1")'
-            u'.job_id("geniejob_repr")'
-            u'.job_name("geniejob_repr")'
-            u'.job_version("1.1.1")'
-            u'.setup_file("/setup.sh")'
-            u'.tags("tag1")'
-            u'.tags("tag2")'
-            u'.timeout(999)'
-            u'.username("jsmith")'
+            '.'.join([
+                u'GenieJob()',
+                u'applications("app1")',
+                u'applications("app2")',
+                u'archive(False)',
+                u'cluster_tags("cluster1")',
+                u'cluster_tags("cluster2")',
+                u'command_arguments("genie job repr args")',
+                u'command_tags("cmd1")',
+                u'command_tags("cmd2")',
+                u'dependencies("/dep1")',
+                u'dependencies("/dep2")',
+                u'description("description")',
+                u'email("jsmith@email.com")',
+                u'genie_url("http://asdfasdf")',
+                u'group("group1")',
+                u'job_id("geniejob_repr")',
+                u'job_name("geniejob_repr")',
+                u'job_version("1.1.1")',
+                u'parameter("param1", "pval1")',
+                u'parameter("param2", "pval2")',
+                u'parameter("param3", "pval3")',
+                u'parameter("param4", "pval4")',
+                u'setup_file("/setup.sh")',
+                u'tags("tag1")',
+                u'tags("tag2")',
+                u'timeout(999)',
+                u'username("jsmith")'
+            ])
         )
 
 
@@ -162,3 +172,77 @@ class TestingGenieJobAdapters(unittest.TestCase):
                 u'version': u'0.0.1alpha'
             }
         )
+
+
+@patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'})
+class TestingJobExecute(unittest.TestCase):
+    """Test executing job."""
+
+    @patch('pygenie.jobs.core.reattach_job')
+    @patch('pygenie.jobs.core.generate_job_id')
+    @patch('pygenie.jobs.core.execute_job')
+    def test_job_execute(self, exec_job, gen_job_id, reattach_job):
+        """Testing job execution."""
+
+        job = pygenie.jobs.HiveJob() \
+            .job_id('exec') \
+            .username('exectester') \
+            .script('select * from db.table')
+
+        job.execute()
+
+        gen_job_id.assert_not_called()
+        reattach_job.assert_not_called()
+        exec_job.assert_called_once_with(job)
+
+    @patch('pygenie.jobs.core.reattach_job')
+    @patch('pygenie.jobs.core.generate_job_id')
+    @patch('pygenie.jobs.core.execute_job')
+    def test_job_execute_retry(self, exec_job, gen_job_id, reattach_job):
+        """Testing job execution with retry."""
+
+        job_id = 'exec-retry'
+        new_job_id = '{}-5'.format(job_id)
+
+        gen_job_id.return_value = new_job_id
+        reattach_job.side_effect = pygenie.exceptions.GenieJobNotFoundError
+
+        job = pygenie.jobs.HiveJob() \
+            .job_id(job_id) \
+            .username('exectester') \
+            .script('select * from db.table')
+
+        job.execute(retry=True)
+
+        gen_job_id.assert_called_once_with(job_id,
+                                           return_success=True,
+                                           conf=job.conf)
+        reattach_job.assert_called_once_with(new_job_id, conf=job.conf)
+        exec_job.assert_called_once_with(job)
+        assert_equals(new_job_id, job._job_id)
+
+    @patch('pygenie.jobs.core.reattach_job')
+    @patch('pygenie.jobs.core.generate_job_id')
+    @patch('pygenie.jobs.core.execute_job')
+    def test_job_execute_retry_force(self, exec_job, gen_job_id, reattach_job):
+        """Testing job execution with retry."""
+
+        job_id = 'exec-retry-force'
+        new_job_id = '{}-8'.format(job_id)
+
+        gen_job_id.return_value = new_job_id
+        reattach_job.side_effect = pygenie.exceptions.GenieJobNotFoundError
+
+        job = pygenie.jobs.HiveJob() \
+            .job_id(job_id) \
+            .username('exectester') \
+            .script('select * from db.table')
+
+        job.execute(retry=True, force=True)
+
+        gen_job_id.assert_called_once_with(job_id,
+                                           return_success=False,
+                                           conf=job.conf)
+        reattach_job.assert_called_once_with(new_job_id, conf=job.conf)
+        exec_job.assert_called_once_with(job)
+        assert_equals(new_job_id, job._job_id)

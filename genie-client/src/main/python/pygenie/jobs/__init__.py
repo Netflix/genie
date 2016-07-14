@@ -6,3 +6,4 @@ from .hive import HiveJob
 from .pig import PigJob
 from .presto import PrestoJob
 from .running import RunningJob
+from .sqoop import SqoopJob

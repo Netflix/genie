@@ -14,6 +14,7 @@ import os
 
 from functools import wraps
 from multipledispatch import dispatch
+from urlparse import urlparse
 
 from ..auth import AuthHandler
 from ..utils import (call,
@@ -28,7 +29,8 @@ from .genie_x import (GenieBaseAdapter,
 from ..exceptions import (GenieAttachmentError,
                           GenieHTTPError,
                           GenieJobError,
-                          GenieJobNotFoundError)
+                          GenieJobNotFoundError,
+                          GenieLogNotFoundError)
 
 #jobs
 from ..jobs.core import GenieJob
@@ -36,28 +38,12 @@ from ..jobs.hadoop import HadoopJob
 from ..jobs.hive import HiveJob
 from ..jobs.pig import PigJob
 from ..jobs.presto import PrestoJob
+from ..jobs.sqoop import SqoopJob
 
 
 logger = logging.getLogger('com.netflix.genie.jobs.adapter.genie_3')
 
 dispatch_ns = dict()
-
-
-def assert_script(func):
-    """Decorator to enforce script is set on a job."""
-
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        """Wraps func."""
-
-        job = args[0]
-        if job.get('script') is None:
-            raise GenieJobError('cannot run {} without specifying script' \
-                .format(job.__class__.__name__))
-
-        return func(*args, **kwargs)
-
-    return wrapper
 
 
 def set_jobname(func):
@@ -73,7 +59,7 @@ def set_jobname(func):
         script = job.get('script')
 
         # handle job name if not set
-        if not job.get('job_name'):
+        if not job.get('job_name') and script:
             payload['name'] = os.path.basename(script) if is_file(script) \
                 else script.replace('\n', ' ')[:40].strip()
 
@@ -99,9 +85,7 @@ def to_attachment(att):
         try:
             return (unicode(att['name']), unicode(att['data']))
         except KeyError:
-            raise GenieAttachmentError(
-                "in-line attachment is missing " \
-                "required keys ('name', 'data') ({})".format(att))
+            raise GenieAttachmentError("in-line attachment is missing required keys ('name', 'data') ({})".format(att))
     raise GenieAttachmentError("cannot handle attachment '{}'".format(att))
 
 
@@ -126,8 +110,7 @@ class Genie3Adapter(GenieBaseAdapter):
             return response.iter_lines() if iterator else response.text
         except GenieHTTPError as err:
             if err.response.status_code == 404:
-                raise GenieJobNotFoundError("job id '{}' not found at {}." \
-                    .format(job_id, url))
+                raise GenieLogNotFoundError("log not found at {}".format(url))
             raise
 
     def __url_for_job(self, job_id):
@@ -162,10 +145,10 @@ class Genie3Adapter(GenieBaseAdapter):
             'applications': job.get('application_ids'),
             'attachments': attachments,
             'clusterCriterias': [
-                {'tags': job.get('cluster_tags')}
+                {'tags': job.get('cluster_tags') or job.default_cluster_tags}
             ],
             'commandArgs': job.get('command_arguments') or job.cmd_args,
-            'commandCriteria': job.get('command_tags'),
+            'commandCriteria': job.get('command_tags') or job.default_command_tags,
             'dependencies': dependencies,
             'description': job.get('description'),
             'disableLogArchival': not job.get('archive'),
@@ -180,18 +163,9 @@ class Genie3Adapter(GenieBaseAdapter):
             'version': job.get('job_version')
         }
 
-        # command tags not set, use default
-        if not payload.get('commandCriteria'):
-            payload['commandCriteria'] = job.default_command_tags
-
-        # cluster tags not set, use default
-        if not [c.get('tags') for c in payload.get('clusterCriterias', []) \
-                if len(c.get('tags', [])) > 0]:
-            payload['clusterCriterias'] = [{'tags': job.default_cluster_tags}]
-
         return payload
 
-    def get(self, job_id, path=None, if_not_found=None):
+    def get(self, job_id, path=None, if_not_found=None, **kwargs):
         """
         Get information for a job.
 
@@ -214,12 +188,13 @@ class Genie3Adapter(GenieBaseAdapter):
         try:
             return call(method='get',
                         url=url,
-                        auth_handler=self.auth_handler).json()
+                        auth_handler=self.auth_handler,
+                        **kwargs) \
+                   .json()
         except GenieHTTPError as err:
             if err.response.status_code == 404:
-                msg = "job id '{}' not found at {}.".format(job_id, url)
+                msg = "job not found at {}".format(url)
                 if if_not_found is not None:
-                    logger.warning(msg)
                     return if_not_found
                 raise GenieJobNotFoundError(msg)
             raise
@@ -229,22 +204,37 @@ class Genie3Adapter(GenieBaseAdapter):
         Get information for RunningJob object.
         """
 
-        data = self.get(job_id)
-        request_data = self.get(job_id, path='request')
+        data = self.get(job_id, timeout=60)
+        request_data = self.get(job_id, path='request', timeout=60)
         application_data = self.get(job_id,
                                     path='applications',
-                                    if_not_found=list())
+                                    if_not_found=list(),
+                                    timeout=60)
         cluster_data = self.get(job_id,
                                 path='cluster',
-                                if_not_found=dict())
+                                if_not_found=dict(),
+                                timeout=60)
         command_data = self.get(job_id,
                                 path='command',
-                                if_not_found=dict())
+                                if_not_found=dict(),
+                                timeout=60)
         execution_data = self.get(job_id,
                                   path='execution',
-                                  if_not_found=dict())
+                                  if_not_found=dict(),
+                                  timeout=60)
 
         link = data.get('_links', {}).get('self', {}).get('href')
+        link_parts = urlparse(link)
+
+        output_link = '{scheme}://{netloc}/output/{job_id}/output' \
+            .format(scheme=link_parts.scheme,
+                    netloc=link_parts.netloc,
+                    job_id=data.get('id'))
+
+        job_link = '{scheme}://{netloc}/jobs?id={job_id}&showDetails={job_id}' \
+            .format(scheme=link_parts.scheme,
+                    netloc=link_parts.netloc,
+                    job_id=data.get('id'))
 
         return {
             'application_name': ','.join(a.get('id') for a in application_data),
@@ -264,10 +254,12 @@ class Genie3Adapter(GenieBaseAdapter):
             'finished': data.get('finished'),
             'group': request_data.get('group'),
             'id': data.get('id'),
+            'job_link': job_link,
             'json_link': link,
             'kill_uri': link,
             'name': data.get('name'),
-            'output_uri': data.get('_links', {}).get('output', {}).get('href'),
+            'output_uri': output_link,
+            'request_data': request_data,
             'setup_file': request_data.get('setupFile'),
             'started': data.get('started'),
             'status': data.get('status'),
@@ -278,7 +270,6 @@ class Genie3Adapter(GenieBaseAdapter):
             'version': data.get('version')
         }
 
-
     def get_genie_log(self, job_id, **kwargs):
         """Get a genie log for a job."""
 
@@ -287,7 +278,7 @@ class Genie3Adapter(GenieBaseAdapter):
     def get_status(self, job_id):
         """Get job status."""
 
-        return self.get(job_id, path='status').get('status')
+        return self.get(job_id, path='status', timeout=10).get('status')
 
     def get_stderr(self, job_id, **kwargs):
         """Get a stderr log for a job."""
@@ -305,11 +296,13 @@ class Genie3Adapter(GenieBaseAdapter):
         url = kill_uri if kill_uri is not None else self.__url_for_job(job_id)
 
         try:
-            return call(method='delete',url=url, auth_handler=self.auth_handler)
+            return call(method='delete',
+                        url=url,
+                        timeout=10,
+                        auth_handler=self.auth_handler)
         except GenieHTTPError as err:
             if err.response.status_code == 404:
-                raise GenieJobNotFoundError("job id '{}' not found at {}." \
-                    .format(job_id, url))
+                raise GenieJobNotFoundError("job not found at {}".format(url))
             raise
 
     def submit_job(self, job):
@@ -333,22 +326,16 @@ class Genie3Adapter(GenieBaseAdapter):
             files.append(('attachment', att))
             logger.debug('adding attachment: %s', att)
 
-        try:
-            logger.debug('payload to genie 3:')
-            logger.debug(json.dumps(payload,
-                                    sort_keys=True,
-                                    indent=4,
-                                    separators=(',', ': ')))
-            call(method='post',
-                 url='{}/{}'.format(job.conf.genie.url,
-                                    Genie3Adapter.JOBS_ENDPOINT),
-                 files=files,
-                 auth_handler=self.auth_handler)
-        except GenieHTTPError as err:
-            if err.response.status_code == 409:
-                logger.debug("reattaching to job id '%s'", job.get('job_id'))
-            else:
-                raise
+        logger.debug('payload to genie 3:')
+        logger.debug(json.dumps(payload,
+                                sort_keys=True,
+                                indent=4,
+                                separators=(',', ': ')))
+        call(method='post',
+             url='{}/{}'.format(job.conf.genie.url, Genie3Adapter.JOBS_ENDPOINT),
+             files=files,
+             timeout=300,
+             auth_handler=self.auth_handler)
 
 
 @dispatch(GenieJob, namespace=dispatch_ns)
@@ -362,16 +349,21 @@ def get_payload(job):
                             'command line arguments (use .command_arguments())')
 
     if not payload.get('commandCriteria'):
-        raise GenieJobError('trying to run GenieJob without specifying' \
-                            'command tags')
+        raise GenieJobError('trying to run GenieJob without specifying command tags')
 
     return payload
 
 
 @dispatch((HadoopJob, HiveJob, PigJob, PrestoJob), namespace=dispatch_ns)
 @set_jobname
-@assert_script
 def get_payload(job):
-    """Construct payload for PigJob -> Genie 3."""
+    """Construct payload for jobs -> Genie 3."""
+
+    return Genie3Adapter.construct_base_payload(job)
+
+
+@dispatch((SqoopJob), namespace=dispatch_ns)
+def get_payload(job):
+    """Construct payload for SqoopJob -> Genie 3."""
 
     return Genie3Adapter.construct_base_payload(job)
