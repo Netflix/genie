@@ -72,7 +72,7 @@ class PrestoJob(GenieJob):
             for k, v in self._command_options.get('--', {}).items()])
 
         sessions_str = ' '.join([
-            '--session {}={}'.format(k, v) \
+            '--session {} {}'.format(k, v) \
             for k, v in self._command_options.get('--session', {}).items()])
 
         return '{sessions} {options} -f {filename}' \

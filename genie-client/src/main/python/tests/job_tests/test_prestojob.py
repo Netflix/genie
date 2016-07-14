@@ -59,7 +59,7 @@ class TestingPrestoJob(unittest.TestCase):
 
         assert_equals(
             job.cmd_args,
-            u'--session s2=v2 --session s1=v1 --debug --source tester --opt1 val1 -f script.presto'
+            u'--session s2 v2 --session s1 v1 --debug --source tester --opt1 val1 -f script.presto'
         )
 
     @patch('pygenie.jobs.presto.is_file')
@@ -78,7 +78,7 @@ class TestingPrestoJob(unittest.TestCase):
 
         assert_equals(
             job.cmd_args,
-            u'--session s2=v2 --session s1=v1 --debug --source tester --opt1 val1 -f test.presto'
+            u'--session s2 v2 --session s1 v1 --debug --source tester --opt1 val1 -f test.presto'
         )
 
 
