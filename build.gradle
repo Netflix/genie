@@ -54,6 +54,7 @@ subprojects {
     apply plugin: 'nebula.optional-base'
     apply plugin: 'nebula.provided-base'
     apply plugin: 'com.gorylenko.gradle-git-properties'
+    apply plugin: 'groovy'
 
     group = "com.netflix.${githubProjectName}"
 
@@ -114,6 +115,9 @@ subprojects {
 
         testRuntime("javax.el:javax.el-api")
         testRuntime("org.glassfish:javax.el")
+
+        testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
+        testCompile 'org.spockframework:spock-guice:1.0-groovy-2.4'
     }
 
     task unitTests(type: Test, group: 'verification') {

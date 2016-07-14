@@ -22,6 +22,8 @@ genie:
       location: "file:///tmp/"
     archive:
       location: /archive/location
+  threshold:
+    used-physical-memory-percent: 100
 
 spring:
   jpa:
