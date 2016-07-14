@@ -60,7 +60,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
-import org.springframework.core.task.TaskExecutor;
+import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.mail.javamail.JavaMailSender;
 
 import java.util.List;
@@ -222,6 +222,7 @@ public class ServicesConfig {
      * @param jobSearchService The job search service to use to locate job information.
      * @param executor         The executor to use to run system processes.
      * @param runAsUser        Whether jobs on this instance are run as the user or not
+     * @param eventPublisher   The application event publisher to use to publish system wide events
      * @return A job kill service instance.
      */
     @Bean
@@ -230,9 +231,10 @@ public class ServicesConfig {
         final JobSearchService jobSearchService,
         final Executor executor,
         @Value("${genie.jobs.runAsUser.enabled:false}")
-        final boolean runAsUser
+        final boolean runAsUser,
+        final ApplicationEventPublisher eventPublisher
     ) {
-        return new LocalJobKillServiceImpl(hostName, jobSearchService, executor, runAsUser);
+        return new LocalJobKillServiceImpl(hostName, jobSearchService, executor, runAsUser, eventPublisher);
     }
 
     /**
@@ -309,11 +311,12 @@ public class ServicesConfig {
      * @param baseArchiveLocation   The base directory location of where the job dir should be archived
      * @param maxRunningJobs        The maximum number of jobs that can run on this node
      * @param registry              The metrics registry to use
+     * @param eventPublisher        The application event publisher to use
      * @return An instance of the JobCoordinatorService.
      */
     @Bean
     public JobCoordinatorService jobCoordinatorService(
-        final TaskExecutor taskExecutor,
+        final AsyncTaskExecutor taskExecutor,
         final JobPersistenceService jobPersistenceService,
         final JobSubmitterService jobSubmitterService,
         final JobKillService jobKillService,
@@ -323,8 +326,9 @@ public class ServicesConfig {
         final String baseArchiveLocation,
         @Value("${genie.jobs.max.running:2}")
         final int maxRunningJobs,
-        final Registry registry
-        ) {
+        final Registry registry,
+        final ApplicationEventPublisher eventPublisher
+    ) {
         return new JobCoordinatorService(
             taskExecutor,
             jobPersistenceService,
@@ -333,7 +337,8 @@ public class ServicesConfig {
             jobCountService,
             baseArchiveLocation,
             maxRunningJobs,
-            registry
+            registry,
+            eventPublisher
         );
     }
 }

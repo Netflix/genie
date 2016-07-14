@@ -62,7 +62,7 @@ public class GenieHealthIndicator implements HealthIndicator {
      */
     @Override
     public Health health() {
-        final int numRunningJobs = this.jobMonitoringCoordinator.getNumRunningJobs();
+        final int numRunningJobs = this.jobMonitoringCoordinator.getNumJobs();
         if (numRunningJobs < this.maxRunningJobs) {
             return Health
                 .up()

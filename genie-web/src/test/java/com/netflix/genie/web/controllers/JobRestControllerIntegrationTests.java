@@ -569,7 +569,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                     .content(OBJECT_MAPPER.writeValueAsBytes(jobConflictRequest))
             )
             .andExpect(MockMvcResultMatchers.status().isConflict());
-
     }
 
     /**

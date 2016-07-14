@@ -17,29 +17,33 @@
  */
 package com.netflix.genie.core.events;
 
-import lombok.Getter;
-import org.hibernate.validator.constraints.NotBlank;
+import com.netflix.genie.test.categories.UnitTest;
+import org.hamcrest.Matchers;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+
+import java.util.UUID;
 
 /**
- * An event fired from within the Genie system when it needs a specific job killed.
+ * Unit tests for BaseJobEvent class.
  *
  * @author tgianos
  * @since 3.0.0
  */
-@Getter
-public class KillJobEvent extends BaseJobEvent {
-
-    private final String reason;
+@Category(UnitTest.class)
+public class BaseJobEventUnitTests {
 
     /**
-     * Constructor.
-     *
-     * @param id     The id of the job to kill
-     * @param reason The reason this job is being requested to be killed
-     * @param source The source object which threw this event
+     * Make sure constructor saves variables properly.
      */
-    public KillJobEvent(@NotBlank final String id, @NotBlank final String reason, final Object source) {
-        super(id, source);
-        this.reason = reason;
+    @Test
+    public void canConstruct() {
+        final String id = UUID.randomUUID().toString();
+        final Object source = new Object();
+
+        final BaseJobEvent event = new BaseJobEvent(id, source);
+        Assert.assertThat(event.getId(), Matchers.is(id));
+        Assert.assertThat(event.getSource(), Matchers.is(source));
     }
 }

@@ -75,8 +75,12 @@ genie:
       enabled: true
       expression: 0 0 0 * * *
       retention: 3
-    pool:
-      size: 10
+    executor:
+      pool:
+        size: 1
+    scheduler:
+      pool:
+        size: 1
 
 info:
   genie:
