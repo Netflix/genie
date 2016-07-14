@@ -104,7 +104,7 @@ export default class JobDetails extends React.Component {
                     </ul>
                   </td>
                 </tr>
-                {this.state.job.status === 'RUNNING' && !this.state.killJobRequestSent ?
+                {(this.state.job.status === 'RUNNING' || this.state.job.status === 'INIT') && !this.state.killJobRequestSent ?
                   <tr>
                     <td>
                       <button
