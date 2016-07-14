@@ -46,7 +46,7 @@ export default class Job extends Page {
         name  : 'sort',
         value : '',
         type  : 'select',
-        selectFields: ['user', 'created', 'id', 'name', 'status', 'clusterName', 'cluserId'].map(field => (
+        selectFields: ['user', 'id', 'name', 'status', 'clusterName', 'cluserId', 'started', 'finished'].map(field => (
           {
             value: field,
             label: field,
