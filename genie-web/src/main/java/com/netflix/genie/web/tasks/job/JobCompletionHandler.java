@@ -183,10 +183,10 @@ public class JobCompletionHandler {
             } else if (status == JobStatus.RUNNING) {
                 this.updateFinalStatusForJob(jobId);
                 this.cleanupProcesses(jobId);
+                this.processJobDir(jobId);
             }
 
             // Things that should be done either way
-            this.processJobDir(jobId);
             this.sendEmail(jobId);
         }
     }
