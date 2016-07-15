@@ -17,13 +17,14 @@
 ##
 
 genie:
+  health:
+    memory:
+      usedPhysicalMemoryPercent: 100
   jobs:
     dir:
       location: "file:///tmp/"
     archive:
       location: /archive/location
-  threshold:
-    used-physical-memory-percent: 100
 
 spring:
   jpa:

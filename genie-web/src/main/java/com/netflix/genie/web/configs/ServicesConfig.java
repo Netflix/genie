@@ -345,7 +345,7 @@ public class ServicesConfig {
     }
 
     /**
-     * Get the .
+     * Returns the operating system MX bean.
      *
      * @return The operating system MX bean.
      */
