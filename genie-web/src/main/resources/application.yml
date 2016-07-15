@@ -24,6 +24,9 @@ eureka:
     enabled: false
 
 genie:
+  health:
+    memory:
+      usedPhysicalMemoryPercent: 90
   jobs:
     archive:
       location: base_archival_location_path
