@@ -32,11 +32,11 @@ public class IntegrationTestActiveProfilesResolver implements ActiveProfilesReso
      */
     @Override
     public String[] resolve(final Class<?> testClass) {
-        final String ciProperty = System.getProperty("CI", "false");
-        final boolean isCI = Boolean.valueOf(ciProperty);
+        final boolean isCI = Boolean.valueOf(System.getProperty("CI", "false"));
+        final boolean isTravis = Boolean.valueOf(System.getProperty("TRAVIS", "false"));
 
         final String[] activeProfiles;
-        if (isCI) {
+        if (isCI || isTravis) {
             activeProfiles = new String[]{"ci"};
         } else {
             activeProfiles = new String[]{"integration"};

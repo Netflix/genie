@@ -15,19 +15,35 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.core.services;
+package com.netflix.genie.core.events;
+
+import lombok.Getter;
+import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.context.ApplicationEvent;
+
+import javax.validation.constraints.NotNull;
 
 /**
- * A service which returns counts for various jobs.
+ * A base event all Genie job events should extend.
  *
  * @author tgianos
  * @since 3.0.0
  */
-public interface JobCountService {
+@Getter
+public class BaseJobEvent extends ApplicationEvent {
+
+    private static final long serialVersionUID = 8635146103611268924L;
+
+    private String id;
+
     /**
-     * Get the number of jobs active on this node.
+     * Constructor.
      *
-     * @return The number of jobs currently active on this node
+     * @param id The id of the job this event relates to
+     * @param source The source object which generates this event
      */
-    int getNumJobs();
+    public BaseJobEvent(@NotEmpty final String id, @NotNull final Object source) {
+        super(source);
+        this.id = id;
+    }
 }

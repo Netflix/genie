@@ -23,10 +23,11 @@ import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
-import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.core.events.JobFinishedEvent;
+import com.netflix.genie.core.events.JobFinishedReason;
 import com.netflix.genie.core.events.JobStartedEvent;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
@@ -176,11 +177,15 @@ public class LocalJobRunner implements JobSubmitterService {
             }
         } catch (final GeniePreconditionException gpe) {
             log.error(gpe.getMessage(), gpe);
-            this.jobPersistenceService.updateJobStatus(id, JobStatus.INVALID, gpe.getMessage());
+            this.applicationEventPublisher.publishEvent(
+                new JobFinishedEvent(id, JobFinishedReason.INVALID, gpe.getMessage(), this)
+            );
             throw gpe;
         } catch (final Exception e) {
             log.error(e.getMessage(), e);
-            this.jobPersistenceService.updateJobStatus(id, JobStatus.FAILED, e.getMessage());
+            this.applicationEventPublisher.publishEvent(
+                new JobFinishedEvent(id, JobFinishedReason.FAILED_TO_INIT, e.getMessage(), this)
+            );
             throw e;
         }
     }

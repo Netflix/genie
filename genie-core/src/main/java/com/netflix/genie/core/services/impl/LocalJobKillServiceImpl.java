@@ -18,9 +18,12 @@
 package com.netflix.genie.core.services.impl;
 
 import com.netflix.genie.common.dto.JobExecution;
+import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.core.events.JobFinishedEvent;
+import com.netflix.genie.core.events.JobFinishedReason;
 import com.netflix.genie.core.events.KillJobEvent;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.services.JobKillService;
@@ -33,6 +36,7 @@ import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.lang3.SystemUtils;
 import org.hibernate.validator.constraints.NotBlank;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 
 import javax.validation.constraints.NotNull;
@@ -52,6 +56,7 @@ public class LocalJobKillServiceImpl implements JobKillService {
     private final JobSearchService jobSearchService;
     private final Executor executor;
     private final boolean runAsUser;
+    private final ApplicationEventPublisher eventPublisher;
 
     /**
      * Constructor.
@@ -60,17 +65,20 @@ public class LocalJobKillServiceImpl implements JobKillService {
      * @param jobSearchService The job search service to use to locate job information
      * @param executor         The executor to use to run system processes
      * @param runAsUser        True if jobs are run as the user who submitted the job
+     * @param eventPublisher   The system event publisher to use
      */
     public LocalJobKillServiceImpl(
         @NotBlank final String hostName,
         @NotNull final JobSearchService jobSearchService,
         @NotNull final Executor executor,
-        final boolean runAsUser
+        final boolean runAsUser,
+        @NotNull final ApplicationEventPublisher eventPublisher
     ) {
         this.hostName = hostName;
         this.jobSearchService = jobSearchService;
         this.executor = executor;
         this.runAsUser = runAsUser;
+        this.eventPublisher = eventPublisher;
     }
 
     /**
@@ -80,29 +88,42 @@ public class LocalJobKillServiceImpl implements JobKillService {
     public void killJob(@NotBlank final String id) throws GenieException {
         // Will throw exception if not found
         // TODO: Could instead check JobMonitorCoordinator eventually for in memory check
-        final JobExecution jobExecution = this.jobSearchService.getJobExecution(id);
-        if (jobExecution.getExitCode() != JobExecution.DEFAULT_EXIT_CODE) {
-            // Job is already finished one way or another
-            return;
-        }
-
-        if (!this.hostName.equals(jobExecution.getHostName())) {
-            throw new GeniePreconditionException(
-                "Job with id "
-                    + id
-                    + " is not running on this host ("
-                    + this.hostName
-                    + "). It's actually on "
-                    + jobExecution.getHostName()
+        final JobStatus jobStatus = this.jobSearchService.getJobStatus(id);
+        if (jobStatus == JobStatus.INIT) {
+            // Send a job finished event to force system to update the job to killed
+            this.eventPublisher.publishEvent(
+                new JobFinishedEvent(
+                    id,
+                    JobFinishedReason.KILLED,
+                    "User requested job be killed during initialization",
+                    this
+                )
             );
-        }
+        } else if (jobStatus == JobStatus.RUNNING) {
+            final JobExecution jobExecution = this.jobSearchService.getJobExecution(id);
+            if (jobExecution.getExitCode() != JobExecution.DEFAULT_EXIT_CODE) {
+                // Job is already finished one way or another
+                return;
+            }
 
-        // Job is on this node and still running as of when query was made to database
-        if (SystemUtils.IS_OS_UNIX) {
-            this.killJobOnUnix(jobExecution.getProcessId());
-        } else {
-            // Windows, etc. May support later
-            throw new java.lang.UnsupportedOperationException("Genie isn't currently supported on this OS");
+            if (!this.hostName.equals(jobExecution.getHostName())) {
+                throw new GeniePreconditionException(
+                    "Job with id "
+                        + id
+                        + " is not running on this host ("
+                        + this.hostName
+                        + "). It's actually on "
+                        + jobExecution.getHostName()
+                );
+            }
+
+            // Job is on this node and still running as of when query was made to database
+            if (SystemUtils.IS_OS_UNIX) {
+                this.killJobOnUnix(jobExecution.getProcessId());
+            } else {
+                // Windows, etc. May support later
+                throw new java.lang.UnsupportedOperationException("Genie isn't currently supported on this OS");
+            }
         }
     }
 
@@ -115,9 +136,6 @@ public class LocalJobKillServiceImpl implements JobKillService {
     @EventListener
     public void onKillJobEvent(@NotNull final KillJobEvent event) throws GenieException {
         this.killJob(event.getId());
-
-        // Do we send a job finished event here? May lead to race conditions with Job monitor, leaving in JobMonitor
-        // for now... - TG
     }
 
     private void killJobOnUnix(final int pid) throws GenieException {

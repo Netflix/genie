@@ -23,17 +23,20 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
+import com.netflix.genie.core.events.JobScheduledEvent;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.jobs.JobLauncher;
 import com.netflix.spectator.api.Registry;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
-import org.springframework.core.task.TaskExecutor;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.TaskRejectedException;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.concurrent.Future;
 
 
 /**
@@ -46,7 +49,7 @@ import javax.validation.constraints.NotNull;
 @Slf4j
 public class JobCoordinatorService {
 
-    private final TaskExecutor taskExecutor;
+    private final AsyncTaskExecutor taskExecutor;
     private final JobPersistenceService jobPersistenceService;
     private final JobSubmitterService jobSubmitterService;
     private final JobKillService jobKillService;
@@ -54,6 +57,7 @@ public class JobCoordinatorService {
     private final int maxRunningJobs;
     private final String baseArchiveLocation;
     private final Registry registry;
+    private final ApplicationEventPublisher eventPublisher;
 
     /**
      * Constructor.
@@ -66,16 +70,18 @@ public class JobCoordinatorService {
      * @param baseArchiveLocation   The base directory location of where the job dir should be archived
      * @param maxRunningJobs        The maximum number of jobs that can run on this host at any time
      * @param registry              The registry to use for metrics
+     * @param eventPublisher        The application event publisher to use
      */
     public JobCoordinatorService(
-        @NotNull final TaskExecutor taskExecutor,
+        @NotNull final AsyncTaskExecutor taskExecutor,
         @NotNull final JobPersistenceService jobPersistenceService,
         @NotNull final JobSubmitterService jobSubmitterService,
         @NotNull final JobKillService jobKillService,
         @NotNull final JobCountService jobCountService,
         @NotNull final String baseArchiveLocation,
         final int maxRunningJobs,
-        @NotNull final Registry registry
+        @NotNull final Registry registry,
+        @NotNull final ApplicationEventPublisher eventPublisher
     ) {
         this.taskExecutor = taskExecutor;
         this.jobPersistenceService = jobPersistenceService;
@@ -85,6 +91,7 @@ public class JobCoordinatorService {
         this.baseArchiveLocation = baseArchiveLocation;
         this.maxRunningJobs = maxRunningJobs;
         this.registry = registry;
+        this.eventPublisher = eventPublisher;
     }
 
     /**
@@ -136,7 +143,11 @@ public class JobCoordinatorService {
             // TODO: if this throws exception the job will never be marked failed
             this.jobPersistenceService.createJob(jobBuilder.build());
             try {
-                this.taskExecutor.execute(new JobLauncher(this.jobSubmitterService, jobRequest, this.registry));
+                final Future<?> task
+                    = this.taskExecutor.submit(new JobLauncher(this.jobSubmitterService, jobRequest, this.registry));
+
+                // Tell the system a new job has been scheduled so any actions can be taken
+                this.eventPublisher.publishEvent(new JobScheduledEvent(jobRequest.getId(), task, this));
             } catch (final TaskRejectedException e) {
                 final String errorMsg = "Unable to launch job due to exception: " + e.getMessage();
                 this.jobPersistenceService.updateJobStatus(jobRequest.getId(), JobStatus.FAILED, errorMsg);
@@ -169,6 +180,6 @@ public class JobCoordinatorService {
      * @return true if the job can run on this node or not
      */
     private synchronized boolean canRunJob() {
-        return this.jobCountService.getNumRunningJobs() < this.maxRunningJobs;
+        return this.jobCountService.getNumJobs() < this.maxRunningJobs;
     }
 }

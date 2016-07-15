@@ -34,7 +34,6 @@ public interface FileTransfer {
      *
      * @param fileName file name to validate
      * @return whether the implementation can handle file based on prefix
-     *
      * @throws GenieException if there are errors
      */
     // TODO can we use a map of file system type to impl
@@ -44,8 +43,7 @@ public interface FileTransfer {
      * Gets a file from any remote location to Genie's local working directory.
      *
      * @param srcRemotePath Source path of the files to copy
-     * @param dstLocalPath Destination path of the files to copy to
-     *
+     * @param dstLocalPath  Destination path of the files to copy to
      * @throws GenieException exception in case of an error
      */
     void getFile(String srcRemotePath, String dstLocalPath) throws GenieException;
@@ -53,17 +51,9 @@ public interface FileTransfer {
     /**
      * Puts a file from Genie's local working directory to a remote location.
      *
-     * @param srcLocalPath Source path of the files to copy
+     * @param srcLocalPath  Source path of the files to copy
      * @param dstRemotePath Destination path of the files to copy to
-     *
      * @throws GenieException exception in case of an error
      */
     void putFile(String srcLocalPath, String dstRemotePath) throws GenieException;
 }
-
-//
-//    GenieFileTransferService {
-//
-//    Iterate over S3FileTransferService, LocalFileTransferService and try to get file/put file
-//
-//    }

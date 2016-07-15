@@ -15,19 +15,32 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.core.services;
+package com.netflix.genie.core.events;
 
 /**
- * A service which returns counts for various jobs.
+ * An enumeration representing the various reasons a JobFinishedEvent would be sent.
  *
  * @author tgianos
  * @since 3.0.0
  */
-public interface JobCountService {
+public enum JobFinishedReason {
     /**
-     * Get the number of jobs active on this node.
-     *
-     * @return The number of jobs currently active on this node
+     * The job was killed.
      */
-    int getNumJobs();
+    KILLED,
+
+    /**
+     * The job request was invalid.
+     */
+    INVALID,
+
+    /**
+     * The job failed during the initialization phase.
+     */
+    FAILED_TO_INIT,
+
+    /**
+     * The jobs process completed either sucessfully or unsuccessfully. Check job done file.
+     */
+    PROCESS_COMPLETED
 }

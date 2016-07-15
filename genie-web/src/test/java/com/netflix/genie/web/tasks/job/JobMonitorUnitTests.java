@@ -243,7 +243,7 @@ public class JobMonitorUnitTests {
             .publishEvent(captor.capture());
 
         Assert.assertNotNull(captor.getValue());
-        Assert.assertThat(captor.getValue().getJobExecution(), Matchers.is(this.jobExecution));
+        Assert.assertThat(captor.getValue().getId(), Matchers.is(this.jobExecution.getId()));
         Assert.assertThat(captor.getValue().getSource(), Matchers.is(this.monitor));
         Mockito.verify(this.finishedRate, Mockito.times(1)).increment();
     }
@@ -311,7 +311,7 @@ public class JobMonitorUnitTests {
         Assert.assertThat(((KillJobEvent) events.get(0)).getId(), Matchers.is(this.jobExecution.getId()));
         Assert.assertThat(events.get(0).getSource(), Matchers.is(this.monitor));
         Assert.assertTrue(events.get(1) instanceof JobFinishedEvent);
-        Assert.assertThat(((JobFinishedEvent) events.get(1)).getJobExecution(), Matchers.is(this.jobExecution));
+        Assert.assertThat(((JobFinishedEvent) events.get(1)).getId(), Matchers.is(this.jobExecution.getId()));
         Assert.assertThat(events.get(1).getSource(), Matchers.is(this.monitor));
         Mockito.verify(this.unsuccessfulCheckRate, Mockito.times(6)).increment();
     }
