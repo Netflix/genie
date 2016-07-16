@@ -21,6 +21,8 @@ import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.stereotype.Component;
 
+import java.lang.management.ManagementFactory;
+
 /**
  * Health indicator for system memory usage. Also mark the service out-of-service if it crosses the threshold.
  * @author amajumdar
@@ -39,14 +41,17 @@ public class MemoryHealthIndicator implements HealthIndicator {
      * Constructor.
      *
      * @param maxUsedPhysicalMemoryPercentage The maximum physical memory threshold
-     * @param operatingSystemMXBean MX bean for operating system
      */
     @Autowired
     public MemoryHealthIndicator(
             @Value("${genie.health.memory.usedPhysicalMemoryPercent:90}")
-            final double maxUsedPhysicalMemoryPercentage,
-            final OperatingSystemMXBean operatingSystemMXBean
+            final double maxUsedPhysicalMemoryPercentage
     ) {
+        this(maxUsedPhysicalMemoryPercentage, (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean());
+    }
+
+    MemoryHealthIndicator(final double maxUsedPhysicalMemoryPercentage,
+            final OperatingSystemMXBean operatingSystemMXBean) {
         this.maxUsedPhysicalMemoryPercentage = maxUsedPhysicalMemoryPercentage;
         this.operatingSystemMXBean = operatingSystemMXBean;
     }
