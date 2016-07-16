@@ -51,7 +51,6 @@ import com.netflix.genie.core.services.impl.LocalJobRunner;
 import com.netflix.genie.core.services.impl.MailServiceImpl;
 import com.netflix.genie.core.services.impl.RandomizedClusterLoadBalancerImpl;
 import com.netflix.spectator.api.Registry;
-import com.sun.management.OperatingSystemMXBean;
 import org.apache.commons.exec.Executor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -64,7 +63,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.mail.javamail.JavaMailSender;
 
-import java.lang.management.ManagementFactory;
 import java.util.List;
 
 /**
@@ -342,15 +340,5 @@ public class ServicesConfig {
             registry,
             eventPublisher
         );
-    }
-
-    /**
-     * Returns the operating system MX bean.
-     *
-     * @return The operating system MX bean.
-     */
-    @Bean
-    public OperatingSystemMXBean operatingSystemMXBean() {
-        return (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
     }
 }
