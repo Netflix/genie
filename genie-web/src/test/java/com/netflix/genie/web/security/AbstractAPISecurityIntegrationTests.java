@@ -24,7 +24,6 @@ import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
-import com.netflix.genie.common.dto.JobRequest;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +38,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.UUID;
 
 /**
@@ -78,16 +75,6 @@ public abstract class AbstractAPISecurityIntegrationTests {
             1000L
         ).build();
 
-    private static final JobRequest JOB_REQUEST =
-        new JobRequest.Builder(
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            new ArrayList<>(),
-            new HashSet<>()
-        ).build();
-
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final String APPLICATIONS_API = "/api/v3/applications";
     private static final String CLUSTERS_API = "/api/v3/clusters";
@@ -96,9 +83,9 @@ public abstract class AbstractAPISecurityIntegrationTests {
 
     private static final ResultMatcher OK = MockMvcResultMatchers.status().isOk();
     private static final ResultMatcher ACCEPTED = MockMvcResultMatchers.status().isAccepted();
+    private static final ResultMatcher BAD_REQUEST = MockMvcResultMatchers.status().isBadRequest();
     private static final ResultMatcher CREATED = MockMvcResultMatchers.status().isCreated();
     private static final ResultMatcher NO_CONTENT = MockMvcResultMatchers.status().isNoContent();
-    private static final ResultMatcher PRECONDITION_FAILED = MockMvcResultMatchers.status().isPreconditionFailed();
     private static final ResultMatcher NOT_FOUND = MockMvcResultMatchers.status().isNotFound();
     private static final ResultMatcher FORBIDDEN = MockMvcResultMatchers.status().isForbidden();
 
@@ -181,7 +168,7 @@ public abstract class AbstractAPISecurityIntegrationTests {
         this.put(COMMANDS_API + "/" + UUID.randomUUID().toString(), COMMAND, FORBIDDEN);
 
         this.get(JOBS_API, OK);
-        this.post(JOBS_API, JOB_REQUEST, ACCEPTED);
+        this.post(JOBS_API, "{\"key\":\"value\"}", BAD_REQUEST);
         this.get(JOBS_API + "/" + UUID.randomUUID().toString(), NOT_FOUND);
         this.delete(JOBS_API + "/" + UUID.randomUUID().toString(), NOT_FOUND);
 
@@ -215,7 +202,7 @@ public abstract class AbstractAPISecurityIntegrationTests {
         this.put(COMMANDS_API + "/" + UUID.randomUUID().toString(), COMMAND, NOT_FOUND);
 
         this.get(JOBS_API, OK);
-        this.post(JOBS_API, JOB_REQUEST, ACCEPTED);
+        this.post(JOBS_API, "{\"key\":\"value\"}", BAD_REQUEST);
         this.get(JOBS_API + "/" + UUID.randomUUID().toString(), NOT_FOUND);
         this.delete(JOBS_API + "/" + UUID.randomUUID().toString(), NOT_FOUND);
 

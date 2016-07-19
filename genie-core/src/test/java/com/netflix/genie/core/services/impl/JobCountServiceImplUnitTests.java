@@ -67,6 +67,6 @@ public class JobCountServiceImplUnitTests {
                 )
             );
 
-        Assert.assertThat(this.jobCountService.getNumRunningJobs(), Matchers.is(3));
+        Assert.assertThat(this.jobCountService.getNumJobs(), Matchers.is(3));
     }
 }

@@ -21,6 +21,8 @@ import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.events.JobFinishedEvent;
+import com.netflix.genie.core.events.JobFinishedReason;
+import com.netflix.genie.core.events.JobScheduledEvent;
 import com.netflix.genie.core.events.JobStartedEvent;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.services.JobSearchService;
@@ -48,6 +50,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledFuture;
 
 /**
@@ -194,17 +197,17 @@ public class JobMonitoringCoordinatorUnitTests {
             this.scheduler.scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(DELAY))
         ).thenReturn(future);
 
-        Assert.assertThat(this.coordinator.getNumRunningJobs(), Matchers.is(0));
+        Assert.assertThat(this.coordinator.getNumJobs(), Matchers.is(0));
         this.coordinator.onJobStarted(event1);
-        Assert.assertThat(this.coordinator.getNumRunningJobs(), Matchers.is(1));
+        Assert.assertThat(this.coordinator.getNumJobs(), Matchers.is(1));
         this.coordinator.onJobStarted(event2);
-        Assert.assertThat(this.coordinator.getNumRunningJobs(), Matchers.is(2));
+        Assert.assertThat(this.coordinator.getNumJobs(), Matchers.is(2));
         this.coordinator.onJobStarted(event3);
-        Assert.assertThat(this.coordinator.getNumRunningJobs(), Matchers.is(3));
+        Assert.assertThat(this.coordinator.getNumJobs(), Matchers.is(3));
         this.coordinator.onJobStarted(event4);
-        Assert.assertThat(this.coordinator.getNumRunningJobs(), Matchers.is(4));
+        Assert.assertThat(this.coordinator.getNumJobs(), Matchers.is(4));
         this.coordinator.onJobStarted(event5);
-        Assert.assertThat(this.coordinator.getNumRunningJobs(), Matchers.is(4));
+        Assert.assertThat(this.coordinator.getNumJobs(), Matchers.is(4));
 
         Mockito
             .verify(this.scheduler, Mockito.times(4))
@@ -227,9 +230,11 @@ public class JobMonitoringCoordinatorUnitTests {
         final JobExecution job2 = builder.build();
 
         final JobStartedEvent startedEvent1 = new JobStartedEvent(job1, this);
-        final JobFinishedEvent finishedEvent1 = new JobFinishedEvent(job1, this);
+        final JobFinishedEvent finishedEvent1
+            = new JobFinishedEvent(job1Id, JobFinishedReason.PROCESS_COMPLETED, "something", this);
         final JobStartedEvent startedEvent2 = new JobStartedEvent(job2, this);
-        final JobFinishedEvent finishedEvent2 = new JobFinishedEvent(job2, this);
+        final JobFinishedEvent finishedEvent2
+            = new JobFinishedEvent(job2Id, JobFinishedReason.KILLED, "something", this);
 
         final ScheduledFuture future1 = Mockito.mock(ScheduledFuture.class);
         Mockito.when(future1.cancel(true)).thenReturn(true);
@@ -240,26 +245,70 @@ public class JobMonitoringCoordinatorUnitTests {
             this.scheduler.scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(DELAY))
         ).thenReturn(future1, future2);
 
-        Assert.assertThat(this.coordinator.getNumRunningJobs(), Matchers.is(0));
+        Assert.assertThat(this.coordinator.getNumJobs(), Matchers.is(0));
         this.coordinator.onJobStarted(startedEvent1);
-        Assert.assertThat(this.coordinator.getNumRunningJobs(), Matchers.is(1));
+        Assert.assertThat(this.coordinator.getNumJobs(), Matchers.is(1));
         this.coordinator.onJobStarted(startedEvent2);
-        Assert.assertThat(this.coordinator.getNumRunningJobs(), Matchers.is(2));
+        Assert.assertThat(this.coordinator.getNumJobs(), Matchers.is(2));
 
         Mockito
             .verify(this.scheduler, Mockito.times(2))
             .scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(DELAY));
 
-        Assert.assertThat(this.coordinator.getNumRunningJobs(), Matchers.is(2));
+        Assert.assertThat(this.coordinator.getNumJobs(), Matchers.is(2));
         this.coordinator.onJobFinished(finishedEvent1);
-        Assert.assertThat(this.coordinator.getNumRunningJobs(), Matchers.is(1));
+        Assert.assertThat(this.coordinator.getNumJobs(), Matchers.is(1));
         this.coordinator.onJobFinished(finishedEvent2);
-        Assert.assertThat(this.coordinator.getNumRunningJobs(), Matchers.is(1));
+        Assert.assertThat(this.coordinator.getNumJobs(), Matchers.is(0));
         this.coordinator.onJobFinished(finishedEvent1);
-        Assert.assertThat(this.coordinator.getNumRunningJobs(), Matchers.is(1));
+        Assert.assertThat(this.coordinator.getNumJobs(), Matchers.is(0));
 
         Mockito.verify(future1, Mockito.times(1)).cancel(true);
         Mockito.verify(future2, Mockito.times(1)).cancel(true);
+        Mockito.verify(this.unableToCancel, Mockito.times(1)).increment();
+    }
+
+    /**
+     * Make sure when a job is scheduled it counts in active jobs.
+     */
+    @Test
+    public void canScheduleJob() {
+        final String jobId = UUID.randomUUID().toString();
+        final Future<?> task = Mockito.mock(Future.class);
+        final JobScheduledEvent jobScheduledEvent = new JobScheduledEvent(jobId, task, this);
+        Assert.assertThat(this.coordinator.getNumJobs(), Matchers.is(0));
+        this.coordinator.onJobScheduled(jobScheduledEvent);
+        Assert.assertThat(this.coordinator.getNumJobs(), Matchers.is(1));
+    }
+
+    /**
+     * Make sure we can kill the job init task on job finished event for the job.
+     */
+    @Test
+    public void canStopJobTask() {
+        final String jobId = UUID.randomUUID().toString();
+        final Future<?> task = Mockito.mock(Future.class);
+        final JobScheduledEvent jobScheduledEvent = new JobScheduledEvent(jobId, task, this);
+        final JobFinishedEvent jobFinishedEvent
+            = new JobFinishedEvent(jobId, JobFinishedReason.FAILED_TO_INIT, "something", this);
+        Mockito.when(task.isDone()).thenReturn(true).thenReturn(false).thenReturn(false);
+        Mockito.when(task.cancel(true)).thenReturn(true).thenReturn(false);
+
+        Assert.assertThat(this.coordinator.getNumJobs(), Matchers.is(0));
+        this.coordinator.onJobScheduled(jobScheduledEvent);
+        Assert.assertThat(this.coordinator.getNumJobs(), Matchers.is(1));
+        this.coordinator.onJobFinished(jobFinishedEvent);
+        Assert.assertThat(this.coordinator.getNumJobs(), Matchers.is(0));
+        this.coordinator.onJobScheduled(jobScheduledEvent);
+        Assert.assertThat(this.coordinator.getNumJobs(), Matchers.is(1));
+        this.coordinator.onJobFinished(jobFinishedEvent);
+        Assert.assertThat(this.coordinator.getNumJobs(), Matchers.is(0));
+        this.coordinator.onJobScheduled(jobScheduledEvent);
+        Assert.assertThat(this.coordinator.getNumJobs(), Matchers.is(1));
+        this.coordinator.onJobFinished(jobFinishedEvent);
+        Assert.assertThat(this.coordinator.getNumJobs(), Matchers.is(0));
+
+        Mockito.verify(task, Mockito.times(2)).cancel(true);
         Mockito.verify(this.unableToCancel, Mockito.times(1)).increment();
     }
 }

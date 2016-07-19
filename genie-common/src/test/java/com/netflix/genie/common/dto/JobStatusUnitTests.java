@@ -65,4 +65,30 @@ public class JobStatusUnitTests {
     public void testBlankJobStatus() throws GeniePreconditionException {
         JobStatus.parse(null);
     }
+
+    /**
+     * Test to make sure isActive is working properly.
+     */
+    @Test
+    public void testIsActive() {
+        Assert.assertTrue(JobStatus.RUNNING.isActive());
+        Assert.assertTrue(JobStatus.INIT.isActive());
+        Assert.assertFalse(JobStatus.FAILED.isActive());
+        Assert.assertFalse(JobStatus.INVALID.isActive());
+        Assert.assertFalse(JobStatus.KILLED.isActive());
+        Assert.assertFalse(JobStatus.SUCCEEDED.isActive());
+    }
+
+    /**
+     * Test to make sure isFinished is working properly.
+     */
+    @Test
+    public void testIsFinished() {
+        Assert.assertFalse(JobStatus.RUNNING.isFinished());
+        Assert.assertFalse(JobStatus.INIT.isFinished());
+        Assert.assertTrue(JobStatus.FAILED.isFinished());
+        Assert.assertTrue(JobStatus.INVALID.isFinished());
+        Assert.assertTrue(JobStatus.KILLED.isFinished());
+        Assert.assertTrue(JobStatus.SUCCEEDED.isFinished());
+    }
 }

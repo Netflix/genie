@@ -17,6 +17,9 @@
 ##
 
 genie:
+  health:
+    memory:
+      usedPhysicalMemoryPercent: 100
   jobs:
     dir:
       location: "file:///tmp/"

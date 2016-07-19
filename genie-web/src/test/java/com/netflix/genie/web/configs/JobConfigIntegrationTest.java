@@ -36,7 +36,12 @@ import java.io.IOException;
  * @since 3.0.0
  */
 @Configuration
-@Profile("integration")
+@Profile(
+    {
+        "ci",
+        "integration"
+    }
+)
 public class JobConfigIntegrationTest {
 
     private File jobsDir;

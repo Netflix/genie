@@ -55,11 +55,11 @@ public class GenieHealthIndicatorUnitTests {
      */
     @Test
     public void canGetHealth() {
-        Mockito.when(this.jobMonitoringCoordinator.getNumRunningJobs()).thenReturn(1);
+        Mockito.when(this.jobMonitoringCoordinator.getNumJobs()).thenReturn(1);
         Assert.assertThat(this.genieHealthIndicator.health().getStatus(), Matchers.is(Status.UP));
-        Mockito.when(this.jobMonitoringCoordinator.getNumRunningJobs()).thenReturn(2);
+        Mockito.when(this.jobMonitoringCoordinator.getNumJobs()).thenReturn(2);
         Assert.assertThat(this.genieHealthIndicator.health().getStatus(), Matchers.is(Status.OUT_OF_SERVICE));
-        Mockito.when(this.jobMonitoringCoordinator.getNumRunningJobs()).thenReturn(3);
+        Mockito.when(this.jobMonitoringCoordinator.getNumJobs()).thenReturn(3);
         Assert.assertThat(this.genieHealthIndicator.health().getStatus(), Matchers.is(Status.OUT_OF_SERVICE));
     }
 }

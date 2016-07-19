@@ -20,6 +20,7 @@ package com.netflix.genie.web.tasks.job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.exceptions.GenieTimeoutException;
 import com.netflix.genie.core.events.JobFinishedEvent;
+import com.netflix.genie.core.events.JobFinishedReason;
 import com.netflix.genie.core.events.KillJobEvent;
 import com.netflix.genie.core.util.ProcessChecker;
 import com.netflix.genie.core.util.UnixProcessChecker;
@@ -145,7 +146,14 @@ public class JobMonitor extends NodeTask {
         } catch (final ExecuteException ee) {
             log.info("Job {} has finished", this.execution.getId());
             this.finishedRate.increment();
-            this.publisher.publishEvent(new JobFinishedEvent(this.execution, this));
+            this.publisher.publishEvent(
+                new JobFinishedEvent(
+                    this.execution.getId(),
+                    JobFinishedReason.PROCESS_COMPLETED,
+                    "Process detected to be complete",
+                    this
+                )
+            );
         } catch (final IOException ioe) {
             // Some other error
             log.error(
@@ -166,7 +174,14 @@ public class JobMonitor extends NodeTask {
                     )
                 );
                 // Also send a job finished event
-                this.publisher.publishEvent(new JobFinishedEvent(this.execution, this));
+                this.publisher.publishEvent(
+                    new JobFinishedEvent(
+                        this.execution.getId(),
+                        JobFinishedReason.KILLED,
+                        "Couldn't check process status " + MAX_ERRORS + " consecutive times",
+                        this
+                    )
+                );
             }
         }
     }

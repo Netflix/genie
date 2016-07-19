@@ -481,7 +481,7 @@ public class JobClient extends BaseGenieClient {
 
             final JobStatus status = this.getJobStatus(jobId);
 
-            if (status == JobStatus.FAILED || status == JobStatus.KILLED || status == JobStatus.SUCCEEDED) {
+            if (status.isFinished()) {
                 return status;
             }
 

@@ -22,29 +22,29 @@ import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.mockito.Mockito;
 
 import java.util.UUID;
+import java.util.concurrent.Future;
 
 /**
- * Tests for the JobFinishedEvent class.
+ * Tests for the JobScheduledEvent class.
  */
 @Category(UnitTest.class)
-public class JobFinishedEventUnitTests {
+public class JobScheduledEventUnitTests {
 
     /**
-     * Make sure we can successfully create a Job Finished Event.
+     * Make sure we can successfully create a Job Started Event.
      */
     @Test
     public void canConstruct() {
-        final String id = UUID.randomUUID().toString();
-        final JobFinishedReason reason = JobFinishedReason.PROCESS_COMPLETED;
-        final String message = UUID.randomUUID().toString();
+        final String jobId = UUID.randomUUID().toString();
+        final Future<?> task = Mockito.mock(Future.class);
         final Object source = new Object();
-        final JobFinishedEvent event = new JobFinishedEvent(id, reason, message, source);
+        final JobScheduledEvent event = new JobScheduledEvent(jobId, task, source);
         Assert.assertNotNull(event);
-        Assert.assertThat(event.getId(), Matchers.is(id));
-        Assert.assertThat(event.getReason(), Matchers.is(reason));
-        Assert.assertThat(event.getMessage(), Matchers.is(message));
+        Assert.assertThat(event.getId(), Matchers.is(jobId));
+        Assert.assertThat(event.getTask(), Matchers.is(task));
         Assert.assertThat(event.getSource(), Matchers.is(source));
     }
 }
