@@ -141,6 +141,10 @@ class Genie3Adapter(GenieBaseAdapter):
             else:
                 dependencies.append(dep)
 
+        description = job.get('description')
+        if isinstance(description, dict):
+            description = json.dumps(description)
+
         payload = {
             'applications': job.get('application_ids'),
             'attachments': attachments,
@@ -150,7 +154,7 @@ class Genie3Adapter(GenieBaseAdapter):
             'commandArgs': job.get('command_arguments') or job.cmd_args,
             'commandCriteria': job.get('command_tags') or job.default_command_tags,
             'dependencies': dependencies,
-            'description': job.get('description'),
+            'description': description,
             'disableLogArchival': not job.get('archive'),
             'email': job.get('email'),
             'group': job.get('group'),

@@ -74,7 +74,7 @@ class TestGeneratingJobId(unittest.TestCase):
 
     @patch('pygenie.jobs.utils.reattach_job')
     def test_gen_job_id_return_success_true_running(self, mock_reattach_job):
-        """Test generating job id with returning successful job set to True a job that is running."""
+        """Test generating job id with returning successful job set to True with a job that is running."""
 
         job_id = 'running'
 
