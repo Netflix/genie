@@ -348,15 +348,25 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
 
     /**
      * Cleanup after tests.
+     *
+     * @throws Exception who cares
      */
     @After
-    public void cleanup() {
+    public void cleanup() throws Exception {
         this.jobRequestRepository.deleteAll();
         this.jobRepository.deleteAll();
         this.jobExecutionRepository.deleteAll();
         this.clusterRepository.deleteAll();
         this.commandRepository.deleteAll();
         this.applicationRepository.deleteAll();
+
+        log.error("HEALTH ENDPOINT DATA: {}", this.mvc
+            .perform(
+                MockMvcRequestBuilders
+                    .get("/actuator/health")
+                    .contentType(MediaType.APPLICATION_JSON)
+            )
+            .andReturn().getResponse().getContentAsString());
     }
 
     /**
