@@ -58,25 +58,25 @@ public class MemoryHealthIndicator implements HealthIndicator {
 
     @Override
     public Health health() {
-        final double freePhysicalMemorySize = (double) operatingSystemMXBean.getFreePhysicalMemorySize();
-        final double totalPhysicalMemorySize = (double) operatingSystemMXBean.getTotalPhysicalMemorySize();
-        final double usedPhysicalMemoryPercentage = ((totalPhysicalMemorySize - freePhysicalMemorySize)
-                / totalPhysicalMemorySize) * 100;
-
-        if (usedPhysicalMemoryPercentage > maxUsedPhysicalMemoryPercentage) {
-            log.warn("Physical memory {} crossed the threshold of {}", usedPhysicalMemoryPercentage,
-                    maxUsedPhysicalMemoryPercentage);
-            return Health
-                    .outOfService()
-                    .withDetail(FREE_PHYSICAL_MEMORY_SIZE, freePhysicalMemorySize)
-                    .withDetail(TOTAL_PHYSICAL_MEMORY_SIZE, totalPhysicalMemorySize)
-                    .build();
-        } else {
-            return Health
-                    .up()
-                    .withDetail(FREE_PHYSICAL_MEMORY_SIZE, freePhysicalMemorySize)
-                    .withDetail(TOTAL_PHYSICAL_MEMORY_SIZE, totalPhysicalMemorySize)
-                    .build();
+        Health.Builder result = Health.up();
+        try {
+            final double freePhysicalMemorySize = (double) operatingSystemMXBean.getFreePhysicalMemorySize();
+            final double totalPhysicalMemorySize = (double) operatingSystemMXBean.getTotalPhysicalMemorySize();
+            final double usedPhysicalMemoryPercentage = ((totalPhysicalMemorySize - freePhysicalMemorySize)
+                    / totalPhysicalMemorySize) * 100;
+            if (usedPhysicalMemoryPercentage > maxUsedPhysicalMemoryPercentage) {
+                log.warn("Physical memory {} crossed the threshold of {}", usedPhysicalMemoryPercentage,
+                        maxUsedPhysicalMemoryPercentage);
+                result = Health.outOfService();
+            }
+            result.withDetail(FREE_PHYSICAL_MEMORY_SIZE, freePhysicalMemorySize)
+                    .withDetail(TOTAL_PHYSICAL_MEMORY_SIZE, totalPhysicalMemorySize);
+        } catch (Throwable e) {
+            //
+            // Log warning if the monitoring failed. Also Health check for this indicator will be UP.
+            //
+            log.warn("Failed monitoring memory health indicator with error {}", e.getMessage());
         }
+        return result.build();
     }
 }
