@@ -788,8 +788,9 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
 
         if (result.getResponse().getStatus() != HttpStatus.ACCEPTED.value()) {
             log.error(
-                "RESPONSE WASN'T 202 IT WAS: {} AND THE MESSAGE IS: {}",
+                "RESPONSE WASN'T 202 IT WAS: {} AND THE ERROR MESSAGE IS: {} AND THE CONTENT IS {}",
                 result.getResponse().getStatus(),
+                result.getResponse().getErrorMessage(),
                 result.getResponse().getContentAsString()
             );
             Assert.fail();
@@ -858,8 +859,9 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
 
         if (result.getResponse().getStatus() != HttpStatus.ACCEPTED.value()) {
             log.error(
-                "RESPONSE WASN'T 202 IT WAS: {} AND THE MESSAGE IS: {}",
+                "RESPONSE WASN'T 202 IT WAS: {} AND THE ERROR MESSAGE IS: {} AND THE CONTENT IS {}",
                 result.getResponse().getStatus(),
+                result.getResponse().getErrorMessage(),
                 result.getResponse().getContentAsString()
             );
             Assert.fail();
