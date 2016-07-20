@@ -146,11 +146,15 @@ class Genie2Adapter(GenieBaseAdapter):
             else:
                 dependencies.append(dep)
 
+        cluster_tag_mapping = job.get('cluster_tag_mapping')
+        clusters = [
+            dict(tags=cluster_tag_mapping.get(priority))
+            for priority in sorted(cluster_tag_mapping.keys())
+        ]
+
         payload = {
             'attachments': attachments,
-            'clusterCriterias': [
-                {'tags': job.get('cluster_tags')}
-            ],
+            'clusterCriterias': [i for i in clusters if i.get('tags')],
             'commandArgs': job.get('command_arguments') or job.cmd_args,
             'commandCriteria': job.get('command_tags'),
             'description': job.get('description'),
@@ -172,7 +176,7 @@ class Genie2Adapter(GenieBaseAdapter):
 
         # cluster tags not set, use default
         if not [c.get('tags') for c in payload.get('clusterCriterias', []) \
-                if len(c.get('tags', [])) > 0]:
+                if len(c.get('tags') or []) > 0]:
             payload['clusterCriterias'] = [{'tags': job.default_cluster_tags}]
 
         return payload

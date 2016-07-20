@@ -176,7 +176,10 @@ class TestingHadoopJobAdapters(unittest.TestCase):
                 u'attachments': [
                     {u'name': u'hadoopfile1', u'data': u'file contents'}
                 ],
-                u'clusterCriterias': [{u'tags': [u'type:hadoopcluster1']}],
+                u'clusterCriterias': [
+                    {u'tags': [u'type:hadoopcluster1']},
+                    {u'tags': [u'type:hadoop']}
+                ],
                 u'commandArgs': u'fs -ls /testing/adapter',
                 u'commandCriteria': [u'type:hadoopcmd'],
                 u'description': u'this job is to test hadoopjob adapter',
@@ -227,7 +230,10 @@ class TestingHadoopJobAdapters(unittest.TestCase):
                 u'attachments': [
                     (u'hadoop.file1', u"open file '/hadoop.file1'")
                 ],
-                u'clusterCriterias': [{u'tags': [u'type:hadoop.cluster1']}],
+                u'clusterCriterias': [
+                    {u'tags': [u'type:hadoop.cluster1']},
+                    {u'tags': [u'type:hadoop']}
+                ],
                 u'commandArgs': u'jar jar jar',
                 u'commandCriteria': [u'type:hadoop.cmd'],
                 u'dependencies': [],

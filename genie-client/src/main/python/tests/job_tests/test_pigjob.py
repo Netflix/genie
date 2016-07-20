@@ -229,7 +229,10 @@ class TestingPigJobAdapters(unittest.TestCase):
                     {u'data': u'file contents', u'name': u'pig_param2.params'},
                     {u'data': u'A = LOAD;', u'name': u'script.pig'}
                 ],
-                u'clusterCriterias': [{u'tags': [u'type:pig_cluster_1']}],
+                u'clusterCriterias': [
+                    {u'tags': [u'type:pig_cluster_1']},
+                    {u'tags': [u'type:pig']}
+                ],
                 u'commandArgs': u' '.join([
                     u'-Dmr.p1=a -Dmr.p2=b',
                     u'-P my_properties.conf',
@@ -289,7 +292,10 @@ class TestingPigJobAdapters(unittest.TestCase):
                     {u'name': u'pigfile1', u'data': u'file contents'},
                     {u'name': u'script.pig', u'data': u'file contents'}
                 ],
-                u'clusterCriterias': [{u'tags': [u'type:pigcluster1']}],
+                u'clusterCriterias': [
+                    {u'tags': [u'type:pigcluster1']},
+                    {u'tags': [u'type:pig']}
+                ],
                 u'commandArgs': u'-f script.pig',
                 u'commandCriteria': [u'type:pigcmd'],
                 u'description': u'this job is to test pigjob adapter',
@@ -350,7 +356,10 @@ class TestingPigJobAdapters(unittest.TestCase):
                     (u'pig_param2.params', u"open file '/pig_param2.params'"),
                     (u'script.pig', u'A = LOAD;')
                 ],
-                u'clusterCriterias': [{u'tags': [u'type:pig_cluster_1']}],
+                u'clusterCriterias': [
+                    {u'tags': [u'type:pig_cluster_1']},
+                    {u'tags': [u'type:pig']}
+                ],
                 u'commandArgs': u' '.join([
                     u'-Dmr.p1=a -Dmr.p2=b',
                     u'-P my_properties.conf',
@@ -413,7 +422,10 @@ class TestingPigJobAdapters(unittest.TestCase):
                     (u'pigfile1', u"open file '/pigfile1'"),
                     (u'script.pig', u"open file '/path/to/test/script.pig'")
                 ],
-                u'clusterCriterias': [{u'tags': [u'type:pigcluster1']}],
+                u'clusterCriterias': [
+                    {u'tags': [u'type:pigcluster1']},
+                    {u'tags': [u'type:pig']}
+                ],
                 u'commandArgs': u'-f script.pig',
                 u'commandCriteria': [u'type:pigcmd'],
                 u'dependencies': [],
