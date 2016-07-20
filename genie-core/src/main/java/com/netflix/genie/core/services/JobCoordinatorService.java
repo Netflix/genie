@@ -159,7 +159,9 @@ public class JobCoordinatorService {
                 .withStatus(JobStatus.FAILED)
                 .withStatusMsg("Unable to run job due to host being too busy during request.");
             this.jobPersistenceService.createJob(jobBuilder.build());
-            throw new GenieServerUnavailableException("Reached max running jobs on this host. Unable to run job.");
+            throw new GenieServerUnavailableException(
+                "Running max running jobs (" + this.maxRunningJobs + ") on this host. Unable to run job."
+            );
         }
     }
 
