@@ -155,7 +155,10 @@ class TestingGenieJobAdapters(unittest.TestCase):
             {
                 u'applications': [u'applicationid1'],
                 u'attachments': [],
-                u'clusterCriterias': [{u'tags': [u'type:cluster1']}],
+                u'clusterCriterias': [
+                    {u'tags': [u'type:cluster1']},
+                    {u'tags': [u'type:genie']},
+                ],
                 u'commandArgs': u'command args for geniejob',
                 u'commandCriteria': [u'type:geniecmd'],
                 u'dependencies': [u'/file1', u'/file2'],

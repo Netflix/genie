@@ -211,7 +211,10 @@ class TestingHiveJobAdapters(unittest.TestCase):
                     {u'name': u'hive.file2', u'data': u'file contents'},
                     {u'name': u'script.hive', u'data': u'SELECT * FROM DUAL'}
                 ],
-                u'clusterCriterias': [{u'tags': [u'type:hive.cluster1']}],
+                u'clusterCriterias': [
+                    {u'tags': [u'type:hive.cluster1']},
+                    {u'tags': [u'type:hive']}
+                ],
                 u'commandArgs': u'-d a=b -f script.hive',
                 u'commandCriteria': [u'type:hive.cmd'],
                 u'description': u'this job is to test hivejob adapter',
@@ -266,7 +269,10 @@ class TestingHiveJobAdapters(unittest.TestCase):
                     {u'name': u'hive.file2', u'data': u'file contents'},
                     {u'name': u'script.hql', u'data': u'file contents'}
                 ],
-                u'clusterCriterias': [{u'tags': [u'type:hive.cluster2']}],
+                u'clusterCriterias': [
+                    {u'tags': [u'type:hive.cluster2']},
+                    {u'tags': [u'type:hive']}
+                ],
                 u'commandArgs': u'-d a=1 -d b=2 -f script.hql',
                 u'commandCriteria': [u'type:hive.cmd.2'],
                 u'description': u'this job is to test hivejob adapter',
@@ -324,7 +330,8 @@ class TestingHiveJobAdapters(unittest.TestCase):
                     (u'script.hive', u'SELECT * FROM DUAL')
                 ],
                 u'clusterCriterias': [
-                    {u'tags': [u'type:hive.cluster-1', u'type:hive.cluster-2']}
+                    {u'tags': [u'type:hive.cluster-1', u'type:hive.cluster-2']},
+                    {u'tags': [u'type:hive']}
                 ],
                 u'commandArgs': u'-i properties.conf  -d a=a -d b=b -f script.hive',
                 u'commandCriteria': [u'type:hive.cmd.1', u'type:hive.cmd.2'],
@@ -387,7 +394,8 @@ class TestingHiveJobAdapters(unittest.TestCase):
                     (u'script.hql', u"open file '/script.hql'")
                 ],
                 u'clusterCriterias': [
-                    {u'tags': [u'type:hive.cluster-1', u'type:hive.cluster-2']}
+                    {u'tags': [u'type:hive.cluster-1', u'type:hive.cluster-2']},
+                    {u'tags': [u'type:hive']}
                 ],
                 u'commandArgs': u'-i properties.conf  -d a=a -d b=b -f script.hql',
                 u'commandCriteria': [u'type:hive.cmd.1', u'type:hive.cmd.2'],

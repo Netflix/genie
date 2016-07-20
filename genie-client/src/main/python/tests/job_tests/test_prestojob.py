@@ -202,7 +202,10 @@ class TestingPrestoJobAdapters(unittest.TestCase):
                     {u'name': u'prestofile2', u'data': u'file contents'},
                     {u'name': u'script.presto', u'data': u'SELECT * FROM DUAL;'}
                 ],
-                u'clusterCriterias': [{u'tags': [u'type:prestocluster1']}],
+                u'clusterCriterias': [
+                    {u'tags': [u'type:prestocluster1']},
+                    {u'tags': [u'type:presto']}
+                ],
                 u'commandArgs': u'-f script.presto',
                 u'commandCriteria': [u'type:presto'],
                 u'description': u'this job is to test prestojob adapter',
@@ -254,7 +257,10 @@ class TestingPrestoJobAdapters(unittest.TestCase):
                     {u'name': u'prestofile2', u'data': u'file contents'},
                     {u'name': u'file.presto', u'data': u'file contents'}
                 ],
-                u'clusterCriterias': [{u'tags': [u'type:prestocluster1']}],
+                u'clusterCriterias': [
+                    {u'tags': [u'type:prestocluster1']},
+                    {u'tags': [u'type:presto']}
+                ],
                 u'commandArgs': u'-f file.presto',
                 u'commandCriteria': [u'type:presto'],
                 u'description': u'this job is to test prestojob adapter',
@@ -305,7 +311,10 @@ class TestingPrestoJobAdapters(unittest.TestCase):
                     (u'prestofile2', u"open file '/prestofile2'"),
                     (u'script.presto', u'SELECT * FROM DUAL;')
                 ],
-                u'clusterCriterias': [{u'tags': [u'type:prestocluster1']}],
+                u'clusterCriterias': [
+                    {u'tags': [u'type:prestocluster1']},
+                    {u'tags': [u'type:presto']}
+                ],
                 u'commandArgs': u'-f script.presto',
                 u'commandCriteria': [u'type:presto'],
                 u'dependencies': [],
@@ -359,7 +368,10 @@ class TestingPrestoJobAdapters(unittest.TestCase):
                     (u'prestofile2', u"open file '/prestofile2'"),
                     (u'file.presto', u"open file '/path/to/test/file.presto'")
                 ],
-                u'clusterCriterias': [{u'tags': [u'type:prestocluster1']}],
+                u'clusterCriterias': [
+                    {u'tags': [u'type:prestocluster1']},
+                    {u'tags': [u'type:presto']}
+                ],
                 u'commandArgs': u'-f file.presto',
                 u'commandCriteria': [u'type:presto'],
                 u'dependencies': [],

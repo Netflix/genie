@@ -138,7 +138,7 @@ class GenieJob(object):
 
         self._application_ids = list()
         self._archive = True
-        self._cluster_tags = list()
+        self._cluster_tag_mapping = defaultdict(list)
         self._command_arguments = None
         self._command_options = defaultdict(dict)
         self._command_tags = list()
@@ -159,6 +159,9 @@ class GenieJob(object):
         self.repr_obj.append('job_id', (self._job_id,))
         self.repr_obj.append('username', (self._username,))
 
+        #initialize cluster tags with default set of tags
+        self._cluster_tag_mapping['default'] = self.default_cluster_tags
+
     def __repr__(self):
         return str(self.repr_obj)
 
@@ -170,6 +173,17 @@ class GenieJob(object):
 
         if dep not in self._dependencies:
             self._dependencies.append(dep)
+
+    def _add_cluster_tag(self, tags, priority=0):
+        """
+        Add a cluster tag to level. The priority is the level of precedence when
+        Genie looks for a cluster to use (higher priority = higher precedence).
+        """
+
+        assert isinstance(tags, list), 'tags should be a list'
+
+        # negate priority so can do sorted(self._cluster_tag_mapping.keys())
+        self._cluster_tag_mapping[-int(priority)].extend(tags)
 
     def _set_command_option(self, flag, name, value=None):
         """
@@ -236,9 +250,8 @@ class GenieJob(object):
         self._archive = archive
         return self
 
-    @arg_list
     @add_to_repr('append')
-    def cluster_tags(self, _cluster_tags):
+    def cluster_tags(self, cluster_tags):
         """
         Adds a tag for Genie to use when selecting which cluster to run the job on.
 
@@ -251,11 +264,15 @@ class GenieJob(object):
             ['type:cluster1', 'misc:c2', 'misc:c3', 'data:test', 'misc:c4']
 
         Args:
-            _cluster_tags (str, list): A tag for the cluster to use.
+            cluster_tags (str, list): A tag for the cluster to use.
 
         Returns:
             :py:class:`GenieJob`: self
         """
+
+        self._add_cluster_tag(str_to_list(cluster_tags))
+
+        return self
 
     @property
     def cmd_args(self):

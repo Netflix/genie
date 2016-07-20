@@ -180,7 +180,10 @@ class TestingSqoopJobAdapters(unittest.TestCase):
                     {u'name': u'sqoopfile1', u'data': u'file contents'},
                     {u'name': u'sqoopfile2', u'data': u'file contents'}
                 ],
-                u'clusterCriterias': [{u'tags': [u'type:sqoopcluster1']}],
+                u'clusterCriterias': [
+                    {u'tags': [u'type:sqoopcluster1']},
+                    {u'tags': [u'type:sqoop']}
+                ],
                 u'commandArgs': u' '.join([
                     u'test-export',
                     u'-Dprop1=pval1',
@@ -241,7 +244,10 @@ class TestingSqoopJobAdapters(unittest.TestCase):
                     (u'sqoopfile1a', u"open file '/sqoopfile1a'"),
                     (u'sqoopfile2b', u"open file '/sqoopfile2b'")
                 ],
-                u'clusterCriterias': [{u'tags': [u'type:sqoop-cluster-1']}],
+                u'clusterCriterias': [
+                    {u'tags': [u'type:sqoop-cluster-1']},
+                    {u'tags': [u'type:sqoop']}
+                ],
                 u'commandArgs': u'test-export-g3 -Dprop1-g3=pval1-g3 --username jsqoop-g3 --password t3st-g3 --opt1-g3 val1-g3 --connect jdbc://test-g3',
                 u'commandCriteria': [u'type:sqoop-test-1'],
                 u'dependencies': [],
