@@ -332,7 +332,7 @@ class GenieJob(object):
             :py:class:`GenieJob`: self
         """
 
-    @add_to_repr('overwrite')
+    @add_to_repr('append')
     def description(self, description):
         """
         Sets the description for the job.
@@ -344,12 +344,10 @@ class GenieJob(object):
             :py:class:`GenieJob`: self
         """
 
-        assert description is not None, 'description should be a string'
-
-        if isinstance(description, dict):
-            description = json.dumps(description)
-
-        self._description = description
+        if isinstance(self._description, dict) and isinstance(description, dict):
+            self._description.update(description)
+        else:
+            self._description = description
 
         return self
 
