@@ -145,12 +145,16 @@ class Genie3Adapter(GenieBaseAdapter):
         if isinstance(description, dict):
             description = json.dumps(description)
 
+        cluster_tag_mapping = job.get('cluster_tag_mapping')
+        clusters = [
+            dict(tags=cluster_tag_mapping.get(priority))
+            for priority in sorted(cluster_tag_mapping.keys())
+        ]
+
         payload = {
             'applications': job.get('application_ids'),
             'attachments': attachments,
-            'clusterCriterias': [
-                {'tags': job.get('cluster_tags') or job.default_cluster_tags}
-            ],
+            'clusterCriterias': [i for i in clusters if i.get('tags')],
             'commandArgs': job.get('command_arguments') or job.cmd_args,
             'commandCriteria': job.get('command_tags') or job.default_command_tags,
             'dependencies': dependencies,
