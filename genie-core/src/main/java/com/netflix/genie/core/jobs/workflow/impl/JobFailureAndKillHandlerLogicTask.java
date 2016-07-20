@@ -19,12 +19,15 @@ package com.netflix.genie.core.jobs.workflow.impl;
 
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.jobs.JobConstants;
+import com.netflix.spectator.api.Registry;
+import com.netflix.spectator.api.Timer;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This class is responsible for adding the kill handling logic to run.sh.
@@ -34,20 +37,34 @@ import java.util.Map;
  */
 @Slf4j
 public class JobFailureAndKillHandlerLogicTask extends GenieBaseTask {
+
+    private final Timer timer;
+
+    /**
+     * Constructor.
+     *
+     * @param registry The metrics registry to use
+     */
+    public JobFailureAndKillHandlerLogicTask(@NotNull final Registry registry) {
+        this.timer = registry.timer("genie.jobs.tasks.jobFailureAndKillHandlerLogicTask.timer");
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public void executeTask(
-        @NotNull
-        final Map<String, Object> context
-    ) throws GenieException, IOException {
+    public void executeTask(@NotNull final Map<String, Object> context) throws GenieException, IOException {
+        final long start = System.nanoTime();
+        try {
+            log.debug("Executing JobKillLogic Task in the workflow.");
 
-        log.debug("Executing JobKillLogic Task in the workflow.");
+            final Writer writer = (Writer) context.get(JobConstants.WRITER_KEY);
 
-        final Writer writer = (Writer) context.get(JobConstants.WRITER_KEY);
-
-        // Append logic for handling job kill signal
-        writer.write(JobConstants.JOB_FAILURE_AND_KILL_HANDLER_LOGIC + System.lineSeparator());
+            // Append logic for handling job kill signal
+            writer.write(JobConstants.JOB_FAILURE_AND_KILL_HANDLER_LOGIC + System.lineSeparator());
+        } finally {
+            final long finish = System.nanoTime();
+            this.timer.record(finish - start, TimeUnit.NANOSECONDS);
+        }
     }
 }

@@ -23,6 +23,8 @@ import com.netflix.genie.core.jobs.FileType;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
 import com.netflix.genie.core.services.impl.GenieFileTransferService;
+import com.netflix.spectator.api.Registry;
+import com.netflix.spectator.api.Timer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -30,6 +32,7 @@ import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Implementation of the workflow task for processing command information.
@@ -40,71 +43,85 @@ import java.util.Map;
 @Slf4j
 public class CommandTask extends GenieBaseTask {
 
+    private final Timer timer;
+
+    /**
+     * Constructor.
+     *
+     * @param registry The metrics registry to use
+     */
+    public CommandTask(@NotNull final Registry registry) {
+        this.timer = registry.timer("genie.jobs.tasks.commandTask.timer");
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public void executeTask(
-        @NotNull
-        final Map<String, Object> context
-    ) throws GenieException, IOException {
-        log.debug("Executing Command Task in the workflow.");
+    public void executeTask(@NotNull final Map<String, Object> context) throws GenieException, IOException {
+        final long start = System.nanoTime();
+        try {
+            log.debug("Executing Command Task in the workflow.");
 
-        final GenieFileTransferService fts =
-            (GenieFileTransferService) context.get(JobConstants.FILE_TRANSFER_SERVICE_KEY);
-        final JobExecutionEnvironment jobExecEnv =
-            (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
-        final String jobWorkingDirectory = jobExecEnv.getJobWorkingDir().getCanonicalPath();
-        final String genieDir = jobWorkingDirectory
-            + JobConstants.FILE_PATH_DELIMITER
-            + JobConstants.GENIE_PATH_VAR;
-        final Writer writer = (Writer) context.get(JobConstants.WRITER_KEY);
+            final GenieFileTransferService fts =
+                (GenieFileTransferService) context.get(JobConstants.FILE_TRANSFER_SERVICE_KEY);
+            final JobExecutionEnvironment jobExecEnv =
+                (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
+            final String jobWorkingDirectory = jobExecEnv.getJobWorkingDir().getCanonicalPath();
+            final String genieDir = jobWorkingDirectory
+                + JobConstants.FILE_PATH_DELIMITER
+                + JobConstants.GENIE_PATH_VAR;
+            final Writer writer = (Writer) context.get(JobConstants.WRITER_KEY);
 
-        // Create the directory for this command under command dir in the cwd
-        createEntityInstanceDirectory(
-            genieDir,
-            jobExecEnv.getCommand().getId(),
-            AdminResources.COMMAND
-        );
-
-        // Create the config directory for this id
-        createEntityInstanceConfigDirectory(
-            genieDir,
-            jobExecEnv.getCommand().getId(),
-            AdminResources.COMMAND
-        );
-
-        // Get the setup file if specified and add it as source command in launcher script
-        final String commandSetupFile = jobExecEnv.getCommand().getSetupFile();
-        if (commandSetupFile != null && StringUtils.isNotBlank(commandSetupFile)) {
-            final String localPath = super.buildLocalFilePath(
-                jobWorkingDirectory,
+            // Create the directory for this command under command dir in the cwd
+            createEntityInstanceDirectory(
+                genieDir,
                 jobExecEnv.getCommand().getId(),
-                commandSetupFile,
-                FileType.SETUP,
                 AdminResources.COMMAND
             );
 
-            fts.getFile(commandSetupFile, localPath);
-
-            super.generateSetupFileSourceSnippet(
+            // Create the config directory for this id
+            createEntityInstanceConfigDirectory(
+                genieDir,
                 jobExecEnv.getCommand().getId(),
-                "Command:",
-                localPath,
-                writer,
-                jobWorkingDirectory);
-        }
-
-        // Iterate over and get all configuration files
-        for (final String configFile: jobExecEnv.getCommand().getConfigs()) {
-            final String localPath = super.buildLocalFilePath(
-                jobWorkingDirectory,
-                jobExecEnv.getCommand().getId(),
-                configFile,
-                FileType.CONFIG,
                 AdminResources.COMMAND
             );
-            fts.getFile(configFile, localPath);
+
+            // Get the setup file if specified and add it as source command in launcher script
+            final String commandSetupFile = jobExecEnv.getCommand().getSetupFile();
+            if (commandSetupFile != null && StringUtils.isNotBlank(commandSetupFile)) {
+                final String localPath = super.buildLocalFilePath(
+                    jobWorkingDirectory,
+                    jobExecEnv.getCommand().getId(),
+                    commandSetupFile,
+                    FileType.SETUP,
+                    AdminResources.COMMAND
+                );
+
+                fts.getFile(commandSetupFile, localPath);
+
+                super.generateSetupFileSourceSnippet(
+                    jobExecEnv.getCommand().getId(),
+                    "Command:",
+                    localPath,
+                    writer,
+                    jobWorkingDirectory);
+            }
+
+            // Iterate over and get all configuration files
+            for (final String configFile : jobExecEnv.getCommand().getConfigs()) {
+                final String localPath = super.buildLocalFilePath(
+                    jobWorkingDirectory,
+                    jobExecEnv.getCommand().getId(),
+                    configFile,
+                    FileType.CONFIG,
+                    AdminResources.COMMAND
+                );
+                fts.getFile(configFile, localPath);
+            }
+        } finally {
+            final long finish = System.nanoTime();
+            this.timer.record(finish - start, TimeUnit.NANOSECONDS);
         }
     }
 }
