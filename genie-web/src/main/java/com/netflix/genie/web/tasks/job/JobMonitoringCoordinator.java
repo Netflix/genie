@@ -201,7 +201,7 @@ public class JobMonitoringCoordinator implements JobCountService {
      *
      * @return the number of jobs currently running on this node
      */
-    public int getNumJobs() {
+    public synchronized int getNumJobs() {
         return this.jobMonitors.size() + this.scheduledJobs.size();
     }
 
