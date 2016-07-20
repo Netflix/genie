@@ -50,6 +50,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -353,13 +354,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
      */
     @After
     public void cleanup() throws Exception {
-        this.jobRequestRepository.deleteAll();
-        this.jobRepository.deleteAll();
-        this.jobExecutionRepository.deleteAll();
-        this.clusterRepository.deleteAll();
-        this.commandRepository.deleteAll();
-        this.applicationRepository.deleteAll();
-
         log.error("HEALTH ENDPOINT DATA: {}", this.mvc
             .perform(
                 MockMvcRequestBuilders
@@ -367,6 +361,13 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                     .contentType(MediaType.APPLICATION_JSON)
             )
             .andReturn().getResponse().getContentAsString());
+
+        this.jobRequestRepository.deleteAll();
+        this.jobRepository.deleteAll();
+        this.jobExecutionRepository.deleteAll();
+        this.clusterRepository.deleteAll();
+        this.commandRepository.deleteAll();
+        this.applicationRepository.deleteAll();
     }
 
     /**
@@ -766,16 +767,33 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .withDisableLogArchival(true)
             .build();
 
+//        final MvcResult result = this.mvc
+//            .perform(
+//                MockMvcRequestBuilders
+//                    .post(JOBS_API)
+//                    .contentType(MediaType.APPLICATION_JSON)
+//                    .content(OBJECT_MAPPER.writeValueAsBytes(jobRequest))
+//            )
+//            .andExpect(MockMvcResultMatchers.status().isAccepted())
+//            .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()))
+//            .andReturn();
+
         final MvcResult result = this.mvc
             .perform(
                 MockMvcRequestBuilders
                     .post(JOBS_API)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(OBJECT_MAPPER.writeValueAsBytes(jobRequest))
-            )
-            .andExpect(MockMvcResultMatchers.status().isAccepted())
-            .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()))
-            .andReturn();
+            ).andReturn();
+
+        if (result.getResponse().getStatus() != HttpStatus.ACCEPTED.value()) {
+            log.error(
+                "RESPONSE WASN'T 202 IT WAS: {} AND THE MESSAGE IS: {}",
+                result.getResponse().getStatus(),
+                result.getResponse().getContentAsString()
+            );
+            Assert.fail();
+        }
 
         final String jobId = this.getIdFromLocation(result.getResponse().getHeader(HttpHeaders.LOCATION));
         final String statusEndpoint = JOBS_API + "/" + jobId + "/status";
@@ -819,16 +837,33 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .withDisableLogArchival(true)
             .build();
 
+//        final MvcResult result = this.mvc
+//            .perform(
+//                MockMvcRequestBuilders
+//                    .post(JOBS_API)
+//                    .contentType(MediaType.APPLICATION_JSON)
+//                    .content(OBJECT_MAPPER.writeValueAsBytes(jobRequest))
+//            )
+//            .andExpect(MockMvcResultMatchers.status().isAccepted())
+//            .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()))
+//            .andReturn();
+
         final MvcResult result = this.mvc
             .perform(
                 MockMvcRequestBuilders
                     .post(JOBS_API)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(OBJECT_MAPPER.writeValueAsBytes(jobRequest))
-            )
-            .andExpect(MockMvcResultMatchers.status().isAccepted())
-            .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()))
-            .andReturn();
+            ).andReturn();
+
+        if (result.getResponse().getStatus() != HttpStatus.ACCEPTED.value()) {
+            log.error(
+                "RESPONSE WASN'T 202 IT WAS: {} AND THE MESSAGE IS: {}",
+                result.getResponse().getStatus(),
+                result.getResponse().getContentAsString()
+            );
+            Assert.fail();
+        }
 
         final String jobId = this.getIdFromLocation(result.getResponse().getHeader(HttpHeaders.LOCATION));
         final String statusEndpoint
