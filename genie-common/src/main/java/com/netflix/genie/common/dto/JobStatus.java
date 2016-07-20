@@ -71,4 +71,22 @@ public enum JobStatus {
             "Unacceptable job status. Must be one of {Init, Running, Succeeded, Killed, Failed, Invalid}"
         );
     }
+
+    /**
+     * Check whether this job is in an active state or not.
+     *
+     * @return True if the job is still actively processing in some manner
+     */
+    public boolean isActive() {
+        return this == INIT || this == RUNNING;
+    }
+
+    /**
+     * Check whether the job is no longer running.
+     *
+     * @return True if the job is no longer processing for one reason or another.
+     */
+    public boolean isFinished() {
+        return this == SUCCEEDED || this == KILLED || this == FAILED || this == INVALID;
+    }
 }
