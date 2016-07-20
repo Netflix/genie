@@ -136,30 +136,40 @@ public class JobCoordinatorService {
             .withId(jobRequest.getId())
             .withTags(jobRequest.getTags());
 
-        if (this.canRunJob()) {
-            jobBuilder
-                .withStatus(JobStatus.INIT)
-                .withStatusMsg("Job Accepted and in initialization phase.");
-            // TODO: if this throws exception the job will never be marked failed
-            this.jobPersistenceService.createJob(jobBuilder.build());
-            try {
-                final Future<?> task
-                    = this.taskExecutor.submit(new JobLauncher(this.jobSubmitterService, jobRequest, this.registry));
+        synchronized (this) {
+            final int numActiveJobs = this.jobCountService.getNumJobs();
+            if (numActiveJobs < this.maxRunningJobs) {
+                jobBuilder
+                    .withStatus(JobStatus.INIT)
+                    .withStatusMsg("Job Accepted and in initialization phase.");
+                // TODO: if this throws exception the job will never be marked failed
+                this.jobPersistenceService.createJob(jobBuilder.build());
+                try {
+                    final Future<?> task = this.taskExecutor.submit(
+                        new JobLauncher(this.jobSubmitterService, jobRequest, this.registry)
+                    );
 
-                // Tell the system a new job has been scheduled so any actions can be taken
-                this.eventPublisher.publishEvent(new JobScheduledEvent(jobRequest.getId(), task, this));
-            } catch (final TaskRejectedException e) {
-                final String errorMsg = "Unable to launch job due to exception: " + e.getMessage();
-                this.jobPersistenceService.updateJobStatus(jobRequest.getId(), JobStatus.FAILED, errorMsg);
-                throw new GenieServerException(errorMsg, e);
+                    // Tell the system a new job has been scheduled so any actions can be taken
+                    this.eventPublisher.publishEvent(new JobScheduledEvent(jobRequest.getId(), task, this));
+                } catch (final TaskRejectedException e) {
+                    final String errorMsg = "Unable to launch job due to exception: " + e.getMessage();
+                    this.jobPersistenceService.updateJobStatus(jobRequest.getId(), JobStatus.FAILED, errorMsg);
+                    throw new GenieServerException(errorMsg, e);
+                }
+                return jobRequest.getId();
+            } else {
+                jobBuilder
+                    .withStatus(JobStatus.FAILED)
+                    .withStatusMsg("Unable to run job due to host being too busy during request.");
+                this.jobPersistenceService.createJob(jobBuilder.build());
+                throw new GenieServerUnavailableException(
+                    "Running ("
+                        + numActiveJobs
+                        + ") when max running jobs is ("
+                        + this.maxRunningJobs
+                        + ") on this host. Unable to run job."
+                );
             }
-            return jobRequest.getId();
-        } else {
-            jobBuilder
-                .withStatus(JobStatus.FAILED)
-                .withStatusMsg("Unable to run job due to host being too busy during request.");
-            this.jobPersistenceService.createJob(jobBuilder.build());
-            throw new GenieServerUnavailableException("Reached max running jobs on this host. Unable to run job.");
         }
     }
 
@@ -171,15 +181,5 @@ public class JobCoordinatorService {
      */
     public void killJob(@NotBlank final String jobId) throws GenieException {
         this.jobKillService.killJob(jobId);
-    }
-
-
-    /**
-     * Synchronized to make sure only one request thread at a time is checking whether they can run.
-     *
-     * @return true if the job can run on this node or not
-     */
-    private synchronized boolean canRunJob() {
-        return this.jobCountService.getNumJobs() < this.maxRunningJobs;
     }
 }

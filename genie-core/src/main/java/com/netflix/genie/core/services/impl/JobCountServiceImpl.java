@@ -49,7 +49,7 @@ public class JobCountServiceImpl implements JobCountService {
      * {@inheritDoc}
      */
     @Override
-    public int getNumJobs() {
+    public synchronized int getNumJobs() {
         return this.jobSearchService.getAllRunningJobExecutionsOnHost(this.hostName).size();
     }
 }
