@@ -29,6 +29,7 @@ import com.netflix.genie.common.exceptions.GenieTimeoutException;
 import com.netflix.genie.core.services.JobSubmitterService;
 import com.netflix.genie.core.util.MetricsConstants;
 import com.netflix.spectator.api.Registry;
+import com.netflix.spectator.api.Timer;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotNull;
@@ -46,6 +47,7 @@ public class JobLauncher implements Runnable {
     private final JobSubmitterService jobSubmitterService;
     private final JobRequest jobRequest;
     private final Registry registry;
+    private final Timer submitTimer;
 
     /**
      * Constructor.
@@ -62,6 +64,7 @@ public class JobLauncher implements Runnable {
         this.jobSubmitterService = jobSubmitterService;
         this.jobRequest = jobRequest;
         this.registry = registry;
+        this.submitTimer = this.registry.timer("genie.jobs.submit.timer");
     }
 
     /**
@@ -69,27 +72,30 @@ public class JobLauncher implements Runnable {
      */
     @Override
     public void run() {
-        try {
-            this.jobSubmitterService.submitJob(this.jobRequest);
-        } catch (final GenieException e) {
-            log.error("Unable to submit job due to exception: {}", e.getMessage(), e);
-            if (e instanceof GenieBadRequestException) {
-                this.registry.counter(MetricsConstants.GENIE_EXCEPTIONS_BAD_REQUEST_RATE).increment();
-            } else if (e instanceof GenieConflictException) {
-                this.registry.counter(MetricsConstants.GENIE_EXCEPTIONS_CONFLICT_RATE).increment();
-            } else if (e instanceof GenieNotFoundException) {
-                this.registry.counter(MetricsConstants.GENIE_EXCEPTIONS_NOT_FOUND_RATE).increment();
-            } else if (e instanceof GeniePreconditionException) {
-                this.registry.counter(MetricsConstants.GENIE_EXCEPTIONS_PRECONDITION_RATE).increment();
-            } else if (e instanceof GenieServerException) {
-                this.registry.counter(MetricsConstants.GENIE_EXCEPTIONS_SERVER_RATE).increment();
-            } else if (e instanceof GenieServerUnavailableException) {
-                this.registry.counter(MetricsConstants.GENIE_EXCEPTIONS_SERVER_UNAVAILABLE_RATE).increment();
-            } else if (e instanceof GenieTimeoutException) {
-                this.registry.counter(MetricsConstants.GENIE_EXCEPTIONS_TIMEOUT_RATE).increment();
-            } else {
-                this.registry.counter(MetricsConstants.GENIE_EXCEPTIONS_OTHER_RATE).increment();
+        this.submitTimer.record(() -> {
+                try {
+                    this.jobSubmitterService.submitJob(this.jobRequest);
+                } catch (final GenieException e) {
+                    log.error("Unable to submit job due to exception: {}", e.getMessage(), e);
+                    if (e instanceof GenieBadRequestException) {
+                        this.registry.counter(MetricsConstants.GENIE_EXCEPTIONS_BAD_REQUEST_RATE).increment();
+                    } else if (e instanceof GenieConflictException) {
+                        this.registry.counter(MetricsConstants.GENIE_EXCEPTIONS_CONFLICT_RATE).increment();
+                    } else if (e instanceof GenieNotFoundException) {
+                        this.registry.counter(MetricsConstants.GENIE_EXCEPTIONS_NOT_FOUND_RATE).increment();
+                    } else if (e instanceof GeniePreconditionException) {
+                        this.registry.counter(MetricsConstants.GENIE_EXCEPTIONS_PRECONDITION_RATE).increment();
+                    } else if (e instanceof GenieServerException) {
+                        this.registry.counter(MetricsConstants.GENIE_EXCEPTIONS_SERVER_RATE).increment();
+                    } else if (e instanceof GenieServerUnavailableException) {
+                        this.registry.counter(MetricsConstants.GENIE_EXCEPTIONS_SERVER_UNAVAILABLE_RATE).increment();
+                    } else if (e instanceof GenieTimeoutException) {
+                        this.registry.counter(MetricsConstants.GENIE_EXCEPTIONS_TIMEOUT_RATE).increment();
+                    } else {
+                        this.registry.counter(MetricsConstants.GENIE_EXCEPTIONS_OTHER_RATE).increment();
+                    }
+                }
             }
-        }
+        );
     }
 }
