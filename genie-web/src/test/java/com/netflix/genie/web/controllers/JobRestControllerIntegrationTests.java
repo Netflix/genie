@@ -35,6 +35,7 @@ import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobExecutionRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
+import com.netflix.genie.core.jpa.repositories.JpaJobRequestMetadataRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRequestRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SystemUtils;
@@ -136,6 +137,9 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
 
     @Autowired
     private JpaJobRequestRepository jobRequestRepository;
+
+    @Autowired
+    private JpaJobRequestMetadataRepository jobRequestMetadataRepository;
 
     @Autowired
     private JpaJobExecutionRepository jobExecutionRepository;
@@ -363,6 +367,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andReturn().getResponse().getContentAsString());
 
         this.jobRequestRepository.deleteAll();
+        this.jobRequestMetadataRepository.deleteAll();
         this.jobRepository.deleteAll();
         this.jobExecutionRepository.deleteAll();
         this.clusterRepository.deleteAll();
@@ -548,6 +553,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
 
         Assert.assertThat(this.jobRepository.count(), Matchers.is(1L));
         Assert.assertThat(this.jobRequestRepository.count(), Matchers.is(1L));
+        Assert.assertThat(this.jobRequestMetadataRepository.count(), Matchers.is(1L));
         Assert.assertThat(this.jobExecutionRepository.count(), Matchers.is(1L));
 
         // Test for conflicts
@@ -735,6 +741,11 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath(ID_PATH, Matchers.is(jobId)))
             .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(JobStatus.KILLED.toString())));
+
+        // Kill the job again to make sure it doesn't cause a problem.
+        this.mvc
+            .perform(MockMvcRequestBuilders.delete(JOBS_API + "/" + jobId))
+            .andExpect(MockMvcResultMatchers.status().isAccepted());
     }
 
     /**

@@ -173,6 +173,22 @@ CREATE TABLE job_executions (
 
 
 --
+-- Name: job_request_metadata; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE job_request_metadata (
+    id character varying(255) NOT NULL,
+    created timestamp(3) without time zone DEFAULT now() NOT NULL,
+    updated timestamp(3) without time zone DEFAULT now() NOT NULL,
+    entity_version integer DEFAULT 0 NOT NULL,
+    client_host character varying(255) DEFAULT NULL::character varying,
+    user_agent character varying(2048) DEFAULT NULL::character varying,
+    num_attachments integer DEFAULT 0 NOT NULL,
+    total_size_of_attachments bigint DEFAULT 0 NOT NULL
+);
+
+
+--
 -- Name: job_requests; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -196,12 +212,8 @@ CREATE TABLE job_requests (
     tags character varying(2048) DEFAULT NULL::character varying,
     cpu integer DEFAULT 1 NOT NULL,
     memory integer DEFAULT 1560 NOT NULL,
-    client_host character varying(255) DEFAULT NULL::character varying,
     applications character varying(2048) DEFAULT '[]'::character varying NOT NULL,
-    timeout integer DEFAULT 604800 NOT NULL,
-    user_agent character varying(1024) DEFAULT NULL::character varying,
-    num_attachments integer DEFAULT 0 NOT NULL,
-    total_size_of_attachments bigint DEFAULT 0 NOT NULL
+    timeout integer DEFAULT 604800 NOT NULL
 );
 
 
@@ -500,6 +512,14 @@ ALTER TABLE ONLY commands_applications
 
 ALTER TABLE ONLY job_executions
     ADD CONSTRAINT job_executions_id_fkey FOREIGN KEY (id) REFERENCES jobs(id) ON DELETE CASCADE;
+
+
+--
+-- Name: job_request_metadata_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY job_request_metadata
+    ADD CONSTRAINT job_request_metadata_id_fkey FOREIGN KEY (id) REFERENCES job_requests(id) ON DELETE CASCADE;
 
 
 --

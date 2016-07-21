@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.client.interceptor;
+package com.netflix.genie.client.interceptors;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -38,10 +38,9 @@ public class ResponseMappingInterceptor implements Interceptor {
 
     /**
      * Constructor.
-     *
      */
     public ResponseMappingInterceptor() {
-        mapper = new ObjectMapper();
+        this.mapper = new ObjectMapper();
     }
 
     /**
@@ -57,10 +56,12 @@ public class ResponseMappingInterceptor implements Interceptor {
             final String bodyContent = response.body().string();
 
             try {
-                final JsonNode responseBody = mapper.readTree(bodyContent);
-                throw new GenieClientException(response.code(), response.message()
-                    + " : " + responseBody.get("message"));
-            } catch (JsonProcessingException jpe) {
+                final JsonNode responseBody = this.mapper.readTree(bodyContent);
+                throw new GenieClientException(
+                    response.code(),
+                    response.message() + " : " + responseBody.get("message")
+                );
+            } catch (final JsonProcessingException jpe) {
                 throw new GenieClientException(response.code(), response.message() + bodyContent);
             }
         }

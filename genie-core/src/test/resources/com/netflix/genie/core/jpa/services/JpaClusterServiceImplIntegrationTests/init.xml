@@ -145,8 +145,6 @@
         cpu="1"
         memory="1560"
         timeout="608400"
-        num_attachments="2"
-        total_size_of_attachments="3802"
         entity_version="1"
     />
     <jobs
@@ -177,8 +175,6 @@
         cpu="2"
         memory="2048"
         timeout="608401"
-        num_attachments="3"
-        total_size_of_attachments="38027"
         entity_version="1"
     />
     <jobs

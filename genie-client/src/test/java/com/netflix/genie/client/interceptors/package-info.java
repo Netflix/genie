@@ -15,10 +15,11 @@
  *     limitations under the License.
  *
  */
+
 /**
- * A package that contains all interceptors to be added to modify outgoing requests and incoming responses.
+ * Tests for the interceptor classes.
  *
- * @author amsharma
+ * @author tgianos
  * @since 3.0.0
  */
-package com.netflix.genie.client.interceptor;
+package com.netflix.genie.client.interceptors;

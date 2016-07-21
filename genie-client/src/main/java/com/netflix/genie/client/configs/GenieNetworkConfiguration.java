@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.client.config;
+package com.netflix.genie.client.configs;
 
 import lombok.Getter;
 import lombok.Setter;

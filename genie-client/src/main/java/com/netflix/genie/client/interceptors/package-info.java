@@ -16,9 +16,9 @@
  *
  */
 /**
- * Package containing configuration classes for Genie client.
+ * A package that contains all interceptors to be added to modify outgoing requests and incoming responses.
  *
  * @author amsharma
  * @since 3.0.0
  */
-package com.netflix.genie.client.config;
+package com.netflix.genie.client.interceptors;

@@ -20,14 +20,17 @@ package com.netflix.genie.client;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.netflix.genie.client.apis.CommandService;
+import com.netflix.genie.client.configs.GenieNetworkConfiguration;
 import com.netflix.genie.client.exceptions.GenieClientException;
-import com.netflix.genie.client.security.SecurityInterceptor;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.Interceptor;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,24 +50,17 @@ public class CommandClient extends BaseGenieClient {
     /**
      * Constructor.
      *
-     * @param url The url of the Genie Service.
-     * @param securityInterceptor An implementation of the Security Interceptor.
-     *
-     * @throws GenieClientException If there is any problem.
+     * @param url                       The endpoint URL of the Genie API. Not null or empty
+     * @param interceptors              Any interceptors to configure the client with, can include security ones
+     * @param genieNetworkConfiguration The network configuration parameters. Could be null
+     * @throws GenieClientException On error
      */
-    public CommandClient(final String url, final SecurityInterceptor securityInterceptor) throws GenieClientException {
-        super(url, securityInterceptor, null);
-        this.commandService = this.getService(CommandService.class);
-    }
-
-    /**
-     * Constructor that takes only the URL.
-     *
-     * @param url The url of the Genie Service.
-     * @throws GenieClientException If there is any problem.
-     */
-    public CommandClient(final String url) throws GenieClientException {
-        super(url, null, null);
+    public CommandClient(
+        @NotEmpty final String url,
+        @Nullable final List<Interceptor> interceptors,
+        @Nullable final GenieNetworkConfiguration genieNetworkConfiguration
+    ) throws GenieClientException {
+        super(url, interceptors, genieNetworkConfiguration);
         this.commandService = this.getService(CommandService.class);
     }
 

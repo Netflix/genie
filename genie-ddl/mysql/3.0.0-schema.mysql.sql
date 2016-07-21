@@ -218,6 +218,27 @@ CREATE TABLE `job_executions` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `job_request_metadata`
+--
+
+DROP TABLE IF EXISTS `job_request_metadata`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `job_request_metadata` (
+  `id` varchar(255) NOT NULL,
+  `created` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `updated` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  `entity_version` int(11) NOT NULL DEFAULT '0',
+  `client_host` varchar(255) DEFAULT NULL,
+  `user_agent` varchar(2048) DEFAULT NULL,
+  `num_attachments` int(11) NOT NULL DEFAULT '0',
+  `total_size_of_attachments` bigint(20) NOT NULL DEFAULT '0',
+  KEY `id` (`id`),
+  CONSTRAINT `job_request_metadata_ibfk_1` FOREIGN KEY (`id`) REFERENCES `job_requests` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `job_requests`
 --
 
@@ -244,12 +265,8 @@ CREATE TABLE `job_requests` (
   `tags` varchar(2048) DEFAULT NULL,
   `cpu` int(11) NOT NULL DEFAULT '1',
   `memory` int(11) NOT NULL DEFAULT '1560',
-  `client_host` varchar(255) DEFAULT NULL,
   `applications` varchar(2048) NOT NULL DEFAULT '[]',
   `timeout` int(11) NOT NULL DEFAULT '604800',
-  `user_agent` varchar(1024) DEFAULT NULL,
-  `num_attachments` int(11) NOT NULL DEFAULT '0',
-  `total_size_of_attachments` bigint(20) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `JOB_REQUESTS_CREATED_INDEX` (`created`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -326,4 +343,4 @@ CREATE TABLE `jobs_applications` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-07-20 18:46:36
+-- Dump completed on 2016-07-20 23:03:40

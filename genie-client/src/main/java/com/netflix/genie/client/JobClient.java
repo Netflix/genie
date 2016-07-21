@@ -20,9 +20,8 @@ package com.netflix.genie.client;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.io.ByteStreams;
 import com.netflix.genie.client.apis.JobService;
-import com.netflix.genie.client.config.GenieNetworkConfiguration;
+import com.netflix.genie.client.configs.GenieNetworkConfiguration;
 import com.netflix.genie.client.exceptions.GenieClientException;
-import com.netflix.genie.client.security.SecurityInterceptor;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
@@ -33,13 +32,16 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieTimeoutException;
+import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okio.BufferedSink;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.validator.constraints.NotEmpty;
 import retrofit2.Response;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -55,68 +57,26 @@ import java.util.Set;
  */
 public class JobClient extends BaseGenieClient {
 
+    private static final String STATUS = "status";
     private static final String ATTACHMENT = "attachment";
     private static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
 
     private final JobService jobService;
 
     /**
-     * Constructor that takes only the URL.
-     *
-     * @param url The url of the Genie Service.
-     * @throws GenieClientException If there is any problem.
-     */
-    public JobClient(
-        final String url
-    ) throws GenieClientException {
-        super(url, null, null);
-        this.jobService = this.getService(JobService.class);
-    }
-
-    /**
      * Constructor.
      *
-     * @param url                 The url of the Genie Service.
-     * @param securityInterceptor An implementation of the Security Interceptor.
-     * @throws GenieClientException If there is any problem.
+     * @param url                       The endpoint URL of the Genie API. Not null or empty
+     * @param interceptors              Any interceptors to configure the client with, can include security ones
+     * @param genieNetworkConfiguration The network configuration parameters. Could be null
+     * @throws GenieClientException On error
      */
     public JobClient(
-        final String url,
-        final SecurityInterceptor securityInterceptor
+        @NotEmpty final String url,
+        @Nullable final List<Interceptor> interceptors,
+        @Nullable final GenieNetworkConfiguration genieNetworkConfiguration
     ) throws GenieClientException {
-        super(url, securityInterceptor, null);
-        this.jobService = this.getService(JobService.class);
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param url                       The url of the Genie Service.
-     * @param genieNetworkConfiguration A configuration object that provides network settings for HTTP calls.
-     * @throws GenieClientException If there is any problem.
-     */
-    public JobClient(
-        final String url,
-        final GenieNetworkConfiguration genieNetworkConfiguration
-    ) throws GenieClientException {
-        super(url, null, genieNetworkConfiguration);
-        this.jobService = this.getService(JobService.class);
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param url                       The url of the Genie Service.
-     * @param securityInterceptor       An implementation of the Security Interceptor.
-     * @param genieNetworkConfiguration A configuration object that provides network settings for HTTP calls.
-     * @throws GenieClientException If there is any problem.
-     */
-    public JobClient(
-        final String url,
-        final SecurityInterceptor securityInterceptor,
-        final GenieNetworkConfiguration genieNetworkConfiguration
-    ) throws GenieClientException {
-        super(url, securityInterceptor, genieNetworkConfiguration);
+        super(url, interceptors, genieNetworkConfiguration);
         this.jobService = this.getService(JobService.class);
     }
 

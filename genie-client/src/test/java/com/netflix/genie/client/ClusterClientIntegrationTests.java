@@ -55,8 +55,8 @@ public class ClusterClientIntegrationTests extends GenieClientsIntegrationTestsB
      */
     @Before
     public void setup() throws Exception {
-        clusterClient = new ClusterClient(getBaseUrl());
-        commandClient = new CommandClient(getBaseUrl());
+        clusterClient = new ClusterClient(getBaseUrl(), null, null);
+        commandClient = new CommandClient(getBaseUrl(), null, null);
     }
 
     /**

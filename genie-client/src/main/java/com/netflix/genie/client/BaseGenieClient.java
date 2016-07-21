@@ -20,17 +20,19 @@ package com.netflix.genie.client;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.netflix.genie.client.config.GenieNetworkConfiguration;
+import com.netflix.genie.client.configs.GenieNetworkConfiguration;
 import com.netflix.genie.client.exceptions.GenieClientException;
-import com.netflix.genie.client.interceptor.ResponseMappingInterceptor;
-import com.netflix.genie.client.interceptor.UserAgentInsertInterceptor;
-import com.netflix.genie.client.security.SecurityInterceptor;
+import com.netflix.genie.client.interceptors.ResponseMappingInterceptor;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.validator.constraints.NotEmpty;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -41,23 +43,22 @@ import java.util.concurrent.TimeUnit;
  */
 public abstract class BaseGenieClient {
 
-    protected static final String STATUS = "status";
-
     private Retrofit retrofit;
     private ObjectMapper mapper;
 
     /**
      * Constructor that takes the service url and a security interceptor implementation.
      *
-     * @param url The url of the Genie Service.
-     * @param securityInterceptor An implementation of the Security Interceptor.
-     * @param genieNetworkConfiguration  A configuration object that provides network settings for HTTP calls.
+     * @param url                       The url of the Genie Service.
+     * @param interceptors              All desired interceptors for the client to be created
+     * @param genieNetworkConfiguration A configuration object that provides network settings for HTTP calls.
      * @throws GenieClientException If there is any problem creating the constructor.
      */
     public BaseGenieClient(
-        final String url,
-        final SecurityInterceptor securityInterceptor,
-        final GenieNetworkConfiguration genieNetworkConfiguration) throws GenieClientException {
+        @NotEmpty final String url,
+        @Nullable final List<Interceptor> interceptors,
+        @Nullable final GenieNetworkConfiguration genieNetworkConfiguration
+    ) throws GenieClientException {
 
         if (StringUtils.isBlank(url)) {
             throw new GenieClientException("Service URL cannot be empty or null");
@@ -75,12 +76,10 @@ public abstract class BaseGenieClient {
         // Add the interceptor to map the retrofit response code to corresponding Genie Exceptions in case of
         // 4xx and 5xx errors.
         builder.addInterceptor(new ResponseMappingInterceptor());
-        // Add the interceptor to inject a user agent string
-        builder.addInterceptor(new UserAgentInsertInterceptor());
-
-        // Add the security interceptor if provided to add credentials to a request.
-        if (securityInterceptor != null) {
-            builder.addInterceptor(securityInterceptor);
+        if (interceptors != null) {
+            for (final Interceptor interceptor : interceptors) {
+                builder.addInterceptor(interceptor);
+            }
         }
         final OkHttpClient client = builder.build();
 

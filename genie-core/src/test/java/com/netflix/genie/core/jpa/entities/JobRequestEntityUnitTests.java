@@ -73,7 +73,6 @@ public class JobRequestEntityUnitTests {
         Assert.assertThat(this.entity.getCreated(), Matchers.notNullValue());
         Assert.assertThat(this.entity.getUpdated(), Matchers.notNullValue());
         Assert.assertThat(this.entity.getTags(), Matchers.empty());
-        Assert.assertThat(this.entity.getClientHost(), Matchers.nullValue());
         Assert.assertThat(this.entity.getClusterCriterias(), Matchers.is(EMPTY_JSON_ARRAY));
         Assert.assertThat(this.entity.getClusterCriteriasAsList(), Matchers.empty());
         Assert.assertThat(this.entity.getCommandArgs(), Matchers.nullValue());
@@ -92,9 +91,6 @@ public class JobRequestEntityUnitTests {
         Assert.assertThat(this.entity.getApplicationsAsList(), Matchers.empty());
         Assert.assertThat(this.entity.getApplications(), Matchers.is(EMPTY_JSON_ARRAY));
         Assert.assertThat(this.entity.getTimeout(), Matchers.is(604800));
-        Assert.assertThat(this.entity.getUserAgent(), Matchers.nullValue());
-        Assert.assertThat(this.entity.getNumAttachments(), Matchers.is(0));
-        Assert.assertThat(this.entity.getTotalSizeOfAttachments(), Matchers.is(0L));
     }
 
     /**
@@ -234,16 +230,6 @@ public class JobRequestEntityUnitTests {
     }
 
     /**
-     * Make sure can set the client host name the request came from.
-     */
-    @Test
-    public void canSetClientHost() {
-        final String clientHost = UUID.randomUUID().toString();
-        this.entity.setClientHost(clientHost);
-        Assert.assertThat(this.entity.getClientHost(), Matchers.is(clientHost));
-    }
-
-    /**
      * Make sure can set the command criteria for the job.
      *
      * @throws GenieException on error
@@ -339,6 +325,18 @@ public class JobRequestEntityUnitTests {
     }
 
     /**
+     * Make sure can set the additional metadata for this request.
+     */
+    @Test
+    public void canSetJobRequestMetadata() {
+        Assert.assertThat(this.entity.getJobRequestMetadata(), Matchers.nullValue());
+        final JobRequestMetadataEntity metadata = new JobRequestMetadataEntity();
+        this.entity.setJobRequestMetadata(metadata);
+        Assert.assertThat(this.entity.getJobRequestMetadata(), Matchers.is(metadata));
+        Assert.assertThat(metadata.getRequest(), Matchers.is(this.entity));
+    }
+
+    /**
      * Make sure the entity class sets the applications right.
      */
     @Test
@@ -385,39 +383,6 @@ public class JobRequestEntityUnitTests {
         final int timeout = 28023423;
         this.entity.setTimeout(timeout);
         Assert.assertThat(this.entity.getTimeout(), Matchers.is(timeout));
-    }
-
-    /**
-     * Make sure we can set and get the user agent string.
-     */
-    @Test
-    public void canSetUserAgent() {
-        Assert.assertThat(this.entity.getUserAgent(), Matchers.nullValue());
-        final String userAgent = UUID.randomUUID().toString();
-        this.entity.setUserAgent(userAgent);
-        Assert.assertThat(this.entity.getUserAgent(), Matchers.is(userAgent));
-    }
-
-    /**
-     * Make sure we can set and get the attachments.
-     */
-    @Test
-    public void canSetNumAttachments() {
-        Assert.assertThat(this.entity.getNumAttachments(), Matchers.is(0));
-        final int numAttachments = 380208;
-        this.entity.setNumAttachments(numAttachments);
-        Assert.assertThat(this.entity.getNumAttachments(), Matchers.is(numAttachments));
-    }
-
-    /**
-     * Make sure we can set and get the attachments.
-     */
-    @Test
-    public void canSetTotalSizeOfAttachments() {
-        Assert.assertThat(this.entity.getTotalSizeOfAttachments(), Matchers.is(0L));
-        final long totalSizeOfAttachments = 90832432L;
-        this.entity.setTotalSizeOfAttachments(totalSizeOfAttachments);
-        Assert.assertThat(this.entity.getTotalSizeOfAttachments(), Matchers.is(totalSizeOfAttachments));
     }
 
     /**

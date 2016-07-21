@@ -33,6 +33,7 @@ import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.entities.JobEntity;
 import com.netflix.genie.core.jpa.entities.JobExecutionEntity;
 import com.netflix.genie.core.jpa.entities.JobRequestEntity;
+import com.netflix.genie.core.jpa.entities.JobRequestMetadataEntity;
 import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
@@ -265,10 +266,14 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         jobRequestEntity.setMemory(jobRequest.getMemory());
         jobRequestEntity.setApplicationsFromList(jobRequest.getApplications());
         jobRequestEntity.setTimeout(jobRequest.getTimeout());
-        jobRequestEntity.setClientHost(jobRequestMetadata.getClientHost());
-        jobRequestEntity.setUserAgent(jobRequestMetadata.getUserAgent());
-        jobRequestEntity.setNumAttachments(jobRequestMetadata.getNumAttachments());
-        jobRequestEntity.setTotalSizeOfAttachments(jobRequestMetadata.getTotalSizeOfAttachments());
+
+        final JobRequestMetadataEntity metadataEntity = new JobRequestMetadataEntity();
+        metadataEntity.setClientHost(jobRequestMetadata.getClientHost());
+        metadataEntity.setUserAgent(jobRequestMetadata.getUserAgent());
+        metadataEntity.setNumAttachments(jobRequestMetadata.getNumAttachments());
+        metadataEntity.setTotalSizeOfAttachments(jobRequestMetadata.getTotalSizeOfAttachments());
+
+        jobRequestEntity.setJobRequestMetadata(metadataEntity);
 
         this.jobRequestRepo.save(jobRequestEntity);
         return jobRequestEntity.getDTO();

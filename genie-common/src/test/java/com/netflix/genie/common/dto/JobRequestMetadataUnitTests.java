@@ -70,6 +70,7 @@ public class JobRequestMetadataUnitTests {
 
         final JobRequestMetadata.Builder builder = new JobRequestMetadata
             .Builder()
+            .withId(UUID.randomUUID().toString())
             .withClientHost(clientHost)
             .withUserAgent(userAgent)
             .withNumAttachments(numAttachments)
@@ -77,7 +78,7 @@ public class JobRequestMetadataUnitTests {
 
         final JobRequestMetadata one = builder.build();
         final JobRequestMetadata two = builder.build();
-        builder.withClientHost(UUID.randomUUID().toString());
+        builder.withId(UUID.randomUUID().toString());
         final JobRequestMetadata three = builder.build();
 
         Assert.assertTrue(one.equals(two));
@@ -97,6 +98,7 @@ public class JobRequestMetadataUnitTests {
 
         final JobRequestMetadata.Builder builder = new JobRequestMetadata
             .Builder()
+            .withId(UUID.randomUUID().toString())
             .withClientHost(clientHost)
             .withUserAgent(userAgent)
             .withNumAttachments(numAttachments)
@@ -104,7 +106,7 @@ public class JobRequestMetadataUnitTests {
 
         final JobRequestMetadata one = builder.build();
         final JobRequestMetadata two = builder.build();
-        builder.withClientHost(UUID.randomUUID().toString());
+        builder.withId(UUID.randomUUID().toString());
         final JobRequestMetadata three = builder.build();
 
         Assert.assertEquals(one.hashCode(), two.hashCode());

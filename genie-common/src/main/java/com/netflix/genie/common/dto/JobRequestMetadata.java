@@ -18,9 +18,7 @@
 package com.netflix.genie.common.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.ToString;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
@@ -33,9 +31,7 @@ import javax.validation.constraints.Min;
  */
 @JsonDeserialize(builder = JobRequestMetadata.Builder.class)
 @Getter
-@EqualsAndHashCode
-@ToString
-public class JobRequestMetadata {
+public class JobRequestMetadata extends BaseDTO {
 
     private final String clientHost;
     private final String userAgent;
@@ -50,6 +46,7 @@ public class JobRequestMetadata {
      * @param builder The builder to construct from
      */
     protected JobRequestMetadata(@Valid final Builder builder) {
+        super(builder);
         this.clientHost = builder.bClientHost;
         this.userAgent = builder.bUserAgent;
         this.numAttachments = builder.bNumAttachments;
@@ -62,7 +59,7 @@ public class JobRequestMetadata {
      * @author tgianos
      * @since 3.0.0
      */
-    public static class Builder {
+    public static class Builder extends BaseDTO.Builder<Builder> {
         private String bClientHost;
         private String bUserAgent;
         @Min(value = 0, message = "Can't have less than zero attachments")

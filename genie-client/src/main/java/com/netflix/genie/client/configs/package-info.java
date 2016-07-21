@@ -15,15 +15,10 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.client.security;
-
-import okhttp3.Interceptor;
-
 /**
- * An interface whose implmentation  is supposed to modify the HTTP Request by adding Security credentials.
+ * Package containing configuration classes for Genie client.
  *
  * @author amsharma
  * @since 3.0.0
  */
-public interface SecurityInterceptor extends Interceptor {
-}
+package com.netflix.genie.client.configs;
