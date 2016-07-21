@@ -121,6 +121,21 @@ public class JobRequestEntity extends SetupFileEntity {
     @Min(value = 1)
     private int timeout = 604800; // Seven days in seconds
 
+    @Basic
+    @Column(name = "user_agent", length = 1024)
+    @Size(min = 0, max = 1024)
+    private String userAgent;
+
+    @Basic(optional = false)
+    @Column(name = "num_attachments", nullable = false)
+    @Min(value = 0, message = "Can't have less than zero attachments")
+    private int numAttachments;
+
+    @Basic(optional = false)
+    @Column(name = "total_size_of_attachments", nullable = false)
+    @Min(value = 0, message = "Can't have less than zero bytes total attachment size")
+    private long totalSizeOfAttachments;
+
     @OneToOne(
         mappedBy = "request",
         fetch = FetchType.LAZY,

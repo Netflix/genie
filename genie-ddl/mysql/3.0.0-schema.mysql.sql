@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.7.12, for osx10.11 (x86_64)
+-- MySQL dump 10.13  Distrib 5.7.13, for osx10.11 (x86_64)
 --
 -- Host: localhost    Database: genie
 -- ------------------------------------------------------
--- Server version	5.7.12
+-- Server version	5.7.13
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -125,6 +125,7 @@ CREATE TABLE `clusters_commands` (
   `cluster_id` varchar(255) NOT NULL,
   `command_id` varchar(255) NOT NULL,
   `command_order` int(11) NOT NULL,
+  KEY `cluster_id` (`cluster_id`),
   KEY `command_id` (`command_id`),
   CONSTRAINT `clusters_commands_ibfk_1` FOREIGN KEY (`cluster_id`) REFERENCES `clusters` (`id`) ON DELETE CASCADE,
   CONSTRAINT `clusters_commands_ibfk_2` FOREIGN KEY (`command_id`) REFERENCES `commands` (`id`)
@@ -185,6 +186,7 @@ CREATE TABLE `commands_applications` (
   `command_id` varchar(255) NOT NULL,
   `application_id` varchar(255) NOT NULL,
   `application_order` int(11) NOT NULL,
+  KEY `command_id` (`command_id`),
   KEY `application_id` (`application_id`),
   CONSTRAINT `commands_applications_ibfk_1` FOREIGN KEY (`command_id`) REFERENCES `commands` (`id`) ON DELETE CASCADE,
   CONSTRAINT `commands_applications_ibfk_2` FOREIGN KEY (`application_id`) REFERENCES `applications` (`id`)
@@ -245,6 +247,9 @@ CREATE TABLE `job_requests` (
   `client_host` varchar(255) DEFAULT NULL,
   `applications` varchar(2048) NOT NULL DEFAULT '[]',
   `timeout` int(11) NOT NULL DEFAULT '604800',
+  `user_agent` varchar(1024) DEFAULT NULL,
+  `num_attachments` int(11) NOT NULL DEFAULT '0',
+  `total_size_of_attachments` bigint(20) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `JOB_REQUESTS_CREATED_INDEX` (`created`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -321,4 +326,4 @@ CREATE TABLE `jobs_applications` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-05-11 14:47:19
+-- Dump completed on 2016-07-20 18:46:36

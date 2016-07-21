@@ -55,7 +55,7 @@ public class ClusterClient extends BaseGenieClient {
         final SecurityInterceptor securityInterceptor
     ) throws GenieClientException {
         super(url, securityInterceptor, null);
-        clusterService = retrofit.create(ClusterService.class);
+        this.clusterService = this.getService(ClusterService.class);
     }
 
     /**
@@ -68,10 +68,10 @@ public class ClusterClient extends BaseGenieClient {
         final String url
     ) throws GenieClientException {
         super(url, null, null);
-        clusterService = retrofit.create(ClusterService.class);
+        clusterService = this.getService(ClusterService.class);
     }
 
-    /******************* CRUD Methods   ***************************/
+    /* CRUD Methods */
 
     /**
      * Create a cluster ing genie.
@@ -143,7 +143,7 @@ public class ClusterClient extends BaseGenieClient {
             .get("_embedded");
         if (jnode != null) {
             for (final JsonNode objNode : jnode.get("clusterList")) {
-                final Cluster cluster  = mapper.treeToValue(objNode, Cluster.class);
+                final Cluster cluster = this.treeToValue(objNode, Cluster.class);
                 clusterList.add(cluster);
             }
         }

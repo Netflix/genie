@@ -18,16 +18,19 @@
 package com.netflix.genie.client;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.genie.client.config.GenieNetworkConfiguration;
-import com.netflix.genie.client.interceptor.ResponseMappingInterceptor;
-import com.netflix.genie.client.security.SecurityInterceptor;
 import com.netflix.genie.client.exceptions.GenieClientException;
+import com.netflix.genie.client.interceptor.ResponseMappingInterceptor;
+import com.netflix.genie.client.interceptor.UserAgentInsertInterceptor;
+import com.netflix.genie.client.security.SecurityInterceptor;
 import okhttp3.OkHttpClient;
 import org.apache.commons.lang3.StringUtils;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -40,8 +43,8 @@ public abstract class BaseGenieClient {
 
     protected static final String STATUS = "status";
 
-    protected Retrofit retrofit;
-    protected ObjectMapper mapper;
+    private Retrofit retrofit;
+    private ObjectMapper mapper;
 
     /**
      * Constructor that takes the service url and a security interceptor implementation.
@@ -67,12 +70,13 @@ public abstract class BaseGenieClient {
             this.addConfigParamsFromConfig(builder, genieNetworkConfiguration);
         }
 
-        mapper = new ObjectMapper().
-            configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        this.mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         // Add the interceptor to map the retrofit response code to corresponding Genie Exceptions in case of
         // 4xx and 5xx errors.
         builder.addInterceptor(new ResponseMappingInterceptor());
+        // Add the interceptor to inject a user agent string
+        builder.addInterceptor(new UserAgentInsertInterceptor());
 
         // Add the security interceptor if provided to add credentials to a request.
         if (securityInterceptor != null) {
@@ -80,7 +84,7 @@ public abstract class BaseGenieClient {
         }
         final OkHttpClient client = builder.build();
 
-        retrofit = new Retrofit.Builder()
+        this.retrofit = new Retrofit.Builder()
             .baseUrl(url)
             .addConverterFactory(JacksonConverterFactory.create(mapper))
             .client(client)
@@ -113,5 +117,13 @@ public abstract class BaseGenieClient {
      */
     protected String getIdFromLocation(final String location) {
         return location.substring(location.lastIndexOf("/") + 1);
+    }
+
+    protected <T> T getService(final Class<T> clazz) {
+        return this.retrofit.create(clazz);
+    }
+
+    protected <T> T treeToValue(final JsonNode node, final Class<T> clazz) throws IOException {
+        return this.mapper.treeToValue(node, clazz);
     }
 }

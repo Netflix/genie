@@ -140,6 +140,8 @@
         memory="1560"
         disable_log_archival="true"
         timeout="608400"
+        num_attachments="1"
+        total_size_of_attachments="380"
         entity_version="1"
     />
     <jobs
@@ -189,6 +191,8 @@
         memory="2048"
         disable_log_archival="false"
         timeout="608400"
+        num_attachments="4"
+        total_size_of_attachments="388902"
         entity_version="1"
     />
     <jobs
@@ -238,6 +242,8 @@
         memory="2048"
         disable_log_archival="true"
         timeout="608400"
+        num_attachments="2"
+        total_size_of_attachments="4502"
         entity_version="1"
     />
     <jobs

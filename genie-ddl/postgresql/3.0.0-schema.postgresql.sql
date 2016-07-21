@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.5.2
--- Dumped by pg_dump version 9.5.2
+-- Dumped from database version 9.5.3
+-- Dumped by pg_dump version 9.5.3
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -198,7 +198,10 @@ CREATE TABLE job_requests (
     memory integer DEFAULT 1560 NOT NULL,
     client_host character varying(255) DEFAULT NULL::character varying,
     applications character varying(2048) DEFAULT '[]'::character varying NOT NULL,
-    timeout integer DEFAULT 604800 NOT NULL
+    timeout integer DEFAULT 604800 NOT NULL,
+    user_agent character varying(1024) DEFAULT NULL::character varying,
+    num_attachments integer DEFAULT 0 NOT NULL,
+    total_size_of_attachments bigint DEFAULT 0 NOT NULL
 );
 
 

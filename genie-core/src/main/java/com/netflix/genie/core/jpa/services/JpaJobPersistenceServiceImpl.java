@@ -21,6 +21,7 @@ import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
+import com.netflix.genie.common.dto.JobRequestMetadata;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
@@ -235,11 +236,10 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
      */
     @Override
     public JobRequest createJobRequest(
-        @NotNull(message = "Job Request is null so cannot be saved")
-        final JobRequest jobRequest,
-        final String clientHost
+        @NotNull final JobRequest jobRequest,
+        @NotNull final JobRequestMetadata jobRequestMetadata
     ) throws GenieException {
-        log.debug("Called with jobRequest: {} and client host: {}", jobRequest, clientHost);
+        log.debug("Called with Job Request: {} and Job Request Metadata: {}", jobRequest, jobRequestMetadata);
 
         if (jobRequest.getId() != null && this.jobRequestRepo.exists(jobRequest.getId())) {
             throw new GenieConflictException("A job with id " + jobRequest.getId() + " already exists");
@@ -265,10 +265,10 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         jobRequestEntity.setMemory(jobRequest.getMemory());
         jobRequestEntity.setApplicationsFromList(jobRequest.getApplications());
         jobRequestEntity.setTimeout(jobRequest.getTimeout());
-
-        if (StringUtils.isNotBlank(clientHost)) {
-            jobRequestEntity.setClientHost(clientHost);
-        }
+        jobRequestEntity.setClientHost(jobRequestMetadata.getClientHost());
+        jobRequestEntity.setUserAgent(jobRequestMetadata.getUserAgent());
+        jobRequestEntity.setNumAttachments(jobRequestMetadata.getNumAttachments());
+        jobRequestEntity.setTotalSizeOfAttachments(jobRequestMetadata.getTotalSizeOfAttachments());
 
         this.jobRequestRepo.save(jobRequestEntity);
         return jobRequestEntity.getDTO();
@@ -291,7 +291,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         }
 
         this.updateJobStatus(jobExecution.getId(), JobStatus.RUNNING, "Job is Running.");
-        final JobEntity jobEntity = jobRepo.findOne(jobExecution.getId());
+        final JobEntity jobEntity = this.jobRepo.findOne(jobExecution.getId());
         if (jobEntity == null) {
             throw new GenieNotFoundException("Cannot find the job for the id of the jobExecution specified.");
         }

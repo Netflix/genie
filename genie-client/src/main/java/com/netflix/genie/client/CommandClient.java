@@ -52,12 +52,9 @@ public class CommandClient extends BaseGenieClient {
      *
      * @throws GenieClientException If there is any problem.
      */
-    public CommandClient(
-        final String url,
-        final SecurityInterceptor securityInterceptor
-    ) throws GenieClientException {
+    public CommandClient(final String url, final SecurityInterceptor securityInterceptor) throws GenieClientException {
         super(url, securityInterceptor, null);
-        commandService = retrofit.create(CommandService.class);
+        this.commandService = this.getService(CommandService.class);
     }
 
     /**
@@ -66,14 +63,12 @@ public class CommandClient extends BaseGenieClient {
      * @param url The url of the Genie Service.
      * @throws GenieClientException If there is any problem.
      */
-    public CommandClient(
-        final String url
-    ) throws GenieClientException {
+    public CommandClient(final String url) throws GenieClientException {
         super(url, null, null);
-        commandService = retrofit.create(CommandService.class);
+        this.commandService = this.getService(CommandService.class);
     }
 
-    /******************* CRUD Methods   ***************************/
+    /* CRUD Methods */
 
     /**
      * Create a command ing genie.
@@ -125,18 +120,17 @@ public class CommandClient extends BaseGenieClient {
         final List<String> statusList,
         final List<String> tagList
     ) throws IOException, GenieClientException {
-
         final List<Command> commandList = new ArrayList<>();
-        final JsonNode jnode =  commandService.getCommands(
+        final JsonNode jNode =  commandService.getCommands(
             name,
             user,
             statusList,
             tagList
         ).execute().body()
             .get("_embedded");
-        if (jnode != null) {
-            for (final JsonNode objNode : jnode.get("commandList")) {
-                final Command command  = mapper.treeToValue(objNode, Command.class);
+        if (jNode != null) {
+            for (final JsonNode objNode : jNode.get("commandList")) {
+                final Command command  = this.treeToValue(objNode, Command.class);
                 commandList.add(command);
             }
         }

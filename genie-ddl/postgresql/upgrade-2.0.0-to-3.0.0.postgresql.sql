@@ -283,6 +283,9 @@ CREATE TABLE job_requests (
   client_host VARCHAR(255) DEFAULT NULL,
   applications VARCHAR(2048) NOT NULL DEFAULT '[]',
   timeout INT NOT NULL DEFAULT 604800,
+  user_agent VARCHAR(1024) DEFAULT NULL,
+  num_attachments INT NOT NULL DEFAULT 0,
+  total_size_of_attachments BIGINT NOT NULL DEFAULT 0,
   PRIMARY KEY (id)
 );
 SELECT CURRENT_TIMESTAMP, 'Successfully created the job_requests table.';
