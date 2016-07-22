@@ -79,15 +79,17 @@ public class PingFederateTokenServices implements ResourceServerTokenServices {
         @NotNull final AccessTokenConverter converter
     ) {
         this.restOperations = new RestTemplate();
-        ((RestTemplate) this.restOperations).setErrorHandler(new DefaultResponseErrorHandler() {
-            @Override
-            // Ignore 400
-            public void handleError(final ClientHttpResponse response) throws IOException {
-                if (response.getRawStatusCode() != HttpStatus.BAD_REQUEST.value()) {
-                    super.handleError(response);
+        ((RestTemplate) this.restOperations).setErrorHandler(
+            new DefaultResponseErrorHandler() {
+                // Ignore 400
+                @Override
+                public void handleError(final ClientHttpResponse response) throws IOException {
+                    if (response.getRawStatusCode() != HttpStatus.BAD_REQUEST.value()) {
+                        super.handleError(response);
+                    }
                 }
             }
-        });
+        );
 
         this.checkTokenEndpointUrl = serverProperties.getTokenInfoUri();
         this.clientId = serverProperties.getClientId();
@@ -97,7 +99,7 @@ public class PingFederateTokenServices implements ResourceServerTokenServices {
         Assert.state(StringUtils.isNotBlank(this.clientId), "Client ID is required");
         Assert.state(StringUtils.isNotBlank(this.clientSecret), "Client secret is required");
 
-        log.debug("checkTokenEnpointUrl = {}", this.checkTokenEndpointUrl);
+        log.debug("checkTokenEndpointUrl = {}", this.checkTokenEndpointUrl);
         log.debug("clientId = {}", this.clientId);
         log.debug("clientSecret = {}", this.clientSecret);
 

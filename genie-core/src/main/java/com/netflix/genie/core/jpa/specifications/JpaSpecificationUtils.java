@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.core.jpa.specifications;
 
+import com.netflix.genie.core.jpa.entities.CommonFieldsEntity;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.NotNull;
@@ -30,7 +31,7 @@ import java.util.Set;
  */
 public final class JpaSpecificationUtils {
 
-//    private static final String PIPE_REGEX = "\\|";
+    private static final char PERCENT = '%';
 
     protected JpaSpecificationUtils() {
     }
@@ -43,11 +44,16 @@ public final class JpaSpecificationUtils {
      */
     public static String getTagLikeString(@NotNull final Set<String> tags) {
         final StringBuilder builder = new StringBuilder();
-        builder.append("%");
         tags.stream()
                 .filter(StringUtils::isNotBlank)
                 .sorted(String.CASE_INSENSITIVE_ORDER)
-                .forEach(tag -> builder.append(tag).append("%"));
-        return builder.toString();
+                .forEach(
+                    tag -> builder
+                        .append(PERCENT)
+                        .append(CommonFieldsEntity.TAG_DELIMITER)
+                        .append(tag)
+                        .append(CommonFieldsEntity.TAG_DELIMITER)
+                );
+        return builder.append(PERCENT).toString();
     }
 }

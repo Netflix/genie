@@ -111,12 +111,19 @@ ALTER TABLE `applications`
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully updated the applications table.' AS '';
 
 SELECT CURRENT_TIMESTAMP AS '', 'De-normalizing application tags for 3.0...' AS '';
-UPDATE `applications` AS `a` SET `a`.`tags` =
-(
-  SELECT GROUP_CONCAT(DISTINCT `t`.`element` ORDER BY `t`.`element` SEPARATOR '|')
-  FROM `application_tags` AS `t`
-  WHERE `a`.`id` = `t`.`APPLICATION_ID`
-  GROUP BY `t`.`APPLICATION_ID`
+UPDATE `applications` AS `a` SET `a`.`tags` = CONCAT(
+  '|',
+  REPLACE(
+    (
+      SELECT GROUP_CONCAT(DISTINCT `t`.`element` ORDER BY `t`.`element` SEPARATOR '|')
+      FROM `application_tags` AS `t`
+      WHERE `a`.`id` = `t`.`APPLICATION_ID`
+      GROUP BY `t`.`APPLICATION_ID`
+    ),
+    '|',
+    '||'
+  ),
+  '|'
 );
 SELECT CURRENT_TIMESTAMP AS '', 'Finished de-normalizing application tags for 3.0.' AS '';
 
@@ -160,12 +167,19 @@ ALTER TABLE `clusters`
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully updated the clusters table.' AS '';
 
 SELECT CURRENT_TIMESTAMP AS '', 'De-normalizing cluster tags for 3.0...' AS '';
-UPDATE `clusters` AS `c` SET `c`.`tags` =
-(
-  SELECT GROUP_CONCAT(DISTINCT `t`.`element` ORDER BY `t`.`element` SEPARATOR '|')
-  FROM `cluster_tags` AS `t`
-  WHERE `c`.`id` = `t`.`CLUSTER_ID`
-  GROUP BY `t`.`CLUSTER_ID`
+UPDATE `clusters` AS `c` SET `c`.`tags` = CONCAT(
+  '|',
+  REPLACE(
+    (
+      SELECT GROUP_CONCAT(DISTINCT `t`.`element` ORDER BY `t`.`element` SEPARATOR '|')
+      FROM `cluster_tags` AS `t`
+      WHERE `c`.`id` = `t`.`CLUSTER_ID`
+      GROUP BY `t`.`CLUSTER_ID`
+    ),
+    '|',
+    '||'
+  ),
+  '|'
 );
 SELECT CURRENT_TIMESTAMP AS '', 'Finished de-normalizing cluster tags for 3.0.' AS '';
 
@@ -216,12 +230,19 @@ ALTER TABLE `commands`
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully updated the commands table.' AS '';
 
 SELECT CURRENT_TIMESTAMP AS '', 'De-normalizing command tags for 3.0...' AS '';
-UPDATE `commands` AS `c` SET `c`.`tags` =
-(
-  SELECT GROUP_CONCAT(DISTINCT `t`.`element` ORDER BY `t`.`element` SEPARATOR '|')
-  FROM `command_tags` AS `t`
-  WHERE `c`.`id` = `t`.`COMMAND_ID`
-  GROUP BY `t`.`COMMAND_ID`
+UPDATE `commands` AS `c` SET `c`.`tags` = CONCAT(
+  '|',
+  REPLACE(
+    (
+      SELECT GROUP_CONCAT(DISTINCT `t`.`element` ORDER BY `t`.`element` SEPARATOR '|')
+      FROM `command_tags` AS `t`
+      WHERE `c`.`id` = `t`.`COMMAND_ID`
+      GROUP BY `t`.`COMMAND_ID`
+    ),
+    '|',
+    '||'
+  ),
+  '|'
 );
 SELECT CURRENT_TIMESTAMP AS '', 'Finished de-normalizing command tags for 3.0.' AS '';
 
@@ -304,11 +325,19 @@ INSERT INTO `job_requests` (
     `j`.`fileDependencies`,
     `j`.`disableLogArchival`,
     `j`.`email`,
-    (
-      SELECT GROUP_CONCAT(DISTINCT `t`.`element` ORDER BY `t`.`element` SEPARATOR '|')
-      FROM `job_tags` `t`
-      WHERE `j`.`id` = `t`.`JOB_ID`
-      GROUP BY `t`.`JOB_ID`
+    CONCAT(
+      '|',
+      REPLACE(
+        (
+          SELECT GROUP_CONCAT(DISTINCT `t`.`element` ORDER BY `t`.`element` SEPARATOR '|')
+          FROM `job_tags` `t`
+          WHERE `j`.`id` = `t`.`JOB_ID`
+          GROUP BY `t`.`JOB_ID`
+        ),
+        '|',
+        '||'
+      ),
+      '|'
     ),
     1,
     1560
@@ -501,12 +530,19 @@ ALTER TABLE `jobs`
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully updated the jobs table.' AS '';
 
 SELECT CURRENT_TIMESTAMP AS '', 'De-normalizing jobs tags for 3.0...' AS '';
-UPDATE `jobs` AS `j` SET `j`.`tags` =
-(
-  SELECT GROUP_CONCAT(DISTINCT `t`.`element` ORDER BY `t`.`element` SEPARATOR '|')
-  FROM `job_tags` AS `t`
-  WHERE `j`.`id` = `t`.`JOB_ID`
-  GROUP BY `t`.`JOB_ID`
+UPDATE `jobs` AS `j` SET `j`.`tags` = CONCAT(
+  '|',
+  REPLACE(
+    (
+      SELECT GROUP_CONCAT(DISTINCT `t`.`element` ORDER BY `t`.`element` SEPARATOR '|')
+      FROM `job_tags` AS `t`
+      WHERE `j`.`id` = `t`.`JOB_ID`
+      GROUP BY `t`.`JOB_ID`
+    ),
+    '|',
+    '||'
+  ),
+  '|'
 );
 SELECT CURRENT_TIMESTAMP AS '', 'Finished de-normalizing job tags for 3.0.' AS '';
 
