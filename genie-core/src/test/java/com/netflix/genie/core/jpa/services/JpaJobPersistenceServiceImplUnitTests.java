@@ -21,6 +21,7 @@ import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
+import com.netflix.genie.common.dto.JobRequestMetadata;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
@@ -98,7 +99,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
             this.commandRepo);
     }
 
-    /******* Unit Tests for Job methods ********/
+    /* Unit Tests for Job methods */
 
     /**
      * Test the createJob method.
@@ -397,7 +398,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
         );
     }
 
-    /******* Unit Tests for Job Request methods ********/
+    /* Unit Tests for Job Request methods */
 
     /**
      * Test the createJobRequest method.
@@ -455,8 +456,21 @@ public class JpaJobPersistenceServiceImplUnitTests {
             .withGroup(group)
             .withTags(tags)
             .build();
+
+        final String clientHost = UUID.randomUUID().toString();
+        final String userAgent = UUID.randomUUID().toString();
+        final int numAttachments = 380;
+        final long totalSizeOfAttachments = 830803L;
+        final JobRequestMetadata metadata = new JobRequestMetadata
+            .Builder()
+            .withClientHost(clientHost)
+            .withUserAgent(userAgent)
+            .withNumAttachments(numAttachments)
+            .withTotalSizeOfAttachments(totalSizeOfAttachments)
+            .build();
+
         final ArgumentCaptor<JobRequestEntity> argument = ArgumentCaptor.forClass(JobRequestEntity.class);
-        this.jobPersistenceService.createJobRequest(jobRequest, UUID.randomUUID().toString());
+        this.jobPersistenceService.createJobRequest(jobRequest, metadata);
         Mockito.verify(this.jobRequestRepo).save(argument.capture());
         // Make sure id supplied is used to create the JobRequest
         Assert.assertEquals(JOB_1_ID, argument.getValue().getId());
@@ -471,9 +485,13 @@ public class JpaJobPersistenceServiceImplUnitTests {
         Assert.assertEquals(tags, argument.getValue().getTags());
         Assert.assertEquals(description, argument.getValue().getDescription());
         Assert.assertThat(argument.getValue().getApplicationsAsList(), Matchers.empty());
+//        Assert.assertThat(argument.getValue().getTotalSizeOfAttachments(), Matchers.is(totalSizeOfAttachments));
+//        Assert.assertThat(argument.getValue().getNumAttachments(), Matchers.is(numAttachments));
+//        Assert.assertThat(argument.getValue().getClientHost(), Matchers.is(clientHost));
+//        Assert.assertThat(argument.getValue().getUserAgent(), Matchers.is(userAgent));
     }
 
-    /******* Unit Tests for Job Execution methods ********/
+    /* Unit Tests for Job Execution methods */
 
     /**
      * Test the createJobExecution method.

@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.google.common.io.ByteStreams;
 import com.netflix.genie.common.dto.JobRequest;
+import com.netflix.genie.common.dto.JobRequestMetadata;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
@@ -191,6 +192,7 @@ public class JobRestController {
      *
      * @param jobRequest         The job request information
      * @param clientHost         client host sending the request
+     * @param userAgent          The user agent string
      * @param httpServletRequest The http servlet request
      * @return The submitted job
      * @throws GenieException For any error
@@ -202,20 +204,13 @@ public class JobRestController {
         final JobRequest jobRequest,
         @RequestHeader(value = FORWARDED_FOR_HEADER, required = false)
         final String clientHost,
+        @RequestHeader(value = HttpHeaders.USER_AGENT, required = false)
+        final String userAgent,
         final HttpServletRequest httpServletRequest
     ) throws GenieException {
         log.info("[submitJob] Called json method type to submit job: {}", jobRequest);
         this.submitJobWithoutAttachmentsRate.increment();
-        if (jobRequest == null) {
-            throw new GeniePreconditionException("No job request entered. Unable to submit.");
-        }
-
-        return this.submitJob(
-            jobRequest,
-            null,
-            clientHost,
-            httpServletRequest
-        );
+        return this.handleSubmitJob(jobRequest, null, clientHost, userAgent, httpServletRequest);
     }
 
     /**
@@ -224,6 +219,7 @@ public class JobRestController {
      * @param jobRequest         The job request information
      * @param attachments        The attachments for the job
      * @param clientHost         client host sending the request
+     * @param userAgent          The user agent string
      * @param httpServletRequest The http servlet request
      * @return The submitted job
      * @throws GenieException For any error
@@ -237,10 +233,22 @@ public class JobRestController {
         final MultipartFile[] attachments,
         @RequestHeader(value = FORWARDED_FOR_HEADER, required = false)
         final String clientHost,
+        @RequestHeader(value = HttpHeaders.USER_AGENT, required = false)
+        final String userAgent,
         final HttpServletRequest httpServletRequest
     ) throws GenieException {
         log.info("[submitJob] Called multipart method to submit job: {}", jobRequest);
         this.submitJobWithAttachmentsRate.increment();
+        return this.handleSubmitJob(jobRequest, attachments, clientHost, userAgent, httpServletRequest);
+    }
+
+    private ResponseEntity<Void> handleSubmitJob(
+        final JobRequest jobRequest,
+        final MultipartFile[] attachments,
+        final String clientHost,
+        final String userAgent,
+        final HttpServletRequest httpServletRequest
+    ) throws GenieException {
         if (jobRequest == null) {
             throw new GeniePreconditionException("No job request entered. Unable to submit.");
         }
@@ -283,8 +291,12 @@ public class JobRestController {
         }
 
         // Download attachments
+        int numAttachments = 0;
+        long totalSizeOfAttachments = 0L;
         if (attachments != null) {
+            numAttachments = attachments.length;
             for (final MultipartFile attachment : attachments) {
+                totalSizeOfAttachments += attachment.getSize();
                 log.debug("Attachment name: {} Size: {}", attachment.getOriginalFilename(), attachment.getSize());
                 try {
                     this.attachmentService.save(jobId, attachment.getOriginalFilename(), attachment.getInputStream());
@@ -294,7 +306,15 @@ public class JobRestController {
             }
         }
 
-        this.jobCoordinatorService.coordinateJob(jobRequestWithId, localClientHost);
+        final JobRequestMetadata metadata = new JobRequestMetadata
+            .Builder()
+            .withClientHost(localClientHost)
+            .withUserAgent(userAgent)
+            .withNumAttachments(numAttachments)
+            .withTotalSizeOfAttachments(totalSizeOfAttachments)
+            .build();
+
+        this.jobCoordinatorService.coordinateJob(jobRequestWithId, metadata);
 
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(

@@ -20,13 +20,16 @@ package com.netflix.genie.client;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.netflix.genie.client.apis.ApplicationService;
+import com.netflix.genie.client.configs.GenieNetworkConfiguration;
 import com.netflix.genie.client.exceptions.GenieClientException;
-import com.netflix.genie.client.security.SecurityInterceptor;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Command;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.Interceptor;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,47 +49,31 @@ public class ApplicationClient extends BaseGenieClient {
     /**
      * Constructor.
      *
-     * @param url The url of the Genie Service.
-     * @param securityInterceptor An implementation of the Security Interceptor.
-     *
-     * @throws GenieClientException If there is any problem.
+     * @param url                       The endpoint URL of the Genie API. Not null or empty
+     * @param interceptors              Any interceptors to configure the client with, can include security ones
+     * @param genieNetworkConfiguration The network configuration parameters. Could be null
+     * @throws GenieClientException On error
      */
     public ApplicationClient(
-        final String url,
-        final SecurityInterceptor securityInterceptor
+        @NotEmpty final String url,
+        @Nullable final List<Interceptor> interceptors,
+        @Nullable final GenieNetworkConfiguration genieNetworkConfiguration
     ) throws GenieClientException {
-        super(url, securityInterceptor, null);
-        applicationService = retrofit.create(ApplicationService.class);
+        super(url, interceptors, genieNetworkConfiguration);
+        this.applicationService = this.getService(ApplicationService.class);
     }
 
-    /**
-     * Constructor that takes only the URL.
-     *
-     * @param url The url of the Genie Service.
-     * @throws GenieClientException If there is any problem.
-     */
-    public ApplicationClient(
-        final String url
-    ) throws GenieClientException {
-        super(url, null, null);
-        applicationService = retrofit.create(ApplicationService.class);
-    }
-
-    /******************* CRUD Methods   ***************************/
+    /* CRUD Methods */
 
     /**
      * Create a application ing genie.
      *
      * @param application A application object.
-     *
      * @return The id of the application created.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues
+     * @throws IOException          For Network and other IO issues
      */
-    public String createApplication(
-        final Application application
-    ) throws IOException, GenieClientException {
+    public String createApplication(final Application application) throws IOException, GenieClientException {
         if (application == null) {
             throw new IllegalArgumentException("Application cannot be null.");
         }
@@ -97,9 +84,8 @@ public class ApplicationClient extends BaseGenieClient {
      * Method to get a list of all the applications.
      *
      * @return A list of applications.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues
+     * @throws IOException          For Network and other IO issues
      */
     public List<Application> getApplications() throws IOException, GenieClientException {
         return this.getApplications(null, null, null, null, null);
@@ -108,16 +94,14 @@ public class ApplicationClient extends BaseGenieClient {
     /**
      * Method to get a list of all the applications from Genie for the query parameters specified.
      *
-     * @param name The name of the commands.
-     * @param user The user who created the command.
+     * @param name       The name of the commands.
+     * @param user       The user who created the command.
      * @param statusList The list of Command statuses.
-     * @param tagList The list of tags.
-     * @param type The type of the application.
-     *
+     * @param tagList    The list of tags.
+     * @param type       The type of the application.
      * @return A list of applications.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues
+     * @throws IOException          For Network and other IO issues
      */
     public List<Application> getApplications(
         final String name,
@@ -125,10 +109,9 @@ public class ApplicationClient extends BaseGenieClient {
         final List<String> statusList,
         final List<String> tagList,
         final String type
-    ) throws IOException, GenieClientException {
-
+    ) throws IOException {
         final List<Application> applicationList = new ArrayList<>();
-        final JsonNode jnode =  applicationService.getApplications(
+        final JsonNode jNode = this.applicationService.getApplications(
             name,
             user,
             statusList,
@@ -136,9 +119,9 @@ public class ApplicationClient extends BaseGenieClient {
             type
         ).execute().body()
             .get("_embedded");
-        if (jnode != null) {
-            for (final JsonNode objNode : jnode.get("applicationList")) {
-                final Application application  = mapper.treeToValue(objNode, Application.class);
+        if (jNode != null) {
+            for (final JsonNode objNode : jNode.get("applicationList")) {
+                final Application application = this.treeToValue(objNode, Application.class);
                 applicationList.add(application);
             }
         }
@@ -150,52 +133,47 @@ public class ApplicationClient extends BaseGenieClient {
      *
      * @param applicationId The id of the application to get.
      * @return The application details.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues
+     * @throws IOException          For Network and other IO issues
      */
-    public Application getApplication(
-        final String applicationId
-    ) throws IOException, GenieClientException {
+    public Application getApplication(final String applicationId) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(applicationId)) {
             throw new IllegalArgumentException("Missing required parameter: applicationId.");
         }
-        return applicationService.getApplication(applicationId).execute().body();
+        return this.applicationService.getApplication(applicationId).execute().body();
     }
 
     /**
      * Method to delete a application from Genie.
      *
      * @param applicationId The id of the application.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues
+     * @throws IOException          For Network and other IO issues
      */
     public void deleteApplication(final String applicationId) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(applicationId)) {
             throw new IllegalArgumentException("Missing required parameter: applicationId.");
         }
-        applicationService.deleteApplication(applicationId).execute();
+        this.applicationService.deleteApplication(applicationId).execute();
     }
 
     /**
      * Method to delete all applications from Genie.
      *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues
+     * @throws IOException          For Network and other IO issues
      */
     public void deleteAllApplications() throws IOException, GenieClientException {
-        applicationService.deleteAllApplications().execute();
+        this.applicationService.deleteAllApplications().execute();
     }
 
     /**
      * Method to patch a application using json patch instructions.
      *
      * @param applicationId The id of the application.
-     * @param patch The patch object specifying all the instructions.
-     *
-     * @throws GenieClientException       For any other error.
-     * @throws IOException If the response received is not 2xx.
+     * @param patch         The patch object specifying all the instructions.
+     * @throws GenieClientException For any other error.
+     * @throws IOException          If the response received is not 2xx.
      */
     public void patchApplication(final String applicationId, final JsonPatch patch)
         throws IOException, GenieClientException {
@@ -207,17 +185,16 @@ public class ApplicationClient extends BaseGenieClient {
             throw new IllegalArgumentException("Patch cannot be null");
         }
 
-        applicationService.patchApplication(applicationId, patch).execute();
+        this.applicationService.patchApplication(applicationId, patch).execute();
     }
 
     /**
      * Method to updated a application.
      *
      * @param applicationId The id of the application.
-     * @param application The updated application object to use.
-     *
+     * @param application   The updated application object to use.
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues
+     * @throws IOException          For Network and other IO issues
      */
     public void updateApplication(final String applicationId, final Application application)
         throws IOException, GenieClientException {
@@ -229,18 +206,16 @@ public class ApplicationClient extends BaseGenieClient {
             throw new IllegalArgumentException("Patch cannot be null");
         }
 
-        applicationService.updateApplication(applicationId, application).execute();
+        this.applicationService.updateApplication(applicationId, application).execute();
     }
 
     /**
      * Method to get all the commands for an application.
      *
      * @param applicationId The id of the application.
-     *
      * @return The set of commands for the applications.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues
+     * @throws IOException          For Network and other IO issues
      */
     public List<Command> getCommandsForApplication(final String applicationId)
         throws IOException, GenieClientException {
@@ -251,17 +226,15 @@ public class ApplicationClient extends BaseGenieClient {
         return applicationService.getCommandsForApplication(applicationId).execute().body();
     }
 
-    /****************** Methods to manipulate configs for a application   *********************/
+    /* Methods to manipulate configs for a application   */
 
     /**
      * Method to get all the configs for a application.
      *
      * @param applicationId The id of the application.
-     *
      * @return The set of configs for the application.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues
+     * @throws IOException          For Network and other IO issues
      */
     public Set<String> getConfigsForApplication(final String applicationId) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(applicationId)) {
@@ -275,10 +248,9 @@ public class ApplicationClient extends BaseGenieClient {
      * Method to add configs to a application.
      *
      * @param applicationId The id of the application.
-     * @param configs The set of configs to add.
-     *
+     * @param configs       The set of configs to add.
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues
+     * @throws IOException          For Network and other IO issues
      */
     public void addConfigsToApplication(
         final String applicationId, final Set<String> configs
@@ -298,10 +270,9 @@ public class ApplicationClient extends BaseGenieClient {
      * Method to update configs for a application.
      *
      * @param applicationId The id of the application.
-     * @param configs The set of configs to add.
-     *
+     * @param configs       The set of configs to add.
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues
+     * @throws IOException          For Network and other IO issues
      */
     public void updateConfigsForApplication(
         final String applicationId, final Set<String> configs
@@ -321,9 +292,8 @@ public class ApplicationClient extends BaseGenieClient {
      * Remove all configs for this application.
      *
      * @param applicationId The id of the application.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues
+     * @throws IOException          For Network and other IO issues
      */
     public void removeAllConfigsForApplication(
         final String applicationId
@@ -341,11 +311,9 @@ public class ApplicationClient extends BaseGenieClient {
      * Method to get all the dependency files for an application.
      *
      * @param applicationId The id of the application.
-     *
      * @return The set of dependencies for the application.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues
+     * @throws IOException          For Network and other IO issues
      */
     public Set<String> getDependenciesForApplication(final String applicationId) throws IOException,
         GenieClientException {
@@ -360,10 +328,9 @@ public class ApplicationClient extends BaseGenieClient {
      * Method to add dependencies to a application.
      *
      * @param applicationId The id of the application.
-     * @param dependencies The set of dependencies to add.
-     *
+     * @param dependencies  The set of dependencies to add.
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues
+     * @throws IOException          For Network and other IO issues
      */
     public void addDependenciesToApplication(
         final String applicationId, final Set<String> dependencies
@@ -383,10 +350,9 @@ public class ApplicationClient extends BaseGenieClient {
      * Method to update dependencies for a application.
      *
      * @param applicationId The id of the application.
-     * @param dependencies The set of dependencies to add.
-     *
+     * @param dependencies  The set of dependencies to add.
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues
+     * @throws IOException          For Network and other IO issues
      */
     public void updateDependenciesForApplication(
         final String applicationId, final Set<String> dependencies
@@ -406,9 +372,8 @@ public class ApplicationClient extends BaseGenieClient {
      * Remove all dependencies for this application.
      *
      * @param applicationId The id of the application.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues
+     * @throws IOException          For Network and other IO issues
      */
     public void removeAllDependenciesForApplication(
         final String applicationId
@@ -426,11 +391,9 @@ public class ApplicationClient extends BaseGenieClient {
      * Method to get all the tags for a application.
      *
      * @param applicationId The id of the application.
-     *
      * @return The set of configs for the application.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues
+     * @throws IOException          For Network and other IO issues
      */
     public Set<String> getTagsForApplication(final String applicationId) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(applicationId)) {
@@ -444,10 +407,9 @@ public class ApplicationClient extends BaseGenieClient {
      * Method to add tags to a application.
      *
      * @param applicationId The id of the application.
-     * @param tags The set of tags to add.
-     *
+     * @param tags          The set of tags to add.
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues
+     * @throws IOException          For Network and other IO issues
      */
     public void addTagsToApplication(
         final String applicationId, final Set<String> tags
@@ -467,10 +429,9 @@ public class ApplicationClient extends BaseGenieClient {
      * Method to update tags for a application.
      *
      * @param applicationId The id of the application.
-     * @param tags The set of tags to add.
-     *
+     * @param tags          The set of tags to add.
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues
+     * @throws IOException          For Network and other IO issues
      */
     public void updateTagsForApplication(
         final String applicationId, final Set<String> tags
@@ -490,10 +451,9 @@ public class ApplicationClient extends BaseGenieClient {
      * Remove a tag from a application.
      *
      * @param applicationId The id of the application.
-     * @param tag The tag to remove.
-     *
+     * @param tag           The tag to remove.
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues
+     * @throws IOException          For Network and other IO issues
      */
     public void removeTagFromApplication(
         final String applicationId,
@@ -514,9 +474,8 @@ public class ApplicationClient extends BaseGenieClient {
      * Remove all tags for this application.
      *
      * @param applicationId The id of the application.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues
+     * @throws IOException          For Network and other IO issues
      */
     public void removeAllTagsForApplication(
         final String applicationId

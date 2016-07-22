@@ -20,9 +20,8 @@ package com.netflix.genie.client;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.io.ByteStreams;
 import com.netflix.genie.client.apis.JobService;
-import com.netflix.genie.client.config.GenieNetworkConfiguration;
+import com.netflix.genie.client.configs.GenieNetworkConfiguration;
 import com.netflix.genie.client.exceptions.GenieClientException;
-import com.netflix.genie.client.security.SecurityInterceptor;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
@@ -33,13 +32,16 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieTimeoutException;
+import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okio.BufferedSink;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.validator.constraints.NotEmpty;
 import retrofit2.Response;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -55,83 +57,36 @@ import java.util.Set;
  */
 public class JobClient extends BaseGenieClient {
 
+    private static final String STATUS = "status";
     private static final String ATTACHMENT = "attachment";
     private static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
 
     private final JobService jobService;
 
     /**
-     * Constructor that takes only the URL.
-     *
-     * @param url The url of the Genie Service.
-     * @throws GenieClientException If there is any problem.
-     */
-    public JobClient(
-        final String url
-    ) throws GenieClientException {
-        super(url, null, null);
-        jobService = retrofit.create(JobService.class);
-    }
-
-    /**
      * Constructor.
      *
-     * @param url The url of the Genie Service.
-     * @param securityInterceptor An implementation of the Security Interceptor.
-     *
-     * @throws GenieClientException If there is any problem.
+     * @param url                       The endpoint URL of the Genie API. Not null or empty
+     * @param interceptors              Any interceptors to configure the client with, can include security ones
+     * @param genieNetworkConfiguration The network configuration parameters. Could be null
+     * @throws GenieClientException On error
      */
     public JobClient(
-        final String url,
-        final SecurityInterceptor securityInterceptor
+        @NotEmpty final String url,
+        @Nullable final List<Interceptor> interceptors,
+        @Nullable final GenieNetworkConfiguration genieNetworkConfiguration
     ) throws GenieClientException {
-        super(url, securityInterceptor, null);
-        jobService = retrofit.create(JobService.class);
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param url The url of the Genie Service.
-     * @param genieNetworkConfiguration A configuration object that provides network settings for HTTP calls.
-     *
-     * @throws GenieClientException If there is any problem.
-     */
-    public JobClient(
-        final String url,
-        final GenieNetworkConfiguration genieNetworkConfiguration
-    ) throws GenieClientException {
-        super(url, null, genieNetworkConfiguration);
-        jobService = retrofit.create(JobService.class);
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param url The url of the Genie Service.
-     * @param securityInterceptor An implementation of the Security Interceptor.
-     * @param genieNetworkConfiguration A configuration object that provides network settings for HTTP calls.
-     *
-     * @throws GenieClientException If there is any problem.
-     */
-    public JobClient(
-        final String url,
-        final SecurityInterceptor securityInterceptor,
-        final GenieNetworkConfiguration genieNetworkConfiguration
-        ) throws GenieClientException {
-        super(url, securityInterceptor, genieNetworkConfiguration);
-        jobService = retrofit.create(JobService.class);
+        super(url, interceptors, genieNetworkConfiguration);
+        this.jobService = this.getService(JobService.class);
     }
 
     /**
      * Submit a job to genie using the jobRequest provided.
      *
      * @param jobRequest A job request containing all the details for running a job.
-     *
      * @return jobId The id of the job submitted.
-     *
      * @throws GenieClientException If the response recieved is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public String submitJob(
         final JobRequest jobRequest
@@ -145,13 +100,11 @@ public class JobClient extends BaseGenieClient {
     /**
      * Submit a job to genie using the jobRequest and attachments provided.
      *
-     * @param jobRequest A job request containing all the details for running a job.
+     * @param jobRequest  A job request containing all the details for running a job.
      * @param attachments A map of filenames/input-streams needed to be sent to the server as attachments.
-     *
      * @return jobId The id of the job submitted.
-     *
      * @throws GenieClientException If the response recieved is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public String submitJobWithAttachments(
         final JobRequest jobRequest,
@@ -195,9 +148,8 @@ public class JobClient extends BaseGenieClient {
      * Method to get a list of all the jobs.
      *
      * @return A list of jobs.
-     *
      * @throws GenieClientException If the response recieved is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public List<JobSearchResult> getJobs() throws IOException, GenieClientException {
         return this.getJobs(null, null, null, null, null, null, null, null, null, null, null, null, null);
@@ -219,10 +171,9 @@ public class JobClient extends BaseGenieClient {
      * @param maxStarted  The time which the job had to start before in order to be returned (exclusive)
      * @param minFinished The time which the job had to finish after in order to be return (inclusive)
      * @param maxFinished The time which the job had to finish before in order to be returned (exclusive)
-     *
      * @return A list of jobs.
      * @throws GenieClientException If the response recieved is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public List<JobSearchResult> getJobs(
         final String id,
@@ -240,7 +191,7 @@ public class JobClient extends BaseGenieClient {
         final Long maxFinished
     ) throws IOException, GenieClientException {
 
-        final JsonNode jnode =  jobService.getJobs(
+        final JsonNode jnode = jobService.getJobs(
             id,
             name,
             user,
@@ -260,7 +211,7 @@ public class JobClient extends BaseGenieClient {
 
         final List<JobSearchResult> jobList = new ArrayList<>();
         for (final JsonNode objNode : jnode) {
-            final JobSearchResult jobSearchResult = mapper.treeToValue(objNode, JobSearchResult.class);
+            final JobSearchResult jobSearchResult = this.treeToValue(objNode, JobSearchResult.class);
             jobList.add(jobSearchResult);
         }
         return jobList;
@@ -271,9 +222,8 @@ public class JobClient extends BaseGenieClient {
      *
      * @param jobId The id of the job to get.
      * @return The job details.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public Job getJob(
         final String jobId
@@ -289,9 +239,8 @@ public class JobClient extends BaseGenieClient {
      *
      * @param jobId The id of the job.
      * @return The cluster object.
-     *
      * @throws GenieClientException If the response recieved is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public Cluster getJobCluster(
         final String jobId
@@ -307,9 +256,8 @@ public class JobClient extends BaseGenieClient {
      *
      * @param jobId The id of the job.
      * @return The command object.
-     *
      * @throws GenieClientException If the response recieved is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public Command getJobCommand(
         final String jobId
@@ -325,9 +273,8 @@ public class JobClient extends BaseGenieClient {
      *
      * @param jobId The id of the job.
      * @return The command object.
-     *
      * @throws GenieClientException If the response recieved is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public JobRequest getJobRequest(
         final String jobId
@@ -343,9 +290,8 @@ public class JobClient extends BaseGenieClient {
      *
      * @param jobId The id of the job.
      * @return The command object.
-     *
      * @throws GenieClientException If the response recieved is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public JobExecution getJobExecution(
         final String jobId
@@ -361,9 +307,8 @@ public class JobClient extends BaseGenieClient {
      *
      * @param jobId The id of the job.
      * @return The list of Applications.
-     *
      * @throws GenieClientException If the response recieved is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public List<Application> getJobApplications(
         final String jobId
@@ -378,11 +323,9 @@ public class JobClient extends BaseGenieClient {
      * Method to fetch the stdout of a job from Genie.
      *
      * @param jobId The id of the job whose output is desired.
-     *
      * @return An inputstream to the output contents.
-     *
      * @throws GenieClientException If the response recieved is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public InputStream getJobStdout(
         final String jobId
@@ -400,11 +343,9 @@ public class JobClient extends BaseGenieClient {
      * Method to fetch the stderr of a job from Genie.
      *
      * @param jobId The id of the job whose stderr is desired.
-     *
      * @return An inputstream to the stderr contents.
-     *
      * @throws GenieClientException If the response recieved is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public InputStream getJobStderr(
         final String jobId
@@ -419,11 +360,9 @@ public class JobClient extends BaseGenieClient {
      * Method to fetch the status of a job.
      *
      * @param jobId The id of the job.
-     *
      * @return The status of the Job.
-     *
      * @throws GenieClientException If the response recieved is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public JobStatus getJobStatus(
         final String jobId
@@ -443,9 +382,8 @@ public class JobClient extends BaseGenieClient {
      * Method to send a kill job request to Genie.
      *
      * @param jobId The id of the job.
-     *
      * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws IOException          For Network and other IO issues.
      */
     public void killJob(final String jobId) throws IOException, GenieClientException {
         if (StringUtils.isEmpty(jobId)) {
@@ -457,15 +395,14 @@ public class JobClient extends BaseGenieClient {
     /**
      * Wait for job to complete, until the given timeout.
      *
-     * @param jobId           the Genie job ID to wait for completion
+     * @param jobId        the Genie job ID to wait for completion
      * @param blockTimeout the time to block for (in ms), after which a
      *                     GenieClientException will be thrown
      * @param pollTime     the time to sleep between polling for job status
      * @return The job status for the job after completion
-     *
-     * @throws InterruptedException on thread errors.
-     * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws InterruptedException  on thread errors.
+     * @throws GenieClientException  If the response received is not 2xx.
+     * @throws IOException           For Network and other IO issues.
      * @throws GenieTimeoutException If the job times out.
      */
     public JobStatus waitForCompletion(final String jobId, final long blockTimeout, final long pollTime)
@@ -496,14 +433,13 @@ public class JobClient extends BaseGenieClient {
     /**
      * Wait for job to complete, until the given timeout.
      *
-     * @param jobId           the Genie job ID to wait for completion.
+     * @param jobId        the Genie job ID to wait for completion.
      * @param blockTimeout the time to block for (in ms), after which a
      *                     GenieClientException will be thrown.
      * @return The job status for the job after completion.
-     *
-     * @throws InterruptedException on thread errors.
-     * @throws GenieClientException If the response received is not 2xx.
-     * @throws IOException For Network and other IO issues.
+     * @throws InterruptedException  on thread errors.
+     * @throws GenieClientException  If the response received is not 2xx.
+     * @throws IOException           For Network and other IO issues.
      * @throws GenieTimeoutException If the job times out.
      */
     public JobStatus waitForCompletion(final String jobId, final long blockTimeout)

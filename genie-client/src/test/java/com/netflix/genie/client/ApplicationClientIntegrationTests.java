@@ -53,8 +53,8 @@ public class ApplicationClientIntegrationTests extends GenieClientsIntegrationTe
      */
     @Before
     public void setup() throws Exception {
-        commandClient = new CommandClient(getBaseUrl());
-        applicationClient = new ApplicationClient(getBaseUrl());
+        commandClient = new CommandClient(getBaseUrl(), null, null);
+        applicationClient = new ApplicationClient(getBaseUrl(), null, null);
     }
 
     /**

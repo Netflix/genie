@@ -19,6 +19,7 @@ package com.netflix.genie.core.services;
 
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobRequest;
+import com.netflix.genie.common.dto.JobRequestMetadata;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
@@ -97,8 +98,8 @@ public class JobCoordinatorService {
     /**
      * Takes in a Job Request object and does necessary preparation for execution.
      *
-     * @param jobRequest of job to kill
-     * @param clientHost Host which is sending the job request
+     * @param jobRequest         of job to kill
+     * @param jobRequestMetadata Metadata about the http request which generated started this job process
      * @return the id of the job run
      * @throws GenieException if there is an error
      */
@@ -106,7 +107,9 @@ public class JobCoordinatorService {
         @NotNull(message = "No jobRequest provided. Unable to submit job for execution.")
         @Valid
         final JobRequest jobRequest,
-        final String clientHost
+        @NotNull
+        @Valid
+        final JobRequestMetadata jobRequestMetadata
     ) throws GenieException {
         log.debug("Called with job request {}", jobRequest);
         if (StringUtils.isBlank(jobRequest.getId())) {
@@ -114,7 +117,7 @@ public class JobCoordinatorService {
         }
 
         // Log the job request and optionally the client host
-        this.jobPersistenceService.createJobRequest(jobRequest, clientHost);
+        this.jobPersistenceService.createJobRequest(jobRequest, jobRequestMetadata);
 
         String archiveLocation = null;
         if (!jobRequest.isDisableLogArchival()) {

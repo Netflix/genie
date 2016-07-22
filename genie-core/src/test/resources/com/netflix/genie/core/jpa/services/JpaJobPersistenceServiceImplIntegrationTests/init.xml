@@ -142,6 +142,14 @@
         timeout="608400"
         entity_version="1"
     />
+    <job_request_metadata
+        id="job1"
+        created="2015-08-11 01:48:00"
+        updated="2015-08-11 02:59:00"
+        num_attachments="2"
+        total_size_of_attachments="38083"
+        entity_version="1"
+    />
     <jobs
         id="job1"
         created="2015-08-11 01:49:00"
@@ -191,6 +199,14 @@
         timeout="608400"
         entity_version="1"
     />
+    <job_request_metadata
+        id="job2"
+        created="2015-08-12 01:48:00"
+        updated="2015-08-12 02:59:00"
+        num_attachments="3"
+        total_size_of_attachments="38082233"
+        entity_version="1"
+    />
     <jobs
         id="job2"
         created="2015-08-12 01:49:00"
@@ -238,6 +254,14 @@
         memory="2048"
         disable_log_archival="true"
         timeout="608400"
+        entity_version="1"
+    />
+    <job_request_metadata
+        id="job3"
+        created="2016-02-24 01:48:00"
+        updated="2016-02-24 02:59:00"
+        num_attachments="1"
+        total_size_of_attachments="382"
         entity_version="1"
     />
     <jobs

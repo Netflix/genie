@@ -258,7 +258,6 @@ CREATE TABLE `job_requests` (
   `tags` VARCHAR(2048) DEFAULT NULL,
   `cpu` INT(11) NOT NULL DEFAULT 1,
   `memory` INT(11) NOT NULL DEFAULT 1560,
-  `client_host` VARCHAR(255) DEFAULT NULL,
   `applications` VARCHAR(2048) NOT NULL DEFAULT '[]',
   `timeout` INT NOT NULL DEFAULT 604800, # Seven days in seconds
   PRIMARY KEY (`id`),
@@ -287,8 +286,7 @@ INSERT INTO `job_requests` (
   `email`,
   `tags`,
   `cpu`,
-  `memory`,
-  `client_host`
+  `memory`
 ) SELECT
     `j`.`id`,
     `j`.`created`,
@@ -313,8 +311,7 @@ INSERT INTO `job_requests` (
       GROUP BY `t`.`JOB_ID`
     ),
     1,
-    1560,
-    `j`.`clientHost`
+    1560
   FROM `jobs` `j`;
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully inserted values into job_requests table.' AS '';
 
@@ -369,6 +366,30 @@ SELECT CURRENT_TIMESTAMP AS '', 'Successfully converted dependencies to JSON in 
 SELECT CURRENT_TIMESTAMP AS '', 'Attempting to make dependencies field not null in job_requests table...' AS '';
 ALTER TABLE `job_requests` MODIFY `dependencies` VARCHAR(30000) NOT NULL;
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully made dependencies field not null in job_requests table.' AS '';
+
+SELECT CURRENT_TIMESTAMP AS '', 'Creating the job_request_metadata table...' AS '';
+CREATE TABLE `job_request_metadata` (
+  `id` VARCHAR(255) NOT NULL,
+  `created` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  `updated` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+  `entity_version` INT(11) NOT NULL DEFAULT 0,
+  `client_host` VARCHAR(255) DEFAULT NULL,
+  `user_agent` VARCHAR(2048) DEFAULT NULL,
+  `num_attachments` INT(11) NOT NULL DEFAULT 0,
+  `total_size_of_attachments` BIGINT NOT NULL DEFAULT 0,
+  FOREIGN KEY (`id`) REFERENCES `job_requests` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+SELECT CURRENT_TIMESTAMP AS '', 'Successfully created the job_request_metadata table.' AS '';
+
+SELECT CURRENT_TIMESTAMP AS '', 'Inserting values into job_request_metadata from the jobs table...' AS '';
+INSERT INTO `job_request_metadata` (
+  `id`,
+  `created`,
+  `updated`,
+  `entity_version`,
+  `client_host`
+) SELECT `id`, `created`, `updated`, `entityVersion`, `clientHost` FROM `jobs`;
+SELECT CURRENT_TIMESTAMP AS '', 'Successfully inserted values into the job_requests_metadata table.' AS '';
 
 SELECT CURRENT_TIMESTAMP AS '', 'Creating the job_executions table...' AS '';
 CREATE TABLE `job_executions` (

@@ -22,6 +22,7 @@ import com.github.springtestdbunit.annotation.DatabaseTearDown;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.jpa.repositories.JpaJobExecutionRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
+import com.netflix.genie.core.jpa.repositories.JpaJobRequestMetadataRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRequestRepository;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.test.categories.IntegrationTest;
@@ -51,6 +52,8 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
     @Autowired
     private JpaJobRequestRepository jobRequestRepository;
     @Autowired
+    private JpaJobRequestMetadataRepository jobRequestMetadataRepository;
+    @Autowired
     private JpaJobRepository jobRepository;
     @Autowired
     private JobPersistenceService jobPersistenceService;
@@ -62,6 +65,7 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
     public void canDeleteJobsCreatedBeforeDate() {
         Assert.assertThat(this.jobExecutionRepository.count(), Matchers.is(3L));
         Assert.assertThat(this.jobRequestRepository.count(), Matchers.is(3L));
+        Assert.assertThat(this.jobRequestMetadataRepository.count(), Matchers.is(3L));
         Assert.assertThat(this.jobRepository.count(), Matchers.is(3L));
 
         // Try to delete all jobs before Jan 1, 2016
@@ -74,9 +78,11 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertThat(deleted, Matchers.is(2L));
         Assert.assertThat(this.jobExecutionRepository.count(), Matchers.is(1L));
         Assert.assertThat(this.jobRequestRepository.count(), Matchers.is(1L));
+        Assert.assertThat(this.jobRequestMetadataRepository.count(), Matchers.is(1L));
         Assert.assertThat(this.jobRepository.count(), Matchers.is(1L));
         Assert.assertNotNull(this.jobExecutionRepository.getOne(JOB_3_ID));
         Assert.assertNotNull(this.jobRequestRepository.getOne(JOB_3_ID));
+        Assert.assertNotNull(this.jobRequestMetadataRepository.getOne(JOB_3_ID));
         Assert.assertNotNull(this.jobRepository.getOne(JOB_3_ID));
     }
 }
