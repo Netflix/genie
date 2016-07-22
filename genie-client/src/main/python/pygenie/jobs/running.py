@@ -211,6 +211,26 @@ class RunningJob(object):
                     else self._cached_genie_log
         return self._adapter.get_genie_log(self._job_id, iterator=iterator)
 
+    def get_log(self, log_path, iterator=False):
+        """
+        Get the specified job's log as either an iterator or full text.
+
+        Example:
+            >>> running_job.get_log('genie/logs/env.log')
+            '...'
+            >>> for l in running_job.get_log('genie/logs/env.log', iterator=True):
+            >>>     print(l)
+
+        Args:
+            log_path (str): The relative log path to the job's output directory.
+            iterator (bool, optional): Set to True if want to return as iterator.
+
+        Returns:
+            str or iterator.
+        """
+
+        return self._adapter.get_log(self._job_id, log_path, iterator=iterator)
+
     @property
     def info(self):
         if not self._info:
