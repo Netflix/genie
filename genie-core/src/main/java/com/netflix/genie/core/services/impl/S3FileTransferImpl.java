@@ -23,10 +23,14 @@ import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.services.FileTransfer;
+import com.netflix.spectator.api.Registry;
+import com.netflix.spectator.api.Timer;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.NotBlank;
 
+import javax.validation.constraints.NotNull;
 import java.io.File;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,24 +43,26 @@ import java.util.regex.Pattern;
 @Slf4j
 public class S3FileTransferImpl implements FileTransfer {
 
+    private final Pattern s3FilePattern = Pattern.compile("^(s3[n]?://)(.*?)/(.*/.*)");
+    private final Pattern s3PrefixPattern = Pattern.compile("^s3[n]?://.*$");
     private AmazonS3Client s3Client;
-
-    private final Pattern s3FilePattern =
-        Pattern.compile("^(s3[n]?://)(.*?)/(.*/.*)");
-
-    private final Pattern s3PrefixPattern =
-        Pattern.compile("^s3[n]?://.*$");
+    private Timer downloadTimer;
+    private Timer uploadTimer;
 
     /**
      * Constructor.
      *
      * @param amazonS3Client An amazon s3 client object
+     * @param registry       The metrics registry to use
      * @throws GenieException If there is a problem
      */
     public S3FileTransferImpl(
-        final AmazonS3Client amazonS3Client
-        ) throws GenieException {
+        @NotNull final AmazonS3Client amazonS3Client,
+        @NotNull final Registry registry
+    ) throws GenieException {
         this.s3Client = amazonS3Client;
+        this.downloadTimer = registry.timer("genie.files.s3.download.timer");
+        this.uploadTimer = registry.timer("genie.files.s3.upload.timer");
     }
 
     /**
@@ -65,8 +71,7 @@ public class S3FileTransferImpl implements FileTransfer {
     @Override
     public boolean isValid(final String fileName) throws GenieException {
         log.debug("Called with file name {}", fileName);
-        final Matcher matcher =
-            s3PrefixPattern.matcher(fileName);
+        final Matcher matcher = this.s3PrefixPattern.matcher(fileName);
         return matcher.matches();
     }
 
@@ -75,28 +80,34 @@ public class S3FileTransferImpl implements FileTransfer {
      */
     @Override
     public void getFile(
-        @NotBlank (message = "Source file path cannot be empty.")
+        @NotBlank(message = "Source file path cannot be empty.")
         final String srcRemotePath,
-        @NotBlank (message = "Destination local path cannot be empty")
+        @NotBlank(message = "Destination local path cannot be empty")
         final String dstLocalPath
     ) throws GenieException {
-        log.debug("Called with src path {} and destination path {}", srcRemotePath, dstLocalPath);
+        final long start = System.nanoTime();
+        try {
+            log.debug("Called with src path {} and destination path {}", srcRemotePath, dstLocalPath);
 
-        final Matcher matcher = s3FilePattern.matcher(srcRemotePath);
-        if (matcher.matches()) {
-            final String bucket = matcher.group(2);
-            final String key = matcher.group(3);
+            final Matcher matcher = s3FilePattern.matcher(srcRemotePath);
+            if (matcher.matches()) {
+                final String bucket = matcher.group(2);
+                final String key = matcher.group(3);
 
-            try {
-                s3Client.getObject(
-                    new GetObjectRequest(bucket, key),
-                    new File(dstLocalPath));
-            } catch (AmazonS3Exception ase) {
-                log.error("Error fetching file {} from s3 due to exception {}", srcRemotePath, ase);
-                throw new GenieServerException("Error downloading file from s3. Filename: " + srcRemotePath);
+                try {
+                    s3Client.getObject(
+                        new GetObjectRequest(bucket, key),
+                        new File(dstLocalPath));
+                } catch (AmazonS3Exception ase) {
+                    log.error("Error fetching file {} from s3 due to exception {}", srcRemotePath, ase);
+                    throw new GenieServerException("Error downloading file from s3. Filename: " + srcRemotePath);
+                }
+            } else {
+                throw new GenieServerException("Invalid path for s3 file" + srcRemotePath);
             }
-        } else {
-            throw new GenieServerException("Invalid path for s3 file" + srcRemotePath);
+        } finally {
+            final long finish = System.nanoTime();
+            this.downloadTimer.record(finish - start, TimeUnit.NANOSECONDS);
         }
     }
 
@@ -105,26 +116,32 @@ public class S3FileTransferImpl implements FileTransfer {
      */
     @Override
     public void putFile(
-        @NotBlank (message = "Source local path cannot be empty.")
+        @NotBlank(message = "Source local path cannot be empty.")
         final String srcLocalPath,
-        @NotBlank (message = "Destination remote path cannot be empty")
+        @NotBlank(message = "Destination remote path cannot be empty")
         final String dstRemotePath
     ) throws GenieException {
-        log.debug("Called with src path {} and destination path {}", srcLocalPath, dstRemotePath);
+        final long start = System.nanoTime();
+        try {
+            log.debug("Called with src path {} and destination path {}", srcLocalPath, dstRemotePath);
 
-        final Matcher matcher = s3FilePattern.matcher(dstRemotePath);
-        if (matcher.matches()) {
-            final String bucket = matcher.group(2);
-            final String key = matcher.group(3);
+            final Matcher matcher = s3FilePattern.matcher(dstRemotePath);
+            if (matcher.matches()) {
+                final String bucket = matcher.group(2);
+                final String key = matcher.group(3);
 
-            try {
-                s3Client.putObject(bucket, key, new File(srcLocalPath));
-            } catch (AmazonS3Exception ase) {
-                log.error("Error posting file {} to s3 due to exception {}", dstRemotePath, ase);
-                throw new GenieServerException("Error uploading file to s3. Filename: " + dstRemotePath);
+                try {
+                    s3Client.putObject(bucket, key, new File(srcLocalPath));
+                } catch (AmazonS3Exception ase) {
+                    log.error("Error posting file {} to s3 due to exception {}", dstRemotePath, ase);
+                    throw new GenieServerException("Error uploading file to s3. Filename: " + dstRemotePath);
+                }
+            } else {
+                throw new GenieServerException("Invalid path for s3 file" + dstRemotePath);
             }
-        } else {
-            throw new GenieServerException("Invalid path for s3 file" + dstRemotePath);
+        } finally {
+            final long finish = System.nanoTime();
+            this.uploadTimer.record(finish - start, TimeUnit.NANOSECONDS);
         }
     }
 }

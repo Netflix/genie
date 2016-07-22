@@ -31,6 +31,7 @@ import com.netflix.genie.core.jpa.services.JpaCommandServiceImpl;
 import com.netflix.genie.core.jpa.services.JpaJobPersistenceServiceImpl;
 import com.netflix.genie.core.jpa.services.JpaJobSearchServiceImpl;
 import com.netflix.genie.core.services.ApplicationService;
+import com.netflix.genie.core.services.AttachmentService;
 import com.netflix.genie.core.services.ClusterLoadBalancer;
 import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;
@@ -41,6 +42,7 @@ import com.netflix.genie.core.services.JobKillService;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobSubmitterService;
+import com.netflix.genie.core.services.impl.FileSystemAttachmentService;
 import com.netflix.genie.core.services.impl.GenieFileTransferService;
 import com.netflix.genie.core.services.impl.JobCountServiceImpl;
 import com.netflix.genie.core.services.impl.LocalJobKillServiceImpl;
@@ -315,5 +317,18 @@ public class ServicesConfigTest {
             registry,
             eventPublisher
         );
+    }
+
+    /**
+     * The attachment service to use.
+     *
+     * @param attachmentsDirectory The directory to use to store attachments temporarily
+     * @return The attachment service to use
+     */
+    @Bean
+    public AttachmentService attachmentService(
+        @Value("${genie.jobs.attachments.dir:#{null}}") final String attachmentsDirectory
+    ) {
+        return new FileSystemAttachmentService(attachmentsDirectory);
     }
 }

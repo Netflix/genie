@@ -25,6 +25,7 @@
     <application_dependencies/>
     <commands_applications/>
     <job_requests/>
+    <job_request_metadata/>
     <jobs/>
     <job_executions/>
     <jobs_applications/>

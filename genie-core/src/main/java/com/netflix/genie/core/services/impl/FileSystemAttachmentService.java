@@ -23,9 +23,6 @@ import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.services.AttachmentService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,7 +34,6 @@ import java.io.InputStream;
  * @author tgianos
  * @since 3.0.0
  */
-@Service
 @Slf4j
 public class FileSystemAttachmentService implements AttachmentService {
 
@@ -48,10 +44,7 @@ public class FileSystemAttachmentService implements AttachmentService {
      *
      * @param attachmentsDirectory The directory to use or null if want to default to system temp directory
      */
-    @Autowired
-    public FileSystemAttachmentService(
-        @Value("${genie.jobs.attachments.dir:#{null}}") final String attachmentsDirectory
-    ) {
+    public FileSystemAttachmentService(final String attachmentsDirectory) {
         this.attachmentsDirectory = attachmentsDirectory;
     }
 

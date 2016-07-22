@@ -20,13 +20,16 @@ package com.netflix.genie.client;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.netflix.genie.client.apis.ClusterService;
+import com.netflix.genie.client.configs.GenieNetworkConfiguration;
 import com.netflix.genie.client.exceptions.GenieClientException;
-import com.netflix.genie.client.security.SecurityInterceptor;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.Interceptor;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,36 +45,25 @@ import java.util.Set;
 public class ClusterClient extends BaseGenieClient {
 
     private ClusterService clusterService;
+
     /**
      * Constructor.
      *
-     * @param url The url of the Genie Service.
-     * @param securityInterceptor An implementation of the Security Interceptor.
-     *
-     * @throws GenieClientException If there is any problem.
+     * @param url                       The endpoint URL of the Genie API. Not null or empty
+     * @param interceptors              Any interceptors to configure the client with, can include security ones
+     * @param genieNetworkConfiguration The network configuration parameters. Could be null
+     * @throws GenieClientException On error
      */
     public ClusterClient(
-        final String url,
-        final SecurityInterceptor securityInterceptor
+        @NotEmpty final String url,
+        @Nullable final List<Interceptor> interceptors,
+        @Nullable final GenieNetworkConfiguration genieNetworkConfiguration
     ) throws GenieClientException {
-        super(url, securityInterceptor, null);
-        clusterService = retrofit.create(ClusterService.class);
+        super(url, interceptors, genieNetworkConfiguration);
+        this.clusterService = this.getService(ClusterService.class);
     }
 
-    /**
-     * Constructor that takes only the URL.
-     *
-     * @param url The url of the Genie Service.
-     * @throws GenieClientException If there is any problem.
-     */
-    public ClusterClient(
-        final String url
-    ) throws GenieClientException {
-        super(url, null, null);
-        clusterService = retrofit.create(ClusterService.class);
-    }
-
-    /******************* CRUD Methods   ***************************/
+    /* CRUD Methods */
 
     /**
      * Create a cluster ing genie.
@@ -143,7 +135,7 @@ public class ClusterClient extends BaseGenieClient {
             .get("_embedded");
         if (jnode != null) {
             for (final JsonNode objNode : jnode.get("clusterList")) {
-                final Cluster cluster  = mapper.treeToValue(objNode, Cluster.class);
+                final Cluster cluster = this.treeToValue(objNode, Cluster.class);
                 clusterList.add(cluster);
             }
         }

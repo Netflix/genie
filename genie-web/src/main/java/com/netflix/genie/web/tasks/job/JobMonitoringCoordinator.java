@@ -32,6 +32,7 @@ import org.apache.commons.exec.Executor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
 import org.springframework.scheduling.TaskScheduler;
@@ -53,6 +54,7 @@ import java.util.concurrent.ScheduledFuture;
  * @since 3.0.0
  */
 @Component
+@Primary
 @Slf4j
 public class JobMonitoringCoordinator implements JobCountService {
 

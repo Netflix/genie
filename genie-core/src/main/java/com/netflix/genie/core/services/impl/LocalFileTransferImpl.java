@@ -41,10 +41,9 @@ public class LocalFileTransferImpl implements FileTransfer {
      */
     @Override
     public boolean isValid(
-        @NotBlank(message = "Filename cannot be blank")
-        final String fileName) throws GenieException {
+        @NotBlank(message = "Filename cannot be blank") final String fileName
+    ) throws GenieException {
         log.debug("Called with file name {}", fileName);
-
         return true;
     }
 
@@ -53,9 +52,9 @@ public class LocalFileTransferImpl implements FileTransfer {
      */
     @Override
     public void getFile(
-        @NotBlank (message = "Source file path cannot be empty.")
+        @NotBlank(message = "Source file path cannot be empty.")
         final String srcRemotePath,
-        @NotBlank (message = "Destination local path cannot be empty")
+        @NotBlank(message = "Destination local path cannot be empty")
         final String dstLocalPath
     ) throws GenieException {
         log.debug("Called with src path {} and destination path {}", srcRemotePath, dstLocalPath);
@@ -67,9 +66,9 @@ public class LocalFileTransferImpl implements FileTransfer {
             log.error("Got error while copying remote file {} to local path {}", srcRemotePath, dstLocalPath);
             throw new GenieServerException(
                 "Got error while copying remote file "
-                + srcRemotePath
-                + " to local path "
-                + dstLocalPath, ioe);
+                    + srcRemotePath
+                    + " to local path "
+                    + dstLocalPath, ioe);
         }
     }
 
@@ -78,9 +77,9 @@ public class LocalFileTransferImpl implements FileTransfer {
      */
     @Override
     public void putFile(
-        @NotBlank (message = "Source local path cannot be empty.")
+        @NotBlank(message = "Source local path cannot be empty.")
         final String srcLocalPath,
-        @NotBlank (message = "Destination remote path cannot be empty")
+        @NotBlank(message = "Destination remote path cannot be empty")
         final String dstRemotePath
     ) throws GenieException {
         log.debug("Called with src path {} and destination path {}", srcLocalPath, dstRemotePath);

@@ -16,6 +16,10 @@
 #
 ##
 
+endpoints:
+  health:
+    time-to-live: 1
+
 genie:
   health:
     memory:

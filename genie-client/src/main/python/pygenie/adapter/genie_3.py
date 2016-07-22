@@ -98,7 +98,7 @@ class Genie3Adapter(GenieBaseAdapter):
         super(Genie3Adapter, self).__init__(conf=conf)
         self.auth_handler = AuthHandler(conf=conf)
 
-    def __get_log(self, job_id, log, iterator=False, **kwargs):
+    def get_log(self, job_id, log, iterator=False, **kwargs):
         url = '{}/output/{}'.format(self.__url_for_job(job_id), log)
 
         try:
@@ -141,16 +141,24 @@ class Genie3Adapter(GenieBaseAdapter):
             else:
                 dependencies.append(dep)
 
+        description = job.get('description')
+        if isinstance(description, dict):
+            description = json.dumps(description)
+
+        cluster_tag_mapping = job.get('cluster_tag_mapping')
+        clusters = [
+            dict(tags=cluster_tag_mapping.get(priority))
+            for priority in sorted(cluster_tag_mapping.keys())
+        ]
+
         payload = {
             'applications': job.get('application_ids'),
             'attachments': attachments,
-            'clusterCriterias': [
-                {'tags': job.get('cluster_tags') or job.default_cluster_tags}
-            ],
+            'clusterCriterias': [i for i in clusters if i.get('tags')],
             'commandArgs': job.get('command_arguments') or job.cmd_args,
             'commandCriteria': job.get('command_tags') or job.default_command_tags,
             'dependencies': dependencies,
-            'description': job.get('description'),
+            'description': description,
             'disableLogArchival': not job.get('archive'),
             'email': job.get('email'),
             'group': job.get('group'),
@@ -273,7 +281,7 @@ class Genie3Adapter(GenieBaseAdapter):
     def get_genie_log(self, job_id, **kwargs):
         """Get a genie log for a job."""
 
-        return self.__get_log(job_id, 'genie/logs/genie.log', **kwargs)
+        return self.get_log(job_id, 'genie/logs/genie.log', **kwargs)
 
     def get_status(self, job_id):
         """Get job status."""
@@ -283,12 +291,12 @@ class Genie3Adapter(GenieBaseAdapter):
     def get_stderr(self, job_id, **kwargs):
         """Get a stderr log for a job."""
 
-        return self.__get_log(job_id, 'stderr', **kwargs)
+        return self.get_log(job_id, 'stderr', **kwargs)
 
     def get_stdout(self, job_id, **kwargs):
         """Get a stdout log for a job."""
 
-        return self.__get_log(job_id, 'stdout', **kwargs)
+        return self.get_log(job_id, 'stdout', **kwargs)
 
     def kill_job(self, job_id=None, kill_uri=None):
         """Kill a job."""

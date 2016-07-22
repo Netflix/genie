@@ -107,12 +107,19 @@ CREATE INDEX APPLICATIONS_TYPE_INDEX ON applications (type);
 SELECT CURRENT_TIMESTAMP, 'Successfully updated the applications table.';
 
 SELECT CURRENT_TIMESTAMP, 'De-normalizing application tags for 3.0...';
-UPDATE applications SET tags =
-(
-  SELECT string_agg(DISTINCT element, '|' ORDER BY element)
-  FROM application_tags
-  WHERE applications.id = application_tags.application_id
-  GROUP BY application_id
+UPDATE applications SET tags = CONCAT(
+  '|',
+  REPLACE(
+    (
+      SELECT string_agg(DISTINCT element, '|' ORDER BY element)
+      FROM application_tags
+      WHERE applications.id = application_tags.application_id
+      GROUP BY application_id
+    ),
+    '|',
+    '||'
+  ),
+  '|'
 );
 SELECT CURRENT_TIMESTAMP, 'Finished de-normalizing application tags for 3.0.';
 
@@ -167,12 +174,19 @@ CREATE INDEX CLUSTERS_STATUS_INDEX ON clusters (status);
 SELECT CURRENT_TIMESTAMP, 'Successfully updated the clusters table.';
 
 SELECT CURRENT_TIMESTAMP, 'De-normalizing cluster tags for 3.0...';
-UPDATE clusters SET tags =
-(
-  SELECT string_agg(DISTINCT element, '|' ORDER BY element)
-  FROM cluster_tags
-  WHERE clusters.id = cluster_tags.cluster_id
-  GROUP BY cluster_id
+UPDATE clusters SET tags = CONCAT(
+  '|',
+  REPLACE(
+    (
+      SELECT string_agg(DISTINCT element, '|' ORDER BY element)
+      FROM cluster_tags
+      WHERE clusters.id = cluster_tags.cluster_id
+      GROUP BY cluster_id
+    ),
+    '|',
+    '||'
+  ),
+  '|'
 );
 SELECT CURRENT_TIMESTAMP, 'Finished de-normalizing cluster tags for 3.0.';
 
@@ -236,13 +250,22 @@ CREATE INDEX COMMANDS_STATUS_INDEX on commands (status);
 SELECT CURRENT_TIMESTAMP, 'Successfully updated the commands table.';
 
 SELECT CURRENT_TIMESTAMP, 'De-normalizing command tags for 3.0...';
-UPDATE commands SET tags =
-(
-  SELECT string_agg(DISTINCT element, '|' ORDER BY element)
-  FROM command_tags
-  WHERE commands.id = command_tags.command_id
-  GROUP BY command_id
+UPDATE commands SET tags = CONCAT(
+  '|',
+  REPLACE(
+    (
+      SELECT string_agg(DISTINCT element, '|' ORDER BY element)
+      FROM command_tags
+      WHERE commands.id = command_tags.command_id
+      GROUP BY command_id
+    ),
+    '|',
+    '||'
+  ),
+  '|'
 );
+UPDATE commands SET tags = REPLACE(tags, '|', '||');
+UPDATE commands SET tags = CONCAT('|', tags, '|');
 SELECT CURRENT_TIMESTAMP, 'Finished de-normalizing command tags for 3.0.';
 
 SELECT CURRENT_TIMESTAMP, 'Updating the command_configs table for 3.0...';
@@ -280,7 +303,6 @@ CREATE TABLE job_requests (
   tags VARCHAR(2048) DEFAULT NULL,
   cpu INT NOT NULL DEFAULT 1,
   memory INT NOT NULL DEFAULT 1560,
-  client_host VARCHAR(255) DEFAULT NULL,
   applications VARCHAR(2048) NOT NULL DEFAULT '[]',
   timeout INT NOT NULL DEFAULT 604800,
   PRIMARY KEY (id)
@@ -309,8 +331,7 @@ INSERT INTO job_requests (
   email,
   tags,
   cpu,
-  memory,
-  client_host
+  memory
 ) SELECT
   j.id,
   j.created,
@@ -328,15 +349,22 @@ INSERT INTO job_requests (
   j.filedependencies,
   j.disablelogarchival,
   j.email,
-  (
-    SELECT string_agg(DISTINCT element, '|' ORDER BY element)
-    FROM job_tags
-    WHERE j.id = job_tags.job_id
-    GROUP BY job_id
+  CONCAT(
+    '|',
+    REPLACE(
+      (
+        SELECT string_agg(DISTINCT element, '|' ORDER BY element)
+        FROM job_tags
+        WHERE j.id = job_tags.job_id
+        GROUP BY job_id
+      ),
+      '|',
+      '||'
+    ),
+    '|'
   ),
   1,
-  1560,
-  j.clientHost
+  1560
   FROM jobs j;
 SELECT CURRENT_TIMESTAMP, 'Successfully inserted values into job_requests table.';
 
@@ -391,6 +419,30 @@ SELECT CURRENT_TIMESTAMP, 'Successfully converted dependencies to JSON in job_re
 SELECT CURRENT_TIMESTAMP, 'Attempting to make dependencies field not null in job_requests table...';
 ALTER TABLE job_requests ALTER COLUMN dependencies SET NOT NULL;;
 SELECT CURRENT_TIMESTAMP, 'Successfully made dependencies field not null in job_requests table.';
+
+SELECT CURRENT_TIMESTAMP, 'Creating the job_request_metadata table...';
+CREATE TABLE job_request_metadata (
+  id VARCHAR(255) NOT NULL,
+  created TIMESTAMP(3) WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated TIMESTAMP(3) WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  entity_version INT NOT NULL DEFAULT 0,
+  client_host VARCHAR(255) DEFAULT NULL,
+  user_agent VARCHAR(2048) DEFAULT NULL,
+  num_attachments INT NOT NULL DEFAULT 0,
+  total_size_of_attachments BIGINT NOT NULL DEFAULT 0,
+  FOREIGN KEY (id) REFERENCES job_requests (id) ON DELETE CASCADE
+);
+SELECT CURRENT_TIMESTAMP, 'Successfully created the job_request_metadata table.';
+
+SELECT CURRENT_TIMESTAMP, 'Inserting values into job_request_metadata from the jobs table...';
+INSERT INTO job_request_metadata (
+  id,
+  created,
+  updated,
+  entity_version,
+  client_host
+) SELECT id, created, updated, entityVersion, clientHost FROM jobs;
+SELECT CURRENT_TIMESTAMP, 'Successfully inserted values into the job_requests_metadata table.';
 
 SELECT CURRENT_TIMESTAMP, 'Creating the job_executions table...';
 CREATE TABLE job_executions (
@@ -512,12 +564,19 @@ CREATE INDEX JOBS_TAGS_INDEX ON jobs (tags);
 SELECT CURRENT_TIMESTAMP, 'Successfully updated the jobs table.';
 
 SELECT CURRENT_TIMESTAMP, 'De-normalizing jobs tags for 3.0...';
-UPDATE jobs SET tags =
-(
-  SELECT string_agg(DISTINCT element, '|' ORDER BY element)
-  FROM job_tags
-  WHERE jobs.id = job_tags.job_id
-  GROUP BY job_id
+UPDATE jobs SET tags = CONCAT(
+  '|',
+  REPLACE(
+    (
+      SELECT string_agg(DISTINCT element, '|' ORDER BY element)
+      FROM job_tags
+      WHERE jobs.id = job_tags.job_id
+      GROUP BY job_id
+    ),
+    '|',
+    '||'
+  ),
+  '|'
 );
 SELECT CURRENT_TIMESTAMP, 'Finished de-normalizing job tags for 3.0.';
 

@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2015 Netflix, Inc.
+ *  Copyright 2016 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,17 +15,11 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.core.jobs.workflow.impl;
-
-import com.netflix.genie.test.categories.UnitTest;
-import org.junit.experimental.categories.Category;
 
 /**
- * Class containing unit tests for ApplicationTask.
+ * Tests for the interceptor classes.
  *
- * @author amsharma
+ * @author tgianos
+ * @since 3.0.0
  */
-@Category(UnitTest.class)
-public class ApplicationTaskUnitTests {
-
-}
+package com.netflix.genie.client.interceptors;
