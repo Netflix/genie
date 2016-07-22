@@ -71,7 +71,7 @@ export default class OutputDirectory extends React.Component {
               <div>
                 <HomeButton jobId={this.state.jobId} />
                 <Table
-                  headers={['Name', 'Size', 'Last Modified']}
+                  headers={['Name', 'Size', 'Last Modified (UTC)']}
                   output={this.state.output}
                 />
                 <DirectoryInfo output={this.state.output} />

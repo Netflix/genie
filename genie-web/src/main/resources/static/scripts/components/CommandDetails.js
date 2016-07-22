@@ -17,8 +17,8 @@ export default class CommandDetails extends React.Component {
       command: {
         configs: [],
       },
-      clusters: [],
-      applications: [],
+      clusters     : [],
+      applications : [],
     };
   }
 

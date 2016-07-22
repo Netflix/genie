@@ -60,7 +60,7 @@ export default class Application extends Page {
 
   get tableHeader() {
     return (
-      ['Id', 'Name', 'Copy Link', 'User', 'Status', 'Version', 'Tags', 'Created', 'Updated']
+      ['Id', 'Name', 'Copy Link', 'User', 'Status', 'Version', 'Tags', 'Created (UTC)', 'Updated (UTC)']
     );
   }
 

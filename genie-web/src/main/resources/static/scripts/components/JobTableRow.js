@@ -1,8 +1,7 @@
 import React, { PropTypes as T } from 'react';
 import { Link } from 'react-router';
 
-import { momentFormat } from '../utils';
-import moment from 'moment';
+import { momentFormat, momentDurationFormat } from '../utils';
 
 import CopyToClipboard from 'react-copy-to-clipboard';
 
@@ -70,7 +69,7 @@ export default class TableRow extends React.Component {
           {this.props.row.finished ? momentFormat(this.props.row.finished) : 'NA'}
         </td>
         <td onClick={() => this.props.toggleRowDetails(this.props.row.id)} className="col-xs-1">
-          {this.props.row.started ? moment.duration(this.props.row.runtime).humanize() : 'NA'}
+          {this.props.row.started ? momentDurationFormat(this.props.row.runtime) : 'NA'}
         </td>
       </tr>
     );

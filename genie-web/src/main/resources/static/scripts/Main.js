@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PropTypes as T } from 'react';
 import { fetch } from './utils';
 
 import cookie from 'react-cookie';
@@ -8,8 +8,8 @@ import SiteFooter from './components/SiteFooter';
 
 export default class App extends React.Component {
   static propTypes = {
-    headers  : React.PropTypes.array,
-    children : React.PropTypes.element.isRequired,
+    headers  : T.array,
+    children : T.element.isRequired,
   }
 
   static defaultProps = {

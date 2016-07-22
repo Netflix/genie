@@ -1,6 +1,11 @@
 import $ from 'jquery';
 import moment from 'moment';
 
+// var p = {foo: [1,2,3], bar: 42};
+// setting traditional to true generates
+// foo=1&foo=2&foo=3&bar=42
+$.ajaxSettings.traditional = true;
+
 export const genieJobsUrl = (url) => {
   const [ignored, path] = url.split('/api/v3/jobs', 2);
   return `/output${path}`;
@@ -46,6 +51,10 @@ export const hasChanged = (o1, o2) => {
   return changed;
 };
 
-export const momentFormat = (dateStr, format = 'MM/DD/YYYY, h:mm:ss') =>
-  moment(dateStr).format(format);
+export const momentFormat = (dateStr, format = 'MM/DD/YYYY, hh:mm:ss') =>
+  moment.utc(dateStr).format(format);
+
+//https://github.com/moment/moment/issues/1048
+export const momentDurationFormat = (durationStr, format = ':mm:ss') =>
+  Math.floor(moment.duration(durationStr).asHours()) + moment.utc(moment.duration(durationStr).asMilliseconds()).format(format)
 
