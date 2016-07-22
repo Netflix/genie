@@ -26,7 +26,7 @@
         status="ACTIVE"
         entity_version="0"
         type="hadoop"
-        tags="genie.id:app1|genie.name:hadoop|type:hadoop"
+        tags="|genie.id:app1||genie.name:hadoop||type:hadoop|"
     />
     <application_configs
         application_id="app1"
@@ -48,7 +48,7 @@
         status="ACTIVE"
         entity_version="0"
         type="spark"
-        tags="genie.id:app2|genie.name:spark|type:spark"
+        tags="|genie.id:app2||genie.name:spark||type:spark|"
     />
     <application_configs
         application_id="app2"
@@ -70,7 +70,7 @@
         status="ACTIVE"
         entity_version="0"
         type="spark"
-        tags="genie.id:app3|genie.name:spark|type:spark"
+        tags="|genie.id:app3||genie.name:spark||type:spark|"
     />
     <application_configs
         application_id="app3"
@@ -93,7 +93,7 @@
         check_delay="10000"
         status="ACTIVE"
         entity_version="0"
-        tags="genie.id:command1|genie.name:spark"
+        tags="|genie.id:command1||genie.name:spark|"
     />
 
     <commands_applications command_id="command1" application_id="app1" application_order="0"/>
@@ -108,7 +108,7 @@
         version="2.4.0"
         status="UP"
         entity_version="0"
-        tags="genie.id:cluster1|genie.name:h2query|sched:adhoc|type:yarn"
+        tags="|genie.id:cluster1||genie.name:h2query||sched:adhoc||type:yarn|"
     />
     <cluster_configs
         cluster_id="cluster1"

@@ -107,12 +107,19 @@ CREATE INDEX APPLICATIONS_TYPE_INDEX ON applications (type);
 SELECT CURRENT_TIMESTAMP, 'Successfully updated the applications table.';
 
 SELECT CURRENT_TIMESTAMP, 'De-normalizing application tags for 3.0...';
-UPDATE applications SET tags =
-(
-  SELECT string_agg(DISTINCT element, '|' ORDER BY element)
-  FROM application_tags
-  WHERE applications.id = application_tags.application_id
-  GROUP BY application_id
+UPDATE applications SET tags = CONCAT(
+  '|',
+  REPLACE(
+    (
+      SELECT string_agg(DISTINCT element, '|' ORDER BY element)
+      FROM application_tags
+      WHERE applications.id = application_tags.application_id
+      GROUP BY application_id
+    ),
+    '|',
+    '||'
+  ),
+  '|'
 );
 SELECT CURRENT_TIMESTAMP, 'Finished de-normalizing application tags for 3.0.';
 
@@ -167,12 +174,19 @@ CREATE INDEX CLUSTERS_STATUS_INDEX ON clusters (status);
 SELECT CURRENT_TIMESTAMP, 'Successfully updated the clusters table.';
 
 SELECT CURRENT_TIMESTAMP, 'De-normalizing cluster tags for 3.0...';
-UPDATE clusters SET tags =
-(
-  SELECT string_agg(DISTINCT element, '|' ORDER BY element)
-  FROM cluster_tags
-  WHERE clusters.id = cluster_tags.cluster_id
-  GROUP BY cluster_id
+UPDATE clusters SET tags = CONCAT(
+  '|',
+  REPLACE(
+    (
+      SELECT string_agg(DISTINCT element, '|' ORDER BY element)
+      FROM cluster_tags
+      WHERE clusters.id = cluster_tags.cluster_id
+      GROUP BY cluster_id
+    ),
+    '|',
+    '||'
+  ),
+  '|'
 );
 SELECT CURRENT_TIMESTAMP, 'Finished de-normalizing cluster tags for 3.0.';
 
@@ -236,13 +250,22 @@ CREATE INDEX COMMANDS_STATUS_INDEX on commands (status);
 SELECT CURRENT_TIMESTAMP, 'Successfully updated the commands table.';
 
 SELECT CURRENT_TIMESTAMP, 'De-normalizing command tags for 3.0...';
-UPDATE commands SET tags =
-(
-  SELECT string_agg(DISTINCT element, '|' ORDER BY element)
-  FROM command_tags
-  WHERE commands.id = command_tags.command_id
-  GROUP BY command_id
+UPDATE commands SET tags = CONCAT(
+  '|',
+  REPLACE(
+    (
+      SELECT string_agg(DISTINCT element, '|' ORDER BY element)
+      FROM command_tags
+      WHERE commands.id = command_tags.command_id
+      GROUP BY command_id
+    ),
+    '|',
+    '||'
+  ),
+  '|'
 );
+UPDATE commands SET tags = REPLACE(tags, '|', '||');
+UPDATE commands SET tags = CONCAT('|', tags, '|');
 SELECT CURRENT_TIMESTAMP, 'Finished de-normalizing command tags for 3.0.';
 
 SELECT CURRENT_TIMESTAMP, 'Updating the command_configs table for 3.0...';
@@ -326,11 +349,19 @@ INSERT INTO job_requests (
   j.filedependencies,
   j.disablelogarchival,
   j.email,
-  (
-    SELECT string_agg(DISTINCT element, '|' ORDER BY element)
-    FROM job_tags
-    WHERE j.id = job_tags.job_id
-    GROUP BY job_id
+  CONCAT(
+    '|',
+    REPLACE(
+      (
+        SELECT string_agg(DISTINCT element, '|' ORDER BY element)
+        FROM job_tags
+        WHERE j.id = job_tags.job_id
+        GROUP BY job_id
+      ),
+      '|',
+      '||'
+    ),
+    '|'
   ),
   1,
   1560
@@ -533,12 +564,19 @@ CREATE INDEX JOBS_TAGS_INDEX ON jobs (tags);
 SELECT CURRENT_TIMESTAMP, 'Successfully updated the jobs table.';
 
 SELECT CURRENT_TIMESTAMP, 'De-normalizing jobs tags for 3.0...';
-UPDATE jobs SET tags =
-(
-  SELECT string_agg(DISTINCT element, '|' ORDER BY element)
-  FROM job_tags
-  WHERE jobs.id = job_tags.job_id
-  GROUP BY job_id
+UPDATE jobs SET tags = CONCAT(
+  '|',
+  REPLACE(
+    (
+      SELECT string_agg(DISTINCT element, '|' ORDER BY element)
+      FROM job_tags
+      WHERE jobs.id = job_tags.job_id
+      GROUP BY job_id
+    ),
+    '|',
+    '||'
+  ),
+  '|'
 );
 SELECT CURRENT_TIMESTAMP, 'Finished de-normalizing job tags for 3.0.';
 

@@ -24,9 +24,8 @@ import org.hibernate.validator.constraints.NotBlank;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -40,11 +39,14 @@ import java.util.stream.Collectors;
  */
 @MappedSuperclass
 public class CommonFieldsEntity extends BaseEntity {
+    /**
+     * The delimiter used to separate tags in the database.
+     */
+    public static final String TAG_DELIMITER = "|";
     protected static final String GENIE_TAG_NAMESPACE = "genie.";
     protected static final String GENIE_ID_TAG_NAMESPACE = GENIE_TAG_NAMESPACE + "id:";
     protected static final String GENIE_NAME_TAG_NAMESPACE = GENIE_TAG_NAMESPACE + "name:";
-    protected static final String PIPE = "|";
-    protected static final String PIPE_REGEX = "\\" + PIPE;
+    protected static final String TAG_DELIMITER_REGEX = "\\" + TAG_DELIMITER + "\\" + TAG_DELIMITER;
 
     private static final long serialVersionUID = -5040659007494311180L;
 
@@ -162,13 +164,11 @@ public class CommonFieldsEntity extends BaseEntity {
      * @return The tags attached to this entity
      */
     public Set<String> getTags() {
-        final Set<String> returnTags = new HashSet<>();
-
         if (this.tags != null) {
-            returnTags.addAll(Arrays.asList(this.tags.split(PIPE_REGEX)));
+            return Sets.newHashSet(this.splitTags(this.tags));
+        } else {
+            return Sets.newHashSet();
         }
-
-        return returnTags;
     }
 
     /**
@@ -179,11 +179,13 @@ public class CommonFieldsEntity extends BaseEntity {
     public void setTags(final Set<String> tags) {
         this.tags = null;
         if (tags != null && !tags.isEmpty()) {
-            this.tags = tags
+            this.tags = TAG_DELIMITER
+                + tags
                 .stream()
                 .sorted(String.CASE_INSENSITIVE_ORDER)
-                .reduce((one, two) -> one + PIPE + two)
-                .get();
+                .reduce((one, two) -> one + TAG_DELIMITER + TAG_DELIMITER + two)
+                .get()
+                + TAG_DELIMITER;
         }
     }
 
@@ -198,7 +200,7 @@ public class CommonFieldsEntity extends BaseEntity {
         if (this.tags == null) {
             finalTags = Sets.newHashSet();
         } else {
-            finalTags = Sets.newHashSet(this.tags.split(PIPE_REGEX))
+            finalTags = Sets.newHashSet(this.splitTags(this.tags))
                 .stream()
                 .filter(tag -> !tag.contains(GENIE_TAG_NAMESPACE))
                 .collect(Collectors.toSet());
@@ -209,5 +211,10 @@ public class CommonFieldsEntity extends BaseEntity {
         finalTags.add(GENIE_ID_TAG_NAMESPACE + this.getId());
         finalTags.add(GENIE_NAME_TAG_NAMESPACE + this.getName());
         return finalTags;
+    }
+
+    @NotNull
+    private String[] splitTags(@NotNull final String tagsToSplit) {
+        return tagsToSplit.substring(1, tagsToSplit.length() - 1).split(TAG_DELIMITER_REGEX);
     }
 }

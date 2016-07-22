@@ -18,6 +18,7 @@
 package com.netflix.genie.core.jpa.specifications;
 
 import com.google.common.collect.Sets;
+import com.netflix.genie.core.jpa.entities.CommonFieldsEntity;
 import com.netflix.genie.test.categories.UnitTest;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
@@ -48,10 +49,27 @@ public class JpaSpecificationUtilsUnitTests {
     @Test
     public void canGetTagLikeString() {
         Assert.assertThat(JpaSpecificationUtils.getTagLikeString(Sets.newHashSet()), Matchers.is("%"));
-        Assert.assertThat(JpaSpecificationUtils.getTagLikeString(Sets.newHashSet("tag")), Matchers.is("%tag%"));
+        Assert.assertThat(
+            JpaSpecificationUtils.getTagLikeString(Sets.newHashSet("tag")),
+            Matchers.is("%" + CommonFieldsEntity.TAG_DELIMITER + "tag" + CommonFieldsEntity.TAG_DELIMITER + "%")
+        );
         Assert.assertThat(
             JpaSpecificationUtils.getTagLikeString(Sets.newHashSet("tag", "Stag", "rag")),
-            Matchers.is("%rag%Stag%tag%")
+            Matchers.is(
+                "%"
+                    + CommonFieldsEntity.TAG_DELIMITER
+                    + "rag"
+                    + CommonFieldsEntity.TAG_DELIMITER
+                    + "%"
+                    + CommonFieldsEntity.TAG_DELIMITER
+                    + "Stag"
+                    + CommonFieldsEntity.TAG_DELIMITER
+                    + "%"
+                    + CommonFieldsEntity.TAG_DELIMITER
+                    + "tag"
+                    + CommonFieldsEntity.TAG_DELIMITER
+                    + "%"
+            )
         );
     }
 }
