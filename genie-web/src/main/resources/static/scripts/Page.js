@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react';
+import React, { PropTypes as T } from 'react';
 import $ from 'jquery';
 
 import SearchForm from './components/SearchForm';
@@ -15,11 +15,11 @@ import { fetch, hasChanged } from './utils';
 
 export default class Page extends React.Component {
   static contextTypes = {
-    router : PropTypes.object.isRequired,
+    router : T.object.isRequired,
   }
 
   static propTypes = {
-    location : PropTypes.object,
+    location : T.object,
   }
 
   constructor(props) {
@@ -63,7 +63,7 @@ export default class Page extends React.Component {
     const { rowId = null, showSearchForm = 'true' } = query;
 
     fetch(this.url, query)
-    .done((data) => {
+    .done(data => {
       if (data.hasOwnProperty('_embedded')) {
         this.setState({
           query,

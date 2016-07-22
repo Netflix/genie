@@ -33,9 +33,15 @@ export default class Job extends Page {
         label : 'Status',
         name  : 'status',
         value : '',
-        type  : 'option',
-        optionValues: ['', 'INIT', 'RUNNING', 'SUCCEEDED', 'FAILED', 'KILLED', 'INVALID'],
-      }, {
+        type  : 'select',
+        selectFields: ['INIT', 'RUNNING', 'SUCCEEDED', 'FAILED', 'KILLED', 'INVALID'].map(field => (
+          {
+            value: field,
+            label: field,
+          }
+        )),
+      },
+      {
         label : 'Size',
         name  : 'size',
         value : 25,
@@ -46,7 +52,7 @@ export default class Job extends Page {
         name  : 'sort',
         value : '',
         type  : 'select',
-        selectFields: ['user', 'id', 'name', 'status', 'clusterName', 'cluserId', 'started', 'finished'].map(field => (
+        selectFields: ['user', 'id', 'name', 'status', 'clusterName', 'cluserId', 'created', 'started', 'finished'].map(field => (
           {
             value: field,
             label: field,
@@ -97,7 +103,7 @@ export default class Job extends Page {
 
   get tableHeader() {
     return (
-        ['Id', 'Name', 'Output', 'Copy Link', 'User', 'Status', 'Cluster', 'Started', 'Finished', 'Run Time']
+        ['Id', 'Name', 'Output', 'Copy Link', 'User', 'Status', 'Cluster', 'Started (UTC)', 'Finished (UTC)', 'Run Time']
     );
   }
 
