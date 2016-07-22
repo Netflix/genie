@@ -110,7 +110,7 @@ class Genie2Adapter(GenieBaseAdapter):
     def __init__(self, conf=None):
         super(Genie2Adapter, self).__init__(conf=conf)
 
-    def __get_log(self, job_id, log, iterator=False, **kwargs):
+    def get_log(self, job_id, log, iterator=False, **kwargs):
         url = '{}/{}'.format(self.__url_for_job(job_id), log) \
             .replace('/genie/v2/jobs/', '/genie-jobs/', 1)
 
@@ -243,7 +243,7 @@ class Genie2Adapter(GenieBaseAdapter):
     def get_genie_log(self, job_id, **kwargs):
         """Get a genie log for a job."""
 
-        return self.__get_log(job_id, 'cmd.log', **kwargs)
+        return self.get_log(job_id, 'cmd.log', **kwargs)
 
     def get_status(self, job_id):
         """Get job status."""
@@ -253,12 +253,12 @@ class Genie2Adapter(GenieBaseAdapter):
     def get_stderr(self, job_id, **kwargs):
         """Get a stderr log for a job."""
 
-        return self.__get_log(job_id, 'stderr.log', **kwargs)
+        return self.get_log(job_id, 'stderr.log', **kwargs)
 
     def get_stdout(self, job_id, **kwargs):
         """Get a stdout log for a job."""
 
-        return self.__get_log(job_id, 'stdout.log', **kwargs)
+        return self.get_log(job_id, 'stdout.log', **kwargs)
 
     def kill_job(self, job_id=None, kill_uri=None):
         """Kill a job."""
