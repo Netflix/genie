@@ -27,12 +27,13 @@ import com.netflix.genie.core.jobs.workflow.impl.ApplicationTask;
 import com.netflix.genie.core.jobs.workflow.impl.ClusterTask;
 import com.netflix.genie.core.jobs.workflow.impl.CommandTask;
 import com.netflix.genie.core.jobs.workflow.impl.InitialSetupTask;
-import com.netflix.genie.core.jobs.workflow.impl.JobKickoffTask;
 import com.netflix.genie.core.jobs.workflow.impl.JobFailureAndKillHandlerLogicTask;
+import com.netflix.genie.core.jobs.workflow.impl.JobKickoffTask;
 import com.netflix.genie.core.jobs.workflow.impl.JobTask;
 import com.netflix.genie.core.services.AttachmentService;
 import com.netflix.genie.core.services.FileTransfer;
 import com.netflix.genie.core.services.impl.LocalFileTransferImpl;
+import com.netflix.spectator.api.Registry;
 import org.apache.commons.exec.Executor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -56,67 +57,74 @@ public class JobConfigTest {
     @Bean
     @Order(value = 2)
     public FileTransfer localFileTransfer() {
-        return new LocalFileTransferImpl(); }
+        return new LocalFileTransferImpl();
+    }
 
     /**
      * Create a task that adds logic to handle kill requests to a job.
      *
+     * @param registry The metrics registry to use
      * @return A jobKillLogicTask bean
      */
     @Bean
     @Order(value = 0)
-    public WorkflowTask jobKillLogicTask() {
-        return new JobFailureAndKillHandlerLogicTask();
+    public WorkflowTask jobKillLogicTask(final Registry registry) {
+        return new JobFailureAndKillHandlerLogicTask(registry);
     }
 
     /**
      * Create an setup Task bean that does initial setup before any of the tasks start.
      *
+     * @param registry The metrics registry to use
      * @return An application task object
      */
     @Bean
     @Order(value = 1)
-    public WorkflowTask initialSetupTask() {
-        return new InitialSetupTask();
+    public WorkflowTask initialSetupTask(final Registry registry) {
+        return new InitialSetupTask(registry);
     }
 
     /**
      * Create an Cluster Task bean that processes the cluster needed for a job.
      *
+     * @param registry The metrics registry to use
      * @return An application task object
      */
     @Bean
     @Order(value = 2)
-    public WorkflowTask clusterProcessorTask() {
-        return new ClusterTask();
+    public WorkflowTask clusterProcessorTask(final Registry registry) {
+        return new ClusterTask(registry);
     }
 
     /**
      * Create an Application Task bean that processes all Applications needed for a job.
      *
+     * @param registry The metrics registry to use
      * @return An application task object
      */
     @Bean
     @Order(value = 3)
-    public WorkflowTask applicationProcessorTask() {
-        return new ApplicationTask();
+    public WorkflowTask applicationProcessorTask(final Registry registry) {
+        return new ApplicationTask(registry);
     }
 
     /**
      * Create an Command Task bean that processes the command needed for a job.
      *
+     * @param registry The metrics registry to use
      * @return An application task object
      */
     @Bean
     @Order(value = 4)
-    public WorkflowTask commandProcessorTask() {
-        return new CommandTask();
+    public WorkflowTask commandProcessorTask(final Registry registry) {
+        return new CommandTask(registry);
     }
 
     /**
      * Create an Job Task bean that processes Job information provided by user.
      *
-     * @param attachmentService An implementation of the attachement service
+     * @param attachmentService An implementation of the attachment service
+     * @param registry          The metrics registry to use
      * @return An job task object
      * @throws GenieException if there is any problem
      */
@@ -124,19 +132,20 @@ public class JobConfigTest {
     @Order(value = 5)
     @Autowired
     public WorkflowTask jobProcessorTask(
-        final AttachmentService attachmentService
+        final AttachmentService attachmentService,
+        final Registry registry
     ) throws GenieException {
-        return new JobTask(attachmentService);
+        return new JobTask(attachmentService, registry);
     }
 
     /**
      * Create an Job Kickoff Task bean that runs the job.
      *
-     * @param isRunAsUserEnabled Flag that tells if job should be run as user specified in the request
+     * @param isRunAsUserEnabled    Flag that tells if job should be run as user specified in the request
      * @param isUserCreationEnabled Flag that tells if the user specified should be created
-     * @param executor An instance of an executor
-     * @param hostname Host on which job will run
-     *
+     * @param executor              An instance of an executor
+     * @param hostname              Host on which job will run
+     * @param registry              The metrics registry to use
      * @return An application task object
      */
     @Bean
@@ -148,8 +157,9 @@ public class JobConfigTest {
         @Value("${genie.jobs.createUser.enabled:false}")
         final boolean isUserCreationEnabled,
         final Executor executor,
-        final String hostname
+        final String hostname,
+        final Registry registry
     ) {
-        return new JobKickoffTask(isRunAsUserEnabled, isUserCreationEnabled, executor, hostname);
+        return new JobKickoffTask(isRunAsUserEnabled, isUserCreationEnabled, executor, hostname, registry);
     }
 }

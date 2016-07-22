@@ -15,12 +15,12 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.client.security;
+package com.netflix.genie.client.interceptors;
 
 import okhttp3.Interceptor;
 
 /**
- * An interface whose implmentation  is supposed to modify the HTTP Request by adding Security credentials.
+ * An interface whose implementation is supposed to modify the HTTP Request by adding Security credentials.
  *
  * @author amsharma
  * @since 3.0.0

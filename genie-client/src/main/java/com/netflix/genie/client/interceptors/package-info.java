@@ -21,4 +21,4 @@
  * @author amsharma
  * @since 3.0.0
  */
-package com.netflix.genie.client.interceptor;
+package com.netflix.genie.client.interceptors;

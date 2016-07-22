@@ -15,10 +15,32 @@
  *     limitations under the License.
  *
  */
+package com.netflix.genie.client.configs;
+
+import lombok.Getter;
+import lombok.Setter;
+
 /**
- * Package containing configuration classes for Genie client.
+ * An object that encapsulates network configurations for Genie client HTTP requests.
  *
  * @author amsharma
  * @since 3.0.0
  */
-package com.netflix.genie.client.config;
+@Getter
+@Setter
+public class GenieNetworkConfiguration {
+
+    /**
+     * Default network timeout value if not specified.
+     */
+    public static final long DEFAULT_TIMEOUT = -1;
+
+    // The default read timeout for new connections.
+    private long readTimeout = DEFAULT_TIMEOUT;
+
+    // The default write timeout for new connections.
+    private long writeTimeout = DEFAULT_TIMEOUT;
+
+    // Default connection timeout in milliseconds for new connections.
+    private long connectTimeout = DEFAULT_TIMEOUT;
+}

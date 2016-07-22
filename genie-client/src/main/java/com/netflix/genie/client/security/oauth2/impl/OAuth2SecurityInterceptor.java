@@ -19,7 +19,7 @@ package com.netflix.genie.client.security.oauth2.impl;
 
 import com.google.common.net.HttpHeaders;
 import com.netflix.genie.client.exceptions.GenieClientException;
-import com.netflix.genie.client.security.SecurityInterceptor;
+import com.netflix.genie.client.interceptors.SecurityInterceptor;
 import com.netflix.genie.client.security.oauth2.AccessToken;
 import com.netflix.genie.client.security.oauth2.TokenFetcher;
 import lombok.extern.slf4j.Slf4j;

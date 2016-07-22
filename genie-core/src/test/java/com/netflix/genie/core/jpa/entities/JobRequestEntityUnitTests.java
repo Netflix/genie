@@ -73,7 +73,6 @@ public class JobRequestEntityUnitTests {
         Assert.assertThat(this.entity.getCreated(), Matchers.notNullValue());
         Assert.assertThat(this.entity.getUpdated(), Matchers.notNullValue());
         Assert.assertThat(this.entity.getTags(), Matchers.empty());
-        Assert.assertThat(this.entity.getClientHost(), Matchers.nullValue());
         Assert.assertThat(this.entity.getClusterCriterias(), Matchers.is(EMPTY_JSON_ARRAY));
         Assert.assertThat(this.entity.getClusterCriteriasAsList(), Matchers.empty());
         Assert.assertThat(this.entity.getCommandArgs(), Matchers.nullValue());
@@ -231,16 +230,6 @@ public class JobRequestEntityUnitTests {
     }
 
     /**
-     * Make sure can set the client host name the request came from.
-     */
-    @Test
-    public void canSetClientHost() {
-        final String clientHost = UUID.randomUUID().toString();
-        this.entity.setClientHost(clientHost);
-        Assert.assertThat(this.entity.getClientHost(), Matchers.is(clientHost));
-    }
-
-    /**
      * Make sure can set the command criteria for the job.
      *
      * @throws GenieException on error
@@ -333,6 +322,18 @@ public class JobRequestEntityUnitTests {
         final JobEntity job = new JobEntity();
         this.entity.setJob(job);
         Assert.assertThat(this.entity.getJob(), Matchers.is(job));
+    }
+
+    /**
+     * Make sure can set the additional metadata for this request.
+     */
+    @Test
+    public void canSetJobRequestMetadata() {
+        Assert.assertThat(this.entity.getJobRequestMetadata(), Matchers.nullValue());
+        final JobRequestMetadataEntity metadata = new JobRequestMetadataEntity();
+        this.entity.setJobRequestMetadata(metadata);
+        Assert.assertThat(this.entity.getJobRequestMetadata(), Matchers.is(metadata));
+        Assert.assertThat(metadata.getRequest(), Matchers.is(this.entity));
     }
 
     /**

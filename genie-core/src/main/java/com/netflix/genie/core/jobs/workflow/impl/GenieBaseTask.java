@@ -53,7 +53,7 @@ public abstract class GenieBaseTask implements WorkflowTask {
      *
      * @throws GenieException If there is any problem
      */
-    public String buildLocalFilePath(
+    protected String buildLocalFilePath(
         @NotBlank
         final String dir,
         @NotBlank
@@ -130,7 +130,7 @@ public abstract class GenieBaseTask implements WorkflowTask {
      *
      * @throws GenieException If there is any problem
      */
-    public void createEntityInstanceDirectory(
+    protected void createEntityInstanceDirectory(
         @NotBlank
         final String genieDir,
         @NotBlank
@@ -172,7 +172,7 @@ public abstract class GenieBaseTask implements WorkflowTask {
      *
      * @throws GenieException If there is any problem
      */
-    public void createEntityInstanceConfigDirectory(
+    protected void createEntityInstanceConfigDirectory(
         @NotBlank
         final String genieDir,
         @NotBlank
@@ -216,7 +216,7 @@ public abstract class GenieBaseTask implements WorkflowTask {
      *
      * @throws GenieException If there is any problem
      */
-    public void createEntityInstanceDependenciesDirectory(
+    protected void createEntityInstanceDependenciesDirectory(
         @NotBlank
         final String genieDir,
         @NotBlank

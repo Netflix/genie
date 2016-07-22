@@ -106,11 +106,6 @@ public class JobRequestEntity extends SetupFileEntity {
     @Min(value = 1, message = "Can't have less than 1 MB of memory allocated")
     private int memory = 1536; // 1.5 GB in MB
 
-    @Basic
-    @Column(name = "client_host")
-    @Size(max = 255, message = "Max length in database is 255 characters")
-    private String clientHost;
-
     @Basic(optional = false)
     @Column(name = "applications", length = 2048)
     @Size(min = 1, max = 2048)
@@ -128,6 +123,14 @@ public class JobRequestEntity extends SetupFileEntity {
         orphanRemoval = true
     )
     private JobEntity job;
+
+    @OneToOne(
+        mappedBy = "request",
+        fetch = FetchType.LAZY,
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    private JobRequestMetadataEntity jobRequestMetadata;
 
     /**
      * Gets the group name of the user who submitted the job.
@@ -282,24 +285,6 @@ public class JobRequestEntity extends SetupFileEntity {
     }
 
     /**
-     * Gets client hostname from which this job is run.
-     *
-     * @return clientHost
-     */
-    public String getClientHost() {
-        return this.clientHost;
-    }
-
-    /**
-     * Set the client host for the job.
-     *
-     * @param clientHost The client host name.
-     */
-    public void setClientHost(final String clientHost) {
-        this.clientHost = clientHost;
-    }
-
-    /**
      * Gets the command criteria which was specified to pick a command to run
      * the job.
      *
@@ -429,6 +414,16 @@ public class JobRequestEntity extends SetupFileEntity {
     public void setJob(@NotNull final JobEntity job) {
         this.job = job;
         job.setRequest(this);
+    }
+
+    /**
+     * Set the additional metadata for this request.
+     *
+     * @param jobRequestMetadata The metadata
+     */
+    public void setJobRequestMetadata(@NotNull final JobRequestMetadataEntity jobRequestMetadata) {
+        this.jobRequestMetadata = jobRequestMetadata;
+        this.jobRequestMetadata.setRequest(this);
     }
 
     /**

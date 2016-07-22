@@ -20,6 +20,8 @@ package com.netflix.genie.core.jobs.workflow.impl;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.spectator.api.Registry;
+import com.netflix.spectator.api.Timer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.Executor;
@@ -53,12 +55,16 @@ public class JobKickoffTaskUnitTests {
      */
     @Before
     public void setUp() {
+        final Registry registry = Mockito.mock(Registry.class);
+        final Timer timer = Mockito.mock(Timer.class);
+        Mockito.when(registry.timer("genie.jobs.tasks.jobKickoffTask.timer")).thenReturn(timer);
         this.executor = Mockito.mock(Executor.class);
         jobKickoffTask = new JobKickoffTask(
             false,
             false,
             this.executor,
-            "localhost"
+            "localhost",
+            registry
         );
     }
 
@@ -70,7 +76,6 @@ public class JobKickoffTaskUnitTests {
      */
     @Test
     public void testChangeOwnershipOfDirectoryMethodSuccess() throws IOException, GenieException {
-
         final String user = "user";
         final String dir = "dir";
         final ArgumentCaptor<CommandLine> argumentCaptor = ArgumentCaptor.forClass(CommandLine.class);
@@ -92,15 +97,11 @@ public class JobKickoffTaskUnitTests {
      */
     @Test(expected = GenieServerException.class)
     public void testChangeOwnershipOfDirectoryMethodFailure() throws IOException, GenieException {
-
         final String user = "user";
         final String dir = "dir";
 
-        Mockito.when(this.executor.execute(Mockito.any())).thenThrow(IOException.class);
-        this.jobKickoffTask.changeOwnershipOfDirectory(
-            dir,
-            user
-        );
+        Mockito.when(this.executor.execute(Mockito.any(CommandLine.class))).thenThrow(new IOException());
+        this.jobKickoffTask.changeOwnershipOfDirectory(dir, user);
     }
 
     /**
@@ -111,16 +112,12 @@ public class JobKickoffTaskUnitTests {
      */
     @Test
     public void testCreateUserMethodSuccessAlreadyExists() throws IOException, GenieException {
-
         final String user = "user";
         final String group = "group";
         final ArgumentCaptor<CommandLine> argumentCaptor = ArgumentCaptor.forClass(CommandLine.class);
         final List<String> command = Arrays.asList("id", "-u", user);
 
-        this.jobKickoffTask.createUser(
-            user,
-            group
-        );
+        this.jobKickoffTask.createUser(user, group);
         Mockito.verify(this.executor).execute(argumentCaptor.capture());
         Assert.assertArrayEquals(command.toArray(), argumentCaptor.getValue().toStrings());
     }
@@ -133,7 +130,6 @@ public class JobKickoffTaskUnitTests {
      */
     @Test
     public void testCreateUserMethodSuccessDoesNotExist1() throws IOException, GenieException {
-
         final String user = "user";
         final String group = "group";
 
@@ -141,16 +137,13 @@ public class JobKickoffTaskUnitTests {
         idCheckCommandLine.addArgument("-u");
         idCheckCommandLine.addArgument(user);
 
-        Mockito.when(this.executor.execute(Mockito.any())).thenThrow(IOException.class);
+        Mockito.when(this.executor.execute(Mockito.any(CommandLine.class))).thenThrow(new IOException());
 
         final ArgumentCaptor<CommandLine> argumentCaptor = ArgumentCaptor.forClass(CommandLine.class);
         final List<String> command = Arrays.asList("sudo", "useradd", user, "-G", group, "-M");
 
         try {
-            this.jobKickoffTask.createUser(
-                user,
-                group
-            );
+            this.jobKickoffTask.createUser(user, group);
         } catch (GenieException ge) {
             log.debug("Ignoring exception to capture arguments.");
         }
@@ -167,11 +160,10 @@ public class JobKickoffTaskUnitTests {
      */
     @Test(expected = GenieServerException.class)
     public void testCreateUserMethodSuccessDoesNotExist2() throws IOException, GenieException {
-
         final String user = "user";
         final String group = "group";
 
-        Mockito.when(this.executor.execute(Mockito.any())).thenThrow(IOException.class);
+        Mockito.when(this.executor.execute(Mockito.any(CommandLine.class))).thenThrow(new IOException());
         this.jobKickoffTask.createUser(
             user,
             group

@@ -20,6 +20,7 @@ package com.netflix.genie.core.services;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
+import com.netflix.genie.common.dto.JobRequestMetadata;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import org.hibernate.validator.constraints.NotBlank;
@@ -78,12 +79,15 @@ public interface JobPersistenceService {
      * Save the jobRequest object in the data store.
      *
      * @param jobRequest the Job request object to save. Not null
-     * @param clientHost the host of the client that sent the request. Can be null.
+     * @param jobRequestMetadata metadata about the job request. Not null
      *
      * @return The job request object that was created
      * @throws GenieException if there is an error
      */
-    JobRequest createJobRequest(@NotNull final JobRequest jobRequest, final String clientHost) throws GenieException;
+    JobRequest createJobRequest(
+        @NotNull final JobRequest jobRequest,
+        @NotNull final JobRequestMetadata jobRequestMetadata
+    ) throws GenieException;
 
     /**
      * Save the jobExecution object in the data store.

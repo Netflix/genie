@@ -280,7 +280,6 @@ CREATE TABLE job_requests (
   tags VARCHAR(2048) DEFAULT NULL,
   cpu INT NOT NULL DEFAULT 1,
   memory INT NOT NULL DEFAULT 1560,
-  client_host VARCHAR(255) DEFAULT NULL,
   applications VARCHAR(2048) NOT NULL DEFAULT '[]',
   timeout INT NOT NULL DEFAULT 604800,
   PRIMARY KEY (id)
@@ -309,8 +308,7 @@ INSERT INTO job_requests (
   email,
   tags,
   cpu,
-  memory,
-  client_host
+  memory
 ) SELECT
   j.id,
   j.created,
@@ -335,8 +333,7 @@ INSERT INTO job_requests (
     GROUP BY job_id
   ),
   1,
-  1560,
-  j.clientHost
+  1560
   FROM jobs j;
 SELECT CURRENT_TIMESTAMP, 'Successfully inserted values into job_requests table.';
 
@@ -391,6 +388,30 @@ SELECT CURRENT_TIMESTAMP, 'Successfully converted dependencies to JSON in job_re
 SELECT CURRENT_TIMESTAMP, 'Attempting to make dependencies field not null in job_requests table...';
 ALTER TABLE job_requests ALTER COLUMN dependencies SET NOT NULL;;
 SELECT CURRENT_TIMESTAMP, 'Successfully made dependencies field not null in job_requests table.';
+
+SELECT CURRENT_TIMESTAMP, 'Creating the job_request_metadata table...';
+CREATE TABLE job_request_metadata (
+  id VARCHAR(255) NOT NULL,
+  created TIMESTAMP(3) WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated TIMESTAMP(3) WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  entity_version INT NOT NULL DEFAULT 0,
+  client_host VARCHAR(255) DEFAULT NULL,
+  user_agent VARCHAR(2048) DEFAULT NULL,
+  num_attachments INT NOT NULL DEFAULT 0,
+  total_size_of_attachments BIGINT NOT NULL DEFAULT 0,
+  FOREIGN KEY (id) REFERENCES job_requests (id) ON DELETE CASCADE
+);
+SELECT CURRENT_TIMESTAMP, 'Successfully created the job_request_metadata table.';
+
+SELECT CURRENT_TIMESTAMP, 'Inserting values into job_request_metadata from the jobs table...';
+INSERT INTO job_request_metadata (
+  id,
+  created,
+  updated,
+  entity_version,
+  client_host
+) SELECT id, created, updated, entityVersion, clientHost FROM jobs;
+SELECT CURRENT_TIMESTAMP, 'Successfully inserted values into the job_requests_metadata table.';
 
 SELECT CURRENT_TIMESTAMP, 'Creating the job_executions table...';
 CREATE TABLE job_executions (
