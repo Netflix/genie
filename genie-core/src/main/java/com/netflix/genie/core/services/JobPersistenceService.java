@@ -25,6 +25,7 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import org.hibernate.validator.constraints.NotBlank;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
@@ -48,7 +49,7 @@ public interface JobPersistenceService {
     /**
      * Update the status and status message of the job.
      *
-     * @param id The id of the job to update the status for.
+     * @param id        The id of the job to update the status for.
      * @param jobStatus The updated status of the job.
      * @param statusMsg The updated status message of the job.
      * @throws GenieException if there is an error
@@ -62,9 +63,9 @@ public interface JobPersistenceService {
     /**
      * Update the job with the various resources used to run the job including the cluster, command and applications.
      *
-     * @param jobId The id of the job to update
-     * @param clusterId The id of the cluster the job runs on
-     * @param commandId The id of the command the job runs with
+     * @param jobId          The id of the job to update
+     * @param clusterId      The id of the cluster the job runs on
+     * @param commandId      The id of the command the job runs with
      * @param applicationIds The ids of the applications used to run the job
      * @throws GenieException For any problems while updating
      */
@@ -78,9 +79,8 @@ public interface JobPersistenceService {
     /**
      * Save the jobRequest object in the data store.
      *
-     * @param jobRequest the Job request object to save. Not null
+     * @param jobRequest         the Job request object to save. Not null
      * @param jobRequestMetadata metadata about the job request. Not null
-     *
      * @return The job request object that was created
      * @throws GenieException if there is an error
      */
@@ -100,11 +100,13 @@ public interface JobPersistenceService {
     /**
      * Method to set exit code for the job execution.
      *
-     * @param id the id of the job to update the exit code
+     * @param id       the id of the job to update the exit code
      * @param exitCode The exit code of the process
+     * @return The final job status corresponding to this exit code or null if no change based on exit code
      * @throws GenieException if there is an error
      */
-    void setExitCode(@NotBlank final String id, @NotBlank final int exitCode) throws GenieException;
+    @Nullable
+    JobStatus setExitCode(@NotBlank final String id, @NotBlank final int exitCode) throws GenieException;
 
     /**
      * This method will delete all jobs whose created time is less than date.

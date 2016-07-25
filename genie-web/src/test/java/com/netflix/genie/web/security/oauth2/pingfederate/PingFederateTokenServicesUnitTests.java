@@ -17,18 +17,27 @@
  */
 package com.netflix.genie.web.security.oauth2.pingfederate;
 
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.spectator.api.Counter;
+import com.netflix.spectator.api.Id;
+import com.netflix.spectator.api.Registry;
+import com.netflix.spectator.api.Timer;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -39,11 +48,14 @@ import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.OAuth2Request;
 import org.springframework.security.oauth2.provider.token.AccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConverter;
-import org.springframework.web.client.RestOperations;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Unit tests for PingFederateTokenServices.
@@ -54,11 +66,23 @@ import java.util.UUID;
 @Category(UnitTest.class)
 public class PingFederateTokenServicesUnitTests {
 
+    private static final int MOCK_PORT = 8089;
     private static final String CLIENT_ID = UUID.randomUUID().toString();
     private static final String CLIENT_SECRET = UUID.randomUUID().toString();
     private static final String CHECK_TOKEN_ENDPOINT_URL = UUID.randomUUID().toString();
 
+    /**
+     * Create a mock server.
+     */
+    @Rule
+    @SuppressFBWarnings("URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD")
+    public WireMockRule wireMockRule = new WireMockRule(MOCK_PORT);
+
     private ResourceServerProperties resourceServerProperties;
+    private Registry registry;
+    private Id validationError;
+    private Timer authenticationTimer;
+    private Timer pingFederateAPITimer;
 
     /**
      * Setup for the tests.
@@ -67,6 +91,17 @@ public class PingFederateTokenServicesUnitTests {
     public void setup() {
         this.resourceServerProperties = new ResourceServerProperties(CLIENT_ID, CLIENT_SECRET);
         this.resourceServerProperties.setTokenInfoUri(CHECK_TOKEN_ENDPOINT_URL);
+        this.registry = Mockito.mock(Registry.class);
+        this.validationError = Mockito.mock(Id.class);
+        this.authenticationTimer = Mockito.mock(Timer.class);
+        this.pingFederateAPITimer = Mockito.mock(Timer.class);
+        Mockito.when(this.registry.createId(Mockito.anyString())).thenReturn(this.validationError);
+        Mockito
+            .when(this.registry.timer(PingFederateTokenServices.AUTHENTICATION_TIMER_NAME))
+            .thenReturn(this.authenticationTimer);
+        Mockito
+            .when(this.registry.timer(PingFederateTokenServices.API_TIMER_NAME))
+            .thenReturn(this.pingFederateAPITimer);
     }
 
     /**
@@ -76,13 +111,13 @@ public class PingFederateTokenServicesUnitTests {
     public void canConstruct() {
         final AccessTokenConverter converter = new DefaultAccessTokenConverter();
         final PingFederateTokenServices services
-            = new PingFederateTokenServices(this.resourceServerProperties, converter);
+            = new PingFederateTokenServices(this.resourceServerProperties, converter, this.registry);
 
         Assert.assertThat(services.getAccessTokenConverter(), Matchers.is(converter));
         Assert.assertThat(services.getCheckTokenEndpointUrl(), Matchers.is(CHECK_TOKEN_ENDPOINT_URL));
         Assert.assertThat(services.getClientId(), Matchers.is(CLIENT_ID));
         Assert.assertThat(services.getClientSecret(), Matchers.is(CLIENT_SECRET));
-        Assert.assertNotNull(services.getRestOperations());
+        Assert.assertNotNull(services.getRestTemplate());
     }
 
     /**
@@ -92,7 +127,7 @@ public class PingFederateTokenServicesUnitTests {
     public void cantConstructWithoutClientId() {
         final ResourceServerProperties properties = new ResourceServerProperties(null, null);
         final AccessTokenConverter converter = new DefaultAccessTokenConverter();
-        new PingFederateTokenServices(properties, converter);
+        new PingFederateTokenServices(properties, converter, this.registry);
     }
 
     /**
@@ -102,7 +137,7 @@ public class PingFederateTokenServicesUnitTests {
     public void cantConstructWithoutClientSecret() {
         final ResourceServerProperties properties = new ResourceServerProperties("AnID", null);
         final AccessTokenConverter converter = new DefaultAccessTokenConverter();
-        new PingFederateTokenServices(properties, converter);
+        new PingFederateTokenServices(properties, converter, this.registry);
     }
 
     /**
@@ -112,7 +147,7 @@ public class PingFederateTokenServicesUnitTests {
     public void cantConstructWithoutCheckTokenURL() {
         this.resourceServerProperties.setTokenInfoUri(null);
         final AccessTokenConverter converter = new DefaultAccessTokenConverter();
-        new PingFederateTokenServices(this.resourceServerProperties, converter);
+        new PingFederateTokenServices(this.resourceServerProperties, converter, this.registry);
     }
 
     /**
@@ -121,10 +156,10 @@ public class PingFederateTokenServicesUnitTests {
     @Test
     public void canLoadAuthentication() {
         final AccessTokenConverter converter = Mockito.mock(AccessTokenConverter.class);
-        final RestOperations restOperations = Mockito.mock(RestOperations.class);
+        final RestTemplate restTemplate = Mockito.mock(RestTemplate.class);
         final PingFederateTokenServices services
-            = new PingFederateTokenServices(this.resourceServerProperties, converter);
-        services.setRestOperations(restOperations);
+            = new PingFederateTokenServices(this.resourceServerProperties, converter, this.registry);
+        services.setRestTemplate(restTemplate);
         final String accessToken = UUID.randomUUID().toString();
 
         final String clientId = UUID.randomUUID().toString();
@@ -142,7 +177,7 @@ public class PingFederateTokenServicesUnitTests {
         final ResponseEntity<Map> response = Mockito.mock(ResponseEntity.class);
 
         Mockito.when(
-            restOperations.exchange(
+            restTemplate.exchange(
                 Mockito.eq(CHECK_TOKEN_ENDPOINT_URL),
                 Mockito.eq(HttpMethod.POST),
                 Mockito.any(HttpEntity.class),
@@ -176,6 +211,12 @@ public class PingFederateTokenServicesUnitTests {
         Assert.assertThat(result.getAuthorities().size(), Matchers.is(2));
         Assert.assertTrue(result.getAuthorities().contains(scope1Authority));
         Assert.assertTrue(result.getAuthorities().contains(scope2Authority));
+        Mockito
+            .verify(this.authenticationTimer, Mockito.times(1))
+            .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+        Mockito
+            .verify(this.pingFederateAPITimer, Mockito.times(1))
+            .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
     }
 
     /**
@@ -184,10 +225,10 @@ public class PingFederateTokenServicesUnitTests {
     @Test(expected = InvalidTokenException.class)
     public void cantLoadAuthenticationOnError() {
         final AccessTokenConverter converter = Mockito.mock(AccessTokenConverter.class);
-        final RestOperations restOperations = Mockito.mock(RestOperations.class);
+        final RestTemplate restTemplate = Mockito.mock(RestTemplate.class);
         final PingFederateTokenServices services
-            = new PingFederateTokenServices(this.resourceServerProperties, converter);
-        services.setRestOperations(restOperations);
+            = new PingFederateTokenServices(this.resourceServerProperties, converter, this.registry);
+        services.setRestTemplate(restTemplate);
         final String accessToken = UUID.randomUUID().toString();
 
         final Map<String, Object> map = Maps.newHashMap();
@@ -197,7 +238,7 @@ public class PingFederateTokenServicesUnitTests {
         final ResponseEntity<Map> response = Mockito.mock(ResponseEntity.class);
 
         Mockito.when(
-            restOperations.exchange(
+            restTemplate.exchange(
                 Mockito.eq(CHECK_TOKEN_ENDPOINT_URL),
                 Mockito.eq(HttpMethod.POST),
                 Mockito.any(HttpEntity.class),
@@ -212,6 +253,41 @@ public class PingFederateTokenServicesUnitTests {
     }
 
     /**
+     * Make sure rest call failures are handled.
+     */
+    @Test
+    public void cantLoadAuthenticationOnRestError() {
+        final String path = UUID.randomUUID().toString();
+        final String uri = "http://localhost:" + MOCK_PORT + "/" + path;
+        final int status = HttpStatus.INTERNAL_SERVER_ERROR.value();
+        WireMock.post(WireMock.urlEqualTo(uri)).willReturn(WireMock.aResponse().withStatus(status));
+        final AccessTokenConverter converter = Mockito.mock(AccessTokenConverter.class);
+        this.resourceServerProperties = new ResourceServerProperties(CLIENT_ID, CLIENT_SECRET);
+        // Some resource no one should ever have
+        this.resourceServerProperties.setTokenInfoUri(uri);
+        final PingFederateTokenServices services
+            = new PingFederateTokenServices(this.resourceServerProperties, converter, this.registry);
+        final String accessToken = UUID.randomUUID().toString();
+        final Counter restErrorCounter = Mockito.mock(Counter.class);
+        final Id finalValidationId = Mockito.mock(Id.class);
+        Mockito
+            .when(this.validationError.withTag(
+                Mockito.anyString(),
+                Mockito.eq(Integer.toString(status)))
+            )
+            .thenReturn(finalValidationId);
+        Mockito.when(this.registry.counter(finalValidationId)).thenReturn(restErrorCounter);
+
+        // Should throw exception based on error key being present
+        try {
+            services.loadAuthentication(accessToken);
+            Assert.fail();
+        } catch (final HttpClientErrorException | HttpServerErrorException e) {
+            Mockito.verify(restErrorCounter, Mockito.times(1)).increment();
+        }
+    }
+
+    /**
      * This method isn't implemented for Ping Federate currently. Make sure this fails in case we ever implement it
      * and need to update the tests.
      */
@@ -219,7 +295,7 @@ public class PingFederateTokenServicesUnitTests {
     public void cantReadAccessToken() {
         final AccessTokenConverter converter = new DefaultAccessTokenConverter();
         final PingFederateTokenServices services
-            = new PingFederateTokenServices(this.resourceServerProperties, converter);
+            = new PingFederateTokenServices(this.resourceServerProperties, converter, this.registry);
         services.readAccessToken(UUID.randomUUID().toString());
     }
 }

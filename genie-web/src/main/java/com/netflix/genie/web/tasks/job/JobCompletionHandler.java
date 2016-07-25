@@ -32,6 +32,7 @@ import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.MailService;
 import com.netflix.genie.core.services.impl.GenieFileTransferService;
 import com.netflix.spectator.api.Counter;
+import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Registry;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.CommandLine;
@@ -45,9 +46,11 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -61,6 +64,9 @@ import java.util.stream.Collectors;
 @Component
 public class JobCompletionHandler {
 
+    private static final String STATUS_TAG = "status";
+    private static final String ERROR_TAG = "error";
+
     private final JobPersistenceService jobPersistenceService;
     private final JobSearchService jobSearchService;
     private final GenieFileTransferService genieFileTransferService;
@@ -72,6 +78,8 @@ public class JobCompletionHandler {
     private final boolean isRunAsUserEnabled;
 
     // Metrics
+    private final Registry registry;
+    private final Id jobCompletionId;
     private final Counter emailSuccessRate;
     private final Counter emailFailureRate;
     private final Counter archivalFailureRate;
@@ -128,6 +136,8 @@ public class JobCompletionHandler {
         }
 
         // Set up the metrics
+        this.registry = registry;
+        this.jobCompletionId = registry.createId("genie.jobs.completion.timer");
         this.emailSuccessRate = registry.counter("genie.jobs.email.success.rate");
         this.emailFailureRate = registry.counter("genie.jobs.email.failure.rate");
         this.archivalFailureRate = registry.counter("genie.jobs.archivalFailure.rate");
@@ -146,48 +156,76 @@ public class JobCompletionHandler {
      */
     @EventListener
     public void handleJobCompletion(final JobFinishedEvent event) throws GenieException {
-        final String jobId = event.getId();
-        // TODO: What if there is an exception thrown here? Everything is missed
-        final Job job = this.jobSearchService.getJob(jobId);
-        final JobStatus status = job.getStatus();
+        final long start = System.nanoTime();
+        Id timerId = null;
+        try {
+            final String jobId = event.getId();
+            // TODO: What if there is an exception thrown here? Everything is missed
+            final Job job = this.jobSearchService.getJob(jobId);
+            final JobStatus status = job.getStatus();
 
-        // Make sure the job isn't already done before doing something
-        if (status != JobStatus.FAILED
-            && status != JobStatus.INVALID
-            && status != JobStatus.KILLED
-            && status != JobStatus.SUCCEEDED) {
-            // Now we know this job should be marked in one of the finished states
-            if (status == JobStatus.INIT) {
-                try {
-                    switch (event.getReason()) {
-                        case KILLED:
-                            this.jobPersistenceService.updateJobStatus(jobId, JobStatus.KILLED, event.getMessage());
-                            break;
-                        case INVALID:
-                            this.jobPersistenceService.updateJobStatus(jobId, JobStatus.INVALID, event.getMessage());
-                            break;
-                        case FAILED_TO_INIT:
-                            this.jobPersistenceService.updateJobStatus(jobId, JobStatus.FAILED, event.getMessage());
-                            break;
-                        case PROCESS_COMPLETED:
-                            this.jobPersistenceService.updateJobStatus(jobId, JobStatus.SUCCEEDED, event.getMessage());
-                            break;
-                        default:
-                            log.error("Unknown case: " + event.getReason());
-                            this.finalStatusUpdateFailureRate.increment();
-                            break;
+            // Make sure the job isn't already done before doing something
+            if (status != JobStatus.FAILED
+                && status != JobStatus.INVALID
+                && status != JobStatus.KILLED
+                && status != JobStatus.SUCCEEDED) {
+                // Now we know this job should be marked in one of the finished states
+                if (status == JobStatus.INIT) {
+                    try {
+                        switch (event.getReason()) {
+                            case KILLED:
+                                this.jobPersistenceService.updateJobStatus(
+                                    jobId, JobStatus.KILLED, event.getMessage()
+                                );
+                                timerId = this.jobCompletionId.withTag(STATUS_TAG, JobStatus.KILLED.toString());
+                                break;
+                            case INVALID:
+                                this.jobPersistenceService.updateJobStatus(
+                                    jobId, JobStatus.INVALID, event.getMessage()
+                                );
+                                timerId = this.jobCompletionId.withTag(STATUS_TAG, JobStatus.INVALID.toString());
+                                break;
+                            case FAILED_TO_INIT:
+                                this.jobPersistenceService.updateJobStatus(
+                                    jobId, JobStatus.FAILED, event.getMessage()
+                                );
+                                timerId = this.jobCompletionId.withTag(STATUS_TAG, JobStatus.FAILED.toString());
+                                break;
+                            case PROCESS_COMPLETED:
+                                this.jobPersistenceService.updateJobStatus(
+                                    jobId, JobStatus.SUCCEEDED, event.getMessage()
+                                );
+                                timerId = this.jobCompletionId.withTag(STATUS_TAG, JobStatus.SUCCEEDED.toString());
+                                break;
+                            default:
+                                log.error("Unknown case: " + event.getReason());
+                                this.finalStatusUpdateFailureRate.increment();
+                                timerId = this.jobCompletionId
+                                    .withTag(STATUS_TAG, "exception")
+                                    .withTag(ERROR_TAG, event.getReason().toString());
+                                break;
+                        }
+                    } catch (final GenieException ge) {
+                        this.finalStatusUpdateFailureRate.increment();
                     }
-                } catch (final GenieException ge) {
-                    this.finalStatusUpdateFailureRate.increment();
+                } else if (status == JobStatus.RUNNING) {
+                    final JobStatus finalStatus = this.updateFinalStatusForJob(jobId);
+                    if (finalStatus != null) {
+                        timerId = this.jobCompletionId.withTag(STATUS_TAG, finalStatus.toString());
+                    }
+                    this.cleanupProcesses(jobId);
                 }
-            } else if (status == JobStatus.RUNNING) {
-                this.updateFinalStatusForJob(jobId);
-                this.cleanupProcesses(jobId);
-            }
 
-            // Things that should be done either way
-            this.processJobDir(jobId);
-            this.sendEmail(jobId);
+                // Things that should be done either way
+                this.processJobDir(jobId);
+                this.sendEmail(jobId);
+            }
+        } finally {
+            final long finish = System.nanoTime();
+            if (timerId == null) {
+                timerId = this.jobCompletionId.withTag(STATUS_TAG, "error").withTag(ERROR_TAG, "Unknown");
+            }
+            this.registry.timer(timerId).record(finish - start, TimeUnit.NANOSECONDS);
         }
     }
 
@@ -223,9 +261,11 @@ public class JobCompletionHandler {
      * Updates the status of the job.
      *
      * @param jobId The job id.
+     * @return the final job status
      * @throws GenieException If there is any problem
      */
-    private void updateFinalStatusForJob(final String jobId) throws GenieException {
+    @Nullable
+    private JobStatus updateFinalStatusForJob(final String jobId) throws GenieException {
         try {
             log.debug("Updating the status of the job.");
 
@@ -240,7 +280,7 @@ public class JobCompletionHandler {
                 final int exitCode = jobDoneFile.getExitCode();
 
                 // This method internally also updates the status according to the exit code.
-                this.jobPersistenceService.setExitCode(jobId, exitCode);
+                return this.jobPersistenceService.setExitCode(jobId, exitCode);
             } catch (final IOException ioe) {
                 this.doneFileProcessingFailureRate.increment();
                 // The run.sh should theoretically ALWAYS generate a done file so we should never hit this code.
@@ -251,10 +291,12 @@ public class JobCompletionHandler {
                     JobStatus.FAILED,
                     "Genie could not load done file."
                 );
+                return JobStatus.FAILED;
             }
         } catch (final Exception e) {
             log.error("Could not update the exit code and status for job: {}", jobId, e);
             this.finalStatusUpdateFailureRate.increment();
+            throw e;
         }
     }
 
