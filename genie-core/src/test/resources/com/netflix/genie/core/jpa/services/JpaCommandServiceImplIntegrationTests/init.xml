@@ -24,7 +24,7 @@
             version="1.2.3"
             status="ACTIVE"
             entity_version="0"
-            tags="genie.id:app1|genie.name:tez|prod|yarn"
+            tags="|genie.id:app1||genie.name:tez||prod||yarn|"
     />
     <application_configs
             application_id="app1"
@@ -50,7 +50,7 @@
             check_delay="18000"
             status="ACTIVE"
             entity_version="0"
-            tags="genie.id:command1|genie.name:pig_13_prod|pig|prod|tez"
+            tags="|genie.id:command1||genie.name:pig_13_prod||pig||prod||tez|"
     />
     <command_configs
             command_id="command1"
@@ -70,7 +70,7 @@
             check_delay="19000"
             status="INACTIVE"
             entity_version="0"
-            tags="genie.id:command2|genie.name:hive_11_prod|hive|prod"
+            tags="|genie.id:command2||genie.name:hive_11_prod||hive||prod|"
     />
     <command_configs
             command_id="command2"
@@ -87,7 +87,7 @@
             check_delay="20000"
             status="DEPRECATED"
             entity_version="0"
-            tags="deprecated|genie.id:command3|genie.name:pig_11_prod|pig|prod"
+            tags="|deprecated||genie.id:command3||genie.name:pig_11_prod||pig||prod|"
     />
     <command_configs
             command_id="command3"
@@ -102,7 +102,7 @@
             version="2.4.0"
             status="UP"
             entity_version="0"
-            tags="genie.id:cluster1|genie.name:h2prod|hive|pig|prod"
+            tags="|genie.id:cluster1||genie.name:h2prod||hive||pig||prod|"
     />
     <cluster_configs
             cluster_id="cluster1"

@@ -18,6 +18,8 @@
 package com.netflix.genie.web.security.saml;
 
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.spectator.api.Registry;
+import com.netflix.spectator.api.Timer;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -30,6 +32,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.saml.SAMLCredential;
 
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Tests for the SAMLUserDetailsImpl class. Makes sure we're pulling the right attributes and authorities from the
@@ -49,6 +52,7 @@ public class SAMLUserDetailsServiceImplUnitTests {
     private static final String[] GROUPS = {UUID.randomUUID().toString(), ADMIN_GROUP, UUID.randomUUID().toString()};
 
     private SAMLUserDetailsServiceImpl service;
+    private Timer loadAuthenticationTimer;
 
     /**
      * Setup the tests.
@@ -65,7 +69,10 @@ public class SAMLUserDetailsServiceImplUnitTests {
         groups.setAdmin(ADMIN_GROUP);
         attributes.setGroups(groups);
         samlProperties.setAttributes(attributes);
-        this.service = new SAMLUserDetailsServiceImpl(samlProperties);
+        this.loadAuthenticationTimer = Mockito.mock(Timer.class);
+        final Registry registry = Mockito.mock(Registry.class);
+        Mockito.when(registry.timer(Mockito.anyString())).thenReturn(this.loadAuthenticationTimer);
+        this.service = new SAMLUserDetailsServiceImpl(samlProperties, registry);
     }
 
     /**
@@ -74,6 +81,9 @@ public class SAMLUserDetailsServiceImplUnitTests {
     @Test(expected = UsernameNotFoundException.class)
     public void doesThrowErrorOnNullCredential() {
         this.service.loadUserBySAML(null);
+        Mockito
+            .verify(this.loadAuthenticationTimer, Mockito.times(1))
+            .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
     }
 
     /**
@@ -84,6 +94,9 @@ public class SAMLUserDetailsServiceImplUnitTests {
         final SAMLCredential credential = Mockito.mock(SAMLCredential.class);
         Mockito.when(credential.getAttributeAsString(Mockito.eq(USER_ATTRIBUTE_NAME))).thenReturn(null);
         this.service.loadUserBySAML(credential);
+        Mockito
+            .verify(this.loadAuthenticationTimer, Mockito.times(1))
+            .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
     }
 
     /**
@@ -101,6 +114,9 @@ public class SAMLUserDetailsServiceImplUnitTests {
         final User user = (User) result;
         Assert.assertThat(user.getUsername(), Matchers.is(USER_ID));
         Assert.assertThat(user.getAuthorities(), Matchers.contains(new SimpleGrantedAuthority("ROLE_USER")));
+        Mockito
+            .verify(this.loadAuthenticationTimer, Mockito.times(1))
+            .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
     }
 
     /**
@@ -121,6 +137,9 @@ public class SAMLUserDetailsServiceImplUnitTests {
             user.getAuthorities(),
             Matchers.hasItems(new SimpleGrantedAuthority("ROLE_USER"), new SimpleGrantedAuthority("ROLE_ADMIN"))
         );
+        Mockito
+            .verify(this.loadAuthenticationTimer, Mockito.times(1))
+            .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
     }
 
     /**
@@ -146,5 +165,8 @@ public class SAMLUserDetailsServiceImplUnitTests {
             user.getAuthorities().size(),
             Matchers.is(1)
         );
+        Mockito
+            .verify(this.loadAuthenticationTimer, Mockito.times(1))
+            .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
     }
 }

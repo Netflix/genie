@@ -41,6 +41,7 @@ export default class SearchForm extends React.Component {
           formFields[field] = this.getFormState(nextProps).formFields[field];
         }
       }
+      console.log(formFields);
       this.setState({ formFields });
     }
   }
@@ -53,14 +54,15 @@ export default class SearchForm extends React.Component {
 
     for (const field of props.hiddenFormFields) {
       formFields[field.name] = field.value;
+
     }
 
     return {
       formFields,
-      sortOrder: 'desc',
-      linkText: 'more',
-      showAllFormFields : false,
-      hasHiddenFormFields: props.hiddenFormFields.length > 0,
+      sortOrder           : 'desc',
+      linkText            : 'more',
+      showAllFormFields   : false,
+      hasHiddenFormFields : props.hiddenFormFields.length > 0,
     };
   }
 
@@ -72,11 +74,13 @@ export default class SearchForm extends React.Component {
     }
   )
 
-  handleSelectChange = (val) => {
-    const { formFields } = this.state;
-    formFields.sort = val;
-    this.setState({ formFields });
-  }
+  handleSelectChange = (key) => (
+    (val) => {
+      const { formFields } = this.state;
+      formFields[`${key}`] = val;
+      this.setState({ formFields });
+    }
+  )
 
   handleSortOrderChange = (e) => {
     e.preventDefault();
@@ -153,13 +157,13 @@ export default class SearchForm extends React.Component {
                 case 'select':
                   return (
                     <div key={`${index}-div`} className="form-group">
-                      <label key={`${index}-label`} className="form-label">Sort by</label>
+                      <label key={`${index}-label`} className="form-label">{field.label}:</label>
                       <Select
                         multi
                         simpleValue
                         value={this.state.formFields[field.name]}
                         options={field.selectFields}
-                        onChange={this.handleSelectChange}
+                        onChange={this.handleSelectChange(field.name)}
                       />
                     </div>
                   );

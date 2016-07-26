@@ -20,6 +20,7 @@ package com.netflix.genie.web.tasks.leader;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.JobExecution;
+import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.services.JobPersistenceService;
@@ -96,7 +97,7 @@ public class ClusterCheckerTaskUnitTests {
     /**
      * Make sure run method works.
      *
-     * @throws IOException on error
+     * @throws IOException    on error
      * @throws GenieException on error
      */
     @Test
@@ -154,7 +155,12 @@ public class ClusterCheckerTaskUnitTests {
         Mockito
             .doThrow(new GenieServerException("blah"))
             .when(this.jobPersistenceService)
-            .setExitCode(job1Id, JobExecution.LOST_EXIT_CODE);
+            .setJobCompletionInformation(
+                Mockito.eq(job1Id),
+                Mockito.eq(JobExecution.LOST_EXIT_CODE),
+                Mockito.eq(JobStatus.FAILED),
+                Mockito.anyString()
+            );
 
         this.task.run();
         Assert.assertThat(this.task.getErrorCountsSize(), Matchers.is(2));
@@ -163,10 +169,34 @@ public class ClusterCheckerTaskUnitTests {
         this.task.run();
         Assert.assertThat(this.task.getErrorCountsSize(), Matchers.is(0));
 
-        Mockito.verify(this.jobPersistenceService, Mockito.times(1)).setExitCode(job1Id, JobExecution.LOST_EXIT_CODE);
-        Mockito.verify(this.jobPersistenceService, Mockito.times(1)).setExitCode(job2Id, JobExecution.LOST_EXIT_CODE);
-        Mockito.verify(this.jobPersistenceService, Mockito.times(1)).setExitCode(job3Id, JobExecution.LOST_EXIT_CODE);
-        Mockito.verify(this.jobPersistenceService, Mockito.times(1)).setExitCode(job4Id, JobExecution.LOST_EXIT_CODE);
+        Mockito.verify(this.jobPersistenceService, Mockito.times(1))
+            .setJobCompletionInformation(
+                Mockito.eq(job1Id),
+                Mockito.eq(JobExecution.LOST_EXIT_CODE),
+                Mockito.eq(JobStatus.FAILED),
+                Mockito.anyString()
+            );
+        Mockito.verify(this.jobPersistenceService, Mockito.times(1))
+            .setJobCompletionInformation(
+                Mockito.eq(job2Id),
+                Mockito.eq(JobExecution.LOST_EXIT_CODE),
+                Mockito.eq(JobStatus.FAILED),
+                Mockito.anyString()
+            );
+        Mockito.verify(this.jobPersistenceService, Mockito.times(1))
+            .setJobCompletionInformation(
+                Mockito.eq(job3Id),
+                Mockito.eq(JobExecution.LOST_EXIT_CODE),
+                Mockito.eq(JobStatus.FAILED),
+                Mockito.anyString()
+            );
+        Mockito.verify(this.jobPersistenceService, Mockito.times(1))
+            .setJobCompletionInformation(
+                Mockito.eq(job4Id),
+                Mockito.eq(JobExecution.LOST_EXIT_CODE),
+                Mockito.eq(JobStatus.FAILED),
+                Mockito.anyString()
+            );
         Mockito.verify(this.lostJobCounter, Mockito.times(3)).increment();
         Mockito.verify(this.unableToUpdateJobCounter, Mockito.times(1)).increment();
     }

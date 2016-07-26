@@ -74,6 +74,14 @@ class GenieBaseAdapter(object):
         """
 
     @raise_not_implemented
+    def get_log(self, *args, **kwargs):
+        """
+        This needs to be implemented by adapter.
+
+        Return the job's specified log.
+        """
+
+    @raise_not_implemented
     def get_genie_log(self, *args, **kwargs):
         """
         This needs to be implemented by adapter.

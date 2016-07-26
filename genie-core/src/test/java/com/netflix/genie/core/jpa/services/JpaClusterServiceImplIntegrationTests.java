@@ -21,10 +21,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseTearDown;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Cluster;
+import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
+import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;
@@ -262,22 +266,58 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
-     * Test the choseClusterForJob function.
+     * Test the choseClusterForJobRequest function.
      *
      * @throws GenieException For any problem
      */
-    @Ignore
     @Test
     public void testChooseClusterForJob() throws GenieException {
-//        final List<Cluster> clusters = this.service.chooseClusterForJob(JOB_1_ID);
-//        Assert.assertEquals(1, clusters.size());
-//        Assert.assertEquals(CLUSTER_1_ID, clusters.get(0).getId());
-//        final JobEntity jobEntity = this.jpaJobRepository.findOne(JOB_1_ID);
-//        final String chosen = jobEntity.getChosenClusterCriteriaString();
-//        Assert.assertEquals(8, chosen.length());
-//        Assert.assertTrue(chosen.contains("prod"));
-//        Assert.assertTrue(chosen.contains("pig"));
-//        Assert.assertTrue(chosen.contains(","));
+        final JobRequest one = new JobRequest.Builder(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            Lists.newArrayList(new ClusterCriteria(Sets.newHashSet("genie.id:cluster1"))),
+            Sets.newHashSet("pig")
+        ).build();
+        final JobRequest two = new JobRequest.Builder(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            Lists.newArrayList(new ClusterCriteria(Sets.newHashSet("genie.id:cluster"))),
+            Sets.newHashSet("pig")
+        ).build();
+        final JobRequest three = new JobRequest.Builder(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            Lists.newArrayList(new ClusterCriteria(Sets.newHashSet("genie.id:cluster1"))),
+            Sets.newHashSet("pi")
+        ).build();
+        final JobRequest four = new JobRequest.Builder(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            Lists.newArrayList(new ClusterCriteria(Sets.newHashSet("pig"))),
+            Sets.newHashSet("pig")
+        ).build();
+        final JobRequest five = new JobRequest.Builder(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            Lists.newArrayList(new ClusterCriteria(Sets.newHashSet("pig", "hive"))),
+            Sets.newHashSet("pig")
+        ).build();
+
+        Assert.assertThat(this.service.chooseClusterForJobRequest(one).size(), Matchers.is(1));
+        Assert.assertThat(this.service.chooseClusterForJobRequest(two).size(), Matchers.is(0));
+        Assert.assertThat(this.service.chooseClusterForJobRequest(three).size(), Matchers.is(0));
+        Assert.assertThat(this.service.chooseClusterForJobRequest(four).size(), Matchers.is(2));
+        Assert.assertThat(this.service.chooseClusterForJobRequest(five).size(), Matchers.is(2));
     }
 
     // TODO Add tests where jobRequest object is
@@ -488,7 +528,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
      * Test to patch a cluster.
      *
      * @throws GenieException For any problem
-     * @throws IOException For Json serialization problem
+     * @throws IOException    For Json serialization problem
      */
     @Test
     public void testPatchCluster() throws GenieException, IOException {

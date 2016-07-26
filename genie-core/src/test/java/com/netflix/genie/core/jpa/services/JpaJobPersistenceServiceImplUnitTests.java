@@ -562,6 +562,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
     @Test(expected = GenieNotFoundException.class)
     public void testSetExitCodeJobDoesNotExist() throws GenieException {
         Mockito.when(this.jobExecutionRepo.findOne(Mockito.eq(JOB_1_ID))).thenReturn(null);
-        this.jobPersistenceService.setExitCode(JOB_1_ID, 0);
+        this.jobPersistenceService
+            .setJobCompletionInformation(JOB_1_ID, 0, JobStatus.FAILED, UUID.randomUUID().toString());
     }
 }

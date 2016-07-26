@@ -15,8 +15,8 @@ export default class ApplicationDetails extends React.Component {
     super(props);
     this.state = {
       application: {
-        configs: [],
-        dependencies: [],
+        configs      : [],
+        dependencies : [],
       },
       commands: [],
     };
@@ -37,8 +37,8 @@ export default class ApplicationDetails extends React.Component {
 
     $.when(fetch(applicationUrl), fetch(commandsUrl)).done((application, commands) => {
       this.setState({
-        application: application[0],
-        commands: commands[0],
+        application : application[0],
+        commands    : commands[0],
       });
     });
   }
