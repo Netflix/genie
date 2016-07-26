@@ -25,7 +25,6 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import org.hibernate.validator.constraints.NotBlank;
 
-import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
@@ -98,15 +97,20 @@ public interface JobPersistenceService {
     void createJobExecution(@NotNull final JobExecution jobExecution) throws GenieException;
 
     /**
-     * Method to set exit code for the job execution.
+     * Method to set all job completion information for a job execution.
      *
-     * @param id       the id of the job to update the exit code
-     * @param exitCode The exit code of the process
-     * @return The final job status corresponding to this exit code or null if no change based on exit code
+     * @param id            the id of the job to update the exit code
+     * @param exitCode      The exit code of the process
+     * @param status        The final job status for the job
+     * @param statusMessage The final job status message
      * @throws GenieException if there is an error
      */
-    @Nullable
-    JobStatus setExitCode(@NotBlank final String id, @NotBlank final int exitCode) throws GenieException;
+    void setJobCompletionInformation(
+        @NotBlank final String id,
+        final int exitCode,
+        @NotNull final JobStatus status,
+        @NotBlank final String statusMessage
+    ) throws GenieException;
 
     /**
      * This method will delete all jobs whose created time is less than date.

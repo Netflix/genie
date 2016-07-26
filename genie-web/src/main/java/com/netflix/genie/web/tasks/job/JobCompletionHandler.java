@@ -20,6 +20,7 @@ package com.netflix.genie.web.tasks.job;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Job;
+import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
@@ -46,7 +47,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -209,10 +209,7 @@ public class JobCompletionHandler {
                         this.finalStatusUpdateFailureRate.increment();
                     }
                 } else if (status == JobStatus.RUNNING) {
-                    final JobStatus finalStatus = this.updateFinalStatusForJob(jobId);
-                    if (finalStatus != null) {
-                        timerId = this.jobCompletionId.withTag(STATUS_TAG, finalStatus.toString());
-                    }
+                    timerId = this.jobCompletionId.withTag(STATUS_TAG, this.updateFinalStatusForJob(jobId).toString());
                     this.cleanupProcesses(jobId);
                 }
 
@@ -260,12 +257,11 @@ public class JobCompletionHandler {
     /**
      * Updates the status of the job.
      *
-     * @param jobId The job id.
+     * @param id The job id.
      * @return the final job status
      * @throws GenieException If there is any problem
      */
-    @Nullable
-    private JobStatus updateFinalStatusForJob(final String jobId) throws GenieException {
+    private JobStatus updateFinalStatusForJob(final String id) throws GenieException {
         try {
             log.debug("Updating the status of the job.");
 
@@ -274,27 +270,58 @@ public class JobCompletionHandler {
 
             try {
                 final JobDoneFile jobDoneFile = objectMapper.readValue(
-                    new File(this.baseWorkingDir + "/" + jobId + "/genie/genie.done"),
+                    new File(this.baseWorkingDir + "/" + id + "/genie/genie.done"),
                     JobDoneFile.class
                 );
                 final int exitCode = jobDoneFile.getExitCode();
 
-                // This method internally also updates the status according to the exit code.
-                return this.jobPersistenceService.setExitCode(jobId, exitCode);
+                final JobStatus finalStatus;
+                switch (exitCode) {
+                    case JobExecution.KILLED_EXIT_CODE:
+                        this.jobPersistenceService.setJobCompletionInformation(
+                            id,
+                            exitCode,
+                            JobStatus.KILLED,
+                            "Job was killed."
+                        );
+                        finalStatus = JobStatus.KILLED;
+                        break;
+                    case JobExecution.SUCCESS_EXIT_CODE:
+                        this.jobPersistenceService.setJobCompletionInformation(
+                            id,
+                            exitCode,
+                            JobStatus.SUCCEEDED,
+                            "Job finished successfully."
+                        );
+                        finalStatus = JobStatus.SUCCEEDED;
+                        break;
+                    // catch all for non-zero and non-zombie, killed and failed exit codes
+                    default:
+                        this.jobPersistenceService.setJobCompletionInformation(
+                            id,
+                            exitCode,
+                            JobStatus.FAILED,
+                            "Job failed."
+                        );
+                        finalStatus = JobStatus.FAILED;
+                        break;
+                }
+
+                return finalStatus;
             } catch (final IOException ioe) {
                 this.doneFileProcessingFailureRate.increment();
                 // The run.sh should theoretically ALWAYS generate a done file so we should never hit this code.
                 // But if we do handle it generate a metric for it which we can track
-                log.error("Could not load the done file for job {}. Marking it as failed.", jobId);
+                log.error("Could not load the done file for job {}. Marking it as failed.", id);
                 this.jobPersistenceService.updateJobStatus(
-                    jobId,
+                    id,
                     JobStatus.FAILED,
                     "Genie could not load done file."
                 );
                 return JobStatus.FAILED;
             }
         } catch (final Exception e) {
-            log.error("Could not update the exit code and status for job: {}", jobId, e);
+            log.error("Could not update the exit code and status for job: {}", id, e);
             this.finalStatusUpdateFailureRate.increment();
             throw e;
         }
