@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.security.oauth2.pingfederate;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.netflix.spectator.api.Registry;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
 import org.springframework.context.annotation.Bean;
@@ -35,19 +35,21 @@ import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConv
 @Configuration
 public class PingFederateConfig {
 
-    @Autowired
-    private ResourceServerProperties resourceServerProperties;
-
     /**
      * When we want to use Ping Federate as our provider/authorization server.
      *
+     * @param resourceServerProperties The properties to use to configure the token services
+     * @param registry                 The metrics registry to use
      * @return The ping federate configuration.
      */
     @Bean
     @Primary
-    public PingFederateTokenServices pingFederateTokenServices() {
+    public PingFederateTokenServices pingFederateTokenServices(
+        final ResourceServerProperties resourceServerProperties,
+        final Registry registry
+    ) {
         final DefaultAccessTokenConverter converter = new DefaultAccessTokenConverter();
         converter.setUserTokenConverter(new PingFederateUserAuthenticationConverter());
-        return new PingFederateTokenServices(this.resourceServerProperties, converter);
+        return new PingFederateTokenServices(resourceServerProperties, converter, registry);
     }
 }

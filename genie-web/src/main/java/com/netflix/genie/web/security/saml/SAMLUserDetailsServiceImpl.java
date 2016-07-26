@@ -18,6 +18,8 @@
 package com.netflix.genie.web.security.saml;
 
 import com.google.common.collect.Lists;
+import com.netflix.spectator.api.Registry;
+import com.netflix.spectator.api.Timer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +35,7 @@ import org.springframework.stereotype.Component;
 import javax.validation.constraints.NotNull;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Get the user and roles from a SAML certificate.
@@ -49,15 +52,18 @@ public class SAMLUserDetailsServiceImpl implements SAMLUserDetailsService {
     private static final GrantedAuthority ADMIN = new SimpleGrantedAuthority("ROLE_ADMIN");
 
     private final SAMLProperties samlProperties;
+    private final Timer loadTimer;
 
     /**
      * Constructor.
      *
-     * @param samlProperties The saml properties to use
+     * @param samlProperties The SAML properties to use
+     * @param registry       The metrics registry to use
      */
     @Autowired
-    public SAMLUserDetailsServiceImpl(@NotNull final SAMLProperties samlProperties) {
+    public SAMLUserDetailsServiceImpl(@NotNull final SAMLProperties samlProperties, @NotNull final Registry registry) {
         this.samlProperties = samlProperties;
+        this.loadTimer = registry.timer("genie.security.saml.parse.timer");
     }
 
     /**
@@ -65,42 +71,48 @@ public class SAMLUserDetailsServiceImpl implements SAMLUserDetailsService {
      */
     @Override
     public Object loadUserBySAML(final SAMLCredential credential) throws UsernameNotFoundException {
-        if (credential == null) {
-            throw new UsernameNotFoundException("No credential entered. Unable to get username.");
+        final long start = System.nanoTime();
+        try {
+            if (credential == null) {
+                throw new UsernameNotFoundException("No credential entered. Unable to get username.");
+            }
+
+            final String userAttributeName = this.samlProperties.getAttributes().getUser().getName();
+            final String userId = credential.getAttributeAsString(userAttributeName);
+            if (StringUtils.isBlank(userId)) {
+                throw new UsernameNotFoundException("No user id found using attribute: " + userAttributeName);
+            }
+
+            // User exists. Give them at least USER role
+            final List<GrantedAuthority> authorities = Lists.newArrayList(USER);
+
+            // See if we can get any other roles
+            final String groupAttributeName = this.samlProperties.getAttributes().getGroups().getName();
+            final String adminGroup = this.samlProperties.getAttributes().getGroups().getAdmin();
+            final String[] groups = credential.getAttributeAsStringArray(groupAttributeName);
+            if (groups == null) {
+                log.warn("No groups found. User will only get ROLE_USER by default.");
+            } else if (Arrays.asList(groups).contains(adminGroup)) {
+                authorities.add(ADMIN);
+            }
+
+            // For debugging what's available in the credential from the IDP
+            if (log.isDebugEnabled()) {
+                log.debug("Attributes:");
+                credential.getAttributes().forEach(attribute -> {
+                    log.debug("Attribute: {}", attribute.getName());
+                    log.debug(
+                        "Values: {}",
+                        StringUtils.join(credential.getAttributeAsStringArray(attribute.getName()), ',')
+                    );
+                });
+            }
+
+            log.info("{} is logged in with authorities {}", userId, authorities);
+            return new User(userId, "DUMMY", authorities);
+        } finally {
+            final long finished = System.nanoTime();
+            this.loadTimer.record(finished - start, TimeUnit.NANOSECONDS);
         }
-
-        final String userAttributeName = this.samlProperties.getAttributes().getUser().getName();
-        final String userId = credential.getAttributeAsString(userAttributeName);
-        if (StringUtils.isBlank(userId)) {
-            throw new UsernameNotFoundException("No user id found using attribute: " + userAttributeName);
-        }
-
-        // User exists. Give them at least USER role
-        final List<GrantedAuthority> authorities = Lists.newArrayList(USER);
-
-        // See if we can get any other roles
-        final String groupAttributeName = this.samlProperties.getAttributes().getGroups().getName();
-        final String adminGroup = this.samlProperties.getAttributes().getGroups().getAdmin();
-        final String[] groups = credential.getAttributeAsStringArray(groupAttributeName);
-        if (groups == null) {
-            log.warn("No groups found. User will only get ROLE_USER by default.");
-        } else if (Arrays.asList(groups).contains(adminGroup)) {
-            authorities.add(ADMIN);
-        }
-
-        // For debugging what's available in the credential from the IDP
-        if (log.isDebugEnabled()) {
-            log.debug("Attributes:");
-            credential.getAttributes().stream().forEach(attribute -> {
-                log.debug("Attribute: {}", attribute.getName());
-                log.debug(
-                    "Values: {}",
-                    StringUtils.join(credential.getAttributeAsStringArray(attribute.getName()), ',')
-                );
-            });
-        }
-
-        log.info("{} is logged in with authorities {}", userId, authorities);
-        return new User(userId, "DUMMY", authorities);
     }
 }

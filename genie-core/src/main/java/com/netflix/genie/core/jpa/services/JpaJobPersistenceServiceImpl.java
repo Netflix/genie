@@ -46,6 +46,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Nullable;
 import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
@@ -316,17 +317,17 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
      * {@inheritDoc}
      */
     @Override
-    public synchronized void setExitCode(
+    @Nullable
+    public synchronized JobStatus setExitCode(
         @NotBlank(message = "No job id entered. Unable to update.")
         final String id,
         @NotBlank(message = "Exit code cannot be blank")
         final int exitCode
     ) throws GenieException {
         log.debug("Called with id {} and exit code {}", id, exitCode);
-
+        JobStatus finalStatus = JobStatus.SUCCEEDED;
         final JobExecutionEntity jobExecutionEntity = this.jobExecutionRepo.findOne(id);
         if (jobExecutionEntity != null) {
-
             // Make sure current exit code is the default one before updating
             if (jobExecutionEntity.getExitCode() == JobExecution.DEFAULT_EXIT_CODE) {
                 switch (exitCode) {
@@ -335,6 +336,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
                         break;
                     case JobExecution.KILLED_EXIT_CODE:
                         this.updateJobStatus(id, JobStatus.KILLED, "Job killed.");
+                        finalStatus = JobStatus.KILLED;
                         break;
                     case JobExecution.LOST_EXIT_CODE:
                         this.updateJobStatus(
@@ -342,6 +344,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
                             JobStatus.FAILED,
                             "Genie leader can't reach node running job. Assuming node and job are lost."
                         );
+                        finalStatus = JobStatus.FAILED;
                         break;
                     case JobExecution.SUCCESS_EXIT_CODE:
                         this.updateJobStatus(id, JobStatus.SUCCEEDED, "Job finished successfully.");
@@ -349,14 +352,18 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
                     // catch all for non-zero and non zombie, killed and failed exit codes
                     default:
                         this.updateJobStatus(id, JobStatus.FAILED, "Job failed.");
+                        finalStatus = JobStatus.FAILED;
+                        break;
                 }
                 jobExecutionEntity.setExitCode(exitCode);
+                return finalStatus;
             } else {
                 // If the exit code is not default check if its being set to the current value itself. If yes
                 // then ignore, else throw exception.
                 if (jobExecutionEntity.getExitCode() != exitCode) {
                     throw new GeniePreconditionException("Exit code already changed from default. Cannot update.");
                 }
+                return null;
             }
         } else {
             throw new GenieNotFoundException("No job with id " + id);
