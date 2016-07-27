@@ -17,6 +17,7 @@
     "url": "https://github.com/Netflix/genie/issues"
   },
   "dependencies": {
+    "filesize": "^3.3.0",
     "jquery": "^2.2.3",
     "moment": "^2.13.0",
     "react": "^15.1.0",
