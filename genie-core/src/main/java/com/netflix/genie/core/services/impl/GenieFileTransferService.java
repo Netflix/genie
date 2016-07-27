@@ -20,11 +20,13 @@ package com.netflix.genie.core.services.impl;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.core.services.FileTransfer;
+import com.netflix.genie.core.services.FileTransferFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
-import java.util.List;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * This class abstracts away all the implementations of FileTransfer interface. It iterates through a list of
@@ -36,19 +38,19 @@ import java.util.List;
 @Slf4j
 public class GenieFileTransferService {
 
-    private final List<FileTransfer> fileTransferList;
+    protected final FileTransferFactory fileTransferFactory;
 
     /**
      * Constructor.
      *
-     * @param fileTransferImpls List of implementations of all fileTransfer interface
+     * @param fileTransferFactory file transfer implementation factory
      * @throws GenieException If there is any problem
      */
     public GenieFileTransferService(
-        @NotNull
-        final List<FileTransfer> fileTransferImpls
+            @NotNull
+            final FileTransferFactory fileTransferFactory
     ) throws GenieException {
-        this.fileTransferList = fileTransferImpls;
+        this.fileTransferFactory = fileTransferFactory;
     }
 
     /**
@@ -59,22 +61,14 @@ public class GenieFileTransferService {
      * @throws GenieException If there is any problem
      */
     public void getFile(
-        @NotBlank(message = "Source file path cannot be empty.")
-        final String srcRemotePath,
-        @NotBlank(message = "Destination local path cannot be empty")
-        final String dstLocalPath
+            @NotBlank(message = "Source file path cannot be empty.")
+            final String srcRemotePath,
+            @NotBlank(message = "Destination local path cannot be empty")
+            final String dstLocalPath
     ) throws GenieException {
         log.debug("Called with src path {} and destination path {}", srcRemotePath, dstLocalPath);
 
-        for (FileTransfer ft : fileTransferList) {
-            if (ft.isValid(srcRemotePath)) {
-                ft.getFile(srcRemotePath, dstLocalPath);
-                return;
-            }
-        }
-
-        throw new GenieNotFoundException("Could not find the appropriate FileTransfer implementation to get file"
-            + srcRemotePath);
+        getFileTransfer(srcRemotePath).getFile(srcRemotePath, dstLocalPath);
     }
 
     /**
@@ -85,21 +79,29 @@ public class GenieFileTransferService {
      * @throws GenieException If there is any problem
      */
     public void putFile(
-        @NotBlank(message = "Source local path cannot be empty.")
-        final String srcLocalPath,
-        @NotBlank(message = "Destination remote path cannot be empty")
-        final String dstRemotePath
+            @NotBlank(message = "Source local path cannot be empty.")
+            final String srcLocalPath,
+            @NotBlank(message = "Destination remote path cannot be empty")
+            final String dstRemotePath
     ) throws GenieException {
         log.debug("Called with src path {} and destination path {}", srcLocalPath, dstRemotePath);
 
-        for (FileTransfer ft : fileTransferList) {
-            if (ft.isValid(dstRemotePath)) {
-                ft.putFile(srcLocalPath, dstRemotePath);
-                return;
-            }
-        }
+        getFileTransfer(dstRemotePath).putFile(srcLocalPath, dstRemotePath);
+    }
 
-        throw new GenieNotFoundException("Could not find the appropriate FileTransfer implementation to get file"
-            + dstRemotePath);
+    protected FileTransfer getFileTransfer(final String path) throws GenieNotFoundException {
+        FileTransfer result;
+        try {
+            final URI uri = new URI(path);
+            result = fileTransferFactory.get(uri.getScheme());
+        } catch (URISyntaxException ignored) {
+            throw new GenieNotFoundException("Could not find the appropriate FileTransfer implementation to get file"
+                    + path);
+        }
+        if (result == null) {
+            throw new GenieNotFoundException("Could not find the appropriate FileTransfer implementation to get file"
+                    + path);
+        }
+        return result;
     }
 }

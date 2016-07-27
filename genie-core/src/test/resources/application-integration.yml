@@ -22,6 +22,9 @@ genie:
       location: "file:///tmp/"
     archive:
       location: /archive/location
+    file:
+      cache:
+        location: "file:///tmp/genie/cache"
 
 spring:
   jpa:

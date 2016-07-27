@@ -118,6 +118,7 @@ subprojects {
 
         testCompile 'org.spockframework:spock-core'
         testCompile 'org.spockframework:spock-spring'
+        testCompile 'cglib:cglib-nodep:2.2.2'
     }
 
     task unitTests(type: Test, group: 'verification') {

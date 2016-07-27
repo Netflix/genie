@@ -27,6 +27,9 @@ genie:
   jobs:
     dir:
       location: "file:///tmp/"
+    file:
+      cache:
+        location: "file:///tmp/genie/cache"
 
 spring:
   datasource:

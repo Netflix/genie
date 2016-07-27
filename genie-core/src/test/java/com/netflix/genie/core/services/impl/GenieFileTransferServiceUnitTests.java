@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.core.services.impl;
 
+import com.google.common.collect.ImmutableMap;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.core.services.FileTransfer;
@@ -26,8 +27,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
 /**
  * This class contains unit tests for GenieFileTransferService.
@@ -43,7 +43,6 @@ public class GenieFileTransferServiceUnitTests {
 
     private LocalFileTransferImpl localFileTransfer;
     private S3FileTransferImpl s3FileTransfer;
-    private final List<FileTransfer> fileTransfers = new ArrayList<>();
 
     private GenieFileTransferService genieFileTransferService;
 
@@ -57,11 +56,11 @@ public class GenieFileTransferServiceUnitTests {
         localFileTransfer = Mockito.mock(LocalFileTransferImpl.class);
         s3FileTransfer = Mockito.mock(S3FileTransferImpl.class);
 
-        fileTransfers.add(localFileTransfer);
-        fileTransfers.add(s3FileTransfer);
+        final Map<String, FileTransfer> fileTransferMap = new ImmutableMap.Builder<String, FileTransfer>()
+                .put("s3", s3FileTransfer)
+                .put("file", localFileTransfer).build();
 
-        genieFileTransferService = new GenieFileTransferService(fileTransfers);
-
+        genieFileTransferService = new GenieFileTransferService(fileTransferMap::get);
     }
 
     /**
@@ -85,8 +84,8 @@ public class GenieFileTransferServiceUnitTests {
         Mockito.when(this.s3FileTransfer.isValid(Mockito.eq(S3_FILE_PATH))).thenReturn(false);
 
         this.genieFileTransferService.getFile(S3_FILE_PATH, LOCAL_FILE_PATH);
-        Mockito.verify(this.localFileTransfer, Mockito.times(1)).getFile(S3_FILE_PATH, LOCAL_FILE_PATH);
-        Mockito.verify(this.s3FileTransfer, Mockito.times(0)).getFile(S3_FILE_PATH, LOCAL_FILE_PATH);
+        Mockito.verify(this.localFileTransfer, Mockito.times(0)).getFile(S3_FILE_PATH, LOCAL_FILE_PATH);
+        Mockito.verify(this.s3FileTransfer, Mockito.times(1)).getFile(S3_FILE_PATH, LOCAL_FILE_PATH);
     }
 
     /**
@@ -125,8 +124,8 @@ public class GenieFileTransferServiceUnitTests {
         Mockito.when(this.s3FileTransfer.isValid(Mockito.eq(S3_FILE_PATH))).thenReturn(false);
 
         this.genieFileTransferService.putFile(LOCAL_FILE_PATH, S3_FILE_PATH);
-        Mockito.verify(this.localFileTransfer, Mockito.times(1)).putFile(LOCAL_FILE_PATH, S3_FILE_PATH);
-        Mockito.verify(this.s3FileTransfer, Mockito.times(0)).putFile(LOCAL_FILE_PATH, S3_FILE_PATH);
+        Mockito.verify(this.localFileTransfer, Mockito.times(0)).putFile(LOCAL_FILE_PATH, S3_FILE_PATH);
+        Mockito.verify(this.s3FileTransfer, Mockito.times(1)).putFile(LOCAL_FILE_PATH, S3_FILE_PATH);
     }
 
     /**

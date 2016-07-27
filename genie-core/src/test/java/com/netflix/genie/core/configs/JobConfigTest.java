@@ -32,6 +32,7 @@ import com.netflix.genie.core.jobs.workflow.impl.JobKickoffTask;
 import com.netflix.genie.core.jobs.workflow.impl.JobTask;
 import com.netflix.genie.core.services.AttachmentService;
 import com.netflix.genie.core.services.FileTransfer;
+import com.netflix.genie.core.services.impl.GenieFileTransferService;
 import com.netflix.genie.core.services.impl.LocalFileTransferImpl;
 import com.netflix.spectator.api.Registry;
 import org.apache.commons.exec.Executor;
@@ -88,36 +89,45 @@ public class JobConfigTest {
      * Create an Cluster Task bean that processes the cluster needed for a job.
      *
      * @param registry The metrics registry to use
+     * @param fts      File transfer service
      * @return An application task object
      */
     @Bean
     @Order(value = 2)
-    public WorkflowTask clusterProcessorTask(final Registry registry) {
-        return new ClusterTask(registry);
+    public WorkflowTask clusterProcessorTask(
+            final Registry registry,
+            final GenieFileTransferService fts) {
+        return new ClusterTask(registry, fts);
     }
 
     /**
      * Create an Application Task bean that processes all Applications needed for a job.
      *
      * @param registry The metrics registry to use
+     * @param fts      File transfer service
      * @return An application task object
      */
     @Bean
     @Order(value = 3)
-    public WorkflowTask applicationProcessorTask(final Registry registry) {
-        return new ApplicationTask(registry);
+    public WorkflowTask applicationProcessorTask(
+            final Registry registry,
+            final GenieFileTransferService fts) {
+        return new ApplicationTask(registry, fts);
     }
 
     /**
      * Create an Command Task bean that processes the command needed for a job.
      *
      * @param registry The metrics registry to use
+     * @param fts      File transfer service
      * @return An application task object
      */
     @Bean
     @Order(value = 4)
-    public WorkflowTask commandProcessorTask(final Registry registry) {
-        return new CommandTask(registry);
+    public WorkflowTask commandProcessorTask(
+            final Registry registry,
+            final GenieFileTransferService fts) {
+        return new CommandTask(registry, fts);
     }
 
     /**
@@ -125,6 +135,7 @@ public class JobConfigTest {
      *
      * @param attachmentService An implementation of the attachment service
      * @param registry          The metrics registry to use
+     * @param fts               File transfer service
      * @return An job task object
      * @throws GenieException if there is any problem
      */
@@ -133,9 +144,10 @@ public class JobConfigTest {
     @Autowired
     public WorkflowTask jobProcessorTask(
         final AttachmentService attachmentService,
-        final Registry registry
+        final Registry registry,
+            final GenieFileTransferService fts
     ) throws GenieException {
-        return new JobTask(attachmentService, registry);
+        return new JobTask(attachmentService, registry, fts);
     }
 
     /**

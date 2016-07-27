@@ -76,7 +76,6 @@ public class LocalJobRunner implements JobSubmitterService {
     private final List<WorkflowTask> jobWorkflowTasks;
     private final Resource baseWorkingDirPath;
     private final ApplicationEventPublisher applicationEventPublisher;
-    private final GenieFileTransferService fileTransferService;
 
     // For reuse in queries
     private final Set<CommandStatus> enumStatuses;
@@ -89,7 +88,6 @@ public class LocalJobRunner implements JobSubmitterService {
      * @param clusterService            Implementation of cluster service interface
      * @param commandService            Implementation of command service interface
      * @param clusterLoadBalancer       Implementation of the cluster load balancer interface
-     * @param fileTransferService       File Transfer service
      * @param applicationEventPublisher Instance of the event publisher
      * @param workflowTasks             List of all the workflow tasks to be executed
      * @param genieWorkingDir           Working directory for genie where it creates jobs directories
@@ -100,7 +98,6 @@ public class LocalJobRunner implements JobSubmitterService {
         @NotNull final ClusterService clusterService,
         @NotNull final CommandService commandService,
         @NotNull final ClusterLoadBalancer clusterLoadBalancer,
-        @NotNull final GenieFileTransferService fileTransferService,
         @NotNull final ApplicationEventPublisher applicationEventPublisher,
         @NotNull final List<WorkflowTask> workflowTasks,
         @NotNull final Resource genieWorkingDir
@@ -112,7 +109,6 @@ public class LocalJobRunner implements JobSubmitterService {
         this.clusterLoadBalancer = clusterLoadBalancer;
         this.jobWorkflowTasks = workflowTasks;
         this.baseWorkingDirPath = genieWorkingDir;
-        this.fileTransferService = fileTransferService;
         this.applicationEventPublisher = applicationEventPublisher;
 
         // We'll only care about active statuses
@@ -279,7 +275,6 @@ public class LocalJobRunner implements JobSubmitterService {
         final Map<String, Object> context = new HashMap<>();
 
         context.put(JobConstants.JOB_EXECUTION_ENV_KEY, jee);
-        context.put(JobConstants.FILE_TRANSFER_SERVICE_KEY, this.fileTransferService);
 
         return context;
     }

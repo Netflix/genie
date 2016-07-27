@@ -26,6 +26,7 @@ import org.hibernate.validator.constraints.NotBlank;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 /**
  * An implementation of the FileTransferService interface in which the remote locations are on local unix filesystem.
@@ -61,7 +62,7 @@ public class LocalFileTransferImpl implements FileTransfer {
         try {
             final File src = new File(srcRemotePath);
             final File dest = new File(dstLocalPath);
-            Files.copy(src.toPath(), dest.toPath());
+            Files.copy(src.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException ioe) {
             log.error("Got error while copying remote file {} to local path {}", srcRemotePath, dstLocalPath);
             throw new GenieServerException(
@@ -86,7 +87,7 @@ public class LocalFileTransferImpl implements FileTransfer {
         try {
             final File src = new File(srcLocalPath);
             final File dest = new File(dstRemotePath);
-            Files.copy(src.toPath(), dest.toPath());
+            Files.copy(src.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException ioe) {
             log.error("Got error while copying local file {} to remote path {}", srcLocalPath, dstRemotePath);
             throw new GenieServerException(
@@ -94,6 +95,20 @@ public class LocalFileTransferImpl implements FileTransfer {
                     + srcLocalPath
                     + " to remote path "
                     + dstRemotePath, ioe);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getLastModifiedTime(final String path) throws GenieException {
+        try {
+            return new File(path).lastModified();
+        } catch (Exception e) {
+            final String message = String.format("Failed getting the last modified time for file with path %s", path);
+            log.error(message);
+            throw new GenieServerException(message, e);
         }
     }
 }

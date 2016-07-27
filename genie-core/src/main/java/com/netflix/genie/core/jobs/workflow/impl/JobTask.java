@@ -44,20 +44,27 @@ public class JobTask extends GenieBaseTask {
 
     private final AttachmentService attachmentService;
     private final Timer timer;
+    private final GenieFileTransferService fts;
 
     /**
      * Constructor.
      *
      * @param attachmentService An implementation of the Attachment Service
      * @param registry          The metrics registry to use
+     * @param fts               File transfer service
      * @throws GenieException If there is any problem.
      */
     public JobTask(
-        @NotNull final AttachmentService attachmentService,
-        @NotNull final Registry registry
+            @NotNull
+            final AttachmentService attachmentService,
+            @NotNull
+            final Registry registry,
+            @NotNull
+            final GenieFileTransferService fts
     ) throws GenieException {
         this.attachmentService = attachmentService;
         this.timer = registry.timer("genie.jobs.tasks.jobTask.timer");
+        this.fts = fts;
     }
 
     /**
@@ -69,8 +76,6 @@ public class JobTask extends GenieBaseTask {
         try {
             log.debug("Execution Job Task in the workflow.");
 
-            final GenieFileTransferService fts
-                = (GenieFileTransferService) context.get(JobConstants.FILE_TRANSFER_SERVICE_KEY);
             final JobExecutionEnvironment jobExecEnv
                 = (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
             final String jobWorkingDirectory = jobExecEnv.getJobWorkingDir().getCanonicalPath();

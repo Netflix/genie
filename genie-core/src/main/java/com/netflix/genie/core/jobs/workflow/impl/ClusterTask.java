@@ -44,14 +44,18 @@ import java.util.concurrent.TimeUnit;
 public class ClusterTask extends GenieBaseTask {
 
     private final Timer timer;
+    private final GenieFileTransferService fts;
 
     /**
      * Constructor.
      *
      * @param registry The metrics registry to use
+     * @param fts File transfer service
      */
-    public ClusterTask(@NotNull final Registry registry) {
+    public ClusterTask(@NotNull final Registry registry,
+            @NotNull final GenieFileTransferService fts) {
         this.timer = registry.timer("genie.jobs.tasks.clusterTask.timer");
+        this.fts = fts;
     }
 
     /**
@@ -63,8 +67,6 @@ public class ClusterTask extends GenieBaseTask {
         try {
             log.debug("Executing Cluster Task in the workflow.");
 
-            final GenieFileTransferService fts =
-                (GenieFileTransferService) context.get(JobConstants.FILE_TRANSFER_SERVICE_KEY);
             final JobExecutionEnvironment jobExecEnv =
                 (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
             final String jobWorkingDirectory = jobExecEnv.getJobWorkingDir().getCanonicalPath();

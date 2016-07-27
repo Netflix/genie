@@ -34,6 +34,9 @@ genie:
       enabled: false
     dir:
       location: file:///tmp/genie/jobs/
+    file:
+      cache:
+        location: "file:///tmp/genie/cache"
     forwarding:
       enabled: true
     max:
