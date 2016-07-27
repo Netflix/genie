@@ -48,18 +48,17 @@ public class DefaultDirectoryWriterUnitTests {
         = "http://genie.netflix.com:8080/api/v3/jobs/" + UUID.randomUUID().toString() + "/output";
     private static final String REQUEST_URL_WITH_PARENT = REQUEST_URL_BASE + "/" + UUID.randomUUID().toString();
 
-    private static final long PARENT_SIZE = 3082;
+    private static final long PARENT_SIZE = 0L;
     private static final Date PARENT_LAST_MODIFIED = new Date();
     private static final String PARENT_NAME = "../";
     private static final String PARENT_URL = REQUEST_URL_BASE;
 
-    private static final long DIR_1_SIZE = 83023;
+    private static final long DIR_1_SIZE = 0L;
     private static final Date DIR_1_LAST_MODIFIED = new Date(new Date().getTime() + 13142);
     private static final String DIR_1_NAME = UUID.randomUUID().toString();
     private static final String DIR_1_URL = REQUEST_URL_WITH_PARENT + "/" + DIR_1_NAME;
 
-
-    private static final long DIR_2_SIZE = 3023;
+    private static final long DIR_2_SIZE = 0L;
     private static final Date DIR_2_LAST_MODIFIED = new Date(new Date().getTime() - 1830);
     private static final String DIR_2_NAME = UUID.randomUUID().toString();
     private static final String DIR_2_URL = REQUEST_URL_WITH_PARENT + "/" + DIR_2_NAME;

@@ -48,7 +48,7 @@ public interface JobPersistenceService {
     /**
      * Update the status and status message of the job.
      *
-     * @param id The id of the job to update the status for.
+     * @param id        The id of the job to update the status for.
      * @param jobStatus The updated status of the job.
      * @param statusMsg The updated status message of the job.
      * @throws GenieException if there is an error
@@ -62,9 +62,9 @@ public interface JobPersistenceService {
     /**
      * Update the job with the various resources used to run the job including the cluster, command and applications.
      *
-     * @param jobId The id of the job to update
-     * @param clusterId The id of the cluster the job runs on
-     * @param commandId The id of the command the job runs with
+     * @param jobId          The id of the job to update
+     * @param clusterId      The id of the cluster the job runs on
+     * @param commandId      The id of the command the job runs with
      * @param applicationIds The ids of the applications used to run the job
      * @throws GenieException For any problems while updating
      */
@@ -78,9 +78,8 @@ public interface JobPersistenceService {
     /**
      * Save the jobRequest object in the data store.
      *
-     * @param jobRequest the Job request object to save. Not null
+     * @param jobRequest         the Job request object to save. Not null
      * @param jobRequestMetadata metadata about the job request. Not null
-     *
      * @return The job request object that was created
      * @throws GenieException if there is an error
      */
@@ -98,13 +97,20 @@ public interface JobPersistenceService {
     void createJobExecution(@NotNull final JobExecution jobExecution) throws GenieException;
 
     /**
-     * Method to set exit code for the job execution.
+     * Method to set all job completion information for a job execution.
      *
-     * @param id the id of the job to update the exit code
-     * @param exitCode The exit code of the process
+     * @param id            the id of the job to update the exit code
+     * @param exitCode      The exit code of the process
+     * @param status        The final job status for the job
+     * @param statusMessage The final job status message
      * @throws GenieException if there is an error
      */
-    void setExitCode(@NotBlank final String id, @NotBlank final int exitCode) throws GenieException;
+    void setJobCompletionInformation(
+        @NotBlank final String id,
+        final int exitCode,
+        @NotNull final JobStatus status,
+        @NotBlank final String statusMessage
+    ) throws GenieException;
 
     /**
      * This method will delete all jobs whose created time is less than date.
