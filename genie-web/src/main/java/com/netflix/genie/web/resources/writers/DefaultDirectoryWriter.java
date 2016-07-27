@@ -27,12 +27,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.catalina.util.ConcurrentDateFormat;
 import org.apache.catalina.util.ServerInfo;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.URL;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
@@ -107,7 +108,7 @@ public class DefaultDirectoryWriter implements DirectoryWriter {
 
         // Write parent if necessary
         if (dir.getParent() != null) {
-            this.writeFileHtml(builder, false, dir.getParent());
+            this.writeFileHtml(builder, false, dir.getParent(), true);
         }
 
         boolean shade = true;
@@ -115,7 +116,7 @@ public class DefaultDirectoryWriter implements DirectoryWriter {
         // Write directories
         if (dir.getDirectories() != null) {
             for (final Entry entry : dir.getDirectories()) {
-                this.writeFileHtml(builder, shade, entry);
+                this.writeFileHtml(builder, shade, entry, true);
                 shade = !shade;
             }
         }
@@ -123,7 +124,7 @@ public class DefaultDirectoryWriter implements DirectoryWriter {
         // Write files
         if (dir.getFiles() != null) {
             for (final Entry entry : dir.getFiles()) {
-                this.writeFileHtml(builder, shade, entry);
+                this.writeFileHtml(builder, shade, entry, false);
                 shade = !shade;
             }
         }
@@ -154,21 +155,11 @@ public class DefaultDirectoryWriter implements DirectoryWriter {
         return mapper.writeValueAsString(dir);
     }
 
-    private String renderSize(final long size) {
-        final long kb = 1024;
-        final long leftSide = size / kb;
-        long rightSide = (size % kb) / 103;   // Makes 1 digit
-        if (leftSide == 0 && rightSide == 0 && size > 0) {
-            rightSide = 1;
-        }
-
-        return leftSide + "." + rightSide + " kb";
-    }
-
     private void writeFileHtml(
         final StringBuilder builder,
         final boolean shade,
-        final Entry entry
+        final Entry entry,
+        final boolean isDirectory
     ) {
         builder.append("<tr");
         if (shade) {
@@ -179,9 +170,13 @@ public class DefaultDirectoryWriter implements DirectoryWriter {
         builder.append("<td align=\"left\">&nbsp;&nbsp;");
         builder.append("<a href=\"").append(entry.getUrl()).append("\">");
         builder.append("<tt>").append(entry.getName()).append("</tt></a></td>");
-        builder
-            .append("<td align=\"right\"><tt>")
-            .append(this.renderSize(entry.getSize())).append("</tt></td>");
+        builder.append("<td align=\"right\"><tt>");
+        if (isDirectory) {
+            builder.append("-");
+        } else {
+            builder.append(FileUtils.byteCountToDisplaySize(entry.getSize()));
+        }
+        builder.append("</tt></td>");
         final String lastModified = ConcurrentDateFormat.formatRfc1123(entry.getLastModified());
         builder.append("<td align=\"right\"><tt>").append(lastModified).append("</tt></td>");
         builder.append("</tr>");
@@ -206,7 +201,7 @@ public class DefaultDirectoryWriter implements DirectoryWriter {
             url = url.substring(0, url.lastIndexOf('/'));
             parent.setName("../");
             parent.setUrl(url);
-            parent.setSize(directory.getParentFile().getAbsoluteFile().length());
+            parent.setSize(0L);
             parent.setLastModified(new Date(directory.getParentFile().getAbsoluteFile().lastModified()));
             dir.setParent(parent);
         }
@@ -218,15 +213,16 @@ public class DefaultDirectoryWriter implements DirectoryWriter {
         if (files != null) {
             for (final File file : files) {
                 final Entry entry = new Entry();
-                entry.setSize(file.getAbsoluteFile().length());
                 entry.setLastModified(new Date(file.getAbsoluteFile().lastModified()));
                 if (file.isDirectory()) {
                     entry.setName(file.getName() + "/");
                     entry.setUrl(baseURL + file.getName() + "/");
+                    entry.setSize(0L);
                     dir.getDirectories().add(entry);
                 } else {
                     entry.setName(file.getName());
                     entry.setUrl(baseURL + file.getName());
+                    entry.setSize(file.getAbsoluteFile().length());
                     dir.getFiles().add(entry);
                 }
             }
@@ -257,7 +253,7 @@ public class DefaultDirectoryWriter implements DirectoryWriter {
         private String name;
         @URL
         private String url;
-        @Size
+        @Min(0)
         private long size;
         @JsonSerialize(using = JsonDateSerializer.class)
         @JsonDeserialize(using = JsonDateDeserializer.class)
