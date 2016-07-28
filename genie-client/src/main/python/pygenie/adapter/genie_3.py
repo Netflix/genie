@@ -220,7 +220,6 @@ class Genie3Adapter(GenieBaseAdapter):
             .format(scheme=link_parts.scheme,
                     netloc=link_parts.netloc,
                     job_id=data.get('id'))
-
         job_link = '{scheme}://{netloc}/jobs?id={job_id}&showDetails={job_id}' \
             .format(scheme=link_parts.scheme,
                     netloc=link_parts.netloc,
