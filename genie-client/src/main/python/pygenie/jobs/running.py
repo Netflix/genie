@@ -567,7 +567,7 @@ class RunningJob(object):
 
         return self.info.get('user')
 
-    def wait(self, sleep_seconds=10, suppress_stream=False):
+    def wait(self, sleep_seconds=10, suppress_stream=False, until_running=False):
         """
         Blocking call that will wait for the job to complete.
 
@@ -580,6 +580,8 @@ class RunningJob(object):
             suppress_stream (bool, optional): If True, do not write anything to
                 the sys stream (stderr/stdout) while waiting for the job to
                 complete (default: False).
+            until_running (bool, optional): If True, only block until the job
+                status becomes 'RUNNING' (default: False).
 
         Returns:
             :py:class:`RunningJob`: self
@@ -587,7 +589,10 @@ class RunningJob(object):
 
         i = 0
 
-        while self._adapter.get_status(self._job_id).upper() in RUNNING_STATUSES:
+        statuses = {s for s in RUNNING_STATUSES \
+            if not until_running or s.upper() != 'RUNNING'}
+
+        while self._adapter.get_status(self._job_id).upper() in statuses:
             if i % 3 == 0 and not suppress_stream:
                 self._write_to_stream('.')
             time.sleep(sleep_seconds)
