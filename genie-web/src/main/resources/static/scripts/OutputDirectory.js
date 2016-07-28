@@ -4,6 +4,7 @@ import { Link } from 'react-router';
 import TableHeader from './components/TableHeader';
 import SiteHeader from './components/SiteHeader';
 import SiteFooter from './components/SiteFooter';
+import filesize from 'filesize';
 
 import { genieJobsUrl, fileUrl, momentFormat, fetch } from './utils';
 
@@ -96,7 +97,7 @@ const FileRow = (props) =>
         <Link target="_blank" to={fileUrl(props.file.url)}>{props.file.name}</Link>
       </span>
     </td>
-    <td>{props.file.size} kb</td>
+    <td>{filesize(props.file.size)}</td>
     <td className="col-xs-3">{momentFormat(props.file.lastModified)}</td>
   </tr>;
 
@@ -117,7 +118,7 @@ const DirectoryRow = (props) =>
         <Link to={genieJobsUrl(props.directory.url)}>{props.directory.name}</Link>
       </span>
     </td>
-    <td>{props.directory.size} kb</td>
+    <td>--</td>
     <td className="col-xs-3">{momentFormat(props.directory.lastModified)}</td>
   </tr>;
 
