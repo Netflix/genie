@@ -17,6 +17,9 @@
 ##
 
 genie:
+  file:
+    cache:
+      location: "file:///tmp/genie/cache"
   health:
     memory:
       usedPhysicalMemoryPercent: 100
@@ -25,9 +28,6 @@ genie:
       location: "file:///tmp/"
     archive:
       location: /archive/location
-    file:
-      cache:
-        location: "file:///tmp/genie/cache"
 
 spring:
   jpa:

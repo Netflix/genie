@@ -24,6 +24,9 @@ eureka:
     enabled: false
 
 genie:
+  file:
+    cache:
+      location: "file:///tmp/genie/cache"
   health:
     memory:
       usedPhysicalMemoryPercent: 90
@@ -34,9 +37,6 @@ genie:
       enabled: false
     dir:
       location: file:///tmp/genie/jobs/
-    file:
-      cache:
-        location: "file:///tmp/genie/cache"
     forwarding:
       enabled: true
     max:

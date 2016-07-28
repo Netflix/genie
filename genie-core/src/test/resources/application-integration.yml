@@ -17,14 +17,14 @@
 ##
 
 genie:
+  file:
+    cache:
+      location: "file:///tmp/genie/cache"
   jobs:
     dir:
       location: "file:///tmp/"
     archive:
       location: /archive/location
-    file:
-      cache:
-        location: "file:///tmp/genie/cache"
 
 spring:
   jpa:

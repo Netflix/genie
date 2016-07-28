@@ -37,8 +37,8 @@ import java.net.URISyntaxException;
  */
 @Slf4j
 public class GenieFileTransferService {
-
-    protected final FileTransferFactory fileTransferFactory;
+    private static final String BEAN_NAME_FILE_SYSTEM_PREFIX = "file.system.";
+    private final FileTransferFactory fileTransferFactory;
 
     /**
      * Constructor.
@@ -93,7 +93,7 @@ public class GenieFileTransferService {
         FileTransfer result;
         try {
             final URI uri = new URI(path);
-            result = fileTransferFactory.get(uri.getScheme());
+            result = fileTransferFactory.get(BEAN_NAME_FILE_SYSTEM_PREFIX + uri.getScheme());
         } catch (URISyntaxException ignored) {
             throw new GenieNotFoundException("Could not find the appropriate FileTransfer implementation to get file"
                     + path);

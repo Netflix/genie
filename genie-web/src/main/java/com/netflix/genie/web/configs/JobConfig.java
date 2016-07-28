@@ -52,7 +52,7 @@ public class JobConfig {
      *
      * @return A unix copy implementation of the FileTransferService.
      */
-    @Bean(name = "file")
+    @Bean(name = { "file.system.file", "file.system.null" })
     @Order(value = 2)
     public FileTransfer localFileTransfer() {
         return new LocalFileTransferImpl();

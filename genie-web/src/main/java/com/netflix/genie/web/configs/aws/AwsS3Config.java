@@ -100,7 +100,7 @@ public class AwsS3Config {
      * @return An s3 implementation of the FileTransfer interface
      * @throws GenieException if there is any problem
      */
-    @Bean(name = "s3")
+    @Bean(name = { "file.system.s3", "file.system.s3n", "file.system.s3a" })
     @Order(value = 1)
     @ConditionalOnBean(AmazonS3Client.class)
     public FileTransfer s3FileTransferImpl(

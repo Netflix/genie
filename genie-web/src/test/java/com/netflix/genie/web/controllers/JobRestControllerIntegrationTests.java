@@ -161,7 +161,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     @Autowired
     private Resource jobDirResource;
 
-    @Value("${genie.jobs.file.cache.location}")
+    @Value("${genie.file.cache.location}")
     private String baseCacheLocation;
 
     /**

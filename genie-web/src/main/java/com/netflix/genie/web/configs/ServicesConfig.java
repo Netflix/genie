@@ -268,9 +268,9 @@ public class ServicesConfig {
     @Bean
     public GenieFileTransferService cacheGenieFileTransferService(
             final FileTransferFactory fileTransferFactory,
-            @Value("${genie.jobs.file.cache.location}")
+            @Value("${genie.file.cache.location}")
             final String baseCacheLocation,
-            @Qualifier("file")
+            @Qualifier("file.system.file")
             final FileTransfer localFileTransfer,
             final Registry registry
     ) throws GenieException {

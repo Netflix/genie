@@ -57,8 +57,8 @@ public class GenieFileTransferServiceUnitTests {
         s3FileTransfer = Mockito.mock(S3FileTransferImpl.class);
 
         final Map<String, FileTransfer> fileTransferMap = new ImmutableMap.Builder<String, FileTransfer>()
-                .put("s3", s3FileTransfer)
-                .put("file", localFileTransfer).build();
+                .put("file.system.s3", s3FileTransfer)
+                .put("file.system.file", localFileTransfer).build();
 
         genieFileTransferService = new GenieFileTransferService(fileTransferMap::get);
     }
@@ -142,6 +142,4 @@ public class GenieFileTransferServiceUnitTests {
         Mockito.verify(this.s3FileTransfer, Mockito.times(1)).putFile(LOCAL_FILE_PATH, S3_FILE_PATH);
         Mockito.verify(this.localFileTransfer, Mockito.times(0)).putFile(LOCAL_FILE_PATH, S3_FILE_PATH);
     }
-
-
 }
