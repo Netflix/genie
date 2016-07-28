@@ -44,15 +44,19 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class ApplicationTask extends GenieBaseTask {
 
-    private Timer timer;
+    private final Timer timer;
+    private final GenieFileTransferService fts;
 
     /**
      * Constructor.
      *
      * @param registry The metrics registry to use for recording any metrics
+     * @param fts File transfer service
      */
-    public ApplicationTask(@NotNull final Registry registry) {
+    public ApplicationTask(@NotNull final Registry registry,
+            @NotNull final GenieFileTransferService fts) {
         this.timer = registry.timer("genie.jobs.tasks.applicationTask.timer");
+        this.fts = fts;
     }
 
     /**
@@ -66,9 +70,6 @@ public class ApplicationTask extends GenieBaseTask {
         final long start = System.nanoTime();
         try {
             log.debug("Executing Application Task in the workflow.");
-
-            final GenieFileTransferService fts =
-                (GenieFileTransferService) context.get(JobConstants.FILE_TRANSFER_SERVICE_KEY);
             final JobExecutionEnvironment jobExecEnv =
                 (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
             final String jobWorkingDirectory = jobExecEnv.getJobWorkingDir().getCanonicalPath();

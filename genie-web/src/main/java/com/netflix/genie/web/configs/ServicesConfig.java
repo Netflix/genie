@@ -30,14 +30,13 @@ import com.netflix.genie.core.jpa.services.JpaClusterServiceImpl;
 import com.netflix.genie.core.jpa.services.JpaCommandServiceImpl;
 import com.netflix.genie.core.jpa.services.JpaJobPersistenceServiceImpl;
 import com.netflix.genie.core.jpa.services.JpaJobSearchServiceImpl;
-import com.netflix.genie.core.metrics.GenieNodeStatistics;
-import com.netflix.genie.core.metrics.impl.GenieNodeStatisticsImpl;
 import com.netflix.genie.core.services.ApplicationService;
 import com.netflix.genie.core.services.AttachmentService;
 import com.netflix.genie.core.services.ClusterLoadBalancer;
 import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;
 import com.netflix.genie.core.services.FileTransfer;
+import com.netflix.genie.core.services.FileTransferFactory;
 import com.netflix.genie.core.services.JobCoordinatorService;
 import com.netflix.genie.core.services.JobCountService;
 import com.netflix.genie.core.services.JobKillService;
@@ -45,6 +44,7 @@ import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobSubmitterService;
 import com.netflix.genie.core.services.MailService;
+import com.netflix.genie.core.services.impl.CacheGenieFileTransferService;
 import com.netflix.genie.core.services.impl.DefaultMailServiceImpl;
 import com.netflix.genie.core.services.impl.FileSystemAttachmentService;
 import com.netflix.genie.core.services.impl.GenieFileTransferService;
@@ -54,8 +54,10 @@ import com.netflix.genie.core.services.impl.MailServiceImpl;
 import com.netflix.genie.core.services.impl.RandomizedClusterLoadBalancerImpl;
 import com.netflix.spectator.api.Registry;
 import org.apache.commons.exec.Executor;
+import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.ServiceLocatorFactoryBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationEventPublisher;
@@ -111,16 +113,6 @@ public class ServicesConfig {
     @ConditionalOnMissingBean
     public MailService getDefaultMailServiceImpl() {
         return new DefaultMailServiceImpl();
-    }
-
-    /**
-     * Get an implementation of the GenieNodeStatistics interface for metrics collection.
-     *
-     * @return A genie node statics instance.
-     */
-    @Bean
-    public GenieNodeStatistics getGenieNodeStatistics() {
-        return new GenieNodeStatisticsImpl();
     }
 
     /**
@@ -252,15 +244,37 @@ public class ServicesConfig {
     /**
      * Get an instance of the Genie File Transfer service.
      *
-     * @param fileTransferImpls List of implementations of all fileTransfer interface
+     * @param fileTransferFactory file transfer implementation factory
      * @return A singleton for GenieFileTransferService
      * @throws GenieException If there is any problem
      */
     @Bean
     public GenieFileTransferService genieFileTransferService(
-        final List<FileTransfer> fileTransferImpls
+            final FileTransferFactory fileTransferFactory
     ) throws GenieException {
-        return new GenieFileTransferService(fileTransferImpls);
+        return new GenieFileTransferService(fileTransferFactory);
+    }
+
+    /**
+     * Get an instance of the Cache Genie File Transfer service.
+     *
+     * @param fileTransferFactory file transfer implementation factory
+     * @param baseCacheLocation file cache location
+     * @param localFileTransfer local file transfer service
+     * @param registry Registry
+     * @return A singleton for GenieFileTransferService
+     * @throws GenieException If there is any problem
+     */
+    @Bean
+    public GenieFileTransferService cacheGenieFileTransferService(
+            final FileTransferFactory fileTransferFactory,
+            @Value("${genie.file.cache.location}")
+            final String baseCacheLocation,
+            @Qualifier("file.system.file")
+            final FileTransfer localFileTransfer,
+            final Registry registry
+    ) throws GenieException {
+        return new CacheGenieFileTransferService(fileTransferFactory, baseCacheLocation, localFileTransfer, registry);
     }
 
     /**
@@ -271,7 +285,6 @@ public class ServicesConfig {
      * @param clusterService      Implementation of cluster service interface.
      * @param commandService      Implementation of command service interface.
      * @param clusterLoadBalancer Implementation of the cluster load balancer interface.
-     * @param fts                 File Transfer service.
      * @param aep                 Instance of the event publisher.
      * @param workflowTasks       List of all the workflow tasks to be executed.
      * @param genieWorkingDir     Working directory for genie where it creates jobs directories.
@@ -284,7 +297,6 @@ public class ServicesConfig {
         final ClusterService clusterService,
         final CommandService commandService,
         final ClusterLoadBalancer clusterLoadBalancer,
-        final GenieFileTransferService fts,
         final ApplicationEventPublisher aep,
         final List<WorkflowTask> workflowTasks,
         final Resource genieWorkingDir
@@ -295,7 +307,6 @@ public class ServicesConfig {
             clusterService,
             commandService,
             clusterLoadBalancer,
-            fts,
             aep,
             workflowTasks,
             genieWorkingDir
@@ -355,5 +366,16 @@ public class ServicesConfig {
         @Value("${genie.jobs.attachments.dir:#{null}}") final String attachmentsDirectory
     ) {
         return new FileSystemAttachmentService(attachmentsDirectory);
+    }
+
+    /**
+     * FileTransfer factory.
+     * @return FileTransfer factory
+     */
+    @Bean
+    public FactoryBean fileTransferFactory() {
+        final ServiceLocatorFactoryBean factoryBean = new ServiceLocatorFactoryBean();
+        factoryBean.setServiceLocatorInterface(FileTransferFactory.class);
+        return factoryBean;
     }
 }

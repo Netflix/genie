@@ -102,7 +102,6 @@ public class LocalJobRunnerUnitTests {
         final CommandService commandService = Mockito.mock(CommandService.class);
         this.clusterLoadBalancer = Mockito.mock(ClusterLoadBalancer.class);
         final ApplicationEventPublisher applicationEventPublisher = Mockito.mock(ApplicationEventPublisher.class);
-        final GenieFileTransferService fileTransferService = Mockito.mock(GenieFileTransferService.class);
         final WorkflowTask task1 = Mockito.mock(WorkflowTask.class);
         this.task2 = Mockito.mock(WorkflowTask.class);
 
@@ -120,7 +119,6 @@ public class LocalJobRunnerUnitTests {
             this.clusterService,
             commandService,
             this.clusterLoadBalancer,
-            fileTransferService,
             applicationEventPublisher,
             jobWorkflowTasks,
             baseWorkingDirResource
