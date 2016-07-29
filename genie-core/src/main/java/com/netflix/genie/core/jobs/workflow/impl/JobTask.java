@@ -74,12 +74,11 @@ public class JobTask extends GenieBaseTask {
     public void executeTask(@NotNull final Map<String, Object> context) throws GenieException, IOException {
         final long start = System.nanoTime();
         try {
-            log.debug("Execution Job Task in the workflow.");
-
             final JobExecutionEnvironment jobExecEnv
                 = (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
             final String jobWorkingDirectory = jobExecEnv.getJobWorkingDir().getCanonicalPath();
             final Writer writer = (Writer) context.get(JobConstants.WRITER_KEY);
+            log.info("Starting Job Task for job {}", jobExecEnv.getJobRequest().getId());
 
             final String jobSetupFile = jobExecEnv.getJobRequest().getSetupFile();
 
@@ -153,6 +152,7 @@ public class JobTask extends GenieBaseTask {
             writer.write(JobConstants.GENIE_DONE_FILE_CONTENT_PREFIX
                 + JobConstants.GENIE_DONE_FILE_NAME
                 + System.lineSeparator());
+            log.info("Finished Job Task for job {}", jobExecEnv.getJobRequest().getId());
         } finally {
             final long finish = System.nanoTime();
             this.timer.record(finish - start, TimeUnit.NANOSECONDS);

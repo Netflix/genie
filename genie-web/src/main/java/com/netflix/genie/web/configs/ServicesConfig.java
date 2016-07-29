@@ -250,7 +250,7 @@ public class ServicesConfig {
      */
     @Bean
     public GenieFileTransferService genieFileTransferService(
-            final FileTransferFactory fileTransferFactory
+        final FileTransferFactory fileTransferFactory
     ) throws GenieException {
         return new GenieFileTransferService(fileTransferFactory);
     }
@@ -259,20 +259,20 @@ public class ServicesConfig {
      * Get an instance of the Cache Genie File Transfer service.
      *
      * @param fileTransferFactory file transfer implementation factory
-     * @param baseCacheLocation file cache location
-     * @param localFileTransfer local file transfer service
-     * @param registry Registry
+     * @param baseCacheLocation   file cache location
+     * @param localFileTransfer   local file transfer service
+     * @param registry            Registry
      * @return A singleton for GenieFileTransferService
      * @throws GenieException If there is any problem
      */
     @Bean
     public GenieFileTransferService cacheGenieFileTransferService(
-            final FileTransferFactory fileTransferFactory,
-            @Value("${genie.file.cache.location}")
-            final String baseCacheLocation,
-            @Qualifier("file.system.file")
-            final FileTransfer localFileTransfer,
-            final Registry registry
+        final FileTransferFactory fileTransferFactory,
+        @Value("${genie.file.cache.location}")
+        final String baseCacheLocation,
+        @Qualifier("file.system.file")
+        final FileTransfer localFileTransfer,
+        final Registry registry
     ) throws GenieException {
         return new CacheGenieFileTransferService(fileTransferFactory, baseCacheLocation, localFileTransfer, registry);
     }
@@ -288,6 +288,7 @@ public class ServicesConfig {
      * @param aep                 Instance of the event publisher.
      * @param workflowTasks       List of all the workflow tasks to be executed.
      * @param genieWorkingDir     Working directory for genie where it creates jobs directories.
+     * @param registry            The metrics registry to use
      * @return An instance of the JobSubmitterService.
      */
     @Bean
@@ -299,7 +300,8 @@ public class ServicesConfig {
         final ClusterLoadBalancer clusterLoadBalancer,
         final ApplicationEventPublisher aep,
         final List<WorkflowTask> workflowTasks,
-        final Resource genieWorkingDir
+        final Resource genieWorkingDir,
+        final Registry registry
     ) {
         return new LocalJobRunner(
             jps,
@@ -309,7 +311,8 @@ public class ServicesConfig {
             clusterLoadBalancer,
             aep,
             workflowTasks,
-            genieWorkingDir
+            genieWorkingDir,
+            registry
         );
     }
 
@@ -370,6 +373,7 @@ public class ServicesConfig {
 
     /**
      * FileTransfer factory.
+     *
      * @return FileTransfer factory
      */
     @Bean

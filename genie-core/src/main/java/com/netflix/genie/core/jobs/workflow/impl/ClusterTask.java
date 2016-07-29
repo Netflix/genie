@@ -65,8 +65,6 @@ public class ClusterTask extends GenieBaseTask {
     public void executeTask(@NotNull final Map<String, Object> context) throws GenieException, IOException {
         final long start = System.nanoTime();
         try {
-            log.debug("Executing Cluster Task in the workflow.");
-
             final JobExecutionEnvironment jobExecEnv =
                 (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
             final String jobWorkingDirectory = jobExecEnv.getJobWorkingDir().getCanonicalPath();
@@ -74,6 +72,7 @@ public class ClusterTask extends GenieBaseTask {
                 + JobConstants.FILE_PATH_DELIMITER
                 + JobConstants.GENIE_PATH_VAR;
             final Writer writer = (Writer) context.get(JobConstants.WRITER_KEY);
+            log.info("Starting Cluster Task for job {}", jobExecEnv.getJobRequest().getId());
 
             // Create the directory for this application under applications in the cwd
             createEntityInstanceDirectory(
@@ -122,6 +121,7 @@ public class ClusterTask extends GenieBaseTask {
                 );
                 fts.getFile(configFile, localPath);
             }
+            log.info("Finished Cluster Task for job {}", jobExecEnv.getJobRequest().getId());
         } finally {
             final long finish = System.nanoTime();
             this.timer.record(finish - start, TimeUnit.NANOSECONDS);

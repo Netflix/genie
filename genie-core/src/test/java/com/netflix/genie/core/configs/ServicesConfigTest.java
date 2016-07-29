@@ -204,7 +204,7 @@ public class ServicesConfigTest {
      */
     @Bean
     public GenieFileTransferService genieFileTransferService(
-            final FileTransferFactory fileTransferFactory
+        final FileTransferFactory fileTransferFactory
     ) throws GenieException {
         return new GenieFileTransferService(fileTransferFactory);
     }
@@ -220,6 +220,7 @@ public class ServicesConfigTest {
      * @param aep                 Instance of the event publisher.
      * @param workflowTasks       List of all the workflow tasks to be executed.
      * @param genieWorkingDir     Working directory for genie where it creates jobs directories.
+     * @param registry            The metrics registry to use
      * @return An instance of the JobSubmitterService.
      */
     @Bean
@@ -231,7 +232,8 @@ public class ServicesConfigTest {
         final ClusterLoadBalancer clusterLoadBalancer,
         final ApplicationEventPublisher aep,
         final List<WorkflowTask> workflowTasks,
-        final Resource genieWorkingDir
+        final Resource genieWorkingDir,
+        final Registry registry
     ) {
         return new LocalJobRunner(
             jps,
@@ -241,7 +243,8 @@ public class ServicesConfigTest {
             clusterLoadBalancer,
             aep,
             workflowTasks,
-            genieWorkingDir
+            genieWorkingDir,
+            registry
         );
     }
 
@@ -333,6 +336,7 @@ public class ServicesConfigTest {
 
     /**
      * FileTransfer factory.
+     *
      * @return FileTransfer factory
      */
     @Bean

@@ -131,7 +131,7 @@ public class ClusterCheckerTask extends LeadershipTask {
             );
 
         // Increment or add new bad nodes
-        badNodes.stream().forEach(
+        badNodes.forEach(
             host -> {
                 if (this.errorCounts.containsKey(host)) {
                     this.errorCounts.put(host, this.errorCounts.get(host) + 1);
@@ -147,7 +147,7 @@ public class ClusterCheckerTask extends LeadershipTask {
             .stream()
             .filter(host -> !badNodes.contains(host))
             .collect(Collectors.toSet());
-        toRemove.stream().forEach(this.errorCounts::remove);
+        toRemove.forEach(this.errorCounts::remove);
 
         // Did we pass bad threshold on any hosts? Error jobs if so
         toRemove.clear();

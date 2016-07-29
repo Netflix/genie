@@ -294,6 +294,7 @@ public class JobRestController {
         int numAttachments = 0;
         long totalSizeOfAttachments = 0L;
         if (attachments != null) {
+            log.info("Saving attachments for job {}", jobId);
             numAttachments = attachments.length;
             for (final MultipartFile attachment : attachments) {
                 totalSizeOfAttachments += attachment.getSize();
@@ -501,6 +502,7 @@ public class JobRestController {
         if (this.jobForwardingProperties.isEnabled() && forwardedFrom == null) {
             final String jobHostname = this.jobSearchService.getJobHost(id);
             if (!this.hostName.equals(jobHostname)) {
+                log.info("Job {} is not on this node. Forwarding kill request to {}", id, jobHostname);
                 //Need to forward job
                 final HttpDelete deleteRequest = new HttpDelete(this.buildForwardURL(request, jobHostname));
                 this.copyRequestHeaders(request, deleteRequest);
@@ -519,6 +521,7 @@ public class JobRestController {
             }
         }
 
+        log.info("Job {} is on this node. Attempting to kill.", id);
         // Job is on this node so try to kill it
         this.jobCoordinatorService.killJob(id);
         response.setStatus(HttpStatus.ACCEPTED.value());
@@ -634,6 +637,7 @@ public class JobRestController {
             //       and it would return false on check if the job with given id is running on that node
             final String jobHostname = this.jobSearchService.getJobHost(id);
             if (!this.hostName.equals(jobHostname)) {
+                log.info("Job {} is not or was not run on this node. Forwarding to {}", id, jobHostname);
                 // Use Apache HttpClient for easier access to result bytes as stream than RestTemplate
                 // RestTemplate read entire byte[] payload into memory before the result object even given back to
                 // application control. Concerned about people getting stdout which could be huge file.
@@ -660,6 +664,7 @@ public class JobRestController {
             }
         }
 
+        log.info("Job {} is running or was run on this node. Fetching requested resource...", id);
         final String path = ControllerUtils.getRemainingPath(request);
         if (StringUtils.isNotBlank(path)) {
             request.setAttribute(GenieResourceHttpRequestHandler.GENIE_JOB_IS_ROOT_DIRECTORY, false);

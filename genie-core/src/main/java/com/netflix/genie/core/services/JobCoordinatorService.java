@@ -111,10 +111,10 @@ public class JobCoordinatorService {
         @Valid
         final JobRequestMetadata jobRequestMetadata
     ) throws GenieException {
-        log.debug("Called with job request {}", jobRequest);
         if (StringUtils.isBlank(jobRequest.getId())) {
             throw new GenieServerException("Id of the jobRequest cannot be null");
         }
+        log.info("Called to schedule job launch for job {}", jobRequest.getId());
 
         // Log the job request and optionally the client host
         this.jobPersistenceService.createJobRequest(jobRequest, jobRequestMetadata);
@@ -140,19 +140,28 @@ public class JobCoordinatorService {
             .withTags(jobRequest.getTags());
 
         synchronized (this) {
+            log.info("Checking if can run job {} on this node", jobRequest.getId());
             final int numActiveJobs = this.jobCountService.getNumJobs();
             if (numActiveJobs < this.maxRunningJobs) {
+                log.info(
+                    "Job {} can run on this node as only {}/{} jobs are active",
+                    jobRequest.getId(),
+                    numActiveJobs,
+                    this.maxRunningJobs
+                );
                 jobBuilder
                     .withStatus(JobStatus.INIT)
                     .withStatusMsg("Job Accepted and in initialization phase.");
                 // TODO: if this throws exception the job will never be marked failed
                 this.jobPersistenceService.createJob(jobBuilder.build());
                 try {
+                    log.info("Scheduling job {} for submission", jobRequest.getId());
                     final Future<?> task = this.taskExecutor.submit(
                         new JobLauncher(this.jobSubmitterService, jobRequest, this.registry)
                     );
 
                     // Tell the system a new job has been scheduled so any actions can be taken
+                    log.info("Publishing job scheduled event for job {}", jobRequest.getId());
                     this.eventPublisher.publishEvent(new JobScheduledEvent(jobRequest.getId(), task, this));
                 } catch (final TaskRejectedException e) {
                     final String errorMsg = "Unable to launch job due to exception: " + e.getMessage();

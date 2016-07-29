@@ -69,7 +69,6 @@ public class ApplicationTask extends GenieBaseTask {
     ) throws GenieException, IOException {
         final long start = System.nanoTime();
         try {
-            log.debug("Executing Application Task in the workflow.");
             final JobExecutionEnvironment jobExecEnv =
                 (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
             final String jobWorkingDirectory = jobExecEnv.getJobWorkingDir().getCanonicalPath();
@@ -77,6 +76,7 @@ public class ApplicationTask extends GenieBaseTask {
                 + JobConstants.FILE_PATH_DELIMITER
                 + JobConstants.GENIE_PATH_VAR;
             final Writer writer = (Writer) context.get(JobConstants.WRITER_KEY);
+            log.info("Starting Application Task for job {}", jobExecEnv.getJobRequest().getId());
 
 
             if (jobExecEnv.getApplications() != null) {
@@ -148,6 +148,7 @@ public class ApplicationTask extends GenieBaseTask {
                     }
                 }
             }
+            log.info("Finished Application Task for job {}", jobExecEnv.getJobRequest().getId());
         } finally {
             final long finish = System.nanoTime();
             this.timer.record(finish - start, TimeUnit.NANOSECONDS);
