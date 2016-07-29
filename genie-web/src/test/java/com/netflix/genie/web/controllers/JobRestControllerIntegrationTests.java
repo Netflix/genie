@@ -46,6 +46,7 @@ import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -57,6 +58,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -158,6 +160,9 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
 
     @Autowired
     private Resource jobDirResource;
+
+    @Value("${genie.file.cache.location}")
+    private String baseCacheLocation;
 
     /**
      * Setup for tests.
@@ -556,8 +561,26 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         Assert.assertThat(this.jobRequestMetadataRepository.count(), Matchers.is(1L));
         Assert.assertThat(this.jobExecutionRepository.count(), Matchers.is(1L));
 
+        // Check if the culster setup file is cached
+        final String clusterSetUpFilePath = this.resourceLoader.getResource(
+                BASE_DIR + CMD1_ID + FILE_DELIMITER + "setupfile").getFile().getAbsolutePath();
+        Assert.assertTrue(Files.exists(Paths.get(baseCacheLocation,
+                UUID.nameUUIDFromBytes(clusterSetUpFilePath.getBytes(Charset.forName("UTF-8"))).toString())));
         // Test for conflicts
         this.testForConflicts(jobId, commandArgs, clusterCriteriaList, commandCriteria);
+    }
+
+    /**
+     * Test the job submit method for success twice to validate the file cache use.
+     *
+     * @throws Exception If there is a problem.
+     */
+    @Test
+    public void testSubmitJobMethodTwiceSuccess() throws Exception {
+        testSubmitJobMethodSuccess();
+        cleanup();
+        setup();
+        testSubmitJobMethodSuccess();
     }
 
     private void testForConflicts(

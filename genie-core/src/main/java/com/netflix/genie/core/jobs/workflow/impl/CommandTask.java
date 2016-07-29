@@ -44,14 +44,18 @@ import java.util.concurrent.TimeUnit;
 public class CommandTask extends GenieBaseTask {
 
     private final Timer timer;
+    private final GenieFileTransferService fts;
 
     /**
      * Constructor.
      *
      * @param registry The metrics registry to use
+     * @param fts File transfer service
      */
-    public CommandTask(@NotNull final Registry registry) {
+    public CommandTask(@NotNull final Registry registry,
+            @NotNull final GenieFileTransferService fts) {
         this.timer = registry.timer("genie.jobs.tasks.commandTask.timer");
+        this.fts = fts;
     }
 
     /**
@@ -61,10 +65,6 @@ public class CommandTask extends GenieBaseTask {
     public void executeTask(@NotNull final Map<String, Object> context) throws GenieException, IOException {
         final long start = System.nanoTime();
         try {
-            log.debug("Executing Command Task in the workflow.");
-
-            final GenieFileTransferService fts =
-                (GenieFileTransferService) context.get(JobConstants.FILE_TRANSFER_SERVICE_KEY);
             final JobExecutionEnvironment jobExecEnv =
                 (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
             final String jobWorkingDirectory = jobExecEnv.getJobWorkingDir().getCanonicalPath();
@@ -72,6 +72,7 @@ public class CommandTask extends GenieBaseTask {
                 + JobConstants.FILE_PATH_DELIMITER
                 + JobConstants.GENIE_PATH_VAR;
             final Writer writer = (Writer) context.get(JobConstants.WRITER_KEY);
+            log.info("Starting Command Task for job {}", jobExecEnv.getJobRequest().getId());
 
             // Create the directory for this command under command dir in the cwd
             createEntityInstanceDirectory(
@@ -119,6 +120,7 @@ public class CommandTask extends GenieBaseTask {
                 );
                 fts.getFile(configFile, localPath);
             }
+            log.info("Finished Command Task for job {}", jobExecEnv.getJobRequest().getId());
         } finally {
             final long finish = System.nanoTime();
             this.timer.record(finish - start, TimeUnit.NANOSECONDS);

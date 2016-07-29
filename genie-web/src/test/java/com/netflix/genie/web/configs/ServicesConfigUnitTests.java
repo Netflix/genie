@@ -29,13 +29,11 @@ import com.netflix.genie.core.services.ApplicationService;
 import com.netflix.genie.core.services.ClusterLoadBalancer;
 import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;
-import com.netflix.genie.core.services.FileTransfer;
 import com.netflix.genie.core.services.JobCountService;
 import com.netflix.genie.core.services.JobKillService;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobSubmitterService;
-import com.netflix.genie.core.services.impl.GenieFileTransferService;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.spectator.api.Registry;
 import org.apache.commons.exec.Executor;
@@ -101,8 +99,7 @@ public class ServicesConfigUnitTests {
      */
     @Test
     public void canGetGenieFileTransfer() throws GenieException {
-        final ArrayList<FileTransfer> fileTransferList = new ArrayList<>();
-        Assert.assertNotNull(this.servicesConfig.genieFileTransferService(fileTransferList));
+        Assert.assertNotNull(this.servicesConfig.genieFileTransferService(scheme -> null));
     }
 
     /**
@@ -129,14 +126,6 @@ public class ServicesConfigUnitTests {
                 "password"
             )
         );
-    }
-
-    /**
-     * Confirm we can get a GenieNodeStatistics implementation.
-     */
-    @Test
-    public void canGetGenieNodeStatisticsBean() {
-        Assert.assertNotNull(this.servicesConfig.getGenieNodeStatistics());
     }
 
     /**
@@ -222,7 +211,6 @@ public class ServicesConfigUnitTests {
         final ClusterService clusterService = Mockito.mock(ClusterService.class);
         final CommandService commandService = Mockito.mock(CommandService.class);
         final ClusterLoadBalancer clusterLoadBalancer = Mockito.mock(ClusterLoadBalancer.class);
-        final GenieFileTransferService genieFileTransferService = Mockito.mock(GenieFileTransferService.class);
         final ApplicationEventPublisher applicationEventPublisher = Mockito.mock(ApplicationEventPublisher.class);
         final Resource resource = Mockito.mock(Resource.class);
         final List<WorkflowTask> workflowTasks = new ArrayList<>();
@@ -234,10 +222,10 @@ public class ServicesConfigUnitTests {
                 clusterService,
                 commandService,
                 clusterLoadBalancer,
-                genieFileTransferService,
                 applicationEventPublisher,
                 workflowTasks,
-                resource
+                resource,
+                Mockito.mock(Registry.class)
             )
         );
     }

@@ -73,6 +73,7 @@ public class JobLauncher implements Runnable {
     @Override
     public void run() {
         this.submitTimer.record(() -> {
+                // TODO: Compress the timer into a single ID tagged by exceptions
                 try {
                     this.jobSubmitterService.submitJob(this.jobRequest);
                 } catch (final GenieException e) {

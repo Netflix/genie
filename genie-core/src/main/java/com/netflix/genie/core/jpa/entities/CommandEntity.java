@@ -37,7 +37,6 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
@@ -104,9 +103,6 @@ public class CommandEntity extends SetupFileEntity {
 
     @ManyToMany(mappedBy = "commands", fetch = FetchType.LAZY)
     private Set<ClusterEntity> clusters = new HashSet<>();
-
-    @OneToMany(mappedBy = "cluster", fetch = FetchType.LAZY)
-    private Set<JobEntity> jobs = new HashSet<>();
 
     /**
      * Default Constructor.
@@ -272,39 +268,6 @@ public class CommandEntity extends SetupFileEntity {
         this.clusters.clear();
         if (clusters != null) {
             this.clusters.addAll(clusters);
-        }
-    }
-
-    /**
-     * Get the jobs which used this command. Probably shouldn't be used as it will return an enormous list.
-     *
-     * @return The jobs this command is used for
-     */
-    protected Set<JobEntity> getJobs() {
-        return this.jobs;
-    }
-
-    /**
-     * Set the jobs run using this command.
-     *
-     * @param jobs The jobs
-     */
-    public void setJobs(final Set<JobEntity> jobs) {
-        this.jobs.clear();
-
-        if (jobs != null) {
-            this.jobs.addAll(jobs);
-        }
-    }
-
-    /**
-     * Add a job to the set of jobs this command was used for.
-     *
-     * @param job The job
-     */
-    public void addJob(final JobEntity job) {
-        if (job != null) {
-            this.jobs.add(job);
         }
     }
 

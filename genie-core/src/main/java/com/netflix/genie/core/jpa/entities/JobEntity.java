@@ -369,7 +369,6 @@ public class JobEntity extends CommonFieldsEntity {
      */
     public void setCluster(final ClusterEntity cluster) {
         if (this.cluster != null) {
-            this.cluster.getJobs().remove(this);
             this.clusterName = null;
         }
 
@@ -377,7 +376,6 @@ public class JobEntity extends CommonFieldsEntity {
 
         // Reverse side of the relationship
         if (this.cluster != null) {
-            this.cluster.addJob(this);
             this.clusterName = cluster.getName();
         }
     }
@@ -398,7 +396,6 @@ public class JobEntity extends CommonFieldsEntity {
      */
     public void setCommand(final CommandEntity command) {
         if (this.command != null) {
-            this.command.getJobs().remove(this);
             this.commandName = null;
         }
 
@@ -406,7 +403,6 @@ public class JobEntity extends CommonFieldsEntity {
 
         // Reverse side of the relationship
         if (this.command != null) {
-            this.command.addJob(this);
             this.commandName = command.getName();
         }
     }

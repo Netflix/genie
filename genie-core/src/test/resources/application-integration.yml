@@ -17,6 +17,9 @@
 ##
 
 genie:
+  file:
+    cache:
+      location: "file:///tmp/genie/cache"
   jobs:
     dir:
       location: "file:///tmp/"

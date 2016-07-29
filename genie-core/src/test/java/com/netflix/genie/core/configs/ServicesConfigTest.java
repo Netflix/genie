@@ -35,7 +35,7 @@ import com.netflix.genie.core.services.AttachmentService;
 import com.netflix.genie.core.services.ClusterLoadBalancer;
 import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;
-import com.netflix.genie.core.services.FileTransfer;
+import com.netflix.genie.core.services.FileTransferFactory;
 import com.netflix.genie.core.services.JobCoordinatorService;
 import com.netflix.genie.core.services.JobCountService;
 import com.netflix.genie.core.services.JobKillService;
@@ -51,7 +51,9 @@ import com.netflix.genie.core.services.impl.RandomizedClusterLoadBalancerImpl;
 import com.netflix.spectator.api.DefaultRegistry;
 import com.netflix.spectator.api.Registry;
 import org.apache.commons.exec.Executor;
+import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.ServiceLocatorFactoryBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -196,15 +198,15 @@ public class ServicesConfigTest {
     /**
      * Get an instance of the Genie File Transfer service.
      *
-     * @param fileTransferImpls List of implementations of all fileTransfer interface
-     * @return An singelton for GenieFileTransferService
+     * @param fileTransferFactory file transfer implementation factory
+     * @return A singleton for GenieFileTransferService
      * @throws GenieException If there is any problem
      */
     @Bean
     public GenieFileTransferService genieFileTransferService(
-        final List<FileTransfer> fileTransferImpls
+        final FileTransferFactory fileTransferFactory
     ) throws GenieException {
-        return new GenieFileTransferService(fileTransferImpls);
+        return new GenieFileTransferService(fileTransferFactory);
     }
 
     /**
@@ -215,10 +217,10 @@ public class ServicesConfigTest {
      * @param clusterService      Implementation of cluster service interface.
      * @param commandService      Implementation of command service interface.
      * @param clusterLoadBalancer Implementation of the cluster load balancer interface.
-     * @param fts                 File Transfer service.
      * @param aep                 Instance of the event publisher.
      * @param workflowTasks       List of all the workflow tasks to be executed.
      * @param genieWorkingDir     Working directory for genie where it creates jobs directories.
+     * @param registry            The metrics registry to use
      * @return An instance of the JobSubmitterService.
      */
     @Bean
@@ -228,10 +230,10 @@ public class ServicesConfigTest {
         final ClusterService clusterService,
         final CommandService commandService,
         final ClusterLoadBalancer clusterLoadBalancer,
-        final GenieFileTransferService fts,
         final ApplicationEventPublisher aep,
         final List<WorkflowTask> workflowTasks,
-        final Resource genieWorkingDir
+        final Resource genieWorkingDir,
+        final Registry registry
     ) {
         return new LocalJobRunner(
             jps,
@@ -239,10 +241,10 @@ public class ServicesConfigTest {
             clusterService,
             commandService,
             clusterLoadBalancer,
-            fts,
             aep,
             workflowTasks,
-            genieWorkingDir
+            genieWorkingDir,
+            registry
         );
     }
 
@@ -330,5 +332,17 @@ public class ServicesConfigTest {
         @Value("${genie.jobs.attachments.dir:#{null}}") final String attachmentsDirectory
     ) {
         return new FileSystemAttachmentService(attachmentsDirectory);
+    }
+
+    /**
+     * FileTransfer factory.
+     *
+     * @return FileTransfer factory
+     */
+    @Bean
+    public FactoryBean fileTransferFactory() {
+        final ServiceLocatorFactoryBean factoryBean = new ServiceLocatorFactoryBean();
+        factoryBean.setServiceLocatorInterface(FileTransferFactory.class);
+        return factoryBean;
     }
 }

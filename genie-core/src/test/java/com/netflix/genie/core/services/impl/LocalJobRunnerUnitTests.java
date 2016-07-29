@@ -36,6 +36,8 @@ import com.netflix.genie.core.services.CommandService;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSubmitterService;
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.spectator.api.Registry;
+import com.netflix.spectator.api.Timer;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -102,7 +104,6 @@ public class LocalJobRunnerUnitTests {
         final CommandService commandService = Mockito.mock(CommandService.class);
         this.clusterLoadBalancer = Mockito.mock(ClusterLoadBalancer.class);
         final ApplicationEventPublisher applicationEventPublisher = Mockito.mock(ApplicationEventPublisher.class);
-        final GenieFileTransferService fileTransferService = Mockito.mock(GenieFileTransferService.class);
         final WorkflowTask task1 = Mockito.mock(WorkflowTask.class);
         this.task2 = Mockito.mock(WorkflowTask.class);
 
@@ -114,16 +115,19 @@ public class LocalJobRunnerUnitTests {
         final Resource baseWorkingDirResource = Mockito.mock(Resource.class);
         Mockito.when(baseWorkingDirResource.getFile()).thenReturn(tmpFolder);
 
+        final Registry registry = Mockito.mock(Registry.class);
+        Mockito.when(registry.timer(Mockito.anyString())).thenReturn(Mockito.mock(Timer.class));
+
         this.jobSubmitterService = new LocalJobRunner(
             this.jobPersistenceService,
             this.applicationService,
             this.clusterService,
             commandService,
             this.clusterLoadBalancer,
-            fileTransferService,
             applicationEventPublisher,
             jobWorkflowTasks,
-            baseWorkingDirResource
+            baseWorkingDirResource,
+            registry
         );
     }
 

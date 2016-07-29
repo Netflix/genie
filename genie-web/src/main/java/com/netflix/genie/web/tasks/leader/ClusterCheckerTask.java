@@ -18,6 +18,7 @@
 package com.netflix.genie.web.tasks.leader;
 
 import com.netflix.genie.common.dto.JobExecution;
+import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
@@ -130,7 +131,7 @@ public class ClusterCheckerTask extends LeadershipTask {
             );
 
         // Increment or add new bad nodes
-        badNodes.stream().forEach(
+        badNodes.forEach(
             host -> {
                 if (this.errorCounts.containsKey(host)) {
                     this.errorCounts.put(host, this.errorCounts.get(host) + 1);
@@ -146,7 +147,7 @@ public class ClusterCheckerTask extends LeadershipTask {
             .stream()
             .filter(host -> !badNodes.contains(host))
             .collect(Collectors.toSet());
-        toRemove.stream().forEach(this.errorCounts::remove);
+        toRemove.forEach(this.errorCounts::remove);
 
         // Did we pass bad threshold on any hosts? Error jobs if so
         toRemove.clear();
@@ -157,10 +158,15 @@ public class ClusterCheckerTask extends LeadershipTask {
                 host -> {
                     toRemove.add(host);
                     final Set<JobExecution> jobs = this.jobSearchService.getAllRunningJobExecutionsOnHost(host);
-                    jobs.stream().forEach(
+                    jobs.forEach(
                         job -> {
                             try {
-                                this.jobPersistenceService.setExitCode(job.getId(), JobExecution.LOST_EXIT_CODE);
+                                this.jobPersistenceService.setJobCompletionInformation(
+                                    job.getId(),
+                                    JobExecution.LOST_EXIT_CODE,
+                                    JobStatus.FAILED,
+                                    "Genie leader can't reach node running job. Assuming node and job are lost."
+                                );
                                 this.lostJobsCounter.increment();
                             } catch (final GenieException ge) {
                                 log.error("Unable to update job {} to failed due to exception", job.getId(), ge);
@@ -171,7 +177,7 @@ public class ClusterCheckerTask extends LeadershipTask {
                 }
             );
         // Remove the fields we just purged
-        toRemove.stream().forEach(this.errorCounts::remove);
+        toRemove.forEach(this.errorCounts::remove);
         log.info("Finished checking for cluster node health.");
     }
 

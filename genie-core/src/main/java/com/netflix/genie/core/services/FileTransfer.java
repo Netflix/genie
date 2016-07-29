@@ -56,4 +56,12 @@ public interface FileTransfer {
      * @throws GenieException exception in case of an error
      */
     void putFile(String srcLocalPath, String dstRemotePath) throws GenieException;
+
+    /**
+     * Returns the last modified time of the file with the given path.
+     * @param path location of the file
+     * @return time in milliseconds
+     * @throws GenieException exception in case of IO error
+     */
+    long getLastModifiedTime(String path) throws GenieException;
 }

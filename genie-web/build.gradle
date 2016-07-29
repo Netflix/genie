@@ -31,6 +31,7 @@ dependencies {
     compile("org.springframework.cloud:spring-cloud-cluster-zookeeper:${spring_cloud_cluster_version}")
     compile("org.springframework.cloud:spring-cloud-starter-eureka:${spring_cloud_netflix_version}")
     compile("org.springframework.cloud:spring-cloud-starter-spectator:${spring_cloud_netflix_version}")
+    compile("org.springframework.security:spring-security-jwt")
     compile("org.springframework.security.extensions:spring-security-saml2-core:${spring_security_saml_version}") {
         exclude group: "org.bouncycastle", module: "bcprov-jdk15"
     }
@@ -64,6 +65,7 @@ dependencies {
     testCompile("org.dbunit:dbunit:${dbunit_version}")
     testCompile("org.springframework.security:spring-security-test")
     testCompile("net.sf.jtidy:jtidy:${jtidy_version}")
+    testCompile("com.github.tomakehurst:wiremock:${wiremock_version}")
 }
 
 license {

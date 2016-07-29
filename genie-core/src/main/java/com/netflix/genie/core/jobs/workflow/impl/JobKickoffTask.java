@@ -90,12 +90,11 @@ public class JobKickoffTask extends GenieBaseTask {
     public void executeTask(@NotNull final Map<String, Object> context) throws GenieException, IOException {
         final long start = System.nanoTime();
         try {
-            log.info("Executing Job Kickoff Task in the workflow.");
-
             final JobExecutionEnvironment jobExecEnv =
                 (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
             final String jobWorkingDirectory = jobExecEnv.getJobWorkingDir().getCanonicalPath();
             final Writer writer = (Writer) context.get(JobConstants.WRITER_KEY);
+            log.info("Starting Job Kickoff Task for job {}", jobExecEnv.getJobRequest().getId());
 
             // At this point all contents are written to the run script and we call an explicit flush and close to write
             // the contents to the file before we execute it.
@@ -154,6 +153,7 @@ public class JobKickoffTask extends GenieBaseTask {
             } catch (final IOException ie) {
                 throw new GenieServerException("Unable to start command " + String.valueOf(command), ie);
             }
+            log.info("Finished Job Kickoff Task for job {}", jobExecEnv.getJobRequest().getId());
         } finally {
             final long finish = System.nanoTime();
             this.timer.record(finish - start, TimeUnit.NANOSECONDS);
