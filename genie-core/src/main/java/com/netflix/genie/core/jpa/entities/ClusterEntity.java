@@ -34,7 +34,6 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
@@ -85,9 +84,6 @@ public class ClusterEntity extends SetupFileEntity {
     )
     @OrderColumn(name = "command_order", nullable = false)
     private List<CommandEntity> commands = new ArrayList<>();
-
-    @OneToMany(mappedBy = "cluster", fetch = FetchType.LAZY)
-    private Set<JobEntity> jobs = new HashSet<>();
 
     /**
      * Default Constructor.
@@ -222,39 +218,6 @@ public class ClusterEntity extends SetupFileEntity {
      */
     public void removeAllCommands() {
         Lists.newArrayList(this.commands).forEach(this::removeCommand);
-    }
-
-    /**
-     * Get the jobs which ran on this cluster. Probably shouldn't be used as it will return an enormous list.
-     *
-     * @return The jobs this cluster ran
-     */
-    protected Set<JobEntity> getJobs() {
-        return this.jobs;
-    }
-
-    /**
-     * Set the jobs run on this cluster.
-     *
-     * @param jobs The jobs
-     */
-    public void setJobs(final Set<JobEntity> jobs) {
-        this.jobs.clear();
-
-        if (jobs != null) {
-            this.jobs.addAll(jobs);
-        }
-    }
-
-    /**
-     * Add a job to the set of jobs this cluster ran.
-     *
-     * @param job The job
-     */
-    public void addJob(final JobEntity job) {
-        if (job != null) {
-            this.jobs.add(job);
-        }
     }
 
     /**

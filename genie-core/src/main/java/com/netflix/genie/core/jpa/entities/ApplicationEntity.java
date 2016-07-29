@@ -83,9 +83,6 @@ public class ApplicationEntity extends SetupFileEntity {
     @ManyToMany(mappedBy = "applications", fetch = FetchType.LAZY)
     private Set<CommandEntity> commands = new HashSet<>();
 
-//    @ManyToMany(mappedBy = "applications", fetch = FetchType.LAZY)
-//    private Set<JobEntity> jobs = new HashSet<>();
-
     /**
      * Default constructor.
      */

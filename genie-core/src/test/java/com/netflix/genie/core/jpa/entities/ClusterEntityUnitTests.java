@@ -334,36 +334,6 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
     }
 
     /**
-     * Test to make sure we can set the jobs for the cluster.
-     */
-    @Test
-    public void canSetJobs() {
-        final Set<JobEntity> jobEntities = Sets.newHashSet(new JobEntity(), new JobEntity());
-        this.c.setJobs(jobEntities);
-        Assert.assertThat(this.c.getJobs(), Matchers.is(jobEntities));
-
-        this.c.setJobs(null);
-        Assert.assertThat(this.c.getJobs(), Matchers.empty());
-    }
-
-    /**
-     * Test to make sure we can add a job to the set of jobs for the cluster.
-     *
-     * @throws GeniePreconditionException for any error
-     */
-    @Test
-    public void canAddJob() throws GeniePreconditionException {
-        final JobEntity job = new JobEntity();
-        job.setId(UUID.randomUUID().toString());
-        this.c.addJob(job);
-        Assert.assertThat(this.c.getJobs(), Matchers.contains(job));
-
-        Assert.assertThat(this.c.getJobs().size(), Matchers.is(1));
-        this.c.addJob(null);
-        Assert.assertThat(this.c.getJobs().size(), Matchers.is(1));
-    }
-
-    /**
      * Test to make sure the entity can return a valid DTO.
      *
      * @throws GenieException on error
