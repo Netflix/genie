@@ -318,16 +318,13 @@ public class JobEntityUnitTests extends EntityTestsBase {
         final ClusterEntity cluster = new ClusterEntity();
         final String clusterName = UUID.randomUUID().toString();
         cluster.setName(clusterName);
-        Assert.assertThat(cluster.getJobs(), Matchers.empty());
         Assert.assertThat(this.jobEntity.getClusterName(), Matchers.nullValue());
         this.jobEntity.setCluster(cluster);
         Assert.assertThat(this.jobEntity.getCluster(), Matchers.is(cluster));
-        Assert.assertThat(cluster.getJobs(), Matchers.contains(this.jobEntity));
         Assert.assertThat(this.jobEntity.getClusterName(), Matchers.is(clusterName));
 
         this.jobEntity.setCluster(null);
         Assert.assertThat(this.jobEntity.getCluster(), Matchers.nullValue());
-        Assert.assertThat(cluster.getJobs(), Matchers.empty());
         Assert.assertThat(this.jobEntity.getClusterName(), Matchers.nullValue());
     }
 
@@ -339,16 +336,13 @@ public class JobEntityUnitTests extends EntityTestsBase {
         final CommandEntity command = new CommandEntity();
         final String commandName = UUID.randomUUID().toString();
         command.setName(commandName);
-        Assert.assertThat(command.getJobs(), Matchers.empty());
         Assert.assertThat(this.jobEntity.getCommandName(), Matchers.nullValue());
         this.jobEntity.setCommand(command);
         Assert.assertThat(this.jobEntity.getCommand(), Matchers.is(command));
-        Assert.assertThat(command.getJobs(), Matchers.contains(this.jobEntity));
         Assert.assertThat(this.jobEntity.getCommandName(), Matchers.is(commandName));
 
         this.jobEntity.setCommand(null);
         Assert.assertThat(this.jobEntity.getCommand(), Matchers.nullValue());
-        Assert.assertThat(command.getJobs(), Matchers.empty());
         Assert.assertThat(this.jobEntity.getCommandName(), Matchers.nullValue());
     }
 

@@ -383,38 +383,6 @@ public class CommandEntityUnitTests extends EntityTestsBase {
     }
 
     /**
-     * Test to make sure we can set the jobs for the cluster.
-     */
-    @Test
-    public void canSetJobs() {
-        final CommandEntity entity = new CommandEntity();
-        final Set<JobEntity> jobEntities = Sets.newHashSet(new JobEntity(), new JobEntity());
-        entity.setJobs(jobEntities);
-        Assert.assertThat(entity.getJobs(), Matchers.is(jobEntities));
-
-        entity.setJobs(null);
-        Assert.assertThat(entity.getJobs(), Matchers.empty());
-    }
-
-    /**
-     * Test to make sure we can add a job to the set of jobs for the cluster.
-     *
-     * @throws GeniePreconditionException for any error
-     */
-    @Test
-    public void canAddJob() throws GeniePreconditionException {
-        final CommandEntity entity = new CommandEntity();
-        final JobEntity job = new JobEntity();
-        job.setId(UUID.randomUUID().toString());
-        entity.addJob(job);
-        Assert.assertThat(entity.getJobs(), Matchers.contains(job));
-
-        Assert.assertThat(entity.getJobs().size(), Matchers.is(1));
-        entity.addJob(null);
-        Assert.assertThat(entity.getJobs().size(), Matchers.is(1));
-    }
-
-    /**
      * Make sure we can get a valid Command DTO.
      *
      * @throws GenieException on error
