@@ -59,13 +59,12 @@ public class InitialSetupTask extends GenieBaseTask {
     public void executeTask(@NotNull final Map<String, Object> context) throws GenieException, IOException {
         final long start = System.nanoTime();
         try {
-            log.debug("Executing Initial setup Task in the workflow.");
-
             final String lineSeparator = System.lineSeparator();
             final JobExecutionEnvironment jobExecEnv
                 = (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
             final String jobWorkingDirectory = jobExecEnv.getJobWorkingDir().getCanonicalPath();
             final Writer writer = (Writer) context.get(JobConstants.WRITER_KEY);
+            log.info("Starting Initial Setup Task for job {}", jobExecEnv.getJobRequest().getId());
 
             // create top level directory structure for the job
 
@@ -251,6 +250,7 @@ public class InitialSetupTask extends GenieBaseTask {
 
             // Append new line
             writer.write(System.lineSeparator());
+            log.info("Finished Initial Setup Task for job {}", jobExecEnv.getJobRequest().getId());
         } finally {
             final long finish = System.nanoTime();
             this.timer.record(finish - start, TimeUnit.NANOSECONDS);

@@ -149,7 +149,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
      * {@inheritDoc}
      */
     @Override
-    public synchronized void updateJobStatus(
+    public void updateJobStatus(
         @NotBlank(message = "No job id entered. Unable to update.")
         final String id,
         @NotNull(message = "Status cannot be null.")
@@ -316,7 +316,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
      * {@inheritDoc}
      */
     @Override
-    public synchronized void setJobCompletionInformation(
+    public void setJobCompletionInformation(
         @NotBlank(message = "No job id entered. Unable to update.")
         final String id,
         final int exitCode,

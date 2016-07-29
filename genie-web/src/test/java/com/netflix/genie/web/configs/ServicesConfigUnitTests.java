@@ -224,7 +224,8 @@ public class ServicesConfigUnitTests {
                 clusterLoadBalancer,
                 applicationEventPublisher,
                 workflowTasks,
-                resource
+                resource,
+                Mockito.mock(Registry.class)
             )
         );
     }

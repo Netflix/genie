@@ -117,23 +117,24 @@ public final class JpaClusterSpecs {
 
             cq.distinct(true);
 
-            predicates.add(cb.equal(commands.get(CommandEntity_.status), CommandStatus.ACTIVE));
             predicates.add(cb.equal(root.get(ClusterEntity_.status), ClusterStatus.UP));
-
-            if (commandCriteria != null && !commandCriteria.isEmpty()) {
-                predicates.add(
-                    cb.like(
-                        commands.get(CommandEntity_.tags),
-                        JpaSpecificationUtils.getTagLikeString(commandCriteria)
-                    )
-                );
-            }
 
             if (clusterCriteria != null && clusterCriteria.getTags() != null && !clusterCriteria.getTags().isEmpty()) {
                 predicates.add(
                     cb.like(
                         root.get(ClusterEntity_.tags),
                         JpaSpecificationUtils.getTagLikeString(clusterCriteria.getTags())
+                    )
+                );
+            }
+
+            predicates.add(cb.equal(commands.get(CommandEntity_.status), CommandStatus.ACTIVE));
+
+            if (commandCriteria != null && !commandCriteria.isEmpty()) {
+                predicates.add(
+                    cb.like(
+                        commands.get(CommandEntity_.tags),
+                        JpaSpecificationUtils.getTagLikeString(commandCriteria)
                     )
                 );
             }

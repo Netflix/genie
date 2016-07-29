@@ -19,6 +19,7 @@ package com.netflix.genie.core.jobs.workflow.impl;
 
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.jobs.JobConstants;
+import com.netflix.genie.core.jobs.JobExecutionEnvironment;
 import com.netflix.spectator.api.Registry;
 import com.netflix.spectator.api.Timer;
 import lombok.extern.slf4j.Slf4j;
@@ -56,12 +57,15 @@ public class JobFailureAndKillHandlerLogicTask extends GenieBaseTask {
     public void executeTask(@NotNull final Map<String, Object> context) throws GenieException, IOException {
         final long start = System.nanoTime();
         try {
-            log.debug("Executing JobKillLogic Task in the workflow.");
+            final JobExecutionEnvironment jobExecEnv
+                = (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
+            log.info("Starting Job Failure and Kill Handler Task for job {}", jobExecEnv.getJobRequest().getId());
 
             final Writer writer = (Writer) context.get(JobConstants.WRITER_KEY);
 
             // Append logic for handling job kill signal
             writer.write(JobConstants.JOB_FAILURE_AND_KILL_HANDLER_LOGIC + System.lineSeparator());
+            log.info("Finished Job Failure and Kill Handler Task for job {}", jobExecEnv.getJobRequest().getId());
         } finally {
             final long finish = System.nanoTime();
             this.timer.record(finish - start, TimeUnit.NANOSECONDS);

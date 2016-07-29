@@ -18,7 +18,6 @@
 package com.netflix.genie.web.tasks.node;
 
 import com.netflix.genie.common.dto.Job;
-import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.services.JobSearchService;
@@ -116,7 +115,7 @@ public class DiskCleanupTask implements Runnable {
             final String id = dir.getName();
             try {
                 final Job job = this.jobSearchService.getJob(id);
-                if (job.getStatus() == JobStatus.INIT || job.getStatus() == JobStatus.RUNNING) {
+                if (job.getStatus().isActive()) {
                     // Don't want to delete anything still going
                     continue;
                 }
