@@ -51,7 +51,7 @@ export const hasChanged = (o1, o2) => {
   return changed;
 };
 
-export const momentFormat = (dateStr, format = 'MM/DD/YYYY, hh:mm:ss') =>
+export const momentFormat = (dateStr, format = 'MM/DD/YYYY, H:mm:ss') =>
   moment.utc(dateStr).format(format);
 
 //https://github.com/moment/moment/issues/1048
