@@ -241,4 +241,9 @@ def reattach_job(job_id, conf=None):
         :py:class:`RunningJob` object.
     """
 
-    return RunningJob(job_id, conf=conf)
+    running_job = RunningJob(job_id, conf=conf)
+
+    # try to access the RunningJob's status to see if the job exists
+    running_job.status
+
+    return running_job

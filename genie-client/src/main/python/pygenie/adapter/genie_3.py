@@ -207,77 +207,98 @@ class Genie3Adapter(GenieBaseAdapter):
                 raise GenieJobNotFoundError(msg)
             raise
 
-    def get_info_for_rj(self, job_id, full=True, *args, **kwargs):
+    def get_info_for_rj(self, job_id, job=False, request=False,
+                        applications=False, cluster=False, command=False,
+                        execution=False, *args, **kwargs):
         """
         Get information for RunningJob object.
         """
 
-        data = self.get(job_id, timeout=60)
+        get_all = all([not job,
+                       not request,
+                       not applications,
+                       not cluster,
+                       not command,
+                       not execution])
 
-        link = data.get('_links', {}).get('self', {}).get('href')
-        link_parts = urlparse(link)
-        output_link = '{scheme}://{netloc}/output/{job_id}/output' \
-            .format(scheme=link_parts.scheme,
-                    netloc=link_parts.netloc,
-                    job_id=data.get('id'))
-        job_link = '{scheme}://{netloc}/jobs?id={job_id}&showDetails={job_id}' \
-            .format(scheme=link_parts.scheme,
-                    netloc=link_parts.netloc,
-                    job_id=data.get('id'))
+        ret = dict()
 
-        ret = {
-            'archive_location': data.get('archiveLocation'),
-            'attachments': None,
-            'command_args': data.get('commandArgs'),
-            'created': data.get('created'),
-            'description': data.get('description'),
-            'finished': data.get('finished'),
-            'id': data.get('id'),
-            'job_link': job_link,
-            'json_link': link,
-            'kill_uri': link,
-            'name': data.get('name'),
-            'output_uri': output_link,
-            'started': data.get('started'),
-            'status': data.get('status'),
-            'status_msg': data.get('statusMsg'),
-            'tags': data.get('tags'),
-            'updated': data.get('updated'),
-            'user': data.get('user'),
-            'version': data.get('version')
-        }
+        if job or get_all:
+            data = self.get(job_id, timeout=60)
 
-        if full:
+            link = data.get('_links', {}).get('self', {}).get('href')
+            link_parts = urlparse(link)
+            output_link = '{scheme}://{netloc}/output/{job_id}/output' \
+                .format(scheme=link_parts.scheme,
+                        netloc=link_parts.netloc,
+                        job_id=data.get('id'))
+            job_link = '{scheme}://{netloc}/jobs?id={job_id}&rowId={job_id}' \
+                .format(scheme=link_parts.scheme,
+                        netloc=link_parts.netloc,
+                        job_id=data.get('id'))
+
+            ret['archive_location'] = data.get('archiveLocation')
+            ret['attachments'] = None
+            ret['command_args'] = data.get('commandArgs')
+            ret['created'] = data.get('created')
+            ret['description'] = data.get('description')
+            ret['finished'] = data.get('finished')
+            ret['id'] = data.get('id')
+            ret['job_link'] = job_link
+            ret['json_link'] = link
+            ret['kill_uri'] = link
+            ret['name'] = data.get('name')
+            ret['output_uri'] = output_link
+            ret['started'] = data.get('started')
+            ret['status'] = data.get('status')
+            ret['status_msg'] = data.get('statusMsg')
+            ret['tags'] = data.get('tags')
+            ret['updated'] = data.get('updated')
+            ret['user'] = data.get('user')
+            ret['version'] = data.get('version')
+
+        if request or get_all:
             request_data = self.get(job_id, path='request', timeout=60)
-            application_data = self.get(job_id,
-                                        path='applications',
-                                        if_not_found=list(),
-                                        timeout=60)
-            cluster_data = self.get(job_id,
-                                    path='cluster',
-                                    if_not_found=dict(),
-                                    timeout=60)
-            command_data = self.get(job_id,
-                                    path='command',
-                                    if_not_found=dict(),
-                                    timeout=60)
-            execution_data = self.get(job_id,
-                                      path='execution',
-                                      if_not_found=dict(),
-                                      timeout=60)
 
-            ret['application_name'] = ','.join(a.get('id') for a in application_data)
-            ret['client_host'] = execution_data.get('hostName')
-            ret['cluster_id'] = cluster_data.get('id')
-            ret['cluster_name'] = cluster_data.get('name')
-            ret['command_id'] = command_data.get('id')
-            ret['command_name'] = command_data.get('name')
             ret['disable_archive'] = request_data.get('disableLogArchival')
             ret['email'] = request_data.get('email')
             ret['file_dependencies'] = request_data.get('dependencies')
             ret['group'] = request_data.get('group')
             ret['request_data'] = request_data
-            ret['setup_file'] = request_data.get('setupFile')
+
+        if applications or get_all:
+            application_data = self.get(job_id,
+                                        path='applications',
+                                        if_not_found=list(),
+                                        timeout=60)
+
+            ret['application_name'] = ','.join(a.get('id') for a in application_data)
+
+        if cluster or get_all:
+            cluster_data = self.get(job_id,
+                                    path='cluster',
+                                    if_not_found=dict(),
+                                    timeout=60)
+
+            ret['cluster_id'] = cluster_data.get('id')
+            ret['cluster_name'] = cluster_data.get('name')
+
+        if command or get_all:
+            command_data = self.get(job_id,
+                                    path='command',
+                                    if_not_found=dict(),
+                                    timeout=60)
+
+            ret['command_id'] = command_data.get('id')
+            ret['command_name'] = command_data.get('name')
+
+        if execution or get_all:
+            execution_data = self.get(job_id,
+                                      path='execution',
+                                      if_not_found=dict(),
+                                      timeout=60)
+
+            ret['client_host'] = execution_data.get('hostName')
 
         return ret
 

@@ -3,7 +3,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import unittest
 
 from mock import patch
-from nose.tools import assert_equals
+from nose.tools import (assert_raises,
+                        assert_equals)
 
 from pygenie.utils import str_to_list
 from pygenie.jobs.utils import (generate_job_id,
@@ -47,13 +48,22 @@ class TestStringToList(unittest.TestCase):
 class TestReattachJob(unittest.TestCase):
     """Test reattaching to a running job."""
 
-    @patch('pygenie.jobs.running.RunningJob.update')
-    def test_reattaching_job(self, rj_update):
+    @patch('pygenie.adapter.genie_3.Genie3Adapter.get_status')
+    def test_reattaching_job(self, get_status):
         """Test reattaching to a running job."""
 
         running_job = reattach_job('test-reattach-job')
 
-        rj_update.assert_called_once_with(info=None)
+        get_status.assert_called_once_with('test-reattach-job')
+
+    @patch('pygenie.adapter.genie_3.Genie3Adapter.get_status')
+    def test_reattaching_job_does_not_exist(self, get_status):
+        """Test reattaching to a running job that does not exist."""
+
+        get_status.side_effect = GenieJobNotFoundError
+
+        with assert_raises(GenieJobNotFoundError) as cm:
+            running_job = reattach_job('test-reattach-job-dne')
 
 
 @patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'})
