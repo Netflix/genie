@@ -28,24 +28,48 @@ RUNNING_STATUSES = {
     'running'
 }
 
+INFO_SECTIONS = {
+    'applications',
+    'cluster',
+    'command',
+    'execution',
+    'job',
+    'request'
+}
 
-def update_info(func):
+
+def get_from_info(info_key, info_section, update_if_running=False):
     """
-    Update information about the job.
+    Get info_key from info dict.
+
+    If the info_key is not present in the info dict, will get info_section from
+    Genie.
+
+    If update_if_running=True, then will go get info_section from Genie even if
+    the info_key is present in the info dict.
     """
 
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        """Wraps func."""
+    def decorator(func):
 
-        self = args[0]
-        status = (self._info.get('status') or 'INIT').upper()
-        if status in RUNNING_STATUSES:
-            self.update(full=status == 'INIT')
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            """Wraps func."""
 
-        return func(*args, **kwargs)
+            self = args[0]
 
-    return wrapper
+            if info_key not in self.info:
+                self._update_info(info_section)
+            elif update_if_running:
+                # don't get status unless have to to limit HTTP requests
+                status = (self.status or 'INIT').upper()
+                if status in RUNNING_STATUSES:
+                    self._update_info(info_section)
+
+            return self.info.get(info_key)
+
+        return wrapper
+
+    return decorator
 
 
 class RunningJob(object):
@@ -57,6 +81,7 @@ class RunningJob(object):
         self._conf = conf or GenieConf()
         self._info = info or dict()
         self._job_id = job_id
+        self._status = self._info.get('status') or None
         self._sys_stream = None
 
         # get_adapter_version is set in main __init__.py to get around circular imports
@@ -66,8 +91,6 @@ class RunningJob(object):
         stream = self._conf.get('genie.progress_stream', 'stdout').lower()
         if stream in {'stderr', 'stdout'}:
             self._sys_stream = getattr(sys, stream)
-
-        self.update(info=info)
 
     def __getattr__(self, attr):
         if attr in self.info:
@@ -91,7 +114,23 @@ class RunningJob(object):
             epoch = dttm_to_epoch(dttm)
         return epoch * 1000
 
+    def _update_info(self, info_section=None):
+        assert (info_section is None) or (info_section in INFO_SECTIONS), \
+            "invalid info_section '{}' (should be None or one of {})" \
+                .format(info_section, INFO_SECTIONS)
+
+        kwargs = {info_section: True} if info_section else dict()
+
+        data = self._adapter.get_info_for_rj(self._job_id, **kwargs)
+
+        self._info.update(data)
+
     @property
+    def info(self):
+        return self._info
+
+    @property
+    @get_from_info('cluster_name', info_section='cluster')
     def cluster_name(self):
         """
         Get the name of the cluster the job was executed on.
@@ -103,8 +142,6 @@ class RunningJob(object):
         Returns:
             str: The cluster name.
         """
-
-        return self.info.get('cluster_name')
 
     @property
     def cmd_args(self):
@@ -122,6 +159,7 @@ class RunningJob(object):
         return self.command_args
 
     @property
+    @get_from_info('command_args', info_section='job')
     def command_args(self):
         """
         Get the job's command line execution.
@@ -134,7 +172,19 @@ class RunningJob(object):
             str: The command line execution.
         """
 
-        return self.info.get('command_args')
+    @property
+    @get_from_info('description', info_section='job')
+    def description(self):
+        """
+        Get the job description.
+
+        Example:
+            >>> running_job.description
+            'This is the job description'
+
+        Returns:
+            str: The job description.
+        """
 
     @property
     def duration(self):
@@ -156,6 +206,7 @@ class RunningJob(object):
         return self.finish_time - self.start_time
 
     @property
+    @get_from_info('file_dependencies', info_section='request')
     def file_dependencies(self):
         """
         Get the job's file dependencies.
@@ -168,10 +219,7 @@ class RunningJob(object):
             list: A list of the file dependencies.
         """
 
-        return self.info.get('file_dependencies')
-
     @property
-    @update_info
     def finish_time(self):
         """
         Get the job's finish epoch time (milliseconds). 0 means the job is still
@@ -184,6 +232,13 @@ class RunningJob(object):
         Returns:
             int: The finish time in epoch (milliseconds).
         """
+
+        status = self.status
+
+        if ('finished' not in self.info) \
+                or status in RUNNING_STATUSES \
+                or status is None:
+            self._update_info('job')
 
         return self.__convert_dttm_to_epoch('finished')
 
@@ -207,8 +262,8 @@ class RunningJob(object):
         if self.is_done:
             if not self._cached_genie_log:
                 self._cached_genie_log = self._adapter.get_genie_log(self._job_id)
-                return self._cached_genie_log.split('\n') if iterator \
-                    else self._cached_genie_log
+            return self._cached_genie_log.split('\n') if iterator \
+                else self._cached_genie_log
         return self._adapter.get_genie_log(self._job_id, iterator=iterator)
 
     def get_log(self, log_path, iterator=False):
@@ -230,12 +285,6 @@ class RunningJob(object):
         """
 
         return self._adapter.get_log(self._job_id, log_path, iterator=iterator)
-
-    @property
-    def info(self):
-        if not self._info:
-            self.update()
-        return self._info
 
     @property
     def is_done(self):
@@ -268,6 +317,7 @@ class RunningJob(object):
         return self.status == 'SUCCEEDED'
 
     @property
+    @get_from_info('id', info_section='job')
     def job_id(self):
         """
         Get the job's id.
@@ -280,9 +330,8 @@ class RunningJob(object):
             str: The job id.
         """
 
-        return self.info.get('id')
-
     @property
+    @get_from_info('name', info_section='job')
     def job_name(self):
         """
         Get the job's name.
@@ -294,8 +343,6 @@ class RunningJob(object):
         Returns:
             str: Job name.
         """
-
-        return self.info.get('name')
 
     @property
     def job_type(self):
@@ -310,11 +357,15 @@ class RunningJob(object):
             str: Job type.
         """
 
-        if 'hive' in self.info.get('command_name', '').lower():
+        if 'command_name' not in self.info:
+            self._update_info('command')
+
+        if 'hive' in (self.info.get('command_name', '') or '').lower():
             return 'HIVE'
         return self.info.get('command_name').upper()
 
     @property
+    @get_from_info('job_link', info_section='job')
     def job_link(self):
         """
         Get the link for the job.
@@ -327,9 +378,8 @@ class RunningJob(object):
             str: The link to the job.
         """
 
-        return self.info.get('job_link')
-
     @property
+    @get_from_info('json_link', info_section='job')
     def json_link(self):
         """
         Get the link for the job json.
@@ -342,9 +392,8 @@ class RunningJob(object):
             str: The link to the job json.
         """
 
-        return self.info.get('json_link')
-
     @property
+    @get_from_info('kill_uri', info_section='job')
     def kill_uri(self):
         """
         Get the uri to kill the job.
@@ -358,8 +407,6 @@ class RunningJob(object):
         Returns:
             str: The kill URI.
         """
-
-        return self.info.get('kill_uri')
 
     def kill(self):
         """
@@ -376,10 +423,10 @@ class RunningJob(object):
             resp = self._adapter.kill_job(kill_uri=self.kill_uri)
         else:
             resp = self._adapter.kill_job(job_id=self._job_id)
-        self.update()
         return resp
 
     @property
+    @get_from_info('output_uri', info_section='job')
     def output_uri(self):
         """
         Get the output uri for the job.
@@ -392,9 +439,8 @@ class RunningJob(object):
             str: The output URI.
         """
 
-        return self.info.get('output_uri')
-
     @property
+    @get_from_info('request_data', info_section='request')
     def request_data(self):
         """
         Get the JSON of the job submission request sent to Genie.
@@ -407,10 +453,7 @@ class RunningJob(object):
             dict: JSON of the job submission request.
         """
 
-        return self.info.get('request_data')
-
     @property
-    @update_info
     def start_time(self):
         """
         Get the job's start epoch time (milliseconds).
@@ -423,10 +466,13 @@ class RunningJob(object):
             int: The start time in epoch (milliseconds).
         """
 
+        if ('started' not in self.info) \
+                or self.info.get('started') is None:
+            self._update_info('job')
+
         return self.__convert_dttm_to_epoch('started')
 
     @property
-    @update_info
     def status(self):
         """
         Get the job's status.
@@ -439,9 +485,11 @@ class RunningJob(object):
             str: Job status.
         """
 
-        status = self.info.get('status')
+        if (self._status is None) or (self._status in RUNNING_STATUSES):
+            self._status = self._adapter.get_status(self._job_id).upper()
+            self._info['status'] = self._status
 
-        return status.upper() if status else None
+        return self._status.upper() if self._status else None
 
     def stderr(self, iterator=False):
         """
@@ -463,8 +511,8 @@ class RunningJob(object):
         if self.is_done:
             if not self._cached_stderr:
                 self._cached_stderr = self._adapter.get_stderr(self._job_id)
-                return self._cached_stderr.split('\n') if iterator \
-                    else self._cached_stderr
+            return self._cached_stderr.split('\n') if iterator \
+                else self._cached_stderr
         return self._adapter.get_stderr(self._job_id, iterator=iterator)
 
     @property
@@ -495,7 +543,7 @@ class RunningJob(object):
         return self._adapter.get_stdout(self._job_id, iterator=iterator)
 
     @property
-    @update_info
+    @get_from_info('status_msg', info_section='job', update_if_running=True)
     def status_msg(self):
         """
         Get the job's status message.
@@ -508,9 +556,8 @@ class RunningJob(object):
             str: Job status message.
         """
 
-        return self.info.get('status_msg')
-
     @property
+    @get_from_info('tags', info_section='job')
     def tags(self):
         """
         Get the job's tags.
@@ -523,21 +570,12 @@ class RunningJob(object):
             list: A list of tags.
         """
 
-        return self.info.get('tags')
+    def update(self, **kwargs):
+        """Update all the job information."""
 
-    def update(self, info=None, full=False):
-        """Update the job information."""
-
-        if info is not None:
-            self._info = info
-        elif full or not self._info:
-            self._info = self._adapter.get_info_for_rj(self._job_id)
-        else:
-            self._info.update(self._adapter.get_info_for_rj(self._job_id,
-                                                            full=False))
+        self._update_info()
 
     @property
-    @update_info
     def update_time(self):
         """
         Get the last update time for the job in epoch time (milliseconds).
@@ -550,9 +588,17 @@ class RunningJob(object):
             int: The update time in epoch (milliseconds).
         """
 
+        status = self.status
+
+        if ('updated' not in self.info) \
+                or status in RUNNING_STATUSES \
+                or status is None:
+            self._update_info('job')
+
         return self.__convert_dttm_to_epoch('updated')
 
     @property
+    @get_from_info('user', info_section='job')
     def username(self):
         """
         Get the username the job was executed as.
@@ -564,8 +610,6 @@ class RunningJob(object):
         Returns:
             str: The username.
         """
-
-        return self.info.get('user')
 
     def wait(self, sleep_seconds=10, suppress_stream=False, until_running=False):
         """
@@ -600,8 +644,6 @@ class RunningJob(object):
 
         if not suppress_stream:
             self._write_to_stream('\n')
-
-        self.update()
 
         return self
 
