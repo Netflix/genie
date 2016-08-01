@@ -26,7 +26,7 @@ eureka:
 genie:
   file:
     cache:
-      location: /tmp/genie/cache
+      location: "file:///tmp/genie/cache"
   health:
     memory:
       usedPhysicalMemoryPercent: 90

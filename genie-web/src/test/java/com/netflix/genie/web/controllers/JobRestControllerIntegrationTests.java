@@ -58,6 +58,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -564,7 +565,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         // Check if the culster setup file is cached
         final String clusterSetUpFilePath = this.resourceLoader.getResource(
                 BASE_DIR + CMD1_ID + FILE_DELIMITER + "setupfile").getFile().getAbsolutePath();
-        Assert.assertTrue(Files.exists(Paths.get(baseCacheLocation,
+        Assert.assertTrue(Files.exists(Paths.get(new URI(baseCacheLocation).getPath(),
                 UUID.nameUUIDFromBytes(clusterSetUpFilePath.getBytes(Charset.forName("UTF-8"))).toString())));
         // Test for conflicts
         this.testForConflicts(jobId, commandArgs, clusterCriteriaList, commandCriteria);
