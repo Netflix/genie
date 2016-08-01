@@ -62,7 +62,6 @@ import java.util.UUID;
 @SpringApplicationConfiguration(classes = GenieWeb.class)
 @WebIntegrationTest(randomPort = true)
 @ActiveProfiles(resolver = IntegrationTestActiveProfilesResolver.class)
-@DirtiesContext
 public abstract class RestControllerIntegrationTestsBase {
 
     protected static final String APPLICATIONS_API = "/api/v3/applications";
