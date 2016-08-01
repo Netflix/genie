@@ -92,14 +92,6 @@ class RunningJob(object):
         if stream in {'stderr', 'stdout'}:
             self._sys_stream = getattr(sys, stream)
 
-    def __getattr__(self, attr):
-        if attr not in self.info:
-            self.update()
-        if attr in self.info:
-            return self.info.get(attr)
-        raise AttributeError("'RunningJob' object has no attribute '{}'" \
-            .format(attr))
-
     def __repr__(self):
         return '{cls}("{job_id}", adapter={adapter})'.format(
             cls=self.__class__.__name__,
