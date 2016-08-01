@@ -92,12 +92,6 @@ class RunningJob(object):
         if stream in {'stderr', 'stdout'}:
             self._sys_stream = getattr(sys, stream)
 
-    def __getattr__(self, attr):
-        if attr in self.info:
-            return self.info.get(attr)
-        raise AttributeError("'RunningJob' object has no attribute '{}'" \
-            .format(attr))
-
     def __repr__(self):
         return '{cls}("{job_id}", adapter={adapter})'.format(
             cls=self.__class__.__name__,
@@ -128,6 +122,20 @@ class RunningJob(object):
     @property
     def info(self):
         return self._info
+
+    @property
+    @get_from_info('command_name', info_section='command')
+    def command_name(self):
+        """
+        Get the name of the command the job used for execution.
+
+        Example:
+            >>> running_job.command_name
+            u'spark'
+
+        Returns:
+            str: The command name.
+        """
 
     @property
     @get_from_info('cluster_name', info_section='cluster')
@@ -343,26 +351,6 @@ class RunningJob(object):
         Returns:
             str: Job name.
         """
-
-    @property
-    def job_type(self):
-        """
-        Get the job's type.
-
-        Example:
-            >>> running_job.job_type
-            u'PIG'
-
-        Returns:
-            str: Job type.
-        """
-
-        if 'command_name' not in self.info:
-            self._update_info('command')
-
-        if 'hive' in (self.info.get('command_name', '') or '').lower():
-            return 'HIVE'
-        return self.info.get('command_name').upper()
 
     @property
     @get_from_info('job_link', info_section='job')
