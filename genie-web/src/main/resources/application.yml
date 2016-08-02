@@ -33,6 +33,8 @@ genie:
   jobs:
     archive:
       location: base_archival_location_path
+    attachments:
+      dir: file:///tmp/genie/attachments/
     createUser:
       enabled: false
     dir:
