@@ -38,7 +38,6 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -62,7 +61,6 @@ import java.util.UUID;
 @SpringApplicationConfiguration(classes = GenieWeb.class)
 @WebIntegrationTest(randomPort = true)
 @ActiveProfiles(resolver = IntegrationTestActiveProfilesResolver.class)
-@DirtiesContext
 public abstract class RestControllerIntegrationTestsBase {
 
     protected static final String APPLICATIONS_API = "/api/v3/applications";

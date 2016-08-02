@@ -27,6 +27,7 @@ import org.hibernate.validator.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -70,8 +71,7 @@ public class CacheGenieFileTransferService extends GenieFileTransferService {
             @NotNull final FileTransfer localFileTransfer,
             @NotNull final Registry registry) throws GenieException {
         super(fileTransferFactory);
-        this.baseCacheLocation = baseCacheLocation;
-        createDirectories(baseCacheLocation);
+        this.baseCacheLocation = createDirectories(baseCacheLocation).toString();
         this.localFileTransfer = localFileTransfer;
         registry.gauge("genie.jobs.file.cache.hitRate", fileCache,
                 (ToDoubleFunction<LoadingCache<String, File>>) value -> value.stats().hitRate());
@@ -109,6 +109,7 @@ public class CacheGenieFileTransferService extends GenieFileTransferService {
                         // been refreshed by a previous thread.
                         if (lastModifiedTime > cachedFile.lastModified()) {
                             fileCache.invalidate(srcRemotePath);
+                            deleteFile(cachedFile);
                             cachedFile = fileCache.get(srcRemotePath);
                         }
                     }
@@ -122,16 +123,22 @@ public class CacheGenieFileTransferService extends GenieFileTransferService {
         localFileTransfer.getFile(cachedFile.getPath(), dstLocalPath);
     }
 
-    protected void createDirectories(final String path) throws GenieException {
-        final File pathFile = new File(path);
-        final Path filePath = pathFile.toPath();
-        if (!Files.exists(filePath)) {
-            try {
-                Files.createDirectories(filePath);
-            } catch (IOException e) {
-                throw new GenieServerException("Failed creating the cache location " + path, e);
+    protected void deleteFile(final File file) throws IOException {
+        Files.deleteIfExists(file.toPath());
+    }
+
+    protected Path createDirectories(final String path) throws GenieException {
+        Path result = null;
+        try {
+            final File pathFile = new File(new URI(path).getPath());
+            result = pathFile.toPath();
+            if (!Files.exists(result)) {
+                Files.createDirectories(result);
             }
+        } catch (Exception e) {
+            throw new GenieServerException("Failed creating the cache location " + path, e);
         }
+        return result;
     }
 
     /**
@@ -146,7 +153,9 @@ public class CacheGenieFileTransferService extends GenieFileTransferService {
         final String pathUUID = UUID.nameUUIDFromBytes(pathBytes).toString();
         final String cacheFilePath = String.format("%s/%s", baseCacheLocation, pathUUID);
         final File cacheFile = new File(cacheFilePath);
-        getFileTransfer(path).getFile(path, cacheFile.getPath());
+        if (!cacheFile.exists()) {
+            getFileTransfer(path).getFile(path, cacheFilePath);
+        }
         return cacheFile;
     }
 }

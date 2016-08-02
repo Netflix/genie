@@ -17,9 +17,6 @@
 ##
 
 genie:
-  file:
-    cache:
-      location: "file:///tmp/genie/cache"
   health:
     memory:
       usedPhysicalMemoryPercent: 100
