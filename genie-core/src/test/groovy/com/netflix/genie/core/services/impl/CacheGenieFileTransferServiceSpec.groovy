@@ -36,6 +36,7 @@ class CacheGenieFileTransferServiceSpec extends Specification{
             Spy( CacheGenieFileTransferService,
                     constructorArgs: [fileTransferFactory, "/tmp", localFileTransfer, registry]){
                 createDirectories(_) >> null
+                deleteFile(_) >> null
             }
 
     def 'Test getFile'(){

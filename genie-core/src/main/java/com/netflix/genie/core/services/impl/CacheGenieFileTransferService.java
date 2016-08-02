@@ -26,6 +26,7 @@ import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -108,6 +109,7 @@ public class CacheGenieFileTransferService extends GenieFileTransferService {
                         // been refreshed by a previous thread.
                         if (lastModifiedTime > cachedFile.lastModified()) {
                             fileCache.invalidate(srcRemotePath);
+                            deleteFile(cachedFile);
                             cachedFile = fileCache.get(srcRemotePath);
                         }
                     }
@@ -119,6 +121,10 @@ public class CacheGenieFileTransferService extends GenieFileTransferService {
             throw new GenieServerException(message, e);
         }
         localFileTransfer.getFile(cachedFile.getPath(), dstLocalPath);
+    }
+
+    protected void deleteFile(final File file) throws IOException {
+        Files.deleteIfExists(file.toPath());
     }
 
     protected Path createDirectories(final String path) throws GenieException {
@@ -147,7 +153,9 @@ public class CacheGenieFileTransferService extends GenieFileTransferService {
         final String pathUUID = UUID.nameUUIDFromBytes(pathBytes).toString();
         final String cacheFilePath = String.format("%s/%s", baseCacheLocation, pathUUID);
         final File cacheFile = new File(cacheFilePath);
-        getFileTransfer(path).getFile(path, cacheFilePath);
+        if (!cacheFile.exists()) {
+            getFileTransfer(path).getFile(path, cacheFilePath);
+        }
         return cacheFile;
     }
 }
