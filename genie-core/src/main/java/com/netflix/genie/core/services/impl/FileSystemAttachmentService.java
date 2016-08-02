@@ -27,6 +27,7 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 
 /**
  * Implementation of the AttachmentService interface which saves and retrieves attachments from the local filesystem.
@@ -37,7 +38,7 @@ import java.io.InputStream;
 @Slf4j
 public class FileSystemAttachmentService implements AttachmentService {
 
-    private String attachmentsDirectory;
+    private File attachmentDirectory;
 
     /**
      * Constructor.
@@ -45,7 +46,7 @@ public class FileSystemAttachmentService implements AttachmentService {
      * @param attachmentsDirectory The directory to use or null if want to default to system temp directory
      */
     public FileSystemAttachmentService(final String attachmentsDirectory) {
-        this.attachmentsDirectory = attachmentsDirectory;
+        createAttachmentDirectory(attachmentsDirectory);
     }
 
     /**
@@ -57,7 +58,7 @@ public class FileSystemAttachmentService implements AttachmentService {
         final String filename,
         final InputStream content
     ) throws GenieException {
-        final File attachment = new File(this.getAttachmentDirectory(), jobId + "/" + filename);
+        final File attachment = new File(attachmentDirectory, jobId + "/" + filename);
         try {
             FileUtils.copyInputStreamToFile(content, attachment);
             log.info("Saved " + filename + " to " + attachment.getAbsolutePath());
@@ -74,7 +75,7 @@ public class FileSystemAttachmentService implements AttachmentService {
         if (destination.exists() && !destination.isDirectory()) {
             throw new GeniePreconditionException(destination + " is not a directory and it needs to be.");
         }
-        final File source = new File(this.getAttachmentDirectory(), jobId);
+        final File source = new File(attachmentDirectory, jobId);
         if (source.exists() && source.isDirectory()) {
             try {
                 FileUtils.copyDirectory(source, destination);
@@ -89,7 +90,7 @@ public class FileSystemAttachmentService implements AttachmentService {
      */
     @Override
     public void delete(final String jobId) throws GenieException {
-        final File jobDir = new File(this.getAttachmentDirectory(), jobId);
+        final File jobDir = new File(attachmentDirectory, jobId);
         if (jobDir.exists()) {
             try {
                 FileUtils.deleteDirectory(jobDir);
@@ -99,16 +100,21 @@ public class FileSystemAttachmentService implements AttachmentService {
         }
     }
 
-    private File getAttachmentDirectory() throws GenieException {
-        if (this.attachmentsDirectory == null) {
-            this.attachmentsDirectory = System.getProperty("java.io.tmpdir") + "/genie/attachments";
+    private void createAttachmentDirectory(final String attachmentsDirectory) {
+        String attachmentsDirectoryPath = attachmentsDirectory;
+        if (!attachmentsDirectoryPath.endsWith(File.separator)) {
+            attachmentsDirectoryPath = attachmentsDirectory + File.separator;
         }
-        final File dir = new File(this.attachmentsDirectory);
-        if (dir.exists() && !dir.isDirectory()) {
-            throw new GenieServerException(
-                "Attachment directory configured isn't actually a directory: " + this.attachmentsDirectory
-            );
+        final File dir = new File(attachmentsDirectoryPath);
+        if (!dir.exists()) {
+            try {
+                Files.createDirectories(dir.toPath());
+            } catch (IOException e) {
+                throw new IllegalArgumentException(
+                        "Failed to create attachements directory " + attachmentsDirectoryPath
+                );
+            }
         }
-        return dir;
+        this.attachmentDirectory = dir;
     }
 }
