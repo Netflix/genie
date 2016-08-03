@@ -18,6 +18,7 @@
 package com.netflix.genie.web.configs.aws;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -52,7 +53,7 @@ public class AwsMvcConfig {
      * @throws IOException When the host can't be calculated
      */
     @Bean
-    public String hostName(final RestTemplate restTemplate) throws IOException {
+    public String hostName(@Qualifier("genieRestTemplate") final RestTemplate restTemplate) throws IOException {
         String result = null;
         try {
             result = restTemplate.getForObject(publicHostNameGet, String.class);

@@ -52,6 +52,7 @@ import com.netflix.spectator.api.Registry;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -162,7 +163,7 @@ public class JobRestController {
             final JobExecutionResourceAssembler jobExecutionResourceAssembler,
             final JobSearchResultResourceAssembler jobSearchResultResourceAssembler,
             final String hostName,
-            final RestTemplate restTemplate,
+            @Qualifier("genieRestTemplate") final RestTemplate restTemplate,
             final GenieResourceHttpRequestHandler resourceHttpRequestHandler,
             final JobForwardingProperties jobForwardingProperties,
             final Registry registry

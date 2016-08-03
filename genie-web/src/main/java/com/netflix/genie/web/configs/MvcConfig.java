@@ -92,8 +92,7 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
      * @param httpReadTimeout http read timeout in milliseconds
      * @return The rest template to use
      */
-    @Bean
-    @ConditionalOnMissingBean
+    @Bean(name = "genieRestTemplate")
     public RestTemplate restTemplate(
             @Value("${genie.http.connect.timeout:2000}") final int httpConnectTimeout,
             @Value("${genie.http.connect.timeout:10000}") final int httpReadTimeout

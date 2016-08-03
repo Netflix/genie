@@ -28,6 +28,7 @@ import com.netflix.spectator.api.Counter;
 import com.netflix.spectator.api.Registry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.actuate.autoconfigure.ManagementServerProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -83,7 +84,7 @@ public class ClusterCheckerTask extends LeadershipTask {
         @NotNull final ClusterCheckerProperties properties,
         @NotNull final JobSearchService jobSearchService,
         @NotNull final JobPersistenceService jobPersistenceService,
-        @NotNull final RestTemplate restTemplate,
+        @Qualifier("genieRestTemplate") @NotNull final RestTemplate restTemplate,
         @NotNull final ManagementServerProperties managementServerProperties,
         @NotNull final Registry registry
     ) {
