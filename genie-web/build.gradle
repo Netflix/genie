@@ -11,12 +11,17 @@ dependencies {
 
     compile(project(":genie-core"))
 
+    // Swagger libs
+    compile("io.springfox:springfox-swagger2:${springfox_version}")
+    compile("io.springfox:springfox-swagger-ui:${springfox_version}")
+    compile("io.springfox:springfox-bean-validators:${springfox_version}")
+
     // Commons
     compile("org.apache.commons:commons-exec:${commons_exec_version}")
     compile("org.apache.httpcomponents:httpclient")
 
-    // Thymeleaf Extras for Spring Security
-    compile("org.thymeleaf.extras:thymeleaf-extras-springsecurity4")
+    // JWT JOSE implementation lib
+    compile("org.bitbucket.b_c:jose4j:0.5.1")
 
     // Spring Libs
     compile("org.springframework.boot:spring-boot-starter-actuator")
@@ -38,10 +43,8 @@ dependencies {
     compile("org.springframework.security.oauth:spring-security-oauth2")
     compile("org.springframework.session:spring-session")
 
-    // Swagger libs
-    compile("io.springfox:springfox-swagger2:${springfox_version}")
-    compile("io.springfox:springfox-swagger-ui:${springfox_version}")
-    compile("io.springfox:springfox-bean-validators:${springfox_version}")
+    // Thymeleaf Extras for Spring Security
+    compile("org.thymeleaf.extras:thymeleaf-extras-springsecurity4")
 
     /*******************************
      * Provided Dependencies

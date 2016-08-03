@@ -65,7 +65,7 @@ public class PingFederateUserAuthenticationConverter extends DefaultUserAuthenti
             throw new InvalidTokenException("Client id was blank. Unable to use as user name");
         }
 
-        // Scopes were already validated in PingFederateTokenServices
+        // Scopes were already validated in PingFederateRemoteTokenServices
         final Object scopeObject = map.get(SCOPE_KEY);
         if (!(scopeObject instanceof Collection)) {
             throw new InvalidTokenException("Scopes were not a collection");
