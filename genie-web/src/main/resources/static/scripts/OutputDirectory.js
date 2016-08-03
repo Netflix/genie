@@ -47,7 +47,7 @@ export default class OutputDirectory extends React.Component {
 
   loadData(url) {
     fetch(`/api/v3/jobs/${url}`)
-    .done((output) => {
+    .done(output => {
       const [jobId, ...ignored] = url.split('/');
       this.setState({
         output, jobId, url,
@@ -70,16 +70,12 @@ export default class OutputDirectory extends React.Component {
               this.state.output.directories.length === 0 ?
               <div>No Output found </div> :
               <div>
-                <HomeButton jobId={this.state.jobId} />
-                <Table
-                  headers={['Name', 'Size', 'Last Modified (UTC)']}
-                  output={this.state.output}
-                />
+                <Navigation url={this.state.url} />
+                <Table>
+                  <TableHeader headers={['Name', 'Size', 'Last Modified (UTC)']} />
+                  <TableBody output={this.state.output} />
+                </Table>
                 <DirectoryInfo output={this.state.output} />
-                <Navigation
-                  url={this.state.url}
-                  parent={this.state.output.parent}
-                />
               </div>
           }
         </div>
@@ -133,8 +129,7 @@ DirectoryRow.propTypes = {
 
 const Table = (props) =>
   <table className="table">
-    <TableHeader headers={props.headers} />
-    <TableBody output={props.output} />
+    {props.children}
   </table>;
 
 Table.propTypes = {
@@ -168,26 +163,6 @@ TableBody.propTypes = {
   }),
 };
 
-const Navigation = (props) => {
-  if (props.url.split('/').length > 2) {
-    return (
-      <div>
-        <Link to={genieJobsUrl(props.parent.url)}>
-          <i className="fa fa-arrow-left" aria-hidden="true"></i> back
-        </Link>
-      </div>
-    );
-  }
-  return <div />;
-};
-
-Navigation.propTypes = {
-  url    : T.string,
-  parent : T.shape({
-    url  : T.string,
-  }),
-};
-
 const DirectoryInfo = (props) =>
   <div className="pull-right directory-info">
     {`${props.output.files.length} File(s), ${props.output.directories.length} Folder(s)`}
@@ -200,15 +175,43 @@ DirectoryInfo.propTypes = {
   }),
 };
 
-const HomeButton = (props) =>
-  <div className="row">
-    <span className="col-xs-3 fa-home-div">
-      <Link to={`/output/${props.jobId}/output`}>
+const Navigation = (props) => {
+  let [jobId, output, ...path] = props.url.split("/");
+  let breadCrumbs = [];
+  //Home Button
+  breadCrumbs.push(
+    <li key={jobId}>
+      <Link to={`/output/${jobId}/output`}>
         <i className="fa fa-home fa-2x" aria-hidden="true"></i>
       </Link>
-    </span>
-  </div>;
+    </li>
+  );
+  //Directory links
+  path.map((name, index) => {
+    if (index === path.length - 1){
+      breadCrumbs.push(
+        <li key={name} className='active'>
+          {name}
+        </li>
+      )
+    } else {
+      const fullPath = path.slice(0, index + 1).join("/");
+      breadCrumbs.push(
+        <li key={index}>
+          <Link to={`/output/${jobId}/${output}/${fullPath}`}>{name}</Link>
+        </li>
+      )
+    }
 
-HomeButton.propTypes = {
-  jobId: T.string,
+  });
+
+  return (
+    <ol className="breadcrumb">
+      {breadCrumbs}
+    </ol>
+  );
+}
+
+Navigation.propTypes = {
+  url  : T.string,
 };

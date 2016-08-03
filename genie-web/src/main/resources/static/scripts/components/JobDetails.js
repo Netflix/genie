@@ -37,7 +37,7 @@ export default class JobDetails extends React.Component {
     const { row } = props;
     const url = row._links.self.href;
 
-    fetch(url).done((job) => {
+    fetch(url).done(job => {
       this.setState({ job });
     });
   }
