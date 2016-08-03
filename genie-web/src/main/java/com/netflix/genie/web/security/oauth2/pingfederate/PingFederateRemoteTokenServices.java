@@ -26,15 +26,17 @@ import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceS
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.ClientHttpRequestExecution;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.common.exceptions.InvalidTokenException;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.AccessTokenConverter;
-import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
+import org.springframework.security.oauth2.provider.token.RemoteTokenServices;
 import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -43,7 +45,9 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -54,7 +58,7 @@ import java.util.concurrent.TimeUnit;
  * @since 3.0.0
  */
 @Slf4j
-public class PingFederateTokenServices implements ResourceServerTokenServices {
+public class PingFederateRemoteTokenServices extends RemoteTokenServices {
 
     protected static final String TOKEN_NAME_KEY = "token";
     protected static final String CLIENT_ID_KEY = "client_id";
@@ -67,6 +71,7 @@ public class PingFederateTokenServices implements ResourceServerTokenServices {
     protected static final String API_TIMER_NAME = "genie.security.oauth2.pingFederate.api.timer";
 
     private final AccessTokenConverter converter;
+    private RestTemplate localRestTemplate;
 
     private final String checkTokenEndpointUrl;
     private final String clientId;
@@ -76,7 +81,6 @@ public class PingFederateTokenServices implements ResourceServerTokenServices {
     private final Id tokenValidationError;
     private final Timer authenticationTimer;
     private final Timer pingFederateAPITimer;
-    private RestTemplate restTemplate;
 
     /**
      * Constructor.
@@ -85,16 +89,29 @@ public class PingFederateTokenServices implements ResourceServerTokenServices {
      * @param converter        The access token converter to use
      * @param registry         The metrics registry to use
      */
-    public PingFederateTokenServices(
+    public PingFederateRemoteTokenServices(
         @NotNull final ResourceServerProperties serverProperties,
         @NotNull final AccessTokenConverter converter,
         @NotNull final Registry registry
     ) {
+        super();
         this.tokenValidationError = registry.createId("genie.security.oauth2.pingFederate.tokenValidation.error.rate");
         this.authenticationTimer = registry.timer(AUTHENTICATION_TIMER_NAME);
         this.pingFederateAPITimer = registry.timer(API_TIMER_NAME);
-        this.restTemplate = new RestTemplate();
-        this.restTemplate.setErrorHandler(
+        final RestTemplate restTemplate = new RestTemplate();
+        final List<ClientHttpRequestInterceptor> interceptors = new ArrayList<>();
+        interceptors.add(
+            (final HttpRequest request, final byte[] body, final ClientHttpRequestExecution execution) -> {
+                final long start = System.nanoTime();
+                try {
+                    return execution.execute(request, body);
+                } finally {
+                    pingFederateAPITimer.record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+                }
+            }
+        );
+        restTemplate.setInterceptors(interceptors);
+        restTemplate.setErrorHandler(
             new DefaultResponseErrorHandler() {
                 // Ignore 400
                 @Override
@@ -107,6 +124,8 @@ public class PingFederateTokenServices implements ResourceServerTokenServices {
                 }
             }
         );
+
+        this.setRestTemplate(restTemplate);
 
         this.checkTokenEndpointUrl = serverProperties.getTokenInfoUri();
         this.clientId = serverProperties.getClientId();
@@ -162,83 +181,25 @@ public class PingFederateTokenServices implements ResourceServerTokenServices {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public OAuth2AccessToken readAccessToken(final String accessToken) {
-        throw new UnsupportedOperationException("readAccessToken not implemented for Ping Federate");
-    }
-
-    /**
-     * Get the access token converter.
-     *
-     * @return The access token converter used by this token service implementation.
-     */
-    protected AccessTokenConverter getAccessTokenConverter() {
-        return this.converter;
-    }
-
-    /**
-     * Get the rest operations used.
-     *
-     * @return The rest operations used by this token services.
-     */
-    protected RestTemplate getRestTemplate() {
-        return this.restTemplate;
-    }
-
-    /**
      * Set the rest operations to use.
      *
      * @param restTemplate The rest operations to use. Not null.
      */
     protected void setRestTemplate(@NotNull final RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
-    }
-
-    /**
-     * Get the endpoint where tokens will be checked.
-     *
-     * @return The check token endpoint.
-     */
-    protected String getCheckTokenEndpointUrl() {
-        return this.checkTokenEndpointUrl;
-    }
-
-    /**
-     * Get the client id sent to the check token endpoint.
-     *
-     * @return The client id
-     */
-    protected String getClientId() {
-        return this.clientId;
-    }
-
-    /**
-     * Get the client secret sent to the check token endpoint.
-     *
-     * @return The client secret
-     */
-    protected String getClientSecret() {
-        return this.clientSecret;
+        super.setRestTemplate(restTemplate);
+        this.localRestTemplate = restTemplate;
     }
 
     private Map<String, Object> postForMap(final String path, final MultiValueMap<String, String> formData) {
-        final long start = System.nanoTime();
-        try {
-            final HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-            @SuppressWarnings("rawtypes")
-            final Map map = this.restTemplate.exchange(
-                path, HttpMethod.POST, new HttpEntity<>(formData, headers), Map.class
-            ).getBody();
-            @SuppressWarnings("unchecked")
-            final Map<String, Object> result = map;
-            return result;
-        } finally {
-            final long finished = System.nanoTime();
-            this.pingFederateAPITimer.record(finished - start, TimeUnit.NANOSECONDS);
-        }
+        final HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        @SuppressWarnings("rawtypes")
+        final Map map = this.localRestTemplate.exchange(
+            path, HttpMethod.POST, new HttpEntity<>(formData, headers), Map.class
+        ).getBody();
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> result = map;
+        return result;
     }
 
     private void convertScopes(final Map<String, Object> oauth2Map) {
