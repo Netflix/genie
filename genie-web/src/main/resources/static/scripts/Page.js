@@ -48,7 +48,7 @@ export default class Page extends React.Component {
 
   toggleRowDetails = (id) => {
     this.setState({
-      rowId: this.state.rowId === id ? null : `${id}`,
+      rowId: this.state.rowId === id ? null : id,
     });
   }
 
