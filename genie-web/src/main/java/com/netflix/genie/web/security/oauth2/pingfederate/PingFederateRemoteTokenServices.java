@@ -32,6 +32,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.common.exceptions.InvalidTokenException;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -98,7 +99,10 @@ public class PingFederateRemoteTokenServices extends RemoteTokenServices {
         this.tokenValidationError = registry.createId("genie.security.oauth2.pingFederate.tokenValidation.error.rate");
         this.authenticationTimer = registry.timer(AUTHENTICATION_TIMER_NAME);
         this.pingFederateAPITimer = registry.timer(API_TIMER_NAME);
-        final RestTemplate restTemplate = new RestTemplate();
+        final HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+        factory.setConnectTimeout(2000);
+        factory.setReadTimeout(10000);
+        final RestTemplate restTemplate = new RestTemplate(factory);
         final List<ClientHttpRequestInterceptor> interceptors = new ArrayList<>();
         interceptors.add(
             (final HttpRequest request, final byte[] body, final ClientHttpRequestExecution execution) -> {
