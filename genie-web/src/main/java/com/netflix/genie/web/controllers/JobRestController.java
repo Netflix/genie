@@ -523,9 +523,10 @@ public class JobRestController {
             final String jobHostname = this.jobSearchService.getJobHost(id);
             if (!this.hostName.equals(jobHostname)) {
                 log.info("Job {} is not on this node. Forwarding kill request to {}", id, jobHostname);
+                final String forwardUrl = buildForwardURL(request, jobHostname);
                 try {
                     //Need to forward job
-                    restTemplate.execute(buildForwardURL(request, jobHostname), HttpMethod.DELETE,
+                    restTemplate.execute(forwardUrl, HttpMethod.DELETE,
                             forwardRequest -> copyRequestHeaders(request, forwardRequest),
                             new ResponseExtractor<Void>() {
                                 @Override
@@ -536,8 +537,10 @@ public class JobRestController {
                                 }
                             });
                 } catch (HttpStatusCodeException e) {
+                    log.error("Failed killing job on {}. Error: {}", forwardUrl, e.getMessage());
                     response.sendError(e.getStatusCode().value(), e.getStatusText());
                 } catch (Exception e) {
+                    log.error("Failed killing job on {}. Error: {}", forwardUrl, e.getMessage());
                     response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
                 }
 
@@ -675,9 +678,9 @@ public class JobRestController {
             final String jobHostname = this.jobSearchService.getJobHost(id);
             if (!this.hostName.equals(jobHostname)) {
                 log.info("Job {} is not or was not run on this node. Forwarding to {}", id, jobHostname);
-
+                final String forwardUrl = buildForwardURL(request, jobHostname);
                 try {
-                    restTemplate.execute(buildForwardURL(request, jobHostname), HttpMethod.GET,
+                    restTemplate.execute(forwardUrl, HttpMethod.GET,
                             forwardRequest -> copyRequestHeaders(request, forwardRequest),
                             new ResponseExtractor<Void>() {
                                 @Override
@@ -691,8 +694,10 @@ public class JobRestController {
                                 }
                             });
                 } catch (HttpStatusCodeException e) {
+                    log.error("Failed getting the remote job output from {}. Error: {}", forwardUrl, e.getMessage());
                     response.sendError(e.getStatusCode().value(), e.getStatusText());
                 } catch (Exception e) {
+                    log.error("Failed getting the remote job output from {}. Error: {}", forwardUrl, e.getMessage());
                     response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
                 }
 
