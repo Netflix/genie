@@ -18,14 +18,11 @@
 package com.netflix.genie.web.configs.aws;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.util.EntityUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -44,33 +41,27 @@ public class AwsMvcConfig {
     private static final Charset UTF_8 = Charset.forName("UTF-8");
 
     // See: http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AESDG-chapter-instancedata.html
-    protected HttpGet publicHostNameGet = new HttpGet("http://169.254.169.254/latest/meta-data/public-hostname");
-    protected HttpGet localIPV4HostNameGet = new HttpGet("http://169.254.169.254/latest/meta-data/local-ipv4");
+    protected String publicHostNameGet = "http://169.254.169.254/latest/meta-data/public-hostname";
+    protected String localIPV4HostNameGet = "http://169.254.169.254/latest/meta-data/local-ipv4";
 
     /**
      * Get the host name for this application by calling the AWS metadata endpoints. Overrides default implementation
      * which defaults to using InetAddress class. Only active when profile enabled.
      *
-     * @param httpClient The http client to use to call the Amazon endpoints
+     * @param restTemplate The rest template to use to call the Amazon endpoints
      * @return The hostname
      * @throws IOException When the host can't be calculated
      */
     @Bean
-    public String hostName(final HttpClient httpClient) throws IOException {
-        final HttpResponse publicHostnameResponse = httpClient.execute(this.publicHostNameGet);
-        if (publicHostnameResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-            final String hostname = EntityUtils.toString(publicHostnameResponse.getEntity(), UTF_8);
-            log.debug("AWS Public Hostname: {}", hostname);
-            return hostname;
+    public String hostName(@Qualifier("genieRestTemplate") final RestTemplate restTemplate) throws IOException {
+        String result = null;
+        try {
+            result = restTemplate.getForObject(publicHostNameGet, String.class);
+            log.debug("AWS Public Hostname: {}", result);
+        } catch (Exception e) {
+            result = restTemplate.getForObject(localIPV4HostNameGet, String.class);
+            log.debug("AWS IPV4 Hostname: {}", result);
         }
-
-        final HttpResponse ipv4Response = httpClient.execute(this.localIPV4HostNameGet);
-        if (ipv4Response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-            final String hostname = EntityUtils.toString(ipv4Response.getEntity(), UTF_8);
-            log.debug("AWS IPV4 Hostname: {}", hostname);
-            return hostname;
-        }
-
-        throw new IOException("Unable to get instance metadata from AWS");
+        return result;
     }
 }

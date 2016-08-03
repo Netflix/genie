@@ -88,11 +88,11 @@ public class MvcConfigUnitTests {
     }
 
     /**
-     * Make sure we get a valid Http client to use.
+     * Make sure we get a valid rest template to use.
      */
     @Test
-    public void canGetHttpClient() {
-        Assert.assertNotNull(this.mvcConfig.genieMvcHttpClient());
+    public void canGetRestTemplate() {
+        Assert.assertNotNull(this.mvcConfig.restTemplate(1, 1));
     }
 
     /**

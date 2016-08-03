@@ -18,21 +18,15 @@
 package com.netflix.genie.web.configs.aws;
 
 import com.netflix.genie.test.categories.UnitTest;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
-import org.apache.http.client.HttpClient;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
+import org.springframework.web.client.RestTemplate;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.UUID;
 
 /**
@@ -61,23 +55,13 @@ public class AwsMvcConfigUnitTests {
      */
     @Test
     public void canGetPublicHostname() throws IOException {
-        final HttpClient client = Mockito.mock(HttpClient.class);
-        final HttpResponse response = Mockito.mock(HttpResponse.class);
-        Mockito.when(client.execute(this.awsMvcConfig.publicHostNameGet)).thenReturn(response);
-
-        final StatusLine statusLine = Mockito.mock(StatusLine.class);
-        Mockito.when(response.getStatusLine()).thenReturn(statusLine);
-        Mockito.when(statusLine.getStatusCode()).thenReturn(HttpStatus.SC_OK);
-
-        final HttpEntity entity = Mockito.mock(HttpEntity.class);
-        Mockito.when(response.getEntity()).thenReturn(entity);
+        final RestTemplate restTemplate = Mockito.mock(RestTemplate.class);
         final String hostname = UUID.randomUUID().toString();
-        final ByteArrayInputStream bis = new ByteArrayInputStream(hostname.getBytes(Charset.forName("UTF-8")));
-        Mockito.when(entity.getContent()).thenReturn(bis);
+        Mockito.when(restTemplate.getForObject(this.awsMvcConfig.publicHostNameGet, String.class)).thenReturn(hostname);
 
-        Assert.assertThat(this.awsMvcConfig.hostName(client), Matchers.is(hostname));
-        Mockito.verify(client, Mockito.times(1)).execute(awsMvcConfig.publicHostNameGet);
-        Mockito.verify(client, Mockito.never()).execute(awsMvcConfig.localIPV4HostNameGet);
+        Assert.assertThat(this.awsMvcConfig.hostName(restTemplate), Matchers.is(hostname));
+        Mockito.verify(restTemplate, Mockito.times(1)).getForObject(awsMvcConfig.publicHostNameGet, String.class);
+        Mockito.verify(restTemplate, Mockito.never()).getForObject(awsMvcConfig.localIPV4HostNameGet, String.class);
     }
 
     /**
@@ -87,54 +71,32 @@ public class AwsMvcConfigUnitTests {
      */
     @Test
     public void canGetIPv4Hostname() throws IOException {
-        final HttpClient client = Mockito.mock(HttpClient.class);
-        final HttpResponse response = Mockito.mock(HttpResponse.class);
-        Mockito.when(client.execute(this.awsMvcConfig.publicHostNameGet)).thenReturn(response);
-
-        final StatusLine statusLine = Mockito.mock(StatusLine.class);
-        Mockito.when(response.getStatusLine()).thenReturn(statusLine);
-        Mockito.when(statusLine.getStatusCode()).thenReturn(HttpStatus.SC_NOT_FOUND);
-
-        final HttpResponse ip4Response = Mockito.mock(HttpResponse.class);
-        Mockito.when(client.execute(this.awsMvcConfig.localIPV4HostNameGet)).thenReturn(ip4Response);
-
-        final StatusLine ip4StatusLine = Mockito.mock(StatusLine.class);
-        Mockito.when(ip4Response.getStatusLine()).thenReturn(ip4StatusLine);
-        Mockito.when(ip4StatusLine.getStatusCode()).thenReturn(HttpStatus.SC_OK);
-
-        final HttpEntity entity = Mockito.mock(HttpEntity.class);
-        Mockito.when(ip4Response.getEntity()).thenReturn(entity);
+        final RestTemplate restTemplate = Mockito.mock(RestTemplate.class);
         final String hostname = UUID.randomUUID().toString();
-        final ByteArrayInputStream bis = new ByteArrayInputStream(hostname.getBytes(Charset.forName("UTF-8")));
-        Mockito.when(entity.getContent()).thenReturn(bis);
+        Mockito.when(restTemplate.getForObject(this.awsMvcConfig.publicHostNameGet, String.class))
+                .thenThrow(Exception.class);
 
-        Assert.assertThat(this.awsMvcConfig.hostName(client), Matchers.is(hostname));
-        Mockito.verify(client, Mockito.times(1)).execute(awsMvcConfig.publicHostNameGet);
-        Mockito.verify(client, Mockito.times(1)).execute(awsMvcConfig.localIPV4HostNameGet);
+        Mockito.when(restTemplate.getForObject(this.awsMvcConfig.localIPV4HostNameGet, String.class))
+                .thenReturn(hostname);
+
+        Assert.assertThat(this.awsMvcConfig.hostName(restTemplate), Matchers.is(hostname));
+        Mockito.verify(restTemplate, Mockito.times(1)).getForObject(awsMvcConfig.publicHostNameGet, String.class);
+        Mockito.verify(restTemplate, Mockito.times(1)).getForObject(awsMvcConfig.localIPV4HostNameGet, String.class);
     }
 
     /**
      * Make sure if both fails we throw an exception.
      *
-     * @throws IOException on any problem
+     * @throws Exception on any problem
      */
-    @Test(expected = IOException.class)
-    public void cantGetHostname() throws IOException {
-        final HttpClient client = Mockito.mock(HttpClient.class);
-        final HttpResponse response = Mockito.mock(HttpResponse.class);
-        Mockito.when(client.execute(this.awsMvcConfig.publicHostNameGet)).thenReturn(response);
+    @Test(expected = Exception.class)
+    public void cantGetHostname() throws Exception {
+        final RestTemplate restTemplate = Mockito.mock(RestTemplate.class);
+        Mockito.when(restTemplate.getForObject(this.awsMvcConfig.publicHostNameGet, String.class))
+                .thenThrow(Exception.class);
+        Mockito.when(restTemplate.getForObject(this.awsMvcConfig.localIPV4HostNameGet, String.class))
+                .thenThrow(Exception.class);
 
-        final StatusLine statusLine = Mockito.mock(StatusLine.class);
-        Mockito.when(response.getStatusLine()).thenReturn(statusLine);
-        Mockito.when(statusLine.getStatusCode()).thenReturn(HttpStatus.SC_NOT_FOUND);
-
-        final HttpResponse ip4Response = Mockito.mock(HttpResponse.class);
-        Mockito.when(client.execute(this.awsMvcConfig.localIPV4HostNameGet)).thenReturn(ip4Response);
-
-        final StatusLine ip4StatusLine = Mockito.mock(StatusLine.class);
-        Mockito.when(ip4Response.getStatusLine()).thenReturn(ip4StatusLine);
-        Mockito.when(ip4StatusLine.getStatusCode()).thenReturn(HttpStatus.SC_BAD_REQUEST);
-
-        this.awsMvcConfig.hostName(client);
+        this.awsMvcConfig.hostName(restTemplate);
     }
 }
