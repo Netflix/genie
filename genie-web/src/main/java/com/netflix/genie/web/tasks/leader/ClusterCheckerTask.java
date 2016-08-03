@@ -27,16 +27,12 @@ import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import com.netflix.spectator.api.Counter;
 import com.netflix.spectator.api.Registry;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.ManagementServerProperties;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 import javax.validation.constraints.NotNull;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -60,7 +56,7 @@ public class ClusterCheckerTask extends LeadershipTask {
     private final ClusterCheckerProperties properties;
     private final JobSearchService jobSearchService;
     private final JobPersistenceService jobPersistenceService;
-    private final HttpClient httpClient;
+    private final RestTemplate restTemplate;
     private final String scheme;
     private final String healthEndpoint;
 
@@ -77,7 +73,7 @@ public class ClusterCheckerTask extends LeadershipTask {
      * @param properties                 The properties to use to configure the task
      * @param jobSearchService           The job search service to use
      * @param jobPersistenceService      The job persistence service to use
-     * @param httpClient                 The http client to use to send requests
+     * @param restTemplate               The rest template for http calls
      * @param managementServerProperties The properties where Spring actuator is running
      * @param registry                   The spectator registry for getting metrics
      */
@@ -87,7 +83,7 @@ public class ClusterCheckerTask extends LeadershipTask {
         @NotNull final ClusterCheckerProperties properties,
         @NotNull final JobSearchService jobSearchService,
         @NotNull final JobPersistenceService jobPersistenceService,
-        @NotNull final HttpClient httpClient,
+        @NotNull final RestTemplate restTemplate,
         @NotNull final ManagementServerProperties managementServerProperties,
         @NotNull final Registry registry
     ) {
@@ -95,7 +91,7 @@ public class ClusterCheckerTask extends LeadershipTask {
         this.properties = properties;
         this.jobSearchService = jobSearchService;
         this.jobPersistenceService = jobPersistenceService;
-        this.httpClient = httpClient;
+        this.restTemplate = restTemplate;
         this.scheme = this.properties.getScheme() + "://";
         this.healthEndpoint = ":" + this.properties.getPort() + managementServerProperties.getContextPath() + "/health";
 
@@ -118,12 +114,8 @@ public class ClusterCheckerTask extends LeadershipTask {
             .forEach(
                 host -> {
                     try {
-                        final HttpGet get = new HttpGet(this.scheme + host + this.healthEndpoint);
-                        final HttpResponse response = this.httpClient.execute(get);
-                        if (response.getStatusLine().getStatusCode() != HttpStatus.OK.value()) {
-                            badNodes.add(host);
-                        }
-                    } catch (final IOException ioe) {
+                        restTemplate.getForObject(this.scheme + host + this.healthEndpoint, String.class);
+                    } catch (final Exception ioe) {
                         log.error("Unable to reach {}", host, ioe);
                         badNodes.add(host);
                     }

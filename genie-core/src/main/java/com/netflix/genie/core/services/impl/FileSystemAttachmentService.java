@@ -27,6 +27,8 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 
 /**
@@ -105,16 +107,16 @@ public class FileSystemAttachmentService implements AttachmentService {
         if (!attachmentsDirectoryPath.endsWith(File.separator)) {
             attachmentsDirectoryPath = attachmentsDirectory + File.separator;
         }
-        final File dir = new File(attachmentsDirectoryPath);
-        if (!dir.exists()) {
-            try {
+        try {
+            final File dir = new File(new URI(attachmentsDirectoryPath));
+            if (!dir.exists()) {
                 Files.createDirectories(dir.toPath());
-            } catch (IOException e) {
-                throw new IllegalArgumentException(
-                        "Failed to create attachements directory " + attachmentsDirectoryPath
-                );
             }
+            this.attachmentDirectory = dir;
+        } catch (IOException | URISyntaxException e) {
+            throw new IllegalArgumentException(
+                    "Failed to create attachments directory " + attachmentsDirectoryPath
+            );
         }
-        this.attachmentDirectory = dir;
     }
 }

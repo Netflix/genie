@@ -30,10 +30,6 @@ import com.netflix.genie.web.properties.ClusterCheckerProperties;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import com.netflix.spectator.api.Counter;
 import com.netflix.spectator.api.Registry;
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -41,6 +37,8 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
 import org.springframework.boot.actuate.autoconfigure.ManagementServerProperties;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.util.List;
@@ -59,7 +57,7 @@ public class ClusterCheckerTaskUnitTests {
     private String hostName;
     private JobSearchService jobSearchService;
     private JobPersistenceService jobPersistenceService;
-    private HttpClient httpClient;
+    private RestTemplate restTemplate;
 
     private Counter lostJobCounter;
     private Counter unableToUpdateJobCounter;
@@ -73,7 +71,7 @@ public class ClusterCheckerTaskUnitTests {
         final ClusterCheckerProperties properties = new ClusterCheckerProperties();
         this.jobSearchService = Mockito.mock(JobSearchService.class);
         this.jobPersistenceService = Mockito.mock(JobPersistenceService.class);
-        this.httpClient = Mockito.mock(HttpClient.class);
+        this.restTemplate = Mockito.mock(RestTemplate.class);
         final ManagementServerProperties serverProperties = Mockito.mock(ManagementServerProperties.class);
         Mockito.when(serverProperties.getContextPath()).thenReturn("/actuator");
         final Registry registry = Mockito.mock(Registry.class);
@@ -88,7 +86,7 @@ public class ClusterCheckerTaskUnitTests {
             properties,
             this.jobSearchService,
             this.jobPersistenceService,
-            this.httpClient,
+            this.restTemplate,
             serverProperties,
             registry
         );
@@ -106,28 +104,18 @@ public class ClusterCheckerTaskUnitTests {
         final String host2 = UUID.randomUUID().toString();
         final String host3 = UUID.randomUUID().toString();
 
-        final HttpResponse response1 = Mockito.mock(HttpResponse.class);
-        final StatusLine statusLine1 = Mockito.mock(StatusLine.class);
-        Mockito.when(statusLine1.getStatusCode()).thenReturn(200);
-        Mockito.when(response1.getStatusLine()).thenReturn(statusLine1);
-
-        final HttpResponse response3 = Mockito.mock(HttpResponse.class);
-        final StatusLine statusLine3 = Mockito.mock(StatusLine.class);
-        Mockito.when(statusLine3.getStatusCode()).thenReturn(500);
-        Mockito.when(response3.getStatusLine()).thenReturn(statusLine3);
-
         // Mock the 9 invocations for 3 calls to run
         Mockito
-            .when(this.httpClient.execute(Mockito.any(HttpGet.class)))
-            .thenReturn(response1)
-            .thenThrow(new IOException("blah"))
-            .thenReturn(response3)
-            .thenReturn(response1)
-            .thenThrow(new IOException("blah"))
-            .thenReturn(response3)
-            .thenReturn(response1)
-            .thenThrow(new IOException("blah"))
-            .thenReturn(response3);
+            .when(this.restTemplate.getForObject(Mockito.anyString(), Mockito.anyObject()))
+            .thenReturn("")
+            .thenThrow(new RestClientException("blah"))
+            .thenReturn("")
+            .thenReturn("")
+            .thenThrow(new RestClientException("blah"))
+            .thenReturn("")
+            .thenReturn("")
+            .thenThrow(new RestClientException("blah"))
+            .thenReturn("");
 
         final List<String> hostsRunningJobs = Lists.newArrayList(this.hostName, host1, host2, host3);
         Mockito.when(this.jobSearchService.getAllHostsRunningJobs()).thenReturn(hostsRunningJobs);
@@ -158,14 +146,13 @@ public class ClusterCheckerTaskUnitTests {
             .setJobCompletionInformation(
                 Mockito.eq(job1Id),
                 Mockito.eq(JobExecution.LOST_EXIT_CODE),
-                Mockito.eq(JobStatus.FAILED),
-                Mockito.anyString()
+                Mockito.eq(JobStatus.FAILED), Mockito.anyString()
             );
 
         this.task.run();
-        Assert.assertThat(this.task.getErrorCountsSize(), Matchers.is(2));
+        Assert.assertThat(this.task.getErrorCountsSize(), Matchers.is(1));
         this.task.run();
-        Assert.assertThat(this.task.getErrorCountsSize(), Matchers.is(2));
+        Assert.assertThat(this.task.getErrorCountsSize(), Matchers.is(1));
         this.task.run();
         Assert.assertThat(this.task.getErrorCountsSize(), Matchers.is(0));
 
@@ -173,31 +160,15 @@ public class ClusterCheckerTaskUnitTests {
             .setJobCompletionInformation(
                 Mockito.eq(job1Id),
                 Mockito.eq(JobExecution.LOST_EXIT_CODE),
-                Mockito.eq(JobStatus.FAILED),
-                Mockito.anyString()
+                Mockito.eq(JobStatus.FAILED), Mockito.anyString()
             );
         Mockito.verify(this.jobPersistenceService, Mockito.times(1))
             .setJobCompletionInformation(
                 Mockito.eq(job2Id),
                 Mockito.eq(JobExecution.LOST_EXIT_CODE),
-                Mockito.eq(JobStatus.FAILED),
-                Mockito.anyString()
+                Mockito.eq(JobStatus.FAILED), Mockito.anyString()
             );
-        Mockito.verify(this.jobPersistenceService, Mockito.times(1))
-            .setJobCompletionInformation(
-                Mockito.eq(job3Id),
-                Mockito.eq(JobExecution.LOST_EXIT_CODE),
-                Mockito.eq(JobStatus.FAILED),
-                Mockito.anyString()
-            );
-        Mockito.verify(this.jobPersistenceService, Mockito.times(1))
-            .setJobCompletionInformation(
-                Mockito.eq(job4Id),
-                Mockito.eq(JobExecution.LOST_EXIT_CODE),
-                Mockito.eq(JobStatus.FAILED),
-                Mockito.anyString()
-            );
-        Mockito.verify(this.lostJobCounter, Mockito.times(3)).increment();
+        Mockito.verify(this.lostJobCounter, Mockito.times(1)).increment();
         Mockito.verify(this.unableToUpdateJobCounter, Mockito.times(1)).increment();
     }
 

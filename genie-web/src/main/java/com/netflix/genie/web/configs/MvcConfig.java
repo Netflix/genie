@@ -21,8 +21,6 @@ import com.google.common.collect.Lists;
 import com.netflix.genie.web.resources.handlers.GenieResourceHttpRequestHandler;
 import com.netflix.genie.web.resources.writers.DefaultDirectoryWriter;
 import com.netflix.genie.web.resources.writers.DirectoryWriter;
-import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationContext;
@@ -31,6 +29,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
@@ -86,14 +86,22 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
     }
 
     /**
-     * Get an HttpClient for calling between Genie nodes.
+     * Get RestTemplate for calling between Genie nodes.
      *
-     * @return The http client to use
+     * @param httpConnectTimeout http connection timeout in milliseconds
+     * @param httpReadTimeout http read timeout in milliseconds
+     * @return The rest template to use
      */
     @Bean
     @ConditionalOnMissingBean
-    public HttpClient genieMvcHttpClient() {
-        return HttpClients.createDefault();
+    public RestTemplate restTemplate(
+            @Value("${genie.http.connect.timeout:2000}") final int httpConnectTimeout,
+            @Value("${genie.http.connect.timeout:10000}") final int httpReadTimeout
+            ) {
+        final HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+        factory.setConnectTimeout(httpConnectTimeout);
+        factory.setReadTimeout(httpReadTimeout);
+        return new RestTemplate(factory);
     }
 
     /**
