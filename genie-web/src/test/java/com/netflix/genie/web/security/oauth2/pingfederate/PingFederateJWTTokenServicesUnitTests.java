@@ -93,12 +93,13 @@ public class PingFederateJWTTokenServicesUnitTests {
         Assert.assertThat(authentication.getPrincipal(), Matchers.is(clientId));
 
         final Collection<GrantedAuthority> authorities = authentication.getAuthorities();
-        Assert.assertThat(authorities.size(), Matchers.is(2));
+        Assert.assertThat(authorities.size(), Matchers.is(3));
         Assert.assertTrue(
             authorities.containsAll(
                 Sets.newHashSet(
                     new SimpleGrantedAuthority("ROLE_ADMIN"),
-                    new SimpleGrantedAuthority("ROLE_" + scope2.toUpperCase())
+                    new SimpleGrantedAuthority("ROLE_" + scope2.toUpperCase()),
+                    new SimpleGrantedAuthority("ROLE_USER")
                 )
             )
         );

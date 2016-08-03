@@ -52,6 +52,9 @@ public class PingFederateJWTTokenServices implements ResourceServerTokenServices
     private static final String GENIE_SCOPE_PREFIX = "genie_";
     private static final int GENIE_SCOPE_PREFIX_LENGTH = GENIE_SCOPE_PREFIX.length();
 
+    private static final SimpleGrantedAuthority USER = new SimpleGrantedAuthority("ROLE_USER");
+    private static final SimpleGrantedAuthority ADMIN = new SimpleGrantedAuthority("ROLE_ADMIN");
+
     private final JwtConsumer jwtConsumer;
     private final Timer loadAuthenticationTimer;
 
@@ -124,7 +127,12 @@ public class PingFederateJWTTokenServices implements ResourceServerTokenServices
             .collect(Collectors.toSet());
 
         if (authorities.isEmpty()) {
-            throw new InvalidTokenException("No genie_ scopes found. Unable to authorize");
+            throw new InvalidTokenException("No scopes found. Unable to authorize");
+        }
+
+        // Assume a user is a subset of admin so always grant admin user the role user as well
+        if (authorities.contains(ADMIN)) {
+            authorities.add(USER);
         }
 
         return new OAuth2Request(null, clientId, authorities, true, scopes, null, null, null, null);
