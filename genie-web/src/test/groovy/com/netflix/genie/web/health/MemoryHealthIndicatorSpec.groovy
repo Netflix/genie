@@ -25,16 +25,16 @@ import spock.lang.Unroll
  * @since 3.0.0
  */
 @Unroll
-class MemoryHealthIndicatorSpec extends Specification{
+class MemoryHealthIndicatorSpec extends Specification {
     OperatingSystemMXBean operatingSystemMXBean
     MemoryHealthIndicator memoryHealthIndicator;
 
-    def setup(){
+    def setup() {
         operatingSystemMXBean = Mock(OperatingSystemMXBean)
         memoryHealthIndicator = new MemoryHealthIndicator(80, operatingSystemMXBean)
     }
 
-    def 'Health should be #status when free memory is #freeMemory and totla is #totalMemory'(){
+    def 'Health should be #status when free memory is #freeMemory and total is #totalMemory'() {
         given:
         operatingSystemMXBean.getFreePhysicalMemorySize() >> freeMemory
         operatingSystemMXBean.getTotalPhysicalMemorySize() >> totalMemory

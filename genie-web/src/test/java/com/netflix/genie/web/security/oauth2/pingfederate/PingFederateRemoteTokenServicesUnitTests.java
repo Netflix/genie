@@ -58,13 +58,13 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Unit tests for PingFederateTokenServices.
+ * Unit tests for PingFederateRemoteTokenServices.
  *
  * @author tgianos
  * @since 3.0.0
  */
 @Category(UnitTest.class)
-public class PingFederateTokenServicesUnitTests {
+public class PingFederateRemoteTokenServicesUnitTests {
 
     private static final int MOCK_PORT = 8089;
     private static final String CLIENT_ID = UUID.randomUUID().toString();
@@ -82,7 +82,6 @@ public class PingFederateTokenServicesUnitTests {
     private Registry registry;
     private Id validationError;
     private Timer authenticationTimer;
-    private Timer pingFederateAPITimer;
 
     /**
      * Setup for the tests.
@@ -94,30 +93,14 @@ public class PingFederateTokenServicesUnitTests {
         this.registry = Mockito.mock(Registry.class);
         this.validationError = Mockito.mock(Id.class);
         this.authenticationTimer = Mockito.mock(Timer.class);
-        this.pingFederateAPITimer = Mockito.mock(Timer.class);
+        final Timer pingFederateAPITimer = Mockito.mock(Timer.class);
         Mockito.when(this.registry.createId(Mockito.anyString())).thenReturn(this.validationError);
         Mockito
-            .when(this.registry.timer(PingFederateTokenServices.AUTHENTICATION_TIMER_NAME))
+            .when(this.registry.timer(PingFederateRemoteTokenServices.AUTHENTICATION_TIMER_NAME))
             .thenReturn(this.authenticationTimer);
         Mockito
-            .when(this.registry.timer(PingFederateTokenServices.API_TIMER_NAME))
-            .thenReturn(this.pingFederateAPITimer);
-    }
-
-    /**
-     * Test to make sure valid input to the constructor works.
-     */
-    @Test
-    public void canConstruct() {
-        final AccessTokenConverter converter = new DefaultAccessTokenConverter();
-        final PingFederateTokenServices services
-            = new PingFederateTokenServices(this.resourceServerProperties, converter, this.registry);
-
-        Assert.assertThat(services.getAccessTokenConverter(), Matchers.is(converter));
-        Assert.assertThat(services.getCheckTokenEndpointUrl(), Matchers.is(CHECK_TOKEN_ENDPOINT_URL));
-        Assert.assertThat(services.getClientId(), Matchers.is(CLIENT_ID));
-        Assert.assertThat(services.getClientSecret(), Matchers.is(CLIENT_SECRET));
-        Assert.assertNotNull(services.getRestTemplate());
+            .when(this.registry.timer(PingFederateRemoteTokenServices.API_TIMER_NAME))
+            .thenReturn(pingFederateAPITimer);
     }
 
     /**
@@ -127,7 +110,7 @@ public class PingFederateTokenServicesUnitTests {
     public void cantConstructWithoutClientId() {
         final ResourceServerProperties properties = new ResourceServerProperties(null, null);
         final AccessTokenConverter converter = new DefaultAccessTokenConverter();
-        new PingFederateTokenServices(properties, converter, this.registry);
+        new PingFederateRemoteTokenServices(properties, converter, this.registry);
     }
 
     /**
@@ -137,7 +120,7 @@ public class PingFederateTokenServicesUnitTests {
     public void cantConstructWithoutClientSecret() {
         final ResourceServerProperties properties = new ResourceServerProperties("AnID", null);
         final AccessTokenConverter converter = new DefaultAccessTokenConverter();
-        new PingFederateTokenServices(properties, converter, this.registry);
+        new PingFederateRemoteTokenServices(properties, converter, this.registry);
     }
 
     /**
@@ -147,7 +130,7 @@ public class PingFederateTokenServicesUnitTests {
     public void cantConstructWithoutCheckTokenURL() {
         this.resourceServerProperties.setTokenInfoUri(null);
         final AccessTokenConverter converter = new DefaultAccessTokenConverter();
-        new PingFederateTokenServices(this.resourceServerProperties, converter, this.registry);
+        new PingFederateRemoteTokenServices(this.resourceServerProperties, converter, this.registry);
     }
 
     /**
@@ -157,8 +140,8 @@ public class PingFederateTokenServicesUnitTests {
     public void canLoadAuthentication() {
         final AccessTokenConverter converter = Mockito.mock(AccessTokenConverter.class);
         final RestTemplate restTemplate = Mockito.mock(RestTemplate.class);
-        final PingFederateTokenServices services
-            = new PingFederateTokenServices(this.resourceServerProperties, converter, this.registry);
+        final PingFederateRemoteTokenServices services
+            = new PingFederateRemoteTokenServices(this.resourceServerProperties, converter, this.registry);
         services.setRestTemplate(restTemplate);
         final String accessToken = UUID.randomUUID().toString();
 
@@ -167,9 +150,9 @@ public class PingFederateTokenServicesUnitTests {
         final String scope2 = UUID.randomUUID().toString();
 
         final Map<String, Object> map = Maps.newHashMap();
-        map.put(PingFederateTokenServices.CLIENT_ID_KEY, clientId);
+        map.put(PingFederateRemoteTokenServices.CLIENT_ID_KEY, clientId);
         map.put(
-            PingFederateTokenServices.SCOPE_KEY,
+            PingFederateRemoteTokenServices.SCOPE_KEY,
             scope1 + " " + scope2
         );
 
@@ -214,9 +197,6 @@ public class PingFederateTokenServicesUnitTests {
         Mockito
             .verify(this.authenticationTimer, Mockito.times(1))
             .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
-        Mockito
-            .verify(this.pingFederateAPITimer, Mockito.times(1))
-            .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
     }
 
     /**
@@ -226,13 +206,13 @@ public class PingFederateTokenServicesUnitTests {
     public void cantLoadAuthenticationOnError() {
         final AccessTokenConverter converter = Mockito.mock(AccessTokenConverter.class);
         final RestTemplate restTemplate = Mockito.mock(RestTemplate.class);
-        final PingFederateTokenServices services
-            = new PingFederateTokenServices(this.resourceServerProperties, converter, this.registry);
+        final PingFederateRemoteTokenServices services
+            = new PingFederateRemoteTokenServices(this.resourceServerProperties, converter, this.registry);
         services.setRestTemplate(restTemplate);
         final String accessToken = UUID.randomUUID().toString();
 
         final Map<String, Object> map = Maps.newHashMap();
-        map.put(PingFederateTokenServices.ERROR_KEY, UUID.randomUUID().toString());
+        map.put(PingFederateRemoteTokenServices.ERROR_KEY, UUID.randomUUID().toString());
 
         @SuppressWarnings("unchecked")
         final ResponseEntity<Map> response = Mockito.mock(ResponseEntity.class);
@@ -265,8 +245,8 @@ public class PingFederateTokenServicesUnitTests {
         this.resourceServerProperties = new ResourceServerProperties(CLIENT_ID, CLIENT_SECRET);
         // Some resource no one should ever have
         this.resourceServerProperties.setTokenInfoUri(uri);
-        final PingFederateTokenServices services
-            = new PingFederateTokenServices(this.resourceServerProperties, converter, this.registry);
+        final PingFederateRemoteTokenServices services
+            = new PingFederateRemoteTokenServices(this.resourceServerProperties, converter, this.registry);
         final String accessToken = UUID.randomUUID().toString();
         final Counter restErrorCounter = Mockito.mock(Counter.class);
         final Id finalValidationId = Mockito.mock(Id.class);
@@ -294,8 +274,8 @@ public class PingFederateTokenServicesUnitTests {
     @Test(expected = UnsupportedOperationException.class)
     public void cantReadAccessToken() {
         final AccessTokenConverter converter = new DefaultAccessTokenConverter();
-        final PingFederateTokenServices services
-            = new PingFederateTokenServices(this.resourceServerProperties, converter, this.registry);
+        final PingFederateRemoteTokenServices services
+            = new PingFederateRemoteTokenServices(this.resourceServerProperties, converter, this.registry);
         services.readAccessToken(UUID.randomUUID().toString());
     }
 }

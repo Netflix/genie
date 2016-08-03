@@ -39,8 +39,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = GenieWeb.class)
 @WebIntegrationTest(randomPort = true)
-@ActiveProfiles({"oauth2", "integration"})
-public class PingFederateConfigIntegrationTests extends AbstractAPISecurityIntegrationTests {
+@ActiveProfiles({"oauth2-pingfederate-remote", "integration"})
+public class PingFederateRemoteConfigIntegrationTests extends AbstractAPISecurityIntegrationTests {
 
     /**
      * {@inheritDoc}

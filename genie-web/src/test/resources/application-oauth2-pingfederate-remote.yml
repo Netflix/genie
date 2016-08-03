@@ -22,6 +22,8 @@ genie:
       enabled: true
       pingfederate:
         enabled: true
+        jwt:
+          enabled: false
 
 management:
   security:

@@ -26,7 +26,7 @@ eureka:
 genie:
   file:
     cache:
-      location: "file:///tmp/genie/cache"
+      location: file:///tmp/genie/cache
   health:
     memory:
       usedPhysicalMemoryPercent: 90
@@ -61,8 +61,9 @@ genie:
     oauth2:
       enabled: false
       pingfederate:
-        enabled:
-          false
+        enabled: false
+        jwt:
+          enabled: false
     saml:
       enabled: false
     x509:

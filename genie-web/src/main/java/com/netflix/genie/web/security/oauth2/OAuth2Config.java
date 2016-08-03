@@ -32,7 +32,7 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Res
  * Security Configuration for OAuth2.
  * <p>
  * https://youtu.be/MLfL1NpwUC4?t=1h7m55s
- *
+ * <p>
  * When enabled by default is given Order(3) which comes from within EnableResourceServer.
  *
  * @author tgianos
