@@ -64,9 +64,9 @@ public class JobExecution extends BaseDTO {
     public static final int LOST_EXIT_CODE = 666;
 
     /**
-     * The default timeout time which is forever in the future.
+     * The default timeout date which is Jan 1 in the year 3000. That should be sufficient.
      */
-    public static final Date DEFAULT_TIMEOUT = new Date(Long.MAX_VALUE);
+    public static final Date DEFAULT_TIMEOUT = new Date(32503708800000L);
 
     /**
      * The exit code that will be set to indicate a job has succeeded.
