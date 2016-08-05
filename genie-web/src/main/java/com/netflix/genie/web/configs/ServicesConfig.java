@@ -328,6 +328,7 @@ public class ServicesConfig {
      * @param maxRunningJobs        The maximum number of jobs that can run on this node
      * @param registry              The metrics registry to use
      * @param eventPublisher        The application event publisher to use
+     * @param hostName              The host this Genie instance is running on
      * @return An instance of the JobCoordinatorService.
      */
     @Bean
@@ -343,7 +344,8 @@ public class ServicesConfig {
         @Value("${genie.jobs.max.running:2}")
         final int maxRunningJobs,
         final Registry registry,
-        final ApplicationEventPublisher eventPublisher
+        final ApplicationEventPublisher eventPublisher,
+        final String hostName
     ) {
         return new JobCoordinatorService(
             taskExecutor,
@@ -354,7 +356,8 @@ public class ServicesConfig {
             baseArchiveLocation,
             maxRunningJobs,
             registry,
-            eventPublisher
+            eventPublisher,
+            hostName
         );
     }
 

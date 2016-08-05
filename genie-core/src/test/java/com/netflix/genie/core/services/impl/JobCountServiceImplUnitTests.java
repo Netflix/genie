@@ -18,7 +18,7 @@
 package com.netflix.genie.core.services.impl;
 
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.dto.JobExecution;
+import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.test.categories.UnitTest;
 import org.hamcrest.Matchers;
@@ -56,14 +56,14 @@ public class JobCountServiceImplUnitTests {
      * Test to make sure the method returns the number of running jobs.
      */
     @Test
-    public void canGetNumRunningJobs() {
+    public void canGetNumJobs() {
         Mockito
-            .when(this.jobSearchService.getAllRunningJobExecutionsOnHost(this.hostName))
+            .when(this.jobSearchService.getAllActiveJobsOnHost(this.hostName))
             .thenReturn(
                 Sets.newHashSet(
-                    Mockito.mock(JobExecution.class),
-                    Mockito.mock(JobExecution.class),
-                    Mockito.mock(JobExecution.class)
+                    Mockito.mock(Job.class),
+                    Mockito.mock(Job.class),
+                    Mockito.mock(Job.class)
                 )
             );
 

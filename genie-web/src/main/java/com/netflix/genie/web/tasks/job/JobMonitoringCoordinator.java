@@ -17,8 +17,12 @@
  */
 package com.netflix.genie.web.tasks.job;
 
+import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
+import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.events.JobFinishedEvent;
+import com.netflix.genie.core.events.JobFinishedReason;
 import com.netflix.genie.core.events.JobScheduledEvent;
 import com.netflix.genie.core.events.JobStartedEvent;
 import com.netflix.genie.core.jobs.JobConstants;
@@ -70,6 +74,7 @@ public class JobMonitoringCoordinator implements JobCountService {
     private final JobOutputMaxProperties outputMaxProperties;
 
     private final Counter unableToCancel;
+    private final Counter unableToReAttach;
 
     /**
      * Constructor.
@@ -109,6 +114,7 @@ public class JobMonitoringCoordinator implements JobCountService {
         this.registry.mapSize("genie.jobs.scheduled.gauge", this.scheduledJobs);
         this.registry.methodValue("genie.jobs.active.gauge", this, "getNumJobs");
         this.unableToCancel = registry.counter("genie.jobs.unableToCancel.rate");
+        this.unableToReAttach = registry.counter("genie.jobs.unableToReAttach.rate");
     }
 
     /**
@@ -117,24 +123,38 @@ public class JobMonitoringCoordinator implements JobCountService {
      * the Genie application crashes when it comes back up it can find the jobs again and not leave them orphaned.
      *
      * @param event The spring boot application ready event indicating the application is ready to start taking load
+     * @throws GenieException on unrecoverable error
      */
     @EventListener
-    public void attachToRunningJobs(final ApplicationReadyEvent event) {
-        log.info("Application is ready according to event {}. Attempting to re-attach to any running jobs", event);
-        final Set<JobExecution> executions = this.jobSearchService.getAllRunningJobExecutionsOnHost(this.hostName);
-        if (executions.isEmpty()) {
-            log.info("No jobs currently running on this node.");
+    public void onStartup(final ApplicationReadyEvent event) throws GenieException {
+        log.info("Application is ready according to event {}. Attempting to re-attach to any active jobs", event);
+        final Set<Job> jobs = this.jobSearchService.getAllActiveJobsOnHost(this.hostName);
+        if (jobs.isEmpty()) {
+            log.info("No jobs currently active on this node.");
             return;
         } else {
-            log.info("{} jobs currently running on this node at startup", executions.size());
+            log.info("{} jobs currently active on this node at startup", jobs.size());
         }
 
-        for (final JobExecution execution : executions) {
-            if (this.jobMonitors.containsKey(execution.getId())) {
-                log.info("Job {} is already being tracked. Ignoring.");
+        for (final Job job : jobs) {
+            final String id = job.getId();
+            if (this.jobMonitors.containsKey(id) || this.scheduledJobs.containsKey(id)) {
+                log.info("Job {} is already being tracked. Ignoring.", id);
+            } else if (job.getStatus() != JobStatus.RUNNING) {
+                this.publisher.publishEvent(
+                    new JobFinishedEvent(id, JobFinishedReason.SYSTEM_CRASH, "System crashed while job starting", this)
+                );
             } else {
-                this.scheduleMonitor(execution);
-                log.info("Re-attached a job monitor to job {}", execution.getId());
+                try {
+                    this.scheduleMonitor(this.jobSearchService.getJobExecution(id));
+                    log.info("Re-attached a job monitor to job {}", id);
+                } catch (final GenieException ge) {
+                    log.error("Unable to re-attach to job {}.", id);
+                    this.publisher.publishEvent(
+                        new JobFinishedEvent(id, JobFinishedReason.SYSTEM_CRASH, "Unable to re-attach on startup", this)
+                    );
+                    this.unableToReAttach.increment();
+                }
             }
         }
     }

@@ -20,6 +20,10 @@ package com.netflix.genie.common.dto;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.Set;
+
 /**
  * Possible statuses for a Job.
  *
@@ -52,6 +56,13 @@ public enum JobStatus {
      */
     INVALID;
 
+    private static final Set<JobStatus> ACTIVE_STATUSES = Collections.unmodifiableSet(
+        EnumSet.of(JobStatus.INIT, JobStatus.RUNNING)
+    );
+    private static final Set<JobStatus> FINISHED_STATUSES = Collections.unmodifiableSet(
+        EnumSet.of(JobStatus.SUCCEEDED, JobStatus.KILLED, JobStatus.FAILED, JobStatus.INVALID)
+    );
+
     /**
      * Parse job status.
      *
@@ -78,7 +89,7 @@ public enum JobStatus {
      * @return True if the job is still actively processing in some manner
      */
     public boolean isActive() {
-        return this == INIT || this == RUNNING;
+        return ACTIVE_STATUSES.contains(this);
     }
 
     /**
@@ -87,6 +98,24 @@ public enum JobStatus {
      * @return True if the job is no longer processing for one reason or another.
      */
     public boolean isFinished() {
-        return this == SUCCEEDED || this == KILLED || this == FAILED || this == INVALID;
+        return FINISHED_STATUSES.contains(this);
+    }
+
+    /**
+     * Get an unmodifiable set of all the statuses that make up a job being considered active.
+     *
+     * @return Unmodifiable set of all active statuses
+     */
+    public static Set<JobStatus> getActiveStatuses() {
+        return ACTIVE_STATUSES;
+    }
+
+    /**
+     * Get an unmodifiable set of all the statuses that make up a job being considered finished.
+     *
+     * @return Unmodifiable set of all finished statuses
+     */
+    public static Set<JobStatus> getFinishedStatuses() {
+        return FINISHED_STATUSES;
     }
 }

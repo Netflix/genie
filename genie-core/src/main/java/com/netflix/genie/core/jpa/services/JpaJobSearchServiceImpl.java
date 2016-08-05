@@ -53,6 +53,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -193,12 +194,33 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
      * {@inheritDoc}
      */
     @Override
-    public Set<JobExecution> getAllRunningJobExecutionsOnHost(@NotBlank final String hostname) {
-        log.debug("Called with hostname {}", hostname);
-        return this.jobExecutionRepository
-            .findByHostNameAndExitCode(hostname, JobExecution.DEFAULT_EXIT_CODE)
+    public Set<Job> getAllActiveJobsOnHost(@NotBlank final String hostName) {
+        log.debug("Called with hostname {}", hostName);
+
+        final CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
+        final CriteriaQuery<JobEntity> query = cb.createQuery(JobEntity.class);
+        final Root<JobEntity> root = query.from(JobEntity.class);
+        final Join<JobEntity, JobExecutionEntity> executions = root.join(JobEntity_.execution);
+
+        final Set<Predicate> statusPredicates = JobStatus
+            .getActiveStatuses()
             .stream()
-            .map(JobExecutionEntity::getDTO)
+            .map(status -> cb.equal(root.get(JobEntity_.status), status))
+            .collect(Collectors.toSet());
+
+        final Predicate statusPredicate = cb.or(statusPredicates.toArray(new Predicate[statusPredicates.size()]));
+
+        final Predicate hostPredicate = cb.equal(executions.get(JobExecutionEntity_.hostName), hostName);
+
+        query
+            .distinct(true)
+            .where(cb.and(statusPredicate, hostPredicate));
+
+        return this.entityManager
+            .createQuery(query)
+            .getResultList()
+            .stream()
+            .map(JobEntity::getDTO)
             .collect(Collectors.toSet());
     }
 
@@ -206,15 +228,24 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
      * {@inheritDoc}
      */
     @Override
-    public List<String> getAllHostsRunningJobs() {
+    public List<String> getAllHostsWithActiveJobs() {
         log.debug("Called");
 
         final CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
         final CriteriaQuery<String> query = cb.createQuery(String.class);
-        final Root<JobExecutionEntity> root = query.from(JobExecutionEntity.class);
-        final Predicate whereClause = cb.equal(root.get(JobExecutionEntity_.exitCode), JobExecution.DEFAULT_EXIT_CODE);
+        final Root<JobEntity> root = query.from(JobEntity.class);
+        final Join<JobEntity, JobExecutionEntity> executions = root.join(JobEntity_.execution);
 
-        query.select(root.get(JobExecutionEntity_.hostName)).distinct(true).where(whereClause);
+        final Set<Predicate> statusPredicates = JobStatus
+            .getActiveStatuses()
+            .stream()
+            .map(status -> cb.equal(root.get(JobEntity_.status), status))
+            .collect(Collectors.toSet());
+
+        query
+            .select(executions.get(JobExecutionEntity_.hostName))
+            .distinct(true)
+            .where(cb.or(statusPredicates.toArray(new Predicate[statusPredicates.size()])));
 
         return this.entityManager.createQuery(query).getResultList();
     }

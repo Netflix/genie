@@ -61,7 +61,7 @@ public class JobExecutionEntity extends BaseEntity {
 
     @Basic(optional = false)
     @Column(name = "process_id", nullable = false)
-    private int processId;
+    private int processId = JobExecution.DEFAULT_PROCESS_ID;
 
     @Basic(optional = false)
     @Column(name = "check_delay", nullable = false)
