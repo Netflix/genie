@@ -26,8 +26,12 @@ import com.netflix.genie.web.tasks.TaskUtils;
 import com.netflix.spectator.api.Counter;
 import com.netflix.spectator.api.Registry;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.Executor;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.Resource;
 import org.springframework.scheduling.TaskScheduler;
@@ -52,8 +56,11 @@ public class DiskCleanupTask implements Runnable {
     private final DiskCleanupProperties properties;
     private final File jobsDir;
     private final JobSearchService jobSearchService;
+    private final boolean runAsUser;
+    private final Executor processExecutor;
 
     private final AtomicLong numberOfDeletedJobDirs;
+    private final AtomicLong numberOfDirsUnableToDelete;
     private final Counter unableToGetJobCounter;
     private final Counter unableToDeleteJobDirCounter;
 
@@ -64,6 +71,8 @@ public class DiskCleanupTask implements Runnable {
      * @param scheduler        The scheduler to use to schedule the cron trigger.
      * @param jobsDir          The resource representing the location of the job directory
      * @param jobSearchService The service to find jobs with
+     * @param runAsUser        If jobs are run as the user (and thus ownership of directories is changed)
+     * @param processExecutor  The process executor to use to delete directories
      * @param registry         The metrics registry
      * @throws IOException When it is unable to open a file reference to the job directory
      */
@@ -73,6 +82,8 @@ public class DiskCleanupTask implements Runnable {
         @NotNull final TaskScheduler scheduler,
         @NotNull final Resource jobsDir,
         @NotNull final JobSearchService jobSearchService,
+        @Value("${genie.jobs.runAsUser.enabled:false}") final boolean runAsUser,
+        @NotNull final Executor processExecutor,
         @NotNull final Registry registry
     ) throws IOException {
         // Job Directory is guaranteed to exist by the MvcConfig bean creation but just in case someone overrides
@@ -83,14 +94,23 @@ public class DiskCleanupTask implements Runnable {
         this.properties = properties;
         this.jobsDir = jobsDir.getFile();
         this.jobSearchService = jobSearchService;
+        this.runAsUser = runAsUser;
+        this.processExecutor = processExecutor;
 
         this.numberOfDeletedJobDirs
             = registry.gauge("genie.tasks.diskCleanup.numberDeletedJobDirs.gauge", new AtomicLong());
+        this.numberOfDirsUnableToDelete
+            = registry.gauge("genie.tasks.diskCleanup.numberDirsUnableToDelete.gauge", new AtomicLong());
         this.unableToGetJobCounter = registry.counter("genie.tasks.diskCleanup.unableToGetJobs.rate");
         this.unableToDeleteJobDirCounter = registry.counter("genie.tasks.diskCleanup.unableToDeleteJobsDir.rate");
 
-        final CronTrigger trigger = new CronTrigger(properties.getExpression(), JobConstants.UTC);
-        scheduler.schedule(this, trigger);
+        // Only schedule the task if we don't need sudo while on a non-unix system
+        if (this.runAsUser && !SystemUtils.IS_OS_UNIX) {
+            log.error("System is not UNIX like. Unable to schedule disk cleanup due to needing Unix commands");
+        } else {
+            final CronTrigger trigger = new CronTrigger(properties.getExpression(), JobConstants.UTC);
+            scheduler.schedule(this, trigger);
+        }
     }
 
     /**
@@ -99,16 +119,20 @@ public class DiskCleanupTask implements Runnable {
      */
     @Override
     public void run() {
+        log.info("Running disk cleanup task...");
         final File[] jobDirs = this.jobsDir.listFiles();
         if (jobDirs == null) {
             log.warn("No job dirs found. Returning.");
             this.numberOfDeletedJobDirs.set(0);
+            this.numberOfDirsUnableToDelete.set(0);
             return;
         }
         // For each of the directories figure out if we need to delete the files or not
         long deletedCount = 0;
+        long unableToDeleteCount = 0;
         for (final File dir : jobDirs) {
             if (!dir.isDirectory()) {
+                log.info("File {} isn't a directory. Skipping.", dir.getName());
                 continue;
             }
 
@@ -124,17 +148,31 @@ public class DiskCleanupTask implements Runnable {
                 final Calendar retentionThreshold = TaskUtils.getMidnightUTC();
                 TaskUtils.subtractDaysFromDate(retentionThreshold, this.properties.getRetention());
                 if (job.getFinished().before(retentionThreshold.getTime())) {
-                    FileUtils.deleteDirectory(dir);
+                    log.info("Attempting to delete job directory for job {}", id);
+                    if (this.runAsUser) {
+                        final CommandLine commandLine = new CommandLine("sudo");
+                        commandLine.addArgument("rm");
+                        commandLine.addArgument("-rf");
+                        commandLine.addArgument(dir.getAbsolutePath());
+                        this.processExecutor.execute(commandLine);
+                    } else {
+                        // Save forking a process ourselves if we don't have to
+                        FileUtils.deleteDirectory(dir);
+                    }
                     deletedCount++;
+                    log.info("Successfully deleted job directory for job {}", id);
                 }
             } catch (final GenieException ge) {
                 log.error("Unable to get job {}. Continuing.", id, ge);
                 this.unableToGetJobCounter.increment();
+                unableToDeleteCount++;
             } catch (final IOException ioe) {
                 log.error("Unable to delete job directory for job with id: {}", id, ioe);
                 this.unableToDeleteJobDirCounter.increment();
+                unableToDeleteCount++;
             }
         }
         this.numberOfDeletedJobDirs.set(deletedCount);
+        this.numberOfDirsUnableToDelete.set(unableToDeleteCount);
     }
 }

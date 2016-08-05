@@ -27,8 +27,11 @@ import com.netflix.genie.web.properties.DiskCleanupProperties;
 import com.netflix.genie.web.tasks.TaskUtils;
 import com.netflix.spectator.api.Counter;
 import com.netflix.spectator.api.Registry;
+import org.apache.commons.exec.Executor;
+import org.apache.commons.lang3.SystemUtils;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -36,6 +39,7 @@ import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
 import org.springframework.core.io.Resource;
 import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.Trigger;
 
 import java.io.File;
 import java.io.IOException;
@@ -74,19 +78,96 @@ public class DiskCleanupTaskUnitTests {
                 Mockito.mock(TaskScheduler.class),
                 jobsDir,
                 Mockito.mock(JobSearchService.class),
+                false,
+                Mockito.mock(Executor.class),
                 Mockito.mock(Registry.class)
             )
         );
     }
 
     /**
-     * Make sure we can run successfully.
+     * Test the constructor on error case.
      *
      * @throws IOException on error
+     */
+    @Test
+    public void wontScheduleOnNonUnixWithSudo() throws IOException {
+        Assume.assumeTrue(!SystemUtils.IS_OS_UNIX);
+        final TaskScheduler scheduler = Mockito.mock(TaskScheduler.class);
+        final Resource jobsDir = Mockito.mock(Resource.class);
+        Mockito.when(jobsDir.exists()).thenReturn(true);
+        Assert.assertNotNull(
+            new DiskCleanupTask(
+                new DiskCleanupProperties(),
+                scheduler,
+                jobsDir,
+                Mockito.mock(JobSearchService.class),
+                true,
+                Mockito.mock(Executor.class),
+                Mockito.mock(Registry.class)
+            )
+        );
+        Mockito.verify(scheduler, Mockito.never()).schedule(Mockito.any(Runnable.class), Mockito.any(Trigger.class));
+    }
+
+    /**
+     * Test the constructor.
+     *
+     * @throws IOException on error
+     */
+    @Test
+    public void willScheduleOnUnixWithSudo() throws IOException {
+        Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
+        final TaskScheduler scheduler = Mockito.mock(TaskScheduler.class);
+        final Resource jobsDir = Mockito.mock(Resource.class);
+        Mockito.when(jobsDir.exists()).thenReturn(true);
+        Assert.assertNotNull(
+            new DiskCleanupTask(
+                new DiskCleanupProperties(),
+                scheduler,
+                jobsDir,
+                Mockito.mock(JobSearchService.class),
+                true,
+                Mockito.mock(Executor.class),
+                Mockito.mock(Registry.class)
+            )
+        );
+        Mockito.verify(scheduler, Mockito.times(1)).schedule(Mockito.any(Runnable.class), Mockito.any(Trigger.class));
+    }
+
+    /**
+     * Test the constructor.
+     *
+     * @throws IOException on error
+     */
+    @Test
+    public void willScheduleOnUnixWithoutSudo() throws IOException {
+        Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
+        final TaskScheduler scheduler = Mockito.mock(TaskScheduler.class);
+        final Resource jobsDir = Mockito.mock(Resource.class);
+        Mockito.when(jobsDir.exists()).thenReturn(true);
+        Assert.assertNotNull(
+            new DiskCleanupTask(
+                new DiskCleanupProperties(),
+                scheduler,
+                jobsDir,
+                Mockito.mock(JobSearchService.class),
+                false,
+                Mockito.mock(Executor.class),
+                Mockito.mock(Registry.class)
+            )
+        );
+        Mockito.verify(scheduler, Mockito.times(1)).schedule(Mockito.any(Runnable.class), Mockito.any(Trigger.class));
+    }
+
+    /**
+     * Make sure we can run successfully when runAsUser is false for the system.
+     *
+     * @throws IOException    on error
      * @throws GenieException on error
      */
     @Test
-    public void canRun() throws IOException, GenieException {
+    public void canRunWithoutSudo() throws IOException, GenieException {
         // Create some random junk file that should be ignored
         this.tmpJobDir.newFile(UUID.randomUUID().toString());
         final DiskCleanupProperties properties = new DiskCleanupProperties();
@@ -123,13 +204,20 @@ public class DiskCleanupTaskUnitTests {
         Mockito.when(jobDir.getFile()).thenReturn(this.tmpJobDir.getRoot());
         final JobSearchService jobSearchService = Mockito.mock(JobSearchService.class);
         final Registry registry = Mockito.mock(Registry.class);
-        final AtomicLong numberOfDeletedJobs = new AtomicLong();
+        final AtomicLong numberOfDeletedJobDirs = new AtomicLong();
         Mockito.when(
             registry.gauge(
                 Mockito.eq("genie.tasks.diskCleanup.numberDeletedJobDirs.gauge"),
                 Mockito.any(AtomicLong.class)
             )
-        ).thenReturn(numberOfDeletedJobs);
+        ).thenReturn(numberOfDeletedJobDirs);
+        final AtomicLong numberOfDirsUnableToDelete = new AtomicLong();
+        Mockito.when(
+            registry.gauge(
+                Mockito.eq("genie.tasks.diskCleanup.numberDirsUnableToDelete.gauge"),
+                Mockito.any(AtomicLong.class)
+            )
+        ).thenReturn(numberOfDirsUnableToDelete);
         final Counter unableToGetJobCounter = Mockito.mock(Counter.class);
         Mockito
             .when(registry.counter("genie.tasks.diskCleanup.unableToGetJobs.rate"))
@@ -145,10 +233,20 @@ public class DiskCleanupTaskUnitTests {
         Mockito.when(jobSearchService.getJob(job4Id)).thenReturn(job4);
         Mockito.when(jobSearchService.getJob(job5Id)).thenThrow(new GenieServerException("blah"));
 
-        final DiskCleanupTask task = new DiskCleanupTask(properties, scheduler, jobDir, jobSearchService, registry);
-        Assert.assertThat(numberOfDeletedJobs.get(), Matchers.is(0L));
+        final DiskCleanupTask task = new DiskCleanupTask(
+            properties,
+            scheduler,
+            jobDir,
+            jobSearchService,
+            false,
+            Mockito.mock(Executor.class),
+            registry
+        );
+        Assert.assertThat(numberOfDeletedJobDirs.get(), Matchers.is(0L));
+        Assert.assertThat(numberOfDirsUnableToDelete.get(), Matchers.is(0L));
         task.run();
-        Assert.assertThat(numberOfDeletedJobs.get(), Matchers.is(1L));
+        Assert.assertThat(numberOfDeletedJobDirs.get(), Matchers.is(1L));
+        Assert.assertThat(numberOfDirsUnableToDelete.get(), Matchers.is(1L));
         Assert.assertTrue(new File(jobDir.getFile(), job1Id).exists());
         Assert.assertTrue(new File(jobDir.getFile(), job2Id).exists());
         Assert.assertFalse(new File(jobDir.getFile(), job3Id).exists());
