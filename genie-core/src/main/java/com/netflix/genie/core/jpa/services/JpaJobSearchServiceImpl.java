@@ -53,6 +53,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
@@ -202,19 +203,11 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
         final Root<JobEntity> root = query.from(JobEntity.class);
         final Join<JobEntity, JobExecutionEntity> executions = root.join(JobEntity_.execution);
 
-        final Set<Predicate> statusPredicates = JobStatus
-            .getActiveStatuses()
-            .stream()
-            .map(status -> cb.equal(root.get(JobEntity_.status), status))
-            .collect(Collectors.toSet());
-
-        final Predicate statusPredicate = cb.or(statusPredicates.toArray(new Predicate[statusPredicates.size()]));
+        final Expression<Boolean> statusExpression = root.get(JobEntity_.status).in(JobStatus.getActiveStatuses());
 
         final Predicate hostPredicate = cb.equal(executions.get(JobExecutionEntity_.hostName), hostName);
 
-        query
-            .distinct(true)
-            .where(cb.and(statusPredicate, hostPredicate));
+        query.where(cb.and(statusExpression, hostPredicate));
 
         return this.entityManager
             .createQuery(query)
@@ -236,16 +229,10 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
         final Root<JobEntity> root = query.from(JobEntity.class);
         final Join<JobEntity, JobExecutionEntity> executions = root.join(JobEntity_.execution);
 
-        final Set<Predicate> statusPredicates = JobStatus
-            .getActiveStatuses()
-            .stream()
-            .map(status -> cb.equal(root.get(JobEntity_.status), status))
-            .collect(Collectors.toSet());
-
         query
             .select(executions.get(JobExecutionEntity_.hostName))
             .distinct(true)
-            .where(cb.or(statusPredicates.toArray(new Predicate[statusPredicates.size()])));
+            .where(root.get(JobEntity_.status).in(JobStatus.getActiveStatuses()));
 
         return this.entityManager.createQuery(query).getResultList();
     }

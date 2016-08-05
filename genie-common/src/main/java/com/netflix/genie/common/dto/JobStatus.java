@@ -34,27 +34,27 @@ public enum JobStatus {
     /**
      * Job has been initialized, but not running yet.
      */
-    INIT,
+    INIT(true),
     /**
      * Job is now running.
      */
-    RUNNING,
+    RUNNING(true),
     /**
      * Job has finished executing, and is successful.
      */
-    SUCCEEDED,
+    SUCCEEDED(false),
     /**
      * Job has been killed.
      */
-    KILLED,
+    KILLED(false),
     /**
      * Job failed.
      */
-    FAILED,
+    FAILED(false),
     /**
      * Job cannot be run due to invalid criteria.
      */
-    INVALID;
+    INVALID(false);
 
     private static final Set<JobStatus> ACTIVE_STATUSES = Collections.unmodifiableSet(
         EnumSet.of(JobStatus.INIT, JobStatus.RUNNING)
@@ -62,6 +62,17 @@ public enum JobStatus {
     private static final Set<JobStatus> FINISHED_STATUSES = Collections.unmodifiableSet(
         EnumSet.of(JobStatus.SUCCEEDED, JobStatus.KILLED, JobStatus.FAILED, JobStatus.INVALID)
     );
+
+    private final boolean active;
+
+    /**
+     * Constructor.
+     *
+     * @param isActive whether this status should be considered active or not
+     */
+    JobStatus(final boolean isActive) {
+        this.active = isActive;
+    }
 
     /**
      * Parse job status.
@@ -89,7 +100,7 @@ public enum JobStatus {
      * @return True if the job is still actively processing in some manner
      */
     public boolean isActive() {
-        return ACTIVE_STATUSES.contains(this);
+        return this.active;
     }
 
     /**
@@ -98,7 +109,7 @@ public enum JobStatus {
      * @return True if the job is no longer processing for one reason or another.
      */
     public boolean isFinished() {
-        return FINISHED_STATUSES.contains(this);
+        return !this.active;
     }
 
     /**
