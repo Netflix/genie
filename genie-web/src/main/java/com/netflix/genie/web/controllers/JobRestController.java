@@ -85,6 +85,7 @@ import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -110,6 +111,7 @@ import java.util.stream.Collectors;
 public class JobRestController {
 
     private static final String FORWARDED_FOR_HEADER = "X-Forwarded-For";
+    private static final String NAME_HEADER_COOKIE = "cookie";
 
     private final JobCoordinatorService jobCoordinatorService;
     private final JobSearchService jobSearchService;
@@ -730,18 +732,37 @@ public class JobRestController {
     }
 
     private void copyRequestHeaders(final HttpServletRequest request, final ClientHttpRequest forwardRequest) {
-        // Copy all the headers (necessary for ACCEPT and security headers especially)
+        // Copy all the headers (necessary for ACCEPT and security headers especially). Do not copy the cookie header.
         final HttpHeaders headers = forwardRequest.getHeaders();
         final Enumeration<String> headerNames = request.getHeaderNames();
         if (headerNames != null) {
             while (headerNames.hasMoreElements()) {
                 final String headerName = headerNames.nextElement();
-                final String headerValue = request.getHeader(headerName);
-                log.debug("Request Header: name = {} value = {}", headerName, headerValue);
-                headers.add(headerName, headerValue);
+                if (!NAME_HEADER_COOKIE.equals(headerName)) {
+                    final String headerValue = request.getHeader(headerName);
+                    log.debug("Request Header: name = {} value = {}", headerName, headerValue);
+                    headers.add(headerName, headerValue);
+                }
             }
         }
-
+        // Lets add the cookie as an header
+        final Cookie[] cookies = request.getCookies();
+        if (cookies != null && cookies.length > 0) {
+            StringBuilder builder = null;
+            for (final Cookie cookie : request.getCookies()) {
+                if (builder == null) {
+                    builder = new StringBuilder();
+                } else {
+                    builder.append(",");
+                }
+                builder.append(cookie.getName()).append("=").append(cookie.getValue());
+            }
+            if (builder != null) {
+                final String cookieValue = builder.toString();
+                headers.add(NAME_HEADER_COOKIE, cookieValue);
+                log.debug("Request Header: name = {} value = {}", NAME_HEADER_COOKIE, cookieValue);
+            }
+        }
         // This method only called when need to forward so add the forwarded from header
         headers.add(JobConstants.GENIE_FORWARDED_FROM_HEADER, request.getRequestURL().toString());
     }
