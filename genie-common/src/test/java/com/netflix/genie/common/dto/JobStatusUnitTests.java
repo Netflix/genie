@@ -19,6 +19,7 @@ package com.netflix.genie.common.dto;
 
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.test.categories.UnitTest;
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -90,5 +91,27 @@ public class JobStatusUnitTests {
         Assert.assertTrue(JobStatus.INVALID.isFinished());
         Assert.assertTrue(JobStatus.KILLED.isFinished());
         Assert.assertTrue(JobStatus.SUCCEEDED.isFinished());
+    }
+
+    /**
+     * Make sure all the active statuses are present in the set.
+     */
+    @Test
+    public void testGetActivesStatuses() {
+        Assert.assertThat(JobStatus.getActiveStatuses().size(), Matchers.is(2));
+        Assert.assertTrue(JobStatus.getActiveStatuses().contains(JobStatus.INIT));
+        Assert.assertTrue(JobStatus.getActiveStatuses().contains(JobStatus.RUNNING));
+    }
+
+    /**
+     * Make sure all the finished statuses are present in the set.
+     */
+    @Test
+    public void testGetFinishedStatuses() {
+        Assert.assertThat(JobStatus.getFinishedStatuses().size(), Matchers.is(4));
+        Assert.assertTrue(JobStatus.getFinishedStatuses().contains(JobStatus.INVALID));
+        Assert.assertTrue(JobStatus.getFinishedStatuses().contains(JobStatus.FAILED));
+        Assert.assertTrue(JobStatus.getFinishedStatuses().contains(JobStatus.KILLED));
+        Assert.assertTrue(JobStatus.getFinishedStatuses().contains(JobStatus.SUCCEEDED));
     }
 }

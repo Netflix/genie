@@ -19,6 +19,7 @@ package com.netflix.genie.web.tasks.leader;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
@@ -118,26 +119,26 @@ public class ClusterCheckerTaskUnitTests {
             .thenReturn("");
 
         final List<String> hostsRunningJobs = Lists.newArrayList(this.hostName, host1, host2, host3);
-        Mockito.when(this.jobSearchService.getAllHostsRunningJobs()).thenReturn(hostsRunningJobs);
+        Mockito.when(this.jobSearchService.getAllHostsWithActiveJobs()).thenReturn(hostsRunningJobs);
 
-        final JobExecution job1 = Mockito.mock(JobExecution.class);
+        final Job job1 = Mockito.mock(Job.class);
         final String job1Id = UUID.randomUUID().toString();
         Mockito.when(job1.getId()).thenReturn(job1Id);
-        final JobExecution job2 = Mockito.mock(JobExecution.class);
+        final Job job2 = Mockito.mock(Job.class);
         final String job2Id = UUID.randomUUID().toString();
         Mockito.when(job2.getId()).thenReturn(job2Id);
-        final JobExecution job3 = Mockito.mock(JobExecution.class);
+        final Job job3 = Mockito.mock(Job.class);
         final String job3Id = UUID.randomUUID().toString();
         Mockito.when(job3.getId()).thenReturn(job3Id);
-        final JobExecution job4 = Mockito.mock(JobExecution.class);
+        final Job job4 = Mockito.mock(Job.class);
         final String job4Id = UUID.randomUUID().toString();
         Mockito.when(job4.getId()).thenReturn(job4Id);
 
         Mockito
-            .when(this.jobSearchService.getAllRunningJobExecutionsOnHost(host2))
+            .when(this.jobSearchService.getAllActiveJobsOnHost(host2))
             .thenReturn(Sets.newHashSet(job1, job2));
         Mockito
-            .when(this.jobSearchService.getAllRunningJobExecutionsOnHost(host3))
+            .when(this.jobSearchService.getAllActiveJobsOnHost(host3))
             .thenReturn(Sets.newHashSet(job3, job4));
 
         Mockito

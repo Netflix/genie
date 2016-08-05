@@ -42,5 +42,10 @@ public enum JobFinishedReason {
     /**
      * The jobs process completed either sucessfully or unsuccessfully. Check job done file.
      */
-    PROCESS_COMPLETED
+    PROCESS_COMPLETED,
+
+    /**
+     * System crash during initialization.
+     */
+    SYSTEM_CRASH
 }

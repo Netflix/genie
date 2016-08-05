@@ -25,6 +25,7 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import org.hibernate.validator.constraints.NotBlank;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
@@ -38,12 +39,16 @@ import java.util.List;
 public interface JobPersistenceService {
 
     /**
-     * Save the job object in the data store.
+     * Save the job object in the data store. Should also persist job execution information.
      *
-     * @param job the Job object to create
+     * @param job          The Job object to create
+     * @param jobExecution The job execution object to create
      * @throws GenieException if there is an error
      */
-    void createJob(@NotNull final Job job) throws GenieException;
+    void createJobAndJobExecution(
+        @NotNull final Job job,
+        @NotNull final JobExecution jobExecution
+    ) throws GenieException;
 
     /**
      * Update the status and status message of the job.
@@ -89,12 +94,20 @@ public interface JobPersistenceService {
     ) throws GenieException;
 
     /**
-     * Save the jobExecution object in the data store.
+     * Update the job with information for the running job process.
      *
-     * @param jobExecution the Job object to save
+     * @param id         the id of the job to update the process id for
+     * @param processId  The id of the process on the box for this job
+     * @param checkDelay The delay to check the process with
+     * @param timeout    The date at which this job should timeout
      * @throws GenieException if there is an error
      */
-    void createJobExecution(@NotNull final JobExecution jobExecution) throws GenieException;
+    void setJobRunningInformation(
+        @NotBlank final String id,
+        @Min(0) final int processId,
+        @Min(1) final long checkDelay,
+        @NotNull final Date timeout
+    ) throws GenieException;
 
     /**
      * Method to set all job completion information for a job execution.

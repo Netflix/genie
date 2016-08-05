@@ -205,7 +205,12 @@ public class LocalJobRunner implements JobSubmitterService {
                     final long createJobExecutionStart = System.nanoTime();
                     try {
                         log.info("Saving job execution for job {}", jobRequest.getId());
-                        this.jobPersistenceService.createJobExecution(jobExecution);
+                        this.jobPersistenceService.setJobRunningInformation(
+                            jobRequest.getId(),
+                            jobExecution.getProcessId(),
+                            jobExecution.getCheckDelay(),
+                            jobExecution.getTimeout()
+                        );
                     } finally {
                         this.saveJobExecutionTimer
                             .record(System.nanoTime() - createJobExecutionStart, TimeUnit.NANOSECONDS);

@@ -18,6 +18,7 @@
 package com.netflix.genie.core.services;
 
 import com.netflix.genie.common.dto.Job;
+import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobRequestMetadata;
 import com.netflix.genie.common.dto.JobStatus;
@@ -57,6 +58,7 @@ public class JobCoordinatorServiceUnitTests {
     private static final String JOB_1_USER = "einstien";
     private static final String JOB_1_VERSION = "1.0";
     private static final String BASE_ARCHIVE_LOCATION = "file://baselocation";
+    private static final String HOST_NAME = UUID.randomUUID().toString();
 
     private AsyncTaskExecutor taskExecutor;
     private JobCoordinatorService jobCoordinatorService;
@@ -85,7 +87,8 @@ public class JobCoordinatorServiceUnitTests {
             BASE_ARCHIVE_LOCATION,
             MAX_RUNNING_JOBS,
             Mockito.mock(Registry.class),
-            this.eventPublisher
+            this.eventPublisher,
+            HOST_NAME
         );
     }
 
@@ -143,15 +146,19 @@ public class JobCoordinatorServiceUnitTests {
         Mockito.verify(this.taskExecutor, Mockito.times(1)).submit(Mockito.any(JobLauncher.class));
         Mockito.verify(this.eventPublisher, Mockito.times(1)).publishEvent(Mockito.any(JobScheduledEvent.class));
 
-        final ArgumentCaptor<Job> argument = ArgumentCaptor.forClass(Job.class);
-        Mockito.verify(this.jobPersistenceService).createJob(argument.capture());
+        final ArgumentCaptor<Job> jobArgumentCaptor = ArgumentCaptor.forClass(Job.class);
+        final ArgumentCaptor<JobExecution> jobExecutionArgumentCaptor = ArgumentCaptor.forClass(JobExecution.class);
+        Mockito.verify(this.jobPersistenceService).createJobAndJobExecution(
+            jobArgumentCaptor.capture(),
+            jobExecutionArgumentCaptor.capture()
+        );
 
-        Assert.assertEquals(JOB_1_ID, argument.getValue().getId());
-        Assert.assertEquals(JOB_1_NAME, argument.getValue().getName());
-        Assert.assertEquals(JOB_1_USER, argument.getValue().getUser());
-        Assert.assertEquals(JOB_1_VERSION, argument.getValue().getVersion());
-        Assert.assertEquals(JobStatus.INIT, argument.getValue().getStatus());
-        Assert.assertEquals(description, argument.getValue().getDescription());
+        Assert.assertEquals(JOB_1_ID, jobArgumentCaptor.getValue().getId());
+        Assert.assertEquals(JOB_1_NAME, jobArgumentCaptor.getValue().getName());
+        Assert.assertEquals(JOB_1_USER, jobArgumentCaptor.getValue().getUser());
+        Assert.assertEquals(JOB_1_VERSION, jobArgumentCaptor.getValue().getVersion());
+        Assert.assertEquals(JobStatus.INIT, jobArgumentCaptor.getValue().getStatus());
+        Assert.assertEquals(description, jobArgumentCaptor.getValue().getDescription());
     }
 
     /**
@@ -183,12 +190,15 @@ public class JobCoordinatorServiceUnitTests {
 
         Mockito.when(this.jobPersistenceService.createJobRequest(jobRequest, metadata)).thenReturn(jobRequest);
         Mockito.when(this.jobCountService.getNumJobs()).thenReturn(MAX_RUNNING_JOBS - 1);
-        final ArgumentCaptor<Job> argument = ArgumentCaptor.forClass(Job.class);
+        final ArgumentCaptor<Job> jobArgumentCaptor = ArgumentCaptor.forClass(Job.class);
+        final ArgumentCaptor<JobExecution> jobExecutionArgumentCaptor = ArgumentCaptor.forClass(JobExecution.class);
         this.jobCoordinatorService.coordinateJob(jobRequest, metadata);
-        Mockito.verify(this.jobPersistenceService).createJob(argument.capture());
+        Mockito
+            .verify(this.jobPersistenceService)
+            .createJobAndJobExecution(jobArgumentCaptor.capture(), jobExecutionArgumentCaptor.capture());
         Assert.assertEquals(
             BASE_ARCHIVE_LOCATION + "/" + JOB_1_ID + ".tar.gz",
-            argument.getValue().getArchiveLocation()
+            jobArgumentCaptor.getValue().getArchiveLocation()
         );
     }
 
@@ -221,10 +231,14 @@ public class JobCoordinatorServiceUnitTests {
 
         Mockito.when(this.jobPersistenceService.createJobRequest(jobRequest, metadata)).thenReturn(jobRequest);
         Mockito.when(this.jobCountService.getNumJobs()).thenReturn(MAX_RUNNING_JOBS - 1);
-        final ArgumentCaptor<Job> argument = ArgumentCaptor.forClass(Job.class);
+        final ArgumentCaptor<Job> jobArgumentCaptor = ArgumentCaptor.forClass(Job.class);
+        final ArgumentCaptor<JobExecution> jobExecutionArgumentCaptor = ArgumentCaptor.forClass(JobExecution.class);
         this.jobCoordinatorService.coordinateJob(jobRequest, metadata);
-        Mockito.verify(this.jobPersistenceService).createJob(argument.capture());
-        Assert.assertNull(argument.getValue().getArchiveLocation());
+        Mockito.verify(this.jobPersistenceService).createJobAndJobExecution(
+            jobArgumentCaptor.capture(),
+            jobExecutionArgumentCaptor.capture()
+        );
+        Assert.assertNull(jobArgumentCaptor.getValue().getArchiveLocation());
     }
 
     /**
@@ -256,10 +270,14 @@ public class JobCoordinatorServiceUnitTests {
 
         Mockito.when(this.jobPersistenceService.createJobRequest(jobRequest, metadata)).thenReturn(jobRequest);
         Mockito.when(this.jobCountService.getNumJobs()).thenReturn(MAX_RUNNING_JOBS);
-        final ArgumentCaptor<Job> argument = ArgumentCaptor.forClass(Job.class);
+        final ArgumentCaptor<Job> jobArgumentCaptor = ArgumentCaptor.forClass(Job.class);
+        final ArgumentCaptor<JobExecution> jobExecutionArgumentCaptor = ArgumentCaptor.forClass(JobExecution.class);
         this.jobCoordinatorService.coordinateJob(jobRequest, metadata);
-        Mockito.verify(this.jobPersistenceService).createJob(argument.capture());
-        Assert.assertThat(argument.getValue().getStatus(), Matchers.is(JobStatus.FAILED));
+        Mockito.verify(this.jobPersistenceService).createJobAndJobExecution(
+            jobArgumentCaptor.capture(),
+            jobExecutionArgumentCaptor.capture()
+        );
+        Assert.assertThat(jobArgumentCaptor.getValue().getStatus(), Matchers.is(JobStatus.FAILED));
     }
 
     /**

@@ -49,6 +49,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Unit Tests for ServicesConfig class.
@@ -245,7 +246,8 @@ public class ServicesConfigUnitTests {
                 "file:///tmp",
                 2,
                 Mockito.mock(Registry.class),
-                Mockito.mock(ApplicationEventPublisher.class)
+                Mockito.mock(ApplicationEventPublisher.class),
+                UUID.randomUUID().toString()
             )
         );
     }

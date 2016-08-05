@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.tasks.leader;
 
+import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
@@ -109,7 +110,7 @@ public class ClusterCheckerTask extends LeadershipTask {
     public void run() {
         log.info("Checking for cluster node health...");
         final Set<String> badNodes = new HashSet<>();
-        this.jobSearchService.getAllHostsRunningJobs()
+        this.jobSearchService.getAllHostsWithActiveJobs()
             .stream()
             .filter(host -> !this.hostName.equals(host))
             .forEach(
@@ -150,7 +151,7 @@ public class ClusterCheckerTask extends LeadershipTask {
             .forEach(
                 host -> {
                     toRemove.add(host);
-                    final Set<JobExecution> jobs = this.jobSearchService.getAllRunningJobExecutionsOnHost(host);
+                    final Set<Job> jobs = this.jobSearchService.getAllActiveJobsOnHost(host);
                     jobs.forEach(
                         job -> {
                             try {

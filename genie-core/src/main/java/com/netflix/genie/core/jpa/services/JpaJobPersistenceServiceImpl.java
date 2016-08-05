@@ -47,6 +47,7 @@ import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.ConstraintViolationException;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
@@ -83,12 +84,12 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
      * @param commandRepo      The command repository to use
      */
     public JpaJobPersistenceServiceImpl(
-        final JpaJobRepository jobRepo,
-        final JpaJobRequestRepository jobRequestRepo,
-        final JpaJobExecutionRepository jobExecutionRepo,
-        final JpaApplicationRepository applicationRepo,
-        final JpaClusterRepository clusterRepo,
-        final JpaCommandRepository commandRepo
+        @NotNull final JpaJobRepository jobRepo,
+        @NotNull final JpaJobRequestRepository jobRequestRepo,
+        @NotNull final JpaJobExecutionRepository jobExecutionRepo,
+        @NotNull final JpaApplicationRepository applicationRepo,
+        @NotNull final JpaClusterRepository clusterRepo,
+        @NotNull final JpaCommandRepository commandRepo
     ) {
         this.jobRepo = jobRepo;
         this.jobRequestRepo = jobRequestRepo;
@@ -102,9 +103,11 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
      * {@inheritDoc}
      */
     @Override
-    public void createJob(
+    public void createJobAndJobExecution(
         @NotNull(message = "No Job provided to create")
-        final Job job
+        final Job job,
+        @NotNull(message = "No Job execution information provided. Unable to create.")
+        final JobExecution jobExecution
     ) throws GenieException {
         log.debug("Called with job: {}", job);
 
@@ -120,13 +123,11 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         }
 
         final JobRequestEntity jobRequestEntity = this.jobRequestRepo.findOne(job.getId());
-
         if (jobRequestEntity == null) {
             throw new GeniePreconditionException("Cannot find the job request for the id of the job specified.");
         }
 
         final JobEntity jobEntity = new JobEntity();
-
         jobEntity.setId(job.getId());
         jobEntity.setName(job.getName());
         jobEntity.setUser(job.getUser());
@@ -142,6 +143,15 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         jobEntity.setTags(job.getTags());
         jobEntity.setCommandArgs(job.getCommandArgs());
 
+        final JobExecutionEntity jobExecutionEntity = new JobExecutionEntity();
+        jobExecutionEntity.setId(jobExecution.getId());
+        jobExecutionEntity.setHostName(jobExecution.getHostName());
+        jobExecutionEntity.setProcessId(jobExecution.getProcessId());
+        jobExecutionEntity.setCheckDelay(jobExecution.getCheckDelay());
+        jobExecutionEntity.setTimeout(jobExecution.getTimeout());
+
+        // Persist the entities
+        jobEntity.setExecution(jobExecutionEntity);
         jobRequestEntity.setJob(jobEntity);
     }
 
@@ -181,7 +191,6 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
                 // with status killed, failed or succeeded. So we set the job finish time.
                 jobEntity.setFinished(new Date());
             }
-            this.jobRepo.save(jobEntity);
         }
     }
 
@@ -283,33 +292,22 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
      * {@inheritDoc}
      */
     @Override
-    public void createJobExecution(
-        @NotNull(message = "Job Request is null so cannot be saved")
-        final JobExecution jobExecution
+    public void setJobRunningInformation(
+        @NotBlank final String id,
+        @Min(value = 0, message = "Must be no lower than zero") final int processId,
+        @Min(value = 1, message = "Must be at least 1 millisecond, preferably much more") final long checkDelay,
+        @NotNull final Date timeout
     ) throws GenieException {
-        log.debug("Called with jobExecution: {}", jobExecution);
+        log.debug("Called with to update job {} with process id {}", id, processId);
 
-        // Since a job request object should always exist before the job object is saved
-        // the id should never be null
-        if (StringUtils.isBlank(jobExecution.getId())) {
-            throw new GeniePreconditionException("Cannot create a job execution entry with id blank or null");
+        final JobExecutionEntity jobExecutionEntity = this.jobExecutionRepo.findOne(id);
+        if (jobExecutionEntity == null) {
+            throw new GenieNotFoundException("No job execution with id " + id + " exists. Unable to update.");
         }
-
-        this.updateJobStatus(jobExecution.getId(), JobStatus.RUNNING, "Job is Running.");
-        final JobEntity jobEntity = this.jobRepo.findOne(jobExecution.getId());
-        if (jobEntity == null) {
-            throw new GenieNotFoundException("Cannot find the job for the id of the jobExecution specified.");
-        }
-
-        final JobExecutionEntity jobExecutionEntity = new JobExecutionEntity();
-
-        jobExecutionEntity.setId(jobExecution.getId());
-        jobExecutionEntity.setHostName(jobExecution.getHostName());
-        jobExecutionEntity.setProcessId(jobExecution.getProcessId());
-        jobExecutionEntity.setCheckDelay(jobExecution.getCheckDelay());
-        jobExecutionEntity.setTimeout(jobExecution.getTimeout());
-
-        jobEntity.setExecution(jobExecutionEntity);
+        jobExecutionEntity.setProcessId(processId);
+        jobExecutionEntity.setCheckDelay(checkDelay);
+        jobExecutionEntity.setTimeout(timeout);
+        this.updateJobStatus(id, JobStatus.RUNNING, "Job is Running.");
     }
 
     /**

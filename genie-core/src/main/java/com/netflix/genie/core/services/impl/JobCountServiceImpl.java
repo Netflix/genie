@@ -50,6 +50,6 @@ public class JobCountServiceImpl implements JobCountService {
      */
     @Override
     public int getNumJobs() {
-        return this.jobSearchService.getAllRunningJobExecutionsOnHost(this.hostName).size();
+        return this.jobSearchService.getAllActiveJobsOnHost(this.hostName).size();
     }
 }

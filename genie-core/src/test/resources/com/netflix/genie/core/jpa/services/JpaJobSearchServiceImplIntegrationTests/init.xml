@@ -198,7 +198,7 @@
         user="tgianos"
         name="testSparkJob1"
         command_args="-f spark.jar"
-        status="RUNNING"
+        status="INIT"
         version="2.4"
         entity_version="0"
         cluster_id="cluster1"

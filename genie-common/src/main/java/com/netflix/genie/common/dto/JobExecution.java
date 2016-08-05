@@ -44,6 +44,16 @@ public class JobExecution extends BaseDTO {
     public static final int DEFAULT_EXIT_CODE = -1;
 
     /**
+     * The process id that will be used as a placeholder while the job isn't yet running.
+     */
+    public static final int DEFAULT_PROCESS_ID = -1;
+
+    /**
+     * The default check delay before it is set when the job moves to running state.
+     */
+    public static final long DEFAULT_CHECK_DELAY = Long.MAX_VALUE;
+
+    /**
      * The exit code that will be set to indicate a job is killed.
      */
     public static final int KILLED_EXIT_CODE = 999;
@@ -52,6 +62,11 @@ public class JobExecution extends BaseDTO {
      * The exit code that will be set to indicate a job is has been lost by Genie.
      */
     public static final int LOST_EXIT_CODE = 666;
+
+    /**
+     * The default timeout date which is Jan 1 in the year 3000. That should be sufficient.
+     */
+    public static final Date DEFAULT_TIMEOUT = new Date(32503708800000L);
 
     /**
      * The exit code that will be set to indicate a job has succeeded.
