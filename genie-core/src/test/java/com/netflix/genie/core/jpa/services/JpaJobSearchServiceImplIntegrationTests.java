@@ -21,7 +21,7 @@ import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseTearDown;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Application;
-import com.netflix.genie.common.dto.JobExecution;
+import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
@@ -104,14 +104,14 @@ public class JpaJobSearchServiceImplIntegrationTests extends DBUnitTestBase {
                 null,
                 page
             );
-        Assert.assertThat(jobs.getTotalElements(), Matchers.is(2L));
+        Assert.assertThat(jobs.getTotalElements(), Matchers.is(1L));
         Assert.assertThat(
             jobs
                 .getContent()
                 .stream()
-                .filter(job -> job.getId().equals(JOB_2_ID) || job.getId().equals(JOB_3_ID))
+                .filter(job -> job.getId().equals(JOB_3_ID))
                 .count(),
-            Matchers.is(2L)
+            Matchers.is(1L)
         );
 
         jobs = this.service
@@ -143,43 +143,43 @@ public class JpaJobSearchServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
-     * Make sure we can get the correct number of job executions which are running on a given host.
+     * Make sure we can get the correct number of jobs which are active on a given host.
      *
      * @throws GenieException on error
      */
     @Test
-    public void canFindRunningJobsByHostName() throws GenieException {
+    public void canFindActiveJobsByHostName() throws GenieException {
         final String hostA = "a.netflix.com";
         final String hostB = "b.netflix.com";
         final String hostC = "c.netflix.com";
 
-        Set<JobExecution> executions = this.service.getAllRunningJobExecutionsOnHost(hostA);
-        Assert.assertThat(executions.size(), Matchers.is(1));
+        Set<Job> jobs = this.service.getAllActiveJobsOnHost(hostA);
+        Assert.assertThat(jobs.size(), Matchers.is(1));
         Assert.assertThat(
-            executions.stream().filter(jobExecution -> JOB_2_ID.equals(jobExecution.getId())).count(),
+            jobs.stream().filter(jobExecution -> JOB_2_ID.equals(jobExecution.getId())).count(),
             Matchers.is(1L)
         );
 
-        executions = this.service.getAllRunningJobExecutionsOnHost(hostB);
-        Assert.assertThat(executions.size(), Matchers.is(1));
+        jobs = this.service.getAllActiveJobsOnHost(hostB);
+        Assert.assertThat(jobs.size(), Matchers.is(1));
         Assert.assertThat(
-            executions.stream().filter(jobExecution -> JOB_3_ID.equals(jobExecution.getId())).count(),
+            jobs.stream().filter(jobExecution -> JOB_3_ID.equals(jobExecution.getId())).count(),
             Matchers.is(1L)
         );
 
-        executions = this.service.getAllRunningJobExecutionsOnHost(hostC);
-        Assert.assertTrue(executions.isEmpty());
+        jobs = this.service.getAllActiveJobsOnHost(hostC);
+        Assert.assertTrue(jobs.isEmpty());
     }
 
     /**
      * Make sure we can get the host names of nodes currently running jobs.
      */
     @Test
-    public void canFindHostnamesOfRunningJobs() {
+    public void canFindHostNamesOfActiveJobs() {
         final String hostA = "a.netflix.com";
         final String hostB = "b.netflix.com";
 
-        final List<String> hostNames = this.service.getAllHostsRunningJobs();
+        final List<String> hostNames = this.service.getAllHostsWithActiveJobs();
         Assert.assertThat(hostNames.size(), Matchers.is(2));
         Assert.assertThat(hostNames, Matchers.hasItem(hostA));
         Assert.assertThat(hostNames, Matchers.hasItem(hostB));
@@ -212,7 +212,7 @@ public class JpaJobSearchServiceImplIntegrationTests extends DBUnitTestBase {
     @Test
     public void canGetJobStatus() throws GenieException {
         Assert.assertThat(this.service.getJobStatus(JOB_1_ID), Matchers.is(JobStatus.SUCCEEDED));
-        Assert.assertThat(this.service.getJobStatus(JOB_2_ID), Matchers.is(JobStatus.RUNNING));
+        Assert.assertThat(this.service.getJobStatus(JOB_2_ID), Matchers.is(JobStatus.INIT));
         Assert.assertThat(this.service.getJobStatus(JOB_3_ID), Matchers.is(JobStatus.RUNNING));
 
         try {

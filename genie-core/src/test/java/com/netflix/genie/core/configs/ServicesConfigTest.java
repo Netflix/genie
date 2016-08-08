@@ -292,6 +292,7 @@ public class ServicesConfigTest {
      * @param maxRunningJobs        The maximum number of running jobs on system
      * @param registry              The registry to use
      * @param eventPublisher        The system event publisher
+     * @param hostName              The host name to use
      * @return An instance of the JobCoordinatorService.
      */
     @Bean
@@ -306,7 +307,8 @@ public class ServicesConfigTest {
         @Value("${genie.jobs.max.running:2}")
         final int maxRunningJobs,
         final Registry registry,
-        final ApplicationEventPublisher eventPublisher
+        final ApplicationEventPublisher eventPublisher,
+        final String hostName
     ) {
         return new JobCoordinatorService(
             taskExecutor,
@@ -317,7 +319,8 @@ public class ServicesConfigTest {
             baseArchiveLocation,
             maxRunningJobs,
             registry,
-            eventPublisher
+            eventPublisher,
+            hostName
         );
     }
 

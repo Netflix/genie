@@ -18,8 +18,11 @@
 package com.netflix.genie.web.tasks.job;
 
 import com.google.common.collect.Sets;
+import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
+import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.core.events.JobFinishedEvent;
 import com.netflix.genie.core.events.JobFinishedReason;
 import com.netflix.genie.core.events.JobScheduledEvent;
@@ -74,6 +77,7 @@ public class JobMonitoringCoordinatorUnitTests {
     private TaskScheduler scheduler;
     private JobMonitoringCoordinator coordinator;
     private JobSearchService jobSearchService;
+    private ApplicationEventPublisher publisher;
     private Date tomorrow;
     private Counter unableToCancel;
 
@@ -90,7 +94,7 @@ public class JobMonitoringCoordinatorUnitTests {
         this.jobSearchService = Mockito.mock(JobSearchService.class);
         final Executor executor = Mockito.mock(Executor.class);
         this.scheduler = Mockito.mock(TaskScheduler.class);
-        final ApplicationEventPublisher publisher = Mockito.mock(ApplicationEventPublisher.class);
+        this.publisher = Mockito.mock(ApplicationEventPublisher.class);
         final Registry registry = Mockito.mock(Registry.class);
         this.unableToCancel = Mockito.mock(Counter.class);
         Mockito.when(registry.counter(Mockito.anyString())).thenReturn(this.unableToCancel);
@@ -123,8 +127,8 @@ public class JobMonitoringCoordinatorUnitTests {
     public void canAttachToRunningJobs() throws GenieException {
         final ApplicationReadyEvent event = Mockito.mock(ApplicationReadyEvent.class);
 
-        Mockito.when(this.jobSearchService.getAllRunningJobExecutionsOnHost(HOSTNAME)).thenReturn(Sets.newHashSet());
-        this.coordinator.attachToRunningJobs(event);
+        Mockito.when(this.jobSearchService.getAllActiveJobsOnHost(HOSTNAME)).thenReturn(Sets.newHashSet());
+        this.coordinator.onStartup(event);
         Mockito
             .verify(this.scheduler, Mockito.never())
             .scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.anyLong());
@@ -134,6 +138,7 @@ public class JobMonitoringCoordinatorUnitTests {
         final String job2Id = UUID.randomUUID().toString();
         final String job3Id = UUID.randomUUID().toString();
         final String job4Id = UUID.randomUUID().toString();
+        final String job5Id = UUID.randomUUID().toString();
         final JobExecution.Builder builder
             = new JobExecution.Builder(UUID.randomUUID().toString(), 2818, DELAY, this.tomorrow);
         builder.withId(job1Id);
@@ -142,8 +147,6 @@ public class JobMonitoringCoordinatorUnitTests {
         final JobExecution job2 = builder.build();
         builder.withId(job3Id);
         final JobExecution job3 = builder.build();
-        builder.withId(job4Id);
-        final JobExecution job4 = builder.build();
 
         final JobStartedEvent event1 = new JobStartedEvent(job1, this);
         final ScheduledFuture future = Mockito.mock(ScheduledFuture.class);
@@ -155,12 +158,32 @@ public class JobMonitoringCoordinatorUnitTests {
             .verify(this.scheduler, Mockito.times(1))
             .scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(DELAY));
 
-        final Set<JobExecution> executions = Sets.newHashSet(job1, job2, job3, job4);
-        Mockito.when(this.jobSearchService.getAllRunningJobExecutionsOnHost(HOSTNAME)).thenReturn(executions);
-        this.coordinator.attachToRunningJobs(event);
+        final Job j1 = Mockito.mock(Job.class);
+        Mockito.when(j1.getId()).thenReturn(job1Id);
+        Mockito.when(j1.getStatus()).thenReturn(JobStatus.RUNNING);
+        final Job j2 = Mockito.mock(Job.class);
+        Mockito.when(j2.getId()).thenReturn(job2Id);
+        Mockito.when(j2.getStatus()).thenReturn(JobStatus.RUNNING);
+        final Job j3 = Mockito.mock(Job.class);
+        Mockito.when(j3.getId()).thenReturn(job3Id);
+        Mockito.when(j3.getStatus()).thenReturn(JobStatus.RUNNING);
+        final Job j4 = Mockito.mock(Job.class);
+        Mockito.when(j4.getId()).thenReturn(job4Id);
+        Mockito.when(j4.getStatus()).thenReturn(JobStatus.RUNNING);
+        final Job j5 = Mockito.mock(Job.class);
+        Mockito.when(j5.getId()).thenReturn(job5Id);
+        Mockito.when(j5.getStatus()).thenReturn(JobStatus.INIT);
+        final Set<Job> jobs = Sets.newHashSet(j1, j2, j3, j4, j5);
+        Mockito.when(this.jobSearchService.getAllActiveJobsOnHost(HOSTNAME)).thenReturn(jobs);
+        Mockito.when(this.jobSearchService.getJobExecution(job1Id)).thenReturn(job1);
+        Mockito.when(this.jobSearchService.getJobExecution(job2Id)).thenReturn(job2);
+        Mockito.when(this.jobSearchService.getJobExecution(job3Id)).thenReturn(job3);
+        Mockito.when(this.jobSearchService.getJobExecution(job4Id)).thenThrow(new GenieNotFoundException("blah"));
+        this.coordinator.onStartup(event);
 
+        Mockito.verify(this.publisher, Mockito.times(2)).publishEvent(Mockito.any(JobFinishedEvent.class));
         Mockito
-            .verify(this.scheduler, Mockito.times(4))
+            .verify(this.scheduler, Mockito.times(3))
             .scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(DELAY));
     }
 

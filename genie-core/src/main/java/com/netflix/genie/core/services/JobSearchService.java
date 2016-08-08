@@ -80,19 +80,19 @@ public interface JobSearchService {
     );
 
     /**
-     * Given a hostname return a set of all the job executions currently running on that host.
+     * Given a hostname return a set of all the jobs currently active on that host.
      *
-     * @param hostname The host name to search for. Not null or empty.
-     * @return All the jobs running on the host as a set of JobExecution objects
+     * @param hostName The host name to search for. Not null or empty.
+     * @return All the jobs active on the host as a set of Job objects
      */
-    Set<JobExecution> getAllRunningJobExecutionsOnHost(@NotBlank final String hostname);
+    Set<Job> getAllActiveJobsOnHost(@NotBlank final String hostName);
 
     /**
-     * Get a list of host names which are currently running jobs in the Genie system.
+     * Get a list of host names which are currently have active jobs in the Genie cluster.
      *
-     * @return The list of hosts with jobs currently in "RUNNING" state
+     * @return The list of hosts with jobs currently in an active state
      */
-    List<String> getAllHostsRunningJobs();
+    List<String> getAllHostsWithActiveJobs();
 
     /**
      * Get job information for given job id.

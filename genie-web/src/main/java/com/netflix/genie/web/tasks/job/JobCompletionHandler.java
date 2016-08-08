@@ -26,6 +26,7 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.events.JobFinishedEvent;
+import com.netflix.genie.core.events.JobFinishedReason;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.jobs.JobDoneFile;
 import com.netflix.genie.core.services.JobPersistenceService;
@@ -197,6 +198,12 @@ public class JobCompletionHandler {
                                 );
                                 timerId = this.jobCompletionId.withTag(STATUS_TAG, JobStatus.SUCCEEDED.toString());
                                 break;
+                            case SYSTEM_CRASH:
+                                this.jobPersistenceService.updateJobStatus(
+                                    jobId, JobStatus.FAILED, event.getMessage()
+                                );
+                                timerId = this.jobCompletionId.withTag(STATUS_TAG, JobStatus.FAILED.toString());
+                                break;
                             default:
                                 log.error("Unknown case: " + event.getReason());
                                 this.finalStatusUpdateFailureRate.increment();
@@ -209,8 +216,14 @@ public class JobCompletionHandler {
                         this.finalStatusUpdateFailureRate.increment();
                     }
                 } else if (status == JobStatus.RUNNING) {
-                    timerId = this.jobCompletionId.withTag(STATUS_TAG, this.updateFinalStatusForJob(jobId).toString());
-                    this.cleanupProcesses(jobId);
+                    if (event.getReason() != JobFinishedReason.SYSTEM_CRASH) {
+                        timerId
+                            = this.jobCompletionId.withTag(STATUS_TAG, this.updateFinalStatusForJob(jobId).toString());
+                        this.cleanupProcesses(jobId);
+                    } else {
+                        this.jobPersistenceService.updateJobStatus(jobId, JobStatus.FAILED, event.getMessage());
+                        timerId = this.jobCompletionId.withTag(STATUS_TAG, JobStatus.FAILED.toString());
+                    }
                 }
 
                 // Things that should be done either way
@@ -218,11 +231,10 @@ public class JobCompletionHandler {
                 this.sendEmail(jobId);
             }
         } finally {
-            final long finish = System.nanoTime();
             if (timerId == null) {
                 timerId = this.jobCompletionId.withTag(STATUS_TAG, "error").withTag(ERROR_TAG, "Unknown");
             }
-            this.registry.timer(timerId).record(finish - start, TimeUnit.NANOSECONDS);
+            this.registry.timer(timerId).record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
     }
 

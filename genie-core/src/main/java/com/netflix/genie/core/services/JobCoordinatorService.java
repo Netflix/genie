@@ -18,6 +18,7 @@
 package com.netflix.genie.core.services;
 
 import com.netflix.genie.common.dto.Job;
+import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobRequestMetadata;
 import com.netflix.genie.common.dto.JobStatus;
@@ -59,6 +60,7 @@ public class JobCoordinatorService {
     private final String baseArchiveLocation;
     private final Registry registry;
     private final ApplicationEventPublisher eventPublisher;
+    private final String hostName;
 
     /**
      * Constructor.
@@ -72,6 +74,7 @@ public class JobCoordinatorService {
      * @param maxRunningJobs        The maximum number of jobs that can run on this host at any time
      * @param registry              The registry to use for metrics
      * @param eventPublisher        The application event publisher to use
+     * @param hostName              The name of the host this Genie instance is running on
      */
     public JobCoordinatorService(
         @NotNull final AsyncTaskExecutor taskExecutor,
@@ -82,7 +85,8 @@ public class JobCoordinatorService {
         @NotNull final String baseArchiveLocation,
         final int maxRunningJobs,
         @NotNull final Registry registry,
-        @NotNull final ApplicationEventPublisher eventPublisher
+        @NotNull final ApplicationEventPublisher eventPublisher,
+        @NotBlank final String hostName
     ) {
         this.taskExecutor = taskExecutor;
         this.jobPersistenceService = jobPersistenceService;
@@ -93,6 +97,7 @@ public class JobCoordinatorService {
         this.maxRunningJobs = maxRunningJobs;
         this.registry = registry;
         this.eventPublisher = eventPublisher;
+        this.hostName = hostName;
     }
 
     /**
@@ -139,6 +144,15 @@ public class JobCoordinatorService {
             .withId(jobRequest.getId())
             .withTags(jobRequest.getTags());
 
+        final JobExecution jobExecution = new JobExecution.Builder(
+            this.hostName,
+            JobExecution.DEFAULT_PROCESS_ID,
+            JobExecution.DEFAULT_CHECK_DELAY,
+            JobExecution.DEFAULT_TIMEOUT
+        )
+            .withId(jobRequest.getId())
+            .build();
+
         synchronized (this) {
             log.info("Checking if can run job {} on this node", jobRequest.getId());
             final int numActiveJobs = this.jobCountService.getNumJobs();
@@ -153,7 +167,7 @@ public class JobCoordinatorService {
                     .withStatus(JobStatus.INIT)
                     .withStatusMsg("Job Accepted and in initialization phase.");
                 // TODO: if this throws exception the job will never be marked failed
-                this.jobPersistenceService.createJob(jobBuilder.build());
+                this.jobPersistenceService.createJobAndJobExecution(jobBuilder.build(), jobExecution);
                 try {
                     log.info("Scheduling job {} for submission", jobRequest.getId());
                     final Future<?> task = this.taskExecutor.submit(
@@ -173,7 +187,7 @@ public class JobCoordinatorService {
                 jobBuilder
                     .withStatus(JobStatus.FAILED)
                     .withStatusMsg("Unable to run job due to host being too busy during request.");
-                this.jobPersistenceService.createJob(jobBuilder.build());
+                this.jobPersistenceService.createJobAndJobExecution(jobBuilder.build(), jobExecution);
                 throw new GenieServerUnavailableException(
                     "Running ("
                         + numActiveJobs
