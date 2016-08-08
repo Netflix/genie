@@ -86,6 +86,8 @@ export GENIE_JOB_ID="JOB_ID_PLACEHOLDER"
 
 export GENIE_JOB_NAME="List * ... Directories bash job"
 
+export GENIE_VERSION=3
+
 # Sourcing setup file from Cluster: cluster1
 source ${GENIE_JOB_DIR}/genie/cluster/cluster1/setupfile
 
@@ -102,7 +104,7 @@ source ${GENIE_JOB_DIR}/genie/command/cmd1/setupfile
 source ${GENIE_JOB_DIR}/jobsetupfile
 
 # Dump the environment to a env.log file
-env > ${GENIE_JOB_DIR}/genie/logs/env.log
+env | sort > ${GENIE_JOB_DIR}/genie/logs/env.log
 
 # Kick off the command in background mode and wait for it using its pid
 /bin/bash -c 'echo hello world' > stdout 2> stderr &
