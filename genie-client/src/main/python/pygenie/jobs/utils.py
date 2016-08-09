@@ -193,7 +193,7 @@ def generate_job_id(job_id, return_success=True, conf=None):
                     or (running_job.is_done \
                         and running_job.is_successful \
                         and return_success):
-                logger.info("returning job id '%s' with status '%s'",
+                logger.debug("returning job id '%s' with status '%s'",
                             running_job.job_id,
                             running_job.status)
                 return running_job.job_id
@@ -205,7 +205,7 @@ def generate_job_id(job_id, return_success=True, conf=None):
             job_id = '-'.join(id_parts)
             logger.debug("trying new job id '%s'", job_id)
         except GenieJobNotFoundError:
-            logger.info("returning new job id '%s'", job_id)
+            logger.debug("returning new job id '%s'", job_id)
             return job_id
 
 
