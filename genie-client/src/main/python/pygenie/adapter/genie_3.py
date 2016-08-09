@@ -60,8 +60,13 @@ def set_jobname(func):
 
         # handle job name if not set
         if not job.get('job_name') and script:
-            payload['name'] = os.path.basename(script) if is_file(script) \
-                else script.replace('\n', ' ')[:40].strip()
+            if is_file(script):
+                payload['name'] = os.path.basename(script)
+            else:
+                payload['name'] = script \
+                    .replace('${', '{') \
+                    .replace('\n', ' ')[:40] \
+                    .strip()
 
         return payload
 
