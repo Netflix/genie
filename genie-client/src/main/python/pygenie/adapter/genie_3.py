@@ -229,7 +229,7 @@ class Genie3Adapter(GenieBaseAdapter):
         ret = dict()
 
         if job or get_all:
-            data = self.get(job_id, timeout=5)
+            data = self.get(job_id, timeout=30)
 
             link = data.get('_links', {}).get('self', {}).get('href')
             link_parts = urlparse(link)
@@ -263,7 +263,7 @@ class Genie3Adapter(GenieBaseAdapter):
             ret['version'] = data.get('version')
 
         if request or get_all:
-            request_data = self.get(job_id, path='request', timeout=5)
+            request_data = self.get(job_id, path='request', timeout=30)
 
             ret['disable_archive'] = request_data.get('disableLogArchival')
             ret['email'] = request_data.get('email')
@@ -275,7 +275,7 @@ class Genie3Adapter(GenieBaseAdapter):
             application_data = self.get(job_id,
                                         path='applications',
                                         if_not_found=list(),
-                                        timeout=5)
+                                        timeout=30)
 
             ret['application_name'] = ','.join(a.get('id') for a in application_data)
 
@@ -283,7 +283,7 @@ class Genie3Adapter(GenieBaseAdapter):
             cluster_data = self.get(job_id,
                                     path='cluster',
                                     if_not_found=dict(),
-                                    timeout=5)
+                                    timeout=30)
 
             ret['cluster_id'] = cluster_data.get('id')
             ret['cluster_name'] = cluster_data.get('name')
@@ -292,7 +292,7 @@ class Genie3Adapter(GenieBaseAdapter):
             command_data = self.get(job_id,
                                     path='command',
                                     if_not_found=dict(),
-                                    timeout=5)
+                                    timeout=30)
 
             ret['command_id'] = command_data.get('id')
             ret['command_name'] = command_data.get('name')
@@ -301,7 +301,7 @@ class Genie3Adapter(GenieBaseAdapter):
             execution_data = self.get(job_id,
                                       path='execution',
                                       if_not_found=dict(),
-                                      timeout=5)
+                                      timeout=30)
 
             ret['client_host'] = execution_data.get('hostName')
 
@@ -315,7 +315,7 @@ class Genie3Adapter(GenieBaseAdapter):
     def get_status(self, job_id):
         """Get job status."""
 
-        return self.get(job_id, path='status', timeout=2).get('status')
+        return self.get(job_id, path='status', timeout=30).get('status')
 
     def get_stderr(self, job_id, **kwargs):
         """Get a stderr log for a job."""
@@ -335,7 +335,7 @@ class Genie3Adapter(GenieBaseAdapter):
         try:
             return call(method='delete',
                         url=url,
-                        timeout=10,
+                        timeout=30,
                         auth_handler=self.auth_handler)
         except GenieHTTPError as err:
             if err.response.status_code == 404:
@@ -371,7 +371,7 @@ class Genie3Adapter(GenieBaseAdapter):
         call(method='post',
              url='{}/{}'.format(job.conf.genie.url, Genie3Adapter.JOBS_ENDPOINT),
              files=files,
-             timeout=10,
+             timeout=30,
              auth_handler=self.auth_handler)
 
 
