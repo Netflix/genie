@@ -720,7 +720,7 @@ class GenieJob(object):
         """
 
         _dict = self.__dict__.copy()
-        _dict['repr'] = str(self.repr_obj)
+        _dict['repr'] = unicode(self.repr_obj)
         del _dict['conf']
         del _dict['repr_obj']
         return {
