@@ -7,7 +7,9 @@ from nose.tools import (assert_equals,
                         assert_raises)
 
 from pygenie.adapter.genie_x import substitute
-from pygenie.adapter.genie_3 import Genie3Adapter
+from pygenie.adapter.genie_3 import (Genie3Adapter,
+                                     get_payload)
+from pygenie.jobs import PrestoJob
 from pygenie.exceptions import GenieLogNotFoundError
 
 from .utils import fake_response
@@ -68,3 +70,17 @@ class TestGenie3Adapter(unittest.TestCase):
 
         with assert_raises(GenieLogNotFoundError):
             adapter.get_stderr('job_id_dne')
+
+    def test_set_job_name_with_script_has_params(self):
+        """Test Genie 3 adapter setting job name (if not set) with script containing parameters."""
+
+        job = PrestoJob() \
+            .script('select * from ${table}') \
+            .parameter('table', 'foo.fizz')
+
+        payload = get_payload(job)
+
+        assert_equals(
+            'select * from {table}',
+            payload['name']
+        )

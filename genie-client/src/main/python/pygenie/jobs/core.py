@@ -349,8 +349,9 @@ class GenieJob(object):
             :py:class:`GenieJob`: self
         """
 
-    @add_to_repr('append')
-    def description(self, description):
+    @arg_string
+    @add_to_repr('overwrite')
+    def description(self, _description):
         """
         Sets the description for the job.
 
@@ -360,13 +361,6 @@ class GenieJob(object):
         Returns:
             :py:class:`GenieJob`: self
         """
-
-        if isinstance(self._description, dict) and isinstance(description, dict):
-            self._description.update(description)
-        else:
-            self._description = description
-
-        return self
 
     def disable_archive(self):
         """
@@ -720,7 +714,7 @@ class GenieJob(object):
         """
 
         _dict = self.__dict__.copy()
-        _dict['repr'] = str(self.repr_obj)
+        _dict['repr'] = unicode(self.repr_obj)
         del _dict['conf']
         del _dict['repr_obj']
         return {
