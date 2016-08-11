@@ -51,10 +51,10 @@ class GenieBaseAdapter(object):
         assert conf is None or isinstance(conf, GenieConf), \
             "invalid conf '{}', should be None or GenieConf".format(conf)
 
-        self.conf = conf if conf else GenieConf()
+        self._conf = conf if conf else GenieConf()
 
     def __repr__(self):
-        return '{}(conf={})'.format(self.__class__.__name__, self.conf)
+        return '{}(conf={})'.format(self.__class__.__name__, self._conf)
 
     @staticmethod
     @raise_not_implemented

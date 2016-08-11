@@ -119,7 +119,7 @@ class Genie3Adapter(GenieBaseAdapter):
             raise
 
     def __url_for_job(self, job_id):
-        return '{}/{}/{}'.format(self.conf.genie.url,
+        return '{}/{}/{}'.format(self._conf.genie.url,
                                  Genie3Adapter.JOBS_ENDPOINT,
                                  job_id)
 
@@ -369,7 +369,7 @@ class Genie3Adapter(GenieBaseAdapter):
                                 indent=4,
                                 separators=(',', ': ')))
         call(method='post',
-             url='{}/{}'.format(job.conf.genie.url, Genie3Adapter.JOBS_ENDPOINT),
+             url='{}/{}'.format(job._conf.genie.url, Genie3Adapter.JOBS_ENDPOINT),
              files=files,
              timeout=30,
              auth_handler=self.auth_handler)

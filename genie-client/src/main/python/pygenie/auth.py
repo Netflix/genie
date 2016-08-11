@@ -49,9 +49,9 @@ class AuthHandler(object):
     """
 
     def __init__(self, conf=None):
-        self.conf = conf or GenieConf()
+        self._conf = conf or GenieConf()
 
-        self.auth_name = self.conf.get('genie.auth')
+        self.auth_name = self._conf.get('genie.auth')
         self.auth = None
 
         if self.auth_name:
@@ -61,7 +61,7 @@ class AuthHandler(object):
             try:
                 cls = getattr(mod, cls_name)
                 logger.debug('setting auth to: %s', cls)
-                self.auth = cls(self.conf)
+                self.auth = cls(self._conf)
             except AttributeError:
                 logger.warning('%s not found in module %s (auth set to None).',
                                cls_name,
@@ -75,11 +75,11 @@ class HTTPBasicGenieAuth(requests.auth.HTTPBasicAuth):
     """
 
     def __init__(self, conf=None, **kwargs):
-        self.conf = conf or GenieConf()
+        self._conf = conf or GenieConf()
 
         # access settings for authentication via configuration
-        self.username = self.conf.get('genie_auth.username')
-        self.password = self.conf.get('genie_auth.password')
+        self.username = self._conf.get('genie_auth.username')
+        self.password = self._conf.get('genie_auth.password')
 
         super(HTTPBasicGenieAuth, self).__init__(self.username, self.password)
 
