@@ -23,7 +23,6 @@ import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.test.categories.UnitTest;
@@ -167,7 +166,7 @@ public class ClusterCheckerTaskUnitTests {
             .thenReturn(Sets.newHashSet(job3, job4));
 
         Mockito
-            .doThrow(new GenieServerException("blah"))
+            .doThrow(new RuntimeException("blah"))
             .doNothing()
             .when(this.jobPersistenceService)
             .setJobCompletionInformation(

@@ -20,7 +20,6 @@ package com.netflix.genie.web.tasks.leader;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.common.base.Splitter;
-import com.google.common.base.Throwables;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobStatus;
@@ -69,7 +68,7 @@ public class ClusterCheckerTask extends LeadershipTask {
     private final String scheme;
     private final String healthEndpoint;
     private final ObjectMapper mapper = new ObjectMapper();
-    private final List<String> ignoreHealthEndPoints;
+    private final List<String> healthIndicatorsToIgnore;
 
     private final Map<String, Integer> errorCounts = new HashMap<>();
 
@@ -86,7 +85,7 @@ public class ClusterCheckerTask extends LeadershipTask {
      * @param jobPersistenceService      The job persistence service to use
      * @param restTemplate               The rest template for http calls
      * @param managementServerProperties The properties where Spring actuator is running
-     * @param ignoreHealthEndPoints      Health end points to ignore when determining node's health
+     * @param healthIndicatorsToIgnore      Health indicators to ignore when determining node's health
      * @param registry                   The spectator registry for getting metrics
      */
     @Autowired
@@ -97,7 +96,8 @@ public class ClusterCheckerTask extends LeadershipTask {
         @NotNull final JobPersistenceService jobPersistenceService,
         @Qualifier("genieRestTemplate") @NotNull final RestTemplate restTemplate,
         @NotNull final ManagementServerProperties managementServerProperties,
-        @Value("${genie.tasks.clusterChecker.ignoreHealthEndPoints:memory,genie}") final String ignoreHealthEndPoints,
+        @Value("${genie.tasks.clusterChecker.healthIndicatorsToIgnore:memory,genie}")
+        final String healthIndicatorsToIgnore,
         @NotNull final Registry registry
     ) {
         this.hostName = hostName;
@@ -107,8 +107,8 @@ public class ClusterCheckerTask extends LeadershipTask {
         this.restTemplate = restTemplate;
         this.scheme = this.properties.getScheme() + "://";
         this.healthEndpoint = ":" + this.properties.getPort() + managementServerProperties.getContextPath() + "/health";
-        this.ignoreHealthEndPoints = Splitter.on(",").omitEmptyStrings()
-            .trimResults().splitToList(ignoreHealthEndPoints);
+        this.healthIndicatorsToIgnore = Splitter.on(",").omitEmptyStrings()
+            .trimResults().splitToList(healthIndicatorsToIgnore);
         // Keep track of the number of nodes currently unreachable from the the master
         registry.mapSize("genie.tasks.clusterChecker.errorCounts.gauge", this.errorCounts);
         this.lostJobsCounter = registry.counter("genie.tasks.clusterChecker.lostJobs.rate");
@@ -159,19 +159,18 @@ public class ClusterCheckerTask extends LeadershipTask {
                     lostJobsCounter.increment();
                 } catch (final GenieException ge) {
                     log.error("Unable to update job {} to failed due to exception", job.getId(), ge);
-                    Throwables.propagate(ge);
+                    unableToUpdateJobCounter.increment();
                 }
             }
         );
     }
 
     private void validateHostAndUpdateErrorCount(final String host) {
-        final boolean isNodeHealthy = isNodeHealthy(host);
         //
         // If node is healthy, remove the entry from the errorCounts.
         // If node is not healthy, update the entry in errorCounts
         //
-        if (isNodeHealthy) {
+        if (isNodeHealthy(host)) {
             if (errorCounts.containsKey(host)) {
                 errorCounts.remove(host);
             }
@@ -186,7 +185,7 @@ public class ClusterCheckerTask extends LeadershipTask {
 
     private boolean isNodeHealthy(final String host) {
         //
-        // A node is valid and healthy if all health endpoints excluding the ones mentioned in ignoreHealthEndPoints
+        // A node is valid and healthy if all health indicators excluding the ones mentioned in healthIndicatorsToIgnore
         // are UP.
         //
         boolean result = true;
@@ -199,10 +198,11 @@ public class ClusterCheckerTask extends LeadershipTask {
                     TypeFactory.defaultInstance().constructMapType(Map.class, String.class, Object.class));
                 for (Map.Entry<String, Object> responseEntry : responseMap.entrySet()) {
                     if (responseEntry.getValue() instanceof Map
-                        && !ignoreHealthEndPoints.contains(responseEntry.getKey())
+                        && !healthIndicatorsToIgnore.contains(responseEntry.getKey())
                         && Status.OUT_OF_SERVICE.getCode()
                         .equals(((Map) responseEntry.getValue()).get(PROPERTY_STATUS))) {
                         result = false;
+                        break;
                     }
                 }
             } catch (Exception ex) {
