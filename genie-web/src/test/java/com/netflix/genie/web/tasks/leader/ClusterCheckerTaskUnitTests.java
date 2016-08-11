@@ -23,7 +23,6 @@ import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.test.categories.UnitTest;
@@ -38,10 +37,13 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
 import org.springframework.boot.actuate.autoconfigure.ManagementServerProperties;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 
@@ -89,6 +91,7 @@ public class ClusterCheckerTaskUnitTests {
             this.jobPersistenceService,
             this.restTemplate,
             serverProperties,
+            "memory,genie ",
             registry
         );
     }
@@ -115,7 +118,28 @@ public class ClusterCheckerTaskUnitTests {
             .thenThrow(new RestClientException("blah"))
             .thenReturn("")
             .thenReturn("")
-            .thenThrow(new RestClientException("blah"))
+            .thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "",
+                ("{\"status\":\"OUT_OF_SERVICE\", \"genie\": { \"status\": \"OUT_OF_SERVICE\"}, "
+                    + "\"db\": { \"status\": \"OUT_OF_SERVICE\"}}").getBytes(StandardCharsets.UTF_8),
+                StandardCharsets.UTF_8))
+            .thenReturn("")
+            .thenReturn("")
+            .thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "",
+                ("{\"status\":\"OUT_OF_SERVICE\", \"genie\": { \"status\": \"OUT_OF_SERVICE\"}, "
+                    + "\"db\": { \"status\": \"OUT_OF_SERVICE\"}}").getBytes(StandardCharsets.UTF_8),
+                StandardCharsets.UTF_8))
+            .thenReturn("")
+            .thenReturn("")
+            .thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "",
+                ("{\"status\":\"OUT_OF_SERVICE\", \"genie\": { \"status\": \"OUT_OF_SERVICE\"}, "
+                    + "\"db\": { \"status\": \"UP\"}}").getBytes(StandardCharsets.UTF_8),
+                StandardCharsets.UTF_8))
+            .thenReturn("")
+            .thenReturn("")
+            .thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "",
+                ("{\"status\":\"OUT_OF_SERVICE\", \"genie\": { \"status\": \"OUT_OF_SERVICE\"}, "
+                    + "\"db\": { \"status\": \"OUT_OF_SERVICE\"}}").getBytes(StandardCharsets.UTF_8),
+                StandardCharsets.UTF_8))
             .thenReturn("");
 
         final List<String> hostsRunningJobs = Lists.newArrayList(this.hostName, host1, host2, host3);
@@ -142,7 +166,8 @@ public class ClusterCheckerTaskUnitTests {
             .thenReturn(Sets.newHashSet(job3, job4));
 
         Mockito
-            .doThrow(new GenieServerException("blah"))
+            .doThrow(new RuntimeException("blah"))
+            .doNothing()
             .when(this.jobPersistenceService)
             .setJobCompletionInformation(
                 Mockito.eq(job1Id),
@@ -155,21 +180,27 @@ public class ClusterCheckerTaskUnitTests {
         this.task.run();
         Assert.assertThat(this.task.getErrorCountsSize(), Matchers.is(1));
         this.task.run();
+        Assert.assertThat(this.task.getErrorCountsSize(), Matchers.is(1));
+        this.task.run();
         Assert.assertThat(this.task.getErrorCountsSize(), Matchers.is(0));
+        this.task.run();
+        Assert.assertThat(this.task.getErrorCountsSize(), Matchers.is(0));
+        this.task.run();
+        Assert.assertThat(this.task.getErrorCountsSize(), Matchers.is(1));
 
-        Mockito.verify(this.jobPersistenceService, Mockito.times(1))
+        Mockito.verify(this.jobPersistenceService, Mockito.times(2))
             .setJobCompletionInformation(
                 Mockito.eq(job1Id),
                 Mockito.eq(JobExecution.LOST_EXIT_CODE),
                 Mockito.eq(JobStatus.FAILED), Mockito.anyString()
             );
-        Mockito.verify(this.jobPersistenceService, Mockito.times(1))
+        Mockito.verify(this.jobPersistenceService, Mockito.atLeast(1))
             .setJobCompletionInformation(
                 Mockito.eq(job2Id),
                 Mockito.eq(JobExecution.LOST_EXIT_CODE),
                 Mockito.eq(JobStatus.FAILED), Mockito.anyString()
             );
-        Mockito.verify(this.lostJobCounter, Mockito.times(1)).increment();
+        Mockito.verify(this.lostJobCounter, Mockito.atLeast(2)).increment();
         Mockito.verify(this.unableToUpdateJobCounter, Mockito.times(1)).increment();
     }
 

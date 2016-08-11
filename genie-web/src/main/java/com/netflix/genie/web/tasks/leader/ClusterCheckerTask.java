@@ -17,6 +17,9 @@
  */
 package com.netflix.genie.web.tasks.leader;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.google.common.base.Splitter;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobStatus;
@@ -30,16 +33,18 @@ import com.netflix.spectator.api.Registry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.autoconfigure.ManagementServerProperties;
+import org.springframework.boot.actuate.health.Status;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.validation.constraints.NotNull;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * A task which checks to see if this leader node can communicate with all other nodes in the cluster. If it can't
@@ -53,6 +58,7 @@ import java.util.stream.Collectors;
 @Component
 @Slf4j
 public class ClusterCheckerTask extends LeadershipTask {
+    private static final String PROPERTY_STATUS = "status";
 
     private final String hostName;
     private final ClusterCheckerProperties properties;
@@ -61,6 +67,8 @@ public class ClusterCheckerTask extends LeadershipTask {
     private final RestTemplate restTemplate;
     private final String scheme;
     private final String healthEndpoint;
+    private final ObjectMapper mapper = new ObjectMapper();
+    private final List<String> healthIndicatorsToIgnore;
 
     private final Map<String, Integer> errorCounts = new HashMap<>();
 
@@ -77,6 +85,7 @@ public class ClusterCheckerTask extends LeadershipTask {
      * @param jobPersistenceService      The job persistence service to use
      * @param restTemplate               The rest template for http calls
      * @param managementServerProperties The properties where Spring actuator is running
+     * @param healthIndicatorsToIgnore      Health indicators to ignore when determining node's health
      * @param registry                   The spectator registry for getting metrics
      */
     @Autowired
@@ -87,6 +96,8 @@ public class ClusterCheckerTask extends LeadershipTask {
         @NotNull final JobPersistenceService jobPersistenceService,
         @Qualifier("genieRestTemplate") @NotNull final RestTemplate restTemplate,
         @NotNull final ManagementServerProperties managementServerProperties,
+        @Value("${genie.tasks.clusterChecker.healthIndicatorsToIgnore:memory,genie,discoveryComposite}")
+        final String healthIndicatorsToIgnore,
         @NotNull final Registry registry
     ) {
         this.hostName = hostName;
@@ -96,7 +107,8 @@ public class ClusterCheckerTask extends LeadershipTask {
         this.restTemplate = restTemplate;
         this.scheme = this.properties.getScheme() + "://";
         this.healthEndpoint = ":" + this.properties.getPort() + managementServerProperties.getContextPath() + "/health";
-
+        this.healthIndicatorsToIgnore = Splitter.on(",").omitEmptyStrings()
+            .trimResults().splitToList(healthIndicatorsToIgnore);
         // Keep track of the number of nodes currently unreachable from the the master
         registry.mapSize("genie.tasks.clusterChecker.errorCounts.gauge", this.errorCounts);
         this.lostJobsCounter = registry.counter("genie.tasks.clusterChecker.lostJobs.rate");
@@ -109,70 +121,98 @@ public class ClusterCheckerTask extends LeadershipTask {
     @Override
     public void run() {
         log.info("Checking for cluster node health...");
-        final Set<String> badNodes = new HashSet<>();
         this.jobSearchService.getAllHostsWithActiveJobs()
             .stream()
             .filter(host -> !this.hostName.equals(host))
-            .forEach(
-                host -> {
-                    try {
-                        restTemplate.getForObject(this.scheme + host + this.healthEndpoint, String.class);
-                    } catch (final Exception ioe) {
-                        log.error("Unable to reach {}", host, ioe);
-                        badNodes.add(host);
-                    }
-                }
-            );
+            .forEach(this::validateHostAndUpdateErrorCount);
 
-        // Increment or add new bad nodes
-        badNodes.forEach(
-            host -> {
-                if (this.errorCounts.containsKey(host)) {
-                    this.errorCounts.put(host, this.errorCounts.get(host) + 1);
-                } else {
-                    this.errorCounts.put(host, 1);
+        this.errorCounts.entrySet().removeIf(entry -> {
+            final String host = entry.getKey();
+            boolean result = true;
+            if (entry.getValue() >= properties.getLostThreshold()) {
+                try {
+                    updateJobsToFailedOnHost(host);
+                } catch (Exception e) {
+                    log.error("Unable to update jobs on host {} due to exception", host, e);
+                    unableToUpdateJobCounter.increment();
+                    result = false;
+                }
+            } else {
+                result = false;
+            }
+            return result;
+        });
+        log.info("Finished checking for cluster node health.");
+    }
+
+    private void updateJobsToFailedOnHost(final String host) {
+        final Set<Job> jobs = jobSearchService.getAllActiveJobsOnHost(host);
+        jobs.forEach(
+            job -> {
+                try {
+                    jobPersistenceService.setJobCompletionInformation(
+                        job.getId(),
+                        JobExecution.LOST_EXIT_CODE,
+                        JobStatus.FAILED,
+                        "Genie leader can't reach node running job. Assuming node and job are lost."
+                    );
+                    lostJobsCounter.increment();
+                } catch (final GenieException ge) {
+                    log.error("Unable to update job {} to failed due to exception", job.getId(), ge);
+                    unableToUpdateJobCounter.increment();
                 }
             }
         );
+    }
 
-        // Find any hosts that are now healthy since last iteration
-        // Two loops to avoid concurrent modification exception
-        final Set<String> toRemove = this.errorCounts.keySet()
-            .stream()
-            .filter(host -> !badNodes.contains(host))
-            .collect(Collectors.toSet());
-        toRemove.forEach(this.errorCounts::remove);
+    private void validateHostAndUpdateErrorCount(final String host) {
+        //
+        // If node is healthy, remove the entry from the errorCounts.
+        // If node is not healthy, update the entry in errorCounts
+        //
+        if (isNodeHealthy(host)) {
+            if (errorCounts.containsKey(host)) {
+                errorCounts.remove(host);
+            }
+        } else {
+            if (this.errorCounts.containsKey(host)) {
+                this.errorCounts.put(host, this.errorCounts.get(host) + 1);
+            } else {
+                this.errorCounts.put(host, 1);
+            }
+        }
+    }
 
-        // Did we pass bad threshold on any hosts? Error jobs if so
-        toRemove.clear();
-        this.errorCounts.keySet()
-            .stream()
-            .filter(host -> this.errorCounts.get(host) == this.properties.getLostThreshold())
-            .forEach(
-                host -> {
-                    toRemove.add(host);
-                    final Set<Job> jobs = this.jobSearchService.getAllActiveJobsOnHost(host);
-                    jobs.forEach(
-                        job -> {
-                            try {
-                                this.jobPersistenceService.setJobCompletionInformation(
-                                    job.getId(),
-                                    JobExecution.LOST_EXIT_CODE,
-                                    JobStatus.FAILED,
-                                    "Genie leader can't reach node running job. Assuming node and job are lost."
-                                );
-                                this.lostJobsCounter.increment();
-                            } catch (final GenieException ge) {
-                                log.error("Unable to update job {} to failed due to exception", job.getId(), ge);
-                                this.unableToUpdateJobCounter.increment();
-                            }
-                        }
-                    );
+    private boolean isNodeHealthy(final String host) {
+        //
+        // A node is valid and healthy if all health indicators excluding the ones mentioned in healthIndicatorsToIgnore
+        // are UP.
+        //
+        boolean result = true;
+        try {
+            restTemplate.getForObject(this.scheme + host + this.healthEndpoint, String.class);
+        } catch (final HttpStatusCodeException e) {
+            log.error("Failed validating host {}", host, e);
+            try {
+                final Map<String, Object> responseMap = mapper.readValue(e.getResponseBodyAsByteArray(),
+                    TypeFactory.defaultInstance().constructMapType(Map.class, String.class, Object.class));
+                for (Map.Entry<String, Object> responseEntry : responseMap.entrySet()) {
+                    if (responseEntry.getValue() instanceof Map
+                        && !healthIndicatorsToIgnore.contains(responseEntry.getKey())
+                        && !Status.UP.getCode().equals(((Map) responseEntry.getValue()).get(PROPERTY_STATUS))) {
+                        result = false;
+                        break;
+                    }
                 }
-            );
-        // Remove the fields we just purged
-        toRemove.forEach(this.errorCounts::remove);
-        log.info("Finished checking for cluster node health.");
+            } catch (Exception ex) {
+                log.error("Failed reading the error response when validating host {}", host, ex);
+                result = false;
+            }
+        } catch (final Exception e) {
+            log.error("Unable to reach {}", host, e);
+            result = false;
+        }
+        return result;
     }
 
     /**
