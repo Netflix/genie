@@ -96,7 +96,7 @@ public class ClusterCheckerTask extends LeadershipTask {
         @NotNull final JobPersistenceService jobPersistenceService,
         @Qualifier("genieRestTemplate") @NotNull final RestTemplate restTemplate,
         @NotNull final ManagementServerProperties managementServerProperties,
-        @Value("${genie.tasks.clusterChecker.healthIndicatorsToIgnore:memory,genie}")
+        @Value("${genie.tasks.clusterChecker.healthIndicatorsToIgnore:memory,genie,discoveryComposite}")
         final String healthIndicatorsToIgnore,
         @NotNull final Registry registry
     ) {
@@ -199,8 +199,7 @@ public class ClusterCheckerTask extends LeadershipTask {
                 for (Map.Entry<String, Object> responseEntry : responseMap.entrySet()) {
                     if (responseEntry.getValue() instanceof Map
                         && !healthIndicatorsToIgnore.contains(responseEntry.getKey())
-                        && Status.OUT_OF_SERVICE.getCode()
-                        .equals(((Map) responseEntry.getValue()).get(PROPERTY_STATUS))) {
+                        && !Status.UP.getCode().equals(((Map) responseEntry.getValue()).get(PROPERTY_STATUS))) {
                         result = false;
                         break;
                     }
