@@ -123,7 +123,7 @@ class Genie2Adapter(GenieBaseAdapter):
             raise
 
     def __url_for_job(self, job_id):
-        return '{}/{}/{}'.format(self.conf.genie.url,
+        return '{}/{}/{}'.format(self._conf.genie.url,
                                  Genie2Adapter.JOBS_ENDPOINT,
                                  job_id)
 
@@ -292,7 +292,7 @@ class Genie2Adapter(GenieBaseAdapter):
                                 indent=4,
                                 separators=(',', ': ')))
         call(method='post',
-             url='{}/{}'.format(job.conf.genie.url, Genie2Adapter.JOBS_ENDPOINT),
+             url='{}/{}'.format(job._conf.genie.url, Genie2Adapter.JOBS_ENDPOINT),
              timeout=30,
              data=json.dumps(payload),
              headers=JSON_HEADERS)
