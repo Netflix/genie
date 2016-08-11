@@ -172,7 +172,9 @@ public class ClusterCheckerTask extends LeadershipTask {
         // If node is not healthy, update the entry in errorCounts
         //
         if (isNodeHealthy) {
-            errorCounts.remove(host);
+            if (errorCounts.containsKey(host)) {
+                errorCounts.remove(host);
+            }
         } else {
             if (this.errorCounts.containsKey(host)) {
                 this.errorCounts.put(host, this.errorCounts.get(host) + 1);

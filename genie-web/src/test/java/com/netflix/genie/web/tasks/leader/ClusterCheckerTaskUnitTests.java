@@ -38,10 +38,13 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
 import org.springframework.boot.actuate.autoconfigure.ManagementServerProperties;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 
@@ -116,16 +119,28 @@ public class ClusterCheckerTaskUnitTests {
             .thenThrow(new RestClientException("blah"))
             .thenReturn("")
             .thenReturn("")
-            .thenThrow(new RestClientException("{\"status\":\"OUT_OF_SERVICE\", "
-                + "\"genie\": { \"status\": \"OUT_OF_SERVICE\"}, \"db\": { \"status\": \"UP\"}}"))
+            .thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "",
+                ("{\"status\":\"OUT_OF_SERVICE\", \"genie\": { \"status\": \"OUT_OF_SERVICE\"}, "
+                    + "\"db\": { \"status\": \"OUT_OF_SERVICE\"}}").getBytes(StandardCharsets.UTF_8),
+                StandardCharsets.UTF_8))
             .thenReturn("")
             .thenReturn("")
-            .thenThrow(new RestClientException("{\"status\":\"OUT_OF_SERVICE\", "
-                + "\"genie\": { \"status\": \"OUT_OFgenie_SERVICE\"}, \"db\": { \"status\": \"OUT_OF_SERVICE\"}}"))
+            .thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "",
+                ("{\"status\":\"OUT_OF_SERVICE\", \"genie\": { \"status\": \"OUT_OF_SERVICE\"}, "
+                    + "\"db\": { \"status\": \"OUT_OF_SERVICE\"}}").getBytes(StandardCharsets.UTF_8),
+                StandardCharsets.UTF_8))
             .thenReturn("")
             .thenReturn("")
-            .thenThrow(new RestClientException("{\"status\":\"OUT_OF_SERVICE\", "
-                + "\"genie\": { \"status\": \"OUT_OF_SERVICE\"}, \"db\": { \"status\": \"OUT_OF_SERVICE\"}}"))
+            .thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "",
+                ("{\"status\":\"OUT_OF_SERVICE\", \"genie\": { \"status\": \"OUT_OF_SERVICE\"}, "
+                    + "\"db\": { \"status\": \"UP\"}}").getBytes(StandardCharsets.UTF_8),
+                StandardCharsets.UTF_8))
+            .thenReturn("")
+            .thenReturn("")
+            .thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "",
+                ("{\"status\":\"OUT_OF_SERVICE\", \"genie\": { \"status\": \"OUT_OF_SERVICE\"}, "
+                    + "\"db\": { \"status\": \"OUT_OF_SERVICE\"}}").getBytes(StandardCharsets.UTF_8),
+                StandardCharsets.UTF_8))
             .thenReturn("");
 
         final List<String> hostsRunningJobs = Lists.newArrayList(this.hostName, host1, host2, host3);
@@ -167,6 +182,8 @@ public class ClusterCheckerTaskUnitTests {
         Assert.assertThat(this.task.getErrorCountsSize(), Matchers.is(1));
         this.task.run();
         Assert.assertThat(this.task.getErrorCountsSize(), Matchers.is(1));
+        this.task.run();
+        Assert.assertThat(this.task.getErrorCountsSize(), Matchers.is(0));
         this.task.run();
         Assert.assertThat(this.task.getErrorCountsSize(), Matchers.is(0));
         this.task.run();
