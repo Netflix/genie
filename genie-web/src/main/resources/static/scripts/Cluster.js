@@ -2,7 +2,6 @@ import Page from './Page';
 import TableRow from './components/TableRow';
 import ClusterDetails from './components/ClusterDetails';
 
-
 export default class Cluster extends Page {
 
   get url() {

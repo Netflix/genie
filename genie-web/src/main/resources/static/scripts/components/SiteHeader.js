@@ -14,7 +14,12 @@ const SiteHeader = (props) =>
         </div>
         <ul className="nav navbar-nav navbar-right site-header-info">
           {props.infos ? props.infos.map((info, index) =>
-            <li key={index} className={info.className}><span>{info.name}</span></li>)
+            <li key={index} className={info.className}>
+              <Link to={info.url} activeClassName={info.className}>
+                {info.name}
+              </Link>
+            </li>
+            )
            : null
           }
         </ul>

@@ -1,6 +1,7 @@
 import React, { PropTypes as T } from 'react';
 
 import { fetch } from '../utils';
+import Modal from 'react-modal';
 
 export default class JobDetails extends React.Component {
 
@@ -12,6 +13,8 @@ export default class JobDetails extends React.Component {
     super(props);
     this.state = {
       killJobRequestSent: false,
+      modalIsOpen: false,
+      killRequestError: null,
       job: {
         id: '',
         _links: {
@@ -36,16 +39,45 @@ export default class JobDetails extends React.Component {
   loadData(props) {
     const { row } = props;
     const url = row._links.self.href;
-
     fetch(url).done(job => {
       this.setState({ job });
     });
   }
 
+  get customStyles() {
+    return {
+      content : {
+        padding     : '5px',
+        width       : '40%',
+        height      : '190px',
+        top         : '40%',
+        left        : '50%',
+        right       : 'auto',
+        bottom      : 'auto',
+        marginRight : '-50%',
+        transform   : 'translate(-50%, -50%)',
+      },
+    };
+  }
+
+  openModal = () =>
+    this.setState({ modalIsOpen: true });
+
+  closeModal = () =>
+    this.setState({ modalIsOpen: false });
+
   killJob = (jobId) => {
     fetch(`/api/v3/jobs/${jobId}`, null, 'DELETE')
       .done(() => {
         this.setState({ killJobRequestSent: true });
+        this.closeModal();
+      })
+      .fail((xhr) => {
+        this.setState({
+          modalIsOpen: false,
+          killJobRequestSent: true,
+          killRequestError: xhr.responseJSON,
+        });
       });
   }
 
@@ -104,22 +136,58 @@ export default class JobDetails extends React.Component {
                     </ul>
                   </td>
                 </tr>
-                {(this.state.job.status === 'RUNNING' || this.state.job.status === 'INIT') && !this.state.killJobRequestSent ?
+                {(this.state.job.status === 'RUNNING' || this.state.job.status === 'INIT')
+                  && !this.state.killJobRequestSent ?
                   <tr>
                     <td>
                       <button
                         type="button"
                         className="btn btn-danger"
-                        onClick={() => this.killJob(this.state.job.id)}
-                      >Send Kill Request</button>
+                        onClick={this.openModal}
+                      >Send Kill Requestss
+                      </button>
+                      <Modal
+                        isOpen={this.state.modalIsOpen}
+                        onRequestClose={this.closeModal}
+                        style={this.customStyles}
+                      >
+                        <div>
+                          <div className="modal-header">
+                            <h4 className="modal-title" id="alert-modal-label">Confirm Kill Request</h4>
+                          </div>
+                          <div className="modal-body">
+                            <div>This cannot be undone.</div>
+                          </div>
+                          <div className="modal-footer">
+                            <button
+                              type="button"
+                              className="btn btn-primary"
+                              onClick={() => this.killJob(this.state.job.id)}
+                            >OK
+                            </button>
+                            <button
+                              type="button"
+                              className="btn btn-default"
+                              onClick={this.closeModal}
+                            >Cancel
+                            </button>
+                          </div>
+                        </div>
+                      </Modal>
                     </td>
                   </tr> : null
                 }
-
               </tbody>
             </table>
-            {this.state.killJobRequestSent ?
-              <small>*Request accepted. Please refresh the page in a few seconds to see status change.</small> : null
+            {this.state.killJobRequestSent && !this.state.killRequestError ?
+              <small>*Request accepted. Please refresh the page in a few seconds to see the status change.</small>
+              : null
+            }
+            {this.state.killRequestError ?
+              <div>
+                <div><small>*Request failed. Please refresh the page and try again.</small></div>
+                <div><small><code>{this.state.killRequestError.message}.</code></small></div>
+              </div> : null
             }
           </div>
         </td>
