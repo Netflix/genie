@@ -219,8 +219,8 @@ class TestingJobExecute(unittest.TestCase):
 
         gen_job_id.assert_called_once_with(job_id,
                                            return_success=True,
-                                           conf=job.conf)
-        reattach_job.assert_called_once_with(new_job_id, conf=job.conf)
+                                           conf=job._conf)
+        reattach_job.assert_called_once_with(new_job_id, conf=job._conf)
         exec_job.assert_called_once_with(job)
         assert_equals(new_job_id, job._job_id)
 
@@ -245,7 +245,7 @@ class TestingJobExecute(unittest.TestCase):
 
         gen_job_id.assert_called_once_with(job_id,
                                            return_success=False,
-                                           conf=job.conf)
-        reattach_job.assert_called_once_with(new_job_id, conf=job.conf)
+                                           conf=job._conf)
+        reattach_job.assert_called_once_with(new_job_id, conf=job._conf)
         exec_job.assert_called_once_with(job)
         assert_equals(new_job_id, job._job_id)

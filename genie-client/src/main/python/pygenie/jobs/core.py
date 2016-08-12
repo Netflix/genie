@@ -125,13 +125,13 @@ class GenieJob(object):
         job_type = cls.rsplit('Job', 1)[0].lower() if cls.endswith('Job') \
             else cls.lower()
 
-        self.conf = conf or GenieConf()
+        self._conf = conf or GenieConf()
         self.default_command_tags = str_to_list(
-            self.conf.get('{}.default_command_tags'.format(cls),
+            self._conf.get('{}.default_command_tags'.format(cls),
                           ['type:{}'.format(job_type)])
         )
         self.default_cluster_tags = str_to_list(
-            self.conf.get('{}.default_cluster_tags'.format(cls),
+            self._conf.get('{}.default_cluster_tags'.format(cls),
                           ['type:{}'.format(job_type)])
         )
         self.repr_obj = Repr(self.__class__.__name__)
@@ -153,7 +153,7 @@ class GenieJob(object):
         self._setup_file = None
         self._tags = list()
         self._timeout = None
-        self._username = self.conf.get('genie.username')
+        self._username = self._conf.get('genie.username')
 
         #initialize repr
         self.repr_obj.append('job_id', (self._job_id,))
@@ -349,8 +349,9 @@ class GenieJob(object):
             :py:class:`GenieJob`: self
         """
 
-    @add_to_repr('append')
-    def description(self, description):
+    @arg_string
+    @add_to_repr('overwrite')
+    def description(self, _description):
         """
         Sets the description for the job.
 
@@ -360,13 +361,6 @@ class GenieJob(object):
         Returns:
             :py:class:`GenieJob`: self
         """
-
-        if isinstance(self._description, dict) and isinstance(description, dict):
-            self._description.update(description)
-        else:
-            self._description = description
-
-        return self
 
     def disable_archive(self):
         """
@@ -450,10 +444,10 @@ class GenieJob(object):
                 #     - (if force=False) successful
                 uid = generate_job_id(uid,
                                       return_success=not force,
-                                      conf=self.conf)
+                                      conf=self._conf)
                 # new uid will raise and be handled in the except block
                 # assigning to running_job variable for killing on signal
-                running_job = reattach_job(uid, conf=self.conf)
+                running_job = reattach_job(uid, conf=self._conf)
                 return running_job
             except GenieJobNotFoundError:
                 self.job_id(uid)
@@ -480,7 +474,7 @@ class GenieJob(object):
             :py:class:`GenieJob`: self
         """
 
-        self.conf.genie.url = url
+        self._conf.genie.url = url
 
         return self
 
@@ -721,7 +715,7 @@ class GenieJob(object):
 
         _dict = self.__dict__.copy()
         _dict['repr'] = unicode(self.repr_obj)
-        del _dict['conf']
+        del _dict['_conf']
         del _dict['repr_obj']
         return {
             attr_name.lstrip('_'): attr_val \

@@ -245,7 +245,8 @@ class RunningJob(object):
 
         if ('finished' not in self.info) \
                 or status in RUNNING_STATUSES \
-                or status is None:
+                or status is None \
+                or self.info.get('finished') in {None, 0, '0'}:
             self._update_info('job')
 
         return self.__convert_dttm_to_epoch('finished')
