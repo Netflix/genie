@@ -3,7 +3,7 @@ import { momentFormat } from '../utils';
 
 import CopyToClipboard from 'react-copy-to-clipboard';
 
-export default class TableRow extends React.Component{
+export default class TableRow extends React.Component {
 
   static propTypes = {
     toggleRowDetails: T.func.isRequired,
@@ -27,12 +27,12 @@ export default class TableRow extends React.Component{
   }
 
   get url() {
-    const {protocol, hostname, pathname} = window.location;
+    const { protocol, hostname, pathname } = window.location;
     return `${protocol}//${hostname}${pathname}`;
   }
 
   render() {
-    return(
+    return (
       <tr className="job-table-row" >
         <td className="link" onClick={() => this.props.toggleRowDetails(this.props.row.id)}>
           {this.props.row.id}
@@ -59,8 +59,18 @@ export default class TableRow extends React.Component{
             )}
           </ul>
         </td>
-        <td onClick={() => this.props.toggleRowDetails(this.props.row.id)} className="col-xs-2">{momentFormat(this.props.row.created)}</td>
-        <td onClick={() => this.props.toggleRowDetails(this.props.row.id)} className="col-xs-2">{momentFormat(this.props.row.updated)}</td>
+        <td
+          onClick={() => this.props.toggleRowDetails(this.props.row.id)}
+          className="col-xs-2"
+        >
+          {momentFormat(this.props.row.created)}
+        </td>
+        <td
+          onClick={() => this.props.toggleRowDetails(this.props.row.id)}
+          className="col-xs-2"
+        >
+          {momentFormat(this.props.row.updated)}
+        </td>
       </tr>
     );
   }
