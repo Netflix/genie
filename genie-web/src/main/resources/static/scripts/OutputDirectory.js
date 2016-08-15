@@ -48,7 +48,7 @@ export default class OutputDirectory extends React.Component {
         jobId,
         url,
         headers: [
-          { url       : genieSiteUrl,
+          { url       : '#',
             name      : 'GENIE',
             className : 'supress',
           },
