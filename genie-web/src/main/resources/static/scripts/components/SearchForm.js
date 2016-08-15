@@ -41,7 +41,6 @@ export default class SearchForm extends React.Component {
           formFields[field] = this.getFormState(nextProps).formFields[field];
         }
       }
-      console.log(formFields);
       this.setState({ formFields });
     }
   }
@@ -54,7 +53,6 @@ export default class SearchForm extends React.Component {
 
     for (const field of props.hiddenFormFields) {
       formFields[field.name] = field.value;
-
     }
 
     return {

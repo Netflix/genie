@@ -52,11 +52,12 @@ export default class Job extends Page {
         name  : 'sort',
         value : '',
         type  : 'select',
-        selectFields: ['user', 'id', 'name', 'status', 'clusterName', 'cluserId', 'created', 'started', 'finished'].map(field => (
-          {
-            value: field,
-            label: field,
-          }
+        selectFields: ['user', 'id', 'name', 'status', 'clusterName',
+          'cluserId', 'created', 'started', 'finished'].map(field => (
+            {
+              value: field,
+              label: field,
+            }
         )),
       },
     ];
@@ -103,7 +104,8 @@ export default class Job extends Page {
 
   get tableHeader() {
     return (
-        ['Id', 'Name', 'Output', 'Copy Link', 'User', 'Status', 'Cluster', 'Started (UTC)', 'Finished (UTC)', 'Run Time']
+      ['Id', 'Name', 'Output', 'Copy Link', 'User', 'Status',
+        'Cluster', 'Started (UTC)', 'Finished (UTC)', 'Run Time']
     );
   }
 

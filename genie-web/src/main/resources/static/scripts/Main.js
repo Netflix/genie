@@ -43,20 +43,17 @@ export default class App extends React.Component {
       version: '',
       infos: [
         {
-          className : '',
+          className : 'supress',
           name      : cookie.load('genie.user'),
+          url       : '#',
         },
       ],
     };
   }
 
   componentDidMount() {
-    this.loadData();
-  }
-
-  loadData() {
     fetch('/actuator/info', null, 'GET', 'application/json')
-    .done((data) => {
+    .done(data => {
       this.setState({ version: data.genie.version });
     });
   }
@@ -64,7 +61,10 @@ export default class App extends React.Component {
   render() {
     return (
       <div>
-        <SiteHeader headers={this.props.headers} infos={this.state.infos} />
+        <SiteHeader
+          headers={this.props.headers}
+          infos={this.state.infos}
+        />
         <div className="container">
           {this.props.children}
         </div>

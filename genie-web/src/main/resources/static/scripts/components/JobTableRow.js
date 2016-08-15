@@ -29,7 +29,7 @@ export default class TableRow extends React.Component {
   }
 
   get jobsUrl() {
-    const {protocol, hostname, pathname} = window.location;
+    const { protocol, hostname, pathname } = window.location;
     return `${protocol}//${hostname}${pathname}`;
   }
 

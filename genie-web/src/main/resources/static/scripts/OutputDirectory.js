@@ -11,17 +11,7 @@ import { genieJobsUrl, fileUrl, momentFormat, fetch } from './utils';
 export default class OutputDirectory extends React.Component {
 
   static propTypes = {
-    headers : T.array,
     params  : T.object,
-  }
-
-  static defaultProps = {
-    headers: [
-      { url       : '#',
-        name      : 'GENIE',
-        className : 'supress',
-      },
-    ],
   }
 
   constructor(props) {
@@ -32,6 +22,8 @@ export default class OutputDirectory extends React.Component {
         directories : [],
       },
       url: '',
+      headers: [],
+      infos: [],
     };
   }
 
@@ -49,21 +41,34 @@ export default class OutputDirectory extends React.Component {
     fetch(`/api/v3/jobs/${url}`)
     .done(output => {
       const [jobId, ...ignored] = url.split('/');
+      const genieSiteUrl = `/jobs?id=${jobId}&rowId=${jobId}`;
+
       this.setState({
-        output, jobId, url,
+        output,
+        jobId,
+        url,
+        headers: [
+          { url       : '#',
+            name      : 'GENIE',
+            className : 'supress',
+          },
+        ],
+        infos: [{
+          url       : genieSiteUrl,
+          name      : <div><i className="fa fa-search" aria-hidden="true"></i> Job Id: {jobId}</div>,
+          className : 'supress',
+        }],
       });
     });
   }
 
   render() {
-    const infos = [{
-      className: '',
-      name: `Job Id: ${this.state.jobId ? this.state.jobId : 'NA'}`,
-    }];
-
     return (
       <div>
-        <SiteHeader headers={this.props.headers} infos={infos} />
+        <SiteHeader
+          headers={this.state.headers}
+          infos={this.state.infos}
+        />
         <div className="container job-output-directory">
           {
             this.state.output.files.length === 0 &&
@@ -133,7 +138,8 @@ const Table = (props) =>
   </table>;
 
 Table.propTypes = {
-  headers: T.array,
+  children : T.array,
+  headers  : T.array,
   output : T.shape({
     files       : T.array,
     directories : T.array,
@@ -176,9 +182,9 @@ DirectoryInfo.propTypes = {
 };
 
 const Navigation = (props) => {
-  let [jobId, output, ...path] = props.url.split("/");
+  const [jobId, output, ...path] = props.url.split('/');
   let breadCrumbs = [];
-  //Home Button
+  // Home Button
   breadCrumbs.push(
     <li key={jobId}>
       <Link to={`/output/${jobId}/output`}>
@@ -186,23 +192,22 @@ const Navigation = (props) => {
       </Link>
     </li>
   );
-  //Directory links
-  path.map((name, index) => {
-    if (index === path.length - 1){
+  // Directory links
+  path.forEach((name, index) => {
+    if (index === path.length - 1) {
       breadCrumbs.push(
-        <li key={name} className='active'>
+        <li key={name} className="active">
           {name}
         </li>
-      )
+      );
     } else {
-      const fullPath = path.slice(0, index + 1).join("/");
+      const fullPath = path.slice(0, index + 1).join('/');
       breadCrumbs.push(
         <li key={index}>
           <Link to={`/output/${jobId}/${output}/${fullPath}`}>{name}</Link>
         </li>
-      )
+      );
     }
-
   });
 
   return (
@@ -210,8 +215,8 @@ const Navigation = (props) => {
       {breadCrumbs}
     </ol>
   );
-}
+};
 
 Navigation.propTypes = {
-  url  : T.string,
+  url : T.string,
 };

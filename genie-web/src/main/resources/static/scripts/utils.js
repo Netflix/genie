@@ -54,7 +54,8 @@ export const hasChanged = (o1, o2) => {
 export const momentFormat = (dateStr, format = 'MM/DD/YYYY, H:mm:ss') =>
   moment.utc(dateStr).format(format);
 
-//https://github.com/moment/moment/issues/1048
+// https://github.com/moment/moment/issues/1048
 export const momentDurationFormat = (durationStr, format = ':mm:ss') =>
-  Math.floor(moment.duration(durationStr).asHours()) + moment.utc(moment.duration(durationStr).asMilliseconds()).format(format)
+  Math.floor(moment.duration(durationStr).asHours()) +
+    moment.utc(moment.duration(durationStr).asMilliseconds()).format(format);
 
