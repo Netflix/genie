@@ -114,7 +114,7 @@ class Genie3Adapter(GenieBaseAdapter):
                             **kwargs)
             return response.iter_lines() if iterator else response.text
         except GenieHTTPError as err:
-            if err.response.status_code == 404:
+            if err.response.status_code in {404, 406}:
                 raise GenieLogNotFoundError("log not found at {}".format(url))
             raise
 
