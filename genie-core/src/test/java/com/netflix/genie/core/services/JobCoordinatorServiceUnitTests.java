@@ -19,8 +19,8 @@ package com.netflix.genie.core.services;
 
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
+import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
-import com.netflix.genie.common.dto.JobRequestMetadata;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
@@ -129,7 +129,7 @@ public class JobCoordinatorServiceUnitTests {
             .withDisableLogArchival(true)
             .build();
 
-        final JobRequestMetadata metadata = new JobRequestMetadata
+        final JobMetadata metadata = new JobMetadata
             .Builder()
             .withClientHost(clientHost)
             .withUserAgent(UUID.randomUUID().toString())
@@ -153,12 +153,15 @@ public class JobCoordinatorServiceUnitTests {
             jobExecutionArgumentCaptor.capture()
         );
 
-        Assert.assertEquals(JOB_1_ID, jobArgumentCaptor.getValue().getId());
+        Assert.assertEquals(JOB_1_ID, jobArgumentCaptor.getValue().getId().orElseThrow(IllegalArgumentException::new));
         Assert.assertEquals(JOB_1_NAME, jobArgumentCaptor.getValue().getName());
         Assert.assertEquals(JOB_1_USER, jobArgumentCaptor.getValue().getUser());
         Assert.assertEquals(JOB_1_VERSION, jobArgumentCaptor.getValue().getVersion());
         Assert.assertEquals(JobStatus.INIT, jobArgumentCaptor.getValue().getStatus());
-        Assert.assertEquals(description, jobArgumentCaptor.getValue().getDescription());
+        Assert.assertEquals(
+            description,
+            jobArgumentCaptor.getValue().getDescription().orElseThrow(IllegalArgumentException::new)
+        );
     }
 
     /**
@@ -180,7 +183,7 @@ public class JobCoordinatorServiceUnitTests {
             .withId(JOB_1_ID)
             .build();
 
-        final JobRequestMetadata metadata = new JobRequestMetadata
+        final JobMetadata metadata = new JobMetadata
             .Builder()
             .withClientHost(clientHost)
             .withUserAgent(UUID.randomUUID().toString())
@@ -198,7 +201,7 @@ public class JobCoordinatorServiceUnitTests {
             .createJobAndJobExecution(jobArgumentCaptor.capture(), jobExecutionArgumentCaptor.capture());
         Assert.assertEquals(
             BASE_ARCHIVE_LOCATION + "/" + JOB_1_ID + ".tar.gz",
-            jobArgumentCaptor.getValue().getArchiveLocation()
+            jobArgumentCaptor.getValue().getArchiveLocation().orElseThrow(IllegalArgumentException::new)
         );
     }
 
@@ -221,7 +224,7 @@ public class JobCoordinatorServiceUnitTests {
             .withId(JOB_1_ID)
             .build();
 
-        final JobRequestMetadata metadata = new JobRequestMetadata
+        final JobMetadata metadata = new JobMetadata
             .Builder()
             .withClientHost(clientHost)
             .withUserAgent(UUID.randomUUID().toString())
@@ -238,7 +241,7 @@ public class JobCoordinatorServiceUnitTests {
             jobArgumentCaptor.capture(),
             jobExecutionArgumentCaptor.capture()
         );
-        Assert.assertNull(jobArgumentCaptor.getValue().getArchiveLocation());
+        Assert.assertFalse(jobArgumentCaptor.getValue().getArchiveLocation().isPresent());
     }
 
     /**
@@ -260,7 +263,7 @@ public class JobCoordinatorServiceUnitTests {
             .withId(JOB_1_ID)
             .build();
 
-        final JobRequestMetadata metadata = new JobRequestMetadata
+        final JobMetadata metadata = new JobMetadata
             .Builder()
             .withClientHost(clientHost)
             .withUserAgent(UUID.randomUUID().toString())

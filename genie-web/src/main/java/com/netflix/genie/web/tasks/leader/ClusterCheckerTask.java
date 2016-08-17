@@ -85,7 +85,7 @@ public class ClusterCheckerTask extends LeadershipTask {
      * @param jobPersistenceService      The job persistence service to use
      * @param restTemplate               The rest template for http calls
      * @param managementServerProperties The properties where Spring actuator is running
-     * @param healthIndicatorsToIgnore      Health indicators to ignore when determining node's health
+     * @param healthIndicatorsToIgnore   Health indicators to ignore when determining node's health
      * @param registry                   The spectator registry for getting metrics
      */
     @Autowired
@@ -151,10 +151,12 @@ public class ClusterCheckerTask extends LeadershipTask {
             job -> {
                 try {
                     jobPersistenceService.setJobCompletionInformation(
-                        job.getId(),
+                        job.getId().orElseThrow(IllegalArgumentException::new),
                         JobExecution.LOST_EXIT_CODE,
                         JobStatus.FAILED,
-                        "Genie leader can't reach node running job. Assuming node and job are lost."
+                        "Genie leader can't reach node running job. Assuming node and job are lost.",
+                        null,
+                        null
                     );
                     lostJobsCounter.increment();
                 } catch (final GenieException ge) {

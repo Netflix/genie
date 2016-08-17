@@ -15,47 +15,37 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.hateoas.resources;
+package com.netflix.genie.common.util;
 
-import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.test.categories.UnitTest;
+import org.hamcrest.Matchers;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.mockito.Mockito;
 
-import java.util.UUID;
+import java.text.FieldPosition;
+import java.util.Date;
 
 /**
- * Unit tests for the JobExecutionResource class.
+ * Unit tests for the GenieDateFormat class.
  *
  * @author tgianos
  * @since 3.0.0
  */
 @Category(UnitTest.class)
-public class JobExecutionResourceUnitTests {
-
-    private static final String ID = UUID.randomUUID().toString();
-    private static final String NAME = UUID.randomUUID().toString();
-
-    private JobExecution jobExecution;
+public class GenieDateFormatUnitTests {
 
     /**
-     * Setup for the tests.
-     */
-    @Before
-    public void setup() {
-        this.jobExecution = new JobExecution
-            .Builder(NAME)
-            .withId(ID)
-            .build();
-    }
-
-    /**
-     * Make sure we can build the resource.
+     * Make sure we can properly format a data in UTC time.
      */
     @Test
-    public void canBuildResource() {
-        Assert.assertNotNull(new JobExecutionResource(this.jobExecution));
+    public void canFormat() {
+        final GenieDateFormat format = new GenieDateFormat();
+        final Date zero = new Date(0);
+        final StringBuffer buffer = new StringBuffer();
+        final FieldPosition pos = Mockito.mock(FieldPosition.class);
+
+        Assert.assertThat(format.format(zero, buffer, pos).toString(), Matchers.is("1970-01-01T00:00:00.000Z"));
     }
 }

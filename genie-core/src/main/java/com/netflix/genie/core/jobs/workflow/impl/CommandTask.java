@@ -18,6 +18,7 @@
 package com.netflix.genie.core.jobs.workflow.impl;
 
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.jobs.AdminResources;
 import com.netflix.genie.core.jobs.FileType;
 import com.netflix.genie.core.jobs.JobConstants;
@@ -32,6 +33,7 @@ import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -50,10 +52,9 @@ public class CommandTask extends GenieBaseTask {
      * Constructor.
      *
      * @param registry The metrics registry to use
-     * @param fts File transfer service
+     * @param fts      File transfer service
      */
-    public CommandTask(@NotNull final Registry registry,
-            @NotNull final GenieFileTransferService fts) {
+    public CommandTask(@NotNull final Registry registry, @NotNull final GenieFileTransferService fts) {
         this.timer = registry.timer("genie.jobs.tasks.commandTask.timer");
         this.fts = fts;
     }
@@ -72,48 +73,57 @@ public class CommandTask extends GenieBaseTask {
                 + JobConstants.FILE_PATH_DELIMITER
                 + JobConstants.GENIE_PATH_VAR;
             final Writer writer = (Writer) context.get(JobConstants.WRITER_KEY);
+
             log.info("Starting Command Task for job {}", jobExecEnv.getJobRequest().getId());
+
+            final String commandId = jobExecEnv
+                .getCommand()
+                .getId()
+                .orElseThrow(() -> new GeniePreconditionException("No command id found"));
 
             // Create the directory for this command under command dir in the cwd
             createEntityInstanceDirectory(
                 genieDir,
-                jobExecEnv.getCommand().getId(),
+                commandId,
                 AdminResources.COMMAND
             );
 
             // Create the config directory for this id
             createEntityInstanceConfigDirectory(
                 genieDir,
-                jobExecEnv.getCommand().getId(),
+                commandId,
                 AdminResources.COMMAND
             );
 
             // Get the setup file if specified and add it as source command in launcher script
-            final String commandSetupFile = jobExecEnv.getCommand().getSetupFile();
-            if (commandSetupFile != null && StringUtils.isNotBlank(commandSetupFile)) {
-                final String localPath = super.buildLocalFilePath(
-                    jobWorkingDirectory,
-                    jobExecEnv.getCommand().getId(),
-                    commandSetupFile,
-                    FileType.SETUP,
-                    AdminResources.COMMAND
-                );
+            final Optional<String> setupFile = jobExecEnv.getCommand().getSetupFile();
+            if (setupFile.isPresent()) {
+                final String commandSetupFile = setupFile.get();
+                if (StringUtils.isNotBlank(commandSetupFile)) {
+                    final String localPath = super.buildLocalFilePath(
+                        jobWorkingDirectory,
+                        commandId,
+                        commandSetupFile,
+                        FileType.SETUP,
+                        AdminResources.COMMAND
+                    );
 
-                fts.getFile(commandSetupFile, localPath);
+                    fts.getFile(commandSetupFile, localPath);
 
-                super.generateSetupFileSourceSnippet(
-                    jobExecEnv.getCommand().getId(),
-                    "Command:",
-                    localPath,
-                    writer,
-                    jobWorkingDirectory);
+                    super.generateSetupFileSourceSnippet(
+                        commandId,
+                        "Command:",
+                        localPath,
+                        writer,
+                        jobWorkingDirectory);
+                }
             }
 
             // Iterate over and get all configuration files
             for (final String configFile : jobExecEnv.getCommand().getConfigs()) {
                 final String localPath = super.buildLocalFilePath(
                     jobWorkingDirectory,
-                    jobExecEnv.getCommand().getId(),
+                    commandId,
                     configFile,
                     FileType.CONFIG,
                     AdminResources.COMMAND

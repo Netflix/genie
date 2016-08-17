@@ -19,6 +19,7 @@ package com.netflix.genie.common.dto;
 
 import com.google.common.collect.Sets;
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.genie.test.suppliers.RandomSuppliers;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
@@ -52,21 +53,23 @@ public class ApplicationUnitTests {
         Assert.assertThat(application.getVersion(), Matchers.is(VERSION));
         Assert.assertThat(application.getStatus(), Matchers.is(ApplicationStatus.ACTIVE));
         Assert.assertThat(application.getDependencies(), Matchers.empty());
-        Assert.assertThat(application.getType(), Matchers.nullValue());
-        Assert.assertThat(application.getSetupFile(), Matchers.nullValue());
+        Assert.assertFalse(application.getType().isPresent());
+        Assert.assertFalse(application.getSetupFile().isPresent());
         Assert.assertThat(application.getConfigs(), Matchers.empty());
-        Assert.assertThat(application.getCreated(), Matchers.nullValue());
-        Assert.assertThat(application.getDescription(), Matchers.nullValue());
-        Assert.assertThat(application.getId(), Matchers.nullValue());
+        Assert.assertFalse(application.getCreated().isPresent());
+        Assert.assertFalse(application.getDescription().isPresent());
+        Assert.assertFalse(application.getId().isPresent());
         Assert.assertThat(application.getTags(), Matchers.empty());
-        Assert.assertThat(application.getUpdated(), Matchers.nullValue());
+        Assert.assertFalse(application.getUpdated().isPresent());
     }
 
     /**
      * Test to make sure we can build an application with all optional parameters.
+     *
+     * @throws Exception on error
      */
     @Test
-    public void canBuildApplicationWithOptionals() {
+    public void canBuildApplicationWithOptionals() throws Exception {
         final Application.Builder builder = new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE);
 
         final Set<String> dependencies = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
@@ -102,14 +105,21 @@ public class ApplicationUnitTests {
         Assert.assertThat(application.getVersion(), Matchers.is(VERSION));
         Assert.assertThat(application.getStatus(), Matchers.is(ApplicationStatus.ACTIVE));
         Assert.assertThat(application.getDependencies(), Matchers.is(dependencies));
-        Assert.assertThat(application.getType(), Matchers.is(type));
-        Assert.assertThat(application.getSetupFile(), Matchers.is(setupFile));
+        Assert.assertThat(
+            application.getType().orElseGet(RandomSuppliers.STRING),
+            Matchers.is(type)
+        );
+        Assert.assertThat(
+            application.getSetupFile().orElseGet(RandomSuppliers.STRING), Matchers.is(setupFile)
+        );
         Assert.assertThat(application.getConfigs(), Matchers.is(configs));
-        Assert.assertThat(application.getCreated(), Matchers.is(created));
-        Assert.assertThat(application.getDescription(), Matchers.is(description));
-        Assert.assertThat(application.getId(), Matchers.is(id));
+        Assert.assertThat(application.getCreated().orElseGet(RandomSuppliers.DATE), Matchers.is(created));
+        Assert.assertThat(
+            application.getDescription().orElseThrow(IllegalArgumentException::new), Matchers.is(description)
+        );
+        Assert.assertThat(application.getId().orElseThrow(IllegalArgumentException::new), Matchers.is(id));
         Assert.assertThat(application.getTags(), Matchers.is(tags));
-        Assert.assertThat(application.getUpdated(), Matchers.is(updated));
+        Assert.assertThat(application.getUpdated().orElseThrow(IllegalArgumentException::new), Matchers.is(updated));
     }
 
     /**
@@ -134,14 +144,14 @@ public class ApplicationUnitTests {
         Assert.assertThat(application.getVersion(), Matchers.is(VERSION));
         Assert.assertThat(application.getStatus(), Matchers.is(ApplicationStatus.ACTIVE));
         Assert.assertThat(application.getDependencies(), Matchers.empty());
-        Assert.assertThat(application.getType(), Matchers.nullValue());
-        Assert.assertThat(application.getSetupFile(), Matchers.nullValue());
+        Assert.assertFalse(application.getType().isPresent());
+        Assert.assertFalse(application.getSetupFile().isPresent());
         Assert.assertThat(application.getConfigs(), Matchers.empty());
-        Assert.assertThat(application.getCreated(), Matchers.nullValue());
-        Assert.assertThat(application.getDescription(), Matchers.nullValue());
-        Assert.assertThat(application.getId(), Matchers.nullValue());
+        Assert.assertFalse(application.getCreated().isPresent());
+        Assert.assertFalse(application.getDescription().isPresent());
+        Assert.assertFalse(application.getId().isPresent());
         Assert.assertThat(application.getTags(), Matchers.empty());
-        Assert.assertThat(application.getUpdated(), Matchers.nullValue());
+        Assert.assertFalse(application.getUpdated().isPresent());
     }
 
     /**

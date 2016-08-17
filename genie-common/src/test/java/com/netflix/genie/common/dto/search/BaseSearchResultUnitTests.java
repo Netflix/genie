@@ -17,12 +17,14 @@
  */
 package com.netflix.genie.common.dto.search;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.genie.test.categories.UnitTest;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import java.io.IOException;
 import java.util.UUID;
 
 /**
@@ -87,5 +89,25 @@ public class BaseSearchResultUnitTests {
 
         Assert.assertEquals(searchResult1.hashCode(), searchResult2.hashCode());
         Assert.assertNotEquals(searchResult1.hashCode(), searchResult3.hashCode());
+    }
+
+    /**
+     * Test to make sure we can create a valid JSON string from a DTO object.
+     */
+    @Test
+    public void canCreateValidJsonString() {
+        final BaseSearchResult searchResult = new BaseSearchResult(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
+        );
+
+        final String json = searchResult.toString();
+        try {
+            final ObjectMapper mapper = new ObjectMapper();
+            mapper.readTree(json);
+        } catch (final IOException ioe) {
+            Assert.fail();
+        }
     }
 }

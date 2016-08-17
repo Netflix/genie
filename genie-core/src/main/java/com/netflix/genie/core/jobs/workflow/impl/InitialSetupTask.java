@@ -20,6 +20,8 @@ package com.netflix.genie.core.jobs.workflow.impl;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
 import com.netflix.spectator.api.Registry;
@@ -66,7 +68,10 @@ public class InitialSetupTask extends GenieBaseTask {
                 = (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
             final String jobWorkingDirectory = jobExecEnv.getJobWorkingDir().getCanonicalPath();
             final Writer writer = (Writer) context.get(JobConstants.WRITER_KEY);
-            final String jobId = jobExecEnv.getJobRequest().getId();
+            final String jobId = jobExecEnv
+                .getJobRequest()
+                .getId()
+                .orElseThrow(() -> new GeniePreconditionException("No job id found. Unable to continue"));
             log.info("Starting Initial Setup Task for job {}", jobId);
 
             this.createJobDirStructure(jobWorkingDirectory);
@@ -170,6 +175,7 @@ public class InitialSetupTask extends GenieBaseTask {
 
     private void createCommandEnvironmentVariables(final Writer writer, final Command command)
         throws GenieException, IOException {
+        final String commandId = command.getId().orElseThrow(() -> new GenieServerException("No command id"));
         writer.write(JobConstants.EXPORT
             + JobConstants.GENIE_COMMAND_DIR_ENV_VAR
             + JobConstants.EQUALS_SYMBOL
@@ -182,7 +188,7 @@ public class InitialSetupTask extends GenieBaseTask {
             + JobConstants.FILE_PATH_DELIMITER
             + JobConstants.COMMAND_PATH_VAR
             + JobConstants.FILE_PATH_DELIMITER
-            + command.getId()
+            + commandId
             + JobConstants.DOUBLE_QUOTE_SYMBOL
             + LINE_SEPARATOR);
 
@@ -194,7 +200,7 @@ public class InitialSetupTask extends GenieBaseTask {
                 + JobConstants.GENIE_COMMAND_ID_ENV_VAR
                 + JobConstants.EQUALS_SYMBOL
                 + JobConstants.DOUBLE_QUOTE_SYMBOL
-                + command.getId()
+                + commandId
                 + JobConstants.DOUBLE_QUOTE_SYMBOL
                 + LINE_SEPARATOR
         );
@@ -218,6 +224,7 @@ public class InitialSetupTask extends GenieBaseTask {
 
     private void createClusterEnvironmentVariables(final Writer writer, final Cluster cluster)
         throws GenieException, IOException {
+        final String clusterId = cluster.getId().orElseThrow(() -> new GenieServerException("No cluster id"));
 
         writer.write(JobConstants.EXPORT
             + JobConstants.GENIE_CLUSTER_DIR_ENV_VAR
@@ -231,7 +238,7 @@ public class InitialSetupTask extends GenieBaseTask {
             + JobConstants.FILE_PATH_DELIMITER
             + JobConstants.CLUSTER_PATH_VAR
             + JobConstants.FILE_PATH_DELIMITER
-            + cluster.getId()
+            + clusterId
             + JobConstants.DOUBLE_QUOTE_SYMBOL
             + LINE_SEPARATOR);
 
@@ -243,7 +250,7 @@ public class InitialSetupTask extends GenieBaseTask {
                 + JobConstants.GENIE_CLUSTER_ID_ENV_VAR
                 + JobConstants.EQUALS_SYMBOL
                 + JobConstants.DOUBLE_QUOTE_SYMBOL
-                + cluster.getId()
+                + clusterId
                 + JobConstants.DOUBLE_QUOTE_SYMBOL
                 + LINE_SEPARATOR
         );

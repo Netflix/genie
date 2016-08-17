@@ -54,10 +54,10 @@ import java.util.Set;
  * @author amsharma
  * @author tgianos
  */
-@Entity
-@Table(name = "commands")
 @Getter
 @Setter
+@Entity
+@Table(name = "commands")
 public class CommandEntity extends SetupFileEntity {
 
     private static final long serialVersionUID = -8058995173025433517L;
@@ -123,53 +123,6 @@ public class CommandEntity extends SetupFileEntity {
     }
 
     /**
-     * Gets the status for this command.
-     *
-     * @return the status
-     * @see CommandStatus
-     */
-    public CommandStatus getStatus() {
-        return this.status;
-    }
-
-    /**
-     * Sets the status for this application.
-     *
-     * @param status The new status.
-     * @see CommandStatus
-     */
-    public void setStatus(final CommandStatus status) {
-        this.status = status;
-    }
-
-    /**
-     * Gets the executable for this command.
-     *
-     * @return executable -- full path on the node
-     */
-    public String getExecutable() {
-        return this.executable;
-    }
-
-    /**
-     * Sets the executable for this command.
-     *
-     * @param executable Full path of the executable on the node.
-     */
-    public void setExecutable(final String executable) {
-        this.executable = executable;
-    }
-
-    /**
-     * Gets the configurations for this command.
-     *
-     * @return the configurations
-     */
-    public Set<String> getConfigs() {
-        return this.configs;
-    }
-
-    /**
      * Sets the configurations for this command.
      *
      * @param configs The configuration files that this command needs
@@ -179,15 +132,6 @@ public class CommandEntity extends SetupFileEntity {
         if (configs != null) {
             this.configs.addAll(configs);
         }
-    }
-
-    /**
-     * Gets the applications that this command uses.
-     *
-     * @return applications linked to this command
-     */
-    public List<ApplicationEntity> getApplications() {
-        return this.applications;
     }
 
     /**
@@ -251,15 +195,6 @@ public class CommandEntity extends SetupFileEntity {
     }
 
     /**
-     * Get the clusters this command is available on.
-     *
-     * @return The clusters.
-     */
-    public Set<ClusterEntity> getClusters() {
-        return this.clusters;
-    }
-
-    /**
      * Set the clusters this command is available on.
      *
      * @param clusters the clusters
@@ -277,7 +212,7 @@ public class CommandEntity extends SetupFileEntity {
      * @return The dto
      */
     public Command getDTO() {
-        return new Command.Builder(
+        final Command.Builder builder = new Command.Builder(
             this.getName(),
             this.getUser(),
             this.getVersion(),
@@ -288,10 +223,12 @@ public class CommandEntity extends SetupFileEntity {
             .withId(this.getId())
             .withCreated(this.getCreated())
             .withUpdated(this.getUpdated())
-            .withDescription(this.getDescription())
             .withTags(this.getTags())
-            .withConfigs(this.configs)
-            .withSetupFile(this.getSetupFile())
-            .build();
+            .withConfigs(this.configs);
+
+        this.getDescription().ifPresent(builder::withDescription);
+        this.getSetupFile().ifPresent(builder::withSetupFile);
+
+        return builder.build();
     }
 }

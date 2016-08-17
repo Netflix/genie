@@ -44,7 +44,6 @@ import com.netflix.genie.core.jpa.specifications.JpaClusterSpecs;
 import com.netflix.genie.core.jpa.specifications.JpaCommandSpecs;
 import com.netflix.genie.core.services.CommandService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.domain.Page;
@@ -57,6 +56,7 @@ import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -109,12 +109,13 @@ public class JpaCommandServiceImpl implements CommandService {
         final Command command
     ) throws GenieException {
         log.debug("Called to create command {}", command);
-        if (StringUtils.isNotBlank(command.getId()) && this.commandRepo.exists(command.getId())) {
-            throw new GenieConflictException("A command with id " + command.getId() + " already exists");
+        final Optional<String> commandId = command.getId();
+        if (commandId.isPresent() && this.commandRepo.exists(commandId.get())) {
+            throw new GenieConflictException("A command with id " + commandId.get() + " already exists");
         }
 
         final CommandEntity commandEntity = new CommandEntity();
-        commandEntity.setId(StringUtils.isBlank(command.getId()) ? UUID.randomUUID().toString() : command.getId());
+        commandEntity.setId(command.getId().orElse(UUID.randomUUID().toString()));
         this.updateAndSaveCommandEntity(commandEntity, command);
         return commandEntity.getId();
     }
@@ -174,7 +175,8 @@ public class JpaCommandServiceImpl implements CommandService {
         if (!this.commandRepo.exists(id)) {
             throw new GenieNotFoundException("No command exists with the given id. Unable to update.");
         }
-        if (!id.equals(updateCommand.getId())) {
+        final Optional<String> updateId = updateCommand.getId();
+        if (updateId.isPresent() && !id.equals(updateId.get())) {
             throw new GenieBadRequestException("Command id inconsistent with id passed in.");
         }
 
@@ -406,7 +408,7 @@ public class JpaCommandServiceImpl implements CommandService {
 
         final CommandEntity commandEntity = this.findCommand(id);
         final List<ApplicationEntity> applicationEntities = new ArrayList<>();
-        applicationIds.stream().forEach(appId -> applicationEntities.add(this.appRepo.findOne(appId)));
+        applicationIds.forEach(appId -> applicationEntities.add(this.appRepo.findOne(appId)));
 
         commandEntity.setApplications(applicationEntities);
     }
@@ -505,11 +507,13 @@ public class JpaCommandServiceImpl implements CommandService {
         commandEntity.setName(command.getName());
         commandEntity.setUser(command.getUser());
         commandEntity.setVersion(command.getVersion());
-        commandEntity.setDescription(command.getDescription());
+        final Optional<String> description = command.getDescription();
+        commandEntity.setDescription(description.isPresent() ? description.get() : null);
         commandEntity.setExecutable(command.getExecutable());
         commandEntity.setCheckDelay(command.getCheckDelay());
         commandEntity.setConfigs(command.getConfigs());
-        commandEntity.setSetupFile(command.getSetupFile());
+        final Optional<String> setupFile = command.getSetupFile();
+        commandEntity.setSetupFile(setupFile.isPresent() ? setupFile.get() : null);
         commandEntity.setStatus(command.getStatus());
         commandEntity.setTags(command.getTags());
 

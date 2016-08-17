@@ -19,15 +19,13 @@ package com.netflix.genie.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.netflix.genie.common.util.JsonDateDeserializer;
-import com.netflix.genie.common.util.JsonDateSerializer;
 import lombok.Getter;
 
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Date;
+import java.util.Optional;
 
 /**
  * All information needed to show state of a running job.
@@ -35,23 +33,9 @@ import java.util.Date;
  * @author tgianos
  * @since 3.0.0
  */
-@JsonDeserialize(builder = JobExecution.Builder.class)
 @Getter
+@JsonDeserialize(builder = JobExecution.Builder.class)
 public class JobExecution extends BaseDTO {
-    /**
-     * The exit code that will be set to indicate a job is currently executing.
-     */
-    public static final int DEFAULT_EXIT_CODE = -1;
-
-    /**
-     * The process id that will be used as a placeholder while the job isn't yet running.
-     */
-    public static final int DEFAULT_PROCESS_ID = -1;
-
-    /**
-     * The default check delay before it is set when the job moves to running state.
-     */
-    public static final long DEFAULT_CHECK_DELAY = Long.MAX_VALUE;
 
     /**
      * The exit code that will be set to indicate a job is killed.
@@ -64,11 +48,6 @@ public class JobExecution extends BaseDTO {
     public static final int LOST_EXIT_CODE = 666;
 
     /**
-     * The default timeout date which is Jan 1 in the year 3000. That should be sufficient.
-     */
-    public static final Date DEFAULT_TIMEOUT = new Date(32503708800000L);
-
-    /**
      * The exit code that will be set to indicate a job has succeeded.
      */
     public static final int SUCCESS_EXIT_CODE = 0;
@@ -77,15 +56,14 @@ public class JobExecution extends BaseDTO {
 
     @Size(min = 1, max = 1024, message = "Host name is required but no longer than 1024 characters")
     private final String hostName;
-    private final int processId;
+    private final Integer processId;
     @Min(
         value = 1,
         message = "The delay between checks must be at least 1 millisecond. Probably should be much more than that"
     )
-    private final long checkDelay;
-    @JsonSerialize(using = JsonDateSerializer.class)
+    private final Long checkDelay;
     private final Date timeout;
-    private final int exitCode;
+    private final Integer exitCode;
 
     /**
      * Constructor used by the builder build() method.
@@ -98,7 +76,29 @@ public class JobExecution extends BaseDTO {
         this.processId = builder.bProcessId;
         this.checkDelay = builder.bCheckDelay;
         this.exitCode = builder.bExitCode;
-        this.timeout = new Date(builder.bTimeout.getTime());
+        if (builder.bTimeout != null) {
+            this.timeout = new Date(builder.bTimeout.getTime());
+        } else {
+            this.timeout = null;
+        }
+    }
+
+    /**
+     * Get the process id for this job execution as Optional.
+     *
+     * @return The process id
+     */
+    public Optional<Integer> getProcessId() {
+        return Optional.ofNullable(this.processId);
+    }
+
+    /**
+     * Get the amount of time (in milliseconds) to delay between checks of status of the job process.
+     *
+     * @return The time to delay as an Optional as it could be null
+     */
+    public Optional<Long> getCheckDelay() {
+        return Optional.ofNullable(this.checkDelay);
     }
 
     /**
@@ -106,8 +106,21 @@ public class JobExecution extends BaseDTO {
      *
      * @return The timeout date
      */
-    public Date getTimeout() {
-        return new Date(this.timeout.getTime());
+    public Optional<Date> getTimeout() {
+        if (this.timeout == null) {
+            return Optional.empty();
+        } else {
+            return Optional.of(new Date(this.timeout.getTime()));
+        }
+    }
+
+    /**
+     * Get the exit code of the process.
+     *
+     * @return The exit code as an Optional as it could be null
+     */
+    public Optional<Integer> getExitCode() {
+        return Optional.ofNullable(this.exitCode);
     }
 
     /**
@@ -119,36 +132,60 @@ public class JobExecution extends BaseDTO {
     public static class Builder extends BaseDTO.Builder<Builder> {
 
         private final String bHostName;
-        private final int bProcessId;
-        private final long bCheckDelay;
-        private final Date bTimeout;
-        private int bExitCode = -1;
+        private Integer bProcessId;
+        private Long bCheckDelay;
+        @JsonDeserialize(using = JsonDateDeserializer.class)
+        private Date bTimeout;
+        private Integer bExitCode;
 
         /**
          * Constructor which has required fields.
          *
-         * @param hostName   The hostname where the job is running
-         * @param processId  The id of the process running the job
-         * @param checkDelay How long, in milliseconds, to wait between checks for job status
-         * @param timeout    The time this job will be killed due to timeout
+         * @param hostName The hostname where the job is running
          */
         public Builder(
             @JsonProperty("hostName")
-            final String hostName,
-            @JsonProperty("processId")
-            final int processId,
-            @JsonProperty("checkDelay")
-            final long checkDelay,
-            @JsonProperty("timeout")
-            @JsonDeserialize(using = JsonDateDeserializer.class)
-            @NotNull
-            final Date timeout
+            final String hostName
         ) {
             super();
             this.bHostName = hostName;
+        }
+
+        /**
+         * Set the process id for the jobs' execution.
+         *
+         * @param processId The process id
+         * @return The builder
+         */
+        public Builder withProcessId(final Integer processId) {
             this.bProcessId = processId;
+            return this;
+        }
+
+        /**
+         * Set the amount of time (in milliseconds) to delay between checks of the process.
+         *
+         * @param checkDelay The check delay to use
+         * @return The builder
+         */
+        public Builder withCheckDelay(final Long checkDelay) {
             this.bCheckDelay = checkDelay;
-            this.bTimeout = new Date(timeout.getTime());
+            return this;
+        }
+
+        /**
+         * Set the timeout date when the job will be failed if it hasn't completed by.
+         *
+         * @param timeout The timeout date
+         * @return The builder
+         */
+        public Builder withTimeout(final Date timeout) {
+            if (timeout != null) {
+                this.bTimeout = new Date(timeout.getTime());
+            } else {
+                this.bTimeout = null;
+            }
+            return this;
         }
 
         /**
@@ -157,7 +194,7 @@ public class JobExecution extends BaseDTO {
          * @param exitCode The exit code.
          * @return The builder
          */
-        public Builder withExitCode(final int exitCode) {
+        public Builder withExitCode(final Integer exitCode) {
             this.bExitCode = exitCode;
             return this;
         }

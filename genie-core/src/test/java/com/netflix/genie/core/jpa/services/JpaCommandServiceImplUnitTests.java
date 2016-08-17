@@ -38,6 +38,7 @@ import org.mockito.Mockito;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -134,7 +135,7 @@ public class JpaCommandServiceImplUnitTests {
     public void testUpdateCommandIdsDontMatch() throws GenieException {
         Mockito.when(this.jpaCommandRepository.exists(COMMAND_2_ID)).thenReturn(true);
         final Command command = Mockito.mock(Command.class);
-        Mockito.when(command.getId()).thenReturn(UUID.randomUUID().toString());
+        Mockito.when(command.getId()).thenReturn(Optional.of(UUID.randomUUID().toString()));
         this.service.updateCommand(COMMAND_2_ID, command);
     }
 

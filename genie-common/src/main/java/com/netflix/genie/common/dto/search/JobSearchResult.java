@@ -24,7 +24,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.DurationDeserializer;
 import com.netflix.genie.common.dto.JobStatus;
-import com.netflix.genie.common.util.JsonDateSerializer;
 import com.netflix.genie.common.util.TimeUtils;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -33,6 +32,7 @@ import org.hibernate.validator.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.Duration;
 import java.util.Date;
+import java.util.Optional;
 
 /**
  * This class represents the subset of data returned from a Job when a search for Jobs is conducted.
@@ -47,9 +47,7 @@ public class JobSearchResult extends BaseSearchResult {
     private static final long serialVersionUID = -3886685874572773514L;
 
     private final JobStatus status;
-    @JsonSerialize(using = JsonDateSerializer.class)
     private final Date started;
-    @JsonSerialize(using = JsonDateSerializer.class)
     private final Date finished;
     private final String clusterName;
     private final String commandName;
@@ -95,8 +93,8 @@ public class JobSearchResult extends BaseSearchResult {
      *
      * @return The started time or null if not set
      */
-    public Date getStarted() {
-        return this.started == null ? null : new Date(this.started.getTime());
+    public Optional<Date> getStarted() {
+        return this.started == null ? Optional.empty() : Optional.of(new Date(this.started.getTime()));
     }
 
     /**
@@ -104,7 +102,25 @@ public class JobSearchResult extends BaseSearchResult {
      *
      * @return The finished time or null if not set
      */
-    public Date getFinished() {
-        return this.finished == null ? null : new Date(this.finished.getTime());
+    public Optional<Date> getFinished() {
+        return this.finished == null ? Optional.empty() : Optional.of(new Date(this.finished.getTime()));
+    }
+
+    /**
+     * Get the name of the cluster running the job if there currently is one.
+     *
+     * @return The name of the cluster where the job is running
+     */
+    public Optional<String> getClusterName() {
+        return Optional.ofNullable(this.clusterName);
+    }
+
+    /**
+     * Get the name of the command running this job if there currently is one.
+     *
+     * @return The name of the command
+     */
+    public Optional<String> getCommandName() {
+        return Optional.ofNullable(this.commandName);
     }
 }

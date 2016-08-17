@@ -15,18 +15,17 @@
  */
 package com.netflix.genie.core.jpa.repositories;
 
-import com.netflix.genie.core.jpa.entities.JobRequestMetadataEntity;
+import com.netflix.genie.core.jpa.entities.JobMetadataEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 /**
- * Job Request Metadata repository.
+ * Job Metadata repository.
  *
  * @author tgianos
  * @since 3.0.0
  */
 @Repository
-public interface JpaJobRequestMetadataRepository
-    extends JpaRepository<JobRequestMetadataEntity, String>, JpaSpecificationExecutor {
+public interface JpaJobMetadataRepository extends JpaRepository<JobMetadataEntity, String>, JpaSpecificationExecutor {
 }

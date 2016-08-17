@@ -28,6 +28,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.test.categories.IntegrationTest;
+import com.netflix.genie.test.suppliers.RandomSuppliers;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
@@ -156,14 +157,25 @@ public class JpaJobSearchServiceImplIntegrationTests extends DBUnitTestBase {
         Set<Job> jobs = this.service.getAllActiveJobsOnHost(hostA);
         Assert.assertThat(jobs.size(), Matchers.is(1));
         Assert.assertThat(
-            jobs.stream().filter(jobExecution -> JOB_2_ID.equals(jobExecution.getId())).count(),
+            jobs
+                .stream()
+                .filter(
+                    jobExecution ->
+                        JOB_2_ID.equals(jobExecution.getId().orElseThrow(IllegalArgumentException::new))
+                )
+                .count(),
             Matchers.is(1L)
         );
 
         jobs = this.service.getAllActiveJobsOnHost(hostB);
         Assert.assertThat(jobs.size(), Matchers.is(1));
         Assert.assertThat(
-            jobs.stream().filter(jobExecution -> JOB_3_ID.equals(jobExecution.getId())).count(),
+            jobs
+                .stream()
+                .filter(
+                    jobExecution -> JOB_3_ID.equals(jobExecution.getId().orElseThrow(IllegalArgumentException::new))
+                )
+                .count(),
             Matchers.is(1L)
         );
 
@@ -249,9 +261,18 @@ public class JpaJobSearchServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void canGetJobExecution() throws GenieException {
-        Assert.assertThat(this.service.getJobExecution(JOB_1_ID).getProcessId(), Matchers.is(317));
-        Assert.assertThat(this.service.getJobExecution(JOB_2_ID).getProcessId(), Matchers.is(318));
-        Assert.assertThat(this.service.getJobExecution(JOB_3_ID).getProcessId(), Matchers.is(319));
+        Assert.assertThat(
+            this.service.getJobExecution(JOB_1_ID).getProcessId().orElseThrow(IllegalArgumentException::new),
+            Matchers.is(317)
+        );
+        Assert.assertThat(
+            this.service.getJobExecution(JOB_2_ID).getProcessId().orElseThrow(IllegalArgumentException::new),
+            Matchers.is(318)
+        );
+        Assert.assertThat(
+            this.service.getJobExecution(JOB_3_ID).getProcessId().orElseThrow(IllegalArgumentException::new),
+            Matchers.is(319)
+        );
 
         try {
             this.service.getJobExecution(UUID.randomUUID().toString());
@@ -268,7 +289,10 @@ public class JpaJobSearchServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void canGetJobCluster() throws GenieException {
-        Assert.assertThat(this.service.getJobCluster(JOB_1_ID).getId(), Matchers.is("cluster1"));
+        Assert.assertThat(
+            this.service.getJobCluster(JOB_1_ID).getId().orElseThrow(IllegalArgumentException::new),
+            Matchers.is("cluster1")
+        );
     }
 
     /**
@@ -278,7 +302,10 @@ public class JpaJobSearchServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void canGetJobCommand() throws GenieException {
-        Assert.assertThat(this.service.getJobCommand(JOB_1_ID).getId(), Matchers.is("command1"));
+        Assert.assertThat(
+            this.service.getJobCommand(JOB_1_ID).getId().orElseThrow(IllegalArgumentException::new),
+            Matchers.is("command1")
+        );
     }
 
     /**
@@ -288,14 +315,13 @@ public class JpaJobSearchServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void canGetJobApplications() throws GenieException {
-        List<Application> applications;
-        applications = this.service.getJobApplications(JOB_1_ID);
+        List<Application> applications = this.service.getJobApplications(JOB_1_ID);
         Assert.assertThat(applications.size(), Matchers.is(2));
-        Assert.assertThat(applications.get(0).getId(), Matchers.is("app1"));
-        Assert.assertThat(applications.get(1).getId(), Matchers.is("app3"));
+        Assert.assertThat(applications.get(0).getId().orElseGet(RandomSuppliers.STRING), Matchers.is("app1"));
+        Assert.assertThat(applications.get(1).getId().orElseGet(RandomSuppliers.STRING), Matchers.is("app3"));
         applications = this.service.getJobApplications(JOB_2_ID);
         Assert.assertThat(applications.size(), Matchers.is(2));
-        Assert.assertThat(applications.get(0).getId(), Matchers.is("app1"));
-        Assert.assertThat(applications.get(1).getId(), Matchers.is("app2"));
+        Assert.assertThat(applications.get(0).getId().orElseGet(RandomSuppliers.STRING), Matchers.is("app1"));
+        Assert.assertThat(applications.get(1).getId().orElseGet(RandomSuppliers.STRING), Matchers.is("app2"));
     }
 }

@@ -137,14 +137,14 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
         Assert.assertEquals(JobStatus.SUCCEEDED, jobStatus);
         final Job job = jobClient.getJob(id);
 
-        Assert.assertEquals(jobId, job.getId());
+        Assert.assertEquals(jobId, job.getId().orElseThrow(IllegalArgumentException::new));
 
         final JobRequest jobRequest1 = jobClient.getJobRequest(jobId);
-        Assert.assertEquals(jobId, jobRequest1.getId());
+        Assert.assertEquals(jobId, jobRequest1.getId().orElseThrow(IllegalArgumentException::new));
         Assert.assertTrue(jobRequest1.getDependencies().contains(depFile1));
 
         final JobExecution jobExecution = jobClient.getJobExecution(jobId);
-        Assert.assertEquals(jobId, jobExecution.getId());
+        Assert.assertEquals(jobId, jobExecution.getId().orElseThrow(IllegalArgumentException::new));
 
         Assert.assertEquals(CLUSTER_NAME, jobClient.getJobCluster(jobId).getName());
         Assert.assertEquals(COMMAND_NAME, jobClient.getJobCommand(jobId).getName());
@@ -162,7 +162,7 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
             final InputStream att1 = new FileInputStream(this.resourceLoader.getResource("/setupfile")
                 .getFile().getAbsolutePath());
             final InputStream att2 = new FileInputStream(this.resourceLoader.getResource("/data.txt")
-                .getFile().getAbsolutePath());
+                .getFile().getAbsolutePath())
         ) {
 
             createClusterAndCommandForTest();
@@ -195,10 +195,10 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
             Assert.assertEquals(JobStatus.SUCCEEDED, jobStatus);
             final Job job = jobClient.getJob(id);
 
-            Assert.assertEquals(jobId, job.getId());
+            Assert.assertEquals(jobId, job.getId().orElseThrow(IllegalArgumentException::new));
 
             final JobRequest jobRequest1 = jobClient.getJobRequest(jobId);
-            Assert.assertEquals(jobId, jobRequest1.getId());
+            Assert.assertEquals(jobId, jobRequest1.getId().orElseThrow(IllegalArgumentException::new));
         }
     }
 
@@ -241,9 +241,10 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
         Assert.assertEquals(JobStatus.SUCCEEDED, jobStatus);
         final Job job = jobClient.getJob(jobId);
 
-        Assert.assertEquals(jobId, job.getId());
+        Assert.assertEquals(jobId, job.getId().orElseThrow(IllegalArgumentException::new));
 
-        final InputStream inputStream1 = jobClient.getJobStdout(jobRequest.getId());
+        final InputStream inputStream1
+            = jobClient.getJobStdout(jobRequest.getId().orElseThrow(IllegalArgumentException::new));
         final BufferedReader reader1 = new BufferedReader(new InputStreamReader(inputStream1, "UTF-8"));
         final StringBuilder sb = new StringBuilder();
         String line;
@@ -285,9 +286,10 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
 
         jobClient.submitJob(jobRequest1);
         Thread.sleep(2000);
-        jobClient.killJob(jobRequest1.getId());
+        jobClient.killJob(jobRequest1.getId().orElseThrow(IllegalArgumentException::new));
 
-        final JobStatus jobStatus = jobClient.waitForCompletion(jobRequest1.getId(), 600000, 5000);
+        final JobStatus jobStatus
+            = jobClient.waitForCompletion(jobRequest1.getId().orElseThrow(IllegalArgumentException::new), 600000, 5000);
 
         Assert.assertEquals(JobStatus.KILLED, jobStatus);
     }
@@ -384,93 +386,105 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
 
         jobClient.submitJob(jobRequest2);
 
-        jobClient.waitForCompletion(jobRequest1.getId(), 60000, 5000);
-        jobClient.waitForCompletion(jobRequest2.getId(), 60000, 5000);
+        jobClient.waitForCompletion(jobRequest1.getId().orElseThrow(IllegalArgumentException::new), 60000, 5000);
+        jobClient.waitForCompletion(jobRequest2.getId().orElseThrow(IllegalArgumentException::new), 60000, 5000);
 
         // Get jobs using id
-        Assert.assertEquals(jobRequest1.getId(), jobClient.getJobs(
-            jobRequest1.getId(),
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-        ).get(0).getId());
+        Assert.assertEquals(
+            jobRequest1.getId().orElseThrow(IllegalArgumentException::new),
+            jobClient.getJobs(
+                jobRequest1.getId().orElseThrow(IllegalArgumentException::new),
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ).get(0).getId()
+        );
 
         // Get jobs using user
-        Assert.assertEquals(jobRequest1.getId(), jobClient.getJobs(
-            null,
-            "job1",
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-        ).get(0).getId());
+        Assert.assertEquals(
+            jobRequest1.getId().orElseThrow(IllegalArgumentException::new),
+            jobClient.getJobs(
+                null,
+                "job1",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ).get(0).getId()
+        );
 
         // Get jobs using name
-        Assert.assertEquals(jobRequest2.getId(), jobClient.getJobs(
-            null,
-            null,
-            "user2",
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-        ).get(0).getId());
+        Assert.assertEquals(
+            jobRequest2.getId().orElseThrow(IllegalArgumentException::new),
+            jobClient.getJobs(
+                null,
+                null,
+                "user2",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ).get(0).getId());
 
         // Get jobs using status
-        Assert.assertEquals(jobRequest1.getId(), jobClient.getJobs(
-            null,
-            null,
-            null,
-            Arrays.stream(new String[]{"SUCCEEDED"}).collect(Collectors.toSet()),
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-        ).get(0).getId());
+        Assert.assertEquals(
+            jobRequest1.getId().orElseThrow(IllegalArgumentException::new),
+            jobClient.getJobs(
+                null,
+                null,
+                null,
+                Arrays.stream(new String[]{"SUCCEEDED"}).collect(Collectors.toSet()),
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ).get(0).getId());
 
         // Get jobs using status
-        Assert.assertEquals(jobRequest2.getId(), jobClient.getJobs(
-            null,
-            null,
-            null,
-            Arrays.stream(new String[]{"FAILED"}).collect(Collectors.toSet()),
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
-        ).get(0).getId());
+        Assert.assertEquals(
+            jobRequest2.getId().orElseThrow(IllegalArgumentException::new),
+            jobClient.getJobs(
+                null,
+                null,
+                null,
+                Arrays.stream(new String[]{"FAILED"}).collect(Collectors.toSet()),
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            ).get(0).getId());
 
         // Get jobs using tags
         Assert.assertEquals(2, jobClient.getJobs(
@@ -518,14 +532,15 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
             .build();
 
         jobClient.submitJob(jobRequest1);
-        jobClient.waitForCompletion(jobRequest1.getId(), 60000, 5000);
+        jobClient.waitForCompletion(jobRequest1.getId().orElseThrow(IllegalArgumentException::new), 60000, 5000);
 
-        final InputStream inputStream1 = jobClient.getJobStdout(jobRequest1.getId());
+        final InputStream inputStream1
+            = jobClient.getJobStdout(jobRequest1.getId().orElseThrow(IllegalArgumentException::new));
         final BufferedReader reader1 = new BufferedReader(new InputStreamReader(inputStream1, "UTF-8"));
         final StringBuilder sb = new StringBuilder();
         String line;
         while ((line = reader1.readLine()) != null) {
-           sb.append(line);
+            sb.append(line);
         }
 
         reader1.close();
@@ -562,9 +577,10 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
             .build();
 
         jobClient.submitJob(jobRequest1);
-        jobClient.waitForCompletion(jobRequest1.getId(), 60000, 5000);
+        jobClient.waitForCompletion(jobRequest1.getId().orElseThrow(IllegalArgumentException::new), 60000, 5000);
 
-        final InputStream inputStream1 = jobClient.getJobStderr(jobRequest1.getId());
+        final InputStream inputStream1
+            = jobClient.getJobStderr(jobRequest1.getId().orElseThrow(IllegalArgumentException::new));
         final BufferedReader reader1 = new BufferedReader(new InputStreamReader(inputStream1, "UTF-8"));
         final StringBuilder sb = new StringBuilder();
         String line;
@@ -642,6 +658,6 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
 
         final String commandId = commandClient.createCommand(command);
 
-        clusterClient.addCommandsToCluster(clusterId, Arrays.asList(commandId));
+        clusterClient.addCommandsToCluster(clusterId, Lists.newArrayList(commandId));
     }
 }

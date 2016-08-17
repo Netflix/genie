@@ -17,7 +17,10 @@
  */
 package com.netflix.genie.docs;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.netflix.genie.GenieWeb;
@@ -28,6 +31,7 @@ import com.netflix.genie.test.categories.DocumentationTest;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -61,6 +65,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import javax.servlet.RequestDispatcher;
 import java.util.List;
+import java.util.TimeZone;
 
 /**
  * Used to generate the documentation for the Genie REST APIs.
@@ -76,6 +81,8 @@ import java.util.List;
 public class ApplicationRestDocs {
 
     private static final String APPLICATION_API_PATH = "/api/v3/applications";
+    private static ObjectMapper objectMapper;
+
     /**
      * Where to put the generated documentation.
      */
@@ -90,6 +97,18 @@ public class ApplicationRestDocs {
 
     private RestDocumentationResultHandler document;
     private MockMvc mockMvc;
+
+    /**
+     * Set up class level variables.
+     */
+    @BeforeClass
+    public static void setupClass() {
+        objectMapper = new ObjectMapper()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .setTimeZone(TimeZone.getTimeZone("UTC"))
+            .setDateFormat(new ISO8601DateFormat())
+            .registerModule(new Jdk8Module());
+    }
 
     /**
      * Setup the tests.
@@ -188,7 +207,7 @@ public class ApplicationRestDocs {
             .perform(
                 MockMvcRequestBuilders.post(APPLICATION_API_PATH)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(new ObjectMapper().writeValueAsBytes(app))
+                    .content(objectMapper.writeValueAsBytes(app))
             )
             .andExpect(MockMvcResultMatchers.status().isCreated())
             .andExpect(MockMvcResultMatchers
@@ -217,7 +236,7 @@ public class ApplicationRestDocs {
             .perform(
                 MockMvcRequestBuilders.post(APPLICATION_API_PATH)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(new ObjectMapper().writeValueAsBytes(app))
+                    .content(objectMapper.writeValueAsBytes(app))
             )
             .andExpect(MockMvcResultMatchers.status().isCreated())
             .andExpect(MockMvcResultMatchers
@@ -308,7 +327,7 @@ public class ApplicationRestDocs {
             .perform(
                 MockMvcRequestBuilders.post(APPLICATION_API_PATH)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(new ObjectMapper().writeValueAsBytes(spark151))
+                    .content(objectMapper.writeValueAsBytes(spark151))
             )
             .andExpect(MockMvcResultMatchers.status().isCreated());
 
@@ -316,7 +335,7 @@ public class ApplicationRestDocs {
             .perform(
                 MockMvcRequestBuilders.post(APPLICATION_API_PATH)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(new ObjectMapper().writeValueAsBytes(spark150))
+                    .content(objectMapper.writeValueAsBytes(spark150))
             )
             .andExpect(MockMvcResultMatchers.status().isCreated());
 
@@ -324,7 +343,7 @@ public class ApplicationRestDocs {
             .perform(
                 MockMvcRequestBuilders.post(APPLICATION_API_PATH)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(new ObjectMapper().writeValueAsBytes(spark141))
+                    .content(objectMapper.writeValueAsBytes(spark141))
             )
             .andExpect(MockMvcResultMatchers.status().isCreated());
 
@@ -332,7 +351,7 @@ public class ApplicationRestDocs {
             .perform(
                 MockMvcRequestBuilders.post(APPLICATION_API_PATH)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(new ObjectMapper().writeValueAsBytes(spark140))
+                    .content(objectMapper.writeValueAsBytes(spark140))
             )
             .andExpect(MockMvcResultMatchers.status().isCreated());
 
@@ -340,7 +359,7 @@ public class ApplicationRestDocs {
             .perform(
                 MockMvcRequestBuilders.post(APPLICATION_API_PATH)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(new ObjectMapper().writeValueAsBytes(spark131))
+                    .content(objectMapper.writeValueAsBytes(spark131))
             )
             .andExpect(MockMvcResultMatchers.status().isCreated());
 
@@ -348,7 +367,7 @@ public class ApplicationRestDocs {
             .perform(
                 MockMvcRequestBuilders.post(APPLICATION_API_PATH)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(new ObjectMapper().writeValueAsBytes(pig))
+                    .content(objectMapper.writeValueAsBytes(pig))
             )
             .andExpect(MockMvcResultMatchers.status().isCreated());
 
@@ -356,7 +375,7 @@ public class ApplicationRestDocs {
             .perform(
                 MockMvcRequestBuilders.post(APPLICATION_API_PATH)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(new ObjectMapper().writeValueAsBytes(hive))
+                    .content(objectMapper.writeValueAsBytes(hive))
             )
             .andExpect(MockMvcResultMatchers.status().isCreated());
 

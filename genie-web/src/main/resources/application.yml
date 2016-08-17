@@ -117,6 +117,9 @@ spring:
         enabled: false
       zookeeper:
         namespace: /genie/leader/
+  jackson:
+    date-format: com.netflix.genie.common.util.GenieDateFormat
+    time-zone: UTC
   profiles:
     active: dev
   mail:

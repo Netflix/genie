@@ -19,6 +19,8 @@ package com.netflix.genie.core.jpa.entities;
 
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.exceptions.GenieException;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.Basic;
@@ -26,6 +28,7 @@ import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -37,6 +40,8 @@ import java.util.stream.Collectors;
  * @author tgianos
  * @since 2.0.0
  */
+@Getter
+@Setter
 @MappedSuperclass
 public class CommonFieldsEntity extends BaseEntity {
     /**
@@ -86,76 +91,12 @@ public class CommonFieldsEntity extends BaseEntity {
     }
 
     /**
-     * Gets the version of this entity.
-     *
-     * @return version
-     */
-    public String getVersion() {
-        return this.version;
-    }
-
-    /**
-     * Sets the version for this entity.
-     *
-     * @param version version number for this entity
-     */
-    public void setVersion(final String version) {
-        this.version = version;
-    }
-
-    /**
-     * Gets the user that created this entity.
-     *
-     * @return user
-     */
-    public String getUser() {
-        return this.user;
-    }
-
-    /**
-     * Sets the user who created this entity.
-     *
-     * @param user user who created this entity. Not null/empty/blank.
-     */
-    public void setUser(final String user) {
-        this.user = user;
-    }
-
-
-    /**
-     * Gets the name for this entity.
-     *
-     * @return name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Sets the name for this entity.
-     *
-     * @param name the new name of this entity. Not null/empty/blank
-     */
-    public void setName(final String name) {
-        this.name = name;
-    }
-
-    /**
      * Gets the description of this entity.
      *
      * @return description
      */
-    public String getDescription() {
-        return this.description;
-    }
-
-    /**
-     * Sets the description for this entity.
-     *
-     * @param description description for the entity. Not null/empty/blank
-     */
-    public void setDescription(final String description) {
-        this.description = description;
+    public Optional<String> getDescription() {
+        return Optional.ofNullable(this.description);
     }
 
     /**
@@ -184,7 +125,7 @@ public class CommonFieldsEntity extends BaseEntity {
                 .stream()
                 .sorted(String.CASE_INSENSITIVE_ORDER)
                 .reduce((one, two) -> one + TAG_DELIMITER + TAG_DELIMITER + two)
-                .get()
+                .orElse("")
                 + TAG_DELIMITER;
         }
     }

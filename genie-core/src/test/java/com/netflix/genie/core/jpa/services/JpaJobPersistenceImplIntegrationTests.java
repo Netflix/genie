@@ -22,7 +22,7 @@ import com.github.springtestdbunit.annotation.DatabaseTearDown;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.jpa.repositories.JpaJobExecutionRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
-import com.netflix.genie.core.jpa.repositories.JpaJobRequestMetadataRepository;
+import com.netflix.genie.core.jpa.repositories.JpaJobMetadataRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRequestRepository;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.test.categories.IntegrationTest;
@@ -52,7 +52,7 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
     @Autowired
     private JpaJobRequestRepository jobRequestRepository;
     @Autowired
-    private JpaJobRequestMetadataRepository jobRequestMetadataRepository;
+    private JpaJobMetadataRepository jobRequestMetadataRepository;
     @Autowired
     private JpaJobRepository jobRepository;
     @Autowired

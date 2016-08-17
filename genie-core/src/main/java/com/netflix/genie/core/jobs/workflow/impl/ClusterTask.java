@@ -18,6 +18,7 @@
 package com.netflix.genie.core.jobs.workflow.impl;
 
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.jobs.AdminResources;
 import com.netflix.genie.core.jobs.FileType;
 import com.netflix.genie.core.jobs.JobConstants;
@@ -32,6 +33,7 @@ import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -74,47 +76,54 @@ public class ClusterTask extends GenieBaseTask {
             final Writer writer = (Writer) context.get(JobConstants.WRITER_KEY);
             log.info("Starting Cluster Task for job {}", jobExecEnv.getJobRequest().getId());
 
+            final String clusterId = jobExecEnv
+                .getCluster()
+                .getId()
+                .orElseThrow(() -> new GeniePreconditionException("No cluster id found"));
+
             // Create the directory for this application under applications in the cwd
             createEntityInstanceDirectory(
                 genieDir,
-                jobExecEnv.getCluster().getId(),
+                clusterId,
                 AdminResources.CLUSTER
             );
 
             // Create the config directory for this id
             createEntityInstanceConfigDirectory(
                 genieDir,
-                jobExecEnv.getCluster().getId(),
+                clusterId,
                 AdminResources.CLUSTER
             );
 
             // Get the set up file for cluster and add it to source in launcher script
-            final String clusterSetupFile = jobExecEnv.getCluster().getSetupFile();
+            final Optional<String> setupFile = jobExecEnv.getCluster().getSetupFile();
+            if (setupFile.isPresent()) {
+                final String clusterSetupFile = setupFile.get();
+                if (StringUtils.isNotBlank(clusterSetupFile)) {
+                    final String localPath = super.buildLocalFilePath(
+                        jobWorkingDirectory,
+                        clusterId,
+                        clusterSetupFile,
+                        FileType.SETUP,
+                        AdminResources.CLUSTER
+                    );
 
-            if (clusterSetupFile != null && StringUtils.isNotBlank(clusterSetupFile)) {
-                final String localPath = super.buildLocalFilePath(
-                    jobWorkingDirectory,
-                    jobExecEnv.getCluster().getId(),
-                    clusterSetupFile,
-                    FileType.SETUP,
-                    AdminResources.CLUSTER
-                );
+                    fts.getFile(clusterSetupFile, localPath);
 
-                fts.getFile(clusterSetupFile, localPath);
-
-                super.generateSetupFileSourceSnippet(
-                    jobExecEnv.getCluster().getId(),
-                    "Cluster:",
-                    localPath,
-                    writer,
-                    jobWorkingDirectory);
+                    super.generateSetupFileSourceSnippet(
+                        clusterId,
+                        "Cluster:",
+                        localPath,
+                        writer,
+                        jobWorkingDirectory);
+                }
             }
 
             // Iterate over and get all configuration files
             for (final String configFile : jobExecEnv.getCluster().getConfigs()) {
                 final String localPath = super.buildLocalFilePath(
                     jobWorkingDirectory,
-                    jobExecEnv.getCluster().getId(),
+                    clusterId,
                     configFile,
                     FileType.CONFIG,
                     AdminResources.CLUSTER

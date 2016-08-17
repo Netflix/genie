@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.core.jpa.entities;
 
-import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.JobExecution;
 import lombok.Getter;
 import lombok.Setter;
@@ -37,6 +36,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Optional;
 import java.util.TimeZone;
 
 /**
@@ -45,10 +45,10 @@ import java.util.TimeZone;
  * @author tgianos
  * @since 3.0.0
  */
-@Entity
-@Table(name = "job_executions")
 @Getter
 @Setter
+@Entity
+@Table(name = "job_executions")
 public class JobExecutionEntity extends BaseEntity {
 
     private static final long serialVersionUID = -5073493356472801960L;
@@ -59,21 +59,21 @@ public class JobExecutionEntity extends BaseEntity {
     @Size(min = 1, max = 255, message = "Must have a host name no longer than 255 characters")
     private String hostName;
 
-    @Basic(optional = false)
-    @Column(name = "process_id", nullable = false)
-    private int processId = JobExecution.DEFAULT_PROCESS_ID;
+    @Basic
+    @Column(name = "process_id")
+    private Integer processId;
 
-    @Basic(optional = false)
-    @Column(name = "check_delay", nullable = false)
+    @Basic
+    @Column(name = "check_delay")
     @Min(1)
-    private long checkDelay = Command.DEFAULT_CHECK_DELAY;
+    private Long checkDelay;
 
-    @Basic(optional = false)
-    @Column(name = "exit_code", nullable = false)
-    private int exitCode = JobExecution.DEFAULT_EXIT_CODE;
+    @Basic
+    @Column(name = "exit_code")
+    private Integer exitCode;
 
-    @Basic(optional = false)
-    @Column(name = "timeout", nullable = false)
+    @Basic
+    @Column(name = "timeout")
     @Temporal(TemporalType.TIMESTAMP)
     private Date timeout;
 
@@ -92,39 +92,12 @@ public class JobExecutionEntity extends BaseEntity {
     }
 
     /**
-     * Get the host name this job is running on.
-     *
-     * @return The hostname
-     */
-    public String getHostName() {
-        return this.hostName;
-    }
-
-    /**
-     * Set the hostname this job is running on.
-     *
-     * @param hostName The hostname
-     */
-    public void setHostName(final String hostName) {
-        this.hostName = hostName;
-    }
-
-    /**
      * Get the process id of the job.
      *
      * @return the process id
      */
-    public int getProcessId() {
-        return this.processId;
-    }
-
-    /**
-     * Set the process id of the job.
-     *
-     * @param processId The process id
-     */
-    public void setProcessId(final int processId) {
-        this.processId = processId;
+    public Optional<Integer> getProcessId() {
+        return Optional.ofNullable(this.processId);
     }
 
     /**
@@ -132,17 +105,8 @@ public class JobExecutionEntity extends BaseEntity {
      *
      * @return The exit code or -1 if the job hasn't finished yet
      */
-    public int getExitCode() {
-        return this.exitCode;
-    }
-
-    /**
-     * Set the exit code from the process.
-     *
-     * @param exitCode The exit code from the process
-     */
-    public void setExitCode(final int exitCode) {
-        this.exitCode = exitCode;
+    public Optional<Integer> getExitCode() {
+        return Optional.ofNullable(this.exitCode);
     }
 
     /**
@@ -150,8 +114,8 @@ public class JobExecutionEntity extends BaseEntity {
      *
      * @return The timeout date
      */
-    public Date getTimeout() {
-        return new Date(this.timeout.getTime());
+    public Optional<Date> getTimeout() {
+        return this.timeout == null ? Optional.empty() : Optional.of(new Date(this.timeout.getTime()));
     }
 
     /**
@@ -161,15 +125,6 @@ public class JobExecutionEntity extends BaseEntity {
      */
     public void setTimeout(@NotNull final Date timeout) {
         this.timeout = new Date(timeout.getTime());
-    }
-
-    /**
-     * Get the job associated with this job execution.
-     *
-     * @return The job
-     */
-    public JobEntity getJob() {
-        return this.job;
     }
 
     /**
@@ -187,12 +142,10 @@ public class JobExecutionEntity extends BaseEntity {
      * @return The read-only DTO.
      */
     public JobExecution getDTO() {
-        return new JobExecution.Builder(
-            this.hostName,
-            this.processId,
-            this.checkDelay,
-            this.timeout
-        )
+        return new JobExecution.Builder(this.hostName)
+            .withProcessId(this.processId)
+            .withCheckDelay(this.checkDelay)
+            .withTimeout(this.timeout)
             .withExitCode(this.exitCode)
             .withId(this.getId())
             .withCreated(this.getCreated())

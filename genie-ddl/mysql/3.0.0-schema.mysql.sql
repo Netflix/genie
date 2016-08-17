@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.7.13, for osx10.11 (x86_64)
+-- MySQL dump 10.13  Distrib 5.7.14, for osx10.11 (x86_64)
 --
 -- Host: localhost    Database: genie
 -- ------------------------------------------------------
--- Server version	5.7.13
+-- Server version	5.7.14
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -206,10 +206,10 @@ CREATE TABLE `job_executions` (
   `updated` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
   `entity_version` int(11) NOT NULL DEFAULT '0',
   `host_name` varchar(255) NOT NULL,
-  `process_id` int(11) NOT NULL,
-  `exit_code` int(11) NOT NULL DEFAULT '-1',
-  `check_delay` bigint(20) NOT NULL DEFAULT '10000',
-  `timeout` datetime(3) NOT NULL,
+  `process_id` int(11) DEFAULT NULL,
+  `exit_code` int(11) DEFAULT NULL,
+  `check_delay` bigint(20) DEFAULT NULL,
+  `timeout` datetime(3) DEFAULT NULL,
   KEY `id` (`id`),
   KEY `JOB_EXECUTIONS_HOSTNAME_INDEX` (`host_name`),
   KEY `JOB_EXECUTIONS_EXIT_CODE_INDEX` (`exit_code`),
@@ -218,23 +218,25 @@ CREATE TABLE `job_executions` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `job_request_metadata`
+-- Table structure for table `job_metadata`
 --
 
-DROP TABLE IF EXISTS `job_request_metadata`;
+DROP TABLE IF EXISTS `job_metadata`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `job_request_metadata` (
+CREATE TABLE `job_metadata` (
   `id` varchar(255) NOT NULL,
   `created` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `updated` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
   `entity_version` int(11) NOT NULL DEFAULT '0',
   `client_host` varchar(255) DEFAULT NULL,
   `user_agent` varchar(2048) DEFAULT NULL,
-  `num_attachments` int(11) NOT NULL DEFAULT '0',
-  `total_size_of_attachments` bigint(20) NOT NULL DEFAULT '0',
+  `num_attachments` int(11) DEFAULT NULL,
+  `total_size_of_attachments` bigint(20) DEFAULT NULL,
+  `std_out_size` bigint(20) DEFAULT NULL,
+  `std_err_size` bigint(20) DEFAULT NULL,
   KEY `id` (`id`),
-  CONSTRAINT `job_request_metadata_ibfk_1` FOREIGN KEY (`id`) REFERENCES `job_requests` (`id`) ON DELETE CASCADE
+  CONSTRAINT `job_metadata_ibfk_1` FOREIGN KEY (`id`) REFERENCES `job_requests` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -263,10 +265,10 @@ CREATE TABLE `job_requests` (
   `disable_log_archival` bit(1) NOT NULL DEFAULT b'0',
   `email` varchar(255) DEFAULT NULL,
   `tags` varchar(2048) DEFAULT NULL,
-  `cpu` int(11) NOT NULL DEFAULT '1',
-  `memory` int(11) NOT NULL DEFAULT '1560',
+  `cpu` int(11) DEFAULT NULL,
+  `memory` int(11) DEFAULT NULL,
   `applications` varchar(2048) NOT NULL DEFAULT '[]',
-  `timeout` int(11) NOT NULL DEFAULT '604800',
+  `timeout` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `JOB_REQUESTS_CREATED_INDEX` (`created`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -343,4 +345,4 @@ CREATE TABLE `jobs_applications` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-07-20 23:03:40
+-- Dump completed on 2016-08-17 10:26:47

@@ -19,12 +19,13 @@ package com.netflix.genie.core.services;
 
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
+import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
-import com.netflix.genie.common.dto.JobRequestMetadata;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import org.hibernate.validator.constraints.NotBlank;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
@@ -83,14 +84,14 @@ public interface JobPersistenceService {
     /**
      * Save the jobRequest object in the data store.
      *
-     * @param jobRequest         the Job request object to save. Not null
-     * @param jobRequestMetadata metadata about the job request. Not null
+     * @param jobRequest  the Job request object to save. Not null
+     * @param jobMetadata metadata about the job request. Not null
      * @return The job request object that was created
      * @throws GenieException if there is an error
      */
     JobRequest createJobRequest(
         @NotNull final JobRequest jobRequest,
-        @NotNull final JobRequestMetadata jobRequestMetadata
+        @NotNull final JobMetadata jobMetadata
     ) throws GenieException;
 
     /**
@@ -116,13 +117,17 @@ public interface JobPersistenceService {
      * @param exitCode      The exit code of the process
      * @param status        The final job status for the job
      * @param statusMessage The final job status message
+     * @param stdOutSize    The size (in bytes) of the standard out file or null if there isn't one
+     * @param stdErrSize    The size (in bytes) of the standard error file or null if there isn't one
      * @throws GenieException if there is an error
      */
     void setJobCompletionInformation(
         @NotBlank final String id,
         final int exitCode,
         @NotNull final JobStatus status,
-        @NotBlank final String statusMessage
+        @NotBlank final String statusMessage,
+        @Nullable final Long stdOutSize,
+        @Nullable final Long stdErrSize
     ) throws GenieException;
 
     /**

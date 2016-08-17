@@ -20,8 +20,8 @@ package com.netflix.genie.web.controllers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.google.common.io.ByteStreams;
+import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
-import com.netflix.genie.common.dto.JobRequestMetadata;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
@@ -94,6 +94,7 @@ import java.util.EnumSet;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -154,21 +155,21 @@ public class JobRestController {
      */
     @Autowired
     public JobRestController(
-            final JobCoordinatorService jobCoordinatorService,
-            final JobSearchService jobSearchService,
-            final AttachmentService attachmentService,
-            final ApplicationResourceAssembler applicationResourceAssembler,
-            final ClusterResourceAssembler clusterResourceAssembler,
-            final CommandResourceAssembler commandResourceAssembler,
-            final JobResourceAssembler jobResourceAssembler,
-            final JobRequestResourceAssembler jobRequestResourceAssembler,
-            final JobExecutionResourceAssembler jobExecutionResourceAssembler,
-            final JobSearchResultResourceAssembler jobSearchResultResourceAssembler,
-            final String hostName,
-            @Qualifier("genieRestTemplate") final RestTemplate restTemplate,
-            final GenieResourceHttpRequestHandler resourceHttpRequestHandler,
-            final JobForwardingProperties jobForwardingProperties,
-            final Registry registry
+        final JobCoordinatorService jobCoordinatorService,
+        final JobSearchService jobSearchService,
+        final AttachmentService attachmentService,
+        final ApplicationResourceAssembler applicationResourceAssembler,
+        final ClusterResourceAssembler clusterResourceAssembler,
+        final CommandResourceAssembler commandResourceAssembler,
+        final JobResourceAssembler jobResourceAssembler,
+        final JobRequestResourceAssembler jobRequestResourceAssembler,
+        final JobExecutionResourceAssembler jobExecutionResourceAssembler,
+        final JobSearchResultResourceAssembler jobSearchResultResourceAssembler,
+        final String hostName,
+        @Qualifier("genieRestTemplate") final RestTemplate restTemplate,
+        final GenieResourceHttpRequestHandler resourceHttpRequestHandler,
+        final JobForwardingProperties jobForwardingProperties,
+        final Registry registry
     ) {
         this.jobCoordinatorService = jobCoordinatorService;
         this.jobSearchService = jobSearchService;
@@ -203,13 +204,13 @@ public class JobRestController {
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity<Void> submitJob(
-            @RequestBody
-            final JobRequest jobRequest,
-            @RequestHeader(value = FORWARDED_FOR_HEADER, required = false)
-            final String clientHost,
-            @RequestHeader(value = HttpHeaders.USER_AGENT, required = false)
-            final String userAgent,
-            final HttpServletRequest httpServletRequest
+        @RequestBody
+        final JobRequest jobRequest,
+        @RequestHeader(value = FORWARDED_FOR_HEADER, required = false)
+        final String clientHost,
+        @RequestHeader(value = HttpHeaders.USER_AGENT, required = false)
+        final String userAgent,
+        final HttpServletRequest httpServletRequest
     ) throws GenieException {
         log.info("[submitJob] Called json method type to submit job: {}", jobRequest);
         this.submitJobWithoutAttachmentsRate.increment();
@@ -230,15 +231,15 @@ public class JobRestController {
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity<Void> submitJob(
-            @RequestPart("request")
-            final JobRequest jobRequest,
-            @RequestPart("attachment")
-            final MultipartFile[] attachments,
-            @RequestHeader(value = FORWARDED_FOR_HEADER, required = false)
-            final String clientHost,
-            @RequestHeader(value = HttpHeaders.USER_AGENT, required = false)
-            final String userAgent,
-            final HttpServletRequest httpServletRequest
+        @RequestPart("request")
+        final JobRequest jobRequest,
+        @RequestPart("attachment")
+        final MultipartFile[] attachments,
+        @RequestHeader(value = FORWARDED_FOR_HEADER, required = false)
+        final String clientHost,
+        @RequestHeader(value = HttpHeaders.USER_AGENT, required = false)
+        final String userAgent,
+        final HttpServletRequest httpServletRequest
     ) throws GenieException {
         log.info("[submitJob] Called multipart method to submit job: {}", jobRequest);
         this.submitJobWithAttachmentsRate.increment();
@@ -246,11 +247,11 @@ public class JobRestController {
     }
 
     private ResponseEntity<Void> handleSubmitJob(
-            final JobRequest jobRequest,
-            final MultipartFile[] attachments,
-            final String clientHost,
-            final String userAgent,
-            final HttpServletRequest httpServletRequest
+        final JobRequest jobRequest,
+        final MultipartFile[] attachments,
+        final String clientHost,
+        final String userAgent,
+        final HttpServletRequest httpServletRequest
     ) throws GenieException {
         if (jobRequest == null) {
             throw new GeniePreconditionException("No job request entered. Unable to submit.");
@@ -267,30 +268,34 @@ public class JobRestController {
         final JobRequest jobRequestWithId;
         // If the job request does not contain an id create one else use the one provided.
         final String jobId;
-        if (StringUtils.isNotBlank(jobRequest.getId())) {
-            jobId = jobRequest.getId();
+        final Optional<String> jobIdOptional = jobRequest.getId();
+        if (jobIdOptional.isPresent() && StringUtils.isNotBlank(jobIdOptional.get())) {
+            jobId = jobIdOptional.get();
             jobRequestWithId = jobRequest;
         } else {
             jobId = UUID.randomUUID().toString();
-            jobRequestWithId = new JobRequest.Builder(
-                    jobRequest.getName(),
-                    jobRequest.getUser(),
-                    jobRequest.getVersion(),
-                    jobRequest.getCommandArgs(),
-                    jobRequest.getClusterCriterias(),
-                    jobRequest.getCommandCriteria()
-            ).withId(jobId)
-                    .withCpu(jobRequest.getCpu())
-                    .withMemory(jobRequest.getMemory())
-                    .withDisableLogArchival(jobRequest.isDisableLogArchival())
-                    .withGroup(jobRequest.getGroup())
-                    .withSetupFile(jobRequest.getSetupFile())
-                    .withDescription(jobRequest.getDescription())
-                    .withTags(jobRequest.getTags())
-                    .withEmail(jobRequest.getEmail())
-                    .withDependencies(jobRequest.getDependencies())
-                    .withTimeout(jobRequest.getTimeout())
-                    .build();
+            final JobRequest.Builder builder = new JobRequest.Builder(
+                jobRequest.getName(),
+                jobRequest.getUser(),
+                jobRequest.getVersion(),
+                jobRequest.getCommandArgs(),
+                jobRequest.getClusterCriterias(),
+                jobRequest.getCommandCriteria()
+            )
+                .withId(jobId)
+                .withDisableLogArchival(jobRequest.isDisableLogArchival())
+                .withTags(jobRequest.getTags())
+                .withDependencies(jobRequest.getDependencies());
+
+            jobRequest.getCpu().ifPresent(builder::withCpu);
+            jobRequest.getMemory().ifPresent(builder::withMemory);
+            jobRequest.getGroup().ifPresent(builder::withGroup);
+            jobRequest.getSetupFile().ifPresent(builder::withSetupFile);
+            jobRequest.getDescription().ifPresent(builder::withDescription);
+            jobRequest.getEmail().ifPresent(builder::withEmail);
+            jobRequest.getTimeout().ifPresent(builder::withTimeout);
+
+            jobRequestWithId = builder.build();
         }
 
         // Download attachments
@@ -310,23 +315,23 @@ public class JobRestController {
             }
         }
 
-        final JobRequestMetadata metadata = new JobRequestMetadata
-                .Builder()
-                .withClientHost(localClientHost)
-                .withUserAgent(userAgent)
-                .withNumAttachments(numAttachments)
-                .withTotalSizeOfAttachments(totalSizeOfAttachments)
-                .build();
+        final JobMetadata metadata = new JobMetadata
+            .Builder()
+            .withClientHost(localClientHost)
+            .withUserAgent(userAgent)
+            .withNumAttachments(numAttachments)
+            .withTotalSizeOfAttachments(totalSizeOfAttachments)
+            .build();
 
         this.jobCoordinatorService.coordinateJob(jobRequestWithId, metadata);
 
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
-                ServletUriComponentsBuilder
-                        .fromCurrentRequest()
-                        .path("/{id}")
-                        .buildAndExpand(jobId)
-                        .toUri()
+            ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(jobId)
+                .toUri()
         );
 
         return new ResponseEntity<>(httpHeaders, HttpStatus.ACCEPTED);
@@ -341,8 +346,8 @@ public class JobRestController {
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     public JobResource getJob(
-            @PathVariable("id")
-            final String id) throws GenieException {
+        @PathVariable("id")
+        final String id) throws GenieException {
         log.info("[getJob] Called for job with id: {}", id);
         return this.jobResourceAssembler.toResource(this.jobSearchService.getJob(id));
     }
@@ -356,13 +361,13 @@ public class JobRestController {
      */
     @RequestMapping(value = "/{id}/status", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public JsonNode getJobStatus(
-            @PathVariable("id")
-            final String id) throws GenieException {
+        @PathVariable("id")
+        final String id) throws GenieException {
         log.debug("[getJobStatus] Called for job with id: {}", id);
         final JsonNodeFactory factory = JsonNodeFactory.instance;
         return factory
-                .objectNode()
-                .set("status", factory.textNode(this.jobSearchService.getJobStatus(id).toString()));
+            .objectNode()
+            .set("status", factory.textNode(this.jobSearchService.getJobStatus(id).toString()));
     }
 
     /**
@@ -389,57 +394,57 @@ public class JobRestController {
     @RequestMapping(method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public PagedResources<JobSearchResultResource> findJobs(
-            @RequestParam(value = "id", required = false)
-            final String id,
-            @RequestParam(value = "name", required = false)
-            final String name,
-            @RequestParam(value = "user", required = false)
-            final String user,
-            @RequestParam(value = "status", required = false)
-            final Set<String> statuses,
-            @RequestParam(value = "tag", required = false)
-            final Set<String> tags,
-            @RequestParam(value = "clusterName", required = false)
-            final String clusterName,
-            @RequestParam(value = "clusterId", required = false)
-            final String clusterId,
-            @RequestParam(value = "commandName", required = false)
-            final String commandName,
-            @RequestParam(value = "commandId", required = false)
-            final String commandId,
-            @RequestParam(value = "minStarted", required = false)
-            final Long minStarted,
-            @RequestParam(value = "maxStarted", required = false)
-            final Long maxStarted,
-            @RequestParam(value = "minFinished", required = false)
-            final Long minFinished,
-            @RequestParam(value = "maxFinished", required = false)
-            final Long maxFinished,
-            @PageableDefault(sort = { "created" }, direction = Sort.Direction.DESC)
-            final Pageable page,
-            final PagedResourcesAssembler<JobSearchResult> assembler
+        @RequestParam(value = "id", required = false)
+        final String id,
+        @RequestParam(value = "name", required = false)
+        final String name,
+        @RequestParam(value = "user", required = false)
+        final String user,
+        @RequestParam(value = "status", required = false)
+        final Set<String> statuses,
+        @RequestParam(value = "tag", required = false)
+        final Set<String> tags,
+        @RequestParam(value = "clusterName", required = false)
+        final String clusterName,
+        @RequestParam(value = "clusterId", required = false)
+        final String clusterId,
+        @RequestParam(value = "commandName", required = false)
+        final String commandName,
+        @RequestParam(value = "commandId", required = false)
+        final String commandId,
+        @RequestParam(value = "minStarted", required = false)
+        final Long minStarted,
+        @RequestParam(value = "maxStarted", required = false)
+        final Long maxStarted,
+        @RequestParam(value = "minFinished", required = false)
+        final Long minFinished,
+        @RequestParam(value = "maxFinished", required = false)
+        final Long maxFinished,
+        @PageableDefault(sort = {"created"}, direction = Sort.Direction.DESC)
+        final Pageable page,
+        final PagedResourcesAssembler<JobSearchResult> assembler
     ) throws GenieException {
         log.info(
-                "[getJobs] Called with "
-                        + "[id | jobName | user | statuses | clusterName "
-                        + "| clusterId | minStarted | maxStarted | minFinished | maxFinished | page]"
+            "[getJobs] Called with "
+                + "[id | jobName | user | statuses | clusterName "
+                + "| clusterId | minStarted | maxStarted | minFinished | maxFinished | page]"
         );
         log.info(
-                "{} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {}",
-                id,
-                name,
-                user,
-                statuses,
-                tags,
-                clusterName,
-                clusterId,
-                commandName,
-                commandId,
-                minStarted,
-                maxStarted,
-                minFinished,
-                maxFinished,
-                page
+            "{} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {}",
+            id,
+            name,
+            user,
+            statuses,
+            tags,
+            clusterName,
+            clusterId,
+            commandName,
+            commandId,
+            minStarted,
+            maxStarted,
+            minFinished,
+            maxFinished,
+            page
         );
 
         Set<JobStatus> enumStatuses = null;
@@ -454,47 +459,47 @@ public class JobRestController {
 
         // Build the self link which will be used for the next, previous, etc links
         final Link self = ControllerLinkBuilder
-                .linkTo(
-                        ControllerLinkBuilder
-                                .methodOn(JobRestController.class)
-                                .findJobs(
-                                        id,
-                                        name,
-                                        user,
-                                        statuses,
-                                        tags,
-                                        clusterName,
-                                        clusterId,
-                                        commandName,
-                                        commandId,
-                                        minStarted,
-                                        maxStarted,
-                                        minFinished,
-                                        maxFinished,
-                                        page,
-                                        assembler
-                                )
-                ).withSelfRel();
-
-        return assembler.toResource(
-                this.jobSearchService.findJobs(
+            .linkTo(
+                ControllerLinkBuilder
+                    .methodOn(JobRestController.class)
+                    .findJobs(
                         id,
                         name,
                         user,
-                        enumStatuses,
+                        statuses,
                         tags,
                         clusterName,
                         clusterId,
                         commandName,
                         commandId,
-                        minStarted == null ? null : new Date(minStarted),
-                        maxStarted == null ? null : new Date(maxStarted),
-                        minFinished == null ? null : new Date(minFinished),
-                        maxFinished == null ? null : new Date(maxFinished),
-                        page
-                ),
-                this.jobSearchResultResourceAssembler,
-                self
+                        minStarted,
+                        maxStarted,
+                        minFinished,
+                        maxFinished,
+                        page,
+                        assembler
+                    )
+            ).withSelfRel();
+
+        return assembler.toResource(
+            this.jobSearchService.findJobs(
+                id,
+                name,
+                user,
+                enumStatuses,
+                tags,
+                clusterName,
+                clusterId,
+                commandName,
+                commandId,
+                minStarted == null ? null : new Date(minStarted),
+                maxStarted == null ? null : new Date(maxStarted),
+                minFinished == null ? null : new Date(minFinished),
+                maxFinished == null ? null : new Date(maxFinished),
+                page
+            ),
+            this.jobSearchResultResourceAssembler,
+            self
         );
     }
 
@@ -512,12 +517,12 @@ public class JobRestController {
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void killJob(
-            @PathVariable("id")
-            final String id,
-            @RequestHeader(name = JobConstants.GENIE_FORWARDED_FROM_HEADER, required = false)
-            final String forwardedFrom,
-            final HttpServletRequest request,
-            final HttpServletResponse response
+        @PathVariable("id")
+        final String id,
+        @RequestHeader(name = JobConstants.GENIE_FORWARDED_FROM_HEADER, required = false)
+        final String forwardedFrom,
+        final HttpServletRequest request,
+        final HttpServletResponse response
     ) throws GenieException, IOException, ServletException {
         log.info("[killJob] Called for job id: {}. Forwarded from: {}", id, forwardedFrom);
 
@@ -530,15 +535,15 @@ public class JobRestController {
                 try {
                     //Need to forward job
                     restTemplate.execute(forwardUrl, HttpMethod.DELETE,
-                            forwardRequest -> copyRequestHeaders(request, forwardRequest),
-                            new ResponseExtractor<Void>() {
-                                @Override
-                                public Void extractData(final ClientHttpResponse forwardResponse) throws IOException {
-                                    response.setStatus(HttpStatus.ACCEPTED.value());
-                                    copyResponseHeaders(response, forwardResponse);
-                                    return null;
-                                }
-                            });
+                        forwardRequest -> copyRequestHeaders(request, forwardRequest),
+                        new ResponseExtractor<Void>() {
+                            @Override
+                            public Void extractData(final ClientHttpResponse forwardResponse) throws IOException {
+                                response.setStatus(HttpStatus.ACCEPTED.value());
+                                copyResponseHeaders(response, forwardResponse);
+                                return null;
+                            }
+                        });
                 } catch (HttpStatusCodeException e) {
                     log.error("Failed killing job on {}. Error: {}", forwardUrl, e.getMessage());
                     response.sendError(e.getStatusCode().value(), e.getStatusText());
@@ -568,8 +573,8 @@ public class JobRestController {
     @RequestMapping(value = "/{id}/request", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public JobRequestResource getJobRequest(
-            @PathVariable("id")
-            final String id) throws GenieException {
+        @PathVariable("id")
+        final String id) throws GenieException {
         log.info("[getJobRequest] Called for job request with id {}", id);
         return this.jobRequestResourceAssembler.toResource(this.jobSearchService.getJobRequest(id));
     }
@@ -584,8 +589,9 @@ public class JobRestController {
     @RequestMapping(value = "/{id}/execution", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public JobExecutionResource getJobExecution(
-            @PathVariable("id")
-            final String id) throws GenieException {
+        @PathVariable("id")
+        final String id
+    ) throws GenieException {
         log.info("[getJobExecution] Called for job execution with id {}", id);
         return this.jobExecutionResourceAssembler.toResource(this.jobSearchService.getJobExecution(id));
     }
@@ -600,8 +606,9 @@ public class JobRestController {
     @RequestMapping(value = "/{id}/cluster", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public ClusterResource getJobCluster(
-            @PathVariable("id")
-            final String id) throws GenieException {
+        @PathVariable("id")
+        final String id
+    ) throws GenieException {
         log.info("[getJobCluster] Called for job with id {}", id);
         return this.clusterResourceAssembler.toResource(this.jobSearchService.getJobCluster(id));
     }
@@ -616,8 +623,8 @@ public class JobRestController {
     @RequestMapping(value = "/{id}/command", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public CommandResource getJobCommand(
-            @PathVariable("id")
-            final String id) throws GenieException {
+        @PathVariable("id")
+        final String id) throws GenieException {
         log.info("[getJobCommand] Called for job with id {}", id);
         return this.commandResourceAssembler.toResource(this.jobSearchService.getJobCommand(id));
     }
@@ -632,15 +639,15 @@ public class JobRestController {
     @RequestMapping(value = "/{id}/applications", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public List<ApplicationResource> getJobApplications(
-            @PathVariable("id")
-            final String id) throws GenieException {
+        @PathVariable("id")
+        final String id) throws GenieException {
         log.info("[getJobApplications] Called for job with id {}", id);
 
         return this.jobSearchService
-                .getJobApplications(id)
-                .stream()
-                .map(this.applicationResourceAssembler::toResource)
-                .collect(Collectors.toList());
+            .getJobApplications(id)
+            .stream()
+            .map(this.applicationResourceAssembler::toResource)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -655,21 +662,21 @@ public class JobRestController {
      * @throws GenieException   on any Genie internal error
      */
     @RequestMapping(
-            value = {
-                    "/{id}/output",
-                    "/{id}/output/",
-                    "/{id}/output/**"
-            },
-            method = RequestMethod.GET,
-            produces = MediaType.ALL_VALUE
+        value = {
+            "/{id}/output",
+            "/{id}/output/",
+            "/{id}/output/**"
+        },
+        method = RequestMethod.GET,
+        produces = MediaType.ALL_VALUE
     )
     public void getJobOutput(
-            @PathVariable("id")
-            final String id,
-            @RequestHeader(name = JobConstants.GENIE_FORWARDED_FROM_HEADER, required = false)
-            final String forwardedFrom,
-            final HttpServletRequest request,
-            final HttpServletResponse response
+        @PathVariable("id")
+        final String id,
+        @RequestHeader(name = JobConstants.GENIE_FORWARDED_FROM_HEADER, required = false)
+        final String forwardedFrom,
+        final HttpServletRequest request,
+        final HttpServletResponse response
     ) throws IOException, ServletException, GenieException {
         log.info("[getJobOutput] Called for job with id: {}", id);
 
@@ -684,18 +691,18 @@ public class JobRestController {
                 final String forwardUrl = buildForwardURL(request, jobHostname);
                 try {
                     restTemplate.execute(forwardUrl, HttpMethod.GET,
-                            forwardRequest -> copyRequestHeaders(request, forwardRequest),
-                            new ResponseExtractor<Void>() {
-                                @Override
-                                public Void extractData(final ClientHttpResponse forwardResponse) throws IOException {
-                                    response.setStatus(HttpStatus.OK.value());
-                                    copyResponseHeaders(response, forwardResponse);
-                                    // Documentation I could find pointed to the HttpEntity reading the bytes off
-                                    // the stream so this should resolve memory problems if the file returned is large
-                                    ByteStreams.copy(forwardResponse.getBody(), response.getOutputStream());
-                                    return null;
-                                }
-                            });
+                        forwardRequest -> copyRequestHeaders(request, forwardRequest),
+                        new ResponseExtractor<Void>() {
+                            @Override
+                            public Void extractData(final ClientHttpResponse forwardResponse) throws IOException {
+                                response.setStatus(HttpStatus.OK.value());
+                                copyResponseHeaders(response, forwardResponse);
+                                // Documentation I could find pointed to the HttpEntity reading the bytes off
+                                // the stream so this should resolve memory problems if the file returned is large
+                                ByteStreams.copy(forwardResponse.getBody(), response.getOutputStream());
+                                return null;
+                            }
+                        });
                 } catch (HttpStatusCodeException e) {
                     log.error("Failed getting the remote job output from {}. Error: {}", forwardUrl, e.getMessage());
                     response.sendError(e.getStatusCode().value(), e.getStatusText());
@@ -724,11 +731,11 @@ public class JobRestController {
 
     private String buildForwardURL(final HttpServletRequest request, final String jobHostname) {
         return this.jobForwardingProperties.getScheme()
-                + "://"
-                + jobHostname
-                + ":"
-                + this.jobForwardingProperties.getPort()
-                + request.getRequestURI();
+            + "://"
+            + jobHostname
+            + ":"
+            + this.jobForwardingProperties.getPort()
+            + request.getRequestURI();
     }
 
     private void copyRequestHeaders(final HttpServletRequest request, final ClientHttpRequest forwardRequest) {

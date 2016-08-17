@@ -162,7 +162,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             MockMvcRequestBuilders
                 .post(COMMANDS_API)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(OBJECT_MAPPER.writeValueAsBytes(cluster))
+                .content(objectMapper.writeValueAsBytes(cluster))
         ).andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
         Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
     }
@@ -263,7 +263,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
         Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
         createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
         final String commandResource = COMMANDS_API + "/" + ID;
-        final Command createdCommand = OBJECT_MAPPER
+        final Command createdCommand = objectMapper
             .readValue(
                 this.mvc.perform(
                     MockMvcRequestBuilders.get(commandResource)
@@ -275,7 +275,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             ).getContent();
         Assert.assertThat(createdCommand.getStatus(), Matchers.is(CommandStatus.ACTIVE));
 
-        final Command updateCommand = new Command.Builder(
+        final Command.Builder updateCommand = new Command.Builder(
             createdCommand.getName(),
             createdCommand.getUser(),
             createdCommand.getVersion(),
@@ -283,20 +283,20 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             createdCommand.getExecutable(),
             createdCommand.getCheckDelay()
         )
-            .withId(createdCommand.getId())
-            .withCreated(createdCommand.getCreated())
-            .withUpdated(createdCommand.getUpdated())
-            .withDescription(createdCommand.getDescription())
+            .withId(createdCommand.getId().orElseThrow(IllegalArgumentException::new))
+            .withCreated(createdCommand.getCreated().orElseThrow(IllegalArgumentException::new))
+            .withUpdated(createdCommand.getUpdated().orElseThrow(IllegalArgumentException::new))
             .withTags(createdCommand.getTags())
-            .withConfigs(createdCommand.getConfigs())
-            .withSetupFile(createdCommand.getSetupFile())
-            .build();
+            .withConfigs(createdCommand.getConfigs());
+
+        createdCommand.getDescription().ifPresent(updateCommand::withDescription);
+        createdCommand.getSetupFile().ifPresent(updateCommand::withSetupFile);
 
         this.mvc.perform(
             MockMvcRequestBuilders
                 .put(commandResource)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(OBJECT_MAPPER.writeValueAsBytes(updateCommand))
+                .content(objectMapper.writeValueAsBytes(updateCommand.build()))
         ).andExpect(MockMvcResultMatchers.status().isNoContent());
 
         this.mvc
@@ -327,13 +327,13 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
 
         final String newName = UUID.randomUUID().toString();
         final String patchString = "[{ \"op\": \"replace\", \"path\": \"/name\", \"value\": \"" + newName + "\" }]";
-        final JsonPatch patch = JsonPatch.fromJson(OBJECT_MAPPER.readTree(patchString));
+        final JsonPatch patch = JsonPatch.fromJson(objectMapper.readTree(patchString));
 
         this.mvc.perform(
             MockMvcRequestBuilders
                 .patch(commandResource)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(OBJECT_MAPPER.writeValueAsBytes(patch))
+                .content(objectMapper.writeValueAsBytes(patch))
         ).andExpect(MockMvcResultMatchers.status().isNoContent());
 
         this.mvc
@@ -518,7 +518,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                 MockMvcRequestBuilders
                     .post(commandApplicationsAPI)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(Lists.newArrayList(applicationId1, applicationId2)))
+                    .content(objectMapper.writeValueAsBytes(Lists.newArrayList(applicationId1, applicationId2)))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
@@ -536,7 +536,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                 MockMvcRequestBuilders
                     .post(commandApplicationsAPI)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(Lists.newArrayList()))
+                    .content(objectMapper.writeValueAsBytes(Lists.newArrayList()))
             )
             .andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
 
@@ -547,7 +547,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                 MockMvcRequestBuilders
                     .post(commandApplicationsAPI)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(Lists.newArrayList(applicationId3)))
+                    .content(objectMapper.writeValueAsBytes(Lists.newArrayList(applicationId3)))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
@@ -589,7 +589,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                 MockMvcRequestBuilders
                     .put(commandApplicationsAPI)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(Lists.newArrayList(applicationId1, applicationId2)))
+                    .content(objectMapper.writeValueAsBytes(Lists.newArrayList(applicationId1, applicationId2)))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
@@ -607,7 +607,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                 MockMvcRequestBuilders
                     .put(commandApplicationsAPI)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(Lists.newArrayList(applicationId2, applicationId1)))
+                    .content(objectMapper.writeValueAsBytes(Lists.newArrayList(applicationId2, applicationId1)))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
@@ -626,7 +626,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                     .put(commandApplicationsAPI)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
-                        OBJECT_MAPPER.writeValueAsBytes(
+                        objectMapper.writeValueAsBytes(
                             Lists.newArrayList(applicationId1, applicationId2, applicationId3))
                     )
             )
@@ -647,7 +647,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                 MockMvcRequestBuilders
                     .put(commandApplicationsAPI)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(Lists.newArrayList()))
+                    .content(objectMapper.writeValueAsBytes(Lists.newArrayList()))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
@@ -679,7 +679,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                 MockMvcRequestBuilders
                     .post(commandApplicationsAPI)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(Lists.newArrayList(applicationId1, applicationId2)))
+                    .content(objectMapper.writeValueAsBytes(Lists.newArrayList(applicationId1, applicationId2)))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
@@ -718,7 +718,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                     .post(commandApplicationsAPI)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
-                        OBJECT_MAPPER.writeValueAsBytes(
+                        objectMapper.writeValueAsBytes(
                             Lists.newArrayList(applicationId1, applicationId2, applicationId3)
                         )
                     )
@@ -781,7 +781,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                 MockMvcRequestBuilders
                     .post(CLUSTERS_API + "/" + cluster1Id + "/commands")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(commandIds))
+                    .content(objectMapper.writeValueAsBytes(commandIds))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
         this.mvc
@@ -789,12 +789,12 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                 MockMvcRequestBuilders
                     .post(CLUSTERS_API + "/" + cluster3Id + "/commands")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(commandIds))
+                    .content(objectMapper.writeValueAsBytes(commandIds))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
-        Arrays.asList(
-            OBJECT_MAPPER.readValue(
+        Arrays.stream(
+            objectMapper.readValue(
                 this.mvc
                     .perform(MockMvcRequestBuilders.get(COMMANDS_API + "/" + ID + "/clusters"))
                     .andExpect(MockMvcResultMatchers.status().isOk())
@@ -804,11 +804,11 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                     .getResponse()
                     .getContentAsByteArray(), ClusterResource[].class
             )
-        ).stream()
+        )
             .map(ClusterResource::getContent)
             .forEach(
                 cluster -> {
-                    final String id = cluster.getId();
+                    final String id = cluster.getId().orElseThrow(IllegalArgumentException::new);
                     if (!id.equals(cluster1Id) && !id.equals(cluster3Id)) {
                         Assert.fail();
                     }

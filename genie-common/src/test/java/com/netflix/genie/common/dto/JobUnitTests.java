@@ -53,26 +53,28 @@ public class JobUnitTests {
         Assert.assertThat(job.getUser(), Matchers.is(USER));
         Assert.assertThat(job.getVersion(), Matchers.is(VERSION));
         Assert.assertThat(job.getCommandArgs(), Matchers.is(COMMAND_ARGS));
-        Assert.assertThat(job.getArchiveLocation(), Matchers.nullValue());
-        Assert.assertThat(job.getClusterName(), Matchers.nullValue());
-        Assert.assertThat(job.getCommandName(), Matchers.nullValue());
-        Assert.assertThat(job.getFinished(), Matchers.nullValue());
-        Assert.assertThat(job.getStarted(), Matchers.nullValue());
+        Assert.assertFalse(job.getArchiveLocation().isPresent());
+        Assert.assertFalse(job.getClusterName().isPresent());
+        Assert.assertFalse(job.getCommandName().isPresent());
+        Assert.assertFalse(job.getFinished().isPresent());
+        Assert.assertFalse(job.getStarted().isPresent());
         Assert.assertThat(job.getStatus(), Matchers.is(JobStatus.INIT));
-        Assert.assertThat(job.getStatusMsg(), Matchers.nullValue());
-        Assert.assertThat(job.getCreated(), Matchers.nullValue());
-        Assert.assertThat(job.getDescription(), Matchers.nullValue());
-        Assert.assertThat(job.getId(), Matchers.nullValue());
+        Assert.assertFalse(job.getStatusMsg().isPresent());
+        Assert.assertFalse(job.getCreated().isPresent());
+        Assert.assertFalse(job.getDescription().isPresent());
+        Assert.assertFalse(job.getId().isPresent());
         Assert.assertThat(job.getTags(), Matchers.empty());
-        Assert.assertThat(job.getUpdated(), Matchers.nullValue());
+        Assert.assertFalse(job.getUpdated().isPresent());
         Assert.assertThat(job.getRuntime(), Matchers.is(Duration.ZERO));
     }
 
     /**
      * Test to make sure can build a valid Job with optional parameters.
+     *
+     * @throws Exception on error
      */
     @Test
-    public void canBuildJobWithOptionals() {
+    public void canBuildJobWithOptionals() throws Exception {
         final Job.Builder builder = new Job.Builder(NAME, USER, VERSION, COMMAND_ARGS);
 
         final String archiveLocation = UUID.randomUUID().toString();
@@ -119,18 +121,20 @@ public class JobUnitTests {
         Assert.assertThat(job.getUser(), Matchers.is(USER));
         Assert.assertThat(job.getVersion(), Matchers.is(VERSION));
         Assert.assertThat(job.getCommandArgs(), Matchers.is(COMMAND_ARGS));
-        Assert.assertThat(job.getArchiveLocation(), Matchers.is(archiveLocation));
-        Assert.assertThat(job.getClusterName(), Matchers.is(clusterName));
-        Assert.assertThat(job.getCommandName(), Matchers.is(commandName));
-        Assert.assertThat(job.getFinished(), Matchers.is(finished));
-        Assert.assertThat(job.getStarted(), Matchers.is(started));
+        Assert.assertThat(
+            job.getArchiveLocation().orElseThrow(IllegalArgumentException::new), Matchers.is(archiveLocation)
+        );
+        Assert.assertThat(job.getClusterName().orElseThrow(IllegalArgumentException::new), Matchers.is(clusterName));
+        Assert.assertThat(job.getCommandName().orElseThrow(IllegalArgumentException::new), Matchers.is(commandName));
+        Assert.assertThat(job.getFinished().orElseThrow(IllegalArgumentException::new), Matchers.is(finished));
+        Assert.assertThat(job.getStarted().orElseThrow(IllegalArgumentException::new), Matchers.is(started));
         Assert.assertThat(job.getStatus(), Matchers.is(JobStatus.SUCCEEDED));
-        Assert.assertThat(job.getStatusMsg(), Matchers.is(statusMsg));
-        Assert.assertThat(job.getCreated(), Matchers.is(created));
-        Assert.assertThat(job.getDescription(), Matchers.is(description));
-        Assert.assertThat(job.getId(), Matchers.is(id));
+        Assert.assertThat(job.getStatusMsg().orElseThrow(IllegalArgumentException::new), Matchers.is(statusMsg));
+        Assert.assertThat(job.getCreated().orElseThrow(IllegalArgumentException::new), Matchers.is(created));
+        Assert.assertThat(job.getDescription().orElseThrow(IllegalArgumentException::new), Matchers.is(description));
+        Assert.assertThat(job.getId().orElseThrow(IllegalArgumentException::new), Matchers.is(id));
         Assert.assertThat(job.getTags(), Matchers.is(tags));
-        Assert.assertThat(job.getUpdated(), Matchers.is(updated));
+        Assert.assertThat(job.getUpdated().orElseThrow(IllegalArgumentException::new), Matchers.is(updated));
         Assert.assertThat(job.getRuntime(), Matchers.is(Duration.ofMillis(finished.getTime() - started.getTime())));
     }
 
@@ -158,18 +162,18 @@ public class JobUnitTests {
         Assert.assertThat(job.getUser(), Matchers.is(USER));
         Assert.assertThat(job.getVersion(), Matchers.is(VERSION));
         Assert.assertThat(job.getCommandArgs(), Matchers.is(COMMAND_ARGS));
-        Assert.assertThat(job.getArchiveLocation(), Matchers.nullValue());
-        Assert.assertThat(job.getClusterName(), Matchers.nullValue());
-        Assert.assertThat(job.getCommandName(), Matchers.nullValue());
-        Assert.assertThat(job.getFinished(), Matchers.nullValue());
-        Assert.assertThat(job.getStarted(), Matchers.nullValue());
+        Assert.assertFalse(job.getArchiveLocation().isPresent());
+        Assert.assertFalse(job.getClusterName().isPresent());
+        Assert.assertFalse(job.getCommandName().isPresent());
+        Assert.assertFalse(job.getFinished().isPresent());
+        Assert.assertFalse(job.getStarted().isPresent());
         Assert.assertThat(job.getStatus(), Matchers.is(JobStatus.INIT));
-        Assert.assertThat(job.getStatusMsg(), Matchers.nullValue());
-        Assert.assertThat(job.getCreated(), Matchers.nullValue());
-        Assert.assertThat(job.getDescription(), Matchers.nullValue());
-        Assert.assertThat(job.getId(), Matchers.nullValue());
+        Assert.assertFalse(job.getStatusMsg().isPresent());
+        Assert.assertFalse(job.getCreated().isPresent());
+        Assert.assertFalse(job.getDescription().isPresent());
+        Assert.assertFalse(job.getId().isPresent());
         Assert.assertThat(job.getTags(), Matchers.empty());
-        Assert.assertThat(job.getUpdated(), Matchers.nullValue());
+        Assert.assertFalse(job.getUpdated().isPresent());
         Assert.assertThat(job.getRuntime(), Matchers.is(Duration.ZERO));
     }
 

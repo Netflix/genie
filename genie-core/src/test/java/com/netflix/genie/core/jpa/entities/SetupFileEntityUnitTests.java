@@ -18,6 +18,7 @@
 package com.netflix.genie.core.jpa.entities;
 
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.genie.test.suppliers.RandomSuppliers;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -50,9 +51,11 @@ public class SetupFileEntityUnitTests extends EntityTestsBase {
      */
     @Test
     public void canSetSetupFile() {
-        Assert.assertNull(this.entity.getSetupFile());
+        Assert.assertFalse(this.entity.getSetupFile().isPresent());
         final String setupFile = UUID.randomUUID().toString();
         this.entity.setSetupFile(setupFile);
-        Assert.assertThat(this.entity.getSetupFile(), Matchers.is(setupFile));
+        Assert.assertThat(
+            this.entity.getSetupFile().orElseGet(RandomSuppliers.STRING), Matchers.is(setupFile)
+        );
     }
 }

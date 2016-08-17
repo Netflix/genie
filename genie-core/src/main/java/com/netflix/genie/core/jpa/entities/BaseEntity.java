@@ -156,7 +156,7 @@ public class BaseEntity implements Serializable {
      * @return The entityVersion of this entity as handled by JPA
      */
     public Long getEntityVersion() {
-        return entityVersion;
+        return this.entityVersion;
     }
 
     /**

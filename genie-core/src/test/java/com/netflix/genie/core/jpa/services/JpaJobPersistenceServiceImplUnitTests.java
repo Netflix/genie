@@ -20,8 +20,8 @@ package com.netflix.genie.core.jpa.services;
 import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
+import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
-import com.netflix.genie.common.dto.JobRequestMetadata;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
@@ -32,11 +32,13 @@ import com.netflix.genie.core.jpa.entities.ClusterEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.entities.JobEntity;
 import com.netflix.genie.core.jpa.entities.JobExecutionEntity;
+import com.netflix.genie.core.jpa.entities.JobMetadataEntity;
 import com.netflix.genie.core.jpa.entities.JobRequestEntity;
 import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobExecutionRepository;
+import com.netflix.genie.core.jpa.repositories.JpaJobMetadataRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRequestRepository;
 import com.netflix.genie.test.categories.UnitTest;
@@ -50,6 +52,7 @@ import org.mockito.Mockito;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -70,13 +73,14 @@ public class JpaJobPersistenceServiceImplUnitTests {
     private static final String JOB_1_STATUS_MSG = "Default message";
 
     private static final String HOST_NAME = UUID.randomUUID().toString();
-    private static final int PROCESS_ID = JobExecution.DEFAULT_PROCESS_ID;
-    private static final long CHECK_DELAY = JobExecution.DEFAULT_CHECK_DELAY;
-    private static final Date TIMEOUT = JobExecution.DEFAULT_TIMEOUT;
+    private static final int PROCESS_ID = 38018;
+    private static final long CHECK_DELAY = 892139L;
+    private static final Date TIMEOUT = new Date();
 
     private JpaJobRepository jobRepo;
     private JpaJobRequestRepository jobRequestRepo;
     private JpaJobExecutionRepository jobExecutionRepo;
+    private JpaJobMetadataRepository jobMetadataRepository;
     private JpaApplicationRepository applicationRepo;
     private JpaClusterRepository clusterRepo;
     private JpaCommandRepository commandRepo;
@@ -91,6 +95,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
         this.jobRepo = Mockito.mock(JpaJobRepository.class);
         this.jobRequestRepo = Mockito.mock(JpaJobRequestRepository.class);
         this.jobExecutionRepo = Mockito.mock(JpaJobExecutionRepository.class);
+        this.jobMetadataRepository = Mockito.mock(JpaJobMetadataRepository.class);
         this.applicationRepo = Mockito.mock(JpaApplicationRepository.class);
         this.clusterRepo = Mockito.mock(JpaClusterRepository.class);
         this.commandRepo = Mockito.mock(JpaCommandRepository.class);
@@ -99,9 +104,11 @@ public class JpaJobPersistenceServiceImplUnitTests {
             this.jobRepo,
             this.jobRequestRepo,
             this.jobExecutionRepo,
+            this.jobMetadataRepository,
             this.applicationRepo,
             this.clusterRepo,
-            this.commandRepo);
+            this.commandRepo
+        );
     }
 
     /* Unit Tests for Job methods */
@@ -114,12 +121,11 @@ public class JpaJobPersistenceServiceImplUnitTests {
     @Test(expected = GeniePreconditionException.class)
     public void testCreateJobIdWithNoId() throws GenieException {
         final Job job = new Job.Builder(JOB_1_NAME, JOB_1_USER, JOB_1_VERSION, JOB_1_COMMAND_ARGS).build();
-        final JobExecution jobExecution = new JobExecution.Builder(
-            HOST_NAME,
-            PROCESS_ID,
-            CHECK_DELAY,
-            TIMEOUT
-        ).build();
+        final JobExecution jobExecution = new JobExecution.Builder(HOST_NAME)
+            .withProcessId(PROCESS_ID)
+            .withCheckDelay(CHECK_DELAY)
+            .withTimeout(TIMEOUT)
+            .build();
         this.jobPersistenceService.createJobAndJobExecution(job, jobExecution);
     }
 
@@ -134,10 +140,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
             .withId(JOB_1_ID)
             .build();
         final JobExecution jobExecution = new JobExecution.Builder(
-            HOST_NAME,
-            PROCESS_ID,
-            CHECK_DELAY,
-            TIMEOUT
+            HOST_NAME
         ).build();
         this.jobPersistenceService.createJobAndJobExecution(job, jobExecution);
     }
@@ -154,10 +157,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
             .build();
         Mockito.when(this.jobRepo.exists(Mockito.eq(JOB_1_ID))).thenReturn(true);
         final JobExecution jobExecution = new JobExecution.Builder(
-            HOST_NAME,
-            PROCESS_ID,
-            CHECK_DELAY,
-            TIMEOUT
+            HOST_NAME
         ).build();
         this.jobPersistenceService.createJobAndJobExecution(job, jobExecution);
     }
@@ -175,10 +175,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
 
         Mockito.when(this.jobRequestRepo.findOne(Mockito.eq(JOB_1_ID))).thenReturn(null);
         final JobExecution jobExecution = new JobExecution.Builder(
-            HOST_NAME,
-            PROCESS_ID,
-            CHECK_DELAY,
-            TIMEOUT
+            HOST_NAME
         ).build();
         this.jobPersistenceService.createJobAndJobExecution(job, jobExecution);
     }
@@ -199,10 +196,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
 
         Mockito.when(this.jobRequestRepo.findOne(Mockito.eq(JOB_1_ID))).thenReturn(jobRequestEntity);
         final JobExecution jobExecution = new JobExecution.Builder(
-            HOST_NAME,
-            PROCESS_ID,
-            CHECK_DELAY,
-            TIMEOUT
+            HOST_NAME
         ).build();
         this.jobPersistenceService.createJobAndJobExecution(job, jobExecution);
 
@@ -243,11 +237,11 @@ public class JpaJobPersistenceServiceImplUnitTests {
         this.jobPersistenceService.updateJobStatus(id, JobStatus.INIT, JOB_1_STATUS_MSG);
 
         Assert.assertEquals(JobStatus.INIT, jobEntity.getStatus());
-        Assert.assertEquals(JOB_1_STATUS_MSG, jobEntity.getStatusMsg());
-        Assert.assertNull(jobEntity.getFinished());
+        Assert.assertEquals(JOB_1_STATUS_MSG, jobEntity.getStatusMsg().orElseThrow(IllegalArgumentException::new));
+        Assert.assertFalse(jobEntity.getFinished().isPresent());
 
         // Started should be null as the status is being set to INIT
-        Assert.assertNull(jobEntity.getStarted());
+        Assert.assertFalse(jobEntity.getStarted().isPresent());
     }
 
     /**
@@ -264,12 +258,12 @@ public class JpaJobPersistenceServiceImplUnitTests {
         this.jobPersistenceService.updateJobStatus(id, JobStatus.RUNNING, JOB_1_STATUS_MSG);
 
         Assert.assertEquals(JobStatus.RUNNING, jobEntity.getStatus());
-        Assert.assertEquals(JOB_1_STATUS_MSG, jobEntity.getStatusMsg());
+        Assert.assertEquals(JOB_1_STATUS_MSG, jobEntity.getStatusMsg().orElseThrow(IllegalArgumentException::new));
 
-        Assert.assertNull(jobEntity.getFinished());
+        Assert.assertFalse(jobEntity.getFinished().isPresent());
 
         // Started should not be null as the status is being set to RUNNING
-        Assert.assertNotNull(jobEntity.getStarted());
+        Assert.assertTrue(jobEntity.getStarted().isPresent());
     }
 
     /**
@@ -286,11 +280,11 @@ public class JpaJobPersistenceServiceImplUnitTests {
         this.jobPersistenceService.updateJobStatus(id, JobStatus.FAILED, JOB_1_STATUS_MSG);
 
         Assert.assertEquals(JobStatus.FAILED, jobEntity.getStatus());
-        Assert.assertEquals(JOB_1_STATUS_MSG, jobEntity.getStatusMsg());
-        Assert.assertNull(jobEntity.getFinished());
+        Assert.assertEquals(JOB_1_STATUS_MSG, jobEntity.getStatusMsg().orElseThrow(IllegalArgumentException::new));
+        Assert.assertFalse(jobEntity.getFinished().isPresent());
 
         // Started should not be set as the status is being set to FAILED
-        Assert.assertNull(jobEntity.getStarted());
+        Assert.assertFalse(jobEntity.getStarted().isPresent());
     }
 
     /**
@@ -308,7 +302,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
         this.jobPersistenceService.updateJobStatus(id, JobStatus.KILLED, JOB_1_STATUS_MSG);
 
         Assert.assertEquals(JobStatus.KILLED, jobEntity.getStatus());
-        Assert.assertEquals(JOB_1_STATUS_MSG, jobEntity.getStatusMsg());
+        Assert.assertEquals(JOB_1_STATUS_MSG, jobEntity.getStatusMsg().orElseThrow(IllegalArgumentException::new));
         Assert.assertNotNull(jobEntity.getFinished());
     }
 
@@ -327,7 +321,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
         this.jobPersistenceService.updateJobStatus(id, JobStatus.SUCCEEDED, JOB_1_STATUS_MSG);
 
         Assert.assertEquals(JobStatus.SUCCEEDED, jobEntity.getStatus());
-        Assert.assertEquals(JOB_1_STATUS_MSG, jobEntity.getStatusMsg());
+        Assert.assertEquals(JOB_1_STATUS_MSG, jobEntity.getStatusMsg().orElseThrow(IllegalArgumentException::new));
         Assert.assertNotNull(jobEntity.getFinished());
     }
 
@@ -478,7 +472,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
         final String userAgent = UUID.randomUUID().toString();
         final int numAttachments = 380;
         final long totalSizeOfAttachments = 830803L;
-        final JobRequestMetadata metadata = new JobRequestMetadata
+        final JobMetadata metadata = new JobMetadata
             .Builder()
             .withClientHost(clientHost)
             .withUserAgent(userAgent)
@@ -494,13 +488,20 @@ public class JpaJobPersistenceServiceImplUnitTests {
         Assert.assertEquals(JOB_1_USER, argument.getValue().getUser());
         Assert.assertEquals(JOB_1_VERSION, argument.getValue().getVersion());
         Assert.assertEquals(JOB_1_NAME, argument.getValue().getName());
-        Assert.assertEquals(cpu, argument.getValue().getCpu());
-        Assert.assertEquals(mem, argument.getValue().getMemory());
-        Assert.assertEquals(email, argument.getValue().getEmail());
-        Assert.assertEquals(setupFile, argument.getValue().getSetupFile());
-        Assert.assertEquals(group, argument.getValue().getGroup());
+        final int actualCpu = argument.getValue().getCpu().orElseThrow(IllegalArgumentException::new);
+        Assert.assertThat(actualCpu, Matchers.is(cpu));
+        final int actualMemory = argument.getValue().getMemory().orElseThrow(IllegalArgumentException::new);
+        Assert.assertThat(actualMemory, Matchers.is(mem));
+        final String actualEmail = argument.getValue().getEmail().orElseThrow(IllegalArgumentException::new);
+        Assert.assertThat(actualEmail, Matchers.is(email));
+        final String actualSetupFile = argument.getValue().getSetupFile().orElseThrow(IllegalArgumentException::new);
+        Assert.assertThat(actualSetupFile, Matchers.is(setupFile));
+        final String actualGroup = argument.getValue().getGroup().orElseThrow(IllegalArgumentException::new);
+        Assert.assertThat(actualGroup, Matchers.is(group));
         Assert.assertEquals(tags, argument.getValue().getTags());
-        Assert.assertEquals(description, argument.getValue().getDescription());
+        final String actualDescription
+            = argument.getValue().getDescription().orElseThrow(IllegalArgumentException::new);
+        Assert.assertThat(actualDescription, Matchers.is(description));
         Assert.assertThat(argument.getValue().getApplicationsAsList(), Matchers.empty());
     }
 
@@ -548,6 +549,61 @@ public class JpaJobPersistenceServiceImplUnitTests {
     public void testSetExitCodeJobDoesNotExist() throws GenieException {
         Mockito.when(this.jobExecutionRepo.findOne(Mockito.eq(JOB_1_ID))).thenReturn(null);
         this.jobPersistenceService
-            .setJobCompletionInformation(JOB_1_ID, 0, JobStatus.FAILED, UUID.randomUUID().toString());
+            .setJobCompletionInformation(JOB_1_ID, 0, JobStatus.FAILED, UUID.randomUUID().toString(), null, null);
+    }
+
+    /**
+     * Test the setJobCompletionInformation method.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test(expected = GenieNotFoundException.class)
+    public void cantUpdateJobMetadataIfNotExists() throws GenieException {
+        final JobEntity jobEntity = Mockito.mock(JobEntity.class);
+        Mockito.when(jobEntity.getStatus()).thenReturn(JobStatus.FAILED);
+        Mockito.when(this.jobRepo.findOne(JOB_1_ID)).thenReturn(jobEntity);
+        final JobExecutionEntity jobExecutionEntity = Mockito.mock(JobExecutionEntity.class);
+        Mockito.when(jobExecutionEntity.getExitCode()).thenReturn(Optional.of(1));
+        Mockito.when(this.jobExecutionRepo.findOne(JOB_1_ID)).thenReturn(jobExecutionEntity);
+        Mockito.when(this.jobMetadataRepository.findOne(JOB_1_ID)).thenReturn(null);
+
+        this.jobPersistenceService.setJobCompletionInformation(JOB_1_ID, 0, JobStatus.FAILED, "k", 100L, 1L);
+    }
+
+    /**
+     * Test the setJobCompletionInformation method.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test
+    public void wontUpdateJobMetadataIfNoSizes() throws GenieException {
+        final JobEntity jobEntity = Mockito.mock(JobEntity.class);
+        Mockito.when(jobEntity.getStatus()).thenReturn(JobStatus.FAILED);
+        Mockito.when(this.jobRepo.findOne(JOB_1_ID)).thenReturn(jobEntity);
+        final JobExecutionEntity jobExecutionEntity = Mockito.mock(JobExecutionEntity.class);
+        Mockito.when(jobExecutionEntity.getExitCode()).thenReturn(Optional.of(1));
+        Mockito.when(this.jobExecutionRepo.findOne(JOB_1_ID)).thenReturn(jobExecutionEntity);
+
+        this.jobPersistenceService.setJobCompletionInformation(JOB_1_ID, 0, JobStatus.FAILED, "k", null, null);
+        Mockito.verify(this.jobMetadataRepository, Mockito.never()).findOne(JOB_1_ID);
+    }
+
+    /**
+     * Test the setJobCompletionInformation method.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test
+    public void willUpdateJobMetadataIfOneSize() throws GenieException {
+        final JobEntity jobEntity = Mockito.mock(JobEntity.class);
+        Mockito.when(jobEntity.getStatus()).thenReturn(JobStatus.FAILED);
+        Mockito.when(this.jobRepo.findOne(JOB_1_ID)).thenReturn(jobEntity);
+        final JobExecutionEntity jobExecutionEntity = Mockito.mock(JobExecutionEntity.class);
+        Mockito.when(jobExecutionEntity.getExitCode()).thenReturn(Optional.of(1));
+        Mockito.when(this.jobExecutionRepo.findOne(JOB_1_ID)).thenReturn(jobExecutionEntity);
+        Mockito.when(this.jobMetadataRepository.findOne(JOB_1_ID)).thenReturn(Mockito.mock(JobMetadataEntity.class));
+
+        this.jobPersistenceService.setJobCompletionInformation(JOB_1_ID, 0, JobStatus.FAILED, "k", null, 100L);
+        Mockito.verify(this.jobMetadataRepository, Mockito.times(1)).findOne(JOB_1_ID);
     }
 }

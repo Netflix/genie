@@ -24,6 +24,7 @@ import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.genie.test.suppliers.RandomSuppliers;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -74,7 +75,7 @@ public class CommandEntityUnitTests extends EntityTestsBase {
     @Test
     public void testDefaultConstructor() {
         final CommandEntity entity = new CommandEntity();
-        Assert.assertNull(entity.getSetupFile());
+        Assert.assertFalse(entity.getSetupFile().isPresent());
         Assert.assertNull(entity.getExecutable());
         Assert.assertThat(entity.getCheckDelay(), Matchers.is(Command.DEFAULT_CHECK_DELAY));
         Assert.assertNull(entity.getName());
@@ -176,14 +177,14 @@ public class CommandEntityUnitTests extends EntityTestsBase {
     }
 
     /**
-     * Test setting the property file.
+     * Test setting the setup file.
      */
     @Test
-    public void testSetEnvPropFile() {
-        Assert.assertNull(this.c.getSetupFile());
+    public void testSetSetupFile() {
+        Assert.assertFalse(this.c.getSetupFile().isPresent());
         final String propFile = "s3://netflix.propFile";
         this.c.setSetupFile(propFile);
-        Assert.assertEquals(propFile, this.c.getSetupFile());
+        Assert.assertEquals(propFile, this.c.getSetupFile().orElseThrow(IllegalArgumentException::new));
     }
 
     /**
@@ -415,18 +416,18 @@ public class CommandEntityUnitTests extends EntityTestsBase {
         entity.setCheckDelay(checkDelay);
 
         final Command command = entity.getDTO();
-        Assert.assertThat(command.getId(), Matchers.is(id));
+        Assert.assertThat(command.getId().orElseGet(RandomSuppliers.STRING), Matchers.is(id));
         Assert.assertThat(command.getName(), Matchers.is(name));
         Assert.assertThat(command.getUser(), Matchers.is(user));
         Assert.assertThat(command.getVersion(), Matchers.is(version));
         Assert.assertThat(command.getStatus(), Matchers.is(CommandStatus.DEPRECATED));
-        Assert.assertThat(command.getDescription(), Matchers.is(description));
-        Assert.assertThat(command.getCreated(), Matchers.is(created));
-        Assert.assertThat(command.getUpdated(), Matchers.is(updated));
+        Assert.assertThat(command.getDescription().orElseGet(RandomSuppliers.STRING), Matchers.is(description));
+        Assert.assertThat(command.getCreated().orElseGet(RandomSuppliers.DATE), Matchers.is(created));
+        Assert.assertThat(command.getUpdated().orElseGet(RandomSuppliers.DATE), Matchers.is(updated));
         Assert.assertThat(command.getExecutable(), Matchers.is(executable));
         Assert.assertThat(command.getCheckDelay(), Matchers.is(checkDelay));
         Assert.assertThat(command.getTags(), Matchers.is(tags));
-        Assert.assertThat(command.getSetupFile(), Matchers.is(setupFile));
+        Assert.assertThat(command.getSetupFile().orElseGet(RandomSuppliers.STRING), Matchers.is(setupFile));
         Assert.assertThat(command.getConfigs(), Matchers.is(configs));
     }
 }

@@ -39,6 +39,7 @@ public class CommandResourceAssembler implements ResourceAssembler<Command, Comm
      */
     @Override
     public CommandResource toResource(final Command command) {
+        final String id = command.getId().orElseThrow(IllegalArgumentException::new);
         final CommandResource commandResource = new CommandResource(command);
 
         try {
@@ -46,7 +47,7 @@ public class CommandResourceAssembler implements ResourceAssembler<Command, Comm
                 ControllerLinkBuilder.linkTo(
                     ControllerLinkBuilder
                         .methodOn(CommandRestController.class)
-                        .getCommand(command.getId())
+                        .getCommand(id)
                 ).withSelfRel()
             );
 
@@ -54,7 +55,7 @@ public class CommandResourceAssembler implements ResourceAssembler<Command, Comm
                 ControllerLinkBuilder.linkTo(
                     ControllerLinkBuilder
                         .methodOn(CommandRestController.class)
-                        .getApplicationsForCommand(command.getId())
+                        .getApplicationsForCommand(id)
                 ).withRel("applications")
             );
 
@@ -62,7 +63,7 @@ public class CommandResourceAssembler implements ResourceAssembler<Command, Comm
                 ControllerLinkBuilder.linkTo(
                     ControllerLinkBuilder
                         .methodOn(CommandRestController.class)
-                        .getClustersForCommand(command.getId(), null)
+                        .getClustersForCommand(id, null)
                 ).withRel("clusters")
             );
         } catch (final GenieException ge) {

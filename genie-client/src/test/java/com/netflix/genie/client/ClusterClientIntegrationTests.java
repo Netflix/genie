@@ -19,6 +19,7 @@ package com.netflix.genie.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
+import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
@@ -124,9 +125,9 @@ public class ClusterClientIntegrationTests extends GenieClientsIntegrationTestsB
 
         final Cluster cluster2 =
             new Cluster.Builder("cluster2name", "cluster2user", "2.0", ClusterStatus.OUT_OF_SERVICE)
-            .withId(cluster2Id)
-            .withTags(cluster2Tags)
-            .build();
+                .withId(cluster2Id)
+                .withTags(cluster2Tags)
+                .build();
 
         clusterClient.createCluster(cluster1);
         clusterClient.createCluster(cluster2);
@@ -135,24 +136,24 @@ public class ClusterClientIntegrationTests extends GenieClientsIntegrationTestsB
         List<Cluster> clusterList = clusterClient.getClusters(
             null,
             null,
-            Arrays.asList("foo"),
+            Lists.newArrayList("foo"),
             null,
             null
         );
         Assert.assertEquals(1, clusterList.size());
-        Assert.assertEquals(cluster1Id, clusterList.get(0).getId());
+        Assert.assertEquals(cluster1Id, clusterList.get(0).getId().orElseThrow(IllegalArgumentException::new));
 
         clusterList = clusterClient.getClusters(
             null,
             null,
-            Arrays.asList("pi"),
+            Lists.newArrayList("pi"),
             null,
             null
         );
 
         Assert.assertEquals(2, clusterList.size());
-        Assert.assertEquals(cluster2Id, clusterList.get(0).getId());
-        Assert.assertEquals(cluster1Id, clusterList.get(1).getId());
+        Assert.assertEquals(cluster2Id, clusterList.get(0).getId().orElseThrow(IllegalArgumentException::new));
+        Assert.assertEquals(cluster1Id, clusterList.get(1).getId().orElseThrow(IllegalArgumentException::new));
 
         // Test get by name
         clusterList = clusterClient.getClusters(
@@ -168,7 +169,7 @@ public class ClusterClientIntegrationTests extends GenieClientsIntegrationTestsB
         // Test get by status
         clusterList = clusterClient.getClusters(
             null,
-            Arrays.asList(ClusterStatus.UP.toString()),
+            Lists.newArrayList(ClusterStatus.UP.toString()),
             null,
             null,
             null
@@ -233,11 +234,11 @@ public class ClusterClientIntegrationTests extends GenieClientsIntegrationTestsB
         final Cluster cluster1 = constructClusterDTO(null);
         clusterClient.createCluster(cluster1);
 
-        final Cluster cluster2 = clusterClient.getCluster(cluster1.getId());
+        final Cluster cluster2 = clusterClient.getCluster(cluster1.getId().orElseThrow(IllegalArgumentException::new));
         Assert.assertEquals(cluster2.getId(), cluster1.getId());
 
-        clusterClient.deleteCluster(cluster1.getId());
-        clusterClient.getCluster(cluster1.getId());
+        clusterClient.deleteCluster(cluster1.getId().orElseThrow(IllegalArgumentException::new));
+        clusterClient.getCluster(cluster1.getId().orElseThrow(IllegalArgumentException::new));
     }
 
     /**
@@ -250,24 +251,24 @@ public class ClusterClientIntegrationTests extends GenieClientsIntegrationTestsB
         final Cluster cluster1 = constructClusterDTO(null);
         clusterClient.createCluster(cluster1);
 
-        final Cluster cluster2 = clusterClient.getCluster(cluster1.getId());
+        final Cluster cluster2 = clusterClient.getCluster(cluster1.getId().orElseThrow(IllegalArgumentException::new));
         Assert.assertEquals(cluster2.getName(), cluster1.getName());
 
         final Cluster cluster3 = new
             Cluster.Builder("newname", "newuser", "new version", ClusterStatus.OUT_OF_SERVICE)
-            .withId(cluster1.getId())
+            .withId(cluster1.getId().orElseThrow(IllegalArgumentException::new))
             .build();
 
-        clusterClient.updateCluster(cluster1.getId(), cluster3);
+        clusterClient.updateCluster(cluster1.getId().orElseThrow(IllegalArgumentException::new), cluster3);
 
-        final Cluster cluster4 = clusterClient.getCluster(cluster1.getId());
+        final Cluster cluster4 = clusterClient.getCluster(cluster1.getId().orElseThrow(IllegalArgumentException::new));
 
         Assert.assertEquals("newname", cluster4.getName());
         Assert.assertEquals("newuser", cluster4.getUser());
         Assert.assertEquals("new version", cluster4.getVersion());
         Assert.assertEquals(ClusterStatus.OUT_OF_SERVICE, cluster4.getStatus());
-        Assert.assertEquals(null, cluster4.getSetupFile());
-        Assert.assertEquals(null, cluster4.getDescription());
+        Assert.assertFalse(cluster4.getSetupFile().isPresent());
+        Assert.assertFalse(cluster4.getDescription().isPresent());
         Assert.assertEquals(Collections.emptySet(), cluster4.getConfigs());
         Assert.assertEquals(cluster4.getTags().contains("foo"), false);
     }
@@ -449,17 +450,17 @@ public class ClusterClientIntegrationTests extends GenieClientsIntegrationTestsB
 
         List<Command> commands = clusterClient.getCommandsForCluster("cluster1");
         Assert.assertEquals(3, commands.size());
-        Assert.assertEquals("foo", commands.get(0).getId());
-        Assert.assertEquals("bar", commands.get(1).getId());
-        Assert.assertEquals("pi", commands.get(2).getId());
+        Assert.assertEquals("foo", commands.get(0).getId().orElseThrow(IllegalArgumentException::new));
+        Assert.assertEquals("bar", commands.get(1).getId().orElseThrow(IllegalArgumentException::new));
+        Assert.assertEquals("pi", commands.get(2).getId().orElseThrow(IllegalArgumentException::new));
 
         // Test removing a command for cluster
         clusterClient.removeCommandFromCluster("cluster1", "pi");
 
         commands = clusterClient.getCommandsForCluster("cluster1");
         Assert.assertEquals(2, commands.size());
-        Assert.assertEquals("foo", commands.get(0).getId());
-        Assert.assertEquals("bar", commands.get(1).getId());
+        Assert.assertEquals("foo", commands.get(0).getId().orElseThrow(IllegalArgumentException::new));
+        Assert.assertEquals("bar", commands.get(1).getId().orElseThrow(IllegalArgumentException::new));
 
         final List<String> updatedCommands = new ArrayList<>();
         updatedCommands.add("foo");
@@ -469,8 +470,8 @@ public class ClusterClientIntegrationTests extends GenieClientsIntegrationTestsB
         clusterClient.updateCommandsForCluster("cluster1", updatedCommands);
         commands = clusterClient.getCommandsForCluster("cluster1");
         Assert.assertEquals(2, commands.size());
-        Assert.assertEquals("foo", commands.get(0).getId());
-        Assert.assertEquals("pi", commands.get(1).getId());
+        Assert.assertEquals("foo", commands.get(0).getId().orElseThrow(IllegalArgumentException::new));
+        Assert.assertEquals("pi", commands.get(1).getId().orElseThrow(IllegalArgumentException::new));
 
         // Test delete all commands in a cluster
         clusterClient.removeAllCommandsForCluster("cluster1");
