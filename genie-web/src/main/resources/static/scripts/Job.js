@@ -104,7 +104,7 @@ export default class Job extends Page {
 
   get tableHeader() {
     return (
-      ['Id', 'Name', 'Output', 'Copy Link', 'User', 'Status',
+      ['Job Id', 'Name', 'Output', 'Copy Link', 'User', 'Status',
         'Cluster', 'Started (UTC)', 'Finished (UTC)', 'Run Time']
     );
   }
