@@ -12,9 +12,9 @@ export default class JobDetails extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      killJobRequestSent: false,
-      modalIsOpen: false,
-      killRequestError: null,
+      killJobRequestSent : false,
+      modalIsOpen        : false,
+      killRequestError   : null,
       job: {
         id: '',
         _links: {
@@ -72,7 +72,7 @@ export default class JobDetails extends React.Component {
         this.setState({ killJobRequestSent: true });
         this.closeModal();
       })
-      .fail((xhr) => {
+      .fail(xhr => {
         this.setState({
           modalIsOpen: false,
           killJobRequestSent: true,
