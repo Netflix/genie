@@ -65,6 +65,7 @@ def set_jobname(func):
             else:
                 payload['name'] = script \
                     .replace('${', '{') \
+                    .replace(';', '') \
                     .replace('\n', ' ')[:40] \
                     .strip()
 
@@ -127,6 +128,11 @@ class Genie3Adapter(GenieBaseAdapter):
     def construct_base_payload(job):
         """Returns a base payload for the job."""
 
+        # do this first because some jobs will apply some logic (like manipulating
+        # dependencies) which need to be done before proceeding with building the
+        # payload
+        command_args = job.cmd_args
+
         attachments = list()
         dependencies = list()
 
@@ -160,7 +166,7 @@ class Genie3Adapter(GenieBaseAdapter):
             'applications': job.get('application_ids'),
             'attachments': attachments,
             'clusterCriterias': [i for i in clusters if i.get('tags')],
-            'commandArgs': job.get('command_arguments') or job.cmd_args,
+            'commandArgs': job.get('command_arguments') or command_args,
             'commandCriteria': job.get('command_tags') or job.default_command_tags,
             'dependencies': [d for d in dependencies if d not in {'', None}],
             'description': description,

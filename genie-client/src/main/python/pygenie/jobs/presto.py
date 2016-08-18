@@ -50,7 +50,6 @@ class PrestoJob(GenieJob):
     def __init__(self, conf=None):
         super(PrestoJob, self).__init__(conf=conf)
 
-        self._filename = PrestoJob.DEFAULT_SCRIPT_NAME
         self._script = None
 
     @property
@@ -63,6 +62,15 @@ class PrestoJob(GenieJob):
 
         if self._command_arguments is not None:
             return self._command_arguments
+
+        if is_file(self._script):
+            filename = os.path.basename(self._script)
+            self._add_dependency(self._script)
+        else:
+            filename = PrestoJob.DEFAULT_SCRIPT_NAME
+            if not self._script.strip().endswith(';'):
+                self._script = '{};'.format(self._script)
+            self._add_dependency({'name': filename, 'data': self._script})
 
         options_str = ' '.join([
             '--{name}{space}{value}' \
@@ -78,7 +86,7 @@ class PrestoJob(GenieJob):
         return '{sessions} {options} -f {filename}' \
             .format(sessions=sessions_str,
                     options=options_str,
-                    filename=self._filename) \
+                    filename=filename) \
             .strip()
 
     def headers(self):
@@ -150,17 +158,6 @@ class PrestoJob(GenieJob):
         Returns:
             :py:class:`PrestoJob`: self
         """
-
-        if is_file(_script):
-            self._filename = os.path.basename(_script)
-            self._add_dependency(_script)
-        else:
-            self._filename = PrestoJob.DEFAULT_SCRIPT_NAME
-            if not _script.strip().endswith(';'):
-                _script = '{};'.format(_script)
-            self._add_dependency({'name': self._filename, 'data': _script})
-
-        return self
 
     @add_to_repr('append')
     def session(self, name, value):

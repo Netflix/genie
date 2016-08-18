@@ -42,7 +42,6 @@ class PigJob(GenieJob):
     def __init__(self, conf=None):
         super(PigJob, self).__init__(conf=conf)
 
-        self._filename = PigJob.DEFAULT_SCRIPT_NAME
         self._parameter_files = list()
         self._property_file = None
         self._script = None
@@ -57,6 +56,13 @@ class PigJob(GenieJob):
 
         if self._command_arguments is not None:
             return self._command_arguments
+
+        if is_file(self._script):
+            filename = os.path.basename(self._script)
+            self._add_dependency(self._script)
+        else:
+            filename = PigJob.DEFAULT_SCRIPT_NAME
+            self._add_dependency({'name': filename, 'data': self._script})
 
         param_files_str = ' '.join([
             '-param_file {}'.format(os.path.basename(p)) \
@@ -81,7 +87,7 @@ class PigJob(GenieJob):
         return '{props} {prop_file} {param_files} {params} -f {filename}' \
             .format(prop_file=prop_file_str,
                     props=props_str,
-                    filename=self._filename,
+                    filename=filename,
                     param_files=param_files_str,
                     params=params_str) \
             .strip()
@@ -183,12 +189,3 @@ class PigJob(GenieJob):
         Returns:
             :py:class:`PigJob`: self
         """
-
-        if is_file(_script):
-            self._filename = os.path.basename(_script)
-            self._add_dependency(_script)
-        else:
-            self._filename = PigJob.DEFAULT_SCRIPT_NAME
-            self._add_dependency({'name': self._filename, 'data': _script})
-
-        return self
