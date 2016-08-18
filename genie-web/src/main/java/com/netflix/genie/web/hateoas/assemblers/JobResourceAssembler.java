@@ -39,6 +39,7 @@ public class JobResourceAssembler implements ResourceAssembler<Job, JobResource>
      */
     @Override
     public JobResource toResource(final Job job) {
+        final String id = job.getId().orElseThrow(IllegalArgumentException::new);
         final JobResource jobResource = new JobResource(job);
 
         try {
@@ -46,7 +47,7 @@ public class JobResourceAssembler implements ResourceAssembler<Job, JobResource>
                 ControllerLinkBuilder.linkTo(
                     ControllerLinkBuilder
                         .methodOn(JobRestController.class)
-                        .getJob(job.getId())
+                        .getJob(id)
                 ).withSelfRel()
             );
 
@@ -72,7 +73,7 @@ public class JobResourceAssembler implements ResourceAssembler<Job, JobResource>
             jobResource.add(
                 ControllerLinkBuilder
                     .linkTo(JobRestController.class)
-                    .slash(job.getId())
+                    .slash(id)
                     .slash(output)
                     .withRel(output)
             );
@@ -81,7 +82,7 @@ public class JobResourceAssembler implements ResourceAssembler<Job, JobResource>
                 ControllerLinkBuilder.linkTo(
                     ControllerLinkBuilder
                         .methodOn(JobRestController.class)
-                        .getJobRequest(job.getId())
+                        .getJobRequest(id)
                 ).withRel("request")
             );
 
@@ -89,7 +90,7 @@ public class JobResourceAssembler implements ResourceAssembler<Job, JobResource>
                 ControllerLinkBuilder.linkTo(
                     ControllerLinkBuilder
                         .methodOn(JobRestController.class)
-                        .getJobExecution(job.getId())
+                        .getJobExecution(id)
                 ).withRel("execution")
             );
 
@@ -97,7 +98,7 @@ public class JobResourceAssembler implements ResourceAssembler<Job, JobResource>
                 ControllerLinkBuilder.linkTo(
                     ControllerLinkBuilder
                         .methodOn(JobRestController.class)
-                        .getJobStatus(job.getId())
+                        .getJobStatus(id)
                 ).withRel("status")
             );
 
@@ -105,7 +106,7 @@ public class JobResourceAssembler implements ResourceAssembler<Job, JobResource>
                 ControllerLinkBuilder.linkTo(
                     ControllerLinkBuilder
                         .methodOn(JobRestController.class)
-                        .getJobCluster(job.getId())
+                        .getJobCluster(id)
                 ).withRel("cluster")
             );
 
@@ -113,7 +114,7 @@ public class JobResourceAssembler implements ResourceAssembler<Job, JobResource>
                 ControllerLinkBuilder.linkTo(
                     ControllerLinkBuilder
                         .methodOn(JobRestController.class)
-                        .getJobCommand(job.getId())
+                        .getJobCommand(id)
                 ).withRel("command")
             );
 
@@ -121,7 +122,7 @@ public class JobResourceAssembler implements ResourceAssembler<Job, JobResource>
                 ControllerLinkBuilder.linkTo(
                     ControllerLinkBuilder
                         .methodOn(JobRestController.class)
-                        .getJobApplications(job.getId())
+                        .getJobApplications(id)
                 ).withRel("applications")
             );
         } catch (final GenieException ge) {

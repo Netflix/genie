@@ -24,6 +24,7 @@ import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.genie.test.suppliers.RandomSuppliers;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -360,14 +361,14 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
         entity.setConfigs(confs);
 
         final Cluster cluster = entity.getDTO();
-        Assert.assertThat(cluster.getId(), Matchers.is(id));
+        Assert.assertThat(cluster.getId().orElseGet(RandomSuppliers.STRING), Matchers.is(id));
         Assert.assertThat(cluster.getName(), Matchers.is(name));
         Assert.assertThat(cluster.getUser(), Matchers.is(user));
         Assert.assertThat(cluster.getVersion(), Matchers.is(version));
-        Assert.assertThat(cluster.getDescription(), Matchers.is(description));
+        Assert.assertThat(cluster.getDescription().orElseGet(RandomSuppliers.STRING), Matchers.is(description));
         Assert.assertThat(cluster.getStatus(), Matchers.is(ClusterStatus.TERMINATED));
-        Assert.assertThat(cluster.getCreated(), Matchers.is(created));
-        Assert.assertThat(cluster.getUpdated(), Matchers.is(updated));
+        Assert.assertThat(cluster.getCreated().orElseGet(RandomSuppliers.DATE), Matchers.is(created));
+        Assert.assertThat(cluster.getUpdated().orElseGet(RandomSuppliers.DATE), Matchers.is(updated));
         Assert.assertThat(cluster.getTags(), Matchers.is(tags));
         Assert.assertThat(cluster.getConfigs(), Matchers.is(confs));
     }

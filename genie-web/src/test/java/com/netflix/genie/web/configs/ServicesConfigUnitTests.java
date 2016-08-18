@@ -23,6 +23,7 @@ import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobExecutionRepository;
+import com.netflix.genie.core.jpa.repositories.JpaJobMetadataRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRequestRepository;
 import com.netflix.genie.core.services.ApplicationService;
@@ -195,6 +196,7 @@ public class ServicesConfigUnitTests {
                 this.jobRepository,
                 this.jobRequestRepository,
                 this.jobExecutionRepository,
+                Mockito.mock(JpaJobMetadataRepository.class),
                 this.applicationRepository,
                 this.clusterRepository,
                 this.commandRepository

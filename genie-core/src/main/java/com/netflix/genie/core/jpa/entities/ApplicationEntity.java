@@ -38,6 +38,7 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -47,10 +48,10 @@ import java.util.Set;
  * @author tgianos
  * @since 2.0.0
  */
-@Entity
-@Table(name = "applications")
 @Getter
 @Setter
+@Entity
+@Table(name = "applications")
 public class ApplicationEntity extends SetupFileEntity {
 
     private static final long serialVersionUID = -8780722054561507963L;
@@ -61,6 +62,7 @@ public class ApplicationEntity extends SetupFileEntity {
     @NotNull(message = "No application status entered and is required.")
     private ApplicationStatus status;
 
+    @Basic
     @Column(name = "type")
     private String type;
 
@@ -102,31 +104,12 @@ public class ApplicationEntity extends SetupFileEntity {
     }
 
     /**
-     * Gets the status for this application.
+     * Get the type of this application.
      *
-     * @return status
-     * @see ApplicationStatus
+     * @return The type as an Optional in case it's null
      */
-    public ApplicationStatus getStatus() {
-        return status;
-    }
-
-    /**
-     * Sets the status for this application.
-     *
-     * @param status One of the possible statuses
-     */
-    public void setStatus(final ApplicationStatus status) {
-        this.status = status;
-    }
-
-    /**
-     * Gets the configurations for this application.
-     *
-     * @return the configurations for this application
-     */
-    public Set<String> getConfigs() {
-        return this.configs;
+    public Optional<String> getType() {
+        return Optional.ofNullable(this.type);
     }
 
     /**
@@ -142,15 +125,6 @@ public class ApplicationEntity extends SetupFileEntity {
     }
 
     /**
-     * Gets the dependencies for this application.
-     *
-     * @return list of jars this application relies on for execution
-     */
-    public Set<String> getDependencies() {
-        return this.dependencies;
-    }
-
-    /**
      * Sets the dependencies needed for this application.
      *
      * @param dependencies All dependencies needed for execution of this application
@@ -160,15 +134,6 @@ public class ApplicationEntity extends SetupFileEntity {
         if (dependencies != null) {
             this.dependencies.addAll(dependencies);
         }
-    }
-
-    /**
-     * Get all the commands associated with this application.
-     *
-     * @return The commands
-     */
-    public Set<CommandEntity> getCommands() {
-        return this.commands;
     }
 
     /**
@@ -183,45 +148,25 @@ public class ApplicationEntity extends SetupFileEntity {
         }
     }
 
-//    /**
-//     * Get all the jobs which ran using this application. Potentially huge data set. Shouldn't really be used, hence
-//     * protected.
-//     *
-//     * @return The jobs
-//     */
-//    protected Set<JobEntity> getJobs() {
-//        return this.jobs;
-//    }
-//
-//    /**
-//     * Set all the jobs which used this application
-//     *
-//     * @param jobs The jobs to set.
-//     */
-//    protected void setJobs(final Set<JobEntity> jobs) {
-//        this.jobs.clear();
-//        if (jobs != null) {
-//            this.jobs.addAll(jobs);
-//        }
-//    }
-
     /**
      * Get a DTO from this entity.
      *
      * @return DTO of this entity.
      */
     public Application getDTO() {
-        return new Application
+        final Application.Builder builder = new Application
             .Builder(this.getName(), this.getUser(), this.getVersion(), this.status)
             .withId(this.getId())
             .withCreated(this.getCreated())
             .withUpdated(this.getUpdated())
-            .withDescription(this.getDescription())
             .withTags(this.getTags())
             .withConfigs(this.configs)
-            .withSetupFile(this.getSetupFile())
             .withDependencies(this.dependencies)
-            .withType(this.type)
-            .build();
+            .withType(this.type);
+
+        this.getDescription().ifPresent(builder::withDescription);
+        this.getSetupFile().ifPresent(builder::withSetupFile);
+
+        return builder.build();
     }
 }

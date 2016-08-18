@@ -39,6 +39,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 
 /**
  * Given a process id this class will check if the job client process is running or not.
@@ -52,6 +53,7 @@ public class JobMonitor extends NodeTask {
     // How many error iterations we can handle
     // TODO: Make this a variable
     private static final int MAX_ERRORS = 5;
+    private final String id;
     private final JobExecution execution;
     private final ProcessChecker processChecker;
     private final ApplicationEventPublisher publisher;
@@ -94,9 +96,13 @@ public class JobMonitor extends NodeTask {
         }
 
         this.errorCount = 0;
+        this.id = execution.getId().orElseThrow(IllegalArgumentException::new);
         this.execution = execution;
         this.publisher = publisher;
-        this.processChecker = new UnixProcessChecker(execution.getProcessId(), executor, execution.getTimeout());
+
+        final int processId = execution.getProcessId().orElseThrow(IllegalArgumentException::new);
+        final Date timeout = execution.getTimeout().orElseThrow(IllegalArgumentException::new);
+        this.processChecker = new UnixProcessChecker(processId, executor, timeout);
 
         this.stdOut = stdOut;
         this.stdErr = stdErr;
@@ -121,19 +127,19 @@ public class JobMonitor extends NodeTask {
         try {
             // Blocks until result
             this.processChecker.checkProcess();
-            log.debug("Job {} is still running...", this.execution.getId());
+            log.debug("Job {} is still running...", this.id);
             if (this.errorCount != 0) {
                 this.errorCount = 0;
             }
 
             if (this.stdOut.exists() && this.stdOut.length() > this.maxStdOutLength) {
-                this.publisher.publishEvent(new KillJobEvent(this.execution.getId(), "Std out length exceeded", this));
+                this.publisher.publishEvent(new KillJobEvent(this.id, "Std out length exceeded", this));
                 this.stdOutTooLarge.increment();
                 return;
             }
 
             if (this.stdErr.exists() && this.stdErr.length() > this.maxStdErrLength) {
-                this.publisher.publishEvent(new KillJobEvent(this.execution.getId(), "Std err length exceeded", this));
+                this.publisher.publishEvent(new KillJobEvent(this.id, "Std err length exceeded", this));
                 this.stdErrTooLarge.increment();
                 return;
             }
@@ -142,13 +148,13 @@ public class JobMonitor extends NodeTask {
         } catch (final GenieTimeoutException gte) {
             log.info("Job {} has timed out", this.execution.getId(), gte);
             this.timeoutRate.increment();
-            this.publisher.publishEvent(new KillJobEvent(this.execution.getId(), "Job exceeded timeout", this));
+            this.publisher.publishEvent(new KillJobEvent(this.id, "Job exceeded timeout", this));
         } catch (final ExecuteException ee) {
-            log.info("Job {} has finished", this.execution.getId());
+            log.info("Job {} has finished", this.id);
             this.finishedRate.increment();
             this.publisher.publishEvent(
                 new JobFinishedEvent(
-                    this.execution.getId(),
+                    this.id,
                     JobFinishedReason.PROCESS_COMPLETED,
                     "Process detected to be complete",
                     this
@@ -168,7 +174,7 @@ public class JobMonitor extends NodeTask {
                 // TODO: What if they throw an exception?
                 this.publisher.publishEvent(
                     new KillJobEvent(
-                        this.execution.getId(),
+                        this.id,
                         "Couldn't check process status " + MAX_ERRORS + " consecutive times",
                         this
                     )
@@ -176,7 +182,7 @@ public class JobMonitor extends NodeTask {
                 // Also send a job finished event
                 this.publisher.publishEvent(
                     new JobFinishedEvent(
-                        this.execution.getId(),
+                        this.id,
                         JobFinishedReason.KILLED,
                         "Couldn't check process status " + MAX_ERRORS + " consecutive times",
                         this
@@ -199,6 +205,6 @@ public class JobMonitor extends NodeTask {
      */
     @Override
     public long getFixedDelay() {
-        return this.execution.getCheckDelay();
+        return this.execution.getCheckDelay().orElseThrow(IllegalArgumentException::new);
     }
 }

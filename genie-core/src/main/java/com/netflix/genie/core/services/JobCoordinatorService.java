@@ -19,8 +19,8 @@ package com.netflix.genie.core.services;
 
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
+import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
-import com.netflix.genie.common.dto.JobRequestMetadata;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
@@ -30,7 +30,6 @@ import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.jobs.JobLauncher;
 import com.netflix.spectator.api.Registry;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.task.AsyncTaskExecutor;
@@ -104,7 +103,7 @@ public class JobCoordinatorService {
      * Takes in a Job Request object and does necessary preparation for execution.
      *
      * @param jobRequest         of job to kill
-     * @param jobRequestMetadata Metadata about the http request which generated started this job process
+     * @param jobMetadata Metadata about the http request which generated started this job process
      * @return the id of the job run
      * @throws GenieException if there is an error
      */
@@ -114,21 +113,21 @@ public class JobCoordinatorService {
         final JobRequest jobRequest,
         @NotNull
         @Valid
-        final JobRequestMetadata jobRequestMetadata
+        final JobMetadata jobMetadata
     ) throws GenieException {
-        if (StringUtils.isBlank(jobRequest.getId())) {
-            throw new GenieServerException("Id of the jobRequest cannot be null");
-        }
-        log.info("Called to schedule job launch for job {}", jobRequest.getId());
+        final String jobId = jobRequest
+            .getId()
+            .orElseThrow(() -> new GenieServerException("Id of the jobRequest cannot be null"));
+        log.info("Called to schedule job launch for job {}", jobId);
 
         // Log the job request and optionally the client host
-        this.jobPersistenceService.createJobRequest(jobRequest, jobRequestMetadata);
+        this.jobPersistenceService.createJobRequest(jobRequest, jobMetadata);
 
         String archiveLocation = null;
         if (!jobRequest.isDisableLogArchival()) {
             archiveLocation = this.baseArchiveLocation
                 + JobConstants.FILE_PATH_DELIMITER
-                + jobRequest.getId()
+                + jobId
                 + ".tar.gz";
         }
 
@@ -139,18 +138,16 @@ public class JobCoordinatorService {
             jobRequest.getVersion(),
             jobRequest.getCommandArgs()
         )
+            .withId(jobId)
             .withArchiveLocation(archiveLocation)
-            .withDescription(jobRequest.getDescription())
-            .withId(jobRequest.getId())
             .withTags(jobRequest.getTags());
 
+        jobRequest.getDescription().ifPresent(jobBuilder::withDescription);
+
         final JobExecution jobExecution = new JobExecution.Builder(
-            this.hostName,
-            JobExecution.DEFAULT_PROCESS_ID,
-            JobExecution.DEFAULT_CHECK_DELAY,
-            JobExecution.DEFAULT_TIMEOUT
+            this.hostName
         )
-            .withId(jobRequest.getId())
+            .withId(jobId)
             .build();
 
         synchronized (this) {
@@ -175,14 +172,14 @@ public class JobCoordinatorService {
                     );
 
                     // Tell the system a new job has been scheduled so any actions can be taken
-                    log.info("Publishing job scheduled event for job {}", jobRequest.getId());
-                    this.eventPublisher.publishEvent(new JobScheduledEvent(jobRequest.getId(), task, this));
+                    log.info("Publishing job scheduled event for job {}", jobId);
+                    this.eventPublisher.publishEvent(new JobScheduledEvent(jobId, task, this));
                 } catch (final TaskRejectedException e) {
                     final String errorMsg = "Unable to launch job due to exception: " + e.getMessage();
-                    this.jobPersistenceService.updateJobStatus(jobRequest.getId(), JobStatus.FAILED, errorMsg);
+                    this.jobPersistenceService.updateJobStatus(jobId, JobStatus.FAILED, errorMsg);
                     throw new GenieServerException(errorMsg, e);
                 }
-                return jobRequest.getId();
+                return jobId;
             } else {
                 jobBuilder
                     .withStatus(JobStatus.FAILED)

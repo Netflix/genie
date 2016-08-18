@@ -72,27 +72,29 @@ public class JobRequestUnitTests {
         Assert.assertThat(request.getCommandArgs(), Matchers.is(COMMAND_ARGS));
         Assert.assertThat(request.getClusterCriterias(), Matchers.is(CLUSTER_CRITERIAS));
         Assert.assertThat(request.getCommandCriteria(), Matchers.is(COMMAND_CRITERIA));
-        Assert.assertThat(request.getCpu(), Matchers.is(1));
+        Assert.assertFalse(request.getCpu().isPresent());
         Assert.assertThat(request.isDisableLogArchival(), Matchers.is(false));
-        Assert.assertThat(request.getEmail(), Matchers.nullValue());
+        Assert.assertFalse(request.getEmail().isPresent());
         Assert.assertThat(request.getDependencies(), Matchers.empty());
-        Assert.assertThat(request.getGroup(), Matchers.nullValue());
-        Assert.assertThat(request.getMemory(), Matchers.is(1536));
-        Assert.assertThat(request.getSetupFile(), Matchers.nullValue());
-        Assert.assertThat(request.getCreated(), Matchers.nullValue());
-        Assert.assertThat(request.getDescription(), Matchers.nullValue());
-        Assert.assertThat(request.getId(), Matchers.nullValue());
+        Assert.assertFalse(request.getGroup().isPresent());
+        Assert.assertFalse(request.getMemory().isPresent());
+        Assert.assertFalse(request.getSetupFile().isPresent());
+        Assert.assertFalse(request.getCreated().isPresent());
+        Assert.assertFalse(request.getDescription().isPresent());
+        Assert.assertFalse(request.getId().isPresent());
         Assert.assertThat(request.getTags(), Matchers.empty());
-        Assert.assertThat(request.getUpdated(), Matchers.nullValue());
+        Assert.assertFalse(request.getUpdated().isPresent());
         Assert.assertThat(request.getApplications(), Matchers.empty());
-        Assert.assertThat(request.getTimeout(), Matchers.is(604800));
+        Assert.assertFalse(request.getTimeout().isPresent());
     }
 
     /**
      * Test to make sure can build a valid JobRequest with optional parameters.
+     *
+     * @throws Exception on error
      */
     @Test
-    public void canBuildJobRequestWithOptionals() {
+    public void canBuildJobRequestWithOptionals() throws Exception {
         final JobRequest.Builder builder
             = new JobRequest.Builder(NAME, USER, VERSION, COMMAND_ARGS, CLUSTER_CRITERIAS, COMMAND_CRITERIA);
 
@@ -158,20 +160,22 @@ public class JobRequestUnitTests {
         Assert.assertThat(request.getCommandArgs(), Matchers.is(COMMAND_ARGS));
         Assert.assertThat(request.getClusterCriterias(), Matchers.is(CLUSTER_CRITERIAS));
         Assert.assertThat(request.getCommandCriteria(), Matchers.is(COMMAND_CRITERIA));
-        Assert.assertThat(request.getCpu(), Matchers.is(cpu));
+        Assert.assertThat(request.getCpu().orElseThrow(IllegalArgumentException::new), Matchers.is(cpu));
         Assert.assertThat(request.isDisableLogArchival(), Matchers.is(disableLogArchival));
-        Assert.assertThat(request.getEmail(), Matchers.is(email));
+        Assert.assertThat(request.getEmail().orElseThrow(IllegalArgumentException::new), Matchers.is(email));
         Assert.assertThat(request.getDependencies(), Matchers.is(dependencies));
-        Assert.assertThat(request.getGroup(), Matchers.is(group));
-        Assert.assertThat(request.getMemory(), Matchers.is(memory));
-        Assert.assertThat(request.getSetupFile(), Matchers.is(setupFile));
-        Assert.assertThat(request.getCreated(), Matchers.is(created));
-        Assert.assertThat(request.getDescription(), Matchers.is(description));
-        Assert.assertThat(request.getId(), Matchers.is(id));
+        Assert.assertThat(request.getGroup().orElseThrow(IllegalArgumentException::new), Matchers.is(group));
+        Assert.assertThat(request.getMemory().orElseThrow(IllegalArgumentException::new), Matchers.is(memory));
+        Assert.assertThat(request.getSetupFile().orElseThrow(IllegalArgumentException::new), Matchers.is(setupFile));
+        Assert.assertThat(request.getCreated().orElseThrow(IllegalArgumentException::new), Matchers.is(created));
+        Assert.assertThat(
+            request.getDescription().orElseThrow(IllegalArgumentException::new), Matchers.is(description)
+        );
+        Assert.assertThat(request.getId().orElseThrow(IllegalArgumentException::new), Matchers.is(id));
         Assert.assertThat(request.getTags(), Matchers.is(tags));
-        Assert.assertThat(request.getUpdated(), Matchers.is(updated));
+        Assert.assertThat(request.getUpdated().orElseThrow(IllegalArgumentException::new), Matchers.is(updated));
         Assert.assertThat(request.getApplications(), Matchers.is(applications));
-        Assert.assertThat(request.getTimeout(), Matchers.is(timeout));
+        Assert.assertThat(request.getTimeout().orElseThrow(IllegalArgumentException::new), Matchers.is(timeout));
     }
 
     /**
@@ -198,19 +202,20 @@ public class JobRequestUnitTests {
         Assert.assertThat(request.getCommandArgs(), Matchers.is(COMMAND_ARGS));
         Assert.assertThat(request.getClusterCriterias(), Matchers.empty());
         Assert.assertThat(request.getCommandCriteria(), Matchers.empty());
-        Assert.assertThat(request.getCpu(), Matchers.is(1));
+        Assert.assertFalse(request.getCpu().isPresent());
         Assert.assertThat(request.isDisableLogArchival(), Matchers.is(false));
-        Assert.assertThat(request.getEmail(), Matchers.nullValue());
+        Assert.assertFalse(request.getEmail().isPresent());
         Assert.assertThat(request.getDependencies(), Matchers.empty());
-        Assert.assertThat(request.getGroup(), Matchers.nullValue());
-        Assert.assertThat(request.getMemory(), Matchers.is(1536));
-        Assert.assertThat(request.getSetupFile(), Matchers.nullValue());
-        Assert.assertThat(request.getCreated(), Matchers.nullValue());
-        Assert.assertThat(request.getDescription(), Matchers.nullValue());
-        Assert.assertThat(request.getId(), Matchers.nullValue());
+        Assert.assertFalse(request.getGroup().isPresent());
+        Assert.assertFalse(request.getMemory().isPresent());
+        Assert.assertFalse(request.getSetupFile().isPresent());
+        Assert.assertFalse(request.getCreated().isPresent());
+        Assert.assertFalse(request.getDescription().isPresent());
+        Assert.assertFalse(request.getId().isPresent());
         Assert.assertThat(request.getTags(), Matchers.empty());
-        Assert.assertThat(request.getUpdated(), Matchers.nullValue());
+        Assert.assertFalse(request.getUpdated().isPresent());
         Assert.assertThat(request.getApplications(), Matchers.empty());
+        Assert.assertFalse(request.getTimeout().isPresent());
     }
 
     /**

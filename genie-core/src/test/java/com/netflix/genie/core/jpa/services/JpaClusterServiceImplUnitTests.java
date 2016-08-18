@@ -38,6 +38,7 @@ import org.mockito.Mockito;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -128,7 +129,7 @@ public class JpaClusterServiceImplUnitTests {
         final String id = UUID.randomUUID().toString();
         final Cluster cluster = Mockito.mock(Cluster.class);
         Mockito.when(this.jpaClusterRepository.exists(id)).thenReturn(true);
-        Mockito.when(cluster.getId()).thenReturn(UUID.randomUUID().toString());
+        Mockito.when(cluster.getId()).thenReturn(Optional.of(UUID.randomUUID().toString()));
         this.service.updateCluster(id, cluster);
     }
 

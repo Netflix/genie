@@ -39,6 +39,7 @@ public class JobExecutionResourceAssembler implements ResourceAssembler<JobExecu
      */
     @Override
     public JobExecutionResource toResource(final JobExecution jobExecution) {
+        final String id = jobExecution.getId().orElseThrow(IllegalArgumentException::new);
         final JobExecutionResource jobExecutionResource = new JobExecutionResource(jobExecution);
 
         try {
@@ -46,7 +47,7 @@ public class JobExecutionResourceAssembler implements ResourceAssembler<JobExecu
                 ControllerLinkBuilder.linkTo(
                     ControllerLinkBuilder
                         .methodOn(JobRestController.class)
-                        .getJobExecution(jobExecution.getId())
+                        .getJobExecution(id)
                 ).withSelfRel()
             );
 
@@ -54,7 +55,7 @@ public class JobExecutionResourceAssembler implements ResourceAssembler<JobExecu
                 ControllerLinkBuilder.linkTo(
                     ControllerLinkBuilder
                         .methodOn(JobRestController.class)
-                        .getJob(jobExecution.getId())
+                        .getJob(id)
                 ).withRel("job")
             );
 
@@ -62,7 +63,7 @@ public class JobExecutionResourceAssembler implements ResourceAssembler<JobExecu
                 ControllerLinkBuilder.linkTo(
                     ControllerLinkBuilder
                         .methodOn(JobRestController.class)
-                        .getJobRequest(jobExecution.getId())
+                        .getJobRequest(id)
                 ).withRel("request")
             );
 
@@ -88,7 +89,7 @@ public class JobExecutionResourceAssembler implements ResourceAssembler<JobExecu
             jobExecutionResource.add(
                 ControllerLinkBuilder
                     .linkTo(JobRestController.class)
-                    .slash(jobExecution.getId())
+                    .slash(id)
                     .slash(output)
                     .withRel(output)
             );
@@ -97,7 +98,7 @@ public class JobExecutionResourceAssembler implements ResourceAssembler<JobExecu
                 ControllerLinkBuilder.linkTo(
                     ControllerLinkBuilder
                         .methodOn(JobRestController.class)
-                        .getJobStatus(jobExecution.getId())
+                        .getJobStatus(id)
                 ).withRel("status")
             );
         } catch (final GenieException ge) {

@@ -18,6 +18,7 @@
 package com.netflix.genie.core.jobs.workflow.impl;
 
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
 import com.netflix.genie.core.services.AttachmentService;
@@ -31,6 +32,7 @@ import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -55,12 +57,12 @@ public class JobTask extends GenieBaseTask {
      * @throws GenieException If there is any problem.
      */
     public JobTask(
-            @NotNull
-            final AttachmentService attachmentService,
-            @NotNull
-            final Registry registry,
-            @NotNull
-            final GenieFileTransferService fts
+        @NotNull
+        final AttachmentService attachmentService,
+        @NotNull
+        final Registry registry,
+        @NotNull
+        final GenieFileTransferService fts
     ) throws GenieException {
         this.attachmentService = attachmentService;
         this.timer = registry.timer("genie.jobs.tasks.jobTask.timer");
@@ -78,43 +80,51 @@ public class JobTask extends GenieBaseTask {
                 = (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
             final String jobWorkingDirectory = jobExecEnv.getJobWorkingDir().getCanonicalPath();
             final Writer writer = (Writer) context.get(JobConstants.WRITER_KEY);
-            log.info("Starting Job Task for job {}", jobExecEnv.getJobRequest().getId());
+            final String jobId = jobExecEnv
+                .getJobRequest()
+                .getId()
+                .orElseThrow(() -> new GeniePreconditionException("No job id found. Unable to continue"));
+            log.info("Starting Job Task for job {}", jobId);
 
-            final String jobSetupFile = jobExecEnv.getJobRequest().getSetupFile();
+            final Optional<String> setupFile = jobExecEnv.getJobRequest().getSetupFile();
+            if (setupFile.isPresent()) {
+                final String jobSetupFile = setupFile.get();
+                if (StringUtils.isNotBlank(jobSetupFile)) {
+                    final String localPath =
+                        jobWorkingDirectory
+                            + JobConstants.FILE_PATH_DELIMITER
+                            + jobSetupFile.substring(jobSetupFile.lastIndexOf(JobConstants.FILE_PATH_DELIMITER) + 1);
 
-            if (jobSetupFile != null && StringUtils.isNotBlank(jobSetupFile)) {
-                final String localPath =
-                    jobWorkingDirectory
-                        + JobConstants.FILE_PATH_DELIMITER
-                        + jobSetupFile.substring(jobSetupFile.lastIndexOf(JobConstants.FILE_PATH_DELIMITER) + 1);
+                    fts.getFile(jobSetupFile, localPath);
 
-                fts.getFile(jobSetupFile, localPath);
+                    writer.write("# Sourcing setup file specified in job request" + System.lineSeparator());
+                    writer.write(
+                        JobConstants.SOURCE
+                            + localPath.replace(jobWorkingDirectory, "${" + JobConstants.GENIE_JOB_DIR_ENV_VAR + "}")
+                            + System.lineSeparator());
 
-                writer.write("# Sourcing setup file specified in job request" + System.lineSeparator());
-                writer.write(
-                    JobConstants.SOURCE
-                        + localPath.replace(jobWorkingDirectory, "${" + JobConstants.GENIE_JOB_DIR_ENV_VAR + "}")
-                        + System.lineSeparator());
-
-                // Append new line
-                writer.write(System.lineSeparator());
+                    // Append new line
+                    writer.write(System.lineSeparator());
+                }
             }
 
             // Iterate over and get all dependencies
             for (final String dependencyFile : jobExecEnv.getJobRequest().getDependencies()) {
-                final String localPath = jobWorkingDirectory
-                    + JobConstants.FILE_PATH_DELIMITER
-                    + dependencyFile.substring(dependencyFile.lastIndexOf(JobConstants.FILE_PATH_DELIMITER) + 1);
+                if (StringUtils.isNotBlank(dependencyFile)) {
+                    final String localPath = jobWorkingDirectory
+                        + JobConstants.FILE_PATH_DELIMITER
+                        + dependencyFile.substring(dependencyFile.lastIndexOf(JobConstants.FILE_PATH_DELIMITER) + 1);
 
-                fts.getFile(dependencyFile, localPath);
+                    fts.getFile(dependencyFile, localPath);
+                }
             }
 
             // Copy down the attachments if any to the current working directory
             this.attachmentService.copy(
-                jobExecEnv.getJobRequest().getId(),
+                jobId,
                 jobExecEnv.getJobWorkingDir());
             // Delete the files from the attachment service to save space on disk
-            this.attachmentService.delete(jobExecEnv.getJobRequest().getId());
+            this.attachmentService.delete(jobId);
 
             // Print out the current Envrionment to a env file before running the command.
             writer.write("# Dump the environment to a env.log file" + System.lineSeparator());

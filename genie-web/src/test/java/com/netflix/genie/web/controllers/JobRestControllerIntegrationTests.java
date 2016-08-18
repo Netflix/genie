@@ -34,8 +34,8 @@ import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobExecutionRepository;
+import com.netflix.genie.core.jpa.repositories.JpaJobMetadataRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
-import com.netflix.genie.core.jpa.repositories.JpaJobRequestMetadataRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRequestRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SystemUtils;
@@ -142,7 +142,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     private JpaJobRequestRepository jobRequestRepository;
 
     @Autowired
-    private JpaJobRequestMetadataRepository jobRequestMetadataRepository;
+    private JpaJobMetadataRepository jobRequestMetadataRepository;
 
     @Autowired
     private JpaJobExecutionRepository jobExecutionRepository;
@@ -192,7 +192,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                 MockMvcRequestBuilders
                     .post(COMMANDS_API + FILE_DELIMITER + CMD1_ID + FILE_DELIMITER + APPLICATIONS_LINK_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(apps))
+                    .content(objectMapper.writeValueAsBytes(apps))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
@@ -203,7 +203,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                 MockMvcRequestBuilders
                     .post(CLUSTERS_API + FILE_DELIMITER + CLUSTER1_ID + FILE_DELIMITER + COMMANDS_LINK_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(cmds))
+                    .content(objectMapper.writeValueAsBytes(cmds))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
     }
@@ -264,7 +264,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                 MockMvcRequestBuilders
                     .post(APPLICATIONS_API)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(app))
+                    .content(objectMapper.writeValueAsBytes(app))
             )
             .andExpect(MockMvcResultMatchers.status().isCreated())
             .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()))
@@ -306,7 +306,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                 MockMvcRequestBuilders
                     .post(CLUSTERS_API)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(cluster))
+                    .content(objectMapper.writeValueAsBytes(cluster))
             )
             .andExpect(MockMvcResultMatchers.status().isCreated())
             .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()))
@@ -350,7 +350,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                 MockMvcRequestBuilders
                     .post(COMMANDS_API)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(cmd))
+                    .content(objectMapper.writeValueAsBytes(cmd))
             )
             .andExpect(MockMvcResultMatchers.status().isCreated())
             .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()))
@@ -364,13 +364,13 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
      */
     @After
     public void cleanup() throws Exception {
-        log.error("HEALTH ENDPOINT DATA: {}", this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .get("/actuator/health")
-                    .contentType(MediaType.APPLICATION_JSON)
-            )
-            .andReturn().getResponse().getContentAsString());
+//        log.error("HEALTH ENDPOINT DATA: {}", this.mvc
+//            .perform(
+//                MockMvcRequestBuilders
+//                    .get("/actuator/health")
+//                    .contentType(MediaType.APPLICATION_JSON)
+//            )
+//            .andReturn().getResponse().getContentAsString());
 
         this.jobRequestRepository.deleteAll();
         this.jobRequestMetadataRepository.deleteAll();
@@ -423,7 +423,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                 MockMvcRequestBuilders
                     .post(JOBS_API)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(jobRequest))
+                    .content(objectMapper.writeValueAsBytes(jobRequest))
             )
             .andExpect(MockMvcResultMatchers.status().isAccepted())
             .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()))
@@ -500,8 +500,8 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andExpect(MockMvcResultMatchers.jsonPath(DEPENDENCIES_PATH, Matchers.hasSize(1)))
             .andExpect(MockMvcResultMatchers.jsonPath(DEPENDENCIES_PATH + "[0]", Matchers.is(depFile1)))
             .andExpect(MockMvcResultMatchers.jsonPath(EMAIL_PATH, Matchers.nullValue()))
-            .andExpect(MockMvcResultMatchers.jsonPath(CPU_PATH, Matchers.is(1)))
-            .andExpect(MockMvcResultMatchers.jsonPath(MEMORY_PATH, Matchers.is(1536)))
+            .andExpect(MockMvcResultMatchers.jsonPath(CPU_PATH, Matchers.nullValue()))
+            .andExpect(MockMvcResultMatchers.jsonPath(MEMORY_PATH, Matchers.nullValue()))
             .andExpect(MockMvcResultMatchers.jsonPath(APPLICATIONS_PATH, Matchers.empty()));
 
         this.mvc
@@ -562,7 +562,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         Assert.assertThat(this.jobRequestMetadataRepository.count(), Matchers.is(1L));
         Assert.assertThat(this.jobExecutionRepository.count(), Matchers.is(1L));
 
-        // Check if the culster setup file is cached
+        // Check if the cluster setup file is cached
         final String clusterSetUpFilePath = this.resourceLoader.getResource(
                 BASE_DIR + CMD1_ID + FILE_DELIMITER + "setupfile").getFile().getAbsolutePath();
         Assert.assertTrue(Files.exists(Paths.get(new URI(baseCacheLocation).getPath(),
@@ -607,7 +607,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                 MockMvcRequestBuilders
                     .post(JOBS_API)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(jobConflictRequest))
+                    .content(objectMapper.writeValueAsBytes(jobConflictRequest))
             )
             .andExpect(MockMvcResultMatchers.status().isConflict());
     }
@@ -649,7 +649,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                 MockMvcRequestBuilders
                     .post(JOBS_API)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(jobRequest))
+                    .content(objectMapper.writeValueAsBytes(jobRequest))
                     .accept(MediaType.APPLICATION_JSON)
             )
             .andExpect(MockMvcResultMatchers.status().isAccepted());
@@ -696,7 +696,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                 MockMvcRequestBuilders
                     .post(JOBS_API)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(jobRequest))
+                    .content(objectMapper.writeValueAsBytes(jobRequest))
             )
             .andExpect(MockMvcResultMatchers.status().isAccepted());
 
@@ -739,7 +739,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                 MockMvcRequestBuilders
                     .post(JOBS_API)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(jobRequest))
+                    .content(objectMapper.writeValueAsBytes(jobRequest))
             )
             .andExpect(MockMvcResultMatchers.status().isAccepted())
             .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()))
@@ -798,27 +798,16 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             clusterCriteriaList,
             commandCriteria
         )
-            .withTimeout(20)
+            .withTimeout(5)
             .withDisableLogArchival(true)
             .build();
-
-//        final MvcResult result = this.mvc
-//            .perform(
-//                MockMvcRequestBuilders
-//                    .post(JOBS_API)
-//                    .contentType(MediaType.APPLICATION_JSON)
-//                    .content(OBJECT_MAPPER.writeValueAsBytes(jobRequest))
-//            )
-//            .andExpect(MockMvcResultMatchers.status().isAccepted())
-//            .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()))
-//            .andReturn();
 
         final MvcResult result = this.mvc
             .perform(
                 MockMvcRequestBuilders
                     .post(JOBS_API)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(jobRequest))
+                    .content(objectMapper.writeValueAsBytes(jobRequest))
             ).andReturn();
 
         if (result.getResponse().getStatus() != HttpStatus.ACCEPTED.value()) {
@@ -878,7 +867,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
 //                MockMvcRequestBuilders
 //                    .post(JOBS_API)
 //                    .contentType(MediaType.APPLICATION_JSON)
-//                    .content(OBJECT_MAPPER.writeValueAsBytes(jobRequest))
+//                    .content(objectMapper.writeValueAsBytes(jobRequest))
 //            )
 //            .andExpect(MockMvcResultMatchers.status().isAccepted())
 //            .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()))
@@ -889,7 +878,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                 MockMvcRequestBuilders
                     .post(JOBS_API)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(jobRequest))
+                    .content(objectMapper.writeValueAsBytes(jobRequest))
             ).andReturn();
 
         if (result.getResponse().getStatus() != HttpStatus.ACCEPTED.value()) {

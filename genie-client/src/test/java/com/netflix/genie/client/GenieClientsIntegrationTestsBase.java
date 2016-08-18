@@ -86,15 +86,13 @@ public abstract class GenieClientsIntegrationTestsBase {
         configList.add("config1");
         configList.add("configs2");
 
-        final Cluster cluster = new Cluster.Builder("name", "user", "1.0", ClusterStatus.UP)
+        return new Cluster.Builder("name", "user", "1.0", ClusterStatus.UP)
             .withId(clusterId)
             .withDescription("client Test")
             .withSetupFile("path to set up file")
             .withTags(tags)
             .withConfigs(configList)
             .build();
-
-        return cluster;
     }
 
     /**
@@ -120,15 +118,13 @@ public abstract class GenieClientsIntegrationTestsBase {
         configList.add("config1");
         configList.add("configs2");
 
-        final Command command = new Command.Builder("name", "user", "1.0", CommandStatus.ACTIVE, "exec", 1000)
+        return new Command.Builder("name", "user", "1.0", CommandStatus.ACTIVE, "exec", 1000)
             .withId(commandId)
             .withDescription("client Test")
             .withSetupFile("path to set up file")
             .withTags(tags)
             .withConfigs(configList)
             .build();
-
-        return command;
     }
 
     /**
@@ -158,7 +154,7 @@ public abstract class GenieClientsIntegrationTestsBase {
         dependenciesList.add("dep1");
         dependenciesList.add("dep2");
 
-        final Application application = new Application.Builder("name", "user", "1.0", ApplicationStatus.ACTIVE)
+        return new Application.Builder("name", "user", "1.0", ApplicationStatus.ACTIVE)
             .withId(applicationId)
             .withDescription("client Test")
             .withSetupFile("path to set up file")
@@ -166,7 +162,5 @@ public abstract class GenieClientsIntegrationTestsBase {
             .withConfigs(configList)
             .withDependencies(dependenciesList)
             .build();
-
-        return application;
     }
 }

@@ -24,6 +24,7 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.genie.test.suppliers.RandomSuppliers;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -109,10 +110,11 @@ public class JobEntityUnitTests extends EntityTestsBase {
      */
     @Test
     public void testSetGetClusterName() {
-        Assert.assertNull(this.jobEntity.getClusterName());
+        Assert.assertFalse(this.jobEntity.getClusterName().isPresent());
         final String clusterName = UUID.randomUUID().toString();
         this.jobEntity.setClusterName(clusterName);
-        Assert.assertEquals(clusterName, this.jobEntity.getClusterName());
+        final String actualClusterName = this.jobEntity.getClusterName().orElseThrow(IllegalArgumentException::new);
+        Assert.assertThat(actualClusterName, Matchers.is(clusterName));
     }
 
     /**
@@ -120,10 +122,11 @@ public class JobEntityUnitTests extends EntityTestsBase {
      */
     @Test
     public void testSetGetCommandName() {
-        Assert.assertNull(this.jobEntity.getCommandName());
+        Assert.assertFalse(this.jobEntity.getCommandName().isPresent());
         final String commandName = UUID.randomUUID().toString();
         this.jobEntity.setCommandName(commandName);
-        Assert.assertEquals(commandName, this.jobEntity.getCommandName());
+        final String actualCommandName = this.jobEntity.getCommandName().orElseThrow(IllegalArgumentException::new);
+        Assert.assertThat(actualCommandName, Matchers.is(commandName));
     }
 
     /**
@@ -142,7 +145,7 @@ public class JobEntityUnitTests extends EntityTestsBase {
      */
     @Test
     public void testSetGetStatus() {
-        Assert.assertNull(this.jobEntity.getStatus());
+        Assert.assertThat(this.jobEntity.getStatus(), Matchers.is(JobStatus.INIT));
         this.jobEntity.setStatus(JobStatus.KILLED);
         Assert.assertEquals(JobStatus.KILLED, this.jobEntity.getStatus());
     }
@@ -152,10 +155,11 @@ public class JobEntityUnitTests extends EntityTestsBase {
      */
     @Test
     public void testSetGetStatusMsg() {
-        Assert.assertNull(this.jobEntity.getStatusMsg());
+        Assert.assertFalse(this.jobEntity.getStatusMsg().isPresent());
         final String statusMsg = "Job is doing great";
         this.jobEntity.setStatusMsg(statusMsg);
-        Assert.assertEquals(statusMsg, this.jobEntity.getStatusMsg());
+        final String actualStatusMsg = this.jobEntity.getStatusMsg().orElseThrow(IllegalArgumentException::new);
+        Assert.assertThat(actualStatusMsg, Matchers.is(statusMsg));
     }
 
     /**
@@ -163,12 +167,13 @@ public class JobEntityUnitTests extends EntityTestsBase {
      */
     @Test
     public void testSetGetStarted() {
-        Assert.assertNull(this.jobEntity.getStarted());
+        Assert.assertFalse(this.jobEntity.getStarted().isPresent());
         final Date started = new Date(123453L);
         this.jobEntity.setStarted(started);
-        Assert.assertEquals(started.getTime(), this.jobEntity.getStarted().getTime());
+        final Date actualStarted = this.jobEntity.getStarted().orElseThrow(IllegalArgumentException::new);
+        Assert.assertThat(actualStarted.getTime(), Matchers.is(started.getTime()));
         this.jobEntity.setStarted(null);
-        Assert.assertNull(this.jobEntity.getStarted());
+        Assert.assertFalse(this.jobEntity.getStarted().isPresent());
     }
 
     /**
@@ -176,12 +181,13 @@ public class JobEntityUnitTests extends EntityTestsBase {
      */
     @Test
     public void testSetGetFinished() {
-        Assert.assertNull(this.jobEntity.getFinished());
+        Assert.assertFalse(this.jobEntity.getFinished().isPresent());
         final Date finished = new Date(123453L);
         this.jobEntity.setFinished(finished);
-        Assert.assertEquals(finished.getTime(), this.jobEntity.getFinished().getTime());
+        final Date actualFinished = this.jobEntity.getFinished().orElseThrow(IllegalArgumentException::new);
+        Assert.assertThat(actualFinished.getTime(), Matchers.is(finished.getTime()));
         this.jobEntity.setFinished(null);
-        Assert.assertNull(this.jobEntity.getFinished());
+        Assert.assertFalse(this.jobEntity.getFinished().isPresent());
     }
 
     /**
@@ -189,10 +195,13 @@ public class JobEntityUnitTests extends EntityTestsBase {
      */
     @Test
     public void testSetGetArchiveLocation() {
-        Assert.assertNull(this.jobEntity.getArchiveLocation());
+        Assert.assertFalse(this.jobEntity.getArchiveLocation().isPresent());
         final String archiveLocation = "s3://some/location";
         this.jobEntity.setArchiveLocation(archiveLocation);
-        Assert.assertEquals(archiveLocation, this.jobEntity.getArchiveLocation());
+        Assert.assertEquals(
+            archiveLocation,
+            this.jobEntity.getArchiveLocation().orElseThrow(IllegalArgumentException::new)
+        );
     }
 
     /**
@@ -204,42 +213,42 @@ public class JobEntityUnitTests extends EntityTestsBase {
         final JobEntity localJobEntity = new JobEntity();
 
         // Times are null on initialization
-        Assert.assertNull(localJobEntity.getStarted());
-        Assert.assertNull(localJobEntity.getFinished());
+        Assert.assertFalse(localJobEntity.getStarted().isPresent());
+        Assert.assertFalse(localJobEntity.getFinished().isPresent());
 
         // start time is not zero on INIT, finish time is still 0
         localJobEntity.setJobStatus(JobStatus.INIT);
-        Assert.assertNotNull(localJobEntity.getStarted());
-        Assert.assertNull(localJobEntity.getFinished());
-        final Date started = localJobEntity.getStarted();
+        Assert.assertTrue(localJobEntity.getStarted().isPresent());
+        Assert.assertFalse(localJobEntity.getFinished().isPresent());
+        final Date started = localJobEntity.getStarted().orElseThrow(IllegalArgumentException::new);
 
         // Shouldn't affect finish time
         localJobEntity.setJobStatus(JobStatus.RUNNING);
-        Assert.assertThat(localJobEntity.getStarted(), Matchers.is(started));
-        Assert.assertNull(localJobEntity.getFinished());
+        Assert.assertThat(localJobEntity.getStarted().orElseGet(RandomSuppliers.DATE), Matchers.is(started));
+        Assert.assertFalse(localJobEntity.getFinished().isPresent());
 
         // finish time is non-zero on completion
         localJobEntity.setJobStatus(JobStatus.SUCCEEDED);
-        Assert.assertThat(localJobEntity.getStarted(), Matchers.is(started));
-        Assert.assertNotNull(localJobEntity.getFinished());
+        Assert.assertThat(localJobEntity.getStarted().orElseGet(RandomSuppliers.DATE), Matchers.is(started));
+        Assert.assertTrue(localJobEntity.getFinished().isPresent());
 
         final JobEntity jobEntity2 = new JobEntity();
         // Times are null on initialization
-        Assert.assertNull(jobEntity2.getStarted());
-        Assert.assertNull(jobEntity2.getFinished());
+        Assert.assertFalse(jobEntity2.getStarted().isPresent());
+        Assert.assertFalse(jobEntity2.getFinished().isPresent());
 
         // start time is not zero on INIT, finish time is still 0
         final String initMessage = "We're initializing";
         jobEntity2.setJobStatus(JobStatus.INIT, initMessage);
-        Assert.assertNotNull(jobEntity2.getStarted());
-        Assert.assertNull(jobEntity2.getFinished());
-        Assert.assertEquals(initMessage, jobEntity2.getStatusMsg());
+        Assert.assertTrue(jobEntity2.getStarted().isPresent());
+        Assert.assertFalse(jobEntity2.getFinished().isPresent());
+        Assert.assertEquals(initMessage, jobEntity2.getStatusMsg().orElseGet(RandomSuppliers.STRING));
 
         // finish time is non-zero on completion
         final String successMessage = "Job Succeeded";
         jobEntity2.setJobStatus(JobStatus.SUCCEEDED, successMessage);
-        Assert.assertEquals(successMessage, jobEntity2.getStatusMsg());
-        Assert.assertNotNull(jobEntity2.getFinished());
+        Assert.assertEquals(successMessage, jobEntity2.getStatusMsg().orElseGet(RandomSuppliers.STRING));
+        Assert.assertTrue(jobEntity2.getFinished().isPresent());
     }
 
     /**
@@ -318,14 +327,15 @@ public class JobEntityUnitTests extends EntityTestsBase {
         final ClusterEntity cluster = new ClusterEntity();
         final String clusterName = UUID.randomUUID().toString();
         cluster.setName(clusterName);
-        Assert.assertThat(this.jobEntity.getClusterName(), Matchers.nullValue());
+        Assert.assertFalse(this.jobEntity.getClusterName().isPresent());
         this.jobEntity.setCluster(cluster);
         Assert.assertThat(this.jobEntity.getCluster(), Matchers.is(cluster));
-        Assert.assertThat(this.jobEntity.getClusterName(), Matchers.is(clusterName));
+        final String actualClusterName = this.jobEntity.getClusterName().orElseThrow(IllegalArgumentException::new);
+        Assert.assertThat(actualClusterName, Matchers.is(clusterName));
 
         this.jobEntity.setCluster(null);
         Assert.assertThat(this.jobEntity.getCluster(), Matchers.nullValue());
-        Assert.assertThat(this.jobEntity.getClusterName(), Matchers.nullValue());
+        Assert.assertFalse(this.jobEntity.getClusterName().isPresent());
     }
 
     /**
@@ -336,14 +346,15 @@ public class JobEntityUnitTests extends EntityTestsBase {
         final CommandEntity command = new CommandEntity();
         final String commandName = UUID.randomUUID().toString();
         command.setName(commandName);
-        Assert.assertThat(this.jobEntity.getCommandName(), Matchers.nullValue());
+        Assert.assertFalse(this.jobEntity.getCommandName().isPresent());
         this.jobEntity.setCommand(command);
         Assert.assertThat(this.jobEntity.getCommand(), Matchers.is(command));
-        Assert.assertThat(this.jobEntity.getCommandName(), Matchers.is(commandName));
+        final String actualCommandName = this.jobEntity.getCommandName().orElseThrow(IllegalArgumentException::new);
+        Assert.assertThat(actualCommandName, Matchers.is(commandName));
 
         this.jobEntity.setCommand(null);
         Assert.assertThat(this.jobEntity.getCommand(), Matchers.nullValue());
-        Assert.assertThat(this.jobEntity.getCommandName(), Matchers.nullValue());
+        Assert.assertFalse(this.jobEntity.getCommandName().isPresent());
     }
 
     /**
@@ -403,20 +414,20 @@ public class JobEntityUnitTests extends EntityTestsBase {
         entity.setStatusMsg(statusMessage);
 
         final Job job = entity.getDTO();
-        Assert.assertThat(job.getId(), Matchers.is(id));
+        Assert.assertThat(job.getId().orElseGet(RandomSuppliers.STRING), Matchers.is(id));
         Assert.assertThat(job.getName(), Matchers.is(name));
         Assert.assertThat(job.getUser(), Matchers.is(user));
         Assert.assertThat(job.getVersion(), Matchers.is(version));
-        Assert.assertThat(job.getDescription(), Matchers.is(description));
-        Assert.assertThat(job.getCreated(), Matchers.is(created));
-        Assert.assertThat(job.getUpdated(), Matchers.is(updated));
-        Assert.assertThat(job.getClusterName(), Matchers.is(clusterName));
-        Assert.assertThat(job.getCommandName(), Matchers.is(commandName));
+        Assert.assertThat(job.getDescription().orElseGet(RandomSuppliers.STRING), Matchers.is(description));
+        Assert.assertThat(job.getCreated().orElseGet(RandomSuppliers.DATE), Matchers.is(created));
+        Assert.assertThat(job.getUpdated().orElseGet(RandomSuppliers.DATE), Matchers.is(updated));
+        Assert.assertThat(job.getClusterName().orElseGet(RandomSuppliers.STRING), Matchers.is(clusterName));
+        Assert.assertThat(job.getCommandName().orElseGet(RandomSuppliers.STRING), Matchers.is(commandName));
         Assert.assertThat(job.getTags(), Matchers.is(tags));
-        Assert.assertThat(job.getArchiveLocation(), Matchers.is(archiveLocation));
-        Assert.assertThat(job.getStarted(), Matchers.is(started));
-        Assert.assertThat(job.getFinished(), Matchers.is(finished));
+        Assert.assertThat(job.getArchiveLocation().orElseGet(RandomSuppliers.STRING), Matchers.is(archiveLocation));
+        Assert.assertThat(job.getStarted().orElseGet(RandomSuppliers.DATE), Matchers.is(started));
+        Assert.assertThat(job.getFinished().orElseGet(RandomSuppliers.DATE), Matchers.is(finished));
         Assert.assertThat(job.getStatus(), Matchers.is(JobStatus.SUCCEEDED));
-        Assert.assertThat(job.getStatusMsg(), Matchers.is(statusMessage));
+        Assert.assertThat(job.getStatusMsg().orElseGet(RandomSuppliers.STRING), Matchers.is(statusMessage));
     }
 }

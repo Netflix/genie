@@ -23,6 +23,7 @@ import lombok.Setter;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
+import java.util.Optional;
 
 /**
  * Abstract entity which provides a setup file field.
@@ -30,9 +31,9 @@ import javax.persistence.MappedSuperclass;
  * @author tgianos
  * @since 3.0.0
  */
-@MappedSuperclass
 @Getter
 @Setter
+@MappedSuperclass
 public class SetupFileEntity extends CommonFieldsEntity {
     private static final long serialVersionUID = -2027110660923577721L;
 
@@ -45,5 +46,14 @@ public class SetupFileEntity extends CommonFieldsEntity {
      */
     public SetupFileEntity() {
         super();
+    }
+
+    /**
+     * Get the setup file for this entity.
+     *
+     * @return The setup file as an Optional in case it's null
+     */
+    public Optional<String> getSetupFile() {
+        return Optional.ofNullable(this.setupFile);
     }
 }

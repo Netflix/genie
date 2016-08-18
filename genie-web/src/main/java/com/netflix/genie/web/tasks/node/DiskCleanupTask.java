@@ -42,6 +42,8 @@ import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -147,7 +149,8 @@ public class DiskCleanupTask implements Runnable {
                 // Delete anything with a finish time before today @12 AM UTC - retention
                 final Calendar retentionThreshold = TaskUtils.getMidnightUTC();
                 TaskUtils.subtractDaysFromDate(retentionThreshold, this.properties.getRetention());
-                if (job.getFinished().before(retentionThreshold.getTime())) {
+                final Optional<Date> finished = job.getFinished();
+                if (finished.isPresent() && finished.get().before(retentionThreshold.getTime())) {
                     log.info("Attempting to delete job directory for job {}", id);
                     if (this.runAsUser) {
                         final CommandLine commandLine = new CommandLine("sudo");

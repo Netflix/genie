@@ -39,9 +39,11 @@ public class JobSearchResultUnitTests {
 
     /**
      * Make sure constructor works.
+     *
+     * @throws Exception on error
      */
     @Test
-    public void canConstruct() {
+    public void canConstruct() throws Exception {
         final String id = UUID.randomUUID().toString();
         final String name = UUID.randomUUID().toString();
         final String user = UUID.randomUUID().toString();
@@ -57,10 +59,14 @@ public class JobSearchResultUnitTests {
         Assert.assertThat(searchResult.getName(), Matchers.is(name));
         Assert.assertThat(searchResult.getUser(), Matchers.is(user));
         Assert.assertThat(searchResult.getStatus(), Matchers.is(status));
-        Assert.assertThat(searchResult.getStarted(), Matchers.is(started));
-        Assert.assertThat(searchResult.getFinished(), Matchers.is(finished));
-        Assert.assertThat(searchResult.getClusterName(), Matchers.is(clusterName));
-        Assert.assertThat(searchResult.getCommandName(), Matchers.is(commandName));
+        Assert.assertThat(searchResult.getStarted().orElseThrow(IllegalArgumentException::new), Matchers.is(started));
+        Assert.assertThat(searchResult.getFinished().orElseThrow(IllegalArgumentException::new), Matchers.is(finished));
+        Assert.assertThat(
+            searchResult.getClusterName().orElseThrow(IllegalArgumentException::new), Matchers.is(clusterName)
+        );
+        Assert.assertThat(
+            searchResult.getCommandName().orElseThrow(IllegalArgumentException::new), Matchers.is(commandName)
+        );
         Assert.assertThat(
             searchResult.getRuntime(),
             Matchers.is(Duration.ofMillis(finished.getTime() - started.getTime()))
@@ -72,10 +78,10 @@ public class JobSearchResultUnitTests {
         Assert.assertThat(searchResult2.getName(), Matchers.is(name));
         Assert.assertThat(searchResult.getUser(), Matchers.is(user));
         Assert.assertThat(searchResult2.getStatus(), Matchers.is(status));
-        Assert.assertNull(searchResult2.getStarted());
-        Assert.assertNull(searchResult2.getFinished());
-        Assert.assertNull(searchResult2.getClusterName());
-        Assert.assertNull(searchResult2.getCommandName());
+        Assert.assertFalse(searchResult2.getStarted().isPresent());
+        Assert.assertFalse(searchResult2.getFinished().isPresent());
+        Assert.assertFalse(searchResult2.getClusterName().isPresent());
+        Assert.assertFalse(searchResult2.getCommandName().isPresent());
         Assert.assertThat(searchResult2.getRuntime(), Matchers.is(Duration.ZERO));
     }
 }

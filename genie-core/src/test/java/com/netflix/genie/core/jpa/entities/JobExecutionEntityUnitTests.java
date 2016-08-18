@@ -17,10 +17,10 @@
  */
 package com.netflix.genie.core.jpa.entities;
 
-import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.genie.test.suppliers.RandomSuppliers;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -67,7 +67,7 @@ public class JobExecutionEntityUnitTests {
     public void canSetProcessId() {
         final int processId = 12309834;
         this.entity.setProcessId(processId);
-        Assert.assertThat(this.entity.getProcessId(), Matchers.is(processId));
+        Assert.assertThat(this.entity.getProcessId().orElseGet(RandomSuppliers.INT), Matchers.is(processId));
     }
 
     /**
@@ -75,7 +75,7 @@ public class JobExecutionEntityUnitTests {
      */
     @Test
     public void canSetCheckDelay() {
-        Assert.assertThat(this.entity.getCheckDelay(), Matchers.is(Command.DEFAULT_CHECK_DELAY));
+        Assert.assertThat(this.entity.getCheckDelay(), Matchers.nullValue());
         final long newDelay = 1803234L;
         this.entity.setCheckDelay(newDelay);
         Assert.assertThat(this.entity.getCheckDelay(), Matchers.is(newDelay));
@@ -88,7 +88,7 @@ public class JobExecutionEntityUnitTests {
     public void canSetExitCode() {
         final int exitCode = 80072043;
         this.entity.setExitCode(exitCode);
-        Assert.assertThat(this.entity.getExitCode(), Matchers.is(exitCode));
+        Assert.assertThat(this.entity.getExitCode().orElseGet(RandomSuppliers.INT), Matchers.is(exitCode));
     }
 
     /**
@@ -109,10 +109,10 @@ public class JobExecutionEntityUnitTests {
      */
     @Test
     public void canSetTimeout() {
-        Assert.assertThat(this.entity.getTimeout(), Matchers.notNullValue());
-        final Date timeout = new Date(this.entity.getTimeout().getTime() + 100);
+        Assert.assertTrue(this.entity.getTimeout().isPresent());
+        final Date timeout = new Date();
         this.entity.setTimeout(timeout);
-        Assert.assertThat(this.entity.getTimeout(), Matchers.is(timeout));
+        Assert.assertThat(this.entity.getTimeout().orElseGet(RandomSuppliers.DATE), Matchers.is(timeout));
     }
 
     /**
@@ -134,13 +134,19 @@ public class JobExecutionEntityUnitTests {
         this.entity.setTimeout(timeout);
 
         final JobExecution execution = this.entity.getDTO();
-        Assert.assertThat(execution.getId(), Matchers.is(ID));
-        Assert.assertThat(execution.getCreated(), Matchers.is(this.entity.getCreated()));
-        Assert.assertThat(execution.getUpdated(), Matchers.is(this.entity.getUpdated()));
-        Assert.assertThat(execution.getExitCode(), Matchers.is(exitCode));
+        Assert.assertThat(execution.getId().orElseGet(RandomSuppliers.STRING), Matchers.is(ID));
+        Assert.assertThat(
+            execution.getCreated().orElseGet(RandomSuppliers.DATE),
+            Matchers.is(this.entity.getCreated())
+        );
+        Assert.assertThat(
+            execution.getUpdated().orElseGet(RandomSuppliers.DATE),
+            Matchers.is(this.entity.getUpdated())
+        );
+        Assert.assertThat(execution.getExitCode().orElseGet(RandomSuppliers.INT), Matchers.is(exitCode));
         Assert.assertThat(execution.getHostName(), Matchers.is(hostName));
-        Assert.assertThat(execution.getProcessId(), Matchers.is(processId));
-        Assert.assertThat(execution.getCheckDelay(), Matchers.is(checkDelay));
-        Assert.assertThat(execution.getTimeout(), Matchers.is(timeout));
+        Assert.assertThat(execution.getProcessId().orElseGet(RandomSuppliers.INT), Matchers.is(processId));
+        Assert.assertThat(execution.getCheckDelay().orElseGet(RandomSuppliers.LONG), Matchers.is(checkDelay));
+        Assert.assertThat(execution.getTimeout().orElseGet(RandomSuppliers.DATE), Matchers.is(timeout));
     }
 }

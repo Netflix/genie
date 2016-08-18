@@ -4,6 +4,7 @@ dependencies {
      *******************************/
 
     compile("com.fasterxml.jackson.core:jackson-databind")
+    compile("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
     compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     compile("com.google.guava:guava")
     compile("org.apache.commons:commons-lang3")

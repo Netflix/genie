@@ -38,10 +38,13 @@ public class JobStartedEventUnitTests {
      */
     @Test
     public void canConstruct() {
-        final JobExecution.Builder jobExecutionBuilder
-            = new JobExecution.Builder(UUID.randomUUID().toString(), 3029, 238124L, new Date());
-        jobExecutionBuilder.withId(UUID.randomUUID().toString());
-        final JobExecution jobExecution = jobExecutionBuilder.build();
+        final JobExecution jobExecution = new JobExecution
+            .Builder(UUID.randomUUID().toString())
+            .withProcessId(3029)
+            .withCheckDelay(238124L)
+            .withTimeout(new Date())
+            .withId(UUID.randomUUID().toString())
+            .build();
         final Object source = new Object();
         final JobStartedEvent event = new JobStartedEvent(jobExecution, source);
         Assert.assertNotNull(event);

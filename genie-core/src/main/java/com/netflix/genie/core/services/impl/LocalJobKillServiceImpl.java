@@ -101,7 +101,7 @@ public class LocalJobKillServiceImpl implements JobKillService {
             );
         } else if (jobStatus == JobStatus.RUNNING) {
             final JobExecution jobExecution = this.jobSearchService.getJobExecution(id);
-            if (jobExecution.getExitCode() != JobExecution.DEFAULT_EXIT_CODE) {
+            if (jobExecution.getExitCode().isPresent()) {
                 // Job is already finished one way or another
                 return;
             }
@@ -119,7 +119,12 @@ public class LocalJobKillServiceImpl implements JobKillService {
 
             // Job is on this node and still running as of when query was made to database
             if (SystemUtils.IS_OS_UNIX) {
-                this.killJobOnUnix(jobExecution.getProcessId());
+                this.killJobOnUnix(jobExecution
+                    .getProcessId()
+                    .orElseThrow(() ->
+                        new GeniePreconditionException("No process id found. Unable to kill if no process id")
+                    )
+                );
             } else {
                 // Windows, etc. May support later
                 throw new java.lang.UnsupportedOperationException("Genie isn't currently supported on this OS");

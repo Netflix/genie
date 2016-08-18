@@ -40,7 +40,6 @@ import com.netflix.genie.core.jpa.specifications.JpaApplicationSpecs;
 import com.netflix.genie.core.jpa.specifications.JpaCommandSpecs;
 import com.netflix.genie.core.services.ApplicationService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.domain.Page;
@@ -52,6 +51,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -100,16 +100,13 @@ public class JpaApplicationServiceImpl implements ApplicationService {
         final Application app
     ) throws GenieException {
         log.debug("Called with application: {}", app.toString());
-        if (app.getId() != null && this.applicationRepo.exists(app.getId())) {
-            throw new GenieConflictException("An application with id " + app.getId() + " already exists");
+        final Optional<String> appId = app.getId();
+        if (appId.isPresent() && this.applicationRepo.exists(appId.get())) {
+            throw new GenieConflictException("An application with id " + appId.get() + " already exists");
         }
 
         final ApplicationEntity applicationEntity = new ApplicationEntity();
-        if (StringUtils.isBlank(app.getId())) {
-            applicationEntity.setId(UUID.randomUUID().toString());
-        } else {
-            applicationEntity.setId(app.getId());
-        }
+        applicationEntity.setId(app.getId().orElse(UUID.randomUUID().toString()));
         this.updateAndSaveApplicationEntity(applicationEntity, app);
         return applicationEntity.getId();
     }
@@ -163,7 +160,8 @@ public class JpaApplicationServiceImpl implements ApplicationService {
         if (!this.applicationRepo.exists(id)) {
             throw new GenieNotFoundException("No application information entered. Unable to update.");
         }
-        if (!id.equals(updateApp.getId())) {
+        final Optional<String> updateId = updateApp.getId();
+        if (updateId.isPresent() && !id.equals(updateId.get())) {
             throw new GenieBadRequestException("Application id inconsistent with id passed in.");
         }
 
@@ -466,13 +464,16 @@ public class JpaApplicationServiceImpl implements ApplicationService {
         entity.setName(dto.getName());
         entity.setUser(dto.getUser());
         entity.setVersion(dto.getVersion());
-        entity.setDescription(dto.getDescription());
+        final Optional<String> description = dto.getDescription();
+        entity.setDescription(description.isPresent() ? description.get() : null);
         entity.setStatus(dto.getStatus());
-        entity.setSetupFile(dto.getSetupFile());
+        final Optional<String> setupFile = dto.getSetupFile();
+        entity.setSetupFile(setupFile.isPresent() ? setupFile.get() : null);
         entity.setConfigs(dto.getConfigs());
         entity.setDependencies(dto.getDependencies());
         entity.setTags(dto.getTags());
-        entity.setType(dto.getType());
+        final Optional<String> type = dto.getType();
+        entity.setType(type.isPresent() ? type.get() : null);
 
         this.applicationRepo.save(entity);
     }

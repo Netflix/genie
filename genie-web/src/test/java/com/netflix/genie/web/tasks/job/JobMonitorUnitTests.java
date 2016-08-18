@@ -81,8 +81,10 @@ public class JobMonitorUnitTests {
     public void setup() {
         final Calendar tomorrow = Calendar.getInstance(JobConstants.UTC);
         tomorrow.add(Calendar.DAY_OF_YEAR, 1);
-        this.jobExecution = new JobExecution
-            .Builder(UUID.randomUUID().toString(), 3808, DELAY, tomorrow.getTime())
+        this.jobExecution = new JobExecution.Builder(UUID.randomUUID().toString())
+            .withProcessId(3808)
+            .withCheckDelay(DELAY)
+            .withTimeout(tomorrow.getTime())
             .withId(UUID.randomUUID().toString())
             .build();
         this.executor = Mockito.mock(Executor.class);
@@ -243,7 +245,11 @@ public class JobMonitorUnitTests {
             .publishEvent(captor.capture());
 
         Assert.assertNotNull(captor.getValue());
-        Assert.assertThat(captor.getValue().getId(), Matchers.is(this.jobExecution.getId()));
+        final String jobId = this.jobExecution.getId().orElseThrow(IllegalArgumentException::new);
+        Assert.assertThat(
+            captor.getValue().getId(),
+            Matchers.is(jobId)
+        );
         Assert.assertThat(captor.getValue().getSource(), Matchers.is(this.monitor));
         Mockito.verify(this.finishedRate, Mockito.times(1)).increment();
     }
@@ -260,8 +266,10 @@ public class JobMonitorUnitTests {
         // Set timeout to yesterday to force timeout when check happens
         final Calendar yesterday = Calendar.getInstance(JobConstants.UTC);
         yesterday.add(Calendar.DAY_OF_YEAR, -1);
-        this.jobExecution = new JobExecution
-            .Builder(UUID.randomUUID().toString(), 3808, DELAY, yesterday.getTime())
+        this.jobExecution = new JobExecution.Builder(UUID.randomUUID().toString())
+            .withProcessId(3808)
+            .withCheckDelay(DELAY)
+            .withTimeout(yesterday.getTime())
             .withId(UUID.randomUUID().toString())
             .build();
         this.monitor = new JobMonitor(
@@ -282,7 +290,11 @@ public class JobMonitorUnitTests {
             .publishEvent(captor.capture());
 
         Assert.assertNotNull(captor.getValue());
-        Assert.assertThat(captor.getValue().getId(), Matchers.is(this.jobExecution.getId()));
+        final String jobId = this.jobExecution.getId().orElseThrow(IllegalArgumentException::new);
+        Assert.assertThat(
+            captor.getValue().getId(),
+            Matchers.is(jobId)
+        );
         Assert.assertThat(captor.getValue().getReason(), Matchers.is("Job exceeded timeout"));
         Assert.assertThat(captor.getValue().getSource(), Matchers.is(this.monitor));
         Mockito.verify(this.timeoutRate, Mockito.times(1)).increment();
@@ -308,10 +320,17 @@ public class JobMonitorUnitTests {
         final List<ApplicationEvent> events = eventCaptor.getAllValues();
         Assert.assertThat(events.size(), Matchers.is(2));
         Assert.assertTrue(events.get(0) instanceof KillJobEvent);
-        Assert.assertThat(((KillJobEvent) events.get(0)).getId(), Matchers.is(this.jobExecution.getId()));
+        final String jobId = this.jobExecution.getId().orElseThrow(IllegalArgumentException::new);
+        Assert.assertThat(
+            ((KillJobEvent) events.get(0)).getId(),
+            Matchers.is(jobId)
+        );
         Assert.assertThat(events.get(0).getSource(), Matchers.is(this.monitor));
         Assert.assertTrue(events.get(1) instanceof JobFinishedEvent);
-        Assert.assertThat(((JobFinishedEvent) events.get(1)).getId(), Matchers.is(this.jobExecution.getId()));
+        Assert.assertThat(
+            ((JobFinishedEvent) events.get(1)).getId(),
+            Matchers.is(jobId)
+        );
         Assert.assertThat(events.get(1).getSource(), Matchers.is(this.monitor));
         Mockito.verify(this.unsuccessfulCheckRate, Mockito.times(6)).increment();
     }

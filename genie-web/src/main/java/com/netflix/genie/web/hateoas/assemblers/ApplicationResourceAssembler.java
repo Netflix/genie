@@ -39,6 +39,7 @@ public class ApplicationResourceAssembler implements ResourceAssembler<Applicati
      */
     @Override
     public ApplicationResource toResource(final Application application) {
+        final String id = application.getId().orElseThrow(IllegalArgumentException::new);
         final ApplicationResource applicationResource = new ApplicationResource(application);
 
         try {
@@ -46,7 +47,7 @@ public class ApplicationResourceAssembler implements ResourceAssembler<Applicati
                 ControllerLinkBuilder.linkTo(
                     ControllerLinkBuilder
                         .methodOn(ApplicationRestController.class)
-                        .getApplication(application.getId())
+                        .getApplication(id)
                 ).withSelfRel()
             );
 
@@ -54,7 +55,7 @@ public class ApplicationResourceAssembler implements ResourceAssembler<Applicati
                 ControllerLinkBuilder.linkTo(
                     ControllerLinkBuilder
                         .methodOn(ApplicationRestController.class)
-                        .getCommandsForApplication(application.getId(), null)
+                        .getCommandsForApplication(id, null)
                 ).withRel("commands")
             );
         } catch (final GenieException ge) {

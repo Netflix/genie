@@ -45,6 +45,7 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -147,16 +148,16 @@ public class ClusterCheckerTaskUnitTests {
 
         final Job job1 = Mockito.mock(Job.class);
         final String job1Id = UUID.randomUUID().toString();
-        Mockito.when(job1.getId()).thenReturn(job1Id);
+        Mockito.when(job1.getId()).thenReturn(Optional.of(job1Id));
         final Job job2 = Mockito.mock(Job.class);
         final String job2Id = UUID.randomUUID().toString();
-        Mockito.when(job2.getId()).thenReturn(job2Id);
+        Mockito.when(job2.getId()).thenReturn(Optional.of(job2Id));
         final Job job3 = Mockito.mock(Job.class);
         final String job3Id = UUID.randomUUID().toString();
-        Mockito.when(job3.getId()).thenReturn(job3Id);
+        Mockito.when(job3.getId()).thenReturn(Optional.of(job3Id));
         final Job job4 = Mockito.mock(Job.class);
         final String job4Id = UUID.randomUUID().toString();
-        Mockito.when(job4.getId()).thenReturn(job4Id);
+        Mockito.when(job4.getId()).thenReturn(Optional.of(job4Id));
 
         Mockito
             .when(this.jobSearchService.getAllActiveJobsOnHost(host2))
@@ -172,7 +173,9 @@ public class ClusterCheckerTaskUnitTests {
             .setJobCompletionInformation(
                 Mockito.eq(job1Id),
                 Mockito.eq(JobExecution.LOST_EXIT_CODE),
-                Mockito.eq(JobStatus.FAILED), Mockito.anyString()
+                Mockito.eq(JobStatus.FAILED), Mockito.anyString(),
+                Mockito.eq(null),
+                Mockito.eq(null)
             );
 
         this.task.run();
@@ -192,13 +195,17 @@ public class ClusterCheckerTaskUnitTests {
             .setJobCompletionInformation(
                 Mockito.eq(job1Id),
                 Mockito.eq(JobExecution.LOST_EXIT_CODE),
-                Mockito.eq(JobStatus.FAILED), Mockito.anyString()
+                Mockito.eq(JobStatus.FAILED), Mockito.anyString(),
+                Mockito.eq(null),
+                Mockito.eq(null)
             );
         Mockito.verify(this.jobPersistenceService, Mockito.atLeast(1))
             .setJobCompletionInformation(
                 Mockito.eq(job2Id),
                 Mockito.eq(JobExecution.LOST_EXIT_CODE),
-                Mockito.eq(JobStatus.FAILED), Mockito.anyString()
+                Mockito.eq(JobStatus.FAILED), Mockito.anyString(),
+                Mockito.eq(null),
+                Mockito.eq(null)
             );
         Mockito.verify(this.lostJobCounter, Mockito.atLeast(2)).increment();
         Mockito.verify(this.unableToUpdateJobCounter, Mockito.times(1)).increment();

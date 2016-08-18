@@ -18,6 +18,8 @@
 package com.netflix.genie.web.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.dto.Cluster;
@@ -38,6 +40,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.TimeZone;
 import java.util.UUID;
 
 /**
@@ -75,7 +78,15 @@ public abstract class AbstractAPISecurityIntegrationTests {
             1000L
         ).build();
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final ObjectMapper OBJECT_MAPPER;
+
+    static {
+        OBJECT_MAPPER = new ObjectMapper()
+            .setTimeZone(TimeZone.getTimeZone("UTC"))
+            .setDateFormat(new ISO8601DateFormat())
+            .registerModule(new Jdk8Module());
+    }
+
     private static final String APPLICATIONS_API = "/api/v3/applications";
     private static final String CLUSTERS_API = "/api/v3/clusters";
     private static final String COMMANDS_API = "/api/v3/commands";

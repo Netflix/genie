@@ -19,16 +19,17 @@ package com.netflix.genie.common.dto;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.netflix.genie.common.util.JsonDateDeserializer;
-import com.netflix.genie.common.util.JsonDateSerializer;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.netflix.genie.common.util.GenieDateFormat;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.text.DateFormat;
 import java.util.Date;
+import java.util.Optional;
+import java.util.TimeZone;
 
 /**
  * Base fields for multiple DTOs.
@@ -41,12 +42,17 @@ import java.util.Date;
 public abstract class BaseDTO implements Serializable {
 
     private static final long serialVersionUID = 9093424855934127120L;
+    private static final ObjectMapper MAPPER;
+
+    static {
+        final DateFormat iso8601 = new GenieDateFormat();
+        iso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
+        MAPPER = new ObjectMapper().registerModule(new Jdk8Module()).setDateFormat(iso8601);
+    }
 
     @Size(max = 255, message = "Max length for the ID is 255 characters")
     private final String id;
-    @JsonSerialize(using = JsonDateSerializer.class)
     private final Date created;
-    @JsonSerialize(using = JsonDateSerializer.class)
     private final Date updated;
 
     /**
@@ -61,15 +67,24 @@ public abstract class BaseDTO implements Serializable {
     }
 
     /**
+     * Get the Id of this DTO.
+     *
+     * @return The id as an Optional
+     */
+    public Optional<String> getId() {
+        return Optional.ofNullable(this.id);
+    }
+
+    /**
      * Get the creation time.
      *
      * @return The creation time or null if not set.
      */
-    public Date getCreated() {
+    public Optional<Date> getCreated() {
         if (this.created != null) {
-            return new Date(this.created.getTime());
+            return Optional.of(new Date(this.created.getTime()));
         } else {
-            return null;
+            return Optional.empty();
         }
     }
 
@@ -78,11 +93,11 @@ public abstract class BaseDTO implements Serializable {
      *
      * @return The update time or null if not set.
      */
-    public Date getUpdated() {
+    public Optional<Date> getUpdated() {
         if (this.updated != null) {
-            return new Date(this.updated.getTime());
+            return Optional.of(new Date(this.updated.getTime()));
         } else {
-            return null;
+            return Optional.empty();
         }
     }
 
@@ -94,8 +109,7 @@ public abstract class BaseDTO implements Serializable {
     @Override
     public String toString() {
         try {
-            final ObjectMapper mapper = new ObjectMapper();
-            return mapper.writeValueAsString(this);
+            return MAPPER.writeValueAsString(this);
         } catch (final JsonProcessingException ioe) {
             return ioe.getLocalizedMessage();
         }
@@ -112,9 +126,7 @@ public abstract class BaseDTO implements Serializable {
     protected abstract static class Builder<T extends Builder> {
 
         private String bId;
-        @JsonDeserialize(using = JsonDateDeserializer.class)
         private Date bCreated;
-        @JsonDeserialize(using = JsonDateDeserializer.class)
         private Date bUpdated;
 
         protected Builder() {

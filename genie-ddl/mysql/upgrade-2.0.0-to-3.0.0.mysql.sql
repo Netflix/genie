@@ -277,10 +277,10 @@ CREATE TABLE `job_requests` (
   `disable_log_archival` BIT(1) NOT NULL DEFAULT 0,
   `email` VARCHAR(255) DEFAULT NULL,
   `tags` VARCHAR(2048) DEFAULT NULL,
-  `cpu` INT(11) NOT NULL DEFAULT 1,
-  `memory` INT(11) NOT NULL DEFAULT 1560,
+  `cpu` INT(11) DEFAULT NULL,
+  `memory` INT(11) DEFAULT NULL,
   `applications` VARCHAR(2048) NOT NULL DEFAULT '[]',
-  `timeout` INT NOT NULL DEFAULT 604800, # Seven days in seconds
+  `timeout` INT DEFAULT NULL,
   PRIMARY KEY (`id`),
   INDEX `JOB_REQUESTS_CREATED_INDEX` (`created`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -305,9 +305,7 @@ INSERT INTO `job_requests` (
   `dependencies`,
   `disable_log_archival`,
   `email`,
-  `tags`,
-  `cpu`,
-  `memory`
+  `tags`
 ) SELECT
     `j`.`id`,
     `j`.`created`,
@@ -338,9 +336,7 @@ INSERT INTO `job_requests` (
         '||'
       ),
       '|'
-    ),
-    1,
-    1560
+    )
   FROM `jobs` `j`;
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully inserted values into job_requests table.' AS '';
 
@@ -396,29 +392,31 @@ SELECT CURRENT_TIMESTAMP AS '', 'Attempting to make dependencies field not null 
 ALTER TABLE `job_requests` MODIFY `dependencies` VARCHAR(30000) NOT NULL;
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully made dependencies field not null in job_requests table.' AS '';
 
-SELECT CURRENT_TIMESTAMP AS '', 'Creating the job_request_metadata table...' AS '';
-CREATE TABLE `job_request_metadata` (
+SELECT CURRENT_TIMESTAMP AS '', 'Creating the job_metadata table...' AS '';
+CREATE TABLE `job_metadata` (
   `id` VARCHAR(255) NOT NULL,
   `created` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `updated` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
   `entity_version` INT(11) NOT NULL DEFAULT 0,
   `client_host` VARCHAR(255) DEFAULT NULL,
   `user_agent` VARCHAR(2048) DEFAULT NULL,
-  `num_attachments` INT(11) NOT NULL DEFAULT 0,
-  `total_size_of_attachments` BIGINT NOT NULL DEFAULT 0,
+  `num_attachments` INT(11) DEFAULT NULL,
+  `total_size_of_attachments` BIGINT DEFAULT NULL,
+  `std_out_size` BIGINT DEFAULT NULL,
+  `std_err_size` BIGINT DEFAULT NULL,
   FOREIGN KEY (`id`) REFERENCES `job_requests` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-SELECT CURRENT_TIMESTAMP AS '', 'Successfully created the job_request_metadata table.' AS '';
+SELECT CURRENT_TIMESTAMP AS '', 'Successfully created the job_metadata table.' AS '';
 
-SELECT CURRENT_TIMESTAMP AS '', 'Inserting values into job_request_metadata from the jobs table...' AS '';
-INSERT INTO `job_request_metadata` (
+SELECT CURRENT_TIMESTAMP AS '', 'Inserting values into job_metadata from the jobs table...' AS '';
+INSERT INTO `job_metadata` (
   `id`,
   `created`,
   `updated`,
   `entity_version`,
   `client_host`
 ) SELECT `id`, `created`, `updated`, `entityVersion`, `clientHost` FROM `jobs`;
-SELECT CURRENT_TIMESTAMP AS '', 'Successfully inserted values into the job_requests_metadata table.' AS '';
+SELECT CURRENT_TIMESTAMP AS '', 'Successfully inserted values into the job_metadata table.' AS '';
 
 SELECT CURRENT_TIMESTAMP AS '', 'Creating the job_executions table...' AS '';
 CREATE TABLE `job_executions` (
@@ -427,10 +425,10 @@ CREATE TABLE `job_executions` (
   `updated` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
   `entity_version` INT(11) NOT NULL DEFAULT 0,
   `host_name` VARCHAR(255) NOT NULL,
-  `process_id` INT(11) NOT NULL,
-  `exit_code` INT(11) NOT NULL DEFAULT -1,
-  `check_delay` BIGINT NOT NULL DEFAULT 10000,
-  `timeout` DATETIME(3) NOT NULL,
+  `process_id` INT(11) DEFAULT NULL,
+  `exit_code` INT(11) DEFAULT NULL,
+  `check_delay` BIGINT DEFAULT NULL,
+  `timeout` DATETIME(3) DEFAULT NULL,
   FOREIGN KEY (`id`) REFERENCES `jobs` (`id`) ON DELETE CASCADE,
   INDEX `JOB_EXECUTIONS_HOSTNAME_INDEX` (`host_name`),
   INDEX `JOB_EXECUTIONS_EXIT_CODE_INDEX` (`exit_code`)
@@ -445,8 +443,7 @@ INSERT INTO `job_executions` (
   `entity_version`,
   `host_name`,
   `process_id`,
-  `exit_code`,
-  `timeout`
+  `exit_code`
 ) SELECT
     `id`,
     `created`,
@@ -454,8 +451,7 @@ INSERT INTO `job_executions` (
     `entityVersion`,
     `hostName`,
     `processHandle`,
-    `exitCode`,
-    CURRENT_TIMESTAMP + INTERVAL 7 DAY
+    `exitCode`
   FROM `jobs`;
 SELECT CURRENT_TIMESTAMP AS '', 'Successfully inserted values into the job_executions table.' AS '';
 

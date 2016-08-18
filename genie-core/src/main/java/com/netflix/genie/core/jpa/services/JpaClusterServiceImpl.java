@@ -41,7 +41,6 @@ import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.core.jpa.specifications.JpaClusterSpecs;
 import com.netflix.genie.core.services.ClusterService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.domain.Page;
@@ -55,6 +54,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -101,13 +101,14 @@ public class JpaClusterServiceImpl implements ClusterService {
         @Valid
         final Cluster cluster
     ) throws GenieException {
-        log.debug("Called to create cluster {}", cluster.toString());
-        if (StringUtils.isNotBlank(cluster.getId()) && this.clusterRepo.exists(cluster.getId())) {
-            throw new GenieConflictException("A cluster with id " + cluster.getId() + " already exists");
+        log.debug("Called to create cluster {}", cluster);
+        final Optional<String> clusterId = cluster.getId();
+        if (clusterId.isPresent() && this.clusterRepo.exists(clusterId.get())) {
+            throw new GenieConflictException("A cluster with id " + clusterId.get() + " already exists");
         }
 
         final ClusterEntity clusterEntity = new ClusterEntity();
-        clusterEntity.setId(StringUtils.isBlank(cluster.getId()) ? UUID.randomUUID().toString() : cluster.getId());
+        clusterEntity.setId(cluster.getId().orElse(UUID.randomUUID().toString()));
         this.updateAndSaveClusterEntity(clusterEntity, cluster);
         return clusterEntity.getId();
     }
@@ -198,7 +199,8 @@ public class JpaClusterServiceImpl implements ClusterService {
         if (!this.clusterRepo.exists(id)) {
             throw new GenieNotFoundException("No cluster exists with the given id. Unable to update.");
         }
-        if (!id.equals(updateCluster.getId())) {
+        final Optional<String> updateId = updateCluster.getId();
+        if (updateId.isPresent() && !id.equals(updateId.get())) {
             throw new GenieBadRequestException("Cluster id inconsistent with id passed in.");
         }
 
@@ -437,7 +439,7 @@ public class JpaClusterServiceImpl implements ClusterService {
         }
         final ClusterEntity clusterEntity = this.findCluster(id);
         final List<CommandEntity> commandEntities = new ArrayList<>();
-        commandIds.stream().forEach(commandId -> commandEntities.add(this.commandRepo.findOne(commandId)));
+        commandIds.forEach(commandId -> commandEntities.add(this.commandRepo.findOne(commandId)));
 
         clusterEntity.setCommands(commandEntities);
     }
@@ -492,11 +494,13 @@ public class JpaClusterServiceImpl implements ClusterService {
         clusterEntity.setName(updateCluster.getName());
         clusterEntity.setUser(updateCluster.getUser());
         clusterEntity.setVersion(updateCluster.getVersion());
-        clusterEntity.setDescription(updateCluster.getDescription());
+        final Optional<String> description = updateCluster.getDescription();
+        clusterEntity.setDescription(description.isPresent() ? description.get() : null);
         clusterEntity.setStatus(updateCluster.getStatus());
         clusterEntity.setConfigs(updateCluster.getConfigs());
         clusterEntity.setTags(updateCluster.getTags());
-        clusterEntity.setSetupFile(updateCluster.getSetupFile());
+        final Optional<String> setupFile = updateCluster.getSetupFile();
+        clusterEntity.setSetupFile(setupFile.isPresent() ? setupFile.get() : null);
 
         this.clusterRepo.save(clusterEntity);
     }

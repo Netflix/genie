@@ -165,26 +165,28 @@ CREATE TABLE job_executions (
     updated timestamp(3) without time zone DEFAULT now() NOT NULL,
     entity_version integer DEFAULT 0 NOT NULL,
     host_name character varying(255) NOT NULL,
-    process_id integer NOT NULL,
-    exit_code integer DEFAULT '-1'::integer NOT NULL,
-    check_delay bigint DEFAULT 10000 NOT NULL,
-    timeout timestamp without time zone DEFAULT ((now())::date + 7) NOT NULL
+    process_id integer,
+    exit_code integer,
+    check_delay bigint,
+    timeout timestamp without time zone
 );
 
 
 --
--- Name: job_request_metadata; Type: TABLE; Schema: public; Owner: -
+-- Name: job_metadata; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE job_request_metadata (
+CREATE TABLE job_metadata (
     id character varying(255) NOT NULL,
     created timestamp(3) without time zone DEFAULT now() NOT NULL,
     updated timestamp(3) without time zone DEFAULT now() NOT NULL,
     entity_version integer DEFAULT 0 NOT NULL,
     client_host character varying(255) DEFAULT NULL::character varying,
     user_agent character varying(2048) DEFAULT NULL::character varying,
-    num_attachments integer DEFAULT 0 NOT NULL,
-    total_size_of_attachments bigint DEFAULT 0 NOT NULL
+    num_attachments integer,
+    total_size_of_attachments bigint,
+    std_out_size bigint,
+    std_err_size bigint
 );
 
 
@@ -210,10 +212,10 @@ CREATE TABLE job_requests (
     disable_log_archival boolean DEFAULT false NOT NULL,
     email character varying(255) DEFAULT NULL::character varying,
     tags character varying(2048) DEFAULT NULL::character varying,
-    cpu integer DEFAULT 1 NOT NULL,
-    memory integer DEFAULT 1560 NOT NULL,
+    cpu integer,
+    memory integer,
     applications character varying(2048) DEFAULT '[]'::character varying NOT NULL,
-    timeout integer DEFAULT 604800 NOT NULL
+    timeout integer
 );
 
 
@@ -515,11 +517,11 @@ ALTER TABLE ONLY job_executions
 
 
 --
--- Name: job_request_metadata_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: job_metadata_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY job_request_metadata
-    ADD CONSTRAINT job_request_metadata_id_fkey FOREIGN KEY (id) REFERENCES job_requests(id) ON DELETE CASCADE;
+ALTER TABLE ONLY job_metadata
+    ADD CONSTRAINT job_metadata_id_fkey FOREIGN KEY (id) REFERENCES job_requests(id) ON DELETE CASCADE;
 
 
 --

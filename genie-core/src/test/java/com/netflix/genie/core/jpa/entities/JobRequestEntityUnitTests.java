@@ -25,6 +25,7 @@ import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.genie.test.suppliers.RandomSuppliers;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -69,7 +70,7 @@ public class JobRequestEntityUnitTests {
         Assert.assertThat(this.entity.getName(), Matchers.nullValue());
         Assert.assertThat(this.entity.getUser(), Matchers.nullValue());
         Assert.assertThat(this.entity.getVersion(), Matchers.nullValue());
-        Assert.assertThat(this.entity.getDescription(), Matchers.nullValue());
+        Assert.assertFalse(this.entity.getDescription().isPresent());
         Assert.assertThat(this.entity.getCreated(), Matchers.notNullValue());
         Assert.assertThat(this.entity.getUpdated(), Matchers.notNullValue());
         Assert.assertThat(this.entity.getTags(), Matchers.empty());
@@ -78,19 +79,19 @@ public class JobRequestEntityUnitTests {
         Assert.assertThat(this.entity.getCommandArgs(), Matchers.nullValue());
         Assert.assertThat(this.entity.getCommandCriteria(), Matchers.is(EMPTY_JSON_ARRAY));
         Assert.assertThat(this.entity.getCommandCriteriaAsSet(), Matchers.empty());
-        Assert.assertThat(this.entity.getCpu(), Matchers.is(1));
-        Assert.assertThat(this.entity.getEmail(), Matchers.nullValue());
+        Assert.assertFalse(this.entity.getCpu().isPresent());
+        Assert.assertFalse(this.entity.getEmail().isPresent());
         Assert.assertThat(this.entity.getDependencies(), Matchers.is(EMPTY_JSON_ARRAY));
         Assert.assertThat(this.entity.getDependenciesAsSet(), Matchers.empty());
-        Assert.assertThat(this.entity.getGroup(), Matchers.nullValue());
+        Assert.assertFalse(this.entity.getGroup().isPresent());
         Assert.assertThat(this.entity.getJob(), Matchers.nullValue());
-        Assert.assertThat(this.entity.getMemory(), Matchers.is(1536));
-        Assert.assertThat(this.entity.getSetupFile(), Matchers.nullValue());
+        Assert.assertFalse(this.entity.getMemory().isPresent());
+        Assert.assertFalse(this.entity.getSetupFile().isPresent());
         Assert.assertThat(this.entity.getTags(), Matchers.empty());
         Assert.assertFalse(this.entity.isDisableLogArchival());
         Assert.assertThat(this.entity.getApplicationsAsList(), Matchers.empty());
         Assert.assertThat(this.entity.getApplications(), Matchers.is(EMPTY_JSON_ARRAY));
-        Assert.assertThat(this.entity.getTimeout(), Matchers.is(604800));
+        Assert.assertFalse(this.entity.getTimeout().isPresent());
     }
 
     /**
@@ -100,7 +101,7 @@ public class JobRequestEntityUnitTests {
     public void canSetGroup() {
         final String group = UUID.randomUUID().toString();
         this.entity.setGroup(group);
-        Assert.assertThat(this.entity.getGroup(), Matchers.is(group));
+        Assert.assertThat(this.entity.getGroup().orElseGet(RandomSuppliers.STRING), Matchers.is(group));
     }
 
     /**
@@ -226,7 +227,7 @@ public class JobRequestEntityUnitTests {
     public void canSetEmail() {
         final String email = UUID.randomUUID().toString();
         this.entity.setEmail(email);
-        Assert.assertThat(this.entity.getEmail(), Matchers.is(email));
+        Assert.assertThat(this.entity.getEmail().orElseGet(RandomSuppliers.STRING), Matchers.is(email));
     }
 
     /**
@@ -271,7 +272,9 @@ public class JobRequestEntityUnitTests {
     public void canSetSetupFile() {
         final String setupFile = UUID.randomUUID().toString();
         this.entity.setSetupFile(setupFile);
-        Assert.assertThat(this.entity.getSetupFile(), Matchers.is(setupFile));
+        Assert.assertThat(
+            this.entity.getSetupFile().orElseGet(RandomSuppliers.STRING), Matchers.is(setupFile)
+        );
     }
 
     /**
@@ -301,7 +304,7 @@ public class JobRequestEntityUnitTests {
     public void canSetCpu() {
         final int cpu = 16;
         this.entity.setCpu(cpu);
-        Assert.assertThat(this.entity.getCpu(), Matchers.is(cpu));
+        Assert.assertThat(this.entity.getCpu().orElseGet(RandomSuppliers.INT), Matchers.is(cpu));
     }
 
     /**
@@ -311,7 +314,7 @@ public class JobRequestEntityUnitTests {
     public void canSetMemory() {
         final int memory = 2048;
         this.entity.setMemory(memory);
-        Assert.assertThat(this.entity.getMemory(), Matchers.is(memory));
+        Assert.assertThat(this.entity.getMemory().orElseGet(RandomSuppliers.INT), Matchers.is(memory));
     }
 
     /**
@@ -328,11 +331,11 @@ public class JobRequestEntityUnitTests {
      * Make sure can set the additional metadata for this request.
      */
     @Test
-    public void canSetJobRequestMetadata() {
-        Assert.assertThat(this.entity.getJobRequestMetadata(), Matchers.nullValue());
-        final JobRequestMetadataEntity metadata = new JobRequestMetadataEntity();
-        this.entity.setJobRequestMetadata(metadata);
-        Assert.assertThat(this.entity.getJobRequestMetadata(), Matchers.is(metadata));
+    public void canSetJobMetadata() {
+        Assert.assertThat(this.entity.getJobMetadata(), Matchers.nullValue());
+        final JobMetadataEntity metadata = new JobMetadataEntity();
+        this.entity.setJobMetadata(metadata);
+        Assert.assertThat(this.entity.getJobMetadata(), Matchers.is(metadata));
         Assert.assertThat(metadata.getRequest(), Matchers.is(this.entity));
     }
 
@@ -379,10 +382,10 @@ public class JobRequestEntityUnitTests {
      */
     @Test
     public void canSetTimeout() {
-        Assert.assertThat(this.entity.getTimeout(), Matchers.is(604800));
+        Assert.assertFalse(this.entity.getTimeout().isPresent());
         final int timeout = 28023423;
         this.entity.setTimeout(timeout);
-        Assert.assertThat(this.entity.getTimeout(), Matchers.is(timeout));
+        Assert.assertThat(this.entity.getTimeout().orElseGet(RandomSuppliers.INT), Matchers.is(timeout));
     }
 
     /**
@@ -478,13 +481,13 @@ public class JobRequestEntityUnitTests {
         requestEntity.setTimeout(timeout);
 
         final JobRequest request = requestEntity.getDTO();
-        Assert.assertThat(request.getId(), Matchers.is(id));
+        Assert.assertThat(request.getId().orElseGet(RandomSuppliers.STRING), Matchers.is(id));
         Assert.assertThat(request.getName(), Matchers.is(name));
         Assert.assertThat(request.getUser(), Matchers.is(user));
         Assert.assertThat(request.getVersion(), Matchers.is(version));
-        Assert.assertThat(request.getDescription(), Matchers.is(description));
-        Assert.assertThat(request.getCreated(), Matchers.is(created));
-        Assert.assertThat(request.getUpdated(), Matchers.is(updated));
+        Assert.assertThat(request.getDescription().orElseGet(RandomSuppliers.STRING), Matchers.is(description));
+        Assert.assertThat(request.getCreated().orElseGet(RandomSuppliers.DATE), Matchers.is(created));
+        Assert.assertThat(request.getUpdated().orElseGet(RandomSuppliers.DATE), Matchers.is(updated));
         Assert.assertThat(request.getTags(), Matchers.is(tags));
         Assert.assertThat(request.getCommandArgs(), Matchers.is(commandArgs));
 
@@ -497,12 +500,12 @@ public class JobRequestEntityUnitTests {
         Assert.assertThat(request.getCommandCriteria(), Matchers.is(commandCriteria));
         Assert.assertThat(request.getDependencies(), Matchers.is(fileDependencies));
         Assert.assertTrue(request.isDisableLogArchival());
-        Assert.assertThat(request.getEmail(), Matchers.is(email));
-        Assert.assertThat(request.getGroup(), Matchers.is(group));
-        Assert.assertThat(request.getSetupFile(), Matchers.is(setupFile));
-        Assert.assertThat(request.getCpu(), Matchers.is(cpu));
-        Assert.assertThat(request.getMemory(), Matchers.is(memory));
+        Assert.assertThat(request.getEmail().orElseGet(RandomSuppliers.STRING), Matchers.is(email));
+        Assert.assertThat(request.getGroup().orElseGet(RandomSuppliers.STRING), Matchers.is(group));
+        Assert.assertThat(request.getSetupFile().orElseGet(RandomSuppliers.STRING), Matchers.is(setupFile));
+        Assert.assertThat(request.getCpu().orElseGet(RandomSuppliers.INT), Matchers.is(cpu));
+        Assert.assertThat(request.getMemory().orElseGet(RandomSuppliers.INT), Matchers.is(memory));
         Assert.assertThat(request.getApplications(), Matchers.is(applications));
-        Assert.assertThat(request.getTimeout(), Matchers.is(timeout));
+        Assert.assertThat(request.getTimeout().orElseGet(RandomSuppliers.INT), Matchers.is(timeout));
     }
 }

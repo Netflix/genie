@@ -174,7 +174,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             MockMvcRequestBuilders
                 .post(APPLICATIONS_API)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(OBJECT_MAPPER.writeValueAsBytes(app))
+                .content(objectMapper.writeValueAsBytes(app))
         ).andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
         Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
     }
@@ -283,7 +283,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
         Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
         final String id = this.createApplication(ID, NAME, USER, VERSION, ApplicationStatus.ACTIVE, null);
         final String applicationResource = APPLICATIONS_API + "/" + id;
-        final Application createdApp = OBJECT_MAPPER
+        final Application createdApp = objectMapper
             .readValue(
                 this.mvc.perform(
                     MockMvcRequestBuilders.get(applicationResource)
@@ -295,27 +295,27 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             ).getContent();
         Assert.assertThat(createdApp.getStatus(), Matchers.is(ApplicationStatus.ACTIVE));
 
-        final Application newStatusApp = new Application.Builder(
+        final Application.Builder newStatusApp = new Application.Builder(
             createdApp.getName(),
             createdApp.getUser(),
             createdApp.getVersion(),
             ApplicationStatus.INACTIVE
         )
-            .withId(createdApp.getId())
-            .withCreated(createdApp.getCreated())
-            .withUpdated(createdApp.getUpdated())
-            .withDescription(createdApp.getDescription())
+            .withId(createdApp.getId().orElseThrow(IllegalArgumentException::new))
+            .withCreated(createdApp.getCreated().orElseThrow(IllegalArgumentException::new))
+            .withUpdated(createdApp.getUpdated().orElseThrow(IllegalArgumentException::new))
             .withTags(createdApp.getTags())
             .withConfigs(createdApp.getConfigs())
-            .withSetupFile(createdApp.getSetupFile())
-            .withDependencies(createdApp.getDependencies())
-            .build();
+            .withDependencies(createdApp.getDependencies());
+
+        createdApp.getDescription().ifPresent(newStatusApp::withDescription);
+        createdApp.getSetupFile().ifPresent(newStatusApp::withSetupFile);
 
         this.mvc.perform(
             MockMvcRequestBuilders
                 .put(applicationResource)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(OBJECT_MAPPER.writeValueAsBytes(newStatusApp))
+                .content(objectMapper.writeValueAsBytes(newStatusApp.build()))
         ).andExpect(MockMvcResultMatchers.status().isNoContent());
 
         this.mvc
@@ -344,13 +344,13 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
 
         final String newUser = UUID.randomUUID().toString();
         final String patchString = "[{ \"op\": \"replace\", \"path\": \"/user\", \"value\": \"" + newUser + "\" }]";
-        final JsonPatch patch = JsonPatch.fromJson(OBJECT_MAPPER.readTree(patchString));
+        final JsonPatch patch = JsonPatch.fromJson(objectMapper.readTree(patchString));
 
         this.mvc.perform(
             MockMvcRequestBuilders
                 .patch(applicationResource)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(OBJECT_MAPPER.writeValueAsBytes(patch))
+                .content(objectMapper.writeValueAsBytes(patch))
         ).andExpect(MockMvcResultMatchers.status().isNoContent());
 
         this.mvc
@@ -564,7 +564,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
                 MockMvcRequestBuilders
                     .post(COMMANDS_API + "/" + command1Id + "/applications")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(appIds))
+                    .content(objectMapper.writeValueAsBytes(appIds))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
         this.mvc
@@ -572,14 +572,14 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
                 MockMvcRequestBuilders
                     .post(COMMANDS_API + "/" + command3Id + "/applications")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(appIds))
+                    .content(objectMapper.writeValueAsBytes(appIds))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
         final String applicationCommandsAPI = APPLICATIONS_API + "/" + ID + "/commands";
 
         Arrays.asList(
-            OBJECT_MAPPER.readValue(
+            objectMapper.readValue(
                 this.mvc
                     .perform(MockMvcRequestBuilders.get(applicationCommandsAPI))
                     .andExpect(MockMvcResultMatchers.status().isOk())
@@ -590,9 +590,10 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
                     .getContentAsByteArray(),
                 Command[].class
             )
-        ).stream().forEach(
+        ).forEach(
             command -> {
-                if (!command.getId().equals(command1Id) && !command.getId().equals(command3Id)) {
+                if (!command.getId().orElseThrow(IllegalArgumentException::new).equals(command1Id)
+                    && !command.getId().orElseThrow(IllegalArgumentException::new).equals(command3Id)) {
                     Assert.fail();
                 }
             }

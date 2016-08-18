@@ -19,6 +19,7 @@ package com.netflix.genie.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
+import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.dto.Cluster;
@@ -141,10 +142,10 @@ public class CommandClientIntegrationTests extends GenieClientsIntegrationTestsB
                 CommandStatus.INACTIVE,
                 "exec",
                 1000
-                )
-            .withId(command2Id)
-            .withTags(command2Tags)
-            .build();
+            )
+                .withId(command2Id)
+                .withTags(command2Tags)
+                .build();
 
         commandClient.createCommand(command1);
         commandClient.createCommand(command2);
@@ -154,21 +155,21 @@ public class CommandClientIntegrationTests extends GenieClientsIntegrationTestsB
             null,
             null,
             null,
-            Arrays.asList("foo")
+            Lists.newArrayList("foo")
         );
         Assert.assertEquals(1, commandList.size());
-        Assert.assertEquals(command1Id, commandList.get(0).getId());
+        Assert.assertEquals(command1Id, commandList.get(0).getId().orElse(UUID.randomUUID().toString()));
 
         commandList = commandClient.getCommands(
             null,
             null,
             null,
-            Arrays.asList("pi")
+            Lists.newArrayList("pi")
         );
 
         Assert.assertEquals(2, commandList.size());
-        Assert.assertEquals(command2Id, commandList.get(0).getId());
-        Assert.assertEquals(command1Id, commandList.get(1).getId());
+        Assert.assertEquals(command2Id, commandList.get(0).getId().orElse(UUID.randomUUID().toString()));
+        Assert.assertEquals(command1Id, commandList.get(1).getId().orElse(UUID.randomUUID().toString()));
 
         // Test get by name
         commandList = commandClient.getCommands(
@@ -184,7 +185,7 @@ public class CommandClientIntegrationTests extends GenieClientsIntegrationTestsB
         commandList = commandClient.getCommands(
             null,
             null,
-            Arrays.asList(CommandStatus.ACTIVE.toString()),
+            Lists.newArrayList(CommandStatus.ACTIVE.toString()),
             null
         );
 
@@ -246,11 +247,11 @@ public class CommandClientIntegrationTests extends GenieClientsIntegrationTestsB
         final Command command1 = constructCommandDTO(null);
         commandClient.createCommand(command1);
 
-        final Command command2 = commandClient.getCommand(command1.getId());
+        final Command command2 = commandClient.getCommand(command1.getId().orElseThrow(IllegalArgumentException::new));
         Assert.assertEquals(command2.getId(), command1.getId());
 
-        commandClient.deleteCommand(command1.getId());
-        commandClient.getCommand(command1.getId());
+        commandClient.deleteCommand(command1.getId().orElseThrow(IllegalArgumentException::new));
+        commandClient.getCommand(command1.getId().orElseThrow(IllegalArgumentException::new));
     }
 
     /**
@@ -263,24 +264,24 @@ public class CommandClientIntegrationTests extends GenieClientsIntegrationTestsB
         final Command command1 = constructCommandDTO(null);
         commandClient.createCommand(command1);
 
-        final Command command2 = commandClient.getCommand(command1.getId());
+        final Command command2 = commandClient.getCommand(command1.getId().orElseThrow(IllegalArgumentException::new));
         Assert.assertEquals(command2.getName(), command1.getName());
 
         final Command command3 = new
             Command.Builder("newname", "newuser", "new version", CommandStatus.ACTIVE, "exec", 1000)
-            .withId(command1.getId())
+            .withId(command1.getId().orElseThrow(IllegalArgumentException::new))
             .build();
 
-        commandClient.updateCommand(command1.getId(), command3);
+        commandClient.updateCommand(command1.getId().orElseThrow(IllegalArgumentException::new), command3);
 
-        final Command command4 = commandClient.getCommand(command1.getId());
+        final Command command4 = commandClient.getCommand(command1.getId().orElseThrow(IllegalArgumentException::new));
 
         Assert.assertEquals("newname", command4.getName());
         Assert.assertEquals("newuser", command4.getUser());
         Assert.assertEquals("new version", command4.getVersion());
         Assert.assertEquals(CommandStatus.ACTIVE, command4.getStatus());
-        Assert.assertEquals(null, command4.getSetupFile());
-        Assert.assertEquals(null, command4.getDescription());
+        Assert.assertFalse(command4.getSetupFile().isPresent());
+        Assert.assertFalse(command4.getDescription().isPresent());
         Assert.assertEquals(Collections.emptySet(), command4.getConfigs());
         Assert.assertEquals(command4.getTags().contains("foo"), false);
     }
@@ -451,17 +452,17 @@ public class CommandClientIntegrationTests extends GenieClientsIntegrationTestsB
 
         List<Application> applications = commandClient.getApplicationsForCommand("command1");
         Assert.assertEquals(3, applications.size());
-        Assert.assertEquals("foo", applications.get(0).getId());
-        Assert.assertEquals("bar", applications.get(1).getId());
-        Assert.assertEquals("pi", applications.get(2).getId());
+        Assert.assertEquals("foo", applications.get(0).getId().orElseThrow(IllegalArgumentException::new));
+        Assert.assertEquals("bar", applications.get(1).getId().orElseThrow(IllegalArgumentException::new));
+        Assert.assertEquals("pi", applications.get(2).getId().orElseThrow(IllegalArgumentException::new));
 
         // Test removing a application for command
         commandClient.removeApplicationFromCommand("command1", "pi");
 
         applications = commandClient.getApplicationsForCommand("command1");
         Assert.assertEquals(2, applications.size());
-        Assert.assertEquals("foo", applications.get(0).getId());
-        Assert.assertEquals("bar", applications.get(1).getId());
+        Assert.assertEquals("foo", applications.get(0).getId().orElseThrow(IllegalArgumentException::new));
+        Assert.assertEquals("bar", applications.get(1).getId().orElseThrow(IllegalArgumentException::new));
 
         final List<String> updatedApplications = new ArrayList<>();
         updatedApplications.add("foo");
@@ -471,8 +472,8 @@ public class CommandClientIntegrationTests extends GenieClientsIntegrationTestsB
         commandClient.updateApplicationsForCommand("command1", updatedApplications);
         applications = commandClient.getApplicationsForCommand("command1");
         Assert.assertEquals(2, applications.size());
-        Assert.assertEquals("foo", applications.get(0).getId());
-        Assert.assertEquals("pi", applications.get(1).getId());
+        Assert.assertEquals("foo", applications.get(0).getId().orElseThrow(IllegalArgumentException::new));
+        Assert.assertEquals("pi", applications.get(1).getId().orElseThrow(IllegalArgumentException::new));
 
         // Test delete all applications in a command
         commandClient.removeAllApplicationsForCommand("command1");
@@ -517,10 +518,17 @@ public class CommandClientIntegrationTests extends GenieClientsIntegrationTestsB
         clusterClient.createCluster(cluster1);
         clusterClient.createCluster(cluster2);
 
-        clusterClient.addCommandsToCluster(cluster1.getId(), Arrays.asList(command.getId()));
-        clusterClient.addCommandsToCluster(cluster2.getId(), Arrays.asList(command.getId()));
+        clusterClient.addCommandsToCluster(
+            cluster1.getId().orElseThrow(IllegalArgumentException::new),
+            Lists.newArrayList(command.getId().orElseThrow(IllegalArgumentException::new))
+        );
+        clusterClient.addCommandsToCluster(
+            cluster2.getId().orElseThrow(IllegalArgumentException::new),
+            Lists.newArrayList(command.getId().orElseThrow(IllegalArgumentException::new))
+        );
 
-        final List<Cluster> clusterList = commandClient.getClustersForCommand(command.getId());
+        final List<Cluster> clusterList
+            = commandClient.getClustersForCommand(command.getId().orElseThrow(IllegalArgumentException::new));
 
         Assert.assertEquals(2, clusterList.size());
     }

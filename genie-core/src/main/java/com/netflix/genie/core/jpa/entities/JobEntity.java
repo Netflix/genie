@@ -19,8 +19,9 @@ package com.netflix.genie.core.jpa.entities;
 
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobStatus;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.NotBlank;
 
 import javax.annotation.Nullable;
 import javax.persistence.Basic;
@@ -45,6 +46,7 @@ import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Representation of the state of a Genie 3.0 job.
@@ -52,6 +54,8 @@ import java.util.List;
  * @author amsharma
  * @author tgianos
  */
+@Getter
+@Setter
 @Entity
 @Table(name = "jobs")
 public class JobEntity extends CommonFieldsEntity {
@@ -62,7 +66,7 @@ public class JobEntity extends CommonFieldsEntity {
 
     private static final long serialVersionUID = 2849367731657512224L;
 
-    @Basic
+    @Basic(optional = false)
     @Column(name = "command_args", nullable = false, length = 10000)
     @Size(min = 1, max = 10000, message = "Must have command line arguments and be no longer than 10000 characters")
     private String commandArgs;
@@ -70,7 +74,7 @@ public class JobEntity extends CommonFieldsEntity {
     @Basic(optional = false)
     @Column(name = "status", nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
-    private JobStatus status;
+    private JobStatus status = JobStatus.INIT;
 
     @Basic
     @Column(name = "status_msg")
@@ -149,8 +153,8 @@ public class JobEntity extends CommonFieldsEntity {
      *
      * @return the cluster name
      */
-    public String getClusterName() {
-        return this.clusterName;
+    public Optional<String> getClusterName() {
+        return Optional.ofNullable(this.clusterName);
     }
 
     /**
@@ -167,8 +171,8 @@ public class JobEntity extends CommonFieldsEntity {
      *
      * @return The command name
      */
-    public String getCommandName() {
-        return this.commandName;
+    public Optional<String> getCommandName() {
+        return Optional.ofNullable(this.commandName);
     }
 
     /**
@@ -181,59 +185,12 @@ public class JobEntity extends CommonFieldsEntity {
     }
 
     /**
-     * Gets the commandArgs specified to run the job.
-     *
-     * @return commandArgs
-     */
-    public String getCommandArgs() {
-        return this.commandArgs;
-    }
-
-    /**
-     * Parameters specified to be run and fed as command line arguments to the
-     * job run.
-     *
-     * @param commandArgs Arguments to be used to run the command with. Not null/empty/blank.
-     */
-    public void setCommandArgs(@NotBlank final String commandArgs) {
-        this.commandArgs = commandArgs;
-    }
-
-    /**
-     * Gets the status for this job.
-     *
-     * @return status
-     * @see JobStatus
-     */
-    public JobStatus getStatus() {
-        return this.status;
-    }
-
-    /**
-     * Set the status for the job.
-     *
-     * @param status The new status
-     */
-    public void setStatus(final JobStatus status) {
-        this.status = status;
-    }
-
-    /**
      * Gets the status message or this job.
      *
      * @return statusMsg
      */
-    public String getStatusMsg() {
-        return this.statusMsg;
-    }
-
-    /**
-     * Set the status message for the job.
-     *
-     * @param statusMsg The status message.
-     */
-    public void setStatusMsg(final String statusMsg) {
-        this.statusMsg = statusMsg;
+    public Optional<String> getStatusMsg() {
+        return Optional.ofNullable(this.statusMsg);
     }
 
     /**
@@ -241,8 +198,8 @@ public class JobEntity extends CommonFieldsEntity {
      *
      * @return startTime as a java.util.Date or null if not yet started
      */
-    public Date getStarted() {
-        return this.started == null ? null : new Date(this.started.getTime());
+    public Optional<Date> getStarted() {
+        return this.started == null ? Optional.empty() : Optional.of(new Date(this.started.getTime()));
     }
 
     /**
@@ -259,8 +216,8 @@ public class JobEntity extends CommonFieldsEntity {
      *
      * @return finished. The job finish timestamp.
      */
-    public Date getFinished() {
-        return this.finished == null ? null : new Date(this.finished.getTime());
+    public Optional<Date> getFinished() {
+        return this.finished == null ? Optional.empty() : Optional.of(new Date(this.finished.getTime()));
     }
 
     /**
@@ -277,17 +234,8 @@ public class JobEntity extends CommonFieldsEntity {
      *
      * @return s3/hdfs location where logs are archived
      */
-    public String getArchiveLocation() {
-        return this.archiveLocation;
-    }
-
-    /**
-     * Set location where logs are archived.
-     *
-     * @param archiveLocation s3/hdfs location where logs are archived
-     */
-    public void setArchiveLocation(final String archiveLocation) {
-        this.archiveLocation = archiveLocation;
+    public Optional<String> getArchiveLocation() {
+        return Optional.ofNullable(this.archiveLocation);
     }
 
     /**
@@ -295,7 +243,7 @@ public class JobEntity extends CommonFieldsEntity {
      *
      * @param jobStatus status for job
      */
-    public void setJobStatus(final JobStatus jobStatus) {
+    public void setJobStatus(@NotNull final JobStatus jobStatus) {
         this.status = jobStatus;
 
         if (jobStatus == JobStatus.INIT) {
@@ -335,15 +283,6 @@ public class JobEntity extends CommonFieldsEntity {
     }
 
     /**
-     * Get the job execution for this job.
-     *
-     * @return The job execution.
-     */
-    public JobExecutionEntity getExecution() {
-        return this.execution;
-    }
-
-    /**
      * Set the job execution for this job.
      *
      * @param execution The execution. Not null.
@@ -351,15 +290,6 @@ public class JobEntity extends CommonFieldsEntity {
     public void setExecution(@NotNull(message = "Execution can't be null") final JobExecutionEntity execution) {
         this.execution = execution;
         execution.setJob(this);
-    }
-
-    /**
-     * Get the cluster this job ran on.
-     *
-     * @return The cluster
-     */
-    public ClusterEntity getCluster() {
-        return this.cluster;
     }
 
     /**
@@ -381,15 +311,6 @@ public class JobEntity extends CommonFieldsEntity {
     }
 
     /**
-     * Get the command this job used to run.
-     *
-     * @return The command
-     */
-    public CommandEntity getCommand() {
-        return this.command;
-    }
-
-    /**
      * Set the command used to run this job.
      *
      * @param command The command
@@ -405,15 +326,6 @@ public class JobEntity extends CommonFieldsEntity {
         if (this.command != null) {
             this.commandName = command.getName();
         }
-    }
-
-    /**
-     * Get the applications used to run this job.
-     *
-     * @return The applications
-     */
-    public List<ApplicationEntity> getApplications() {
-        return this.applications;
     }
 
     /**
@@ -434,7 +346,7 @@ public class JobEntity extends CommonFieldsEntity {
      * @return The read-only DTO.
      */
     public Job getDTO() {
-        return new Job.Builder(
+        final Job.Builder builder = new Job.Builder(
             this.getName(),
             this.getUser(),
             this.getVersion(),
@@ -444,14 +356,16 @@ public class JobEntity extends CommonFieldsEntity {
             .withClusterName(this.clusterName)
             .withCommandName(this.commandName)
             .withCreated(this.getCreated())
-            .withDescription(this.getDescription())
             .withTags(this.getTags())
             .withUpdated(this.getUpdated())
             .withArchiveLocation(this.archiveLocation)
             .withFinished(this.finished)
             .withStarted(this.started)
             .withStatus(this.status)
-            .withStatusMsg(this.statusMsg)
-            .build();
+            .withStatusMsg(this.statusMsg);
+
+        this.getDescription().ifPresent(builder::withDescription);
+
+        return builder.build();
     }
 }

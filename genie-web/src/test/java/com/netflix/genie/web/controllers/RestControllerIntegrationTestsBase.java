@@ -19,6 +19,7 @@ package com.netflix.genie.web.controllers;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.collect.Sets;
 import com.netflix.genie.GenieWeb;
 import com.netflix.genie.common.dto.Application;
@@ -27,10 +28,10 @@ import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
+import com.netflix.genie.common.util.GenieDateFormat;
 import com.netflix.genie.test.categories.IntegrationTest;
 import org.hamcrest.Matchers;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +49,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.UUID;
 
 /**
@@ -71,8 +73,8 @@ public abstract class RestControllerIntegrationTestsBase {
     protected static final String ID_PATH = "$.id";
     protected static final String CREATED_PATH = "$.created";
     protected static final String UPDATED_PATH = "$.updated";
-    protected static final String NAME_PATH =  "$.name";
-    protected static final String VERSION_PATH =  "$.version";
+    protected static final String NAME_PATH = "$.name";
+    protected static final String VERSION_PATH = "$.version";
     protected static final String USER_PATH = "$.user";
     protected static final String DESCRIPTION_PATH = "$.description";
     protected static final String TAGS_PATH = "$.tags";
@@ -89,20 +91,12 @@ public abstract class RestControllerIntegrationTestsBase {
     protected static final String APPLICATIONS_LINK_KEY = "applications";
     protected static final String JOBS_LINK_KEY = "jobs";
 
-    protected static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    protected ObjectMapper objectMapper;
 
     protected MockMvc mvc;
 
     @Autowired
     private WebApplicationContext context;
-
-    /**
-     * Setup class wide configuration.
-     */
-    @BeforeClass
-    public static void setupClass() {
-        OBJECT_MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    }
 
     /**
      * Setup for tests.
@@ -114,6 +108,14 @@ public abstract class RestControllerIntegrationTestsBase {
         this.mvc = MockMvcBuilders
             .webAppContextSetup(this.context)
             .build();
+
+        if (this.objectMapper == null) {
+            this.objectMapper = new ObjectMapper()
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                .setTimeZone(TimeZone.getTimeZone("UTC"))
+                .setDateFormat(new GenieDateFormat())
+                .registerModule(new Jdk8Module());
+        }
     }
 
     protected void canAddElementsToResource(final String api) throws Exception {
@@ -131,7 +133,7 @@ public abstract class RestControllerIntegrationTestsBase {
                 MockMvcRequestBuilders
                     .post(api)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(elements))
+                    .content(objectMapper.writeValueAsBytes(elements))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
@@ -153,7 +155,7 @@ public abstract class RestControllerIntegrationTestsBase {
                 MockMvcRequestBuilders
                     .post(api)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(elements))
+                    .content(objectMapper.writeValueAsBytes(elements))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
@@ -163,7 +165,7 @@ public abstract class RestControllerIntegrationTestsBase {
                 MockMvcRequestBuilders
                     .put(api)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(Sets.newHashSet(element3)))
+                    .content(objectMapper.writeValueAsBytes(Sets.newHashSet(element3)))
             ).andExpect(MockMvcResultMatchers.status().isNoContent());
 
         this.mvc
@@ -182,7 +184,7 @@ public abstract class RestControllerIntegrationTestsBase {
                 MockMvcRequestBuilders
                     .post(api)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(Sets.newHashSet(element1, element2)))
+                    .content(objectMapper.writeValueAsBytes(Sets.newHashSet(element1, element2)))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
@@ -214,7 +216,7 @@ public abstract class RestControllerIntegrationTestsBase {
                 MockMvcRequestBuilders
                     .post(api)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(configs))
+                    .content(objectMapper.writeValueAsBytes(configs))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
@@ -238,7 +240,7 @@ public abstract class RestControllerIntegrationTestsBase {
                 MockMvcRequestBuilders
                     .post(api)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(tags))
+                    .content(objectMapper.writeValueAsBytes(tags))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
@@ -248,7 +250,7 @@ public abstract class RestControllerIntegrationTestsBase {
                 MockMvcRequestBuilders
                     .put(api)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(Sets.newHashSet(tag3)))
+                    .content(objectMapper.writeValueAsBytes(Sets.newHashSet(tag3)))
             ).andExpect(MockMvcResultMatchers.status().isNoContent());
 
         this.mvc
@@ -269,7 +271,7 @@ public abstract class RestControllerIntegrationTestsBase {
                 MockMvcRequestBuilders
                     .post(api)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(Sets.newHashSet(tag1, tag2)))
+                    .content(objectMapper.writeValueAsBytes(Sets.newHashSet(tag1, tag2)))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
@@ -294,7 +296,7 @@ public abstract class RestControllerIntegrationTestsBase {
                 MockMvcRequestBuilders
                     .post(api)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(Sets.newHashSet(tag1, tag2)))
+                    .content(objectMapper.writeValueAsBytes(Sets.newHashSet(tag1, tag2)))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
@@ -326,7 +328,7 @@ public abstract class RestControllerIntegrationTestsBase {
                 MockMvcRequestBuilders
                     .post(APPLICATIONS_API)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(app))
+                    .content(objectMapper.writeValueAsBytes(app))
             )
             .andExpect(MockMvcResultMatchers.status().isCreated())
             .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()))
@@ -348,7 +350,7 @@ public abstract class RestControllerIntegrationTestsBase {
                 MockMvcRequestBuilders
                     .post(CLUSTERS_API)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(cluster))
+                    .content(objectMapper.writeValueAsBytes(cluster))
             )
             .andExpect(MockMvcResultMatchers.status().isCreated())
             .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()))
@@ -373,7 +375,7 @@ public abstract class RestControllerIntegrationTestsBase {
                 MockMvcRequestBuilders
                     .post(COMMANDS_API)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(command))
+                    .content(objectMapper.writeValueAsBytes(command))
             )
             .andExpect(MockMvcResultMatchers.status().isCreated())
             .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()))

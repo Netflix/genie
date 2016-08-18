@@ -45,6 +45,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -187,10 +188,10 @@ public class DiskCleanupTaskUnitTests {
         Mockito.when(job2.getStatus()).thenReturn(JobStatus.RUNNING);
         final Job job3 = Mockito.mock(Job.class);
         Mockito.when(job3.getStatus()).thenReturn(JobStatus.SUCCEEDED);
-        Mockito.when(job3.getFinished()).thenReturn(new Date(threshold.getTime() - 1));
+        Mockito.when(job3.getFinished()).thenReturn(Optional.of(new Date(threshold.getTime() - 1)));
         final Job job4 = Mockito.mock(Job.class);
         Mockito.when(job4.getStatus()).thenReturn(JobStatus.FAILED);
-        Mockito.when(job4.getFinished()).thenReturn(threshold);
+        Mockito.when(job4.getFinished()).thenReturn(Optional.of(threshold));
 
         this.createJobDir(job1Id);
         this.createJobDir(job2Id);

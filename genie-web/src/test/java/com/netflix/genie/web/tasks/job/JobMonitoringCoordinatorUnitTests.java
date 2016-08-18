@@ -51,6 +51,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Future;
@@ -139,8 +140,10 @@ public class JobMonitoringCoordinatorUnitTests {
         final String job3Id = UUID.randomUUID().toString();
         final String job4Id = UUID.randomUUID().toString();
         final String job5Id = UUID.randomUUID().toString();
-        final JobExecution.Builder builder
-            = new JobExecution.Builder(UUID.randomUUID().toString(), 2818, DELAY, this.tomorrow);
+        final JobExecution.Builder builder = new JobExecution.Builder(UUID.randomUUID().toString())
+            .withProcessId(2818)
+            .withCheckDelay(DELAY)
+            .withTimeout(this.tomorrow);
         builder.withId(job1Id);
         final JobExecution job1 = builder.build();
         builder.withId(job2Id);
@@ -159,19 +162,19 @@ public class JobMonitoringCoordinatorUnitTests {
             .scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(DELAY));
 
         final Job j1 = Mockito.mock(Job.class);
-        Mockito.when(j1.getId()).thenReturn(job1Id);
+        Mockito.when(j1.getId()).thenReturn(Optional.of(job1Id));
         Mockito.when(j1.getStatus()).thenReturn(JobStatus.RUNNING);
         final Job j2 = Mockito.mock(Job.class);
-        Mockito.when(j2.getId()).thenReturn(job2Id);
+        Mockito.when(j2.getId()).thenReturn(Optional.of(job2Id));
         Mockito.when(j2.getStatus()).thenReturn(JobStatus.RUNNING);
         final Job j3 = Mockito.mock(Job.class);
-        Mockito.when(j3.getId()).thenReturn(job3Id);
+        Mockito.when(j3.getId()).thenReturn(Optional.of(job3Id));
         Mockito.when(j3.getStatus()).thenReturn(JobStatus.RUNNING);
         final Job j4 = Mockito.mock(Job.class);
-        Mockito.when(j4.getId()).thenReturn(job4Id);
+        Mockito.when(j4.getId()).thenReturn(Optional.of(job4Id));
         Mockito.when(j4.getStatus()).thenReturn(JobStatus.RUNNING);
         final Job j5 = Mockito.mock(Job.class);
-        Mockito.when(j5.getId()).thenReturn(job5Id);
+        Mockito.when(j5.getId()).thenReturn(Optional.of(job5Id));
         Mockito.when(j5.getStatus()).thenReturn(JobStatus.INIT);
         final Set<Job> jobs = Sets.newHashSet(j1, j2, j3, j4, j5);
         Mockito.when(this.jobSearchService.getAllActiveJobsOnHost(HOSTNAME)).thenReturn(jobs);
@@ -197,8 +200,10 @@ public class JobMonitoringCoordinatorUnitTests {
         final String job2Id = UUID.randomUUID().toString();
         final String job3Id = UUID.randomUUID().toString();
         final String job4Id = UUID.randomUUID().toString();
-        final JobExecution.Builder builder
-            = new JobExecution.Builder(UUID.randomUUID().toString(), 2818, DELAY, this.tomorrow);
+        final JobExecution.Builder builder = new JobExecution.Builder(UUID.randomUUID().toString())
+            .withProcessId(2818)
+            .withCheckDelay(DELAY)
+            .withTimeout(this.tomorrow);
         builder.withId(job1Id);
         final JobExecution job1 = builder.build();
         builder.withId(job2Id);
@@ -244,8 +249,10 @@ public class JobMonitoringCoordinatorUnitTests {
     @SuppressWarnings("unchecked")
     public void canStopJobMonitor() {
         final String job1Id = UUID.randomUUID().toString();
-        final JobExecution.Builder builder
-            = new JobExecution.Builder(UUID.randomUUID().toString(), 2818, DELAY, this.tomorrow);
+        final JobExecution.Builder builder = new JobExecution.Builder(UUID.randomUUID().toString())
+            .withProcessId(2818)
+            .withCheckDelay(DELAY)
+            .withTimeout(this.tomorrow);
         builder.withId(job1Id);
         final JobExecution job1 = builder.build();
         final String job2Id = UUID.randomUUID().toString();

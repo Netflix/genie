@@ -45,23 +45,29 @@ public class JobExecutionUnitTests {
      */
     @Test
     public void canBuildJob() {
-        final JobExecution execution = new JobExecution.Builder(HOST_NAME, PROCESS_ID, CHECK_DELAY, TIMEOUT).build();
+        final JobExecution execution = new JobExecution.Builder(HOST_NAME).build();
         Assert.assertThat(execution.getHostName(), Matchers.is(HOST_NAME));
-        Assert.assertThat(execution.getProcessId(), Matchers.is(PROCESS_ID));
-        Assert.assertThat(execution.getCheckDelay(), Matchers.is(CHECK_DELAY));
-        Assert.assertThat(execution.getTimeout(), Matchers.is(TIMEOUT));
-        Assert.assertThat(execution.getExitCode(), Matchers.is(-1));
-        Assert.assertThat(execution.getCreated(), Matchers.nullValue());
-        Assert.assertThat(execution.getId(), Matchers.nullValue());
-        Assert.assertThat(execution.getUpdated(), Matchers.nullValue());
+        Assert.assertFalse(execution.getProcessId().isPresent());
+        Assert.assertFalse(execution.getCheckDelay().isPresent());
+        Assert.assertFalse(execution.getTimeout().isPresent());
+        Assert.assertFalse(execution.getExitCode().isPresent());
+        Assert.assertFalse(execution.getCreated().isPresent());
+        Assert.assertFalse(execution.getId().isPresent());
+        Assert.assertFalse(execution.getUpdated().isPresent());
     }
 
     /**
      * Test to make sure can build a valid JobExecution with optional parameters.
+     *
+     * @throws Exception on error
      */
     @Test
-    public void canBuildJobWithOptionals() {
-        final JobExecution.Builder builder = new JobExecution.Builder(HOST_NAME, PROCESS_ID, CHECK_DELAY, TIMEOUT);
+    public void canBuildJobWithOptionals() throws Exception {
+        final JobExecution.Builder builder = new JobExecution.Builder(HOST_NAME);
+
+        builder.withCheckDelay(CHECK_DELAY);
+        builder.withProcessId(PROCESS_ID);
+        builder.withTimeout(TIMEOUT);
 
         final int exitCode = 0;
         builder.withExitCode(exitCode);
@@ -77,13 +83,15 @@ public class JobExecutionUnitTests {
 
         final JobExecution execution = builder.build();
         Assert.assertThat(execution.getHostName(), Matchers.is(HOST_NAME));
-        Assert.assertThat(execution.getProcessId(), Matchers.is(PROCESS_ID));
-        Assert.assertThat(execution.getCheckDelay(), Matchers.is(CHECK_DELAY));
-        Assert.assertThat(execution.getTimeout(), Matchers.is(TIMEOUT));
-        Assert.assertThat(execution.getExitCode(), Matchers.is(exitCode));
-        Assert.assertThat(execution.getCreated(), Matchers.is(created));
-        Assert.assertThat(execution.getId(), Matchers.is(id));
-        Assert.assertThat(execution.getUpdated(), Matchers.is(updated));
+        Assert.assertThat(execution.getProcessId().orElseThrow(IllegalArgumentException::new), Matchers.is(PROCESS_ID));
+        Assert.assertThat(
+            execution.getCheckDelay().orElseThrow(IllegalArgumentException::new), Matchers.is(CHECK_DELAY)
+        );
+        Assert.assertThat(execution.getTimeout().orElseThrow(IllegalArgumentException::new), Matchers.is(TIMEOUT));
+        Assert.assertThat(execution.getExitCode().orElseThrow(IllegalArgumentException::new), Matchers.is(exitCode));
+        Assert.assertThat(execution.getCreated().orElseThrow(IllegalArgumentException::new), Matchers.is(created));
+        Assert.assertThat(execution.getId().orElseThrow(IllegalArgumentException::new), Matchers.is(id));
+        Assert.assertThat(execution.getUpdated().orElseThrow(IllegalArgumentException::new), Matchers.is(updated));
     }
 
     /**
@@ -91,20 +99,24 @@ public class JobExecutionUnitTests {
      */
     @Test
     public void canBuildJobWithNulls() {
-        final JobExecution.Builder builder = new JobExecution.Builder(HOST_NAME, PROCESS_ID, CHECK_DELAY, TIMEOUT);
+        final JobExecution.Builder builder = new JobExecution.Builder(HOST_NAME);
+        builder.withExitCode(null);
+        builder.withProcessId(null);
+        builder.withCheckDelay(null);
+        builder.withTimeout(null);
         builder.withCreated(null);
         builder.withId(null);
         builder.withUpdated(null);
 
         final JobExecution execution = builder.build();
         Assert.assertThat(execution.getHostName(), Matchers.is(HOST_NAME));
-        Assert.assertThat(execution.getProcessId(), Matchers.is(PROCESS_ID));
-        Assert.assertThat(execution.getCheckDelay(), Matchers.is(CHECK_DELAY));
-        Assert.assertThat(execution.getTimeout(), Matchers.is(TIMEOUT));
-        Assert.assertThat(execution.getExitCode(), Matchers.is(-1));
-        Assert.assertThat(execution.getCreated(), Matchers.nullValue());
-        Assert.assertThat(execution.getId(), Matchers.nullValue());
-        Assert.assertThat(execution.getUpdated(), Matchers.nullValue());
+        Assert.assertFalse(execution.getProcessId().isPresent());
+        Assert.assertFalse(execution.getCheckDelay().isPresent());
+        Assert.assertFalse(execution.getTimeout().isPresent());
+        Assert.assertFalse(execution.getExitCode().isPresent());
+        Assert.assertFalse(execution.getCreated().isPresent());
+        Assert.assertFalse(execution.getId().isPresent());
+        Assert.assertFalse(execution.getUpdated().isPresent());
     }
 
     /**
@@ -112,7 +124,7 @@ public class JobExecutionUnitTests {
      */
     @Test
     public void canFindEquality() {
-        final JobExecution.Builder builder = new JobExecution.Builder(HOST_NAME, PROCESS_ID, CHECK_DELAY, TIMEOUT);
+        final JobExecution.Builder builder = new JobExecution.Builder(HOST_NAME);
         builder.withCreated(null);
         builder.withId(UUID.randomUUID().toString());
         builder.withUpdated(null);
@@ -132,7 +144,7 @@ public class JobExecutionUnitTests {
      */
     @Test
     public void canUseHashCode() {
-        final JobExecution.Builder builder = new JobExecution.Builder(HOST_NAME, PROCESS_ID, CHECK_DELAY, TIMEOUT);
+        final JobExecution.Builder builder = new JobExecution.Builder(HOST_NAME);
         builder.withCreated(null);
         builder.withId(UUID.randomUUID().toString());
         builder.withUpdated(null);

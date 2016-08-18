@@ -23,6 +23,7 @@ import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobExecutionRepository;
+import com.netflix.genie.core.jpa.repositories.JpaJobMetadataRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRequestRepository;
 import com.netflix.genie.core.jpa.services.JpaApplicationServiceImpl;
@@ -139,12 +140,13 @@ public class ServicesConfigTest {
     /**
      * Get JPA based implementation of the JobPersistenceService.
      *
-     * @param jobRepo          The job repository to use
-     * @param jobRequestRepo   The job request repository to use
-     * @param jobExecutionRepo The jobExecution Repository to use
-     * @param applicationRepo  The application repository to use
-     * @param clusterRepo      The cluster repository to use
-     * @param commandRepo      The command repository to use
+     * @param jobRepo               The job repository to use
+     * @param jobRequestRepo        The job request repository to use
+     * @param jobExecutionRepo      The jobExecution Repository to use
+     * @param jobMetadataRepository The job metadata repository to use
+     * @param applicationRepo       The application repository to use
+     * @param clusterRepo           The cluster repository to use
+     * @param commandRepo           The command repository to use
      * @return A job search service instance.
      */
     @Bean
@@ -152,6 +154,7 @@ public class ServicesConfigTest {
         final JpaJobRepository jobRepo,
         final JpaJobRequestRepository jobRequestRepo,
         final JpaJobExecutionRepository jobExecutionRepo,
+        final JpaJobMetadataRepository jobMetadataRepository,
         final JpaApplicationRepository applicationRepo,
         final JpaClusterRepository clusterRepo,
         final JpaCommandRepository commandRepo
@@ -160,6 +163,7 @@ public class ServicesConfigTest {
             jobRepo,
             jobRequestRepo,
             jobExecutionRepo,
+            jobMetadataRepository,
             applicationRepo,
             clusterRepo,
             commandRepo

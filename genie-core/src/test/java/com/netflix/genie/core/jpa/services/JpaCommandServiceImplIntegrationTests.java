@@ -30,6 +30,7 @@ import com.netflix.genie.core.services.ApplicationService;
 import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;
 import com.netflix.genie.test.categories.IntegrationTest;
+import com.netflix.genie.test.suppliers.RandomSuppliers;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -106,7 +107,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     @Test
     public void testGetCommand() throws GenieException {
         final Command command1 = this.service.getCommand(COMMAND_1_ID);
-        Assert.assertEquals(COMMAND_1_ID, command1.getId());
+        Assert.assertEquals(COMMAND_1_ID, command1.getId().orElseThrow(IllegalArgumentException::new));
         Assert.assertEquals(COMMAND_1_NAME, command1.getName());
         Assert.assertEquals(COMMAND_1_USER, command1.getUser());
         Assert.assertEquals(COMMAND_1_VERSION, command1.getVersion());
@@ -116,7 +117,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(2, command1.getConfigs().size());
 
         final Command command2 = this.service.getCommand(COMMAND_2_ID);
-        Assert.assertEquals(COMMAND_2_ID, command2.getId());
+        Assert.assertEquals(COMMAND_2_ID, command2.getId().orElseThrow(IllegalArgumentException::new));
         Assert.assertEquals(COMMAND_2_NAME, command2.getName());
         Assert.assertEquals(COMMAND_2_USER, command2.getUser());
         Assert.assertEquals(COMMAND_2_VERSION, command2.getVersion());
@@ -126,7 +127,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(1, command2.getConfigs().size());
 
         final Command command3 = this.service.getCommand(COMMAND_3_ID);
-        Assert.assertEquals(COMMAND_3_ID, command3.getId());
+        Assert.assertEquals(COMMAND_3_ID, command3.getId().orElseThrow(IllegalArgumentException::new));
         Assert.assertEquals(COMMAND_3_NAME, command3.getName());
         Assert.assertEquals(COMMAND_3_USER, command3.getUser());
         Assert.assertEquals(COMMAND_3_VERSION, command3.getVersion());
@@ -153,7 +154,9 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     public void testGetCommandsByName() {
         final Page<Command> commands = this.service.getCommands(COMMAND_2_NAME, null, null, null, PAGE);
         Assert.assertEquals(1, commands.getNumberOfElements());
-        Assert.assertEquals(COMMAND_2_ID, commands.getContent().get(0).getId());
+        Assert.assertEquals(
+            COMMAND_2_ID, commands.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new)
+        );
     }
 
     /**
@@ -163,8 +166,12 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     public void testGetCommandsByUserName() {
         final Page<Command> commands = this.service.getCommands(null, COMMAND_1_USER, null, null, PAGE);
         Assert.assertEquals(2, commands.getNumberOfElements());
-        Assert.assertEquals(COMMAND_3_ID, commands.getContent().get(0).getId());
-        Assert.assertEquals(COMMAND_1_ID, commands.getContent().get(1).getId());
+        Assert.assertEquals(
+            COMMAND_3_ID, commands.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new)
+        );
+        Assert.assertEquals(
+            COMMAND_1_ID, commands.getContent().get(1).getId().orElseThrow(IllegalArgumentException::new)
+        );
     }
 
     /**
@@ -177,8 +184,12 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         statuses.add(CommandStatus.DEPRECATED);
         final Page<Command> commands = this.service.getCommands(null, null, statuses, null, PAGE);
         Assert.assertEquals(2, commands.getNumberOfElements());
-        Assert.assertEquals(COMMAND_2_ID, commands.getContent().get(0).getId());
-        Assert.assertEquals(COMMAND_3_ID, commands.getContent().get(1).getId());
+        Assert.assertEquals(
+            COMMAND_2_ID, commands.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new)
+        );
+        Assert.assertEquals(
+            COMMAND_3_ID, commands.getContent().get(1).getId().orElseThrow(IllegalArgumentException::new)
+        );
     }
 
     /**
@@ -190,21 +201,33 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         tags.add("prod");
         Page<Command> commands = this.service.getCommands(null, null, null, tags, PAGE);
         Assert.assertEquals(3, commands.getNumberOfElements());
-        Assert.assertEquals(COMMAND_2_ID, commands.getContent().get(0).getId());
-        Assert.assertEquals(COMMAND_3_ID, commands.getContent().get(1).getId());
-        Assert.assertEquals(COMMAND_1_ID, commands.getContent().get(2).getId());
+        Assert.assertEquals(
+            COMMAND_2_ID, commands.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new)
+        );
+        Assert.assertEquals(
+            COMMAND_3_ID, commands.getContent().get(1).getId().orElseThrow(IllegalArgumentException::new)
+        );
+        Assert.assertEquals(
+            COMMAND_1_ID, commands.getContent().get(2).getId().orElseThrow(IllegalArgumentException::new)
+        );
 
         tags.add("pig");
         commands = this.service.getCommands(null, null, null, tags, PAGE);
         Assert.assertEquals(2, commands.getNumberOfElements());
-        Assert.assertEquals(COMMAND_3_ID, commands.getContent().get(0).getId());
-        Assert.assertEquals(COMMAND_1_ID, commands.getContent().get(1).getId());
+        Assert.assertEquals(
+            COMMAND_3_ID, commands.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new)
+        );
+        Assert.assertEquals(
+            COMMAND_1_ID, commands.getContent().get(1).getId().orElseThrow(IllegalArgumentException::new)
+        );
 
         tags.clear();
         tags.add("hive");
         commands = this.service.getCommands(null, null, null, tags, PAGE);
         Assert.assertEquals(1, commands.getNumberOfElements());
-        Assert.assertEquals(COMMAND_2_ID, commands.getContent().get(0).getId());
+        Assert.assertEquals(
+            COMMAND_2_ID, commands.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new)
+        );
 
         tags.add("somethingThatWouldNeverReallyExist");
         commands = this.service.getCommands(null, null, null, tags, PAGE);
@@ -213,9 +236,15 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         tags.clear();
         commands = this.service.getCommands(null, null, null, tags, PAGE);
         Assert.assertEquals(3, commands.getNumberOfElements());
-        Assert.assertEquals(COMMAND_2_ID, commands.getContent().get(0).getId());
-        Assert.assertEquals(COMMAND_3_ID, commands.getContent().get(1).getId());
-        Assert.assertEquals(COMMAND_1_ID, commands.getContent().get(2).getId());
+        Assert.assertEquals(
+            COMMAND_2_ID, commands.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new)
+        );
+        Assert.assertEquals(
+            COMMAND_3_ID, commands.getContent().get(1).getId().orElseThrow(IllegalArgumentException::new)
+        );
+        Assert.assertEquals(
+            COMMAND_1_ID, commands.getContent().get(2).getId().orElseThrow(IllegalArgumentException::new)
+        );
     }
 
     /**
@@ -226,9 +255,15 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         //Default to order by Updated
         final Page<Command> commands = this.service.getCommands(null, null, null, null, PAGE);
         Assert.assertEquals(3, commands.getNumberOfElements());
-        Assert.assertEquals(COMMAND_2_ID, commands.getContent().get(0).getId());
-        Assert.assertEquals(COMMAND_3_ID, commands.getContent().get(1).getId());
-        Assert.assertEquals(COMMAND_1_ID, commands.getContent().get(2).getId());
+        Assert.assertEquals(
+            COMMAND_2_ID, commands.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new)
+        );
+        Assert.assertEquals(
+            COMMAND_3_ID, commands.getContent().get(1).getId().orElseThrow(IllegalArgumentException::new)
+        );
+        Assert.assertEquals(
+            COMMAND_1_ID, commands.getContent().get(2).getId().orElseThrow(IllegalArgumentException::new)
+        );
     }
 
     /**
@@ -240,9 +275,15 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         //Default to order by Updated
         final Page<Command> commands = this.service.getCommands(null, null, null, null, ascending);
         Assert.assertEquals(3, commands.getNumberOfElements());
-        Assert.assertEquals(COMMAND_1_ID, commands.getContent().get(0).getId());
-        Assert.assertEquals(COMMAND_3_ID, commands.getContent().get(1).getId());
-        Assert.assertEquals(COMMAND_2_ID, commands.getContent().get(2).getId());
+        Assert.assertEquals(
+            COMMAND_1_ID, commands.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new)
+        );
+        Assert.assertEquals(
+            COMMAND_3_ID, commands.getContent().get(1).getId().orElseThrow(IllegalArgumentException::new)
+        );
+        Assert.assertEquals(
+            COMMAND_2_ID, commands.getContent().get(2).getId().orElseThrow(IllegalArgumentException::new)
+        );
     }
 
     /**
@@ -253,9 +294,15 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         final Pageable name = new PageRequest(0, 10, Sort.Direction.DESC, "name");
         final Page<Command> commands = this.service.getCommands(null, null, null, null, name);
         Assert.assertEquals(3, commands.getNumberOfElements());
-        Assert.assertEquals(COMMAND_1_ID, commands.getContent().get(0).getId());
-        Assert.assertEquals(COMMAND_3_ID, commands.getContent().get(1).getId());
-        Assert.assertEquals(COMMAND_2_ID, commands.getContent().get(2).getId());
+        Assert.assertEquals(
+            COMMAND_1_ID, commands.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new)
+        );
+        Assert.assertEquals(
+            COMMAND_3_ID, commands.getContent().get(1).getId().orElseThrow(IllegalArgumentException::new)
+        );
+        Assert.assertEquals(
+            COMMAND_2_ID, commands.getContent().get(2).getId().orElseThrow(IllegalArgumentException::new)
+        );
     }
 
     /**
@@ -266,9 +313,15 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         final Pageable invalid = new PageRequest(0, 10, Sort.Direction.DESC, "I'mNotAValidField");
         final Page<Command> commands = this.service.getCommands(null, null, null, null, invalid);
         Assert.assertEquals(3, commands.getNumberOfElements());
-        Assert.assertEquals(COMMAND_2_ID, commands.getContent().get(0).getId());
-        Assert.assertEquals(COMMAND_3_ID, commands.getContent().get(1).getId());
-        Assert.assertEquals(COMMAND_1_ID, commands.getContent().get(2).getId());
+        Assert.assertEquals(
+            COMMAND_2_ID, commands.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new)
+        );
+        Assert.assertEquals(
+            COMMAND_3_ID, commands.getContent().get(1).getId().orElseThrow(IllegalArgumentException::new)
+        );
+        Assert.assertEquals(
+            COMMAND_1_ID, commands.getContent().get(2).getId().orElseThrow(IllegalArgumentException::new)
+        );
     }
 
     /**
@@ -280,9 +333,15 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         final Pageable tags = new PageRequest(0, 10, Sort.Direction.DESC, "tags");
         final Page<Command> commands = this.service.getCommands(null, null, null, null, tags);
         Assert.assertEquals(3, commands.getNumberOfElements());
-        Assert.assertEquals(COMMAND_2_ID, commands.getContent().get(0).getId());
-        Assert.assertEquals(COMMAND_3_ID, commands.getContent().get(1).getId());
-        Assert.assertEquals(COMMAND_1_ID, commands.getContent().get(2).getId());
+        Assert.assertEquals(
+            COMMAND_2_ID, commands.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new)
+        );
+        Assert.assertEquals(
+            COMMAND_3_ID, commands.getContent().get(1).getId().orElseThrow(IllegalArgumentException::new)
+        );
+        Assert.assertEquals(
+            COMMAND_1_ID, commands.getContent().get(2).getId().orElseThrow(IllegalArgumentException::new)
+        );
     }
 
     /**
@@ -307,7 +366,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertThat(createdId, Matchers.is(id));
         final Command created = this.service.getCommand(id);
         Assert.assertNotNull(this.service.getCommand(id));
-        Assert.assertEquals(id, created.getId());
+        Assert.assertEquals(id, created.getId().orElseThrow(IllegalArgumentException::new));
         Assert.assertEquals(COMMAND_1_NAME, created.getName());
         Assert.assertEquals(COMMAND_1_USER, created.getUser());
         Assert.assertEquals(CommandStatus.ACTIVE, created.getStatus());
@@ -342,15 +401,15 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         ).build();
         final String id = this.service.createCommand(command);
         final Command created = this.service.getCommand(id);
-        Assert.assertNotNull(this.service.getCommand(created.getId()));
+        Assert.assertNotNull(this.service.getCommand(created.getId().orElseThrow(IllegalArgumentException::new)));
         Assert.assertEquals(COMMAND_1_NAME, created.getName());
         Assert.assertEquals(COMMAND_1_USER, created.getUser());
         Assert.assertEquals(CommandStatus.ACTIVE, created.getStatus());
         Assert.assertEquals(COMMAND_1_EXECUTABLE, created.getExecutable());
         Assert.assertThat(COMMAND_1_CHECK_DELAY, Matchers.is(created.getCheckDelay()));
-        this.service.deleteCommand(created.getId());
+        this.service.deleteCommand(created.getId().orElseThrow(IllegalArgumentException::new));
         try {
-            this.service.getCommand(created.getId());
+            this.service.getCommand(created.getId().orElseThrow(IllegalArgumentException::new));
             Assert.fail("Should have thrown exception");
         } catch (final GenieException ge) {
             Assert.assertEquals(
@@ -385,7 +444,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         tags.add("yarn");
         tags.add("hadoop");
 
-        final Command updateCommand = new Command.Builder(
+        final Command.Builder updateCommand = new Command.Builder(
             command.getName(),
             COMMAND_2_USER,
             command.getVersion(),
@@ -393,16 +452,16 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
             command.getExecutable(),
             command.getCheckDelay()
         )
-            .withId(command.getId())
-            .withCreated(command.getCreated())
-            .withUpdated(command.getUpdated())
-            .withDescription(command.getDescription())
+            .withId(command.getId().orElseThrow(IllegalArgumentException::new))
+            .withCreated(command.getCreated().orElseThrow(IllegalArgumentException::new))
+            .withUpdated(command.getUpdated().orElseThrow(IllegalArgumentException::new))
             .withTags(tags)
-            .withConfigs(command.getConfigs())
-            .withSetupFile(command.getSetupFile())
-            .build();
+            .withConfigs(command.getConfigs());
 
-        this.service.updateCommand(COMMAND_1_ID, updateCommand);
+        command.getDescription().ifPresent(updateCommand::withDescription);
+        command.getSetupFile().ifPresent(updateCommand::withSetupFile);
+
+        this.service.updateCommand(COMMAND_1_ID, updateCommand.build());
 
         final Command updated = this.service.getCommand(COMMAND_1_ID);
         Assert.assertEquals(COMMAND_2_USER, updated.getUser());
@@ -442,10 +501,10 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     @Test
     public void testUpdateCreateAndUpdate() throws GenieException {
         final Command init = this.service.getCommand(COMMAND_1_ID);
-        final Date created = init.getCreated();
-        final Date updated = init.getUpdated();
+        final Date created = init.getCreated().orElseThrow(IllegalArgumentException::new);
+        final Date updated = init.getUpdated().orElseThrow(IllegalArgumentException::new);
 
-        final Command updateCommand = new Command.Builder(
+        final Command.Builder updateCommand = new Command.Builder(
             init.getName(),
             init.getUser(),
             init.getVersion(),
@@ -453,20 +512,20 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
             init.getExecutable(),
             init.getCheckDelay()
         )
-            .withId(init.getId())
+            .withId(init.getId().orElseThrow(IllegalArgumentException::new))
             .withCreated(new Date())
             .withUpdated(new Date(0))
-            .withDescription(init.getDescription())
             .withTags(init.getTags())
-            .withConfigs(init.getConfigs())
-            .withSetupFile(init.getSetupFile())
-            .build();
+            .withConfigs(init.getConfigs());
 
-        this.service.updateCommand(COMMAND_1_ID, updateCommand);
+        init.getDescription().ifPresent(updateCommand::withDescription);
+        init.getSetupFile().ifPresent(updateCommand::withSetupFile);
+
+        this.service.updateCommand(COMMAND_1_ID, updateCommand.build());
         final Command updatedCommand = this.service.getCommand(COMMAND_1_ID);
-        Assert.assertEquals(created, updatedCommand.getCreated());
-        Assert.assertNotEquals(updated, updatedCommand.getUpdated());
-        Assert.assertNotEquals(new Date(0), updatedCommand.getUpdated());
+        Assert.assertEquals(created, updatedCommand.getCreated().orElseThrow(IllegalArgumentException::new));
+        Assert.assertNotEquals(updated, updatedCommand.getUpdated().orElseThrow(IllegalArgumentException::new));
+        Assert.assertNotEquals(new Date(0), updatedCommand.getUpdated().orElseThrow(IllegalArgumentException::new));
     }
 
     /**
@@ -493,13 +552,13 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
      * Test to patch a command.
      *
      * @throws GenieException For any problem
-     * @throws IOException For Json serialization problem
+     * @throws IOException    For Json serialization problem
      */
     @Test
     public void testPatchCommand() throws GenieException, IOException {
         final Command getCommand = this.service.getCommand(COMMAND_1_ID);
         Assert.assertThat(getCommand.getName(), Matchers.is(COMMAND_1_NAME));
-        final Date updateTime = getCommand.getUpdated();
+        final Date updateTime = getCommand.getUpdated().orElseThrow(IllegalArgumentException::new);
 
         final String patchString
             = "[{ \"op\": \"replace\", \"path\": \"/name\", \"value\": \"" + COMMAND_2_NAME + "\" }]";
@@ -536,7 +595,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(3, commands.size());
         boolean found = false;
         for (final Command command : commands) {
-            if (COMMAND_1_ID.equals(command.getId())) {
+            if (COMMAND_1_ID.equals(command.getId().orElseThrow(IllegalArgumentException::new))) {
                 found = true;
                 break;
             }
@@ -546,7 +605,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(1, appCommands.size());
         found = false;
         for (final Command command : appCommands) {
-            if (COMMAND_1_ID.equals(command.getId())) {
+            if (COMMAND_1_ID.equals(command.getId().orElseThrow(IllegalArgumentException::new))) {
                 found = true;
                 break;
             }
@@ -560,7 +619,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(2, commands.size());
         found = false;
         for (final Command command : commands) {
-            if (COMMAND_1_ID.equals(command.getId())) {
+            if (COMMAND_1_ID.equals(command.getId().orElseThrow(IllegalArgumentException::new))) {
                 found = true;
                 break;
             }
@@ -756,7 +815,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(1, preCommands.size());
         Assert.assertEquals(1, preCommands
             .stream()
-            .filter(command -> COMMAND_1_ID.equals(command.getId()))
+            .filter(command -> COMMAND_1_ID.equals(command.getId().orElseGet(RandomSuppliers.STRING)))
             .count()
         );
 
@@ -764,7 +823,13 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
 
         final Set<Command> savedCommands = this.appService.getCommandsForApplication(APP_1_ID, null);
         Assert.assertEquals(2, savedCommands.size());
-        Assert.assertThat(this.service.getApplicationsForCommand(COMMAND_2_ID).get(0).getId(), Matchers.is(APP_1_ID));
+        Assert.assertThat(
+            this.service.getApplicationsForCommand(COMMAND_2_ID)
+                .get(0)
+                .getId()
+                .orElseGet(RandomSuppliers.STRING),
+            Matchers.is(APP_1_ID)
+        );
     }
 
     /**
@@ -781,7 +846,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(1, preCommands.size());
         Assert.assertEquals(1, preCommands
             .stream()
-            .filter(command -> COMMAND_1_ID.equals(command.getId()))
+            .filter(command -> COMMAND_1_ID.equals(command.getId().orElseThrow(IllegalArgumentException::new)))
             .count()
         );
 
@@ -793,7 +858,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
             1,
             this.service.getApplicationsForCommand(COMMAND_2_ID)
                 .stream()
-                .filter(application -> APP_1_ID.equals(application.getId()))
+                .filter(application -> APP_1_ID.equals(application.getId().orElseThrow(IllegalArgumentException::new)))
                 .count()
         );
     }
@@ -827,7 +892,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     public void testGetApplicationsForCommand() throws GenieException {
         Assert.assertEquals(1, this.service.getApplicationsForCommand(COMMAND_1_ID)
             .stream()
-            .filter(application -> APP_1_ID.equals(application.getId()))
+            .filter(application -> APP_1_ID.equals(application.getId().orElseThrow(IllegalArgumentException::new)))
             .count()
         );
     }
@@ -1040,7 +1105,9 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     public void testGetCommandsForCommand() throws GenieException {
         final Set<Cluster> clusters = this.service.getClustersForCommand(COMMAND_1_ID, null);
         Assert.assertEquals(1, clusters.size());
-        Assert.assertEquals(CLUSTER_1_ID, clusters.iterator().next().getId());
+        Assert.assertEquals(
+            CLUSTER_1_ID, clusters.iterator().next().getId().orElseThrow(IllegalArgumentException::new)
+        );
     }
 
     /**

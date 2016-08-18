@@ -22,6 +22,8 @@ import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.Basic;
 import javax.persistence.CollectionTable;
@@ -51,6 +53,8 @@ import java.util.Set;
  * @author tgianos
  * @since 2.0.0
  */
+@Getter
+@Setter
 @Entity
 @Table(name = "clusters")
 public class ClusterEntity extends SetupFileEntity {
@@ -104,34 +108,6 @@ public class ClusterEntity extends SetupFileEntity {
     }
 
     /**
-     * Gets the status for this cluster.
-     *
-     * @return status - possible values: Types.ConfigStatus
-     */
-    public ClusterStatus getStatus() {
-        return status;
-    }
-
-    /**
-     * Sets the status for this cluster.
-     *
-     * @param status The status of the cluster. Not null.
-     * @see ClusterStatus
-     */
-    public void setStatus(final ClusterStatus status) {
-        this.status = status;
-    }
-
-    /**
-     * Gets the configurations for this cluster.
-     *
-     * @return The cluster configurations as unmodifiable list
-     */
-    public Set<String> getConfigs() {
-        return this.configs;
-    }
-
-    /**
      * Sets the configurations for this cluster.
      *
      * @param configs The configuration files that this cluster needs. Not
@@ -142,16 +118,6 @@ public class ClusterEntity extends SetupFileEntity {
         if (configs != null) {
             this.configs.addAll(configs);
         }
-    }
-
-    /**
-     * Gets the commands that this cluster supports.
-     *
-     * @return commands Not supposed to be exposed in request/response messages
-     * hence marked transient.
-     */
-    public List<CommandEntity> getCommands() {
-        return this.commands;
     }
 
     /**
@@ -226,7 +192,7 @@ public class ClusterEntity extends SetupFileEntity {
      * @return The DTO
      */
     public Cluster getDTO() {
-        return new Cluster.Builder(
+        final Cluster.Builder builder = new Cluster.Builder(
             this.getName(),
             this.getUser(),
             this.getVersion(),
@@ -235,10 +201,12 @@ public class ClusterEntity extends SetupFileEntity {
             .withId(this.getId())
             .withCreated(this.getCreated())
             .withUpdated(this.getUpdated())
-            .withDescription(this.getDescription())
             .withTags(this.getTags())
-            .withSetupFile(this.getSetupFile())
-            .withConfigs(this.configs)
-            .build();
+            .withConfigs(this.configs);
+
+        this.getDescription().ifPresent(builder::withDescription);
+        this.getSetupFile().ifPresent(builder::withSetupFile);
+
+        return builder.build();
     }
 }

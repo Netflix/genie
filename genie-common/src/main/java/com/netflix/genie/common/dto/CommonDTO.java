@@ -23,6 +23,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -63,6 +64,15 @@ public abstract class CommonDTO extends BaseDTO {
         this.version = builder.bVersion;
         this.description = builder.bDescription;
         this.tags.addAll(builder.bTags);
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return The description as an optional
+     */
+    public Optional<String> getDescription() {
+        return Optional.ofNullable(this.description);
     }
 
     /**
