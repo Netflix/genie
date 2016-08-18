@@ -24,6 +24,7 @@ import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import org.hibernate.validator.constraints.NotBlank;
+import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.Min;
@@ -37,6 +38,7 @@ import java.util.List;
  * @author tgianos
  * @since 3.0.0
  */
+@Validated
 public interface JobPersistenceService {
 
     /**
@@ -47,8 +49,8 @@ public interface JobPersistenceService {
      * @throws GenieException if there is an error
      */
     void createJobAndJobExecution(
-        @NotNull final Job job,
-        @NotNull final JobExecution jobExecution
+        @NotNull(message = "No Job provided to create") final Job job,
+        @NotNull(message = "No Job execution information provided. Unable to create.") final JobExecution jobExecution
     ) throws GenieException;
 
     /**
@@ -60,9 +62,9 @@ public interface JobPersistenceService {
      * @throws GenieException if there is an error
      */
     void updateJobStatus(
-        @NotBlank final String id,
-        @NotNull final JobStatus jobStatus,
-        @NotBlank final String statusMsg
+        @NotBlank(message = "No job id entered. Unable to update.") final String id,
+        @NotNull(message = "Status cannot be null.") final JobStatus jobStatus,
+        @NotBlank(message = "Status message cannot be empty.") final String statusMsg
     ) throws GenieException;
 
     /**
@@ -105,8 +107,8 @@ public interface JobPersistenceService {
      */
     void setJobRunningInformation(
         @NotBlank final String id,
-        @Min(0) final int processId,
-        @Min(1) final long checkDelay,
+        @Min(value = 0, message = "Must be no lower than zero") final int processId,
+        @Min(value = 1, message = "Must be at least 1 millisecond, preferably much more") final long checkDelay,
         @NotNull final Date timeout
     ) throws GenieException;
 
@@ -122,10 +124,10 @@ public interface JobPersistenceService {
      * @throws GenieException if there is an error
      */
     void setJobCompletionInformation(
-        @NotBlank final String id,
+        @NotBlank(message = "No job id entered. Unable to update.") final String id,
         final int exitCode,
-        @NotNull final JobStatus status,
-        @NotBlank final String statusMessage,
+        @NotNull(message = "No job status entered. Unable to update") final JobStatus status,
+        @NotBlank(message = "Status message can't be blank. Unable to update") final String statusMessage,
         @Nullable final Long stdOutSize,
         @Nullable final Long stdErrSize
     ) throws GenieException;

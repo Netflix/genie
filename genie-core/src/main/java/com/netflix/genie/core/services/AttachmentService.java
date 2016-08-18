@@ -18,6 +18,7 @@
 package com.netflix.genie.core.services;
 
 import com.netflix.genie.common.exceptions.GenieException;
+import org.springframework.validation.annotation.Validated;
 
 import java.io.File;
 import java.io.InputStream;
@@ -29,6 +30,7 @@ import java.io.InputStream;
  * @author tgianos
  * @since 3.0.0
  */
+@Validated
 public interface AttachmentService {
 
     /**

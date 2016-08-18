@@ -45,6 +45,7 @@ import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobSubmitterService;
 import com.netflix.genie.core.services.impl.FileSystemAttachmentService;
 import com.netflix.genie.core.services.impl.GenieFileTransferService;
+import com.netflix.genie.core.services.impl.JobCoordinatorServiceImpl;
 import com.netflix.genie.core.services.impl.JobCountServiceImpl;
 import com.netflix.genie.core.services.impl.LocalJobKillServiceImpl;
 import com.netflix.genie.core.services.impl.LocalJobRunner;
@@ -314,7 +315,7 @@ public class ServicesConfigTest {
         final ApplicationEventPublisher eventPublisher,
         final String hostName
     ) {
-        return new JobCoordinatorService(
+        return new JobCoordinatorServiceImpl(
             taskExecutor,
             jobPersistenceService,
             jobSubmitterService,

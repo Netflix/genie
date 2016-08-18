@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.core.services;
+package com.netflix.genie.core.services.impl;
 
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
@@ -26,6 +26,10 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
 import com.netflix.genie.core.events.JobScheduledEvent;
 import com.netflix.genie.core.jobs.JobLauncher;
+import com.netflix.genie.core.services.JobCountService;
+import com.netflix.genie.core.services.JobKillService;
+import com.netflix.genie.core.services.JobPersistenceService;
+import com.netflix.genie.core.services.JobSubmitterService;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.spectator.api.Registry;
 import org.hamcrest.Matchers;
@@ -50,7 +54,7 @@ import java.util.concurrent.Future;
  * @since 3.0.0
  */
 @Category(UnitTest.class)
-public class JobCoordinatorServiceUnitTests {
+public class JobCoordinatorServiceImplUnitTests {
 
     private static final int MAX_RUNNING_JOBS = 2;
     private static final String JOB_1_ID = "job1";
@@ -61,7 +65,7 @@ public class JobCoordinatorServiceUnitTests {
     private static final String HOST_NAME = UUID.randomUUID().toString();
 
     private AsyncTaskExecutor taskExecutor;
-    private JobCoordinatorService jobCoordinatorService;
+    private JobCoordinatorServiceImpl jobCoordinatorService;
     private JobPersistenceService jobPersistenceService;
     private JobKillService jobKillService;
     private JobCountService jobCountService;
@@ -78,7 +82,7 @@ public class JobCoordinatorServiceUnitTests {
         this.jobCountService = Mockito.mock(JobCountService.class);
         this.eventPublisher = Mockito.mock(ApplicationEventPublisher.class);
 
-        this.jobCoordinatorService = new JobCoordinatorService(
+        this.jobCoordinatorService = new JobCoordinatorServiceImpl(
             this.taskExecutor,
             this.jobPersistenceService,
             Mockito.mock(JobSubmitterService.class),
