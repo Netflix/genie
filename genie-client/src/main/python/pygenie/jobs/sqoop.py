@@ -239,24 +239,3 @@ class SqoopJob(GenieJob):
         """
 
         return self.option('target-dir', value)
-
-    def username(self, value):
-        """
-        Set the '--username' parameter for the Sqoop command and the username
-        for the Genie job.
-
-        Example:
-            >>> # sqoop --username jsmith
-            >>> job = SqoopJob() \\
-            ...     .username('jsmith')
-
-        Args:
-            value (str): The value to set the '--username' option to.
-
-        Returns:
-            :py:class:`SqoopJob`: self
-        """
-
-        self.option('username', value)
-
-        return super(SqoopJob, self).username(value)

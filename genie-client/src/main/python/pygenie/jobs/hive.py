@@ -40,7 +40,6 @@ class HiveJob(GenieJob):
     def __init__(self, conf=None):
         super(HiveJob, self).__init__(conf=conf)
 
-        self._filename = HiveJob.DEFAULT_SCRIPT_NAME
         self._parameters = dict()
         self._property_file = None
         self._script = None
@@ -55,6 +54,13 @@ class HiveJob(GenieJob):
 
         if self._command_arguments is not None:
             return self._command_arguments
+
+        if is_file(self._script):
+            filename = os.path.basename(self._script)
+            self._add_dependency(self._script)
+        else:
+            filename = HiveJob.DEFAULT_SCRIPT_NAME
+            self._add_dependency({'name': filename, 'data': self._script})
 
         params_str = ' '.join([
             '-d {qu}{name}={value}{qu}' \
@@ -74,7 +80,7 @@ class HiveJob(GenieJob):
         return '{prop_file} {props} {params} -f {filename}' \
             .format(prop_file=prop_file_str,
                     props=props_str,
-                    filename=self._filename,
+                    filename=filename,
                     params=params_str) \
             .strip()
 
@@ -173,12 +179,3 @@ class HiveJob(GenieJob):
         Returns:
             :py:class:`HiveJob`: self
         """
-
-        if is_file(_script):
-            self._filename = os.path.basename(_script)
-            self._add_dependency(_script)
-        else:
-            self._filename = HiveJob.DEFAULT_SCRIPT_NAME
-            self._add_dependency({'name': self._filename, 'data': _script})
-
-        return self
