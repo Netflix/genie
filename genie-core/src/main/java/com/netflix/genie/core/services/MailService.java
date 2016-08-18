@@ -19,6 +19,7 @@ package com.netflix.genie.core.services;
 
 import com.netflix.genie.common.exceptions.GenieException;
 import org.hibernate.validator.constraints.NotBlank;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * An interface for sending emails.
@@ -26,6 +27,7 @@ import org.hibernate.validator.constraints.NotBlank;
  * @author amsharma
  * @since 3.0.0
  */
+@Validated
 public interface MailService {
 
     /**

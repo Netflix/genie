@@ -88,6 +88,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.Date;
 import java.util.EnumSet;
@@ -204,6 +205,7 @@ public class JobRestController {
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity<Void> submitJob(
+        @Valid
         @RequestBody
         final JobRequest jobRequest,
         @RequestHeader(value = FORWARDED_FOR_HEADER, required = false)
@@ -231,6 +233,7 @@ public class JobRestController {
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity<Void> submitJob(
+        @Valid
         @RequestPart("request")
         final JobRequest jobRequest,
         @RequestPart("attachment")

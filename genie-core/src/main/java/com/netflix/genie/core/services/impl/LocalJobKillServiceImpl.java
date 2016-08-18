@@ -85,7 +85,9 @@ public class LocalJobKillServiceImpl implements JobKillService {
      * {@inheritDoc}
      */
     @Override
-    public void killJob(@NotBlank final String id) throws GenieException {
+    public void killJob(
+        @NotBlank(message = "No id entered. Unable to kill job.") final String id
+    ) throws GenieException {
         // Will throw exception if not found
         // TODO: Could instead check JobMonitorCoordinator eventually for in memory check
         final JobStatus jobStatus = this.jobSearchService.getJobStatus(id);

@@ -29,6 +29,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
@@ -41,6 +42,7 @@ import java.util.Set;
  * @author amsharma
  * @since 3.0.0
  */
+@Validated
 public interface JobSearchService {
 
     /**
@@ -101,7 +103,7 @@ public interface JobSearchService {
      * @return the job
      * @throws GenieException if there is an error
      */
-    Job getJob(@NotBlank final String id) throws GenieException;
+    Job getJob(@NotBlank(message = "No id entered. Unable to get job.") final String id) throws GenieException;
 
     /**
      * Get the status of the job with the given id.
