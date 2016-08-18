@@ -61,15 +61,13 @@ class TestingSqoopJob(unittest.TestCase):
             .password('passw0rd') \
             .split_by('col1') \
             .table('mytable') \
-            .target_dir('/path/to/output') \
-            .username('jtest')
+            .target_dir('/path/to/output')
 
         assert_equals(
             job.cmd_args,
             u' '.join([
                 u'export',
                 u'-Dprop1=value1',
-                u'--username jtest',
                 u'--verbose',
                 u'--target-dir /path/to/output',
                 u'--split-by col1',
@@ -105,8 +103,7 @@ class TestingSqoopJobRepr(unittest.TestCase):
             .password('1234') \
             .split_by('col_a') \
             .table('test_table') \
-            .target_dir('/path/to/test/output') \
-            .username('tester')
+            .target_dir('/path/to/test/output')
 
         assert_equals(
             str(job),
@@ -122,11 +119,10 @@ class TestingSqoopJobRepr(unittest.TestCase):
             u'.option("split-by", "col_a")'
             u'.option("table", "test_table")'
             u'.option("target-dir", "/path/to/test/output")'
-            u'.option("username", "tester")'
             u'.option("verbose", None)'
             u'.property("p1", "v1", "-D")'
             u'.property("p2", "v2", "-f")'
-            u'.username("tester")'
+            u'.username("user_ini")'
         )
 
 
@@ -169,6 +165,7 @@ class TestingSqoopJobAdapters(unittest.TestCase):
             .username('jsqoop') \
             .cmd('test-export') \
             .option('opt1', 'val1') \
+            .option('username', 'user') \
             .property('prop1', 'pval1') \
             .connect('jdbc://test') \
             .password('t3st')
@@ -181,13 +178,13 @@ class TestingSqoopJobAdapters(unittest.TestCase):
                     {u'name': u'sqoopfile2', u'data': u'file contents'}
                 ],
                 u'clusterCriterias': [
-                    {u'tags': [u'type:sqoopcluster1']},
-                    {u'tags': [u'type:sqoop']}
+                    {'tags': [u'type:sqoopcluster1']},
+                    {'tags': [u'type:sqoop']}
                 ],
                 u'commandArgs': u' '.join([
                     u'test-export',
                     u'-Dprop1=pval1',
-                    u'--username jsqoop',
+                    u'--username user',
                     u'--password t3st',
                     u'--opt1 val1',
                     u'--connect jdbc://test']),
@@ -232,6 +229,7 @@ class TestingSqoopJobAdapters(unittest.TestCase):
             .username('jsqoop-g3') \
             .cmd('test-export-g3') \
             .option('opt1-g3', 'val1-g3') \
+            .option('username', 'user-g3') \
             .property('prop1-g3', 'pval1-g3') \
             .connect('jdbc://test-g3') \
             .password('t3st-g3')
@@ -245,10 +243,10 @@ class TestingSqoopJobAdapters(unittest.TestCase):
                     (u'sqoopfile2b', u"open file '/sqoopfile2b'")
                 ],
                 u'clusterCriterias': [
-                    {u'tags': [u'type:sqoop-cluster-1']},
-                    {u'tags': [u'type:sqoop']}
+                    {'tags': [u'type:sqoop-cluster-1']},
+                    {'tags': [u'type:sqoop']}
                 ],
-                u'commandArgs': u'test-export-g3 -Dprop1-g3=pval1-g3 --username jsqoop-g3 --password t3st-g3 --opt1-g3 val1-g3 --connect jdbc://test-g3',
+                u'commandArgs': u'test-export-g3 -Dprop1-g3=pval1-g3 --username user-g3 --password t3st-g3 --opt1-g3 val1-g3 --connect jdbc://test-g3',
                 u'commandCriteria': [u'type:sqoop-test-1'],
                 u'dependencies': [],
                 u'description': u'this job is to test sqoopjob adapter for genie 3',
