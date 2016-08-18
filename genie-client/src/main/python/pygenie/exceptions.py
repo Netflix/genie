@@ -69,3 +69,8 @@ class GenieJobNotFoundError(GenieError):
 class GenieLogNotFoundError(GenieError):
     """Error when a log is not found."""
     pass
+
+
+class JobTimeoutError(GenieError):
+    """Error when a job runs longer than a specified timeout."""
+    pass
