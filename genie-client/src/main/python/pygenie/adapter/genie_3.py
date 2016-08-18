@@ -162,7 +162,7 @@ class Genie3Adapter(GenieBaseAdapter):
             'clusterCriterias': [i for i in clusters if i.get('tags')],
             'commandArgs': job.get('command_arguments') or job.cmd_args,
             'commandCriteria': job.get('command_tags') or job.default_command_tags,
-            'dependencies': dependencies,
+            'dependencies': [d for d in dependencies if d not in {'', None}],
             'description': description,
             'disableLogArchival': not job.get('archive'),
             'email': job.get('email'),
