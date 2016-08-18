@@ -109,10 +109,8 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
      */
     @Override
     public void createJobAndJobExecution(
-        @NotNull(message = "No Job provided to create")
-        final Job job,
-        @NotNull(message = "No Job execution information provided. Unable to create.")
-        final JobExecution jobExecution
+        @NotNull(message = "No Job provided to create") final Job job,
+        @NotNull(message = "No Job execution information provided. Unable to create.") final JobExecution jobExecution
     ) throws GenieException {
         log.debug("Called with job: {}", job);
 
@@ -162,12 +160,9 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
      */
     @Override
     public void updateJobStatus(
-        @NotBlank(message = "No job id entered. Unable to update.")
-        final String id,
-        @NotNull(message = "Status cannot be null.")
-        final JobStatus jobStatus,
-        @NotBlank(message = "Status message cannot be empty.")
-        final String statusMsg
+        @NotBlank(message = "No job id entered. Unable to update.") final String id,
+        @NotNull(message = "Status cannot be null.") final JobStatus jobStatus,
+        @NotBlank(message = "Status message cannot be empty.") final String statusMsg
     ) throws GenieException {
         log.debug("Called to update job with id {}, status {} and statusMsg \"{}\"", id, jobStatus, statusMsg);
 

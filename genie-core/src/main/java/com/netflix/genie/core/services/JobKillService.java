@@ -21,6 +21,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.events.KillJobEvent;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.context.event.EventListener;
+import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotNull;
 
@@ -30,6 +31,7 @@ import javax.validation.constraints.NotNull;
  * @author tgianos
  * @since 3.0.0
  */
+@Validated
 public interface JobKillService {
 
     /**
