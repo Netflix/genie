@@ -110,15 +110,23 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
     /**
      * Get RetryTemplate.
      *
+     * @param noOfRetries number of retries
+     * @param initialInterval initial interval for the backoff policy
+     * @param maxInterval maximum interval for the backoff policy
      * @return The retry template to use
      */
     @Bean(name = "genieRetryTemplate")
-    public RetryTemplate retryTemplate() {
+    public RetryTemplate retryTemplate(
+        @Value("${genie.retry.noOfRetries:5}") final int noOfRetries,
+        @Value("${genie.retry.initialInterval:10000}") final int initialInterval,
+        @Value("${genie.retry.maxInterval:60000}") final int maxInterval
+    ) {
         final RetryTemplate retryTemplate = new RetryTemplate();
-        retryTemplate.setRetryPolicy(new SimpleRetryPolicy(5, Collections.singletonMap(Exception.class, true)));
+        retryTemplate.setRetryPolicy(new SimpleRetryPolicy(noOfRetries,
+            Collections.singletonMap(Exception.class, true)));
         final ExponentialBackOffPolicy backOffPolicy = new ExponentialBackOffPolicy();
-        backOffPolicy.setInitialInterval(10000);
-        backOffPolicy.setMaxInterval(50000);
+        backOffPolicy.setInitialInterval(initialInterval);
+        backOffPolicy.setMaxInterval(maxInterval);
         retryTemplate.setBackOffPolicy(backOffPolicy);
         return retryTemplate;
     }

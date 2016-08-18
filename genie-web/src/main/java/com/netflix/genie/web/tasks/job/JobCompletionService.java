@@ -178,7 +178,7 @@ public class JobCompletionService {
             final JobStatus status = job.getStatus();
 
             // Make sure the job isn't already done before doing something
-            if (status == JobStatus.INIT || status == JobStatus.RUNNING) {
+            if (status.isActive()) {
                 try {
                     retryTemplate.execute(context -> updateJob(job, event, tags));
                 } catch (Exception e) {
@@ -205,9 +205,10 @@ public class JobCompletionService {
         } catch (Exception e) {
             log.error("Failed getting job with id: {}", jobId, e);
             tags.put(ERROR_TAG, "GET_JOB_FAILURE");
+        } finally {
+            final Id timerId = this.jobCompletionId.withTags(tags);
+            this.registry.timer(timerId).record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
-        final Id timerId = this.jobCompletionId.withTags(tags);
-        this.registry.timer(timerId).record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
     }
 
     private Job getJob(final String jobId) throws GenieException {
