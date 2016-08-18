@@ -5,6 +5,7 @@ import cookie from 'react-cookie';
 
 import SiteHeader from './components/SiteHeader';
 import SiteFooter from './components/SiteFooter';
+import AuthCheck from './components/AuthCheck';
 
 export default class App extends React.Component {
   static propTypes = {
@@ -65,6 +66,7 @@ export default class App extends React.Component {
           headers={this.props.headers}
           infos={this.state.infos}
         />
+        <AuthCheck />
         <div className="container">
           {this.props.children}
         </div>
