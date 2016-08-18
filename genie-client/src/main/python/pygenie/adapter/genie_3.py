@@ -114,7 +114,7 @@ class Genie3Adapter(GenieBaseAdapter):
                             **kwargs)
             return response.iter_lines() if iterator else response.text
         except GenieHTTPError as err:
-            if err.response.status_code == 404:
+            if err.response.status_code in {404, 406}:
                 raise GenieLogNotFoundError("log not found at {}".format(url))
             raise
 
@@ -162,7 +162,7 @@ class Genie3Adapter(GenieBaseAdapter):
             'clusterCriterias': [i for i in clusters if i.get('tags')],
             'commandArgs': job.get('command_arguments') or job.cmd_args,
             'commandCriteria': job.get('command_tags') or job.default_command_tags,
-            'dependencies': dependencies,
+            'dependencies': [d for d in dependencies if d not in {'', None}],
             'description': description,
             'disableLogArchival': not job.get('archive'),
             'email': job.get('email'),
