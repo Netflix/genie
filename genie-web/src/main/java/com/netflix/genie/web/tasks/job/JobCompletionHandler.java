@@ -41,6 +41,7 @@ import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.exec.PumpStreamHandler;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,6 +52,7 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -71,12 +73,13 @@ public class JobCompletionHandler {
     private final JobPersistenceService jobPersistenceService;
     private final JobSearchService jobSearchService;
     private final GenieFileTransferService genieFileTransferService;
-    private final String baseWorkingDir;
+    private final File baseWorkingDir;
     private final MailService mailServiceImpl;
     private final Executor executor;
     private final boolean deleteArchiveFile;
     private final boolean deleteDependencies;
     private final boolean isRunAsUserEnabled;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     // Metrics
     private final Registry registry;
@@ -131,8 +134,8 @@ public class JobCompletionHandler {
         executor.setStreamHandler(new PumpStreamHandler(null, null));
 
         try {
-            this.baseWorkingDir = genieWorkingDir.getFile().getCanonicalPath();
-        } catch (IOException gse) {
+            this.baseWorkingDir = genieWorkingDir.getFile();
+        } catch (final IOException gse) {
             throw new GenieServerException("Could not load the base path from resource");
         }
 
@@ -246,19 +249,21 @@ public class JobCompletionHandler {
      */
     private void cleanupProcesses(final String jobId) {
         try {
-            final int pid = this.jobSearchService.getJobExecution(jobId).getProcessId();
-            try {
-                final CommandLine commandLine = new CommandLine(JobConstants.UNIX_PKILL_COMMAND);
-                commandLine.addArgument(JobConstants.getKillFlag());
-                commandLine.addArgument(Integer.toString(pid));
-                this.executor.execute(commandLine);
+            final Optional<Integer> pid = this.jobSearchService.getJobExecution(jobId).getProcessId();
+            if (pid.isPresent()) {
+                try {
+                    final CommandLine commandLine = new CommandLine(JobConstants.UNIX_PKILL_COMMAND);
+                    commandLine.addArgument(JobConstants.getKillFlag());
+                    commandLine.addArgument(Integer.toString(pid.get()));
+                    this.executor.execute(commandLine);
 
-                // The process group should not exist and the above code should always throw and exception. If it does
-                // not then the bash script is not cleaning up stuff well during kills or the script is done but
-                // child processes are still remaining. This metric tracks all that.
-                this.processGroupCleanupFailureRate.increment();
-            } catch (final Exception e) {
-                log.debug("Received expected exception. Ignoring.");
+                    // The process group should not exist and the above code should always throw and exception.
+                    // If it does not then the bash script is not cleaning up stuff well during kills or the script is
+                    // done but child processes are still remaining. This metric tracks all that.
+                    this.processGroupCleanupFailureRate.increment();
+                } catch (final Exception e) {
+                    log.debug("Received expected exception. Ignoring.");
+                }
             }
         } catch (final GenieException ge) {
             log.error("Unable to get job execution so unable to cleanup process for job " + jobId, ge);
@@ -277,15 +282,19 @@ public class JobCompletionHandler {
         try {
             log.debug("Updating the status of the job.");
 
-            // read the done file and get exit code to decide status
-            final ObjectMapper objectMapper = new ObjectMapper();
-
             try {
-                final JobDoneFile jobDoneFile = objectMapper.readValue(
-                    new File(this.baseWorkingDir + "/" + id + "/genie/genie.done"),
+                final File jobDir = new File(this.baseWorkingDir, id);
+                final JobDoneFile jobDoneFile = this.objectMapper.readValue(
+                    new File(jobDir, "genie/genie.done"),
                     JobDoneFile.class
                 );
                 final int exitCode = jobDoneFile.getExitCode();
+
+                // Read the size of STD OUT and STD ERR files
+                final File stdOut = new File(jobDir, JobConstants.STDOUT_LOG_FILE_NAME);
+                final Long stdOutSize = stdOut.exists() && stdOut.isFile() ? stdOut.length() : null;
+                final File stdErr = new File(jobDir, JobConstants.STDERR_LOG_FILE_NAME);
+                final Long stdErrSize = stdErr.exists() && stdErr.isFile() ? stdErr.length() : null;
 
                 final JobStatus finalStatus;
                 switch (exitCode) {
@@ -294,7 +303,9 @@ public class JobCompletionHandler {
                             id,
                             exitCode,
                             JobStatus.KILLED,
-                            "Job was killed."
+                            "Job was killed.",
+                            stdOutSize,
+                            stdErrSize
                         );
                         finalStatus = JobStatus.KILLED;
                         break;
@@ -303,7 +314,9 @@ public class JobCompletionHandler {
                             id,
                             exitCode,
                             JobStatus.SUCCEEDED,
-                            "Job finished successfully."
+                            "Job finished successfully.",
+                            stdOutSize,
+                            stdErrSize
                         );
                         finalStatus = JobStatus.SUCCEEDED;
                         break;
@@ -313,7 +326,9 @@ public class JobCompletionHandler {
                             id,
                             exitCode,
                             JobStatus.FAILED,
-                            "Job failed."
+                            "Job failed.",
+                            stdOutSize,
+                            stdErrSize
                         );
                         finalStatus = JobStatus.FAILED;
                         break;
@@ -342,50 +357,47 @@ public class JobCompletionHandler {
     /**
      * Delete the application dependencies off disk to save space.
      *
-     * @param jobId         The ID of the job to delete dependencies for
-     * @param jobWorkingDir The job working directory
+     * @param jobId  The ID of the job to delete dependencies for
+     * @param jobDir The job working directory
      */
-    private void deleteApplicationDependencies(final String jobId, final String jobWorkingDir) {
+    private void deleteApplicationDependencies(final String jobId, final File jobDir) {
         log.debug("Deleting dependencies as its enabled.");
-        final File jobDir = new File(jobWorkingDir);
         if (jobDir.exists()) {
             try {
                 final List<String> appIds = this.jobSearchService
                     .getJobApplications(jobId)
                     .stream()
                     .map(Application::getId)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
                     .collect(Collectors.toList());
 
                 for (final String appId : appIds) {
-                    final String applicationDependencyFolder = jobWorkingDir
-                        + JobConstants.FILE_PATH_DELIMITER
-                        + JobConstants.GENIE_PATH_VAR
-                        + JobConstants.FILE_PATH_DELIMITER
-                        + JobConstants.APPLICATION_PATH_VAR
-                        + JobConstants.FILE_PATH_DELIMITER
-                        + appId
-                        + JobConstants.FILE_PATH_DELIMITER
-                        + JobConstants.DEPENDENCY_FILE_PATH_PREFIX;
-
-                    final File appDependencyDir = new File(applicationDependencyFolder);
+                    final File appDependencyDir = new File(
+                        jobDir,
+                        JobConstants.GENIE_PATH_VAR
+                            + JobConstants.FILE_PATH_DELIMITER
+                            + JobConstants.APPLICATION_PATH_VAR
+                            + JobConstants.FILE_PATH_DELIMITER
+                            + appId
+                            + JobConstants.FILE_PATH_DELIMITER
+                            + JobConstants.DEPENDENCY_FILE_PATH_PREFIX
+                    );
 
                     if (appDependencyDir.exists()) {
-                        final CommandLine deleteCommand;
                         if (this.isRunAsUserEnabled) {
-                            deleteCommand = new CommandLine("sudo");
+                            final CommandLine deleteCommand = new CommandLine("sudo");
                             deleteCommand.addArgument("rm");
+                            deleteCommand.addArgument("-rf");
+                            deleteCommand.addArgument(appDependencyDir.getCanonicalPath());
+                            log.debug("Delete command is {}", deleteCommand.toString());
+                            this.executor.execute(deleteCommand);
                         } else {
-                            deleteCommand = new CommandLine("rm");
+                            FileUtils.deleteDirectory(appDependencyDir);
                         }
-
-                        deleteCommand.addArgument("-rf");
-                        deleteCommand.addArgument(applicationDependencyFolder);
-
-                        log.debug("Delete command is {}", deleteCommand.toString());
-                        this.executor.execute(deleteCommand);
                     }
                 }
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 log.error("Could not delete job dependencies after completion for job: {} due to error {}",
                     jobId, e);
                 this.deleteDependenciesFailure.increment();
@@ -403,49 +415,47 @@ public class JobCompletionHandler {
         log.debug("Got a job finished event. Will process job directory.");
 
         final Job job = this.jobSearchService.getJob(jobId);
-        final String jobWorkingDir = this.baseWorkingDir + JobConstants.FILE_PATH_DELIMITER + jobId;
-        final File jobDir = new File(jobWorkingDir);
+        final File jobDir = new File(this.baseWorkingDir, jobId);
 
         if (jobDir.exists()) {
             if (this.deleteDependencies) {
-                this.deleteApplicationDependencies(jobId, jobWorkingDir);
+                this.deleteApplicationDependencies(jobId, jobDir);
             }
 
             try {
                 // If archive location is provided create a tar and upload it
-                if (StringUtils.isNotBlank(job.getArchiveLocation())) {
-
+                final Optional<String> archiveLocation = job.getArchiveLocation();
+                if (archiveLocation.isPresent() && StringUtils.isNotBlank(archiveLocation.get())) {
                     log.debug("Archiving job directory");
                     // Create the tar file
-                    final String localArchiveFile = jobWorkingDir
-                        + JobConstants.FILE_PATH_DELIMITER
-                        + "genie/logs/"
-                        + jobId
-                        + ".tar.gz";
+                    final File localArchiveFile = new File(jobDir, "genie/logs/" + jobId + ".tar.gz");
 
                     final CommandLine commandLine = new CommandLine("sudo");
                     commandLine.addArgument("tar");
                     commandLine.addArgument("-c");
                     commandLine.addArgument("-z");
                     commandLine.addArgument("-f");
-                    commandLine.addArgument(localArchiveFile);
+                    commandLine.addArgument(localArchiveFile.getCanonicalPath());
                     commandLine.addArgument("./");
 
                     this.executor.setWorkingDirectory(jobDir);
 
                     log.debug("Archive command : {}", commandLine.toString());
-                    executor.execute(commandLine);
+                    this.executor.execute(commandLine);
 
                     // Upload the tar file to remote location
-                    this.genieFileTransferService.putFile(localArchiveFile, job.getArchiveLocation());
+                    this.genieFileTransferService.putFile(localArchiveFile.getCanonicalPath(), archiveLocation.get());
 
                     // At this point the archive file is successfully uploaded to archive location specified in the job.
                     // Now we can delete it from local disk to save space if enabled.
                     if (this.deleteArchiveFile) {
                         log.debug("Deleting archive file");
                         try {
-                            new File(localArchiveFile).delete();
-                        } catch (Exception e) {
+                            if (!localArchiveFile.delete()) {
+                                log.error("Failed to delete archive file for job: {}", jobId);
+                                this.archiveFileDeletionFailure.increment();
+                            }
+                        } catch (final Exception e) {
                             log.error("Failed to delete archive file for job: {}", jobId, e);
                             this.archiveFileDeletionFailure.increment();
                         }
@@ -469,10 +479,11 @@ public class JobCompletionHandler {
             log.debug("Got a job finished event. Sending email.");
             final JobRequest jobRequest = this.jobSearchService.getJobRequest(jobId);
 
-            if (StringUtils.isNotBlank(jobRequest.getEmail())) {
+            final Optional<String> email = jobRequest.getEmail();
+            if (email.isPresent() && StringUtils.isNotBlank(email.get())) {
                 final JobStatus status = this.jobSearchService.getJobStatus(jobId);
                 this.mailServiceImpl.sendEmail(
-                    jobRequest.getEmail(),
+                    email.get(),
                     "Genie Job" + jobId,
                     "Job with id [" + jobId + "] finished with status " + status
                 );

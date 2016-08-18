@@ -41,7 +41,7 @@ public class JobStartedEvent extends BaseJobEvent {
      * @param source       The source which threw this event
      */
     public JobStartedEvent(@NotNull @Valid final JobExecution jobExecution, @NotNull final Object source) {
-        super(jobExecution.getId(), source);
+        super(jobExecution.getId().orElseThrow(IllegalArgumentException::new), source);
         this.jobExecution = jobExecution;
     }
 }

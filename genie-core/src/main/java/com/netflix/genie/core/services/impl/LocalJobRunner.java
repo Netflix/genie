@@ -57,6 +57,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -164,7 +165,7 @@ public class LocalJobRunner implements JobSubmitterService {
 
         try {
             log.info("Beginning local job submission for {}", jobRequest);
-            final String id = jobRequest.getId();
+            final String id = jobRequest.getId().orElseThrow(() -> new GenieServerException("No job id found."));
 
             try {
                 final File jobWorkingDir = this.createJobWorkingDirectory(id);
@@ -181,12 +182,23 @@ public class LocalJobRunner implements JobSubmitterService {
                 // Job can be run as there is a valid set of cluster, command and applications
                 // Save all the runtime environment information for the job
                 final long jobEnvironmentStart = System.nanoTime();
+                final String clusterId = cluster
+                    .getId()
+                    .orElseThrow(() -> new GenieServerException("Cluster has no id"));
+                final String commandId = command
+                    .getId()
+                    .orElseThrow(() -> new GenieServerException("Command has no id"));
                 try {
                     this.jobPersistenceService.updateJobWithRuntimeEnvironment(
                         id,
-                        cluster.getId(),
-                        command.getId(),
-                        applications.stream().map(Application::getId).collect(Collectors.toList())
+                        clusterId,
+                        commandId,
+                        applications
+                            .stream()
+                            .map(Application::getId)
+                            .filter(Optional::isPresent)
+                            .map(Optional::get)
+                            .collect(Collectors.toList())
                     );
                 } finally {
                     this.setJobEnvironmentTimer.record(System.nanoTime() - jobEnvironmentStart, TimeUnit.NANOSECONDS);
@@ -206,10 +218,18 @@ public class LocalJobRunner implements JobSubmitterService {
                     try {
                         log.info("Saving job execution for job {}", jobRequest.getId());
                         this.jobPersistenceService.setJobRunningInformation(
-                            jobRequest.getId(),
-                            jobExecution.getProcessId(),
-                            jobExecution.getCheckDelay(),
-                            jobExecution.getTimeout()
+                            id,
+                            jobExecution.
+                                getProcessId()
+                                .orElseThrow(() ->
+                                    new GenieServerException("No process id returned. Unable to persist")
+                                ),
+                            jobExecution.getCheckDelay().orElse(Command.DEFAULT_CHECK_DELAY),
+                            jobExecution
+                                .getTimeout()
+                                .orElseThrow(() ->
+                                    new GenieServerException("No timeout date returned. Unable to persist")
+                                )
                         );
                     } finally {
                         this.saveJobExecutionTimer
@@ -301,11 +321,13 @@ public class LocalJobRunner implements JobSubmitterService {
     private Command getCommand(final JobRequest jobRequest, final Cluster cluster) throws GenieException {
         final long start = System.nanoTime();
         try {
-            log.info("Selecting command attached to cluster {} for job {} ", cluster.getId(), jobRequest.getId());
+            final String clusterId = cluster.getId().orElseThrow(() -> new GenieServerException("No cluster id."));
+            final String jobId = jobRequest.getId().orElseThrow(() -> new GenieServerException("No job id"));
+            log.info("Selecting command attached to cluster {} for job {} ", clusterId, jobId);
             final Set<String> commandCriteria = jobRequest.getCommandCriteria();
             // TODO: what happens if the get method throws an error we don't mark the job failed here
             for (
-                final Command command : this.clusterService.getCommandsForCluster(cluster.getId(), this.enumStatuses)
+                final Command command : this.clusterService.getCommandsForCluster(clusterId, this.enumStatuses)
                 ) {
                 if (command.getTags().containsAll(jobRequest.getCommandCriteria())) {
                     log.info("Selected command {} for job {} ", command.getId(), jobRequest.getId());
@@ -330,11 +352,13 @@ public class LocalJobRunner implements JobSubmitterService {
     ) throws GenieException {
         final long start = System.nanoTime();
         try {
-            log.info("Selecting applications for job {} and command {}", jobRequest.getId(), command.getId());
+            final String jobId = jobRequest.getId().orElseThrow(() -> new GenieServerException("No job Id"));
+            final String commandId = command.getId().orElseThrow(() -> new GenieServerException("No command Id"));
+            log.info("Selecting applications for job {} and command {}", jobId, commandId);
             // TODO: What do we do about application status? Should probably check here
             final List<Application> applications = new ArrayList<>();
             if (jobRequest.getApplications().isEmpty()) {
-                applications.addAll(this.commandService.getApplicationsForCommand(command.getId()));
+                applications.addAll(this.commandService.getApplicationsForCommand(commandId));
             } else {
                 for (final String applicationId : jobRequest.getApplications()) {
                     applications.add(this.applicationService.getApplication(applicationId));
@@ -342,7 +366,12 @@ public class LocalJobRunner implements JobSubmitterService {
             }
             log.info(
                 "Selected applications {} for job {}",
-                applications.stream().map(Application::getId).reduce((one, two) -> one + "," + two),
+                applications
+                    .stream()
+                    .map(Application::getId)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .reduce((one, two) -> one + "," + two),
                 jobRequest.getId()
             );
             return applications;
@@ -379,8 +408,10 @@ public class LocalJobRunner implements JobSubmitterService {
     private JobExecution executeJob(final Map<String, Object> context, final File runScript) throws GenieException {
         final long start = System.nanoTime();
         try (final Writer writer = new OutputStreamWriter(new FileOutputStream(runScript), "UTF-8")) {
-            final String jobId
-                = ((JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY)).getJobRequest().getId();
+            final String jobId = ((JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY))
+                .getJobRequest()
+                .getId()
+                .orElseThrow(() -> new GenieServerException("No job id. Unable to execute"));
             log.info("Executing job workflow for job {}", jobId);
             context.put(JobConstants.WRITER_KEY, writer);
 

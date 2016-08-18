@@ -29,6 +29,7 @@ import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.core.services.ApplicationService;
 import com.netflix.genie.core.services.CommandService;
 import com.netflix.genie.test.categories.IntegrationTest;
+import com.netflix.genie.test.suppliers.RandomSuppliers;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -98,34 +99,34 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
     @Test
     public void testGetApplication() throws GenieException {
         final Application app = this.appService.getApplication(APP_1_ID);
-        Assert.assertEquals(APP_1_ID, app.getId());
+        Assert.assertEquals(APP_1_ID, app.getId().orElseGet(RandomSuppliers.STRING));
         Assert.assertEquals(APP_1_NAME, app.getName());
         Assert.assertEquals(APP_1_USER, app.getUser());
         Assert.assertEquals(APP_1_VERSION, app.getVersion());
         Assert.assertEquals(APP_1_STATUS, app.getStatus());
-        Assert.assertThat(app.getType(), Matchers.nullValue());
+        Assert.assertFalse(app.getType().isPresent());
         Assert.assertEquals(3, app.getTags().size());
         Assert.assertEquals(2, app.getConfigs().size());
         Assert.assertEquals(2, app.getDependencies().size());
 
         final Application app2 = this.appService.getApplication(APP_2_ID);
-        Assert.assertEquals(APP_2_ID, app2.getId());
+        Assert.assertEquals(APP_2_ID, app2.getId().orElseGet(RandomSuppliers.STRING));
         Assert.assertEquals(APP_2_NAME, app2.getName());
         Assert.assertEquals(APP_2_USER, app2.getUser());
         Assert.assertEquals(APP_2_VERSION, app2.getVersion());
         Assert.assertEquals(APP_2_STATUS, app2.getStatus());
-        Assert.assertThat(app2.getType(), Matchers.is(APP_2_TYPE));
+        Assert.assertThat(app2.getType().orElseGet(RandomSuppliers.STRING), Matchers.is(APP_2_TYPE));
         Assert.assertEquals(4, app2.getTags().size());
         Assert.assertEquals(2, app2.getConfigs().size());
         Assert.assertEquals(1, app2.getDependencies().size());
 
         final Application app3 = this.appService.getApplication(APP_3_ID);
-        Assert.assertEquals(APP_3_ID, app3.getId());
+        Assert.assertEquals(APP_3_ID, app3.getId().orElseGet(RandomSuppliers.STRING));
         Assert.assertEquals(APP_3_NAME, app3.getName());
         Assert.assertEquals(APP_3_USER, app3.getUser());
         Assert.assertEquals(APP_3_VERSION, app3.getVersion());
         Assert.assertEquals(APP_3_STATUS, app3.getStatus());
-        Assert.assertThat(app3.getType(), Matchers.is(APP_3_TYPE));
+        Assert.assertThat(app3.getType().orElseGet(RandomSuppliers.STRING), Matchers.is(APP_3_TYPE));
         Assert.assertEquals(3, app3.getTags().size());
         Assert.assertEquals(1, app3.getConfigs().size());
         Assert.assertEquals(2, app3.getDependencies().size());
@@ -158,7 +159,10 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
     public void testGetApplicationsByName() {
         final Page<Application> apps = this.appService.getApplications(APP_2_NAME, null, null, null, null, PAGEABLE);
         Assert.assertEquals(1, apps.getNumberOfElements());
-        Assert.assertTrue(apps.getContent().stream().allMatch(application -> application.getId().equals(APP_2_ID)));
+        Assert.assertThat(
+            apps.getContent().get(0).getId().orElseGet(RandomSuppliers.STRING),
+            Matchers.is(APP_2_ID)
+        );
     }
 
     /**
@@ -168,8 +172,8 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
     public void testGetApplicationsByUser() {
         final Page<Application> apps = this.appService.getApplications(null, APP_1_USER, null, null, null, PAGEABLE);
         Assert.assertEquals(2, apps.getNumberOfElements());
-        Assert.assertEquals(APP_3_ID, apps.getContent().get(0).getId());
-        Assert.assertEquals(APP_1_ID, apps.getContent().get(1).getId());
+        Assert.assertEquals(APP_3_ID, apps.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new));
+        Assert.assertEquals(APP_1_ID, apps.getContent().get(1).getId().orElseThrow(IllegalArgumentException::new));
     }
 
     /**
@@ -182,8 +186,8 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
         statuses.add(ApplicationStatus.INACTIVE);
         final Page<Application> apps = this.appService.getApplications(null, null, statuses, null, null, PAGEABLE);
         Assert.assertEquals(2, apps.getNumberOfElements());
-        Assert.assertEquals(APP_2_ID, apps.getContent().get(0).getId());
-        Assert.assertEquals(APP_1_ID, apps.getContent().get(1).getId());
+        Assert.assertEquals(APP_2_ID, apps.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new));
+        Assert.assertEquals(APP_1_ID, apps.getContent().get(1).getId().orElseThrow(IllegalArgumentException::new));
     }
 
     /**
@@ -195,20 +199,20 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
         tags.add("prod");
         Page<Application> apps = this.appService.getApplications(null, null, null, tags, null, PAGEABLE);
         Assert.assertEquals(3, apps.getNumberOfElements());
-        Assert.assertEquals(APP_3_ID, apps.getContent().get(0).getId());
-        Assert.assertEquals(APP_2_ID, apps.getContent().get(1).getId());
-        Assert.assertEquals(APP_1_ID, apps.getContent().get(2).getId());
+        Assert.assertEquals(APP_3_ID, apps.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new));
+        Assert.assertEquals(APP_2_ID, apps.getContent().get(1).getId().orElseThrow(IllegalArgumentException::new));
+        Assert.assertEquals(APP_1_ID, apps.getContent().get(2).getId().orElseThrow(IllegalArgumentException::new));
 
         tags.add("yarn");
         apps = this.appService.getApplications(null, null, null, tags, null, PAGEABLE);
         Assert.assertEquals(1, apps.getNumberOfElements());
-        Assert.assertEquals(APP_2_ID, apps.getContent().get(0).getId());
+        Assert.assertEquals(APP_2_ID, apps.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new));
 
         tags.clear();
         tags.add("genie.name:spark");
         apps = this.appService.getApplications(null, null, null, tags, null, PAGEABLE);
         Assert.assertEquals(1, apps.getNumberOfElements());
-        Assert.assertEquals(APP_2_ID, apps.getContent().get(0).getId());
+        Assert.assertEquals(APP_2_ID, apps.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new));
 
         tags.add("somethingThatWouldNeverReallyExist");
         apps = this.appService.getApplications(null, null, null, tags, null, PAGEABLE);
@@ -217,9 +221,9 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
         tags.clear();
         apps = this.appService.getApplications(null, null, null, tags, null, PAGEABLE);
         Assert.assertEquals(3, apps.getNumberOfElements());
-        Assert.assertEquals(APP_3_ID, apps.getContent().get(0).getId());
-        Assert.assertEquals(APP_2_ID, apps.getContent().get(1).getId());
-        Assert.assertEquals(APP_1_ID, apps.getContent().get(2).getId());
+        Assert.assertEquals(APP_3_ID, apps.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new));
+        Assert.assertEquals(APP_2_ID, apps.getContent().get(1).getId().orElseThrow(IllegalArgumentException::new));
+        Assert.assertEquals(APP_1_ID, apps.getContent().get(2).getId().orElseThrow(IllegalArgumentException::new));
     }
 
     /**
@@ -229,7 +233,7 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
     public void testGetApplicationsByType() {
         final Page<Application> apps = this.appService.getApplications(null, null, null, null, APP_2_TYPE, PAGEABLE);
         Assert.assertEquals(1, apps.getNumberOfElements());
-        Assert.assertEquals(APP_2_ID, apps.getContent().get(0).getId());
+        Assert.assertEquals(APP_2_ID, apps.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new));
     }
 
     /**
@@ -240,9 +244,15 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
         //Default to order by Updated
         final Page<Application> applications = this.appService.getApplications(null, null, null, null, null, PAGEABLE);
         Assert.assertEquals(3, applications.getNumberOfElements());
-        Assert.assertEquals(APP_3_ID, applications.getContent().get(0).getId());
-        Assert.assertEquals(APP_2_ID, applications.getContent().get(1).getId());
-        Assert.assertEquals(APP_1_ID, applications.getContent().get(2).getId());
+        Assert.assertEquals(
+            APP_3_ID, applications.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new)
+        );
+        Assert.assertEquals(
+            APP_2_ID, applications.getContent().get(1).getId().orElseThrow(IllegalArgumentException::new)
+        );
+        Assert.assertEquals(
+            APP_1_ID, applications.getContent().get(2).getId().orElseThrow(IllegalArgumentException::new)
+        );
     }
 
     /**
@@ -255,9 +265,15 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
         final Page<Application> applications
             = this.appService.getApplications(null, null, null, null, null, ascendingPage);
         Assert.assertEquals(3, applications.getNumberOfElements());
-        Assert.assertEquals(APP_1_ID, applications.getContent().get(0).getId());
-        Assert.assertEquals(APP_2_ID, applications.getContent().get(1).getId());
-        Assert.assertEquals(APP_3_ID, applications.getContent().get(2).getId());
+        Assert.assertEquals(
+            APP_1_ID, applications.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new)
+        );
+        Assert.assertEquals(
+            APP_2_ID, applications.getContent().get(1).getId().orElseThrow(IllegalArgumentException::new)
+        );
+        Assert.assertEquals(
+            APP_3_ID, applications.getContent().get(2).getId().orElseThrow(IllegalArgumentException::new)
+        );
     }
 
     /**
@@ -268,9 +284,15 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
         //Default to order by Updated
         final Page<Application> applications = this.appService.getApplications(null, null, null, null, null, PAGEABLE);
         Assert.assertEquals(3, applications.getNumberOfElements());
-        Assert.assertEquals(APP_3_ID, applications.getContent().get(0).getId());
-        Assert.assertEquals(APP_2_ID, applications.getContent().get(1).getId());
-        Assert.assertEquals(APP_1_ID, applications.getContent().get(2).getId());
+        Assert.assertEquals(
+            APP_3_ID, applications.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new)
+        );
+        Assert.assertEquals(
+            APP_2_ID, applications.getContent().get(1).getId().orElseThrow(IllegalArgumentException::new)
+        );
+        Assert.assertEquals(
+            APP_1_ID, applications.getContent().get(2).getId().orElseThrow(IllegalArgumentException::new)
+        );
     }
 
     /**
@@ -282,9 +304,15 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
         final Page<Application> applications
             = this.appService.getApplications(null, null, null, null, null, orderByNamePage);
         Assert.assertEquals(3, applications.getNumberOfElements());
-        Assert.assertEquals(APP_1_ID, applications.getContent().get(0).getId());
-        Assert.assertEquals(APP_3_ID, applications.getContent().get(1).getId());
-        Assert.assertEquals(APP_2_ID, applications.getContent().get(2).getId());
+        Assert.assertEquals(
+            APP_1_ID, applications.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new)
+        );
+        Assert.assertEquals(
+            APP_3_ID, applications.getContent().get(1).getId().orElseThrow(IllegalArgumentException::new)
+        );
+        Assert.assertEquals(
+            APP_2_ID, applications.getContent().get(2).getId().orElseThrow(IllegalArgumentException::new)
+        );
     }
 
     /**
@@ -307,9 +335,15 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
             = this.appService.getApplications(null, null, null, null, null, orderByTagsPage);
         Assert.assertThat(applications.getContent().toString(), Matchers.is("blahs"));
         Assert.assertEquals(3, applications.getNumberOfElements());
-        Assert.assertEquals(APP_3_ID, applications.getContent().get(0).getId());
-        Assert.assertEquals(APP_2_ID, applications.getContent().get(1).getId());
-        Assert.assertEquals(APP_1_ID, applications.getContent().get(2).getId());
+        Assert.assertEquals(
+            APP_3_ID, applications.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new)
+        );
+        Assert.assertEquals(
+            APP_2_ID, applications.getContent().get(1).getId().orElseThrow(IllegalArgumentException::new)
+        );
+        Assert.assertEquals(
+            APP_1_ID, applications.getContent().get(2).getId().orElseThrow(IllegalArgumentException::new)
+        );
     }
 
     /**
@@ -321,14 +355,14 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
     public void testCreateApplication() throws GenieException {
         final String id = UUID.randomUUID().toString();
         final Application app = new Application
-                .Builder(APP_1_NAME, APP_1_USER, APP_1_VERSION, ApplicationStatus.ACTIVE)
-                .withId(id)
-                .build();
+            .Builder(APP_1_NAME, APP_1_USER, APP_1_VERSION, ApplicationStatus.ACTIVE)
+            .withId(id)
+            .build();
         final String createdId = this.appService.createApplication(app);
         Assert.assertThat(createdId, Matchers.is(id));
         final Application created = this.appService.getApplication(id);
         Assert.assertNotNull(created);
-        Assert.assertEquals(id, created.getId());
+        Assert.assertEquals(id, created.getId().orElseThrow(IllegalArgumentException::new));
         Assert.assertEquals(APP_1_NAME, created.getName());
         Assert.assertEquals(APP_1_USER, created.getUser());
         Assert.assertEquals(ApplicationStatus.ACTIVE, created.getStatus());
@@ -338,8 +372,8 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
             Assert.fail("Should have thrown exception");
         } catch (final GenieException ge) {
             Assert.assertEquals(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    ge.getErrorCode()
+                HttpURLConnection.HTTP_NOT_FOUND,
+                ge.getErrorCode()
             );
         }
     }
@@ -352,22 +386,22 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
     @Test
     public void testCreateApplicationNoId() throws GenieException {
         final Application app = new Application
-                .Builder(APP_1_NAME, APP_1_USER, APP_1_VERSION, ApplicationStatus.ACTIVE)
-                .build();
+            .Builder(APP_1_NAME, APP_1_USER, APP_1_VERSION, ApplicationStatus.ACTIVE)
+            .build();
         final String id = this.appService.createApplication(app);
         final Application created = this.appService.getApplication(id);
         Assert.assertNotNull(created);
         Assert.assertEquals(APP_1_NAME, created.getName());
         Assert.assertEquals(APP_1_USER, created.getUser());
         Assert.assertEquals(ApplicationStatus.ACTIVE, created.getStatus());
-        this.appService.deleteApplication(created.getId());
+        this.appService.deleteApplication(created.getId().orElseThrow(IllegalArgumentException::new));
         try {
-            this.appService.getApplication(created.getId());
+            this.appService.getApplication(created.getId().orElseThrow(IllegalArgumentException::new));
             Assert.fail();
         } catch (final GenieException ge) {
             Assert.assertEquals(
-                    HttpURLConnection.HTTP_NOT_FOUND,
-                    ge.getErrorCode()
+                HttpURLConnection.HTTP_NOT_FOUND,
+                ge.getErrorCode()
             );
         }
     }
@@ -393,25 +427,25 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(APP_1_USER, getApp.getUser());
         Assert.assertEquals(ApplicationStatus.INACTIVE, getApp.getStatus());
         Assert.assertEquals(3, getApp.getTags().size());
-        final Date updateTime = getApp.getUpdated();
+        final Date updateTime = getApp.getUpdated().orElseThrow(IllegalArgumentException::new);
 
         final Set<String> tags = new HashSet<>(getApp.getTags());
         tags.add("prod");
         tags.add("tez");
         tags.add("yarn");
         tags.add("hadoop");
-        final Application updateApp = new Application
-                .Builder(getApp.getName(), APP_2_USER, getApp.getVersion(), ApplicationStatus.ACTIVE)
-                .withId(getApp.getId())
-                .withCreated(getApp.getCreated())
-                .withUpdated(getApp.getUpdated())
-                .withDescription(getApp.getDescription())
-                .withTags(tags)
-                .withConfigs(getApp.getConfigs())
-                .withSetupFile(getApp.getSetupFile())
-                .withDependencies(getApp.getDependencies())
-                .build();
-        this.appService.updateApplication(APP_1_ID, updateApp);
+        final Application.Builder updateApp = new Application
+            .Builder(getApp.getName(), APP_2_USER, getApp.getVersion(), ApplicationStatus.ACTIVE)
+            .withId(getApp.getId().orElseThrow(IllegalArgumentException::new))
+            .withCreated(getApp.getCreated().orElseThrow(IllegalArgumentException::new))
+            .withUpdated(getApp.getUpdated().orElseThrow(IllegalArgumentException::new))
+            .withTags(tags)
+            .withConfigs(getApp.getConfigs())
+            .withDependencies(getApp.getDependencies());
+
+        getApp.getDescription().ifPresent(updateApp::withDescription);
+        getApp.getSetupFile().ifPresent(updateApp::withSetupFile);
+        this.appService.updateApplication(APP_1_ID, updateApp.build());
 
         final Application updated = this.appService.getApplication(APP_1_ID);
         Assert.assertNotEquals(updated.getUpdated(), Matchers.is(updateTime));
@@ -428,26 +462,26 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
     @Test
     public void testUpdateCreateAndUpdate() throws GenieException {
         final Application init = this.appService.getApplication(APP_1_ID);
-        final Date created = init.getCreated();
-        final Date updated = init.getUpdated();
+        final Date created = init.getCreated().orElseThrow(IllegalArgumentException::new);
+        final Date updated = init.getUpdated().orElseThrow(IllegalArgumentException::new);
 
-        final Application updateApp = new Application.Builder(
-                init.getName(), init.getUser(), init.getVersion(), init.getStatus()
+        final Application.Builder updateApp = new Application.Builder(
+            init.getName(), init.getUser(), init.getVersion(), init.getStatus()
         )
-                .withId(init.getId())
-                .withCreated(new Date())
-                .withUpdated(new Date(0))
-                .withDescription(init.getDescription())
-                .withTags(init.getTags())
-                .withConfigs(init.getConfigs())
-                .withSetupFile(init.getSetupFile())
-                .withDependencies(init.getDependencies())
-                .build();
+            .withId(init.getId().orElseThrow(IllegalArgumentException::new))
+            .withCreated(new Date())
+            .withUpdated(new Date(0))
+            .withTags(init.getTags())
+            .withConfigs(init.getConfigs())
+            .withDependencies(init.getDependencies());
 
-        this.appService.updateApplication(APP_1_ID, updateApp);
+        init.getDescription().ifPresent(updateApp::withDescription);
+        init.getSetupFile().ifPresent(updateApp::withSetupFile);
+
+        this.appService.updateApplication(APP_1_ID, updateApp.build());
 
         final Application updatedApp = this.appService.getApplication(APP_1_ID);
-        Assert.assertEquals(created, updatedApp.getCreated());
+        Assert.assertEquals(created, updatedApp.getCreated().orElseThrow(IllegalArgumentException::new));
         Assert.assertThat(updatedApp.getUpdated(), Matchers.not(updated));
         Assert.assertNotEquals(new Date(0), updatedApp.getUpdated());
     }
@@ -456,13 +490,13 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
      * Test to patch an application.
      *
      * @throws GenieException For any problem
-     * @throws IOException For Json serialization problem
+     * @throws IOException    For Json serialization problem
      */
     @Test
     public void testPatchApplication() throws GenieException, IOException {
         final Application getApp = this.appService.getApplication(APP_1_ID);
         Assert.assertEquals(APP_1_USER, getApp.getUser());
-        final Date updateTime = getApp.getUpdated();
+        final Date updateTime = getApp.getUpdated().orElseThrow(IllegalArgumentException::new);
 
         final String patchString = "[{ \"op\": \"replace\", \"path\": \"/user\", \"value\": \"" + APP_2_USER + "\" }]";
         final ObjectMapper mapper = new ObjectMapper();
@@ -503,14 +537,14 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
     @Test
     public void testDeleteAll() throws GenieException {
         Assert.assertEquals(
-                3,
-                this.appService.getApplications(null, null, null, null, null, PAGEABLE).getNumberOfElements()
+            3,
+            this.appService.getApplications(null, null, null, null, null, PAGEABLE).getNumberOfElements()
         );
         // To solve referential integrity problem
         this.commandService.deleteCommand(COMMAND_1_ID);
         this.appService.deleteAllApplications();
         Assert.assertTrue(
-                this.appService.getApplications(null, null, null, null, null, PAGEABLE).getNumberOfElements() == 0
+            this.appService.getApplications(null, null, null, null, null, PAGEABLE).getNumberOfElements() == 0
         );
     }
 
@@ -784,7 +818,7 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
     @Test
     public void testGetDependenciesForApplication() throws GenieException {
         Assert.assertEquals(2,
-                this.appService.getDependenciesForApplication(APP_1_ID).size());
+            this.appService.getDependenciesForApplication(APP_1_ID).size());
     }
 
     /**
@@ -941,7 +975,7 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
     @Test
     public void testGetTagsForApplication() throws GenieException {
         Assert.assertEquals(3,
-                this.appService.getTagsForApplication(APP_1_ID).size());
+            this.appService.getTagsForApplication(APP_1_ID).size());
     }
 
     /**
@@ -1016,10 +1050,11 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void testGetCommandsForApplication() throws GenieException {
-        final Set<Command> commands
-                = this.appService.getCommandsForApplication(APP_1_ID, null);
+        final Set<Command> commands = this.appService.getCommandsForApplication(APP_1_ID, null);
         Assert.assertEquals(1, commands.size());
-        Assert.assertEquals(COMMAND_1_ID, commands.iterator().next().getId());
+        Assert.assertEquals(
+            COMMAND_1_ID, commands.iterator().next().getId().orElseThrow(IllegalArgumentException::new)
+        );
     }
 
     /**

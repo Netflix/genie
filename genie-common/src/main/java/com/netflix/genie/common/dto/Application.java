@@ -24,6 +24,7 @@ import lombok.Getter;
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -32,8 +33,8 @@ import java.util.Set;
  * @author tgianos
  * @since 3.0.0
  */
-@JsonDeserialize(builder = Application.Builder.class)
 @Getter
+@JsonDeserialize(builder = Application.Builder.class)
 public class Application extends ConfigDTO {
 
     private static final long serialVersionUID = 212266105066344180L;
@@ -53,6 +54,15 @@ public class Application extends ConfigDTO {
         this.status = builder.bStatus;
         this.dependencies.addAll(builder.bDependencies);
         this.type = builder.bType;
+    }
+
+    /**
+     * Get the type of this application.
+     *
+     * @return The type as an Optional
+     */
+    public Optional<String> getType() {
+        return Optional.ofNullable(this.type);
     }
 
     /**

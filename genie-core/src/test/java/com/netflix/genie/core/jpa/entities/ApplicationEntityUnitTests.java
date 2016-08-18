@@ -22,6 +22,7 @@ import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.genie.test.suppliers.RandomSuppliers;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -65,7 +66,7 @@ public class ApplicationEntityUnitTests extends EntityTestsBase {
     @Test
     public void testDefaultConstructor() {
         final ApplicationEntity entity = new ApplicationEntity();
-        Assert.assertNull(entity.getSetupFile());
+        Assert.assertFalse(entity.getSetupFile().isPresent());
         Assert.assertNull(entity.getStatus());
         Assert.assertNull(entity.getName());
         Assert.assertNull(entity.getUser());
@@ -154,10 +155,10 @@ public class ApplicationEntityUnitTests extends EntityTestsBase {
      */
     @Test
     public void testSetSetupFile() {
-        Assert.assertNull(this.a.getSetupFile());
-        final String propFile = "s3://netflix.propFile";
-        this.a.setSetupFile(propFile);
-        Assert.assertEquals(propFile, this.a.getSetupFile());
+        Assert.assertFalse(this.a.getSetupFile().isPresent());
+        final String setupFile = "s3://netflix.propFile";
+        this.a.setSetupFile(setupFile);
+        Assert.assertEquals(setupFile, this.a.getSetupFile().orElseThrow(IllegalArgumentException::new));
     }
 
     /**
@@ -265,16 +266,16 @@ public class ApplicationEntityUnitTests extends EntityTestsBase {
         entity.setStatus(ApplicationStatus.ACTIVE);
 
         final Application application = entity.getDTO();
-        Assert.assertThat(application.getId(), Matchers.is(id));
+        Assert.assertThat(application.getId().orElseGet(RandomSuppliers.STRING), Matchers.is(id));
         Assert.assertThat(application.getName(), Matchers.is(name));
         Assert.assertThat(application.getUser(), Matchers.is(user));
         Assert.assertThat(application.getVersion(), Matchers.is(version));
-        Assert.assertThat(application.getCreated(), Matchers.is(created));
-        Assert.assertThat(application.getUpdated(), Matchers.is(updated));
-        Assert.assertThat(application.getDescription(), Matchers.is(description));
+        Assert.assertThat(application.getCreated().orElseGet(RandomSuppliers.DATE), Matchers.is(created));
+        Assert.assertThat(application.getUpdated().orElseGet(RandomSuppliers.DATE), Matchers.is(updated));
+        Assert.assertThat(application.getDescription().orElseGet(RandomSuppliers.STRING), Matchers.is(description));
         Assert.assertThat(application.getTags(), Matchers.is(tags));
         Assert.assertThat(application.getConfigs(), Matchers.is(configs));
-        Assert.assertThat(application.getSetupFile(), Matchers.is(setupFile));
+        Assert.assertThat(application.getSetupFile().orElseGet(RandomSuppliers.STRING), Matchers.is(setupFile));
         Assert.assertThat(application.getDependencies(), Matchers.is(dependencies));
         Assert.assertThat(application.getStatus(), Matchers.is(ApplicationStatus.ACTIVE));
     }

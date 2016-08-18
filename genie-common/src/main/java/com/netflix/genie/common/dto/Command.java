@@ -33,8 +33,8 @@ import javax.validation.constraints.Size;
  * @author tgianos
  * @since 3.0.0
  */
-@JsonDeserialize(builder = Command.Builder.class)
 @Getter
+@JsonDeserialize(builder = Command.Builder.class)
 public class Command extends ConfigDTO {
 
     /**

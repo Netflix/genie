@@ -142,7 +142,7 @@
         timeout="608400"
         entity_version="1"
     />
-    <job_request_metadata
+    <job_metadata
         id="job1"
         created="2015-08-11 01:48:00"
         updated="2015-08-11 02:59:00"
@@ -199,7 +199,7 @@
         timeout="608400"
         entity_version="1"
     />
-    <job_request_metadata
+    <job_metadata
         id="job2"
         created="2015-08-12 01:48:00"
         updated="2015-08-12 02:59:00"
@@ -256,7 +256,7 @@
         timeout="608400"
         entity_version="1"
     />
-    <job_request_metadata
+    <job_metadata
         id="job3"
         created="2016-02-24 01:48:00"
         updated="2016-02-24 02:59:00"

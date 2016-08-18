@@ -20,6 +20,7 @@ package com.netflix.genie.core.jobs.workflow.impl;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
@@ -94,7 +95,11 @@ public class JobKickoffTask extends GenieBaseTask {
                 (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
             final String jobWorkingDirectory = jobExecEnv.getJobWorkingDir().getCanonicalPath();
             final Writer writer = (Writer) context.get(JobConstants.WRITER_KEY);
-            log.info("Starting Job Kickoff Task for job {}", jobExecEnv.getJobRequest().getId());
+            final String jobId = jobExecEnv
+                .getJobRequest()
+                .getId()
+                .orElseThrow(() -> new GeniePreconditionException("No job id found. Unable to continue."));
+            log.info("Starting Job Kickoff Task for job {}", jobId);
 
             // At this point all contents are written to the run script and we call an explicit flush and close to write
             // the contents to the file before we execute it.
@@ -110,7 +115,8 @@ public class JobKickoffTask extends GenieBaseTask {
                 + JobConstants.GENIE_JOB_LAUNCHER_SCRIPT;
 
             if (this.isUserCreationEnabled) {
-                createUser(jobExecEnv.getJobRequest().getUser(), jobExecEnv.getJobRequest().getGroup());
+                final String user = jobExecEnv.getJobRequest().getUser();
+                this.createUser(user, jobExecEnv.getJobRequest().getGroup().orElse(user));
             }
 
             final List<String> command = new ArrayList<>();
@@ -140,14 +146,16 @@ public class JobKickoffTask extends GenieBaseTask {
 
             try {
                 final Process process = pb.start();
-                final int processId = getProcessId(process);
+                final int processId = this.getProcessId(process);
                 final JobRequest request = jobExecEnv.getJobRequest();
                 final Calendar calendar = Calendar.getInstance(UTC);
-//            context.put(JobConstants.JOB_STARTED_KEY, new Date(calendar.getTime().getTime()));
-                calendar.add(Calendar.SECOND, request.getTimeout());
+                calendar.add(Calendar.SECOND, request.getTimeout().orElse(JobRequest.DEFAULT_TIMEOUT_DURATION));
                 final JobExecution jobExecution = new JobExecution
-                    .Builder(this.hostname, processId, jobExecEnv.getCommand().getCheckDelay(), calendar.getTime())
-                    .withId(request.getId())
+                    .Builder(this.hostname)
+                    .withId(jobId)
+                    .withProcessId(processId)
+                    .withCheckDelay(jobExecEnv.getCommand().getCheckDelay())
+                    .withTimeout(calendar.getTime())
                     .build();
                 context.put(JobConstants.JOB_EXECUTION_DTO_KEY, jobExecution);
             } catch (final IOException ie) {
@@ -182,9 +190,7 @@ public class JobKickoffTask extends GenieBaseTask {
      * @param group group id
      * @throws GenieException If there is any problem.
      */
-    protected synchronized void createUser(
-        final String user,
-        final String group) throws GenieException {
+    protected synchronized void createUser(final String user, final String group) throws GenieException {
 
         // First check if user already exists
         final CommandLine idCheckCommandLine = new CommandLine("id");

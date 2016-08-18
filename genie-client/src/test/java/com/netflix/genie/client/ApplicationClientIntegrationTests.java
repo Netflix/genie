@@ -19,6 +19,7 @@ package com.netflix.genie.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
+import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.dto.Command;
@@ -144,23 +145,23 @@ public class ApplicationClientIntegrationTests extends GenieClientsIntegrationTe
             null,
             null,
             null,
-            Arrays.asList("foo"),
+            Lists.newArrayList("foo"),
             null
         );
         Assert.assertEquals(1, applicationList.size());
-        Assert.assertEquals(application1Id, applicationList.get(0).getId());
+        Assert.assertEquals(application1Id, applicationList.get(0).getId().orElseThrow(IllegalArgumentException::new));
 
         applicationList = applicationClient.getApplications(
             null,
             null,
             null,
-            Arrays.asList("pi"),
+            Lists.newArrayList("pi"),
             null
         );
 
         Assert.assertEquals(2, applicationList.size());
-        Assert.assertEquals(application2Id, applicationList.get(0).getId());
-        Assert.assertEquals(application1Id, applicationList.get(1).getId());
+        Assert.assertEquals(application2Id, applicationList.get(0).getId().orElseThrow(IllegalArgumentException::new));
+        Assert.assertEquals(application1Id, applicationList.get(1).getId().orElseThrow(IllegalArgumentException::new));
 
         // Test get by name
         applicationList = applicationClient.getApplications(
@@ -177,7 +178,7 @@ public class ApplicationClientIntegrationTests extends GenieClientsIntegrationTe
         applicationList = applicationClient.getApplications(
             null,
             null,
-            Arrays.asList(ApplicationStatus.ACTIVE.toString()),
+            Lists.newArrayList(ApplicationStatus.ACTIVE.toString()),
             null,
             null
         );
@@ -241,11 +242,12 @@ public class ApplicationClientIntegrationTests extends GenieClientsIntegrationTe
         final Application application1 = constructApplicationDTO(null);
         applicationClient.createApplication(application1);
 
-        final Application application2 = applicationClient.getApplication(application1.getId());
+        final Application application2
+            = applicationClient.getApplication(application1.getId().orElseThrow(IllegalArgumentException::new));
         Assert.assertEquals(application2.getId(), application1.getId());
 
-        applicationClient.deleteApplication(application1.getId());
-        applicationClient.getApplication(application1.getId());
+        applicationClient.deleteApplication(application1.getId().orElseThrow(IllegalArgumentException::new));
+        applicationClient.getApplication(application1.getId().orElseThrow(IllegalArgumentException::new));
     }
 
     /**
@@ -258,24 +260,27 @@ public class ApplicationClientIntegrationTests extends GenieClientsIntegrationTe
         final Application application1 = constructApplicationDTO(null);
         applicationClient.createApplication(application1);
 
-        final Application application2 = applicationClient.getApplication(application1.getId());
+        final Application application2
+            = applicationClient.getApplication(application1.getId().orElseThrow(IllegalArgumentException::new));
         Assert.assertEquals(application2.getName(), application1.getName());
 
-        final Application application3 = new
-            Application.Builder("newname", "newuser", "new version", ApplicationStatus.ACTIVE)
-            .withId(application1.getId())
+        final Application application3
+            = new Application.Builder("newname", "newuser", "new version", ApplicationStatus.ACTIVE)
+            .withId(application1.getId().orElseThrow(IllegalArgumentException::new))
             .build();
 
-        applicationClient.updateApplication(application1.getId(), application3);
+        applicationClient
+            .updateApplication(application1.getId().orElseThrow(IllegalArgumentException::new), application3);
 
-        final Application application4 = applicationClient.getApplication(application1.getId());
+        final Application application4
+            = applicationClient.getApplication(application1.getId().orElseThrow(IllegalArgumentException::new));
 
         Assert.assertEquals("newname", application4.getName());
         Assert.assertEquals("newuser", application4.getUser());
         Assert.assertEquals("new version", application4.getVersion());
         Assert.assertEquals(ApplicationStatus.ACTIVE, application4.getStatus());
-        Assert.assertEquals(null, application4.getSetupFile());
-        Assert.assertEquals(null, application4.getDescription());
+        Assert.assertFalse(application4.getSetupFile().isPresent());
+        Assert.assertFalse(application4.getDescription().isPresent());
         Assert.assertEquals(Collections.emptySet(), application4.getConfigs());
         Assert.assertEquals(application4.getTags().contains("foo"), false);
     }
@@ -433,10 +438,18 @@ public class ApplicationClientIntegrationTests extends GenieClientsIntegrationTe
 
         applicationClient.createApplication(application);
 
-        commandClient.addApplicationsToCommand(command1.getId(), Arrays.asList(application.getId()));
-        commandClient.addApplicationsToCommand(command2.getId(), Arrays.asList(application.getId()));
+        commandClient.addApplicationsToCommand(
+            command1.getId().orElseThrow(IllegalArgumentException::new),
+            Lists.newArrayList(application.getId().orElseThrow(IllegalArgumentException::new))
+        );
+        commandClient.addApplicationsToCommand(
+            command2.getId().orElseThrow(IllegalArgumentException::new),
+            Lists.newArrayList(application.getId().orElseThrow(IllegalArgumentException::new))
+        );
 
-        final List<Command> commandList = applicationClient.getCommandsForApplication(application.getId());
+        final List<Command> commandList = applicationClient.getCommandsForApplication(
+            application.getId().orElseThrow(IllegalArgumentException::new)
+        );
 
         Assert.assertEquals(2, commandList.size());
     }

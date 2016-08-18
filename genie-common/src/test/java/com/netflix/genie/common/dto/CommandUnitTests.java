@@ -55,20 +55,22 @@ public class CommandUnitTests {
         Assert.assertThat(command.getVersion(), Matchers.is(VERSION));
         Assert.assertThat(command.getStatus(), Matchers.is(CommandStatus.ACTIVE));
         Assert.assertThat(command.getExecutable(), Matchers.is(EXECUTABLE));
-        Assert.assertThat(command.getSetupFile(), Matchers.nullValue());
+        Assert.assertFalse(command.getSetupFile().isPresent());
         Assert.assertThat(command.getConfigs(), Matchers.empty());
-        Assert.assertThat(command.getCreated(), Matchers.nullValue());
-        Assert.assertThat(command.getDescription(), Matchers.nullValue());
-        Assert.assertThat(command.getId(), Matchers.nullValue());
+        Assert.assertFalse(command.getCreated().isPresent());
+        Assert.assertFalse(command.getDescription().isPresent());
+        Assert.assertFalse(command.getId().isPresent());
         Assert.assertThat(command.getTags(), Matchers.empty());
-        Assert.assertThat(command.getUpdated(), Matchers.nullValue());
+        Assert.assertFalse(command.getUpdated().isPresent());
     }
 
     /**
      * Test to make sure we can build a command with all optional parameters.
+     *
+     * @throws Exception on error
      */
     @Test
-    public void canBuildCommandWithOptionals() {
+    public void canBuildCommandWithOptionals() throws Exception {
         final Command.Builder builder
             = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
 
@@ -100,13 +102,15 @@ public class CommandUnitTests {
         Assert.assertThat(command.getStatus(), Matchers.is(CommandStatus.ACTIVE));
         Assert.assertThat(command.getExecutable(), Matchers.is(EXECUTABLE));
         Assert.assertThat(command.getCheckDelay(), Matchers.is(CHECK_DELAY));
-        Assert.assertThat(command.getSetupFile(), Matchers.is(setupFile));
+        Assert.assertThat(command.getSetupFile().orElseThrow(IllegalArgumentException::new), Matchers.is(setupFile));
         Assert.assertThat(command.getConfigs(), Matchers.is(configs));
-        Assert.assertThat(command.getCreated(), Matchers.is(created));
-        Assert.assertThat(command.getDescription(), Matchers.is(description));
-        Assert.assertThat(command.getId(), Matchers.is(id));
+        Assert.assertThat(command.getCreated().orElseThrow(IllegalArgumentException::new), Matchers.is(created));
+        Assert.assertThat(
+            command.getDescription().orElseThrow(IllegalArgumentException::new), Matchers.is(description)
+        );
+        Assert.assertThat(command.getId().orElseThrow(IllegalArgumentException::new), Matchers.is(id));
         Assert.assertThat(command.getTags(), Matchers.is(tags));
-        Assert.assertThat(command.getUpdated(), Matchers.is(updated));
+        Assert.assertThat(command.getUpdated().orElseThrow(IllegalArgumentException::new), Matchers.is(updated));
     }
 
     /**
@@ -130,13 +134,13 @@ public class CommandUnitTests {
         Assert.assertThat(command.getVersion(), Matchers.is(VERSION));
         Assert.assertThat(command.getStatus(), Matchers.is(CommandStatus.ACTIVE));
         Assert.assertThat(command.getExecutable(), Matchers.is(EXECUTABLE));
-        Assert.assertThat(command.getSetupFile(), Matchers.nullValue());
+        Assert.assertFalse(command.getSetupFile().isPresent());
         Assert.assertThat(command.getConfigs(), Matchers.empty());
-        Assert.assertThat(command.getCreated(), Matchers.nullValue());
-        Assert.assertThat(command.getDescription(), Matchers.nullValue());
-        Assert.assertThat(command.getId(), Matchers.nullValue());
+        Assert.assertFalse(command.getCreated().isPresent());
+        Assert.assertFalse(command.getDescription().isPresent());
+        Assert.assertFalse(command.getId().isPresent());
         Assert.assertThat(command.getTags(), Matchers.empty());
-        Assert.assertThat(command.getUpdated(), Matchers.nullValue());
+        Assert.assertFalse(command.getUpdated().isPresent());
     }
 
     /**

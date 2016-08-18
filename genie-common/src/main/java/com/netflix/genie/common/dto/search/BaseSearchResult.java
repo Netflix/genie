@@ -21,11 +21,15 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.hibernate.validator.constraints.NotBlank;
 
 import java.io.Serializable;
+import java.text.DateFormat;
+import java.util.TimeZone;
 
 /**
  * Base class for search results containing common fields.
@@ -38,6 +42,13 @@ import java.io.Serializable;
 public class BaseSearchResult implements Serializable {
 
     private static final long serialVersionUID = -273035797399359914L;
+    private static final ObjectMapper MAPPER;
+
+    static {
+        final DateFormat iso8601 = new ISO8601DateFormat();
+        iso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
+        MAPPER = new ObjectMapper().registerModule(new Jdk8Module()).setDateFormat(iso8601);
+    }
 
     private final String id;
     private final String name;
@@ -69,8 +80,7 @@ public class BaseSearchResult implements Serializable {
     @Override
     public String toString() {
         try {
-            final ObjectMapper mapper = new ObjectMapper();
-            return mapper.writeValueAsString(this);
+            return MAPPER.writeValueAsString(this);
         } catch (final JsonProcessingException ioe) {
             return ioe.getLocalizedMessage();
         }

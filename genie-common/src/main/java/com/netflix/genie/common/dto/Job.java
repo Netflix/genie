@@ -21,8 +21,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import com.netflix.genie.common.util.JsonDateDeserializer;
-import com.netflix.genie.common.util.JsonDateSerializer;
 import com.netflix.genie.common.util.TimeUtils;
 import lombok.Getter;
 
@@ -30,6 +28,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.Duration;
 import java.util.Date;
+import java.util.Optional;
 
 /**
  * Read only data transfer object representing a Job in the Genie system.
@@ -37,21 +36,16 @@ import java.util.Date;
  * @author tgianos
  * @since 3.0.0
  */
-@JsonDeserialize(builder = Job.Builder.class)
 @Getter
+@JsonDeserialize(builder = Job.Builder.class)
 public class Job extends CommonDTO {
 
     private static final long serialVersionUID = -4218933066048954819L;
-
-    @Size(min = 1, max = 10000, message = "Command arguments are required and max at 10000 characters")
-    private String commandArgs;
     @NotNull(message = "A valid job status is required")
     private final JobStatus status;
     @Size(max = 255, message = "Max length of the status message is 255 characters")
     private final String statusMsg;
-    @JsonSerialize(using = JsonDateSerializer.class)
     private final Date started;
-    @JsonSerialize(using = JsonDateSerializer.class)
     private final Date finished;
     @Size(max = 1024, message = "Max character length is 1024 characters for the archive location")
     private final String archiveLocation;
@@ -62,6 +56,8 @@ public class Job extends CommonDTO {
     @NotNull
     @JsonSerialize(using = ToStringSerializer.class)
     private final Duration runtime;
+    @Size(min = 1, max = 10000, message = "Command arguments are required and max at 10000 characters")
+    private String commandArgs;
 
     /**
      * Constructor used by the builder.
@@ -83,12 +79,48 @@ public class Job extends CommonDTO {
     }
 
     /**
+     * Get the current status message.
+     *
+     * @return The status message as an optional
+     */
+    public Optional<String> getStatusMsg() {
+        return Optional.ofNullable(this.statusMsg);
+    }
+
+    /**
+     * Get the archive location for the job if there is one.
+     *
+     * @return The archive location
+     */
+    public Optional<String> getArchiveLocation() {
+        return Optional.ofNullable(this.archiveLocation);
+    }
+
+    /**
+     * Get the name of the cluster running the job if there currently is one.
+     *
+     * @return The name of the cluster where the job is running
+     */
+    public Optional<String> getClusterName() {
+        return Optional.ofNullable(this.clusterName);
+    }
+
+    /**
+     * Get the name of the command running this job if there currently is one.
+     *
+     * @return The name of the command
+     */
+    public Optional<String> getCommandName() {
+        return Optional.ofNullable(this.commandName);
+    }
+
+    /**
      * Get the time the job started.
      *
      * @return The started time or null if not set
      */
-    public Date getStarted() {
-        return this.started == null ? null : new Date(this.started.getTime());
+    public Optional<Date> getStarted() {
+        return this.started == null ? Optional.empty() : Optional.of(new Date(this.started.getTime()));
     }
 
     /**
@@ -96,8 +128,8 @@ public class Job extends CommonDTO {
      *
      * @return The finished time or null if not set
      */
-    public Date getFinished() {
-        return this.finished == null ? null : new Date(this.finished.getTime());
+    public Optional<Date> getFinished() {
+        return this.finished == null ? Optional.empty() : Optional.of(new Date(this.finished.getTime()));
     }
 
     /**
@@ -111,9 +143,7 @@ public class Job extends CommonDTO {
         private final String bCommandArgs;
         private JobStatus bStatus = JobStatus.INIT;
         private String bStatusMsg;
-        @JsonDeserialize(using = JsonDateDeserializer.class)
         private Date bStarted;
-        @JsonDeserialize(using = JsonDateDeserializer.class)
         private Date bFinished;
         private String bArchiveLocation;
         private String bClusterName;

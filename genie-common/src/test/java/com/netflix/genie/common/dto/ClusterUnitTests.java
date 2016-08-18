@@ -52,18 +52,21 @@ public class ClusterUnitTests {
         Assert.assertThat(cluster.getVersion(), Matchers.is(VERSION));
         Assert.assertThat(cluster.getStatus(), Matchers.is(ClusterStatus.UP));
         Assert.assertThat(cluster.getConfigs(), Matchers.empty());
-        Assert.assertThat(cluster.getCreated(), Matchers.nullValue());
-        Assert.assertThat(cluster.getDescription(), Matchers.nullValue());
-        Assert.assertThat(cluster.getId(), Matchers.nullValue());
+        Assert.assertFalse(cluster.getCreated().isPresent());
+        Assert.assertFalse(cluster.getDescription().isPresent());
+        Assert.assertFalse(cluster.getSetupFile().isPresent());
+        Assert.assertFalse(cluster.getId().isPresent());
         Assert.assertThat(cluster.getTags(), Matchers.empty());
-        Assert.assertThat(cluster.getUpdated(), Matchers.nullValue());
+        Assert.assertFalse(cluster.getUpdated().isPresent());
     }
 
     /**
      * Test to make sure we can build a cluster with all optional parameters.
+     *
+     * @throws Exception on error
      */
     @Test
-    public void canBuildClusterWithOptionals() {
+    public void canBuildClusterWithOptionals() throws Exception {
         final Cluster.Builder builder = new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP);
 
         final Set<String> configs = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
@@ -90,11 +93,13 @@ public class ClusterUnitTests {
         Assert.assertThat(cluster.getVersion(), Matchers.is(VERSION));
         Assert.assertThat(cluster.getStatus(), Matchers.is(ClusterStatus.UP));
         Assert.assertThat(cluster.getConfigs(), Matchers.is(configs));
-        Assert.assertThat(cluster.getCreated(), Matchers.is(created));
-        Assert.assertThat(cluster.getDescription(), Matchers.is(description));
-        Assert.assertThat(cluster.getId(), Matchers.is(id));
+        Assert.assertThat(cluster.getCreated().orElseThrow(IllegalArgumentException::new), Matchers.is(created));
+        Assert.assertThat(
+            cluster.getDescription().orElseThrow(IllegalArgumentException::new), Matchers.is(description)
+        );
+        Assert.assertThat(cluster.getId().orElseThrow(IllegalArgumentException::new), Matchers.is(id));
         Assert.assertThat(cluster.getTags(), Matchers.is(tags));
-        Assert.assertThat(cluster.getUpdated(), Matchers.is(updated));
+        Assert.assertThat(cluster.getUpdated().orElseThrow(IllegalArgumentException::new), Matchers.is(updated));
     }
 
     /**
@@ -116,11 +121,12 @@ public class ClusterUnitTests {
         Assert.assertThat(cluster.getVersion(), Matchers.is(VERSION));
         Assert.assertThat(cluster.getStatus(), Matchers.is(ClusterStatus.UP));
         Assert.assertThat(cluster.getConfigs(), Matchers.empty());
-        Assert.assertThat(cluster.getCreated(), Matchers.nullValue());
-        Assert.assertThat(cluster.getDescription(), Matchers.nullValue());
-        Assert.assertThat(cluster.getId(), Matchers.nullValue());
+        Assert.assertFalse(cluster.getCreated().isPresent());
+        Assert.assertFalse(cluster.getDescription().isPresent());
+        Assert.assertFalse(cluster.getSetupFile().isPresent());
+        Assert.assertFalse(cluster.getId().isPresent());
         Assert.assertThat(cluster.getTags(), Matchers.empty());
-        Assert.assertThat(cluster.getUpdated(), Matchers.nullValue());
+        Assert.assertFalse(cluster.getUpdated().isPresent());
     }
 
     /**

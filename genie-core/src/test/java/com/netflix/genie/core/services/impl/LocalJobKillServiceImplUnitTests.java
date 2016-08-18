@@ -41,6 +41,7 @@ import org.mockito.Mockito;
 import org.springframework.context.ApplicationEventPublisher;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -86,7 +87,7 @@ public class LocalJobKillServiceImplUnitTests {
     public void wontKillJobIfAlreadyNotRunning() throws GenieException {
         final JobExecution jobExecution = Mockito.mock(JobExecution.class);
         Mockito.when(this.jobSearchService.getJobStatus(ID)).thenReturn(JobStatus.RUNNING);
-        Mockito.when(jobExecution.getExitCode()).thenReturn(JobExecution.DEFAULT_EXIT_CODE + 1);
+        Mockito.when(jobExecution.getExitCode()).thenReturn(Optional.of(1));
         Mockito.when(this.jobSearchService.getJobExecution(ID)).thenReturn(jobExecution);
 
         this.service.killJob(ID);
@@ -100,7 +101,7 @@ public class LocalJobKillServiceImplUnitTests {
     @Test(expected = GeniePreconditionException.class)
     public void cantKillJobIfNotOnThisHost() throws GenieException {
         final JobExecution jobExecution = Mockito.mock(JobExecution.class);
-        Mockito.when(jobExecution.getExitCode()).thenReturn(JobExecution.DEFAULT_EXIT_CODE);
+        Mockito.when(jobExecution.getExitCode()).thenReturn(Optional.empty());
         Mockito.when(jobExecution.getHostName()).thenReturn(UUID.randomUUID().toString());
         Mockito.when(this.jobSearchService.getJobStatus(ID)).thenReturn(JobStatus.RUNNING);
         Mockito.when(this.jobSearchService.getJobExecution(ID)).thenReturn(jobExecution);
@@ -117,9 +118,9 @@ public class LocalJobKillServiceImplUnitTests {
     @Test
     public void cantKillJobIfAlreadyDoneSinceDBCall() throws GenieException, IOException {
         final JobExecution jobExecution = Mockito.mock(JobExecution.class);
-        Mockito.when(jobExecution.getExitCode()).thenReturn(JobExecution.DEFAULT_EXIT_CODE);
+        Mockito.when(jobExecution.getExitCode()).thenReturn(Optional.empty());
         Mockito.when(jobExecution.getHostName()).thenReturn(HOSTNAME);
-        Mockito.when(jobExecution.getProcessId()).thenReturn(PID);
+        Mockito.when(jobExecution.getProcessId()).thenReturn(Optional.of(PID));
         Mockito.when(this.jobSearchService.getJobStatus(ID)).thenReturn(JobStatus.RUNNING);
         Mockito.when(this.jobSearchService.getJobExecution(ID)).thenReturn(jobExecution);
         Mockito.when(this.executor.execute(Mockito.any(CommandLine.class))).thenThrow(new ExecuteException("blah", 1));
@@ -138,9 +139,9 @@ public class LocalJobKillServiceImplUnitTests {
     @Test(expected = GenieServerException.class)
     public void cantKillJobIfCantCheckProcessStatus() throws GenieException, IOException {
         final JobExecution jobExecution = Mockito.mock(JobExecution.class);
-        Mockito.when(jobExecution.getExitCode()).thenReturn(JobExecution.DEFAULT_EXIT_CODE);
+        Mockito.when(jobExecution.getExitCode()).thenReturn(Optional.empty());
         Mockito.when(jobExecution.getHostName()).thenReturn(HOSTNAME);
-        Mockito.when(jobExecution.getProcessId()).thenReturn(PID);
+        Mockito.when(jobExecution.getProcessId()).thenReturn(Optional.of(PID));
         Mockito.when(this.jobSearchService.getJobStatus(ID)).thenReturn(JobStatus.RUNNING);
         Mockito.when(this.jobSearchService.getJobExecution(ID)).thenReturn(jobExecution);
         Mockito.when(this.executor.execute(Mockito.any(CommandLine.class))).thenThrow(new IOException());
@@ -159,9 +160,9 @@ public class LocalJobKillServiceImplUnitTests {
     @Test(expected = GenieServerException.class)
     public void cantKillJobIfCantKillProcess() throws GenieException, IOException {
         final JobExecution jobExecution = Mockito.mock(JobExecution.class);
-        Mockito.when(jobExecution.getExitCode()).thenReturn(JobExecution.DEFAULT_EXIT_CODE);
+        Mockito.when(jobExecution.getExitCode()).thenReturn(Optional.empty());
         Mockito.when(jobExecution.getHostName()).thenReturn(HOSTNAME);
-        Mockito.when(jobExecution.getProcessId()).thenReturn(PID);
+        Mockito.when(jobExecution.getProcessId()).thenReturn(Optional.of(PID));
         Mockito.when(this.jobSearchService.getJobStatus(ID)).thenReturn(JobStatus.RUNNING);
         Mockito.when(this.jobSearchService.getJobExecution(ID)).thenReturn(jobExecution);
         Mockito.when(this.executor.execute(Mockito.any(CommandLine.class))).thenReturn(0).thenThrow(new IOException());
@@ -179,9 +180,9 @@ public class LocalJobKillServiceImplUnitTests {
     @Test
     public void canKillJob() throws GenieException, IOException {
         final JobExecution jobExecution = Mockito.mock(JobExecution.class);
-        Mockito.when(jobExecution.getExitCode()).thenReturn(JobExecution.DEFAULT_EXIT_CODE);
+        Mockito.when(jobExecution.getExitCode()).thenReturn(Optional.empty());
         Mockito.when(jobExecution.getHostName()).thenReturn(HOSTNAME);
-        Mockito.when(jobExecution.getProcessId()).thenReturn(PID);
+        Mockito.when(jobExecution.getProcessId()).thenReturn(Optional.of(PID));
         Mockito.when(this.jobSearchService.getJobStatus(ID)).thenReturn(JobStatus.RUNNING);
         Mockito.when(this.jobSearchService.getJobExecution(ID)).thenReturn(jobExecution);
         Mockito.when(this.executor.execute(Mockito.any(CommandLine.class))).thenReturn(0, 0);
@@ -203,9 +204,9 @@ public class LocalJobKillServiceImplUnitTests {
             = new LocalJobKillServiceImpl(HOSTNAME, this.jobSearchService, this.executor, true, this.eventPublisher);
 
         final JobExecution jobExecution = Mockito.mock(JobExecution.class);
-        Mockito.when(jobExecution.getExitCode()).thenReturn(JobExecution.DEFAULT_EXIT_CODE);
+        Mockito.when(jobExecution.getExitCode()).thenReturn(Optional.empty());
         Mockito.when(jobExecution.getHostName()).thenReturn(HOSTNAME);
-        Mockito.when(jobExecution.getProcessId()).thenReturn(PID);
+        Mockito.when(jobExecution.getProcessId()).thenReturn(Optional.of(PID));
         Mockito.when(this.jobSearchService.getJobStatus(ID)).thenReturn(JobStatus.RUNNING);
         Mockito.when(this.jobSearchService.getJobExecution(ID)).thenReturn(jobExecution);
 

@@ -148,10 +148,10 @@ public class CommonFieldsEntityUnitTests extends EntityTestsBase {
      */
     @Test
     public void testSetDescription() {
-        Assert.assertNull(this.c.getDescription());
+        Assert.assertFalse(this.c.getDescription().isPresent());
         final String description = "Test description";
         this.c.setDescription(description);
-        Assert.assertEquals(description, this.c.getDescription());
+        Assert.assertEquals(description, this.c.getDescription().orElseThrow(IllegalArgumentException::new));
     }
 
     /**

@@ -39,6 +39,7 @@ public class ClusterResourceAssembler implements ResourceAssembler<Cluster, Clus
      */
     @Override
     public ClusterResource toResource(final Cluster cluster) {
+        final String id = cluster.getId().orElseThrow(IllegalArgumentException::new);
         final ClusterResource clusterResource = new ClusterResource(cluster);
 
         try {
@@ -46,7 +47,7 @@ public class ClusterResourceAssembler implements ResourceAssembler<Cluster, Clus
                 ControllerLinkBuilder.linkTo(
                     ControllerLinkBuilder
                         .methodOn(ClusterRestController.class)
-                        .getCluster(cluster.getId())
+                        .getCluster(id)
                 ).withSelfRel()
             );
 
@@ -54,7 +55,7 @@ public class ClusterResourceAssembler implements ResourceAssembler<Cluster, Clus
                 ControllerLinkBuilder.linkTo(
                     ControllerLinkBuilder
                         .methodOn(ClusterRestController.class)
-                        .getCommandsForCluster(cluster.getId(), null)
+                        .getCommandsForCluster(id, null)
                 ).withRel("commands")
             );
         } catch (final GenieException ge) {

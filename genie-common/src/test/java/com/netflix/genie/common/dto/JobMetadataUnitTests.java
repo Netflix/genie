@@ -26,36 +26,56 @@ import org.junit.experimental.categories.Category;
 import java.util.UUID;
 
 /**
- * Unit tests for the JobRequestMetadata class.
+ * Unit tests for the JobMetadata class.
  *
  * @author tgianos
  * @since 3.0.0
  */
 @Category(UnitTest.class)
-public class JobRequestMetadataUnitTests {
+public class JobMetadataUnitTests {
 
     /**
-     * Test to make sure we can successfully build a JobRequestMetadata class.
+     * Test to make sure we can successfully build a JobMetadata class.
+     *
+     * @throws Exception on error
      */
     @Test
-    public void canBuild() {
+    public void canBuild() throws Exception {
         final String clientHost = UUID.randomUUID().toString();
         final String userAgent = UUID.randomUUID().toString();
         final int numAttachments = 38;
         final long totalSizeOfAttachments = 3809234L;
+        final long stdOutSize = 80283L;
+        final long stdErrSize = 8002343L;
 
-        final JobRequestMetadata metadata = new JobRequestMetadata
+        final JobMetadata metadata = new JobMetadata
             .Builder()
             .withClientHost(clientHost)
             .withUserAgent(userAgent)
             .withNumAttachments(numAttachments)
             .withTotalSizeOfAttachments(totalSizeOfAttachments)
+            .withStdOutSize(stdOutSize)
+            .withStdErrSize(stdErrSize)
             .build();
 
-        Assert.assertThat(metadata.getClientHost(), Matchers.is(clientHost));
-        Assert.assertThat(metadata.getUserAgent(), Matchers.is(userAgent));
-        Assert.assertThat(metadata.getNumAttachments(), Matchers.is(numAttachments));
-        Assert.assertThat(metadata.getTotalSizeOfAttachments(), Matchers.is(totalSizeOfAttachments));
+        Assert.assertThat(metadata.getClientHost().orElseThrow(IllegalArgumentException::new), Matchers.is(clientHost));
+        Assert.assertThat(metadata.getUserAgent().orElseThrow(IllegalArgumentException::new), Matchers.is(userAgent));
+        Assert.assertThat(
+            metadata.getNumAttachments().orElseThrow(IllegalArgumentException::new),
+            Matchers.is(numAttachments)
+        );
+        Assert.assertThat(
+            metadata.getTotalSizeOfAttachments().orElseThrow(IllegalArgumentException::new),
+            Matchers.is(totalSizeOfAttachments)
+        );
+        Assert.assertThat(
+            metadata.getStdOutSize().orElseThrow(IllegalArgumentException::new),
+            Matchers.is(stdOutSize)
+        );
+        Assert.assertThat(
+            metadata.getStdErrSize().orElseThrow(IllegalArgumentException::new),
+            Matchers.is(stdErrSize)
+        );
     }
 
     /**
@@ -68,7 +88,7 @@ public class JobRequestMetadataUnitTests {
         final int numAttachments = 38;
         final long totalSizeOfAttachments = 3809234L;
 
-        final JobRequestMetadata.Builder builder = new JobRequestMetadata
+        final JobMetadata.Builder builder = new JobMetadata
             .Builder()
             .withId(UUID.randomUUID().toString())
             .withClientHost(clientHost)
@@ -76,10 +96,10 @@ public class JobRequestMetadataUnitTests {
             .withNumAttachments(numAttachments)
             .withTotalSizeOfAttachments(totalSizeOfAttachments);
 
-        final JobRequestMetadata one = builder.build();
-        final JobRequestMetadata two = builder.build();
+        final JobMetadata one = builder.build();
+        final JobMetadata two = builder.build();
         builder.withId(UUID.randomUUID().toString());
-        final JobRequestMetadata three = builder.build();
+        final JobMetadata three = builder.build();
 
         Assert.assertTrue(one.equals(two));
         Assert.assertFalse(one.equals(new Object()));
@@ -96,7 +116,7 @@ public class JobRequestMetadataUnitTests {
         final int numAttachments = 38;
         final long totalSizeOfAttachments = 3809234L;
 
-        final JobRequestMetadata.Builder builder = new JobRequestMetadata
+        final JobMetadata.Builder builder = new JobMetadata
             .Builder()
             .withId(UUID.randomUUID().toString())
             .withClientHost(clientHost)
@@ -104,10 +124,10 @@ public class JobRequestMetadataUnitTests {
             .withNumAttachments(numAttachments)
             .withTotalSizeOfAttachments(totalSizeOfAttachments);
 
-        final JobRequestMetadata one = builder.build();
-        final JobRequestMetadata two = builder.build();
+        final JobMetadata one = builder.build();
+        final JobMetadata two = builder.build();
         builder.withId(UUID.randomUUID().toString());
-        final JobRequestMetadata three = builder.build();
+        final JobMetadata three = builder.build();
 
         Assert.assertEquals(one.hashCode(), two.hashCode());
         Assert.assertNotEquals(one.hashCode(), three.hashCode());

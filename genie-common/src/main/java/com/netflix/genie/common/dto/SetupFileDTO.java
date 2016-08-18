@@ -19,22 +19,21 @@ package com.netflix.genie.common.dto;
 
 import lombok.Getter;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import javax.validation.constraints.Size;
+import java.util.Optional;
 
 /**
- * Base class DTO for configuration service DTOs like Application, Cluster, Command.
+ * Base class DTO for DTOs which require a setup file.
  *
  * @author tgianos
  * @since 3.0.0
  */
 @Getter
-public abstract class ConfigDTO extends SetupFileDTO {
+public abstract class SetupFileDTO extends CommonDTO {
 
-    private static final long serialVersionUID = 147545317805515362L;
-
-    private final Set<String> configs = new HashSet<>();
+    private static final long serialVersionUID = 2116254045303538065L;
+    @Size(max = 1024, message = "Max length of the setup file is 1024 characters")
+    private final String setupFile;
 
     /**
      * Constructor.
@@ -42,18 +41,18 @@ public abstract class ConfigDTO extends SetupFileDTO {
      * @param builder The builder to use
      */
     @SuppressWarnings("unchecked")
-    protected ConfigDTO(final Builder builder) {
+    protected SetupFileDTO(final Builder builder) {
         super(builder);
-        this.configs.addAll(builder.bConfigs);
+        this.setupFile = builder.bSetupFile;
     }
 
     /**
-     * Get the configuration files for this config resource.
+     * Get the setup file.
      *
-     * @return The configuration file locations as a read-only set. Any attempt to modify will throw exception.
+     * @return The setup file location as an Optional
      */
-    public Set<String> getConfigs() {
-        return Collections.unmodifiableSet(this.configs);
+    public Optional<String> getSetupFile() {
+        return Optional.ofNullable(this.setupFile);
     }
 
     /**
@@ -64,9 +63,9 @@ public abstract class ConfigDTO extends SetupFileDTO {
      * @since 3.0.0
      */
     @SuppressWarnings("unchecked")
-    protected abstract static class Builder<T extends Builder> extends SetupFileDTO.Builder<T> {
+    protected abstract static class Builder<T extends Builder> extends CommonDTO.Builder<T> {
 
-        private Set<String> bConfigs = new HashSet<>();
+        private String bSetupFile;
 
         /**
          * Constructor with required fields.
@@ -80,15 +79,13 @@ public abstract class ConfigDTO extends SetupFileDTO {
         }
 
         /**
-         * The configs to use with the resource if desired.
+         * The setup file to use with the resource if desired.
          *
-         * @param configs The configuration file locations
+         * @param setupFile The setup file location
          * @return The builder
          */
-        public T withConfigs(final Set<String> configs) {
-            if (configs != null) {
-                this.bConfigs.addAll(configs);
-            }
+        public T withSetupFile(final String setupFile) {
+            this.bSetupFile = setupFile;
             return (T) this;
         }
     }

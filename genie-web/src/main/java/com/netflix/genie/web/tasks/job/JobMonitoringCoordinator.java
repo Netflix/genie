@@ -21,6 +21,7 @@ import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.events.JobFinishedEvent;
 import com.netflix.genie.core.events.JobFinishedReason;
 import com.netflix.genie.core.events.JobScheduledEvent;
@@ -137,7 +138,7 @@ public class JobMonitoringCoordinator implements JobCountService {
         }
 
         for (final Job job : jobs) {
-            final String id = job.getId();
+            final String id = job.getId().orElseThrow(() -> new GenieServerException("Job has no id!"));
             if (this.jobMonitors.containsKey(id) || this.scheduledJobs.containsKey(id)) {
                 log.info("Job {} is already being tracked. Ignoring.", id);
             } else if (job.getStatus() != JobStatus.RUNNING) {
@@ -178,9 +179,9 @@ public class JobMonitoringCoordinator implements JobCountService {
      */
     @EventListener
     public synchronized void onJobStarted(final JobStartedEvent event) {
-        final String jobId = event.getJobExecution().getId();
+        final String jobId = event.getJobExecution().getId().orElseThrow(IllegalArgumentException::new);
         this.scheduledJobs.remove(jobId);
-        if (!this.jobMonitors.containsKey(event.getJobExecution().getId())) {
+        if (!this.jobMonitors.containsKey(jobId)) {
             this.scheduleMonitor(event.getJobExecution());
         }
     }
@@ -228,8 +229,9 @@ public class JobMonitoringCoordinator implements JobCountService {
     }
 
     private void scheduleMonitor(final JobExecution jobExecution) {
-        final File stdOut = new File(this.jobsDir, jobExecution.getId() + "/" + JobConstants.STDOUT_LOG_FILE_NAME);
-        final File stdErr = new File(this.jobsDir, jobExecution.getId() + "/" + JobConstants.STDERR_LOG_FILE_NAME);
+        final String jobId = jobExecution.getId().orElseThrow(IllegalArgumentException::new);
+        final File stdOut = new File(this.jobsDir, jobId + "/" + JobConstants.STDOUT_LOG_FILE_NAME);
+        final File stdErr = new File(this.jobsDir, jobId + "/" + JobConstants.STDERR_LOG_FILE_NAME);
 
         final JobMonitor monitor = new JobMonitor(
             jobExecution,
@@ -254,7 +256,7 @@ public class JobMonitoringCoordinator implements JobCountService {
             default:
                 throw new UnsupportedOperationException("Unknown schedule type: " + monitor.getScheduleType());
         }
-        this.jobMonitors.put(jobExecution.getId(), future);
+        this.jobMonitors.put(jobId, future);
         log.info("Scheduled job monitoring for Job {}", jobExecution.getId());
     }
 }
