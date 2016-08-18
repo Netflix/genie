@@ -30,6 +30,9 @@ import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.retry.backoff.ExponentialBackOffPolicy;
+import org.springframework.retry.policy.SimpleRetryPolicy;
+import org.springframework.retry.support.RetryTemplate;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -38,6 +41,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Collections;
 
 /**
  * Configuration for Spring MVC.
@@ -101,6 +105,22 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
         factory.setConnectTimeout(httpConnectTimeout);
         factory.setReadTimeout(httpReadTimeout);
         return new RestTemplate(factory);
+    }
+
+    /**
+     * Get RetryTemplate.
+     *
+     * @return The retry template to use
+     */
+    @Bean(name = "genieRetryTemplate")
+    public RetryTemplate retryTemplate() {
+        final RetryTemplate retryTemplate = new RetryTemplate();
+        retryTemplate.setRetryPolicy(new SimpleRetryPolicy(5, Collections.singletonMap(Exception.class, true)));
+        final ExponentialBackOffPolicy backOffPolicy = new ExponentialBackOffPolicy();
+        backOffPolicy.setInitialInterval(10000);
+        backOffPolicy.setMaxInterval(50000);
+        retryTemplate.setBackOffPolicy(backOffPolicy);
+        return retryTemplate;
     }
 
     /**
