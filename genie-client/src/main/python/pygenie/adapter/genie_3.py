@@ -374,6 +374,7 @@ class Genie3Adapter(GenieBaseAdapter):
                                 sort_keys=True,
                                 indent=4,
                                 separators=(',', ': ')))
+
         call(method='post',
              url='{}/{}'.format(job._conf.genie.url, Genie3Adapter.JOBS_ENDPOINT),
              files=files,
