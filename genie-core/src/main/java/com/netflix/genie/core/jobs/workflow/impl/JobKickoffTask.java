@@ -116,7 +116,7 @@ public class JobKickoffTask extends GenieBaseTask {
 
             if (this.isUserCreationEnabled) {
                 final String user = jobExecEnv.getJobRequest().getUser();
-                this.createUser(user, jobExecEnv.getJobRequest().getGroup().orElse(user));
+                this.createUser(user, jobExecEnv.getJobRequest().getGroup().orElse(null));
             }
 
             final List<String> command = new ArrayList<>();
@@ -204,16 +204,18 @@ public class JobKickoffTask extends GenieBaseTask {
             log.debug("User does not exist. Creating it now.");
 
             // Create the group for the user.
-            final CommandLine groupCreateCommandLine = new CommandLine("sudo");
-            groupCreateCommandLine.addArgument("groupadd");
-            groupCreateCommandLine.addArgument(group);
+            if (group != null) {
+                final CommandLine groupCreateCommandLine = new CommandLine("sudo");
+                groupCreateCommandLine.addArgument("groupadd");
+                groupCreateCommandLine.addArgument(group);
 
-            // We create the group and ignore the error as it will fail if group already exists.
-            // If the failure is due to some other reason, then user creation will fail and we catch that.
-            try {
-                this.executor.execute(groupCreateCommandLine);
-            } catch (IOException ioexception) {
-                log.debug("Group creation  threw an error as it might already exist");
+                // We create the group and ignore the error as it will fail if group already exists.
+                // If the failure is due to some other reason, then user creation will fail and we catch that.
+                try {
+                    this.executor.execute(groupCreateCommandLine);
+                } catch (IOException ioexception) {
+                    log.debug("Group creation threw an error as it might already exist");
+                }
             }
 
             final CommandLine userCreateCommandLine = new CommandLine("sudo");
@@ -230,7 +232,7 @@ public class JobKickoffTask extends GenieBaseTask {
             try {
                 this.executor.execute(userCreateCommandLine);
             } catch (IOException ioexception) {
-                throw new GenieServerException("Could not create user " + user + "with exception " + ioexception);
+                throw new GenieServerException("Could not create user " + user + " with exception " + ioexception);
             }
         }
     }
