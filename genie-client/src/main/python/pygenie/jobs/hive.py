@@ -58,7 +58,7 @@ class HiveJob(GenieJob):
         if is_file(self._script):
             filename = os.path.basename(self._script)
             self._add_dependency(self._script)
-        else:
+        elif self._script is not None:
             filename = HiveJob.DEFAULT_SCRIPT_NAME
             self._add_dependency({'name': filename, 'data': self._script})
 
