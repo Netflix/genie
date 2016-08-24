@@ -34,6 +34,7 @@ import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.lang3.SystemUtils;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.ApplicationEventMulticaster;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -57,6 +58,7 @@ public class JobMonitor extends NodeTask {
     private final JobExecution execution;
     private final ProcessChecker processChecker;
     private final ApplicationEventPublisher publisher;
+    private final ApplicationEventMulticaster eventMulticaster;
     private final File stdOut;
     private final File stdErr;
     private final long maxStdOutLength;
@@ -79,6 +81,7 @@ public class JobMonitor extends NodeTask {
      * @param stdErr              The std err output file
      * @param executor            The process executor to use
      * @param publisher           The event publisher to use when a job isn't running anymore
+     * @param eventMulticaster    The multicaster to send async events
      * @param registry            The metrics event registry
      * @param outputMaxProperties The properties which say how long job output files can be at their max
      */
@@ -88,6 +91,7 @@ public class JobMonitor extends NodeTask {
         @NotNull final File stdErr,
         @NotNull final Executor executor,
         @NotNull final ApplicationEventPublisher publisher,
+        @NotNull final ApplicationEventMulticaster eventMulticaster,
         @NotNull final Registry registry,
         @NotNull final JobOutputMaxProperties outputMaxProperties
     ) {
@@ -99,6 +103,7 @@ public class JobMonitor extends NodeTask {
         this.id = execution.getId().orElseThrow(IllegalArgumentException::new);
         this.execution = execution;
         this.publisher = publisher;
+        this.eventMulticaster = eventMulticaster;
 
         final int processId = execution.getProcessId().orElseThrow(IllegalArgumentException::new);
         final Date timeout = execution.getTimeout().orElseThrow(IllegalArgumentException::new);
@@ -152,7 +157,7 @@ public class JobMonitor extends NodeTask {
         } catch (final ExecuteException ee) {
             log.info("Job {} has finished", this.id);
             this.finishedRate.increment();
-            this.publisher.publishEvent(
+            this.eventMulticaster.multicastEvent(
                 new JobFinishedEvent(
                     this.id,
                     JobFinishedReason.PROCESS_COMPLETED,
@@ -180,7 +185,7 @@ public class JobMonitor extends NodeTask {
                     )
                 );
                 // Also send a job finished event
-                this.publisher.publishEvent(
+                this.eventMulticaster.multicastEvent(
                     new JobFinishedEvent(
                         this.id,
                         JobFinishedReason.KILLED,

@@ -44,6 +44,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.core.io.Resource;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -195,7 +196,6 @@ public class ServicesConfigUnitTests {
             this.servicesConfig.jobPersistenceService(
                 this.jobRepository,
                 this.jobRequestRepository,
-                this.jobExecutionRepository,
                 Mockito.mock(JpaJobMetadataRepository.class),
                 this.applicationRepository,
                 this.clusterRepository,
@@ -214,7 +214,8 @@ public class ServicesConfigUnitTests {
         final ClusterService clusterService = Mockito.mock(ClusterService.class);
         final CommandService commandService = Mockito.mock(CommandService.class);
         final ClusterLoadBalancer clusterLoadBalancer = Mockito.mock(ClusterLoadBalancer.class);
-        final ApplicationEventPublisher applicationEventPublisher = Mockito.mock(ApplicationEventPublisher.class);
+        final ApplicationEventPublisher eventPublisher = Mockito.mock(ApplicationEventPublisher.class);
+        final ApplicationEventMulticaster eventMulticaster = Mockito.mock(ApplicationEventMulticaster.class);
         final Resource resource = Mockito.mock(Resource.class);
         final List<WorkflowTask> workflowTasks = new ArrayList<>();
 
@@ -225,7 +226,8 @@ public class ServicesConfigUnitTests {
                 clusterService,
                 commandService,
                 clusterLoadBalancer,
-                applicationEventPublisher,
+                eventPublisher,
+                eventMulticaster,
                 workflowTasks,
                 resource,
                 Mockito.mock(Registry.class)

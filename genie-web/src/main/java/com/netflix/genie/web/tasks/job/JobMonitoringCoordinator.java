@@ -38,6 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
 import org.springframework.scheduling.TaskScheduler;
@@ -69,6 +70,7 @@ public class JobMonitoringCoordinator implements JobCountService {
     private final JobSearchService jobSearchService;
     private final TaskScheduler scheduler;
     private final ApplicationEventPublisher publisher;
+    private final ApplicationEventMulticaster eventMulticaster;
     private final Executor executor;
     private final Registry registry;
     private final File jobsDir;
@@ -82,7 +84,8 @@ public class JobMonitoringCoordinator implements JobCountService {
      *
      * @param hostName            The name of the host this Genie process is running on
      * @param jobSearchService    The search service to use to find jobs
-     * @param publisher           The event publisher to use to publish events
+     * @param publisher           The application event publisher to use to publish synchronous events
+     * @param eventMulticaster    The event eventMulticaster to use to publish asynchronous events
      * @param scheduler           The task scheduler to use to register scheduling of job checkers
      * @param executor            The executor to use to launch processes
      * @param registry            The metrics registry
@@ -95,6 +98,7 @@ public class JobMonitoringCoordinator implements JobCountService {
         final String hostName,
         final JobSearchService jobSearchService,
         final ApplicationEventPublisher publisher,
+        final ApplicationEventMulticaster eventMulticaster,
         final TaskScheduler scheduler,
         final Executor executor,
         final Registry registry,
@@ -104,6 +108,7 @@ public class JobMonitoringCoordinator implements JobCountService {
         this.hostName = hostName;
         this.jobSearchService = jobSearchService;
         this.publisher = publisher;
+        this.eventMulticaster = eventMulticaster;
         this.scheduler = scheduler;
         this.executor = executor;
         this.registry = registry;
@@ -142,7 +147,7 @@ public class JobMonitoringCoordinator implements JobCountService {
             if (this.jobMonitors.containsKey(id) || this.scheduledJobs.containsKey(id)) {
                 log.info("Job {} is already being tracked. Ignoring.", id);
             } else if (job.getStatus() != JobStatus.RUNNING) {
-                this.publisher.publishEvent(
+                this.eventMulticaster.multicastEvent(
                     new JobFinishedEvent(id, JobFinishedReason.SYSTEM_CRASH, "System crashed while job starting", this)
                 );
             } else {
@@ -151,7 +156,7 @@ public class JobMonitoringCoordinator implements JobCountService {
                     log.info("Re-attached a job monitor to job {}", id);
                 } catch (final GenieException ge) {
                     log.error("Unable to re-attach to job {}.", id);
-                    this.publisher.publishEvent(
+                    this.eventMulticaster.multicastEvent(
                         new JobFinishedEvent(id, JobFinishedReason.SYSTEM_CRASH, "Unable to re-attach on startup", this)
                     );
                     this.unableToReAttach.increment();
@@ -239,6 +244,7 @@ public class JobMonitoringCoordinator implements JobCountService {
             stdErr,
             this.executor,
             this.publisher,
+            this.eventMulticaster,
             this.registry,
             this.outputMaxProperties
         );
