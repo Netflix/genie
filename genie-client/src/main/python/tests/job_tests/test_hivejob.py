@@ -60,9 +60,11 @@ class TestingHiveJob(unittest.TestCase):
 
         assert_equals(
             job.cmd_args,
-            u'--hiveconf hconf1=h1 --hiveconf prop1=p1 --hiveconf prop2=p2 ' \
-            u'-d foo=fizz -d bar=buzz ' \
-            u'-f script.hive'
+            u" ".join([
+                u"--hiveconf hconf1=h1 --hiveconf prop1=p1 --hiveconf prop2=p2",
+                u"-d 'foo=fizz' -d 'bar=buzz'",
+                u"-f script.hive"
+            ])
         )
 
     @patch('pygenie.jobs.hive.is_file')
@@ -80,9 +82,30 @@ class TestingHiveJob(unittest.TestCase):
 
         assert_equals(
             job.cmd_args,
-            u'--hiveconf p2=v2 --hiveconf p1=v1 ' \
-            u'-d hello=hi -d goodbye=bye ' \
-            u'-f test.hql'
+            u" ".join([
+                u"--hiveconf p2=v2 --hiveconf p1=v1",
+                u"-d 'hello=hi' -d 'goodbye=bye'",
+                u"-f test.hql"
+            ])
+        )
+
+    def test_cmd_args_constructed_quotes(self):
+        """Test HiveJob constructed cmd args with quotes."""
+
+        job = pygenie.jobs.HiveJob() \
+            .script('foo') \
+            .parameter("spaces", "this has spaces") \
+            .parameter("single_quotes", "test' test'") \
+            .parameter("escaped_single_quotes", "Barney\\'s Adventure")
+
+        assert_equals(
+            job.cmd_args,
+            u" ".join([
+                u"-d 'escaped_single_quotes=Barney\\''s Adventure'",
+                u"-d 'spaces=this has spaces'",
+                u"-d 'single_quotes=test'' test'''",
+                u"-f script.hive"
+            ])
         )
 
 
@@ -215,7 +238,7 @@ class TestingHiveJobAdapters(unittest.TestCase):
                     {u'tags': [u'type:hive.cluster1']},
                     {u'tags': [u'type:hive']}
                 ],
-                u'commandArgs': u'-d a=b -f script.hive',
+                u'commandArgs': u'-d \'a=b\' -f script.hive',
                 u'commandCriteria': [u'type:hive.cmd'],
                 u'description': u'this job is to test hivejob adapter',
                 u'disableLogArchival': True,
@@ -273,7 +296,7 @@ class TestingHiveJobAdapters(unittest.TestCase):
                     {u'tags': [u'type:hive.cluster2']},
                     {u'tags': [u'type:hive']}
                 ],
-                u'commandArgs': u'-d a=1 -d b=2 -f script.hql',
+                u'commandArgs': u'-d \'a=1\' -d \'b=2\' -f script.hql',
                 u'commandCriteria': [u'type:hive.cmd.2'],
                 u'description': u'this job is to test hivejob adapter',
                 u'disableLogArchival': True,
@@ -333,7 +356,7 @@ class TestingHiveJobAdapters(unittest.TestCase):
                     {u'tags': [u'type:hive.cluster-1', u'type:hive.cluster-2']},
                     {u'tags': [u'type:hive']}
                 ],
-                u'commandArgs': u'-i properties.conf  -d a=a -d b=b -f script.hive',
+                u'commandArgs': u'-i properties.conf  -d \'a=a\' -d \'b=b\' -f script.hive',
                 u'commandCriteria': [u'type:hive.cmd.1', u'type:hive.cmd.2'],
                 u'dependencies': [u'x://properties.conf'],
                 u'description': u'this job is to test hivejob adapter',
@@ -397,7 +420,7 @@ class TestingHiveJobAdapters(unittest.TestCase):
                     {u'tags': [u'type:hive.cluster-1', u'type:hive.cluster-2']},
                     {u'tags': [u'type:hive']}
                 ],
-                u'commandArgs': u'-i properties.conf  -d a=a -d b=b -f script.hql',
+                u'commandArgs': u'-i properties.conf  -d \'a=a\' -d \'b=b\' -f script.hql',
                 u'commandCriteria': [u'type:hive.cmd.1', u'type:hive.cmd.2'],
                 u'dependencies': [],
                 u'description': u'this job is to test hivejob adapter',
