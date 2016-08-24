@@ -64,8 +64,9 @@ class HiveJob(GenieJob):
             self._add_dependency({'name': filename, 'data': self._script})
 
         params_str = ' '.join([
-            '-d {qu}{name}={value}{qu}' \
-                .format(name=k, value=v, qu='"' if ' ' in unicode(v) else '') \
+            "-d '{name}={value}'" \
+                .format(name=k,
+                        value=v.replace("'", "''")) \
             for k, v in self._parameters.items()
         ])
 
