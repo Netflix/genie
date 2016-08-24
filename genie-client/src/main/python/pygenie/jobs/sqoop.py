@@ -12,6 +12,7 @@ import logging
 
 from collections import defaultdict
 
+from ..utils import unicodify
 from .core import GenieJob
 from .utils import add_to_repr
 
@@ -76,6 +77,7 @@ class SqoopJob(GenieJob):
                     options=' '.join(opts_list)) \
             .strip()
 
+    @unicodify
     @add_to_repr('overwrite')
     def cmd(self, cmd):
         """
@@ -98,6 +100,7 @@ class SqoopJob(GenieJob):
 
         return self
 
+    @unicodify
     @add_to_repr('append')
     def option(self, name, value=None):
         """
@@ -125,6 +128,7 @@ class SqoopJob(GenieJob):
 
         return self
 
+    @unicodify
     @add_to_repr('append')
     def property(self, name, value, flag='-D'):
         """

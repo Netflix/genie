@@ -15,8 +15,10 @@ import re
 from collections import defaultdict
 
 from ..conf import GenieConf
-from ..utils import (is_str,
+from ..utils import (convert_to_unicode,
+                     is_str,
                      str_to_list,
+                     unicodify,
                      uuid_str)
 from .utils import (add_to_repr,
                     arg_list,
@@ -41,6 +43,12 @@ class Repr(object):
         self.__repr_list = list()
 
     def __repr__(self):
+        return str(self)
+
+    def __str__(self):
+        return unicode(self).encode('utf-8')
+
+    def __unicode__(self):
         return '.'.join(self.repr_list)
 
     @staticmethod
@@ -73,12 +81,15 @@ class Repr(object):
     def args_to_str(self, args):
         """Convert args tuple to string."""
 
-        return ', '.join([
-            '{qu}{val}{qu}' \
-                .format(val=a,
-                        qu=self.__quote(a) if is_str(a) else '')
-            for a in args
-        ]) if args is not None else ''
+        if args is not None:
+            results = list()
+            for arg in [convert_to_unicode(a) for a in args]:
+                results.append('{qu}{val}{qu}' \
+                    .format(val=arg,
+                            qu=self.__quote(arg) if is_str(arg) else ''))
+            return ', '.join(results)
+
+        return ''
 
     def kwargs_to_str(self, kwargs):
         """Convert kwargs dict to string."""
@@ -163,7 +174,13 @@ class GenieJob(object):
         self._cluster_tag_mapping['default'] = self.default_cluster_tags
 
     def __repr__(self):
-        return str(self.repr_obj)
+        return str(self)
+
+    def __str__(self):
+        return unicode(self).encode('utf-8')
+
+    def __unicode__(self):
+        return unicode(self.repr_obj)
 
     def _add_dependency(self, dep):
         """
@@ -174,6 +191,7 @@ class GenieJob(object):
         if dep not in self._dependencies:
             self._dependencies.append(dep)
 
+    @unicodify
     def _add_cluster_tag(self, tags, priority=0):
         """
         Add a cluster tag to level. The priority is the level of precedence when
@@ -185,6 +203,7 @@ class GenieJob(object):
         # negate priority so can do sorted(self._cluster_tag_mapping.keys())
         self._cluster_tag_mapping[-int(priority)].extend(tags)
 
+    @unicodify
     def _set_command_option(self, flag, name, value=None):
         """
         Convenience method for storing an option which can later be used
@@ -198,6 +217,7 @@ class GenieJob(object):
 
         self._command_options[flag][name] = value
 
+    @unicodify
     @arg_list
     @add_to_repr('append')
     def applications(self, _application_ids):
@@ -250,6 +270,7 @@ class GenieJob(object):
         self._archive = archive
         return self
 
+    @unicodify
     @add_to_repr('append')
     def cluster_tags(self, cluster_tags):
         """
@@ -290,6 +311,7 @@ class GenieJob(object):
         raise GenieJobError('should not try to access core GenieJob ' \
                             'constructed command arguments')
 
+    @unicodify
     @arg_string
     @add_to_repr('overwrite')
     def command_arguments(self, _command_arguments):
@@ -307,6 +329,7 @@ class GenieJob(object):
             :py:class:`GenieJob`: self
         """
 
+    @unicodify
     @arg_list
     @add_to_repr('append')
     def command_tags(self, _command_tags):
@@ -349,6 +372,7 @@ class GenieJob(object):
             :py:class:`GenieJob`: self
         """
 
+    @unicodify
     @arg_string
     @add_to_repr('overwrite')
     def description(self, _description):
@@ -376,6 +400,7 @@ class GenieJob(object):
 
         return self.archive(False)
 
+    @unicodify
     @arg_string
     @add_to_repr('overwrite')
     def email(self, _email):
@@ -500,6 +525,7 @@ class GenieJob(object):
 
         return self.to_dict().get(attr, default)
 
+    @unicodify
     @arg_string
     @add_to_repr('overwrite')
     def group(self, _group):
@@ -518,6 +544,7 @@ class GenieJob(object):
             :py:class:`GenieJob`: self
         """
 
+    @unicodify
     @arg_string
     @add_to_repr('overwrite')
     def job_id(self, _job_id):
@@ -540,6 +567,7 @@ class GenieJob(object):
             :py:class:`GenieJob`: self
         """
 
+    @unicodify
     @arg_string
     @add_to_repr('overwrite')
     def job_name(self, _job_name):
@@ -557,6 +585,7 @@ class GenieJob(object):
             :py:class:`GenieJob`: self
         """
 
+    @unicodify
     @arg_string
     @add_to_repr('overwrite')
     def job_version(self, _job_version):
@@ -574,6 +603,7 @@ class GenieJob(object):
             :py:class:`GenieJob`: self
         """
 
+    @unicodify
     @add_to_repr('append')
     def parameter(self, name, value):
         """
@@ -625,6 +655,7 @@ class GenieJob(object):
 
         return self
 
+    @unicodify
     @add_to_repr('overwrite')
     def setup_file(self, setup_file):
         """
@@ -655,6 +686,7 @@ class GenieJob(object):
 
         return self
 
+    @unicodify
     @arg_list
     @add_to_repr('append')
     def tags(self, _tags):
@@ -737,6 +769,7 @@ class GenieJob(object):
 
         return json.dumps(self.to_dict(), sort_keys=True, indent=4)
 
+    @unicodify
     @arg_string
     @add_to_repr('overwrite')
     def username(self, _username):

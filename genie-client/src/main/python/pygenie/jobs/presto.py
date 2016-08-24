@@ -23,6 +23,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import logging
 import os
 
+from ..utils import unicodify
 from .core import GenieJob
 from .utils import (add_to_repr,
                     arg_string,
@@ -106,6 +107,7 @@ class PrestoJob(GenieJob):
 
         return self.option('output-format', 'CSV_HEADER')
 
+    @unicodify
     @add_to_repr('append')
     def option(self, name, value=None):
         """
@@ -139,6 +141,7 @@ class PrestoJob(GenieJob):
 
         return self.script(script)
 
+    @unicodify
     @arg_string
     @add_to_repr('overwrite')
     def script(self, _script):
@@ -159,6 +162,7 @@ class PrestoJob(GenieJob):
             :py:class:`PrestoJob`: self
         """
 
+    @unicodify
     @add_to_repr('append')
     def session(self, name, value):
         """
