@@ -64,11 +64,11 @@ class PrestoJob(GenieJob):
         if self._command_arguments is not None:
             return self._command_arguments
 
+        filename = PrestoJob.DEFAULT_SCRIPT_NAME
         if is_file(self._script):
             filename = os.path.basename(self._script)
             self._add_dependency(self._script)
         elif self._script is not None:
-            filename = PrestoJob.DEFAULT_SCRIPT_NAME
             if not self._script.strip().endswith(';'):
                 self._script = '{};'.format(self._script)
             self._add_dependency({'name': filename, 'data': self._script})
