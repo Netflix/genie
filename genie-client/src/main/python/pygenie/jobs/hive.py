@@ -56,11 +56,11 @@ class HiveJob(GenieJob):
         if self._command_arguments is not None:
             return self._command_arguments
 
+        filename = HiveJob.DEFAULT_SCRIPT_NAME
         if is_file(self._script):
             filename = os.path.basename(self._script)
             self._add_dependency(self._script)
         elif self._script is not None:
-            filename = HiveJob.DEFAULT_SCRIPT_NAME
             self._add_dependency({'name': filename, 'data': self._script})
 
         params_str = ' '.join([
