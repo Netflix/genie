@@ -43,6 +43,7 @@ import com.netflix.spectator.api.Timer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.core.io.Resource;
 
 import javax.validation.Valid;
@@ -79,7 +80,8 @@ public class LocalJobRunner implements JobSubmitterService {
     private final ClusterLoadBalancer clusterLoadBalancer;
     private final List<WorkflowTask> jobWorkflowTasks;
     private final Resource baseWorkingDirPath;
-    private final ApplicationEventPublisher applicationEventPublisher;
+    private final ApplicationEventPublisher eventPublisher;
+    private final ApplicationEventMulticaster eventMulticaster;
 
     // For reuse in queries
     private final Set<CommandStatus> enumStatuses;
@@ -98,15 +100,16 @@ public class LocalJobRunner implements JobSubmitterService {
     /**
      * Constructor create the object.
      *
-     * @param jobPersistenceService     Implementation of the job persistence service
-     * @param applicationService        Implementation of application service interface
-     * @param clusterService            Implementation of cluster service interface
-     * @param commandService            Implementation of command service interface
-     * @param clusterLoadBalancer       Implementation of the cluster load balancer interface
-     * @param applicationEventPublisher Instance of the event publisher
-     * @param workflowTasks             List of all the workflow tasks to be executed
-     * @param genieWorkingDir           Working directory for genie where it creates jobs directories
-     * @param registry                  The metrics registry to use
+     * @param jobPersistenceService Implementation of the job persistence service
+     * @param applicationService    Implementation of application service interface
+     * @param clusterService        Implementation of cluster service interface
+     * @param commandService        Implementation of command service interface
+     * @param clusterLoadBalancer   Implementation of the cluster load balancer interface
+     * @param eventPublisher        The synchronous event publisher to use
+     * @param eventMulticaster      Instance of the asynchronous event publisher to use
+     * @param workflowTasks         List of all the workflow tasks to be executed
+     * @param genieWorkingDir       Working directory for genie where it creates jobs directories
+     * @param registry              The metrics registry to use
      */
     public LocalJobRunner(
         @NotNull final JobPersistenceService jobPersistenceService,
@@ -114,7 +117,8 @@ public class LocalJobRunner implements JobSubmitterService {
         @NotNull final ClusterService clusterService,
         @NotNull final CommandService commandService,
         @NotNull final ClusterLoadBalancer clusterLoadBalancer,
-        @NotNull final ApplicationEventPublisher applicationEventPublisher,
+        @NotNull final ApplicationEventPublisher eventPublisher,
+        @NotNull final ApplicationEventMulticaster eventMulticaster,
         @NotNull final List<WorkflowTask> workflowTasks,
         @NotNull final Resource genieWorkingDir,
         @NotNull final Registry registry
@@ -126,7 +130,8 @@ public class LocalJobRunner implements JobSubmitterService {
         this.clusterLoadBalancer = clusterLoadBalancer;
         this.jobWorkflowTasks = workflowTasks;
         this.baseWorkingDirPath = genieWorkingDir;
-        this.applicationEventPublisher = applicationEventPublisher;
+        this.eventPublisher = eventPublisher;
+        this.eventMulticaster = eventMulticaster;
 
         // We'll only care about active statuses
         this.enumStatuses = EnumSet.noneOf(CommandStatus.class);
@@ -239,8 +244,8 @@ public class LocalJobRunner implements JobSubmitterService {
                     // Publish a job start Event
                     final long publishEventStart = System.nanoTime();
                     try {
-                        log.info("Publishing job started event for job {}", jobRequest.getId());
-                        this.applicationEventPublisher.publishEvent(new JobStartedEvent(jobExecution, this));
+                        log.info("Publishing job started event for job {}", id);
+                        this.eventPublisher.publishEvent(new JobStartedEvent(jobExecution, this));
                     } finally {
                         this.publishJobStartedEventTimer
                             .record(System.nanoTime() - publishEventStart, TimeUnit.NANOSECONDS);
@@ -248,13 +253,13 @@ public class LocalJobRunner implements JobSubmitterService {
                 }
             } catch (final GeniePreconditionException gpe) {
                 log.error(gpe.getMessage(), gpe);
-                this.applicationEventPublisher.publishEvent(
+                this.eventMulticaster.multicastEvent(
                     new JobFinishedEvent(id, JobFinishedReason.INVALID, gpe.getMessage(), this)
                 );
                 throw gpe;
             } catch (final Exception e) {
                 log.error(e.getMessage(), e);
-                this.applicationEventPublisher.publishEvent(
+                this.eventMulticaster.multicastEvent(
                     new JobFinishedEvent(id, JobFinishedReason.FAILED_TO_INIT, e.getMessage(), this)
                 );
                 throw e;

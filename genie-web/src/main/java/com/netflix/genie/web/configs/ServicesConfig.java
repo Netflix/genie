@@ -65,6 +65,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.core.io.Resource;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -186,7 +187,6 @@ public class ServicesConfig {
      *
      * @param jobRepo               The job repository to use
      * @param jobRequestRepo        The job request repository to use
-     * @param jobExecutionRepo      The jobExecution Repository to use
      * @param jobMetadataRepository The job metadata repository to use
      * @param applicationRepo       The application repository to use
      * @param clusterRepo           The cluster repository to use
@@ -197,7 +197,6 @@ public class ServicesConfig {
     public JobPersistenceService jobPersistenceService(
         final JpaJobRepository jobRepo,
         final JpaJobRequestRepository jobRequestRepo,
-        final JpaJobExecutionRepository jobExecutionRepo,
         final JpaJobMetadataRepository jobMetadataRepository,
         final JpaApplicationRepository applicationRepo,
         final JpaClusterRepository clusterRepo,
@@ -206,7 +205,6 @@ public class ServicesConfig {
         return new JpaJobPersistenceServiceImpl(
             jobRepo,
             jobRequestRepo,
-            jobExecutionRepo,
             jobMetadataRepository,
             applicationRepo,
             clusterRepo,
@@ -290,7 +288,8 @@ public class ServicesConfig {
      * @param clusterService      Implementation of cluster service interface.
      * @param commandService      Implementation of command service interface.
      * @param clusterLoadBalancer Implementation of the cluster load balancer interface.
-     * @param aep                 Instance of the event publisher.
+     * @param eventPublisher      Instance of the synchronous event publisher.
+     * @param eventMulticaster    Instance of the asynchronous event publisher.
      * @param workflowTasks       List of all the workflow tasks to be executed.
      * @param genieWorkingDir     Working directory for genie where it creates jobs directories.
      * @param registry            The metrics registry to use
@@ -303,7 +302,8 @@ public class ServicesConfig {
         final ClusterService clusterService,
         final CommandService commandService,
         final ClusterLoadBalancer clusterLoadBalancer,
-        final ApplicationEventPublisher aep,
+        final ApplicationEventPublisher eventPublisher,
+        final ApplicationEventMulticaster eventMulticaster,
         final List<WorkflowTask> workflowTasks,
         final Resource genieWorkingDir,
         final Registry registry
@@ -314,7 +314,8 @@ public class ServicesConfig {
             clusterService,
             commandService,
             clusterLoadBalancer,
-            aep,
+            eventPublisher,
+            eventMulticaster,
             workflowTasks,
             genieWorkingDir,
             registry

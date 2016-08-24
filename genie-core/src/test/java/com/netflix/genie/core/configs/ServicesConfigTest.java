@@ -59,8 +59,11 @@ import org.springframework.beans.factory.config.ServiceLocatorFactoryBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.ApplicationEventMulticaster;
+import org.springframework.context.event.SimpleApplicationEventMulticaster;
 import org.springframework.core.io.Resource;
 import org.springframework.core.task.AsyncTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.List;
@@ -143,7 +146,6 @@ public class ServicesConfigTest {
      *
      * @param jobRepo               The job repository to use
      * @param jobRequestRepo        The job request repository to use
-     * @param jobExecutionRepo      The jobExecution Repository to use
      * @param jobMetadataRepository The job metadata repository to use
      * @param applicationRepo       The application repository to use
      * @param clusterRepo           The cluster repository to use
@@ -154,7 +156,6 @@ public class ServicesConfigTest {
     public JobPersistenceService jobPersistenceService(
         final JpaJobRepository jobRepo,
         final JpaJobRequestRepository jobRequestRepo,
-        final JpaJobExecutionRepository jobExecutionRepo,
         final JpaJobMetadataRepository jobMetadataRepository,
         final JpaApplicationRepository applicationRepo,
         final JpaClusterRepository clusterRepo,
@@ -163,7 +164,6 @@ public class ServicesConfigTest {
         return new JpaJobPersistenceServiceImpl(
             jobRepo,
             jobRequestRepo,
-            jobExecutionRepo,
             jobMetadataRepository,
             applicationRepo,
             clusterRepo,
@@ -222,7 +222,8 @@ public class ServicesConfigTest {
      * @param clusterService      Implementation of cluster service interface.
      * @param commandService      Implementation of command service interface.
      * @param clusterLoadBalancer Implementation of the cluster load balancer interface.
-     * @param aep                 Instance of the event publisher.
+     * @param eventPublisher      Instance of the synchronous event publisher.
+     * @param eventMulticaster    Instance of the asynchronous event publisher.
      * @param workflowTasks       List of all the workflow tasks to be executed.
      * @param genieWorkingDir     Working directory for genie where it creates jobs directories.
      * @param registry            The metrics registry to use
@@ -235,7 +236,8 @@ public class ServicesConfigTest {
         final ClusterService clusterService,
         final CommandService commandService,
         final ClusterLoadBalancer clusterLoadBalancer,
-        final ApplicationEventPublisher aep,
+        final ApplicationEventPublisher eventPublisher,
+        final ApplicationEventMulticaster eventMulticaster,
         final List<WorkflowTask> workflowTasks,
         final Resource genieWorkingDir,
         final Registry registry
@@ -246,7 +248,8 @@ public class ServicesConfigTest {
             clusterService,
             commandService,
             clusterLoadBalancer,
-            aep,
+            eventPublisher,
+            eventMulticaster,
             workflowTasks,
             genieWorkingDir,
             registry
@@ -273,6 +276,19 @@ public class ServicesConfigTest {
     @Bean
     public AsyncTaskExecutor taskExecutor() {
         return new ThreadPoolTaskExecutor();
+    }
+
+    /**
+     * A multicast (async) event publisher to replace the synchronous one used by Spring via the ApplicationContext.
+     *
+     * @param taskExecutor The task executor to use
+     * @return The application event multicaster to use
+     */
+    @Bean
+    public ApplicationEventMulticaster applicationEventMulticaster(final TaskExecutor taskExecutor) {
+        final SimpleApplicationEventMulticaster applicationEventMulticaster = new SimpleApplicationEventMulticaster();
+        applicationEventMulticaster.setTaskExecutor(taskExecutor);
+        return applicationEventMulticaster;
     }
 
     /**

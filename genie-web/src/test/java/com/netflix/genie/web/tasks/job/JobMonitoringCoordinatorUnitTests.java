@@ -44,6 +44,7 @@ import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.core.io.Resource;
 import org.springframework.scheduling.TaskScheduler;
 
@@ -78,7 +79,7 @@ public class JobMonitoringCoordinatorUnitTests {
     private TaskScheduler scheduler;
     private JobMonitoringCoordinator coordinator;
     private JobSearchService jobSearchService;
-    private ApplicationEventPublisher publisher;
+    private ApplicationEventMulticaster eventMulticaster;
     private Date tomorrow;
     private Counter unableToCancel;
 
@@ -95,7 +96,7 @@ public class JobMonitoringCoordinatorUnitTests {
         this.jobSearchService = Mockito.mock(JobSearchService.class);
         final Executor executor = Mockito.mock(Executor.class);
         this.scheduler = Mockito.mock(TaskScheduler.class);
-        this.publisher = Mockito.mock(ApplicationEventPublisher.class);
+        this.eventMulticaster = Mockito.mock(ApplicationEventMulticaster.class);
         final Registry registry = Mockito.mock(Registry.class);
         this.unableToCancel = Mockito.mock(Counter.class);
         Mockito.when(registry.counter(Mockito.anyString())).thenReturn(this.unableToCancel);
@@ -109,7 +110,8 @@ public class JobMonitoringCoordinatorUnitTests {
         this.coordinator = new JobMonitoringCoordinator(
             HOSTNAME,
             this.jobSearchService,
-            publisher,
+            Mockito.mock(ApplicationEventPublisher.class),
+            this.eventMulticaster,
             this.scheduler,
             executor,
             registry,
@@ -184,7 +186,7 @@ public class JobMonitoringCoordinatorUnitTests {
         Mockito.when(this.jobSearchService.getJobExecution(job4Id)).thenThrow(new GenieNotFoundException("blah"));
         this.coordinator.onStartup(event);
 
-        Mockito.verify(this.publisher, Mockito.times(2)).publishEvent(Mockito.any(JobFinishedEvent.class));
+        Mockito.verify(this.eventMulticaster, Mockito.times(2)).multicastEvent(Mockito.any(JobFinishedEvent.class));
         Mockito
             .verify(this.scheduler, Mockito.times(3))
             .scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(DELAY));
