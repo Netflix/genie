@@ -29,7 +29,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.ApplicationEventMulticaster;
+import org.springframework.context.event.SimpleApplicationEventMulticaster;
 import org.springframework.core.task.AsyncTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -55,6 +58,19 @@ public class TaskConfig {
         final Executor executor = new DefaultExecutor();
         executor.setStreamHandler(new PumpStreamHandler(null, null));
         return executor;
+    }
+
+    /**
+     * A multicast (async) event publisher to replace the synchronous one used by Spring via the ApplicationContext.
+     *
+     * @param taskExecutor The task executor to use
+     * @return The application event multicaster to use
+     */
+    @Bean
+    public ApplicationEventMulticaster applicationEventMulticaster(final TaskExecutor taskExecutor) {
+        final SimpleApplicationEventMulticaster applicationEventMulticaster = new SimpleApplicationEventMulticaster();
+        applicationEventMulticaster.setTaskExecutor(taskExecutor);
+        return applicationEventMulticaster;
     }
 
     /**
