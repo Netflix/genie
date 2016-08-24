@@ -11,6 +11,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import logging
 import os
 
+from ..utils import unicodify
 from .core import GenieJob
 from .utils import (add_to_repr,
                     arg_string,
@@ -64,7 +65,7 @@ class HiveJob(GenieJob):
 
         params_str = ' '.join([
             '-d {qu}{name}={value}{qu}' \
-                .format(name=k, value=v, qu='"' if ' ' in str(v) else '') \
+                .format(name=k, value=v, qu='"' if ' ' in unicode(v) else '') \
             for k, v in self._parameters.items()
         ])
 
@@ -100,6 +101,7 @@ class HiveJob(GenieJob):
         self.tags('headers')
         return self.hiveconf('hive.cli.print.header', 'true')
 
+    @unicodify
     @add_to_repr('append')
     def hiveconf(self, name, value):
         """
@@ -131,6 +133,7 @@ class HiveJob(GenieJob):
         """Alias for :py:meth:`HiveJob.hiveconf`"""
         return self.hiveconf(name, value)
 
+    @unicodify
     @arg_string
     @add_to_repr('overwrite')
     def property_file(self, _property_file):
@@ -162,6 +165,7 @@ class HiveJob(GenieJob):
 
         return self.script(script)
 
+    @unicodify
     @arg_string
     @add_to_repr('overwrite')
     def script(self, _script):

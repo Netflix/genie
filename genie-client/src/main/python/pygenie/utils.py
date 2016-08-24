@@ -16,6 +16,8 @@ import socket
 import time
 import uuid
 
+from functools import wraps
+
 import requests
 
 from .auth import AuthHandler
@@ -97,6 +99,33 @@ def call(url, method='get', headers=None, raise_not_status=None,
     return resp
 
 
+def convert_to_unicode(value):
+    """Convert value to unicode."""
+
+    if is_str(value) and not isinstance(value, unicode):
+        return value.decode('utf-8')
+
+    return value
+
+
+def unicodify(func):
+    """
+    Decorator to convert all string args and kwargs to unicode.
+    """
+
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        """Wraps func."""
+
+        args = tuple(convert_to_unicode(i) for i in args)
+        kwargs = {convert_to_unicode(key): convert_to_unicode(value) \
+            for key, value in kwargs.items()}
+
+        return func(*args, **kwargs)
+
+    return wrapper
+
+
 def dttm_to_epoch(date_str, frmt='%Y-%m-%dT%H:%M:%SZ'):
     """Convert a date string to epoch seconds."""
 
@@ -146,4 +175,4 @@ def uuid_str():
         str: A unique id.
     """
 
-    return str(uuid.uuid1())
+    return unicode(uuid.uuid1())
