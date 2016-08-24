@@ -225,7 +225,7 @@ def is_file(path):
     path = convert_to_unicode(path)
 
     return path is not None and \
-        (os.path.isfile(path) \
+        (os.path.isfile(path.encode('utf-8')) \
          or path.startswith('s3://') \
          or path.startswith('s3n://'))
 
