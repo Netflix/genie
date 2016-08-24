@@ -63,13 +63,13 @@ class TestingPigJob(unittest.TestCase):
 
         assert_equals(
             job.cmd_args,
-            u' '.join([
-                u'-Dprop1=v1 -Dprop2=v2',
-                u'-P props.conf',
-                u'-param_file params1.param',
-                u'-param_file params2.param',
-                u'-p p2=v2 -p "p3=with space" -p p1=v1',
-                u'-f script.pig'
+            u" ".join([
+                u"-Dprop1=v1 -Dprop2=v2",
+                u"-P props.conf",
+                u"-param_file params1.param",
+                u"-param_file params2.param",
+                u"-p 'p2=v2' -p 'p3=with space' -p 'p1=v1'",
+                u"-f script.pig"
             ])
         )
 
@@ -89,12 +89,31 @@ class TestingPigJob(unittest.TestCase):
 
         assert_equals(
             job.cmd_args,
-            u' '.join([
-                u'-Dp2=v2 -Dp1=v1',
-                u'-P p.conf',
-                u'-param_file p.params',
-                u'-p p=v',
-                u'-f test.pig'
+            u" ".join([
+                u"-Dp2=v2 -Dp1=v1",
+                u"-P p.conf",
+                u"-param_file p.params",
+                u"-p 'p=v'",
+                u"-f test.pig"
+            ])
+        )
+
+    def test_cmd_args_constructed_quotes(self):
+        """Test PigJob constructed cmd args with quotes."""
+
+        job = pygenie.jobs.PigJob() \
+            .script('foo') \
+            .parameter("spaces", "this has spaces") \
+            .parameter("single_quotes", "test' test'") \
+            .parameter("escaped_single_quotes", "Barney\\'s Adventure")
+
+        assert_equals(
+            job.cmd_args,
+            u" ".join([
+                u"-p 'escaped_single_quotes=Barney\\''s Adventure'",
+                u"-p 'spaces=this has spaces'",
+                u"-p 'single_quotes=test'' test'''",
+                u"-f script.pig"
             ])
         )
 
@@ -237,7 +256,7 @@ class TestingPigJobAdapters(unittest.TestCase):
                     u'-Dmr.p1=a -Dmr.p2=b',
                     u'-P my_properties.conf',
                     u'-param_file pig_param1.params -param_file pig_param2.params',
-                    u'-p param2=2 -p param1=1',
+                    u'-p \'param2=2\' -p \'param1=1\'',
                     u'-f script.pig'
                 ]),
                 u'commandCriteria': [u'type:pig'],
@@ -365,7 +384,7 @@ class TestingPigJobAdapters(unittest.TestCase):
                     u'-P my_properties.conf',
                     u'-param_file pig_param1.params',
                     u'-param_file pig_param2.params',
-                    u'-p param2=2 -p param1=1',
+                    u'-p \'param2=2\' -p \'param1=1\'',
                     u'-f script.pig'
                 ]),
                 u'commandCriteria': [u'type:pig'],
