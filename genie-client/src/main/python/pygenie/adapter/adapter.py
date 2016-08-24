@@ -46,6 +46,7 @@ def execute_job(job):
 
     version = job._conf.get('genie.version')
     adapter = get_adapter_for_version(version)(conf=job._conf)
+
     if adapter is not None:
         try:
             adapter.submit_job(job)
@@ -56,6 +57,8 @@ def execute_job(job):
                 raise
         except NotImplementedError:
             pass
+
         return RunningJob(job.get('job_id'), adapter=adapter, conf=job._conf)
+
     raise GenieAdapterError("no adapter for '{}' to version '{}'" \
         .format(job.__class__.__name__, version))

@@ -228,7 +228,7 @@ class TestingJobExecute(unittest.TestCase):
     @patch('pygenie.jobs.core.generate_job_id')
     @patch('pygenie.jobs.core.execute_job')
     def test_job_execute_retry_force(self, exec_job, gen_job_id, reattach_job):
-        """Testing job execution with retry."""
+        """Testing job execution with force retry."""
 
         job_id = 'exec-retry-force'
         new_job_id = '{}-8'.format(job_id)

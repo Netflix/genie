@@ -13,6 +13,7 @@ import logging
 import pkg_resources
 import six
 import socket
+import time
 import uuid
 
 import requests
@@ -45,7 +46,8 @@ class DotDict(dict):
 
 
 def call(url, method='get', headers=None, raise_not_status=None,
-         none_on_404=False, auth_handler=None, *args, **kwargs):
+         none_on_404=False, auth_handler=None, attempts=4, backoff=3,
+         *args, **kwargs):
     """
     Wrap HTTP request calls to the Genie server.
 
@@ -69,12 +71,17 @@ def call(url, method='get', headers=None, raise_not_status=None,
     logger.debug('"%s %s"', method.upper(), url)
     logger.debug('headers: %s', headers)
 
-    resp = requests.request(method,
-                            url=url,
-                            headers=headers,
-                            auth=auth_handler.auth,
-                            *args,
-                            **kwargs)
+    for i in xrange(attempts):
+        resp = requests.request(method,
+                                url=url,
+                                headers=headers,
+                                auth=auth_handler.auth,
+                                *args,
+                                **kwargs)
+        if resp.status_code == 503 and i < attempts - 1:
+            time.sleep(i * backoff)
+        else:
+            break
 
     # Allow us to return None if we receive a 404
     if resp.status_code == 404 and none_on_404:

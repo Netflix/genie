@@ -144,7 +144,7 @@ export default class JobDetails extends React.Component {
                         type="button"
                         className="btn btn-danger"
                         onClick={this.openModal}
-                      >Send Kill Requestss
+                      >Send Kill Request
                       </button>
                       <Modal
                         isOpen={this.state.modalIsOpen}

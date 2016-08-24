@@ -6,11 +6,13 @@ from mock import patch
 from nose.tools import (assert_equals,
                         assert_raises)
 
+from pygenie.adapter.adapter import execute_job
 from pygenie.adapter.genie_x import substitute
 from pygenie.adapter.genie_3 import (Genie3Adapter,
                                      get_payload)
 from pygenie.jobs import PrestoJob
-from pygenie.exceptions import GenieLogNotFoundError
+from pygenie.exceptions import (GenieHTTPError,
+                                GenieLogNotFoundError)
 
 from .utils import fake_response
 

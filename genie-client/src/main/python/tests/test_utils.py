@@ -6,13 +6,105 @@ from mock import patch
 from nose.tools import (assert_raises,
                         assert_equals)
 
-from pygenie.utils import str_to_list
+from pygenie.utils import (call,
+                           str_to_list)
 from pygenie.jobs.utils import (generate_job_id,
                                 reattach_job)
 
-from pygenie.exceptions import GenieJobNotFoundError
+from pygenie.exceptions import (GenieHTTPError,
+                                GenieJobNotFoundError)
 
-from .utils import FakeRunningJob
+from .utils import (FakeRunningJob,
+                    fake_response)
+
+
+@patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'})
+@patch('pygenie.utils.requests.request')
+class TestCall(unittest.TestCase):
+    """Test HTTP request calls to Genie server."""
+
+    def test_202(self, request):
+        """Test HTTP request via call() with 200 response."""
+
+        request.return_value = fake_response({}, 202)
+
+        resp = call('http://genie-202')
+
+        assert_equals(202, resp.status_code)
+        assert_equals(1, request.call_count)
+
+    @patch('pygenie.utils.time.sleep')
+    def test_503s(self, sleep, request):
+        """Test HTTP request via call() with 503 responses."""
+
+        request.side_effect = [
+            fake_response({}, 503),
+            fake_response({}, 503),
+            fake_response({}, 503),
+            fake_response({}, 503),
+            fake_response({}, 503)
+        ]
+
+        with assert_raises(GenieHTTPError):
+            call('http://genie-503', attempts=4, backoff=0)
+
+        assert_equals(4, request.call_count)
+        assert_equals(3, sleep.call_count)
+
+    @patch('pygenie.utils.time.sleep')
+    def test_503_409(self, sleep, request):
+        """Test HTTP request via call() with 503 then 409 responses."""
+
+        request.side_effect = [
+            fake_response({}, 503),
+            fake_response({}, 409)
+        ]
+
+        with assert_raises(GenieHTTPError):
+            call('http://genie-503-409', attempts=4, backoff=0)
+
+        assert_equals(2, request.call_count)
+        assert_equals(1, sleep.call_count)
+
+    @patch('pygenie.utils.time.sleep')
+    def test_503_202(self, sleep, request):
+        """Test HTTP request via call() with 503 then 202 responses."""
+
+        request.side_effect = [
+            fake_response({}, 503),
+            fake_response({}, 503),
+            fake_response({}, 202)
+        ]
+
+        resp = call('http://genie-503-202', attempts=4, backoff=0)
+
+        assert_equals(202, resp.status_code)
+        assert_equals(3, request.call_count)
+        assert_equals(2, sleep.call_count)
+
+    @patch('pygenie.utils.time.sleep')
+    def test_404_not_none(self, sleep, request):
+        """Test HTTP request via call() with 404 response (raise error)."""
+
+        request.return_value = fake_response({}, 404)
+
+        with assert_raises(GenieHTTPError):
+            call('http://genie-404-raise')
+
+        assert_equals(1, request.call_count)
+        assert_equals(0, sleep.call_count)
+
+    @patch('pygenie.utils.time.sleep')
+    def test_404_none(self, sleep, request):
+        """Test HTTP request via call() with 404 response (return None)."""
+
+        request.return_value = fake_response({}, 404)
+
+        resp = call('http://genie-404-none', none_on_404=True)
+
+        assert_equals(None, resp)
+        assert_equals(1, request.call_count)
+        assert_equals(0, sleep.call_count)
 
 
 @patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'})
