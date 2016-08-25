@@ -66,7 +66,7 @@ class HiveJob(GenieJob):
         params_str = ' '.join([
             "-d '{name}={value}'" \
                 .format(name=k,
-                        value=v.replace("'", "''")) \
+                        value=unicode(v).replace("'", "''")) \
             for k, v in self._parameters.items()
         ])
 

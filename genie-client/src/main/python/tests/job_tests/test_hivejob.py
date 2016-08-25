@@ -96,7 +96,9 @@ class TestingHiveJob(unittest.TestCase):
             .script('foo') \
             .parameter("spaces", "this has spaces") \
             .parameter("single_quotes", "test' test'") \
-            .parameter("escaped_single_quotes", "Barney\\'s Adventure")
+            .parameter("escaped_single_quotes", "Barney\\'s Adventure") \
+            .parameter("unicode", "\xf3\xf3\xf3") \
+            .parameter("number", 8)
 
         assert_equals(
             job.cmd_args,
@@ -104,6 +106,8 @@ class TestingHiveJob(unittest.TestCase):
                 u"-d 'escaped_single_quotes=Barney\\''s Adventure'",
                 u"-d 'spaces=this has spaces'",
                 u"-d 'single_quotes=test'' test'''",
+                u"-d 'unicode=\xf3\xf3\xf3'",
+                u"-d 'number=8'",
                 u"-f script.hive"
             ])
         )
