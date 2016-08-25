@@ -73,7 +73,7 @@ class PigJob(GenieJob):
         params_str = ' '.join([
             "-p '{name}={value}'" \
                 .format(name=k,
-                        value=v.replace("'", "''")) \
+                        value=unicode(v).replace("'", "''")) \
             for k, v in self._parameters.items()
         ])
 
