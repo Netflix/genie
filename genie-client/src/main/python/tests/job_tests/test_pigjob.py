@@ -105,7 +105,9 @@ class TestingPigJob(unittest.TestCase):
             .script('foo') \
             .parameter("spaces", "this has spaces") \
             .parameter("single_quotes", "test' test'") \
-            .parameter("escaped_single_quotes", "Barney\\'s Adventure")
+            .parameter("escaped_single_quotes", "Barney\\'s Adventure") \
+            .parameter("number", 8) \
+            .parameter("unicode", "\u0147\u0147\u0147")
 
         assert_equals(
             job.cmd_args,
@@ -113,6 +115,8 @@ class TestingPigJob(unittest.TestCase):
                 u"-p 'escaped_single_quotes=Barney\\''s Adventure'",
                 u"-p 'spaces=this has spaces'",
                 u"-p 'single_quotes=test'' test'''",
+                u"-p 'unicode=\u0147\u0147\u0147'",
+                u"-p 'number=8'",
                 u"-f script.pig"
             ])
         )
