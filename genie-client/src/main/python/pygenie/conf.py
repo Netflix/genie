@@ -82,7 +82,6 @@ class GenieConfSection(object):
     def set(self, name, value=None):
         """Sets an attribute (option) to the value."""
 
-        logger.debug('setting config -> %s.%s=%s', self.__name, name, value)
         setattr(self, name, value)
 
     def to_dict(self):

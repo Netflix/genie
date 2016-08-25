@@ -106,6 +106,39 @@ class TestCall(unittest.TestCase):
         assert_equals(1, request.call_count)
         assert_equals(0, sleep.call_count)
 
+    @patch('pygenie.utils.time.sleep')
+    def test_retry_codes(self, sleep, request):
+        """Test HTTP request via call() with retry status codes."""
+
+        request.side_effect = [
+            fake_response({}, 500),
+            fake_response({}, 503),
+            fake_response({}, 500),
+            fake_response({}, 503),
+            fake_response({}, 500)
+        ]
+
+        with assert_raises(GenieHTTPError):
+            call('http://genie-retry-codes', retry_status_codes=500, attempts=4, backoff=0)
+
+        assert_equals(4, request.call_count)
+        assert_equals(3, sleep.call_count)
+
+    @patch('pygenie.utils.time.sleep')
+    def test_retry_codes_2(self, sleep, request):
+        """Test HTTP request via call() with retry status codes (finishing with 202)."""
+
+        request.side_effect = [
+            fake_response({}, 500),
+            fake_response({}, 503),
+            fake_response({}, 202)
+        ]
+
+        call('http://genie-retry-codes-202', retry_status_codes=500, attempts=4, backoff=0)
+
+        assert_equals(3, request.call_count)
+        assert_equals(2, sleep.call_count)
+
 
 @patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'})
 class TestStringToList(unittest.TestCase):

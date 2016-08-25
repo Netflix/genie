@@ -48,7 +48,8 @@ class DotDict(dict):
 
 
 def call(url, method='get', headers=None, raise_not_status=None,
-         none_on_404=False, auth_handler=None, attempts=4, backoff=3,
+         none_on_404=False, auth_handler=None, retry_status_codes=None,
+         attempts=4, backoff=3,
          *args, **kwargs):
     """
     Wrap HTTP request calls to the Genie server.
@@ -65,6 +66,15 @@ def call(url, method='get', headers=None, raise_not_status=None,
             GenieHTTPError.
     """
 
+    assert isinstance(retry_status_codes, (list, int)) \
+            or retry_status_codes is None, \
+        'retry_status_codes should be an int or list of ints'
+
+    retry_status_codes = retry_status_codes or list()
+    if isinstance(retry_status_codes, int):
+        retry_status_codes = [retry_status_codes]
+    retry_status_codes = set(retry_status_codes + [503])
+
     auth_handler = auth_handler or AuthHandler()
 
     headers = USER_AGENT_HEADER if headers is None \
@@ -73,14 +83,18 @@ def call(url, method='get', headers=None, raise_not_status=None,
     logger.debug('"%s %s"', method.upper(), url)
     logger.debug('headers: %s', headers)
 
-    for i in xrange(attempts):
+    for i in range(attempts):
         resp = requests.request(method,
                                 url=url,
                                 headers=headers,
                                 auth=auth_handler.auth,
                                 *args,
                                 **kwargs)
-        if resp.status_code == 503 and i < attempts - 1:
+        if resp.status_code in retry_status_codes and i < attempts - 1:
+            logger.warning('attempt %s -> %s: %s',
+                           i + 1,
+                           resp.status_code,
+                           resp.text)
             time.sleep(i * backoff)
         else:
             break
