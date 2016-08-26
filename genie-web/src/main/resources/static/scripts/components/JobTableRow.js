@@ -41,12 +41,9 @@ export default class TableRow extends React.Component {
         </td>
         <td onClick={() => this.props.toggleRowDetails(this.props.row.id)}>{this.props.row.name}</td>
         <td>
-          <Link
-            target="_blank"
-            to={`/output/${this.props.row.id}/output`}
-          >
+          <a href={`/output/${this.props.row.id}/output`}>
             <i className="fa fa-lg fa-folder" aria-hidden="true"></i>
-          </Link>
+          </a>
         </td>
         <td onMouseMove={() => { this.setState({ copied: false }); }}>
           <CopyToClipboard

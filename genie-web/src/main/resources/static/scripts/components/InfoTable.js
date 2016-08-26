@@ -13,12 +13,9 @@ const InfoTable = (props) =>
       {props.data.map((info, index) =>
         <tr key={index}>
           <td>
-            <Link
-              target="_blank"
-              to={`${props.type}?name=${info.name}&rowId=${info.id}`}
-            >
+            <a href={`${props.type}?name=${info.name}&rowId=${info.id}`}>
               {info.id}
-            </Link>
+            </a>
           </td>
           <td>{info.name}</td>
         </tr>
