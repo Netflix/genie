@@ -11,6 +11,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import logging
 import os
 
+from ..utils import unicodify
 from .core import GenieJob
 from .utils import (add_to_repr,
                     arg_list,
@@ -57,11 +58,11 @@ class PigJob(GenieJob):
         if self._command_arguments is not None:
             return self._command_arguments
 
+        filename = PigJob.DEFAULT_SCRIPT_NAME
         if is_file(self._script):
             filename = os.path.basename(self._script)
             self._add_dependency(self._script)
         elif self._script is not None:
-            filename = PigJob.DEFAULT_SCRIPT_NAME
             self._add_dependency({'name': filename, 'data': self._script})
 
         param_files_str = ' '.join([
@@ -70,8 +71,9 @@ class PigJob(GenieJob):
         ])
 
         params_str = ' '.join([
-            '-p {qu}{name}={value}{qu}' \
-                .format(name=k, value=v, qu='"' if ' ' in str(v) else '') \
+            "-p '{name}={value}'" \
+                .format(name=k,
+                        value=unicode(v).replace("'", "''")) \
             for k, v in self._parameters.items()
         ])
 
@@ -92,6 +94,7 @@ class PigJob(GenieJob):
                     params=params_str) \
             .strip()
 
+    @unicodify
     @arg_list
     @add_to_repr('append')
     def parameter_file(self, _parameter_files):
@@ -119,6 +122,7 @@ class PigJob(GenieJob):
 
         return self
 
+    @unicodify
     @add_to_repr('append')
     def property(self, name, value):
         """
@@ -146,6 +150,7 @@ class PigJob(GenieJob):
 
         return self
 
+    @unicodify
     @arg_string
     @add_to_repr('overwrite')
     def property_file(self, _property_file):
@@ -172,6 +177,7 @@ class PigJob(GenieJob):
 
         return self
 
+    @unicodify
     @arg_string
     @add_to_repr('overwrite')
     def script(self, _script):

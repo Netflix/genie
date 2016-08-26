@@ -208,6 +208,7 @@ class Genie3Adapter(GenieBaseAdapter):
             return call(method='get',
                         url=url,
                         auth_handler=self.auth_handler,
+                        retry_status_codes=500,
                         **kwargs) \
                    .json()
         except GenieHTTPError as err:

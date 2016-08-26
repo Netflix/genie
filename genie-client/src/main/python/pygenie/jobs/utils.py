@@ -17,7 +17,8 @@ from functools import wraps
 
 from .running import RunningJob
 
-from ..utils import (is_str,
+from ..utils import (convert_to_unicode,
+                     is_str,
                      str_to_list)
 
 from ..exceptions import GenieJobNotFoundError
@@ -163,7 +164,7 @@ def arg_string(func):
         assert is_str(value), \
             '{}() argument value should be a string'.format(func.__name__)
 
-        setattr(self, attr_name, value)
+        setattr(self, attr_name, convert_to_unicode(value))
 
         return func(*args, **kwargs) or self
 
@@ -199,7 +200,7 @@ def generate_job_id(job_id, return_success=True, conf=None):
                 return running_job.job_id
             id_parts = running_job.job_id.split('-')
             if id_parts[-1].isdigit():
-                id_parts[-1] = str(int(id_parts[-1]) + 1)
+                id_parts[-1] = unicode(int(id_parts[-1]) + 1)
             else:
                 id_parts.append('1')
             job_id = '-'.join(id_parts)
@@ -221,8 +222,10 @@ def is_attachment(dependency):
 def is_file(path):
     """Checks if path is to a file."""
 
+    path = convert_to_unicode(path)
+
     return path is not None and \
-        (os.path.isfile(path) \
+        (os.path.isfile(path.encode('utf-8')) \
          or path.startswith('s3://') \
          or path.startswith('s3n://'))
 

@@ -37,7 +37,6 @@ import com.netflix.genie.core.jpa.entities.JobRequestEntity;
 import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
-import com.netflix.genie.core.jpa.repositories.JpaJobExecutionRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobMetadataRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRequestRepository;
@@ -69,7 +68,6 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
 
     private final JpaJobRepository jobRepo;
     private final JpaJobRequestRepository jobRequestRepo;
-    private final JpaJobExecutionRepository jobExecutionRepo;
     private final JpaJobMetadataRepository jobMetadataRepository;
     private final JpaApplicationRepository applicationRepo;
     private final JpaClusterRepository clusterRepo;
@@ -80,7 +78,6 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
      *
      * @param jobRepo               The job repository to use
      * @param jobRequestRepo        The job request repository to use
-     * @param jobExecutionRepo      The jobExecution Repository to use
      * @param jobMetadataRepository The job metadata repository to use
      * @param applicationRepo       The application repository to use
      * @param clusterRepo           The cluster repository to use
@@ -89,7 +86,6 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
     public JpaJobPersistenceServiceImpl(
         @NotNull final JpaJobRepository jobRepo,
         @NotNull final JpaJobRequestRepository jobRequestRepo,
-        @NotNull final JpaJobExecutionRepository jobExecutionRepo,
         @NotNull final JpaJobMetadataRepository jobMetadataRepository,
         @NotNull final JpaApplicationRepository applicationRepo,
         @NotNull final JpaClusterRepository clusterRepo,
@@ -97,7 +93,6 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
     ) {
         this.jobRepo = jobRepo;
         this.jobRequestRepo = jobRequestRepo;
-        this.jobExecutionRepo = jobExecutionRepo;
         this.jobMetadataRepository = jobMetadataRepository;
         this.applicationRepo = applicationRepo;
         this.clusterRepo = clusterRepo;
@@ -171,21 +166,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
             throw new GenieNotFoundException("No job exists for the id specified");
         }
 
-        final JobStatus status = jobEntity.getStatus();
-        // Only change the status if the entity isn't already in a terminal state
-        if (status.isActive()) {
-            jobEntity.setStatus(jobStatus);
-            jobEntity.setStatusMsg(statusMsg);
-
-            if (jobStatus.equals(JobStatus.RUNNING)) {
-                // Status being changed to running so set start date.
-                jobEntity.setStarted(new Date());
-            } else if (jobEntity.getStarted().isPresent() && jobStatus.isFinished()) {
-                // Since start date is set the job was running previously and now has finished
-                // with status killed, failed or succeeded. So we set the job finish time.
-                jobEntity.setFinished(new Date());
-            }
-        }
+        this.updateJobStatus(jobEntity, jobStatus, statusMsg);
     }
 
     /**
@@ -298,14 +279,20 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
     ) throws GenieException {
         log.debug("Called with to update job {} with process id {}", id, processId);
 
-        final JobExecutionEntity jobExecutionEntity = this.jobExecutionRepo.findOne(id);
+        final JobEntity jobEntity = this.jobRepo.findOne(id);
+        if (jobEntity == null) {
+            throw new GenieNotFoundException("No job with id " + id +  " exists. Unable to update");
+        }
+
+        final JobExecutionEntity jobExecutionEntity = jobEntity.getExecution();
         if (jobExecutionEntity == null) {
             throw new GenieNotFoundException("No job execution with id " + id + " exists. Unable to update.");
         }
+
+        this.updateJobStatus(jobEntity, JobStatus.RUNNING, "Job is Running.");
         jobExecutionEntity.setProcessId(processId);
         jobExecutionEntity.setCheckDelay(checkDelay);
         jobExecutionEntity.setTimeout(timeout);
-        this.updateJobStatus(id, JobStatus.RUNNING, "Job is Running.");
     }
 
     /**
@@ -323,12 +310,16 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         log.debug(
             "Called with id {}, exit code {}, status {} and status message {}", id, exitCode, status, statusMessage
         );
-        final JobExecutionEntity jobExecutionEntity = this.jobExecutionRepo.findOne(id);
+        final JobEntity jobEntity = this.jobRepo.findOne(id);
+        if (jobEntity == null) {
+            throw new GenieNotFoundException("No job with id " + id + " exists unable to update");
+        }
+        this.updateJobStatus(jobEntity, status, statusMessage);
+        final JobExecutionEntity jobExecutionEntity = jobEntity.getExecution();
         if (jobExecutionEntity != null) {
             if (!jobExecutionEntity.getExitCode().isPresent()) {
                 jobExecutionEntity.setExitCode(exitCode);
             }
-            this.updateJobStatus(id, status, statusMessage);
         } else {
             throw new GenieNotFoundException("No job execution with ID " + id + " exists");
         }
@@ -351,5 +342,23 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
     @Override
     public long deleteAllJobsCreatedBeforeDate(@NotNull final Date date) {
         return this.jobRequestRepo.deleteByCreatedBefore(date);
+    }
+
+    private void updateJobStatus(final JobEntity jobEntity, final JobStatus jobStatus, final String statusMsg) {
+        final JobStatus status = jobEntity.getStatus();
+        // Only change the status if the entity isn't already in a terminal state
+        if (status.isActive()) {
+            jobEntity.setStatus(jobStatus);
+            jobEntity.setStatusMsg(statusMsg);
+
+            if (jobStatus.equals(JobStatus.RUNNING)) {
+                // Status being changed to running so set start date.
+                jobEntity.setStarted(new Date());
+            } else if (jobEntity.getStarted().isPresent() && jobStatus.isFinished()) {
+                // Since start date is set the job was running previously and now has finished
+                // with status killed, failed or succeeded. So we set the job finish time.
+                jobEntity.setFinished(new Date());
+            }
+        }
     }
 }

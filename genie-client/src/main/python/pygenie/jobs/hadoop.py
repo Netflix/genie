@@ -11,6 +11,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import logging
 import os
 
+from ..utils import unicodify
 from .core import GenieJob
 from .utils import (add_to_repr,
                     arg_string)
@@ -59,6 +60,7 @@ class HadoopJob(GenieJob):
 
         return self.script(script)
 
+    @unicodify
     @add_to_repr('append')
     def property(self, name, value):
         """
@@ -85,6 +87,7 @@ class HadoopJob(GenieJob):
 
         return self
 
+    @unicodify
     @arg_string
     @add_to_repr('overwrite')
     def property_file(self, _property_file):
@@ -110,6 +113,7 @@ class HadoopJob(GenieJob):
 
         return self
 
+    @unicodify
     @arg_string
     @add_to_repr('overwrite')
     def script(self, _script):

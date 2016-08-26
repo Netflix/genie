@@ -40,6 +40,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.ApplicationEventMulticaster;
 
 import java.io.File;
 import java.io.IOException;
@@ -64,6 +65,7 @@ public class JobMonitorUnitTests {
     private JobExecution jobExecution;
     private Executor executor;
     private ApplicationEventPublisher publisher;
+    private ApplicationEventMulticaster eventMulticaster;
     private Registry registry;
     private File stdOut;
     private File stdErr;
@@ -89,6 +91,7 @@ public class JobMonitorUnitTests {
             .build();
         this.executor = Mockito.mock(Executor.class);
         this.publisher = Mockito.mock(ApplicationEventPublisher.class);
+        this.eventMulticaster = Mockito.mock(ApplicationEventMulticaster.class);
         this.successfulCheckRate = Mockito.mock(Counter.class);
         this.timeoutRate = Mockito.mock(Counter.class);
         this.finishedRate = Mockito.mock(Counter.class);
@@ -127,6 +130,7 @@ public class JobMonitorUnitTests {
             this.stdErr,
             this.executor,
             this.publisher,
+            this.eventMulticaster,
             this.registry,
             outputMaxProperties
         );
@@ -224,6 +228,7 @@ public class JobMonitorUnitTests {
 
         Mockito.verify(this.successfulCheckRate, Mockito.times(2)).increment();
         Mockito.verify(this.publisher, Mockito.never()).publishEvent(Mockito.any(ApplicationEvent.class));
+        Mockito.verify(this.eventMulticaster, Mockito.never()).multicastEvent(Mockito.any(ApplicationEvent.class));
         Mockito.verify(this.unsuccessfulCheckRate, Mockito.times(1)).increment();
     }
 
@@ -241,8 +246,8 @@ public class JobMonitorUnitTests {
 
         final ArgumentCaptor<JobFinishedEvent> captor = ArgumentCaptor.forClass(JobFinishedEvent.class);
         Mockito
-            .verify(this.publisher, Mockito.times(1))
-            .publishEvent(captor.capture());
+            .verify(this.eventMulticaster, Mockito.times(1))
+            .multicastEvent(captor.capture());
 
         Assert.assertNotNull(captor.getValue());
         final String jobId = this.jobExecution.getId().orElseThrow(IllegalArgumentException::new);
@@ -278,6 +283,7 @@ public class JobMonitorUnitTests {
             this.stdErr,
             this.executor,
             this.publisher,
+            this.eventMulticaster,
             this.registry,
             new JobOutputMaxProperties()
         );
@@ -315,23 +321,24 @@ public class JobMonitorUnitTests {
             this.monitor.run();
         }
 
-        final ArgumentCaptor<ApplicationEvent> eventCaptor = ArgumentCaptor.forClass(ApplicationEvent.class);
-        Mockito.verify(this.publisher, Mockito.times(2)).publishEvent(eventCaptor.capture());
-        final List<ApplicationEvent> events = eventCaptor.getAllValues();
-        Assert.assertThat(events.size(), Matchers.is(2));
-        Assert.assertTrue(events.get(0) instanceof KillJobEvent);
+        final ArgumentCaptor<KillJobEvent> eventCaptor = ArgumentCaptor.forClass(KillJobEvent.class);
+        Mockito.verify(this.publisher, Mockito.times(1)).publishEvent(eventCaptor.capture());
+        final List<KillJobEvent> events = eventCaptor.getAllValues();
+        Assert.assertThat(events.size(), Matchers.is(1));
         final String jobId = this.jobExecution.getId().orElseThrow(IllegalArgumentException::new);
         Assert.assertThat(
-            ((KillJobEvent) events.get(0)).getId(),
+            events.get(0).getId(),
             Matchers.is(jobId)
         );
         Assert.assertThat(events.get(0).getSource(), Matchers.is(this.monitor));
-        Assert.assertTrue(events.get(1) instanceof JobFinishedEvent);
+
+        final ArgumentCaptor<JobFinishedEvent> finishedCaptor = ArgumentCaptor.forClass(JobFinishedEvent.class);
+        Mockito.verify(this.eventMulticaster, Mockito.times(1)).multicastEvent(finishedCaptor.capture());
         Assert.assertThat(
-            ((JobFinishedEvent) events.get(1)).getId(),
+            finishedCaptor.getValue().getId(),
             Matchers.is(jobId)
         );
-        Assert.assertThat(events.get(1).getSource(), Matchers.is(this.monitor));
+        Assert.assertThat(finishedCaptor.getValue().getSource(), Matchers.is(this.monitor));
         Mockito.verify(this.unsuccessfulCheckRate, Mockito.times(6)).increment();
     }
 

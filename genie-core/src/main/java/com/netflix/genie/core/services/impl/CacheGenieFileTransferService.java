@@ -95,23 +95,19 @@ public class CacheGenieFileTransferService extends GenieFileTransferService {
             final String dstLocalPath
     ) throws GenieException {
         log.debug("Called with src path {} and destination path {}", srcRemotePath, dstLocalPath);
-        File cachedFile = fileCache.getIfPresent(srcRemotePath);
+        File cachedFile = null;
         try {
-            if (cachedFile == null) {
-                cachedFile = fileCache.get(srcRemotePath);
-            } else {
-                cachedFile = fileCache.get(srcRemotePath);
-                // Before using the cached file check if the real file has been modified after we have cached
-                final long lastModifiedTime = getFileTransfer(srcRemotePath).getLastModifiedTime(srcRemotePath);
-                if (lastModifiedTime > cachedFile.lastModified()) {
-                    synchronized (this) {
-                        // Check the modification time again because threads that were waiting for a file might have
-                        // been refreshed by a previous thread.
-                        if (lastModifiedTime > cachedFile.lastModified()) {
-                            fileCache.invalidate(srcRemotePath);
-                            deleteFile(cachedFile);
-                            cachedFile = fileCache.get(srcRemotePath);
-                        }
+            cachedFile = fileCache.get(srcRemotePath);
+            // Before using the cached file check if the real file has been modified after we have cached
+            final long lastModifiedTime = getFileTransfer(srcRemotePath).getLastModifiedTime(srcRemotePath);
+            if (lastModifiedTime > cachedFile.lastModified()) {
+                synchronized (this) {
+                    // Check the modification time again because threads that were waiting for a file might have
+                    // been refreshed by a previous thread.
+                    if (lastModifiedTime > cachedFile.lastModified()) {
+                        fileCache.invalidate(srcRemotePath);
+                        deleteFile(cachedFile);
+                        cachedFile = fileCache.get(srcRemotePath);
                     }
                 }
             }

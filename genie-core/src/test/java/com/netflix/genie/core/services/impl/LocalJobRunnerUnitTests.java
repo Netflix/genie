@@ -48,6 +48,7 @@ import org.junit.rules.TemporaryFolder;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.core.io.Resource;
 
 import java.io.File;
@@ -103,7 +104,8 @@ public class LocalJobRunnerUnitTests {
         this.clusterService = Mockito.mock(ClusterService.class);
         final CommandService commandService = Mockito.mock(CommandService.class);
         this.clusterLoadBalancer = Mockito.mock(ClusterLoadBalancer.class);
-        final ApplicationEventPublisher applicationEventPublisher = Mockito.mock(ApplicationEventPublisher.class);
+        final ApplicationEventPublisher eventPublisher = Mockito.mock(ApplicationEventPublisher.class);
+        final ApplicationEventMulticaster eventMulticaster = Mockito.mock(ApplicationEventMulticaster.class);
         final WorkflowTask task1 = Mockito.mock(WorkflowTask.class);
         this.task2 = Mockito.mock(WorkflowTask.class);
 
@@ -124,7 +126,8 @@ public class LocalJobRunnerUnitTests {
             this.clusterService,
             commandService,
             this.clusterLoadBalancer,
-            applicationEventPublisher,
+            eventPublisher,
+            eventMulticaster,
             jobWorkflowTasks,
             baseWorkingDirResource,
             registry

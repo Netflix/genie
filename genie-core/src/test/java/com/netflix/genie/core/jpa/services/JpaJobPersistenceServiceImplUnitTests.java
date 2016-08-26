@@ -37,7 +37,6 @@ import com.netflix.genie.core.jpa.entities.JobRequestEntity;
 import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
-import com.netflix.genie.core.jpa.repositories.JpaJobExecutionRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobMetadataRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRequestRepository;
@@ -79,7 +78,6 @@ public class JpaJobPersistenceServiceImplUnitTests {
 
     private JpaJobRepository jobRepo;
     private JpaJobRequestRepository jobRequestRepo;
-    private JpaJobExecutionRepository jobExecutionRepo;
     private JpaJobMetadataRepository jobMetadataRepository;
     private JpaApplicationRepository applicationRepo;
     private JpaClusterRepository clusterRepo;
@@ -94,7 +92,6 @@ public class JpaJobPersistenceServiceImplUnitTests {
     public void setup() {
         this.jobRepo = Mockito.mock(JpaJobRepository.class);
         this.jobRequestRepo = Mockito.mock(JpaJobRequestRepository.class);
-        this.jobExecutionRepo = Mockito.mock(JpaJobExecutionRepository.class);
         this.jobMetadataRepository = Mockito.mock(JpaJobMetadataRepository.class);
         this.applicationRepo = Mockito.mock(JpaApplicationRepository.class);
         this.clusterRepo = Mockito.mock(JpaClusterRepository.class);
@@ -103,7 +100,6 @@ public class JpaJobPersistenceServiceImplUnitTests {
         this.jobPersistenceService = new JpaJobPersistenceServiceImpl(
             this.jobRepo,
             this.jobRequestRepo,
-            this.jobExecutionRepo,
             this.jobMetadataRepository,
             this.applicationRepo,
             this.clusterRepo,
@@ -513,8 +509,10 @@ public class JpaJobPersistenceServiceImplUnitTests {
     @Test(expected = GenieNotFoundException.class)
     public void cantFindJobToUpdateRunningInformationFor() throws GenieException {
         final String id = UUID.randomUUID().toString();
+        final JobEntity jobEntity = Mockito.mock(JobEntity.class);
 
-        Mockito.when(this.jobExecutionRepo.findOne(id)).thenReturn(null);
+        Mockito.when(this.jobRepo.findOne(id)).thenReturn(jobEntity);
+        Mockito.when(jobEntity.getExecution()).thenReturn(null);
         this.jobPersistenceService.setJobRunningInformation(id, 1, 1, new Date());
     }
 
@@ -529,10 +527,10 @@ public class JpaJobPersistenceServiceImplUnitTests {
         final int processId = 28042;
         final long checkDelay = 280234L;
         final Date timeout = new Date();
-        final JobEntity jobEntity = Mockito.mock(JobEntity.class);
-        Mockito.when(jobEntity.getStatus()).thenReturn(JobStatus.INIT);
         final JobExecutionEntity jobExecutionEntity = Mockito.mock(JobExecutionEntity.class);
-        Mockito.when(this.jobExecutionRepo.findOne(id)).thenReturn(jobExecutionEntity);
+        final JobEntity jobEntity = Mockito.mock(JobEntity.class);
+        Mockito.when(jobEntity.getExecution()).thenReturn(jobExecutionEntity);
+        Mockito.when(jobEntity.getStatus()).thenReturn(JobStatus.INIT);
         Mockito.when(this.jobRepo.findOne(id)).thenReturn(jobEntity);
         this.jobPersistenceService.setJobRunningInformation(id, processId, checkDelay, timeout);
         Mockito.verify(jobExecutionEntity, Mockito.times(1)).setTimeout(timeout);
@@ -547,7 +545,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
      */
     @Test(expected = GenieNotFoundException.class)
     public void testSetExitCodeJobDoesNotExist() throws GenieException {
-        Mockito.when(this.jobExecutionRepo.findOne(Mockito.eq(JOB_1_ID))).thenReturn(null);
+        Mockito.when(this.jobRepo.findOne(JOB_1_ID)).thenReturn(null);
         this.jobPersistenceService
             .setJobCompletionInformation(JOB_1_ID, 0, JobStatus.FAILED, UUID.randomUUID().toString(), null, null);
     }
@@ -560,11 +558,11 @@ public class JpaJobPersistenceServiceImplUnitTests {
     @Test(expected = GenieNotFoundException.class)
     public void cantUpdateJobMetadataIfNotExists() throws GenieException {
         final JobEntity jobEntity = Mockito.mock(JobEntity.class);
-        Mockito.when(jobEntity.getStatus()).thenReturn(JobStatus.FAILED);
-        Mockito.when(this.jobRepo.findOne(JOB_1_ID)).thenReturn(jobEntity);
         final JobExecutionEntity jobExecutionEntity = Mockito.mock(JobExecutionEntity.class);
+        Mockito.when(jobEntity.getStatus()).thenReturn(JobStatus.FAILED);
+        Mockito.when(jobEntity.getExecution()).thenReturn(jobExecutionEntity);
+        Mockito.when(this.jobRepo.findOne(JOB_1_ID)).thenReturn(jobEntity);
         Mockito.when(jobExecutionEntity.getExitCode()).thenReturn(Optional.of(1));
-        Mockito.when(this.jobExecutionRepo.findOne(JOB_1_ID)).thenReturn(jobExecutionEntity);
         Mockito.when(this.jobMetadataRepository.findOne(JOB_1_ID)).thenReturn(null);
 
         this.jobPersistenceService.setJobCompletionInformation(JOB_1_ID, 0, JobStatus.FAILED, "k", 100L, 1L);
@@ -578,11 +576,11 @@ public class JpaJobPersistenceServiceImplUnitTests {
     @Test
     public void wontUpdateJobMetadataIfNoSizes() throws GenieException {
         final JobEntity jobEntity = Mockito.mock(JobEntity.class);
-        Mockito.when(jobEntity.getStatus()).thenReturn(JobStatus.FAILED);
-        Mockito.when(this.jobRepo.findOne(JOB_1_ID)).thenReturn(jobEntity);
         final JobExecutionEntity jobExecutionEntity = Mockito.mock(JobExecutionEntity.class);
+        Mockito.when(jobEntity.getStatus()).thenReturn(JobStatus.FAILED);
+        Mockito.when(jobEntity.getExecution()).thenReturn(jobExecutionEntity);
+        Mockito.when(this.jobRepo.findOne(JOB_1_ID)).thenReturn(jobEntity);
         Mockito.when(jobExecutionEntity.getExitCode()).thenReturn(Optional.of(1));
-        Mockito.when(this.jobExecutionRepo.findOne(JOB_1_ID)).thenReturn(jobExecutionEntity);
 
         this.jobPersistenceService.setJobCompletionInformation(JOB_1_ID, 0, JobStatus.FAILED, "k", null, null);
         Mockito.verify(this.jobMetadataRepository, Mockito.never()).findOne(JOB_1_ID);
@@ -596,11 +594,11 @@ public class JpaJobPersistenceServiceImplUnitTests {
     @Test
     public void willUpdateJobMetadataIfOneSize() throws GenieException {
         final JobEntity jobEntity = Mockito.mock(JobEntity.class);
-        Mockito.when(jobEntity.getStatus()).thenReturn(JobStatus.FAILED);
-        Mockito.when(this.jobRepo.findOne(JOB_1_ID)).thenReturn(jobEntity);
         final JobExecutionEntity jobExecutionEntity = Mockito.mock(JobExecutionEntity.class);
+        Mockito.when(jobEntity.getStatus()).thenReturn(JobStatus.FAILED);
+        Mockito.when(jobEntity.getExecution()).thenReturn(jobExecutionEntity);
+        Mockito.when(this.jobRepo.findOne(JOB_1_ID)).thenReturn(jobEntity);
         Mockito.when(jobExecutionEntity.getExitCode()).thenReturn(Optional.of(1));
-        Mockito.when(this.jobExecutionRepo.findOne(JOB_1_ID)).thenReturn(jobExecutionEntity);
         Mockito.when(this.jobMetadataRepository.findOne(JOB_1_ID)).thenReturn(Mockito.mock(JobMetadataEntity.class));
 
         this.jobPersistenceService.setJobCompletionInformation(JOB_1_ID, 0, JobStatus.FAILED, "k", null, 100L);
