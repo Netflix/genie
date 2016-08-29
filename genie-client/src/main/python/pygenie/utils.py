@@ -22,6 +22,7 @@ import requests
 
 from .auth import AuthHandler
 
+from requests.exceptions import Timeout, ConnectionError
 from .exceptions import GenieHTTPError
 
 
@@ -83,34 +84,40 @@ def call(url, method='get', headers=None, raise_not_status=None,
     logger.debug('"%s %s"', method.upper(), url)
     logger.debug('headers: %s', headers)
 
+    errors = list()
     for i in range(attempts):
-        resp = requests.request(method,
-                                url=url,
-                                headers=headers,
-                                auth=auth_handler.auth,
-                                *args,
-                                **kwargs)
-        if resp.status_code in retry_status_codes and i < attempts - 1:
-            logger.warning('attempt %s -> %s: %s',
-                           i + 1,
-                           resp.status_code,
-                           resp.text)
+        try:
+            resp = requests.request(method,
+                                    url=url,
+                                    headers=headers,
+                                    auth=auth_handler.auth,
+                                    *args,
+                                    **kwargs)
+        except (ConnectionError, Timeout, socket.timeout) as err:
+            errors.append(err)
+            resp = None
+
+        if i < attempts - 1 and (resp is None or resp.status_code in retry_status_codes):
+            msg = ''
+            if resp is not None:
+                msg = '-> {}: {}'.format(resp.status_code, resp.text)
+            logger.warning('attempt %s %s', i + 1, msg)
             time.sleep(i * backoff)
         else:
             break
 
-    # Allow us to return None if we receive a 404
-    if resp.status_code == 404 and none_on_404:
-        return None
-
-    if not resp.ok:
-        raise GenieHTTPError(resp)
-
-    # Raise GenieHTTPError if a particular status code was not returned
-    if raise_not_status and resp.status_code != raise_not_status:
-        raise GenieHTTPError(resp)
-
-    return resp
+    if resp is not None:
+        # Allow us to return None if we receive a 404
+        if resp.status_code == 404 and none_on_404:
+            return None
+        if not resp.ok:
+            raise GenieHTTPError(resp)
+        # Raise GenieHTTPError if a particular status code was not returned
+        if raise_not_status and resp.status_code != raise_not_status:
+            raise GenieHTTPError(resp)
+        return resp
+    elif len(errors) > 0:
+        raise errors[-1]
 
 
 def convert_to_unicode(value):
