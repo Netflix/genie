@@ -17,6 +17,9 @@ from pygenie.exceptions import (GenieHTTPError,
 from .utils import (FakeRunningJob,
                     fake_response)
 
+from requests.exceptions import Timeout, ConnectionError
+from socket import timeout
+
 
 @patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'})
 @patch('pygenie.utils.requests.request')
@@ -138,6 +141,83 @@ class TestCall(unittest.TestCase):
 
         assert_equals(3, request.call_count)
         assert_equals(2, sleep.call_count)
+
+    @patch('pygenie.utils.time.sleep')
+    def test_retry_timeout(self, sleep, request):
+        """Test HTTP request via call() with timeouts."""
+
+        request.side_effect = [
+            Timeout,
+            ConnectionError,
+            timeout,
+            Timeout
+        ]
+
+        with assert_raises(Timeout):
+            call('http://genie-timeout', attempts=4, backoff=0)
+
+        assert_equals(4, request.call_count)
+        assert_equals(3, sleep.call_count)
+
+    @patch('pygenie.utils.time.sleep')
+    def test_retry_timeout_202(self, sleep, request):
+        """Test HTTP request via call() with timeouts (finishing with 202)."""
+
+        request.side_effect = [
+            Timeout,
+            ConnectionError,
+            fake_response({}, 202),
+            timeout,
+            Timeout
+        ]
+
+        call('http://genie-timeout-202', attempts=5, backoff=0)
+
+        assert_equals(3, request.call_count)
+        assert_equals(2, sleep.call_count)
+
+    @patch('pygenie.utils.time.sleep')
+    def test_retry_timeout_404(self, sleep, request):
+        """Test HTTP request via call() with timeouts (finishing with 404)."""
+
+        request.side_effect = [
+            Timeout,
+            ConnectionError,
+            timeout,
+            fake_response({}, 404),
+            Timeout,
+            ConnectionError,
+            timeout
+        ]
+
+        with assert_raises(GenieHTTPError):
+            call('http://genie-timeout-404', attempts=7, backoff=0)
+
+        assert_equals(4, request.call_count)
+        assert_equals(3, sleep.call_count)
+
+    @patch('pygenie.utils.time.sleep')
+    def test_retry_timeout_404_return_none(self, sleep, request):
+        """Test HTTP request via call() with timeouts (finishing with 404 but return None)."""
+
+        request.side_effect = [
+            Timeout,
+            ConnectionError,
+            timeout,
+            fake_response({}, 404),
+            Timeout,
+            ConnectionError,
+            timeout
+        ]
+
+        resp = call('http://genie-timeout-404',
+                    attempts=7,
+                    backoff=0,
+                    none_on_404=True)
+
+        assert_equals(4, request.call_count)
+        assert_equals(3, sleep.call_count)
+        assert_equals(None, resp)
 
 
 @patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'})
