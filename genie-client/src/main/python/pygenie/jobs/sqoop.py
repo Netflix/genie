@@ -60,22 +60,35 @@ class SqoopJob(GenieJob):
             '-D{name}={value}'.format(name=name, value=value)
             for name, value in self._command_options.get('-D', {}).items()])
 
-        opts_list = list()
-        for flag in [f for f in self._command_options.keys() if f != '-D']:
-            opts_list.append(' '.join([
-                '{flag}{name} {value}' \
-                    .format(flag=flag,
-                            name=k,
-                            value=v if v is not None else '') \
-                    .strip()
-                for k, v in self._command_options[flag].items()
-            ]))
+        # put options into an options file and specify options file on command line
+        # this is to get around putting bad characters (like '$') on the command line
+        # which Genie's run bash script have issues with
+        self._add_dependency({
+            'name': '_sqoop_options.txt',
+            'data': self._options_file
+        })
 
-        return '{cmd} {hadoop_opts} {options}' \
+        return '{cmd} {hadoop_opts} --options-file _sqoop_options.txt' \
             .format(cmd=self._cmd,
-                    hadoop_opts=hadoop_opts,
-                    options=' '.join(opts_list)) \
+                    hadoop_opts=hadoop_opts) \
             .strip()
+
+    @property
+    def _options_file(self):
+        """Takes specified options and creates a string for the options file."""
+
+        opts_file = ""
+
+        for flag in [f for f in self._command_options.keys() if f != '-D']:
+            for name, value in self._command_options[flag].items():
+                value = unicode(value).replace('\n', ' ') if value is not None else ''
+                opts_file = "{opts}{flag}{name}\n'{value}'\n" \
+                    .format(opts=opts_file,
+                            flag=flag,
+                            name=name,
+                            value=value)
+
+        return opts_file
 
     @unicodify
     @add_to_repr('overwrite')

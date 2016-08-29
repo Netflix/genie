@@ -65,19 +65,10 @@ class TestingSqoopJob(unittest.TestCase):
 
         assert_equals(
             job.cmd_args,
-            u' '.join([
-                u'export',
-                u'-Dprop1=value1',
-                u'--verbose',
-                u'--target-dir /path/to/output',
-                u'--split-by col1',
-                u'--connect jdbc://test',
-                u'--table mytable',
-                u'--password passw0rd',
-                u'--option2 value2',
-                u'--option3 value3',
-                u'--option1 value1',
-                u'-Xprop2 value2'
+            ' '.join([
+                'export',
+                '-Dprop1=value1',
+                '--options-file _sqoop_options.txt'
             ])
         )
 
@@ -123,6 +114,70 @@ class TestingSqoopJobRepr(unittest.TestCase):
             u'.property("p1", "v1", "-D")'
             u'.property("p2", "v2", "-f")'
             u'.username("user_ini")'
+        )
+
+
+@patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'})
+class TestingSqoopOptionsFile(unittest.TestCase):
+    """Test SqoopJob options file construction."""
+
+    def test_basic(self):
+        """Test SqoopJob options file construction"""
+
+        job = pygenie.jobs.SqoopJob() \
+            .option('connect', 'jdbc:oracle@ZZZZZ') \
+            .option('username', 'testsqoop') \
+            .option('password', 'testsqooppw') \
+            .option('target-dir', 's3://xyz/1') \
+            .option('num-mappers', 1) \
+            .option('fields-terminated-by', '\\001') \
+            .option('query', 'select * from table') \
+            .option('null-string', '\\\\N') \
+            .option('null-non-string', '')
+
+        assert_equals(
+            u"\n".join([
+                u"--username",
+                u"'testsqoop'",
+                u"--null-non-string",
+                u"''",
+                u"--target-dir",
+                u"'s3://xyz/1'",
+                u"--connect",
+                u"'jdbc:oracle@ZZZZZ'",
+                u"--null-string",
+                u"'\\\\N'",
+                u"--query",
+                u"'select * from table'",
+                u"--password",
+                u"'testsqooppw'",
+                u"--num-mappers",
+                u"'1'",
+                u"--fields-terminated-by",
+                u"'\\001'"
+            ]) + u"\n",
+            job._options_file
+        )
+
+    def test_newlines(self):
+        """Test SqoopJob options file construction with new lines"""
+
+        query = """
+SELECT
+    col1,
+    col2,
+FROM
+    table
+WHERE
+    col1 > 0
+"""
+
+        job = pygenie.jobs.SqoopJob() \
+            .option('query', query)
+
+        assert_equals(
+            u"--query\n' SELECT     col1,     col2, FROM     table WHERE     col1 > 0 '\n",
+            job._options_file
         )
 
 
@@ -175,7 +230,8 @@ class TestingSqoopJobAdapters(unittest.TestCase):
             {
                 u'attachments': [
                     {u'name': u'sqoopfile1', u'data': u'file contents'},
-                    {u'name': u'sqoopfile2', u'data': u'file contents'}
+                    {u'name': u'sqoopfile2', u'data': u'file contents'},
+                    {u'name': u'_sqoop_options.txt', u'data': u"--username\n'user'\n--password\n't3st'\n--opt1\n'val1'\n--connect\n'jdbc://test'\n"}
                 ],
                 u'clusterCriterias': [
                     {'tags': [u'type:sqoopcluster1']},
@@ -184,10 +240,7 @@ class TestingSqoopJobAdapters(unittest.TestCase):
                 u'commandArgs': u' '.join([
                     u'test-export',
                     u'-Dprop1=pval1',
-                    u'--username user',
-                    u'--password t3st',
-                    u'--opt1 val1',
-                    u'--connect jdbc://test']),
+                    u'--options-file _sqoop_options.txt']),
                 u'commandCriteria': [u'type:sqoop-test'],
                 u'description': u'this job is to test sqoopjob adapter',
                 u'disableLogArchival': True,
@@ -240,13 +293,14 @@ class TestingSqoopJobAdapters(unittest.TestCase):
                 u'applications': [u'sqoop-app-id1'],
                 u'attachments': [
                     (u'sqoopfile1a', u"open file '/sqoopfile1a'"),
-                    (u'sqoopfile2b', u"open file '/sqoopfile2b'")
+                    (u'sqoopfile2b', u"open file '/sqoopfile2b'"),
+                    (u'_sqoop_options.txt', u"--username\n'user-g3'\n--password\n't3st-g3'\n--opt1-g3\n'val1-g3'\n--connect\n'jdbc://test-g3'\n")
                 ],
                 u'clusterCriterias': [
                     {'tags': [u'type:sqoop-cluster-1']},
                     {'tags': [u'type:sqoop']}
                 ],
-                u'commandArgs': u'test-export-g3 -Dprop1-g3=pval1-g3 --username user-g3 --password t3st-g3 --opt1-g3 val1-g3 --connect jdbc://test-g3',
+                u'commandArgs': u'test-export-g3 -Dprop1-g3=pval1-g3 --options-file _sqoop_options.txt',
                 u'commandCriteria': [u'type:sqoop-test-1'],
                 u'dependencies': [],
                 u'description': u'this job is to test sqoopjob adapter for genie 3',
