@@ -288,7 +288,8 @@ public class JobRestController {
                 .withId(jobId)
                 .withDisableLogArchival(jobRequest.isDisableLogArchival())
                 .withTags(jobRequest.getTags())
-                .withDependencies(jobRequest.getDependencies());
+                .withDependencies(jobRequest.getDependencies())
+                .withApplications(jobRequest.getApplications());
 
             jobRequest.getCpu().ifPresent(builder::withCpu);
             jobRequest.getMemory().ifPresent(builder::withMemory);
