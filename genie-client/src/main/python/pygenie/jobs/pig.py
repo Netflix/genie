@@ -70,12 +70,14 @@ class PigJob(GenieJob):
             for p in self._parameter_files
         ])
 
-        params_str = ' '.join([
-            "-p '{name}={value}'" \
-                .format(name=k,
-                        value=unicode(v).replace("'", "''")) \
-            for k, v in self._parameters.items()
-        ])
+        # put parameters into a parameter file and specify paramter file on command line
+        # this is to get around weird quoting issues in parameter values, etc
+        param_str = self._parameter_file
+        if param_str:
+            self._add_dependency({
+                'name': '_pig_parameters.txt',
+                'data': param_str
+            })
 
         props_str = ' '.join([
             '-D{name}={value}'.format(name=k, value=v) \
@@ -91,8 +93,22 @@ class PigJob(GenieJob):
                     props=props_str,
                     filename=filename,
                     param_files=param_files_str,
-                    params=params_str) \
+                    params='-param_file _pig_parameters.txt' if param_str else '') \
             .strip()
+
+    @property
+    def _parameter_file(self):
+        """Takes specified parameters and creates a string for the parameter file."""
+
+        param_file = ""
+
+        for name, value in self._parameters.items():
+            param_file = '{p}{name} = "{value}"\n' \
+                .format(p=param_file,
+                        name=name,
+                        value=unicode(value).replace('"', '\\"'))
+
+        return param_file
 
     @unicodify
     @arg_list
