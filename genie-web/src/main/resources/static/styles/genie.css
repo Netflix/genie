@@ -133,6 +133,14 @@ div .container {
   color: #337ab7;
 }
 
+.break-word {
+  word-break: break-all;
+}
+
+.job-name {
+  word-break: break-all;
+}
+
 .job-table-row:hover {
   cursor: pointer;
 }

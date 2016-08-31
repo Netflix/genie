@@ -12,7 +12,7 @@ export default class AuthCheck extends React.Component {
   }
 
   componentDidMount() {
-    //Every 15 mins
+    // Every 15 mins
     this.authCheckTimer = setInterval(this.doAuthCheck, 900000);
   }
 

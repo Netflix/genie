@@ -1,4 +1,5 @@
 import React, { PropTypes as T } from 'react';
+import { Link } from 'react-router';
 
 import { momentFormat, fetch } from '../utils';
 import Modal from 'react-modal';
@@ -18,11 +19,14 @@ export default class JobDetails extends React.Component {
       job: {
         id: '',
         _links: {
-          output    : '',
-          request   : '',
-          execution : '',
-          status    : '',
-          self      : '',
+          output       : '',
+          request      : '',
+          execution    : '',
+          status       : '',
+          self         : '',
+          command      : '',
+          cluster      : '',
+          applications : '',
         },
       },
     };
@@ -127,11 +131,21 @@ export default class JobDetails extends React.Component {
                 </tr>
                 <tr>
                   <td className="col-xs-2">Command Name:</td>
-                  <td>{this.state.job.commandName}</td>
+                  <td><Link to={`commands?name=${this.state.job.commandName}`}>{this.state.job.commandName}</Link></td>
                 </tr>
                 <tr>
                   <td className="col-xs-2">Command Args:</td>
                   <td>{this.state.job.commandArgs}</td>
+                </tr>
+                <tr>
+                  <td className="col-xs-2">Details:</td>
+                  <td>
+                    <ul>
+                      <li><a href={this.state.job._links.cluster.href}>Cluster</a></li>
+                      <li><a href={this.state.job._links.command.href}>Command</a></li>
+                      <li><a href={this.state.job._links.applications.href}>Application</a></li>
+                    </ul>
+                  </td>
                 </tr>
                 <tr>
                   <td className="col-xs-2">Links:</td>
