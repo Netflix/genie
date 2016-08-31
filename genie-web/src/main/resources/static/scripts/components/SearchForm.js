@@ -129,102 +129,100 @@ export default class SearchForm extends React.Component {
 
   render() {
     return (
-      <div>
-        <div className="col-xs-2 form-job-search">
-          <div className="pull-right form-group">
-            <a href="javascript:void(0)" onClick={() => this.props.toggleSearchForm()}>
-              <i className="fa fa-navicon fa-lg" aria-hidden="true"></i>
-            </a>
-          </div>
-          <form className="form-horizontal" role="search">
-            {this.props.formFields.map((field, index) => {
-              switch (field.type) {
-                case 'input':
-                  return (
-                    <div key={`${index}-div`} className="form-group">
-                      <label key={`${index}-label`} className="form-label">{field.label}:</label>
-                      <input
-                        key={index}
-                        type="text"
-                        value={this.state.formFields[field.name]}
-                        onChange={this.handleFormFieldChange(field.name)}
-                        className="form-control"
-                      />
-                    </div>
-                );
-                case 'select':
-                  return (
-                    <div key={`${index}-div`} className="form-group">
-                      <label key={`${index}-label`} className="form-label">{field.label}:</label>
-                      <Select
-                        multi
-                        simpleValue
-                        value={this.state.formFields[field.name]}
-                        options={field.selectFields}
-                        onChange={this.handleSelectChange(field.name)}
-                      />
-                    </div>
-                  );
-                case 'option':
-                  return (
-                    <div key={`${index}-div`} className="form-group">
-                      <label key={`${index}-label`} className="form-label">{field.label}:</label>
-                      <select
-                        className="form-control"
-                        value={this.state.formFields[field.name]}
-                        onChange={this.handleFormFieldChange(field.name)}
-                      >
-                        {field.optionValues.map((value, idx) => (
-                          <option key={idx} value={value}>{value}</option>
-                          ))
-                        }
-                      </select>
-                    </div>
-                  );
-                default :
-                  return null;
-              }
-            }
-            )}
-            <div className={this.state.formFields.sort === '' ? 'hidden' : ''}>
-              <div className="form-group">
-                <label className="form-label">Order:</label>
-                <select
-                  className="form-control"
-                  value={this.state.sortOrder}
-                  onChange={this.handleSortOrderChange}
-                >
-                  <option value="asc">asc</option>
-                  <option value="desc">desc</option>
-                </select>
-              </div>
-            </div>
-            <div className={this.state.showAllFormFields ? '' : 'hidden'}>
-              {this.props.hiddenFormFields.map((field, index) => (
-                <div key={`${index}-div`} className="form-group">
-                  <label key={`${index}-label`} className="form-label">{field.label}:</label>
-                  <input
-                    key={index}
-                    type="text"
-                    value={this.state.formFields[field.name]}
-                    onChange={this.handleFormFieldChange(field.name)}
-                    className="form-control"
-                  />
-                </div>
-              ))
-              }
-            </div>
-            {this.state.hasHiddenFormFields ?
-              <div className="form-group">
-                <a href="javascript:void(0)" onClick={this.toggleFormFields}>Show {this.state.linkText}</a>
-              </div> : null
-            }
-            <div className="form-group">
-              <button type="submit" className="btn btn-primary" onClick={this.handleSearch}>Search</button>
-              <a href="javascript:void(0)" onClick={this.resetFormFields} className="reset-link">reset</a>
-            </div>
-          </form>
+      <div className="col-xs-2 form-job-search">
+        <div className="pull-right form-group">
+          <a href="javascript:void(0)" onClick={() => this.props.toggleSearchForm()}>
+            <i className="fa fa-navicon fa-lg" aria-hidden="true"></i>
+          </a>
         </div>
+        <form className="form-horizontal" role="search">
+          {this.props.formFields.map((field, index) => {
+            switch (field.type) {
+              case 'input':
+                return (
+                  <div key={`${index}-div`} className="form-group">
+                    <label key={`${index}-label`} className="form-label">{field.label}:</label>
+                    <input
+                      key={index}
+                      type="text"
+                      value={this.state.formFields[field.name]}
+                      onChange={this.handleFormFieldChange(field.name)}
+                      className="form-control"
+                    />
+                  </div>
+              );
+              case 'select':
+                return (
+                  <div key={`${index}-div`} className="form-group">
+                    <label key={`${index}-label`} className="form-label">{field.label}:</label>
+                    <Select
+                      multi
+                      simpleValue
+                      value={this.state.formFields[field.name]}
+                      options={field.selectFields}
+                      onChange={this.handleSelectChange(field.name)}
+                    />
+                  </div>
+                );
+              case 'option':
+                return (
+                  <div key={`${index}-div`} className="form-group">
+                    <label key={`${index}-label`} className="form-label">{field.label}:</label>
+                    <select
+                      className="form-control"
+                      value={this.state.formFields[field.name]}
+                      onChange={this.handleFormFieldChange(field.name)}
+                    >
+                      {field.optionValues.map((value, idx) => (
+                        <option key={idx} value={value}>{value}</option>
+                        ))
+                      }
+                    </select>
+                  </div>
+                );
+              default :
+                return null;
+            }
+          }
+          )}
+          <div className={this.state.formFields.sort === '' ? 'hidden' : ''}>
+            <div className="form-group">
+              <label className="form-label">Order:</label>
+              <select
+                className="form-control"
+                value={this.state.sortOrder}
+                onChange={this.handleSortOrderChange}
+              >
+                <option value="asc">asc</option>
+                <option value="desc">desc</option>
+              </select>
+            </div>
+          </div>
+          <div className={this.state.showAllFormFields ? '' : 'hidden'}>
+            {this.props.hiddenFormFields.map((field, index) => (
+              <div key={`${index}-div`} className="form-group">
+                <label key={`${index}-label`} className="form-label">{field.label}:</label>
+                <input
+                  key={index}
+                  type="text"
+                  value={this.state.formFields[field.name]}
+                  onChange={this.handleFormFieldChange(field.name)}
+                  className="form-control"
+                />
+              </div>
+            ))
+            }
+          </div>
+          {this.state.hasHiddenFormFields ?
+            <div className="form-group">
+              <a href="javascript:void(0)" onClick={this.toggleFormFields}>Show {this.state.linkText}</a>
+            </div> : null
+          }
+          <div className="form-group">
+            <button type="submit" className="btn btn-primary" onClick={this.handleSearch}>Search</button>
+            <a href="javascript:void(0)" onClick={this.resetFormFields} className="reset-link">reset</a>
+          </div>
+        </form>
       </div>
     );
   }
