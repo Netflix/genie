@@ -1,6 +1,6 @@
 import React, { PropTypes as T } from 'react';
 
-import { fetch } from '../utils';
+import { momentFormat, fetch } from '../utils';
 import $ from 'jquery';
 
 import InfoTable from './InfoTable';
@@ -79,6 +79,14 @@ export default class CommandDetails extends React.Component {
                       )}
                     </ul>
                   </td>
+                </tr>
+                <tr>
+                  <td className="col-xs-2">Created:</td>
+                  <td>{momentFormat(this.state.command.created)}</td>
+                </tr>
+                <tr>
+                  <td className="col-xs-2">Updated:</td>
+                  <td>{momentFormat(this.state.command.updated)}</td>
                 </tr>
                 <tr>
                   <td className="col-xs-2">Clusters:</td>

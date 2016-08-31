@@ -95,7 +95,7 @@ const FileRow = (props) =>
     <td>
       <i className="fa fa-file-o" aria-hidden="true"></i>
       <span className="output-listing">
-        <Link target="_blank" to={fileUrl(props.file.url)}>{props.file.name}</Link>
+        <a href={fileUrl(props.file.url)}>{props.file.name}</a>
       </span>
     </td>
     <td>{filesize(props.file.size)}</td>

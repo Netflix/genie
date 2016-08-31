@@ -68,7 +68,7 @@ class TestingPigJob(unittest.TestCase):
                 u"-P props.conf",
                 u"-param_file params1.param",
                 u"-param_file params2.param",
-                u"-p 'p2=v2' -p 'p3=with space' -p 'p1=v1'",
+                u"-param_file _pig_parameters.txt",
                 u"-f script.pig"
             ])
         )
@@ -93,32 +93,40 @@ class TestingPigJob(unittest.TestCase):
                 u"-Dp2=v2 -Dp1=v1",
                 u"-P p.conf",
                 u"-param_file p.params",
-                u"-p 'p=v'",
+                u"-param_file _pig_parameters.txt",
                 u"-f test.pig"
             ])
         )
 
-    def test_cmd_args_constructed_quotes(self):
-        """Test PigJob constructed cmd args with quotes."""
+
+@patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'})
+class TestingPigParameterFile(unittest.TestCase):
+    """Test PigJob parameter file consturction."""
+
+    def test_basic(self):
+        """Test PigJob parameter file construction."""
 
         job = pygenie.jobs.PigJob() \
-            .script('foo') \
             .parameter("spaces", "this has spaces") \
             .parameter("single_quotes", "test' test'") \
+            .parameter("double_quotes", 'Something: "Episode 189"') \
             .parameter("escaped_single_quotes", "Barney\\'s Adventure") \
             .parameter("number", 8) \
             .parameter("unicode", "\u0147\u0147\u0147")
 
+        param_file = \
+"""\
+single_quotes = "test' test'"
+number = "8"
+spaces = "this has spaces"
+double_quotes = "Something: \\"Episode 189\\""
+unicode = "\u0147\u0147\u0147"
+escaped_single_quotes = "Barney\\'s Adventure"
+"""
+
         assert_equals(
-            job.cmd_args,
-            u" ".join([
-                u"-p 'escaped_single_quotes=Barney\\''s Adventure'",
-                u"-p 'spaces=this has spaces'",
-                u"-p 'single_quotes=test'' test'''",
-                u"-p 'unicode=\u0147\u0147\u0147'",
-                u"-p 'number=8'",
-                u"-f script.pig"
-            ])
+            param_file,
+            job._parameter_file
         )
 
 
@@ -250,7 +258,8 @@ class TestingPigJobAdapters(unittest.TestCase):
                     {u'data': u'file contents', u'name': u'pigfile2'},
                     {u'data': u'file contents', u'name': u'pig_param1.params'},
                     {u'data': u'file contents', u'name': u'pig_param2.params'},
-                    {u'data': u'A = LOAD;', u'name': u'script.pig'}
+                    {u'data': u'A = LOAD;', u'name': u'script.pig'},
+                    {u'data': u'param2 = "2"\nparam1 = "1"\n', u'name': u'_pig_parameters.txt'}
                 ],
                 u'clusterCriterias': [
                     {u'tags': [u'type:pig_cluster_1']},
@@ -260,7 +269,7 @@ class TestingPigJobAdapters(unittest.TestCase):
                     u'-Dmr.p1=a -Dmr.p2=b',
                     u'-P my_properties.conf',
                     u'-param_file pig_param1.params -param_file pig_param2.params',
-                    u'-p \'param2=2\' -p \'param1=1\'',
+                    u'-param_file _pig_parameters.txt',
                     u'-f script.pig'
                 ]),
                 u'commandCriteria': [u'type:pig'],
@@ -377,7 +386,8 @@ class TestingPigJobAdapters(unittest.TestCase):
                     (u'pigfile2', u"open file '/pigfile2'"),
                     (u'pig_param1.params', u"open file '/pig_param1.params'"),
                     (u'pig_param2.params', u"open file '/pig_param2.params'"),
-                    (u'script.pig', u'A = LOAD;')
+                    (u'script.pig', u'A = LOAD;'),
+                    (u'_pig_parameters.txt', u'param2 = "2"\nparam1 = "1"\n')
                 ],
                 u'clusterCriterias': [
                     {u'tags': [u'type:pig_cluster_1']},
@@ -388,7 +398,7 @@ class TestingPigJobAdapters(unittest.TestCase):
                     u'-P my_properties.conf',
                     u'-param_file pig_param1.params',
                     u'-param_file pig_param2.params',
-                    u'-p \'param2=2\' -p \'param1=1\'',
+                    u'-param_file _pig_parameters.txt',
                     u'-f script.pig'
                 ]),
                 u'commandCriteria': [u'type:pig'],

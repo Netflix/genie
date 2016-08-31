@@ -1,6 +1,6 @@
 import React, { PropTypes as T } from 'react';
 
-import { fetch } from '../utils';
+import { momentFormat, fetch } from '../utils';
 import Modal from 'react-modal';
 
 export default class JobDetails extends React.Component {
@@ -114,6 +114,14 @@ export default class JobDetails extends React.Component {
                   <td>{this.state.job.statusMsg}</td>
                 </tr>
                 <tr>
+                  <td className="col-xs-2">Created:</td>
+                  <td>{momentFormat(this.state.job.created)}</td>
+                </tr>
+                <tr>
+                  <td className="col-xs-2">Updated:</td>
+                  <td>{momentFormat(this.state.job.updated)}</td>
+                </tr>
+                <tr>
                   <td className="col-xs-2">Archive Location:</td>
                   <td>{this.state.job.archiveLocation}</td>
                 </tr>
@@ -129,10 +137,10 @@ export default class JobDetails extends React.Component {
                   <td className="col-xs-2">Links:</td>
                   <td>
                     <ul>
-                      <li><a target="_blank" href={this.state.job._links.self.href}>Json</a></li>
-                      <li><a target="_blank" href={this.state.job._links.request.href}>Request</a></li>
-                      <li><a target="_blank" href={this.state.job._links.execution.href}>Execution</a></li>
-                      <li><a target="_blank" href={this.state.job._links.status.href}>Status </a></li>
+                      <li><a href={this.state.job._links.self.href}>Json</a></li>
+                      <li><a href={this.state.job._links.request.href}>Request</a></li>
+                      <li><a href={this.state.job._links.execution.href}>Execution</a></li>
+                      <li><a href={this.state.job._links.status.href}>Status </a></li>
                     </ul>
                   </td>
                 </tr>

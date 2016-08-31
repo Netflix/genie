@@ -208,6 +208,7 @@ class Genie3Adapter(GenieBaseAdapter):
             return call(method='get',
                         url=url,
                         auth_handler=self.auth_handler,
+                        retry_status_codes=500,
                         **kwargs) \
                    .json()
         except GenieHTTPError as err:
@@ -321,7 +322,7 @@ class Genie3Adapter(GenieBaseAdapter):
     def get_status(self, job_id):
         """Get job status."""
 
-        return self.get(job_id, path='status', timeout=30).get('status')
+        return self.get(job_id, path='status', timeout=10).get('status')
 
     def get_stderr(self, job_id, **kwargs):
         """Get a stderr log for a job."""

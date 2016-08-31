@@ -22,6 +22,7 @@ import requests
 
 from .auth import AuthHandler
 
+from requests.exceptions import Timeout, ConnectionError
 from .exceptions import GenieHTTPError
 
 
@@ -48,7 +49,8 @@ class DotDict(dict):
 
 
 def call(url, method='get', headers=None, raise_not_status=None,
-         none_on_404=False, auth_handler=None, attempts=4, backoff=3,
+         none_on_404=False, auth_handler=None, retry_status_codes=None,
+         attempts=4, backoff=3,
          *args, **kwargs):
     """
     Wrap HTTP request calls to the Genie server.
@@ -65,6 +67,15 @@ def call(url, method='get', headers=None, raise_not_status=None,
             GenieHTTPError.
     """
 
+    assert isinstance(retry_status_codes, (list, int)) \
+            or retry_status_codes is None, \
+        'retry_status_codes should be an int or list of ints'
+
+    retry_status_codes = retry_status_codes or list()
+    if isinstance(retry_status_codes, int):
+        retry_status_codes = [retry_status_codes]
+    retry_status_codes = set(retry_status_codes + [503])
+
     auth_handler = auth_handler or AuthHandler()
 
     headers = USER_AGENT_HEADER if headers is None \
@@ -73,30 +84,40 @@ def call(url, method='get', headers=None, raise_not_status=None,
     logger.debug('"%s %s"', method.upper(), url)
     logger.debug('headers: %s', headers)
 
-    for i in xrange(attempts):
-        resp = requests.request(method,
-                                url=url,
-                                headers=headers,
-                                auth=auth_handler.auth,
-                                *args,
-                                **kwargs)
-        if resp.status_code == 503 and i < attempts - 1:
+    errors = list()
+    for i in range(attempts):
+        try:
+            resp = requests.request(method,
+                                    url=url,
+                                    headers=headers,
+                                    auth=auth_handler.auth,
+                                    *args,
+                                    **kwargs)
+        except (ConnectionError, Timeout, socket.timeout) as err:
+            errors.append(err)
+            resp = None
+
+        if i < attempts - 1 and (resp is None or resp.status_code in retry_status_codes):
+            msg = ''
+            if resp is not None:
+                msg = '-> {}: {}'.format(resp.status_code, resp.text)
+            logger.warning('attempt %s %s', i + 1, msg)
             time.sleep(i * backoff)
         else:
             break
 
-    # Allow us to return None if we receive a 404
-    if resp.status_code == 404 and none_on_404:
-        return None
-
-    if not resp.ok:
-        raise GenieHTTPError(resp)
-
-    # Raise GenieHTTPError if a particular status code was not returned
-    if raise_not_status and resp.status_code != raise_not_status:
-        raise GenieHTTPError(resp)
-
-    return resp
+    if resp is not None:
+        # Allow us to return None if we receive a 404
+        if resp.status_code == 404 and none_on_404:
+            return None
+        if not resp.ok:
+            raise GenieHTTPError(resp)
+        # Raise GenieHTTPError if a particular status code was not returned
+        if raise_not_status and resp.status_code != raise_not_status:
+            raise GenieHTTPError(resp)
+        return resp
+    elif len(errors) > 0:
+        raise errors[-1]
 
 
 def convert_to_unicode(value):
