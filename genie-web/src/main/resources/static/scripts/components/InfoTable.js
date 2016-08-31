@@ -15,7 +15,7 @@ const InfoTable = (props) =>
           <td>
             <Link to={`${props.type}?name=${info.name}&rowId=${info.id}`}>
               {info.id}
-            </Link>
+            </a>
           </td>
           <td>{info.name}</td>
         </tr>
