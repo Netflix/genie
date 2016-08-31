@@ -68,7 +68,7 @@ div .container {
     padding: 5px;
 }
 
-.no-data-found {
+.result-panel-msg {
     padding-left: 50px;
 }
 
@@ -131,6 +131,14 @@ div .container {
 
 .link {
   color: #337ab7;
+}
+
+.break-word {
+  word-break: break-all;
+}
+
+.job-name {
+  word-break: break-all;
 }
 
 .job-table-row:hover {

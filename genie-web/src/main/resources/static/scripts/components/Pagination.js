@@ -53,7 +53,7 @@ const Pagination = (props) => {
 
   return (
     <div>
-      <span>Showing {start} to {end} of {props.page.totalElements} entries</span>
+      <span>Showing {start} to {end} of {props.page.totalElements.toLocaleString()} entries</span>
       <nav>
         <ul className="pager">
           {pageLinks}

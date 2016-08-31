@@ -10,6 +10,7 @@ import Pagination from './components/Pagination';
 import Table from './components/Table';
 import TableHeader from './components/TableHeader';
 import TableBody from './components/TableBody';
+import Error from './components/Error';
 
 import { fetch, hasChanged } from './utils';
 
@@ -28,6 +29,7 @@ export default class Page extends React.Component {
       data           : [],
       links          : {},
       page           : {},
+      error          : null,
       noSearchResult : false,
       showSearchForm : true,
     };
@@ -68,6 +70,7 @@ export default class Page extends React.Component {
         this.setState({
           query,
           rowId,
+          error          : null,
           noSearchResult : false,
           page           : data.page,
           links          : data._links,
@@ -76,11 +79,19 @@ export default class Page extends React.Component {
         });
       } else {
         this.setState({
-          noSearchResult: true,
           query,
-          data  : [],
+          data           : [],
+          error          : null,
+          noSearchResult : true,
         });
       }
+    })
+    .fail(xhr => {
+      this.setState({
+        query,
+        data   : [],
+        error  : xhr.responseJSON,
+      });
     });
   }
 
@@ -95,32 +106,37 @@ export default class Page extends React.Component {
       /> :
       <SearchBar toggleSearchForm={this.toggleSearchForm} />;
 
-    const searchResult = this.state.data.length > 0 ?
-      <div className={this.state.showSearchForm ? 'col-md-10' : 'col-md-12'}>
-        <Table>
-          <TableHeader headers={this.tableHeader} />
-          <TableBody
-            rows={this.state.data}
-            rowId={this.state.rowId}
-            rowType={this.rowType}
-            detailsTable={this.detailsTable}
-            toggleRowDetails={this.toggleRowDetails}
+    let resultPanel = null;
+    if (this.state.error != null) {
+      resultPanel = <Error error={this.state.error} />;
+    } else {
+      resultPanel = this.state.data.length > 0 ?
+        <div className={this.state.showSearchForm ? 'col-md-10' : 'col-md-12'}>
+          <Table>
+            <TableHeader headers={this.tableHeader} />
+            <TableBody
+              rows={this.state.data}
+              rowId={this.state.rowId}
+              rowType={this.rowType}
+              detailsTable={this.detailsTable}
+              toggleRowDetails={this.toggleRowDetails}
+            />
+          </Table>
+          <Pagination
+            page={this.state.page}
+            pageType={this.searchPath}
+            links={this.state.links}
           />
-        </Table>
-        <Pagination
-          page={this.state.page}
-          pageType={this.searchPath}
-          links={this.state.links}
-        />
-      </div> :
-      this.state.noSearchResult ?
-        <NoSearchResult /> :
-        <Loading />;
+        </div> :
+        this.state.noSearchResult ?
+          <NoSearchResult /> :
+          <Loading />;
+    }
 
     return (
       <div className="row" >
         {sideBar}
-        {searchResult}
+        {resultPanel}
       </div>
     );
   }
