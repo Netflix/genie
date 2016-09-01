@@ -1,7 +1,7 @@
 import React from 'react';
 
 const Loading = () =>
-  <div className="col-xs-4 no-data-found">
+  <div className="col-xs-4 result-panel-msg">
     <i className="fa fa-spinner fa-spin" aria-hidden="true"></i> Loading...
   </div>;
 
