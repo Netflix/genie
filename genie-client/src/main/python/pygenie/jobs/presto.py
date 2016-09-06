@@ -188,3 +188,25 @@ class PrestoJob(GenieJob):
         self._set_command_option('--session', name, value)
 
         return self
+
+    @unicodify
+    @add_to_repr('append')
+    def session_properties(self, **kwargs):
+        """
+        Convenience method for setting multiple session properties using kwargs.
+
+        Example:
+            >>> job = PrestoJob() \\
+            ...     .session_properties(foo='1', bar='2')
+
+        Args:
+            **kwargs: Keyword arguments for each session property.
+
+        Returns:
+            :py:class:`PrestoJob`: self
+
+        """
+        for name, value in kwargs.items():
+            self.session(name, value)
+
+        return self
