@@ -27,8 +27,9 @@ class AuthHandler(object):
 
     The auth object must implement 2 methods (see HTTPBasicGenieAuth below for
     an example):
-    1. __init__() must accept a GenieConf object as an arg.
-        Example: cls.__init__(self, conf=None)
+    1. __init__() must accept a GenieConf object as a kwarg, and options specified
+        in the "genie_auth" section will be passed as kwargs.
+        Example: cls.__init__(self, conf=None, **kwargs)
     2. __call__() must accept a request object as an arg.
         Example: cls.__call__(self, req)
 
@@ -61,7 +62,7 @@ class AuthHandler(object):
             try:
                 cls = getattr(mod, cls_name)
                 logger.debug('setting auth to: %s', cls)
-                self.auth = cls(self._conf)
+                self.auth = cls(conf=self._conf, **self._conf.genie_auth.to_dict())
             except AttributeError:
                 logger.warning('%s not found in module %s (auth set to None).',
                                cls_name,

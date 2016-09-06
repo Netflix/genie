@@ -112,10 +112,12 @@ class TestingPigParameterFile(unittest.TestCase):
             .parameter("double_quotes", 'Something: "Episode 189"') \
             .parameter("escaped_single_quotes", "Barney\\'s Adventure") \
             .parameter("number", 8) \
-            .parameter("unicode", "\u0147\u0147\u0147")
+            .parameter("unicode", "\u0147\u0147\u0147") \
+            .parameter("filter_ts", "ts >= '2000-01-01 00:00:00' AND ts < '2000-12-31 00:00:00'")
 
         param_file = \
 """\
+filter_ts = "ts >= '2000-01-01 00:00:00' AND ts < '2000-12-31 00:00:00'"
 single_quotes = "test' test'"
 number = "8"
 spaces = "this has spaces"
