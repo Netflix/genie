@@ -154,7 +154,10 @@ class TestingPigJobRepr(unittest.TestCase):
             .dependencies('/Users/pig/dep2') \
             .description('"test pig desc"') \
             .disable_archive() \
-            .email('pig@email.com') \
+            .genie_email('pig@email.com') \
+            .genie_setup_file('/pig_setup.sh') \
+            .genie_timeout(5) \
+            .genie_username('jpig') \
             .group('piggroup') \
             .job_id('pigjob_repr_id') \
             .job_name('pigjob_repr') \
@@ -167,43 +170,42 @@ class TestingPigJobRepr(unittest.TestCase):
             .property('mapred.pig.2', 'p2') \
             .property_file('/Users/pig/test.conf') \
             .script('/Users/pig/testscript.pig') \
-            .setup_file('/pig_setup.sh') \
             .tags('pig_tag_1') \
-            .tags('pig_tag_2') \
-            .timeout(5) \
-            .username('jpig')
+            .tags('pig_tag_2')
 
         assert_equals(
             str(job),
-            u'PigJob()' \
-            u'.applications("pig_app_1")' \
-            u'.applications("pig_app_2")' \
-            u'.archive(False)' \
-            u'.cluster_tags("pig_cluster_1")' \
-            u'.cluster_tags("pig_cluster_2")' \
-            u'.command_tags("pig_cmd_1")' \
-            u'.command_tags("pig_cmd_2")' \
-            u'.dependencies("/Users/pig/dep1")' \
-            u'.dependencies("/Users/pig/dep2")' \
-            u".description('\"test pig desc\"')" \
-            u'.email("pig@email.com")' \
-            u'.group("piggroup")' \
-            u'.job_id("pigjob_repr_id")' \
-            u'.job_name("pigjob_repr")' \
-            u'.job_version("0.0.0")' \
-            u'.parameter("pig_param_1", "1")' \
-            u'.parameter("pig_param_2", "2")' \
-            u'.parameter_file("/Users/pig/param_1.params")' \
-            u'.parameter_file("/Users/pig/param_2.params")' \
-            u'.property("mapred.pig.1", "p1")' \
-            u'.property("mapred.pig.2", "p2")' \
-            u'.property_file("/Users/pig/test.conf")' \
-            u'.script("/Users/pig/testscript.pig")' \
-            u'.setup_file("/pig_setup.sh")' \
-            u'.tags("pig_tag_1")' \
-            u'.tags("pig_tag_2")' \
-            u'.timeout(5)' \
-            u'.username("jpig")'
+            '.'.join([
+                'PigJob()',
+                'applications("pig_app_1")',
+                'applications("pig_app_2")',
+                'archive(False)',
+                'cluster_tags("pig_cluster_1")',
+                'cluster_tags("pig_cluster_2")',
+                'command_tags("pig_cmd_1")',
+                'command_tags("pig_cmd_2")',
+                'dependencies("/Users/pig/dep1")',
+                'dependencies("/Users/pig/dep2")',
+                "description('\"test pig desc\"')",
+                'genie_email("pig@email.com")',
+                'genie_setup_file("/pig_setup.sh")',
+                'genie_timeout(5)',
+                'genie_username("jpig")',
+                'group("piggroup")',
+                'job_id("pigjob_repr_id")',
+                'job_name("pigjob_repr")',
+                'job_version("0.0.0")',
+                'parameter("pig_param_1", "1")',
+                'parameter("pig_param_2", "2")',
+                'parameter_file("/Users/pig/param_1.params")',
+                'parameter_file("/Users/pig/param_2.params")',
+                'property("mapred.pig.1", "p1")',
+                'property("mapred.pig.2", "p2")',
+                'property_file("/Users/pig/test.conf")',
+                'script("/Users/pig/testscript.pig")',
+                'tags("pig_tag_1")',
+                'tags("pig_tag_2")'
+            ])
         )
 
 
@@ -235,7 +237,9 @@ class TestingPigJobAdapters(unittest.TestCase):
             .dependencies('x://externalfile') \
             .description('this job is to test pigjob adapter') \
             .archive(False) \
-            .email('pig@email.com') \
+            .genie_email('pig@email.com') \
+            .genie_timeout(1) \
+            .genie_username('jpig') \
             .group('piggroup') \
             .job_id('pig_job_id_1') \
             .job_name('testing_adapting_pigjob') \
@@ -248,8 +252,6 @@ class TestingPigJobAdapters(unittest.TestCase):
             .property_file('x://external/my_properties.conf') \
             .script("""A = LOAD;""") \
             .tags('pigtag1, pigtag2') \
-            .timeout(1) \
-            .username('jpig') \
             .job_version('0.0.1pig')
 
         assert_equals(
@@ -309,14 +311,14 @@ class TestingPigJobAdapters(unittest.TestCase):
             .dependencies(['/pigfile1']) \
             .description('this job is to test pigjob adapter') \
             .archive(False) \
-            .email('jpig@email.com') \
+            .genie_email('jpig@email.com') \
+            .genie_timeout(7) \
+            .genie_username('jpig') \
             .group('piggroup') \
             .job_id('pigjob1') \
             .job_name('testing_adapting_pigjob') \
             .script('/path/to/test/script.pig') \
             .tags('pigtag') \
-            .timeout(7) \
-            .username('jpig') \
             .job_version('0.0.pig')
 
         assert_equals(
@@ -362,7 +364,9 @@ class TestingPigJobAdapters(unittest.TestCase):
             .dependencies('x://externalfile') \
             .description('this job is to test pigjob adapter') \
             .archive(False) \
-            .email('pig@email.com') \
+            .genie_email('pig@email.com') \
+            .genie_timeout(1) \
+            .genie_username('jpig') \
             .group('piggroup') \
             .job_id('pig_job_id_1') \
             .job_name('testing_adapting_pigjob') \
@@ -375,8 +379,6 @@ class TestingPigJobAdapters(unittest.TestCase):
             .property_file('x://external/my_properties.conf') \
             .script("""A = LOAD;""") \
             .tags('pigtag1, pigtag2') \
-            .timeout(1) \
-            .username('jpig') \
             .job_version('0.0.1pig')
 
         assert_equals(
@@ -439,14 +441,14 @@ class TestingPigJobAdapters(unittest.TestCase):
             .dependencies(['/pigfile1']) \
             .description('this job is to test pigjob adapter') \
             .archive(False) \
-            .email('jpig@email.com') \
+            .genie_email('jpig@email.com') \
+            .genie_timeout(7) \
+            .genie_username('jpig') \
             .group('piggroup') \
             .job_id('pigjob1') \
             .job_name('testing_adapting_pigjob') \
             .script('/path/to/test/script.pig') \
             .tags('pigtag') \
-            .timeout(7) \
-            .username('jpig') \
             .job_version('0.0.pig')
 
         assert_equals(

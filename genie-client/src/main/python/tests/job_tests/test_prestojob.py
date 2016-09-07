@@ -104,7 +104,10 @@ class TestingPrestoJobRepr(unittest.TestCase):
             .dependencies('/prestodep2') \
             .description('presto description') \
             .disable_archive() \
-            .email('jpresto@email.com') \
+            .genie_email('jpresto@email.com') \
+            .genie_setup_file('/prestosetup.sh') \
+            .genie_timeout(1) \
+            .genie_username('jpresto') \
             .group('prestogroup') \
             .headers() \
             .job_id('prestojob_repr') \
@@ -117,42 +120,41 @@ class TestingPrestoJobRepr(unittest.TestCase):
             """) \
             .session('session1', 'value1') \
             .session('session2', 'value2') \
-            .setup_file('/prestosetup.sh') \
             .tags('prestotag1') \
-            .tags('prestotag2') \
-            .timeout(1) \
-            .username('jpresto')
+            .tags('prestotag2')
 
         assert_equals(
             str(job),
-            u'PrestoJob()'
-            u'.applications("prestoapp1")'
-            u'.applications("prestoapp2")'
-            u'.archive(False)'
-            u'.cluster_tags("prestocluster1")'
-            u'.cluster_tags("prestocluster2")'
-            u'.command_tags("prestocmd1")'
-            u'.command_tags("prestocmd2")'
-            u'.dependencies("/prestodep1")'
-            u'.dependencies("/prestodep2")'
-            u'.description("presto description")'
-            u'.email("jpresto@email.com")'
-            u'.group("prestogroup")'
-            u'.job_id("prestojob_repr")'
-            u'.job_name("prestojob_repr")'
-            u'.job_version("1.1.1")'
-            u'.option("debug", None)'
-            u'.option("output-format", "CSV_HEADER")'
-            u'.option("source", "testrepr")'
-            u'.script("""\n            SELECT * FROM TEST\n            """)'
-            u'.session("session1", "value1")'
-            u'.session("session2", "value2")'
-            u'.setup_file("/prestosetup.sh")'
-            u'.tags("headers")'
-            u'.tags("prestotag1")'
-            u'.tags("prestotag2")'
-            u'.timeout(1)'
-            u'.username("jpresto")'
+            '.'.join([
+                'PrestoJob()',
+                'applications("prestoapp1")',
+                'applications("prestoapp2")',
+                'archive(False)',
+                'cluster_tags("prestocluster1")',
+                'cluster_tags("prestocluster2")',
+                'command_tags("prestocmd1")',
+                'command_tags("prestocmd2")',
+                'dependencies("/prestodep1")',
+                'dependencies("/prestodep2")',
+                'description("presto description")',
+                'genie_email("jpresto@email.com")',
+                'genie_setup_file("/prestosetup.sh")',
+                'genie_timeout(1)',
+                'genie_username("jpresto")',
+                'group("prestogroup")',
+                'job_id("prestojob_repr")',
+                'job_name("prestojob_repr")',
+                'job_version("1.1.1")',
+                'option("debug", None)',
+                'option("output-format", "CSV_HEADER")',
+                'option("source", "testrepr")',
+                'script("""\n            SELECT * FROM TEST\n            """)',
+                'session("session1", "value1")',
+                'session("session2", "value2")',
+                'tags("headers")',
+                'tags("prestotag1")',
+                'tags("prestotag2")'
+            ])
         )
 
 
@@ -184,14 +186,14 @@ class TestingPrestoJobAdapters(unittest.TestCase):
             .dependencies(['/prestofile1', '/prestofile2']) \
             .description('this job is to test prestojob adapter') \
             .archive(False) \
-            .email('jpresto@email.com') \
+            .genie_email('jpresto@email.com') \
+            .genie_timeout(7) \
+            .genie_username('jpresto') \
             .group('prestogroup') \
             .job_id('prestojob1') \
             .job_name('testing_adapting_prestojob') \
             .script('SELECT * FROM DUAL') \
             .tags('prestotag1, prestotag2') \
-            .timeout(7) \
-            .username('jpresto') \
             .job_version('0.0.1presto')
 
         assert_equals(
@@ -239,14 +241,14 @@ class TestingPrestoJobAdapters(unittest.TestCase):
             .dependencies(['/prestofile1', '/prestofile2']) \
             .description('this job is to test prestojob adapter') \
             .archive(False) \
-            .email('jpresto@email.com') \
+            .genie_email('jpresto@email.com') \
+            .genie_timeout(7) \
+            .genie_username('jpresto') \
             .group('prestogroup') \
             .job_id('prestojob1') \
             .job_name('testing_adapting_prestojob') \
             .script('/path/to/test/file.presto') \
             .tags('prestotag1, prestotag2') \
-            .timeout(7) \
-            .username('jpresto') \
             .job_version('0.0.1presto')
 
         assert_equals(
@@ -292,14 +294,14 @@ class TestingPrestoJobAdapters(unittest.TestCase):
             .dependencies(['/prestofile1', '/prestofile2']) \
             .description('this job is to test prestojob adapter') \
             .archive(False) \
-            .email('jpresto@email.com') \
+            .genie_email('jpresto@email.com') \
+            .genie_timeout(7) \
+            .genie_username('jpresto') \
             .group('prestogroup') \
             .job_id('prestojob1') \
             .job_name('testing_adapting_prestojob') \
             .script('SELECT * FROM DUAL') \
             .tags('prestotag1, prestotag2') \
-            .timeout(7) \
-            .username('jpresto') \
             .job_version('0.0.1presto')
 
         assert_equals(
@@ -349,14 +351,14 @@ class TestingPrestoJobAdapters(unittest.TestCase):
             .dependencies(['/prestofile1', '/prestofile2']) \
             .description('this job is to test prestojob adapter') \
             .archive(False) \
-            .email('jpresto@email.com') \
+            .genie_email('jpresto@email.com') \
+            .genie_timeout(7) \
+            .genie_username('jpresto') \
             .group('prestogroup') \
             .job_id('prestojob1') \
             .job_name('testing_adapting_prestojob') \
             .script('/path/to/test/file.presto') \
             .tags('prestotag1, prestotag2') \
-            .timeout(7) \
-            .username('jpresto') \
             .job_version('0.0.1presto')
 
         assert_equals(
