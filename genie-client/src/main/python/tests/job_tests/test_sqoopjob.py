@@ -98,22 +98,24 @@ class TestingSqoopJobRepr(unittest.TestCase):
 
         assert_equals(
             str(job),
-            u'SqoopJob()'
-            u'.cmd("importtest")'
-            u'.job_id("1234-abcd")'
-            u'.option("bar", "buzz")'
-            u'.option("connect", "jdbc://")'
-            u'.option("debug", None)'
-            u'.option("foo", "fizz")'
-            u'.option("hello", "world")'
-            u'.option("password", "1234")'
-            u'.option("split-by", "col_a")'
-            u'.option("table", "test_table")'
-            u'.option("target-dir", "/path/to/test/output")'
-            u'.option("verbose", None)'
-            u'.property("p1", "v1", "-D")'
-            u'.property("p2", "v2", "-f")'
-            u'.username("user_ini")'
+            '.'.join([
+                'SqoopJob()',
+                'cmd("importtest")',
+                'genie_username("user_ini")',
+                'job_id("1234-abcd")',
+                'option("bar", "buzz")',
+                'option("connect", "jdbc://")',
+                'option("debug", None)',
+                'option("foo", "fizz")',
+                'option("hello", "world")',
+                'option("password", "1234")',
+                'option("split-by", "col_a")',
+                'option("table", "test_table")',
+                'option("target-dir", "/path/to/test/output")',
+                'option("verbose", None)',
+                'property("p1", "v1", "-D")',
+                'property("p2", "v2", "-f")'
+            ])
         )
 
 
@@ -209,14 +211,15 @@ class TestingSqoopJobAdapters(unittest.TestCase):
             .dependencies(['/sqoopfile1', '/sqoopfile2']) \
             .description('this job is to test sqoopjob adapter') \
             .archive(False) \
-            .email('jsqoop@email.com') \
+            .genie_email('jsqoop@email.com') \
+            .genie_timeout(58) \
+            .genie_username('jsqoop-genie') \
             .group('sqoopgroup') \
             .job_id('sqoopjob1') \
             .job_name('testing_adapting_sqoopjob') \
             .job_version('0.0.1sqoop') \
             .setup_file('/path/to/testsetup.sh') \
             .tags('sqooptag1, sqooptag2') \
-            .timeout(58) \
             .username('jsqoop') \
             .cmd('test-export') \
             .option('opt1', 'val1') \
@@ -251,7 +254,7 @@ class TestingSqoopJobAdapters(unittest.TestCase):
                 u'id': u'sqoopjob1',
                 u'name': u'testing_adapting_sqoopjob',
                 u'tags': [u'sqooptag1', u'sqooptag2'],
-                u'user': u'jsqoop',
+                u'user': u'jsqoop-genie',
                 u'version': u'0.0.1sqoop'
             }
         )
@@ -271,14 +274,15 @@ class TestingSqoopJobAdapters(unittest.TestCase):
             .dependencies(['/sqoopfile1a', '/sqoopfile2b']) \
             .description('this job is to test sqoopjob adapter for genie 3') \
             .archive(False) \
-            .email('jsqoop-g3@email.com') \
+            .genie_email('jsqoop-g3@email.com') \
+            .genie_timeout(5) \
+            .genie_username('jsqoop-genie3') \
             .group('sqoopgroup-g3') \
             .job_id('sqoopjob1-g3') \
             .job_name('testing_adapting_sqoopjob-g3') \
             .job_version('0.0.1sqoop-g3') \
             .setup_file('/path/to/testsetup.sh-g3') \
             .tags('sqooptag1-g3, sqooptag2-g3') \
-            .timeout(5) \
             .username('jsqoop-g3') \
             .cmd('test-export-g3') \
             .option('opt1-g3', 'val1-g3') \
@@ -312,7 +316,7 @@ class TestingSqoopJobAdapters(unittest.TestCase):
                 u'setupFile': u'/path/to/testsetup.sh-g3',
                 u'tags': [u'sqooptag1-g3', u'sqooptag2-g3'],
                 u'timeout': 5,
-                u'user': u'jsqoop-g3',
+                u'user': u'jsqoop-genie3',
                 u'version': u'0.0.1sqoop-g3'
             }
         )
