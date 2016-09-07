@@ -70,7 +70,7 @@ class Repr(object):
         call_str = '{func}({args}{comma}{kwargs})' \
             .format(func=func_name,
                     args=args_str if args_str else '',
-                    comma=', ' if kwargs_str else '',
+                    comma=', ' if kwargs_str and args_str else '',
                     kwargs=kwargs_str if kwargs_str else '')
 
         # remove any exact duplicate calls

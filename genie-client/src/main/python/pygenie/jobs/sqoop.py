@@ -81,12 +81,13 @@ class SqoopJob(GenieJob):
 
         for flag in [f for f in self._command_options.keys() if f != '-D']:
             for name, value in self._command_options[flag].items():
-                value = unicode(value).replace('\n', ' ') if value is not None else ''
-                opts_file = "{opts}{flag}{name}\n'{value}'\n" \
+                if value is not None:
+                    value = unicode(value).replace('\n', ' ')
+                opts_file = "{opts}{flag}{name}{value}\n" \
                     .format(opts=opts_file,
                             flag=flag,
                             name=name,
-                            value=value)
+                            value="\n'{}'".format(value) if value is not None else '')
 
         return opts_file
 
