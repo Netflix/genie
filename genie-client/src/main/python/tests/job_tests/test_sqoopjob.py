@@ -135,29 +135,33 @@ class TestingSqoopOptionsFile(unittest.TestCase):
             .option('fields-terminated-by', '\\001') \
             .option('query', 'select * from table') \
             .option('null-string', '\\\\N') \
-            .option('null-non-string', '')
+            .option('null-non-string', '') \
+            .option('verbose') \
+            .option('direct')
 
         assert_equals(
-            u"\n".join([
-                u"--username",
-                u"'testsqoop'",
-                u"--null-non-string",
-                u"''",
-                u"--target-dir",
-                u"'s3://xyz/1'",
-                u"--connect",
-                u"'jdbc:oracle@ZZZZZ'",
-                u"--null-string",
-                u"'\\\\N'",
-                u"--query",
-                u"'select * from table'",
-                u"--password",
-                u"'testsqooppw'",
-                u"--num-mappers",
-                u"'1'",
-                u"--fields-terminated-by",
-                u"'\\001'"
-            ]) + u"\n",
+            "\n".join([
+                "--username",
+                "'testsqoop'",
+                "--verbose",
+                "--null-non-string",
+                "''",
+                "--target-dir",
+                "'s3://xyz/1'",
+                "--direct",
+                "--connect",
+                "'jdbc:oracle@ZZZZZ'",
+                "--null-string",
+                "'\\\\N'",
+                "--query",
+                "'select * from table'",
+                "--password",
+                "'testsqooppw'",
+                "--num-mappers",
+                "'1'",
+                "--fields-terminated-by",
+                "'\\001'"
+            ]) + "\n",
             job._options_file
         )
 
