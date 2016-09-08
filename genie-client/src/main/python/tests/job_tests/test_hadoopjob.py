@@ -85,16 +85,16 @@ class TestingHadoopJobRepr(unittest.TestCase):
             .dependencies('/Users/hadoop/dep2') \
             .description('"test hadoop desc"') \
             .disable_archive() \
-            .email('hadoop@email.com') \
+            .genie_email('hadoop@email.com') \
+            .genie_setup_file('/hadoop_setup.sh') \
+            .genie_timeout(5) \
+            .genie_username('jhadoop') \
             .group('hadoopgroup') \
             .job_id('hadoopjob_repr_id') \
             .job_name('hadoopjob_repr') \
             .job_version('0.0.0') \
-            .setup_file('/hadoop_setup.sh') \
             .tags('hadoop_tag_1') \
-            .tags('hadoop_tag_2') \
-            .timeout(5) \
-            .username('jhadoop')
+            .tags('hadoop_tag_2')
         job \
             .property('mapred.1', 'p1') \
             .property('mapred.2', 'p2') \
@@ -103,31 +103,33 @@ class TestingHadoopJobRepr(unittest.TestCase):
 
         assert_equals(
             str(job),
-            u'HadoopJob()' \
-            u'.applications("hadoop_app_1")' \
-            u'.applications("hadoop_app_2")' \
-            u'.archive(False)' \
-            u'.cluster_tags("hadoop_cluster_1")' \
-            u'.cluster_tags("hadoop_cluster_2")' \
-            u'.command_tags("hadoop_cmd_1")' \
-            u'.command_tags("hadoop_cmd_2")' \
-            u'.dependencies("/Users/hadoop/dep1")' \
-            u'.dependencies("/Users/hadoop/dep2")' \
-            u".description('\"test hadoop desc\"')" \
-            u'.email("hadoop@email.com")' \
-            u'.group("hadoopgroup")' \
-            u'.job_id("hadoopjob_repr_id")' \
-            u'.job_name("hadoopjob_repr")' \
-            u'.job_version("0.0.0")' \
-            u'.property("mapred.1", "p1")' \
-            u'.property("mapred.2", "p2")' \
-            u'.property_file("/Users/hadoop/test.conf")' \
-            u'.script("jar testing.jar")' \
-            u'.setup_file("/hadoop_setup.sh")' \
-            u'.tags("hadoop_tag_1")' \
-            u'.tags("hadoop_tag_2")' \
-            u'.timeout(5)' \
-            u'.username("jhadoop")'
+            '.'.join([
+                'HadoopJob()',
+                'applications("hadoop_app_1")',
+                'applications("hadoop_app_2")',
+                'archive(False)',
+                'cluster_tags("hadoop_cluster_1")',
+                'cluster_tags("hadoop_cluster_2")',
+                'command_tags("hadoop_cmd_1")',
+                'command_tags("hadoop_cmd_2")',
+                'dependencies("/Users/hadoop/dep1")',
+                'dependencies("/Users/hadoop/dep2")',
+                "description('\"test hadoop desc\"')",
+                'genie_email("hadoop@email.com")',
+                'genie_setup_file("/hadoop_setup.sh")',
+                'genie_timeout(5)',
+                'genie_username("jhadoop")',
+                'group("hadoopgroup")',
+                'job_id("hadoopjob_repr_id")',
+                'job_name("hadoopjob_repr")',
+                'job_version("0.0.0")',
+                'property("mapred.1", "p1")',
+                'property("mapred.2", "p2")',
+                'property_file("/Users/hadoop/test.conf")',
+                'script("jar testing.jar")',
+                'tags("hadoop_tag_1")',
+                'tags("hadoop_tag_2")'
+            ])
         )
 
 
@@ -160,14 +162,14 @@ class TestingHadoopJobAdapters(unittest.TestCase):
             .dependencies(['/hadoopfile1']) \
             .description('this job is to test hadoopjob adapter') \
             .archive(False) \
-            .email('jhadoop@email.com') \
+            .genie_email('jhadoop@email.com') \
+            .genie_timeout(7) \
+            .genie_username('jhadoop') \
             .group('hadoopgroup') \
             .job_id('hadoopjob1') \
             .job_name('testing_adapting_hadoopjob') \
             .script('fs -ls /testing/adapter') \
             .tags('hadooptag') \
-            .timeout(7) \
-            .username('jhadoop') \
             .job_version('0.0.hadoop-alpha')
 
         assert_equals(
@@ -213,14 +215,14 @@ class TestingHadoopJobAdapters(unittest.TestCase):
             .dependencies(['/hadoop.file1']) \
             .description('this job is to test hadoopjob adapter') \
             .archive(False) \
-            .email('jhadoop@email.com') \
+            .genie_email('jhadoop@email.com') \
+            .genie_timeout(7) \
+            .genie_username('jhadoop') \
             .group('hadoop-group') \
             .job_id('hadoop-job1') \
             .job_name('testing_adapting_hadoopjob') \
             .script('jar jar jar') \
             .tags('hadoop.tag') \
-            .timeout(7) \
-            .username('jhadoop') \
             .job_version('0.0.hadoop')
 
         assert_equals(
