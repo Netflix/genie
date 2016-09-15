@@ -490,11 +490,11 @@ public class JobCompletionService {
      * @throws GenieException If there is any problem.
      */
     private boolean sendEmail(final String jobId) throws GenieException {
-        log.debug("Got a job finished event. Sending email.");
         final JobRequest jobRequest = this.jobSearchService.getJobRequest(jobId);
         boolean result = false;
         final Optional<String> email = jobRequest.getEmail();
-        if (email.isPresent() && Strings.isNullOrEmpty(email.get())) {
+        if (email.isPresent() && !Strings.isNullOrEmpty(email.get())) {
+            log.debug("Got a job finished event. Sending email: {}", email.get());
             final JobStatus status = this.jobSearchService.getJobStatus(jobId);
             this.mailServiceImpl.sendEmail(
                 email.get(),

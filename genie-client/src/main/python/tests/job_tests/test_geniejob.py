@@ -69,8 +69,11 @@ class TestingGenieJobRepr(unittest.TestCase):
             .dependencies('/dep2') \
             .description('description') \
             .disable_archive() \
-            .email('jsmith@email.com') \
+            .genie_email('jsmith@email.com') \
+            .genie_setup_file('/setup.sh') \
+            .genie_timeout(999) \
             .genie_url('http://asdfasdf') \
+            .genie_username('jsmith') \
             .group('group1') \
             .job_id('geniejob_repr') \
             .job_name('geniejob_repr') \
@@ -78,11 +81,8 @@ class TestingGenieJobRepr(unittest.TestCase):
             .parameter('param1', 'pval1') \
             .parameter('param2', 'pval2') \
             .parameters(param3='pval3', param4='pval4') \
-            .setup_file('/setup.sh') \
             .tags('tag1') \
-            .tags('tag2') \
-            .timeout(999) \
-            .username('jsmith')
+            .tags('tag2')
 
         assert_equals(
             str(job),
@@ -99,8 +99,11 @@ class TestingGenieJobRepr(unittest.TestCase):
                 u'dependencies("/dep1")',
                 u'dependencies("/dep2")',
                 u'description("description")',
-                u'email("jsmith@email.com")',
+                u'genie_email("jsmith@email.com")',
+                u'genie_setup_file("/setup.sh")',
+                u'genie_timeout(999)',
                 u'genie_url("http://asdfasdf")',
+                u'genie_username("jsmith")',
                 u'group("group1")',
                 u'job_id("geniejob_repr")',
                 u'job_name("geniejob_repr")',
@@ -109,11 +112,8 @@ class TestingGenieJobRepr(unittest.TestCase):
                 u'parameter("param2", "pval2")',
                 u'parameter("param3", "pval3")',
                 u'parameter("param4", "pval4")',
-                u'setup_file("/setup.sh")',
                 u'tags("tag1")',
-                u'tags("tag2")',
-                u'timeout(999)',
-                u'username("jsmith")'
+                u'tags("tag2")'
             ])
         )
 
@@ -140,14 +140,14 @@ class TestingGenieJobAdapters(unittest.TestCase):
             .dependencies(['/file1', '/file2']) \
             .description('this job is to test geniejob adapter') \
             .archive(False) \
-            .email('jdoe@email.com') \
+            .genie_email('jdoe@email.com') \
+            .genie_timeout(100) \
             .genie_url('http://fdsafdsa') \
+            .genie_username('jdoe') \
             .group('geniegroup1') \
             .job_id('geniejob1') \
             .job_name('testing_adapting_geniejob') \
             .tags('tag1, tag2') \
-            .timeout(100) \
-            .username('jdoe') \
             .job_version('0.0.1alpha')
 
         assert_equals(
@@ -189,7 +189,7 @@ class TestingJobExecute(unittest.TestCase):
 
         job = pygenie.jobs.HiveJob() \
             .job_id('exec') \
-            .username('exectester') \
+            .genie_username('exectester') \
             .script('select * from db.table')
 
         job.execute()
@@ -212,7 +212,7 @@ class TestingJobExecute(unittest.TestCase):
 
         job = pygenie.jobs.HiveJob() \
             .job_id(job_id) \
-            .username('exectester') \
+            .genie_username('exectester') \
             .script('select * from db.table')
 
         job.execute(retry=True)
@@ -238,7 +238,7 @@ class TestingJobExecute(unittest.TestCase):
 
         job = pygenie.jobs.HiveJob() \
             .job_id(job_id) \
-            .username('exectester') \
+            .genie_username('exectester') \
             .script('select * from db.table')
 
         job.execute(retry=True, force=True)
