@@ -88,7 +88,7 @@ export default class OutputDirectory extends React.Component {
                 <div>
                   <Navigation url={this.state.url} />
                   {
-                      this.state.output.directories.length === 0 ?
+                      this.state.output.files.length === 0 && this.state.output.directories.length === 0 ?
                         <div>Empty directory</div> :
                         <div>
                           <Table>
