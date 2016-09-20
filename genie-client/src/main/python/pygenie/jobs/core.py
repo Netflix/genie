@@ -156,6 +156,8 @@ class GenieJob(object):
         self._dependencies = list()
         self._description = None
         self._email = None
+        self._genie_cpu = None
+        self._genie_memory = None
         self._group = None
         self._job_id = uuid_str()
         self._job_name = None
@@ -464,6 +466,28 @@ class GenieJob(object):
         running_job = execute_job(self)
         return running_job
 
+    @add_to_repr('overwrite')
+    def genie_cpu(self, cpu):
+        """
+        Set the number of CPUs for Genie to allocate when executing the job.
+
+        Example:
+            >>> job = GenieJob() \\
+            ...     .genie_cpu(2)
+
+        Args:
+            cpu (int): Number of CPUs to allocate.
+
+        Returns:
+            :py:class:`GenieJob`: self
+        """
+
+        assert int(cpu) > 0, 'number of CPUs cannot be less than 1'
+
+        self._genie_cpu = int(cpu)
+
+        return self
+
     @unicodify
     @arg_string
     @add_to_repr('overwrite')
@@ -487,6 +511,29 @@ class GenieJob(object):
         # TODO: for legacy support (need to remove) - should use .genie_timeout()
         logger.warning("Use .genie_email('%s') to set Genie email.", email)
         return self.genie_email(email)
+
+    @add_to_repr('overwrite')
+    def genie_memory(self, memory):
+        """
+        Set the amount of memory (MB) for Genie to allocate when executing the job.
+
+        Example:
+            >>> # set Genie to allocate 6 GB of memory
+            >>> job = GenieJob() \\
+            ...     .genie_memory(6000)
+
+        Args:
+            memory (int): Amount of memory (MB) to allocate.
+
+        Returns:
+            :py:class:`GenieJob`: self
+        """
+
+        assert int(memory) > 0, 'memory amount (MB) cannot be less than 1'
+
+        self._genie_memory = int(memory)
+
+        return self
 
     @unicodify
     @add_to_repr('overwrite')
