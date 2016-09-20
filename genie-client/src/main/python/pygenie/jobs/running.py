@@ -140,6 +140,21 @@ class RunningJob(object):
         """
 
     @property
+    def cpu(self):
+        """
+        Get the job's allocated number of CPUs.
+
+        Example:
+            >>> running_job.cpu
+            10
+
+        Returns:
+            int: Number of allocated CPUs.
+        """
+
+        return self.request_data.get('cpu')
+
+    @property
     @get_from_info('cluster_name', info_section='cluster')
     def cluster_name(self):
         """
@@ -415,6 +430,21 @@ class RunningJob(object):
         else:
             resp = self._adapter.kill_job(job_id=self._job_id)
         return resp
+
+    @property
+    def memory(self):
+        """
+        Get the job's allocated memory (MB).
+
+        Example:
+            >>> running_job.memory
+            1600
+
+        Returns:
+            int: Allocated memory (MB).
+        """
+
+        return self.request_data.get('memory')
 
     @property
     @get_from_info('output_uri', info_section='job')
