@@ -182,7 +182,9 @@ public class ServicesConfigUnitTests {
             this.servicesConfig.jobSearchService(
                 this.jobRepository,
                 this.jobRequestRepository,
-                this.jobExecutionRepository
+                this.jobExecutionRepository,
+                Mockito.mock(JpaClusterRepository.class),
+                Mockito.mock(JpaCommandRepository.class)
             )
         );
     }
