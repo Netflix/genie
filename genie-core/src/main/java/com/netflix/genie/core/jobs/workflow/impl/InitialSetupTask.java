@@ -144,7 +144,7 @@ public class InitialSetupTask extends GenieBaseTask {
         }
         final File stderr = new File(jobWorkingDirectory, JobConstants.STDERR_LOG_FILE_NAME);
         if (!stderr.exists() && !stderr.createNewFile()) {
-            throw new GenieServerException("Unable to create std err file at " + stdout);
+            throw new GenieServerException("Unable to create std err file at " + stderr);
         }
     }
 
