@@ -55,23 +55,23 @@ export default class CommandDetails extends React.Component {
             <table className="table job-detail-table">
               <tbody>
                 <tr>
-                  <td className="col-xs-2">Description:</td>
+                  <td className="col-xs-2 align-right">Description:</td>
                   <td>{this.state.command.description}</td>
                 </tr>
                 <tr>
-                  <td className="col-xs-2">Check Delay:</td>
+                  <td className="col-xs-2 align-right">Check Delay:</td>
                   <td>{this.state.command.checkDelay}</td>
                 </tr>
                 <tr>
-                  <td className="col-xs-2">Setup File:</td>
+                  <td className="col-xs-2 align-right">Setup File:</td>
                   <td>{this.state.command.setupFile}</td>
                 </tr>
                 <tr>
-                  <td className="col-xs-2">Executable:</td>
+                  <td className="col-xs-2 align-right">Executable:</td>
                   <td>{this.state.command.executable}</td>
                 </tr>
                 <tr>
-                  <td className="col-xs-2">Config:</td>
+                  <td className="col-xs-2 align-right">Config:</td>
                   <td>
                     <ul>
                       {this.state.command.configs.map((config, index) =>
@@ -81,15 +81,15 @@ export default class CommandDetails extends React.Component {
                   </td>
                 </tr>
                 <tr>
-                  <td className="col-xs-2">Created:</td>
+                  <td className="col-xs-2 align-right">Created:</td>
                   <td>{momentFormat(this.state.command.created)}</td>
                 </tr>
                 <tr>
-                  <td className="col-xs-2">Updated:</td>
+                  <td className="col-xs-2 align-right">Updated:</td>
                   <td>{momentFormat(this.state.command.updated)}</td>
                 </tr>
                 <tr>
-                  <td className="col-xs-2">Clusters:</td>
+                  <td className="col-xs-2 align-right">Clusters:</td>
                   <td>
                     {this.state.clusters.length > 0 ?
                       <InfoTable data={this.state.clusters} type="clusters" />
@@ -98,7 +98,7 @@ export default class CommandDetails extends React.Component {
                   </td>
                 </tr>
                 <tr>
-                  <td className="col-xs-2">Applications:</td>
+                  <td className="col-xs-2 align-right">Applications:</td>
                   <td>
                     {this.state.applications.length > 0 ?
                       <InfoTable data={this.state.applications} type="applications" />
