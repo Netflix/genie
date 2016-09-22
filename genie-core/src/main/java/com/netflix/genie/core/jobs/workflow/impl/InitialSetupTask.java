@@ -29,6 +29,7 @@ import com.netflix.spectator.api.Timer;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotNull;
+import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
@@ -102,7 +103,7 @@ public class InitialSetupTask extends GenieBaseTask {
         }
     }
 
-    private void createJobDirStructure(final String jobWorkingDirectory) throws GenieException {
+    private void createJobDirStructure(final String jobWorkingDirectory) throws GenieException, IOException {
         // create top level directory structure for the job
 
         // Genie Directory {basedir/genie}
@@ -135,6 +136,16 @@ public class InitialSetupTask extends GenieBaseTask {
             + JobConstants.GENIE_PATH_VAR
             + JobConstants.FILE_PATH_DELIMITER
             + JobConstants.CLUSTER_PATH_VAR);
+
+        // Create std out file
+        final File stdout = new File(jobWorkingDirectory, JobConstants.STDOUT_LOG_FILE_NAME);
+        if (!stdout.exists() && !stdout.createNewFile()) {
+            throw new GenieServerException("Unable to create std out file at " + stdout);
+        }
+        final File stderr = new File(jobWorkingDirectory, JobConstants.STDERR_LOG_FILE_NAME);
+        if (!stderr.exists() && !stderr.createNewFile()) {
+            throw new GenieServerException("Unable to create std err file at " + stdout);
+        }
     }
 
     private void createJobDirEnvironmentVariables(final Writer writer, final String jobWorkingDirectory)
