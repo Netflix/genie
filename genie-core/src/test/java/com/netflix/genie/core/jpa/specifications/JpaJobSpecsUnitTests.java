@@ -48,9 +48,9 @@ public class JpaJobSpecsUnitTests {
     private static final String JOB_NAME = "jobName";
     private static final String USER_NAME = "tgianos";
     private static final String CLUSTER_NAME = "hprod2";
-    private static final String CLUSTER_ID = "prod";
+    private static final ClusterEntity CLUSTER = Mockito.mock(ClusterEntity.class);
     private static final String COMMAND_NAME = "pig";
-    private static final String COMMAND_ID = "pig14";
+    private static final CommandEntity COMMAND = Mockito.mock(CommandEntity.class);
     private static final Set<String> TAGS = new HashSet<>();
     private static final Set<JobStatus> STATUSES = new HashSet<>();
     private static final String TAG = UUID.randomUUID().toString();
@@ -108,7 +108,7 @@ public class JpaJobSpecsUnitTests {
         final Path<ClusterEntity> clusterIdPath = (Path<ClusterEntity>) Mockito.mock(Path.class);
         final Predicate equalClusterIdPredicate = Mockito.mock(Predicate.class);
         Mockito.when(this.root.get(JobEntity_.cluster)).thenReturn(clusterIdPath);
-        Mockito.when(this.cb.equal(clusterIdPath, CLUSTER_ID)).thenReturn(equalClusterIdPredicate);
+        Mockito.when(this.cb.equal(clusterIdPath, CLUSTER)).thenReturn(equalClusterIdPredicate);
 
         final Path<String> commandNamePath = (Path<String>) Mockito.mock(Path.class);
         final Predicate equalCommandNamePredicate = Mockito.mock(Predicate.class);
@@ -118,7 +118,7 @@ public class JpaJobSpecsUnitTests {
         final Path<CommandEntity> commandIdPath = (Path<CommandEntity>) Mockito.mock(Path.class);
         final Predicate equalCommandIdPredicate = Mockito.mock(Predicate.class);
         Mockito.when(this.root.get(JobEntity_.command)).thenReturn(commandIdPath);
-        Mockito.when(this.cb.equal(clusterIdPath, COMMAND_ID)).thenReturn(equalCommandIdPredicate);
+        Mockito.when(this.cb.equal(clusterIdPath, COMMAND)).thenReturn(equalCommandIdPredicate);
 
         final Path<String> tagPath = (Path<String>) Mockito.mock(Path.class);
         final Predicate likeTagPredicate = Mockito.mock(Predicate.class);
@@ -166,9 +166,9 @@ public class JpaJobSpecsUnitTests {
             STATUSES,
             TAGS,
             CLUSTER_NAME,
-            CLUSTER_ID,
+            CLUSTER,
             COMMAND_NAME,
-            COMMAND_ID,
+            COMMAND,
             MIN_STARTED,
             MAX_STARTED,
             MIN_FINISHED,
@@ -182,9 +182,9 @@ public class JpaJobSpecsUnitTests {
             Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
-        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
-        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.command), COMMAND_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.command), COMMAND);
         Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.tags), this.tagLikeStatement);
         Mockito.verify(this.cb, Mockito.times(1)).greaterThanOrEqualTo(this.root.get(JobEntity_.started), MIN_STARTED);
         Mockito.verify(this.cb, Mockito.times(1)).lessThan(this.root.get(JobEntity_.started), MAX_STARTED);
@@ -208,9 +208,9 @@ public class JpaJobSpecsUnitTests {
             STATUSES,
             TAGS,
             CLUSTER_NAME,
-            CLUSTER_ID,
+            CLUSTER,
             COMMAND_NAME,
-            COMMAND_ID,
+            COMMAND,
             MIN_STARTED,
             MAX_STARTED,
             MIN_FINISHED,
@@ -224,9 +224,9 @@ public class JpaJobSpecsUnitTests {
             Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
-        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
-        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.command), COMMAND_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.command), COMMAND);
         Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.tags), this.tagLikeStatement);
         Mockito.verify(this.cb, Mockito.times(1)).greaterThanOrEqualTo(this.root.get(JobEntity_.started), MIN_STARTED);
         Mockito.verify(this.cb, Mockito.times(1)).lessThan(this.root.get(JobEntity_.started), MAX_STARTED);
@@ -250,9 +250,9 @@ public class JpaJobSpecsUnitTests {
             STATUSES,
             TAGS,
             CLUSTER_NAME,
-            CLUSTER_ID,
+            CLUSTER,
             COMMAND_NAME,
-            COMMAND_ID,
+            COMMAND,
             MIN_STARTED,
             MAX_STARTED,
             MIN_FINISHED,
@@ -266,9 +266,9 @@ public class JpaJobSpecsUnitTests {
             Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
-        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
-        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.command), COMMAND_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.command), COMMAND);
         Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.tags), this.tagLikeStatement);
         Mockito.verify(this.cb, Mockito.times(1)).greaterThanOrEqualTo(this.root.get(JobEntity_.started), MIN_STARTED);
         Mockito.verify(this.cb, Mockito.times(1)).lessThan(this.root.get(JobEntity_.started), MAX_STARTED);
@@ -292,9 +292,9 @@ public class JpaJobSpecsUnitTests {
             STATUSES,
             TAGS,
             CLUSTER_NAME,
-            CLUSTER_ID,
+            CLUSTER,
             COMMAND_NAME,
-            COMMAND_ID,
+            COMMAND,
             MIN_STARTED,
             MAX_STARTED,
             MIN_FINISHED,
@@ -308,9 +308,9 @@ public class JpaJobSpecsUnitTests {
             Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
-        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
-        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.command), COMMAND_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.command), COMMAND);
         Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.tags), this.tagLikeStatement);
         Mockito.verify(this.cb, Mockito.times(1)).greaterThanOrEqualTo(this.root.get(JobEntity_.started), MIN_STARTED);
         Mockito.verify(this.cb, Mockito.times(1)).lessThan(this.root.get(JobEntity_.started), MAX_STARTED);
@@ -334,9 +334,9 @@ public class JpaJobSpecsUnitTests {
             null,
             TAGS,
             CLUSTER_NAME,
-            CLUSTER_ID,
+            CLUSTER,
             COMMAND_NAME,
-            COMMAND_ID,
+            COMMAND,
             MIN_STARTED,
             MAX_STARTED,
             MIN_FINISHED,
@@ -350,9 +350,9 @@ public class JpaJobSpecsUnitTests {
             Mockito.verify(this.cb, Mockito.never()).equal(this.root.get(JobEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
-        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
-        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.command), COMMAND_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.command), COMMAND);
         Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.tags), this.tagLikeStatement);
         Mockito.verify(this.cb, Mockito.times(1)).greaterThanOrEqualTo(this.root.get(JobEntity_.started), MIN_STARTED);
         Mockito.verify(this.cb, Mockito.times(1)).lessThan(this.root.get(JobEntity_.started), MAX_STARTED);
@@ -376,9 +376,9 @@ public class JpaJobSpecsUnitTests {
             new HashSet<>(),
             TAGS,
             CLUSTER_NAME,
-            CLUSTER_ID,
+            CLUSTER,
             COMMAND_NAME,
-            COMMAND_ID,
+            COMMAND,
             MIN_STARTED,
             MAX_STARTED,
             MIN_FINISHED,
@@ -392,9 +392,9 @@ public class JpaJobSpecsUnitTests {
             Mockito.verify(this.cb, Mockito.never()).equal(this.root.get(JobEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
-        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
-        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.command), COMMAND_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.command), COMMAND);
         Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.tags), this.tagLikeStatement);
         Mockito.verify(this.cb, Mockito.times(1)).greaterThanOrEqualTo(this.root.get(JobEntity_.started), MIN_STARTED);
         Mockito.verify(this.cb, Mockito.times(1)).lessThan(this.root.get(JobEntity_.started), MAX_STARTED);
@@ -418,9 +418,9 @@ public class JpaJobSpecsUnitTests {
             STATUSES,
             TAGS,
             null,
-            CLUSTER_ID,
+            CLUSTER,
             COMMAND_NAME,
-            COMMAND_ID,
+            COMMAND,
             MIN_STARTED,
             MAX_STARTED,
             MIN_FINISHED,
@@ -434,9 +434,9 @@ public class JpaJobSpecsUnitTests {
             Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.never()).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
-        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
-        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.command), COMMAND_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.command), COMMAND);
         Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.tags), this.tagLikeStatement);
         Mockito.verify(this.cb, Mockito.times(1)).greaterThanOrEqualTo(this.root.get(JobEntity_.started), MIN_STARTED);
         Mockito.verify(this.cb, Mockito.times(1)).lessThan(this.root.get(JobEntity_.started), MAX_STARTED);
@@ -462,7 +462,7 @@ public class JpaJobSpecsUnitTests {
             CLUSTER_NAME,
             null,
             COMMAND_NAME,
-            COMMAND_ID,
+            COMMAND,
             MIN_STARTED,
             MAX_STARTED,
             MIN_FINISHED,
@@ -476,9 +476,9 @@ public class JpaJobSpecsUnitTests {
             Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
-        Mockito.verify(this.cb, Mockito.never()).equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
+        Mockito.verify(this.cb, Mockito.never()).equal(this.root.get(JobEntity_.cluster), CLUSTER);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
-        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.command), COMMAND_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.command), COMMAND);
         Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.tags), this.tagLikeStatement);
         Mockito.verify(this.cb, Mockito.times(1)).greaterThanOrEqualTo(this.root.get(JobEntity_.started), MIN_STARTED);
         Mockito.verify(this.cb, Mockito.times(1)).lessThan(this.root.get(JobEntity_.started), MAX_STARTED);
@@ -502,9 +502,9 @@ public class JpaJobSpecsUnitTests {
             STATUSES,
             TAGS,
             CLUSTER_NAME,
-            CLUSTER_ID,
+            CLUSTER,
             null,
-            COMMAND_ID,
+            COMMAND,
             MIN_STARTED,
             MAX_STARTED,
             MIN_FINISHED,
@@ -518,9 +518,9 @@ public class JpaJobSpecsUnitTests {
             Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
-        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER);
         Mockito.verify(this.cb, Mockito.never()).equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
-        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.command), COMMAND_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.command), COMMAND);
         Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.tags), this.tagLikeStatement);
         Mockito.verify(this.cb, Mockito.times(1)).greaterThanOrEqualTo(this.root.get(JobEntity_.started), MIN_STARTED);
         Mockito.verify(this.cb, Mockito.times(1)).lessThan(this.root.get(JobEntity_.started), MAX_STARTED);
@@ -544,7 +544,7 @@ public class JpaJobSpecsUnitTests {
             STATUSES,
             TAGS,
             CLUSTER_NAME,
-            CLUSTER_ID,
+            CLUSTER,
             COMMAND_NAME,
             null,
             MIN_STARTED,
@@ -560,9 +560,9 @@ public class JpaJobSpecsUnitTests {
             Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
-        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
-        Mockito.verify(this.cb, Mockito.never()).equal(this.root.get(JobEntity_.command), COMMAND_ID);
+        Mockito.verify(this.cb, Mockito.never()).equal(this.root.get(JobEntity_.command), COMMAND);
         Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.tags), this.tagLikeStatement);
         Mockito.verify(this.cb, Mockito.times(1)).greaterThanOrEqualTo(this.root.get(JobEntity_.started), MIN_STARTED);
         Mockito.verify(this.cb, Mockito.times(1)).lessThan(this.root.get(JobEntity_.started), MAX_STARTED);
@@ -586,9 +586,9 @@ public class JpaJobSpecsUnitTests {
             STATUSES,
             null,
             CLUSTER_NAME,
-            CLUSTER_ID,
+            CLUSTER,
             COMMAND_NAME,
-            COMMAND_ID,
+            COMMAND,
             MIN_STARTED,
             MAX_STARTED,
             MIN_FINISHED,
@@ -602,9 +602,9 @@ public class JpaJobSpecsUnitTests {
             Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
-        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
-        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.command), COMMAND_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.command), COMMAND);
         Mockito.verify(this.cb, Mockito.never()).like(this.root.get(JobEntity_.tags), this.tagLikeStatement);
         Mockito.verify(this.cb, Mockito.times(1)).greaterThanOrEqualTo(this.root.get(JobEntity_.started), MIN_STARTED);
         Mockito.verify(this.cb, Mockito.times(1)).lessThan(this.root.get(JobEntity_.started), MAX_STARTED);
@@ -628,9 +628,9 @@ public class JpaJobSpecsUnitTests {
             STATUSES,
             TAGS,
             CLUSTER_NAME,
-            CLUSTER_ID,
+            CLUSTER,
             COMMAND_NAME,
-            COMMAND_ID,
+            COMMAND,
             null,
             MAX_STARTED,
             MIN_FINISHED,
@@ -644,9 +644,9 @@ public class JpaJobSpecsUnitTests {
             Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
-        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
-        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.command), COMMAND_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.command), COMMAND);
         Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.tags), this.tagLikeStatement);
         Mockito.verify(this.cb, Mockito.never()).greaterThanOrEqualTo(this.root.get(JobEntity_.started), MIN_STARTED);
         Mockito.verify(this.cb, Mockito.times(1)).lessThan(this.root.get(JobEntity_.started), MAX_STARTED);
@@ -670,9 +670,9 @@ public class JpaJobSpecsUnitTests {
             STATUSES,
             TAGS,
             CLUSTER_NAME,
-            CLUSTER_ID,
+            CLUSTER,
             COMMAND_NAME,
-            COMMAND_ID,
+            COMMAND,
             MIN_STARTED,
             null,
             MIN_FINISHED,
@@ -686,9 +686,9 @@ public class JpaJobSpecsUnitTests {
             Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
-        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
-        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.command), COMMAND_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.command), COMMAND);
         Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.tags), this.tagLikeStatement);
         Mockito.verify(this.cb, Mockito.times(1)).greaterThanOrEqualTo(this.root.get(JobEntity_.started), MIN_STARTED);
         Mockito.verify(this.cb, Mockito.never()).lessThan(this.root.get(JobEntity_.started), MAX_STARTED);
@@ -712,9 +712,9 @@ public class JpaJobSpecsUnitTests {
             STATUSES,
             TAGS,
             CLUSTER_NAME,
-            CLUSTER_ID,
+            CLUSTER,
             COMMAND_NAME,
-            COMMAND_ID,
+            COMMAND,
             MIN_STARTED,
             MAX_STARTED,
             null,
@@ -728,9 +728,9 @@ public class JpaJobSpecsUnitTests {
             Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
-        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
-        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.command), COMMAND_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.command), COMMAND);
         Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.tags), this.tagLikeStatement);
         Mockito.verify(this.cb, Mockito.times(1)).greaterThanOrEqualTo(this.root.get(JobEntity_.started), MIN_STARTED);
         Mockito.verify(this.cb, Mockito.times(1)).lessThan(this.root.get(JobEntity_.started), MAX_STARTED);
@@ -754,9 +754,9 @@ public class JpaJobSpecsUnitTests {
             STATUSES,
             TAGS,
             CLUSTER_NAME,
-            CLUSTER_ID,
+            CLUSTER,
             COMMAND_NAME,
-            COMMAND_ID,
+            COMMAND,
             MIN_STARTED,
             MAX_STARTED,
             MIN_FINISHED,
@@ -770,9 +770,9 @@ public class JpaJobSpecsUnitTests {
             Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
-        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.commandName), COMMAND_NAME);
-        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.command), COMMAND_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.command), COMMAND);
         Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.tags), this.tagLikeStatement);
         Mockito.verify(this.cb, Mockito.times(1)).greaterThanOrEqualTo(this.root.get(JobEntity_.started), MIN_STARTED);
         Mockito.verify(this.cb, Mockito.times(1)).lessThan(this.root.get(JobEntity_.started), MAX_STARTED);
@@ -797,9 +797,9 @@ public class JpaJobSpecsUnitTests {
             STATUSES,
             TAGS,
             CLUSTER_NAME,
-            CLUSTER_ID,
+            CLUSTER,
             COMMAND_NAME,
-            COMMAND_ID,
+            COMMAND,
             MIN_STARTED,
             MAX_STARTED,
             MIN_FINISHED,
@@ -813,7 +813,7 @@ public class JpaJobSpecsUnitTests {
             Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.clusterName), CLUSTER_NAME);
-        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER_ID);
+        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(JobEntity_.cluster), CLUSTER);
         Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(JobEntity_.tags), this.tagLikeStatement);
         Mockito.verify(this.cb, Mockito.times(1)).greaterThanOrEqualTo(this.root.get(JobEntity_.started), MIN_STARTED);
         Mockito.verify(this.cb, Mockito.times(1)).lessThan(this.root.get(JobEntity_.started), MAX_STARTED);

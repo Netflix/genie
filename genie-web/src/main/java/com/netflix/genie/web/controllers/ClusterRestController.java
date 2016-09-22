@@ -149,7 +149,7 @@ ClusterRestController {
         @RequestParam(value = "tag", required = false) final Set<String> tags,
         @RequestParam(value = "minUpdateTime", required = false) final Long minUpdateTime,
         @RequestParam(value = "maxUpdateTime", required = false) final Long maxUpdateTime,
-        @PageableDefault(page = 0, size = 64, sort = {"updated"}, direction = Sort.Direction.DESC) final Pageable page,
+        @PageableDefault(size = 64, sort = {"updated"}, direction = Sort.Direction.DESC) final Pageable page,
         final PagedResourcesAssembler<Cluster> assembler
     ) throws GenieException {
         log.debug("Called [name | statuses | tags | minUpdateTime | maxUpdateTime | page]");

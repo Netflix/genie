@@ -130,15 +130,25 @@ public class ServicesConfigTest {
      * @param jobRepository          The repository to use for job entities
      * @param jobRequestRepository   The repository to use for job request entities
      * @param jobExecutionRepository The repository to use for job execution entities
+     * @param clusterRepository      The repository to use for cluster entities
+     * @param commandRepository      The repository to use for command entities
      * @return A job search service instance.
      */
     @Bean
     public JobSearchService jobSearchService(
         final JpaJobRepository jobRepository,
         final JpaJobRequestRepository jobRequestRepository,
-        final JpaJobExecutionRepository jobExecutionRepository
+        final JpaJobExecutionRepository jobExecutionRepository,
+        final JpaClusterRepository clusterRepository,
+        final JpaCommandRepository commandRepository
     ) {
-        return new JpaJobSearchServiceImpl(jobRepository, jobRequestRepository, jobExecutionRepository);
+        return new JpaJobSearchServiceImpl(
+            jobRepository,
+            jobRequestRepository,
+            jobExecutionRepository,
+            clusterRepository,
+            commandRepository
+        );
     }
 
     /**

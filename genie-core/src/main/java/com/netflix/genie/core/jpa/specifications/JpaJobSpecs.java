@@ -16,6 +16,8 @@
 package com.netflix.genie.core.jpa.specifications;
 
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.core.jpa.entities.ClusterEntity;
+import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.entities.JobEntity;
 import com.netflix.genie.core.jpa.entities.JobEntity_;
 import org.apache.commons.lang3.StringUtils;
@@ -54,9 +56,9 @@ public final class JpaJobSpecs {
      * @param statuses    The job statuses
      * @param tags        The tags for the jobs to find
      * @param clusterName The cluster name
-     * @param clusterId   The cluster id
+     * @param cluster     The cluster the job should have been run on
      * @param commandName The command name
-     * @param commandId   The command id
+     * @param command     The command the job should have been run with
      * @param minStarted  The time which the job had to start after in order to be return (inclusive)
      * @param maxStarted  The time which the job had to start before in order to be returned (exclusive)
      * @param minFinished The time which the job had to finish after in order to be return (inclusive)
@@ -72,9 +74,9 @@ public final class JpaJobSpecs {
         final Set<JobStatus> statuses,
         final Set<String> tags,
         final String clusterName,
-        final String clusterId,
+        final ClusterEntity cluster,
         final String commandName,
-        final String commandId,
+        final CommandEntity command,
         final Date minStarted,
         final Date maxStarted,
         final Date minFinished,
@@ -101,14 +103,14 @@ public final class JpaJobSpecs {
         if (tags != null && !tags.isEmpty()) {
             predicates.add(cb.like(root.get(JobEntity_.tags), JpaSpecificationUtils.getTagLikeString(tags)));
         }
-        if (StringUtils.isNotBlank(clusterId)) {
-            predicates.add(cb.equal(root.get(JobEntity_.cluster), clusterId));
+        if (cluster != null) {
+            predicates.add(cb.equal(root.get(JobEntity_.cluster), cluster));
         }
         if (StringUtils.isNotBlank(clusterName)) {
             predicates.add(cb.equal(root.get(JobEntity_.clusterName), clusterName));
         }
-        if (StringUtils.isNotBlank(commandId)) {
-            predicates.add(cb.equal(root.get(JobEntity_.command), commandId));
+        if (command != null) {
+            predicates.add(cb.equal(root.get(JobEntity_.command), command));
         }
         if (StringUtils.isNotBlank(commandName)) {
             predicates.add(cb.equal(root.get(JobEntity_.commandName), commandName));
