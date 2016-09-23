@@ -70,7 +70,7 @@ class Repr(object):
         call_str = '{func}({args}{comma}{kwargs})' \
             .format(func=func_name,
                     args=args_str if args_str else '',
-                    comma=', ' if kwargs_str else '',
+                    comma=', ' if kwargs_str and args_str else '',
                     kwargs=kwargs_str if kwargs_str else '')
 
         # remove any exact duplicate calls
@@ -156,6 +156,8 @@ class GenieJob(object):
         self._dependencies = list()
         self._description = None
         self._email = None
+        self._genie_cpu = None
+        self._genie_memory = None
         self._group = None
         self._job_id = uuid_str()
         self._job_name = None
@@ -168,7 +170,7 @@ class GenieJob(object):
 
         #initialize repr
         self.repr_obj.append('job_id', (self._job_id,))
-        self.repr_obj.append('username', (self._username,))
+        self.repr_obj.append('genie_username', (self._username,))
 
         #initialize cluster tags with default set of tags
         self._cluster_tag_mapping['default'] = self.default_cluster_tags
@@ -400,25 +402,6 @@ class GenieJob(object):
 
         return self.archive(False)
 
-    @unicodify
-    @arg_string
-    @add_to_repr('overwrite')
-    def email(self, _email):
-        """
-        Sets an email address for Genie to send a notification to after the job
-        is done.
-
-        Example:
-            >>> job = GenieJob() \\
-            ...     .email('jdoe@domain.com')
-
-        Args:
-            email_addr (str): The email address.
-
-        Returns:
-            :py:class:`GenieJob`: self
-        """
-
     def execute(self, retry=False, force=False, catch_signal=False):
         """
         Send the job to Genie and execute.
@@ -484,6 +467,142 @@ class GenieJob(object):
         return running_job
 
     @add_to_repr('overwrite')
+    def genie_cpu(self, cpu):
+        """
+        Set the number of CPUs for Genie to allocate when executing the job.
+
+        Example:
+            >>> job = GenieJob() \\
+            ...     .genie_cpu(2)
+
+        Args:
+            cpu (int): Number of CPUs to allocate.
+
+        Returns:
+            :py:class:`GenieJob`: self
+        """
+
+        assert int(cpu) > 0, 'number of CPUs cannot be less than 1'
+
+        self._genie_cpu = int(cpu)
+
+        return self
+
+    @unicodify
+    @arg_string
+    @add_to_repr('overwrite')
+    def genie_email(self, _email):
+        """
+        Sets an email address for Genie to send a notification to after the job
+        is done.
+
+        Example:
+            >>> job = GenieJob() \\
+            ...     .genie_email('jdoe@domain.com')
+
+        Args:
+            email_addr (str): The email address.
+
+        Returns:
+            :py:class:`GenieJob`: self
+        """
+
+    def email(self, email):
+        # TODO: for legacy support (need to remove) - should use .genie_timeout()
+        logger.warning("Use .genie_email('%s') to set Genie email.", email)
+        return self.genie_email(email)
+
+    @add_to_repr('overwrite')
+    def genie_memory(self, memory):
+        """
+        Set the amount of memory (MB) for Genie to allocate when executing the job.
+
+        Example:
+            >>> # set Genie to allocate 6 GB of memory
+            >>> job = GenieJob() \\
+            ...     .genie_memory(6000)
+
+        Args:
+            memory (int): Amount of memory (MB) to allocate.
+
+        Returns:
+            :py:class:`GenieJob`: self
+        """
+
+        assert int(memory) > 0, 'memory amount (MB) cannot be less than 1'
+
+        self._genie_memory = int(memory)
+
+        return self
+
+    @unicodify
+    @add_to_repr('overwrite')
+    def genie_setup_file(self, setup_file):
+        """
+        Sets a Bash file to source before the job is executed.
+
+        Genie will source the Bash file before executing the job. This can be
+        used to set environment variables before the job is run, etc. This
+        should not be used to set job configuration properties via a file (job's
+        should have separate interfaces for setting property files).
+
+        The file must be stored externally, or available on the Genie nodes.
+
+        Example:
+            >>> job = GenieJob() \\
+            ...     .genie_setup_file('/Users/jdoe/my_setup_file.sh')
+
+        Args:
+            setup_file (str): The local path to the Bash file to use for setup.
+
+        Returns:
+            :py:class:`GenieJob`: self
+        """
+
+        assert setup_file is not None and is_file(setup_file), \
+            "setup file '{}' does not exist".format(setup_file)
+
+        self._setup_file = setup_file
+
+        return self
+
+    def setup_file(self, setup_file):
+        # TODO: for legacy support (need to remove) - should use .genie_timeout()
+        logger.warning("Use .genie_setup_file('%s') to set Genie setup file.", setup_file)
+        return self.genie_setup_file(setup_file)
+
+    @add_to_repr('overwrite')
+    def genie_timeout(self, timeout):
+        """
+        Sets a Genie job timeout (in seconds) for the job.
+
+        If the job does not finish within the specified timeout, Genie will kill
+        the job.
+
+        Example:
+            >>> job = GenieJob() \\
+            ...     .genie_timeout(3600)
+
+        Args:
+            timeout (int): The timeout for the job in seconds.
+
+        Returns:
+            :py:class:`GenieJob`: self
+        """
+
+        assert timeout is not None, \
+            'timeout cannot None and should be an int (number of seconds)'
+
+        self._timeout = int(timeout)
+
+        return self
+
+    def timeout(self, timeout):
+        # TODO: for legacy support (need to remove) - should use .genie_timeout()
+        logger.warning("Use .genie_timeout(%s) to set Genie timeout.", timeout)
+        return self.genie_timeout(timeout)
+
+    @add_to_repr('overwrite')
     def genie_url(self, url):
         """
         Set the Genie url to use when submitting the job.
@@ -502,6 +621,29 @@ class GenieJob(object):
         self._conf.genie.url = url
 
         return self
+
+    @unicodify
+    @arg_string
+    @add_to_repr('overwrite')
+    def genie_username(self, _username):
+        """
+        Sets the Genie username to use when executing the job.
+
+        Example:
+            >>> job = GenieJob() \\
+            ...     .genie_username('jdoe')
+
+        Args:
+            username (str): The username.
+
+        Returns:
+            :py:class:`GenieJob`: self
+        """
+
+    def username(self, username):
+        # TODO: for legacy support (need to remove) - should use .genie_username()
+        logger.warning("Use .genie_username('%s') to set Genie user.", username)
+        return self.genie_username(username)
 
     def get(self, attr, default=None):
         """
@@ -656,37 +798,6 @@ class GenieJob(object):
         return self
 
     @unicodify
-    @add_to_repr('overwrite')
-    def setup_file(self, setup_file):
-        """
-        Sets a Bash file to source before the job is executed.
-
-        Genie will source the Bash file before executing the job. This can be
-        used to set environment variables before the job is run, etc. This
-        should not be used to set job configuration properties via a file (job's
-        should have separate interfaces for setting property files).
-
-        The file must be stored externally, or available on the Genie nodes.
-
-        Example:
-            >>> job = GenieJob() \\
-            ...     .setup_file('/Users/jdoe/my_setup_file.sh')
-
-        Args:
-            setup_file (str): The local path to the Bash file to use for setup.
-
-        Returns:
-            :py:class:`GenieJob`: self
-        """
-
-        assert setup_file is not None and is_file(setup_file), \
-            "setup file '{}' does not exist".format(setup_file)
-
-        self._setup_file = setup_file
-
-        return self
-
-    @unicodify
     @arg_list
     @add_to_repr('append')
     def tags(self, _tags):
@@ -708,30 +819,6 @@ class GenieJob(object):
             :py:class:`GenieJob`: self
         """
 
-    @add_to_repr('overwrite')
-    def timeout(self, timeout):
-        """
-        Sets a job timeout (in seconds) for the job.
-
-        If the job does not finish within the specified timeout, Genie will kill
-        the job.
-
-        Example:
-            >>> job = GenieJob() \\
-            ...     .timeout(3600)
-
-        Args:
-            timeout (int): The timeout for the job in seconds.
-
-        Returns:
-            :py:class:`GenieJob`: self
-        """
-
-        assert timeout is not None, \
-            'timeout cannot None and should be an int (number of seconds)'
-
-        self._timeout = int(timeout)
-        return self
 
     def to_dict(self):
         """
@@ -768,21 +855,3 @@ class GenieJob(object):
         """
 
         return json.dumps(self.to_dict(), sort_keys=True, indent=4)
-
-    @unicodify
-    @arg_string
-    @add_to_repr('overwrite')
-    def username(self, _username):
-        """
-        Sets the username to use when executing the job.
-
-        Example:
-            >>> job = GenieJob() \\
-            ...     .username('jdoe')
-
-        Args:
-            username (str): The username.
-
-        Returns:
-            :py:class:`GenieJob`: self
-        """

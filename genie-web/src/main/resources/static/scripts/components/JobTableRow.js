@@ -1,8 +1,5 @@
 import React, { PropTypes as T } from 'react';
-import { Link } from 'react-router';
-
 import { momentFormat, momentDurationFormat } from '../utils';
-
 import CopyToClipboard from 'react-copy-to-clipboard';
 
 export default class TableRow extends React.Component {
@@ -36,10 +33,12 @@ export default class TableRow extends React.Component {
   render() {
     return (
       <tr className="job-table-row" >
-        <td className="link" onClick={() => this.props.toggleRowDetails(this.props.row.id)}>
+        <td className="link break-word col-md-3" onClick={() => this.props.toggleRowDetails(this.props.row.id)}>
           {this.props.row.id}
         </td>
-        <td onClick={() => this.props.toggleRowDetails(this.props.row.id)}>{this.props.row.name}</td>
+        <td className="job-name" onClick={() => this.props.toggleRowDetails(this.props.row.id)}>
+          {this.props.row.name}
+        </td>
         <td>
           <a href={`/output/${this.props.row.id}/output`}>
             <i className="fa fa-lg fa-folder" aria-hidden="true"></i>
@@ -59,10 +58,10 @@ export default class TableRow extends React.Component {
         <td onClick={() => this.props.toggleRowDetails(this.props.row.id)}>{this.props.row.user}</td>
         <td onClick={() => this.props.toggleRowDetails(this.props.row.id)}>{this.props.row.status}</td>
         <td onClick={() => this.props.toggleRowDetails(this.props.row.id)}>{this.props.row.clusterName}</td>
-        <td onClick={() => this.props.toggleRowDetails(this.props.row.id)} className="col-xs-2">
+        <td onClick={() => this.props.toggleRowDetails(this.props.row.id)} className="col-xs-1">
           {this.props.row.started ? momentFormat(this.props.row.started) : 'NA'}
         </td>
-        <td onClick={() => this.props.toggleRowDetails(this.props.row.id)} className="col-xs-2">
+        <td onClick={() => this.props.toggleRowDetails(this.props.row.id)} className="col-xs-1">
           {this.props.row.finished ? momentFormat(this.props.row.finished) : 'NA'}
         </td>
         <td onClick={() => this.props.toggleRowDetails(this.props.row.id)} className="col-xs-1">

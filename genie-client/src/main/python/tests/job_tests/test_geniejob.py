@@ -69,8 +69,11 @@ class TestingGenieJobRepr(unittest.TestCase):
             .dependencies('/dep2') \
             .description('description') \
             .disable_archive() \
-            .email('jsmith@email.com') \
+            .genie_email('jsmith@email.com') \
+            .genie_setup_file('/setup.sh') \
+            .genie_timeout(999) \
             .genie_url('http://asdfasdf') \
+            .genie_username('jsmith') \
             .group('group1') \
             .job_id('geniejob_repr') \
             .job_name('geniejob_repr') \
@@ -78,11 +81,8 @@ class TestingGenieJobRepr(unittest.TestCase):
             .parameter('param1', 'pval1') \
             .parameter('param2', 'pval2') \
             .parameters(param3='pval3', param4='pval4') \
-            .setup_file('/setup.sh') \
             .tags('tag1') \
-            .tags('tag2') \
-            .timeout(999) \
-            .username('jsmith')
+            .tags('tag2')
 
         assert_equals(
             str(job),
@@ -99,8 +99,11 @@ class TestingGenieJobRepr(unittest.TestCase):
                 u'dependencies("/dep1")',
                 u'dependencies("/dep2")',
                 u'description("description")',
-                u'email("jsmith@email.com")',
+                u'genie_email("jsmith@email.com")',
+                u'genie_setup_file("/setup.sh")',
+                u'genie_timeout(999)',
                 u'genie_url("http://asdfasdf")',
+                u'genie_username("jsmith")',
                 u'group("group1")',
                 u'job_id("geniejob_repr")',
                 u'job_name("geniejob_repr")',
@@ -109,12 +112,45 @@ class TestingGenieJobRepr(unittest.TestCase):
                 u'parameter("param2", "pval2")',
                 u'parameter("param3", "pval3")',
                 u'parameter("param4", "pval4")',
-                u'setup_file("/setup.sh")',
                 u'tags("tag1")',
-                u'tags("tag2")',
-                u'timeout(999)',
-                u'username("jsmith")'
+                u'tags("tag2")'
             ])
+        )
+
+    def test_genie_cpu(self):
+        """Test GenieJob repr (genie_cpu)."""
+
+        job = pygenie.jobs.GenieJob() \
+            .job_id('123') \
+            .genie_username('user') \
+            .genie_cpu(12)
+
+        assert_equals(
+            '.'.join([
+                'GenieJob()',
+                'genie_cpu(12)',
+                'genie_username("user")',
+                'job_id("123")'
+            ]),
+            str(job)
+        )
+
+    def test_genie_memory(self):
+        """Test GenieJob repr (genie_memory)."""
+
+        job = pygenie.jobs.GenieJob() \
+            .job_id('123') \
+            .genie_username('user') \
+            .genie_memory(7000)
+
+        assert_equals(
+            '.'.join([
+                'GenieJob()',
+                'genie_memory(7000)',
+                'genie_username("user")',
+                'job_id("123")'
+            ]),
+            str(job)
         )
 
 
@@ -140,39 +176,43 @@ class TestingGenieJobAdapters(unittest.TestCase):
             .dependencies(['/file1', '/file2']) \
             .description('this job is to test geniejob adapter') \
             .archive(False) \
-            .email('jdoe@email.com') \
+            .genie_cpu(3) \
+            .genie_email('jdoe@email.com') \
+            .genie_memory(999) \
+            .genie_timeout(100) \
             .genie_url('http://fdsafdsa') \
+            .genie_username('jdoe') \
             .group('geniegroup1') \
             .job_id('geniejob1') \
             .job_name('testing_adapting_geniejob') \
             .tags('tag1, tag2') \
-            .timeout(100) \
-            .username('jdoe') \
             .job_version('0.0.1alpha')
 
         assert_equals(
             pygenie.adapter.genie_3.get_payload(job),
             {
-                u'applications': [u'applicationid1'],
-                u'attachments': [],
-                u'clusterCriterias': [
-                    {u'tags': [u'type:cluster1']},
-                    {u'tags': [u'type:genie']},
+                'applications': ['applicationid1'],
+                'attachments': [],
+                'clusterCriterias': [
+                    {'tags': ['type:cluster1']},
+                    {'tags': ['type:genie']},
                 ],
-                u'commandArgs': u'command args for geniejob',
-                u'commandCriteria': [u'type:geniecmd'],
-                u'dependencies': [u'/file1', u'/file2'],
-                u'description': u'this job is to test geniejob adapter',
-                u'disableLogArchival': True,
-                u'email': u'jdoe@email.com',
-                u'group': u'geniegroup1',
-                u'id': u'geniejob1',
-                u'name': u'testing_adapting_geniejob',
-                u'setupFile': None,
-                u'tags': [u'tag1', u'tag2'],
-                u'timeout': 100,
-                u'user': u'jdoe',
-                u'version': u'0.0.1alpha'
+                'commandArgs': 'command args for geniejob',
+                'commandCriteria': ['type:geniecmd'],
+                'cpu': 3,
+                'dependencies': ['/file1', '/file2'],
+                'description': 'this job is to test geniejob adapter',
+                'disableLogArchival': True,
+                'email': 'jdoe@email.com',
+                'group': 'geniegroup1',
+                'id': 'geniejob1',
+                'memory': 999,
+                'name': 'testing_adapting_geniejob',
+                'setupFile': None,
+                'tags': ['tag1', 'tag2'],
+                'timeout': 100,
+                'user': 'jdoe',
+                'version': '0.0.1alpha'
             }
         )
 
@@ -189,7 +229,7 @@ class TestingJobExecute(unittest.TestCase):
 
         job = pygenie.jobs.HiveJob() \
             .job_id('exec') \
-            .username('exectester') \
+            .genie_username('exectester') \
             .script('select * from db.table')
 
         job.execute()
@@ -212,7 +252,7 @@ class TestingJobExecute(unittest.TestCase):
 
         job = pygenie.jobs.HiveJob() \
             .job_id(job_id) \
-            .username('exectester') \
+            .genie_username('exectester') \
             .script('select * from db.table')
 
         job.execute(retry=True)
@@ -238,7 +278,7 @@ class TestingJobExecute(unittest.TestCase):
 
         job = pygenie.jobs.HiveJob() \
             .job_id(job_id) \
-            .username('exectester') \
+            .genie_username('exectester') \
             .script('select * from db.table')
 
         job.execute(retry=True, force=True)

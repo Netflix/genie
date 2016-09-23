@@ -5,6 +5,7 @@ import TableHeader from './components/TableHeader';
 import SiteHeader from './components/SiteHeader';
 import SiteFooter from './components/SiteFooter';
 import filesize from 'filesize';
+import Loading from './components/Loading';
 
 import { genieJobsUrl, fileUrl, momentFormat, fetch } from './utils';
 
@@ -21,8 +22,10 @@ export default class OutputDirectory extends React.Component {
         files       : [],
         directories : [],
       },
+      fetching: true,
+      error: false,
       url: '',
-      headers: [],
+      headers: this.headers,
       infos: [],
     };
   }
@@ -37,27 +40,34 @@ export default class OutputDirectory extends React.Component {
     this.loadData(splat);
   }
 
+  get headers() {
+    return [
+      { url       : '#',
+        name      : 'GENIE',
+        className : 'supress',
+      },
+    ];
+  }
+
   loadData(url) {
     fetch(`/api/v3/jobs/${url}`)
     .done(output => {
       const [jobId, ...ignored] = url.split('/');
-      const genieSiteUrl = `/jobs?id=${jobId}&rowId=${jobId}`;
-
       this.setState({
         output,
         jobId,
         url,
-        headers: [
-          { url       : '#',
-            name      : 'GENIE',
-            className : 'supress',
-          },
-        ],
+        fetching: false,
         infos: [{
-          url       : genieSiteUrl,
+          url       : `/jobs?id=${jobId}&rowId=${jobId}`,
           name      : <div><i className="fa fa-search" aria-hidden="true"></i> Job Id: {jobId}</div>,
           className : 'supress',
         }],
+      });
+    })
+    .fail(() => {
+      this.setState({
+        error: true,
       });
     });
   }
@@ -69,21 +79,29 @@ export default class OutputDirectory extends React.Component {
           headers={this.state.headers}
           infos={this.state.infos}
         />
-        <div className="container job-output-directory">
-          {
-            this.state.output.files.length === 0 &&
-              this.state.output.directories.length === 0 ?
-              <div>No Output found </div> :
-              <div>
-                <Navigation url={this.state.url} />
-                <Table>
-                  <TableHeader headers={['Name', 'Size', 'Last Modified (UTC)']} />
-                  <TableBody output={this.state.output} />
-                </Table>
-                <DirectoryInfo output={this.state.output} />
-              </div>
-          }
-        </div>
+        {this.state.error ?
+          <div className="container job-output-directory"> Output not found </div> :
+          <div className="container job-output-directory">
+            {
+              this.state.fetching && !this.state.error ?
+                <Loading /> :
+                <div>
+                  <Navigation url={this.state.url} />
+                  {
+                      this.state.output.files.length === 0 && this.state.output.directories.length === 0 ?
+                        <div>Empty directory</div> :
+                        <div>
+                          <Table>
+                            <TableHeader headers={['Name', 'Size', 'Last Modified (UTC)']} />
+                            <TableBody output={this.state.output} />
+                          </Table>
+                          <DirectoryInfo output={this.state.output} />
+                        </div>
+                  }
+                </div>
+            }
+          </div>
+        }
         <SiteFooter />
       </div>
     );

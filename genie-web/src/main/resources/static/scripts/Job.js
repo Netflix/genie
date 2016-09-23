@@ -53,7 +53,7 @@ export default class Job extends Page {
         value : '',
         type  : 'select',
         selectFields: ['user', 'id', 'name', 'status', 'clusterName',
-          'cluserId', 'created', 'started', 'finished'].map(field => (
+          'clusterId', 'created', 'started', 'finished'].map(field => (
             {
               value: field,
               label: field,
@@ -77,7 +77,7 @@ export default class Job extends Page {
         type  : 'input',
       }, {
         label : 'Cluster ID',
-        name  : 'cluserId',
+        name  : 'clusterId',
         value : '',
         type  : 'input',
       }, {

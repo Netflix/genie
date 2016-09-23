@@ -1,4 +1,5 @@
 import React, { PropTypes as T } from 'react';
+import { Link } from 'react-router';
 
 import { momentFormat, fetch } from '../utils';
 import Modal from 'react-modal';
@@ -18,11 +19,14 @@ export default class JobDetails extends React.Component {
       job: {
         id: '',
         _links: {
-          output    : '',
-          request   : '',
-          execution : '',
-          status    : '',
-          self      : '',
+          output       : '',
+          request      : '',
+          execution    : '',
+          status       : '',
+          self         : '',
+          command      : '',
+          cluster      : '',
+          applications : '',
         },
       },
     };
@@ -90,51 +94,61 @@ export default class JobDetails extends React.Component {
             <table className="table job-detail-table">
               <tbody>
                 <tr>
-                  <td className="col-xs-2">Job Id:</td>
+                  <td className="col-xs-2 align-right">Job Id:</td>
                   <td>{this.state.job.id}</td>
                 </tr>
                 <tr>
-                  <td className="col-xs-2">Version:</td>
+                  <td className="col-xs-2 align-right">Version:</td>
                   <td>{this.state.job.version}</td>
                 </tr>
                 <tr>
-                  <td className="col-xs-2">Description:</td>
+                  <td className="col-xs-2 align-right">Description:</td>
                   <td>{this.state.job.description}</td>
                 </tr>
                 <tr>
-                  <td className="col-xs-2">Tags:</td>
+                  <td className="col-xs-2 align-right">Tags:</td>
                   <td>{this.state.job.tags}</td>
                 </tr>
                 <tr>
-                  <td className="col-xs-2">Status:</td>
+                  <td className="col-xs-2 align-right">Status:</td>
                   <td>{this.state.job.status}</td>
                 </tr>
                 <tr>
-                  <td className="col-xs-2">Status Msg:</td>
+                  <td className="col-xs-2 align-right">Status Msg:</td>
                   <td>{this.state.job.statusMsg}</td>
                 </tr>
                 <tr>
-                  <td className="col-xs-2">Created:</td>
+                  <td className="col-xs-2 align-right">Created:</td>
                   <td>{momentFormat(this.state.job.created)}</td>
                 </tr>
                 <tr>
-                  <td className="col-xs-2">Updated:</td>
+                  <td className="col-xs-2 align-right">Updated:</td>
                   <td>{momentFormat(this.state.job.updated)}</td>
                 </tr>
                 <tr>
-                  <td className="col-xs-2">Archive Location:</td>
+                  <td className="col-xs-2 align-right">Archive Location:</td>
                   <td>{this.state.job.archiveLocation}</td>
                 </tr>
                 <tr>
-                  <td className="col-xs-2">Command Name:</td>
-                  <td>{this.state.job.commandName}</td>
+                  <td className="col-xs-2 align-right">Command Name:</td>
+                  <td><Link to={`commands?name=${this.state.job.commandName}`}>{this.state.job.commandName}</Link></td>
                 </tr>
                 <tr>
-                  <td className="col-xs-2">Command Args:</td>
+                  <td className="col-xs-2 align-right">Command Args:</td>
                   <td>{this.state.job.commandArgs}</td>
                 </tr>
                 <tr>
-                  <td className="col-xs-2">Links:</td>
+                  <td className="col-xs-2 align-right">Details:</td>
+                  <td>
+                    <ul>
+                      <li><a href={this.state.job._links.cluster.href}>Cluster</a></li>
+                      <li><a href={this.state.job._links.command.href}>Command</a></li>
+                      <li><a href={this.state.job._links.applications.href}>Application</a></li>
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <td className="col-xs-2 align-right">Links:</td>
                   <td>
                     <ul>
                       <li><a href={this.state.job._links.self.href}>Json</a></li>

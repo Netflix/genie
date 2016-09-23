@@ -2,10 +2,10 @@ import React, { PropTypes as T } from 'react';
 import { Link } from 'react-router';
 
 const InfoTable = (props) =>
-  <table className="table">
+  <table className="table" style={{"width": "50%"}}>
     <thead>
       <tr>
-        <td>Id</td>
+        <td class="align-right">Id</td>
         <td>Name</td>
       </tr>
     </thead>
@@ -13,9 +13,9 @@ const InfoTable = (props) =>
       {props.data.map((info, index) =>
         <tr key={index}>
           <td>
-            <a href={`${props.type}?name=${info.name}&rowId=${info.id}`}>
+            <Link to={`${props.type}?name=${info.name}&rowId=${info.id}`}>
               {info.id}
-            </a>
+            </Link>
           </td>
           <td>{info.name}</td>
         </tr>

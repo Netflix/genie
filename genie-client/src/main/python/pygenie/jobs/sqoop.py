@@ -81,12 +81,13 @@ class SqoopJob(GenieJob):
 
         for flag in [f for f in self._command_options.keys() if f != '-D']:
             for name, value in self._command_options[flag].items():
-                value = unicode(value).replace('\n', ' ') if value is not None else ''
-                opts_file = "{opts}{flag}{name}\n'{value}'\n" \
+                if value is not None:
+                    value = unicode(value).replace('\n', ' ')
+                opts_file = "{opts}{flag}{name}{value}\n" \
                     .format(opts=opts_file,
                             flag=flag,
                             name=name,
-                            value=value)
+                            value="\n'{}'".format(value) if value is not None else '')
 
         return opts_file
 
@@ -192,7 +193,7 @@ class SqoopJob(GenieJob):
         Example:
             >>> # sqoop --password passw0rd
             >>> job = SqoopJob() \\
-            ...     .username('passw0rd')
+            ...     .password('passw0rd')
 
         Args:
             value (str): The value to set the '--password' option to.
@@ -256,3 +257,21 @@ class SqoopJob(GenieJob):
         """
 
         return self.option('target-dir', value)
+
+    def username(self, value):
+        """
+        Set the '--username' parameter for the Sqoop command.
+
+        Example:
+            >>> # sqoop --username jsmith
+            >>> job = SqoopJob() \\
+            ...     .username('jsmith')
+
+        Args:
+            value (str): The value to set the '--username' option to.
+
+        Returns:
+            :py:class:`SqoopJob`: self
+        """
+
+        return self.option('username', value)

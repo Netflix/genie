@@ -1,6 +1,7 @@
 package com.netflix.genie.web.tasks.job
 
 import com.netflix.genie.common.dto.Job
+import com.netflix.genie.common.dto.JobRequest
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.exceptions.GenieServerException
 import com.netflix.genie.core.events.JobFinishedEvent
@@ -69,5 +70,15 @@ class JobCompletionServiceSpec extends Specification{
         1 * jobSearchService.getJob(jobId) >> new Job.Builder(NAME, USER, VERSION, COMMAND_ARGS)
                 .withId(jobId).withStatus(JobStatus.RUNNING).build();
         1 * jobPersistenceService.updateJobStatus(jobId,_,_)
+        when:
+        jobCompletionService.handleJobCompletion(new JobFinishedEvent(jobId, JobFinishedReason.KILLED, "null", this))
+        then:
+        noExceptionThrown()
+        1 * jobSearchService.getJob(jobId) >> new Job.Builder(NAME, USER, VERSION, COMMAND_ARGS)
+                .withId(jobId).withStatus(JobStatus.RUNNING).build();
+        1 * jobSearchService.getJobRequest(jobId) >> new JobRequest.Builder(NAME, USER, VERSION, COMMAND_ARGS, null, null)
+                .withId(jobId).withEmail('admin@netflix.com').build();
+        1 * jobPersistenceService.updateJobStatus(jobId,_,_)
+        1 * mailService.sendEmail('admin@netflix.com',_,_)
     }
 }

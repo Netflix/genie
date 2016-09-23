@@ -68,7 +68,7 @@ div .container {
     padding: 5px;
 }
 
-.no-data-found {
+.result-panel-msg {
     padding-left: 50px;
 }
 
@@ -80,8 +80,8 @@ div .container {
     padding-top: 10px;
 }
 
-.job-detail-row {
-    padding-left: 30px;
+.compact-table {
+    width: 70%;
 }
 
 .job-detail-table tbody tr td {
@@ -133,6 +133,14 @@ div .container {
   color: #337ab7;
 }
 
+.break-word {
+  word-break: break-all;
+}
+
+.job-name {
+  word-break: break-all;
+}
+
 .job-table-row:hover {
   cursor: pointer;
 }
@@ -140,6 +148,10 @@ div .container {
 .copied-text {
   padding-top: 11px;
   font-size: 10px;
+}
+
+.align-right {
+    text-align: right;
 }
 /*
 a {

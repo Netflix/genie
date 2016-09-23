@@ -151,7 +151,7 @@ public class CommandRestController {
         @RequestParam(value = "user", required = false) final String user,
         @RequestParam(value = "status", required = false) final Set<String> statuses,
         @RequestParam(value = "tag", required = false) final Set<String> tags,
-        @PageableDefault(page = 0, size = 64, sort = {"updated"}, direction = Sort.Direction.DESC) final Pageable page,
+        @PageableDefault(size = 64, sort = {"updated"}, direction = Sort.Direction.DESC) final Pageable page,
         final PagedResourcesAssembler<Command> assembler
     ) throws GenieException {
         log.debug("Called [name | user | status | tags | page]");

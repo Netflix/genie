@@ -135,18 +135,18 @@ class TestingHiveJobRepr(unittest.TestCase):
             .dependencies('/hive/dep2') \
             .description('hive description') \
             .disable_archive() \
-            .email('jhive@email.com') \
+            .genie_email('jhive@email.com') \
+            .genie_setup_file('/hive.setup.sh') \
+            .genie_timeout(1) \
+            .genie_username('jhive') \
             .group('hive-group') \
             .job_id('hivejob_repr') \
             .job_name('hivejob_repr') \
             .job_version('1.1.5') \
             .parameter('param1', 'pval1') \
             .parameter('param2', 'pval2') \
-            .setup_file('/hive.setup.sh') \
             .tags('hive.tag.1') \
-            .tags('hive.tag.2') \
-            .timeout(1) \
-            .username('jhive')
+            .tags('hive.tag.2')
 
         job \
             .hiveconf('hconf1', '1') \
@@ -158,35 +158,37 @@ class TestingHiveJobRepr(unittest.TestCase):
 
         assert_equals(
             str(job),
-            u'HiveJob()'
-            u'.applications("hive.app.1")'
-            u'.applications("hive.app.2")'
-            u'.archive(False)'
-            u'.cluster_tags("hive.cluster1")'
-            u'.cluster_tags("hive.cluster2")'
-            u'.command_tags("hive.cmd1")'
-            u'.command_tags("hive.cmd2")'
-            u'.dependencies("/hive/dep1")'
-            u'.dependencies("/hive/dep2")'
-            u'.description("hive description")'
-            u'.email("jhive@email.com")'
-            u'.group("hive-group")'
-            u'.hiveconf("hconf1", "1")'
-            u'.hiveconf("hconf2", "2")'
-            u'.hiveconf("prop1", "1")'
-            u'.hiveconf("prop2", "2")'
-            u'.job_id("hivejob_repr")'
-            u'.job_name("hivejob_repr")'
-            u'.job_version("1.1.5")'
-            u'.parameter("param1", "pval1")'
-            u'.parameter("param2", "pval2")'
-            u'.property_file("/hive/conf.prop")'
-            u'.script("SELECT * FROM TEST")'
-            u'.setup_file("/hive.setup.sh")'
-            u'.tags("hive.tag.1")'
-            u'.tags("hive.tag.2")'
-            u'.timeout(1)'
-            u'.username("jhive")'
+            '.'.join([
+                'HiveJob()',
+                'applications("hive.app.1")',
+                'applications("hive.app.2")',
+                'archive(False)',
+                'cluster_tags("hive.cluster1")',
+                'cluster_tags("hive.cluster2")',
+                'command_tags("hive.cmd1")',
+                'command_tags("hive.cmd2")',
+                'dependencies("/hive/dep1")',
+                'dependencies("/hive/dep2")',
+                'description("hive description")',
+                'genie_email("jhive@email.com")',
+                'genie_setup_file("/hive.setup.sh")',
+                'genie_timeout(1)',
+                'genie_username("jhive")',
+                'group("hive-group")',
+                'hiveconf("hconf1", "1")',
+                'hiveconf("hconf2", "2")',
+                'hiveconf("prop1", "1")',
+                'hiveconf("prop2", "2")',
+                'job_id("hivejob_repr")',
+                'job_name("hivejob_repr")',
+                'job_version("1.1.5")',
+                'parameter("param1", "pval1")',
+                'parameter("param2", "pval2")',
+                'property_file("/hive/conf.prop")',
+                'script("SELECT * FROM TEST")',
+                'tags("hive.tag.1")',
+                'tags("hive.tag.2")'
+            ])
         )
 
 
@@ -218,16 +220,16 @@ class TestingHiveJobAdapters(unittest.TestCase):
             .command_tags('type:hive.cmd') \
             .dependencies(['/hive.file1', '/hive.file2']) \
             .description('this job is to test hivejob adapter') \
-            .email('jhive@email.com') \
+            .genie_email('jhive@email.com') \
+            .genie_setup_file('/hive/setup.sh') \
+            .genie_timeout(7) \
+            .genie_username('jhive') \
             .group('hive-group') \
             .job_id('hive-job1') \
             .job_name('testing_adapting_hivejob') \
             .job_version('0.0.hive') \
             .parameter('a', 'b') \
-            .setup_file('/hive/setup.sh') \
             .tags('hive.tag1, hive.tag2') \
-            .timeout(7) \
-            .username('jhive') \
             .script('SELECT * FROM DUAL')
 
         assert_equals(
@@ -275,17 +277,17 @@ class TestingHiveJobAdapters(unittest.TestCase):
             .command_tags('type:hive.cmd.2') \
             .dependencies(['/hive.file1', '/hive.file2']) \
             .description('this job is to test hivejob adapter') \
-            .email('hive@email.com') \
+            .genie_email('hive@email.com') \
+            .genie_setup_file('/hive/setup.sh') \
+            .genie_timeout(9) \
+            .genie_username('hive') \
             .group('hive-group') \
             .job_id('hive-job-2') \
             .job_name('testing_adapting_hivejob') \
             .job_version('0.0.hive-alpha') \
             .parameter('a', '1') \
             .parameter('b', '2') \
-            .setup_file('/hive/setup.sh') \
             .tags('hive.tag1, hive.tag2') \
-            .timeout(9) \
-            .username('hive') \
             .script('/hive/script.hql')
 
         assert_equals(
@@ -333,17 +335,17 @@ class TestingHiveJobAdapters(unittest.TestCase):
             .command_tags('type:hive.cmd.2') \
             .dependencies(['/hive.file1', '/hive.file2']) \
             .description('this job is to test hivejob adapter') \
-            .email('hive@email.com') \
+            .genie_email('hive@email.com') \
+            .genie_setup_file('/hive/setup.sh') \
+            .genie_timeout(9) \
+            .genie_username('hive') \
             .group('hive-group') \
             .job_id('hive-job-1') \
             .job_name('testing_adapting_hivejob') \
             .job_version('0.0.-0') \
             .parameter('a', 'a') \
             .parameter('b', 'b') \
-            .setup_file('/hive/setup.sh') \
             .tags('hive.tag.1, hive.tag.2') \
-            .timeout(9) \
-            .username('hive') \
             .property_file('x://properties.conf') \
             .script('SELECT * FROM DUAL')
 
@@ -396,17 +398,17 @@ class TestingHiveJobAdapters(unittest.TestCase):
             .command_tags('type:hive.cmd.2') \
             .dependencies(['/hive.file1', '/hive.file2']) \
             .description('this job is to test hivejob adapter') \
-            .email('hive@email.com') \
+            .genie_email('hive@email.com') \
+            .genie_setup_file('/hive/setup.sh') \
+            .genie_timeout(9) \
+            .genie_username('hive') \
             .group('hive-group') \
             .job_id('hive-job-1') \
             .job_name('testing_adapting_hivejob') \
             .job_version('0.0.-0') \
             .parameter('a', 'a') \
             .parameter('b', 'b') \
-            .setup_file('/hive/setup.sh') \
             .tags('hive.tag.1, hive.tag.2') \
-            .timeout(9) \
-            .username('hive') \
             .property_file('/properties.conf') \
             .script('/script.hql')
 
