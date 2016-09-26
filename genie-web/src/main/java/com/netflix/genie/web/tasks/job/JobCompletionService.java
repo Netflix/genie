@@ -503,11 +503,11 @@ public class JobCompletionService {
             final JobStatus status = this.jobSearchService.getJobStatus(jobId);
 
             final StringBuilder subject = new StringBuilder()
-                .append("Genie Job Finished. ID: [")
+                .append("Genie Job Finished. Id: [")
                 .append(jobId)
-                .append("] Name: [")
+                .append("], Name: [")
                 .append(jobRequest.getName())
-                .append("] Status [")
+                .append("], Status: [")
                 .append(status)
                 .append("].");
 
@@ -517,7 +517,7 @@ public class JobCompletionService {
                 .append("Status: [" + status + "]\n")
                 .append("User: [" + jobRequest.getUser() + "]\n")
                 .append("Description: [" + jobRequest.getDescription() + "]\n")
-                .append("Tags: [" + jobRequest.getTags() + "]\n");
+                .append("Tags: " + jobRequest.getTags() + "\n");
 
             this.mailServiceImpl.sendEmail(
                 email.get(),
