@@ -2,10 +2,10 @@ import React, { PropTypes as T } from 'react';
 import { Link } from 'react-router';
 
 const InfoTable = (props) =>
-  <table className="table">
+  <table className="table" style={{"width": "50%"}}>
     <thead>
       <tr>
-        <td>Id</td>
+        <td class="align-right">Id</td>
         <td>Name</td>
       </tr>
     </thead>

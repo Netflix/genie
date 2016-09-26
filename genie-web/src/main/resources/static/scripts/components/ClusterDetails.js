@@ -52,15 +52,15 @@ export default class ClusterDetails extends React.Component {
             <table className="table job-detail-table">
               <tbody>
                 <tr>
-                  <td className="col-xs-2">Description:</td>
+                  <td className="col-xs-2 align-right">Description:</td>
                   <td>{this.state.cluster.description}</td>
                 </tr>
                 <tr>
-                  <td className="col-xs-2">Setup File:</td>
+                  <td className="col-xs-2 align-right">Setup File:</td>
                   <td>{this.state.cluster.setupFile}</td>
                 </tr>
                 <tr>
-                  <td className="col-xs-2">Config:</td>
+                  <td className="col-xs-2 align-right">Config:</td>
                   <td>
                     <ul>
                       {this.state.cluster.configs.map((config, index) =>
@@ -70,15 +70,15 @@ export default class ClusterDetails extends React.Component {
                   </td>
                 </tr>
                 <tr>
-                  <td className="col-xs-2">Created:</td>
+                  <td className="col-xs-2 align-right">Created:</td>
                   <td>{momentFormat(this.state.cluster.created)}</td>
                 </tr>
                 <tr>
-                  <td className="col-xs-2">Updated:</td>
+                  <td className="col-xs-2 align-right">Updated:</td>
                   <td>{momentFormat(this.state.cluster.updated)}</td>
                 </tr>
                 <tr>
-                  <td className="col-xs-2">Commands:</td>
+                  <td className="col-xs-2 align-right">Commands:</td>
                   <td>
                     {this.state.commands.length > 0 ?
                       <InfoTable data={this.state.commands} type="commands" />

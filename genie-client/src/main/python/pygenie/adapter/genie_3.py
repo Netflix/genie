@@ -182,6 +182,11 @@ class Genie3Adapter(GenieBaseAdapter):
             'version': job.get('job_version')
         }
 
+        if job.get('genie_cpu'):
+            payload['cpu'] = job.get('genie_cpu')
+        if job.get('genie_memory'):
+            payload['memory'] = job.get('genie_memory')
+
         return payload
 
     def get(self, job_id, path=None, if_not_found=None, **kwargs):

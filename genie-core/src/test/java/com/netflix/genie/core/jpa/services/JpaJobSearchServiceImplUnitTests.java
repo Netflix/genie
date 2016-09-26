@@ -23,6 +23,8 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.core.jpa.entities.JobEntity;
 import com.netflix.genie.core.jpa.entities.JobExecutionEntity;
+import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
+import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobExecutionRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRequestRepository;
@@ -58,8 +60,13 @@ public class JpaJobSearchServiceImplUnitTests {
         this.jobRepository = Mockito.mock(JpaJobRepository.class);
         this.jobRequestRepository = Mockito.mock(JpaJobRequestRepository.class);
         this.jobExecutionRepository = Mockito.mock(JpaJobExecutionRepository.class);
-        this.service
-            = new JpaJobSearchServiceImpl(this.jobRepository, this.jobRequestRepository, this.jobExecutionRepository);
+        this.service = new JpaJobSearchServiceImpl(
+            this.jobRepository,
+            this.jobRequestRepository,
+            this.jobExecutionRepository,
+            Mockito.mock(JpaClusterRepository.class),
+            Mockito.mock(JpaCommandRepository.class)
+        );
     }
 
     /**
