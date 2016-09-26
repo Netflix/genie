@@ -19,6 +19,8 @@ dependencies {
     /*******************************
      * Test Dependencies
      *******************************/
+    testCompile "org.spockframework:spock-core:$spockVersion"
+    testCompile("cglib:cglib-nodep:$cgLibVersion") { force = true }
 }
 
 clean {
