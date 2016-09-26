@@ -60,6 +60,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -349,7 +350,7 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
             if (applications != null && !applications.isEmpty()) {
                 return applications.stream().map(ApplicationEntity::getDTO).collect(Collectors.toList());
             } else {
-                throw new GenieNotFoundException("Job " + id + " doesn't have a cluster associated with it");
+                return Collections.EMPTY_LIST;
             }
         } else {
             throw new GenieNotFoundException("No job with id " + id + " exists. Unable to get cluster");

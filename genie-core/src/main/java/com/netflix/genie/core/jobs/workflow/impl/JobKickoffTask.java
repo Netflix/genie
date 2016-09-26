@@ -203,8 +203,8 @@ public class JobKickoffTask extends GenieBaseTask {
         } catch (final IOException ioe) {
             log.debug("User does not exist. Creating it now.");
 
-            // Create the group for the user.
-            if (group != null) {
+            // Create the group for the user if its not the same as the user.
+            if (group != null && !group.equals(user)) {
                 final CommandLine groupCreateCommandLine = new CommandLine("sudo");
                 groupCreateCommandLine.addArgument("groupadd");
                 groupCreateCommandLine.addArgument(group);
