@@ -92,7 +92,12 @@ public class GenieResourceHttpRequestHandler extends ResourceHttpRequestHandler 
         final File file = resource.getFile();
         if (file.isDirectory()) {
             final Object rootDirAttribute = request.getAttribute(GENIE_JOB_IS_ROOT_DIRECTORY);
-            final boolean isRootDirectory = rootDirAttribute != null ? (Boolean) rootDirAttribute : true;
+            final boolean isRootDirectory;
+            if (rootDirAttribute != null) {
+                isRootDirectory = (Boolean) rootDirAttribute;
+            } else {
+                isRootDirectory = true;
+            }
             final String accept = request.getHeader(HttpHeaders.ACCEPT);
             final String requestUrl;
             if (request.getHeader(JobConstants.GENIE_FORWARDED_FROM_HEADER) != null) {
