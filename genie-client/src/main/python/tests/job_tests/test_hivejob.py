@@ -59,12 +59,12 @@ class TestingHiveJob(unittest.TestCase):
             .property('prop2', 'p2')
 
         assert_equals(
-            job.cmd_args,
             u" ".join([
                 u"--hiveconf hconf1=h1 --hiveconf prop1=p1 --hiveconf prop2=p2",
-                u"-d 'foo=fizz' -d 'bar=buzz'",
+                u"-i _hive_parameters.txt",
                 u"-f script.hive"
-            ])
+            ]),
+            job.cmd_args
         )
 
     @patch('pygenie.jobs.hive.is_file')
@@ -84,32 +84,35 @@ class TestingHiveJob(unittest.TestCase):
             job.cmd_args,
             u" ".join([
                 u"--hiveconf p2=v2 --hiveconf p1=v1",
-                u"-d 'hello=hi' -d 'goodbye=bye'",
+                u"-i _hive_parameters.txt",
                 u"-f test.hql"
             ])
         )
 
-    def test_cmd_args_constructed_quotes(self):
-        """Test HiveJob constructed cmd args with quotes."""
+
+@patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'})
+class TestingHiveJobParameters(unittest.TestCase):
+    """Test HiveJob parameters."""
+
+    def test_parameter_file(self):
+        """Test HiveJob parameters into file."""
 
         job = pygenie.jobs.HiveJob() \
-            .script('foo') \
             .parameter("spaces", "this has spaces") \
             .parameter("single_quotes", "test' test'") \
-            .parameter("escaped_single_quotes", "Barney\\'s Adventure") \
+            .parameter("escaped_single_quotes", "Barney\\\'s Adventure") \
             .parameter("unicode", "\xf3\xf3\xf3") \
             .parameter("number", 8)
 
         assert_equals(
-            job.cmd_args,
-            u" ".join([
-                u"-d 'escaped_single_quotes=Barney\\''s Adventure'",
-                u"-d 'spaces=this has spaces'",
-                u"-d 'single_quotes=test'' test'''",
-                u"-d 'unicode=\xf3\xf3\xf3'",
-                u"-d 'number=8'",
-                u"-f script.hive"
-            ])
+            '\n'.join([
+                "SET hivevar:escaped_single_quotes=Barney\\\'s Adventure;",
+                "SET hivevar:spaces=this has spaces;",
+                "SET hivevar:single_quotes=test' test';",
+                "SET hivevar:unicode=\xf3\xf3\xf3;",
+                "SET hivevar:number=8;"
+            ]),
+            job._parameter_file
         )
 
 
@@ -238,13 +241,14 @@ class TestingHiveJobAdapters(unittest.TestCase):
                 u'attachments': [
                     {u'name': u'hive.file1', u'data': u'file contents'},
                     {u'name': u'hive.file2', u'data': u'file contents'},
-                    {u'name': u'script.hive', u'data': u'SELECT * FROM DUAL'}
+                    {u'name': u'script.hive', u'data': u'SELECT * FROM DUAL'},
+                    {u'name': u'_hive_parameters.txt', u'data': u'SET hivevar:a=b;'}
                 ],
                 u'clusterCriterias': [
                     {u'tags': [u'type:hive.cluster1']},
                     {u'tags': [u'type:hive']}
                 ],
-                u'commandArgs': u'-d \'a=b\' -f script.hive',
+                u'commandArgs': u'-i _hive_parameters.txt -f script.hive',
                 u'commandCriteria': [u'type:hive.cmd'],
                 u'description': u'this job is to test hivejob adapter',
                 u'disableLogArchival': True,
@@ -296,13 +300,15 @@ class TestingHiveJobAdapters(unittest.TestCase):
                 u'attachments': [
                     {u'name': u'hive.file1', u'data': u'file contents'},
                     {u'name': u'hive.file2', u'data': u'file contents'},
-                    {u'name': u'script.hql', u'data': u'file contents'}
+                    {u'name': u'script.hql', u'data': u'file contents'},
+                    {u'name': u'_hive_parameters.txt',
+                     u'data': u'SET hivevar:a=1;\nSET hivevar:b=2;'}
                 ],
                 u'clusterCriterias': [
                     {u'tags': [u'type:hive.cluster2']},
                     {u'tags': [u'type:hive']}
                 ],
-                u'commandArgs': u'-d \'a=1\' -d \'b=2\' -f script.hql',
+                u'commandArgs': u'-i _hive_parameters.txt -f script.hql',
                 u'commandCriteria': [u'type:hive.cmd.2'],
                 u'description': u'this job is to test hivejob adapter',
                 u'disableLogArchival': True,
@@ -356,13 +362,14 @@ class TestingHiveJobAdapters(unittest.TestCase):
                 u'attachments': [
                     (u'hive.file1', u"open file '/hive.file1'"),
                     (u'hive.file2', u"open file '/hive.file2'"),
-                    (u'script.hive', u'SELECT * FROM DUAL')
+                    (u'script.hive', u'SELECT * FROM DUAL'),
+                    (u'_hive_parameters.txt', u'SET hivevar:a=a;\nSET hivevar:b=b;')
                 ],
                 u'clusterCriterias': [
                     {u'tags': [u'type:hive.cluster-1', u'type:hive.cluster-2']},
                     {u'tags': [u'type:hive']}
                 ],
-                u'commandArgs': u'-i properties.conf  -d \'a=a\' -d \'b=b\' -f script.hive',
+                u'commandArgs': u'-i properties.conf  -i _hive_parameters.txt -f script.hive',
                 u'commandCriteria': [u'type:hive.cmd.1', u'type:hive.cmd.2'],
                 u'dependencies': [u'x://properties.conf'],
                 u'description': u'this job is to test hivejob adapter',
@@ -383,7 +390,7 @@ class TestingHiveJobAdapters(unittest.TestCase):
     @patch('os.path.isfile')
     @patch('pygenie.jobs.hive.is_file')
     def test_genie3_payload_file_script(self, presto_is_file, os_isfile, file_open):
-        """Test PrestoJob payload for Genie 3 (file script)."""
+        """Test HiveJob payload for Genie 3 (file script)."""
 
         os_isfile.return_value = True
         presto_is_file.return_value = True
@@ -420,13 +427,14 @@ class TestingHiveJobAdapters(unittest.TestCase):
                     (u'hive.file1', u"open file '/hive.file1'"),
                     (u'hive.file2', u"open file '/hive.file2'"),
                     (u'properties.conf', u"open file '/properties.conf'"),
-                    (u'script.hql', u"open file '/script.hql'")
+                    (u'script.hql', u"open file '/script.hql'"),
+                    (u'_hive_parameters.txt', u'SET hivevar:a=a;\nSET hivevar:b=b;')
                 ],
                 u'clusterCriterias': [
                     {u'tags': [u'type:hive.cluster-1', u'type:hive.cluster-2']},
                     {u'tags': [u'type:hive']}
                 ],
-                u'commandArgs': u'-i properties.conf  -d \'a=a\' -d \'b=b\' -f script.hql',
+                u'commandArgs': u'-i properties.conf  -i _hive_parameters.txt -f script.hql',
                 u'commandCriteria': [u'type:hive.cmd.1', u'type:hive.cmd.2'],
                 u'dependencies': [],
                 u'description': u'this job is to test hivejob adapter',
