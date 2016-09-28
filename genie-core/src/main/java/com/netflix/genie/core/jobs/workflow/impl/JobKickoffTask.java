@@ -203,8 +203,11 @@ public class JobKickoffTask extends GenieBaseTask {
         } catch (final IOException ioe) {
             log.debug("User does not exist. Creating it now.");
 
+            // Determine if the group is valid by checking that its not null and not same as user.
+            final boolean isGroupValid = StringUtils.isNotBlank(group) && !group.equals(user);
+
             // Create the group for the user if its not the same as the user.
-            if (group != null && !group.equals(user) && StringUtils.isNotBlank(group)) {
+            if (isGroupValid) {
                 log.debug("Group and User are different so creating group now.");
                 final CommandLine groupCreateCommandLine = new CommandLine("sudo");
                 groupCreateCommandLine.addArgument("groupadd");
@@ -213,7 +216,7 @@ public class JobKickoffTask extends GenieBaseTask {
                 // We create the group and ignore the error as it will fail if group already exists.
                 // If the failure is due to some other reason, then user creation will fail and we catch that.
                 try {
-                    log.debug("Running command [" + groupCreateCommandLine.toString() + "]");
+                    log.debug("Running command to create group:  [" + groupCreateCommandLine.toString() + "]");
                     this.executor.execute(groupCreateCommandLine);
                 } catch (IOException ioexception) {
                     log.debug("Group creation threw an error as it might already exist");
@@ -224,7 +227,7 @@ public class JobKickoffTask extends GenieBaseTask {
             userCreateCommandLine.addArgument("useradd");
             userCreateCommandLine.addArgument(user);
 
-            if (StringUtils.isNotBlank(group) && !group.equals(user)) {
+            if (isGroupValid) {
                 userCreateCommandLine.addArgument("-G");
                 userCreateCommandLine.addArgument(group);
             }
@@ -232,7 +235,7 @@ public class JobKickoffTask extends GenieBaseTask {
             userCreateCommandLine.addArgument("-M");
 
             try {
-                log.debug("Running command [" + userCreateCommandLine.toString() + "]");
+                log.debug("Running command to create user: [" + userCreateCommandLine.toString() + "]");
                 this.executor.execute(userCreateCommandLine);
             } catch (IOException ioexception) {
                 throw new GenieServerException("Could not create user " + user + " with exception " + ioexception);
