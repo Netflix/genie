@@ -19,7 +19,9 @@ package com.netflix.genie.web.controllers;
 
 import com.github.fge.jsonpatch.JsonPatch;
 import com.google.common.collect.Lists;
+import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
+import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
@@ -89,7 +91,10 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
     @Test
     public void canCreateCommandWithoutId() throws Exception {
         Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
-        final String id = this.createCommand(null, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
+        final String id = this.createConfigResource(
+            new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY).build(),
+            null
+        );
 
         this.mvc
             .perform(MockMvcRequestBuilders.get(COMMANDS_API + "/" + id))
@@ -123,7 +128,10 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
     @Test
     public void canCreateCommandWithId() throws Exception {
         Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
-        createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
+        this.createConfigResource(
+            new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY).withId(ID).build(),
+            null
+        );
 
         this.mvc
             .perform(MockMvcRequestBuilders.get(COMMANDS_API + "/" + ID))
@@ -191,11 +199,29 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
         final String executable2 = UUID.randomUUID().toString();
         final String executable3 = UUID.randomUUID().toString();
 
-        createCommand(id1, name1, user1, version1, CommandStatus.ACTIVE, executable1, CHECK_DELAY);
+        this.createConfigResource(
+            new Command
+                .Builder(name1, user1, version1, CommandStatus.ACTIVE, executable1, CHECK_DELAY)
+                .withId(id1)
+                .build(),
+            null
+        );
         Thread.sleep(1000);
-        createCommand(id2, name2, user2, version2, CommandStatus.DEPRECATED, executable2, CHECK_DELAY);
+        this.createConfigResource(
+            new Command
+                .Builder(name2, user2, version2, CommandStatus.DEPRECATED, executable2, CHECK_DELAY)
+                .withId(id2)
+                .build(),
+            null
+        );
         Thread.sleep(1000);
-        createCommand(id3, name3, user3, version3, CommandStatus.INACTIVE, executable3, CHECK_DELAY);
+        this.createConfigResource(
+            new Command
+                .Builder(name3, user3, version3, CommandStatus.INACTIVE, executable3, CHECK_DELAY)
+                .withId(id3)
+                .build(),
+            null
+        );
 
         // Test finding all commands
         this.mvc
@@ -261,7 +287,13 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
     @Test
     public void canUpdateCommand() throws Exception {
         Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
-        createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
+        this.createConfigResource(
+            new Command
+                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
+                .withId(ID)
+                .build(),
+            null
+        );
         final String commandResource = COMMANDS_API + "/" + ID;
         final Command createdCommand = objectMapper
             .readValue(
@@ -317,7 +349,13 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
     @Test
     public void canPatchCommand() throws Exception {
         Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
-        final String id = this.createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
+        final String id = this.createConfigResource(
+            new Command
+                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
+                .withId(ID)
+                .build(),
+            null
+        );
         final String commandResource = COMMANDS_API + "/" + id;
         this.mvc
             .perform(MockMvcRequestBuilders.get(commandResource))
@@ -352,9 +390,24 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
     @Test
     public void canDeleteAllCommands() throws Exception {
         Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
-        createCommand(null, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
-        createCommand(null, NAME, USER, VERSION, CommandStatus.DEPRECATED, EXECUTABLE, CHECK_DELAY);
-        createCommand(null, NAME, USER, VERSION, CommandStatus.INACTIVE, EXECUTABLE, CHECK_DELAY);
+        this.createConfigResource(
+            new Command
+                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
+                .build(),
+            null
+        );
+        this.createConfigResource(
+            new Command
+                .Builder(NAME, USER, VERSION, CommandStatus.DEPRECATED, EXECUTABLE, CHECK_DELAY)
+                .build(),
+            null
+        );
+        this.createConfigResource(
+            new Command
+                .Builder(NAME, USER, VERSION, CommandStatus.INACTIVE, EXECUTABLE, CHECK_DELAY)
+                .build(),
+            null
+        );
         Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(3L));
 
         this.mvc
@@ -388,9 +441,27 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
         final String executable2 = UUID.randomUUID().toString();
         final String executable3 = UUID.randomUUID().toString();
 
-        createCommand(id1, name1, user1, version1, CommandStatus.ACTIVE, executable1, CHECK_DELAY);
-        createCommand(id2, name2, user2, version2, CommandStatus.DEPRECATED, executable2, CHECK_DELAY);
-        createCommand(id3, name3, user3, version3, CommandStatus.INACTIVE, executable3, CHECK_DELAY);
+        this.createConfigResource(
+            new Command
+                .Builder(name1, user1, version1, CommandStatus.ACTIVE, executable1, CHECK_DELAY)
+                .withId(id1)
+                .build(),
+            null
+        );
+        this.createConfigResource(
+            new Command
+                .Builder(name2, user2, version2, CommandStatus.ACTIVE, executable2, CHECK_DELAY)
+                .withId(id2)
+                .build(),
+            null
+        );
+        this.createConfigResource(
+            new Command
+                .Builder(name3, user3, version3, CommandStatus.ACTIVE, executable3, CHECK_DELAY)
+                .withId(id3)
+                .build(),
+            null
+        );
         Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(3L));
 
         this.mvc
@@ -412,7 +483,13 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
     @Test
     public void canAddConfigsToCommand() throws Exception {
         Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
-        createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
+        this.createConfigResource(
+            new Command
+                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
+                .withId(ID)
+                .build(),
+            null
+        );
         this.canAddElementsToResource(COMMANDS_API + "/" + ID + "/configs");
     }
 
@@ -424,7 +501,13 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
     @Test
     public void canUpdateConfigsForCommand() throws Exception {
         Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
-        createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
+        this.createConfigResource(
+            new Command
+                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
+                .withId(ID)
+                .build(),
+            null
+        );
         this.canUpdateElementsForResource(COMMANDS_API + "/" + ID + "/configs");
     }
 
@@ -436,7 +519,13 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
     @Test
     public void canDeleteConfigsForCommand() throws Exception {
         Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
-        createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
+        this.createConfigResource(
+            new Command
+                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
+                .withId(ID)
+                .build(),
+            null
+        );
         this.canDeleteElementsFromResource(COMMANDS_API + "/" + ID + "/configs");
     }
 
@@ -448,7 +537,13 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
     @Test
     public void canAddTagsToCommand() throws Exception {
         Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
-        createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
+        this.createConfigResource(
+            new Command
+                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
+                .withId(ID)
+                .build(),
+            null
+        );
         final String api = COMMANDS_API + "/" + ID + "/tags";
         this.canAddTagsToResource(api, ID, NAME);
     }
@@ -461,7 +556,13 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
     @Test
     public void canUpdateTagsForCommand() throws Exception {
         Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
-        createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
+        this.createConfigResource(
+            new Command
+                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
+                .withId(ID)
+                .build(),
+            null
+        );
         final String api = COMMANDS_API + "/" + ID + "/tags";
         this.canUpdateTagsForResource(api, ID, NAME);
     }
@@ -474,7 +575,13 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
     @Test
     public void canDeleteTagsForCommand() throws Exception {
         Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
-        createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
+        this.createConfigResource(
+            new Command
+                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
+                .withId(ID)
+                .build(),
+            null
+        );
         final String api = COMMANDS_API + "/" + ID + "/tags";
         this.canDeleteTagsForResource(api, ID, NAME);
     }
@@ -487,7 +594,13 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
     @Test
     public void canDeleteTagForCommand() throws Exception {
         Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
-        createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
+        this.createConfigResource(
+            new Command
+                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
+                .withId(ID)
+                .build(),
+            null
+        );
         final String api = COMMANDS_API + "/" + ID + "/tags";
         this.canDeleteTagForResource(api, ID, NAME);
     }
@@ -499,7 +612,13 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canAddApplicationsForACommand() throws Exception {
-        createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
+        this.createConfigResource(
+            new Command
+                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
+                .withId(ID)
+                .build(),
+            null
+        );
         final String commandApplicationsAPI = COMMANDS_API + "/" + ID + "/applications";
         this.mvc
             .perform(MockMvcRequestBuilders.get(commandApplicationsAPI))
@@ -510,8 +629,20 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
         final String placeholder = UUID.randomUUID().toString();
         final String applicationId1 = UUID.randomUUID().toString();
         final String applicationId2 = UUID.randomUUID().toString();
-        createApplication(applicationId1, placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE, null);
-        createApplication(applicationId2, placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE, null);
+        this.createConfigResource(
+            new Application
+                .Builder(placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE)
+                .withId(applicationId1)
+                .build(),
+            null
+        );
+        this.createConfigResource(
+            new Application
+                .Builder(placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE)
+                .withId(applicationId2)
+                .build(),
+            null
+        );
 
         this.mvc
             .perform(
@@ -541,7 +672,13 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             .andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
 
         final String applicationId3 = UUID.randomUUID().toString();
-        createApplication(applicationId3, placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE, null);
+        this.createConfigResource(
+            new Application
+                .Builder(placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE)
+                .withId(applicationId3)
+                .build(),
+            null
+        );
         this.mvc
             .perform(
                 MockMvcRequestBuilders
@@ -568,7 +705,13 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canSetApplicationsForACommand() throws Exception {
-        createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
+        this.createConfigResource(
+            new Command
+                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
+                .withId(ID)
+                .build(),
+            null
+        );
         final String commandApplicationsAPI = COMMANDS_API + "/" + ID + "/applications";
         this.mvc
             .perform(MockMvcRequestBuilders.get(commandApplicationsAPI))
@@ -580,9 +723,27 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
         final String applicationId1 = UUID.randomUUID().toString();
         final String applicationId2 = UUID.randomUUID().toString();
         final String applicationId3 = UUID.randomUUID().toString();
-        createApplication(applicationId1, placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE, null);
-        createApplication(applicationId2, placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE, null);
-        createApplication(applicationId3, placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE, null);
+        this.createConfigResource(
+            new Application
+                .Builder(placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE)
+                .withId(applicationId1)
+                .build(),
+            null
+        );
+        this.createConfigResource(
+            new Application
+                .Builder(placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE)
+                .withId(applicationId2)
+                .build(),
+            null
+        );
+        this.createConfigResource(
+            new Application
+                .Builder(placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE)
+                .withId(applicationId3)
+                .build(),
+            null
+        );
 
         this.mvc
             .perform(
@@ -665,14 +826,32 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canRemoveApplicationsFromACommand() throws Exception {
-        createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
+        this.createConfigResource(
+            new Command
+                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
+                .withId(ID)
+                .build(),
+            null
+        );
         final String commandApplicationsAPI = COMMANDS_API + "/" + ID + "/applications";
 
         final String placeholder = UUID.randomUUID().toString();
         final String applicationId1 = UUID.randomUUID().toString();
         final String applicationId2 = UUID.randomUUID().toString();
-        createApplication(applicationId1, placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE, null);
-        createApplication(applicationId2, placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE, null);
+        this.createConfigResource(
+            new Application
+                .Builder(placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE)
+                .withId(applicationId1)
+                .build(),
+            null
+        );
+        this.createConfigResource(
+            new Application
+                .Builder(placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE)
+                .withId(applicationId2)
+                .build(),
+            null
+        );
 
         this.mvc
             .perform(
@@ -701,16 +880,40 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canRemoveApplicationFromACommand() throws Exception {
-        createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
+        this.createConfigResource(
+            new Command
+                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
+                .withId(ID)
+                .build(),
+            null
+        );
         final String commandApplicationsAPI = COMMANDS_API + "/" + ID + "/applications";
 
         final String placeholder = UUID.randomUUID().toString();
         final String applicationId1 = UUID.randomUUID().toString();
         final String applicationId2 = UUID.randomUUID().toString();
         final String applicationId3 = UUID.randomUUID().toString();
-        createApplication(applicationId1, placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE, null);
-        createApplication(applicationId2, placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE, null);
-        createApplication(applicationId3, placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE, null);
+        this.createConfigResource(
+            new Application
+                .Builder(placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE)
+                .withId(applicationId1)
+                .build(),
+            null
+        );
+        this.createConfigResource(
+            new Application
+                .Builder(placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE)
+                .withId(applicationId2)
+                .build(),
+            null
+        );
+        this.createConfigResource(
+            new Application
+                .Builder(placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE)
+                .withId(applicationId3)
+                .build(),
+            null
+        );
 
         this.mvc
             .perform(
@@ -766,14 +969,35 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canGetClustersForCommand() throws Exception {
-        createCommand(ID, NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
+        this.createConfigResource(
+            new Command
+                .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
+                .withId(ID)
+                .build(),
+            null
+        );
         final String placeholder = UUID.randomUUID().toString();
         final String cluster1Id = UUID.randomUUID().toString();
         final String cluster2Id = UUID.randomUUID().toString();
         final String cluster3Id = UUID.randomUUID().toString();
-        createCluster(cluster1Id, placeholder, placeholder, placeholder, ClusterStatus.UP);
-        createCluster(cluster2Id, placeholder, placeholder, placeholder, ClusterStatus.OUT_OF_SERVICE);
-        createCluster(cluster3Id, placeholder, placeholder, placeholder, ClusterStatus.TERMINATED);
+        this.createConfigResource(
+            new Cluster.Builder(placeholder, placeholder, placeholder, ClusterStatus.UP).withId(cluster1Id).build(),
+            null
+        );
+        this.createConfigResource(
+            new Cluster
+                .Builder(placeholder, placeholder, placeholder, ClusterStatus.OUT_OF_SERVICE)
+                .withId(cluster2Id)
+                .build(),
+            null
+        );
+        this.createConfigResource(
+            new Cluster
+                .Builder(placeholder, placeholder, placeholder, ClusterStatus.TERMINATED)
+                .withId(cluster3Id)
+                .build(),
+            null
+        );
 
         final List<String> commandIds = Lists.newArrayList(ID);
         this.mvc
