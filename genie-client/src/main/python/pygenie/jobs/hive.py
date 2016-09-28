@@ -63,12 +63,14 @@ class HiveJob(GenieJob):
         elif self._script is not None:
             self._add_dependency({'name': filename, 'data': self._script})
 
-        params_str = ' '.join([
-            "-d '{name}={value}'" \
-                .format(name=k,
-                        value=unicode(v).replace("'", "''")) \
-            for k, v in self._parameters.items()
-        ])
+        # put parameters into a parameter file and specify parameter file on command line
+        # this is to get around weird quoting issues in parameter values, etc
+        param_str = self._parameter_file
+        if param_str:
+            self._add_dependency({
+                'name': '_hive_parameters.txt',
+                'data': param_str
+            })
 
         props_str = ' '.join([
             '--hiveconf {name}={value}'.format(name=k, value=v) \
@@ -83,8 +85,22 @@ class HiveJob(GenieJob):
             .format(prop_file=prop_file_str,
                     props=props_str,
                     filename=filename,
-                    params=params_str) \
+                    params='-i _hive_parameters.txt' if param_str else '') \
             .strip()
+
+    @property
+    def _parameter_file(self):
+        """Takes specified parameters and creates a string for the parameter file."""
+
+        param_file = ""
+
+        for name, value in self._parameters.items():
+            param_file = '{p}SET hivevar:{name}={value};\n' \
+                .format(p=param_file,
+                        name=name,
+                        value=unicode(value))
+
+        return param_file.strip()
 
     def headers(self):
         """

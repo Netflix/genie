@@ -70,7 +70,7 @@ class PigJob(GenieJob):
             for p in self._parameter_files
         ])
 
-        # put parameters into a parameter file and specify paramter file on command line
+        # put parameters into a parameter file and specify parameter file on command line
         # this is to get around weird quoting issues in parameter values, etc
         param_str = self._parameter_file
         if param_str:
@@ -108,7 +108,7 @@ class PigJob(GenieJob):
                         name=name,
                         value=unicode(value).replace('"', '\\"'))
 
-        return param_file
+        return param_file.strip()
 
     @unicodify
     @arg_list
