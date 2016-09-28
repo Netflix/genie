@@ -1,4 +1,4 @@
-apply plugin: 'spring-boot'
+apply plugin: "spring-boot"
 
 dependencies {
     /*******************************
@@ -31,13 +31,13 @@ jar {
 }
 
 springBoot {
-    layout = 'ZIP'
-    mainClass = 'com.netflix.genie.GenieWeb'
+    layout = "ZIP"
+    mainClass = "com.netflix.genie.GenieWeb"
 }
 
 def env = project.hasProperty("env") ? project.getProperty("env") : "dev"
 
 bootRun {
     addResources = false
-    systemProperty 'spring.profiles.active', env
+    systemProperty "spring.profiles.active", env
 }

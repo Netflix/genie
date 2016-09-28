@@ -2,7 +2,7 @@ buildscript {
     repositories {
         jcenter()
         maven {
-            url 'http://repo.spring.io/milestone'
+            url "http://repo.spring.io/milestone"
         }
     }
 
@@ -15,46 +15,47 @@ buildscript {
 }
 
 plugins {
-    id 'com.github.kt3k.coveralls' version '2.6.3'
-    id 'nebula.netflixoss' version '3.4.0'
-    id 'nebula.optional-base' version '3.0.3'
-    id 'nebula.provided-base' version '3.0.3'
+    id "com.github.kt3k.coveralls" version "2.6.3"
+    id "nebula.netflixoss" version "3.4.0"
+    id "nebula.optional-base" version "3.0.3"
+    id "nebula.provided-base" version "3.0.3"
+    id "org.ajoberstar.github-pages" version "1.6.0-rc.1"
 }
 
 ext.githubProjectName = rootProject.name
 
 allprojects {
-    apply plugin: 'jacoco'
-    apply plugin: 'idea'
-    apply plugin: 'eclipse'
+    apply plugin: "jacoco"
+    apply plugin: "idea"
+    apply plugin: "eclipse"
 
     repositories {
         jcenter()
         maven {
-            url 'http://repo.spring.io/milestone'
+            url "http://repo.spring.io/milestone"
         }
     }
 }
 
 idea {
     project {
-        jdkName = '1.8'
-        languageLevel = '1.8'
-        vcs = 'Git'
+        jdkName = "1.8"
+        languageLevel = "1.8"
+        vcs = "Git"
     }
 }
 
 subprojects {
-    apply plugin: 'nebula.netflixoss'
-    apply plugin: 'java'
-    apply plugin: 'checkstyle'
-    apply plugin: 'findbugs'
-    apply plugin: 'pmd'
-    apply plugin: 'io.spring.dependency-management'
-    apply plugin: 'nebula.optional-base'
-    apply plugin: 'nebula.provided-base'
-    apply plugin: 'com.gorylenko.gradle-git-properties'
-    apply plugin: 'groovy'
+    apply plugin: "nebula.netflixoss"
+    apply plugin: "java"
+    apply plugin: "checkstyle"
+    apply plugin: "findbugs"
+    apply plugin: "pmd"
+    apply plugin: "io.spring.dependency-management"
+    apply plugin: "nebula.optional-base"
+    apply plugin: "nebula.provided-base"
+    apply plugin: "com.gorylenko.gradle-git-properties"
+    apply plugin: "groovy"
 
     group = "com.netflix.${githubProjectName}"
 
@@ -63,8 +64,8 @@ subprojects {
 
     dependencyManagement {
         imports {
-            mavenBom 'io.spring.platform:platform-bom:2.0.8.RELEASE'
-//            mavenBom 'org.springframework.cloud:spring-cloud-starter-parent:Brixton.RC1'
+            mavenBom "io.spring.platform:platform-bom:2.0.8.RELEASE"
+//            mavenBom "org.springframework.cloud:spring-cloud-starter-parent:Brixton.RC1"
         }
     }
 
@@ -116,32 +117,32 @@ subprojects {
         testRuntime("javax.el:javax.el-api")
         testRuntime("org.glassfish:javax.el")
 
-        testCompile 'org.spockframework:spock-core'
-        testCompile 'org.spockframework:spock-spring'
+        testCompile "org.spockframework:spock-core"
+        testCompile "org.spockframework:spock-spring"
         testCompile("cglib:cglib-nodep:${cglib_nodep_version}")
     }
 
-    task unitTests(type: Test, group: 'verification') {
+    task unitTests(type: Test, group: "verification") {
         useJUnit {
-            includeCategories 'com.netflix.genie.test.categories.UnitTest'
-            excludeCategories 'com.netflix.genie.test.categories.IntegrationTest'
-            excludeCategories 'com.netflix.genie.test.categories.DocumentationTest'
+            includeCategories "com.netflix.genie.test.categories.UnitTest"
+            excludeCategories "com.netflix.genie.test.categories.IntegrationTest"
+            excludeCategories "com.netflix.genie.test.categories.DocumentationTest"
         }
     }
 
-    task integrationTests(type: Test, group: 'verification') {
+    task integrationTests(type: Test, group: "verification") {
         useJUnit {
-            includeCategories 'com.netflix.genie.test.categories.IntegrationTest'
-            excludeCategories 'com.netflix.genie.test.categories.UnitTest'
-            excludeCategories 'com.netflix.genie.test.categories.DocumentationTest'
+            includeCategories "com.netflix.genie.test.categories.IntegrationTest"
+            excludeCategories "com.netflix.genie.test.categories.UnitTest"
+            excludeCategories "com.netflix.genie.test.categories.DocumentationTest"
         }
     }
 
-    task documentationTests(type: Test, group: 'verification') {
+    task documentationTests(type: Test, group: "verification") {
         useJUnit {
-            includeCategories 'com.netflix.genie.test.categories.DocumentationTest'
-            excludeCategories 'com.netflix.genie.test.categories.UnitTest'
-            excludeCategories 'com.netflix.genie.test.categories.IntegrationTest'
+            includeCategories "com.netflix.genie.test.categories.DocumentationTest"
+            excludeCategories "com.netflix.genie.test.categories.UnitTest"
+            excludeCategories "com.netflix.genie.test.categories.IntegrationTest"
         }
     }
 
@@ -164,7 +165,7 @@ subprojects {
     }
 
     checkstyle {
-        toolVersion = '6.11'
+        toolVersion = "6.11"
         configFile = new File(project.parent.projectDir, "codequality/checkstyle/checkstyle.xml")
     }
 
@@ -186,11 +187,11 @@ subprojects {
 }
 
 task clean(type: Delete) {
-    delete 'build'
+    delete "build"
 }
 
-task jacocoRootReport(type: JacocoReport, group: 'Coverage reports') {
-    group = 'Coverage Reports'
+task jacocoRootReport(type: JacocoReport, group: "Coverage reports") {
+    group = "Coverage Reports"
     dependsOn subprojects.test
     additionalSourceDirs = files(subprojects.sourceSets.main.allSource.srcDirs)
     sourceDirectories = files(subprojects.sourceSets.main.allSource.srcDirs)
@@ -216,11 +217,11 @@ coveralls {
 }
 
 tasks.coveralls {
-    group = 'Coverage reports'
-    description = 'Uploads the aggregated coverage report to Coveralls'
+    group = "Coverage reports"
+    description = "Uploads the aggregated coverage report to Coveralls"
 
     dependsOn jacocoRootReport
     onlyIf {
-        System.env.'CI'
+        System.env."CI"
     }
 }
