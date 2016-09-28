@@ -21,6 +21,7 @@ import com.github.fge.jsonpatch.JsonPatch;
 import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
+import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
@@ -76,7 +77,10 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
     @Test
     public void canCreateClusterWithoutId() throws Exception {
         Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
-        final String id = this.createCluster(null, NAME, USER, VERSION, ClusterStatus.UP);
+        final String id = this.createConfigResource(
+            new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).build(),
+            null
+        );
         this.mvc
             .perform(MockMvcRequestBuilders.get(CLUSTERS_API + "/" + id))
             .andExpect(MockMvcResultMatchers.status().isOk())
@@ -105,7 +109,10 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
     @Test
     public void canCreateClusterWithId() throws Exception {
         Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
-        this.createCluster(ID, NAME, USER, VERSION, ClusterStatus.UP);
+        this.createConfigResource(
+            new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(),
+            null
+        );
         this.mvc
             .perform(MockMvcRequestBuilders.get(CLUSTERS_API + "/" + ID))
             .andExpect(MockMvcResultMatchers.status().isOk())
@@ -165,11 +172,20 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         final String version2 = UUID.randomUUID().toString();
         final String version3 = UUID.randomUUID().toString();
 
-        createCluster(id1, name1, user1, version1, ClusterStatus.UP);
+        this.createConfigResource(
+            new Cluster.Builder(name1, user1, version1, ClusterStatus.UP).withId(id1).build(),
+            null
+        );
         Thread.sleep(1000);
-        createCluster(id2, name2, user2, version2, ClusterStatus.OUT_OF_SERVICE);
+        this.createConfigResource(
+            new Cluster.Builder(name2, user2, version2, ClusterStatus.OUT_OF_SERVICE).withId(id2).build(),
+            null
+        );
         Thread.sleep(1000);
-        createCluster(id3, name3, user3, version3, ClusterStatus.TERMINATED);
+        this.createConfigResource(
+            new Cluster.Builder(name3, user3, version3, ClusterStatus.TERMINATED).withId(id3).build(),
+            null
+        );
 
         // Test finding all clusters
         this.mvc
@@ -228,9 +244,12 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
     @Test
     public void canUpdateCluster() throws Exception {
         Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
-        createCluster(ID, NAME, USER, VERSION, ClusterStatus.UP);
+        this.createConfigResource(
+            new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(),
+            null
+        );
         final String clusterResource = CLUSTERS_API + "/" + ID;
-        final Cluster createdCluster = objectMapper
+        final Cluster createdCluster = this.objectMapper
             .readValue(
                 this.mvc.perform(
                     MockMvcRequestBuilders.get(clusterResource)
@@ -261,7 +280,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
             MockMvcRequestBuilders
                 .put(clusterResource)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(updateCluster.build()))
+                .content(this.objectMapper.writeValueAsBytes(updateCluster.build()))
         ).andExpect(MockMvcResultMatchers.status().isNoContent());
 
         this.mvc
@@ -282,7 +301,10 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
     @Test
     public void canPatchCluster() throws Exception {
         Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
-        final String id = this.createCluster(ID, NAME, USER, VERSION, ClusterStatus.UP);
+        final String id = this.createConfigResource(
+            new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(),
+            null
+        );
         final String clusterResource = CLUSTERS_API + "/" + id;
         this.mvc
             .perform(MockMvcRequestBuilders.get(clusterResource))
@@ -317,9 +339,9 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
     @Test
     public void canDeleteAllClusters() throws Exception {
         Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
-        createCluster(null, NAME, USER, VERSION, ClusterStatus.UP);
-        createCluster(null, NAME, USER, VERSION, ClusterStatus.OUT_OF_SERVICE);
-        createCluster(null, NAME, USER, VERSION, ClusterStatus.TERMINATED);
+        this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).build(), null);
+        this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.OUT_OF_SERVICE).build(), null);
+        this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.TERMINATED).build(), null);
         Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(3L));
 
         this.mvc
@@ -350,9 +372,18 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         final String version2 = UUID.randomUUID().toString();
         final String version3 = UUID.randomUUID().toString();
 
-        createCluster(id1, name1, user1, version1, ClusterStatus.UP);
-        createCluster(id2, name2, user2, version2, ClusterStatus.OUT_OF_SERVICE);
-        createCluster(id3, name3, user3, version3, ClusterStatus.TERMINATED);
+        this.createConfigResource(
+            new Cluster.Builder(name1, user1, version1, ClusterStatus.UP).withId(id1).build(),
+            null
+        );
+        this.createConfigResource(
+            new Cluster.Builder(name2, user2, version2, ClusterStatus.OUT_OF_SERVICE).withId(id2).build(),
+            null
+        );
+        this.createConfigResource(
+            new Cluster.Builder(name3, user3, version3, ClusterStatus.TERMINATED).withId(id3).build(),
+            null
+        );
         Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(3L));
 
         this.mvc
@@ -374,7 +405,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
     @Test
     public void canAddConfigsToCluster() throws Exception {
         Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
-        createCluster(ID, NAME, USER, VERSION, ClusterStatus.UP);
+        this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
         this.canAddElementsToResource(CLUSTERS_API + "/" + ID + "/configs");
     }
 
@@ -386,7 +417,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
     @Test
     public void canUpdateConfigsForCluster() throws Exception {
         Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
-        createCluster(ID, NAME, USER, VERSION, ClusterStatus.UP);
+        this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
         this.canUpdateElementsForResource(CLUSTERS_API + "/" + ID + "/configs");
     }
 
@@ -398,7 +429,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
     @Test
     public void canDeleteConfigsForCluster() throws Exception {
         Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
-        createCluster(ID, NAME, USER, VERSION, ClusterStatus.UP);
+        this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
         this.canDeleteElementsFromResource(CLUSTERS_API + "/" + ID + "/configs");
     }
 
@@ -410,7 +441,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
     @Test
     public void canAddTagsToCluster() throws Exception {
         Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
-        createCluster(ID, NAME, USER, VERSION, ClusterStatus.UP);
+        this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
         final String api = CLUSTERS_API + "/" + ID + "/tags";
         this.canAddTagsToResource(api, ID, NAME);
     }
@@ -423,7 +454,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
     @Test
     public void canUpdateTagsForCluster() throws Exception {
         Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
-        createCluster(ID, NAME, USER, VERSION, ClusterStatus.UP);
+        this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
         final String api = CLUSTERS_API + "/" + ID + "/tags";
         this.canUpdateTagsForResource(api, ID, NAME);
     }
@@ -436,7 +467,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
     @Test
     public void canDeleteTagsForCluster() throws Exception {
         Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
-        createCluster(ID, NAME, USER, VERSION, ClusterStatus.UP);
+        this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
         final String api = CLUSTERS_API + "/" + ID + "/tags";
         this.canDeleteTagsForResource(api, ID, NAME);
     }
@@ -449,7 +480,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
     @Test
     public void canDeleteTagForCluster() throws Exception {
         Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
-        createCluster(ID, NAME, USER, VERSION, ClusterStatus.UP);
+        this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
         final String api = CLUSTERS_API + "/" + ID + "/tags";
         this.canDeleteTagForResource(api, ID, NAME);
     }
@@ -461,7 +492,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canAddCommandsForACluster() throws Exception {
-        createCluster(ID, NAME, USER, VERSION, ClusterStatus.UP);
+        this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
         final String clusterCommandsAPI = CLUSTERS_API + "/" + ID + "/commands";
         this.mvc
             .perform(MockMvcRequestBuilders.get(clusterCommandsAPI))
@@ -472,8 +503,20 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         final String placeholder = UUID.randomUUID().toString();
         final String commandId1 = UUID.randomUUID().toString();
         final String commandId2 = UUID.randomUUID().toString();
-        createCommand(commandId1, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 1000L);
-        createCommand(commandId2, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 2000L);
+        this.createConfigResource(
+            new Command
+                .Builder(placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 1000L)
+                .withId(commandId1)
+                .build(),
+            null
+        );
+        this.createConfigResource(
+            new Command
+                .Builder(placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 2000L)
+                .withId(commandId2)
+                .build(),
+            null
+        );
 
         this.mvc
             .perform(
@@ -503,7 +546,13 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
             .andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
 
         final String commandId3 = UUID.randomUUID().toString();
-        createCommand(commandId3, placeholder, placeholder, placeholder, CommandStatus.INACTIVE, placeholder, 1000L);
+        this.createConfigResource(
+            new Command
+                .Builder(placeholder, placeholder, placeholder, CommandStatus.INACTIVE, placeholder, 1000L)
+                .withId(commandId3)
+                .build(),
+            null
+        );
         this.mvc
             .perform(
                 MockMvcRequestBuilders
@@ -539,7 +588,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canSetCommandsForACluster() throws Exception {
-        createCluster(ID, NAME, USER, VERSION, ClusterStatus.UP);
+        this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
         final String clusterCommandsAPI = CLUSTERS_API + "/" + ID + "/commands";
         this.mvc
             .perform(MockMvcRequestBuilders.get(clusterCommandsAPI))
@@ -550,8 +599,20 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         final String placeholder = UUID.randomUUID().toString();
         final String commandId1 = UUID.randomUUID().toString();
         final String commandId2 = UUID.randomUUID().toString();
-        createCommand(commandId1, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 4000L);
-        createCommand(commandId2, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 5000L);
+        this.createConfigResource(
+            new Command
+                .Builder(placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 4000L)
+                .withId(commandId1)
+                .build(),
+            null
+        );
+        this.createConfigResource(
+            new Command
+                .Builder(placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 5000L)
+                .withId(commandId2)
+                .build(),
+            null
+        );
 
         this.mvc
             .perform(
@@ -594,14 +655,26 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canRemoveCommandsFromACluster() throws Exception {
-        createCluster(ID, NAME, USER, VERSION, ClusterStatus.UP);
+        this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
         final String clusterCommandsAPI = CLUSTERS_API + "/" + ID + "/commands";
 
         final String placeholder = UUID.randomUUID().toString();
         final String commandId1 = UUID.randomUUID().toString();
         final String commandId2 = UUID.randomUUID().toString();
-        createCommand(commandId1, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 7000L);
-        createCommand(commandId2, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 8000L);
+        this.createConfigResource(
+            new Command
+                .Builder(placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 7000L)
+                .withId(commandId1)
+                .build(),
+            null
+        );
+        this.createConfigResource(
+            new Command
+                .Builder(placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 8000L)
+                .withId(commandId2)
+                .build(),
+            null
+        );
 
         this.mvc
             .perform(
@@ -630,16 +703,34 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canRemoveCommandFromACluster() throws Exception {
-        createCluster(ID, NAME, USER, VERSION, ClusterStatus.UP);
+        this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
         final String clusterCommandsAPI = CLUSTERS_API + "/" + ID + "/commands";
 
         final String placeholder = UUID.randomUUID().toString();
         final String commandId1 = UUID.randomUUID().toString();
         final String commandId2 = UUID.randomUUID().toString();
         final String commandId3 = UUID.randomUUID().toString();
-        createCommand(commandId1, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 1000L);
-        createCommand(commandId2, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 2000L);
-        createCommand(commandId3, placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 3000L);
+        this.createConfigResource(
+            new Command
+                .Builder(placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 1000L)
+                .withId(commandId1)
+                .build(),
+            null
+        );
+        this.createConfigResource(
+            new Command
+                .Builder(placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 2000L)
+                .withId(commandId2)
+                .build(),
+            null
+        );
+        this.createConfigResource(
+            new Command
+                .Builder(placeholder, placeholder, placeholder, CommandStatus.ACTIVE, placeholder, 3000L)
+                .withId(commandId3)
+                .build(),
+            null
+        );
 
         this.mvc
             .perform(
