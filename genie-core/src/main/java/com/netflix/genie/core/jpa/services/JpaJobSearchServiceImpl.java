@@ -36,6 +36,8 @@ import com.netflix.genie.core.jpa.entities.JobEntity_;
 import com.netflix.genie.core.jpa.entities.JobExecutionEntity;
 import com.netflix.genie.core.jpa.entities.JobExecutionEntity_;
 import com.netflix.genie.core.jpa.entities.JobRequestEntity;
+import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
+import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobExecutionRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRequestRepository;
@@ -60,6 +62,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -77,6 +80,8 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
     private final JpaJobRepository jobRepository;
     private final JpaJobRequestRepository jobRequestRepository;
     private final JpaJobExecutionRepository jobExecutionRepository;
+    private final JpaClusterRepository clusterRepository;
+    private final JpaCommandRepository commandRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -87,15 +92,21 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
      * @param jobRepository          The repository to use for job entities
      * @param jobRequestRepository   The repository to use for job request entities
      * @param jobExecutionRepository The repository to use for job execution entities
+     * @param clusterRepository      The repository to use for cluster entities
+     * @param commandRepository      The repository to use for command entities
      */
     public JpaJobSearchServiceImpl(
         final JpaJobRepository jobRepository,
         final JpaJobRequestRepository jobRequestRepository,
-        final JpaJobExecutionRepository jobExecutionRepository
+        final JpaJobExecutionRepository jobExecutionRepository,
+        final JpaClusterRepository clusterRepository,
+        final JpaCommandRepository commandRepository
     ) {
         this.jobRepository = jobRepository;
         this.jobRequestRepository = jobRequestRepository;
         this.jobExecutionRepository = jobExecutionRepository;
+        this.clusterRepository = clusterRepository;
+        this.commandRepository = commandRepository;
     }
 
     /**
@@ -134,9 +145,9 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
                 statuses,
                 tags,
                 clusterName,
-                clusterId,
+                clusterId == null ? null : this.clusterRepository.findOne(clusterId),
                 commandName,
-                commandId,
+                commandId == null ? null : this.commandRepository.findOne(commandId),
                 minStarted,
                 maxStarted,
                 minFinished,
@@ -349,7 +360,7 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
             if (applications != null && !applications.isEmpty()) {
                 return applications.stream().map(ApplicationEntity::getDTO).collect(Collectors.toList());
             } else {
-                throw new GenieNotFoundException("Job " + id + " doesn't have a cluster associated with it");
+                return Collections.EMPTY_LIST;
             }
         } else {
             throw new GenieNotFoundException("No job with id " + id + " exists. Unable to get cluster");

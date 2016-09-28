@@ -80,8 +80,8 @@ div .container {
     padding-top: 10px;
 }
 
-.job-detail-row {
-    padding-left: 30px;
+.compact-table {
+    width: 70%;
 }
 
 .job-detail-table tbody tr td {
@@ -148,6 +148,10 @@ div .container {
 .copied-text {
   padding-top: 11px;
   font-size: 10px;
+}
+
+.align-right {
+    text-align: right;
 }
 /*
 a {

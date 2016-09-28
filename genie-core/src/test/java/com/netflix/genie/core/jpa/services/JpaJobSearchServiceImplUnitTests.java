@@ -23,6 +23,8 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.core.jpa.entities.JobEntity;
 import com.netflix.genie.core.jpa.entities.JobExecutionEntity;
+import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
+import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobExecutionRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRequestRepository;
@@ -58,8 +60,13 @@ public class JpaJobSearchServiceImplUnitTests {
         this.jobRepository = Mockito.mock(JpaJobRepository.class);
         this.jobRequestRepository = Mockito.mock(JpaJobRequestRepository.class);
         this.jobExecutionRepository = Mockito.mock(JpaJobExecutionRepository.class);
-        this.service
-            = new JpaJobSearchServiceImpl(this.jobRepository, this.jobRequestRepository, this.jobExecutionRepository);
+        this.service = new JpaJobSearchServiceImpl(
+            this.jobRepository,
+            this.jobRequestRepository,
+            this.jobExecutionRepository,
+            Mockito.mock(JpaClusterRepository.class),
+            Mockito.mock(JpaCommandRepository.class)
+        );
     }
 
     /**
@@ -184,13 +191,13 @@ public class JpaJobSearchServiceImplUnitTests {
      *
      * @throws GenieException For any problem
      */
-    @Test(expected = GenieNotFoundException.class)
+    @Test()
     public void cantGetJobApplicationsIfApplicationsDoNotExist() throws GenieException {
         final String id = UUID.randomUUID().toString();
         final JobEntity entity = Mockito.mock(JobEntity.class);
         Mockito.when(entity.getApplications()).thenReturn(null);
         Mockito.when(this.jobRepository.findOne(id)).thenReturn(entity);
-        this.service.getJobApplications(id);
+        Assert.assertTrue(this.service.getJobApplications(id).isEmpty());
     }
 
     /**
@@ -198,13 +205,13 @@ public class JpaJobSearchServiceImplUnitTests {
      *
      * @throws GenieException For any problem
      */
-    @Test(expected = GenieNotFoundException.class)
+    @Test()
     public void cantGetJobApplicationsIfApplicationsAreEmpty() throws GenieException {
         final String id = UUID.randomUUID().toString();
         final JobEntity entity = Mockito.mock(JobEntity.class);
         Mockito.when(entity.getApplications()).thenReturn(Lists.newArrayList());
         Mockito.when(this.jobRepository.findOne(id)).thenReturn(entity);
-        this.service.getJobApplications(id);
+        Assert.assertTrue(this.service.getJobApplications(id).isEmpty());
     }
 
     /**

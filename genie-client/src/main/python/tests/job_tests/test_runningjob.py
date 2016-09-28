@@ -169,6 +169,36 @@ class TestingRunningJobProperties(unittest.TestCase):
 
     @patch('pygenie.adapter.genie_3.Genie3Adapter.get_status')
     @patch('pygenie.adapter.genie_3.Genie3Adapter.get_info_for_rj')
+    def test_get_runningjob_cpu(self, get_info, get_status):
+        """Test getting RunningJob.cpu."""
+
+        value = 9
+
+        get_status.return_value = 'RUNNING'
+        get_info.return_value = {'request_data': {'cpu': value}}
+
+        running_job = pygenie.jobs.RunningJob('rj-cpu')
+
+        # access property multiple times and make sure GET is only called once
+        values = [
+            running_job.cpu,
+            running_job.cpu,
+            running_job.cpu
+        ]
+
+        get_info.assert_called_once_with('rj-cpu', request=True)
+
+        assert_equals(
+            [
+                value,
+                value,
+                value
+            ],
+            values
+        )
+
+    @patch('pygenie.adapter.genie_3.Genie3Adapter.get_status')
+    @patch('pygenie.adapter.genie_3.Genie3Adapter.get_info_for_rj')
     def test_get_runningjob_description(self, get_info, get_status):
         """Test getting RunningJob.description."""
 
@@ -188,6 +218,36 @@ class TestingRunningJobProperties(unittest.TestCase):
 
         assert_equals(
             [value, value],
+            values
+        )
+
+    @patch('pygenie.adapter.genie_3.Genie3Adapter.get_status')
+    @patch('pygenie.adapter.genie_3.Genie3Adapter.get_info_for_rj')
+    def test_get_runningjob_memory(self, get_info, get_status):
+        """Test getting RunningJob.memory."""
+
+        value = 111
+
+        get_status.return_value = 'RUNNING'
+        get_info.return_value = {'request_data': {'memory': value}}
+
+        running_job = pygenie.jobs.RunningJob('rj-memory')
+
+        # access property multiple times and make sure GET is only called once
+        values = [
+            running_job.memory,
+            running_job.memory,
+            running_job.memory
+        ]
+
+        get_info.assert_called_once_with('rj-memory', request=True)
+
+        assert_equals(
+            [
+                value,
+                value,
+                value
+            ],
             values
         )
 

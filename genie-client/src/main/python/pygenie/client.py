@@ -113,12 +113,13 @@ class Genie(object):
         self.path_job = self.host \
             + self.conf.genie.get('job_url', '/api/v3/jobs')
 
-    def get_applications(self, filters=None):
+    def get_applications(self, filters=None, req_size=1000):
         """
         Get a list of applications.
 
         Args:
             filters (dict): a dictionary of filters to use in the query.
+            req_size (int): the number of items to return per request.
 
         Yields:
            dict: an application
@@ -129,10 +130,12 @@ class Genie(object):
 
         """
         params = filters or {}
-        _verify_filters(params, ['name', 'user', 'status', 'tag', 'type', 'page'])
+        _verify_filters(params, ['name', 'user', 'size', 'status', 'tag',
+                                 'type', 'page'])
 
         # Iterate through any responses until we get to the end
         params['page'] = 0
+        params['size'] = req_size
         while True:
             resp = _call(self.path_application, method='GET', params=params)
 
@@ -665,7 +668,7 @@ class Genie(object):
         _call(self.path_command, method='DELETE', raise_not_status=204)
 
     # TODO: Page and size should be separate arguments
-    def get_commands(self, filters=None):
+    def get_commands(self, filters=None, req_size=1000):
         """
         Get all of the commands in a cluster.
 
@@ -677,6 +680,7 @@ class Genie(object):
         Args:
             filters (dict): a dictionary of filters to use. Valid key parameters
                 are: name, user, status, tag
+            req_size (int): the number of items to return per request.
 
         Yields:
             dict: a command dictionary
@@ -693,10 +697,11 @@ class Genie(object):
         _check_type(filters, dict)
 
         params = filters or {}
-        _verify_filters(params, ['name', 'user', 'status', 'tag'])
+        _verify_filters(params, ['name', 'user', 'size', 'status', 'tag'])
 
         # Iterate through any responses until we get to the end
         params['page'] = 0
+        params['size'] = req_size
         while True:
             resp = _call(self.path_command, method='GET', params=params)
 
@@ -716,7 +721,7 @@ class Genie(object):
             logger.info('Fetching additional commands from genie [%s/%s]',
                          params['page'], resp['page']['totalPages'])
 
-    def get_clusters(self, filters=None):
+    def get_clusters(self, filters=None, req_size=1000):
         """
         Get all of the clusters.
 
@@ -728,6 +733,7 @@ class Genie(object):
         Args:
             filters (optional[dict]): a dictionary of filters to use. Valid key parameters
                 are: name, status, tag
+            req_size (int): the number of items to return per request.
 
         Yields:
             dict: a cluster configuration
@@ -741,10 +747,11 @@ class Genie(object):
 
         """
         params = filters or {}
-        _verify_filters(params, ['name', 'status', 'tag', 'page'])
+        _verify_filters(params, ['name', 'size', 'status', 'tag', 'page'])
 
         # Iterate through any responses until we get to the end
         params['page'] = 0
+        params['size'] = req_size
         while True:
             resp = _call(self.path_cluster, method='GET', params=params)
 
@@ -1440,7 +1447,7 @@ class Genie(object):
         path = self.path_command + '/' + command_id + '/' + tag
         _call(path, method='DELETE', raise_not_status=204)
 
-    def get_jobs(self, filters=None):
+    def get_jobs(self, filters=None, req_size=1000):
         """
         Get jobs. This command makes pages through results from Genie and will
         make multiple API calls until all of the results have been returned.
@@ -1448,6 +1455,7 @@ class Genie(object):
         Args:
             filters (dict): filter the jobs by these value(s). Valid parameters
                 are id, clusterName, user, status, and tag.
+            req_size (int): the number of items to return per request.
 
         Yields:
             dict: a job
@@ -1461,10 +1469,12 @@ class Genie(object):
 
         """
         params = filters or {}
-        _verify_filters(params, ['id', 'clusterName', 'user', 'status', 'tag'])
+        _verify_filters(params, ['id', 'clusterName', 'user', 'size', 'status'
+                                 'tag'])
 
         # Iterate through any responses until we get to the end
         params['page'] = 0
+        params['size'] = req_size
         while True:
             resp = _call(self.path_job, method='GET', params=params)
 

@@ -123,7 +123,7 @@ number = "8"
 spaces = "this has spaces"
 double_quotes = "Something: \\"Episode 189\\""
 unicode = "\u0147\u0147\u0147"
-escaped_single_quotes = "Barney\\'s Adventure"
+escaped_single_quotes = "Barney\\'s Adventure"\
 """
 
         assert_equals(
@@ -263,7 +263,7 @@ class TestingPigJobAdapters(unittest.TestCase):
                     {u'data': u'file contents', u'name': u'pig_param1.params'},
                     {u'data': u'file contents', u'name': u'pig_param2.params'},
                     {u'data': u'A = LOAD;', u'name': u'script.pig'},
-                    {u'data': u'param2 = "2"\nparam1 = "1"\n', u'name': u'_pig_parameters.txt'}
+                    {u'data': u'param2 = "2"\nparam1 = "1"', u'name': u'_pig_parameters.txt'}
                 ],
                 u'clusterCriterias': [
                     {u'tags': [u'type:pig_cluster_1']},
@@ -391,7 +391,7 @@ class TestingPigJobAdapters(unittest.TestCase):
                     (u'pig_param1.params', u"open file '/pig_param1.params'"),
                     (u'pig_param2.params', u"open file '/pig_param2.params'"),
                     (u'script.pig', u'A = LOAD;'),
-                    (u'_pig_parameters.txt', u'param2 = "2"\nparam1 = "1"\n')
+                    (u'_pig_parameters.txt', u'param2 = "2"\nparam1 = "1"')
                 ],
                 u'clusterCriterias': [
                     {u'tags': [u'type:pig_cluster_1']},

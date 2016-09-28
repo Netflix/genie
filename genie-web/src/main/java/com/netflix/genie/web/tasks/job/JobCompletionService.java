@@ -268,29 +268,31 @@ public class JobCompletionService {
 
     /**
      * An external fail-safe mechanism to clean up processes left behind by the run.sh after the
-     * job is killed or failed.
+     * job is killed or failed. This method is a no-op for jobs whose status is INVALID.
      *
      * @param jobId The id of the job to cleanup processes for.
      */
     private void cleanupProcesses(final String jobId) {
         try {
-            this.jobSearchService.getJobExecution(jobId).getProcessId().ifPresent(pid -> {
-                try {
-                    final CommandLine commandLine = new CommandLine(JobConstants.UNIX_PKILL_COMMAND);
-                    commandLine.addArgument(JobConstants.getKillFlag());
-                    commandLine.addArgument(Integer.toString(pid));
-                    executor.execute(commandLine);
+            if (!this.jobSearchService.getJobStatus(jobId).equals(JobStatus.INVALID)) {
+                this.jobSearchService.getJobExecution(jobId).getProcessId().ifPresent(pid -> {
+                    try {
+                        final CommandLine commandLine = new CommandLine(JobConstants.UNIX_PKILL_COMMAND);
+                        commandLine.addArgument(JobConstants.getKillFlag());
+                        commandLine.addArgument(Integer.toString(pid));
+                        executor.execute(commandLine);
 
-                    // The process group should not exist and the above code should always throw and exception.
-                    // If it does not then the bash script is not cleaning up stuff well during kills
-                    // or the script is done but child processes are still remaining. This metric tracks all that.
-                    processGroupCleanupFailureRate.increment();
-                } catch (final Exception e) {
-                    log.debug("Received expected exception. Ignoring.");
-                }
-            });
+                        // The process group should not exist and the above code should always throw and exception.
+                        // If it does not then the bash script is not cleaning up stuff well during kills
+                        // or the script is done but child processes are still remaining. This metric tracks all that.
+                        processGroupCleanupFailureRate.increment();
+                    } catch (final Exception e) {
+                        log.debug("Received expected exception. Ignoring.");
+                    }
+                });
+            }
         } catch (final GenieException ge) {
-            log.error("Unable to get job execution so unable to cleanup process for job " + jobId, ge);
+            log.error("Unable to cleanup process for job due to exception. " + jobId, ge);
             this.processGroupCleanupFailureRate.increment();
         }
     }
@@ -431,7 +433,9 @@ public class JobCompletionService {
         log.debug("Got a job finished event. Will process job directory.");
         boolean result = false;
         final Optional<String> oJobId = job.getId();
-        if (oJobId.isPresent()) {
+
+        // The deletion of dependencies and archiving only happens for job requests which are not Invalid.
+        if (oJobId.isPresent() && !(this.jobSearchService.getJobStatus(job.getId().get()).equals(JobStatus.INVALID))) {
             final String jobId = oJobId.get();
             final File jobDir = new File(this.baseWorkingDir, jobId);
 
@@ -493,13 +497,32 @@ public class JobCompletionService {
         final JobRequest jobRequest = this.jobSearchService.getJobRequest(jobId);
         boolean result = false;
         final Optional<String> email = jobRequest.getEmail();
+
         if (email.isPresent() && !Strings.isNullOrEmpty(email.get())) {
             log.debug("Got a job finished event. Sending email: {}", email.get());
             final JobStatus status = this.jobSearchService.getJobStatus(jobId);
+
+            final StringBuilder subject = new StringBuilder()
+                .append("Genie Job Finished. Id: [")
+                .append(jobId)
+                .append("], Name: [")
+                .append(jobRequest.getName())
+                .append("], Status: [")
+                .append(status)
+                .append("].");
+
+            final StringBuilder body = new StringBuilder()
+                .append("Id: [" + jobId + "]\n")
+                .append("Name: [" + jobRequest.getName() + "]\n")
+                .append("Status: [" + status + "]\n")
+                .append("User: [" + jobRequest.getUser() + "]\n")
+                .append("Description: [" + jobRequest.getDescription() + "]\n")
+                .append("Tags: " + jobRequest.getTags() + "\n");
+
             this.mailServiceImpl.sendEmail(
                 email.get(),
-                "Genie Job" + jobId,
-                "Job with id [" + jobId + "] finished with status " + status
+                subject.toString(),
+                body.toString()
             );
             result = true;
             this.emailSuccessRate.increment();

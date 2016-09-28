@@ -4,6 +4,12 @@ plugins {
     id "com.moowork.node" version "0.12"
 }
 
+apply plugin: 'org.asciidoctor.convert'
+
+ext {
+    snippetsDir = file('build/generated-snippets')
+}
+
 dependencies {
     /*******************************
      * Compile Dependencies
@@ -21,7 +27,7 @@ dependencies {
     compile("org.apache.httpcomponents:httpclient")
 
     // JWT JOSE implementation lib
-    compile("org.bitbucket.b_c:jose4j:0.5.1")
+    compile("org.bitbucket.b_c:jose4j:${jose4j_version}")
 
     // Spring Libs
     compile("org.springframework.boot:spring-boot-starter-actuator")
@@ -29,7 +35,6 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-hateoas")
     compile("org.springframework.boot:spring-boot-starter-redis")
     compile("org.springframework.boot:spring-boot-starter-security")
-    compile("org.springframework.boot:spring-boot-starter-thymeleaf")
     compile("org.springframework.boot:spring-boot-starter-tomcat")
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.cloud:spring-cloud-cluster-autoconfigure:${spring_cloud_cluster_version}")
@@ -42,9 +47,6 @@ dependencies {
     }
     compile("org.springframework.security.oauth:spring-security-oauth2")
     compile("org.springframework.session:spring-session")
-
-    // Thymeleaf Extras for Spring Security
-    compile("org.thymeleaf.extras:thymeleaf-extras-springsecurity4")
 
     /*******************************
      * Provided Dependencies
@@ -66,6 +68,8 @@ dependencies {
     testCompile("com.github.springtestdbunit:spring-test-dbunit:${spring_test_dbunit_version}")
     testCompile("com.jayway.jsonpath:json-path")
     testCompile("org.dbunit:dbunit:${dbunit_version}")
+    testCompile("org.springframework.restdocs:spring-restdocs-core:1.1.2.RELEASE")
+    testCompile("org.springframework.restdocs:spring-restdocs-mockmvc:1.1.2.RELEASE")
     testCompile("org.springframework.security:spring-security-test")
     testCompile("net.sf.jtidy:jtidy:${jtidy_version}")
     testCompile("com.github.tomakehurst:wiremock:${wiremock_version}")
@@ -75,10 +79,14 @@ license {
     excludes(["static/*", "*.yml", "genie-banner.txt"])
 }
 
-jar {
-    manifest {
-        attributes("Implementation-Version": version)
-    }
+test {
+    outputs.dir snippetsDir
+}
+
+asciidoctor {
+    attributes 'snippets': snippetsDir
+    inputs.dir snippetsDir
+    dependsOn test
 }
 
 processResources {
@@ -105,9 +113,15 @@ bundle.dependsOn(npm_install)
 
 jar {
     dependsOn bundle
+    dependsOn asciidoctor
 
     from("${project.projectDir}/src/main/resources/static/build") {
         into 'static'
     }
+    from ("${asciidoctor.outputDir}/html5") {
+        into 'static/docs'
+    }
+    manifest {
+        attributes("Implementation-Version": version)
+    }
 }
-

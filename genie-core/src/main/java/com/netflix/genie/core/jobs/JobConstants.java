@@ -321,7 +321,7 @@ public final class JobConstants {
         .append("}\n")
         .append("\n")
         .append("SELF_PID=$$\n\n")
-        .append("echo \"Start run execution\"\n")
+        .append("echo Start: `date '+%Y-%m-%d %H:%M:%S'`\n")
         .toString();
 
     /**

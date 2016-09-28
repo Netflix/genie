@@ -64,7 +64,7 @@ function handle_kill_request {
 
 SELF_PID=$$
 
-echo "Start run execution"
+echo Start: `date '+%Y-%m-%d %H:%M:%S'`
 
 export GENIE_JOB_DIR="TEST_GENIE_JOB_WORKING_DIR_PLACEHOLDER"
 
@@ -112,3 +112,4 @@ wait $!
 
 # Write the return code from the command in the done file.
 printf '{"exitCode": "%s"}\n' "$?" > ./genie/genie.done
+echo End: `date '+%Y-%m-%d %H:%M:%S'`
