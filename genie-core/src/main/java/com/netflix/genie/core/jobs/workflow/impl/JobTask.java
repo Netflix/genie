@@ -162,6 +162,10 @@ public class JobTask extends GenieBaseTask {
             writer.write(JobConstants.GENIE_DONE_FILE_CONTENT_PREFIX
                 + JobConstants.GENIE_DONE_FILE_NAME
                 + System.lineSeparator());
+
+            // Print the timestamp once its done running.
+            writer.write("echo End: `date '+%Y-%m-%d %H:%M:%S'`\n");
+
             log.info("Finished Job Task for job {}", jobExecEnv.getJobRequest().getId());
         } finally {
             final long finish = System.nanoTime();
