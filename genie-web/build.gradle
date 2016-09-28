@@ -4,10 +4,10 @@ plugins {
     id "com.moowork.node" version "0.12"
 }
 
-apply plugin: 'org.asciidoctor.convert'
+apply plugin: "org.asciidoctor.convert"
 
 ext {
-    snippetsDir = file('build/generated-snippets')
+    snippetsDir = file("build/generated-snippets")
 }
 
 dependencies {
@@ -35,6 +35,7 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-hateoas")
     compile("org.springframework.boot:spring-boot-starter-redis")
     compile("org.springframework.boot:spring-boot-starter-security")
+    compile("org.springframework.boot:spring-boot-starter-thymeleaf")
     compile("org.springframework.boot:spring-boot-starter-tomcat")
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.cloud:spring-cloud-cluster-autoconfigure:${spring_cloud_cluster_version}")
@@ -47,6 +48,9 @@ dependencies {
     }
     compile("org.springframework.security.oauth:spring-security-oauth2")
     compile("org.springframework.session:spring-session")
+
+    // Thymeleaf Extras for Spring Security
+    compile("org.thymeleaf.extras:thymeleaf-extras-springsecurity4")
 
     /*******************************
      * Provided Dependencies
@@ -84,15 +88,15 @@ test {
 }
 
 asciidoctor {
-    attributes 'snippets': snippetsDir
+    attributes "snippets": snippetsDir
     inputs.dir snippetsDir
     dependsOn test
 }
 
 processResources {
-    from('src/main/resources') {
-        include '**/*.properties'
-        include '**/*.yml'
+    from("src/main/resources") {
+        include "**/*.properties"
+        include "**/*.yml"
         filter ReplaceTokens, tokens: [
             "project.version": project.version.toString()
         ]
@@ -100,28 +104,25 @@ processResources {
 }
 
 node {
-    version = '4.4.0'
-    npmVersion = '3.8.6'
+    version = "4.4.0"
+    npmVersion = "3.8.6"
     download = true
 }
 
 task bundle(type: NpmTask) {
-    args = ['run', 'bundle']
+    args = ["run", "bundle"]
 }
 
 bundle.dependsOn(npm_install)
 
 jar {
     dependsOn bundle
-    dependsOn asciidoctor
 
-    from("${project.projectDir}/src/main/resources/static/build") {
-        into 'static'
-    }
-    from ("${asciidoctor.outputDir}/html5") {
-        into 'static/docs'
-    }
     manifest {
         attributes("Implementation-Version": version)
+    }
+
+    from("${project.projectDir}/src/main/resources/static/build") {
+        into "static"
     }
 }

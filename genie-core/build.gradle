@@ -64,7 +64,7 @@ dependencies {
     jpaModelGen("org.hibernate:hibernate-jpamodelgen")
 }
 
-task generateJPAMetaModel(type: JavaCompile, group: 'build', description: 'Generate JPA Meta Models') {
+task generateJPAMetaModel(type: JavaCompile, group: "build", description: "Generate JPA Meta Models") {
     source = sourceSets.main.java
     outputs.dir generatedSourcesJavaDir
     destinationDir = generatedSourcesJavaDir
@@ -86,7 +86,7 @@ tasks.withType(Checkstyle) {
 
 tasks.withType(FindBugs) {
     classes = classes.filter {
-        !it.path.contains('_')
+        !it.path.contains("_")
     }
 }
 
@@ -96,12 +96,12 @@ tasks.withType(Pmd) {
 
 test {
     jacoco {
-        excludes = ['com/netflix/genie/core/jpa/entities/*_*']
+        excludes = ["com/netflix/genie/core/jpa/entities/*_*"]
     }
 }
 
 jacocoTestReport {
     doFirst {
-        classDirectories = fileTree(dir: "${buildDir}/classes/main/").exclude(['com/netflix/genie/core/jpa/entities/*_*'])
+        classDirectories = fileTree(dir: "${buildDir}/classes/main/").exclude(["com/netflix/genie/core/jpa/entities/*_*"])
     }
 }
