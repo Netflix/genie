@@ -11,6 +11,7 @@ buildscript {
         classpath("io.spring.gradle:dependency-management-plugin:0.6.0.RELEASE")
         classpath("org.asciidoctor:asciidoctor-gradle-plugin:1.5.3")
         classpath("gradle.plugin.com.gorylenko.gradle-git-properties:gradle-git-properties:1.4.11")
+        classpath("com.netflix.nebula:gradle-aggregate-javadocs-plugin:3.0.1")
     }
 }
 
@@ -21,6 +22,8 @@ plugins {
     id "nebula.provided-base" version "3.0.3"
     id "org.ajoberstar.github-pages" version "1.6.0-rc.1"
 }
+
+apply plugin: "nebula-aggregate-javadocs"
 
 ext.githubProjectName = rootProject.name
 
@@ -43,6 +46,10 @@ idea {
         languageLevel = "1.8"
         vcs = "Git"
     }
+}
+
+task clean(type: Delete) {
+    delete "build"
 }
 
 subprojects {
@@ -186,10 +193,6 @@ subprojects {
     }
 }
 
-task clean(type: Delete) {
-    delete "build"
-}
-
 task jacocoRootReport(type: JacocoReport, group: "Coverage reports") {
     group = "Coverage Reports"
     dependsOn subprojects.test
@@ -221,6 +224,32 @@ tasks.coveralls {
     description = "Uploads the aggregated coverage report to Coveralls"
 
     dependsOn jacocoRootReport
+    onlyIf {
+        System.env."CI"
+    }
+}
+
+githubPages {
+    credentials {
+        username = System.getenv("GH_TOKEN")
+        password = ""
+    }
+    pages {
+        from "${project.buildDir}/docs/javadoc"
+        // by default this will copy into the root of the gh-pages branch and delete any previous files
+        // customizing the destination will only delete files within that target dir
+        into "docs/${version}/javadoc"
+    }
+}
+
+prepareGhPages {
+    dependsOn "aggregateJavadocs"
+    onlyIf {
+        System.env."CI"
+    }
+}
+
+publishGhPages {
     onlyIf {
         System.env."CI"
     }

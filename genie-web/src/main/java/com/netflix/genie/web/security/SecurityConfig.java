@@ -60,6 +60,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      * Configure the global authentication manager.
      *
      * @param auth The builder to configure
+     * @throws Exception on error
      */
     @Autowired
     protected void configureGlobal(final AuthenticationManagerBuilder auth) throws Exception {
