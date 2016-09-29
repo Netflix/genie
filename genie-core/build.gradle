@@ -34,7 +34,6 @@ dependencies {
     // AWS Libs
     compile("com.amazonaws:aws-java-sdk-sts:${aws_java_sdk_sts_version}")
 
-
     /*******************************
      * Provided Dependencies
      *******************************/
