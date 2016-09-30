@@ -94,7 +94,7 @@ public class JobClient extends BaseGenieClient {
         if (jobRequest == null) {
             throw new IllegalArgumentException("Job Request cannot be null.");
         }
-        return getIdFromLocation(jobService.submitJob(jobRequest).execute().headers().get("location"));
+        return getIdFromLocation(this.jobService.submitJob(jobRequest).execute().headers().get("location"));
     }
 
     /**
@@ -140,7 +140,7 @@ public class JobClient extends BaseGenieClient {
             attachmentFiles.add(part);
         }
 
-        final Response response = jobService.submitJobWithAttachments(jobRequest, attachmentFiles).execute();
+        final Response response = this.jobService.submitJobWithAttachments(jobRequest, attachmentFiles).execute();
         return getIdFromLocation(response.headers().get("location"));
     }
 
