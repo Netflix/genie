@@ -68,7 +68,6 @@ public abstract class BaseGenieClient {
         }
 
         final OkHttpClient.Builder builder = new OkHttpClient.Builder();
-        builder.retryOnConnectionFailure(false);
 
         if (genieNetworkConfiguration != null) {
             this.addConfigParamsFromConfig(builder, genieNetworkConfiguration);
@@ -84,9 +83,7 @@ public abstract class BaseGenieClient {
         // 4xx and 5xx errors.
         builder.addInterceptor(new ResponseMappingInterceptor());
         if (interceptors != null) {
-            for (final Interceptor interceptor : interceptors) {
-                builder.addInterceptor(interceptor);
-            }
+            interceptors.forEach(builder::addInterceptor);
         }
         final OkHttpClient client = builder.build();
 
@@ -97,11 +94,11 @@ public abstract class BaseGenieClient {
             .build();
     }
 
-    // Private helper method to add network configurations to oktthp builder
+    // Private helper method to add network configurations to okhttp builder
     private void addConfigParamsFromConfig(
         final OkHttpClient.Builder builder,
-        final GenieNetworkConfiguration genieNetworkConfiguration) {
-
+        final GenieNetworkConfiguration genieNetworkConfiguration
+    ) {
         if (genieNetworkConfiguration.getConnectTimeout() != GenieNetworkConfiguration.DEFAULT_TIMEOUT) {
             builder.connectTimeout(genieNetworkConfiguration.getConnectTimeout(), TimeUnit.MILLISECONDS);
         }
@@ -113,6 +110,8 @@ public abstract class BaseGenieClient {
         if (genieNetworkConfiguration.getWriteTimeout() != GenieNetworkConfiguration.DEFAULT_TIMEOUT) {
             builder.writeTimeout(genieNetworkConfiguration.getWriteTimeout(), TimeUnit.MILLISECONDS);
         }
+
+        builder.retryOnConnectionFailure(genieNetworkConfiguration.isRetryOnConnectionFailure());
     }
 
     /**

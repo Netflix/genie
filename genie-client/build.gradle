@@ -6,6 +6,7 @@ dependencies {
     compile project(":genie-common")
 
     compile("commons-beanutils:commons-beanutils")
+    compile("com.squareup.okhttp3:okhttp:${okhttp_version}")
     compile("com.squareup.retrofit2:retrofit:${retrofit_version}")
     compile("com.squareup.retrofit2:converter-jackson:${retrofit_version}")
     compile("org.apache.commons:commons-configuration2:${commons_configuration2_version}")
