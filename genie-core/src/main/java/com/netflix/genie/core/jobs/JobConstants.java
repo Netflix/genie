@@ -215,6 +215,11 @@ public final class JobConstants {
     public static final String GENIE_JOB_NAME_ENV_VAR = "GENIE_JOB_NAME";
 
     /**
+     * Environment variable for Genie Job Memory.
+     */
+    public static final String GENIE_JOB_MEMORY_ENV_VAR = "GENIE_JOB_MEMORY";
+
+    /**
      * Process ID.
      **/
     public static final String PID = "pid";
@@ -238,11 +243,6 @@ public final class JobConstants {
      * Key used to look up the writer object.
      */
     public static final String WRITER_KEY = "writer";
-
-//    /**
-//     * Key to store when the job was started on the system.
-//     */
-//    public static final String JOB_STARTED_KEY = "jobStarted";
 
     /**
      * UTC timezone.
@@ -331,7 +331,7 @@ public final class JobConstants {
     }
 
     /**
-     * Returns the apprporiate flag to append to kill command based on the OS.
+     * Returns the appropriate flag to append to kill command based on the OS.
      *
      * @return The flag to use for kill command.
      */
@@ -348,7 +348,7 @@ public final class JobConstants {
      *
      * @return The flag to use for kill command.
      */
-    public static int getChildProcessThreshold() {
+    private static int getChildProcessThreshold() {
         if (SystemUtils.IS_OS_LINUX) {
             return 3;
         } else {

@@ -15,19 +15,11 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.core.services;
 
 /**
- * A service which returns counts for various jobs.
+ * Classes to represent type safe configuration properties used by classes in core.
  *
  * @author tgianos
  * @since 3.0.0
  */
-public interface JobCountService {
-    /**
-     * Get the number of jobs active on this node.
-     *
-     * @return The number of jobs currently active on this node
-     */
-    int getNumJobs();
-}
+package com.netflix.genie.core.properties;

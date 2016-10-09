@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.core.services.impl;
 
-import com.netflix.genie.core.services.JobCountService;
+import com.netflix.genie.core.services.JobMetricsService;
 import com.netflix.genie.core.services.JobSearchService;
 
 import javax.validation.constraints.NotNull;
@@ -29,7 +29,7 @@ import javax.validation.constraints.NotNull;
  * @author tgianos
  * @since 3.0.0
  */
-public class JobCountServiceImpl implements JobCountService {
+public class JobMetricsServiceImpl implements JobMetricsService {
 
     private final JobSearchService jobSearchService;
     private final String hostName;
@@ -40,7 +40,7 @@ public class JobCountServiceImpl implements JobCountService {
      * @param jobSearchService The job search service to use.
      * @param hostName         The name of this host
      */
-    public JobCountServiceImpl(@NotNull final JobSearchService jobSearchService, @NotNull final String hostName) {
+    public JobMetricsServiceImpl(@NotNull final JobSearchService jobSearchService, @NotNull final String hostName) {
         this.jobSearchService = jobSearchService;
         this.hostName = hostName;
     }
@@ -49,7 +49,18 @@ public class JobCountServiceImpl implements JobCountService {
      * {@inheritDoc}
      */
     @Override
-    public int getNumJobs() {
+    public int getNumActiveJobs() {
         return this.jobSearchService.getAllActiveJobsOnHost(this.hostName).size();
+    }
+
+    /**
+     * Get the amount of memory currently used by jobs in MB.
+     *
+     * @return The total memory used by jobs in megabytes
+     */
+    @Override
+    public int getUsedMemory() {
+        //TODO: Fill this out with query from database
+        return 0;
     }
 }

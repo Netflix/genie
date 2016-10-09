@@ -17,8 +17,9 @@
  */
 package com.netflix.genie.core.services.impl;
 
-import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.test.categories.UnitTest;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -26,6 +27,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.rules.TemporaryFolder;
+import org.mockito.Mockito;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -72,10 +74,24 @@ public class FileSystemAttachmentServiceUnitTests {
         final String jobId = UUID.randomUUID().toString();
         final File original = this.saveAttachment(jobId);
         final File saved = new File(
-                this.folder.getRoot().getAbsolutePath() + "/" + jobId + "/" + original.getName()
+            this.folder.getRoot().getAbsolutePath() + "/" + jobId + "/" + original.getName()
         );
         Assert.assertTrue(original.exists());
         Assert.assertTrue(saved.exists());
+    }
+
+    /**
+     * Make sure it can't copy if the destination isn't a directory.
+     *
+     * @throws GenieException on error
+     * @throws IOException    on error
+     */
+    @Test(expected = GeniePreconditionException.class)
+    public void cantCopyIfDestinationIsntDirectory() throws GenieException, IOException {
+        final File destination = Mockito.mock(File.class);
+        Mockito.when(destination.exists()).thenReturn(true);
+        Mockito.when(destination.isDirectory()).thenReturn(false);
+        this.service.copy(UUID.randomUUID().toString(), destination);
     }
 
     /**
@@ -88,15 +104,7 @@ public class FileSystemAttachmentServiceUnitTests {
     public void canCopyAttachments() throws GenieException, IOException {
         final String jobId = UUID.randomUUID().toString();
         final String finalDirName = UUID.randomUUID().toString();
-        final Set<File> originals = new HashSet<>();
-        for (int i = 0; i < 10; i++) {
-            final File original = saveAttachment(jobId);
-            final File saved = new File(
-                    this.folder.getRoot().getAbsolutePath() + "/" + jobId + "/" + original.getName()
-            );
-            Assert.assertTrue(saved.exists());
-            originals.add(saved);
-        }
+        final Set<File> originals = this.saveAttachments(jobId);
         final File jobDir = new File(this.folder.getRoot().getAbsoluteFile(), jobId);
         Assert.assertTrue(jobDir.exists());
         final File finalDir = new File(this.folder.getRoot().getAbsoluteFile(), finalDirName);
@@ -120,20 +128,25 @@ public class FileSystemAttachmentServiceUnitTests {
     @Test
     public void canDeleteAttachments() throws GenieException, IOException {
         final String jobId = UUID.randomUUID().toString();
-        final Set<File> attachments = new HashSet<>();
-        for (int i = 0; i < 10; i++) {
-            final File original = saveAttachment(jobId);
-            final File saved = new File(
-                    this.folder.getRoot().getAbsolutePath() + "/" + jobId + "/" + original.getName()
-            );
-            Assert.assertTrue(saved.exists());
-            attachments.add(saved);
-        }
+        final Set<File> attachments = this.saveAttachments(jobId);
         final File jobDir = new File(this.folder.getRoot().getAbsoluteFile(), jobId);
         Assert.assertTrue(jobDir.exists());
         this.service.delete(jobId);
         Assert.assertFalse(jobDir.exists());
         attachments.forEach(file -> Assert.assertFalse(file.exists()));
+    }
+
+    private Set<File> saveAttachments(final String jobId) throws GenieException, IOException {
+        final Set<File> attachments = new HashSet<>();
+        for (int i = 0; i < 10; i++) {
+            final File original = saveAttachment(jobId);
+            final File saved = new File(
+                this.folder.getRoot().getAbsolutePath() + "/" + jobId + "/" + original.getName()
+            );
+            Assert.assertTrue(saved.exists());
+            attachments.add(saved);
+        }
+        return attachments;
     }
 
     private File saveAttachment(final String jobId) throws GenieException, IOException {

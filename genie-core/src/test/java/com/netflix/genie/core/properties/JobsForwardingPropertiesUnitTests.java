@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.properties;
+package com.netflix.genie.core.properties;
 
 import com.netflix.genie.test.categories.UnitTest;
 import org.hamcrest.Matchers;
@@ -33,16 +33,16 @@ import java.util.UUID;
  * @since 3.0.0
  */
 @Category(UnitTest.class)
-public class JobForwardingPropertiesUnitTests {
+public class JobsForwardingPropertiesUnitTests {
 
-    private JobForwardingProperties properties;
+    private JobsForwardingProperties properties;
 
     /**
      * Setup for the tests.
      */
     @Before
     public void setup() {
-        this.properties = new JobForwardingProperties();
+        this.properties = new JobsForwardingProperties();
     }
 
     /**

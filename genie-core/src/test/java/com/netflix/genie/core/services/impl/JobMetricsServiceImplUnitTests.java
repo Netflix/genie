@@ -31,17 +31,17 @@ import org.mockito.Mockito;
 import java.util.UUID;
 
 /**
- * Unit tests for the default implementation of the JobCountService.
+ * Unit tests for the default implementation of the JobMetricsService.
  *
  * @author tgianos
  * @since 3.0.0
  */
 @Category(UnitTest.class)
-public class JobCountServiceImplUnitTests {
+public class JobMetricsServiceImplUnitTests {
 
     private final String hostName = UUID.randomUUID().toString();
     private JobSearchService jobSearchService;
-    private JobCountServiceImpl jobCountService;
+    private JobMetricsServiceImpl jobMetricsService;
 
     /**
      * Setup for tests.
@@ -49,7 +49,7 @@ public class JobCountServiceImplUnitTests {
     @Before
     public void setup() {
         this.jobSearchService = Mockito.mock(JobSearchService.class);
-        this.jobCountService = new JobCountServiceImpl(this.jobSearchService, this.hostName);
+        this.jobMetricsService = new JobMetricsServiceImpl(this.jobSearchService, this.hostName);
     }
 
     /**
@@ -67,6 +67,6 @@ public class JobCountServiceImplUnitTests {
                 )
             );
 
-        Assert.assertThat(this.jobCountService.getNumJobs(), Matchers.is(3));
+        Assert.assertThat(this.jobMetricsService.getNumActiveJobs(), Matchers.is(3));
     }
 }

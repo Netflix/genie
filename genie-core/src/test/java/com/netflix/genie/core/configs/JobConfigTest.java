@@ -17,10 +17,6 @@
  */
 package com.netflix.genie.core.configs;
 
-/**
- * @author amsharma
- */
-
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import com.netflix.genie.core.jobs.workflow.impl.ApplicationTask;
@@ -30,6 +26,7 @@ import com.netflix.genie.core.jobs.workflow.impl.InitialSetupTask;
 import com.netflix.genie.core.jobs.workflow.impl.JobFailureAndKillHandlerLogicTask;
 import com.netflix.genie.core.jobs.workflow.impl.JobKickoffTask;
 import com.netflix.genie.core.jobs.workflow.impl.JobTask;
+import com.netflix.genie.core.properties.JobsProperties;
 import com.netflix.genie.core.services.AttachmentService;
 import com.netflix.genie.core.services.FileTransfer;
 import com.netflix.genie.core.services.impl.GenieFileTransferService;
@@ -37,7 +34,6 @@ import com.netflix.genie.core.services.impl.LocalFileTransferImpl;
 import com.netflix.spectator.api.Registry;
 import org.apache.commons.exec.Executor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -95,8 +91,8 @@ public class JobConfigTest {
     @Bean
     @Order(value = 2)
     public WorkflowTask clusterProcessorTask(
-            final Registry registry,
-            final GenieFileTransferService fts) {
+        final Registry registry,
+        final GenieFileTransferService fts) {
         return new ClusterTask(registry, fts);
     }
 
@@ -110,8 +106,8 @@ public class JobConfigTest {
     @Bean
     @Order(value = 3)
     public WorkflowTask applicationProcessorTask(
-            final Registry registry,
-            final GenieFileTransferService fts) {
+        final Registry registry,
+        final GenieFileTransferService fts) {
         return new ApplicationTask(registry, fts);
     }
 
@@ -125,8 +121,8 @@ public class JobConfigTest {
     @Bean
     @Order(value = 4)
     public WorkflowTask commandProcessorTask(
-            final Registry registry,
-            final GenieFileTransferService fts) {
+        final Registry registry,
+        final GenieFileTransferService fts) {
         return new CommandTask(registry, fts);
     }
 
@@ -145,7 +141,7 @@ public class JobConfigTest {
     public WorkflowTask jobProcessorTask(
         final AttachmentService attachmentService,
         final Registry registry,
-            final GenieFileTransferService fts
+        final GenieFileTransferService fts
     ) throws GenieException {
         return new JobTask(attachmentService, registry, fts);
     }
@@ -153,25 +149,27 @@ public class JobConfigTest {
     /**
      * Create an Job Kickoff Task bean that runs the job.
      *
-     * @param isRunAsUserEnabled    Flag that tells if job should be run as user specified in the request
-     * @param isUserCreationEnabled Flag that tells if the user specified should be created
-     * @param executor              An instance of an executor
-     * @param hostname              Host on which job will run
-     * @param registry              The metrics registry to use
+     * @param jobsProperties The jobs properties to use
+     * @param executor       An instance of an executor
+     * @param hostname       Host on which job will run
+     * @param registry       The metrics registry to use
      * @return An application task object
      */
     @Bean
     @Order(value = 6)
     @Autowired
     public WorkflowTask jobKickoffTask(
-        @Value("${genie.jobs.runAsUser.enabled:false}")
-        final boolean isRunAsUserEnabled,
-        @Value("${genie.jobs.createUser.enabled:false}")
-        final boolean isUserCreationEnabled,
+        final JobsProperties jobsProperties,
         final Executor executor,
         final String hostname,
         final Registry registry
     ) {
-        return new JobKickoffTask(isRunAsUserEnabled, isUserCreationEnabled, executor, hostname, registry);
+        return new JobKickoffTask(
+            jobsProperties.getUsers().isRunAsUserEnabled(),
+            jobsProperties.getUsers().isCreationEnabled(),
+            executor,
+            hostname,
+            registry
+        );
     }
 }

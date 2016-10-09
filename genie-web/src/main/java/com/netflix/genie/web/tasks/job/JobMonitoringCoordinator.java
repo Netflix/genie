@@ -27,9 +27,9 @@ import com.netflix.genie.core.events.JobFinishedReason;
 import com.netflix.genie.core.events.JobScheduledEvent;
 import com.netflix.genie.core.events.JobStartedEvent;
 import com.netflix.genie.core.jobs.JobConstants;
-import com.netflix.genie.core.services.JobCountService;
+import com.netflix.genie.core.properties.JobsProperties;
+import com.netflix.genie.core.services.JobMetricsService;
 import com.netflix.genie.core.services.JobSearchService;
-import com.netflix.genie.web.properties.JobOutputMaxProperties;
 import com.netflix.spectator.api.Counter;
 import com.netflix.spectator.api.Registry;
 import lombok.extern.slf4j.Slf4j;
@@ -62,10 +62,11 @@ import java.util.concurrent.ScheduledFuture;
 @Component
 @Primary
 @Slf4j
-public class JobMonitoringCoordinator implements JobCountService {
+public class JobMonitoringCoordinator implements JobMetricsService {
 
     private final Map<String, ScheduledFuture<?>> jobMonitors = Collections.synchronizedMap(new HashMap<>());
     private final Map<String, Future<?>> scheduledJobs = Collections.synchronizedMap(new HashMap<>());
+    private final Map<String, Integer> jobMemories = Collections.synchronizedMap(new HashMap<>());
     private final String hostName;
     private final JobSearchService jobSearchService;
     private final TaskScheduler scheduler;
@@ -74,7 +75,7 @@ public class JobMonitoringCoordinator implements JobCountService {
     private final Executor executor;
     private final Registry registry;
     private final File jobsDir;
-    private final JobOutputMaxProperties outputMaxProperties;
+    private final JobsProperties jobsProperties;
 
     private final Counter unableToCancel;
     private final Counter unableToReAttach;
@@ -82,15 +83,15 @@ public class JobMonitoringCoordinator implements JobCountService {
     /**
      * Constructor.
      *
-     * @param hostName            The name of the host this Genie process is running on
-     * @param jobSearchService    The search service to use to find jobs
-     * @param publisher           The application event publisher to use to publish synchronous events
-     * @param eventMulticaster    The event eventMulticaster to use to publish asynchronous events
-     * @param scheduler           The task scheduler to use to register scheduling of job checkers
-     * @param executor            The executor to use to launch processes
-     * @param registry            The metrics registry
-     * @param jobsDir             The directory where job output is stored
-     * @param outputMaxProperties The properties for the maximum length of job output files
+     * @param hostName         The name of the host this Genie process is running on
+     * @param jobSearchService The search service to use to find jobs
+     * @param publisher        The application event publisher to use to publish synchronous events
+     * @param eventMulticaster The event eventMulticaster to use to publish asynchronous events
+     * @param scheduler        The task scheduler to use to register scheduling of job checkers
+     * @param executor         The executor to use to launch processes
+     * @param registry         The metrics registry
+     * @param jobsDir          The directory where job output is stored
+     * @param jobsProperties   The properties pertaining to jobs
      * @throws IOException on error with the filesystem
      */
     @Autowired
@@ -103,7 +104,7 @@ public class JobMonitoringCoordinator implements JobCountService {
         final Executor executor,
         final Registry registry,
         final Resource jobsDir,
-        final JobOutputMaxProperties outputMaxProperties
+        final JobsProperties jobsProperties
     ) throws IOException {
         this.hostName = hostName;
         this.jobSearchService = jobSearchService;
@@ -113,12 +114,13 @@ public class JobMonitoringCoordinator implements JobCountService {
         this.executor = executor;
         this.registry = registry;
         this.jobsDir = jobsDir.getFile();
-        this.outputMaxProperties = outputMaxProperties;
+        this.jobsProperties = jobsProperties;
 
         // Automatically track the number of jobs running on this node
         this.registry.mapSize("genie.jobs.running.gauge", this.jobMonitors);
         this.registry.mapSize("genie.jobs.scheduled.gauge", this.scheduledJobs);
-        this.registry.methodValue("genie.jobs.active.gauge", this, "getNumJobs");
+        this.registry.methodValue("genie.jobs.active.gauge", this, "getNumActiveJobs");
+        this.registry.methodValue("genie.jobs.memory.used.gauge", this, "getUsedMemory");
         this.unableToCancel = registry.counter("genie.jobs.unableToCancel.rate");
         this.unableToReAttach = registry.counter("genie.jobs.unableToReAttach.rate");
     }
@@ -152,7 +154,9 @@ public class JobMonitoringCoordinator implements JobCountService {
                 );
             } else {
                 try {
-                    this.scheduleMonitor(this.jobSearchService.getJobExecution(id));
+                    final JobExecution jobExecution = this.jobSearchService.getJobExecution(id);
+                    this.jobMemories.put(id, jobExecution.getMemory().orElse(0));
+                    this.scheduleMonitor(jobExecution);
                     log.info("Re-attached a job monitor to job {}", id);
                 } catch (final GenieException ge) {
                     log.error("Unable to re-attach to job {}.", id);
@@ -173,6 +177,8 @@ public class JobMonitoringCoordinator implements JobCountService {
      */
     @EventListener
     public synchronized void onJobScheduled(final JobScheduledEvent event) {
+        // Increment the amount of memory used to account for this job
+        this.jobMemories.put(event.getId(), event.getMemory());
         this.scheduledJobs.put(event.getId(), event.getTask());
     }
 
@@ -185,6 +191,9 @@ public class JobMonitoringCoordinator implements JobCountService {
     @EventListener
     public synchronized void onJobStarted(final JobStartedEvent event) {
         final String jobId = event.getJobExecution().getId().orElseThrow(IllegalArgumentException::new);
+        if (!this.jobMemories.containsKey(jobId)) {
+            this.jobMemories.put(jobId, event.getJobExecution().getMemory().orElse(0));
+        }
         this.scheduledJobs.remove(jobId);
         if (!this.jobMonitors.containsKey(jobId)) {
             this.scheduleMonitor(event.getJobExecution());
@@ -195,10 +204,12 @@ public class JobMonitoringCoordinator implements JobCountService {
      * When a job is finished this event is fired. This method will cancel the task monitoring the job process.
      *
      * @param event the event of the finished job
+     * @throws GenieException When a job execution can't be found (should never happen)
      */
     @EventListener
-    public synchronized void onJobFinished(final JobFinishedEvent event) {
+    public synchronized void onJobFinished(final JobFinishedEvent event) throws GenieException {
         final String jobId = event.getId();
+        this.jobMemories.remove(jobId);
         if (this.jobMonitors.containsKey(jobId)) {
             //TODO: should we add back off it is unable to cancel?
             if (this.jobMonitors.get(jobId).cancel(true)) {
@@ -225,12 +236,19 @@ public class JobMonitoringCoordinator implements JobCountService {
     }
 
     /**
-     * Get the number of jobs currently running on this node.
-     *
-     * @return the number of jobs currently running on this node
+     * {@inheritDoc}
      */
-    public int getNumJobs() {
+    @Override
+    public int getNumActiveJobs() {
         return this.jobMonitors.size() + this.scheduledJobs.size();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getUsedMemory() {
+        return this.jobMemories.values().stream().reduce((a, b) -> a + b).orElse(0);
     }
 
     private void scheduleMonitor(final JobExecution jobExecution) {
@@ -246,7 +264,7 @@ public class JobMonitoringCoordinator implements JobCountService {
             this.publisher,
             this.eventMulticaster,
             this.registry,
-            this.outputMaxProperties
+            this.jobsProperties
         );
         final ScheduledFuture<?> future;
         switch (monitor.getScheduleType()) {

@@ -31,6 +31,7 @@ import com.netflix.genie.core.jpa.services.JpaClusterServiceImpl;
 import com.netflix.genie.core.jpa.services.JpaCommandServiceImpl;
 import com.netflix.genie.core.jpa.services.JpaJobPersistenceServiceImpl;
 import com.netflix.genie.core.jpa.services.JpaJobSearchServiceImpl;
+import com.netflix.genie.core.properties.JobsProperties;
 import com.netflix.genie.core.services.ApplicationService;
 import com.netflix.genie.core.services.AttachmentService;
 import com.netflix.genie.core.services.ClusterLoadBalancer;
@@ -39,8 +40,8 @@ import com.netflix.genie.core.services.CommandService;
 import com.netflix.genie.core.services.FileTransfer;
 import com.netflix.genie.core.services.FileTransferFactory;
 import com.netflix.genie.core.services.JobCoordinatorService;
-import com.netflix.genie.core.services.JobCountService;
 import com.netflix.genie.core.services.JobKillService;
+import com.netflix.genie.core.services.JobMetricsService;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobSubmitterService;
@@ -86,25 +87,15 @@ public class ServicesConfig {
      *
      * @param javaMailSender An implementation of the JavaMailSender interface.
      * @param fromAddress    The from email address for the email.
-     * @param mailUser       The userid of the account used to send email.
-     * @param mailPassword   The password of the account used to send email.
      * @return An instance of MailService implementation.
-     * @throws GenieException If there is any problem.
      */
     @Bean
     @ConditionalOnProperty("spring.mail.host")
     public MailService getJavaMailSenderMailService(
         final JavaMailSender javaMailSender,
-        @Value("${genie.mail.fromAddress}") final String fromAddress,
-        @Value("${genie.mail.user:#{null}}") final String mailUser,
-        @Value("${genie.mail.password:#{null}}") final String mailPassword
-    ) throws GenieException {
-        return new MailServiceImpl(
-            javaMailSender,
-            fromAddress,
-            mailUser,
-            mailPassword
-        );
+        @Value("${genie.mail.fromAddress}") final String fromAddress
+    ) {
+        return new MailServiceImpl(javaMailSender, fromAddress);
     }
 
     /**
@@ -293,25 +284,17 @@ public class ServicesConfig {
     /**
      * Get a implementation of the JobSubmitterService that runs jobs locally.
      *
-     * @param jps                 Implementation of the job persistence service.
-     * @param applicationService  Implementation of application service interface.
-     * @param clusterService      Implementation of cluster service interface.
-     * @param commandService      Implementation of command service interface.
-     * @param clusterLoadBalancer Implementation of the cluster load balancer interface.
-     * @param eventPublisher      Instance of the synchronous event publisher.
-     * @param eventMulticaster    Instance of the asynchronous event publisher.
-     * @param workflowTasks       List of all the workflow tasks to be executed.
-     * @param genieWorkingDir     Working directory for genie where it creates jobs directories.
-     * @param registry            The metrics registry to use
+     * @param jobPersistenceService Implementation of the job persistence service.
+     * @param eventPublisher        Instance of the synchronous event publisher.
+     * @param eventMulticaster      Instance of the asynchronous event publisher.
+     * @param workflowTasks         List of all the workflow tasks to be executed.
+     * @param genieWorkingDir       Working directory for genie where it creates jobs directories.
+     * @param registry              The metrics registry to use
      * @return An instance of the JobSubmitterService.
      */
     @Bean
     public JobSubmitterService jobSubmitterService(
-        final JobPersistenceService jps,
-        final ApplicationService applicationService,
-        final ClusterService clusterService,
-        final CommandService commandService,
-        final ClusterLoadBalancer clusterLoadBalancer,
+        final JobPersistenceService jobPersistenceService,
         final ApplicationEventPublisher eventPublisher,
         final ApplicationEventMulticaster eventMulticaster,
         final List<WorkflowTask> workflowTasks,
@@ -319,11 +302,7 @@ public class ServicesConfig {
         final Registry registry
     ) {
         return new LocalJobRunner(
-            jps,
-            applicationService,
-            clusterService,
-            commandService,
-            clusterLoadBalancer,
+            jobPersistenceService,
             eventPublisher,
             eventMulticaster,
             workflowTasks,
@@ -339,9 +318,12 @@ public class ServicesConfig {
      * @param jobPersistenceService implementation of job persistence service interface
      * @param jobSubmitterService   implementation of the job submitter service
      * @param jobKillService        The job kill service to use
-     * @param jobCountService       The job count service to use
-     * @param baseArchiveLocation   The base directory location of where the job dir should be archived
-     * @param maxRunningJobs        The maximum number of jobs that can run on this node
+     * @param jobMetricsService     The running job metrics service to use
+     * @param jobsProperties        The jobs properties to use
+     * @param applicationService    Implementation of application service interface
+     * @param clusterService        Implementation of cluster service interface
+     * @param commandService        Implementation of command service interface
+     * @param clusterLoadBalancer   Implementation of the cluster load balancer interface
      * @param registry              The metrics registry to use
      * @param eventPublisher        The application event publisher to use
      * @param hostName              The host this Genie instance is running on
@@ -354,11 +336,12 @@ public class ServicesConfig {
         final JobSubmitterService jobSubmitterService,
         final JobKillService jobKillService,
         @Qualifier("jobMonitoringCoordinator")
-        final JobCountService jobCountService,
-        @Value("${genie.jobs.archive.location}")
-        final String baseArchiveLocation,
-        @Value("${genie.jobs.max.running:2}")
-        final int maxRunningJobs,
+        final JobMetricsService jobMetricsService,
+        final JobsProperties jobsProperties,
+        final ApplicationService applicationService,
+        final ClusterService clusterService,
+        final CommandService commandService,
+        final ClusterLoadBalancer clusterLoadBalancer,
         final Registry registry,
         final ApplicationEventPublisher eventPublisher,
         final String hostName
@@ -368,9 +351,12 @@ public class ServicesConfig {
             jobPersistenceService,
             jobSubmitterService,
             jobKillService,
-            jobCountService,
-            baseArchiveLocation,
-            maxRunningJobs,
+            jobMetricsService,
+            jobsProperties,
+            applicationService,
+            clusterService,
+            commandService,
+            clusterLoadBalancer,
             registry,
             eventPublisher,
             hostName
@@ -380,14 +366,12 @@ public class ServicesConfig {
     /**
      * The attachment service to use.
      *
-     * @param attachmentsDirectory The directory to use to store attachments temporarily
+     * @param jobsProperties All properties related to jobs
      * @return The attachment service to use
      */
     @Bean
-    public AttachmentService attachmentService(
-        @Value("${genie.jobs.attachments.dir:#{null}}") final String attachmentsDirectory
-    ) {
-        return new FileSystemAttachmentService(attachmentsDirectory);
+    public AttachmentService attachmentService(final JobsProperties jobsProperties) {
+        return new FileSystemAttachmentService(jobsProperties.getLocations().getAttachments());
     }
 
     /**

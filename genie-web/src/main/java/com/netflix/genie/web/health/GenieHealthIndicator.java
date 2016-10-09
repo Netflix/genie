@@ -17,9 +17,10 @@
  */
 package com.netflix.genie.web.health;
 
-import com.netflix.genie.web.tasks.job.JobMonitoringCoordinator;
+import com.netflix.genie.core.properties.JobsMemoryProperties;
+import com.netflix.genie.core.properties.JobsProperties;
+import com.netflix.genie.core.services.JobMetricsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.stereotype.Component;
@@ -27,8 +28,7 @@ import org.springframework.stereotype.Component;
 import javax.validation.constraints.NotNull;
 
 /**
- * A health indicator based around metrics from the Genie system most notably the number of running jobs relative to
- * the max configured.
+ * A health indicator based around metrics from the Genie system.
  *
  * @author tgianos
  * @since 3.0.0
@@ -36,25 +36,27 @@ import javax.validation.constraints.NotNull;
 @Component
 public class GenieHealthIndicator implements HealthIndicator {
 
-    private static final String MAX_RUNNING_JOBS_KEY = "maxRunningJobs";
     private static final String NUMBER_RUNNING_JOBS_KEY = "numRunningJobs";
+    private static final String USED_MEMORY_KEY = "usedMemory";
+    private static final String AVAILABLE_MEMORY = "availableMemory";
+    private static final String AVAILABLE_DEFAULT_JOB_CAPACITY = "availableDefaultJobCapacity";
 
-    private final JobMonitoringCoordinator jobMonitoringCoordinator;
-    private final int maxRunningJobs;
+    private final JobMetricsService jobMetricsService;
+    private final JobsProperties jobsProperties;
 
     /**
      * Constructor.
      *
-     * @param jobMonitoringCoordinator The job monitoring coordinator used to check how many jobs are running
-     * @param maxRunningJobs           The maximum number of jobs that can run on this node
+     * @param jobMetricsService The metrics service to get status info from
+     * @param jobsProperties    The various properties related to running jobs
      */
     @Autowired
     public GenieHealthIndicator(
-        @NotNull final JobMonitoringCoordinator jobMonitoringCoordinator,
-        @Value("${genie.jobs.max.running:2}") final int maxRunningJobs
+        @NotNull final JobMetricsService jobMetricsService,
+        @NotNull final JobsProperties jobsProperties
     ) {
-        this.jobMonitoringCoordinator = jobMonitoringCoordinator;
-        this.maxRunningJobs = maxRunningJobs;
+        this.jobMetricsService = jobMetricsService;
+        this.jobsProperties = jobsProperties;
     }
 
     /**
@@ -62,19 +64,25 @@ public class GenieHealthIndicator implements HealthIndicator {
      */
     @Override
     public Health health() {
-        final int numRunningJobs = this.jobMonitoringCoordinator.getNumJobs();
-        if (numRunningJobs < this.maxRunningJobs) {
-            return Health
-                .up()
-                .withDetail(MAX_RUNNING_JOBS_KEY, this.maxRunningJobs)
-                .withDetail(NUMBER_RUNNING_JOBS_KEY, numRunningJobs)
-                .build();
+        final int usedMemory = this.jobMetricsService.getUsedMemory();
+        final JobsMemoryProperties memoryProperties = this.jobsProperties.getMemory();
+        final int availableMemory = memoryProperties.getMaxSystemMemory() - usedMemory;
+        final int defaultJobMemory = memoryProperties.getDefaultJobMemory();
+
+        final Health.Builder builder;
+
+        // If we can fit one more default job in we're still healthy
+        if (availableMemory >= defaultJobMemory) {
+            builder = Health.up();
         } else {
-            return Health
-                .outOfService()
-                .withDetail(MAX_RUNNING_JOBS_KEY, this.maxRunningJobs)
-                .withDetail(NUMBER_RUNNING_JOBS_KEY, numRunningJobs)
-                .build();
+            builder = Health.outOfService();
         }
+
+        return builder
+            .withDetail(NUMBER_RUNNING_JOBS_KEY, this.jobMetricsService.getNumActiveJobs())
+            .withDetail(USED_MEMORY_KEY, usedMemory)
+            .withDetail(AVAILABLE_MEMORY, availableMemory)
+            .withDetail(AVAILABLE_DEFAULT_JOB_CAPACITY, availableMemory % defaultJobMemory)
+            .build();
     }
 }

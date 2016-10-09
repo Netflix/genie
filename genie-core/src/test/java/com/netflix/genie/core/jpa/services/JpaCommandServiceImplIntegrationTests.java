@@ -372,6 +372,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(CommandStatus.ACTIVE, created.getStatus());
         Assert.assertEquals(COMMAND_1_EXECUTABLE, created.getExecutable());
         Assert.assertThat(COMMAND_1_CHECK_DELAY, Matchers.is(created.getCheckDelay()));
+        Assert.assertFalse(created.getMemory().isPresent());
         this.service.deleteCommand(id);
         try {
             this.service.getCommand(id);
@@ -391,6 +392,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void testCreateCommandNoId() throws GenieException {
+        final int memory = 512;
         final Command command = new Command.Builder(
             COMMAND_1_NAME,
             COMMAND_1_USER,
@@ -398,7 +400,9 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
             CommandStatus.ACTIVE,
             COMMAND_1_EXECUTABLE,
             COMMAND_1_CHECK_DELAY
-        ).build();
+        )
+            .withMemory(memory)
+            .build();
         final String id = this.service.createCommand(command);
         final Command created = this.service.getCommand(id);
         Assert.assertNotNull(this.service.getCommand(created.getId().orElseThrow(IllegalArgumentException::new)));
@@ -407,6 +411,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(CommandStatus.ACTIVE, created.getStatus());
         Assert.assertEquals(COMMAND_1_EXECUTABLE, created.getExecutable());
         Assert.assertThat(COMMAND_1_CHECK_DELAY, Matchers.is(created.getCheckDelay()));
+        Assert.assertThat(created.getMemory().orElse(memory + 1), Matchers.is(memory));
         this.service.deleteCommand(created.getId().orElseThrow(IllegalArgumentException::new));
         try {
             this.service.getCommand(created.getId().orElseThrow(IllegalArgumentException::new));
@@ -440,10 +445,12 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(COMMAND_1_USER, command.getUser());
         Assert.assertEquals(CommandStatus.ACTIVE, command.getStatus());
         Assert.assertEquals(5, command.getTags().size());
+        Assert.assertFalse(command.getMemory().isPresent());
         final Set<String> tags = new HashSet<>(command.getTags());
         tags.add("yarn");
         tags.add("hadoop");
 
+        final int memory = 1_024;
         final Command.Builder updateCommand = new Command.Builder(
             command.getName(),
             COMMAND_2_USER,
@@ -456,7 +463,8 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
             .withCreated(command.getCreated().orElseThrow(IllegalArgumentException::new))
             .withUpdated(command.getUpdated().orElseThrow(IllegalArgumentException::new))
             .withTags(tags)
-            .withConfigs(command.getConfigs());
+            .withConfigs(command.getConfigs())
+            .withMemory(memory);
 
         command.getDescription().ifPresent(updateCommand::withDescription);
         command.getSetupFile().ifPresent(updateCommand::withSetupFile);
@@ -467,6 +475,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(COMMAND_2_USER, updated.getUser());
         Assert.assertEquals(CommandStatus.INACTIVE, updated.getStatus());
         Assert.assertEquals(7, updated.getTags().size());
+        Assert.assertThat(updated.getMemory().orElse(memory + 1), Matchers.is(memory));
     }
 
     /**

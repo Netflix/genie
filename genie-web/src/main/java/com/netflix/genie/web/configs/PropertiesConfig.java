@@ -15,11 +15,30 @@
  *     limitations under the License.
  *
  */
+package com.netflix.genie.web.configs;
+
+import com.netflix.genie.core.properties.JobsProperties;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
- * This package contains classes which represent configuration properties for type binding and simpler usage.
+ * Configuration for creating beans for Genie Properties.
  *
  * @author tgianos
  * @since 3.0.0
  */
-package com.netflix.genie.web.properties;
+@Configuration
+public class PropertiesConfig {
+
+    /**
+     * All the properties related to configuring and running jobs.
+     *
+     * @return The jobs properties structure
+     */
+    @Bean
+    @ConfigurationProperties("genie.jobs")
+    public JobsProperties jobsProperties() {
+        return new JobsProperties();
+    }
+}

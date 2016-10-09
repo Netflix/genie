@@ -15,11 +15,26 @@
  *     limitations under the License.
  *
  */
+package com.netflix.genie.core.properties;
+
+import lombok.Getter;
+import lombok.Setter;
+
+import javax.validation.constraints.Min;
 
 /**
- * This package contains classes which represent configuration properties for type binding and simpler usage.
+ * Properties related to maximum values allowed for various components of running jobs.
  *
  * @author tgianos
  * @since 3.0.0
  */
-package com.netflix.genie.web.properties;
+@Getter
+@Setter
+public class JobsMaxProperties {
+
+    @Min(value = 1L, message = "Max standard output file size has to be at least 1 byte and preferably much larger")
+    private long stdOutSize = 8_589_934_592L;
+
+    @Min(value = 1L, message = "Max standard error file size has to be at least 1 byte and preferably much larger")
+    private long stdErrSize = 8_589_934_592L;
+}

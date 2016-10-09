@@ -21,8 +21,8 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.core.events.JobFinishedEvent;
 import com.netflix.genie.core.events.KillJobEvent;
 import com.netflix.genie.core.jobs.JobConstants;
+import com.netflix.genie.core.properties.JobsProperties;
 import com.netflix.genie.test.categories.UnitTest;
-import com.netflix.genie.web.properties.JobOutputMaxProperties;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import com.netflix.spectator.api.Counter;
 import com.netflix.spectator.api.Registry;
@@ -120,9 +120,9 @@ public class JobMonitorUnitTests {
             .when(this.registry.counter("genie.jobs.stdErrTooLarge.rate"))
             .thenReturn(this.stdErrTooLarge);
 
-        final JobOutputMaxProperties outputMaxProperties = new JobOutputMaxProperties();
-        outputMaxProperties.setStdOut(MAX_STD_OUT_LENGTH);
-        outputMaxProperties.setStdErr(MAX_STD_ERR_LENGTH);
+        final JobsProperties outputMaxProperties = new JobsProperties();
+        outputMaxProperties.getMax().setStdOutSize(MAX_STD_OUT_LENGTH);
+        outputMaxProperties.getMax().setStdErrSize(MAX_STD_ERR_LENGTH);
 
         this.monitor = new JobMonitor(
             this.jobExecution,
@@ -285,7 +285,7 @@ public class JobMonitorUnitTests {
             this.publisher,
             this.eventMulticaster,
             this.registry,
-            new JobOutputMaxProperties()
+            new JobsProperties()
         );
 
         this.monitor.run();

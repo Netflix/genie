@@ -26,6 +26,7 @@ import org.hibernate.validator.constraints.NotBlank;
  * Default No-Op implementation of Mail Service Interface.
  *
  * @author amsharma
+ * @since 3.0.0
  */
 @Slf4j
 public class DefaultMailServiceImpl implements MailService {
@@ -45,6 +46,6 @@ public class DefaultMailServiceImpl implements MailService {
         final String subject,
         final String body
     ) throws GenieException {
-        log.debug("Skippig sending email.");
+        log.debug("Default mail service skips sending email.");
     }
 }

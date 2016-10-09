@@ -17,9 +17,9 @@
  */
 
 /**
- * This package contains classes which represent configuration properties for type binding and simpler usage.
+ * Classes to test type safe configuration properties used by classes in core.
  *
  * @author tgianos
  * @since 3.0.0
  */
-package com.netflix.genie.web.properties;
+package com.netflix.genie.core.properties;

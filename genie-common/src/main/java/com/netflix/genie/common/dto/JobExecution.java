@@ -64,6 +64,11 @@ public class JobExecution extends BaseDTO {
     private final Long checkDelay;
     private final Date timeout;
     private final Integer exitCode;
+    @Min(
+        value = 1,
+        message = "The amount of memory this job is set to use on the system"
+    )
+    private final Integer memory;
 
     /**
      * Constructor used by the builder build() method.
@@ -76,6 +81,7 @@ public class JobExecution extends BaseDTO {
         this.processId = builder.bProcessId;
         this.checkDelay = builder.bCheckDelay;
         this.exitCode = builder.bExitCode;
+        this.memory = builder.bMemory;
         if (builder.bTimeout != null) {
             this.timeout = new Date(builder.bTimeout.getTime());
         } else {
@@ -124,6 +130,15 @@ public class JobExecution extends BaseDTO {
     }
 
     /**
+     * Get the amount of memory (in MB) of the job.
+     *
+     * @return The amount of memory the job is set to use as an Optional as it could be null
+     */
+    public Optional<Integer> getMemory() {
+        return Optional.ofNullable(this.memory);
+    }
+
+    /**
      * A builder to create job requests.
      *
      * @author tgianos
@@ -137,6 +152,7 @@ public class JobExecution extends BaseDTO {
         @JsonDeserialize(using = JsonDateDeserializer.class)
         private Date bTimeout;
         private Integer bExitCode;
+        private Integer bMemory;
 
         /**
          * Constructor which has required fields.
@@ -196,6 +212,17 @@ public class JobExecution extends BaseDTO {
          */
         public Builder withExitCode(final Integer exitCode) {
             this.bExitCode = exitCode;
+            return this;
+        }
+
+        /**
+         * Set the amount of memory (in MB) to use for this job execution.
+         *
+         * @param memory The amount of memory in megabytes
+         * @return The builder
+         */
+        public Builder withMemory(final Integer memory) {
+            this.bMemory = memory;
             return this;
         }
 

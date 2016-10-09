@@ -52,6 +52,7 @@ public class CommandEntityUnitTests extends EntityTestsBase {
     private static final String EXECUTABLE = "/bin/pig13";
     private static final String VERSION = "1.0";
     private static final long CHECK_DELAY = 18083L;
+    private static final int MEMORY = 10_240;
 
     private CommandEntity c;
 
@@ -67,6 +68,7 @@ public class CommandEntityUnitTests extends EntityTestsBase {
         this.c.setStatus(CommandStatus.ACTIVE);
         this.c.setExecutable(EXECUTABLE);
         this.c.setCheckDelay(CHECK_DELAY);
+        this.c.setMemory(MEMORY);
     }
 
     /**
@@ -90,6 +92,7 @@ public class CommandEntityUnitTests extends EntityTestsBase {
         Assert.assertTrue(entity.getClusters().isEmpty());
         Assert.assertNotNull(entity.getApplications());
         Assert.assertTrue(entity.getApplications().isEmpty());
+        Assert.assertFalse(entity.getMemory().isPresent());
     }
 
     /**
@@ -205,6 +208,17 @@ public class CommandEntityUnitTests extends EntityTestsBase {
         Assert.assertThat(this.c.getCheckDelay(), Matchers.is(CHECK_DELAY));
         this.c.setCheckDelay(newDelay);
         Assert.assertThat(this.c.getCheckDelay(), Matchers.is(newDelay));
+    }
+
+    /**
+     * Make sure can set the memory for the command if a user desires it.
+     */
+    @Test
+    public void testSetMemory() {
+        Assert.assertThat(this.c.getMemory().orElseGet(RandomSuppliers.INT), Matchers.is(MEMORY));
+        final int newMemory = MEMORY + 1;
+        this.c.setMemory(newMemory);
+        Assert.assertThat(this.c.getMemory().orElseGet(RandomSuppliers.INT), Matchers.is(newMemory));
     }
 
     /**
@@ -414,6 +428,8 @@ public class CommandEntityUnitTests extends EntityTestsBase {
         entity.setExecutable(executable);
         final long checkDelay = 2180234L;
         entity.setCheckDelay(checkDelay);
+        final int memory = 10_241;
+        entity.setMemory(memory);
 
         final Command command = entity.getDTO();
         Assert.assertThat(command.getId().orElseGet(RandomSuppliers.STRING), Matchers.is(id));
@@ -429,5 +445,6 @@ public class CommandEntityUnitTests extends EntityTestsBase {
         Assert.assertThat(command.getTags(), Matchers.is(tags));
         Assert.assertThat(command.getSetupFile().orElseGet(RandomSuppliers.STRING), Matchers.is(setupFile));
         Assert.assertThat(command.getConfigs(), Matchers.is(configs));
+        Assert.assertThat(command.getMemory().orElseGet(RandomSuppliers.INT), Matchers.is(memory));
     }
 }

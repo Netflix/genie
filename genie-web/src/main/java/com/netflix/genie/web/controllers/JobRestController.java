@@ -28,6 +28,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.jobs.JobConstants;
+import com.netflix.genie.core.properties.JobsProperties;
 import com.netflix.genie.core.services.AttachmentService;
 import com.netflix.genie.core.services.JobCoordinatorService;
 import com.netflix.genie.core.services.JobSearchService;
@@ -45,7 +46,6 @@ import com.netflix.genie.web.hateoas.resources.JobExecutionResource;
 import com.netflix.genie.web.hateoas.resources.JobRequestResource;
 import com.netflix.genie.web.hateoas.resources.JobResource;
 import com.netflix.genie.web.hateoas.resources.JobSearchResultResource;
-import com.netflix.genie.web.properties.JobForwardingProperties;
 import com.netflix.genie.web.resources.handlers.GenieResourceHttpRequestHandler;
 import com.netflix.spectator.api.Counter;
 import com.netflix.spectator.api.Registry;
@@ -128,7 +128,7 @@ public class JobRestController {
     private final String hostName;
     private final RestTemplate restTemplate;
     private final GenieResourceHttpRequestHandler resourceHttpRequestHandler;
-    private final JobForwardingProperties jobForwardingProperties;
+    private final JobsProperties jobsProperties;
 
     // Metrics
     private final Counter submitJobWithoutAttachmentsRate;
@@ -151,7 +151,7 @@ public class JobRestController {
      * @param restTemplate                     The rest template for http requests
      * @param resourceHttpRequestHandler       The handler to return requests for static resources on the
      *                                         Genie File System.
-     * @param jobForwardingProperties          All the properties associated with job forwarding
+     * @param jobsProperties                   All the properties associated with jobs
      * @param registry                         The metrics registry to use
      */
     @Autowired
@@ -169,7 +169,7 @@ public class JobRestController {
         final String hostName,
         @Qualifier("genieRestTemplate") final RestTemplate restTemplate,
         final GenieResourceHttpRequestHandler resourceHttpRequestHandler,
-        final JobForwardingProperties jobForwardingProperties,
+        final JobsProperties jobsProperties,
         final Registry registry
     ) {
         this.jobCoordinatorService = jobCoordinatorService;
@@ -185,7 +185,7 @@ public class JobRestController {
         this.hostName = hostName;
         this.restTemplate = restTemplate;
         this.resourceHttpRequestHandler = resourceHttpRequestHandler;
-        this.jobForwardingProperties = jobForwardingProperties;
+        this.jobsProperties = jobsProperties;
 
         // Set up the metrics
         this.submitJobWithoutAttachmentsRate = registry.counter("genie.api.v3.jobs.submitJobWithoutAttachments.rate");
@@ -531,7 +531,7 @@ public class JobRestController {
         log.info("[killJob] Called for job id: {}. Forwarded from: {}", id, forwardedFrom);
 
         // If forwarded from is null this request hasn't been forwarded at all. Check we're on the right node
-        if (this.jobForwardingProperties.isEnabled() && forwardedFrom == null) {
+        if (this.jobsProperties.getForwarding().isEnabled() && forwardedFrom == null) {
             final String jobHostname = this.jobSearchService.getJobHost(id);
             if (!this.hostName.equals(jobHostname)) {
                 log.info("Job {} is not on this node. Forwarding kill request to {}", id, jobHostname);
@@ -685,7 +685,7 @@ public class JobRestController {
         log.info("[getJobOutput] Called for job with id: {}", id);
 
         // if forwarded from isn't null it's already been forwarded to this node. Assume data is on this node.
-        if (this.jobForwardingProperties.isEnabled() && forwardedFrom == null) {
+        if (this.jobsProperties.getForwarding().isEnabled() && forwardedFrom == null) {
             // TODO: It's possible that could use the JobMonitorCoordinator to check this in memory
             //       However that could get into problems where the job finished or died
             //       and it would return false on check if the job with given id is running on that node
@@ -734,11 +734,11 @@ public class JobRestController {
     }
 
     private String buildForwardURL(final HttpServletRequest request, final String jobHostname) {
-        return this.jobForwardingProperties.getScheme()
+        return this.jobsProperties.getForwarding().getScheme()
             + "://"
             + jobHostname
             + ":"
-            + this.jobForwardingProperties.getPort()
+            + this.jobsProperties.getForwarding().getPort()
             + request.getRequestURI();
     }
 

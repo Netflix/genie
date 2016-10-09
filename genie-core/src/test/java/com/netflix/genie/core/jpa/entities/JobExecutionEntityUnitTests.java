@@ -75,10 +75,13 @@ public class JobExecutionEntityUnitTests {
      */
     @Test
     public void canSetCheckDelay() {
-        Assert.assertThat(this.entity.getCheckDelay(), Matchers.nullValue());
+        Assert.assertFalse(this.entity.getCheckDelay().isPresent());
         final long newDelay = 1803234L;
         this.entity.setCheckDelay(newDelay);
-        Assert.assertThat(this.entity.getCheckDelay(), Matchers.is(newDelay));
+        Assert.assertThat(
+            this.entity.getCheckDelay().orElseThrow(IllegalArgumentException::new),
+            Matchers.is(newDelay)
+        );
     }
 
     /**
@@ -116,6 +119,17 @@ public class JobExecutionEntityUnitTests {
     }
 
     /**
+     * Make sure setting memory works.
+     */
+    @Test
+    public void canSetMemory() {
+        Assert.assertFalse(this.entity.getMemory().isPresent());
+        final int memory = 10_240;
+        this.entity.setMemory(memory);
+        Assert.assertThat(this.entity.getMemory().orElseGet(RandomSuppliers.INT), Matchers.is(memory));
+    }
+
+    /**
      * Test to make sure can generate valid DTO.
      *
      * @throws GenieException On serialization issues
@@ -132,6 +146,8 @@ public class JobExecutionEntityUnitTests {
         this.entity.setExitCode(exitCode);
         final Date timeout = new Date();
         this.entity.setTimeout(timeout);
+        final int memory = 10_265;
+        this.entity.setMemory(memory);
 
         final JobExecution execution = this.entity.getDTO();
         Assert.assertThat(execution.getId().orElseGet(RandomSuppliers.STRING), Matchers.is(ID));
@@ -148,5 +164,6 @@ public class JobExecutionEntityUnitTests {
         Assert.assertThat(execution.getProcessId().orElseGet(RandomSuppliers.INT), Matchers.is(processId));
         Assert.assertThat(execution.getCheckDelay().orElseGet(RandomSuppliers.LONG), Matchers.is(checkDelay));
         Assert.assertThat(execution.getTimeout().orElseGet(RandomSuppliers.DATE), Matchers.is(timeout));
+        Assert.assertThat(execution.getMemory().orElseGet(RandomSuppliers.INT), Matchers.is(memory));
     }
 }

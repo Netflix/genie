@@ -20,7 +20,6 @@ package com.netflix.genie.core.services.impl;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
-import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
@@ -32,10 +31,6 @@ import com.netflix.genie.core.events.JobStartedEvent;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
-import com.netflix.genie.core.services.ApplicationService;
-import com.netflix.genie.core.services.ClusterLoadBalancer;
-import com.netflix.genie.core.services.ClusterService;
-import com.netflix.genie.core.services.CommandService;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSubmitterService;
 import com.netflix.spectator.api.Registry;
@@ -47,21 +42,17 @@ import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.core.io.Resource;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 /**
  * Implementation of the Job Submitter service that runs the job locally on the same host.
@@ -74,25 +65,14 @@ import java.util.stream.Collectors;
 public class LocalJobRunner implements JobSubmitterService {
 
     private final JobPersistenceService jobPersistenceService;
-    private final ApplicationService applicationService;
-    private final ClusterService clusterService;
-    private final CommandService commandService;
-    private final ClusterLoadBalancer clusterLoadBalancer;
     private final List<WorkflowTask> jobWorkflowTasks;
     private final Resource baseWorkingDirPath;
     private final ApplicationEventPublisher eventPublisher;
     private final ApplicationEventMulticaster eventMulticaster;
 
-    // For reuse in queries
-    private final Set<CommandStatus> enumStatuses;
-
     private final Timer overallSubmitTimer;
     private final Timer createJobDirTimer;
     private final Timer createRunScriptTimer;
-    private final Timer selectClusterTimer;
-    private final Timer selectCommandTimer;
-    private final Timer selectApplicationsTimer;
-    private final Timer setJobEnvironmentTimer;
     private final Timer executeJobTimer;
     private final Timer saveJobExecutionTimer;
     private final Timer publishJobStartedEventTimer;
@@ -101,10 +81,6 @@ public class LocalJobRunner implements JobSubmitterService {
      * Constructor create the object.
      *
      * @param jobPersistenceService Implementation of the job persistence service
-     * @param applicationService    Implementation of application service interface
-     * @param clusterService        Implementation of cluster service interface
-     * @param commandService        Implementation of command service interface
-     * @param clusterLoadBalancer   Implementation of the cluster load balancer interface
      * @param eventPublisher        The synchronous event publisher to use
      * @param eventMulticaster      Instance of the asynchronous event publisher to use
      * @param workflowTasks         List of all the workflow tasks to be executed
@@ -113,10 +89,6 @@ public class LocalJobRunner implements JobSubmitterService {
      */
     public LocalJobRunner(
         @NotNull final JobPersistenceService jobPersistenceService,
-        @NotNull final ApplicationService applicationService,
-        @NotNull final ClusterService clusterService,
-        @NotNull final CommandService commandService,
-        @NotNull final ClusterLoadBalancer clusterLoadBalancer,
         @NotNull final ApplicationEventPublisher eventPublisher,
         @NotNull final ApplicationEventMulticaster eventMulticaster,
         @NotNull final List<WorkflowTask> workflowTasks,
@@ -124,37 +96,22 @@ public class LocalJobRunner implements JobSubmitterService {
         @NotNull final Registry registry
     ) {
         this.jobPersistenceService = jobPersistenceService;
-        this.applicationService = applicationService;
-        this.clusterService = clusterService;
-        this.commandService = commandService;
-        this.clusterLoadBalancer = clusterLoadBalancer;
         this.jobWorkflowTasks = workflowTasks;
         this.baseWorkingDirPath = genieWorkingDir;
         this.eventPublisher = eventPublisher;
         this.eventMulticaster = eventMulticaster;
 
-        // We'll only care about active statuses
-        this.enumStatuses = EnumSet.noneOf(CommandStatus.class);
-        this.enumStatuses.add(CommandStatus.ACTIVE);
-
         // Metrics
         this.overallSubmitTimer = registry.timer("genie.jobs.submit.localRunner.overall.timer");
         this.createJobDirTimer = registry.timer("genie.jobs.submit.localRunner.createJobDir.timer");
         this.createRunScriptTimer = registry.timer("genie.jobs.submit.localRunner.createRunScript.timer");
-        this.selectClusterTimer = registry.timer("genie.jobs.submit.localRunner.selectCluster.timer");
-        this.selectCommandTimer = registry.timer("genie.jobs.submit.localRunner.selectCommand.timer");
-        this.selectApplicationsTimer = registry.timer("genie.jobs.submit.localRunner.selectApplications.timer");
-        this.setJobEnvironmentTimer = registry.timer("genie.jobs.submit.localRunner.setJobEnvironment.timer");
         this.executeJobTimer = registry.timer("genie.jobs.submit.localRunner.executeJob.timer");
         this.saveJobExecutionTimer = registry.timer("genie.jobs.submit.localRunner.saveJobExecution.timer");
         this.publishJobStartedEventTimer = registry.timer("genie.jobs.submit.localRunner.publishJobStartedEvent.timer");
     }
 
     /**
-     * Submit the job for appropriate execution based on environment.
-     *
-     * @param jobRequest of job to run
-     * @throws GenieException if there is an error
+     * {@inheritDoc}
      */
     @SuppressFBWarnings(
         value = "REC_CATCH_EXCEPTION",
@@ -162,9 +119,19 @@ public class LocalJobRunner implements JobSubmitterService {
     )
     @Override
     public void submitJob(
-        @NotNull(message = "No job provided. Unable to submit job for execution.")
         @Valid
-        final JobRequest jobRequest
+        @NotNull(message = "No job provided. Unable to submit job for execution.")
+        final JobRequest jobRequest,
+        @Valid
+        @NotNull(message = "No cluster provided. Unable to submit job for execution")
+        final Cluster cluster,
+        @Valid
+        @NotNull(message = "No command provided. Unable to submit job for execution")
+        final Command command,
+        @NotNull(message = "No applications provided. Unable to submit job for execution")
+        final List<Application> applications,
+        @Min(value = 1, message = "Memory can't be less than 1 MB")
+        final int memory
     ) throws GenieException {
         final long start = System.nanoTime();
 
@@ -176,42 +143,9 @@ public class LocalJobRunner implements JobSubmitterService {
                 final File jobWorkingDir = this.createJobWorkingDirectory(id);
                 final File runScript = this.createRunScript(jobWorkingDir);
 
-                //TODO: Combine the cluster and command selection into a single method/database query for efficiency
-                // Resolve the cluster for the job request based on the tags specified
-                final Cluster cluster = this.getCluster(jobRequest);
-                // Resolve the command for the job request based on command tags and cluster chosen
-                final Command command = this.getCommand(jobRequest, cluster);
-                // Resolve the applications to use based on the command that was selected
-                final List<Application> applications = this.getApplications(jobRequest, command);
-
-                // Job can be run as there is a valid set of cluster, command and applications
-                // Save all the runtime environment information for the job
-                final long jobEnvironmentStart = System.nanoTime();
-                final String clusterId = cluster
-                    .getId()
-                    .orElseThrow(() -> new GenieServerException("Cluster has no id"));
-                final String commandId = command
-                    .getId()
-                    .orElseThrow(() -> new GenieServerException("Command has no id"));
-                try {
-                    this.jobPersistenceService.updateJobWithRuntimeEnvironment(
-                        id,
-                        clusterId,
-                        commandId,
-                        applications
-                            .stream()
-                            .map(Application::getId)
-                            .filter(Optional::isPresent)
-                            .map(Optional::get)
-                            .collect(Collectors.toList())
-                    );
-                } finally {
-                    this.setJobEnvironmentTimer.record(System.nanoTime() - jobEnvironmentStart, TimeUnit.NANOSECONDS);
-                }
-
                 // The map object stores the context for all the workflow tasks
                 final Map<String, Object> context
-                    = this.createJobContext(jobRequest, cluster, command, applications, jobWorkingDir);
+                    = this.createJobContext(jobRequest, cluster, command, applications, memory, jobWorkingDir);
 
                 // Execute the job
                 final JobExecution jobExecution = this.executeJob(context, runScript);
@@ -310,86 +244,12 @@ public class LocalJobRunner implements JobSubmitterService {
         }
     }
 
-    private Cluster getCluster(final JobRequest jobRequest) throws GenieException {
-        final long start = System.nanoTime();
-        try {
-            log.info("Selecting cluster for job {}", jobRequest.getId());
-            final Cluster cluster
-                = this.clusterLoadBalancer.selectCluster(this.clusterService.chooseClusterForJobRequest(jobRequest));
-            log.info("Selected cluster {} for job {}", cluster.getId(), jobRequest.getId());
-            return cluster;
-        } finally {
-            this.selectClusterTimer.record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
-        }
-    }
-
-    private Command getCommand(final JobRequest jobRequest, final Cluster cluster) throws GenieException {
-        final long start = System.nanoTime();
-        try {
-            final String clusterId = cluster.getId().orElseThrow(() -> new GenieServerException("No cluster id."));
-            final String jobId = jobRequest.getId().orElseThrow(() -> new GenieServerException("No job id"));
-            log.info("Selecting command attached to cluster {} for job {} ", clusterId, jobId);
-            final Set<String> commandCriteria = jobRequest.getCommandCriteria();
-            // TODO: what happens if the get method throws an error we don't mark the job failed here
-            for (
-                final Command command : this.clusterService.getCommandsForCluster(clusterId, this.enumStatuses)
-                ) {
-                if (command.getTags().containsAll(jobRequest.getCommandCriteria())) {
-                    log.info("Selected command {} for job {} ", command.getId(), jobRequest.getId());
-                    return command;
-                }
-            }
-
-            throw new GeniePreconditionException(
-                "No command found matching all command criteria ["
-                    + commandCriteria
-                    + "] attached to cluster with id: "
-                    + cluster.getId()
-            );
-        } finally {
-            this.selectCommandTimer.record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
-        }
-    }
-
-    private List<Application> getApplications(
-        final JobRequest jobRequest,
-        final Command command
-    ) throws GenieException {
-        final long start = System.nanoTime();
-        try {
-            final String jobId = jobRequest.getId().orElseThrow(() -> new GenieServerException("No job Id"));
-            final String commandId = command.getId().orElseThrow(() -> new GenieServerException("No command Id"));
-            log.info("Selecting applications for job {} and command {}", jobId, commandId);
-            // TODO: What do we do about application status? Should probably check here
-            final List<Application> applications = new ArrayList<>();
-            if (jobRequest.getApplications().isEmpty()) {
-                applications.addAll(this.commandService.getApplicationsForCommand(commandId));
-            } else {
-                for (final String applicationId : jobRequest.getApplications()) {
-                    applications.add(this.applicationService.getApplication(applicationId));
-                }
-            }
-            log.info(
-                "Selected applications {} for job {}",
-                applications
-                    .stream()
-                    .map(Application::getId)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .reduce((one, two) -> one + "," + two),
-                jobRequest.getId()
-            );
-            return applications;
-        } finally {
-            this.selectApplicationsTimer.record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
-        }
-    }
-
     private Map<String, Object> createJobContext(
         final JobRequest jobRequest,
         final Cluster cluster,
         final Command command,
         final List<Application> applications,
+        final int memory,
         final File jobWorkingDir
     ) throws GenieException {
         // construct the job execution environment object for this job request
@@ -397,6 +257,7 @@ public class LocalJobRunner implements JobSubmitterService {
             jobRequest,
             cluster,
             command,
+            memory,
             jobWorkingDir
         )
             .withApplications(applications)

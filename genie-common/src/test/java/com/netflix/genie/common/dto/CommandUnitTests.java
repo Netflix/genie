@@ -42,6 +42,7 @@ public class CommandUnitTests {
     private static final String VERSION = UUID.randomUUID().toString();
     private static final long CHECK_DELAY = 12380L;
     private static final String EXECUTABLE = UUID.randomUUID().toString();
+    private static final int MEMORY = 10_255;
 
     /**
      * Test to make sure we can build a command using the default builder constructor.
@@ -62,6 +63,7 @@ public class CommandUnitTests {
         Assert.assertFalse(command.getId().isPresent());
         Assert.assertThat(command.getTags(), Matchers.empty());
         Assert.assertFalse(command.getUpdated().isPresent());
+        Assert.assertFalse(command.getMemory().isPresent());
     }
 
     /**
@@ -95,6 +97,8 @@ public class CommandUnitTests {
         final Date updated = new Date();
         builder.withUpdated(updated);
 
+        builder.withMemory(MEMORY);
+
         final Command command = builder.build();
         Assert.assertThat(command.getName(), Matchers.is(NAME));
         Assert.assertThat(command.getUser(), Matchers.is(USER));
@@ -111,6 +115,7 @@ public class CommandUnitTests {
         Assert.assertThat(command.getId().orElseThrow(IllegalArgumentException::new), Matchers.is(id));
         Assert.assertThat(command.getTags(), Matchers.is(tags));
         Assert.assertThat(command.getUpdated().orElseThrow(IllegalArgumentException::new), Matchers.is(updated));
+        Assert.assertThat(command.getMemory().orElseThrow(IllegalArgumentException::new), Matchers.is(MEMORY));
     }
 
     /**
@@ -127,6 +132,7 @@ public class CommandUnitTests {
         builder.withId(null);
         builder.withTags(null);
         builder.withUpdated(null);
+        builder.withMemory(null);
 
         final Command command = builder.build();
         Assert.assertThat(command.getName(), Matchers.is(NAME));
@@ -141,6 +147,7 @@ public class CommandUnitTests {
         Assert.assertFalse(command.getId().isPresent());
         Assert.assertThat(command.getTags(), Matchers.empty());
         Assert.assertFalse(command.getUpdated().isPresent());
+        Assert.assertFalse(command.getMemory().isPresent());
     }
 
     /**

@@ -26,12 +26,12 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.NotBlank;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 
 /**
  * Encapsulates the details of the job, cluster , command and applications needed to run a job.
@@ -41,24 +41,26 @@ import java.util.List;
  */
 @Getter
 @Slf4j
-public class JobExecutionEnvironment {
+public final class JobExecutionEnvironment {
 
-    private JobRequest jobRequest;
-    private Cluster cluster;
-    private Command command;
-    private List<Application> applications = new ArrayList<>();
-    private File jobWorkingDir;
+    private final JobRequest jobRequest;
+    private final Cluster cluster;
+    private final Command command;
+    private final List<Application> applications = new ArrayList<>();
+    private final int memory;
+    private final File jobWorkingDir;
 
     /**
      * Constructor used by the builder build() method.
      *
      * @param builder The builder to use
      */
-    public JobExecutionEnvironment(final Builder builder) {
+    private JobExecutionEnvironment(final Builder builder) {
         this.jobRequest = builder.bJobRequest;
         this.cluster = builder.bCluster;
         this.command = builder.bCommand;
         this.applications.addAll(builder.bApplications);
+        this.memory = builder.bMemory;
         this.jobWorkingDir = builder.bJobWorkingDir;
     }
 
@@ -78,19 +80,21 @@ public class JobExecutionEnvironment {
      * @since 3.0.0
      */
     public static class Builder {
-        private JobRequest bJobRequest;
-        private Cluster bCluster;
-        private Command bCommand;
-        private List<Application> bApplications = new ArrayList<>();
-        private File bJobWorkingDir;
+        private final JobRequest bJobRequest;
+        private final Cluster bCluster;
+        private final Command bCommand;
+        private final List<Application> bApplications = new ArrayList<>();
+        private final int bMemory;
+        private final File bJobWorkingDir;
 
         /**
          * Constructor.
          *
-         * @param request The job request object.
+         * @param request    The job request object.
          * @param clusterObj The cluster object.
          * @param commandObj The command object.
-         * @param dir The directory location for this job.
+         * @param memory     The amount of memory (in MB) to use to run the job
+         * @param dir        The directory location for this job.
          * @throws GenieException If there is an error.
          */
         public Builder(
@@ -100,12 +104,15 @@ public class JobExecutionEnvironment {
             final Cluster clusterObj,
             @NotNull(message = "Command cannot be null")
             final Command commandObj,
+            @Min(value = 1, message = "Amount of memory can't be less than 1 MB")
+            final int memory,
             @NotBlank(message = "Job working directory cannot be empty")
             final File dir
         ) throws GenieException {
             this.bJobRequest = request;
             this.bCluster = clusterObj;
             this.bCommand = commandObj;
+            this.bMemory = memory;
             this.bJobWorkingDir = dir;
         }
 
@@ -116,6 +123,7 @@ public class JobExecutionEnvironment {
          * @return The builder
          */
         public Builder withApplications(final List<Application> applications) {
+            this.bApplications.clear();
             if (applications != null) {
                 this.bApplications.addAll(applications);
             }

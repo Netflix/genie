@@ -21,12 +21,10 @@ genie:
     cache:
       location: "file:///tmp/genie/cache"
   jobs:
-    attachments:
-      dir: file:///tmp/genie/attachments/
-    dir:
-      location: "file:///tmp/"
-    archive:
-      location: /archive/location
+    locations:
+      archive: file:///archive/location/
+      attachments: file:///tmp/genie/attachments/
+      jobs: file:///tmp/
 
 spring:
   jpa:

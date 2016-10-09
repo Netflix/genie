@@ -15,11 +15,34 @@
  *     limitations under the License.
  *
  */
+package com.netflix.genie.core.properties;
+
+import lombok.Getter;
+import lombok.Setter;
+
+import javax.validation.constraints.NotNull;
 
 /**
- * This package contains classes which represent configuration properties for type binding and simpler usage.
+ * All properties related to jobs in Genie.
  *
  * @author tgianos
  * @since 3.0.0
  */
-package com.netflix.genie.web.properties;
+@Getter
+@Setter
+public class JobsProperties {
+    @NotNull
+    private JobsForwardingProperties forwarding = new JobsForwardingProperties();
+
+    @NotNull
+    private JobsLocationsProperties locations = new JobsLocationsProperties();
+
+    @NotNull
+    private JobsMaxProperties max = new JobsMaxProperties();
+
+    @NotNull
+    private JobsMemoryProperties memory = new JobsMemoryProperties();
+
+    @NotNull
+    private JobsUsersProperties users = new JobsUsersProperties();
+}

@@ -48,7 +48,7 @@ public class FileSystemAttachmentService implements AttachmentService {
      * @param attachmentsDirectory The directory to use or null if want to default to system temp directory
      */
     public FileSystemAttachmentService(final String attachmentsDirectory) {
-        createAttachmentDirectory(attachmentsDirectory);
+        this.createAttachmentDirectory(attachmentsDirectory);
     }
 
     /**

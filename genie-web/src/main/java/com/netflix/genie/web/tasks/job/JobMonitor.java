@@ -22,9 +22,9 @@ import com.netflix.genie.common.exceptions.GenieTimeoutException;
 import com.netflix.genie.core.events.JobFinishedEvent;
 import com.netflix.genie.core.events.JobFinishedReason;
 import com.netflix.genie.core.events.KillJobEvent;
+import com.netflix.genie.core.properties.JobsProperties;
 import com.netflix.genie.core.util.ProcessChecker;
 import com.netflix.genie.core.util.UnixProcessChecker;
-import com.netflix.genie.web.properties.JobOutputMaxProperties;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import com.netflix.genie.web.tasks.node.NodeTask;
 import com.netflix.spectator.api.Counter;
@@ -76,14 +76,14 @@ public class JobMonitor extends NodeTask {
     /**
      * Constructor.
      *
-     * @param execution           The job execution object including the pid
-     * @param stdOut              The std out output file
-     * @param stdErr              The std err output file
-     * @param executor            The process executor to use
-     * @param publisher           The event publisher to use when a job isn't running anymore
-     * @param eventMulticaster    The multicaster to send async events
-     * @param registry            The metrics event registry
-     * @param outputMaxProperties The properties which say how long job output files can be at their max
+     * @param execution        The job execution object including the pid
+     * @param stdOut           The std out output file
+     * @param stdErr           The std err output file
+     * @param executor         The process executor to use
+     * @param publisher        The event publisher to use when a job isn't running anymore
+     * @param eventMulticaster The multicaster to send async events
+     * @param registry         The metrics event registry
+     * @param jobsProperties   The properties for jobs
      */
     public JobMonitor(
         @Valid final JobExecution execution,
@@ -93,7 +93,7 @@ public class JobMonitor extends NodeTask {
         @NotNull final ApplicationEventPublisher publisher,
         @NotNull final ApplicationEventMulticaster eventMulticaster,
         @NotNull final Registry registry,
-        @NotNull final JobOutputMaxProperties outputMaxProperties
+        @NotNull final JobsProperties jobsProperties
     ) {
         if (!SystemUtils.IS_OS_UNIX) {
             throw new UnsupportedOperationException("Genie doesn't currently support " + SystemUtils.OS_NAME);
@@ -112,8 +112,8 @@ public class JobMonitor extends NodeTask {
         this.stdOut = stdOut;
         this.stdErr = stdErr;
 
-        this.maxStdOutLength = outputMaxProperties.getStdOut();
-        this.maxStdErrLength = outputMaxProperties.getStdErr();
+        this.maxStdOutLength = jobsProperties.getMax().getStdOutSize();
+        this.maxStdErrLength = jobsProperties.getMax().getStdErrSize();
 
         this.successfulCheckRate = registry.counter("genie.jobs.successfulStatusCheck.rate");
         this.timeoutRate = registry.counter("genie.jobs.timeout.rate");

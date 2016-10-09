@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.7.14, for osx10.11 (x86_64)
+-- MySQL dump 10.13  Distrib 5.7.15, for osx10.11 (x86_64)
 --
 -- Host: localhost    Database: genie
 -- ------------------------------------------------------
--- Server version	5.7.14
+-- Server version	5.7.15
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -166,6 +166,7 @@ CREATE TABLE `commands` (
   `setup_file` varchar(1024) DEFAULT NULL,
   `executable` varchar(255) NOT NULL,
   `check_delay` bigint(20) NOT NULL DEFAULT '10000',
+  `memory` int(11) DEFAULT NULL,
   `status` varchar(20) NOT NULL DEFAULT 'INACTIVE',
   `entity_version` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
@@ -210,6 +211,7 @@ CREATE TABLE `job_executions` (
   `exit_code` int(11) DEFAULT NULL,
   `check_delay` bigint(20) DEFAULT NULL,
   `timeout` datetime(3) DEFAULT NULL,
+  `memory` int(11) DEFAULT NULL,
   KEY `id` (`id`),
   KEY `JOB_EXECUTIONS_HOSTNAME_INDEX` (`host_name`),
   KEY `JOB_EXECUTIONS_EXIT_CODE_INDEX` (`exit_code`),
@@ -345,4 +347,4 @@ CREATE TABLE `jobs_applications` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-08-17 10:26:47
+-- Dump completed on 2016-10-04 10:52:41

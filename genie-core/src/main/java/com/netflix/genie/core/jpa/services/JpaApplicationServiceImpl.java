@@ -197,13 +197,7 @@ public class JpaApplicationServiceImpl implements ApplicationService {
         log.debug("Called");
         // Check to make sure the application isn't tied to any existing commands
         for (final ApplicationEntity applicationEntity : this.applicationRepo.findAll()) {
-            final Set<CommandEntity> commandEntities = applicationEntity.getCommands();
-            if (commandEntities != null && !commandEntities.isEmpty()) {
-                throw new GeniePreconditionException(
-                    "Unable to delete app " + applicationEntity.getId() + " as it is attached to "
-                        + commandEntities.size() + " commands still."
-                );
-            }
+            this.checkCommands(applicationEntity);
         }
         this.applicationRepo.deleteAll();
     }
@@ -218,14 +212,7 @@ public class JpaApplicationServiceImpl implements ApplicationService {
     ) throws GenieException {
         log.debug("Called with id {}", id);
         final ApplicationEntity applicationEntity = this.findApplication(id);
-        final Set<CommandEntity> commandEntities = applicationEntity.getCommands();
-        if (commandEntities != null && !commandEntities.isEmpty()) {
-            throw new GeniePreconditionException(
-                "Unable to delete app " + applicationEntity.getId() + " as it is attached to "
-                    + commandEntities.size() + " commands."
-            );
-        }
-
+        this.checkCommands(applicationEntity);
         this.applicationRepo.delete(applicationEntity);
     }
 
@@ -476,5 +463,20 @@ public class JpaApplicationServiceImpl implements ApplicationService {
         entity.setType(type.isPresent() ? type.get() : null);
 
         this.applicationRepo.save(entity);
+    }
+
+    private void checkCommands(
+        final ApplicationEntity applicationEntity
+    ) throws GeniePreconditionException {
+        final Set<CommandEntity> commands = applicationEntity.getCommands();
+        if (commands != null && !commands.isEmpty()) {
+            throw new GeniePreconditionException(
+                "Unable to delete app "
+                    + applicationEntity.getId()
+                    + " as it is attached to "
+                    + commands.size()
+                    + " commands still."
+            );
+        }
     }
 }

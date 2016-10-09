@@ -40,11 +40,13 @@ public class JobScheduledEventUnitTests {
     public void canConstruct() {
         final String jobId = UUID.randomUUID().toString();
         final Future<?> task = Mockito.mock(Future.class);
+        final int memory = 1_034;
         final Object source = new Object();
-        final JobScheduledEvent event = new JobScheduledEvent(jobId, task, source);
+        final JobScheduledEvent event = new JobScheduledEvent(jobId, task, memory, source);
         Assert.assertNotNull(event);
         Assert.assertThat(event.getId(), Matchers.is(jobId));
         Assert.assertThat(event.getTask(), Matchers.is(task));
+        Assert.assertThat(event.getMemory(), Matchers.is(memory));
         Assert.assertThat(event.getSource(), Matchers.is(source));
     }
 }

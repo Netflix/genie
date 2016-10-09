@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.properties;
+package com.netflix.genie.core.properties;
 
 import com.netflix.genie.test.categories.UnitTest;
 import org.hamcrest.Matchers;
@@ -25,22 +25,22 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 /**
- * Unit tests for JobOutputMaxProperties.
+ * Unit tests for JobMaxProperties.
  *
  * @author tgianos
  * @since 3.0.0
  */
 @Category(UnitTest.class)
-public class JobOutputMaxPropertiesUnitTests {
+public class JobsMaxPropertiesUnitTests {
 
-    private JobOutputMaxProperties properties;
+    private JobsMaxProperties properties;
 
     /**
      * Setup for the tests.
      */
     @Before
     public void setup() {
-        this.properties = new JobOutputMaxProperties();
+        this.properties = new JobsMaxProperties();
     }
 
     /**
@@ -48,8 +48,8 @@ public class JobOutputMaxPropertiesUnitTests {
      */
     @Test
     public void canConstruct() {
-        Assert.assertThat(this.properties.getStdOut(), Matchers.is(8589934592L));
-        Assert.assertThat(this.properties.getStdErr(), Matchers.is(8589934592L));
+        Assert.assertThat(this.properties.getStdOutSize(), Matchers.is(8_589_934_592L));
+        Assert.assertThat(this.properties.getStdErrSize(), Matchers.is(8_589_934_592L));
     }
 
     /**
@@ -57,9 +57,9 @@ public class JobOutputMaxPropertiesUnitTests {
      */
     @Test
     public void canSetStdOut() {
-        final long newStdOut = 180234L;
-        this.properties.setStdOut(newStdOut);
-        Assert.assertThat(this.properties.getStdOut(), Matchers.is(newStdOut));
+        final long newStdOut = 180_234L;
+        this.properties.setStdOutSize(newStdOut);
+        Assert.assertThat(this.properties.getStdOutSize(), Matchers.is(newStdOut));
     }
 
     /**
@@ -68,7 +68,7 @@ public class JobOutputMaxPropertiesUnitTests {
     @Test
     public void canSetStdErr() {
         final long newStdErr = 180234L;
-        this.properties.setStdErr(newStdErr);
-        Assert.assertThat(this.properties.getStdErr(), Matchers.is(newStdErr));
+        this.properties.setStdErrSize(newStdErr);
+        Assert.assertThat(this.properties.getStdErrSize(), Matchers.is(newStdErr));
     }
 }

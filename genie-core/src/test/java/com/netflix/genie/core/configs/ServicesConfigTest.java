@@ -31,6 +31,7 @@ import com.netflix.genie.core.jpa.services.JpaClusterServiceImpl;
 import com.netflix.genie.core.jpa.services.JpaCommandServiceImpl;
 import com.netflix.genie.core.jpa.services.JpaJobPersistenceServiceImpl;
 import com.netflix.genie.core.jpa.services.JpaJobSearchServiceImpl;
+import com.netflix.genie.core.properties.JobsProperties;
 import com.netflix.genie.core.services.ApplicationService;
 import com.netflix.genie.core.services.AttachmentService;
 import com.netflix.genie.core.services.ClusterLoadBalancer;
@@ -38,15 +39,15 @@ import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;
 import com.netflix.genie.core.services.FileTransferFactory;
 import com.netflix.genie.core.services.JobCoordinatorService;
-import com.netflix.genie.core.services.JobCountService;
 import com.netflix.genie.core.services.JobKillService;
+import com.netflix.genie.core.services.JobMetricsService;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobSubmitterService;
 import com.netflix.genie.core.services.impl.FileSystemAttachmentService;
 import com.netflix.genie.core.services.impl.GenieFileTransferService;
 import com.netflix.genie.core.services.impl.JobCoordinatorServiceImpl;
-import com.netflix.genie.core.services.impl.JobCountServiceImpl;
+import com.netflix.genie.core.services.impl.JobMetricsServiceImpl;
 import com.netflix.genie.core.services.impl.LocalJobKillServiceImpl;
 import com.netflix.genie.core.services.impl.LocalJobRunner;
 import com.netflix.genie.core.services.impl.RandomizedClusterLoadBalancerImpl;
@@ -54,8 +55,8 @@ import com.netflix.spectator.api.DefaultRegistry;
 import com.netflix.spectator.api.Registry;
 import org.apache.commons.exec.Executor;
 import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ServiceLocatorFactoryBean;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -227,25 +228,17 @@ public class ServicesConfigTest {
     /**
      * Get a implementation of the JobSubmitterService that runs jobs locally.
      *
-     * @param jps                 Implementation of the job persistence service.
-     * @param applicationService  Implementation of application service interface.
-     * @param clusterService      Implementation of cluster service interface.
-     * @param commandService      Implementation of command service interface.
-     * @param clusterLoadBalancer Implementation of the cluster load balancer interface.
-     * @param eventPublisher      Instance of the synchronous event publisher.
-     * @param eventMulticaster    Instance of the asynchronous event publisher.
-     * @param workflowTasks       List of all the workflow tasks to be executed.
-     * @param genieWorkingDir     Working directory for genie where it creates jobs directories.
-     * @param registry            The metrics registry to use
+     * @param jobPersistenceService Implementation of the job persistence service.
+     * @param eventPublisher        Instance of the synchronous event publisher.
+     * @param eventMulticaster      Instance of the asynchronous event publisher.
+     * @param workflowTasks         List of all the workflow tasks to be executed.
+     * @param genieWorkingDir       Working directory for genie where it creates jobs directories.
+     * @param registry              The metrics registry to use
      * @return An instance of the JobSubmitterService.
      */
     @Bean
     public JobSubmitterService jobSubmitterService(
-        final JobPersistenceService jps,
-        final ApplicationService applicationService,
-        final ClusterService clusterService,
-        final CommandService commandService,
-        final ClusterLoadBalancer clusterLoadBalancer,
+        final JobPersistenceService jobPersistenceService,
         final ApplicationEventPublisher eventPublisher,
         final ApplicationEventMulticaster eventMulticaster,
         final List<WorkflowTask> workflowTasks,
@@ -253,11 +246,7 @@ public class ServicesConfigTest {
         final Registry registry
     ) {
         return new LocalJobRunner(
-            jps,
-            applicationService,
-            clusterService,
-            commandService,
-            clusterLoadBalancer,
+            jobPersistenceService,
             eventPublisher,
             eventMulticaster,
             workflowTasks,
@@ -270,12 +259,12 @@ public class ServicesConfigTest {
      * The job count service to use.
      *
      * @param jobSearchService The job search implementation to use
-     * @param hostname         The hostname of this Genie node
+     * @param hostName         The host name of this Genie node
      * @return The job count service bean
      */
     @Bean
-    public JobCountService jobCountService(final JobSearchService jobSearchService, final String hostname) {
-        return new JobCountServiceImpl(jobSearchService, hostname);
+    public JobMetricsService jobCountService(final JobSearchService jobSearchService, final String hostName) {
+        return new JobMetricsServiceImpl(jobSearchService, hostName);
     }
 
     /**
@@ -317,10 +306,13 @@ public class ServicesConfigTest {
      * @param taskExecutor          implementation of the async task executor interface to use
      * @param jobPersistenceService implementation of job persistence service interface.
      * @param jobSubmitterService   implementation of the job submitter service.
-     * @param jobCountService       implementation of job count service interface
+     * @param jobMetricsService     implementation of job metrics service interface
      * @param jobKillService        The job kill service to use.
-     * @param baseArchiveLocation   The base directory location of where the job dir should be archived.
-     * @param maxRunningJobs        The maximum number of running jobs on system
+     * @param jobsProperties        The jobs properties to use
+     * @param applicationService    Implementation of application service interface
+     * @param clusterService        Implementation of cluster service interface
+     * @param commandService        Implementation of command service interface
+     * @param clusterLoadBalancer   Implementation of the cluster load balancer interface
      * @param registry              The registry to use
      * @param eventPublisher        The system event publisher
      * @param hostName              The host name to use
@@ -332,11 +324,12 @@ public class ServicesConfigTest {
         final JobPersistenceService jobPersistenceService,
         final JobSubmitterService jobSubmitterService,
         final JobKillService jobKillService,
-        final JobCountService jobCountService,
-        @Value("${genie.jobs.archive.location}")
-        final String baseArchiveLocation,
-        @Value("${genie.jobs.max.running:2}")
-        final int maxRunningJobs,
+        final JobMetricsService jobMetricsService,
+        final JobsProperties jobsProperties,
+        final ApplicationService applicationService,
+        final ClusterService clusterService,
+        final CommandService commandService,
+        final ClusterLoadBalancer clusterLoadBalancer,
         final Registry registry,
         final ApplicationEventPublisher eventPublisher,
         final String hostName
@@ -346,9 +339,12 @@ public class ServicesConfigTest {
             jobPersistenceService,
             jobSubmitterService,
             jobKillService,
-            jobCountService,
-            baseArchiveLocation,
-            maxRunningJobs,
+            jobMetricsService,
+            jobsProperties,
+            applicationService,
+            clusterService,
+            commandService,
+            clusterLoadBalancer,
             registry,
             eventPublisher,
             hostName
@@ -358,14 +354,12 @@ public class ServicesConfigTest {
     /**
      * The attachment service to use.
      *
-     * @param attachmentsDirectory The directory to use to store attachments temporarily
+     * @param jobsProperties The various jobs properties including the location of the attachments directory
      * @return The attachment service to use
      */
     @Bean
-    public AttachmentService attachmentService(
-        @Value("${genie.jobs.attachments.dir:#{null}}") final String attachmentsDirectory
-    ) {
-        return new FileSystemAttachmentService(attachmentsDirectory);
+    public AttachmentService attachmentService(final JobsProperties jobsProperties) {
+        return new FileSystemAttachmentService(jobsProperties.getLocations().getAttachments());
     }
 
     /**
@@ -378,5 +372,16 @@ public class ServicesConfigTest {
         final ServiceLocatorFactoryBean factoryBean = new ServiceLocatorFactoryBean();
         factoryBean.setServiceLocatorInterface(FileTransferFactory.class);
         return factoryBean;
+    }
+
+    /**
+     * Get the jobs properties to use for the services.
+     *
+     * @return The jobs properties to use
+     */
+    @Bean
+    @ConfigurationProperties("genie.jobs")
+    public JobsProperties jobsProperties() {
+        return new JobsProperties();
     }
 }
