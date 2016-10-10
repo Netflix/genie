@@ -189,6 +189,7 @@ public class ServicesConfig {
      * @param jobRepo               The job repository to use
      * @param jobRequestRepo        The job request repository to use
      * @param jobMetadataRepository The job metadata repository to use
+     * @param jobExecutionRepo      The job execution repository to use
      * @param applicationRepo       The application repository to use
      * @param clusterRepo           The cluster repository to use
      * @param commandRepo           The command repository to use
@@ -199,6 +200,7 @@ public class ServicesConfig {
         final JpaJobRepository jobRepo,
         final JpaJobRequestRepository jobRequestRepo,
         final JpaJobMetadataRepository jobMetadataRepository,
+        final JpaJobExecutionRepository jobExecutionRepo,
         final JpaApplicationRepository applicationRepo,
         final JpaClusterRepository clusterRepo,
         final JpaCommandRepository commandRepo
@@ -207,6 +209,7 @@ public class ServicesConfig {
             jobRepo,
             jobRequestRepo,
             jobMetadataRepository,
+            jobExecutionRepo,
             applicationRepo,
             clusterRepo,
             commandRepo

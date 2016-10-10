@@ -84,7 +84,6 @@ public class JobRequestEntityUnitTests {
         Assert.assertThat(this.entity.getDependencies(), Matchers.is(EMPTY_JSON_ARRAY));
         Assert.assertThat(this.entity.getDependenciesAsSet(), Matchers.empty());
         Assert.assertFalse(this.entity.getGroup().isPresent());
-        Assert.assertThat(this.entity.getJob(), Matchers.nullValue());
         Assert.assertFalse(this.entity.getMemory().isPresent());
         Assert.assertFalse(this.entity.getSetupFile().isPresent());
         Assert.assertThat(this.entity.getTags(), Matchers.empty());
@@ -323,8 +322,8 @@ public class JobRequestEntityUnitTests {
     @Test
     public void canSetJob() {
         final JobEntity job = new JobEntity();
-        this.entity.setJob(job);
-        Assert.assertThat(this.entity.getJob(), Matchers.is(job));
+        job.setRequest(this.entity);
+        Assert.assertThat(this.entity, Matchers.is(job.getRequest()));
     }
 
     /**
@@ -332,10 +331,8 @@ public class JobRequestEntityUnitTests {
      */
     @Test
     public void canSetJobMetadata() {
-        Assert.assertThat(this.entity.getJobMetadata(), Matchers.nullValue());
         final JobMetadataEntity metadata = new JobMetadataEntity();
-        this.entity.setJobMetadata(metadata);
-        Assert.assertThat(this.entity.getJobMetadata(), Matchers.is(metadata));
+        metadata.setRequest(entity);
         Assert.assertThat(metadata.getRequest(), Matchers.is(this.entity));
     }
 

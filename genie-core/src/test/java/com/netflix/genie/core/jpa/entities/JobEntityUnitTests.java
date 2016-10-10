@@ -315,8 +315,8 @@ public class JobEntityUnitTests extends EntityTestsBase {
     @Test
     public void canSetJobExecution() {
         final JobExecutionEntity entity = new JobExecutionEntity();
-        this.jobEntity.setExecution(entity);
-        Assert.assertThat(this.jobEntity.getExecution(), Matchers.is(entity));
+        entity.setJob(this.jobEntity);
+        Assert.assertThat(this.jobEntity, Matchers.is(entity.getJob()));
     }
 
     /**

@@ -22,6 +22,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Job repository.
@@ -33,10 +34,17 @@ import java.util.Date;
 public interface JpaJobRequestRepository extends JpaRepository<JobRequestEntity, String>, JpaSpecificationExecutor {
 
     /**
-     * Delete all job requests created before the given date.
+     * Returns all job requests created before the given date.
      *
-     * @param date The date before which all job requests should be deleted.
-     * @return The number of deleted records
+     * @param date The date before which all job requests were created.
+     * @return List of job requests
      */
-    Long deleteByCreatedBefore(@NotNull final Date date);
+    List<JobRequestEntity> findByCreatedBefore(@NotNull final Date date);
+
+    /**
+     * Deletes all job requests for the given ids.
+     * @param ids list of ids for which the job requests should be deleted
+     * @return no. of requests deleted
+     */
+    Long deleteByIdIn(@NotNull final List<String> ids);
 }

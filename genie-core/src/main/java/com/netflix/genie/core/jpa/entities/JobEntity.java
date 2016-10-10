@@ -25,7 +25,6 @@ import org.hibernate.validator.constraints.Length;
 
 import javax.annotation.Nullable;
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -36,6 +35,8 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapsId;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.OrderColumn;
 import javax.persistence.Table;
@@ -58,7 +59,17 @@ import java.util.Optional;
 @Setter
 @Entity
 @Table(name = "jobs")
+@NamedQueries({
+    @NamedQuery(
+        name = JobEntity.QUERY_GET_STATUS_BY_ID,
+        query = "select j.status from JobEntity j where j.id = :id"
+    )
+})
 public class JobEntity extends CommonFieldsEntity {
+    /**
+     * Query name to get job status.
+     */
+    public static final String QUERY_GET_STATUS_BY_ID = "getStatusById";
     /**
      * Used as default version when one not entered.
      */
@@ -110,14 +121,6 @@ public class JobEntity extends CommonFieldsEntity {
     @JoinColumn(name = "id")
     @MapsId
     private JobRequestEntity request;
-
-    @OneToOne(
-        mappedBy = "job",
-        fetch = FetchType.LAZY,
-        cascade = CascadeType.ALL,
-        orphanRemoval = true
-    )
-    private JobExecutionEntity execution;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cluster_id")
@@ -278,18 +281,8 @@ public class JobEntity extends CommonFieldsEntity {
      *
      * @param request The job request. Not null.
      */
-    protected void setRequest(final JobRequestEntity request) {
+    public void setRequest(final JobRequestEntity request) {
         this.request = request;
-    }
-
-    /**
-     * Set the job execution for this job.
-     *
-     * @param execution The execution. Not null.
-     */
-    public void setExecution(@NotNull(message = "Execution can't be null") final JobExecutionEntity execution) {
-        this.execution = execution;
-        execution.setJob(this);
     }
 
     /**

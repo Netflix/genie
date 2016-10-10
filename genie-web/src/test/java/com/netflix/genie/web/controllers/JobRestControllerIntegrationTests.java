@@ -372,10 +372,10 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
 //            )
 //            .andReturn().getResponse().getContentAsString());
 
-        this.jobRequestRepository.deleteAll();
         this.jobRequestMetadataRepository.deleteAll();
-        this.jobRepository.deleteAll();
         this.jobExecutionRepository.deleteAll();
+        this.jobRepository.deleteAll();
+        this.jobRequestRepository.deleteAll();
         this.clusterRepository.deleteAll();
         this.commandRepository.deleteAll();
         this.applicationRepository.deleteAll();

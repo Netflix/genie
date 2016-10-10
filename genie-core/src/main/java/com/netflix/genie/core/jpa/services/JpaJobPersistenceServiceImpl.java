@@ -28,6 +28,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.jpa.entities.ApplicationEntity;
+import com.netflix.genie.core.jpa.entities.BaseEntity;
 import com.netflix.genie.core.jpa.entities.ClusterEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.entities.JobEntity;
@@ -37,6 +38,7 @@ import com.netflix.genie.core.jpa.entities.JobRequestEntity;
 import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
+import com.netflix.genie.core.jpa.repositories.JpaJobExecutionRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobMetadataRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRequestRepository;
@@ -51,6 +53,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * JPA implementation of the job persistence service.
@@ -68,6 +71,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
 
     private final JpaJobRepository jobRepo;
     private final JpaJobRequestRepository jobRequestRepo;
+    private final JpaJobExecutionRepository jobExecutionRepo;
     private final JpaJobMetadataRepository jobMetadataRepository;
     private final JpaApplicationRepository applicationRepo;
     private final JpaClusterRepository clusterRepo;
@@ -79,6 +83,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
      * @param jobRepo               The job repository to use
      * @param jobRequestRepo        The job request repository to use
      * @param jobMetadataRepository The job metadata repository to use
+     * @param jobExecutionRepo      The job execution repository to use
      * @param applicationRepo       The application repository to use
      * @param clusterRepo           The cluster repository to use
      * @param commandRepo           The command repository to use
@@ -87,6 +92,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         @NotNull final JpaJobRepository jobRepo,
         @NotNull final JpaJobRequestRepository jobRequestRepo,
         @NotNull final JpaJobMetadataRepository jobMetadataRepository,
+        @NotNull final JpaJobExecutionRepository jobExecutionRepo,
         @NotNull final JpaApplicationRepository applicationRepo,
         @NotNull final JpaClusterRepository clusterRepo,
         @NotNull final JpaCommandRepository commandRepo
@@ -94,6 +100,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         this.jobRepo = jobRepo;
         this.jobRequestRepo = jobRequestRepo;
         this.jobMetadataRepository = jobMetadataRepository;
+        this.jobExecutionRepo = jobExecutionRepo;
         this.applicationRepo = applicationRepo;
         this.clusterRepo = clusterRepo;
         this.commandRepo = commandRepo;
@@ -127,11 +134,14 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         final JobEntity jobEntity = this.jobDtoToEntity(job);
         final JobExecutionEntity jobExecutionEntity = this.jobExecutionDtoToEntity(jobExecution);
 
-        jobEntity.setExecution(jobExecutionEntity);
-        jobRequestEntity.setJobMetadata(metadataEntity);
-        jobRequestEntity.setJob(jobEntity);
-
         this.jobRequestRepo.save(jobRequestEntity);
+
+        jobEntity.setRequest(jobRequestEntity);
+        this.jobRepo.save(jobEntity);
+        metadataEntity.setRequest(jobRequestEntity);
+        this.jobMetadataRepository.save(metadataEntity);
+        jobExecutionEntity.setJob(jobEntity);
+        this.jobExecutionRepo.save(jobExecutionEntity);
     }
 
     /**
@@ -201,7 +211,11 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         job.setApplications(applications);
 
         // Save the amount of memory to allocate to the job
-        job.getExecution().setMemory(memory);
+        final JobExecutionEntity jobExecutionEntity = this.jobExecutionRepo.findOne(jobId);
+        if (jobExecutionEntity == null) {
+            throw new GenieNotFoundException("No job execution with id " + jobId + " exists.");
+        }
+        jobExecutionEntity.setMemory(memory);
     }
 
     /**
@@ -221,7 +235,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
             throw new GenieNotFoundException("No job with id " + id + " exists. Unable to update");
         }
 
-        final JobExecutionEntity jobExecutionEntity = jobEntity.getExecution();
+        final JobExecutionEntity jobExecutionEntity = this.jobExecutionRepo.findOne(id);
         if (jobExecutionEntity == null) {
             throw new GenieNotFoundException("No job execution with id " + id + " exists. Unable to update.");
         }
@@ -258,7 +272,10 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
             throw new GenieNotFoundException("No job with id " + id + " exists unable to update");
         }
         this.updateJobStatus(jobEntity, status, statusMessage);
-        final JobExecutionEntity jobExecutionEntity = jobEntity.getExecution();
+        final JobExecutionEntity jobExecutionEntity = this.jobExecutionRepo.findOne(id);
+        if (jobExecutionEntity == null) {
+            throw new GenieNotFoundException("No job execution with id " + id + " exists. Unable to update.");
+        }
         if (!jobExecutionEntity.getExitCode().isPresent()) {
             jobExecutionEntity.setExitCode(exitCode);
         }
@@ -280,7 +297,12 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
      */
     @Override
     public long deleteAllJobsCreatedBeforeDate(@NotNull final Date date) {
-        return this.jobRequestRepo.deleteByCreatedBefore(date);
+        final List<JobRequestEntity> requests = jobRequestRepo.findByCreatedBefore(date);
+        final List<String> ids = requests.stream().map(BaseEntity::getId).collect(Collectors.toList());
+        jobExecutionRepo.deleteByIdIn(ids);
+        jobMetadataRepository.deleteByIdIn(ids);
+        jobRepo.deleteByIdIn(ids);
+        return jobRequestRepo.deleteByIdIn(ids);
     }
 
     private void updateJobStatus(final JobEntity jobEntity, final JobStatus jobStatus, final String statusMsg) {
