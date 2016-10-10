@@ -52,6 +52,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -270,14 +271,14 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
     @Override
     public JobStatus getJobStatus(@NotBlank final String id) throws GenieException {
         log.debug("Called with id {}", id);
-        if (this.jobRepository.exists(id)) {
-            final CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
-            final CriteriaQuery<JobStatus> query = cb.createQuery(JobStatus.class);
-            final Root<JobEntity> root = query.from(JobEntity.class);
-            query.select(root.get(JobEntity_.status));
-            query.where(cb.equal(root.get(JobEntity_.id), id));
-            return this.entityManager.createQuery(query).getSingleResult();
-        } else {
+        final CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        final CriteriaQuery<JobStatus> query = cb.createQuery(JobStatus.class);
+        final Root<JobEntity> root = query.from(JobEntity.class);
+        query.select(root.get(JobEntity_.status));
+        query.where(cb.equal(root.get(JobEntity_.id), id));
+        try {
+            return entityManager.createQuery(query).getSingleResult();
+        } catch (NoResultException e) {
             throw new GenieNotFoundException("No job with id " + id + " exists.");
         }
     }
