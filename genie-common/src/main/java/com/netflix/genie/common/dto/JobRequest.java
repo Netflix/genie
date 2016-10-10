@@ -91,10 +91,7 @@ public class JobRequest extends SetupFileDTO {
         this.cpu = builder.bCpu;
         this.memory = builder.bMemory;
         this.timeout = builder.bTimeout;
-
-        if (builder.bApplications != null) {
-            this.applications.addAll(builder.bApplications);
-        }
+        this.applications.addAll(builder.bApplications);
     }
 
     /**

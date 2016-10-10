@@ -26,6 +26,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.Optional;
 
 /**
  * A command data transfer object. After creation it is read-only.
@@ -54,6 +55,11 @@ public class Command extends ConfigDTO {
         message = "The delay between checks must be at least 1 millisecond. Probably should be much more than that"
     )
     private final long checkDelay;
+    @Min(
+        value = 1,
+        message = "The minimum amount of memory if desired is 1 MB. Probably should be much more than that"
+    )
+    private final Integer memory;
 
     /**
      * Constructor used by the builder.
@@ -65,6 +71,16 @@ public class Command extends ConfigDTO {
         this.status = builder.bStatus;
         this.executable = builder.bExecutable;
         this.checkDelay = builder.bCheckDelay;
+        this.memory = builder.bMemory;
+    }
+
+    /**
+     * Get the default amount of memory (in MB) to use for jobs which use this command.
+     *
+     * @return Optional of the amount of memory as it could be null if none set
+     */
+    public Optional<Integer> getMemory() {
+        return Optional.ofNullable(this.memory);
     }
 
     /**
@@ -78,6 +94,7 @@ public class Command extends ConfigDTO {
         private final CommandStatus bStatus;
         private final String bExecutable;
         private final long bCheckDelay;
+        private Integer bMemory;
 
         /**
          * Constructor which has required fields.
@@ -112,6 +129,17 @@ public class Command extends ConfigDTO {
             }
             this.bExecutable = executable;
             this.bCheckDelay = checkDelay;
+        }
+
+        /**
+         * Set the amount of memory (in MB) to default jobs run with this command to use.
+         *
+         * @param memory The default amount of memory (in MB) for jobs to use
+         * @return The builder
+         */
+        public Builder withMemory(final Integer memory) {
+            this.bMemory = memory;
+            return this;
         }
 
         /**

@@ -35,6 +35,6 @@ import org.springframework.stereotype.Component;
 public class ClusterCheckerProperties {
     private String scheme = "http";
     private int port = 8080;
-    private long rate = 300000L;
+    private long rate = 300_000L;
     private int lostThreshold = 3;
 }

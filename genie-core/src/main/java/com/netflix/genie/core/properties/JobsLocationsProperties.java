@@ -15,28 +15,27 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.properties;
+package com.netflix.genie.core.properties;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
-
-import javax.validation.constraints.Min;
+import org.hibernate.validator.constraints.NotEmpty;
 
 /**
- * Properties related to the maximum length of certain job related files.
+ * Properties for various job related locations.
  *
  * @author tgianos
  * @since 3.0.0
  */
-@ConfigurationProperties(prefix = "genie.jobs.output.max")
-@Component
 @Getter
 @Setter
-public class JobOutputMaxProperties {
-    @Min(1L)
-    private long stdOut = 8589934592L;
-    @Min(1L)
-    private long stdErr = 8589934592L;
+public class JobsLocationsProperties {
+    @NotEmpty(message = "Archives location is required")
+    private String archives = "file:///tmp/genie/archives/";
+
+    @NotEmpty(message = "Attachments temporary location is required")
+    private String attachments = "file:///tmp/genie/attachments/";
+
+    @NotEmpty(message = "Jobs dir is required")
+    private String jobs = "file:///tmp/genie/jobs/";
 }

@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.configs;
 
+import com.netflix.genie.core.properties.JobsProperties;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.resources.handlers.GenieResourceHttpRequestHandler;
 import com.netflix.genie.web.resources.writers.DefaultDirectoryWriter;
@@ -113,6 +114,8 @@ public class MvcConfigUnitTests {
     public void cantGetJobsDirWhenJobsDirInvalid() throws IOException {
         final ResourceLoader resourceLoader = Mockito.mock(ResourceLoader.class);
         final String jobsDirLocation = UUID.randomUUID().toString();
+        final JobsProperties jobsProperties = new JobsProperties();
+        jobsProperties.getLocations().setJobs(jobsDirLocation);
 
         final Resource tmpResource = Mockito.mock(Resource.class);
         Mockito.when(resourceLoader.getResource(jobsDirLocation)).thenReturn(tmpResource);
@@ -123,7 +126,7 @@ public class MvcConfigUnitTests {
         Mockito.when(file.isDirectory()).thenReturn(false);
 
         try {
-            this.mvcConfig.jobsDir(resourceLoader, jobsDirLocation);
+            this.mvcConfig.jobsDir(resourceLoader, jobsProperties);
             Assert.fail();
         } catch (final IllegalStateException ise) {
             Assert.assertThat(
@@ -143,7 +146,7 @@ public class MvcConfigUnitTests {
         Mockito.when(file.mkdirs()).thenReturn(false);
 
         try {
-            this.mvcConfig.jobsDir(resourceLoader, jobsDirLocation);
+            this.mvcConfig.jobsDir(resourceLoader, jobsProperties);
             Assert.fail();
         } catch (final IllegalStateException ise) {
             Assert.assertThat(
@@ -162,6 +165,8 @@ public class MvcConfigUnitTests {
     public void canGetJobsDir() throws IOException {
         final ResourceLoader resourceLoader = Mockito.mock(ResourceLoader.class);
         final String jobsDirLocation = UUID.randomUUID().toString() + "/";
+        final JobsProperties jobsProperties = new JobsProperties();
+        jobsProperties.getLocations().setJobs(jobsDirLocation);
 
         final Resource jobsDirResource = Mockito.mock(Resource.class);
         Mockito.when(resourceLoader.getResource(jobsDirLocation)).thenReturn(jobsDirResource);
@@ -171,7 +176,7 @@ public class MvcConfigUnitTests {
         Mockito.when(jobsDirResource.getFile()).thenReturn(file);
         Mockito.when(file.isDirectory()).thenReturn(true);
 
-        final Resource jobsDir = this.mvcConfig.jobsDir(resourceLoader, jobsDirLocation);
+        final Resource jobsDir = this.mvcConfig.jobsDir(resourceLoader, jobsProperties);
         Assert.assertNotNull(jobsDir);
     }
 

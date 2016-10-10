@@ -86,6 +86,8 @@ export GENIE_JOB_ID="JOB_ID_PLACEHOLDER"
 
 export GENIE_JOB_NAME="List * ... Directories bash job"
 
+export GENIE_JOB_MEMORY=1024
+
 export GENIE_VERSION=3
 
 # Sourcing setup file from Cluster: cluster1

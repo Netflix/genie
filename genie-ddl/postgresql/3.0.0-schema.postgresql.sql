@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.5.3
--- Dumped by pg_dump version 9.5.3
+-- Dumped from database version 9.5.4
+-- Dumped by pg_dump version 9.5.4
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -140,7 +140,8 @@ CREATE TABLE commands (
     entityversion integer DEFAULT 0 NOT NULL,
     description character varying(10000) DEFAULT NULL::character varying,
     tags character varying(2048) DEFAULT NULL::character varying,
-    check_delay bigint DEFAULT 10000 NOT NULL
+    check_delay bigint DEFAULT 10000 NOT NULL,
+    memory integer
 );
 
 
@@ -168,7 +169,8 @@ CREATE TABLE job_executions (
     process_id integer,
     exit_code integer,
     check_delay bigint,
-    timeout timestamp without time zone
+    timeout timestamp without time zone,
+    memory integer
 );
 
 

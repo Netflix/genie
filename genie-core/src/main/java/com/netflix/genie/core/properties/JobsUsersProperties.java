@@ -15,11 +15,20 @@
  *     limitations under the License.
  *
  */
+package com.netflix.genie.core.properties;
+
+import lombok.Getter;
+import lombok.Setter;
 
 /**
- * This package contains classes which represent configuration properties for type binding and simpler usage.
+ * Properties related to users running jobs.
  *
  * @author tgianos
  * @since 3.0.0
  */
-package com.netflix.genie.web.properties;
+@Getter
+@Setter
+public class JobsUsersProperties {
+    private boolean creationEnabled;
+    private boolean runAsUserEnabled;
+}

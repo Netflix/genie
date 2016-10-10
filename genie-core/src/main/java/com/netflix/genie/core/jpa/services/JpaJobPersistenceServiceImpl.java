@@ -103,51 +103,35 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
      * {@inheritDoc}
      */
     @Override
-    public void createJobAndJobExecution(
-        @NotNull(message = "No Job provided to create") final Job job,
-        @NotNull(message = "No Job execution information provided. Unable to create.") final JobExecution jobExecution
+    public void createJob(
+        @NotNull final JobRequest jobRequest,
+        @NotNull final JobMetadata jobMetadata,
+        @NotNull final Job job,
+        @NotNull final JobExecution jobExecution
     ) throws GenieException {
-        log.debug("Called with job: {}", job);
+        log.debug(
+            "Called with\nRequest:\n{}\nMetadata:\n{}\nJob:\n{}\nExecution:\n{}\n",
+            jobRequest,
+            jobMetadata,
+            job,
+            jobExecution
+        );
 
-        // Since a job request object should always exist before the job object is saved
-        // the id should never be null
-        final String jobId = job
-            .getId()
-            .orElseThrow(() -> new GeniePreconditionException("Cannot create a job without the id specified"));
-
-        // check if job already exists in the database
-        if (this.jobRepo.exists(jobId)) {
+        final String jobId = jobRequest.getId().orElseThrow(() -> new GeniePreconditionException("No job id entered"));
+        if (this.jobRequestRepo.exists(jobId)) {
             throw new GenieConflictException("A job with id " + jobId + " already exists");
         }
 
-        final JobRequestEntity jobRequestEntity = this.jobRequestRepo.findOne(jobId);
-        if (jobRequestEntity == null) {
-            throw new GeniePreconditionException("Cannot find the job request for the id of the job specified.");
-        }
+        final JobRequestEntity jobRequestEntity = this.jobRequestDtoToEntity(jobId, jobRequest);
+        final JobMetadataEntity metadataEntity = this.jobMetadataDtoToEntity(jobMetadata);
+        final JobEntity jobEntity = this.jobDtoToEntity(job);
+        final JobExecutionEntity jobExecutionEntity = this.jobExecutionDtoToEntity(jobExecution);
 
-        final JobEntity jobEntity = new JobEntity();
-        jobEntity.setId(jobId);
-        jobEntity.setName(job.getName());
-        jobEntity.setUser(job.getUser());
-        jobEntity.setVersion(job.getVersion());
-        job.getArchiveLocation().ifPresent(jobEntity::setArchiveLocation);
-        job.getDescription().ifPresent(jobEntity::setDescription);
-        job.getStarted().ifPresent(jobEntity::setStarted);
-        jobEntity.setStatus(job.getStatus());
-        job.getStatusMsg().ifPresent(jobEntity::setStatusMsg);
-        jobEntity.setTags(job.getTags());
-        jobEntity.setCommandArgs(job.getCommandArgs());
-
-        final JobExecutionEntity jobExecutionEntity = new JobExecutionEntity();
-        jobExecutionEntity.setHostName(jobExecution.getHostName());
-        jobExecutionEntity.setId(jobId);
-        jobExecution.getProcessId().ifPresent(jobExecutionEntity::setProcessId);
-        jobExecution.getCheckDelay().ifPresent(jobExecutionEntity::setCheckDelay);
-        jobExecution.getTimeout().ifPresent(jobExecutionEntity::setTimeout);
-
-        // Persist the entities
         jobEntity.setExecution(jobExecutionEntity);
+        jobRequestEntity.setJobMetadata(metadataEntity);
         jobRequestEntity.setJob(jobEntity);
+
+        this.jobRequestRepo.save(jobRequestEntity);
     }
 
     /**
@@ -177,7 +161,8 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         @NotBlank final String jobId,
         @NotBlank final String clusterId,
         @NotBlank final String commandId,
-        @NotNull final List<String> applicationIds
+        @NotNull final List<String> applicationIds,
+        @Min(1) final int memory
     ) throws GenieException {
         log.debug(
             "Called to update job ({}) runtime with cluster {}, command {} and applications {}",
@@ -214,57 +199,9 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         job.setCluster(cluster);
         job.setCommand(command);
         job.setApplications(applications);
-    }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public JobRequest createJobRequest(
-        @NotNull final JobRequest jobRequest,
-        @NotNull final JobMetadata jobMetadata
-    ) throws GenieException {
-        log.debug("Called with Job Request: {} and Job Metadata: {}", jobRequest, jobMetadata);
-
-        final String jobId = jobRequest.getId().orElseThrow(() -> new GeniePreconditionException("No job id entered"));
-
-        if (this.jobRequestRepo.exists(jobId)) {
-            throw new GenieConflictException("A job with id " + jobId + " already exists");
-        }
-
-        final JobRequestEntity jobRequestEntity = new JobRequestEntity();
-
-        jobRequestEntity.setId(jobId);
-        jobRequestEntity.setName(jobRequest.getName());
-        jobRequestEntity.setUser(jobRequest.getUser());
-        jobRequestEntity.setVersion(jobRequest.getVersion());
-        jobRequest.getDescription().ifPresent(jobRequestEntity::setDescription);
-        jobRequestEntity.setCommandArgs(jobRequest.getCommandArgs());
-        jobRequest.getGroup().ifPresent(jobRequestEntity::setGroup);
-        jobRequest.getSetupFile().ifPresent(jobRequestEntity::setSetupFile);
-        jobRequestEntity.setClusterCriteriasFromList(jobRequest.getClusterCriterias());
-        jobRequestEntity.setCommandCriteriaFromSet(jobRequest.getCommandCriteria());
-        jobRequestEntity.setDependenciesFromSet(jobRequest.getDependencies());
-        jobRequestEntity.setDisableLogArchival(jobRequest.isDisableLogArchival());
-        jobRequest.getEmail().ifPresent(jobRequestEntity::setEmail);
-        jobRequestEntity.setTags(jobRequest.getTags());
-        jobRequest.getCpu().ifPresent(jobRequestEntity::setCpu);
-        jobRequest.getMemory().ifPresent(jobRequestEntity::setMemory);
-        jobRequestEntity.setApplicationsFromList(jobRequest.getApplications());
-        jobRequest.getTimeout().ifPresent(jobRequestEntity::setTimeout);
-
-        final JobMetadataEntity metadataEntity = new JobMetadataEntity();
-        jobMetadata.getClientHost().ifPresent(metadataEntity::setClientHost);
-        jobMetadata.getUserAgent().ifPresent(metadataEntity::setUserAgent);
-        jobMetadata.getNumAttachments().ifPresent(metadataEntity::setNumAttachments);
-        jobMetadata.getTotalSizeOfAttachments().ifPresent(metadataEntity::setTotalSizeOfAttachments);
-        jobMetadata.getStdOutSize().ifPresent(metadataEntity::setStdOutSize);
-        jobMetadata.getStdErrSize().ifPresent(metadataEntity::setStdErrSize);
-
-        jobRequestEntity.setJobMetadata(metadataEntity);
-
-        this.jobRequestRepo.save(jobRequestEntity);
-        return jobRequestEntity.getDTO();
+        // Save the amount of memory to allocate to the job
+        job.getExecution().setMemory(memory);
     }
 
     /**
@@ -281,7 +218,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
 
         final JobEntity jobEntity = this.jobRepo.findOne(id);
         if (jobEntity == null) {
-            throw new GenieNotFoundException("No job with id " + id +  " exists. Unable to update");
+            throw new GenieNotFoundException("No job with id " + id + " exists. Unable to update");
         }
 
         final JobExecutionEntity jobExecutionEntity = jobEntity.getExecution();
@@ -308,7 +245,13 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         @Nullable final Long stdErrSize
     ) throws GenieException {
         log.debug(
-            "Called with id {}, exit code {}, status {} and status message {}", id, exitCode, status, statusMessage
+            "Called with id: {}, exit code: {}, status: {}, status message: {}, std out size: {}, std err size {}",
+            id,
+            exitCode,
+            status,
+            statusMessage,
+            stdOutSize,
+            stdErrSize
         );
         final JobEntity jobEntity = this.jobRepo.findOne(id);
         if (jobEntity == null) {
@@ -316,12 +259,8 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         }
         this.updateJobStatus(jobEntity, status, statusMessage);
         final JobExecutionEntity jobExecutionEntity = jobEntity.getExecution();
-        if (jobExecutionEntity != null) {
-            if (!jobExecutionEntity.getExitCode().isPresent()) {
-                jobExecutionEntity.setExitCode(exitCode);
-            }
-        } else {
-            throw new GenieNotFoundException("No job execution with ID " + id + " exists");
+        if (!jobExecutionEntity.getExitCode().isPresent()) {
+            jobExecutionEntity.setExitCode(exitCode);
         }
 
         // Save database query if we don't need it
@@ -360,5 +299,64 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
                 jobEntity.setFinished(new Date());
             }
         }
+    }
+
+    private JobRequestEntity jobRequestDtoToEntity(final String id, final JobRequest jobRequest) throws GenieException {
+        final JobRequestEntity jobRequestEntity = new JobRequestEntity();
+        jobRequestEntity.setId(id);
+        jobRequestEntity.setName(jobRequest.getName());
+        jobRequestEntity.setUser(jobRequest.getUser());
+        jobRequestEntity.setVersion(jobRequest.getVersion());
+        jobRequest.getDescription().ifPresent(jobRequestEntity::setDescription);
+        jobRequestEntity.setCommandArgs(jobRequest.getCommandArgs());
+        jobRequest.getGroup().ifPresent(jobRequestEntity::setGroup);
+        jobRequest.getSetupFile().ifPresent(jobRequestEntity::setSetupFile);
+        jobRequestEntity.setClusterCriteriasFromList(jobRequest.getClusterCriterias());
+        jobRequestEntity.setCommandCriteriaFromSet(jobRequest.getCommandCriteria());
+        jobRequestEntity.setDependenciesFromSet(jobRequest.getDependencies());
+        jobRequestEntity.setDisableLogArchival(jobRequest.isDisableLogArchival());
+        jobRequest.getEmail().ifPresent(jobRequestEntity::setEmail);
+        jobRequestEntity.setTags(jobRequest.getTags());
+        jobRequest.getCpu().ifPresent(jobRequestEntity::setCpu);
+        jobRequest.getMemory().ifPresent(jobRequestEntity::setMemory);
+        jobRequestEntity.setApplicationsFromList(jobRequest.getApplications());
+        jobRequest.getTimeout().ifPresent(jobRequestEntity::setTimeout);
+        return jobRequestEntity;
+    }
+
+    private JobMetadataEntity jobMetadataDtoToEntity(final JobMetadata jobMetadata) throws GenieException {
+        final JobMetadataEntity metadataEntity = new JobMetadataEntity();
+        jobMetadata.getClientHost().ifPresent(metadataEntity::setClientHost);
+        jobMetadata.getUserAgent().ifPresent(metadataEntity::setUserAgent);
+        jobMetadata.getNumAttachments().ifPresent(metadataEntity::setNumAttachments);
+        jobMetadata.getTotalSizeOfAttachments().ifPresent(metadataEntity::setTotalSizeOfAttachments);
+        jobMetadata.getStdOutSize().ifPresent(metadataEntity::setStdOutSize);
+        jobMetadata.getStdErrSize().ifPresent(metadataEntity::setStdErrSize);
+        return metadataEntity;
+    }
+
+    private JobEntity jobDtoToEntity(final Job job) throws GenieException {
+        final JobEntity jobEntity = new JobEntity();
+        jobEntity.setName(job.getName());
+        jobEntity.setUser(job.getUser());
+        jobEntity.setVersion(job.getVersion());
+        job.getArchiveLocation().ifPresent(jobEntity::setArchiveLocation);
+        job.getDescription().ifPresent(jobEntity::setDescription);
+        job.getStarted().ifPresent(jobEntity::setStarted);
+        jobEntity.setStatus(job.getStatus());
+        job.getStatusMsg().ifPresent(jobEntity::setStatusMsg);
+        jobEntity.setTags(job.getTags());
+        jobEntity.setCommandArgs(job.getCommandArgs());
+        return jobEntity;
+    }
+
+    private JobExecutionEntity jobExecutionDtoToEntity(final JobExecution jobExecution) throws GenieException {
+        final JobExecutionEntity jobExecutionEntity = new JobExecutionEntity();
+        jobExecutionEntity.setHostName(jobExecution.getHostName());
+        jobExecution.getProcessId().ifPresent(jobExecutionEntity::setProcessId);
+        jobExecution.getCheckDelay().ifPresent(jobExecutionEntity::setCheckDelay);
+        jobExecution.getTimeout().ifPresent(jobExecutionEntity::setTimeout);
+        jobExecution.getMemory().ifPresent(jobExecutionEntity::setMemory);
+        return jobExecutionEntity;
     }
 }

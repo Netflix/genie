@@ -33,20 +33,24 @@ import java.util.concurrent.Future;
 public class JobScheduledEvent extends BaseJobEvent {
 
     private Future<?> task;
+    private int memory;
 
     /**
      * Constructor.
      *
      * @param id     The id of the job that was scheduled
      * @param task   The future representing the thread that will setup and run the job
+     * @param memory The amount of memory (in MB) the job is scheduled to use
      * @param source The source object which generated this event
      */
     public JobScheduledEvent(
         @NotEmpty final String id,
         @NotNull final Future<?> task,
+        final int memory,
         @NotNull final Object source
     ) {
         super(id, source);
         this.task = task;
+        this.memory = memory;
     }
 }

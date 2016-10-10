@@ -156,6 +156,7 @@ public class JobKickoffTask extends GenieBaseTask {
                     .withProcessId(processId)
                     .withCheckDelay(jobExecEnv.getCommand().getCheckDelay())
                     .withTimeout(calendar.getTime())
+                    .withMemory(jobExecEnv.getMemory())
                     .build();
                 context.put(JobConstants.JOB_EXECUTION_DTO_KEY, jobExecution);
             } catch (final IOException ie) {

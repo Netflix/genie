@@ -15,12 +15,13 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.properties;
+package com.netflix.genie.core.properties;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+import org.hibernate.validator.constraints.NotEmpty;
+
+import javax.validation.constraints.Min;
 
 /**
  * Properties related to job forwarding.
@@ -28,12 +29,14 @@ import org.springframework.stereotype.Component;
  * @author tgianos
  * @since 3.0.0
  */
-@ConfigurationProperties(prefix = "genie.jobs.forwarding")
-@Component
 @Getter
 @Setter
-public class JobForwardingProperties {
+public class JobsForwardingProperties {
     private boolean enabled;
+
+    @NotEmpty(message = "A scheme is required for forwarding")
     private String scheme = "http";
+
+    @Min(value = 1, message = "Port can't be less than one for forwarding")
     private int port = 8080;
 }

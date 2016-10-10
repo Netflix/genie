@@ -203,7 +203,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                 MockMvcRequestBuilders
                     .post(CLUSTERS_API + FILE_DELIMITER + CLUSTER1_ID + FILE_DELIMITER + COMMANDS_LINK_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsBytes(cmds))
+                    .content(this.objectMapper.writeValueAsBytes(cmds))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
     }
@@ -264,7 +264,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                 MockMvcRequestBuilders
                     .post(APPLICATIONS_API)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsBytes(app))
+                    .content(this.objectMapper.writeValueAsBytes(app))
             )
             .andExpect(MockMvcResultMatchers.status().isCreated())
             .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()))
@@ -649,14 +649,13 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                 MockMvcRequestBuilders
                     .post(JOBS_API)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsBytes(jobRequest))
+                    .content(this.objectMapper.writeValueAsBytes(jobRequest))
                     .accept(MediaType.APPLICATION_JSON)
             )
-            .andExpect(MockMvcResultMatchers.status().isAccepted());
+            .andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
 
         final String statusEndpoint = JOBS_API + "/" + jobId + "/status";
-        this.waitForDone(statusEndpoint);
-        Assert.assertThat(this.getStatus(statusEndpoint), Matchers.is("{\"status\":\"INVALID\"}"));
+        Assert.assertThat(this.getStatus(statusEndpoint), Matchers.is("{\"status\":\"FAILED\"}"));
     }
 
     /**
@@ -698,11 +697,10 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsBytes(jobRequest))
             )
-            .andExpect(MockMvcResultMatchers.status().isAccepted());
+            .andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
 
         final String statusEndpoint = JOBS_API + "/" + jobId + "/status";
-        this.waitForDone(statusEndpoint);
-        Assert.assertThat(this.getStatus(statusEndpoint), Matchers.is("{\"status\":\"INVALID\"}"));
+        Assert.assertThat(this.getStatus(statusEndpoint), Matchers.is("{\"status\":\"FAILED\"}"));
     }
 
     /**

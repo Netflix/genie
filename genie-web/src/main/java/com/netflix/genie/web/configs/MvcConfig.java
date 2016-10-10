@@ -18,6 +18,7 @@
 package com.netflix.genie.web.configs;
 
 import com.google.common.collect.Lists;
+import com.netflix.genie.core.properties.JobsProperties;
 import com.netflix.genie.web.resources.handlers.GenieResourceHttpRequestHandler;
 import com.netflix.genie.web.resources.writers.DefaultDirectoryWriter;
 import com.netflix.genie.web.resources.writers.DirectoryWriter;
@@ -93,14 +94,14 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
      * Get RestTemplate for calling between Genie nodes.
      *
      * @param httpConnectTimeout http connection timeout in milliseconds
-     * @param httpReadTimeout http read timeout in milliseconds
+     * @param httpReadTimeout    http read timeout in milliseconds
      * @return The rest template to use
      */
     @Bean(name = "genieRestTemplate")
     public RestTemplate restTemplate(
-            @Value("${genie.http.connect.timeout:2000}") final int httpConnectTimeout,
-            @Value("${genie.http.connect.timeout:10000}") final int httpReadTimeout
-            ) {
+        @Value("${genie.http.connect.timeout:2000}") final int httpConnectTimeout,
+        @Value("${genie.http.connect.timeout:10000}") final int httpReadTimeout
+    ) {
         final HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
         factory.setConnectTimeout(httpConnectTimeout);
         factory.setReadTimeout(httpReadTimeout);
@@ -110,9 +111,9 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
     /**
      * Get RetryTemplate.
      *
-     * @param noOfRetries number of retries
+     * @param noOfRetries     number of retries
      * @param initialInterval initial interval for the backoff policy
-     * @param maxInterval maximum interval for the backoff policy
+     * @param maxInterval     maximum interval for the backoff policy
      * @return The retry template to use
      */
     @Bean(name = "genieRetryTemplate")
@@ -145,8 +146,8 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
     /**
      * Get the jobs dir as a Spring Resource. Will create if it doesn't exist.
      *
-     * @param resourceLoader  The resource loader to use
-     * @param jobsDirLocation The location of the job dir
+     * @param resourceLoader The resource loader to use
+     * @param jobsProperties The jobs properties to use
      * @return The job dir as a resource
      * @throws IOException on error reading or creating the directory
      */
@@ -154,8 +155,9 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
     @ConditionalOnMissingBean
     public Resource jobsDir(
         final ResourceLoader resourceLoader,
-        @Value("${genie.jobs.dir.location}") final String jobsDirLocation
+        final JobsProperties jobsProperties
     ) throws IOException {
+        final String jobsDirLocation = jobsProperties.getLocations().getJobs();
         final Resource tmpJobsDirResource = resourceLoader.getResource(jobsDirLocation);
         if (tmpJobsDirResource.exists() && !tmpJobsDirResource.getFile().isDirectory()) {
             throw new IllegalStateException(jobsDirLocation + " exists but isn't a directory. Unable to continue");

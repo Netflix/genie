@@ -15,11 +15,26 @@
  *     limitations under the License.
  *
  */
+package com.netflix.genie.core.services;
 
 /**
- * This package contains classes which represent configuration properties for type binding and simpler usage.
+ * A service which returns metrics for active jobs.
  *
  * @author tgianos
  * @since 3.0.0
  */
-package com.netflix.genie.web.properties;
+public interface JobMetricsService {
+    /**
+     * Get the number of jobs active on this node.
+     *
+     * @return The number of jobs currently active on this node
+     */
+    int getNumActiveJobs();
+
+    /**
+     * Get the amount of memory currently used by jobs in MB.
+     *
+     * @return The total memory used by jobs in megabytes
+     */
+    int getUsedMemory();
+}

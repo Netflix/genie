@@ -18,32 +18,51 @@
 
 package com.netflix.genie.core.services;
 
+import com.netflix.genie.common.dto.Application;
+import com.netflix.genie.common.dto.Cluster;
+import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
- * Interface to handoff job execution based on different environments.
+ * Interface to hand off job execution based on different environments.
  *
  * @author amsharma
+ * @author tgianos
  * @since 3.0.0
  */
 @Validated
-public interface  JobSubmitterService {
+public interface JobSubmitterService {
 
     /**
      * Submit the job for appropriate execution based on environment.
      *
-     * @param jobRequest of job to run
+     * @param jobRequest   of job to run
+     * @param cluster      The cluster this job should run on
+     * @param command      the command to run this job with
+     * @param applications Any applications that are needed to run the command
+     * @param memory       The amount of memory (in MB) to use to run the job
      * @throws GenieException if there is an error
      */
     void submitJob(
-            @NotNull(message = "No job provided. Unable to submit job for execution.")
-            @Valid
-            final JobRequest jobRequest
+        @Valid
+        @NotNull(message = "No job provided. Unable to submit job for execution.")
+        final JobRequest jobRequest,
+        @Valid
+        @NotNull(message = "No cluster provided. Unable to submit job for execution")
+        final Cluster cluster,
+        @Valid
+        @NotNull(message = "No command provided. Unable to submit job for execution")
+        final Command command,
+        @NotNull(message = "No applications provided. Unable to submit job for execution")
+        final List<Application> applications,
+        @Min(value = 1, message = "Memory can't be less than 1 MB")
+        final int memory
     ) throws GenieException;
-
 }

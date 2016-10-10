@@ -42,15 +42,37 @@ import java.util.List;
 public interface JobPersistenceService {
 
     /**
-     * Save the job object in the data store. Should also persist job execution information.
+     * Save all the initial job fields in the data store.
      *
+     * @param jobRequest   the Job request object to save. Not null
+     * @param jobMetadata  metadata about the job request. Not null
      * @param job          The Job object to create
      * @param jobExecution The job execution object to create
      * @throws GenieException if there is an error
      */
-    void createJobAndJobExecution(
-        @NotNull(message = "No Job provided to create") final Job job,
-        @NotNull(message = "No Job execution information provided. Unable to create.") final JobExecution jobExecution
+    void createJob(
+        @NotNull final JobRequest jobRequest,
+        @NotNull final JobMetadata jobMetadata,
+        @NotNull final Job job,
+        @NotNull final JobExecution jobExecution
+    ) throws GenieException;
+
+    /**
+     * Update the job with the various resources used to run the job including the cluster, command and applications.
+     *
+     * @param jobId          The id of the job to update
+     * @param clusterId      The id of the cluster the job runs on
+     * @param commandId      The id of the command the job runs with
+     * @param applicationIds The ids of the applications used to run the job
+     * @param memory         The amount of memory (in MB) to run the job with
+     * @throws GenieException For any problems while updating
+     */
+    void updateJobWithRuntimeEnvironment(
+        @NotBlank final String jobId,
+        @NotBlank final String clusterId,
+        @NotBlank final String commandId,
+        @NotNull final List<String> applicationIds,
+        @Min(1) final int memory
     ) throws GenieException;
 
     /**
@@ -65,35 +87,6 @@ public interface JobPersistenceService {
         @NotBlank(message = "No job id entered. Unable to update.") final String id,
         @NotNull(message = "Status cannot be null.") final JobStatus jobStatus,
         @NotBlank(message = "Status message cannot be empty.") final String statusMsg
-    ) throws GenieException;
-
-    /**
-     * Update the job with the various resources used to run the job including the cluster, command and applications.
-     *
-     * @param jobId          The id of the job to update
-     * @param clusterId      The id of the cluster the job runs on
-     * @param commandId      The id of the command the job runs with
-     * @param applicationIds The ids of the applications used to run the job
-     * @throws GenieException For any problems while updating
-     */
-    void updateJobWithRuntimeEnvironment(
-        @NotBlank final String jobId,
-        @NotBlank final String clusterId,
-        @NotBlank final String commandId,
-        @NotNull final List<String> applicationIds
-    ) throws GenieException;
-
-    /**
-     * Save the jobRequest object in the data store.
-     *
-     * @param jobRequest  the Job request object to save. Not null
-     * @param jobMetadata metadata about the job request. Not null
-     * @return The job request object that was created
-     * @throws GenieException if there is an error
-     */
-    JobRequest createJobRequest(
-        @NotNull final JobRequest jobRequest,
-        @NotNull final JobMetadata jobMetadata
     ) throws GenieException;
 
     /**

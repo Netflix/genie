@@ -90,7 +90,12 @@ public class InitialSetupTask extends GenieBaseTask {
             this.createClusterEnvironmentVariables(writer, cluster);
 
             // create environment variable for the job itself
-            this.createJobEnvironmentVariables(writer, jobId, jobExecEnv.getJobRequest().getName());
+            this.createJobEnvironmentVariables(
+                writer,
+                jobId,
+                jobExecEnv.getJobRequest().getName(),
+                jobExecEnv.getMemory()
+            );
 
             //Export the Genie Version
             writer.write(GENIE_VERSION_EXPORT);
@@ -283,8 +288,12 @@ public class InitialSetupTask extends GenieBaseTask {
         writer.write(System.lineSeparator());
     }
 
-    private void createJobEnvironmentVariables(final Writer writer, final String jobId, final String jobName)
-        throws GenieException, IOException {
+    private void createJobEnvironmentVariables(
+        final Writer writer,
+        final String jobId,
+        final String jobName,
+        final int memory
+    ) throws GenieException, IOException {
         writer.write(JobConstants.EXPORT
             + JobConstants.GENIE_JOB_ID_ENV_VAR
             + JobConstants.EQUALS_SYMBOL
@@ -304,6 +313,18 @@ public class InitialSetupTask extends GenieBaseTask {
             + jobName
             + JobConstants.DOUBLE_QUOTE_SYMBOL
             + LINE_SEPARATOR);
+
+        // Append new line
+        writer.write(LINE_SEPARATOR);
+
+        // create environment variable for the job name
+        writer.write(
+            JobConstants.EXPORT
+                + JobConstants.GENIE_JOB_MEMORY_ENV_VAR
+                + JobConstants.EQUALS_SYMBOL
+                + memory
+                + LINE_SEPARATOR
+        );
 
         // Append new line
         writer.write(LINE_SEPARATOR);

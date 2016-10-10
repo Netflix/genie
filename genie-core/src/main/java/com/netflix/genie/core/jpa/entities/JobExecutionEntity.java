@@ -73,6 +73,10 @@ public class JobExecutionEntity extends BaseEntity {
     private Integer exitCode;
 
     @Basic
+    @Column(name = "memory")
+    private Integer memory;
+
+    @Basic
     @Column(name = "timeout")
     @Temporal(TemporalType.TIMESTAMP)
     private Date timeout;
@@ -101,12 +105,30 @@ public class JobExecutionEntity extends BaseEntity {
     }
 
     /**
+     * Get the amount of time (in milliseconds) to delay the check for the job status.
+     *
+     * @return Could be null so return optional of the Long
+     */
+    public Optional<Long> getCheckDelay() {
+        return Optional.ofNullable(this.checkDelay);
+    }
+
+    /**
      * Get the exit code from the process that ran the job.
      *
      * @return The exit code or -1 if the job hasn't finished yet
      */
     public Optional<Integer> getExitCode() {
         return Optional.ofNullable(this.exitCode);
+    }
+
+    /**
+     * Get the amount of memory (in MB) that this job is/was run with.
+     *
+     * @return The memory as an optional as it could be null
+     */
+    public Optional<Integer> getMemory() {
+        return Optional.ofNullable(this.memory);
     }
 
     /**
@@ -147,6 +169,7 @@ public class JobExecutionEntity extends BaseEntity {
             .withCheckDelay(this.checkDelay)
             .withTimeout(this.timeout)
             .withExitCode(this.exitCode)
+            .withMemory(this.memory)
             .withId(this.getId())
             .withCreated(this.getCreated())
             .withUpdated(this.getUpdated())

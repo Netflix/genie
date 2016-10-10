@@ -15,11 +15,33 @@
  *     limitations under the License.
  *
  */
+package com.netflix.genie.core.properties;
+
+import lombok.Getter;
+import lombok.Setter;
 
 /**
- * This package contains classes which represent configuration properties for type binding and simpler usage.
+ * Properties pertaining to how much memory jobs can use on Genie.
  *
  * @author tgianos
  * @since 3.0.0
  */
-package com.netflix.genie.web.properties;
+@Getter
+@Setter
+public class JobsMemoryProperties {
+
+    /**
+     * Default to 30 GB (30,720 MB).
+     */
+    private int maxSystemMemory = 30_720;
+
+    /**
+     * Default to 1.5 GB (1,536 MB).
+     */
+    private int defaultJobMemory = 1_024;
+
+    /**
+     * Defaults to 10 GB (10,240 MB).
+     */
+    private int maxJobMemory = 10_240;
+}

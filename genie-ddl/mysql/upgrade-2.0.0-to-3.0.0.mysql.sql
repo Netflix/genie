@@ -218,6 +218,7 @@ ALTER TABLE `commands`
   ADD COLUMN `description` VARCHAR(10000) DEFAULT NULL AFTER `version`,
   ADD COLUMN `tags` VARCHAR(2048) DEFAULT NULL AFTER `description`,
   ADD COLUMN `check_delay` BIGINT NOT NULL DEFAULT 10000 AFTER `executable`,
+  ADD COLUMN `memory` INT(11) DEFAULT NULL AFTER `check_delay`,
   MODIFY `status` VARCHAR(20) NOT NULL DEFAULT 'INACTIVE',
   MODIFY `executable` VARCHAR(255) NOT NULL,
   CHANGE `envPropFile` `setup_file` VARCHAR(1024) DEFAULT NULL,
@@ -429,6 +430,7 @@ CREATE TABLE `job_executions` (
   `exit_code` INT(11) DEFAULT NULL,
   `check_delay` BIGINT DEFAULT NULL,
   `timeout` DATETIME(3) DEFAULT NULL,
+  `memory` INT(11) DEFAULT NULL,
   FOREIGN KEY (`id`) REFERENCES `jobs` (`id`) ON DELETE CASCADE,
   INDEX `JOB_EXECUTIONS_HOSTNAME_INDEX` (`host_name`),
   INDEX `JOB_EXECUTIONS_EXIT_CODE_INDEX` (`exit_code`)

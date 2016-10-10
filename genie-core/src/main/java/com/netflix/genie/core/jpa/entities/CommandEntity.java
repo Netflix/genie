@@ -46,6 +46,7 @@ import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -78,6 +79,11 @@ public class CommandEntity extends SetupFileEntity {
     @Column(name = "check_delay", nullable = false)
     @Min(1)
     private long checkDelay = Command.DEFAULT_CHECK_DELAY;
+
+    @Basic
+    @Column(name = "memory")
+    @Min(1)
+    private Integer memory;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
@@ -120,6 +126,15 @@ public class CommandEntity extends SetupFileEntity {
     @PreUpdate
     protected void onCreateOrUpdateCommand() throws GenieException {
         this.setTags(this.getFinalTags());
+    }
+
+    /**
+     * Get the default memory for a job using this command.
+     *
+     * @return Optional of Integer as it could be null
+     */
+    public Optional<Integer> getMemory() {
+        return Optional.ofNullable(this.memory);
     }
 
     /**
@@ -224,7 +239,8 @@ public class CommandEntity extends SetupFileEntity {
             .withCreated(this.getCreated())
             .withUpdated(this.getUpdated())
             .withTags(this.getTags())
-            .withConfigs(this.configs);
+            .withConfigs(this.configs)
+            .withMemory(this.memory);
 
         this.getDescription().ifPresent(builder::withDescription);
         this.getSetupFile().ifPresent(builder::withSetupFile);

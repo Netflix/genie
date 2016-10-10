@@ -39,6 +39,7 @@ public class JobExecutionUnitTests {
     private static final long CHECK_DELAY = 280843L;
     private static final int PROCESS_ID = 134234;
     private static final Date TIMEOUT = new Date();
+    private static final int MEMORY = 1_024;
 
     /**
      * Test to make sure can build a valid JobExecution using the builder.
@@ -54,6 +55,7 @@ public class JobExecutionUnitTests {
         Assert.assertFalse(execution.getCreated().isPresent());
         Assert.assertFalse(execution.getId().isPresent());
         Assert.assertFalse(execution.getUpdated().isPresent());
+        Assert.assertFalse(execution.getMemory().isPresent());
     }
 
     /**
@@ -68,6 +70,7 @@ public class JobExecutionUnitTests {
         builder.withCheckDelay(CHECK_DELAY);
         builder.withProcessId(PROCESS_ID);
         builder.withTimeout(TIMEOUT);
+        builder.withMemory(MEMORY);
 
         final int exitCode = 0;
         builder.withExitCode(exitCode);
@@ -92,6 +95,7 @@ public class JobExecutionUnitTests {
         Assert.assertThat(execution.getCreated().orElseThrow(IllegalArgumentException::new), Matchers.is(created));
         Assert.assertThat(execution.getId().orElseThrow(IllegalArgumentException::new), Matchers.is(id));
         Assert.assertThat(execution.getUpdated().orElseThrow(IllegalArgumentException::new), Matchers.is(updated));
+        Assert.assertThat(execution.getMemory().orElseThrow(IllegalArgumentException::new), Matchers.is(MEMORY));
     }
 
     /**
@@ -104,6 +108,7 @@ public class JobExecutionUnitTests {
         builder.withProcessId(null);
         builder.withCheckDelay(null);
         builder.withTimeout(null);
+        builder.withMemory(null);
         builder.withCreated(null);
         builder.withId(null);
         builder.withUpdated(null);
@@ -117,6 +122,7 @@ public class JobExecutionUnitTests {
         Assert.assertFalse(execution.getCreated().isPresent());
         Assert.assertFalse(execution.getId().isPresent());
         Assert.assertFalse(execution.getUpdated().isPresent());
+        Assert.assertFalse(execution.getMemory().isPresent());
     }
 
     /**

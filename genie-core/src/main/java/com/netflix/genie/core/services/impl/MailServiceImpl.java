@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2015 Netflix, Inc.
+ *  Copyright 2016 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -36,30 +36,16 @@ public class MailServiceImpl implements MailService {
 
     private final JavaMailSender javaMailSender;
     private final String fromAddress;
-    // TODO can we use this here?
-    private final String mailUser;
-    private final String mailPassword;
 
     /**
      * Constructor.
      *
      * @param javaMailSender An implementation of the JavaMailSender interface.
      * @param fromAddress The from email address for the email.
-     * @param mailUser The userid of the account used to send email.
-     * @param mailPassword The password of the account used to send email.
-     *
-     * @throws GenieException If there is any problem.
      */
-    public MailServiceImpl(
-        final JavaMailSender javaMailSender,
-        final String fromAddress,
-        final String mailUser,
-        final String mailPassword
-    ) throws GenieException {
+    public MailServiceImpl(final JavaMailSender javaMailSender, final String fromAddress) {
         this.javaMailSender = javaMailSender;
         this.fromAddress = fromAddress;
-        this.mailUser = mailUser;
-        this.mailPassword = mailPassword;
     }
 
     @Override
@@ -70,12 +56,12 @@ public class MailServiceImpl implements MailService {
         final String subject,
         final String body
     ) throws GenieException {
-
         final SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
 
         simpleMailMessage.setTo(toEmail);
-        simpleMailMessage.setFrom(fromAddress);
+        simpleMailMessage.setFrom(this.fromAddress);
         simpleMailMessage.setSubject(subject);
+        simpleMailMessage.setText(body);
 
         // check if body is not empty
         if (StringUtils.isNotBlank(body)) {
@@ -83,8 +69,8 @@ public class MailServiceImpl implements MailService {
         }
 
         try {
-            javaMailSender.send(simpleMailMessage);
-        } catch (MailException me) {
+            this.javaMailSender.send(simpleMailMessage);
+        } catch (final MailException me) {
             throw new GenieServerException("Failure to send email: " + me);
         }
     }

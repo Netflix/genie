@@ -26,12 +26,13 @@ import com.netflix.genie.core.jpa.repositories.JpaJobExecutionRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobMetadataRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRequestRepository;
+import com.netflix.genie.core.properties.JobsProperties;
 import com.netflix.genie.core.services.ApplicationService;
 import com.netflix.genie.core.services.ClusterLoadBalancer;
 import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;
-import com.netflix.genie.core.services.JobCountService;
 import com.netflix.genie.core.services.JobKillService;
+import com.netflix.genie.core.services.JobMetricsService;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobSubmitterService;
@@ -115,20 +116,11 @@ public class ServicesConfigUnitTests {
 
     /**
      * Confirm we can get a mail service implementation using JavaMailSender.
-     *
-     * @throws GenieException if there is any problem.
      */
     @Test
-    public void canGetMailServiceImpl() throws GenieException {
+    public void canGetMailServiceImpl() {
         final JavaMailSender javaMailSender = Mockito.mock(JavaMailSender.class);
-        Assert.assertNotNull(
-            this.servicesConfig.getJavaMailSenderMailService(
-                javaMailSender,
-                "fromAddress",
-                "user",
-                "password"
-            )
-        );
+        Assert.assertNotNull(this.servicesConfig.getJavaMailSenderMailService(javaMailSender, "fromAddress"));
     }
 
     /**
@@ -212,10 +204,6 @@ public class ServicesConfigUnitTests {
     @Test
     public void canGetJobSubmitterServiceBean() {
         final JobPersistenceService jobPersistenceService = Mockito.mock(JobPersistenceService.class);
-        final ApplicationService applicationService = Mockito.mock(ApplicationService.class);
-        final ClusterService clusterService = Mockito.mock(ClusterService.class);
-        final CommandService commandService = Mockito.mock(CommandService.class);
-        final ClusterLoadBalancer clusterLoadBalancer = Mockito.mock(ClusterLoadBalancer.class);
         final ApplicationEventPublisher eventPublisher = Mockito.mock(ApplicationEventPublisher.class);
         final ApplicationEventMulticaster eventMulticaster = Mockito.mock(ApplicationEventMulticaster.class);
         final Resource resource = Mockito.mock(Resource.class);
@@ -224,10 +212,6 @@ public class ServicesConfigUnitTests {
         Assert.assertNotNull(
             this.servicesConfig.jobSubmitterService(
                 jobPersistenceService,
-                applicationService,
-                clusterService,
-                commandService,
-                clusterLoadBalancer,
                 eventPublisher,
                 eventMulticaster,
                 workflowTasks,
@@ -248,9 +232,12 @@ public class ServicesConfigUnitTests {
                 Mockito.mock(JobPersistenceService.class),
                 Mockito.mock(JobSubmitterService.class),
                 Mockito.mock(JobKillService.class),
-                Mockito.mock(JobCountService.class),
-                "file:///tmp",
-                2,
+                Mockito.mock(JobMetricsService.class),
+                new JobsProperties(),
+                Mockito.mock(ApplicationService.class),
+                Mockito.mock(ClusterService.class),
+                Mockito.mock(CommandService.class),
+                Mockito.mock(ClusterLoadBalancer.class),
                 Mockito.mock(Registry.class),
                 Mockito.mock(ApplicationEventPublisher.class),
                 UUID.randomUUID().toString()

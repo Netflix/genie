@@ -516,6 +516,8 @@ public class JpaCommandServiceImpl implements CommandService {
         commandEntity.setSetupFile(setupFile.isPresent() ? setupFile.get() : null);
         commandEntity.setStatus(command.getStatus());
         commandEntity.setTags(command.getTags());
+        final Optional<Integer> memory = command.getMemory();
+        commandEntity.setMemory(memory.isPresent() ? memory.get() : null);
 
         this.commandRepo.save(commandEntity);
     }

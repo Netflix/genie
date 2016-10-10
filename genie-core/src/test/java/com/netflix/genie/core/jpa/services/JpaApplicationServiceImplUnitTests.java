@@ -143,6 +143,20 @@ public class JpaApplicationServiceImplUnitTests {
     }
 
     /**
+     * Test delete all still runs if commands is null.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test
+    public void testDeleteAllNullCommands() throws GenieException {
+        final ApplicationEntity applicationEntity = Mockito.mock(ApplicationEntity.class);
+        Mockito.when(this.jpaApplicationRepository.findAll()).thenReturn(Lists.newArrayList(applicationEntity));
+        Mockito.when(applicationEntity.getCommands()).thenReturn(null);
+        this.appService.deleteAllApplications();
+        Mockito.verify(this.jpaApplicationRepository, Mockito.times(1)).deleteAll();
+    }
+
+    /**
      * Test delete.
      *
      * @throws GenieException For any problem

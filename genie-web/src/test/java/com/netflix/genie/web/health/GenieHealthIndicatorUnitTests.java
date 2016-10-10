@@ -17,8 +17,9 @@
  */
 package com.netflix.genie.web.health;
 
+import com.netflix.genie.core.properties.JobsProperties;
+import com.netflix.genie.core.services.JobMetricsService;
 import com.netflix.genie.test.categories.UnitTest;
-import com.netflix.genie.web.tasks.job.JobMonitoringCoordinator;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -36,18 +37,23 @@ import org.springframework.boot.actuate.health.Status;
 @Category(UnitTest.class)
 public class GenieHealthIndicatorUnitTests {
 
+    private static final int MAX_SYSTEM_MEMORY = 10_240;
+    private static final int DEFAULT_JOB_MEMORY = 1_024;
+
     private GenieHealthIndicator genieHealthIndicator;
-    private JobMonitoringCoordinator jobMonitoringCoordinator;
-    private int maxRunningJobs;
+    private JobMetricsService jobMetricsService;
 
     /**
      * Setup for the tests.
      */
     @Before
     public void setup() {
-        this.jobMonitoringCoordinator = Mockito.mock(JobMonitoringCoordinator.class);
-        this.maxRunningJobs = 2;
-        this.genieHealthIndicator = new GenieHealthIndicator(this.jobMonitoringCoordinator, this.maxRunningJobs);
+        this.jobMetricsService = Mockito.mock(JobMetricsService.class);
+        final JobsProperties jobsProperties = new JobsProperties();
+        jobsProperties.getMemory().setDefaultJobMemory(DEFAULT_JOB_MEMORY);
+        jobsProperties.getMemory().setMaxSystemMemory(MAX_SYSTEM_MEMORY);
+
+        this.genieHealthIndicator = new GenieHealthIndicator(this.jobMetricsService, jobsProperties);
     }
 
     /**
@@ -55,11 +61,11 @@ public class GenieHealthIndicatorUnitTests {
      */
     @Test
     public void canGetHealth() {
-        Mockito.when(this.jobMonitoringCoordinator.getNumJobs()).thenReturn(1);
+        Mockito.when(this.jobMetricsService.getNumActiveJobs()).thenReturn(1, 2, 3);
+        Mockito.when(this.jobMetricsService.getUsedMemory())
+            .thenReturn(1024, 2048, MAX_SYSTEM_MEMORY - DEFAULT_JOB_MEMORY + 1);
         Assert.assertThat(this.genieHealthIndicator.health().getStatus(), Matchers.is(Status.UP));
-        Mockito.when(this.jobMonitoringCoordinator.getNumJobs()).thenReturn(2);
-        Assert.assertThat(this.genieHealthIndicator.health().getStatus(), Matchers.is(Status.OUT_OF_SERVICE));
-        Mockito.when(this.jobMonitoringCoordinator.getNumJobs()).thenReturn(3);
+        Assert.assertThat(this.genieHealthIndicator.health().getStatus(), Matchers.is(Status.UP));
         Assert.assertThat(this.genieHealthIndicator.health().getStatus(), Matchers.is(Status.OUT_OF_SERVICE));
     }
 }
