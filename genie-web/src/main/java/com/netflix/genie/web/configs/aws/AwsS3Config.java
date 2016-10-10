@@ -17,9 +17,11 @@
  */
 package com.netflix.genie.web.configs.aws;
 
+import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.ClasspathPropertiesFileCredentialsProvider;
 import com.amazonaws.auth.STSAssumeRoleSessionCredentialsProvider;
+import com.amazonaws.retry.PredefinedRetryPolicies;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.services.FileTransfer;
@@ -81,15 +83,19 @@ public class AwsS3Config {
     /**
      * A bean providing a client to work with S3.
      *
+     * @param noOfS3Retries No. of S3 request retries
      * @param awsCredentialsProvider A credentials provider used to instantiate the client.
      * @return An amazon s3 client object
      */
     @Bean
     @ConditionalOnBean(AWSCredentialsProvider.class)
     public AmazonS3Client genieS3Client(
+        @Value("${genie.retry.s3.noOfRetries:5}") final int noOfS3Retries,
         final AWSCredentialsProvider awsCredentialsProvider
     ) {
-        return new AmazonS3Client(awsCredentialsProvider);
+        final ClientConfiguration clientConfiguration = new ClientConfiguration()
+            .withRetryPolicy(PredefinedRetryPolicies.getDefaultRetryPolicyWithCustomMaxRetries(noOfS3Retries));
+        return new AmazonS3Client(awsCredentialsProvider, clientConfiguration);
     }
 
     /**
