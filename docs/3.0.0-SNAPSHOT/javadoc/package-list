@@ -18,6 +18,7 @@ com.netflix.genie.core.jpa.entities
 com.netflix.genie.core.jpa.repositories
 com.netflix.genie.core.jpa.services
 com.netflix.genie.core.jpa.specifications
+com.netflix.genie.core.properties
 com.netflix.genie.core.services
 com.netflix.genie.core.services.impl
 com.netflix.genie.core.util
