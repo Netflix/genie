@@ -20,6 +20,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
+import javax.validation.constraints.NotNull;
+import java.util.List;
+
 /**
  * Job repository.
  *
@@ -28,4 +31,10 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface JpaJobExecutionRepository extends JpaRepository<JobExecutionEntity, String>, JpaSpecificationExecutor {
+    /**
+     * Deletes all job executions for the given ids.
+     * @param ids list of ids for which the job requests should be deleted
+     * @return no. of executions deleted
+     */
+    Long deleteByIdIn(@NotNull final List<String> ids);
 }

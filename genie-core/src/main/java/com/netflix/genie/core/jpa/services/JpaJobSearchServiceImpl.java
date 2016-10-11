@@ -34,7 +34,6 @@ import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.entities.JobEntity;
 import com.netflix.genie.core.jpa.entities.JobEntity_;
 import com.netflix.genie.core.jpa.entities.JobExecutionEntity;
-import com.netflix.genie.core.jpa.entities.JobExecutionEntity_;
 import com.netflix.genie.core.jpa.entities.JobRequestEntity;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
@@ -54,10 +53,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -210,19 +208,12 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
     public Set<Job> getAllActiveJobsOnHost(@NotBlank final String hostName) {
         log.debug("Called with hostname {}", hostName);
 
-        final CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
-        final CriteriaQuery<JobEntity> query = cb.createQuery(JobEntity.class);
-        final Root<JobEntity> root = query.from(JobEntity.class);
-        final Join<JobEntity, JobExecutionEntity> executions = root.join(JobEntity_.execution);
+        final TypedQuery<JobEntity> query = entityManager
+            .createNamedQuery(JobExecutionEntity.QUERY_FIND_BY_STATUS_HOST, JobEntity.class);
+        query.setParameter("statuses", JobStatus.getActiveStatuses());
+        query.setParameter("hostName", hostName);
 
-        final Expression<Boolean> statusExpression = root.get(JobEntity_.status).in(JobStatus.getActiveStatuses());
-
-        final Predicate hostPredicate = cb.equal(executions.get(JobExecutionEntity_.hostName), hostName);
-
-        query.where(cb.and(statusExpression, hostPredicate));
-
-        return this.entityManager
-            .createQuery(query)
+        return query
             .getResultList()
             .stream()
             .map(JobEntity::getDTO)
@@ -236,17 +227,11 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
     public List<String> getAllHostsWithActiveJobs() {
         log.debug("Called");
 
-        final CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
-        final CriteriaQuery<String> query = cb.createQuery(String.class);
-        final Root<JobEntity> root = query.from(JobEntity.class);
-        final Join<JobEntity, JobExecutionEntity> executions = root.join(JobEntity_.execution);
+        final TypedQuery<String> query = entityManager
+            .createNamedQuery(JobExecutionEntity.QUERY_FIND_HOSTS_BY_STATUS, String.class);
+        query.setParameter("statuses", JobStatus.getActiveStatuses());
 
-        query
-            .select(executions.get(JobExecutionEntity_.hostName))
-            .distinct(true)
-            .where(root.get(JobEntity_.status).in(JobStatus.getActiveStatuses()));
-
-        return this.entityManager.createQuery(query).getResultList();
+        return query.getResultList();
     }
 
     /**
@@ -271,13 +256,11 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
     @Override
     public JobStatus getJobStatus(@NotBlank final String id) throws GenieException {
         log.debug("Called with id {}", id);
-        final CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        final CriteriaQuery<JobStatus> query = cb.createQuery(JobStatus.class);
-        final Root<JobEntity> root = query.from(JobEntity.class);
-        query.select(root.get(JobEntity_.status));
-        query.where(cb.equal(root.get(JobEntity_.id), id));
+        final TypedQuery<JobStatus> query = entityManager
+            .createNamedQuery(JobEntity.QUERY_GET_STATUS_BY_ID, JobStatus.class);
+        query.setParameter("id", id);
         try {
-            return entityManager.createQuery(query).getSingleResult();
+            return query.getSingleResult();
         } catch (NoResultException e) {
             throw new GenieNotFoundException("No job with id " + id + " exists.");
         }

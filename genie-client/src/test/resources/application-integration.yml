@@ -28,6 +28,10 @@ spring:
     hibernate:
       ddl-auto: update
       naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
+    properties:
+      hibernate:
+        show_sql: true
+        type: trace
   datasource:
     url: jdbc:hsqldb:mem:genie-int-db;shutdown=true
     username: SA

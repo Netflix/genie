@@ -191,6 +191,7 @@ public class ServicesConfigUnitTests {
                 this.jobRepository,
                 this.jobRequestRepository,
                 Mockito.mock(JpaJobMetadataRepository.class),
+                jobExecutionRepository,
                 this.applicationRepository,
                 this.clusterRepository,
                 this.commandRepository

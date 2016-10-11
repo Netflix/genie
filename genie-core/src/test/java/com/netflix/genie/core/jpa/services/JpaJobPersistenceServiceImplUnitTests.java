@@ -38,6 +38,7 @@ import com.netflix.genie.core.jpa.entities.JobRequestEntity;
 import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
+import com.netflix.genie.core.jpa.repositories.JpaJobExecutionRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobMetadataRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRequestRepository;
@@ -75,6 +76,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
     private JpaJobRepository jobRepo;
     private JpaJobRequestRepository jobRequestRepo;
     private JpaJobMetadataRepository jobMetadataRepository;
+    private JpaJobExecutionRepository jobExecutionRepo;
     private JpaApplicationRepository applicationRepo;
     private JpaClusterRepository clusterRepo;
     private JpaCommandRepository commandRepo;
@@ -89,6 +91,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
         this.jobRepo = Mockito.mock(JpaJobRepository.class);
         this.jobRequestRepo = Mockito.mock(JpaJobRequestRepository.class);
         this.jobMetadataRepository = Mockito.mock(JpaJobMetadataRepository.class);
+        this.jobExecutionRepo = Mockito.mock(JpaJobExecutionRepository.class);
         this.applicationRepo = Mockito.mock(JpaApplicationRepository.class);
         this.clusterRepo = Mockito.mock(JpaClusterRepository.class);
         this.commandRepo = Mockito.mock(JpaCommandRepository.class);
@@ -97,6 +100,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
             this.jobRepo,
             this.jobRequestRepo,
             this.jobMetadataRepository,
+            this.jobExecutionRepo,
             this.applicationRepo,
             this.clusterRepo,
             this.commandRepo
@@ -180,9 +184,6 @@ public class JpaJobPersistenceServiceImplUnitTests {
             = argument.getValue().getDescription().orElseThrow(IllegalArgumentException::new);
         Assert.assertThat(actualDescription, Matchers.is(description));
         Assert.assertThat(argument.getValue().getApplicationsAsList(), Matchers.empty());
-        Assert.assertThat(argument.getValue().getJob(), Matchers.notNullValue());
-        Assert.assertThat(argument.getValue().getJob().getExecution(), Matchers.notNullValue());
-        Assert.assertThat(argument.getValue().getJobMetadata(), Matchers.notNullValue());
     }
 
     /**
@@ -441,7 +442,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
         final JobEntity jobEntity = Mockito.mock(JobEntity.class);
 
         Mockito.when(this.jobRepo.findOne(id)).thenReturn(jobEntity);
-        Mockito.when(jobEntity.getExecution()).thenReturn(null);
+        Mockito.when(this.jobExecutionRepo.findOne(id)).thenReturn(null);
         this.jobPersistenceService.setJobRunningInformation(id, 1, 1, new Date());
     }
 
@@ -458,7 +459,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
         final Date timeout = new Date();
         final JobExecutionEntity jobExecutionEntity = Mockito.mock(JobExecutionEntity.class);
         final JobEntity jobEntity = Mockito.mock(JobEntity.class);
-        Mockito.when(jobEntity.getExecution()).thenReturn(jobExecutionEntity);
+        Mockito.when(this.jobExecutionRepo.findOne(id)).thenReturn(jobExecutionEntity);
         Mockito.when(jobEntity.getStatus()).thenReturn(JobStatus.INIT);
         Mockito.when(this.jobRepo.findOne(id)).thenReturn(jobEntity);
         this.jobPersistenceService.setJobRunningInformation(id, processId, checkDelay, timeout);
@@ -501,7 +502,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
         final JobEntity jobEntity = Mockito.mock(JobEntity.class);
         final JobExecutionEntity jobExecutionEntity = Mockito.mock(JobExecutionEntity.class);
         Mockito.when(jobEntity.getStatus()).thenReturn(JobStatus.FAILED);
-        Mockito.when(jobEntity.getExecution()).thenReturn(jobExecutionEntity);
+        Mockito.when(this.jobExecutionRepo.findOne(JOB_1_ID)).thenReturn(jobExecutionEntity);
         Mockito.when(this.jobRepo.findOne(JOB_1_ID)).thenReturn(jobEntity);
         Mockito.when(jobExecutionEntity.getExitCode()).thenReturn(Optional.of(1));
         Mockito.when(this.jobMetadataRepository.findOne(JOB_1_ID)).thenReturn(null);
@@ -519,7 +520,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
         final JobEntity jobEntity = Mockito.mock(JobEntity.class);
         final JobExecutionEntity jobExecutionEntity = Mockito.mock(JobExecutionEntity.class);
         Mockito.when(jobEntity.getStatus()).thenReturn(JobStatus.FAILED);
-        Mockito.when(jobEntity.getExecution()).thenReturn(jobExecutionEntity);
+        Mockito.when(this.jobExecutionRepo.findOne(JOB_1_ID)).thenReturn(jobExecutionEntity);
         Mockito.when(this.jobRepo.findOne(JOB_1_ID)).thenReturn(jobEntity);
         Mockito.when(jobExecutionEntity.getExitCode()).thenReturn(Optional.of(1));
 
@@ -537,7 +538,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
         final JobEntity jobEntity = Mockito.mock(JobEntity.class);
         final JobExecutionEntity jobExecutionEntity = Mockito.mock(JobExecutionEntity.class);
         Mockito.when(jobEntity.getStatus()).thenReturn(JobStatus.FAILED);
-        Mockito.when(jobEntity.getExecution()).thenReturn(jobExecutionEntity);
+        Mockito.when(this.jobExecutionRepo.findOne(JOB_1_ID)).thenReturn(jobExecutionEntity);
         Mockito.when(this.jobRepo.findOne(JOB_1_ID)).thenReturn(jobEntity);
         Mockito.when(jobExecutionEntity.getExitCode()).thenReturn(Optional.of(1));
         Mockito.when(this.jobMetadataRepository.findOne(JOB_1_ID)).thenReturn(Mockito.mock(JobMetadataEntity.class));

@@ -28,14 +28,10 @@ import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.Optional;
@@ -116,22 +112,6 @@ public class JobRequestEntity extends SetupFileEntity {
     @Column(name = "timeout")
     @Min(value = 1)
     private Integer timeout;
-
-    @OneToOne(
-        mappedBy = "request",
-        fetch = FetchType.LAZY,
-        cascade = CascadeType.ALL,
-        orphanRemoval = true
-    )
-    private JobEntity job;
-
-    @OneToOne(
-        mappedBy = "request",
-        fetch = FetchType.LAZY,
-        cascade = CascadeType.ALL,
-        orphanRemoval = true
-    )
-    private JobMetadataEntity jobMetadata;
 
     /**
      * Gets the group name of the user who submitted the job.
@@ -332,35 +312,6 @@ public class JobRequestEntity extends SetupFileEntity {
      */
     protected void setApplications(final String applications) {
         this.applications = applications;
-    }
-
-    /**
-     * Get the job associated with this job request.
-     *
-     * @return The job
-     */
-    public JobEntity getJob() {
-        return this.job;
-    }
-
-    /**
-     * Set the job for this request.
-     *
-     * @param job The job
-     */
-    public void setJob(@NotNull final JobEntity job) {
-        this.job = job;
-        job.setRequest(this);
-    }
-
-    /**
-     * Set the additional metadata for this request.
-     *
-     * @param jobMetadata The metadata
-     */
-    public void setJobMetadata(@NotNull final JobMetadataEntity jobMetadata) {
-        this.jobMetadata = jobMetadata;
-        this.jobMetadata.setRequest(this);
     }
 
     /**

@@ -27,6 +27,8 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.MapsId;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -49,8 +51,25 @@ import java.util.TimeZone;
 @Setter
 @Entity
 @Table(name = "job_executions")
+@NamedQueries({
+    @NamedQuery(
+        name = JobExecutionEntity.QUERY_FIND_BY_STATUS_HOST,
+        query = "select e.job from JobExecutionEntity e where e.job.status in :statuses and e.hostName = :hostName"
+    ),
+    @NamedQuery(
+        name = JobExecutionEntity.QUERY_FIND_HOSTS_BY_STATUS,
+        query = "select distinct e.hostName from JobExecutionEntity e where e.job.status in :statuses"
+    )
+})
 public class JobExecutionEntity extends BaseEntity {
-
+    /**
+     * Query name to find jobs by statuses and host.
+     */
+    public static final String QUERY_FIND_BY_STATUS_HOST = "findByStatusHost";
+    /**
+     * Query name to find hosts by statuses.
+     */
+    public static final String QUERY_FIND_HOSTS_BY_STATUS = "findHostsByStatus";
     private static final long serialVersionUID = -5073493356472801960L;
     private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
 
@@ -154,7 +173,7 @@ public class JobExecutionEntity extends BaseEntity {
      *
      * @param job The job
      */
-    protected void setJob(final JobEntity job) {
+    public void setJob(final JobEntity job) {
         this.job = job;
     }
 
