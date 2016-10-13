@@ -32,6 +32,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
+import org.springframework.http.HttpStatus;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolationException;
@@ -41,6 +42,7 @@ import java.io.IOException;
  * Tests for the exception mapper.
  *
  * @author tgianos
+ * @since 3.0.0
  */
 @Category(UnitTest.class)
 public class GenieExceptionMapperUnitTests {
@@ -128,6 +130,7 @@ public class GenieExceptionMapperUnitTests {
     public void canHandleConstraintViolationExceptions() throws IOException {
         this.mapper.handleConstraintViolation(response, new ConstraintViolationException("cve", null));
         Mockito.verify(this.constraintViolationRate, Mockito.times(1)).increment();
-        Mockito.verify(this.response, Mockito.times(1)).sendError(Mockito.anyInt(), Mockito.anyString());
+        Mockito.verify(this.response, Mockito.times(1))
+            .sendError(Mockito.eq(HttpStatus.PRECONDITION_FAILED.value()), Mockito.anyString());
     }
 }

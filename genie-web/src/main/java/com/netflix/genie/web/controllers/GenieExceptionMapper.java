@@ -86,8 +86,8 @@ public class GenieExceptionMapper {
      */
     @ExceptionHandler(GenieException.class)
     public void handleGenieException(
-            final HttpServletResponse response,
-            final GenieException e
+        final HttpServletResponse response,
+        final GenieException e
     ) throws IOException {
         if (e instanceof GenieBadRequestException) {
             this.badRequestRate.increment();
@@ -118,8 +118,8 @@ public class GenieExceptionMapper {
      */
     @ExceptionHandler(ConstraintViolationException.class)
     public void handleConstraintViolation(
-            final HttpServletResponse response,
-            final ConstraintViolationException cve
+        final HttpServletResponse response,
+        final ConstraintViolationException cve
     ) throws IOException {
         final StringBuilder builder = new StringBuilder();
         if (cve.getConstraintViolations() != null) {

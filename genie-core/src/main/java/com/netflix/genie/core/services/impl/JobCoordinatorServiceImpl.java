@@ -239,56 +239,58 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
             }
 
             synchronized (this) {
-                log.info("Checking if can run job {} on this node", jobRequest.getId());
-                final int maxSystemMemory = this.jobsProperties.getMemory().getMaxSystemMemory();
-                final int usedMemory = this.jobMetricsService.getUsedMemory();
-                if (usedMemory + memory <= maxSystemMemory) {
-                    log.info(
-                        "Job {} can run on this node as only {}/{} MB are used and requested {} MB",
-                        jobId,
-                        usedMemory,
-                        maxSystemMemory,
-                        memory
-                    );
-                    try {
-                        log.info("Scheduling job {} for submission", jobRequest.getId());
-                        final Future<?> task = this.taskExecutor.submit(
-                            new JobLauncher(
-                                this.jobSubmitterService,
-                                jobRequest,
-                                cluster,
-                                command,
-                                applications,
-                                memory,
-                                this.registry
-                            )
+                try {
+                    log.info("Checking if can run job {} on this node", jobRequest.getId());
+                    final int maxSystemMemory = this.jobsProperties.getMemory().getMaxSystemMemory();
+                    final int usedMemory = this.jobMetricsService.getUsedMemory();
+                    if (usedMemory + memory <= maxSystemMemory) {
+                        log.info(
+                            "Job {} can run on this node as only {}/{} MB are used and requested {} MB",
+                            jobId,
+                            usedMemory,
+                            maxSystemMemory,
+                            memory
                         );
+                        try {
+                            log.info("Scheduling job {} for submission", jobRequest.getId());
+                            final Future<?> task = this.taskExecutor.submit(
+                                new JobLauncher(
+                                    this.jobSubmitterService,
+                                    jobRequest,
+                                    cluster,
+                                    command,
+                                    applications,
+                                    memory,
+                                    this.registry
+                                )
+                            );
 
-                        // Tell the system a new job has been scheduled so any actions can be taken
-                        log.info("Publishing job scheduled event for job {}", jobId);
-                        this.eventPublisher.publishEvent(new JobScheduledEvent(jobId, task, memory, this));
-                    } catch (final TaskRejectedException e) {
-                        final String errorMsg = "Unable to launch job due to exception: " + e.getMessage();
-                        this.jobPersistenceService.updateJobStatus(jobId, JobStatus.FAILED, errorMsg);
-                        throw new GenieServerException(errorMsg, e);
+                            // Tell the system a new job has been scheduled so any actions can be taken
+                            log.info("Publishing job scheduled event for job {}", jobId);
+                            this.eventPublisher.publishEvent(new JobScheduledEvent(jobId, task, memory, this));
+                            return jobId;
+                        } catch (final TaskRejectedException e) {
+                            throw new GenieServerException(
+                                "Unable to launch job due to exception: " + e.getMessage(),
+                                e
+                            );
+                        }
+                    } else {
+                        throw new GenieServerUnavailableException(
+                            "Job "
+                                + jobId
+                                + " can't run on this node only "
+                                + usedMemory
+                                + "/"
+                                + maxSystemMemory
+                                + " MB are used and requested "
+                                + memory
+                                + " MB"
+                        );
                     }
-                    return jobId;
-                } else {
-                    this.jobPersistenceService.updateJobStatus(jobId,
-                        JobStatus.FAILED,
-                        "Unable to run job due to lack of available memory on host."
-                    );
-                    throw new GenieServerUnavailableException(
-                        "Job "
-                            + jobId
-                            + " can't run on this node only "
-                            + usedMemory
-                            + "/"
-                            + maxSystemMemory
-                            + " MB are used and requested "
-                            + memory
-                            + " MB"
-                    );
+                } catch (final Exception e) {
+                    this.jobPersistenceService.updateJobStatus(jobId, JobStatus.FAILED, e.getMessage());
+                    throw e;
                 }
             }
         } finally {
