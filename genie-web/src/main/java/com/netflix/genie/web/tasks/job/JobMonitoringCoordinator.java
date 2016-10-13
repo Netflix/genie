@@ -248,7 +248,10 @@ public class JobMonitoringCoordinator implements JobMetricsService {
      */
     @Override
     public int getUsedMemory() {
-        return this.jobMemories.values().stream().reduce((a, b) -> a + b).orElse(0);
+        // Synchronized to avoid concurrent modification exception
+        synchronized (this.jobMemories) {
+            return this.jobMemories.values().stream().reduce((a, b) -> a + b).orElse(0);
+        }
     }
 
     private void scheduleMonitor(final JobExecution jobExecution) {
