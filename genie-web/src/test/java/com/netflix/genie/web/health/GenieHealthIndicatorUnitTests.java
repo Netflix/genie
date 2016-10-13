@@ -39,6 +39,7 @@ public class GenieHealthIndicatorUnitTests {
 
     private static final int MAX_SYSTEM_MEMORY = 10_240;
     private static final int DEFAULT_JOB_MEMORY = 1_024;
+    private static final int MAX_JOB_MEMORY = 5_120;
 
     private GenieHealthIndicator genieHealthIndicator;
     private JobMetricsService jobMetricsService;
@@ -52,6 +53,7 @@ public class GenieHealthIndicatorUnitTests {
         final JobsProperties jobsProperties = new JobsProperties();
         jobsProperties.getMemory().setDefaultJobMemory(DEFAULT_JOB_MEMORY);
         jobsProperties.getMemory().setMaxSystemMemory(MAX_SYSTEM_MEMORY);
+        jobsProperties.getMemory().setMaxJobMemory(MAX_JOB_MEMORY);
 
         this.genieHealthIndicator = new GenieHealthIndicator(this.jobMetricsService, jobsProperties);
     }
@@ -63,7 +65,7 @@ public class GenieHealthIndicatorUnitTests {
     public void canGetHealth() {
         Mockito.when(this.jobMetricsService.getNumActiveJobs()).thenReturn(1, 2, 3);
         Mockito.when(this.jobMetricsService.getUsedMemory())
-            .thenReturn(1024, 2048, MAX_SYSTEM_MEMORY - DEFAULT_JOB_MEMORY + 1);
+            .thenReturn(1024, 2048, MAX_SYSTEM_MEMORY - MAX_JOB_MEMORY + 1);
         Assert.assertThat(this.genieHealthIndicator.health().getStatus(), Matchers.is(Status.UP));
         Assert.assertThat(this.genieHealthIndicator.health().getStatus(), Matchers.is(Status.UP));
         Assert.assertThat(this.genieHealthIndicator.health().getStatus(), Matchers.is(Status.OUT_OF_SERVICE));

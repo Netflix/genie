@@ -27,9 +27,6 @@ genie:
   file:
     cache:
       location: file:///tmp/genie/cache
-  health:
-    memory:
-      usedPhysicalMemoryPercent: 90
   jobs:
     forwarding:
       enabled: true
@@ -40,7 +37,6 @@ genie:
       attachments: file:///tmp/genie/attachments/
       jobs: file:///tmp/genie/jobs/
     max:
-      runningJobs: 2
       stdOutSize: 8589934592
       stdErrSize: 8589934592
     memory:
@@ -58,6 +54,9 @@ genie:
     #password:
   redis:
     enabled: false
+  retry:
+    s3:
+      noOfRetries: 5
   security:
     oauth2:
       enabled: false

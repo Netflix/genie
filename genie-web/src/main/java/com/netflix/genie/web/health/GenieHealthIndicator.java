@@ -40,6 +40,7 @@ public class GenieHealthIndicator implements HealthIndicator {
     private static final String USED_MEMORY_KEY = "usedMemory";
     private static final String AVAILABLE_MEMORY = "availableMemory";
     private static final String AVAILABLE_DEFAULT_JOB_CAPACITY = "availableDefaultJobCapacity";
+    private static final String AVAILABLE_MAX_JOB_CAPACITY = "availableMaxJobCapacity";
 
     private final JobMetricsService jobMetricsService;
     private final JobsProperties jobsProperties;
@@ -67,12 +68,13 @@ public class GenieHealthIndicator implements HealthIndicator {
         final int usedMemory = this.jobMetricsService.getUsedMemory();
         final JobsMemoryProperties memoryProperties = this.jobsProperties.getMemory();
         final int availableMemory = memoryProperties.getMaxSystemMemory() - usedMemory;
+        final int maxJobMemory = memoryProperties.getMaxJobMemory();
         final int defaultJobMemory = memoryProperties.getDefaultJobMemory();
 
         final Health.Builder builder;
 
-        // If we can fit one more default job in we're still healthy
-        if (availableMemory >= defaultJobMemory) {
+        // If we can fit one more max job in we're still healthy
+        if (availableMemory >= maxJobMemory) {
             builder = Health.up();
         } else {
             builder = Health.outOfService();
@@ -83,6 +85,7 @@ public class GenieHealthIndicator implements HealthIndicator {
             .withDetail(USED_MEMORY_KEY, usedMemory)
             .withDetail(AVAILABLE_MEMORY, availableMemory)
             .withDetail(AVAILABLE_DEFAULT_JOB_CAPACITY, availableMemory % defaultJobMemory)
+            .withDetail(AVAILABLE_MAX_JOB_CAPACITY, availableMemory % maxJobMemory)
             .build();
     }
 }
