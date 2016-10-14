@@ -28,6 +28,7 @@ import com.netflix.genie.common.exceptions.GenieTimeoutException;
 import com.netflix.genie.core.util.MetricsConstants;
 import com.netflix.spectator.api.Counter;
 import com.netflix.spectator.api.Registry;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -44,6 +45,7 @@ import java.io.IOException;
  * @author tgianos
  * @since 3.0.0
  */
+@Slf4j
 @ControllerAdvice
 public class GenieExceptionMapper {
 
@@ -106,6 +108,7 @@ public class GenieExceptionMapper {
         } else {
             this.genieRate.increment();
         }
+        log.error(e.getLocalizedMessage(), e);
         response.sendError(e.getErrorCode(), e.getLocalizedMessage());
     }
 
@@ -131,6 +134,7 @@ public class GenieExceptionMapper {
             }
         }
         this.constraintViolationRate.increment();
+        log.error(cve.getLocalizedMessage(), cve);
         response.sendError(HttpStatus.PRECONDITION_FAILED.value(), builder.toString());
     }
 }

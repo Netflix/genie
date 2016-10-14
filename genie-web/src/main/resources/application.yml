@@ -28,6 +28,9 @@ genie:
     cache:
       location: file:///tmp/genie/cache
   jobs:
+    cleanup:
+      deleteArchiveFile: true
+      deleteDependencies: true
     forwarding:
       enabled: true
       port: 8080
