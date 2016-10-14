@@ -20,32 +20,15 @@ package com.netflix.genie.core.properties;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.validation.constraints.NotNull;
-
 /**
- * All properties related to jobs in Genie.
+ * Properties related to cleanup for jobs.
  *
  * @author tgianos
  * @since 3.0.0
  */
 @Getter
 @Setter
-public class JobsProperties {
-    @NotNull
-    private JobsCleanupProperties cleanup = new JobsCleanupProperties();
-
-    @NotNull
-    private JobsForwardingProperties forwarding = new JobsForwardingProperties();
-
-    @NotNull
-    private JobsLocationsProperties locations = new JobsLocationsProperties();
-
-    @NotNull
-    private JobsMaxProperties max = new JobsMaxProperties();
-
-    @NotNull
-    private JobsMemoryProperties memory = new JobsMemoryProperties();
-
-    @NotNull
-    private JobsUsersProperties users = new JobsUsersProperties();
+public class JobsCleanupProperties {
+    private boolean deleteArchiveFile = true;
+    private boolean deleteDependencies = true;
 }

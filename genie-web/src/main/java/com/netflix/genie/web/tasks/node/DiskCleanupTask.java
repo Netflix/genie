@@ -20,6 +20,7 @@ package com.netflix.genie.web.tasks.node;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.jobs.JobConstants;
+import com.netflix.genie.core.properties.JobsProperties;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.web.properties.DiskCleanupProperties;
 import com.netflix.genie.web.tasks.TaskUtils;
@@ -31,7 +32,6 @@ import org.apache.commons.exec.Executor;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.Resource;
 import org.springframework.scheduling.TaskScheduler;
@@ -73,7 +73,7 @@ public class DiskCleanupTask implements Runnable {
      * @param scheduler        The scheduler to use to schedule the cron trigger.
      * @param jobsDir          The resource representing the location of the job directory
      * @param jobSearchService The service to find jobs with
-     * @param runAsUser        If jobs are run as the user (and thus ownership of directories is changed)
+     * @param jobsProperties   The jobs properties to use
      * @param processExecutor  The process executor to use to delete directories
      * @param registry         The metrics registry
      * @throws IOException When it is unable to open a file reference to the job directory
@@ -84,7 +84,7 @@ public class DiskCleanupTask implements Runnable {
         @NotNull final TaskScheduler scheduler,
         @NotNull final Resource jobsDir,
         @NotNull final JobSearchService jobSearchService,
-        @Value("${genie.jobs.runAsUser.enabled:false}") final boolean runAsUser,
+        @NotNull final JobsProperties jobsProperties,
         @NotNull final Executor processExecutor,
         @NotNull final Registry registry
     ) throws IOException {
@@ -96,7 +96,7 @@ public class DiskCleanupTask implements Runnable {
         this.properties = properties;
         this.jobsDir = jobsDir.getFile();
         this.jobSearchService = jobSearchService;
-        this.runAsUser = runAsUser;
+        this.runAsUser = jobsProperties.getUsers().isRunAsUserEnabled();
         this.processExecutor = processExecutor;
 
         this.numberOfDeletedJobDirs

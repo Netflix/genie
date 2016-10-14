@@ -222,7 +222,7 @@ public class ServicesConfig {
      * @param hostName         The name of the host this Genie node is running on.
      * @param jobSearchService The job search service to use to locate job information.
      * @param executor         The executor to use to run system processes.
-     * @param runAsUser        Whether jobs on this instance are run as the user or not
+     * @param jobsProperties   The jobs properties to use
      * @param eventPublisher   The application event publisher to use to publish system wide events
      * @return A job kill service instance.
      */
@@ -231,11 +231,16 @@ public class ServicesConfig {
         final String hostName,
         final JobSearchService jobSearchService,
         final Executor executor,
-        @Value("${genie.jobs.runAsUser.enabled:false}")
-        final boolean runAsUser,
+        final JobsProperties jobsProperties,
         final ApplicationEventPublisher eventPublisher
     ) {
-        return new LocalJobKillServiceImpl(hostName, jobSearchService, executor, runAsUser, eventPublisher);
+        return new LocalJobKillServiceImpl(
+            hostName,
+            jobSearchService,
+            executor,
+            jobsProperties.getUsers().isRunAsUserEnabled(),
+            eventPublisher
+        );
     }
 
     /**

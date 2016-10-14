@@ -256,7 +256,7 @@ public class ServicesConfigUnitTests {
                 "localhost",
                 this.jobSearchService,
                 Mockito.mock(Executor.class),
-                true,
+                new JobsProperties(),
                 Mockito.mock(ApplicationEventPublisher.class)
             )
         );

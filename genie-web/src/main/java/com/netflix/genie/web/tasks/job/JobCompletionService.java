@@ -31,6 +31,7 @@ import com.netflix.genie.core.events.JobFinishedEvent;
 import com.netflix.genie.core.events.JobFinishedReason;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.jobs.JobDoneFile;
+import com.netflix.genie.core.properties.JobsProperties;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.MailService;
@@ -46,7 +47,6 @@ import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Service;
@@ -82,7 +82,7 @@ public class JobCompletionService {
     private final Executor executor;
     private final boolean deleteArchiveFile;
     private final boolean deleteDependencies;
-    private final boolean isRunAsUserEnabled;
+    private final boolean runAsUserEnabled;
 
     // Metrics
     private final Registry registry;
@@ -107,9 +107,7 @@ public class JobCompletionService {
      * @param genieWorkingDir          The working directory where all job directories are created.
      * @param mailServiceImpl          An implementation of the mail service.
      * @param registry                 The metrics registry to use
-     * @param deleteArchiveFile        Flag that determines if the job archive file will be deleted after upload.
-     * @param deleteDependencies       Flag that determines if the job dependencies will be deleted after job is done.
-     * @param isRunAsUserEnabled       Flag that decides where jobs are run as user themselves or genie user.
+     * @param jobsProperties           The properties relating to running jobs
      * @param retryTemplate            Retry template for retrying remote calls
      * @throws GenieException if there is a problem
      */
@@ -121,24 +119,19 @@ public class JobCompletionService {
         final Resource genieWorkingDir,
         final MailService mailServiceImpl,
         final Registry registry,
-        @Value("${genie.jobs.cleanup.deleteArchiveFile.enabled:true}")
-        final boolean deleteArchiveFile,
-        @Value("${genie.jobs.cleanup.deleteDependencies.enabled:true}")
-        final boolean deleteDependencies,
-        @Value("${genie.jobs.runAsUser.enabled:false}")
-        final boolean isRunAsUserEnabled,
+        final JobsProperties jobsProperties,
         @Qualifier("genieRetryTemplate") @NotNull final RetryTemplate retryTemplate
     ) throws GenieException {
         this.jobPersistenceService = jobPersistenceService;
         this.jobSearchService = jobSearchService;
         this.genieFileTransferService = genieFileTransferService;
         this.mailServiceImpl = mailServiceImpl;
-        this.deleteArchiveFile = deleteArchiveFile;
-        this.deleteDependencies = deleteDependencies;
-        this.isRunAsUserEnabled = isRunAsUserEnabled;
+        this.deleteArchiveFile = jobsProperties.getCleanup().isDeleteArchiveFile();
+        this.deleteDependencies = jobsProperties.getCleanup().isDeleteDependencies();
+        this.runAsUserEnabled = jobsProperties.getUsers().isRunAsUserEnabled();
 
         this.executor = new DefaultExecutor();
-        executor.setStreamHandler(new PumpStreamHandler(null, null));
+        this.executor.setStreamHandler(new PumpStreamHandler(null, null));
 
         try {
             this.baseWorkingDir = genieWorkingDir.getFile();
@@ -403,7 +396,7 @@ public class JobCompletionService {
                     );
 
                     if (appDependencyDir.exists()) {
-                        if (this.isRunAsUserEnabled) {
+                        if (this.runAsUserEnabled) {
                             final CommandLine deleteCommand = new CommandLine("sudo");
                             deleteCommand.addArgument("rm");
                             deleteCommand.addArgument("-rf");

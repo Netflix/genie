@@ -21,6 +21,7 @@ import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.core.properties.JobsProperties;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.properties.DiskCleanupProperties;
@@ -71,6 +72,8 @@ public class DiskCleanupTaskUnitTests {
      */
     @Test(expected = IOException.class)
     public void cantConstruct() throws IOException {
+        final JobsProperties properties = new JobsProperties();
+        properties.getUsers().setRunAsUserEnabled(false);
         final Resource jobsDir = Mockito.mock(Resource.class);
         Mockito.when(jobsDir.exists()).thenReturn(false);
         Assert.assertNotNull(
@@ -79,7 +82,7 @@ public class DiskCleanupTaskUnitTests {
                 Mockito.mock(TaskScheduler.class),
                 jobsDir,
                 Mockito.mock(JobSearchService.class),
-                false,
+                properties,
                 Mockito.mock(Executor.class),
                 Mockito.mock(Registry.class)
             )
@@ -103,7 +106,7 @@ public class DiskCleanupTaskUnitTests {
                 scheduler,
                 jobsDir,
                 Mockito.mock(JobSearchService.class),
-                true,
+                new JobsProperties(),
                 Mockito.mock(Executor.class),
                 Mockito.mock(Registry.class)
             )
@@ -128,7 +131,7 @@ public class DiskCleanupTaskUnitTests {
                 scheduler,
                 jobsDir,
                 Mockito.mock(JobSearchService.class),
-                true,
+                new JobsProperties(),
                 Mockito.mock(Executor.class),
                 Mockito.mock(Registry.class)
             )
@@ -143,6 +146,8 @@ public class DiskCleanupTaskUnitTests {
      */
     @Test
     public void willScheduleOnUnixWithoutSudo() throws IOException {
+        final JobsProperties properties = new JobsProperties();
+        properties.getUsers().setRunAsUserEnabled(false);
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
         final TaskScheduler scheduler = Mockito.mock(TaskScheduler.class);
         final Resource jobsDir = Mockito.mock(Resource.class);
@@ -153,7 +158,7 @@ public class DiskCleanupTaskUnitTests {
                 scheduler,
                 jobsDir,
                 Mockito.mock(JobSearchService.class),
-                false,
+                properties,
                 Mockito.mock(Executor.class),
                 Mockito.mock(Registry.class)
             )
@@ -169,6 +174,9 @@ public class DiskCleanupTaskUnitTests {
      */
     @Test
     public void canRunWithoutSudo() throws IOException, GenieException {
+        final JobsProperties jobsProperties = new JobsProperties();
+        jobsProperties.getUsers().setRunAsUserEnabled(false);
+
         // Create some random junk file that should be ignored
         this.tmpJobDir.newFile(UUID.randomUUID().toString());
         final DiskCleanupProperties properties = new DiskCleanupProperties();
@@ -239,7 +247,7 @@ public class DiskCleanupTaskUnitTests {
             scheduler,
             jobDir,
             jobSearchService,
-            false,
+            jobsProperties,
             Mockito.mock(Executor.class),
             registry
         );

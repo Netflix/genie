@@ -23,6 +23,7 @@ import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.exceptions.GenieServerException
 import com.netflix.genie.core.events.JobFinishedEvent
 import com.netflix.genie.core.events.JobFinishedReason
+import com.netflix.genie.core.properties.JobsProperties
 import com.netflix.genie.core.services.JobPersistenceService
 import com.netflix.genie.core.services.JobSearchService
 import com.netflix.genie.core.services.MailService
@@ -51,15 +52,20 @@ class JobCompletionServiceSpec extends Specification{
     JobCompletionService jobCompletionService;
     MailService mailService;
     GenieFileTransferService genieFileTransferService;
+    JobsProperties jobsProperties;
 
     def setup(){
         jobPersistenceService = Mock(JobPersistenceService.class)
         jobSearchService = Mock(JobSearchService.class)
         mailService = Mock(MailService.class)
         genieFileTransferService = Mock(GenieFileTransferService.class)
+        jobsProperties = new JobsProperties()
+        jobsProperties.cleanup.deleteArchiveFile = false
+        jobsProperties.cleanup.deleteDependencies = false
+        jobsProperties.users.runAsUserEnabled = false
         jobCompletionService = new JobCompletionService( jobPersistenceService, jobSearchService,
                 genieFileTransferService, new FileSystemResource("/tmp"), mailService, new NoopRegistry(),
-                false, false, false, new RetryTemplate())
+                jobsProperties, new RetryTemplate())
     }
 
     def handleJobCompletion() throws Exception{
