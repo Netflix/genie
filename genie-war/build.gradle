@@ -1,0 +1,35 @@
+apply plugin: "war"
+
+dependencies {
+    /*******************************
+     * Compile Dependencies
+     *******************************/
+
+    compile(project(":genie-web"))
+
+    /*******************************
+     * Provided Dependencies
+     *******************************/
+
+    provided("org.springframework.boot:spring-boot-starter-tomcat")
+
+    /*******************************
+     * Optional Dependencies
+     *******************************/
+
+    /*******************************
+     * Runtime Dependencies
+     *******************************/
+
+    /*******************************
+     * Test Dependencies
+     *******************************/
+
+    testCompile(project(":genie-test"))
+}
+
+jar {
+    manifest {
+        attributes("Implementation-Version": version)
+    }
+}
