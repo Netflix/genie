@@ -3,6 +3,7 @@ package com.netflix.genie.web.aspect
 import com.netflix.genie.common.exceptions.GenieException
 import com.netflix.genie.common.exceptions.GenieServerException
 import com.netflix.genie.core.jpa.services.JpaJobSearchServiceImpl
+import com.netflix.genie.core.properties.DataServiceRetryProperties
 import com.netflix.genie.test.categories.UnitTest
 import org.aspectj.lang.ProceedingJoinPoint
 import org.junit.experimental.categories.Category
@@ -19,7 +20,16 @@ import spock.lang.Specification
  */
 @Category(UnitTest.class)
 class DataServiceRetryAspectSpec extends Specification{
-    @Shared dataServiceRetryAspect = new DataServiceRetryAspect(2,10,10)
+    def dataServiceRetryAspect
+
+    def setup(){
+        def dataServiceRetryProperties = new DataServiceRetryProperties()
+        dataServiceRetryProperties.setNoOfRetries(2)
+        dataServiceRetryProperties.setMaxInterval(10)
+        dataServiceRetryProperties.setInitialInterval(10)
+        dataServiceRetryAspect = new DataServiceRetryAspect(dataServiceRetryProperties);
+    }
+
     def testProfile(){
         given:
         def ProceedingJoinPoint joinPoint = Mock(ProceedingJoinPoint.class)

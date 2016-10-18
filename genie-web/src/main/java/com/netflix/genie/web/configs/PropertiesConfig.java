@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.configs;
 
+import com.netflix.genie.core.properties.DataServiceRetryProperties;
 import com.netflix.genie.core.properties.JobsProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -40,5 +41,16 @@ public class PropertiesConfig {
     @ConfigurationProperties("genie.jobs")
     public JobsProperties jobsProperties() {
         return new JobsProperties();
+    }
+
+    /**
+     * All the properties related to configuring data service retries.
+     *
+     * @return The data service retry properties structure
+     */
+    @Bean
+    @ConfigurationProperties("genie.data.service.retry")
+    public DataServiceRetryProperties dataServiceRetryProperties() {
+        return new DataServiceRetryProperties();
     }
 }

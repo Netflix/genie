@@ -20,12 +20,12 @@ package com.netflix.genie.web.aspect;
 import com.google.common.collect.ImmutableMap;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.core.properties.DataServiceRetryProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.dao.ConcurrencyFailureException;
@@ -56,17 +56,12 @@ public class DataServiceRetryAspect implements Ordered {
 
     /**
      * Constructor.
-     * @param noOfRetries number of retries
-     * @param initialInterval initial interval in milliseconds before retrying the first attempt
-     * @param maxInterval maximum interval in milliseconds
+     * @param dataServiceRetryProperties retry properties
      */
     @Autowired
-    public DataServiceRetryAspect(
-        @Value("${genie.data.service.retry.noOfRetries:5}") final int noOfRetries,
-        @Value("${genie.data.service.retry.initialInterval:100}") final int initialInterval,
-        @Value("${genie.data.service.retry.maxInterval:30000}") final int maxInterval) {
+    public DataServiceRetryAspect(final DataServiceRetryProperties dataServiceRetryProperties) {
         retryTemplate = new RetryTemplate();
-        retryTemplate.setRetryPolicy(new SimpleRetryPolicy(noOfRetries,
+        retryTemplate.setRetryPolicy(new SimpleRetryPolicy(dataServiceRetryProperties.getNoOfRetries(),
             new ImmutableMap.Builder<Class<? extends Throwable>, Boolean>()
                 .put(CannotGetJdbcConnectionException.class, true)
                 .put(CannotAcquireLockException.class, true)
@@ -74,12 +69,13 @@ public class DataServiceRetryAspect implements Ordered {
                 .put(OptimisticLockingFailureException.class, true)
                 .put(PessimisticLockingFailureException.class, true)
                 .put(ConcurrencyFailureException.class, true)
+                // Will this work for cases where the write queries timeout on the client?
                 .put(QueryTimeoutException.class, true)
                 .put(TransientDataAccessResourceException.class, true)
                 .build()));
         final ExponentialBackOffPolicy backOffPolicy = new ExponentialBackOffPolicy();
-        backOffPolicy.setInitialInterval(initialInterval);
-        backOffPolicy.setMaxInterval(maxInterval);
+        backOffPolicy.setInitialInterval(dataServiceRetryProperties.getInitialInterval());
+        backOffPolicy.setMaxInterval(dataServiceRetryProperties.getMaxInterval());
         retryTemplate.setBackOffPolicy(backOffPolicy);
     }
 
@@ -110,6 +106,7 @@ public class DataServiceRetryAspect implements Ordered {
 
     @Override
     public int getOrder() {
+        // Currently setting this to 0 since we want the retry to happen before the transaction interceptor.
         return 0;
     }
 }
