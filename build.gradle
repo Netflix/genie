@@ -12,6 +12,7 @@ buildscript {
         classpath("org.asciidoctor:asciidoctor-gradle-plugin:1.5.3")
         classpath("gradle.plugin.com.gorylenko.gradle-git-properties:gradle-git-properties:1.4.17")
         classpath("com.netflix.nebula:gradle-aggregate-javadocs-plugin:3.0.1")
+        classpath("com.bmuschko:gradle-docker-plugin:3.0.3")
     }
 }
 
