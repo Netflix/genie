@@ -1,4 +1,5 @@
 from openjdk:8
+MAINTAINER NetflixOSS <netflixoss@netflix.com>
 ARG JAR_NAME
 ARG VERSION
 EXPOSE 8080
