@@ -13,6 +13,7 @@ jdk:
 - oraclejdk8
 services:
 - mysql
+- docker
 git:
   depth: 200
 install: true
@@ -33,6 +34,8 @@ env:
   - secure: c0LFCj1KBTEIFSWlpRGgaei86bfrpnSr8qmMOu/S4dl2JRnCnW9AHmrmQzYhd5NlNPugOAncYk9lnkxA7xqtDlv/Ih4YKBaeP924hwLWO//0tKgxhF1dr0dHI+bRKURvcSyLXFDNFjuXUrw4SalBLbZCmiNFzJLMmy2Lvs9UTso=
   - secure: Nv1mMLy2XX+bYziq536KbNg/mAVDTaLw3q3bKP2Mil3JVicXxYVbkEo+DK2O4rsuT7JNbyroN6/3x7xT9qBo4X7vzCjU91QUAxq5t0SmG0FW+oAIApHWTum307b5XS2UyqV/88gg1O6g9or3bKmDLUsJ1A/+fsASozA207a7zls=
   - secure: "azkmD+d2nSitHJS8AB/L2aAJyiUDBa8tQX4c/gzC/dZHkSUBslyAbGz7OyLWt31JF1WdlNpoWel1gp2/nNoi8W5s46N5z9yYMbGONJUAqaUNWYDfjrLqRtUDPAoo39zARUfsuKPu9Bqt+ZEjb5jiHwj9CRBoejkdbFdPdMNziwA="
+  - secure: "VcIk7En7f0roWC4TmhEqBjTRk4SQyqewiR40R3hPYtuIAeQJVp3p7BuQXHw2SE8vrH6FP15Upc+wQdT9fH1+VFud4p2cPe29PEu9i/XljVE8aBRfupkBaA9LM1HxGFf4NDHVVNyVwYCKl3qQ2YtXbzlcW+CqfjiS9BJc3StTMGU="
+  - secure: "WxyfobFKon0REJS7HSYdVJw1gmyEs+6c7sl/zT2mPkQ+uAcHX2mIBl6YDA9rpu5pt0WY6EX4pHYNydGquN59DqOCQpk1ny88h2kVB6CWi2MOjFloxXJmCRWdecx3UtvvoKROG+kReldQwQwL6VpO3l1+K3ISDnjQTqPkPjdukyQ="
 notifications:
   slack:
     secure: H5nS+GX6TYTU27ur6YFG5OgrQeUbzXLok5ub6+xcmyYEeVPpnQ1Gg/wKqTAGsP9j6tAkqPpxgYT9i9Do6eyTEplK6bTvQVyhilsEDtxGJbUO8XOE9TSo6jAe/lD3EB5l46gxFID+Hg9IkPii4LwEabP7PVehrB1JfNZ6QDgSRRM=
