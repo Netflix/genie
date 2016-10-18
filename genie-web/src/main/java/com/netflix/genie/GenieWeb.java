@@ -22,7 +22,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.boot.autoconfigure.session.SessionAutoConfiguration;
-import org.springframework.retry.annotation.EnableRetry;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 import java.util.Map;
 
@@ -32,8 +32,8 @@ import java.util.Map;
  * @author tgianos
  * @since 3.0.0
  */
-@EnableRetry
 @SpringBootApplication(exclude = {SessionAutoConfiguration.class, RedisAutoConfiguration.class})
+@EnableAspectJAutoProxy
 public class GenieWeb {
 
     protected static final String SPRING_CONFIG_LOCATION = "spring.config.location";

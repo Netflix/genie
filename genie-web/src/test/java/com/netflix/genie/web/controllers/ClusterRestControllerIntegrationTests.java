@@ -25,17 +25,23 @@ import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
+import com.netflix.genie.web.aspect.DataServiceRetryAspect;
 import com.netflix.genie.web.hateoas.resources.ClusterResource;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
+import org.springframework.retry.RetryListener;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.Statement;
 import java.util.UUID;
 
 /**
@@ -59,6 +65,12 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
 
     @Autowired
     private JpaCommandRepository jpaCommandRepository;
+
+    @Autowired
+    private DataSource dataSource;
+
+    @Autowired
+    private DataServiceRetryAspect dataServiceRetryAspect;
 
     /**
      * Cleanup after tests.
@@ -349,6 +361,39 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
         Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
+    }
+
+    /**
+     * Make sure can successfully delete all clusters with retries.
+     *
+     * @throws Exception on a configuration error
+     */
+    @Test
+    public void canDeleteAllClustersWithRetry() throws Exception {
+        final RetryListener retryListener = Mockito.mock(RetryListener.class);
+        try (final Connection conn = dataSource.getConnection(); final Statement stmt = conn.createStatement()) {
+            Mockito.when(retryListener.open(Mockito.any(), Mockito.any())).thenReturn(true);
+            final RetryListener[] retryListeners = {retryListener};
+            dataServiceRetryAspect.setRetryListeners(retryListeners);
+            Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
+            this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).build(), null);
+            conn.setAutoCommit(false);
+            stmt.execute("LOCK TABLE clusters WRITE");
+            this.mvc
+                .perform(MockMvcRequestBuilders.delete(CLUSTERS_API))
+                .andExpect(MockMvcResultMatchers.status().is5xxServerError());
+            Mockito.verify(retryListener, Mockito.times(2)).onError(Mockito.any(), Mockito.any(), Mockito.any());
+            Mockito.doAnswer(invocation -> {
+                conn.commit();
+                return null;
+            }).when(retryListener).onError(Mockito.any(), Mockito.any(), Mockito.any());
+            this.mvc
+                .perform(MockMvcRequestBuilders.delete(CLUSTERS_API))
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
+            Mockito.verify(retryListener, Mockito.times(3)).onError(Mockito.any(), Mockito.any(), Mockito.any());
+            Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
+            dataServiceRetryAspect.setRetryListeners(new RetryListener[0]);
+        }
     }
 
     /**

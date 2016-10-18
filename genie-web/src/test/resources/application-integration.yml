@@ -17,6 +17,12 @@
 ##
 
 genie:
+  data:
+    service:
+      retry:
+        noOfRetries: 2
+        initialInterval: 10
+        maxInterval: 10
   health:
     memory:
       usedPhysicalMemoryPercent: 100
@@ -35,3 +41,5 @@ spring:
     url: jdbc:hsqldb:mem:genie-int-db;shutdown=true
     username: SA
     password:
+    max-active: 5
+    jdbc-interceptors: org.apache.tomcat.jdbc.pool.interceptor.QueryTimeoutInterceptor
