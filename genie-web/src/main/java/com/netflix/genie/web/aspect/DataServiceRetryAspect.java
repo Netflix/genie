@@ -35,6 +35,7 @@ import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.dao.QueryTimeoutException;
 import org.springframework.dao.TransientDataAccessResourceException;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
+import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.retry.RetryListener;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 import org.springframework.retry.policy.SimpleRetryPolicy;
@@ -72,6 +73,7 @@ public class DataServiceRetryAspect implements Ordered {
                 // Will this work for cases where the write queries timeout on the client?
                 .put(QueryTimeoutException.class, true)
                 .put(TransientDataAccessResourceException.class, true)
+                .put(JpaSystemException.class, true)
                 .build()));
         final ExponentialBackOffPolicy backOffPolicy = new ExponentialBackOffPolicy();
         backOffPolicy.setInitialInterval(dataServiceRetryProperties.getInitialInterval());
