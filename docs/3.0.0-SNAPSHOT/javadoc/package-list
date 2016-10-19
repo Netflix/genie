@@ -24,6 +24,7 @@ com.netflix.genie.core.services.impl
 com.netflix.genie.core.util
 com.netflix.genie.test.categories
 com.netflix.genie.test.suppliers
+com.netflix.genie.web.aspect
 com.netflix.genie.web.configs
 com.netflix.genie.web.configs.aws
 com.netflix.genie.web.controllers
