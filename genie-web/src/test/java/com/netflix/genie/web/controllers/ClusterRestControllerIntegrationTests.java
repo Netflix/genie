@@ -371,7 +371,9 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
     @Test
     public void canDeleteAllClustersWithRetry() throws Exception {
         final RetryListener retryListener = Mockito.mock(RetryListener.class);
-        try (final Connection conn = dataSource.getConnection(); final Statement stmt = conn.createStatement()) {
+        final Connection conn = dataSource.getConnection();
+        final Statement stmt = conn.createStatement();
+        try {
             Mockito.when(retryListener.open(Mockito.any(), Mockito.any())).thenReturn(true);
             final RetryListener[] retryListeners = {retryListener};
             dataServiceRetryAspect.setRetryListeners(retryListeners);
@@ -392,6 +394,10 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
             Mockito.verify(retryListener, Mockito.times(3)).onError(Mockito.any(), Mockito.any(), Mockito.any());
             Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
+        } finally {
+            stmt.close();
+            conn.commit();
+            conn.close();
             dataServiceRetryAspect.setRetryListeners(new RetryListener[0]);
         }
     }

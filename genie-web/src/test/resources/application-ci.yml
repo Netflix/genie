@@ -21,6 +21,12 @@ endpoints:
     time-to-live: 1
 
 genie:
+  data:
+    service:
+      retry:
+        noOfRetries: 2
+        initialInterval: 10
+        maxInterval: 10
   health:
     memory:
       usedPhysicalMemoryPercent: 100
