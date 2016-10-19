@@ -380,7 +380,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
             Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
             this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).build(), null);
             conn.setAutoCommit(false);
-            stmt.execute("LOCK TABLE clusters WRITE");
+            stmt.execute("select * from clusters for update");
             this.mvc
                 .perform(MockMvcRequestBuilders.delete(CLUSTERS_API))
                 .andExpect(MockMvcResultMatchers.status().is5xxServerError());
