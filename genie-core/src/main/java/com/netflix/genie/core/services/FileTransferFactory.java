@@ -16,7 +16,8 @@ package com.netflix.genie.core.services;
 /**
  * Factory for FileTransfer implementation based on the scheme.
  *
- * Created by amajumdar on 7/21/16.
+ * @author amajumdar
+ * @since 3.0.0
  */
 public interface FileTransferFactory {
     /**

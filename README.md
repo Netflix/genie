@@ -26,6 +26,15 @@ Genie builds are run on Travis CI [here](https://travis-ci.org/Netflix/genie).
 |  Master | [![Build Status](https://travis-ci.org/Netflix/genie.svg?branch=master)](https://travis-ci.org/Netflix/genie) |  [![Coverage Status](https://coveralls.io/repos/github/Netflix/genie/badge.svg?branch=master)](https://coveralls.io/github/Netflix/genie?branch=master)  |
 | Develop | [![Build Status](https://travis-ci.org/Netflix/genie.svg?branch=master)](https://travis-ci.org/Netflix/genie) | [![Coverage Status](https://coveralls.io/repos/github/Netflix/genie/badge.svg?branch=develop)](https://coveralls.io/github/Netflix/genie?branch=develop) |
 
+## Docker
+
+[![Docker Example](https://img.shields.io/docker/pulls/netflixoss/genie-app.svg)](https://hub.docker.com/r/netflixoss/genie-app/)
+
+Successful builds which generate SNAPSHOT, release candidate (rc) or final artifacts also generate a docker container 
+which is published to Docker Hub. You can use `docker pull netflixoss/genie-app:{version}` to test the one you want.
+ 
+You can run via `docker run -t --rm -p 8080:8080 netflixoss/genie-app:{version}`
+
 ## Documentation
 
 * Netflix Tech Blog Posts

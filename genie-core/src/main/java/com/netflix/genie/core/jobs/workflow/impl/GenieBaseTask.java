@@ -116,8 +116,6 @@ public abstract class GenieBaseTask implements WorkflowTask {
         localPath.append(JobConstants.FILE_PATH_DELIMITER).append(fileName);
 
         return localPath.toString();
-
-
     }
 
     /**
