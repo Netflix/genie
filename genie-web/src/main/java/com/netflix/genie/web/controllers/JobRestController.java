@@ -694,7 +694,7 @@ public class JobRestController {
                 log.info("Job {} is not or was not run on this node. Forwarding to {}", id, jobHostname);
                 final String forwardUrl = buildForwardURL(request, jobHostname);
                 try {
-                    restTemplate.execute(forwardUrl, HttpMethod.GET,
+                    this.restTemplate.execute(forwardUrl, HttpMethod.GET,
                         forwardRequest -> copyRequestHeaders(request, forwardRequest),
                         new ResponseExtractor<Void>() {
                             @Override

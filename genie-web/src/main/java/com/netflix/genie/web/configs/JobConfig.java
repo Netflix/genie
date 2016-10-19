@@ -31,6 +31,7 @@ import com.netflix.genie.core.services.AttachmentService;
 import com.netflix.genie.core.services.FileTransfer;
 import com.netflix.genie.core.services.impl.GenieFileTransferService;
 import com.netflix.genie.core.services.impl.LocalFileTransferImpl;
+import com.netflix.genie.web.services.impl.HttpFileTransferImpl;
 import com.netflix.spectator.api.Registry;
 import org.apache.commons.exec.Executor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * Configuration for Jobs Setup and Run.
@@ -56,6 +58,19 @@ public class JobConfig {
     @Order(value = 2)
     public FileTransfer localFileTransfer() {
         return new LocalFileTransferImpl();
+    }
+
+    /**
+     * Bean to create a http[s] file transfer object.
+     *
+     * @param restTemplate The rest template to use
+     * @param registry     The registry to use for metrics
+     * @return A http implementation of the FileTransferService.
+     */
+    @Bean(name = {"file.system.http", "file.system.https"})
+    @Order(value = 3)
+    public FileTransfer httpFileTransfer(final RestTemplate restTemplate, final Registry registry) {
+        return new HttpFileTransferImpl(restTemplate, registry);
     }
 
 

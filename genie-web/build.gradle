@@ -25,6 +25,7 @@ dependencies {
     // Commons
     compile("org.apache.commons:commons-exec:${commons_exec_version}")
     compile("org.apache.httpcomponents:httpclient")
+    compile("commons-validator:commons-validator:${commons_validator_version}")
 
     // JWT JOSE implementation lib
     compile("org.bitbucket.b_c:jose4j:${jose4j_version}")
