@@ -33,6 +33,8 @@
          consistency regarding their keys. -->
     <module name="Translation"/>
 
+    <module name="SuppressWarningsFilter" />
+
     <module name="TreeWalker">
         <!-- Checks the style of array type definitions. -->
         <module name="ArrayTypeStyle"/>
@@ -282,6 +284,8 @@
 
         <!-- Checks that a token is surrounded by whitespace. -->
         <module name="WhitespaceAround"/>
+
+        <module name="SuppressWarningsHolder" />
     </module>
 
     <!-- Enable suppression comments -->

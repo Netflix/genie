@@ -23,7 +23,6 @@ import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.boot.autoconfigure.session.SessionAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.web.SpringBootServletInitializer;
-import org.springframework.retry.annotation.EnableRetry;
 
 /**
  * A class that serves to set up Spring Boot within a servlet container rather than an embedded one.
@@ -31,7 +30,6 @@ import org.springframework.retry.annotation.EnableRetry;
  * @author tgianos
  * @since 3.0.0
  */
-@EnableRetry
 @SpringBootApplication(
     exclude = {
         SessionAutoConfiguration.class,
