@@ -1469,8 +1469,6 @@ class Genie(object):
 
         """
         params = filters or {}
-        _verify_filters(params, ['id', 'clusterName', 'user', 'size', 'status'
-                                 'tag'])
 
         # Iterate through any responses until we get to the end
         params['page'] = 0
