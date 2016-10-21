@@ -279,7 +279,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                         throw new GenieServerUnavailableException(
                             "Job "
                                 + jobId
-                                + " can't run on this node only "
+                                + " can't run on this node "
                                 + usedMemory
                                 + "/"
                                 + maxSystemMemory

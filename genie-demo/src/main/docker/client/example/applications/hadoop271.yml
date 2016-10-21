@@ -1,0 +1,14 @@
+id: hadoop271
+name: hadoop
+user: genieDemo
+status: ACTIVE
+description: Hadoop Application
+setupFile: http://genie-apache/applications/hadoop/2.7.1/setup.sh
+configs: []
+version: 2.7.1
+type: hadoop
+tags:
+  - type:hadoop
+  - ver:2.7.1
+dependencies:
+  - http://genie-apache/applications/hadoop/2.7.1/hadoop-2.7.1.tar.gz
