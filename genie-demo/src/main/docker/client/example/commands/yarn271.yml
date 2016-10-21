@@ -1,0 +1,13 @@
+id: yarn271
+name: yarn
+user: genieDemo
+description: Yarn Command
+status: ACTIVE
+setupFile:
+configs: []
+executable: ${HADOOP_HOME}/bin/yarn
+version: 2.7.1
+tags:
+  - type:yarn
+  - ver:2.7.1
+checkDelay: 5000
