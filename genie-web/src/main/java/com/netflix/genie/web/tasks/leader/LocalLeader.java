@@ -18,11 +18,11 @@
 package com.netflix.genie.web.tasks.leader;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.cloud.cluster.leader.event.OnGrantedEvent;
 import org.springframework.cloud.cluster.leader.event.OnRevokedEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.ContextClosedEvent;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 
 /**
@@ -60,7 +60,7 @@ public class LocalLeader {
      * @param event The Spring Boot application ready event to startup on
      */
     @EventListener
-    public void startLeadership(final ApplicationReadyEvent event) {
+    public void startLeadership(final ContextRefreshedEvent event) {
         if (this.isLeader) {
             log.debug("Starting Leadership due to " + event);
             this.publisher.publishEvent(new OnGrantedEvent(this, null, "leader"));

@@ -35,10 +35,11 @@ import com.netflix.spectator.api.Registry;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.Executor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.event.ApplicationEventMulticaster;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
 import org.springframework.scheduling.TaskScheduler;
@@ -130,43 +131,12 @@ public class JobMonitoringCoordinator implements JobMetricsService {
      * database to find any jobs already running on this node that aren't in the map. The use case for this is if
      * the Genie application crashes when it comes back up it can find the jobs again and not leave them orphaned.
      *
-     * @param event The spring boot application ready event indicating the application is ready to start taking load
+     * @param event The spring ready event indicating the application is ready to start taking load
      * @throws GenieException on unrecoverable error
      */
     @EventListener
-    public void onStartup(final ApplicationReadyEvent event) throws GenieException {
-        log.info("Application is ready according to event {}. Attempting to re-attach to any active jobs", event);
-        final Set<Job> jobs = this.jobSearchService.getAllActiveJobsOnHost(this.hostName);
-        if (jobs.isEmpty()) {
-            log.info("No jobs currently active on this node.");
-            return;
-        } else {
-            log.info("{} jobs currently active on this node at startup", jobs.size());
-        }
-
-        for (final Job job : jobs) {
-            final String id = job.getId().orElseThrow(() -> new GenieServerException("Job has no id!"));
-            if (this.jobMonitors.containsKey(id) || this.scheduledJobs.containsKey(id)) {
-                log.info("Job {} is already being tracked. Ignoring.", id);
-            } else if (job.getStatus() != JobStatus.RUNNING) {
-                this.eventMulticaster.multicastEvent(
-                    new JobFinishedEvent(id, JobFinishedReason.SYSTEM_CRASH, "System crashed while job starting", this)
-                );
-            } else {
-                try {
-                    final JobExecution jobExecution = this.jobSearchService.getJobExecution(id);
-                    this.jobMemories.put(id, jobExecution.getMemory().orElse(0));
-                    this.scheduleMonitor(jobExecution);
-                    log.info("Re-attached a job monitor to job {}", id);
-                } catch (final GenieException ge) {
-                    log.error("Unable to re-attach to job {}.", id);
-                    this.eventMulticaster.multicastEvent(
-                        new JobFinishedEvent(id, JobFinishedReason.SYSTEM_CRASH, "Unable to re-attach on startup", this)
-                    );
-                    this.unableToReAttach.increment();
-                }
-            }
-        }
+    public void onStartup(final ContextRefreshedEvent event) throws GenieException {
+        this.reAttach(event);
     }
 
     /**
@@ -251,6 +221,41 @@ public class JobMonitoringCoordinator implements JobMetricsService {
         // Synchronized to avoid concurrent modification exception
         synchronized (this.jobMemories) {
             return this.jobMemories.values().stream().reduce((a, b) -> a + b).orElse(0);
+        }
+    }
+
+    private void reAttach(final ApplicationEvent event) throws GenieException {
+        log.info("Application is ready according to event {}. Attempting to re-attach to any active jobs", event);
+        final Set<Job> jobs = this.jobSearchService.getAllActiveJobsOnHost(this.hostName);
+        if (jobs.isEmpty()) {
+            log.info("No jobs currently active on this node.");
+            return;
+        } else {
+            log.info("{} jobs currently active on this node at startup", jobs.size());
+        }
+
+        for (final Job job : jobs) {
+            final String id = job.getId().orElseThrow(() -> new GenieServerException("Job has no id!"));
+            if (this.jobMonitors.containsKey(id) || this.scheduledJobs.containsKey(id)) {
+                log.info("Job {} is already being tracked. Ignoring.", id);
+            } else if (job.getStatus() != JobStatus.RUNNING) {
+                this.eventMulticaster.multicastEvent(
+                    new JobFinishedEvent(id, JobFinishedReason.SYSTEM_CRASH, "System crashed while job starting", this)
+                );
+            } else {
+                try {
+                    final JobExecution jobExecution = this.jobSearchService.getJobExecution(id);
+                    this.jobMemories.put(id, jobExecution.getMemory().orElse(0));
+                    this.scheduleMonitor(jobExecution);
+                    log.info("Re-attached a job monitor to job {}", id);
+                } catch (final GenieException ge) {
+                    log.error("Unable to re-attach to job {}.", id);
+                    this.eventMulticaster.multicastEvent(
+                        new JobFinishedEvent(id, JobFinishedReason.SYSTEM_CRASH, "Unable to re-attach on startup", this)
+                    );
+                    this.unableToReAttach.increment();
+                }
+            }
         }
     }
 
