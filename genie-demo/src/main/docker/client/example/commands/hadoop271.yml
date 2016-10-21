@@ -1,0 +1,13 @@
+id: hadoop271
+name: hadoop
+user: genieDemo
+description: Hadoop Command
+status: ACTIVE
+setupFile:
+configs: []
+executable: ${HADOOP_HOME}/bin/hadoop
+version: 2.7.1
+tags:
+  - type:hadoop
+  - ver:2.7.0
+checkDelay: 5000

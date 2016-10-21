@@ -1,0 +1,12 @@
+name: GenieDemoProd
+user: genieDemo
+version: 2.7.1
+status: UP
+tags:
+  - sched:sla
+  - type:yarn
+  - ver:2.7.1
+configs:
+  - http://genie-apache/clusters/yarn/2.7.1/prod/conf/core-site.xml
+  - http://genie-apache/clusters/yarn/2.7.1/prod/conf/mapred-site.xml
+  - http://genie-apache/clusters/yarn/2.7.1/prod/conf/yarn-site.xml

@@ -1,0 +1,11 @@
+<configuration>
+    <property>
+        <name>yarn.nodemanager.aux-services</name>
+        <value>mapreduce_shuffle</value>
+    </property>
+
+    <property>
+        <name>yarn.resourcemanager.hostname</name>
+        <value>genie-hadoop-prod</value>
+    </property>
+</configuration>
