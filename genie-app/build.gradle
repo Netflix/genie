@@ -48,7 +48,7 @@ def isLatest() {
     return (boolean) !project.version.toString().contains("SNAPSHOT") && !project.version.toString().contains("-rc.")
 }
 
-def getTags(String appName) {
+def getDockerTags(String appName) {
     def tags = ["netflixoss/${appName}:${project.version}"]
     if (isLatest()) {
         tags.add("netflixoss/${appName}:latest")
@@ -67,7 +67,7 @@ task dockerBuildImage(type: Exec, group: "Docker", description: "Build docker im
     dependsOn tasks.dockerCreateInputDir
     workingDir dockerDir
 
-    def appName = jar.baseName.toString()
+    def appName = tasks.jar.baseName.toString()
 
     def commandArgs = new ArrayList<>()
     commandArgs.add("docker")
@@ -77,7 +77,7 @@ task dockerBuildImage(type: Exec, group: "Docker", description: "Build docker im
     commandArgs.add("JAR_NAME=${appName}")
     commandArgs.add("--build-arg")
     commandArgs.add("VERSION=${project.version}")
-    for (String tag : getTags(appName)) {
+    for (String tag : this.getDockerTags(appName)) {
         commandArgs.add("-t")
         commandArgs.add(tag)
     }
@@ -101,8 +101,8 @@ task dockerPush(group: "Docker", description: "Push the built docker image to Do
         System.env."CI"
     }
     doLast {
-        def appName = jar.baseName.toString()
-        for (String tag : getTags(appName)) {
+        def appName = tasks.jar.baseName.toString()
+        for (String tag : this.getDockerTags(appName)) {
             exec {
                 commandLine "docker", "push", tag
             }

@@ -1,0 +1,13 @@
+id: hdfs271
+name: hdfs
+user: genieDemo
+description: HDFS Command
+status: ACTIVE
+setupFile:
+configs: []
+executable: ${HADOOP_HOME}/bin/hdfs
+version: 2.7.1
+tags:
+  - type:hdfs
+  - ver:2.7.1
+checkDelay: 5000
