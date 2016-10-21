@@ -16,6 +16,11 @@ export default class JobDetails extends React.Component {
       killJobRequestSent : false,
       modalIsOpen        : false,
       killRequestError   : null,
+      command: {
+        id: '',
+        version: '',
+        name: ''
+      },
       job: {
         id: '',
         _links: {
@@ -44,7 +49,9 @@ export default class JobDetails extends React.Component {
     const { row } = props;
     const url = row._links.self.href;
     fetch(url).done(job => {
-      this.setState({ job });
+      fetch(job._links.command.href).done(command => {
+        this.setState({ job, command });
+      });
     });
   }
 
@@ -132,6 +139,26 @@ export default class JobDetails extends React.Component {
                 <tr>
                   <td className="col-xs-2 align-right">Command Name:</td>
                   <td><Link to={`commands?name=${this.state.job.commandName}`}>{this.state.job.commandName}</Link></td>
+                </tr>
+                <tr>
+                  <td className="col-xs-2 align-right">Command Id:</td>
+                  <td><Link to={`commands?name=${this.state.job.commandName}&rowId=${this.state.command.id}`}>{this.state.command.id}</Link></td>
+                </tr>
+                <tr>
+                  <td className="col-xs-2 align-right">Command Version:</td>
+                  <td>{this.state.command.version}</td>
+                </tr>
+                <tr>
+                  <td className="col-xs-2 align-right">Command Created:</td>
+                  <td>{momentFormat(this.state.command.created)}</td>
+                </tr>
+                <tr>
+                  <td className="col-xs-2 align-right">Command Updated:</td>
+                  <td>{momentFormat(this.state.command.updated)}</td>
+                </tr>
+                <tr>
+                  <td className="col-xs-2 align-right">Command Status:</td>
+                  <td>{this.state.command.status}</td>
                 </tr>
                 <tr>
                   <td className="col-xs-2 align-right">Command Args:</td>
