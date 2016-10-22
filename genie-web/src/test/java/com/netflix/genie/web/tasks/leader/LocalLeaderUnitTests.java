@@ -23,11 +23,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.cloud.cluster.leader.event.OnGrantedEvent;
 import org.springframework.cloud.cluster.leader.event.OnRevokedEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.ContextClosedEvent;
+import org.springframework.context.event.ContextRefreshedEvent;
 
 /**
  * Unit tests for the LocalLeader class.
@@ -40,7 +40,7 @@ public class LocalLeaderUnitTests {
 
     private LocalLeader localLeader;
     private ApplicationEventPublisher publisher;
-    private ApplicationReadyEvent applicationReadyEvent;
+    private ContextRefreshedEvent contextRefreshedEvent;
     private ContextClosedEvent contextClosedEvent;
 
     /**
@@ -49,7 +49,7 @@ public class LocalLeaderUnitTests {
     @Before
     public void setup() {
         this.publisher = Mockito.mock(ApplicationEventPublisher.class);
-        this.applicationReadyEvent = Mockito.mock(ApplicationReadyEvent.class);
+        this.contextRefreshedEvent = Mockito.mock(ContextRefreshedEvent.class);
         this.contextClosedEvent = Mockito.mock(ContextClosedEvent.class);
     }
 
@@ -67,7 +67,7 @@ public class LocalLeaderUnitTests {
     @Test
     public void canStartLeadershipIfLeader() {
         this.localLeader = new LocalLeader(this.publisher, true);
-        this.localLeader.startLeadership(this.applicationReadyEvent);
+        this.localLeader.startLeadership(this.contextRefreshedEvent);
         Mockito.verify(this.publisher, Mockito.times(1)).publishEvent(Mockito.any(OnGrantedEvent.class));
     }
 
@@ -77,7 +77,7 @@ public class LocalLeaderUnitTests {
     @Test
     public void wontStartLeadershipIfNotLeader() {
         this.localLeader = new LocalLeader(this.publisher, false);
-        this.localLeader.startLeadership(this.applicationReadyEvent);
+        this.localLeader.startLeadership(this.contextRefreshedEvent);
         Mockito.verify(this.publisher, Mockito.never()).publishEvent(Mockito.any(OnGrantedEvent.class));
     }
 

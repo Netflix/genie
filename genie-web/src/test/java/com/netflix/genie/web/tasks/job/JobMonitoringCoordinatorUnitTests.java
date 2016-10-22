@@ -42,9 +42,9 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.ApplicationEventMulticaster;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.io.Resource;
 import org.springframework.scheduling.TaskScheduler;
 
@@ -126,7 +126,7 @@ public class JobMonitoringCoordinatorUnitTests {
     @Test
     @SuppressWarnings("unchecked")
     public void canAttachToRunningJobs() throws GenieException {
-        final ApplicationReadyEvent event = Mockito.mock(ApplicationReadyEvent.class);
+        final ContextRefreshedEvent event = Mockito.mock(ContextRefreshedEvent.class);
 
         Mockito.when(this.jobSearchService.getAllActiveJobsOnHost(HOSTNAME)).thenReturn(Sets.newHashSet());
         this.coordinator.onStartup(event);
