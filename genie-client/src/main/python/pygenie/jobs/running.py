@@ -110,12 +110,13 @@ class RunningJob(object):
             epoch = dttm_to_epoch(dttm)
         return epoch * 1000
 
-    def _update_info(self, info_section=None):
+    def _update_info(self, info_section=None, **kwargs):
         assert (info_section is None) or (info_section in INFO_SECTIONS), \
             "invalid info_section '{}' (should be None or one of {})" \
                 .format(info_section, INFO_SECTIONS)
 
-        kwargs = {info_section: True} if info_section else dict()
+        if info_section:
+            kwargs.update({info_section: True})
 
         data = self._adapter.get_info_for_rj(self._job_id, **kwargs)
 
@@ -594,7 +595,7 @@ class RunningJob(object):
     def update(self, **kwargs):
         """Update all the job information."""
 
-        self._update_info()
+        self._update_info(**kwargs)
 
     @property
     def update_time(self):

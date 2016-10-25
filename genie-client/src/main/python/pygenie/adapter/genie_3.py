@@ -226,7 +226,7 @@ class Genie3Adapter(GenieBaseAdapter):
 
     def get_info_for_rj(self, job_id, job=False, request=False,
                         applications=False, cluster=False, command=False,
-                        execution=False, *args, **kwargs):
+                        execution=False, timeout=30, *args, **kwargs):
         """
         Get information for RunningJob object.
         """
@@ -241,7 +241,7 @@ class Genie3Adapter(GenieBaseAdapter):
         ret = dict()
 
         if job or get_all:
-            data = self.get(job_id, timeout=30)
+            data = self.get(job_id, timeout=timeout)
 
             link = data.get('_links', {}).get('self', {}).get('href')
             link_parts = urlparse(link)
@@ -275,7 +275,7 @@ class Genie3Adapter(GenieBaseAdapter):
             ret['version'] = data.get('version')
 
         if request or get_all:
-            request_data = self.get(job_id, path='request', timeout=30)
+            request_data = self.get(job_id, path='request', timeout=timeout)
 
             ret['disable_archive'] = request_data.get('disableLogArchival')
             ret['email'] = request_data.get('email')
@@ -287,7 +287,7 @@ class Genie3Adapter(GenieBaseAdapter):
             application_data = self.get(job_id,
                                         path='applications',
                                         if_not_found=list(),
-                                        timeout=30)
+                                        timeout=timeout)
 
             ret['application_name'] = ','.join(a.get('id') for a in application_data)
 
@@ -295,7 +295,7 @@ class Genie3Adapter(GenieBaseAdapter):
             cluster_data = self.get(job_id,
                                     path='cluster',
                                     if_not_found=dict(),
-                                    timeout=30)
+                                    timeout=timeout)
 
             ret['cluster_id'] = cluster_data.get('id')
             ret['cluster_name'] = cluster_data.get('name')
@@ -304,7 +304,7 @@ class Genie3Adapter(GenieBaseAdapter):
             command_data = self.get(job_id,
                                     path='command',
                                     if_not_found=dict(),
-                                    timeout=30)
+                                    timeout=timeout)
 
             ret['command_id'] = command_data.get('id')
             ret['command_name'] = command_data.get('name')
@@ -313,7 +313,7 @@ class Genie3Adapter(GenieBaseAdapter):
             execution_data = self.get(job_id,
                                       path='execution',
                                       if_not_found=dict(),
-                                      timeout=30)
+                                      timeout=timeout)
 
             ret['client_host'] = execution_data.get('hostName')
 
