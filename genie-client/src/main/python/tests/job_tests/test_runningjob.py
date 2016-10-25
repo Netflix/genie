@@ -114,6 +114,49 @@ class TestingRunningJobUpdate(unittest.TestCase):
             [call(u'1234-update')]
         )
 
+    @patch('pygenie.adapter.genie_3.Genie3Adapter.get')
+    def test_update_timeout(self, get):
+        """Test calling update for RunningJob (with timeout)."""
+
+        running_job = pygenie.jobs.RunningJob('1234-update-timeout')
+        running_job.update(timeout=3)
+
+        assert_equals(
+            [
+                call('1234-update-timeout', timeout=3),
+                call('1234-update-timeout', path='request', timeout=3),
+                call('1234-update-timeout', if_not_found=[], path='applications', timeout=3),
+                call('1234-update-timeout', if_not_found={}, path='cluster', timeout=3),
+                call('1234-update-timeout', if_not_found={}, path='command', timeout=3),
+                call('1234-update-timeout', if_not_found={}, path='execution', timeout=3)
+            ],
+            get.call_args_list
+        )
+
+    @patch('pygenie.adapter.genie_3.Genie3Adapter.get')
+    def test_update_section(self, get):
+        """Test calling update section for RunningJob."""
+
+        running_job = pygenie.jobs.RunningJob('1234-update-section')
+        running_job.update(info_section='job')
+
+        assert_equals(
+            [call(u'1234-update-section', timeout=30)],
+            get.call_args_list
+        )
+
+    @patch('pygenie.adapter.genie_3.Genie3Adapter.get')
+    def test_update_section_timeout(self, get):
+        """Test calling update section for RunningJob (with timeout)."""
+
+        running_job = pygenie.jobs.RunningJob('1234-update-section-timeout')
+        running_job.update(info_section='request', timeout=1)
+
+        assert_equals(
+            [call('1234-update-section-timeout', path='request', timeout=1)],
+            get.call_args_list
+        )
+
 
 @patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'})
 class TestingRunningJobProperties(unittest.TestCase):

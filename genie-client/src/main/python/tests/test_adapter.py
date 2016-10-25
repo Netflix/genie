@@ -2,17 +2,15 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import unittest
 
-from mock import patch
+from mock import call, patch
 from nose.tools import (assert_equals,
                         assert_raises)
 
-from pygenie.adapter.adapter import execute_job
 from pygenie.adapter.genie_x import substitute
 from pygenie.adapter.genie_3 import (Genie3Adapter,
                                      get_payload)
 from pygenie.jobs import PrestoJob
-from pygenie.exceptions import (GenieHTTPError,
-                                GenieLogNotFoundError)
+from pygenie.exceptions import GenieLogNotFoundError
 
 from .utils import fake_response
 
@@ -85,4 +83,56 @@ class TestGenie3Adapter(unittest.TestCase):
         assert_equals(
             'select * from {table}',
             payload['name']
+        )
+
+    @patch('pygenie.adapter.genie_3.Genie3Adapter.get')
+    def test_get_info_for_rj_all(self, get):
+        """Test Genie 3 adapter get info call for job (all)."""
+
+        adapter = Genie3Adapter()
+        adapter.get_info_for_rj('111-all')
+
+        assert_equals(
+            [
+                call('111-all', timeout=30),
+                call('111-all', path='request', timeout=30),
+                call('111-all', if_not_found=[], path='applications', timeout=30),
+                call('111-all', if_not_found={}, path='cluster', timeout=30),
+                call('111-all', if_not_found={}, path='command', timeout=30),
+                call('111-all', if_not_found={}, path='execution', timeout=30)
+            ],
+            get.call_args_list
+        )
+
+    @patch('pygenie.adapter.genie_3.Genie3Adapter.get')
+    def test_get_info_for_rj_all_timeout(self, get):
+        """Test Genie 3 adapter get info call for job (all) (with timeout)."""
+
+        adapter = Genie3Adapter()
+        adapter.get_info_for_rj('111-all-timeout', timeout=1)
+
+        assert_equals(
+            [
+                call('111-all-timeout', timeout=1),
+                call('111-all-timeout', path='request', timeout=1),
+                call('111-all-timeout', if_not_found=[], path='applications', timeout=1),
+                call('111-all-timeout', if_not_found={}, path='cluster', timeout=1),
+                call('111-all-timeout', if_not_found={}, path='command', timeout=1),
+                call('111-all-timeout', if_not_found={}, path='execution', timeout=1)
+            ],
+            get.call_args_list
+        )
+
+    @patch('pygenie.adapter.genie_3.Genie3Adapter.get')
+    def test_get_info_for_rj_job(self, get):
+        """Test Genie 3 adapter get info call for job (job section)."""
+
+        adapter = Genie3Adapter()
+        adapter.get_info_for_rj('111-job', job=True)
+
+        assert_equals(
+            [
+                call('111-job', timeout=30)
+            ],
+            get.call_args_list
         )
