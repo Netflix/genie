@@ -27,6 +27,10 @@ apply plugin: "nebula-aggregate-javadocs"
 
 ext.githubProjectName = rootProject.name
 
+def javaProjects = subprojects.findAll {
+    it.name != "genie-demo" && it.name != "genie-ddl"  && it.name != "genie-docs"
+}
+
 allprojects {
     apply plugin: "jacoco"
     apply plugin: "idea"
@@ -52,7 +56,7 @@ task clean(type: Delete) {
     delete "build"
 }
 
-subprojects {
+configure(javaProjects) {
     apply plugin: "nebula.netflixoss"
     apply plugin: "java"
     apply plugin: "checkstyle"
@@ -153,18 +157,19 @@ subprojects {
         }
     }
 
-    tasks.withType(Test) { task ->
-        // set heap size for the test JVM(s)
-        minHeapSize = "256m"
-        maxHeapSize = "2g"
+    tasks.withType(Test) {
+        task ->
+            // set heap size for the test JVM(s)
+            minHeapSize = "256m"
+            maxHeapSize = "2g"
 
-        // If the project is running on a CI server
-        if (System.getenv("CI") != null) {
-            systemProperty "CI", System.getenv("CI")
-        }
+            // If the project is running on a CI server
+            if (System.getenv("CI") != null) {
+                systemProperty "CI", System.getenv("CI")
+            }
 
-        reports.html.destination = file("${reporting.baseDir}/test/${task.name}")
-        jacocoTestReport.executionData += files("$buildDir/jacoco/${task.name}.exec")
+            reports.html.destination = file("${reporting.baseDir}/test/${task.name}")
+            jacocoTestReport.executionData += files("$buildDir/jacoco/${task.name}.exec")
     }
 
     license {
@@ -195,11 +200,11 @@ subprojects {
 
 task jacocoRootReport(type: JacocoReport, group: "Coverage reports") {
     group = "Coverage Reports"
-    dependsOn subprojects.test
-    additionalSourceDirs = files(subprojects.sourceSets.main.allSource.srcDirs)
-    sourceDirectories = files(subprojects.sourceSets.main.allSource.srcDirs)
-    classDirectories = files(subprojects.sourceSets.main.output)
-    executionData = files(subprojects.jacocoTestReport.executionData)
+    dependsOn javaProjects.test
+    additionalSourceDirs = files(javaProjects.sourceSets.main.allSource.srcDirs)
+    sourceDirectories = files(javaProjects.sourceSets.main.allSource.srcDirs)
+    classDirectories = files(javaProjects.sourceSets.main.output)
+    executionData = files(javaProjects.jacocoTestReport.executionData)
     reports {
         html.enabled = true
         xml.enabled = true
@@ -208,15 +213,17 @@ task jacocoRootReport(type: JacocoReport, group: "Coverage reports") {
         true
     }
     doFirst {
-        executionData = files(executionData.findAll {
-            it.exists()
-        })
+        executionData = files(
+                executionData.findAll {
+                    it.exists()
+                }
+        )
     }
 }
 
 coveralls {
-    sourceDirs = subprojects.sourceSets.main.allSource.srcDirs.flatten()
-    jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
+    sourceDirs = javaProjects.sourceSets.main.allSource.srcDirs.flatten()
+    jacocoReportPath = "${project.buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
 }
 
 tasks.coveralls {
@@ -238,18 +245,22 @@ githubPages {
     commitMessage = "Documentation generated for ${version} by Travis Build ${System.env.TRAVIS_BUILD_NUMBER}"
 
     pages {
-        from "${project.buildDir}/docs/javadoc"
-        // by default this will copy into the root of the gh-pages branch and delete any previous files
-        // customizing the destination will only delete files within that target dir
-        into "docs/${version}/javadoc"
+        from("${project.buildDir}/docs/javadoc") {
+            into "docs/${project.version}/javadoc"
+        }
+        from(new File(project(":genie-web").buildDir, "asciidoc/html5")) {
+            into "docs/${project.version}/rest"
+        }
+        from(new File(project(":genie-docs").buildDir, "asciidoc/html5")) {
+            into "docs/${project.version}/reference"
+        }
     }
 }
 
 prepareGhPages {
+    // This also depends on asciidoctor task for some subprojects but that dependency is reverse mapped in the
+    // pertinent subproject build file
     dependsOn "aggregateJavadocs"
-    onlyIf {
-        System.env."CI"
-    }
 }
 
 publishGhPages {

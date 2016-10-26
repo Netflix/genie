@@ -1,0 +1,11 @@
+apply plugin: "org.asciidoctor.convert"
+
+project.parent.tasks.prepareGhPages.dependsOn project.tasks.asciidoctor
+
+// This is needed cause some things like attributes for asciidoctor don't serialize project.version properly at runtime
+def genieVersion = project.version.toString()
+
+asciidoctor {
+    inputs.dir new File(project.projectDir, "/src/main/asciidoc")
+    attributes "revnumber": genieVersion
+}
