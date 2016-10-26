@@ -236,31 +236,47 @@ tasks.coveralls {
     }
 }
 
+task collectDocumentation(group: "documentation", description: "Copy the documentation from subprojects") {
+    dependsOn "aggregateJavadocs"
+    inputs.dir new File(project(":genie-web").buildDir, "asciidoc/html5")
+    inputs.dir new File(project(":genie-docs").buildDir, "asciidoc/html5")
+    inputs.dir new File(project(":genie-demo").buildDir, "asciidoc/html5")
+    outputs.dir new File(project.buildDir, "docs")
+
+    doLast {
+        copy {
+            from new File(project(":genie-web").buildDir, "asciidoc/html5")
+            into "${project.buildDir}/docs/rest"
+        }
+        copy {
+            from new File(project(":genie-docs").buildDir, "asciidoc/html5")
+            into "${project.buildDir}/docs/reference"
+        }
+        copy {
+            from new File(project(":genie-demo").buildDir, "asciidoc/html5")
+            into "${project.buildDir}/docs/demo"
+        }
+    }
+}
+
 githubPages {
     credentials {
         username = System.getenv("GH_TOKEN")
         password = ""
     }
 
-    commitMessage = "Documentation generated for ${version} by Travis Build ${System.env.TRAVIS_BUILD_NUMBER}"
+    commitMessage = "Documentation generated for ${project.version} by Travis Build ${System.env.TRAVIS_BUILD_NUMBER}"
 
     pages {
-        from("${project.buildDir}/docs/javadoc") {
-            into "docs/${project.version}/javadoc"
-        }
-        from(new File(project(":genie-web").buildDir, "asciidoc/html5")) {
-            into "docs/${project.version}/rest"
-        }
-        from(new File(project(":genie-docs").buildDir, "asciidoc/html5")) {
-            into "docs/${project.version}/reference"
-        }
+        from "${project.buildDir}/docs/"
+        into "docs/${project.version}/"
     }
 }
 
 prepareGhPages {
     // This also depends on asciidoctor task for some subprojects but that dependency is reverse mapped in the
     // pertinent subproject build file
-    dependsOn "aggregateJavadocs"
+    dependsOn tasks.collectDocumentation
 }
 
 publishGhPages {
