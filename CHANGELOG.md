@@ -1,3 +1,7 @@
+# 3.0.0
+
+See issues [here](https://github.com/Netflix/genie/issues?q=milestone%3A3.0.0)
+
 # 2.2.3
 
 See issues [here](https://github.com/Netflix/genie/issues?q=milestone%3A2.2.3)

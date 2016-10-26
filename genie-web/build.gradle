@@ -6,6 +6,8 @@ plugins {
 
 apply plugin: "org.asciidoctor.convert"
 
+project.parent.tasks.prepareGhPages.dependsOn project.tasks.asciidoctor
+
 ext {
     snippetsDir = file("build/generated-snippets")
 }
@@ -88,10 +90,14 @@ test {
     outputs.dir snippetsDir
 }
 
+// This is needed cause some things like attributes for asciidoctor don't serialize project.version properly at runtime
+def genieVersion = project.version.toString()
+
 asciidoctor {
-    attributes "snippets": snippetsDir
-    inputs.dir snippetsDir
     dependsOn test
+    inputs.dir snippetsDir
+    inputs.dir new File(project.projectDir, "/src/main/asciidoc")
+    attributes "snippets": snippetsDir, "revnumber": genieVersion
 }
 
 processResources {
@@ -99,7 +105,7 @@ processResources {
         include "**/*.properties"
         include "**/*.yml"
         filter ReplaceTokens, tokens: [
-            "project.version": project.version.toString()
+            "project.version": genieVersion
         ]
     }
 }
@@ -120,7 +126,7 @@ jar {
     dependsOn bundle
 
     manifest {
-        attributes("Implementation-Version": version)
+        attributes("Implementation-Version": genieVersion)
     }
 
     from("${project.projectDir}/src/main/resources/static/build") {
