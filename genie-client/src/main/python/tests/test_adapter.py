@@ -6,6 +6,7 @@ from mock import call, patch
 from nose.tools import (assert_equals,
                         assert_raises)
 
+from pygenie.conf import GenieConf
 from pygenie.adapter.genie_x import substitute
 from pygenie.adapter.genie_3 import (Genie3Adapter,
                                      get_payload)
@@ -136,3 +137,71 @@ class TestGenie3Adapter(unittest.TestCase):
             ],
             get.call_args_list
         )
+
+
+@patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'})
+class TestGenie3AdapterDisableTimeout(unittest.TestCase):
+    """Test Genie 3 adapter with disabled timeout."""
+
+    def setUp(self):
+        conf = GenieConf()
+        conf.genie.set('disable_adapter_timeout', 'True')
+        self.adapter = Genie3Adapter(conf=conf)
+
+    @staticmethod
+    def has_timeout_in_kwargs(kwargs):
+        return 'timeout' in kwargs
+
+    def test_disable_adapter_timeout_conf(self):
+        """Test Genie 3 adapter disable_adapter_timeout values."""
+
+        for value in {'True', 'true', 'TRUE', True, '1', 1}:
+            conf = GenieConf()
+            conf.genie.set('disable_adapter_timeout', value)
+            adapter = Genie3Adapter(conf=conf)
+            assert_equals(True, adapter.disable_timeout)
+
+    @patch('pygenie.adapter.genie_3.call')
+    def test_get_log_disabled_timeout(self, genie_call):
+        """Test Genie 3 adapter get_log() (disabled timeout)."""
+
+        self.adapter.get_log('job-1111', 'some.log', timeout=111)
+
+        assert_equals(True, 'timeout' not in genie_call.call_args[1])
+
+    @patch('pygenie.adapter.genie_3.call')
+    def test_get_disabled_timeout(self, genie_call):
+        """Test Genie 3 adapter get() (disabled timeout)."""
+
+        self.adapter.get('job-2222', timeout=222)
+
+        assert_equals(True, 'timeout' not in genie_call.call_args[1])
+
+    @patch('pygenie.adapter.genie_3.call')
+    def test_get_info_for_rj_disabled_timeout(self, genie_call):
+        """Test Genie 3 adapter get_info_for_rj() (disabled timeout)."""
+
+        self.adapter.get_info_for_rj('job-3333', timeout=333)
+
+        assert_equals(
+            False,
+            any([self.has_timeout_in_kwargs(kall[1]) for kall in genie_call.call_args_list])
+        )
+
+    @patch('pygenie.adapter.genie_3.call')
+    def test_get_status_disabled_timeout(self, genie_call):
+        """Test Genie 3 adapter get_status() (disabled timeout)."""
+
+        self.adapter.get_status('job-4444', timeout=1)
+
+        assert_equals(True, 'timeout' not in genie_call.call_args[1])
+
+    @patch('pygenie.adapter.genie_3.call')
+    def test_submit_job_disabled_timeout(self, genie_call):
+        """Test Genie 3 adapter submit_job() (disabled timeout)."""
+
+        job = PrestoJob().script('select * from table')
+
+        self.adapter.submit_job(job)
+
+        assert_equals(None, genie_call.call_args[1]['timeout'])

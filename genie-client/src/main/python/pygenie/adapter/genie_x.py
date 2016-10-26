@@ -52,6 +52,8 @@ class GenieBaseAdapter(object):
             "invalid conf '{}', should be None or GenieConf".format(conf)
 
         self._conf = conf if conf else GenieConf()
+        self.disable_timeout = self._conf.genie.get('disable_adapter_timeout') \
+            in {'True', 'TRUE', 'true', True, '1', 1}
 
     def __repr__(self):
         return '{}(conf={})'.format(self.__class__.__name__, self._conf)

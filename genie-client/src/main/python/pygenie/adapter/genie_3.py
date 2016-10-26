@@ -107,6 +107,9 @@ class Genie3Adapter(GenieBaseAdapter):
     def get_log(self, job_id, log, iterator=False, **kwargs):
         url = '{}/output/{}'.format(self.__url_for_job(job_id), log)
 
+        if self.disable_timeout and 'timeout' in kwargs:
+            del kwargs['timeout']
+
         try:
             response = call(method='get',
                             url=url,
@@ -209,6 +212,9 @@ class Genie3Adapter(GenieBaseAdapter):
         if path:
             url = '{}/{}'.format(url, path.lstrip('/'))
 
+        if self.disable_timeout and 'timeout' in kwargs:
+            del kwargs['timeout']
+
         try:
             return call(method='get',
                         url=url,
@@ -237,6 +243,8 @@ class Genie3Adapter(GenieBaseAdapter):
                        not cluster,
                        not command,
                        not execution])
+
+        timeout = None if self.disable_timeout else timeout
 
         ret = dict()
 
@@ -324,10 +332,13 @@ class Genie3Adapter(GenieBaseAdapter):
 
         return self.get_log(job_id, 'genie/logs/genie.log', **kwargs)
 
-    def get_status(self, job_id):
+    def get_status(self, job_id, timeout=10):
         """Get job status."""
 
-        return self.get(job_id, path='status', timeout=10).get('status')
+        return self.get(job_id,
+                        path='status',
+                        timeout=None if self.disable_timeout else timeout) \
+               .get('status')
 
     def get_stderr(self, job_id, **kwargs):
         """Get a stderr log for a job."""
@@ -339,7 +350,7 @@ class Genie3Adapter(GenieBaseAdapter):
 
         return self.get_log(job_id, 'stdout', **kwargs)
 
-    def kill_job(self, job_id=None, kill_uri=None):
+    def kill_job(self, job_id=None, kill_uri=None, timeout=30):
         """Kill a job."""
 
         url = kill_uri if kill_uri is not None else self.__url_for_job(job_id)
@@ -347,14 +358,14 @@ class Genie3Adapter(GenieBaseAdapter):
         try:
             return call(method='delete',
                         url=url,
-                        timeout=30,
+                        timeout=None if self.disable_timeout else timeout,
                         auth_handler=self.auth_handler)
         except GenieHTTPError as err:
             if err.response.status_code == 404:
                 raise GenieJobNotFoundError("job not found at {}".format(url))
             raise
 
-    def submit_job(self, job):
+    def submit_job(self, job, timeout=30):
         """Submit a job execution to the server."""
 
         payload = {
@@ -384,7 +395,7 @@ class Genie3Adapter(GenieBaseAdapter):
         call(method='post',
              url='{}/{}'.format(job._conf.genie.url, Genie3Adapter.JOBS_ENDPOINT),
              files=files,
-             timeout=30,
+             timeout=None if self.disable_timeout else timeout,
              auth_handler=self.auth_handler)
 
 
