@@ -269,7 +269,7 @@ class RunningJob(object):
 
         return self.__convert_dttm_to_epoch('finished')
 
-    def genie_log(self, iterator=False):
+    def genie_log(self, iterator=False, **kwargs):
         """
         Get the job's Genie log as either an iterator or full text.
 
@@ -288,12 +288,15 @@ class RunningJob(object):
 
         if self.is_done:
             if not self._cached_genie_log:
-                self._cached_genie_log = self._adapter.get_genie_log(self._job_id)
+                self._cached_genie_log = self._adapter.get_genie_log(self._job_id,
+                                                                     **kwargs)
             return self._cached_genie_log.split('\n') if iterator \
                 else self._cached_genie_log
-        return self._adapter.get_genie_log(self._job_id, iterator=iterator)
+        return self._adapter.get_genie_log(self._job_id,
+                                           iterator=iterator,
+                                           **kwargs)
 
-    def get_log(self, log_path, iterator=False):
+    def get_log(self, log_path, iterator=False, **kwargs):
         """
         Get the specified job's log as either an iterator or full text.
 
@@ -311,7 +314,10 @@ class RunningJob(object):
             str or iterator.
         """
 
-        return self._adapter.get_log(self._job_id, log_path, iterator=iterator)
+        return self._adapter.get_log(self._job_id,
+                                     log_path,
+                                     iterator=iterator,
+                                     **kwargs)
 
     @property
     def is_done(self):
@@ -415,7 +421,7 @@ class RunningJob(object):
             str: The kill URI.
         """
 
-    def kill(self):
+    def kill(self, **kwargs):
         """
         Kill the job.
 
@@ -427,9 +433,9 @@ class RunningJob(object):
         """
 
         if self.info.get('kill_uri'):
-            resp = self._adapter.kill_job(kill_uri=self.kill_uri)
+            resp = self._adapter.kill_job(kill_uri=self.kill_uri, **kwargs)
         else:
-            resp = self._adapter.kill_job(job_id=self._job_id)
+            resp = self._adapter.kill_job(job_id=self._job_id, **kwargs)
         return resp
 
     @property
@@ -513,7 +519,7 @@ class RunningJob(object):
 
         return self._status.upper() if self._status else None
 
-    def stderr(self, iterator=False):
+    def stderr(self, iterator=False, **kwargs):
         """
         Get the job's stderr as either an iterator or full text.
 
@@ -532,10 +538,13 @@ class RunningJob(object):
 
         if self.is_done:
             if not self._cached_stderr:
-                self._cached_stderr = self._adapter.get_stderr(self._job_id)
+                self._cached_stderr = self._adapter.get_stderr(self._job_id,
+                                                               **kwargs)
             return self._cached_stderr.split('\n') if iterator \
                 else self._cached_stderr
-        return self._adapter.get_stderr(self._job_id, iterator=iterator)
+        return self._adapter.get_stderr(self._job_id,
+                                        iterator=iterator,
+                                        **kwargs)
 
     @property
     def stdout_url(self):
@@ -545,7 +554,7 @@ class RunningJob(object):
 
         return '{}/stdout'.format(self.output_uri.replace('/output/', '/file/', 1))
 
-    def stdout(self, iterator=False):
+    def stdout(self, iterator=False, **kwargs):
         """
         Get the job's stdout as either an iterator or full text.
 
@@ -562,7 +571,9 @@ class RunningJob(object):
             str or iterator.
         """
 
-        return self._adapter.get_stdout(self._job_id, iterator=iterator)
+        return self._adapter.get_stdout(self._job_id,
+                                        iterator=iterator,
+                                        **kwargs)
 
     @property
     @get_from_info('status_msg', info_section='job', update_if_running=True)
