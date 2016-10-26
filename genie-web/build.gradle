@@ -117,6 +117,8 @@ node {
 }
 
 task bundle(type: NpmTask) {
+    inputs.files(fileTree("${project.projectDir}/src/main/resources/static"))
+    outputs.dir("${project.projectDir}/src/main/resources/static/build")
     args = ["run", "bundle"]
 }
 
