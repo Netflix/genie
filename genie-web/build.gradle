@@ -6,7 +6,7 @@ plugins {
 
 apply plugin: "org.asciidoctor.convert"
 
-project.parent.tasks.prepareGhPages.dependsOn project.tasks.asciidoctor
+project.parent.tasks.collectDocumentation.dependsOn project.tasks.asciidoctor
 
 ext {
     snippetsDir = file("build/generated-snippets")
@@ -96,7 +96,7 @@ def genieVersion = project.version.toString()
 asciidoctor {
     dependsOn test
     inputs.dir snippetsDir
-    inputs.dir new File(project.projectDir, "/src/main/asciidoc")
+    inputs.dir new File(project.projectDir, "/src/docs/asciidoc")
     attributes "snippets": snippetsDir, "revnumber": genieVersion
 }
 

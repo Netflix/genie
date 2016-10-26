@@ -1,0 +1,9 @@
+= Genie Demo Guide
+Tom Gianos <NetflixOSS@netflix.com>
+v{revnumber}, {localdate}
+:description: Reference documentation for Netflix OSS Genie
+:keywords: genie, netflix, documentation, big data, cloud, oss, open source software
+:toc:
+
+== Something
+{project-version}

@@ -1,3 +1,15 @@
+apply plugin: "org.asciidoctor.convert"
+
+project.parent.tasks.collectDocumentation.dependsOn project.tasks.asciidoctor
+
+// This is needed cause some things like attributes for asciidoctor don't serialize project.version properly at runtime
+def genieVersion = project.version.toString()
+
+asciidoctor {
+    inputs.dir new File(project.projectDir, "/src/docs/asciidoc")
+    attributes "revnumber": genieVersion
+}
+
 def dockerDir = new File(project.projectDir, "/src/main/docker")
 
 task demoStart(type: Exec, group: "Demo", description: "Bring up the Genie demo containers") {
