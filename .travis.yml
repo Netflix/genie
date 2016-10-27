@@ -15,7 +15,7 @@ services:
 - mysql
 - docker
 git:
-  depth: 200
+  depth: 250
 install: true
 before_script:
 - mysql -u root -e 'create database genie;'
