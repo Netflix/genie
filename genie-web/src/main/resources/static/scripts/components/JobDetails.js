@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 
 import { momentFormat, fetch } from '../utils';
 import Modal from 'react-modal';
+import Error from './Error';
 
 export default class JobDetails extends React.Component {
 
@@ -49,8 +50,12 @@ export default class JobDetails extends React.Component {
     const { row } = props;
     const url = row._links.self.href;
     fetch(url).done(job => {
+      this.setState({ job });
       fetch(job._links.command.href).done(command => {
-        this.setState({ job, command });
+        this.setState({ command });
+      })
+      .fail(xhr => {
+        this.setState({error: xhr.responseJSON});
       });
     });
   }
@@ -237,6 +242,15 @@ export default class JobDetails extends React.Component {
                 <div><small>*Request failed. Please refresh the page and try again.</small></div>
                 <div><small><code>{this.state.killRequestError.message}.</code></small></div>
               </div> : null
+            }
+            {this.state.error ?
+              <div>
+                <div>
+                  <span>Failed to load Command details:</span>
+                </div>
+                <Error error={this.state.error} />
+              </div>
+             : null
             }
           </div>
         </td>

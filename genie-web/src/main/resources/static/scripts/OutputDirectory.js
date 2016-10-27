@@ -80,7 +80,11 @@ export default class OutputDirectory extends React.Component {
           infos={this.state.infos}
         />
         {this.state.error ?
-          <div className="container job-output-directory"> Output not found </div> :
+          <div className="container job-output-directory"> Output not found
+            <div>
+              <Link to="/jobs">&larr; back</Link>
+            </div>
+          </div> :
           <div className="container job-output-directory">
             {
               this.state.fetching && !this.state.error ?
