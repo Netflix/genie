@@ -29,8 +29,11 @@ import com.netflix.spectator.api.Timer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.Executor;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
+import org.springframework.retry.backoff.ExponentialBackOffPolicy;
+import org.springframework.retry.support.RetryTemplate;
 
 import javax.validation.constraints.NotNull;
 import java.io.File;
@@ -60,6 +63,8 @@ public class JobKickoffTask extends GenieBaseTask {
     private final Executor executor;
     private final String hostname;
     private final Timer timer;
+    private final Registry registry;
+    private final RetryTemplate retryTemplate;
 
     /**
      * Constructor.
@@ -81,7 +86,10 @@ public class JobKickoffTask extends GenieBaseTask {
         this.isUserCreationEnabled = userCreationEnabled;
         this.executor = executor;
         this.hostname = hostname;
+        this.registry = registry;
         this.timer = registry.timer("genie.jobs.tasks.jobKickoffTask.timer");
+        retryTemplate = new RetryTemplate();
+        retryTemplate.setBackOffPolicy(new ExponentialBackOffPolicy());
     }
 
     /**
@@ -94,9 +102,10 @@ public class JobKickoffTask extends GenieBaseTask {
             final JobExecutionEnvironment jobExecEnv =
                 (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
             final String jobWorkingDirectory = jobExecEnv.getJobWorkingDir().getCanonicalPath();
+            final JobRequest jobRequest = jobExecEnv.getJobRequest();
+            final String user = jobRequest.getUser();
             final Writer writer = (Writer) context.get(JobConstants.WRITER_KEY);
-            final String jobId = jobExecEnv
-                .getJobRequest()
+            final String jobId = jobRequest
                 .getId()
                 .orElseThrow(() -> new GeniePreconditionException("No job id found. Unable to continue."));
             log.info("Starting Job Kickoff Task for job {}", jobId);
@@ -109,25 +118,20 @@ public class JobKickoffTask extends GenieBaseTask {
             } catch (IOException e) {
                 throw new GenieServerException("Failed to execute job with exception." + e);
             }
-
-            final String runScript = jobWorkingDirectory
-                + JobConstants.FILE_PATH_DELIMITER
-                + JobConstants.GENIE_JOB_LAUNCHER_SCRIPT;
-
-            if (this.isUserCreationEnabled) {
-                final String user = jobExecEnv.getJobRequest().getUser();
-                this.createUser(user, jobExecEnv.getJobRequest().getGroup().orElse(null));
+            // Create user, if enabled
+            if (isUserCreationEnabled) {
+                createUser(user, jobRequest.getGroup().orElse(null));
             }
-
+            // Set the ownership to the user and run as the user, if enabled
             final List<String> command = new ArrayList<>();
-            if (this.isRunAsUserEnabled) {
-                changeOwnershipOfDirectory(jobWorkingDirectory, jobExecEnv.getJobRequest().getUser());
+            if (isRunAsUserEnabled) {
+                changeOwnershipOfDirectory(jobWorkingDirectory, user);
 
                 // This is needed because the genie.log file is still generated as the user running Genie system.
                 makeDirGroupWritable(jobWorkingDirectory + "/genie/logs");
                 command.add("sudo");
                 command.add("-u");
-                command.add(jobExecEnv.getJobRequest().getUser());
+                command.add(user);
             }
 
             // If the OS is linux use setsid to launch the process so that the entire process tree
@@ -135,21 +139,29 @@ public class JobKickoffTask extends GenieBaseTask {
             if (SystemUtils.IS_OS_LINUX) {
                 command.add("setsid");
             }
-            //command.add("bash");
+
+            final String runScript = jobWorkingDirectory
+                + JobConstants.FILE_PATH_DELIMITER
+                + JobConstants.GENIE_JOB_LAUNCHER_SCRIPT;
             command.add(runScript);
 
-            // Cannot convert to executor because it does not provide an api to get process id.
-            final ProcessBuilder pb = new ProcessBuilder(command);
-            pb.directory(jobExecEnv.getJobWorkingDir());
-            pb.redirectOutput(new File(jobExecEnv.getJobWorkingDir() + JobConstants.GENIE_LOG_PATH));
-            pb.redirectError(new File(jobExecEnv.getJobWorkingDir() + JobConstants.GENIE_LOG_PATH));
 
+            // Cannot convert to executor because it does not provide an api to get process id.
+            final ProcessBuilder pb = new ProcessBuilder(command)
+                .directory(jobExecEnv.getJobWorkingDir())
+                .redirectOutput(new File(jobExecEnv.getJobWorkingDir() + JobConstants.GENIE_LOG_PATH))
+                .redirectError(new File(jobExecEnv.getJobWorkingDir() + JobConstants.GENIE_LOG_PATH));
+
+            //
+            // Check if file can be executed. This is to fix issue where execution of the run script fails because
+            // the file may be used by some other program
+            //
+            canExecute(runScript);
             try {
                 final Process process = pb.start();
                 final int processId = this.getProcessId(process);
-                final JobRequest request = jobExecEnv.getJobRequest();
                 final Calendar calendar = Calendar.getInstance(UTC);
-                calendar.add(Calendar.SECOND, request.getTimeout().orElse(JobRequest.DEFAULT_TIMEOUT_DURATION));
+                calendar.add(Calendar.SECOND, jobRequest.getTimeout().orElse(JobRequest.DEFAULT_TIMEOUT_DURATION));
                 final JobExecution jobExecution = new JobExecution
                     .Builder(this.hostname)
                     .withId(jobId)
@@ -162,20 +174,31 @@ public class JobKickoffTask extends GenieBaseTask {
             } catch (final IOException ie) {
                 throw new GenieServerException("Unable to start command " + String.valueOf(command), ie);
             }
-            log.info("Finished Job Kickoff Task for job {}", jobExecEnv.getJobRequest().getId());
+            log.info("Finished Job Kickoff Task for job {}", jobId);
         } finally {
             final long finish = System.nanoTime();
             this.timer.record(finish - start, TimeUnit.NANOSECONDS);
         }
     }
 
+    private boolean canExecute(final String runScriptFile) {
+        try {
+            return retryTemplate.execute(c -> {
+                FileUtils.touch(new File(runScriptFile));
+                return true;
+            });
+        } catch (Exception e) {
+            registry.counter("genie.jobs.tasks.jobKickoffTask.run.failure").increment();
+            log.warn("Failed touching the run script file", e);
+        }
+        return false;
+    }
+
     // Helper method to add write permissions to a directory for the group owner
     private void makeDirGroupWritable(final String dir) throws GenieServerException {
         log.debug("Adding write permissions for the directory " + dir + " for the group.");
-        final CommandLine commandLIne = new CommandLine("sudo");
-        commandLIne.addArgument("chmod");
-        commandLIne.addArgument("g+w");
-        commandLIne.addArgument(dir);
+        final CommandLine commandLIne = new CommandLine("sudo").addArgument("chmod").addArgument("g+w")
+            .addArgument(dir);
 
         try {
             this.executor.execute(commandLIne);
@@ -194,9 +217,7 @@ public class JobKickoffTask extends GenieBaseTask {
     protected synchronized void createUser(final String user, final String group) throws GenieException {
 
         // First check if user already exists
-        final CommandLine idCheckCommandLine = new CommandLine("id");
-        idCheckCommandLine.addArgument("-u");
-        idCheckCommandLine.addArgument(user);
+        final CommandLine idCheckCommandLine = new CommandLine("id").addArgument("-u").addArgument(user);
 
         try {
             this.executor.execute(idCheckCommandLine);
@@ -210,9 +231,8 @@ public class JobKickoffTask extends GenieBaseTask {
             // Create the group for the user if its not the same as the user.
             if (isGroupValid) {
                 log.debug("Group and User are different so creating group now.");
-                final CommandLine groupCreateCommandLine = new CommandLine("sudo");
-                groupCreateCommandLine.addArgument("groupadd");
-                groupCreateCommandLine.addArgument(group);
+                final CommandLine groupCreateCommandLine = new CommandLine("sudo").addArgument("groupadd")
+                    .addArgument(group);
 
                 // We create the group and ignore the error as it will fail if group already exists.
                 // If the failure is due to some other reason, then user creation will fail and we catch that.
@@ -224,15 +244,10 @@ public class JobKickoffTask extends GenieBaseTask {
                 }
             }
 
-            final CommandLine userCreateCommandLine = new CommandLine("sudo");
-            userCreateCommandLine.addArgument("useradd");
-            userCreateCommandLine.addArgument(user);
-
+            final CommandLine userCreateCommandLine = new CommandLine("sudo").addArgument("useradd").addArgument(user);
             if (isGroupValid) {
-                userCreateCommandLine.addArgument("-G");
-                userCreateCommandLine.addArgument(group);
+                userCreateCommandLine.addArgument("-G").addArgument(group);
             }
-
             userCreateCommandLine.addArgument("-M");
 
             try {
@@ -255,11 +270,8 @@ public class JobKickoffTask extends GenieBaseTask {
         final String dir,
         final String user) throws GenieException {
 
-        final CommandLine commandLine = new CommandLine("sudo");
-        commandLine.addArgument("chown");
-        commandLine.addArgument("-R");
-        commandLine.addArgument(user);
-        commandLine.addArgument(dir);
+        final CommandLine commandLine = new CommandLine("sudo").addArgument("chown").addArgument("-R")
+            .addArgument(user).addArgument(dir);
 
         try {
             this.executor.execute(commandLine);
