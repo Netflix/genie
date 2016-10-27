@@ -116,7 +116,16 @@ node {
     download = true
 }
 
+def static_build_dir = new File(project.projectDir, "/src/main/resources/static/build")
+def static_project_dir = new File(project.projectDir, "/src/main/resources/static")
+
+clean {
+    delete static_build_dir
+}
+
 task bundle(type: NpmTask) {
+    inputs.dir static_project_dir
+    outputs.dir static_build_dir
     args = ["run", "bundle"]
 }
 
@@ -129,7 +138,7 @@ jar {
         attributes("Implementation-Version": genieVersion)
     }
 
-    from("${project.projectDir}/src/main/resources/static/build") {
+    from(static_build_dir) {
         into "static"
     }
 }
