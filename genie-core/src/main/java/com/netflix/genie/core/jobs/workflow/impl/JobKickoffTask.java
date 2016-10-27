@@ -63,6 +63,7 @@ public class JobKickoffTask extends GenieBaseTask {
     private final Executor executor;
     private final String hostname;
     private final Timer timer;
+    private final Registry registry;
     private final RetryTemplate retryTemplate;
 
     /**
@@ -85,6 +86,7 @@ public class JobKickoffTask extends GenieBaseTask {
         this.isUserCreationEnabled = userCreationEnabled;
         this.executor = executor;
         this.hostname = hostname;
+        this.registry = registry;
         this.timer = registry.timer("genie.jobs.tasks.jobKickoffTask.timer");
         retryTemplate = new RetryTemplate();
         retryTemplate.setBackOffPolicy(new ExponentialBackOffPolicy());
@@ -172,7 +174,7 @@ public class JobKickoffTask extends GenieBaseTask {
             } catch (final IOException ie) {
                 throw new GenieServerException("Unable to start command " + String.valueOf(command), ie);
             }
-            log.info("Finished Job Kickoff Task for job {}", jobRequest.getId());
+            log.info("Finished Job Kickoff Task for job {}", jobId);
         } finally {
             final long finish = System.nanoTime();
             this.timer.record(finish - start, TimeUnit.NANOSECONDS);
@@ -186,6 +188,7 @@ public class JobKickoffTask extends GenieBaseTask {
                 return true;
             });
         } catch (Exception e) {
+            registry.counter("genie.jobs.tasks.jobKickoffTask.run.failure").increment();
             log.warn("Failed touching the run script file", e);
         }
         return false;
