@@ -22,28 +22,44 @@ task demoInit(type: Exec, group: "Demo", description: "Setup the configuration m
     commandLine "docker", "exec", "docker_genie-client_1", "./init_demo.py"
 }
 
-task demoRunProdHadoopJob(type: Exec, group: "Demo", description: "Run example Hadoop job on production cluster") {
+task demoRunProdHadoopJob(type: Exec, group: "Demo", description: "Run demo Hadoop job on production cluster") {
     commandLine "docker", "exec", "docker_genie-client_1", "./run_hadoop_job.py", "sla"
 }
 
-task demoRunTestHadoopJob(type: Exec, group: "Demo", description: "Run example Hadoop job on test cluster") {
+task demoRunTestHadoopJob(type: Exec, group: "Demo", description: "Run demo Hadoop job on test cluster") {
     commandLine "docker", "exec", "docker_genie-client_1", "./run_hadoop_job.py", "test"
 }
 
-task demoRunProdHDFSJob(type: Exec, group: "Demo", description: "Run example HDFS job on production cluster") {
+task demoRunProdHDFSJob(type: Exec, group: "Demo", description: "Run demo HDFS job on production cluster") {
     commandLine "docker", "exec", "docker_genie-client_1", "./run_hdfs_job.py", "sla"
 }
 
-task demoRunTestHDFSJob(type: Exec, group: "Demo", description: "Run example HDFS job on test cluster") {
+task demoRunTestHDFSJob(type: Exec, group: "Demo", description: "Run demo HDFS job on test cluster") {
     commandLine "docker", "exec", "docker_genie-client_1", "./run_hdfs_job.py", "test"
 }
 
-task demoRunProdYarnJob(type: Exec, group: "Demo", description: "Run example YARN job on production cluster") {
+task demoRunProdYarnJob(type: Exec, group: "Demo", description: "Run demo YARN job on production cluster") {
     commandLine "docker", "exec", "docker_genie-client_1", "./run_yarn_job.py", "sla"
 }
 
-task demoRunTestYarnJob(type: Exec, group: "Demo", description: "Run example YARN job on test cluster") {
+task demoRunTestYarnJob(type: Exec, group: "Demo", description: "Run demo YARN job on test cluster") {
     commandLine "docker", "exec", "docker_genie-client_1", "./run_yarn_job.py", "test"
+}
+
+task demoRunProdSparkShellJob(type: Exec, group: "Demo", description: "Run demo Spark Shell job on production cluster") {
+    commandLine "docker", "exec", "docker_genie-client_1", "./run_spark_shell_job.py", "sla"
+}
+
+task demoRunTestSparkShellJob(type: Exec, group: "Demo", description: "Run demo Spark Shell job on test cluster") {
+    commandLine "docker", "exec", "docker_genie-client_1", "./run_spark_shell_job.py", "test"
+}
+
+task demoRunProdSparkSubmitJob(type: Exec, group: "Demo", description: "Run demo Spark Submit job on production cluster") {
+    commandLine "docker", "exec", "docker_genie-client_1", "./run_spark_submit_job.py", "sla"
+}
+
+task demoRunTestSparkSubmitJob(type: Exec, group: "Demo", description: "Run demo Spark Submit job on test cluster") {
+    commandLine "docker", "exec", "docker_genie-client_1", "./run_spark_submit_job.py", "test"
 }
 
 task demoStop(type: Exec, group: "Demo", description: "Bring down the  Genie demo") {

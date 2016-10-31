@@ -89,18 +89,14 @@ application (hadoop)
 * Review the Genie UI again and notice that now clusters, commands and applications have data in them
 * Run some jobs. Recommend running the Hadoop job first so others have something interesting to show. 
 Available jobs include:
-    * `./gradlew demoRunProdHadoopJob`
-        * See the MR job at `http://localhost:8088`
-    * `./gradlew demoRunTestHadoopJob`
-        * See the MR job at `http://localhost:8089`
-    * `./gradlew demoRunProdHDFSJob`
-        * Runs a `dfs -ls` on the input directory and stores results in stdout
-    * `./gradlew demoRunTestHDFSJob`
-        * Runs a `dfs -ls` on the input directory and stores results in stdout
-    * `./gradlew demoRunProdYarnJob`
+    * `./gradlew demoRunProdHadoopJob` or `./gradlew demoRunTestHadoopJob`
+        * See the MR job at `http://localhost:8088` or `http://localhost:8089` respectively
+    * `./gradlew demoRunProdHDFSJob` or `./gradlew demoRunTestHDFSJob`
+        * Runs a `dfs -ls` on the input directory on HDFS and stores results in stdout
+    * `./gradlew demoRunProdYarnJob` or `./gradlew demoRunTestYarnJob`
         * Lists all yarn applications from the resource manager into stdout
-    * `./gradlew demoRunTestYarnJob`
-        * Lists all yarn applications from the resource manager into stdout
+    * `./gradlew demoRunProdSparkSubmitJob` or `./gradlew demoRunTestSparkSubmitJob`
+        * Runs the SparkPi example with input of 10. Results stored in stdout
 * For each of these jobs you can see their status, output and other information via the Genie UI
 * For how everything is configured and run you can view the scripts in `genie-demo/src/main/docker/client/example`
 * Once you're done trying everything out you can shut down the demo

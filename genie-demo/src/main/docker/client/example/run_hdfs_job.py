@@ -34,9 +34,9 @@ pygenie.conf.DEFAULT_GENIE_URL = "http://genie:8080"
 
 # Create a job instance and fill in the required parameters
 job = pygenie.jobs.HadoopJob() \
-    .job_name('GenieDemoHDFSJob') \
+    .job_name('Genie Demo HDFS Job') \
     .genie_username('root') \
-    .job_version('2.7.1')
+    .job_version('3.0.0')
 
 # Set cluster criteria which determine the cluster to run the job on
 job.cluster_tags(['sched:' + str(sys.argv[1]), 'type:yarn'])
