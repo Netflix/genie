@@ -33,8 +33,8 @@ LOGGER = logging.getLogger(__name__)
 pygenie.conf.DEFAULT_GENIE_URL = "http://genie:8080"
 
 # Create a job instance and fill in the required parameters
-job = pygenie.jobs.HadoopJob() \
-    .job_name('Genie Demo YARN Job') \
+job = pygenie.jobs.GenieJob() \
+    .job_name('Genie Demo Spark Shell Job') \
     .genie_username('root') \
     .job_version('3.0.0')
 
@@ -42,11 +42,15 @@ job = pygenie.jobs.HadoopJob() \
 job.cluster_tags(['sched:' + str(sys.argv[1]), 'type:yarn'])
 
 # Set command criteria which will determine what command Genie executes for the job
-job.command_tags(['type:yarn'])
+job.command_tags(['type:spark-shell'])
 
 # Any command line arguments to run along with the command. In this case it holds
 # the actual query but this could also be done via an attachment or file dependency.
-job.command("application -list --appStates ALL")
+# This jar location is where it is installed on the Genie node but could also pass
+# the jar as attachment and use it locally
+job.command_arguments(
+    "--help"
+)
 
 # Submit the job to Genie
 running_job = job.execute()

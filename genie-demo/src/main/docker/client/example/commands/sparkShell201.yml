@@ -1,0 +1,11 @@
+id: sparkshell201
+name: Spark Shell
+user: genieDemo
+description: Spark Shell Command
+status: ACTIVE
+setupFile: http://genie-apache/commands/spark/2.0.1/setupShell.sh
+configs: []
+executable: ${SPARK_HOME}/bin/spark-shell
+version: 2.0.1
+tags: ['type:spark-shell', 'ver:2.0.1']
+checkDelay: 5000
