@@ -1,0 +1,26 @@
+{% comment %}
+*
+*  This lets you loop through and display all the issues for an associated
+*  milestone.
+*
+*  Example: {% include list-issues milestone='7' %}
+*
+{% endcomment %}
+
+<div id="milestone{{ include.milestone }}Issues">
+</div>
+
+<script>
+var urlToGetAllOpenBugs = "https://api.github.com/repos/Netflix/genie/issues?milestone={{ include.milestone }}&state=all";
+$(document).ready(function () {
+  $.getJSON(urlToGetAllOpenBugs, function (allIssues) {
+    $("#milestone{{ include.milestone }}Issues").append("found " + allIssues.length + " issues</br>");
+    $.each(allIssues, function (i, issue) {
+      $("#milestone{{ include.milestone }}Issues")
+      .append("<b>" + issue.number + " - " + issue.title + "</b></br>")
+      .append("created at: " + issue.created_at + "</br>")
+      .append(issue.body + "</br></br></br>");
+      });
+      });
+      });
+</script>
