@@ -32,7 +32,6 @@ import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
 import com.netflix.genie.core.events.JobScheduledEvent;
 import com.netflix.genie.core.jobs.JobConstants;
-import com.netflix.genie.core.jobs.JobLauncher;
 import com.netflix.genie.core.properties.JobsProperties;
 import com.netflix.genie.core.services.ApplicationService;
 import com.netflix.genie.core.services.ClusterLoadBalancer;
@@ -42,14 +41,11 @@ import com.netflix.genie.core.services.JobCoordinatorService;
 import com.netflix.genie.core.services.JobKillService;
 import com.netflix.genie.core.services.JobMetricsService;
 import com.netflix.genie.core.services.JobPersistenceService;
-import com.netflix.genie.core.services.JobSubmitterService;
 import com.netflix.spectator.api.Registry;
 import com.netflix.spectator.api.Timer;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.core.task.AsyncTaskExecutor;
-import org.springframework.core.task.TaskRejectedException;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -58,7 +54,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -73,9 +68,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class JobCoordinatorServiceImpl implements JobCoordinatorService {
 
-    private final AsyncTaskExecutor taskExecutor;
     private final JobPersistenceService jobPersistenceService;
-    private final JobSubmitterService jobSubmitterService;
     private final JobKillService jobKillService;
     private final JobMetricsService jobMetricsService;
     private final ApplicationService applicationService;
@@ -83,7 +76,6 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
     private final CommandService commandService;
     private final ClusterLoadBalancer clusterLoadBalancer;
     private final JobsProperties jobsProperties;
-    private final Registry registry;
     private final ApplicationEventPublisher eventPublisher;
     private final String hostName;
 
@@ -100,9 +92,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
     /**
      * Constructor.
      *
-     * @param taskExecutor          The executor to use to launch jobs
      * @param jobPersistenceService implementation of job persistence service interface
-     * @param jobSubmitterService   implementation of the job submitter service
      * @param jobKillService        The job kill service to use
      * @param jobMetricsService     The service which will return various metrics about jobs currently running
      * @param jobsProperties        The jobs properties to use
@@ -110,14 +100,12 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
      * @param clusterService        Implementation of cluster service interface
      * @param commandService        Implementation of command service interface
      * @param clusterLoadBalancer   Implementation of the cluster load balancer interface
-     * @param registry              The registry to use for metrics
      * @param eventPublisher        The application event publisher to use
+     * @param registry              The registry
      * @param hostName              The name of the host this Genie instance is running on
      */
     public JobCoordinatorServiceImpl(
-        @NotNull final AsyncTaskExecutor taskExecutor,
         @NotNull final JobPersistenceService jobPersistenceService,
-        @NotNull final JobSubmitterService jobSubmitterService,
         @NotNull final JobKillService jobKillService,
         @NotNull final JobMetricsService jobMetricsService,
         @NotNull final JobsProperties jobsProperties,
@@ -129,9 +117,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
         @NotNull final ApplicationEventPublisher eventPublisher,
         @NotBlank final String hostName
     ) {
-        this.taskExecutor = taskExecutor;
         this.jobPersistenceService = jobPersistenceService;
-        this.jobSubmitterService = jobSubmitterService;
         this.jobKillService = jobKillService;
         this.jobMetricsService = jobMetricsService;
         this.applicationService = applicationService;
@@ -139,7 +125,6 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
         this.commandService = commandService;
         this.clusterLoadBalancer = clusterLoadBalancer;
         this.jobsProperties = jobsProperties;
-        this.registry = registry;
         this.eventPublisher = eventPublisher;
         this.hostName = hostName;
 
@@ -251,30 +236,11 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                             maxSystemMemory,
                             memory
                         );
-                        try {
-                            log.info("Scheduling job {} for submission", jobRequest.getId());
-                            final Future<?> task = this.taskExecutor.submit(
-                                new JobLauncher(
-                                    this.jobSubmitterService,
-                                    jobRequest,
-                                    cluster,
-                                    command,
-                                    applications,
-                                    memory,
-                                    this.registry
-                                )
-                            );
-
-                            // Tell the system a new job has been scheduled so any actions can be taken
-                            log.info("Publishing job scheduled event for job {}", jobId);
-                            this.eventPublisher.publishEvent(new JobScheduledEvent(jobId, task, memory, this));
-                            return jobId;
-                        } catch (final TaskRejectedException e) {
-                            throw new GenieServerException(
-                                "Unable to launch job due to exception: " + e.getMessage(),
-                                e
-                            );
-                        }
+                        // Tell the system a new job has been scheduled so any actions can be taken
+                        log.info("Publishing job scheduled event for job {}", jobId);
+                        this.eventPublisher.publishEvent(new JobScheduledEvent(jobId, jobRequest,
+                            cluster, command, applications, memory, this));
+                        return jobId;
                     } else {
                         throw new GenieServerUnavailableException(
                             "Job "

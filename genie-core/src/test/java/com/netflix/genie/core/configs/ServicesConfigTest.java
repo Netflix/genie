@@ -306,9 +306,7 @@ public class ServicesConfigTest {
     /**
      * Get an instance of the JobCoordinatorService.
      *
-     * @param taskExecutor          implementation of the async task executor interface to use
      * @param jobPersistenceService implementation of job persistence service interface.
-     * @param jobSubmitterService   implementation of the job submitter service.
      * @param jobMetricsService     implementation of job metrics service interface
      * @param jobKillService        The job kill service to use.
      * @param jobsProperties        The jobs properties to use
@@ -323,9 +321,7 @@ public class ServicesConfigTest {
      */
     @Bean
     public JobCoordinatorService jobCoordinatorService(
-        final AsyncTaskExecutor taskExecutor,
         final JobPersistenceService jobPersistenceService,
-        final JobSubmitterService jobSubmitterService,
         final JobKillService jobKillService,
         final JobMetricsService jobMetricsService,
         final JobsProperties jobsProperties,
@@ -338,9 +334,7 @@ public class ServicesConfigTest {
         final String hostName
     ) {
         return new JobCoordinatorServiceImpl(
-            taskExecutor,
             jobPersistenceService,
-            jobSubmitterService,
             jobKillService,
             jobMetricsService,
             jobsProperties,

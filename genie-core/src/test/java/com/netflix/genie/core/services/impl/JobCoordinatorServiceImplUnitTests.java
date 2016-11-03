@@ -33,7 +33,6 @@ import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
 import com.netflix.genie.core.events.JobScheduledEvent;
-import com.netflix.genie.core.jobs.JobLauncher;
 import com.netflix.genie.core.properties.JobsProperties;
 import com.netflix.genie.core.services.ApplicationService;
 import com.netflix.genie.core.services.ClusterLoadBalancer;
@@ -42,7 +41,6 @@ import com.netflix.genie.core.services.CommandService;
 import com.netflix.genie.core.services.JobKillService;
 import com.netflix.genie.core.services.JobMetricsService;
 import com.netflix.genie.core.services.JobPersistenceService;
-import com.netflix.genie.core.services.JobSubmitterService;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.spectator.api.Registry;
 import com.netflix.spectator.api.Timer;
@@ -51,15 +49,12 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.core.task.AsyncTaskExecutor;
-import org.springframework.core.task.TaskRejectedException;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.Future;
 
 /**
  * Unit tests for JobCoordinatorServiceImpl.
@@ -78,7 +73,6 @@ public class JobCoordinatorServiceImplUnitTests {
     private static final String HOST_NAME = UUID.randomUUID().toString();
     private static final int MEMORY = 1_512;
 
-    private AsyncTaskExecutor taskExecutor;
     private JobCoordinatorServiceImpl jobCoordinatorService;
     private JobPersistenceService jobPersistenceService;
     private JobKillService jobKillService;
@@ -95,7 +89,6 @@ public class JobCoordinatorServiceImplUnitTests {
      */
     @Before
     public void setup() {
-        this.taskExecutor = Mockito.mock(AsyncTaskExecutor.class);
         this.jobPersistenceService = Mockito.mock(JobPersistenceService.class);
         this.jobKillService = Mockito.mock(JobKillService.class);
         this.jobMetricsService = Mockito.mock(JobMetricsService.class);
@@ -112,9 +105,7 @@ public class JobCoordinatorServiceImplUnitTests {
         Mockito.when(registry.timer(Mockito.anyString())).thenReturn(Mockito.mock(Timer.class));
 
         this.jobCoordinatorService = new JobCoordinatorServiceImpl(
-            this.taskExecutor,
             this.jobPersistenceService,
-            Mockito.mock(JobSubmitterService.class),
             this.jobKillService,
             this.jobMetricsService,
             jobsProperties,
@@ -178,9 +169,6 @@ public class JobCoordinatorServiceImplUnitTests {
 
         Mockito.when(this.jobMetricsService.getUsedMemory()).thenReturn(0);
 
-        final Future<?> task = Mockito.mock(Future.class);
-        Mockito.doReturn(task).when(this.taskExecutor).submit(Mockito.any(JobLauncher.class));
-
         this.jobCoordinatorService.coordinateJob(jobRequest, jobMetadata);
 
         Mockito.verify(this.jobPersistenceService, Mockito.times(1))
@@ -194,7 +182,6 @@ public class JobCoordinatorServiceImplUnitTests {
         Mockito.verify(this.jobPersistenceService, Mockito.times(1))
             .updateJobWithRuntimeEnvironment(JOB_1_ID, clusterId, commandId, Lists.newArrayList(applicationId), MEMORY);
 
-        Mockito.verify(this.taskExecutor, Mockito.times(1)).submit(Mockito.any(JobLauncher.class));
         Mockito.verify(this.eventPublisher, Mockito.times(1)).publishEvent(Mockito.any(JobScheduledEvent.class));
     }
 
@@ -248,9 +235,6 @@ public class JobCoordinatorServiceImplUnitTests {
 
         Mockito.when(this.jobMetricsService.getUsedMemory()).thenReturn(0);
 
-        final Future<?> task = Mockito.mock(Future.class);
-        Mockito.doReturn(task).when(this.taskExecutor).submit(Mockito.any(JobLauncher.class));
-
         this.jobCoordinatorService.coordinateJob(jobRequest, jobMetadata);
 
         Mockito.verify(this.jobPersistenceService, Mockito.times(1))
@@ -264,7 +248,6 @@ public class JobCoordinatorServiceImplUnitTests {
         Mockito.verify(this.jobPersistenceService, Mockito.times(1))
             .updateJobWithRuntimeEnvironment(JOB_1_ID, clusterId, commandId, Lists.newArrayList(applicationId), MEMORY);
 
-        Mockito.verify(this.taskExecutor, Mockito.times(1)).submit(Mockito.any(JobLauncher.class));
         Mockito.verify(this.eventPublisher, Mockito.times(1)).publishEvent(Mockito.any(JobScheduledEvent.class));
     }
 
@@ -377,7 +360,6 @@ public class JobCoordinatorServiceImplUnitTests {
         this.jobCoordinatorService.coordinateJob(jobRequest, jobMetadata);
 
         Mockito.verify(this.jobMetricsService, Mockito.times(1)).getUsedMemory();
-        Mockito.verify(this.taskExecutor, Mockito.never()).submit(Mockito.any(JobLauncher.class));
         Mockito
             .verify(this.jobPersistenceService, Mockito.times(1))
             .updateJobStatus(Mockito.eq(JOB_1_ID), Mockito.eq(JobStatus.FAILED), Mockito.anyString());
@@ -388,7 +370,7 @@ public class JobCoordinatorServiceImplUnitTests {
      *
      * @throws GenieException If there is any problem
      */
-    @Test(expected = GenieServerException.class)
+    @Test(expected = RuntimeException.class)
     public void cantCoordinateJobIfTaskDoesntLaunch() throws GenieException {
         final Set<String> commandCriteria = Sets.newHashSet(
             UUID.randomUUID().toString(),
@@ -430,19 +412,14 @@ public class JobCoordinatorServiceImplUnitTests {
         final List<Application> applications = Lists.newArrayList(application);
 
         Mockito.when(this.commandService.getApplicationsForCommand(commandId)).thenReturn(applications);
-
+        Mockito.doThrow(new RuntimeException()).when(eventPublisher).publishEvent(Mockito.any());
         Mockito
             .when(this.jobMetricsService.getUsedMemory())
             .thenReturn(0);
 
-        Mockito
-            .when(this.taskExecutor.submit(Mockito.any(JobLauncher.class)))
-            .thenThrow(new TaskRejectedException("test"));
-
         this.jobCoordinatorService.coordinateJob(jobRequest, jobMetadata);
 
         Mockito.verify(this.jobMetricsService, Mockito.times(1)).getUsedMemory();
-        Mockito.verify(this.taskExecutor, Mockito.times(1)).submit(Mockito.any(JobLauncher.class));
         Mockito
             .verify(this.jobPersistenceService, Mockito.times(1))
             .updateJobStatus(Mockito.eq(JOB_1_ID), Mockito.eq(JobStatus.FAILED), Mockito.anyString());

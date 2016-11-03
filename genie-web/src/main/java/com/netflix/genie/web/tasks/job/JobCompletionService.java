@@ -349,7 +349,6 @@ public class JobCompletionService {
                     finalStatus = JobStatus.FAILED;
                     break;
             }
-
             return finalStatus;
         } catch (final IOException ioe) {
             this.doneFileProcessingFailureRate.increment();

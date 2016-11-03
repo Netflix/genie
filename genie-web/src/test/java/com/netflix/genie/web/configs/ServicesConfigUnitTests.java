@@ -47,7 +47,6 @@ import org.mockito.Mockito;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.core.io.Resource;
-import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.mail.javamail.JavaMailSender;
 
 import java.util.ArrayList;
@@ -229,7 +228,6 @@ public class ServicesConfigUnitTests {
     public void canGetJobCoordinatorServiceBean() {
         Assert.assertNotNull(
             this.servicesConfig.jobCoordinatorService(
-                Mockito.mock(AsyncTaskExecutor.class),
                 Mockito.mock(JobPersistenceService.class),
                 Mockito.mock(JobSubmitterService.class),
                 Mockito.mock(JobKillService.class),
