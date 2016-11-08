@@ -1,0 +1,25 @@
+<div class="medium-4 columns frontpage-widget">
+	<div style="height: 250px">
+		{% capture widget_url %}{% if include.widget.url contains 'http' %}{{ include.widget.url }}{% else %}{{ site.baseurl }}{{ include.widget.url }}{% endif %}{% endcapture %}
+		<a href="{{ widget_url }}">
+			{% if include.widget.image %}
+				{% capture widget_image %}{% if include.widget.image contains 'http' %}{{ include.widget.image }}{% else %}{{ site.baseurl }}{{ include.widget.image }}{% endif %}{% endcapture %}
+				<img src="{{widget_image}}" style="display: block; margin: auto; object-fit: contain; width: 100%; height: 100%"/>
+			{% elsif include.widget.video %}
+				<a href="#" data-reveal-id="videoModal{{ include.widget.title }}"><img src="{{ include.widget.video.image }}" style="display: block; margin: auto; object-fit: contain; width: 100%; height: 100%"/></a>
+			{% endif %}
+		</a>
+	</div>
+	<h2 class="font-size-h3 t10">{{ include.widget.title }}</h2>
+	<p>{{ include.widget.text }}</p>
+	<p><a class="button tiny radius" href="{% if include.widget.url contains 'http' %}{{ include.widget.url }}{% else %}{{ site.baseurl }}{{ include.widget.url }}{% endif %}">{{ site.data.language.more }}</a></p>
+
+	{% if include.widget.video %}
+	<div id="videoModal{{ include.widget.title }}" class="reveal-modal large" data-reveal="">
+		<div class="flex-video widescreen vimeo" style="display: block;">
+			<iframe width="1280" height="720" src="{{ include.widget.video.src }}" frameborder="0" allowfullscreen></iframe>
+		</div>
+		<a class="close-reveal-modal">&#215;</a>
+	</div>
+	{% endif %}
+</div>
