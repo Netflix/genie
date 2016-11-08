@@ -1,0 +1,44 @@
+- name: GitHub
+  url: http://github.com/Netflix/genie
+  class: icon-github
+  title: ""
+
+- name: YouTube
+  url: http://www.youtube.com/user/NetflixOpenSource
+  class: icon-youtube
+  title: ""
+
+- name: Twitter
+  url: http://twitter.com/netflixoss
+  class: icon-twitter
+  title: ""
+
+# - name: Mixcloud
+#   url: http://www.mixcloud.com/
+#   class: icon-cloud
+#   title: ""
+
+# - name: Facebook
+#   url: http://www.facebook.com/
+#   class: icon-facebook
+#   title: ""
+
+# - name: Soundcloud
+#   url: http://soundcloud.com/
+#   class: icon-soundcloud
+#   title: ""
+
+# - name: Instagram
+#   url: http://instagram.com/
+#   class: icon-instagram
+#   title: ""
+
+# - name: Pinterest
+#   url: http://www.pinterest.com/
+#   class: icon-pinterest
+#   title: ""
+
+# - name: Xing
+#   url: https://www.xing.com/profile/
+#   class: icon-xing
+#   title: Xing Profil

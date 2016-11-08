@@ -1,0 +1,40 @@
+#
+#   Navigation to the left › side: left
+#
+- title: Home
+  url: "/"
+  side: left
+
+- title: "Releases"
+  url: "/releases/"
+  side: left
+
+- title: "Presentations"
+  url: "/presentations/"
+  side: left
+  dropdown:
+    - title: QCon SF 2016
+      url: /presentations/QCon2016.html
+    - title: Netflix OSS Meetup January 2015
+      url: /presentations/OSSMeetupSeason3Episode1.html
+    - title: Hadoop Summit 2013
+      url: /presentations/HadoopSummit2013.html
+
+- title: Blog
+  url: "/blog/"
+  side: left
+
+#
+#   Navigation to the right › side: right
+#
+- title: "Info"
+  url: "/info/"
+  side: right
+
+- title: "Search"
+  url: "/search/"
+  side: right
+
+- title: "Contact"
+  url: "/contact/"
+  side: right

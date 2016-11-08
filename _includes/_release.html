@@ -1,0 +1,21 @@
+{% if page.version contains "SNAPSHOT" %}{% else %}[ ![Download](https://api.bintray.com/packages/netflixoss/maven/genie/images/download.svg?version={{ page.version }}) ](https://bintray.com/netflixoss/maven/genie/{{ page.version }}/link){% endif %}
+{% if page.version contains "SNAPSHOT" %}{% else %}[ ![Coverage Status](https://coveralls.io/repos/github/Netflix/genie/badge.svg?branch=v{{ page.version }})](https://coveralls.io/github/Netflix/genie?branch=v{{ page.version }}){% endif %}
+[ ![License](https://img.shields.io/github/license/Netflix/genie.svg)](http://www.apache.org/licenses/LICENSE-2.0)
+
+- [Reference Docs][1]
+- [REST API Docs][2]
+- [JavaDocs][3]
+- [Demo Docs][4]
+- [View Source Tree][5]
+- Source Downloads
+  - [zip][6]
+  - [tar.gz][7]
+
+
+[1]: {{ site.baseurl }}/docs/{{ page.version }}/reference/
+[2]: {{ site.baseurl }}/docs/{{ page.version }}/rest/
+[3]: {{ site.baseurl }}/docs/{{ page.version }}/javadoc/
+[4]: {{ site.baseurl }}/docs/{{ page.version }}/demo/
+[5]: {{ site.github.repository_url }}{% if page.version contains "SNAPSHOT" %}{% else %}/tree/v{{ page.version }}{% endif %}
+[6]: {{ site.github.repository_url }}/archive/{% if page.version contains "SNAPSHOT" %}master{% else %}v{{ page.version }}{% endif %}.zip
+[7]: {{ site.github.repository_url }}/archive/{% if page.version contains "SNAPSHOT" %}master{% else %}v{{ page.version }}{% endif %}.tar.gz
