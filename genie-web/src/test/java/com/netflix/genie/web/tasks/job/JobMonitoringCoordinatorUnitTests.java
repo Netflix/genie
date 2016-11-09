@@ -193,7 +193,7 @@ public class JobMonitoringCoordinatorUnitTests {
         Mockito
             .verify(this.scheduler, Mockito.times(3))
             .scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(DELAY));
-        Assert.assertThat(this.coordinator.getNumActiveJobs(), Matchers.is(1));
+        Assert.assertThat(this.coordinator.getNumActiveJobs(), Matchers.is(3));
         Assert.assertThat(this.coordinator.getUsedMemory(), Matchers.is(3 * 1024));
     }
 

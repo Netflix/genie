@@ -145,6 +145,7 @@ public class JobStateServiceImpl implements JobStateService {
             final JobInfo jobInfo = jobs.get(jobId);
             jobInfo.setMemory(memory);
             jobInfo.setRunningTask(task);
+            jobInfo.setActive(true);
             return null;
         });
     }
