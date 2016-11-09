@@ -43,11 +43,13 @@ import com.netflix.genie.core.services.JobKillService;
 import com.netflix.genie.core.services.JobMetricsService;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
+import com.netflix.genie.core.services.JobStateService;
 import com.netflix.genie.core.services.JobSubmitterService;
 import com.netflix.genie.core.services.impl.FileSystemAttachmentService;
 import com.netflix.genie.core.services.impl.GenieFileTransferService;
 import com.netflix.genie.core.services.impl.JobCoordinatorServiceImpl;
 import com.netflix.genie.core.services.impl.JobMetricsServiceImpl;
+import com.netflix.genie.core.services.impl.JobStateServiceImpl;
 import com.netflix.genie.core.services.impl.LocalJobKillServiceImpl;
 import com.netflix.genie.core.services.impl.LocalJobRunner;
 import com.netflix.genie.core.services.impl.RandomizedClusterLoadBalancerImpl;
@@ -65,7 +67,9 @@ import org.springframework.context.event.SimpleApplicationEventMulticaster;
 import org.springframework.core.io.Resource;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import java.util.List;
 
@@ -271,6 +275,32 @@ public class ServicesConfigTest {
     }
 
     /**
+     * Default task scheduler.
+     * @return task scheduler
+     */
+    @Bean
+    public TaskScheduler taskScheduler() {
+        return new ThreadPoolTaskScheduler();
+    }
+
+    /**
+     * The job state service to use.
+     *
+     * @param jobSubmitterService The job submitter implementation to use
+     * @param taskScheduler       The task scheduler to use to register scheduling of job checkers
+     * @param eventPublisher      The application event publisher to use to publish synchronous events
+     * @param registry            The metrics registry
+     * @return The job state service bean
+     */
+    @Bean
+    public JobStateService jobStateService(final JobSubmitterService jobSubmitterService,
+                                           final TaskScheduler taskScheduler,
+                                           final ApplicationEventPublisher eventPublisher,
+                                           final Registry registry) {
+        return new JobStateServiceImpl(jobSubmitterService, taskScheduler, eventPublisher, registry);
+    }
+
+    /**
      * The task executor to use.
      *
      * @return The task executor to for launching jobs
@@ -307,7 +337,7 @@ public class ServicesConfigTest {
      * Get an instance of the JobCoordinatorService.
      *
      * @param jobPersistenceService implementation of job persistence service interface.
-     * @param jobMetricsService     implementation of job metrics service interface
+     * @param jobStateService       implementation of job state service interface
      * @param jobKillService        The job kill service to use.
      * @param jobsProperties        The jobs properties to use
      * @param applicationService    Implementation of application service interface
@@ -315,7 +345,6 @@ public class ServicesConfigTest {
      * @param commandService        Implementation of command service interface
      * @param clusterLoadBalancer   Implementation of the cluster load balancer interface
      * @param registry              The registry to use
-     * @param eventPublisher        The system event publisher
      * @param hostName              The host name to use
      * @return An instance of the JobCoordinatorService.
      */
@@ -323,27 +352,25 @@ public class ServicesConfigTest {
     public JobCoordinatorService jobCoordinatorService(
         final JobPersistenceService jobPersistenceService,
         final JobKillService jobKillService,
-        final JobMetricsService jobMetricsService,
+        final JobStateService jobStateService,
         final JobsProperties jobsProperties,
         final ApplicationService applicationService,
         final ClusterService clusterService,
         final CommandService commandService,
         final ClusterLoadBalancer clusterLoadBalancer,
         final Registry registry,
-        final ApplicationEventPublisher eventPublisher,
         final String hostName
     ) {
         return new JobCoordinatorServiceImpl(
             jobPersistenceService,
             jobKillService,
-            jobMetricsService,
+            jobStateService,
             jobsProperties,
             applicationService,
             clusterService,
             commandService,
             clusterLoadBalancer,
             registry,
-            eventPublisher,
             hostName
         );
     }

@@ -32,10 +32,9 @@ import com.netflix.genie.core.services.ClusterLoadBalancer;
 import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;
 import com.netflix.genie.core.services.JobKillService;
-import com.netflix.genie.core.services.JobMetricsService;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
-import com.netflix.genie.core.services.JobSubmitterService;
+import com.netflix.genie.core.services.JobStateService;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.spectator.api.Registry;
 import org.apache.commons.exec.Executor;
@@ -229,16 +228,14 @@ public class ServicesConfigUnitTests {
         Assert.assertNotNull(
             this.servicesConfig.jobCoordinatorService(
                 Mockito.mock(JobPersistenceService.class),
-                Mockito.mock(JobSubmitterService.class),
                 Mockito.mock(JobKillService.class),
-                Mockito.mock(JobMetricsService.class),
+                Mockito.mock(JobStateService.class),
                 new JobsProperties(),
                 Mockito.mock(ApplicationService.class),
                 Mockito.mock(ClusterService.class),
                 Mockito.mock(CommandService.class),
                 Mockito.mock(ClusterLoadBalancer.class),
                 Mockito.mock(Registry.class),
-                Mockito.mock(ApplicationEventPublisher.class),
                 UUID.randomUUID().toString()
             )
         );

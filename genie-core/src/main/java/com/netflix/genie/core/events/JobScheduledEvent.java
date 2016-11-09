@@ -17,15 +17,11 @@
  */
 package com.netflix.genie.core.events;
 
-import com.netflix.genie.common.dto.Application;
-import com.netflix.genie.common.dto.Cluster;
-import com.netflix.genie.common.dto.Command;
-import com.netflix.genie.common.dto.JobRequest;
 import lombok.Getter;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
-import java.util.List;
+import java.util.concurrent.Future;
 
 /**
  * Event when a job is scheduled to be executed.
@@ -36,37 +32,25 @@ import java.util.List;
 @Getter
 public class JobScheduledEvent extends BaseJobEvent {
 
-    private JobRequest jobRequest;
-    private Cluster cluster;
-    private Command command;
-    private List<Application> applications;
+    private Future<?> task;
     private int memory;
 
     /**
      * Constructor.
      *
-     * @param id            The id of the job that was scheduled
-     * @param jobRequest    The job request
-     * @param cluster       The job cluster
-     * @param command       The job command
-     * @param applications  The job applications
-     * @param memory        The amount of memory (in MB) the job is scheduled to use
-     * @param source        The source object which generated this event
+     * @param id     The id of the job that was scheduled
+     * @param task   The future representing the thread that will setup and run the job
+     * @param memory The amount of memory (in MB) the job is scheduled to use
+     * @param source The source object which generated this event
      */
     public JobScheduledEvent(
         @NotEmpty final String id,
-        @NotNull final JobRequest jobRequest,
-        @NotNull final Cluster cluster,
-        @NotNull final Command command,
-        @NotNull final List<Application> applications,
+        @NotNull final Future<?> task,
         final int memory,
         @NotNull final Object source
     ) {
         super(id, source);
-        this.jobRequest = jobRequest;
-        this.cluster = cluster;
-        this.command = command;
-        this.applications = applications;
+        this.task = task;
         this.memory = memory;
     }
 }

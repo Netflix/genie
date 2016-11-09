@@ -17,20 +17,14 @@
  */
 package com.netflix.genie.web.tasks.job;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.dto.Application;
-import com.netflix.genie.common.dto.Cluster;
-import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
-import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.core.events.JobFinishedEvent;
 import com.netflix.genie.core.events.JobFinishedReason;
-import com.netflix.genie.core.events.JobScheduledEvent;
 import com.netflix.genie.core.events.JobStartedEvent;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.properties.JobsProperties;
@@ -58,7 +52,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -166,7 +159,8 @@ public class JobMonitoringCoordinatorUnitTests {
         Mockito
             .when(this.scheduler.scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(DELAY)))
             .thenReturn(future);
-        coordinator.onJobScheduled(new JobScheduledEvent(job1Id, null, null, null, null, 1024, this));
+        coordinator.init(job1Id);
+        coordinator.schedule(job1Id, null, null, null, null, 1024);
         this.coordinator.onJobStarted(event1);
         Mockito
             .verify(this.scheduler, Mockito.times(1))
@@ -199,7 +193,7 @@ public class JobMonitoringCoordinatorUnitTests {
         Mockito
             .verify(this.scheduler, Mockito.times(3))
             .scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(DELAY));
-        Assert.assertThat(this.coordinator.getNumActiveJobs(), Matchers.is(3));
+        Assert.assertThat(this.coordinator.getNumActiveJobs(), Matchers.is(1));
         Assert.assertThat(this.coordinator.getUsedMemory(), Matchers.is(3 * 1024));
     }
 
@@ -227,11 +221,15 @@ public class JobMonitoringCoordinatorUnitTests {
         builder.withId(job4Id);
         final JobExecution job4 = builder.build();
 
-        coordinator.onJobScheduled(new JobScheduledEvent(job1Id, null, null, null, null, 1024, this));
-        coordinator.onJobScheduled(new JobScheduledEvent(job2Id, null, null, null, null, 1024, this));
-        coordinator.onJobScheduled(new JobScheduledEvent(job3Id, null, null, null, null, 1024, this));
-        coordinator.onJobScheduled(new JobScheduledEvent(job4Id, null, null, null, null, 1024, this));
-        coordinator.onJobScheduled(new JobScheduledEvent(job1Id, null, null, null, null, 1024, this));
+        coordinator.init(job1Id);
+        coordinator.schedule(job1Id, null, null, null, null, 1024);
+        coordinator.init(job2Id);
+        coordinator.schedule(job2Id, null, null, null, null, 1024);
+        coordinator.init(job3Id);
+        coordinator.schedule(job3Id, null, null, null, null, 1024);
+        coordinator.init(job4Id);
+        coordinator.schedule(job4Id, null, null, null, null, 1024);
+        coordinator.schedule(job1Id, null, null, null, null, 1024);
 
         final JobStartedEvent event1 = new JobStartedEvent(job1, this);
         final JobStartedEvent event2 = new JobStartedEvent(job2, this);
@@ -306,11 +304,13 @@ public class JobMonitoringCoordinatorUnitTests {
 
         Assert.assertThat(this.coordinator.getNumActiveJobs(), Matchers.is(0));
         Assert.assertThat(this.coordinator.getUsedMemory(), Matchers.is(0));
-        coordinator.onJobScheduled(new JobScheduledEvent(job1Id, null, null, null, null, 1024, this));
+        coordinator.init(job1Id);
+        coordinator.schedule(job1Id, null, null, null, null, 1024);
         this.coordinator.onJobStarted(startedEvent1);
         Assert.assertThat(this.coordinator.getNumActiveJobs(), Matchers.is(1));
         Assert.assertThat(this.coordinator.getUsedMemory(), Matchers.is(1024));
-        coordinator.onJobScheduled(new JobScheduledEvent(job2Id, null, null, null, null, 1024, this));
+        coordinator.init(job2Id);
+        coordinator.schedule(job2Id, null, null, null, null, 1024);
         this.coordinator.onJobStarted(startedEvent2);
         Assert.assertThat(this.coordinator.getNumActiveJobs(), Matchers.is(2));
         Assert.assertThat(this.coordinator.getUsedMemory(), Matchers.is(2048));
@@ -342,15 +342,10 @@ public class JobMonitoringCoordinatorUnitTests {
     @Test
     public void canScheduleJob() {
         final String jobId = UUID.randomUUID().toString();
-        final JobRequest jobRequest = Mockito.mock(JobRequest.class);
-        final Cluster cluster = Mockito.mock(Cluster.class);
-        final Command command = Mockito.mock(Command.class);
-        final List<Application> applications = Lists.newArrayList();
-        final JobScheduledEvent jobScheduledEvent = new JobScheduledEvent(jobId, jobRequest, cluster,
-            command, applications, 1024, this);
         Assert.assertThat(this.coordinator.getNumActiveJobs(), Matchers.is(0));
         Assert.assertThat(this.coordinator.getUsedMemory(), Matchers.is(0));
-        this.coordinator.onJobScheduled(jobScheduledEvent);
+        coordinator.init(jobId);
+        coordinator.schedule(jobId, null, null, null, null, 1024);
         Assert.assertThat(this.coordinator.getNumActiveJobs(), Matchers.is(1));
         Assert.assertThat(this.coordinator.getUsedMemory(), Matchers.is(1024));
     }
@@ -364,12 +359,6 @@ public class JobMonitoringCoordinatorUnitTests {
     public void canStopJobTask() throws GenieException {
         final String jobId = UUID.randomUUID().toString();
         final ScheduledFuture task = Mockito.mock(ScheduledFuture.class);
-        final JobRequest jobRequest = Mockito.mock(JobRequest.class);
-        final Cluster cluster = Mockito.mock(Cluster.class);
-        final Command command = Mockito.mock(Command.class);
-        final List<Application> applications = Lists.newArrayList();
-        final JobScheduledEvent jobScheduledEvent = new JobScheduledEvent(jobId, jobRequest, cluster,
-            command, applications, 1024, this);
         final JobFinishedEvent jobFinishedEvent
             = new JobFinishedEvent(jobId, JobFinishedReason.FAILED_TO_INIT, "something", this);
         Mockito.when(task.isDone()).thenReturn(true).thenReturn(false).thenReturn(false);
@@ -377,19 +366,22 @@ public class JobMonitoringCoordinatorUnitTests {
         Mockito.when(scheduler.schedule(Mockito.any(), Mockito.any(Date.class))).thenReturn(task);
         Assert.assertThat(this.coordinator.getNumActiveJobs(), Matchers.is(0));
         Assert.assertThat(this.coordinator.getUsedMemory(), Matchers.is(0));
-        this.coordinator.onJobScheduled(jobScheduledEvent);
+        coordinator.init(jobId);
+        coordinator.schedule(jobId, null, null, null, null, 1024);
         Assert.assertThat(this.coordinator.getNumActiveJobs(), Matchers.is(1));
         Assert.assertThat(this.coordinator.getUsedMemory(), Matchers.is(1024));
         this.coordinator.onJobFinished(jobFinishedEvent);
         Assert.assertThat(this.coordinator.getNumActiveJobs(), Matchers.is(0));
         Assert.assertThat(this.coordinator.getUsedMemory(), Matchers.is(0));
-        this.coordinator.onJobScheduled(jobScheduledEvent);
+        coordinator.init(jobId);
+        coordinator.schedule(jobId, null, null, null, null, 1024);
         Assert.assertThat(this.coordinator.getNumActiveJobs(), Matchers.is(1));
         Assert.assertThat(this.coordinator.getUsedMemory(), Matchers.is(1024));
         this.coordinator.onJobFinished(jobFinishedEvent);
         Assert.assertThat(this.coordinator.getNumActiveJobs(), Matchers.is(0));
         Assert.assertThat(this.coordinator.getUsedMemory(), Matchers.is(0));
-        this.coordinator.onJobScheduled(jobScheduledEvent);
+        coordinator.init(jobId);
+        coordinator.schedule(jobId, null, null, null, null, 1024);
         Assert.assertThat(this.coordinator.getNumActiveJobs(), Matchers.is(1));
         Assert.assertThat(this.coordinator.getUsedMemory(), Matchers.is(1024));
         this.coordinator.onJobFinished(jobFinishedEvent);

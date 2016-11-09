@@ -24,21 +24,16 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.events.JobFinishedEvent;
 import com.netflix.genie.core.events.JobFinishedReason;
-import com.netflix.genie.core.events.JobScheduledEvent;
 import com.netflix.genie.core.events.JobStartedEvent;
 import com.netflix.genie.core.jobs.JobConstants;
-import com.netflix.genie.core.jobs.JobLauncher;
 import com.netflix.genie.core.properties.JobsProperties;
-import com.netflix.genie.core.services.JobMetricsService;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobSubmitterService;
+import com.netflix.genie.core.services.impl.JobStateServiceImpl;
 import com.netflix.spectator.api.Counter;
 import com.netflix.spectator.api.Registry;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.Executor;
-import org.joda.time.Instant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
@@ -52,13 +47,9 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledFuture;
-import java.util.function.Supplier;
 
 /**
  * A Task to monitor running jobs on a Genie node.
@@ -69,21 +60,14 @@ import java.util.function.Supplier;
 @Component
 @Primary
 @Slf4j
-public class JobMonitoringCoordinator implements JobMetricsService {
-
-    private final Map<String, JobInfo> jobs = Collections.synchronizedMap(new HashMap<>());
+public class JobMonitoringCoordinator extends JobStateServiceImpl {
     private final String hostName;
     private final JobSearchService jobSearchService;
-    private final TaskScheduler scheduler;
-    private final ApplicationEventPublisher publisher;
     private final ApplicationEventMulticaster eventMulticaster;
     private final Executor executor;
-    private final Registry registry;
     private final File jobsDir;
     private final JobsProperties jobsProperties;
-    private final JobSubmitterService jobSubmitterService;
 
-    private final Counter unableToCancel;
     private final Counter unableToReAttach;
 
     /**
@@ -114,22 +98,15 @@ public class JobMonitoringCoordinator implements JobMetricsService {
         final JobsProperties jobsProperties,
         final JobSubmitterService jobSubmitterService
     ) throws IOException {
+        super(jobSubmitterService, scheduler, publisher, registry);
         this.hostName = hostName;
         this.jobSearchService = jobSearchService;
-        this.publisher = publisher;
         this.eventMulticaster = eventMulticaster;
-        this.scheduler = scheduler;
         this.executor = executor;
-        this.registry = registry;
         this.jobsDir = jobsDir.getFile();
         this.jobsProperties = jobsProperties;
-        this.jobSubmitterService = jobSubmitterService;
 
         // Automatically track the number of jobs running on this node
-        this.registry.mapSize("genie.jobs.running.gauge", this.jobs);
-        this.registry.methodValue("genie.jobs.active.gauge", this, "getNumActiveJobs");
-        this.registry.methodValue("genie.jobs.memory.used.gauge", this, "getUsedMemory");
-        this.unableToCancel = registry.counter("genie.jobs.unableToCancel.rate");
         this.unableToReAttach = registry.counter("genie.jobs.unableToReAttach.rate");
     }
 
@@ -147,32 +124,6 @@ public class JobMonitoringCoordinator implements JobMetricsService {
     }
 
     /**
-     * This event is fired when a job is scheduled to run on this Genie node. We'll track the future here in case
-     * it needs to be killed while still in INIT state. Once it's running the onJobStarted event will clear it out.
-     *
-     * @param event The job scheduled event with information for tracking the job through the INIT stage
-     */
-    @EventListener
-    public void onJobScheduled(final JobScheduledEvent event) {
-        final String jobId = event.getId();
-        jobs.put(jobId, new JobInfo());
-        handle(event.getId(), () -> {
-            final JobInfo jobInfo = jobs.get(jobId);
-            jobInfo.setMemory(event.getMemory());
-            final JobLauncher jobLauncher = new JobLauncher(this.jobSubmitterService,
-                event.getJobRequest(),
-                event.getCluster(),
-                event.getCommand(),
-                event.getApplications(),
-                event.getMemory(),
-                this.registry
-            );
-            jobInfo.setRunningTask(scheduler.schedule(jobLauncher, Instant.now().toDate()));
-            return null;
-        });
-    }
-
-    /**
      * This event is fired when a job is started on this Genie node. Will create a JobMonitor and schedule it
      * for monitoring.
      *
@@ -181,12 +132,8 @@ public class JobMonitoringCoordinator implements JobMetricsService {
     @EventListener
     public void onJobStarted(final JobStartedEvent event) {
         final String jobId = event.getJobExecution().getId().orElseThrow(IllegalArgumentException::new);
-        handle(jobId, () -> {
-            final JobInfo jobInfo = jobs.get(jobId);
-            jobInfo.setMemory(event.getJobExecution().getMemory().orElse(0));
-            jobInfo.setRunningTask(scheduleMonitor(event.getJobExecution()));
-            return null;
-        });
+        setMemoryAndTask(jobId, event.getJobExecution().getMemory().orElse(0),
+            scheduleMonitor(event.getJobExecution()));
     }
 
     /**
@@ -197,56 +144,7 @@ public class JobMonitoringCoordinator implements JobMetricsService {
      */
     @EventListener
     public void onJobFinished(final JobFinishedEvent event) throws GenieException {
-        final String jobId = event.getId();
-        handle(jobId, () -> {
-            final JobInfo jobInfo = jobs.get(jobId);
-            final Future<?> task = jobInfo.getRunningTask();
-            if (task != null && !task.isDone()) {
-                if (task.cancel(true)) {
-                    log.debug("Successfully cancelled job task for job {}", jobId);
-                } else {
-                    log.error("Unable to cancel job task for job {}", jobId);
-                    this.unableToCancel.increment();
-                }
-            }
-            jobs.remove(jobId);
-            return null;
-        });
-    }
-
-    private void handle(final String jobId, final Supplier<Void> supplier) {
-        JobInfo jobInfo = jobs.get(jobId);
-        if (jobInfo != null) {
-            synchronized (jobInfo) {
-                jobInfo = jobs.get(jobId);
-                if (jobInfo != null) {
-                    if (!jobInfo.isDone()) {
-                        supplier.get();
-                    } else {
-                        jobs.remove(jobId);
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getNumActiveJobs() {
-        return jobs.size();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getUsedMemory() {
-        // Synchronized to avoid concurrent modification exception
-        synchronized (this.jobs) {
-            return this.jobs.values().stream().map(JobInfo::getMemory).reduce((a, b) -> a + b).orElse(0);
-        }
+        done(event.getId());
     }
 
     private void reAttach(final ApplicationEvent event) throws GenieException {
@@ -261,7 +159,7 @@ public class JobMonitoringCoordinator implements JobMetricsService {
 
         for (final Job job : jobsOnHost) {
             final String id = job.getId().orElseThrow(() -> new GenieServerException("Job has no id!"));
-            if (this.jobs.containsKey(id)) {
+            if (jobExists(id)) {
                 log.info("Job {} is already being tracked. Ignoring.", id);
             } else if (job.getStatus() != JobStatus.RUNNING) {
                 this.eventMulticaster.multicastEvent(
@@ -270,10 +168,8 @@ public class JobMonitoringCoordinator implements JobMetricsService {
             } else {
                 try {
                     final JobExecution jobExecution = this.jobSearchService.getJobExecution(id);
-                    final JobInfo jobInfo = new JobInfo();
-                    jobInfo.setMemory(jobExecution.getMemory().orElse(0));
-                    jobInfo.setRunningTask(scheduleMonitor(jobExecution));
-                    this.jobs.putIfAbsent(id, jobInfo);
+                    init(id);
+                    setMemoryAndTask(id, jobExecution.getMemory().orElse(0), scheduleMonitor(jobExecution));
                     log.info("Re-attached a job monitor to job {}", id);
                 } catch (final GenieException ge) {
                     log.error("Unable to re-attach to job {}.", id);
@@ -317,13 +213,5 @@ public class JobMonitoringCoordinator implements JobMetricsService {
         }
         log.info("Scheduled job monitoring for Job {}", jobExecution.getId());
         return future;
-    }
-
-    @Getter
-    @Setter
-    private static class JobInfo {
-        private Future<?> runningTask;
-        private Integer memory;
-        private boolean done;
     }
 }
