@@ -1,0 +1,11 @@
+id: sparksubmit163
+name: Spark Submit
+user: genieDemo
+description: Spark Submit Command
+status: ACTIVE
+setupFile: http://genie-apache/commands/spark/1.6.3/setupSubmit.sh
+configs: []
+executable: ${SPARK_HOME}/bin/spark-submit --master yarn --deploy-mode client
+version: 1.6.3
+tags: ['type:spark-submit', 'ver:1.6.3']
+checkDelay: 5000

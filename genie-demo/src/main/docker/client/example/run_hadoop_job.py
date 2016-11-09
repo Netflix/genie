@@ -23,8 +23,9 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import logging
-import pygenie
 import sys
+
+import pygenie
 
 logging.basicConfig(level=logging.ERROR)
 

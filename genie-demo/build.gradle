@@ -62,6 +62,22 @@ task demoRunTestSparkSubmitJob(type: Exec, group: "Demo", description: "Run demo
     commandLine "docker", "exec", "docker_genie-client_1", "./run_spark_submit_job.py", "test"
 }
 
+task demoRunProdSpark2SubmitJob(type: Exec, group: "Demo", description: "Run demo Spark 2.x Submit job on production cluster") {
+    commandLine "docker", "exec", "docker_genie-client_1", "./run_spark_submit_job.py", "sla", "2.0.1"
+}
+
+task demoRunTestSpark2SubmitJob(type: Exec, group: "Demo", description: "Run demo Spark 2.x Submit job on test cluster") {
+    commandLine "docker", "exec", "docker_genie-client_1", "./run_spark_submit_job.py", "test", "2.0.1"
+}
+
+task demoMakeTestProd(type: Exec, group: "Demo", description: "Move production tags from prod to test cluster") {
+    commandLine "docker", "exec", "docker_genie-client_1", "./move_tags.py"
+}
+
+task demoResetProd(type: Exec, group: "Demo", description: "Move production tags back to production cluster") {
+    commandLine "docker", "exec", "docker_genie-client_1", "./reset_tags.py"
+}
+
 task demoStop(type: Exec, group: "Demo", description: "Bring down the  Genie demo") {
     workingDir dockerDir
     environment("GENIE_VERSION", project.version)

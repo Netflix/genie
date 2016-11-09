@@ -23,8 +23,9 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import logging
-import pygenie
 import sys
+
+import pygenie
 
 logging.basicConfig(level=logging.ERROR)
 
@@ -34,7 +35,6 @@ pygenie.conf.DEFAULT_GENIE_URL = "http://genie:8080"
 
 # Create a job instance and fill in the required parameters
 job = pygenie.jobs.GenieJob() \
-    .job_name('Genie Demo Spark Submit Job') \
     .genie_username('root') \
     .job_version('3.0.0')
 
@@ -42,17 +42,33 @@ job = pygenie.jobs.GenieJob() \
 job.cluster_tags(['sched:' + str(sys.argv[1]), 'type:yarn'])
 
 # Set command criteria which will determine what command Genie executes for the job
-job.command_tags(['type:spark-submit'])
+if len(sys.argv) == 2:
+    # Use the default spark
+    job.command_tags(['type:spark-submit'])
+    job.job_name('Genie Demo Spark Submit Job')
+else:
+    # Use the spark version passed in
+    job.command_tags(['type:spark-submit', 'ver:' + str(sys.argv[2])])
+    job.job_name('Genie Demo Spark ' + str(sys.argv[2]) + ' Submit Job')
 
 # Any command line arguments to run along with the command. In this case it holds
 # the actual query but this could also be done via an attachment or file dependency.
 # This jar location is where it is installed on the Genie node but could also pass
 # the jar as attachment and use it locally
-job.command_arguments(
-    "--class org.apache.spark.examples.SparkPi "
-    "${SPARK_HOME}/examples/jars/spark-examples*.jar "
-    "10"
-)
+if len(sys.argv) == 2:
+    # Default is spark 1.6.3
+    job.command_arguments(
+        "--class org.apache.spark.examples.SparkPi "
+        "${SPARK_HOME}/lib/spark-examples*.jar "
+        "10"
+    )
+else:
+    # Override with Spark 2.x location
+    job.command_arguments(
+        "--class org.apache.spark.examples.SparkPi "
+        "${SPARK_HOME}/examples/jars/spark-examples*.jar "
+        "10"
+    )
 
 # Submit the job to Genie
 running_job = job.execute()

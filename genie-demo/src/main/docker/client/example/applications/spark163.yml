@@ -1,0 +1,11 @@
+id: spark163
+name: spark
+user: genieDemo
+status: ACTIVE
+description: Spark Application
+setupFile: http://genie-apache/applications/spark/1.6.3/setup.sh
+version: 1.6.3
+type: spark
+tags: ['type:spark', 'ver:1.6.3', 'ver:1.6']
+dependencies:
+  - http://genie-apache/applications/spark/1.6.3/spark-1.6.3-bin-hadoop2.6.tgz
