@@ -57,11 +57,13 @@ systems to run
 click a link in the UI and it doesn't work try swapping in localhost for the hostname instead.
 
 ### Steps:
-* Clone the repository
-    * `git clone git@github.com:Netflix/genie.git` or `git clone https://github.com/Netflix/genie.git`
-* Go to the root of the repo
+1. Open a terminal and navigate to a directory where you will clone Genie
+2. Clone the repository
+    * `git clone https://github.com/Netflix/genie.git` or `git clone git@github.com:Netflix/genie.git` if you have 
+    ssh keys already setup with Github
+3. Go to the root of the repo
     * `cd genie`
-* Start the demo
+4. Start the demo containers
     * `./gradlew demoStart`
     * The first time you run this it could take quite a while as it has to download 2 large images (Genie itself 
     and Hadoop) and build two others (a genie-apache image for serving files and a genie-client)
@@ -75,34 +77,70 @@ click a link in the UI and it doesn't work try swapping in localhost for the hos
             * Simulates a client node for Genie which includes several python scripts to configure and run jobs on Genie
         * sequenceiq/hadoop-docker:2.7.1 (docker_genie-hadoop-prod_1 and docker_genie-hadoop-test_1)
             * Two Hadoop "clusters" one designated prod and one designated test
-            * Ports Exposed (prod/test)
-                * 8088/8089 Resource Manager UI
-                * 19888/19889 Job History UI
-                * 50070/50071 NameNode (HDFS) UI
-                * 50075/50076 DataNode UI
-    * Wait a while after the build says SUCCEEDED. You'll know how long once `http://localhost:8080` shows the Genie UI
-* Look at the Genie UI (`http://localhost:8080`) and notice there are no jobs, clusters, commands or applications 
-currently
-* Initialize the configurations for the two clusters (prod and test), three commands (hadoop, hdfs, yarn) and single
-application (hadoop)
+            * UI's Exposed
+            
+            |         UI         |           Prod           |           Test           |
+            |:------------------:|:------------------------:|:------------------------:|
+            |  Resource Manager  |  `http://localhost:8088` |  `http://localhost:8089` |
+            | Job History Server | `http://localhost:19888` | `http://localhost:19889` |
+            |      NameNode      | `http://localhost:50070` | `http://localhost:50071` |
+            |      DataNode      | `http://localhost:50075` | `http://localhost:50076` |
+    * **Wait a while after the build says SUCCEEDED. You'll know how long once `http://localhost:8080` shows the 
+    Genie UI**
+5. Check out the Genie UI
+    * In a browser navigate to the Genie UI (`http://localhost:8080`) and notice there are no `Jobs`, `Clusters`, 
+    `Commands` or `applications` currently
+    * These are available by clicking on the tabs in the top left of the UI
+6. Initialize the System
+    * Back in the terminal initialize the configurations for the two clusters (prod and test), 5 commands (hadoop, 
+    hdfs, yarn, spark-submit, spark-shell) and two application (hadoop, spark)
     * `./gradlew demoInit`
-* Review the Genie UI again and notice that now clusters, commands and applications have data in them
-* Run some jobs. Recommend running the Hadoop job first so others have something interesting to show. 
-Available jobs include:
-    * `./gradlew demoRunProdHadoopJob` or `./gradlew demoRunTestHadoopJob`
-        * See the MR job at `http://localhost:8088` or `http://localhost:8089` respectively
-    * `./gradlew demoRunProdHDFSJob` or `./gradlew demoRunTestHDFSJob`
-        * Runs a `dfs -ls` on the input directory on HDFS and stores results in stdout
-    * `./gradlew demoRunProdYarnJob` or `./gradlew demoRunTestYarnJob`
-        * Lists all yarn applications from the resource manager into stdout
-    * `./gradlew demoRunProdSparkSubmitJob` or `./gradlew demoRunTestSparkSubmitJob`
-        * Runs the SparkPi example with input of 10. Results stored in stdout
-* For each of these jobs you can see their status, output and other information via the Genie UI
-* For how everything is configured and run you can view the scripts in `genie-demo/src/main/docker/client/example`
-* Once you're done trying everything out you can shut down the demo
+7. Verify Configurations Loaded
+    * In the browser browse the Genie UI again and verify that now `Clusters`, `Commands` and `Applications` have data 
+    in them
+8. Run some jobs. 
+    * Recommend running the Hadoop job first so others have something interesting to show. 
+    * Sub in the environment (env) for the Gradle commands below (`Prod` or `Test`)
+    * Available jobs include:
+    
+    |    Job    |              Gradle Command             |                                                  Description                                                 |
+    |:---------:|:---------------------------------------:|:------------------------------------------------------------------------------------------------------------:|
+    |   Hadoop  | `./gradlew demoRun{env}HadoopJob`       | Runs grep against input directory in HDFS                                                                    |
+    |    HDFS   | `./gradlew demoRun{env}HDFSJob`         | Runs a `dfs -ls` on the input directory on HDFS and stores results in stdout                                 |
+    |    YARN   | `./gradlew demoRun{env}YarnJob`         | Lists all yarn applications from the resource manager into stdout                                            |
+    |   Spark   | `./gradlew demoRun{env}SparkSubmitJob`  | Runs the SparkPi example for Spark 1.6.x with input of 10. Results stored in stdout                          |
+    | Spark 2.x | `./gradlew demoRun{env}Spark2SubmitJob` | Overrides default Spark with Spark 2.0.x and runs SparkPi example with input of 10. Results stored in stdout |
+9. For each of these jobs you can see their status, output and other information via the UI's
+    * In the jobs tab you can see all the job history in the Genie UI `Jobs` tab
+        * Clicking any row will expand that job information and provide more links
+        * Clicking the folder icon will bring you to the working directory for that job
+    * Go to the respective cluster Resource Manager UI's and verify the jobs ran on their respective cluster
+10. Move load from prod to test
+    * Lets say there is something wrong with the production cluster. You don't want to interfere with users but you 
+    need to fix the prod cluster. Lets switch the load over to the test cluster temporarily using Genie
+    * In terminal switch the prod tag `sched:sla` from Prod to Test cluster
+    * `./gradlew demoMakeTestProd`
+    * Verify in Genie UI `Clusters` tab that the `sched:sla` tag only appears on the `GenieDemoTest` cluster
+11. Run more of the above jobs
+    * Verify that all jobs went to the `GenieDemoTest` cluster and none went to the `GenieDemoProd` cluster regardless 
+    of which `env` you passed into the Gradle commands above
+12. Reset the system
+    * You've resolved the issues with your production cluster. Move the `sched:sla` tag back
+    * `./gradlew demoResetProd`
+    * Verify in Genie UI `Clusters` tab that `sched:sla` tag only appears on `GenieDemoProd` cluster
+13. Run some jobs
+    * Verify jobs are again running on `Prod` and `Test` cluster based on environment
+14. Explore the clients
+    * You can see the script backing the Gradlew commands in the source code in 
+    `genie-demo/src/main/docker/client/example`
+    * If you want to mess around with your own scrips feel free to log into the container 
+        * `docker exec -it docker_genie-client_1 /bin/bash`
+            * This will put you in the working directory where you can execute your own python scripts
+15. Shut it down 
+    * Once you're done trying everything out you can shut down the demo
     * `./gradlew demoStop`
     * This will stop and remove all the containers from the demo. The images will remain on disk and if you run
-    the demo again it will startup much fasters since nothing needs to be downloaded or built.
+    the demo again it will startup much faster since nothing needs to be downloaded or built
 
 ## Documentation
 
