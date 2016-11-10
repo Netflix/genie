@@ -2,15 +2,15 @@
 #   Navigation to the left › side: left
 #
 - title: Home
-  url: "/"
+  url: /
   side: left
 
-- title: "Releases"
-  url: "/releases/"
+- title: Releases
+  url: /releases/
   side: left
 
-- title: "Presentations"
-  url: "/presentations/"
+- title: Presentations
+  url: /presentations/
   side: left
   dropdown:
     - title: QCon SF 2016
@@ -20,21 +20,28 @@
     - title: Hadoop Summit 2013
       url: /presentations/HadoopSummit2013.html
 
+- title: Podcasts
+  url: /podcasts/
+  side: left
+  dropdown:
+    - title: Software Engineering Daily
+      url: /podcasts/SoftwareEngineeringDaily.html
+
 - title: Blog
-  url: "/blog/"
+  url: /blog/
   side: left
 
 #
 #   Navigation to the right › side: right
 #
-- title: "Info"
-  url: "/info/"
+- title: Info
+  url: /info/
   side: right
 
-- title: "Search"
-  url: "/search/"
+- title: Search
+  url: /search/
   side: right
 
-- title: "Contact"
-  url: "/contact/"
+- title: Contact
+  url: /contact/
   side: right
