@@ -111,7 +111,7 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "/api/v3/jobs")
 @Slf4j
 public class JobRestController {
-
+    private static final String TRANSFER_ENCODING_HEADER = "Transfer-Encoding";
     private static final String FORWARDED_FOR_HEADER = "X-Forwarded-For";
     private static final String NAME_HEADER_COOKIE = "cookie";
 
@@ -781,7 +781,13 @@ public class JobRestController {
     private void copyResponseHeaders(final HttpServletResponse response, final ClientHttpResponse forwardResponse) {
         final HttpHeaders headers = forwardResponse.getHeaders();
         for (final Map.Entry<String, String> header : headers.toSingleValueMap().entrySet()) {
-            response.setHeader(header.getKey(), header.getValue());
+            //
+            // Do not add transfer encoding header since it forces Apache to truncate the response. Ideally we should
+            // only copy headers that are needed.
+            //
+            if (!TRANSFER_ENCODING_HEADER.equalsIgnoreCase(header.getKey())) {
+                response.setHeader(header.getKey(), header.getValue());
+            }
         }
     }
 }

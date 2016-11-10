@@ -41,9 +41,9 @@ import com.netflix.genie.core.services.FileTransfer;
 import com.netflix.genie.core.services.FileTransferFactory;
 import com.netflix.genie.core.services.JobCoordinatorService;
 import com.netflix.genie.core.services.JobKillService;
-import com.netflix.genie.core.services.JobMetricsService;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
+import com.netflix.genie.core.services.JobStateService;
 import com.netflix.genie.core.services.JobSubmitterService;
 import com.netflix.genie.core.services.MailService;
 import com.netflix.genie.core.services.impl.CacheGenieFileTransferService;
@@ -68,7 +68,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.core.io.Resource;
-import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.mail.javamail.JavaMailSender;
 
 import java.util.List;
@@ -322,51 +321,42 @@ public class ServicesConfig {
     /**
      * Get an instance of the JobCoordinatorService.
      *
-     * @param taskExecutor          The task executor to use
      * @param jobPersistenceService implementation of job persistence service interface
-     * @param jobSubmitterService   implementation of the job submitter service
      * @param jobKillService        The job kill service to use
-     * @param jobMetricsService     The running job metrics service to use
+     * @param jobStateService     The running job metrics service to use
      * @param jobsProperties        The jobs properties to use
      * @param applicationService    Implementation of application service interface
      * @param clusterService        Implementation of cluster service interface
      * @param commandService        Implementation of command service interface
      * @param clusterLoadBalancer   Implementation of the cluster load balancer interface
      * @param registry              The metrics registry to use
-     * @param eventPublisher        The application event publisher to use
      * @param hostName              The host this Genie instance is running on
      * @return An instance of the JobCoordinatorService.
      */
     @Bean
     public JobCoordinatorService jobCoordinatorService(
-        final AsyncTaskExecutor taskExecutor,
         final JobPersistenceService jobPersistenceService,
-        final JobSubmitterService jobSubmitterService,
         final JobKillService jobKillService,
         @Qualifier("jobMonitoringCoordinator")
-        final JobMetricsService jobMetricsService,
+        final JobStateService jobStateService,
         final JobsProperties jobsProperties,
         final ApplicationService applicationService,
         final ClusterService clusterService,
         final CommandService commandService,
         final ClusterLoadBalancer clusterLoadBalancer,
         final Registry registry,
-        final ApplicationEventPublisher eventPublisher,
         final String hostName
     ) {
         return new JobCoordinatorServiceImpl(
-            taskExecutor,
             jobPersistenceService,
-            jobSubmitterService,
             jobKillService,
-            jobMetricsService,
+            jobStateService,
             jobsProperties,
             applicationService,
             clusterService,
             commandService,
             clusterLoadBalancer,
             registry,
-            eventPublisher,
             hostName
         );
     }

@@ -32,10 +32,9 @@ import com.netflix.genie.core.services.ClusterLoadBalancer;
 import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;
 import com.netflix.genie.core.services.JobKillService;
-import com.netflix.genie.core.services.JobMetricsService;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
-import com.netflix.genie.core.services.JobSubmitterService;
+import com.netflix.genie.core.services.JobStateService;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.spectator.api.Registry;
 import org.apache.commons.exec.Executor;
@@ -47,7 +46,6 @@ import org.mockito.Mockito;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.core.io.Resource;
-import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.mail.javamail.JavaMailSender;
 
 import java.util.ArrayList;
@@ -229,18 +227,15 @@ public class ServicesConfigUnitTests {
     public void canGetJobCoordinatorServiceBean() {
         Assert.assertNotNull(
             this.servicesConfig.jobCoordinatorService(
-                Mockito.mock(AsyncTaskExecutor.class),
                 Mockito.mock(JobPersistenceService.class),
-                Mockito.mock(JobSubmitterService.class),
                 Mockito.mock(JobKillService.class),
-                Mockito.mock(JobMetricsService.class),
+                Mockito.mock(JobStateService.class),
                 new JobsProperties(),
                 Mockito.mock(ApplicationService.class),
                 Mockito.mock(ClusterService.class),
                 Mockito.mock(CommandService.class),
                 Mockito.mock(ClusterLoadBalancer.class),
                 Mockito.mock(Registry.class),
-                Mockito.mock(ApplicationEventPublisher.class),
                 UUID.randomUUID().toString()
             )
         );

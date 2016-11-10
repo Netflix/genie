@@ -24,12 +24,12 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.events.JobFinishedEvent;
 import com.netflix.genie.core.events.JobFinishedReason;
-import com.netflix.genie.core.events.JobScheduledEvent;
 import com.netflix.genie.core.events.JobStartedEvent;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.properties.JobsProperties;
-import com.netflix.genie.core.services.JobMetricsService;
 import com.netflix.genie.core.services.JobSearchService;
+import com.netflix.genie.core.services.JobSubmitterService;
+import com.netflix.genie.core.services.impl.JobStateServiceImpl;
 import com.netflix.spectator.api.Counter;
 import com.netflix.spectator.api.Registry;
 import lombok.extern.slf4j.Slf4j;
@@ -47,9 +47,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledFuture;
@@ -63,22 +60,14 @@ import java.util.concurrent.ScheduledFuture;
 @Component
 @Primary
 @Slf4j
-public class JobMonitoringCoordinator implements JobMetricsService {
-
-    private final Map<String, ScheduledFuture<?>> jobMonitors = Collections.synchronizedMap(new HashMap<>());
-    private final Map<String, Future<?>> scheduledJobs = Collections.synchronizedMap(new HashMap<>());
-    private final Map<String, Integer> jobMemories = Collections.synchronizedMap(new HashMap<>());
+public class JobMonitoringCoordinator extends JobStateServiceImpl {
     private final String hostName;
     private final JobSearchService jobSearchService;
-    private final TaskScheduler scheduler;
-    private final ApplicationEventPublisher publisher;
     private final ApplicationEventMulticaster eventMulticaster;
     private final Executor executor;
-    private final Registry registry;
     private final File jobsDir;
     private final JobsProperties jobsProperties;
 
-    private final Counter unableToCancel;
     private final Counter unableToReAttach;
 
     /**
@@ -93,6 +82,7 @@ public class JobMonitoringCoordinator implements JobMetricsService {
      * @param registry         The metrics registry
      * @param jobsDir          The directory where job output is stored
      * @param jobsProperties   The properties pertaining to jobs
+     * @param jobSubmitterService   implementation of the job submitter service
      * @throws IOException on error with the filesystem
      */
     @Autowired
@@ -105,24 +95,18 @@ public class JobMonitoringCoordinator implements JobMetricsService {
         final Executor executor,
         final Registry registry,
         final Resource jobsDir,
-        final JobsProperties jobsProperties
+        final JobsProperties jobsProperties,
+        final JobSubmitterService jobSubmitterService
     ) throws IOException {
+        super(jobSubmitterService, scheduler, publisher, registry);
         this.hostName = hostName;
         this.jobSearchService = jobSearchService;
-        this.publisher = publisher;
         this.eventMulticaster = eventMulticaster;
-        this.scheduler = scheduler;
         this.executor = executor;
-        this.registry = registry;
         this.jobsDir = jobsDir.getFile();
         this.jobsProperties = jobsProperties;
 
         // Automatically track the number of jobs running on this node
-        this.registry.mapSize("genie.jobs.running.gauge", this.jobMonitors);
-        this.registry.mapSize("genie.jobs.scheduled.gauge", this.scheduledJobs);
-        this.registry.methodValue("genie.jobs.active.gauge", this, "getNumActiveJobs");
-        this.registry.methodValue("genie.jobs.memory.used.gauge", this, "getUsedMemory");
-        this.unableToCancel = registry.counter("genie.jobs.unableToCancel.rate");
         this.unableToReAttach = registry.counter("genie.jobs.unableToReAttach.rate");
     }
 
@@ -140,34 +124,16 @@ public class JobMonitoringCoordinator implements JobMetricsService {
     }
 
     /**
-     * This event is fired when a job is scheduled to run on this Genie node. We'll track the future here in case
-     * it needs to be killed while still in INIT state. Once it's running the onJobStarted event will clear it out.
-     *
-     * @param event The job scheduled event with information for tracking the job through the INIT stage
-     */
-    @EventListener
-    public synchronized void onJobScheduled(final JobScheduledEvent event) {
-        // Increment the amount of memory used to account for this job
-        this.jobMemories.put(event.getId(), event.getMemory());
-        this.scheduledJobs.put(event.getId(), event.getTask());
-    }
-
-    /**
      * This event is fired when a job is started on this Genie node. Will create a JobMonitor and schedule it
      * for monitoring.
      *
      * @param event The event of the started job
      */
     @EventListener
-    public synchronized void onJobStarted(final JobStartedEvent event) {
+    public void onJobStarted(final JobStartedEvent event) {
         final String jobId = event.getJobExecution().getId().orElseThrow(IllegalArgumentException::new);
-        if (!this.jobMemories.containsKey(jobId)) {
-            this.jobMemories.put(jobId, event.getJobExecution().getMemory().orElse(0));
-        }
-        this.scheduledJobs.remove(jobId);
-        if (!this.jobMonitors.containsKey(jobId)) {
-            this.scheduleMonitor(event.getJobExecution());
-        }
+        setMemoryAndTask(jobId, event.getJobExecution().getMemory().orElse(0),
+            scheduleMonitor(event.getJobExecution()));
     }
 
     /**
@@ -177,66 +143,23 @@ public class JobMonitoringCoordinator implements JobMetricsService {
      * @throws GenieException When a job execution can't be found (should never happen)
      */
     @EventListener
-    public synchronized void onJobFinished(final JobFinishedEvent event) throws GenieException {
-        final String jobId = event.getId();
-        this.jobMemories.remove(jobId);
-        if (this.jobMonitors.containsKey(jobId)) {
-            //TODO: should we add back off it is unable to cancel?
-            if (this.jobMonitors.get(jobId).cancel(true)) {
-                log.debug("Successfully cancelled task monitoring job {}", jobId);
-            } else {
-                log.error("Unable to cancel task monitoring job {}", jobId);
-                this.unableToCancel.increment();
-            }
-            this.jobMonitors.remove(jobId);
-        } else if (this.scheduledJobs.containsKey(jobId)) {
-            final Future<?> task = this.scheduledJobs.get(jobId);
-            // If this job setup isn't actually done try killing it
-            // TODO: If we can't kill should we have back-off?
-            if (!task.isDone()) {
-                if (task.cancel(true)) {
-                    log.debug("Successfully cancelled job init task for job {}", jobId);
-                } else {
-                    log.error("Unable to cancel job init task for job {}", jobId);
-                    this.unableToCancel.increment();
-                }
-            }
-            this.scheduledJobs.remove(jobId);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getNumActiveJobs() {
-        return this.jobMonitors.size() + this.scheduledJobs.size();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getUsedMemory() {
-        // Synchronized to avoid concurrent modification exception
-        synchronized (this.jobMemories) {
-            return this.jobMemories.values().stream().reduce((a, b) -> a + b).orElse(0);
-        }
+    public void onJobFinished(final JobFinishedEvent event) throws GenieException {
+        done(event.getId());
     }
 
     private void reAttach(final ApplicationEvent event) throws GenieException {
         log.info("Application is ready according to event {}. Attempting to re-attach to any active jobs", event);
-        final Set<Job> jobs = this.jobSearchService.getAllActiveJobsOnHost(this.hostName);
-        if (jobs.isEmpty()) {
+        final Set<Job> jobsOnHost = this.jobSearchService.getAllActiveJobsOnHost(this.hostName);
+        if (jobsOnHost.isEmpty()) {
             log.info("No jobs currently active on this node.");
             return;
         } else {
-            log.info("{} jobs currently active on this node at startup", jobs.size());
+            log.info("{} jobs currently active on this node at startup", jobsOnHost.size());
         }
 
-        for (final Job job : jobs) {
+        for (final Job job : jobsOnHost) {
             final String id = job.getId().orElseThrow(() -> new GenieServerException("Job has no id!"));
-            if (this.jobMonitors.containsKey(id) || this.scheduledJobs.containsKey(id)) {
+            if (jobExists(id)) {
                 log.info("Job {} is already being tracked. Ignoring.", id);
             } else if (job.getStatus() != JobStatus.RUNNING) {
                 this.eventMulticaster.multicastEvent(
@@ -245,8 +168,8 @@ public class JobMonitoringCoordinator implements JobMetricsService {
             } else {
                 try {
                     final JobExecution jobExecution = this.jobSearchService.getJobExecution(id);
-                    this.jobMemories.put(id, jobExecution.getMemory().orElse(0));
-                    this.scheduleMonitor(jobExecution);
+                    init(id);
+                    setMemoryAndTask(id, jobExecution.getMemory().orElse(0), scheduleMonitor(jobExecution));
                     log.info("Re-attached a job monitor to job {}", id);
                 } catch (final GenieException ge) {
                     log.error("Unable to re-attach to job {}.", id);
@@ -259,7 +182,7 @@ public class JobMonitoringCoordinator implements JobMetricsService {
         }
     }
 
-    private void scheduleMonitor(final JobExecution jobExecution) {
+    private Future<?> scheduleMonitor(final JobExecution jobExecution) {
         final String jobId = jobExecution.getId().orElseThrow(IllegalArgumentException::new);
         final File stdOut = new File(this.jobsDir, jobId + "/" + JobConstants.STDOUT_LOG_FILE_NAME);
         final File stdErr = new File(this.jobsDir, jobId + "/" + JobConstants.STDERR_LOG_FILE_NAME);
@@ -288,7 +211,7 @@ public class JobMonitoringCoordinator implements JobMetricsService {
             default:
                 throw new UnsupportedOperationException("Unknown schedule type: " + monitor.getScheduleType());
         }
-        this.jobMonitors.put(jobId, future);
         log.info("Scheduled job monitoring for Job {}", jobExecution.getId());
+        return future;
     }
 }

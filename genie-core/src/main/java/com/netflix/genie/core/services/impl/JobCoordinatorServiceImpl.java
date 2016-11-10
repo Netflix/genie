@@ -30,9 +30,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
-import com.netflix.genie.core.events.JobScheduledEvent;
 import com.netflix.genie.core.jobs.JobConstants;
-import com.netflix.genie.core.jobs.JobLauncher;
 import com.netflix.genie.core.properties.JobsProperties;
 import com.netflix.genie.core.services.ApplicationService;
 import com.netflix.genie.core.services.ClusterLoadBalancer;
@@ -40,16 +38,12 @@ import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;
 import com.netflix.genie.core.services.JobCoordinatorService;
 import com.netflix.genie.core.services.JobKillService;
-import com.netflix.genie.core.services.JobMetricsService;
 import com.netflix.genie.core.services.JobPersistenceService;
-import com.netflix.genie.core.services.JobSubmitterService;
+import com.netflix.genie.core.services.JobStateService;
 import com.netflix.spectator.api.Registry;
 import com.netflix.spectator.api.Timer;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.NotBlank;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.core.task.AsyncTaskExecutor;
-import org.springframework.core.task.TaskRejectedException;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -58,7 +52,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -73,18 +66,14 @@ import java.util.stream.Collectors;
 @Slf4j
 public class JobCoordinatorServiceImpl implements JobCoordinatorService {
 
-    private final AsyncTaskExecutor taskExecutor;
     private final JobPersistenceService jobPersistenceService;
-    private final JobSubmitterService jobSubmitterService;
     private final JobKillService jobKillService;
-    private final JobMetricsService jobMetricsService;
+    private final JobStateService jobStateService;
     private final ApplicationService applicationService;
     private final ClusterService clusterService;
     private final CommandService commandService;
     private final ClusterLoadBalancer clusterLoadBalancer;
     private final JobsProperties jobsProperties;
-    private final Registry registry;
-    private final ApplicationEventPublisher eventPublisher;
     private final String hostName;
 
     // For reuse in queries
@@ -100,47 +89,38 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
     /**
      * Constructor.
      *
-     * @param taskExecutor          The executor to use to launch jobs
      * @param jobPersistenceService implementation of job persistence service interface
-     * @param jobSubmitterService   implementation of the job submitter service
      * @param jobKillService        The job kill service to use
-     * @param jobMetricsService     The service which will return various metrics about jobs currently running
+     * @param jobStateService       The service where we report the job state and keep track of various metrics about
+     *                              jobs currently running
      * @param jobsProperties        The jobs properties to use
      * @param applicationService    Implementation of application service interface
      * @param clusterService        Implementation of cluster service interface
      * @param commandService        Implementation of command service interface
      * @param clusterLoadBalancer   Implementation of the cluster load balancer interface
-     * @param registry              The registry to use for metrics
-     * @param eventPublisher        The application event publisher to use
+     * @param registry              The registry
      * @param hostName              The name of the host this Genie instance is running on
      */
     public JobCoordinatorServiceImpl(
-        @NotNull final AsyncTaskExecutor taskExecutor,
         @NotNull final JobPersistenceService jobPersistenceService,
-        @NotNull final JobSubmitterService jobSubmitterService,
         @NotNull final JobKillService jobKillService,
-        @NotNull final JobMetricsService jobMetricsService,
+        @NotNull final JobStateService jobStateService,
         @NotNull final JobsProperties jobsProperties,
         @NotNull final ApplicationService applicationService,
         @NotNull final ClusterService clusterService,
         @NotNull final CommandService commandService,
         @NotNull final ClusterLoadBalancer clusterLoadBalancer,
         @NotNull final Registry registry,
-        @NotNull final ApplicationEventPublisher eventPublisher,
         @NotBlank final String hostName
     ) {
-        this.taskExecutor = taskExecutor;
         this.jobPersistenceService = jobPersistenceService;
-        this.jobSubmitterService = jobSubmitterService;
         this.jobKillService = jobKillService;
-        this.jobMetricsService = jobMetricsService;
+        this.jobStateService = jobStateService;
         this.applicationService = applicationService;
         this.clusterService = clusterService;
         this.commandService = commandService;
         this.clusterLoadBalancer = clusterLoadBalancer;
         this.jobsProperties = jobsProperties;
-        this.registry = registry;
-        this.eventPublisher = eventPublisher;
         this.hostName = hostName;
 
         // We'll only care about active statuses
@@ -168,12 +148,13 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
         final JobMetadata jobMetadata
     ) throws GenieException {
         final long coordinationStart = System.nanoTime();
+        final String jobId = jobRequest
+            .getId()
+            .orElseThrow(() -> new GenieServerException("Id of the jobRequest cannot be null"));
+        JobStatus jobStatus = JobStatus.FAILED;
         try {
-            final String jobId = jobRequest
-                .getId()
-                .orElseThrow(() -> new GenieServerException("Id of the jobRequest cannot be null"));
             log.info("Called to schedule job launch for job {}", jobId);
-
+            jobStateService.init(jobId);
             // create the job object in the database with status INIT
             final Job.Builder jobBuilder = new Job.Builder(
                 jobRequest.getName(),
@@ -204,31 +185,22 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
             this.jobPersistenceService.createJob(jobRequest, jobMetadata, jobBuilder.build(), jobExecution);
 
             //TODO: Combine the cluster and command selection into a single method/database query for efficiency
-            final Cluster cluster;
-            final Command command;
-            final List<Application> applications;
-            final int memory;
-            try {
-                // Resolve the cluster for the job request based on the tags specified
-                cluster = this.getCluster(jobRequest);
-                // Resolve the command for the job request based on command tags and cluster chosen
-                command = this.getCommand(jobRequest, cluster);
-                // Resolve the applications to use based on the command that was selected
-                applications = this.getApplications(jobRequest, command);
-                // Now that we have command how much memory should the job use?
-                memory = jobRequest.getMemory()
-                    .orElse(command.getMemory().orElse(this.jobsProperties.getMemory().getDefaultJobMemory()));
+            // Resolve the cluster for the job request based on the tags specified
+            final Cluster cluster = this.getCluster(jobRequest);
+            // Resolve the command for the job request based on command tags and cluster chosen
+            final Command command = this.getCommand(jobRequest, cluster);
+            // Resolve the applications to use based on the command that was selected
+            final List<Application> applications = this.getApplications(jobRequest, command);
+            // Now that we have command how much memory should the job use?
+            final int memory = jobRequest.getMemory()
+                .orElse(command.getMemory().orElse(this.jobsProperties.getMemory().getDefaultJobMemory()));
 
-                // Save all the runtime information
-                this.setRuntimeEnvironment(jobId, cluster, command, applications, memory);
-            } catch (final GenieException ge) {
-                this.jobPersistenceService.updateJobStatus(jobId, JobStatus.FAILED, ge.getMessage());
-                throw ge;
-            }
+            // Save all the runtime information
+            this.setRuntimeEnvironment(jobId, cluster, command, applications, memory);
 
             final int maxJobMemory = this.jobsProperties.getMemory().getMaxJobMemory();
             if (memory > maxJobMemory) {
-                this.jobPersistenceService.updateJobStatus(jobId, JobStatus.INVALID, "Requested too much memory");
+                jobStatus = JobStatus.INVALID;
                 throw new GeniePreconditionException(
                     "Requested "
                         + memory
@@ -239,60 +211,43 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
             }
 
             synchronized (this) {
-                try {
-                    log.info("Checking if can run job {} on this node", jobRequest.getId());
-                    final int maxSystemMemory = this.jobsProperties.getMemory().getMaxSystemMemory();
-                    final int usedMemory = this.jobMetricsService.getUsedMemory();
-                    if (usedMemory + memory <= maxSystemMemory) {
-                        log.info(
-                            "Job {} can run on this node as only {}/{} MB are used and requested {} MB",
-                            jobId,
-                            usedMemory,
-                            maxSystemMemory,
-                            memory
-                        );
-                        try {
-                            log.info("Scheduling job {} for submission", jobRequest.getId());
-                            final Future<?> task = this.taskExecutor.submit(
-                                new JobLauncher(
-                                    this.jobSubmitterService,
-                                    jobRequest,
-                                    cluster,
-                                    command,
-                                    applications,
-                                    memory,
-                                    this.registry
-                                )
-                            );
-
-                            // Tell the system a new job has been scheduled so any actions can be taken
-                            log.info("Publishing job scheduled event for job {}", jobId);
-                            this.eventPublisher.publishEvent(new JobScheduledEvent(jobId, task, memory, this));
-                            return jobId;
-                        } catch (final TaskRejectedException e) {
-                            throw new GenieServerException(
-                                "Unable to launch job due to exception: " + e.getMessage(),
-                                e
-                            );
-                        }
-                    } else {
-                        throw new GenieServerUnavailableException(
-                            "Job "
-                                + jobId
-                                + " can't run on this node "
-                                + usedMemory
-                                + "/"
-                                + maxSystemMemory
-                                + " MB are used and requested "
-                                + memory
-                                + " MB"
-                        );
-                    }
-                } catch (final Exception e) {
-                    this.jobPersistenceService.updateJobStatus(jobId, JobStatus.FAILED, e.getMessage());
-                    throw e;
+                log.info("Checking if can run job {} on this node", jobRequest.getId());
+                final int maxSystemMemory = this.jobsProperties.getMemory().getMaxSystemMemory();
+                final int usedMemory = this.jobStateService.getUsedMemory();
+                if (usedMemory + memory <= maxSystemMemory) {
+                    log.info(
+                        "Job {} can run on this node as only {}/{} MB are used and requested {} MB",
+                        jobId,
+                        usedMemory,
+                        maxSystemMemory,
+                        memory
+                    );
+                    // Tell the system a new job has been scheduled so any actions can be taken
+                    log.info("Publishing job scheduled event for job {}", jobId);
+                    jobStateService.schedule(jobId, jobRequest, cluster, command, applications, memory);
+                    return jobId;
+                } else {
+                    throw new GenieServerUnavailableException(
+                        "Job "
+                            + jobId
+                            + " can't run on this node "
+                            + usedMemory
+                            + "/"
+                            + maxSystemMemory
+                            + " MB are used and requested "
+                            + memory
+                            + " MB"
+                    );
                 }
             }
+        } catch (GenieException e) {
+            jobStateService.done(jobId);
+            jobPersistenceService.updateJobStatus(jobId, jobStatus, e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            jobStateService.done(jobId);
+            jobPersistenceService.updateJobStatus(jobId, jobStatus, e.getMessage());
+            throw new GenieServerException(e);
         } finally {
             this.coordinationTimer.record(System.nanoTime() - coordinationStart, TimeUnit.MILLISECONDS);
         }

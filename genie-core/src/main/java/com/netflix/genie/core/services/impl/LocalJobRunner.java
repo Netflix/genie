@@ -283,6 +283,10 @@ public class LocalJobRunner implements JobSubmitterService {
 
             for (WorkflowTask workflowTask : this.jobWorkflowTasks) {
                 workflowTask.executeTask(context);
+                if (Thread.currentThread().isInterrupted()) {
+                    log.info("Interrupted job workflow for job {}", jobId);
+                    break;
+                }
             }
 
             log.info("Finished Executing job workflow for job {}", jobId);
