@@ -427,21 +427,650 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 3.0.0-SNAPSHOT,</span>
-<span id="revdate">2016-11-10</span>
+<span id="revdate">2016-11-14</span>
 </div>
 <div id="toc" class="toc">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_something">Something</a></li>
+<li><a href="#_purpose">Purpose</a></li>
+<li><a href="#_info">Info</a>
+<ul class="sectlevel2">
+<li><a href="#_prerequisites">Prerequisites</a></li>
+<li><a href="#_development_environment">Development Environment</a></li>
+<li><a href="#_caveats">Caveats</a></li>
+<li><a href="#_port_usages">Port Usages</a></li>
+<li><a href="#_scripts">Scripts</a></li>
+</ul>
+</li>
+<li><a href="#_demo_steps">Demo Steps</a></li>
+<li><a href="#_feedback">Feedback</a></li>
 </ul>
 </div>
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="_something">Something</h2>
+<h2 id="_purpose">Purpose</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>3.0.0-SNAPSHOT</p>
+<p>Genie is a complicated service. It can be hard to understand the value it brings to a data platform without seeing it
+in action. For this reason this set of demo steps was developed to show how Genie fits into a data platform and how it
+can help both administrators and users.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_info">Info</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_prerequisites">Prerequisites</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://docs.docker.com/engine/installation/">Docker</a></p>
+</li>
+<li>
+<p><a href="https://docs.docker.com/compose/install/">Docker Compose</a></p>
+</li>
+<li>
+<p>Memory</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Probably at least 8 GB. Wouldn&#8217;t start on machine with 6 GB</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Disk Space</p>
+<div class="ulist">
+<ul>
+<li>
+<p>About 3.82 GB for 4 images</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Available Ports on local machine</p>
+<div class="ulist">
+<ul>
+<li>
+<p>8080, 8088, 19888, 50070, 50075, 8089, 19889, 50071, 50076</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_development_environment">Development Environment</h3>
+<div class="paragraph">
+<p>For reference here is the machine specs that this demo was developed and tested on</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Mid-2015 MacBook Pro</p>
+<div class="ulist">
+<ul>
+<li>
+<p>MacOS Sierra 10.12.1</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>2.5 GHz Intel Core i7</p>
+</li>
+<li>
+<p>16 GB 1600 MHz DDR3</p>
+</li>
+<li>
+<p>Docker 1.12.3</p>
+</li>
+<li>
+<p>Docker Compose 1.8.1</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_caveats">Caveats</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Since all this is running locally on one machine it can be slow, much slower than you&#8217;d expect production level
+systems to run</p>
+</li>
+<li>
+<p>Networking is kind of funky within the Hadoop UI due to how DNS is working between the containers. Sometimes if you
+click a link in the UI and it doesn&#8217;t work try swapping in localhost for the hostname instead.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_port_usages">Port Usages</h3>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Table 1. Genie Endpoints</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Endpoint</th>
+<th class="tableblock halign-left valign-top">URL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UI</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="http://localhost:8080" class="bare">http://localhost:8080</a></code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">API</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="http://localhost:8080/api/v3/" class="bare">http://localhost:8080/api/v3/</a></code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Actuator</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="http://localhost:8080/actuator" class="bare">http://localhost:8080/actuator</a></code></p></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Table 2. Hadoop Interfaces</caption>
+<colgroup>
+<col style="width: 33%;">
+<col style="width: 33%;">
+<col style="width: 33%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">UI</th>
+<th class="tableblock halign-left valign-top">Prod URL</th>
+<th class="tableblock halign-left valign-top">Test URL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Resource Manager</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="http://localhost:8088" class="bare">http://localhost:8088</a></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="http://localhost:8089" class="bare">http://localhost:8089</a></code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Job History Server</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="http://localhost:19888" class="bare">http://localhost:19888</a></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="http://localhost:19889" class="bare">http://localhost:19889</a></code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">NameNode</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="http://localhost:50070" class="bare">http://localhost:50070</a></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="http://localhost:50071" class="bare">http://localhost:50071</a></code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">DataNode</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="http://localhost:50075" class="bare">http://localhost:50075</a></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><a href="http://localhost:50076" class="bare">http://localhost:50076</a></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_scripts">Scripts</h3>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Table 3. Admin Scripts</caption>
+<colgroup>
+<col style="width: 33%;">
+<col style="width: 33%;">
+<col style="width: 33%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Script Name</th>
+<th class="tableblock halign-left valign-top">Invocation</th>
+<th class="tableblock halign-left valign-top">Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Init</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>./init_demo.py</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Initialize the configuration data in the Genie system for the rest of the demo</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Move Tags</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>./move_tags.py</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Move the production tag <code>sched:sla</code> from the prod cluster to the test cluster</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Reset Tags</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>./reset_tags.py</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Move the production tag <code>sched:sla</code> back to the test cluster from the production cluster</p></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Table 4. Job Scripts</caption>
+<colgroup>
+<col style="width: 33%;">
+<col style="width: 33%;">
+<col style="width: 33%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Job</th>
+<th class="tableblock halign-left valign-top">Invocation</th>
+<th class="tableblock halign-left valign-top">Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Hadoop</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>./run_hadoop_job.py {sla|test}</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runs grep against input directory in HDFS</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">HDFS</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>./run_hdfs_job.py {sla|test}</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runs a <code>dfs -ls</code> on the input directory on HDFS and stores results in stdout</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Spark Shell</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>./run_spark_shell_job.py {sla|test}</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Simply prints the Spark Shell help output to stdout</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Spark Submit 1.6.x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>./run_spark_submit_job.py {sla|test}</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Runs the SparkPi example for Spark 1.6.x with input of 10. Results stored in stdout</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Spark Submit 2.0.x</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>./run_spark_submit_job.py {sla|test} 2.0.1</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Overrides default Spark with Spark 2.0.x and runs SparkPi example with input of 10. Results stored in stdout</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">YARN</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>./run_yarn_job.py {sla|test}</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lists all yarn applications from the resource manager into stdout</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_demo_steps">Demo Steps</h2>
+<div class="sectionbody">
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Open a terminal</p>
+</li>
+<li>
+<p>Download the Docker Compose file</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Save the below file as <code>docker-compose.yml</code> somewhere on your machine</p>
+</li>
+<li>
+<p><a href="https://netflix.github.io/genie/docs/3.0.0-SNAPSHOT/demo/docker-compose.yml">docker-compose.yml</a></p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Go to your working directory</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Wherever you downloaded the <code>docker-compose.yml</code> to</p>
+</li>
+<li>
+<p><code>cd YourWorkDir</code></p>
+</li>
+<li>
+<p>Note the name of your working directory. When you bring up the demo this will become the first part of your
+container names</p>
+<div class="olist lowerroman">
+<ol class="lowerroman" type="i">
+<li>
+<p>For Example</p>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Start the demo containers</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p><code>docker-compose up -d</code></p>
+<div class="olist lowerroman">
+<ol class="lowerroman" type="i">
+<li>
+<p>The first time you run this it could take quite a while as it has to download 4 large images</p>
+<div class="olist upperalpha">
+<ol class="upperalpha" type="A">
+<li>
+<p>netflixoss/genie-app:3.0.0-SNAPSHOT</p>
+</li>
+<li>
+<p>netflixoss/genie-demo-apache:3.0.0-SNAPSHOT</p>
+</li>
+<li>
+<p>netflixoss/genie-demo-client:3.0.0-SNAPSHOT</p>
+</li>
+<li>
+<p>sequenceiq/hadoop-docker:2.7.1</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>This will use docker compose to bring up 5 containers</p>
+<div class="olist upperalpha">
+<ol class="upperalpha" type="A">
+<li>
+<p>genie_demo_app_3.0.0-SNAPSHOT</p>
+<div class="olist upperroman">
+<ol class="upperroman" type="I">
+<li>
+<p>Instantiation of netflixoss/genie-app:3.0.0-SNAPSHOT image</p>
+</li>
+<li>
+<p>Image from official Genie build which runs Genie app server</p>
+</li>
+<li>
+<p>Maps port 8080 for Genie UI</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>genie_demo_apache_3.0.0-SNAPSHOT</p>
+<div class="olist upperroman">
+<ol class="upperroman" type="I">
+<li>
+<p>Instantiation of netflixoss/genie-demo-apache:3.0.0-SNAPSHOT</p>
+</li>
+<li>
+<p>Extension of apache image which includes files used during demo that Genie will download</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>genie_demo_client_3.0.0-SNAPSHOT</p>
+<div class="olist upperroman">
+<ol class="upperroman" type="I">
+<li>
+<p>Instantiation of netflixoss/genie-demo-client:3.0.0-SNAPSHOT</p>
+</li>
+<li>
+<p>Simulates a client node for Genie which includes several python scripts to configure and run jobs on Genie</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>genie_demo_hadoop_prod_3.0.0-SNAPSHOT and genie_demo_hadoop_test_3.0.0-SNAPSHOT</p>
+<div class="olist upperroman">
+<ol class="upperroman" type="I">
+<li>
+<p>Instantiations of sequenceiq/hadoop-docker:2.7.1</p>
+</li>
+<li>
+<p>Simulates having two clusters available and registered with Genie with roles as a production and a test cluster</p>
+</li>
+<li>
+<p>See <code>Hadoop Interfaces</code> table for list of available ports</p>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Wait for all services to start</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Verify Genie UI and both Resource Manager UI&#8217;s are available via your browser</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Check out the Genie UI</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>In a browser navigate to the Genie UI (<code><a href="http://localhost:8080" class="bare">http://localhost:8080</a></code>) and notice there are no <code>Jobs</code>, <code>Clusters</code>,
+<code>Commands</code> or <code>applications</code> currently</p>
+</li>
+<li>
+<p>These are available by clicking on the tabs in the top left of the UI</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Login to the client container</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>From terminal <code>docker exec -it genie_demo_client_3.0.0-SNAPSHOT /bin/bash</code></p>
+<div class="olist lowerroman">
+<ol class="lowerroman" type="i">
+<li>
+<p>This should put you into a bash shell in <code>/apps/genie/example</code> within the running container</p>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Initialize the System</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Back in the terminal initialize the configurations for the two clusters (prod and test), 5 commands (hadoop, hdfs,
+yarn, spark-submit, spark-shell) and two application (hadoop, spark)</p>
+</li>
+<li>
+<p><code>./init_demo.py</code></p>
+</li>
+<li>
+<p>Feel free to <code>cat</code> the contents of this script to see what is happening</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Verify Configurations Loaded</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>In the browser browse the Genie UI again and verify that now <code>Clusters</code>, <code>Commands</code> and <code>Applications</code> have data in
+them</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Run some jobs</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Recommend running the Hadoop job before <code>yarn</code> or <code>hdfs</code> so others they have something interesting to show</p>
+</li>
+<li>
+<p>Sub in the environment env for desired cluster</p>
+<div class="olist lowerroman">
+<ol class="lowerroman" type="i">
+<li>
+<p><code>sla</code> for the Prod cluster</p>
+</li>
+<li>
+<p><code>test</code> for the Test cluster</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>See the <code>Job Scripts</code> table for available commands</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>For each of these jobs you can see their status, output and other information via the UI&#8217;s</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>In the <code>Jobs</code> tab of the Genie UI you can see all the job history</p>
+<div class="olist lowerroman">
+<ol class="lowerroman" type="i">
+<li>
+<p>Clicking any row will expand that job information and provide more links</p>
+</li>
+<li>
+<p>Clicking the folder icon will bring you to the working directory for that job</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Go to the respective cluster Resource Manager UI&#8217;s and verify the jobs ran on their respective cluster</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Move load from prod to test</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Lets say there is something wrong with the production cluster. You don&#8217;t want to interfere with users but you need
+to fix the prod cluster. Lets switch the load over to the test cluster temporarily using Genie</p>
+</li>
+<li>
+<p>In terminal switch the prod tag <code>sched:sla</code> from Prod to Test cluster</p>
+<div class="olist lowerroman">
+<ol class="lowerroman" type="i">
+<li>
+<p><code>./move_tags.py</code></p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Verify in Genie UI <code>Clusters</code> tab that the <code>sched:sla</code> tag only appears on the <code>GenieDemoTest</code> cluster</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Run more of the available jobs</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Verify that all jobs went to the <code>GenieDemoTest</code> cluster and none went to the <code>GenieDemoProd</code> cluster regardless  of
+which <code>env</code> you passed into the Gradle commands above</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Reset the system</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>You&#8217;ve resolved the issues with your production cluster. Move the <code>sched:sla</code> tag back</p>
+</li>
+<li>
+<p><code>./reset_tags.py</code></p>
+</li>
+<li>
+<p>Verify in Genie UI <code>Clusters</code> tab that <code>sched:sla</code> tag only appears on <code>GenieDemoProd</code> cluster</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Run some jobs</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Verify jobs are again running on <code>Prod</code> and <code>Test</code> cluster based on environment</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Explore the scripts</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Look through the scripts to get a sense of what is submitted to Genie</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Log out of the container</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p><code>exit</code></p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Shut the demo down</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Once you&#8217;re done trying everything out you can shut down the demo</p>
+</li>
+<li>
+<p><code>docker-compose down</code></p>
+</li>
+<li>
+<p>This will stop and remove all the containers from the demo. The images will remain on disk and if you run the demo
+again it will startup much faster since nothing needs to be downloaded or built</p>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_feedback">Feedback</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If you have any feedback about this demo feel free to reach out to the Genie team via any of the communication
+methods listed in the <a href="https://netflix.github.io/genie/contact/">Contact</a> page.</p>
 </div>
 </div>
 </div>
@@ -449,7 +1078,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="footer">
 <div id="footer-text">
 Version 3.0.0-SNAPSHOT<br>
-Last updated 2016-11-10 19:55:34 +00:00
+Last updated 2016-11-14 23:39:36 +00:00
 </div>
 </div>
 </body>
