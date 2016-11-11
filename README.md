@@ -7,9 +7,8 @@
 
 ## In Active Development
 
-This branch contains code in active development towards Genie 3.0. It is not yet ready for use. If you're looking for
-a version that is ready for production please see the [master](https://github.com/Netflix/genie/tree/master) branch.
-If you want to see what we're working on see the [3.0.0 Milestone](https://github.com/Netflix/genie/milestones/3.0.0).
+This branch contains code in active development towards Genie 3.0. If you want to see what we're working on see the 
+[3.0.0 Milestone](https://github.com/Netflix/genie/milestones/3.0.0).
 
 ## Introduction
 
@@ -24,7 +23,6 @@ Genie builds are run on Travis CI [here](https://travis-ci.org/Netflix/genie).
 |  Branch |                                                     Build                                                     |                                                                         Coverage                                                                         |
 |:-------:|:-------------------------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------------------------------------------------:|
 |  Master | [![Build Status](https://travis-ci.org/Netflix/genie.svg?branch=master)](https://travis-ci.org/Netflix/genie) |  [![Coverage Status](https://coveralls.io/repos/github/Netflix/genie/badge.svg?branch=master)](https://coveralls.io/github/Netflix/genie?branch=master)  |
-| Develop | [![Build Status](https://travis-ci.org/Netflix/genie.svg?branch=master)](https://travis-ci.org/Netflix/genie) | [![Coverage Status](https://coveralls.io/repos/github/Netflix/genie/badge.svg?branch=develop)](https://coveralls.io/github/Netflix/genie?branch=develop) |
 
 ## Docker
 

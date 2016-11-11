@@ -10,13 +10,9 @@ services:
       - genie-apache
     tty: true
   genie-apache:
-    build:
-      context: ./apache
     image: netflixoss/genie-demo-apache:${GENIE_VERSION}
     tty: true
   genie-client:
-    build:
-      context: ./client
     image: netflixoss/genie-demo-client:${GENIE_VERSION}
     depends_on:
       - genie

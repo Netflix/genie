@@ -20,7 +20,7 @@ plugins {
     id "nebula.netflixoss" version "3.5.1"
     id "nebula.optional-base" version "3.1.0"
     id "nebula.provided-base" version "3.1.0"
-    id "org.ajoberstar.github-pages" version "1.6.0-rc.1"
+    id "org.ajoberstar.github-pages" version "1.6.0"
 }
 
 apply plugin: "nebula-aggregate-javadocs"
@@ -221,6 +221,10 @@ task jacocoRootReport(type: JacocoReport, group: "Coverage reports") {
     }
 }
 
+/**********************************
+ * Coverage Tasks
+ **********************************/
+
 coveralls {
     sourceDirs = javaProjects.sourceSets.main.allSource.srcDirs.flatten()
     jacocoReportPath = "${project.buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
@@ -236,14 +240,26 @@ tasks.coveralls {
     }
 }
 
-task collectDocumentation(group: "documentation", description: "Copy the documentation from subprojects") {
+/**********************************
+ * Github Pages Tasks
+ **********************************/
+
+task collectDocumentation(group: "documentation", description: "Copy the documentation from sub-projects") {
     dependsOn "aggregateJavadocs"
     inputs.dir new File(project(":genie-web").buildDir, "asciidoc/html5")
     inputs.dir new File(project(":genie-docs").buildDir, "asciidoc/html5")
     inputs.dir new File(project(":genie-demo").buildDir, "asciidoc/html5")
+    inputs.file new File(project(":genie-demo").projectDir, "src/main/docker/docker-compose.yml")
     outputs.dir new File(project.buildDir, "docs")
 
     doLast {
+        copy {
+            from new File(project(":genie-demo").projectDir, "src/main/docker/docker-compose.yml")
+            into "${project.buildDir}/docs/demo/"
+            filter {
+                it.replace('${GENIE_VERSION}', project.version.toString())
+            }
+        }
         copy {
             from new File(project(":genie-web").buildDir, "asciidoc/html5")
             into "${project.buildDir}/docs/rest"
@@ -283,4 +299,29 @@ publishGhPages {
     onlyIf {
         System.env."CI"
     }
+}
+
+/**********************************
+ * Docker Tasks
+ **********************************/
+
+def isLatest() {
+    return (boolean) !project.version.toString().contains("SNAPSHOT") && !project.version.toString().contains("-rc.")
+}
+
+def getDockerTags(String appName) {
+    def tags = ["netflixoss/${appName}:${project.version}"]
+    if (isLatest()) {
+        tags.add("netflixoss/${appName}:latest")
+    }
+    return tags
+}
+
+task dockerLogout(type: Exec, group: "Docker", description: "Logout of docker hub") {
+    commandLine "docker", "logout"
+}
+
+task dockerLogin(type: Exec, group: "Docker", description: "Login to docker hub using DOCKER_USER and DOCKER_PASSWORD environment variables") {
+    dependsOn tasks.dockerLogout
+    commandLine "docker", "login", "-u", System.getenv("DOCKER_USER"), "-p", System.getenv("DOCKER_PASSWORD")
 }

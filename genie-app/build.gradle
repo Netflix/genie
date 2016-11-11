@@ -44,18 +44,6 @@ bootRun {
 
 def dockerDir = new File(project.buildDir, "/docker")
 
-def isLatest() {
-    return (boolean) !project.version.toString().contains("SNAPSHOT") && !project.version.toString().contains("-rc.")
-}
-
-def getDockerTags(String appName) {
-    def tags = ["netflixoss/${appName}:${project.version}"]
-    if (isLatest()) {
-        tags.add("netflixoss/${appName}:latest")
-    }
-    return tags
-}
-
 task dockerCreateInputDir(type: Copy, group: "Docker", description: "Stage all the necessary files docker image") {
     dependsOn tasks.jar, tasks.bootRepackage
     from tasks.jar
@@ -63,7 +51,7 @@ task dockerCreateInputDir(type: Copy, group: "Docker", description: "Stage all t
     into dockerDir
 }
 
-task dockerBuildImage(type: Exec, group: "Docker", description: "Build docker image based on the Dockerfile") {
+task dockerBuildAppImage(type: Exec, group: "Docker", description: "Build docker image for the Genie App") {
     dependsOn tasks.dockerCreateInputDir
     workingDir dockerDir
 
@@ -86,17 +74,8 @@ task dockerBuildImage(type: Exec, group: "Docker", description: "Build docker im
     commandLine commandArgs
 }
 
-task dockerLogout(type: Exec, group: "Docker", description: "Logout of docker hub") {
-    commandLine "docker", "logout"
-}
-
-task dockerLogin(type: Exec, group: "Docker", description: "Login to docker hub using DOCKER_USER and DOCKER_PASSWORD environment variables") {
-    dependsOn tasks.dockerLogout
-    commandLine "docker", "login", "-u", System.getenv("DOCKER_USER"), "-p", System.getenv("DOCKER_PASSWORD")
-}
-
-task dockerPush(group: "Docker", description: "Push the built docker image to Docker Hub") {
-    dependsOn tasks.dockerLogin, tasks.dockerBuildImage
+task dockerPush(group: "Docker", description: "Push the built docker app image to Docker Hub") {
+    dependsOn parent.tasks.dockerLogin, tasks.dockerBuildAppImage
     onlyIf {
         System.env."CI"
     }
