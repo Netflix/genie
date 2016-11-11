@@ -1,4 +1,4 @@
-from httpd:2.4
+from httpd:2.4-alpine
 MAINTAINER NetflixOSS <netflixoss@netflix.com>
 COPY ./files/ /usr/local/apache2/htdocs/
 ADD http://apache.cs.utah.edu/hadoop/common/hadoop-2.7.1/hadoop-2.7.1.tar.gz /usr/local/apache2/htdocs/applications/hadoop/2.7.1/

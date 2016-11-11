@@ -83,3 +83,57 @@ task demoStop(type: Exec, group: "Demo", description: "Bring down the  Genie dem
     environment("GENIE_VERSION", project.version)
     commandLine "docker-compose", "down"
 }
+
+def apacheImageName = "genie-demo-apache"
+def clientImageName = "genie-demo-client"
+
+task dockerBuildApacheImage(type: Exec, group: "Docker", description: "Build docker image for demo apache") {
+    workingDir new File(project.projectDir, "/src/main/docker/apache")
+
+    def commandArgs = new ArrayList<>()
+    commandArgs.add("docker")
+    commandArgs.add("build")
+    commandArgs.add("--force-rm")
+    for (String tag : this.getDockerTags(apacheImageName)) {
+        commandArgs.add("-t")
+        commandArgs.add(tag)
+    }
+    commandArgs.add(".")
+
+    commandLine commandArgs
+}
+
+task dockerBuildClientImage(type: Exec, group: "Docker", description: "Build docker image for demo client") {
+    workingDir new File(project.projectDir, "/src/main/docker/client")
+
+    def commandArgs = new ArrayList<>()
+    commandArgs.add("docker")
+    commandArgs.add("build")
+    commandArgs.add("--force-rm")
+    for (String tag : this.getDockerTags(clientImageName)) {
+        commandArgs.add("-t")
+        commandArgs.add(tag)
+    }
+    commandArgs.add(".")
+
+    commandLine commandArgs
+}
+
+task dockerPush(group: "Docker", description: "Push the demo docker images to docker hub") {
+    dependsOn parent.tasks.dockerLogin, tasks.dockerBuildApacheImage, tasks.dockerBuildClientImage
+    onlyIf {
+        System.env."CI"
+    }
+    doLast {
+        for (String tag : this.getDockerTags(apacheImageName)) {
+            exec {
+                commandLine "docker", "push", tag
+            }
+        }
+        for (String tag : this.getDockerTags(clientImageName)) {
+            exec {
+                commandLine "docker", "push", tag
+            }
+        }
+    }
+}

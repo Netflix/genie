@@ -96,7 +96,7 @@ genie:
 
 info:
   genie:
-    version: @project.version@
+    version: GENIE_VERSION
 
 management:
   context-path: /actuator
