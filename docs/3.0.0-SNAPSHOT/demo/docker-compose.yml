@@ -9,14 +9,17 @@ services:
       - genie-hadoop-test
       - genie-apache
     tty: true
+    container_name: genie_demo_app_3.0.0-SNAPSHOT
   genie-apache:
     image: netflixoss/genie-demo-apache:3.0.0-SNAPSHOT
     tty: true
+    container_name: genie_demo_apache_3.0.0-SNAPSHOT
   genie-client:
     image: netflixoss/genie-demo-client:3.0.0-SNAPSHOT
     depends_on:
       - genie
     tty: true
+    container_name: genie_demo_client_3.0.0-SNAPSHOT
   genie-hadoop-prod:
     image: sequenceiq/hadoop-docker:2.7.1
     command: /bin/bash -c "/usr/local/hadoop/sbin/mr-jobhistory-daemon.sh start historyserver && /etc/bootstrap.sh -bash"
@@ -26,6 +29,7 @@ services:
       - "50075:50075"
       - "8088:8088"
     tty: true
+    container_name: genie_demo_hadoop_prod_3.0.0-SNAPSHOT
   genie-hadoop-test:
     image: sequenceiq/hadoop-docker:2.7.1
     command: /bin/bash -c "/usr/local/hadoop/sbin/mr-jobhistory-daemon.sh start historyserver && /etc/bootstrap.sh -bash"
@@ -35,3 +39,4 @@ services:
       - "50076:50075"
       - "8089:8088"
     tty: true
+    container_name: genie_demo_hadoop_test_3.0.0-SNAPSHOT
