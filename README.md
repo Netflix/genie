@@ -12,7 +12,7 @@ This branch contains code in active development towards Genie 3.0. If you want t
 
 ## Introduction
 
-Genie is a federated job execution engine developed by Netflix. Genie provides REST-ful APIs to run a variety of big
+Genie is a federated job orchestration engine developed by Netflix. Genie provides REST-ful APIs to run a variety of big
 data jobs like Hadoop, Pig, Hive, Spark, Presto, Sqoop and more. It also provides APIs for managing many distributed
 processing cluster configurations and the commands and applications which run on them.
 
@@ -38,7 +38,7 @@ the one you want.
  
 You can run via `docker run -t --rm -p 8080:8080 netflixoss/genie-app:{version}`
 
-## WAR Image
+### WAR Image
 
 [![WAR Image](https://img.shields.io/docker/pulls/netflixoss/genie-war.svg)]
 (https://hub.docker.com/r/netflixoss/genie-war/)
@@ -58,32 +58,8 @@ progress example.**
 
 ## Documentation
 
-* Netflix Tech Blog Posts
-    * [Genie 1](http://techblog.netflix.com/2013/06/genie-is-out-of-bottle.html)
-    * [Genie 2](http://techblog.netflix.com/2014/11/genie-20-second-wish-granted.html)
-    * [All Posts](http://techblog.netflix.com/search/label/big%20data) from the Big Data Team at Netflix
-* Presentations
-    * Netflix OSS Meetups
-        * Season 3 Episode 1
-            * [Slides](http://www.slideshare.net/RuslanMeshenberg/netflixoss-meetup-season-3-episode-1/24)
-            * [YouTube](http://youtu.be/hi7BDAtjfKY?t=15m53s)
-    * [2013 Hadoop Summit](http://www.slideshare.net/krishflix/genie-hadoop-platform-as-a-service-at-netflix)
-* Genie Github
-    * [Wiki](https://github.com/Netflix/genie/wiki)
-    * [Source](https://github.com/Netflix/genie/tree/master)
-* Client API Documentation
-    * [REST](http://netflix.github.io/genie/docs/api/)
-    * [Python](https://pypi.python.org/pypi/nflx-genie-client)
-    * [Java](http://netflix.github.io/genie/docs/javadoc/client/index.html)
-
-## Support
-
-Please use the [Google Group](https://groups.google.com/d/forum/genieoss) for general questions and discussion.
-
-## Issues
-
-You can report bugs and request new features [here](https://github.com/Netflix/genie/issues). Pull requests are always 
-welcome.
+See the official [website](https://netflix.github.io/genie) to find documentation about Genie and specific 
+documentation for various releases.
 
 
 
