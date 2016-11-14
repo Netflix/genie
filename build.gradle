@@ -246,31 +246,39 @@ tasks.coveralls {
 
 task collectDocumentation(group: "documentation", description: "Copy the documentation from sub-projects") {
     dependsOn "aggregateJavadocs"
-    inputs.dir new File(project(":genie-web").buildDir, "asciidoc/html5")
-    inputs.dir new File(project(":genie-docs").buildDir, "asciidoc/html5")
-    inputs.dir new File(project(":genie-demo").buildDir, "asciidoc/html5")
-    inputs.file new File(project(":genie-demo").projectDir, "src/main/docker/docker-compose.yml")
-    outputs.dir new File(project.buildDir, "docs")
+
+    // TODO: Maybe make this dependent on output of asciidoc tasks?
+    def restDocs = new File(project(":genie-web").buildDir, "asciidoc/html5")
+    def referenceDocs = new File(project(":genie-docs").buildDir, "asciidoc/html5")
+    def demoDocs = new File(project(":genie-demo").buildDir, "asciidoc/html5")
+    def dockerCompose = new File(project(":genie-demo").projectDir, "src/main/docker/docker-compose.yml")
+    def docsDir = new File(project.buildDir, "docs")
+
+    inputs.dir restDocs
+    inputs.dir referenceDocs
+    inputs.dir demoDocs
+    inputs.file dockerCompose
+    outputs.dir docsDir
 
     doLast {
         copy {
-            from new File(project(":genie-demo").projectDir, "src/main/docker/docker-compose.yml")
-            into "${project.buildDir}/docs/demo/"
+            from dockerCompose
+            into new File(docsDir, "demo")
             filter {
                 it.replace('${GENIE_VERSION}', project.version.toString())
             }
         }
         copy {
-            from new File(project(":genie-web").buildDir, "asciidoc/html5")
-            into "${project.buildDir}/docs/rest"
+            from restDocs
+            into new File(docsDir, "rest")
         }
         copy {
-            from new File(project(":genie-docs").buildDir, "asciidoc/html5")
-            into "${project.buildDir}/docs/reference"
+            from referenceDocs
+            into new File(docsDir, "reference")
         }
         copy {
-            from new File(project(":genie-demo").buildDir, "asciidoc/html5")
-            into "${project.buildDir}/docs/demo"
+            from demoDocs
+            into new File(docsDir, "demo")
         }
     }
 }
@@ -281,17 +289,29 @@ githubPages {
         password = ""
     }
 
+    deleteExistingFiles = false
+
     commitMessage = "Documentation generated for ${project.version} by Travis Build ${System.env.TRAVIS_BUILD_NUMBER}"
 
     pages {
-        from "${project.buildDir}/docs/"
-        into "docs/${project.version}/"
+        into("docs/${project.version}/") {
+            from "${project.buildDir}/docs/"
+        }
+        into("_releases") {
+            from new File(project(":genie-docs").projectDir, "src/templates/releaseTemplate.md")
+            rename {
+                String fileName -> fileName.replace("releaseTemplate", "${project.version}")
+            }
+            filter {
+                it.replace("GENIE_VERSION", project.version.toString())
+            }
+        }
     }
 }
 
 prepareGhPages {
-    // This also depends on asciidoctor task for some subprojects but that dependency is reverse mapped in the
-    // pertinent subproject build file
+    // This also depends on asciidoctor task for some sub-projects but that dependency is reverse mapped in the
+    // pertinent sub-project build file
     dependsOn tasks.collectDocumentation
 }
 

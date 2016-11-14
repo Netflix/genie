@@ -5,5 +5,216 @@ v{revnumber}, {localdate}
 :keywords: genie, netflix, documentation, big data, cloud, oss, open source software
 :toc:
 
-== Something
-{project-version}
+== Purpose
+
+Genie is a complicated service. It can be hard to understand the value it brings to a data platform without seeing it
+in action. For this reason this set of demo steps was developed to show how Genie fits into a data platform and how it
+can help both administrators and users.
+
+== Info
+
+=== Prerequisites
+
+* https://docs.docker.com/engine/installation/[Docker]
+* https://docs.docker.com/compose/install/[Docker Compose]
+* Memory
+** Probably at least 8 GB. Wouldn't start on machine with 6 GB
+* Disk Space
+** About 3.82 GB for 4 images
+* Available Ports on local machine
+** 8080, 8088, 19888, 50070, 50075, 8089, 19889, 50071, 50076
+
+=== Development Environment
+
+For reference here is the machine specs that this demo was developed and tested on
+
+* Mid-2015 MacBook Pro
+** MacOS Sierra 10.12.1
+* 2.5 GHz Intel Core i7
+* 16 GB 1600 MHz DDR3
+* Docker 1.12.3
+* Docker Compose 1.8.1
+
+=== Caveats
+
+* Since all this is running locally on one machine it can be slow, much slower than you'd expect production level
+systems to run
+* Networking is kind of funky within the Hadoop UI due to how DNS is working between the containers. Sometimes if you
+click a link in the UI and it doesn't work try swapping in localhost for the hostname instead.
+
+=== Port Usages
+
+.Genie Endpoints
+|===
+| Endpoint| URL
+
+| UI
+| `http://localhost:8080`
+
+| API
+| `http://localhost:8080/api/v3/`
+
+| Actuator
+| `http://localhost:8080/actuator`
+|===
+
+.Hadoop Interfaces
+|===
+| UI| Prod URL| Test URL
+
+| Resource Manager
+| `http://localhost:8088`
+| `http://localhost:8089`
+
+| Job History Server
+| `http://localhost:19888`
+| `http://localhost:19889`
+
+| NameNode
+| `http://localhost:50070`
+| `http://localhost:50071`
+
+
+| DataNode
+| `http://localhost:50075`
+| `http://localhost:50076`
+|===
+
+=== Scripts
+
+.Admin Scripts
+|===
+| Script Name| Invocation| Purpose
+
+|Init
+|`./init_demo.py`
+|Initialize the configuration data in the Genie system for the rest of the demo
+
+|Move Tags
+|`./move_tags.py`
+|Move the production tag `sched:sla` from the prod cluster to the test cluster
+
+|Reset Tags
+|`./reset_tags.py`
+|Move the production tag `sched:sla` back to the test cluster from the production cluster
+|===
+
+.Job Scripts
+|===
+| Job| Invocation| Action
+
+|Hadoop
+|`./run_hadoop_job.py {sla\|test}`
+|Runs grep against input directory in HDFS
+
+|HDFS
+|`./run_hdfs_job.py {sla\|test}`
+|Runs a `dfs -ls` on the input directory on HDFS and stores results in stdout
+
+|Spark Shell
+|`./run_spark_shell_job.py {sla\|test}`
+|Simply prints the Spark Shell help output to stdout
+
+|Spark Submit 1.6.x
+|`./run_spark_submit_job.py {sla\|test}`
+|Runs the SparkPi example for Spark 1.6.x with input of 10. Results stored in stdout
+
+|Spark Submit 2.0.x
+|`./run_spark_submit_job.py {sla\|test} 2.0.1`
+|Overrides default Spark with Spark 2.0.x and runs SparkPi example with input of 10. Results stored in stdout
+
+|YARN
+|`./run_yarn_job.py {sla\|test}`
+|Lists all yarn applications from the resource manager into stdout
+|===
+
+== Demo Steps
+. Open a terminal
+. Download the Docker Compose file
+.. Save the below file as `docker-compose.yml` somewhere on your machine
+.. https://netflix.github.io/genie/docs/{project-version}/demo/docker-compose.yml[docker-compose.yml]
+. Go to your working directory
+.. Wherever you downloaded the `docker-compose.yml` to
+.. `cd YourWorkDir`
+.. Note the name of your working directory. When you bring up the demo this will become the first part of your
+container names
+... For Example
+. Start the demo containers
+.. `docker-compose up -d`
+... The first time you run this it could take quite a while as it has to download 4 large images
+.... netflixoss/genie-app:{project-version}
+.... netflixoss/genie-demo-apache:{project-version}
+.... netflixoss/genie-demo-client:{project-version}
+.... sequenceiq/hadoop-docker:2.7.1
+... This will use docker compose to bring up 5 containers
+.... genie_demo_app_{project-version}
+..... Instantiation of netflixoss/genie-app:{project-version} image
+..... Image from official Genie build which runs Genie app server
+..... Maps port 8080 for Genie UI
+.... genie_demo_apache_{project-version}
+..... Instantiation of netflixoss/genie-demo-apache:{project-version}
+..... Extension of apache image which includes files used during demo that Genie will download
+.... genie_demo_client_{project-version}
+..... Instantiation of netflixoss/genie-demo-client:{project-version}
+..... Simulates a client node for Genie which includes several python scripts to configure and run jobs on Genie
+.... genie_demo_hadoop_prod_{project-version} and genie_demo_hadoop_test_{project-version}
+..... Instantiations of sequenceiq/hadoop-docker:2.7.1
+..... Simulates having two clusters available and registered with Genie with roles as a production and a test cluster
+..... See `Hadoop Interfaces` table for list of available ports
+. Wait for all services to start
+.. Verify Genie UI and both Resource Manager UI's are available via your browser
+. Check out the Genie UI
+.. In a browser navigate to the Genie UI (`http://localhost:8080`) and notice there are no `Jobs`, `Clusters`,
+`Commands` or `applications` currently
+.. These are available by clicking on the tabs in the top left of the UI
+. Login to the client container
+.. From terminal `docker exec -it genie_demo_client_{project-version} /bin/bash`
+... This should put you into a bash shell in `/apps/genie/example` within the running container
+. Initialize the System
+.. Back in the terminal initialize the configurations for the two clusters (prod and test), 5 commands (hadoop, hdfs,
+yarn, spark-submit, spark-shell) and two application (hadoop, spark)
+.. `./init_demo.py`
+.. Feel free to `cat` the contents of this script to see what is happening
+. Verify Configurations Loaded
+.. In the browser browse the Genie UI again and verify that now `Clusters`, `Commands` and `Applications` have data in
+them
+. Run some jobs
+.. Recommend running the Hadoop job before `yarn` or `hdfs` so others they have something interesting to show
+.. Sub in the environment env for desired cluster
+... `sla` for the Prod cluster
+... `test` for the Test cluster
+.. See the `Job Scripts` table for available commands
+. For each of these jobs you can see their status, output and other information via the UI's
+.. In the `Jobs` tab of the Genie UI you can see all the job history
+... Clicking any row will expand that job information and provide more links
+... Clicking the folder icon will bring you to the working directory for that job
+.. Go to the respective cluster Resource Manager UI's and verify the jobs ran on their respective cluster
+. Move load from prod to test
+.. Lets say there is something wrong with the production cluster. You don't want to interfere with users but you need
+to fix the prod cluster. Lets switch the load over to the test cluster temporarily using Genie
+.. In terminal switch the prod tag `sched:sla` from Prod to Test cluster
+... `./move_tags.py`
+.. Verify in Genie UI `Clusters` tab that the `sched:sla` tag only appears on the `GenieDemoTest` cluster
+. Run more of the available jobs
+.. Verify that all jobs went to the `GenieDemoTest` cluster and none went to the `GenieDemoProd` cluster regardless  of
+which `env` you passed into the Gradle commands above
+. Reset the system
+.. You've resolved the issues with your production cluster. Move the `sched:sla` tag back
+.. `./reset_tags.py`
+.. Verify in Genie UI `Clusters` tab that `sched:sla` tag only appears on `GenieDemoProd` cluster
+. Run some jobs
+.. Verify jobs are again running on `Prod` and `Test` cluster based on environment
+. Explore the scripts
+.. Look through the scripts to get a sense of what is submitted to Genie
+. Log out of the container
+.. `exit`
+. Shut the demo down
+.. Once you're done trying everything out you can shut down the demo
+.. `docker-compose down`
+.. This will stop and remove all the containers from the demo. The images will remain on disk and if you run the demo
+again it will startup much faster since nothing needs to be downloaded or built
+
+== Feedback
+
+If you have any feedback about this demo feel free to reach out to the Genie team via any of the communication
+methods listed in the https://netflix.github.io/genie/contact/[Contact] page.
