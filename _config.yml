@@ -12,7 +12,7 @@ title: "Genie by Netflix OSS"
 
 
 # The slogan describes your website and is used on homepage in <title> and other important places
-slogan: "Distributed Job Federation"
+slogan: "Distributed Big Data Job Orchestration"
 
 
 # The description is used on homepage and in the footer to quickly describe your website. Use a maximum of 150 characters for SEO-purposes.
@@ -22,9 +22,14 @@ description: "Homepage for Genie by Netflix OSS. You'll find documentation and h
 # See > authors.yml
 author: tgianos
 
-# This URL is the main address for absolute links. Don't include a slash at the end.
-#
-# url: 'https://tgianos.github.io'
+introduction: >
+  Genie is a completely open source federated job orchestration engine developed
+  by Netflix. Genie provides REST-ful APIs to run a variety of big data jobs
+  like Hadoop, Pig, Hive, Spark, Presto, Sqoop and more. It also provides APIs
+  for managing the metadata of many distributed processing clusters and the
+  commands and applications which run on them.
+
+# This URL is the base address for absolute links. Don't include a slash at the end.
 baseurl: /genie
 
 # Logo size is 600x80 pixels
