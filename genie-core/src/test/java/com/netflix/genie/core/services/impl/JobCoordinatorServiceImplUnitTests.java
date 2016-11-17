@@ -28,6 +28,7 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
@@ -476,6 +477,22 @@ public class JobCoordinatorServiceImplUnitTests {
         final JobRequest request = Mockito.mock(JobRequest.class);
         Mockito.when(request.getId()).thenReturn(Optional.empty());
         this.jobCoordinatorService.coordinateJob(request, Mockito.mock(JobMetadata.class));
+    }
+
+    /**
+     * Make sure if the job with id already exists.
+     *
+     * @throws GenieException On error
+     */
+    @Test(expected = GenieConflictException.class)
+    public void cantCoordinateIfJobAlreadyExists() throws GenieException {
+        final JobRequest request = getJobRequest(false, null, null, null);
+        final JobMetadata metadata = Mockito.mock(JobMetadata.class);
+        Mockito.doThrow(GenieConflictException.class).when(jobPersistenceService)
+            .createJob(Mockito.eq(request), Mockito.eq(metadata),
+                Mockito.any(Job.class),
+                Mockito.any(JobExecution.class));
+        this.jobCoordinatorService.coordinateJob(request, metadata);
     }
 
     /**

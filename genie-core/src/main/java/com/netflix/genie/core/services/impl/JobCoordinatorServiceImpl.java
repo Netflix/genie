@@ -26,6 +26,7 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
@@ -154,7 +155,6 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
         JobStatus jobStatus = JobStatus.FAILED;
         try {
             log.info("Called to schedule job launch for job {}", jobId);
-            jobStateService.init(jobId);
             // create the job object in the database with status INIT
             final Job.Builder jobBuilder = new Job.Builder(
                 jobRequest.getName(),
@@ -183,7 +183,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
 
             // Log all the job initial job information
             this.jobPersistenceService.createJob(jobRequest, jobMetadata, jobBuilder.build(), jobExecution);
-
+            jobStateService.init(jobId);
             //TODO: Combine the cluster and command selection into a single method/database query for efficiency
             // Resolve the cluster for the job request based on the tags specified
             final Cluster cluster = this.getCluster(jobRequest);
@@ -240,13 +240,28 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                     );
                 }
             }
+        } catch (GenieConflictException e) {
+            // Job has not been initiated so we don't have to call JobStateService.done()
+            throw e;
         } catch (GenieException e) {
-            jobStateService.done(jobId);
-            jobPersistenceService.updateJobStatus(jobId, jobStatus, e.getMessage());
+            //
+            // Need to check if the job exists in the JobStateService
+            // because this error can happen before the job is initiated.
+            //
+            if (jobStateService.jobExists(jobId)) {
+                jobStateService.done(jobId);
+                jobPersistenceService.updateJobStatus(jobId, jobStatus, e.getMessage());
+            }
             throw e;
         } catch (Exception e) {
-            jobStateService.done(jobId);
-            jobPersistenceService.updateJobStatus(jobId, jobStatus, e.getMessage());
+            //
+            // Need to check if the job exists in the JobStateService
+            // because this error can happen before the job is initiated.
+            //
+            if (jobStateService.jobExists(jobId)) {
+                jobStateService.done(jobId);
+                jobPersistenceService.updateJobStatus(jobId, jobStatus, e.getMessage());
+            }
             throw new GenieServerException(e);
         } finally {
             this.coordinationTimer.record(System.nanoTime() - coordinationStart, TimeUnit.MILLISECONDS);
