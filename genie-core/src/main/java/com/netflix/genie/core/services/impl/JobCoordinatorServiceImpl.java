@@ -241,14 +241,23 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                 }
             }
         } catch (GenieConflictException e) {
+            // Job has not been initiated so we don't have to call JobStateService.done()
             throw e;
         } catch (GenieException e) {
+            //
+            // Need to check if the job exists in the JobStateService
+            // because this error can happen before the job is initiated.
+            //
             if (jobStateService.jobExists(jobId)) {
                 jobStateService.done(jobId);
                 jobPersistenceService.updateJobStatus(jobId, jobStatus, e.getMessage());
             }
             throw e;
         } catch (Exception e) {
+            //
+            // Need to check if the job exists in the JobStateService
+            // because this error can happen before the job is initiated.
+            //
             if (jobStateService.jobExists(jobId)) {
                 jobStateService.done(jobId);
                 jobPersistenceService.updateJobStatus(jobId, jobStatus, e.getMessage());
