@@ -26,6 +26,7 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
@@ -240,6 +241,9 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                     );
                 }
             }
+        } catch (GenieConflictException e) {
+            jobStateService.done(jobId);
+            throw e;
         } catch (GenieException e) {
             jobStateService.done(jobId);
             jobPersistenceService.updateJobStatus(jobId, jobStatus, e.getMessage());
