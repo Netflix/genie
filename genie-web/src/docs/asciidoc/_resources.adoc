@@ -1,0 +1,25 @@
+== Resources
+
+=== Application
+
+include::{snippets}/application-rest-controller-integration-tests/can-create-application-without-id/2/response-fields.adoc[]
+
+=== Cluster
+
+include::{snippets}/cluster-rest-controller-integration-tests/can-create-cluster-without-id/2/response-fields.adoc[]
+
+=== Command
+
+include::{snippets}/command-rest-controller-integration-tests/can-create-command-without-id/2/response-fields.adoc[]
+
+=== Job Request
+
+include::{snippets}/job-rest-controller-integration-tests/1/getJobRequest/response-fields.adoc[]
+
+=== Job
+
+include::{snippets}/job-rest-controller-integration-tests/1/getJob/response-fields.adoc[]
+
+=== Job Execution
+
+include::{snippets}/job-rest-controller-integration-tests/1/getJobExecution/response-fields.adoc[]

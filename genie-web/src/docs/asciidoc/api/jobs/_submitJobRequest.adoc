@@ -1,0 +1,53 @@
+=== Submit a Job
+
+==== Description
+
+The main API in Genie. Submitting a job to be run.
+
+There are two different ways to submit a job to Genie. Both go to the same endpoint but you can simply send a JSON
+payload if you have no attachments. This means setting your content type to `application/json`. If you do have
+attachments you want to send with your job request you need to set the content type to `multipart/form-data` and
+post the request that way. Examples are below.
+
+==== Endpoint
+
+`POST /api/v3/jobs`
+
+IMPORTANT: The id in this example is optional. If you include one Genie will use it. If not it will provide one. If you
+provide one it must be unique.
+
+NOTE: This Example is without attachments
+
+:snippet-base: {snippets}/job-rest-controller-integration-tests/1/submitJobWithoutAttachments
+:id-base: submit-job-without-attachments
+:request-headers: {snippet-base}/request-headers.adoc
+:!request-path-params:
+:!request-query-params:
+:request-fields: {snippet-base}/request-fields.adoc
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:response-headers: {snippet-base}/response-headers.adoc
+:!response-fields:
+:!response-links:
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]
+
+NOTE: This example is with attachments
+
+:snippet-base: {snippets}/job-rest-controller-integration-tests/4/submitJobWithAttachments
+:id-base: submit-job-with-attachments
+:request-headers: {snippet-base}/request-headers.adoc
+:!request-path-params:
+:!request-query-params:
+:request-fields: {snippet-base}/request-parts.adoc
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:response-headers: {snippet-base}/response-headers.adoc
+:!response-fields:
+:!response-links:
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]

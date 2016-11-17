@@ -1,0 +1,27 @@
+=== Remove All Tags From Cluster
+
+==== Description
+
+Remove all the tags for an existing cluster
+
+IMPORTANT: The `genie.id:{id}` and `genie.name:{name}` tags will **NOT** be removed by this operation
+
+==== Endpoint
+
+`DELETE /api/v3/clusters/{id}/tags`
+
+:snippet-base: {snippets}/cluster-rest-controller-integration-tests/can-delete-tags-for-cluster/3
+:id-base: remove-all-tags-from-cluster
+:!request-headers:
+:request-path-params: {snippet-base}/path-parameters.adoc
+:!request-query-params:
+:!request-fields:
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:!response-headers:
+:!response-fields:
+:!response-links:
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]

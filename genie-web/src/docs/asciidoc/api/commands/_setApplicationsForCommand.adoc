@@ -1,0 +1,27 @@
+=== Set Applications for a Command
+
+==== Description
+
+Set the applications (as array of their ID's) that are dependencies of the command.
+
+WARNING: The applications with the ID's must already exist in the system
+
+==== Endpoint
+
+`PUT /api/v3/commands/{id}/applications`
+
+:snippet-base: {snippets}/command-rest-controller-integration-tests/can-set-applications-for-a-command/6
+:id-base: set-applications-for-command
+:request-headers: {snippet-base}/request-headers.adoc
+:request-path-params: {snippet-base}/path-parameters.adoc
+:!request-query-params:
+:request-fields: {snippet-base}/request-fields.adoc
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:!response-headers:
+:!response-fields:
+:!response-links:
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]

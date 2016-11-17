@@ -1,0 +1,25 @@
+=== Update Configs for a Command
+
+==== Description
+
+Update the configuration file locations for an existing command. Stored as a set so duplicates are ignored.
+
+==== Endpoint
+
+`PUT /api/v3/commands/{id}/configs`
+
+:snippet-base: {snippets}/command-rest-controller-integration-tests/can-update-configs-for-command/3
+:id-base: update-configs-for-command
+:request-headers: {snippet-base}/request-headers.adoc
+:request-path-params: {snippet-base}/path-parameters.adoc
+:!request-query-params:
+:request-fields: {snippet-base}/request-fields.adoc
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:!response-headers:
+:!response-fields:
+:!response-links:
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]

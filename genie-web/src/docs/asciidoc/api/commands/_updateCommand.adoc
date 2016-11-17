@@ -1,0 +1,28 @@
+=== Update an Entire Command
+
+==== Description
+
+Update the metadata about a command. This method does a complete replace of the resource. Usual flow is to
+call to get the most recent state then update what you want and call this API with the result.
+
+NOTE: For more fine grained control call the PATCH API.
+
+==== Endpoint
+
+`PUT /api/v3/commands/{id}`
+
+:snippet-base: {snippets}/command-rest-controller-integration-tests/can-update-command/3
+:id-base: update-command
+:request-headers: {snippet-base}/request-headers.adoc
+:request-path-params: {snippet-base}/path-parameters.adoc
+:!request-query-params:
+:request-fields: {snippet-base}/request-fields.adoc
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:!response-headers:
+:!response-fields:
+:!response-links:
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]

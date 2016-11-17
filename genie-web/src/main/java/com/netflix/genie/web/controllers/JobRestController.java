@@ -540,14 +540,12 @@ public class JobRestController {
                     //Need to forward job
                     restTemplate.execute(forwardUrl, HttpMethod.DELETE,
                         forwardRequest -> copyRequestHeaders(request, forwardRequest),
-                        new ResponseExtractor<Void>() {
-                            @Override
-                            public Void extractData(final ClientHttpResponse forwardResponse) throws IOException {
-                                response.setStatus(HttpStatus.ACCEPTED.value());
-                                copyResponseHeaders(response, forwardResponse);
-                                return null;
-                            }
-                        });
+                        (final ClientHttpResponse forwardResponse) -> {
+                            response.setStatus(HttpStatus.ACCEPTED.value());
+                            copyResponseHeaders(response, forwardResponse);
+                            return null;
+                        }
+                    );
                 } catch (HttpStatusCodeException e) {
                     log.error("Failed killing job on {}. Error: {}", forwardUrl, e.getMessage());
                     response.sendError(e.getStatusCode().value(), e.getStatusText());

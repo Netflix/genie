@@ -34,8 +34,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.restdocs.operation.preprocess.Preprocessors;
+import org.springframework.restdocs.payload.PayloadDocumentation;
+import org.springframework.restdocs.request.RequestDocumentation;
+import org.springframework.restdocs.snippet.Attributes;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
@@ -91,8 +95,9 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             "{class-name}/{method-name}/{step}/",
             Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
             Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
-            Snippets.APPLICATION_REQUEST_PAYLOAD,
-            Snippets.LOCATION_HEADER
+            Snippets.CONTENT_TYPE_HEADER, // Request headers
+            Snippets.getApplicationRequestPayload(), // Request fields
+            Snippets.LOCATION_HEADER // Response headers
         );
 
         final String id = this.createConfigResource(
@@ -112,13 +117,14 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             "{class-name}/{method-name}/{step}/",
             Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
             Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
-            Snippets.APPLICATION_RESPONSE_PAYLOAD,
-            Snippets.APPLICATION_LINKS,
-            Snippets.HAL_CONTENT_TYPE_HEADER
+            Snippets.ID_PATH_PARAM, // path parameters
+            Snippets.HAL_CONTENT_TYPE_HEADER, // response headers
+            Snippets.getApplicationResponsePayload(), // response payload
+            Snippets.APPLICATION_LINKS // response links
         );
 
         this.mvc
-            .perform(MockMvcRequestBuilders.get(APPLICATIONS_API + "/" + id))
+            .perform(RestDocumentationRequestBuilders.get(APPLICATIONS_API + "/{id}", id))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath(ID_PATH, Matchers.is(id)))
@@ -332,10 +338,10 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             "{class-name}/{method-name}/{step}/",
             Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
             Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
-            Snippets.SEARCH_LINKS,
-            Snippets.APPLICATION_SEARCH_QUERY_PARAMETERS,
-            Snippets.APPLICATION_SEARCH_RESULT_FIELDS,
-            Snippets.HAL_CONTENT_TYPE_HEADER
+            Snippets.APPLICATION_SEARCH_QUERY_PARAMETERS, // Request query parameters
+            Snippets.HAL_CONTENT_TYPE_HEADER, // Response headers
+            Snippets.APPLICATION_SEARCH_RESULT_FIELDS, // Result fields
+            Snippets.SEARCH_LINKS // HAL Links
         );
 
         // Test finding all applications
@@ -429,11 +435,11 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE).withId(ID).build(),
             null
         );
-        final String applicationResource = APPLICATIONS_API + "/" + id;
-        final Application createdApp = objectMapper
+        final String applicationResource = APPLICATIONS_API + "/{id}";
+        final Application createdApp = this.objectMapper
             .readValue(
                 this.mvc.perform(
-                    MockMvcRequestBuilders.get(applicationResource)
+                    MockMvcRequestBuilders.get(applicationResource, id)
                 )
                     .andReturn()
                     .getResponse()
@@ -458,15 +464,26 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
         createdApp.getDescription().ifPresent(newStatusApp::withDescription);
         createdApp.getSetupFile().ifPresent(newStatusApp::withSetupFile);
 
+        final RestDocumentationResultHandler updateResultHandler = MockMvcRestDocumentation.document(
+            "{class-name}/{method-name}/{step}/",
+            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            Snippets.CONTENT_TYPE_HEADER, // request header
+            Snippets.ID_PATH_PARAM, // path parameters
+            Snippets.getApplicationRequestPayload() // payload fields
+        );
+
         this.mvc.perform(
-            MockMvcRequestBuilders
-                .put(applicationResource)
+            RestDocumentationRequestBuilders
+                .put(applicationResource, id)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(newStatusApp.build()))
-        ).andExpect(MockMvcResultMatchers.status().isNoContent());
+                .content(this.objectMapper.writeValueAsBytes(newStatusApp.build()))
+        )
+            .andExpect(MockMvcResultMatchers.status().isNoContent())
+            .andDo(updateResultHandler);
 
         this.mvc
-            .perform(MockMvcRequestBuilders.get(applicationResource))
+            .perform(MockMvcRequestBuilders.get(applicationResource, id))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(ApplicationStatus.INACTIVE.toString())));
@@ -485,26 +502,37 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE).withId(ID).build(),
             null
         );
-        final String applicationResource = APPLICATIONS_API + "/" + id;
+        final String applicationResource = APPLICATIONS_API + "/{id}";
         this.mvc
-            .perform(MockMvcRequestBuilders.get(applicationResource))
+            .perform(MockMvcRequestBuilders.get(applicationResource, id))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.jsonPath(USER_PATH, Matchers.is(USER)));
 
 
         final String newUser = UUID.randomUUID().toString();
         final String patchString = "[{ \"op\": \"replace\", \"path\": \"/user\", \"value\": \"" + newUser + "\" }]";
-        final JsonPatch patch = JsonPatch.fromJson(objectMapper.readTree(patchString));
+        final JsonPatch patch = JsonPatch.fromJson(this.objectMapper.readTree(patchString));
+
+        final RestDocumentationResultHandler patchResultHandler = MockMvcRestDocumentation.document(
+            "{class-name}/{method-name}/{step}/",
+            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            Snippets.CONTENT_TYPE_HEADER, // request headers
+            Snippets.ID_PATH_PARAM, // path params
+            Snippets.PATCH_FIELDS // request payload
+        );
 
         this.mvc.perform(
-            MockMvcRequestBuilders
-                .patch(applicationResource)
+            RestDocumentationRequestBuilders
+                .patch(applicationResource, id)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(patch))
-        ).andExpect(MockMvcResultMatchers.status().isNoContent());
+                .content(this.objectMapper.writeValueAsBytes(patch))
+        )
+            .andExpect(MockMvcResultMatchers.status().isNoContent())
+            .andDo(patchResultHandler);
 
         this.mvc
-            .perform(MockMvcRequestBuilders.get(applicationResource))
+            .perform(MockMvcRequestBuilders.get(applicationResource, id))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath(USER_PATH, Matchers.is(newUser)));
@@ -533,9 +561,16 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
         );
         Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(3L));
 
+        final RestDocumentationResultHandler deleteResultHandler = MockMvcRestDocumentation.document(
+            "{class-name}/{method-name}/{step}/",
+            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+            Preprocessors.preprocessResponse(Preprocessors.prettyPrint())
+        );
+
         this.mvc
             .perform(MockMvcRequestBuilders.delete(APPLICATIONS_API))
-            .andExpect(MockMvcResultMatchers.status().isNoContent());
+            .andExpect(MockMvcResultMatchers.status().isNoContent())
+            .andDo(deleteResultHandler);
 
         Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
     }
@@ -585,12 +620,20 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
         );
         Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(3L));
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.delete(APPLICATIONS_API + "/" + id2))
-            .andExpect(MockMvcResultMatchers.status().isNoContent());
+        final RestDocumentationResultHandler deleteResultHandler = MockMvcRestDocumentation.document(
+            "{class-name}/{method-name}/{step}/",
+            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            Snippets.ID_PATH_PARAM // path parameters
+        );
 
         this.mvc
-            .perform(MockMvcRequestBuilders.get(COMMANDS_API + "/" + id2))
+            .perform(RestDocumentationRequestBuilders.delete(APPLICATIONS_API + "/{id}", id2))
+            .andExpect(MockMvcResultMatchers.status().isNoContent())
+            .andDo(deleteResultHandler);
+
+        this.mvc
+            .perform(MockMvcRequestBuilders.get(APPLICATIONS_API + "/{id}", id2))
             .andExpect(MockMvcResultMatchers.status().isNotFound());
 
         Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(2L));
@@ -608,7 +651,24 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE).withId(ID).build(),
             null
         );
-        this.canAddElementsToResource(APPLICATIONS_API + "/" + ID + "/configs");
+
+        final RestDocumentationResultHandler addResultHandler = MockMvcRestDocumentation.document(
+            "{class-name}/{method-name}/{step}/",
+            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            Snippets.CONTENT_TYPE_HEADER, // request headers
+            Snippets.ID_PATH_PARAM, // path parameters
+            PayloadDocumentation.requestFields(Snippets.CONFIG_FIELDS) // request payload fields
+        );
+        final RestDocumentationResultHandler getResultHandler = MockMvcRestDocumentation.document(
+            "{class-name}/{method-name}/{step}/",
+            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            Snippets.ID_PATH_PARAM, // path parameters
+            Snippets.JSON_CONTENT_TYPE_HEADER, // response headers
+            PayloadDocumentation.responseFields(Snippets.CONFIG_FIELDS) // response fields
+        );
+        this.canAddElementsToResource(APPLICATIONS_API + "/{id}/configs", ID, addResultHandler, getResultHandler);
     }
 
     /**
@@ -623,7 +683,16 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE).withId(ID).build(),
             null
         );
-        this.canUpdateElementsForResource(APPLICATIONS_API + "/" + ID + "/configs");
+
+        final RestDocumentationResultHandler updateResultHandler = MockMvcRestDocumentation.document(
+            "{class-name}/{method-name}/{step}/",
+            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            Snippets.CONTENT_TYPE_HEADER, // Request header
+            Snippets.ID_PATH_PARAM, // Path parameters
+            PayloadDocumentation.requestFields(Snippets.CONFIG_FIELDS) // Request fields
+        );
+        this.canUpdateElementsForResource(APPLICATIONS_API + "/{id}/configs", ID, updateResultHandler);
     }
 
     /**
@@ -638,7 +707,14 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE).withId(ID).build(),
             null
         );
-        this.canDeleteElementsFromResource(APPLICATIONS_API + "/" + ID + "/configs");
+
+        final RestDocumentationResultHandler deleteResultHandler = MockMvcRestDocumentation.document(
+            "{class-name}/{method-name}/{step}/",
+            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            Snippets.ID_PATH_PARAM // Path parameters
+        );
+        this.canDeleteElementsFromResource(APPLICATIONS_API + "/{id}/configs", ID, deleteResultHandler);
     }
 
     /**
@@ -653,7 +729,29 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE).withId(ID).build(),
             null
         );
-        this.canAddElementsToResource(APPLICATIONS_API + "/" + ID + "/dependencies");
+
+        final RestDocumentationResultHandler addResultHandler = MockMvcRestDocumentation.document(
+            "{class-name}/{method-name}/{step}/",
+            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            Snippets.ID_PATH_PARAM, // path params
+            Snippets.CONTENT_TYPE_HEADER, // request header
+            PayloadDocumentation.requestFields(Snippets.DEPENDENCIES_FIELDS) // response fields
+        );
+        final RestDocumentationResultHandler getResultHandler = MockMvcRestDocumentation.document(
+            "{class-name}/{method-name}/{step}/",
+            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            Snippets.ID_PATH_PARAM, // path params
+            Snippets.JSON_CONTENT_TYPE_HEADER, // response headers
+            PayloadDocumentation.responseFields(Snippets.DEPENDENCIES_FIELDS) // response fields
+        );
+        this.canAddElementsToResource(
+            APPLICATIONS_API + "/{id}/dependencies",
+            ID,
+            addResultHandler,
+            getResultHandler
+        );
     }
 
     /**
@@ -668,7 +766,20 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE).withId(ID).build(),
             null
         );
-        this.canUpdateElementsForResource(APPLICATIONS_API + "/" + ID + "/dependencies");
+
+        final RestDocumentationResultHandler updateResultHandler = MockMvcRestDocumentation.document(
+            "{class-name}/{method-name}/{step}/",
+            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            Snippets.CONTENT_TYPE_HEADER, // Request header
+            Snippets.ID_PATH_PARAM, // Path parameters
+            PayloadDocumentation.requestFields(Snippets.DEPENDENCIES_FIELDS) // Request fields
+        );
+        this.canUpdateElementsForResource(
+            APPLICATIONS_API + "/{id}/dependencies",
+            ID,
+            updateResultHandler
+        );
     }
 
     /**
@@ -683,7 +794,18 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE).withId(ID).build(),
             null
         );
-        this.canDeleteElementsFromResource(APPLICATIONS_API + "/" + ID + "/dependencies");
+
+        final RestDocumentationResultHandler deleteResultHandler = MockMvcRestDocumentation.document(
+            "{class-name}/{method-name}/{step}/",
+            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            Snippets.ID_PATH_PARAM // Path variables
+        );
+        this.canDeleteElementsFromResource(
+            APPLICATIONS_API + "/{id}/dependencies",
+            ID,
+            deleteResultHandler
+        );
     }
 
     /**
@@ -698,8 +820,25 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE).withId(ID).build(),
             null
         );
-        final String api = APPLICATIONS_API + "/" + ID + "/tags";
-        this.canAddTagsToResource(api, ID, NAME);
+        final String api = APPLICATIONS_API + "/{id}/tags";
+
+        final RestDocumentationResultHandler addResultHandler = MockMvcRestDocumentation.document(
+            "{class-name}/{method-name}/{step}/",
+            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            Snippets.ID_PATH_PARAM, // path params
+            Snippets.CONTENT_TYPE_HEADER, // request header
+            PayloadDocumentation.requestFields(Snippets.TAGS_FIELDS) // response fields
+        );
+        final RestDocumentationResultHandler getResultHandler = MockMvcRestDocumentation.document(
+            "{class-name}/{method-name}/{step}/",
+            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            Snippets.ID_PATH_PARAM, // path parameters
+            Snippets.JSON_CONTENT_TYPE_HEADER, // response headers
+            PayloadDocumentation.responseFields(Snippets.TAGS_FIELDS) // response fields
+        );
+        this.canAddTagsToResource(api, ID, NAME, addResultHandler, getResultHandler);
     }
 
     /**
@@ -714,8 +853,17 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE).withId(ID).build(),
             null
         );
-        final String api = APPLICATIONS_API + "/" + ID + "/tags";
-        this.canUpdateTagsForResource(api, ID, NAME);
+        final String api = APPLICATIONS_API + "/{id}/tags";
+
+        final RestDocumentationResultHandler updateResultHandler = MockMvcRestDocumentation.document(
+            "{class-name}/{method-name}/{step}/",
+            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            Snippets.CONTENT_TYPE_HEADER, // Request header
+            Snippets.ID_PATH_PARAM, // Path parameters
+            PayloadDocumentation.requestFields(Snippets.TAGS_FIELDS) // Request fields
+        );
+        this.canUpdateTagsForResource(api, ID, NAME, updateResultHandler);
     }
 
     /**
@@ -730,8 +878,15 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE).withId(ID).build(),
             null
         );
-        final String api = APPLICATIONS_API + "/" + ID + "/tags";
-        this.canDeleteTagsForResource(api, ID, NAME);
+        final String api = APPLICATIONS_API + "/{id}/tags";
+
+        final RestDocumentationResultHandler deleteResultHandler = MockMvcRestDocumentation.document(
+            "{class-name}/{method-name}/{step}/",
+            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            Snippets.ID_PATH_PARAM
+        );
+        this.canDeleteTagsForResource(api, ID, NAME, deleteResultHandler);
     }
 
     /**
@@ -746,8 +901,17 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE).withId(ID).build(),
             null
         );
-        final String api = APPLICATIONS_API + "/" + ID + "/tags";
-        this.canDeleteTagForResource(api, ID, NAME);
+        final String api = APPLICATIONS_API + "/{id}/tags";
+
+        final RestDocumentationResultHandler deleteResultHandler = MockMvcRestDocumentation.document(
+            "{class-name}/{method-name}/{step}/",
+            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            Snippets.ID_PATH_PARAM.and(
+                RequestDocumentation.parameterWithName("tag").description("The tag to remove")
+            )
+        );
+        this.canDeleteTagForResource(api, ID, NAME, deleteResultHandler);
     }
 
     /**
@@ -793,7 +957,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
                 MockMvcRequestBuilders
                     .post(COMMANDS_API + "/" + command1Id + "/applications")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsBytes(appIds))
+                    .content(this.objectMapper.writeValueAsBytes(appIds))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
         this.mvc
@@ -801,16 +965,16 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
                 MockMvcRequestBuilders
                     .post(COMMANDS_API + "/" + command3Id + "/applications")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsBytes(appIds))
+                    .content(this.objectMapper.writeValueAsBytes(appIds))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
-        final String applicationCommandsAPI = APPLICATIONS_API + "/" + ID + "/commands";
+        final String applicationCommandsAPI = APPLICATIONS_API + "/{id}/commands";
 
         Arrays.asList(
-            objectMapper.readValue(
+            this.objectMapper.readValue(
                 this.mvc
-                    .perform(MockMvcRequestBuilders.get(applicationCommandsAPI))
+                    .perform(MockMvcRequestBuilders.get(applicationCommandsAPI, ID))
                     .andExpect(MockMvcResultMatchers.status().isOk())
                     .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
                     .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
@@ -829,13 +993,38 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
         );
 
         // Filter by status
+        final RestDocumentationResultHandler getResultHandler = MockMvcRestDocumentation.document(
+            "{class-name}/{method-name}/{step}/",
+            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            Snippets.ID_PATH_PARAM, // Path parameters
+            RequestDocumentation.requestParameters(
+                RequestDocumentation
+                    .parameterWithName("status")
+                    .description("The status of commands to search for")
+                    .attributes(
+                        Attributes.key(Snippets.CONSTRAINTS).value(CommandStatus.values())
+                    )
+                    .optional()
+            ), // Query Parameters
+            Snippets.HAL_CONTENT_TYPE_HEADER, // Response Headers
+            PayloadDocumentation.responseFields(
+                PayloadDocumentation
+                    .fieldWithPath("[]")
+                    .description("The list of commands found")
+                    .attributes(Snippets.EMPTY_CONSTRAINTS)
+            )
+        );
         this.mvc
             .perform(
-                MockMvcRequestBuilders.get(applicationCommandsAPI).param("status", CommandStatus.DEPRECATED.toString())
+                RestDocumentationRequestBuilders
+                    .get(applicationCommandsAPI, ID)
+                    .param("status", CommandStatus.ACTIVE.toString(), CommandStatus.INACTIVE.toString())
             )
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(1)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(command3Id)));
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(command1Id)))
+            .andDo(getResultHandler);
     }
 }

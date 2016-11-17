@@ -1,0 +1,25 @@
+=== Get the Applications a Job Command Used
+
+==== Description
+
+Get the list of applications that were used by the command selected by job to execute.
+
+==== Endpoint
+
+`GET /api/v3/jobs/{id}/applications`
+
+:snippet-base: {snippets}/job-rest-controller-integration-tests/1/getJobApplications
+:id-base: get-job-command
+:!request-headers:
+:request-path-params: {snippet-base}/path-parameters.adoc
+:!request-query-params:
+:!request-fields:
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:response-headers: {snippet-base}/response-headers.adoc
+:response-fields: {snippet-base}/response-fields.adoc
+:!response-links:
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]

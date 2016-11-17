@@ -1,0 +1,25 @@
+=== Find Applications
+
+==== Description
+
+Find applications using various query parameters.
+
+==== Endpoint
+
+`GET /api/v3/applications`
+
+:snippet-base: {snippets}/application-rest-controller-integration-tests/can-find-applications/12
+:id-base: find-applications
+:!request-headers:
+:!request-path-params:
+:request-query-params: {snippet-base}/request-parameters.adoc
+:!request-fields:
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:response-headers: {snippet-base}/response-headers.adoc
+:response-fields: {snippet-base}/response-fields.adoc
+:response-links: {snippet-base}/links.adoc
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]

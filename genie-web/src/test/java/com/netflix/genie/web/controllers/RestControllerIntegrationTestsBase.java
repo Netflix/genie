@@ -40,6 +40,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.JUnitRestDocumentation;
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -124,9 +125,14 @@ public abstract class RestControllerIntegrationTestsBase {
             .build();
     }
 
-    void canAddElementsToResource(final String api) throws Exception {
+    void canAddElementsToResource(
+        final String api,
+        final String id,
+        final RestDocumentationResultHandler addHandler,
+        final RestDocumentationResultHandler getHandler
+    ) throws Exception {
         this.mvc
-            .perform(MockMvcRequestBuilders.get(api))
+            .perform(MockMvcRequestBuilders.get(api, id))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.empty()));
@@ -134,80 +140,100 @@ public abstract class RestControllerIntegrationTestsBase {
         final String element1 = UUID.randomUUID().toString();
         final String element2 = UUID.randomUUID().toString();
         final Set<String> elements = Sets.newHashSet(element1, element2);
-        this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .post(api)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsBytes(elements))
-            )
-            .andExpect(MockMvcResultMatchers.status().isNoContent());
 
         this.mvc
-            .perform(MockMvcRequestBuilders.get(api))
+            .perform(
+                RestDocumentationRequestBuilders
+                    .post(api, id)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(this.objectMapper.writeValueAsBytes(elements))
+            )
+            .andExpect(MockMvcResultMatchers.status().isNoContent())
+            .andDo(addHandler);
+
+        this.mvc
+            .perform(RestDocumentationRequestBuilders.get(api, id))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem(element1)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem(element2)));
+            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem(element2)))
+            .andDo(getHandler);
     }
 
-    void canUpdateElementsForResource(final String api) throws Exception {
+    void canUpdateElementsForResource(
+        final String api,
+        final String id,
+        final RestDocumentationResultHandler resultHandler
+    ) throws Exception {
         final String element1 = UUID.randomUUID().toString();
         final String element2 = UUID.randomUUID().toString();
         final Set<String> elements = Sets.newHashSet(element1, element2);
         this.mvc
             .perform(
                 MockMvcRequestBuilders
-                    .post(api)
+                    .post(api, id)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsBytes(elements))
+                    .content(this.objectMapper.writeValueAsBytes(elements))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
         final String element3 = UUID.randomUUID().toString();
         this.mvc
             .perform(
-                MockMvcRequestBuilders
-                    .put(api)
+                RestDocumentationRequestBuilders
+                    .put(api, id)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsBytes(Sets.newHashSet(element3)))
-            ).andExpect(MockMvcResultMatchers.status().isNoContent());
+                    .content(this.objectMapper.writeValueAsBytes(Sets.newHashSet(element3)))
+            )
+            .andExpect(MockMvcResultMatchers.status().isNoContent())
+            .andDo(resultHandler);
 
         this.mvc
-            .perform(MockMvcRequestBuilders.get(api))
+            .perform(MockMvcRequestBuilders.get(api, id))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(1)))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem(element3)));
     }
 
-    void canDeleteElementsFromResource(final String api) throws Exception {
+    void canDeleteElementsFromResource(
+        final String api,
+        final String id,
+        final RestDocumentationResultHandler resultHandler
+    ) throws Exception {
         final String element1 = UUID.randomUUID().toString();
         final String element2 = UUID.randomUUID().toString();
         this.mvc
             .perform(
                 MockMvcRequestBuilders
-                    .post(api)
+                    .post(api, id)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsBytes(Sets.newHashSet(element1, element2)))
+                    .content(this.objectMapper.writeValueAsBytes(Sets.newHashSet(element1, element2)))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
         this.mvc
-            .perform(MockMvcRequestBuilders.delete(api))
-            .andExpect(MockMvcResultMatchers.status().isNoContent());
+            .perform(RestDocumentationRequestBuilders.delete(api, id))
+            .andExpect(MockMvcResultMatchers.status().isNoContent())
+            .andDo(resultHandler);
 
         this.mvc
-            .perform(MockMvcRequestBuilders.get(api))
+            .perform(MockMvcRequestBuilders.get(api, id))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.empty()));
     }
 
-    void canAddTagsToResource(final String api, final String id, final String name) throws Exception {
+    void canAddTagsToResource(
+        final String api,
+        final String id,
+        final String name,
+        final RestDocumentationResultHandler addHandler,
+        final RestDocumentationResultHandler getHandler
+    ) throws Exception {
         this.mvc
-            .perform(MockMvcRequestBuilders.get(api))
+            .perform(MockMvcRequestBuilders.get(api, id))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
@@ -219,48 +245,57 @@ public abstract class RestControllerIntegrationTestsBase {
         final Set<String> configs = Sets.newHashSet(tag1, tag2);
         this.mvc
             .perform(
-                MockMvcRequestBuilders
-                    .post(api)
+                RestDocumentationRequestBuilders
+                    .post(api, id)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsBytes(configs))
+                    .content(this.objectMapper.writeValueAsBytes(configs))
             )
-            .andExpect(MockMvcResultMatchers.status().isNoContent());
+            .andExpect(MockMvcResultMatchers.status().isNoContent())
+            .andDo(addHandler);
 
         this.mvc
-            .perform(MockMvcRequestBuilders.get(api))
+            .perform(RestDocumentationRequestBuilders.get(api, id))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(4)))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem("genie.id:" + id)))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem("genie.name:" + name)))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem(tag1)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem(tag2)));
+            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem(tag2)))
+            .andDo(getHandler);
     }
 
-    void canUpdateTagsForResource(final String api, final String id, final String name) throws Exception {
+    void canUpdateTagsForResource(
+        final String api,
+        final String id,
+        final String name,
+        final RestDocumentationResultHandler resultHandler
+    ) throws Exception {
         final String tag1 = UUID.randomUUID().toString();
         final String tag2 = UUID.randomUUID().toString();
         final Set<String> tags = Sets.newHashSet(tag1, tag2);
         this.mvc
             .perform(
                 MockMvcRequestBuilders
-                    .post(api)
+                    .post(api, id)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsBytes(tags))
+                    .content(this.objectMapper.writeValueAsBytes(tags))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
         final String tag3 = UUID.randomUUID().toString();
         this.mvc
             .perform(
-                MockMvcRequestBuilders
-                    .put(api)
+                RestDocumentationRequestBuilders
+                    .put(api, id)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsBytes(Sets.newHashSet(tag3)))
-            ).andExpect(MockMvcResultMatchers.status().isNoContent());
+                    .content(this.objectMapper.writeValueAsBytes(Sets.newHashSet(tag3)))
+            )
+            .andExpect(MockMvcResultMatchers.status().isNoContent())
+            .andDo(resultHandler);
 
         this.mvc
-            .perform(MockMvcRequestBuilders.get(api))
+            .perform(MockMvcRequestBuilders.get(api, id))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(3)))
@@ -269,24 +304,30 @@ public abstract class RestControllerIntegrationTestsBase {
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem(tag3)));
     }
 
-    void canDeleteTagsForResource(final String api, final String id, final String name) throws Exception {
+    void canDeleteTagsForResource(
+        final String api,
+        final String id,
+        final String name,
+        final RestDocumentationResultHandler resultHandler
+    ) throws Exception {
         final String tag1 = UUID.randomUUID().toString();
         final String tag2 = UUID.randomUUID().toString();
         this.mvc
             .perform(
                 MockMvcRequestBuilders
-                    .post(api)
+                    .post(api, id)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsBytes(Sets.newHashSet(tag1, tag2)))
+                    .content(this.objectMapper.writeValueAsBytes(Sets.newHashSet(tag1, tag2)))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
         this.mvc
-            .perform(MockMvcRequestBuilders.delete(api))
-            .andExpect(MockMvcResultMatchers.status().isNoContent());
+            .perform(RestDocumentationRequestBuilders.delete(api, id))
+            .andExpect(MockMvcResultMatchers.status().isNoContent())
+            .andDo(resultHandler);
 
         this.mvc
-            .perform(MockMvcRequestBuilders.get(api))
+            .perform(MockMvcRequestBuilders.get(api, id))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
@@ -294,24 +335,30 @@ public abstract class RestControllerIntegrationTestsBase {
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem("genie.name:" + name)));
     }
 
-    void canDeleteTagForResource(final String api, final String id, final String name) throws Exception {
+    void canDeleteTagForResource(
+        final String api,
+        final String id,
+        final String name,
+        final RestDocumentationResultHandler resultHandler
+    ) throws Exception {
         final String tag1 = UUID.randomUUID().toString();
         final String tag2 = UUID.randomUUID().toString();
         this.mvc
             .perform(
                 MockMvcRequestBuilders
-                    .post(api)
+                    .post(api, id)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsBytes(Sets.newHashSet(tag1, tag2)))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
         this.mvc
-            .perform(MockMvcRequestBuilders.delete(api + "/" + tag1))
-            .andExpect(MockMvcResultMatchers.status().isNoContent());
+            .perform(RestDocumentationRequestBuilders.delete(api + "/{tag}", id, tag1))
+            .andExpect(MockMvcResultMatchers.status().isNoContent())
+            .andDo(resultHandler);
 
         this.mvc
-            .perform(MockMvcRequestBuilders.get(api))
+            .perform(MockMvcRequestBuilders.get(api, id))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(3)))

@@ -1,0 +1,70 @@
+=== Get Contents From the Job Working Directory
+
+==== Description
+
+This API acts as a file browser for the remote working directory of your job. You can request endpoints and if it is a
+directory you will be shown the contents of the directory and be able to navigate. If the endpoint points to a file
+it will return the file.
+
+==== Endpoint
+
+`GET /api/v3/jobs/{id}/output/{path}**`
+
+==== Getting a directory as JSON
+
+NOTE: This is the default behavior for directories if no `Accept` header is present
+
+:snippet-base: {snippets}/job-rest-controller-integration-tests/1/getJobOutput/json
+:id-base: get-job-output-json
+:request-headers: {snippet-base}/request-headers.adoc
+:request-path-params: {snippet-base}/path-parameters.adoc
+:!request-query-params:
+:!request-fields:
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:response-headers: {snippet-base}/response-headers.adoc
+:response-fields: {snippet-base}/response-fields.adoc
+:!response-links:
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]
+
+==== Getting a directory as HTML
+
+NOTE: This would happen automatically if you called from browser due to browser default
+accept header
+
+:snippet-base: {snippets}/job-rest-controller-integration-tests/1/getJobOutput/html
+:id-base: get-job-output-html
+:request-headers: {snippet-base}/request-headers.adoc
+:request-path-params: {snippet-base}/path-parameters.adoc
+:!request-query-params:
+:!request-fields:
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:response-headers: {snippet-base}/response-headers.adoc
+:!response-fields:
+:!response-links:
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]
+
+==== Getting a file
+
+:snippet-base: {snippets}/job-rest-controller-integration-tests/1/getJobOutput/file
+:id-base: get-job-output-file
+:request-headers: {snippet-base}/request-headers.adoc
+:request-path-params: {snippet-base}/path-parameters.adoc
+:!request-query-params:
+:!request-fields:
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:response-headers: {snippet-base}/response-headers.adoc
+:!response-fields:
+:!response-links:
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]

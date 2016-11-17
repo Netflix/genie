@@ -1,0 +1,146 @@
+==== API
+
+[subs=attributes]
+++++
+<div class="apiAccordion">
+    <h3>Request Documentation</h3>
+    <div>
+        <div class="apiTabs">
+            <ul>
+                <li><a href="#{id-base}-request-headers">Headers</a></li>
+                <li><a href="#{id-base}-request-path-params">Path Params</a></li>
+                <li><a href="#{id-base}-request-query-params">Query Params</a></li>
+                <li><a href="#{id-base}-request-payload-fields">Payload Fields</a></li>
+            </ul>
+            <div id="{id-base}-request-headers">
+++++
+ifdef::request-headers[]
+include::{request-headers}[]
+endif::request-headers[]
+ifndef::request-headers[]
+None
+endif::request-headers[]
+[subs=attributes]
+++++
+            </div>
+            <div id="{id-base}-request-path-params">
+++++
+ifdef::request-path-params[]
+include::{request-path-params}[]
+endif::request-path-params[]
+ifndef::request-path-params[]
+None
+endif::request-path-params[]
+[subs=attributes]
+++++
+            </div>
+            <div id="{id-base}-request-query-params">
+++++
+ifdef::request-query-params[]
+include::{request-query-params}[]
+endif::request-query-params[]
+ifndef::request-query-params[]
+None
+endif::request-query-params[]
+[subs=attributes]
+++++
+            </div>
+            <div id="{id-base}-request-payload-fields">
+++++
+ifdef::request-fields[]
+include::{request-fields}[]
+endif::request-fields[]
+ifndef::request-fields[]
+None
+endif::request-fields[]
+[subs=attributes]
+++++
+            </div>
+        </div>
+    </div>
+    <h3>Request Examples</h3>
+    <div>
+        <div class="apiTabs">
+            <ul>
+                <li><a href="#{id-base}-curl">cURL</a></li>
+                <li><a href="#{id-base}-httpie">HTTPie</a></li>
+            </ul>
+            <div id="{id-base}-curl">
+++++
+include::{curl-request}[]
+[subs=attributes]
+++++
+            </div>
+            <div id="{id-base}-httpie">
+++++
+include::{httpie-request}[]
+[subs=attributes]
+++++
+            </div>
+        </div>
+    </div>
+    <h3>Response Documentation</h3>
+    <div>
+        <div class="apiTabs">
+            <ul>
+                <li><a href="#{id-base}-response-headers">Headers</a></li>
+                <li><a href="#{id-base}-response-fields">Payload Fields</a></li>
+                <li><a href="#{id-base}-response-links">Links</a></li>
+            </ul>
+            <div id="{id-base}-response-headers">
+++++
+ifdef::response-headers[]
+include::{response-headers}[]
+endif::response-headers[]
+ifndef::response-headers[]
+None
+endif::response-headers[]
+[subs=attributes]
+++++
+            </div>
+            <div id="{id-base}-response-fields">
+++++
+ifdef::response-fields[]
+include::{response-fields}[]
+endif::response-fields[]
+ifndef::response-fields[]
+None
+endif::response-fields[]
+[subs=attributes]
+++++
+            </div>
+            <div id="{id-base}-response-links">
+++++
+ifdef::response-links[]
+include::{response-links}[]
+endif::response-links[]
+ifndef::response-links[]
+None
+endif::response-links[]
+[subs=attributes]
+++++
+            </div>
+        </div>
+    </div>
+    <h3>HTTP Messages</h3>
+    <div>
+        <div class="apiTabs">
+            <ul>
+                <li><a href="#{id-base}-request">Request</a></li>
+                <li><a href="#{id-base}-response">Response</a></li>
+            </ul>
+            <div id="{id-base}-request">
+++++
+include::{http-request}[]
+[subs=attributes]
+++++
+            </div>
+            <div id="{id-base}-response">
+++++
+include::{http-response}[]
+++++
+            </div>
+        </div>
+    </div>
+</div>
+++++

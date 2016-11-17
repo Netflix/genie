@@ -1,0 +1,25 @@
+=== Get an Application
+
+==== Description
+
+Get the metadata about an application in the system.
+
+==== Endpoint
+
+`GET /api/v3/applications/{id}`
+
+:snippet-base: {snippets}/application-rest-controller-integration-tests/can-create-application-without-id/2
+:id-base: get-application
+:!request-headers:
+:request-path-params: {snippet-base}/path-parameters.adoc
+:!request-query-params:
+:!request-fields:
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:response-headers: {snippet-base}/response-headers.adoc
+:response-fields: {snippet-base}/response-fields.adoc
+:response-links: {snippet-base}/links.adoc
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]

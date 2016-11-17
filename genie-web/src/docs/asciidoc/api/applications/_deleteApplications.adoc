@@ -1,0 +1,25 @@
+=== Delete All Applications
+
+==== Description
+
+Delete all the applications currently stored in the system.
+
+==== Endpoint
+
+`DELETE /api/v3/applications`
+
+:snippet-base: {snippets}/application-rest-controller-integration-tests/can-delete-all-applications/4
+:id-base: delete-all-applications
+:!request-headers:
+:!request-path-params:
+:!request-query-params:
+:!request-fields:
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:!response-headers:
+:!response-fields:
+:!response-links:
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]

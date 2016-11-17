@@ -1,0 +1,25 @@
+=== Delete All Clusters
+
+==== Description
+
+Delete all the clusters currently stored in the system.
+
+==== Endpoint
+
+`DELETE /api/v3/clusters`
+
+:snippet-base: {snippets}/cluster-rest-controller-integration-tests/can-delete-all-clusters/4
+:id-base: delete-all-clusters
+:!request-headers:
+:!request-path-params:
+:!request-query-params:
+:!request-fields:
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:!response-headers:
+:!response-fields:
+:!response-links:
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]

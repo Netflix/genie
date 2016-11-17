@@ -1,0 +1,28 @@
+=== Get the Commands for a Cluster
+
+==== Description
+
+Get the commands currently linked to the cluster. This indicates the command is able to be run on that cluster.
+
+IMPORTANT: The order of the commands is important. This represents priority order if two commands with same tags match
+for the given cluster the one earlier in the list will be selected.
+
+==== Endpoint
+
+`GET /api/v3/clusters/{id}/commands`
+
+:snippet-base: {snippets}/cluster-rest-controller-integration-tests/can-add-commands-for-a-cluster/11
+:id-base: get-commands-for-cluster
+:!request-headers:
+:request-path-params: {snippet-base}/path-parameters.adoc
+:request-query-params: {snippet-base}/request-parameters.adoc
+:!request-fields:
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:response-headers: {snippet-base}/response-headers.adoc
+:response-fields: {snippet-base}/response-fields.adoc
+:!response-links:
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]

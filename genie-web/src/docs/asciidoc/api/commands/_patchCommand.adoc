@@ -1,0 +1,27 @@
+=== Update Parts of a Command
+
+==== Description
+
+Update the metadata about a command using JSON Patch. This will **ONLY** update the fields you request be changed.
+
+NOTE: For more information about JSON Patch RFC see the http://jsonpatch.com/[website].
+
+==== Endpoint
+
+`PATCH /api/v3/commands/{id}`
+
+:snippet-base: {snippets}/command-rest-controller-integration-tests/can-patch-command/3
+:id-base: patch-command
+:request-headers: {snippet-base}/request-headers.adoc
+:request-path-params: {snippet-base}/path-parameters.adoc
+:!request-query-params:
+:request-fields: {snippet-base}/request-fields.adoc
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:!response-headers:
+:!response-fields:
+:!response-links:
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]

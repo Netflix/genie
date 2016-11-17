@@ -1,0 +1,27 @@
+=== Add Tags to Command
+
+==== Description
+
+Add tags to an existing command. Stored as a set so all duplicates are ignored.
+
+NOTE: `genie.id:{id}` and `genie.name:{name}` tags are automatically added by the service.
+
+==== Endpoint
+
+`POST /api/v3/commands/{id}/tags`
+
+:snippet-base: {snippets}/command-rest-controller-integration-tests/can-add-tags-to-command/3
+:id-base: add-tags-to-command
+:request-headers: {snippet-base}/request-headers.adoc
+:request-path-params: {snippet-base}/path-parameters.adoc
+:!request-query-params:
+:request-fields: {snippet-base}/request-fields.adoc
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:!response-headers:
+:!response-fields:
+:!response-links:
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]
