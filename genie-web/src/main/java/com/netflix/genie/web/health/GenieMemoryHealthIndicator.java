@@ -34,7 +34,7 @@ import javax.validation.constraints.NotNull;
  * @since 3.0.0
  */
 @Component
-public class GenieHealthIndicator implements HealthIndicator {
+public class GenieMemoryHealthIndicator implements HealthIndicator {
 
     private static final String NUMBER_RUNNING_JOBS_KEY = "numRunningJobs";
     private static final String USED_MEMORY_KEY = "usedMemory";
@@ -52,7 +52,7 @@ public class GenieHealthIndicator implements HealthIndicator {
      * @param jobsProperties    The various properties related to running jobs
      */
     @Autowired
-    public GenieHealthIndicator(
+    public GenieMemoryHealthIndicator(
         @NotNull final JobMetricsService jobMetricsService,
         @NotNull final JobsProperties jobsProperties
     ) {
