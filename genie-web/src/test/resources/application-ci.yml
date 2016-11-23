@@ -28,8 +28,7 @@ genie:
         initialInterval: 10
         maxInterval: 10
   health:
-    memory:
-      usedPhysicalMemoryPercent: 100
+    maxCpuLoadPercent: 100
   jobs:
     dir:
       location: "file:///tmp/"
