@@ -18,6 +18,7 @@
 package com.netflix.genie.web.configs;
 
 import com.netflix.genie.core.properties.DataServiceRetryProperties;
+import com.netflix.genie.core.properties.HealthProperties;
 import com.netflix.genie.core.properties.JobsProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -52,5 +53,16 @@ public class PropertiesConfig {
     @ConfigurationProperties("genie.data.service.retry")
     public DataServiceRetryProperties dataServiceRetryProperties() {
         return new DataServiceRetryProperties();
+    }
+
+    /**
+     * All the properties related to configuring health threshold properties.
+     *
+     * @return The health properties structure
+     */
+    @Bean
+    @ConfigurationProperties("genie.health")
+    public HealthProperties healthProperties() {
+        return new HealthProperties();
     }
 }

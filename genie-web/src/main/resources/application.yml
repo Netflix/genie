@@ -27,6 +27,8 @@ genie:
   file:
     cache:
       location: file:///tmp/genie/cache
+  health:
+    maxCpuLoadPercent: 80
   jobs:
     cleanup:
       deleteArchiveFile: true
