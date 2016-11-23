@@ -17,14 +17,15 @@
  */
 package com.netflix.genie.web.health;
 
+import com.netflix.genie.core.properties.HealthProperties;
 import com.sun.management.OperatingSystemMXBean;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.NotNull;
 import java.lang.management.ManagementFactory;
 
 /**
@@ -41,14 +42,14 @@ public class GenieCpuHealthIndicator implements HealthIndicator {
     /**
      * Constructor.
      *
-     * @param maxCpuLoadPercent The maximum physical memory threshold
+     * @param healthProperties The maximum physical memory threshold
      */
     @Autowired
     public GenieCpuHealthIndicator(
-        @Value("${genie.health.cpu.maxLoadPercent:80}")
-        final double maxCpuLoadPercent
-    ) {
-        this(maxCpuLoadPercent, (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean());
+        @NotNull final HealthProperties healthProperties
+        ) {
+        this(healthProperties.getMaxCpuLoadPercent(),
+            (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean());
     }
 
     GenieCpuHealthIndicator(final double maxCpuLoadPercent,

@@ -35,7 +35,7 @@ import org.springframework.boot.actuate.health.Status;
  * @since 3.0.0
  */
 @Category(UnitTest.class)
-public class GenieHealthIndicatorUnitTests {
+public class GenieMemoryHealthIndicatorUnitTests {
 
     private static final int MAX_SYSTEM_MEMORY = 10_240;
     private static final int DEFAULT_JOB_MEMORY = 1_024;

@@ -1,5 +1,6 @@
 package com.netflix.genie.web.health
 
+import com.netflix.genie.web.configs.PropertiesConfig
 import com.sun.management.OperatingSystemMXBean
 import org.springframework.boot.actuate.health.Status
 import spock.lang.Specification
@@ -18,7 +19,8 @@ class GenieCpuHealthIndicatorSpec extends Specification{
 
     def setup(){
         operatingSystemMXBean = Mock(OperatingSystemMXBean)
-        cpuHealthIndicator = new GenieCpuHealthIndicator(80, operatingSystemMXBean)
+        cpuHealthIndicator = new GenieCpuHealthIndicator(
+                new PropertiesConfig().healthProperties().getMaxCpuLoadPercent(), operatingSystemMXBean)
     }
 
     def 'Health should be #status when free memory is #freeMemory and totla is #totalMemory'(){
