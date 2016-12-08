@@ -1,11 +1,66 @@
-= Genie REST API
+= Genie REST API Guide
 Tom Gianos <NetflixOSS@netflix.com>
 v{revnumber}, {localdate}
 :description: Reference documentation for Netflix OSS Genie REST API
 :keywords: genie, netflix, documentation, big data, cloud, oss, open source software
 :toc: left
+:toclevels: 2
+:doctype: book
+:sectanchors:
 :sectlinks:
+:sectnums:
+:linkattrs:
 :icons: font
+:stylesheet: rubygems.css
+:stylesdir: stylesheets
+:source-highlighter: highlight.js
+
+== Introduction
+
+This is the REST API documentation for Genie version {revnumber}. Here you will find specific details of how to invoke
+the Genie REST API and what you can expect as return values.
+
+NOTE: For high level concept documentation please see the https://netflix.github.io/genie[website].
+
+NOTE: For how to install this version please see the
+https://netflix.github.io/genie/docs/{revnumber}/reference[reference guide].
+
+NOTE: For a demo of this version of Genie please see
+https://netflix.github.io/genie/docs/{revnumber}/reference[demo guide].
+
+== Assumptions
+
+This documentation assumes a basic knowledge of how REST APIs work. If you don't know things like HTTP verbs see
+websites like http://www.restapitutorial.com/[this] one.
+
+== HATEOAS
+
+A lot of the API's return `application/hal+json` as a content type. This is a superset of JSON built to support
+HATEOAS (**H**ypermedia **a**s **t**he **E**ngine **o**f **A**pplication **S**tate). Rather than re-writing what
+HATEOAS is see this great write up on the https://spring.io/understanding/HATEOAS[Spring Website] about it.
+
+HATEOAS has several ways to represent the state in return payloads. Genie uses HAL. You can find documentation about
+it http://stateless.co/hal_specification.html[here] or https://apigility.org/documentation/api-primer/halprimer[here].
+
+== Security
+
+All of this documentation assumes security is disabled for Genie. If your installation has security enabled the REST
+APIs will be secured via OAuth2 or x509 certs or both.
+
+NOTE: These are the currently supported API security mechanisms but others could be plugged in. We'll only talk about
+OAuth2 here for now until another implementation is done.
+
+=== OAuth2
+
+If OAuth2 is enabled you'll need to send your https://jwt.io/[JWT] you got back from your provider along with your
+API request. This is accomplished by setting your `Authorization` header to a value of `Bearer {your token here}`.
+
+=== x509
+
+If your admin has security Genie using client and server certificates mechanisms you'll need to send your client
+certificate along with your request.
+
+Something like `curl --cert {your cert} {genie endpoint}`
 
 include::_resources.adoc[]
 include::api/jobs/_api.adoc[]

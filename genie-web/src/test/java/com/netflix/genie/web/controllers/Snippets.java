@@ -515,7 +515,7 @@ final class Snippets {
                             .key(CONSTRAINTS)
                             .value("")
                     )
-                    .description("<<resources-index-links,Links>> to other resources.")
+                    .description("<<_hateoas,Links>> to other resources.")
                     .ignored()
             );
     }
@@ -534,7 +534,7 @@ final class Snippets {
                             .key(CONSTRAINTS)
                             .value("")
                     )
-                    .description("<<resources-index-links,Links>> to other resources.")
+                    .description("<<_hateoas,Links>> to other resources.")
                     .ignored()
             );
     }
@@ -553,7 +553,7 @@ final class Snippets {
                             .key(CONSTRAINTS)
                             .value("")
                     )
-                    .description("<<resources-index-links,Links>> to other resources.")
+                    .description("<<_hateoas,Links>> to other resources.")
                     .ignored()
             );
     }
@@ -572,7 +572,7 @@ final class Snippets {
                             .key(CONSTRAINTS)
                             .value("")
                     )
-                    .description("<<resources-index-links,Links>> to other resources.")
+                    .description("<<_hateoas,Links>> to other resources.")
                     .ignored()
             );
     }
@@ -587,7 +587,7 @@ final class Snippets {
                             .key(CONSTRAINTS)
                             .value("")
                     )
-                    .description("<<resources-index-links,Links>> to other resources.")
+                    .description("<<_hateoas,Links>> to other resources.")
                     .ignored()
             );
     }
@@ -602,7 +602,7 @@ final class Snippets {
                             .key(CONSTRAINTS)
                             .value("")
                     )
-                    .description("<<resources-index-links,Links>> to other resources.")
+                    .description("<<_hateoas,Links>> to other resources.")
                     .ignored()
             );
     }
@@ -894,7 +894,7 @@ final class Snippets {
         return new FieldDescriptor[]{
             PayloadDocumentation
                 .fieldWithPath("_links")
-                .description("<<resources-index-links,Links>> to other resources.")
+                .description("<<_hateoas,Links>> to other resources.")
                 .attributes(EMPTY_CONSTRAINTS),
             PayloadDocumentation
                 .fieldWithPath("page")
