@@ -28,7 +28,7 @@ apply plugin: "nebula-aggregate-javadocs"
 ext.githubProjectName = rootProject.name
 
 def javaProjects = subprojects.findAll {
-    it.name != "genie-demo" && it.name != "genie-ddl"  && it.name != "genie-docs"
+    it.name != "genie-demo" && it.name != "genie-ddl" && it.name != "genie-docs"
 }
 
 allprojects {
@@ -216,6 +216,13 @@ task jacocoRootReport(type: JacocoReport, group: "Coverage reports") {
         executionData = files(
                 executionData.findAll {
                     it.exists()
+                }
+        )
+    }
+    afterEvaluate {
+        classDirectories = files(
+                classDirectories.files.collect {
+                    fileTree(dir: it, exclude: ["com/netflix/genie/core/jpa/entities/*_*"])
                 }
         )
     }
