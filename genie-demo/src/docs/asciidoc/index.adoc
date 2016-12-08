@@ -4,13 +4,30 @@ v{revnumber}, {localdate}
 :description: Reference documentation for Netflix OSS Genie
 :keywords: genie, netflix, documentation, big data, cloud, oss, open source software
 :toc: left
+:toclevels: 2
+:doctype: book
+:sectanchors:
 :sectlinks:
+:sectnums:
+:linkattrs:
+:icons: font
+:stylesheet: rubygems.css
+:stylesdir: stylesheets
+:source-highlighter: highlight.js
 
-== Purpose
+== Introduction
 
 Genie is a complicated service. It can be hard to understand the value it brings to a data platform without seeing it
 in action. For this reason this set of demo steps was developed to show how Genie fits into a data platform and how it
 can help both administrators and users.
+
+NOTE: For high level concept documentation please see the https://netflix.github.io/genie[website].
+
+NOTE: For how to install this version please see the
+https://netflix.github.io/genie/docs/{revnumber}/reference[Reference Guide].
+
+NOTE: For documentation of the REST API for this version of Genie please see the
+https://netflix.github.io/genie/docs/{revnumber}/rest[API Guide].
 
 == Info
 

@@ -1,8 +1,18 @@
-= Genie Reference
+= Genie Reference Guide
 Tom Gianos <NetflixOSS@netflix.com>
 v{revnumber}, {localdate}
 :description: Reference documentation for Netflix OSS Genie
 :keywords: genie, netflix, documentation, big data, cloud, oss, open source software
-:toc:
+:toc: left
+:toclevels: 2
+:doctype: book
+:sectanchors:
+:sectlinks:
+:sectnums:
+:linkattrs:
+:icons: font
+:stylesheet: rubygems.css
+:stylesdir: stylesheets
+:source-highlighter: highlight.js
 
-IMPORTANT: COMING SOON
+WARNING: Work In Progress (obviously)

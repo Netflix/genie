@@ -121,7 +121,14 @@ public abstract class RestControllerIntegrationTestsBase {
     public void setup() throws Exception {
         this.mvc = MockMvcBuilders
             .webAppContextSetup(this.context)
-            .apply(MockMvcRestDocumentation.documentationConfiguration(this.restDocumentation))
+            .apply(
+                MockMvcRestDocumentation
+                    .documentationConfiguration(this.restDocumentation)
+                    .uris()
+                    .withScheme("https")
+                    .withHost("genie.example.com")
+                    .withPort(443)
+            )
             .build();
     }
 

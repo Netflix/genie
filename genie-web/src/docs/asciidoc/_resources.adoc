@@ -1,5 +1,10 @@
 == Resources
 
+This section contains the documentation for various resources sent to and from the various Genie APIs. Note their
+structure and fields, particularly what is marked optional. Optional means when you submit one of these resources
+to Genie you don't need to set that field. Genie either doesn't require it or if it does, as is the case with ID's,
+it will create one if you don't provide it. When you get a resource all fields Genie has stored will be returned.
+
 === Application
 
 include::{snippets}/application-rest-controller-integration-tests/can-create-application-without-id/2/response-fields.adoc[]
