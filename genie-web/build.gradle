@@ -7,7 +7,7 @@ apply plugin: "org.asciidoctor.convert"
 project.parent.tasks.collectDocumentation.dependsOn project.tasks.asciidoctor
 
 ext {
-    snippetsDir = file("build/generated-snippets")
+    snippetsDir = new File(project.buildDir, "generated-snippets")
 }
 
 dependencies {
@@ -94,8 +94,28 @@ def genieVersion = project.version.toString()
 asciidoctor {
     dependsOn test
     inputs.dir snippetsDir
-    inputs.dir new File(project.projectDir, "/src/docs/asciidoc")
-    attributes "snippets": snippetsDir, "revnumber": genieVersion
+    attributes \
+            "snippets": snippetsDir,
+            "revnumber": genieVersion,
+            "docinfo1": ""
+
+
+    // See: https://github.com/asciidoctor/asciidoctor-gradle-plugin/issues/154
+    def capturedOutput = [ ]
+    def listener = { capturedOutput << it } as StandardOutputListener
+
+    logging.addStandardErrorListener(listener)
+    logging.addStandardOutputListener(listener)
+
+    doLast {
+        logging.removeStandardOutputListener(listener)
+        logging.removeStandardErrorListener(listener)
+        capturedOutput.join('').with { output ->
+            if (output =~ /include file not found:/) {
+                throw new RuntimeException("Include file(s) not found.\n" + output)
+            }
+        }
+    }
 }
 
 processResources {

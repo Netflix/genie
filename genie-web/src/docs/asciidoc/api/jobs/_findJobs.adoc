@@ -1,0 +1,25 @@
+=== Find Jobs
+
+==== Description
+
+Search for jobs using query parameters.
+
+==== Endpoint
+
+`GET /api/v3/jobs`
+
+:snippet-base: {snippets}/job-rest-controller-integration-tests/1/findJobs
+:id-base: find-jobs
+:!request-headers:
+:!request-path-params:
+:request-query-params: {snippet-base}/request-parameters.adoc
+:!request-fields:
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:response-headers: {snippet-base}/response-headers.adoc
+:response-fields: {snippet-base}/response-fields.adoc
+:response-links: {snippet-base}/links.adoc
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]

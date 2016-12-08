@@ -1,0 +1,25 @@
+=== Remove All Configs From an Application
+
+==== Description
+
+Remove all the configuration file locations for an existing application.
+
+==== Endpoint
+
+`DELETE /api/v3/applications/{id}/configs`
+
+:snippet-base: {snippets}/application-rest-controller-integration-tests/can-delete-configs-for-application/3
+:id-base: remove-all-configs-from-application
+:!request-headers:
+:request-path-params: {snippet-base}/path-parameters.adoc
+:!request-query-params:
+:!request-fields:
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:!response-headers:
+:!response-fields:
+:!response-links:
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]

@@ -1,0 +1,25 @@
+=== Find Clusters
+
+==== Description
+
+Find clusters using various query parameters.
+
+==== Endpoint
+
+`GET /api/v3/clusters`
+
+:snippet-base: {snippets}/cluster-rest-controller-integration-tests/can-find-clusters/8
+:id-base: find-clusters
+:!request-headers:
+:!request-path-params:
+:request-query-params: {snippet-base}/request-parameters.adoc
+:!request-fields:
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:response-headers: {snippet-base}/response-headers.adoc
+:response-fields: {snippet-base}/response-fields.adoc
+:response-links: {snippet-base}/links.adoc
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]

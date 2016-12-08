@@ -1,0 +1,25 @@
+=== Get the Clusters that Have Command Available
+
+==== Description
+
+Search the clusters that the given command is linked to.
+
+==== Endpoint
+
+`GET /api/v3/applications/{id}/commands`
+
+:snippet-base: {snippets}/command-rest-controller-integration-tests/can-get-clusters-for-command/8
+:id-base: get-clusters-for-command
+:!request-headers:
+:request-path-params: {snippet-base}/path-parameters.adoc
+:request-query-params: {snippet-base}/request-parameters.adoc
+:!request-fields:
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:response-headers: {snippet-base}/response-headers.adoc
+:response-fields: {snippet-base}/response-fields.adoc
+:!response-links:
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]

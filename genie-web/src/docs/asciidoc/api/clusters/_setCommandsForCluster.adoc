@@ -1,0 +1,30 @@
+=== Set Commands for a Cluster
+
+==== Description
+
+Set the commands (as array of their ID's) that can run on the cluster.
+
+IMPORTANT: The order of the commands is important. This represents priority order if two commands with same tags match
+for the given cluster the one earlier in the list will be selected.
+
+WARNING: The commands for the ID's must already exist in the system
+
+==== Endpoint
+
+`PUT /api/v3/clusters/{id}/commands`
+
+:snippet-base: {snippets}/cluster-rest-controller-integration-tests/can-set-commands-for-a-cluster/5
+:id-base: set-commands-for-cluster
+:request-headers: {snippet-base}/request-headers.adoc
+:request-path-params: {snippet-base}/path-parameters.adoc
+:!request-query-params:
+:request-fields: {snippet-base}/request-fields.adoc
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:!response-headers:
+:!response-fields:
+:!response-links:
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]

@@ -1,0 +1,28 @@
+=== Update Tags for an Application
+
+==== Description
+
+Update the tags for an existing application.
+
+IMPORTANT: The `genie.id:{id}` and `genie.name:{name}` tags can't be removed. They will automatically be added back
+by the system.
+
+==== Endpoint
+
+`PUT /api/v3/applications/{id}/tags`
+
+:snippet-base: {snippets}/application-rest-controller-integration-tests/can-update-tags-for-application/3
+:id-base: update-tags-for-application
+:request-headers: {snippet-base}/request-headers.adoc
+:request-path-params: {snippet-base}/path-parameters.adoc
+:!request-query-params:
+:request-fields: {snippet-base}/request-fields.adoc
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:!response-headers:
+:!response-fields:
+:!response-links:
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]

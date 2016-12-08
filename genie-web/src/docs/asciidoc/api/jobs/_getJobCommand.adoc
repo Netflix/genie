@@ -1,0 +1,26 @@
+=== Get the Command a Job Executed
+
+==== Description
+
+Get the metadata about the command which was selected to be executed by the job based on the cluster and command
+criteria in the job request.
+
+==== Endpoint
+
+`GET /api/v3/jobs/{id}/command`
+
+:snippet-base: {snippets}/job-rest-controller-integration-tests/1/getJobCommand
+:id-base: get-job-command
+:!request-headers:
+:request-path-params: {snippet-base}/path-parameters.adoc
+:!request-query-params:
+:!request-fields:
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:response-headers: {snippet-base}/response-headers.adoc
+:response-fields: {snippet-base}/response-fields.adoc
+:response-links: {snippet-base}/links.adoc
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]

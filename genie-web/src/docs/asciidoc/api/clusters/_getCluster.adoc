@@ -1,0 +1,25 @@
+=== Get a Cluster
+
+==== Description
+
+Get the metadata about an cluster in the system.
+
+==== Endpoint
+
+`GET /api/v3/clusters/{id}`
+
+:snippet-base: {snippets}/cluster-rest-controller-integration-tests/can-create-cluster-without-id/2
+:id-base: get-cluster
+:!request-headers:
+:request-path-params: {snippet-base}/path-parameters.adoc
+:!request-query-params:
+:!request-fields:
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:response-headers: {snippet-base}/response-headers.adoc
+:response-fields: {snippet-base}/response-fields.adoc
+:response-links: {snippet-base}/links.adoc
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]

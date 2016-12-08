@@ -1,0 +1,28 @@
+=== Create a Command
+
+==== Description
+
+Create a new command in the system.
+
+==== Endpoint
+
+`POST /api/v3/commands`
+
+IMPORTANT: The id in this example is optional. If you include one Genie will use it. If not it will provide one. If you
+provide one it must be unique.
+
+:snippet-base: {snippets}/command-rest-controller-integration-tests/can-create-command-without-id/1
+:id-base: create-command
+:request-headers: {snippet-base}/request-headers.adoc
+:!request-path-params:
+:!request-query-params:
+:request-fields: {snippet-base}/request-fields.adoc
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:response-headers: {snippet-base}/response-headers.adoc
+:!response-fields:
+:!response-links:
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]

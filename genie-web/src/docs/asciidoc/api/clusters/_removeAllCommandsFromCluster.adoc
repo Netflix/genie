@@ -1,0 +1,27 @@
+=== Remove All Commands From a Cluster
+
+==== Description
+
+Remove all the commands currently associated with the given cluster.
+
+NOTE: This does **NOT** delete the command(s) from the system just unlinks them
+
+==== Endpoint
+
+`DELETE /api/v3/clusters/{id}/commands`
+
+:snippet-base: {snippets}/cluster-rest-controller-integration-tests/can-remove-commands-from-a-cluster/5
+:id-base: remove-all-commands-from-cluster
+:!request-headers:
+:request-path-params: {snippet-base}/path-parameters.adoc
+:!request-query-params:
+:!request-fields:
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:!response-headers:
+:!response-fields:
+:!response-links:
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]

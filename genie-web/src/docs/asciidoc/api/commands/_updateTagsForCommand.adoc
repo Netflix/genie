@@ -1,0 +1,28 @@
+=== Update Tags for a Command
+
+==== Description
+
+Update the tags for an existing command.
+
+IMPORTANT: The `genie.id:{id}` and `genie.name:{name}` tags can't be removed. They will automatically be added back
+by the system.
+
+==== Endpoint
+
+`PUT /api/v3/commands/{id}/tags`
+
+:snippet-base: {snippets}/command-rest-controller-integration-tests/can-update-tags-for-command/3
+:id-base: update-tags-for-command
+:request-headers: {snippet-base}/request-headers.adoc
+:request-path-params: {snippet-base}/path-parameters.adoc
+:!request-query-params:
+:request-fields: {snippet-base}/request-fields.adoc
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:!response-headers:
+:!response-fields:
+:!response-links:
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]

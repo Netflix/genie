@@ -1,0 +1,27 @@
+=== Remove A Single Command From a Cluster
+
+==== Description
+
+Remove the identified command from the cluster.
+
+NOTE: This does **NOT** delete the command from the system just unlinks it
+
+==== Endpoint
+
+`DELETE /api/v3/clusters/{id}/commands/{commandId}`
+
+:snippet-base: {snippets}/cluster-rest-controller-integration-tests/can-remove-command-from-a-cluster/6
+:id-base: remove-a-command-from-cluster
+:!request-headers:
+:request-path-params: {snippet-base}/path-parameters.adoc
+:!request-query-params:
+:!request-fields:
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:!response-headers:
+:!response-fields:
+:!response-links:
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]

@@ -1,0 +1,27 @@
+=== Remove Tag From Application
+
+==== Description
+
+Remove a tag from an existing application.
+
+NOTE: You can't remove the `genie.id:{id}` and `genie.name:{name}` tags. They will just be added back by the system
+
+==== Endpoint
+
+`DELETE /api/v3/applications/{id}/tags/{tag}`
+
+:snippet-base: {snippets}/application-rest-controller-integration-tests/can-delete-tag-for-application/3
+:id-base: remove-tag-from-application
+:!request-headers:
+:request-path-params: {snippet-base}/path-parameters.adoc
+:!request-query-params:
+:!request-fields:
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:!response-headers:
+:!response-fields:
+:!response-links:
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]

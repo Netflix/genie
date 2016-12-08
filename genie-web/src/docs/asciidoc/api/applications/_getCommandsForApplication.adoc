@@ -1,0 +1,25 @@
+=== Get the Commands that Use an Application
+
+==== Description
+
+Search the commands that use the given application.
+
+==== Endpoint
+
+`GET /api/v3/applications/{id}/commands`
+
+:snippet-base: {snippets}/application-rest-controller-integration-tests/can-get-commands-for-application/8
+:id-base: get-commands-for-application
+:!request-headers:
+:request-path-params: {snippet-base}/path-parameters.adoc
+:request-query-params: {snippet-base}/request-parameters.adoc
+:!request-fields:
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:response-headers: {snippet-base}/response-headers.adoc
+:response-fields: {snippet-base}/response-fields.adoc
+:!response-links:
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]

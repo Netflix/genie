@@ -1,0 +1,25 @@
+=== Get a Job
+
+==== Description
+
+Get metadata about a specific job.
+
+==== Endpoint
+
+`GET /api/v3/jobs/{id}`
+
+:snippet-base: {snippets}/job-rest-controller-integration-tests/1/getJob
+:id-base: get-job
+:!request-headers:
+:request-path-params: {snippet-base}/path-parameters.adoc
+:!request-query-params:
+:!request-fields:
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:response-headers: {snippet-base}/response-headers.adoc
+:response-fields: {snippet-base}/response-fields.adoc
+:response-links: {snippet-base}/links.adoc
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]

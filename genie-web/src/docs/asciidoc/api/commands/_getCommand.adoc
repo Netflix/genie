@@ -1,0 +1,25 @@
+=== Get a Command
+
+==== Description
+
+Get the metadata about an command in the system.
+
+==== Endpoint
+
+`GET /api/v3/commands/{id}`
+
+:snippet-base: {snippets}/command-rest-controller-integration-tests/can-create-command-without-id/2
+:id-base: get-command
+:!request-headers:
+:request-path-params: {snippet-base}/path-parameters.adoc
+:!request-query-params:
+:!request-fields:
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:response-headers: {snippet-base}/response-headers.adoc
+:response-fields: {snippet-base}/response-fields.adoc
+:response-links: {snippet-base}/links.adoc
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]

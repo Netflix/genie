@@ -5,5 +5,4 @@ v{revnumber}, {localdate}
 :keywords: genie, netflix, documentation, big data, cloud, oss, open source software
 :toc:
 
-== Something
-{project-version}
+IMPORTANT: COMING SOON

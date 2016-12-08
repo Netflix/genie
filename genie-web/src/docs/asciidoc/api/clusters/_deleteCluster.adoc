@@ -1,0 +1,25 @@
+=== Delete a Cluster
+
+==== Description
+
+Delete a cluster currently configured in the system.
+
+==== Endpoint
+
+`DELETE /api/v3/clusters/{id}`
+
+:snippet-base: {snippets}/cluster-rest-controller-integration-tests/can-delete-a-cluster/4
+:id-base: delete-cluster
+:!request-headers:
+:request-path-params: {snippet-base}/path-parameters.adoc
+:!request-query-params:
+:!request-fields:
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:!response-headers:
+:!response-fields:
+:!response-links:
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]
