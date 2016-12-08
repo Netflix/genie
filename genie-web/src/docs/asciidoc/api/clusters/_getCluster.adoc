@@ -2,7 +2,7 @@
 
 ==== Description
 
-Get the metadata about an cluster in the system.
+Get the metadata about a cluster in the system.
 
 ==== Endpoint
 
