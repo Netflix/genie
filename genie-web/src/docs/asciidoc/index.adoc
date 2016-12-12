@@ -26,7 +26,7 @@ NOTE: For how to install this version please see the
 https://netflix.github.io/genie/docs/{revnumber}/reference[reference guide].
 
 NOTE: For a demo of this version of Genie please see
-https://netflix.github.io/genie/docs/{revnumber}/reference[demo guide].
+https://netflix.github.io/genie/docs/{revnumber}/demo[demo guide].
 
 == Assumptions
 
