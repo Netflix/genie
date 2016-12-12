@@ -5,6 +5,10 @@
   url: /
   side: left
 
+- title: Concepts
+  url: /concepts/
+  side: left
+
 - title: Releases
   url: /releases/
   side: left
@@ -31,16 +35,20 @@
   url: /blog/
   side: left
 
+- title: FAQ
+  url: /faq/
+  side: left
+
 #
 #   Navigation to the right › side: right
 #
-- title: Info
-  url: /info/
+- title: About
+  url: /about/
   side: right
 
-- title: Search
-  url: /search/
-  side: right
+# - title: Search
+#   url: /search/
+#   side: right
 
 - title: Contact
   url: /contact/
