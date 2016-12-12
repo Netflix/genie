@@ -2,7 +2,7 @@
 
 ==== Description
 
-Get the metadata about an command in the system.
+Get the metadata about a command in the system.
 
 ==== Endpoint
 
