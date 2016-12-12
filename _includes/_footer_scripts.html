@@ -10,8 +10,8 @@ $('audio,video').mediaelementplayer();
 
 {% if page.header.image_fullwidth %}
 <script>
-    $("#masthead").backstretch("{{ site.baseurl }}/images/{{ page.header.image_fullwidth }}", {fade: 700});
-    $("#masthead-with-text").backstretch("{{ site.baseurl }}/images/{{ page.header.image_fullwidth }}", {fade: 700});
+    $("#masthead").backstretch("{{ page.header.image_fullwidth }}", {fade: 700});
+    $("#masthead-with-text").backstretch("{{ page.header.image_fullwidth }}", {fade: 700});
 </script>
 {% endif %}
 

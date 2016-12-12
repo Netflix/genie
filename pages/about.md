@@ -1,14 +1,12 @@
 ---
 layout: page
-title: "Info"
+title: "About"
 subheadline: "About Genie"
 teaser: "High level information about Genie"
-permalink: /info/
+permalink: /about/
 header: no
 sidebar: left
 ---
-
-## About
 
 Genie provides scalable, federated job and resource management for users of computational resources.
 
@@ -18,7 +16,7 @@ Administrators will use the configuration APIs to register clusters and the comm
 
 A big advantage of this model is the scalability that it provides for client resources. This solves a very common problem where a single machine is configured as an entry point to submit jobs to large clusters and the machine gets overloaded. Genie allows the use of a group of machines which can increase and decrease in number to handle the increasing load, providing a very scalable solution.
 
-### Github Info
+## Github Info
 
 <iframe src="https://ghbtns.com/github-btn.html?user={{ site.github.owner_name }}&repo={{ site.github.repository_name }}&type=star&count=true&size=large" frameborder="0" scrolling="0" width="160px" height="30px"></iframe>
 <iframe src="https://ghbtns.com/github-btn.html?user={{ site.github.owner_name }}&repo={{ site.github.repository_name }}&type=watch&count=true&size=large&v=2" frameborder="0" scrolling="0" width="160px" height="30px"></iframe>
