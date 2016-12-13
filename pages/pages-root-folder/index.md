@@ -12,7 +12,6 @@ header:
   caption: Source
 #  caption_url: https://unsplash.com/photos/Ji_G7Bu1MoM
   caption_url: https://unsplash.com/photos/44se2xSCo00
-#  caption: Source
 #  caption_url: http://wall-papers.info/wallpapers/background-black-and-red.html
 widget1:
   title: About
