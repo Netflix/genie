@@ -7,7 +7,9 @@ def genieVersion = project.version.toString()
 
 asciidoctor {
     inputs.dir new File(project.projectDir, "/src/docs/asciidoc")
-    attributes "revnumber": genieVersion
+    attributes \
+            "revnumber": genieVersion,
+            "docinfo1": ""
 }
 
 def dockerDir = new File(project.projectDir, "/src/main/docker")
