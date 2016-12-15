@@ -39,19 +39,19 @@ others at
 
 Example for Maven:
 
-```xml
+{% highlight xml %}
 <dependency>
     <groupId>com.netflix.genie</groupId>
     <artifactId>genie-client</artifactId>
     <version>2.2.3</version>
 </dependency>
-```
+{% endhighlight %}
 
 Example for Gradle:
 
-```groovy
+{% highlight gradle %}
 compile 'com.netflix.genie:genie-client:2.2.3'
-```
+{% endhighlight %}
 
 #### Documentation
 
@@ -80,15 +80,15 @@ directly using pip.
 
 For the latest version:
 
-```bash
+{% highlight shell %}
 pip install nflx-genie-client
-```
+{% endhighlight %}
 
 or if you want a specific version:
 
-```bash
+{% highlight shell %}
 pip install nflx-genie-client==<version>
-```
+{% endhighlight %}
 
 #### Documentation
 

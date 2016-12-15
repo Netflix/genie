@@ -1,0 +1,210 @@
+---
+layout: page
+title: Data Model
+teaser: Genie 3 Data Model
+header: no
+permalink: /concepts/3/DataModel.html
+sidebar: left
+---
+
+## Introduction
+
+The Genie 3 data model contains modifications and additions to the
+[Genie 2 data model]({{ site.baseurl }}/concepts/2/DataModel.html) to enable
+even more flexibility, modularity and meta data retention.
+
+Several limitations of the Genie 2 data model were uncovered in its more than
+two years of production use at Netflix. A few of those limitations were:
+
+- Inability to link multiple applications to a command
+- Lack of insight into what the original user request for a job contained
+- Too much normalization, particularly between tags and jobs, causing
+inefficient joins and slow performance
+- Lack of system data for job dimensions like attachment size, output size, etc.
+
+The changes made to the data model will become apparent in the following
+sections.
+
+### Caveats
+
+- What we called `entities` in Genie 2 we'll call `resources` in Genie 3 to
+decouple the idea from database implementation to user API level
+- The specific resource fields are **NOT** defined in this document. These
+fields are available in the REST API documentation for specific
+[releases]({{ site.baseurl }}/releases/)
+  - This enables us to have the documentation for specific fields stay in sync
+  with the code
+  - This documentation covers the higher level purposes of the resources and
+  not their contents
+
+## Resources
+
+The following sections describe the various resources available from the Genie
+REST APIs. You should reference the API Docs for a specific
+[release]({{ site.baseurl }}/releases/) for how to manipulate these resources.
+These sections will focus on the high level purposes for each resource and how
+they rely and/or interact with other resources within the system.
+
+### Resource Tagging
+
+One important aspect to comment on is tagging of resources. Genie relies heavily
+on tags for how the system discovers resources like clusters and commands
+for a job. Each of the core resources has a set of tags that can be associated
+with them. These tags can be of set to whatever you want but it is recommended
+to come up with some sort of consistent structure for your tags to make it
+easier for users to understand their purpose. For example at Netflix we've
+adopted some of the following standards for our tags:
+
+- `sched:{something}`
+  - This corresponds to any schedule like that this resource (likely a cluster)
+  is expected to adhere to
+  - e.g. `sched:sla` or `sched:adhoc`
+- `type:{something}`
+  - Pretty self explanatory.
+  - e.g. `type:yarn` or `type:presto` for a cluster or `type:hive` or
+  `type:spark` for a command
+- `ver:{something}`
+  - The specific version of said resource
+  - e.g. two different Spark commands could have `ver:1.6.1` vs `ver:2.0.0`
+- `data:{something}`
+  - Used to classify the type of data a resource (usually a command) will access
+  - e.g. `data:prod` or `data:test`
+
+### Configuration Resources
+
+The following resources (applications, commands and clusters) are considered
+configuration, or admin, resources. They're generally set up by the Genie
+administrator and available to all users for user with their jobs.
+
+#### Application Resource
+
+An application resource represents pretty much what you'd expect. It is a
+reusable set of binaries, configuration files and setup files that can be used
+to install and configure (surprise!) an application. Generally these resources
+are used when an application isn't already installed and on the `PATH` on a
+Genie node.
+
+When a job is run and applications are involved in running the job Genie will
+download all the dependencies, configuration files and setup files of each
+application and store it all in the job working directory. It will then execute
+the setup script in order to install that application for that job. Genie is
+"dumb" as to the contents or purpose of any of these files so the onus is on
+the administrators to create and test these packages.
+
+Applications are very useful for decoupling application binaries from a Genie
+deployment. For example you could deploy a Genie cluster and change the version
+of Hadoop, Hive, Spark that Genie will download without actually re-deploying
+Genie. Applications can be combined together via a command. This will be
+explained more in the Command section.
+
+The first entity to talk about is an application. Applications are linked to
+commands in order for binaries and configurations to be downloaded and
+installed at runtime. Within Netflix this is frequently used to deploy new
+clients without redeploying a Genie cluster.
+
+At Netflix our applications frequently consiste of a zip of all the binaries
+uploaded to s3 along with a setup file to unzip and configure environment
+variables for that application.
+
+It is important to note applications are entirely optional and if you prefer
+to just install all client binaries on a Genie node beforehand you're free to
+do that. It will save in overhead for job launch times but you will lose
+flexibility in the tradeoff.
+
+#### Command Resource
+
+Commands resources primarily represent what a user would enter at the command
+line if you wanted to run a process on a cluster and what dependencies
+(applications) you would need on your PATH to make that possible.
+
+Commands can have configuration and setup files just like applications but
+primarily they should have an ordered list of applications associated with them
+if necessary. For example lets take a typical scenario involving running Hive.
+To run Hive you generally need a few things:
+
+1. A cluster to run its processing on (we'll get to that in the Cluster section)
+2. A hive-site.xml file which says what metastore to connect to amongst other
+settings
+3. Hive binaries
+4. Hadoop configurations and binaries
+
+So a typical setup for Hive in Genie would be to have one, or many, Hive
+commands configured. Each command would have its own hive-site.xml pointing
+to a specific metastore (prod, test, etc). The command would depend on Hadoop
+and Hive applications already configured which would have all the default
+Hadoop and Hive binaries and configurations. All this would be combined
+in the job working directory in order to run Hive.
+
+You can have any number of commands configured in the system. They should then
+be linked to the clusters they can execute on. Clusters are explained next.
+
+#### Cluster
+
+A cluster stores all the details of an execution cluster including connection
+information, properties, etc. Some cluster examples are Hadoop, Spark, Presto,
+etc. Every cluster can be linked to a set of commands that it can run.
+
+Genie DOES not launch clusters for you. It merely stores metadata about the
+clusters you have running in your environment so that jobs using commands
+and applications can connect to them.
+
+Once a cluster has been linked to commands your Genie instance is ready to
+start running jobs. The job resources are described in the following section.
+One important thing to note is that the list of commands linked to the cluster
+is a priority ordered list. That means if you have two pig commands available
+on your system for the same cluster the first one found in the list will be
+chosen provided all tags match.
+See [how it works]({{ site.baseurl }}/concepts/3/HowItWorks.html) for more
+details.
+
+### Job Resources
+
+The following resources all relate to a user submitting and monitoring a given
+job. They are split up from the Genie 2 Job idea to provide better separation
+of concerns as usually a user doesn't care about certain things. What node a
+job ran on or its Linux process exit code for example.
+
+Users interact with these entities directly though all but the initial job
+request are **read-only** in the sense you can only get their current state
+back from Genie.
+
+#### Job Request
+
+This is the resource you use to kick off a job. It contains all the information
+the system needs to run a job. Optionally the REST API's can take attachments.
+All attachments and file dependencies are downloaded into the root of the jobs
+working directory. The most important aspects are the command line arguments,
+the cluster criteria and the command criteria. These dictate the which cluster,
+command and arguments will be used when the job is executed. See the
+[How It Works]({{ site.baseurl }}/concepts/3/HowItWorks.html) section for more
+details.
+
+#### Job
+
+The job resource is created in the system after a Job Request is received. All
+the information a typical user would be interested in should be contained within
+this resource. It has links to the command, cluster and applications used to run
+the job as well as the meta information like status, start time, end time and
+others. See the REST API documentation for more details.
+
+#### Job Execution
+
+The job execution resource contains information about where a job was run and
+other information that may be more interesting to a system admin than a regular
+user. Frequently useful in debugging.
+
+A job contains all the details of a job request and execution including any
+command line arguments. Based on the request parameters, a cluster and command
+combination is selected for execution. Job requests can also supply necessary
+files to Genie either as attachments or using the file dependencies field if
+they already exist in an accessible file system. As a job executes, its details
+are recorded in the job record within the Genie database.
+
+## Conclusion
+
+Hopefully this guide provides insight into how the Genie data model is thought
+out and works together. It is meant to be very generic and support as many use
+cases as possible without modifications to the Genie codebase.
+
+If you have further questions don't hesitate to reach out on the via one of the
+methods on the [Contact]({{ site.baseurl }}/contact/) page.
