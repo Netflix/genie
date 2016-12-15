@@ -77,9 +77,9 @@ Click on `Files` and navigate to `genie-web/2.2.3` and download the
 
 You should first clone the source as follows
 
-```bash
+{% highlight shell %}
 git clone --branch 2.2.3 git@github.com:Netflix/genie.git
-```
+{% endhighlight %}
 
 If you are having trouble cloning from GitHub, check out
 [GitHub Help](https://help.github.com/articles/which-remote-url-should-i-use).
@@ -91,7 +91,7 @@ Genie uses Gradle for builds.
 Verify that your system is setup right. It should look something like this when
 you run. Make sure the JVM is > 1.7.x
 
-```bash
+{% highlight shell %}
 $ cd genie
 $ ./gradlew --version
 
@@ -107,21 +107,21 @@ Groovy:       2.3.6
 Ant:          Apache Ant(TM) version 1.9.3 compiled on December 23 2013
 JVM:          1.8.0_45 (Oracle Corporation 25.45-b02)
 OS:           Mac OS X 10.10.3 x86_64
-```
+{% endhighlight %}
 
 Build Genie
 
-```bash
+{% highlight shell %}
 $ ./gradlew clean build
-```
+{% endhighlight %}
 
 A successful build should have something like this at the end
 
-```bash
+{% highlight shell %}
 BUILD SUCCESSFUL
 
 Total time: 1 mins 28.964 secs
-```
+{% endhighlight %}
 
 The war will be in `genie-web/build/libs/`.
 
@@ -132,23 +132,27 @@ The war will be in `genie-web/build/libs/`.
 Assumes you've set ```CATALINA_HOME``` to be the root of your Tomcat deployment.
 If not:
 
-```
+{% highlight shell %}
 export CATALINA_HOME=/your/path/to/tomcat
-```
+{% endhighlight %}
 
 Also if Tomcat already has a ROOT app in ```$CATALINA_HOME/webapps``` you should
 move it or delete it.
 
 ### Unzip the WAR
 
-    mkdir $CATALINA_HOME/webapps/ROOT &&\
-    cd $CATALINA_HOME/webapps/ROOT &&\
-    jar xf <where you downloaded or build the war>/genie-web-2.2.3.war
+{% highlight shell %}
+mkdir $CATALINA_HOME/webapps/ROOT &&\
+cd $CATALINA_HOME/webapps/ROOT &&\
+jar xf <where you downloaded or build the war>/genie-web-2.2.3.war
+{% endhighlight %}
 
 ### Make genie-jobs and download listing formatting
 
-    mkdir $CATALINA_HOME/webapps/genie-jobs &&\
-    wget -q -P $CATALINA_HOME/conf 'https://raw.githubusercontent.com/Netflix/genie/2.2.3/root/apps/tomcat/conf/listings.xsl'
+{% highlight shell %}
+mkdir $CATALINA_HOME/webapps/genie-jobs &&\
+wget -q -P $CATALINA_HOME/conf 'https://raw.githubusercontent.com/Netflix/genie/2.2.3/root/apps/tomcat/conf/listings.xsl'
+{% endhighlight %}
 
 ### Enable Listings in Tomcat
 
@@ -158,35 +162,35 @@ browser.
 Edit `$CATALINA_HOME/conf/web.xml` to enable listings by changing the default
 servlet
 
-```xml
+{% highlight xml %}
 <init-param>
     <param-name>listings</param-name>
     <param-value>false</param-value>
 </init-param>
-```
+{% endhighlight %}
 
 to
 
-```xml
+{% highlight xml %}
 <init-param>
     <param-name>listings</param-name>
     <param-value>true</param-value>
 </init-param>
-```
+{% endhighlight %}
 
 Also add path to the listings.xsl file you downloaded above (replace
-$CATALINA_HOME with full path on your system)
+`$CATALINA_HOME` with full path on your system)
 
-```xml
+{% highlight xml %}
 <init-param>
     <param-name>globalXsltFile</param-name>
     <param-value>$CATALINA_HOME/conf/listings.xsl</param-value>
 </init-param>
-```
+{% endhighlight %}
 
 Default servlet should look something like this when you're done
 
-```xml
+{% highlight xml %}
 <servlet>
     <servlet-name>default</servlet-name>
     <servlet-class>org.apache.catalina.servlets.DefaultServlet</servlet-class>
@@ -204,7 +208,7 @@ Default servlet should look something like this when you're done
     </init-param>
     <load-on-startup>1</load-on-startup>
 </servlet>
-```
+{% endhighlight %}
 
 ### Modify Database Connection Settings (Optional)
 
@@ -242,7 +246,7 @@ and `7001` to match your deployment. Zip the files back up into a jar.
 
 The whole process described above should look something like this:
 
-```bash
+{% highlight shell %}
 GENIE_SERVER_JAR_PATH=($CATALINA_HOME/webapps/ROOT/WEB-INF/lib/genie-server-*.jar)
 GENIE_SERVER_JAR_NAME=$(basename ${GENIE_SERVER_JAR_PATH})
 mkdir /tmp/genie-server
@@ -256,7 +260,7 @@ mv ${GENIE_SERVER_JAR_NAME} ${GENIE_SERVER_JAR_PATH}
 popd
 rm -rf /tmp/genie-server
 sed -i "s/localhost/${EC2_PUBLIC_HOSTNAME}/g" $CATALINA_HOME/webapps/ROOT/WEB-INF/classes/genie-swagger.xml
-```
+{% endhighlight %}
 
 Once you've made these changes when you bring up Genie you can navigate to
 `http://{genieHost}:{port}/docs/api` to begin using the Swagger UI.
@@ -270,7 +274,7 @@ this location in the property file configuration in the next section.
 
 Download all the Genie scripts that are used to run jobs
 
-```bash
+{% highlight shell %}
 mkdir -p $GENIE_HOME &&\
 wget -q -P $GENIE_HOME 'https://raw.githubusercontent.com/Netflix/genie/2.2.3/root/apps/genie/bin/jobkill.sh' &&\
 chmod 755 $GENIE_HOME/jobkill.sh &&\
@@ -280,7 +284,7 @@ wget -q -P $GENIE_HOME 'https://raw.githubusercontent.com/Netflix/genie/2.2.3/ro
 chmod 755 $GENIE_HOME/localCleanup.py &&\
 wget -q -P $GENIE_HOME 'https://raw.githubusercontent.com/Netflix/genie/2.2.3/root/apps/genie/bin/timeout3' &&\
 chmod 755 $GENIE_HOME/timeout3
-```
+{% endhighlight %}
 
 On line 228 of `joblauncher.sh` you may have to modify the hadoop conf location.
 Older Hadoop distros have `$HADOOP_HOME/conf/` and newer ones seem to store
@@ -299,7 +303,7 @@ using the `archaius.deployment.environment` property in `CATALINA_OPTS`.
 You should review all the properties in the file but in particular pay attention
 to the following and set them as need be for your configuration.
 
-```java
+{% highlight java %}
 com.netflix.genie.server.java.home
 com.netflix.genie.server.hadoop.home
 netflix.appinfo.port
@@ -310,7 +314,7 @@ com.netflix.genie.server.job.manager.yarn.command.cp
 com.netflix.genie.server.job.manager.yarn.command.mkdir
 com.netflix.genie.server.job.manager.presto.command.cp
 com.netflix.genie.server.job.manager.presto.command.mkdir
-```
+{% endhighlight %}
 
 For further information on customizing your Genie install see the customization
 section below.
@@ -324,20 +328,18 @@ properties in `genie.properties` if `-Darchaius.deployment.environment=dev` is
 used. Below example sets Spring profile to prod which will use the prod database
 connection to MySQL (unless this was modified above).
 
-```bash
-export CATALINA_OPTS="-Dspring.profiles.active=prod
--Darchaius.deployment.applicationId=genie
--Darchaius.deployment.environment=prod"
-```
+{% highlight shell %}
+export CATALINA_OPTS="-Dspring.profiles.active=prod -Darchaius.deployment.applicationId=genie -Darchaius.deployment.environment=prod"
+{% endhighlight %}
 
 If you are running in the cloud (AWS), you should also set
 `-Dnetflix.datacenter=cloud`.
 
 Start up Tomcat as follows:
 
-```bash
+{% highlight shell %}
 $CATALINA_HOME/bin/startup.sh
-```
+{% endhighlight %}
 
 Note that the CATALINA_OPTS environment variable must be set, and available to
 the Tomcat startup script.
@@ -388,10 +390,10 @@ different cluster types. This mapping is controlled by the following properties:
 #### Cluster Type to JobManager mapping
 Format: com.netflix.genie.server.job.manager.<clusterType>.impl=<JobManagerImpl class>
 
-```java
+{% highlight java %}
 com.netflix.genie.server.job.manager.yarn.impl=com.netflix.genie.server.jobmanager.impl.YarnJobManagerImpl
 com.netflix.genie.server.job.manager.presto.impl=com.netflix.genie.server.jobmanager.impl.PrestoJobManagerImpl
-```
+{% endhighlight %}
 
 If you implement your own you'll want to assign it a type. For example lets use
 Spark. You would add a property
@@ -417,12 +419,12 @@ directory to create.
 
 The default properties to change are these:
 
-```java
+{% highlight java %}
 com.netflix.genie.server.job.manager.yarn.command.cp
 com.netflix.genie.server.job.manager.yarn.command.mkdir
 com.netflix.genie.server.job.manager.presto.command.cp
 com.netflix.genie.server.job.manager.presto.command.mkdir
-```
+{% endhighlight %}
 
 Internally within Netflix we actually have a custom script which interacts
 directly with AWS and S3 rather than using the Hadoop commands.
@@ -440,12 +442,12 @@ do so by un-commenting the following lines in the
 [joblauncher.sh](https://github.com/Netflix/genie/blob/2.2.3r/root/apps/genie/bin/joblauncher.sh)
 (Note that the user running Genie must be a sudoer for this to work):
 
-```bash
+{% highlight shell %}
 # Uncomment the following if you want Genie to create users if they don't exist already
 echo "Create user.group $HADOOP_USER_NAME.$HADOOP_GROUP_NAME, if it doesn't exist already"
 sudo groupadd $HADOOP_GROUP_NAME
 sudo useradd $HADOOP_USER_NAME -g $HADOOP_GROUP_NAME
-```
+{% endhighlight %}
 
 ### Eureka Integration
 
@@ -463,9 +465,9 @@ In the genie.properties, set the following property to false
 Before starting Tomcat, also append the following to CATALINA_OPTS (assuming you
   are running in the cloud)
 
-```bash
+{% highlight shell %}
 export CATALINA_OPTS=$CATALINA_OPTS" -Deureka.datacenter=cloud"
-```
+{% endhighlight %}
 
 #### Configure Genie Clients
 
@@ -475,21 +477,21 @@ to your CLASSPATH, with the following settings (NOTE: Assumes you've named your
 app genie, if you've named it genie2 change names of file and properties to
 match):
 
-```java
+{% highlight java %}
 // Servers virtual address
 genieClient.ribbon.DeploymentContextBasedVipAddresses=genie.cloud.netflix.net:<your_tomcat_port>
 
 // Use Eureka/Discovery enabled load balancer
 genieClient.ribbon.NIWSServerListClassName=com.netflix.niws.loadbalancer.DiscoveryEnabledNIWSServerList
-```
+{% endhighlight %}
 
 Also configure the
 [eureka-client.properties](https://github.com/Netflix/genie/blob/2.2.3/genie-client/src/main/resources/eureka-client.properties) as follows:
 
-```java
+{% highlight java %}
 // Service URLs for the Eureka server
 eureka.serviceUrl.default=http://<EUREKA_SERVER_HOST>:<EUREKA_SERVER_PORT>/eureka/v2/
-```
+{% endhighlight %}
 
 #### More Eureka Information
 
@@ -503,7 +505,7 @@ Eureka integration enabled. If you have Eureka integration enabled,
 review/update the following properties in
 [genie.properties](https://github.com/Netflix/genie/blob/2.2.3/genie-web/src/main/resources/genie.properties):
 
-```java
+{% highlight java %}
 // max running jobs on this instance, after which 503s are thrown
 com.netflix.genie.server.max.running.jobs=30
 
@@ -518,7 +520,7 @@ com.netflix.genie.server.idle.host.threshold.delta=5
 
 // max running jobs on instance that jobs can be forwarded to
 com.netflix.genie.server.max.idle.host.threshold=27
-```
+{% endhighlight %}
 
 ### Cloud Security
 

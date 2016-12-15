@@ -49,23 +49,23 @@ payload that would be sent to the
 [createApplication](https://netflix.github.io/genie/docs/2.2.3/api/#!/applications/createApplication)
 API.
 
-```JSON
+{% highlight json %}
 {
-    id: "sqoop145",
-    version: "1.4.5",
-    user: "tgianos",
-    name: "sqoop",
-    status: "ACTIVE",
-    envPropFile: "s3://aS3Bucket/sqoop/sqoop145.env",
-    jars: [
-        "s3://aS3Bucket/sqoop/sqoop-1.4.5.tar.gz"
-    ],
-    tags: [
-        "type:sqoop",
-        "ver:1.4.5"
-    ]
+  "id": "sqoop145",
+  "version": "1.4.5",
+  "user": "tgianos",
+  "name": "sqoop",
+  "status": "ACTIVE",
+  "envPropFile": "s3://aS3Bucket/sqoop/sqoop145.env",
+  "jars": [
+    "s3://aS3Bucket/sqoop/sqoop-1.4.5.tar.gz"
+  ],
+  "tags": [
+    "type:sqoop",
+    "ver:1.4.5"
+  ]
 }
-```
+{% endhighlight %}
 
 Breaking down a couple details in this example. All the Sqoop version 1.4.5
 libraries were zipped up into `sqoop-1.4.5.tar.gz` and stored in S3. At runtime
@@ -79,28 +79,28 @@ searches. Below is the result of the createApplication call where Genie has
 added system fields about when it was created, updated and some tags
 corresponding to id and name.
 
-```JSON
+{% highlight json %}
 {
-    id: "sqoop145",
-    created: "2015-02-18T23:21:13Z",
-    updated: "2015-02-19T00:05:53Z",
-    version: "1.4.5",
-    user: "tgianos",
-    name: "sqoop",
-    status: "ACTIVE",
-    envPropFile: "s3://aS3Bucket/sqoop/sqoop145.env",
-    configs: [ ],
-    jars: [
-        "s3://aS3Bucket/sqoop/sqoop-1.4.5.tar.gz"
-    ],
-    tags: [
-        "genie.id:sqoop145",
-        "genie.name:sqoop",
-        "type:sqoop",
-        "ver:1.4.5"
-    ]
+  "id": "sqoop145",
+  "created": "2015-02-18T23:21:13Z",
+  "updated": "2015-02-19T00:05:53Z",
+  "version": "1.4.5",
+  "user": "tgianos",
+  "name": "sqoop",
+  "status": "ACTIVE",
+  "envPropFile": "s3://aS3Bucket/sqoop/sqoop145.env",
+  "configs": [ ],
+  "jars": [
+    "s3://aS3Bucket/sqoop/sqoop-1.4.5.tar.gz"
+  ],
+  "tags": [
+    "genie.id:sqoop145",
+    "genie.name:sqoop",
+    "type:sqoop",
+    "ver:1.4.5"
+  ]
 }
-```
+{% endhighlight %}
 
 Applications should be used to dynamically install clients and decouple their
 deployment from Genie and are optional. You can have commands without a linked
@@ -153,50 +153,50 @@ using the
 [setApplicationForCommand](https://netflix.github.io/genie/docs/2.2.3/api/#!/commands/setApplicationForCommand)
 API.
 
-```JSON
+{% highlight json %}
 {
-    id: "sqoop145",
-    version: "1.4.5",
-    user: "tgianos",
-    name: "sqoop",
-    status: "ACTIVE",
-    executable: "jars/bin/sqoop",
-    jobType: "sqoop",
-    tags: [
-        "type:sqoop",
-        "data:prod",
-        "data:test",
-    ]
+  "id": "sqoop145",
+  "version": "1.4.5",
+  "user": "tgianos",
+  "name": "sqoop",
+  "status": "ACTIVE",
+  "executable": "jars/bin/sqoop",
+  "jobType": "sqoop",
+  "tags": [
+    "type:sqoop",
+    "data:prod",
+    "data:test",
+  ]
 }
-```
+{% endhighlight %}
 
 Note that the executable is `jars/bin/sqoop`. This means that the executable is
 relative to the job working directory and it's where the above Sqoop application
 installed the binary via the `envPropFile`. After creation the Sqoop command
 will look something like this:
 
-```JSON
+{% highlight json %}
 {
-    id: "sqoop145",
-    created: "2015-02-19T00:05:52Z",
-    updated: "2015-02-20T00:48:12Z",
-    version: "1.4.5",
-    user: "tgianos",
-    name: "sqoop",
-    status: "ACTIVE",
-    executable: "jars/bin/sqoop",
-    envPropFile: null,
-    jobType: "sqoop",
-    configs: [ ],
-    tags: [
-        "genie.id:sqoop145",
-        "genie.name:sqoop",
-        "type:sqoop",
-        "data:prod",
-        "data:test",
-    ]
+  "id": "sqoop145",
+  "created": "2015-02-19T00:05:52Z",
+  "updated": "2015-02-20T00:48:12Z",
+  "version": "1.4.5",
+  "user": "tgianos",
+  "name": "sqoop",
+  "status": "ACTIVE",
+  "executable": "jars/bin/sqoop",
+  "envPropFile": null,
+  "jobType": "sqoop",
+  "configs": [ ],
+  "tags": [
+    "genie.id:sqoop145",
+    "genie.name:sqoop",
+    "type:sqoop",
+    "data:prod",
+    "data:test",
+  ]
 }
-```
+{% endhighlight %}
 
 You can have any number of commands configured in the system. They should then
 be linked to the clusters they can execute on. Clusters are explained next.
@@ -247,27 +247,27 @@ cluster via the
 [addCommandsForCluster](https://netflix.github.io/genie/docs/2.2.3/api/#!/clusters/addCommandsForCluster)
 API.
 
-```JSON
+{% highlight json %}
 {
-    id: "bdp_h2query_20150219_185356",
-    version: "2.4.0",
-    user: "tgianos",
-    name: "h2query",
-    status: "UP",
-    clusterType: "yarn",
-    configs: [
-        "s3://aS3Bucket/users/bdp/h2query/20150219/185356/genie/hdfs-site.xml",
-        "s3://aS3Bucket/users/bdp/h2query/20150219/185356/genie/mapred-site.xml",
-        "s3://aS3Bucket/users/bdp/h2query/20150219/185356/genie/yarn-site.xml",
-        "s3://aS3Bucket/users/bdp/h2query/20150219/185356/genie/core-site.xml"
-    ],
-    tags: [
-        "type:yarn",
-        "ver:2.4.0",
-        "sched:adhoc"
-    ]
+  "id": "bdp_h2query_20150219_185356",
+  "version": "2.4.0",
+  "user": "tgianos",
+  "name": "h2query",
+  "status": "UP",
+  "clusterType": "yarn",
+  "configs": [
+    "s3://aS3Bucket/users/bdp/h2query/20150219/185356/genie/hdfs-site.xml",
+    "s3://aS3Bucket/users/bdp/h2query/20150219/185356/genie/mapred-site.xml",
+    "s3://aS3Bucket/users/bdp/h2query/20150219/185356/genie/yarn-site.xml",
+    "s3://aS3Bucket/users/bdp/h2query/20150219/185356/genie/core-site.xml"
+  ],
+  "tags": [
+    "type:yarn",
+    "ver:2.4.0",
+    "sched:adhoc"
+  ]
 }
-```
+{% endhighlight %}
 
 In this example when the cluster was brought up in EMR the four pertinent
 `*-site.xml` files were uploaded to S3 so they can be downloaded by Genie.
@@ -278,31 +278,31 @@ property `com.netflix.genie.server.job.manager.yarn.impl` in
 `genie.properties`. After the cluster has successfully been registered in Genie
 it will look something like this:
 
-```JSON
+{% highlight json %}
 {
-    id: "bdp_h2query_20150219_185356",
-    created: "2015-02-20T00:47:44Z",
-    updated: "2015-02-20T00:47:44Z",
-    version: "2.4.0",
-    user: "tgianos",
-    name: "h2query",
-    status: "UP",
-    clusterType: "yarn",
-    configs: [
-        "s3://aS3Bucket/users/bdp/h2query/20150219/185356/genie/hdfs-site.xml",
-        "s3://aS3Bucket/users/bdp/h2query/20150219/185356/genie/mapred-site.xml",
-        "s3://aS3Bucket/users/bdp/h2query/20150219/185356/genie/yarn-site.xml",
-        "s3://aS3Bucket/users/bdp/h2query/20150219/185356/genie/core-site.xml"
-    ],
-    tags: [
-        "genie.id:bdp_h2query_20150219_185356",
-        "genie.name:h2query",
-        "type:yarn",
-        "ver:2.4.0",
-        "sched:adhoc"
-    ]
+  "id": "bdp_h2query_20150219_185356",
+  "created": "2015-02-20T00:47:44Z",
+  "updated": "2015-02-20T00:47:44Z",
+  "version": "2.4.0",
+  "user": "tgianos",
+  "name": "h2query",
+  "status": "UP",
+  "clusterType": "yarn",
+  "configs": [
+    "s3://aS3Bucket/users/bdp/h2query/20150219/185356/genie/hdfs-site.xml",
+    "s3://aS3Bucket/users/bdp/h2query/20150219/185356/genie/mapred-site.xml",
+    "s3://aS3Bucket/users/bdp/h2query/20150219/185356/genie/yarn-site.xml",
+    "s3://aS3Bucket/users/bdp/h2query/20150219/185356/genie/core-site.xml"
+  ],
+  "tags": [
+    "genie.id:bdp_h2query_20150219_185356",
+    "genie.name:h2query",
+    "type:yarn",
+    "ver:2.4.0",
+    "sched:adhoc"
+  ]
 }
-```
+{% endhighlight %}
 
 Once a cluster has been linked to a command your Genie instance is ready to
 start running jobs. The job entity is described in the following section. One
@@ -391,40 +391,40 @@ Below is a Job object sent to the
 [submitJob](https://netflix.github.io/genie/docs/2.2.3/api/#!/jobs/submitJob)
 API.
 
-```JSON
+{% highlight json %}
 {
-    version: "NA",
-    user: "sqoop",
-    name: "O2S3.PLTFRM.TRANSFER_AUTOMIC_JOB_STATS_TO_S3_DAILY",
-    commandArgs: "command arguments for the sqoop command here",
-    clusterCriterias: [
-        {
-            tags: [
-                "sched:adhoc",
-                "type:yarn"
-            ]
-        },
-        {
-            tags: [
-                "type:yarn"
-            ]
-        }
-    ],
-    commandCriteria: [
-        "type:sqoop",
-        "ver:1.4.5"
-    ],
-    tags: [
-        "sqoop"
-    ]
+  "version": "NA",
+  "user": "sqoop",
+  "name": "O2S3.PLTFRM.TRANSFER_AUTOMIC_JOB_STATS_TO_S3_DAILY",
+  "commandArgs": "command arguments for the sqoop command here",
+  "clusterCriterias": [
+    {
+      "tags": [
+        "sched:adhoc",
+        "type:yarn"
+      ]
+    },
+    {
+      "tags": [
+        "type:yarn"
+      ]
+    }
+  ],
+  "commandCriteria": [
+    "type:sqoop",
+    "ver:1.4.5"
+  ],
+  "tags": [
+    "sqoop"
+  ]
 }
-```
+{% endhighlight %}
 
 Some things to note. There are two sets of `commandCriteria`. If you look back
 at the cluster registered in the Cluster section you'll see it has
 the following tags:
 
-```JSON
+{% highlight json %}
 [
   "genie.id:bdp_h2query_20150219_185356",
   "genie.name:h2query",
@@ -432,13 +432,13 @@ the following tags:
   "ver:2.4.0",
   "sched:adhoc"
 ]
-```
+{% endhighlight %}
 
 It's easy to see that the first set of `clusterCriteria` will match a subset of
 the Cluster tags. Now the `commandCriteria` if you look back to the
 Command section you'll see it was registered with tags:
 
-```JSON
+{% highlight json %}
 [
   "genie.id:sqoop145",
   "genie.name:sqoop",
@@ -446,7 +446,7 @@ Command section you'll see it was registered with tags:
   "data:prod",
   "data:test"
 ]
-```
+{% endhighlight %}
 
 type:sqoop and ver:1.4.5 were all that was requested by the job so it will match
 this command and cluster combination as they were linked. So now we have the
@@ -458,62 +458,62 @@ search for it later along with other sqoop jobs. After the job is submitted
 Genie will execute it and update the job object in the database. After job
 completion the object will look something like this:
 
-```JSON
+{% highlight json %}
 {
-    id: "01259902-af71-11e4-bb44-0a03223debf4",
-    created: "2015-02-08T09:01:05Z",
-    updated: "2015-02-08T09:04:21Z",
-    version: "NA",
-    user: "sqoop",
-    name: "O2S3.PLTFRM.TRANSFER_AUTOMIC_JOB_STATS_TO_S3_DAILY",
-    commandArgs: "command arguments for the sqoop command here",
-    description: null,
-    group: null,
-    envPropFile: null,
-    clusterCriterias: [
-        {
-            tags: [
-                "sched:adhoc",
-                "type:yarn"
-            ]
-        },
-        {
-            tags: [
-                "type:yarn"
-            ]
-        }
-    ],
-    commandCriteria: [
-        "type:sqoop",
-        "ver:1.4.5"
-    ],
-    fileDependencies: "",
-    attachments: null,
-    disableLogArchival: false,
-    email: null,
-    tags: [
-        "sqoop"
-    ],
-    executionClusterName: "h2query",
-    executionClusterId: "bdp_h2query_20150219_185356",
-    applicationName: "sqoop",
-    applicationId: "sqoop145",
-    commandName: "sqoop",
-    commandId: "sqoop145",
-    processHandle: 29266,
-    status: "SUCCEEDED",
-    statusMsg: "Job finished successfully",
-    started: "2015-02-21T09:01:05Z",
-    finished: "2015-02-21T09:04:21Z",
-    clientHost: "X.X.X.X",
-    hostName: "X.X.X.X",
-    killURI: "http://X.X.X.X:7001/genie/v2/jobs/01259902-af71-11e4-bb44-0a03223debf4",
-    outputURI: "http://X.X.X.X:7001/genie-jobs/01259902-af71-11e4-bb44-0a03223debf4",
-    exitCode: 0,
-    forwarded: false,
-    archiveLocation: "s3://aS3Bucket/genie/logs/01259902-af71-11e4-bb44-0a03223debf4"
+  "id": "01259902-af71-11e4-bb44-0a03223debf4",
+  "created": "2015-02-08T09:01:05Z",
+  "updated": "2015-02-08T09:04:21Z",
+  "version": "NA",
+  "user": "sqoop",
+  "name": "O2S3.PLTFRM.TRANSFER_AUTOMIC_JOB_STATS_TO_S3_DAILY",
+  "commandArgs": "command arguments for the sqoop command here",
+  "description": null,
+  "group": null,
+  "envPropFile": null,
+  "clusterCriterias": [
+    {
+      "tags": [
+        "sched:adhoc",
+        "type:yarn"
+      ]
+    },
+    {
+      "tags": [
+        "type:yarn"
+      ]
+    }
+  ],
+  "commandCriteria": [
+    "type:sqoop",
+    "ver:1.4.5"
+  ],
+  "fileDependencies": "",
+  "attachments": null,
+  "disableLogArchival": false,
+  "email": null,
+  "tags": [
+    "sqoop"
+  ],
+  "executionClusterName": "h2query",
+  "executionClusterId": "bdp_h2query_20150219_185356",
+  "applicationName": "sqoop",
+  "applicationId": "sqoop145",
+  "commandName": "sqoop",
+  "commandId": "sqoop145",
+  "processHandle": 29266,
+  "status": "SUCCEEDED",
+  "statusMsg": "Job finished successfully",
+  "started": "2015-02-21T09:01:05Z",
+  "finished": "2015-02-21T09:04:21Z",
+  "clientHost": "X.X.X.X",
+  "hostName": "X.X.X.X",
+  "killURI": "http://X.X.X.X:7001/genie/v2/jobs/01259902-af71-11e4-bb44-0a03223debf4",
+  "outputURI": "http://X.X.X.X:7001/genie-jobs/01259902-af71-11e4-bb44-0a03223debf4",
+  "exitCode": 0,
+  "forwarded": false,
+  "archiveLocation": "s3://aS3Bucket/genie/logs/01259902-af71-11e4-bb44-0a03223debf4"
 }
-```
+{% endhighlight %}
 
 Now all those other fields from the model are filled in. We can see the final
 job status, where job results are using the `outputURI` and other important

@@ -16,4 +16,6 @@ Please see the various topics below for more information.
 
 ## Topics
 
+- [Data Model]({{ site.baseurl }}/concepts/3/DataModel.html)
+- [How It Works]({{ site.baseurl }}/concepts/3/HowItWorks.html)
 - [Deployment at Netflix]({{ site.baseurl }}/concepts/3/NetflixDeployment.html)
