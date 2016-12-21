@@ -7,6 +7,9 @@ permalink: /concepts/2/HowItWorks.html
 sidebar: left
 ---
 
+* TOC
+{:toc}
+
 The following diagram explains the core components of Genie, and its two classes
 of users - administrators,and end-users.
 

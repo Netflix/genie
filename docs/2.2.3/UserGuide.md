@@ -7,6 +7,9 @@ permalink: /releases/2.2.3/UserGuide.html
 sidebar: left
 ---
 
+* TOC
+{:toc}
+
 ## Introduction
 
 This page provides details of all the API's and Client information for Genie

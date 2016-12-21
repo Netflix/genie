@@ -6,6 +6,9 @@ permalink: /concepts/2/
 sidebar: left
 ---
 
+* TOC
+{:toc}
+
 ## Introduction
 
 This page serves as the homepage for high level Genie version 2.x documentation
