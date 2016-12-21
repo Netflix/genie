@@ -3,9 +3,12 @@ layout: page
 title: Netflix Deployment
 teaser: How Genie is Deployed at Netflix
 header: no
-permalink: /concepts/3/NetflixDeployment.html
+permalink: /concepts/3/NetflixDeployment/
 sidebar: left
 ---
+
+* TOC
+{:toc}
 
 # Introduction
 

@@ -3,9 +3,12 @@ layout: page
 title: Data Model
 teaser: Genie 3 Data Model
 header: no
-permalink: /concepts/3/DataModel.html
+permalink: /concepts/3/DataModel/
 sidebar: left
 ---
+
+* TOC
+{:toc}
 
 ## Introduction
 

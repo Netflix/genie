@@ -1,0 +1,2 @@
+# Disable analytics in development
+google_analytics_tracking_id: false

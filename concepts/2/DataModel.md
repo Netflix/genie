@@ -7,6 +7,9 @@ permalink: /concepts/2/DataModel.html
 sidebar: left
 ---
 
+* TOC
+{:toc}
+
 ## Introduction
 
 The Genie data model was built to support adding new job execution clients to

@@ -7,6 +7,9 @@ permalink: /releases/2.2.3/setup.html
 sidebar: left
 ---
 
+* TOC
+{:toc}
+
 ## Introduction
 
 These instructions walk through setting up Genie from scratch. If you just want
