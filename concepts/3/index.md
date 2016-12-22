@@ -6,20 +6,7 @@ permalink: /concepts/3/
 sidebar: left
 ---
 
-* TOC
-{:toc}
-
-## Introduction
-
-This page serves as the homepage for high level Genie version 3.x documentation
-about concepts like how Genie works, the data model, how it is deployed at
-Netflix, etc.
-
-Please see the various topics below for more information.
-
-## Topics
-
-- [Data Model]({{ site.baseurl }}/concepts/3/DataModel/)
-- [How It Works]({{ site.baseurl }}/concepts/3/HowItWorks/)
-- [Configuration at Netflix]({{ site.baseurl }}/concepts/3/HowItWorks/NetflixExample.html)
-- [Deployment at Netflix]({{ site.baseurl }}/concepts/3/NetflixDeployment/)
+Genie 3 concept documentation has been moved to the reference documentation for
+each specific [release]({{ site.baseurl }}/releases/). This will allow us to
+snapshot the documentation at each release and hopefully keep everything in
+sync as releases move forward.
