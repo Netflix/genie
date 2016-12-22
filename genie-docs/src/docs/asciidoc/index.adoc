@@ -14,5 +14,19 @@ v{revnumber}, {localdate}
 :stylesheet: rubygems.css
 :stylesdir: stylesheets
 :source-highlighter: highlight.js
+:imagesdir: images/
 
-WARNING: Work In Progress (obviously)
+== Introduction
+
+This is the reference documentation for Genie version {revnumber}. Here you will find high level concept documentation
+as well as documentation about how to install and configure this Genie version.
+
+NOTE: For documentation of the REST API for this version of Genie please see the
+https://netflix.github.io/genie/docs/{revnumber}/rest[API Guide].
+
+NOTE: For a demo of this version of Genie please see the
+https://netflix.github.io/genie/docs/{revnumber}/demo[Demo Guide].
+
+WARNING: Work In Progress
+
+include::concepts/_concepts.adoc[]

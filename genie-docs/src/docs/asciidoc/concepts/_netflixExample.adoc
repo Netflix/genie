@@ -1,0 +1,1227 @@
+=== Netflix Example
+
+Understanding Genie without a concrete example is hard. This section attempts to walk through an end to end
+configuration and job execution example of a job at Netflix. To see more examples or try your own please see the
+https://netflix.github.io/genie/docs/{revnumber}/demo/[Demo Guide]. Also see the
+https://netflix.github.io/genie/docs/{revnumber}/rest/[REST API] documentation which will describe the purpose of the
+fields of the resources shown below.
+
+NOTE: This example contains JSON representations of resources.
+
+==== Configuration
+
+For the purpose of brevity we will only cover a subset of the total Netflix
+configuration.
+
+===== Clusters
+
+At Netflix there are tens of active clusters available at any given time. For this example we'll focus on the
+production (SLA) and adhoc http://hadoop.apache.org/[Hadoop] YARN clusters and the production
+https://prestodb.io[Presto] cluster. For the Hadoop clusters we launch using
+https://aws.amazon.com/emr/[Amazon EMR] but it really shouldn't matter how clusters are launched provided you can
+access the proper `*site.xml` files.
+
+The process of launching a YARN cluster at Netflix involves a set of Python tools which interact with the Amazon and
+Genie APIs. First these tools use the EMR APIs to launch the cluster based on configuration files for the cluster
+profile. Then the cluster site XML files are uploaded to S3. Once this is complete all the metadata is sent to Genie to
+create a cluster resource which you can see examples of below.
+
+Presto clusters are launched using http://www.spinnaker.io/[Spinnaker] on regular EC2 instances. As part of the
+pipeline the metadata is registered with Genie using the aforementioned Python tools, which in turn leverage the OSS
+https://pypi.python.org/pypi/nflx-genie-client[Genie Python Client].
+
+In the following cluster resources you should note the `tags` applied to each cluster. Remember that the `genie.id` and
+`genie.name` tags are automatically applied by Genie but all other tags are applied by the admin.
+
+For the YARN clusters note that all the configuration files are referenced by their S3 locations. These files are
+downloaded into the job working directory at runtime.
+
+====== Hadoop Prod Cluster
+
+[source,json]
+----
+{
+  "id": "bdp_h2prod_20161217_205111",
+  "created": "2016-12-17T21:09:30.845Z",
+  "updated": "2016-12-20T17:31:32.523Z",
+  "tags": [
+    "genie.id:bdp_h2prod_20161217_205111",
+    "genie.name:h2prod",
+    "sched:sla",
+    "ver:2.7.0",
+    "type:yarn",
+    "misc:h2bonus3",
+    "misc:h2bonus2",
+    "misc:h2bonus1"
+  ],
+  "version": "2.7.0",
+  "user": "dataeng",
+  "name": "h2prod",
+  "description": null,
+  "setupFile": null,
+  "configs": [
+    "s3://bucket/users/bdp/h2prod/20161217/205111/genie/yarn-site.xml",
+    "s3://bucket/users/bdp/h2prod/20161217/205111/genie/mapred-site.xml",
+    "s3://bucket/users/bdp/h2prod/20161217/205111/genie/hdfs-site.xml",
+    "s3://bucket/users/bdp/h2prod/20161217/205111/genie/core-site.xml"
+  ],
+  "status": "UP",
+  "_links": {
+    "self": {
+      "href": "https://genieHost/api/v3/clusters/bdp_h2prod_20161217_205111"
+    },
+    "commands": {
+      "href": "https://genieHost/api/v3/clusters/bdp_h2prod_20161217_205111/commands"
+    }
+  }
+}
+----
+
+====== Hadoop Adhoc Cluster
+
+[source,json]
+----
+{
+  "id": "bdp_h2query_20161108_204556",
+  "created": "2016-11-08T21:07:17.284Z",
+  "updated": "2016-12-07T00:51:19.655Z",
+  "tags": [
+    "sched:adhoc",
+    "misc:profiled",
+    "ver:2.4.0",
+    "sched:sting",
+    "type:yarn",
+    "genie.name:h2query",
+    "genie.id:bdp_h2query_20161108_204556"
+  ],
+  "version": "2.7.0",
+  "user": "dataeng",
+  "name": "h2query",
+  "description": null,
+  "setupFile": "",
+  "configs": [
+    "s3://bucket/users/bdp/h2query/20161108/204556/genie/core-site.xml",
+    "s3://bucket/users/bdp/h2query/20161108/204556/genie/hdfs-site.xml",
+    "s3://bucket/users/bdp/h2query/20161108/204556/genie/mapred-site.xml",
+    "s3://bucket/users/bdp/h2query/20161108/204556/genie/yarn-site.xml"
+  ],
+  "status": "UP",
+  "_links": {
+    "self": {
+      "href": "https://genieHost/api/v3/clusters/bdp_h2query_20161108_204556"
+    },
+    "commands": {
+      "href": "https://genieHost/api/v3/clusters/bdp_h2query_20161108_204556/commands"
+    }
+  }
+}
+----
+
+====== Presto Prod Cluster
+
+[source,json]
+----
+{
+  "id": "presto-prod-v009",
+  "created": "2016-12-05T19:33:52.575Z",
+  "updated": "2016-12-05T19:34:14.725Z",
+  "tags": [
+    "sched:adhoc",
+    "genie.id:presto-prod-v009",
+    "type:presto",
+    "genie.name:presto",
+    "ver:0.149",
+    "data:prod",
+    "type:spinnaker-presto"
+  ],
+  "version": "1480966454",
+  "user": "dataeng",
+  "name": "presto",
+  "description": null,
+  "setupFile": null,
+  "configs": [],
+  "status": "UP",
+  "_links": {
+    "self": {
+      "href": "https://genieHost/api/v3/clusters/presto-prod-v009"
+    },
+    "commands": {
+      "href": "https://genieHost/api/v3/clusters/presto-prod-v009/commands"
+    }
+  }
+}
+----
+
+===== Commands
+
+Commands and applications at Netflix are handled a bit differently than clusters. The source data for these command and
+application resources are not generated dynamically like the cluster configuration files. Instead they are stored in a
+git repository as a combination of YAML, bash, python and other files. These configuration files are synced to an S3
+bucket every time a commit occurs. This makes sure Genie is always pulling in the latest configuration. This sync is
+performed by a Jenkins job responding to a commit hook trigger. Also done in this Jenkins job is registration of the
+commands and applications with Genie via the same python tool set and Genie python client as with clusters.
+
+Pay attention to the tags applied to the commands as they are used to select which command to use when a job is run.
+The presto command includes a setup file which allows additional configuration when it is used.
+
+====== Presto 0.149
+
+[source,json]
+----
+{
+  "id": "presto0149",
+  "created": "2016-08-08T23:22:15.977Z",
+  "updated": "2016-12-20T23:28:44.678Z",
+  "tags": [
+    "genie.id:presto0149",
+    "type:presto",
+    "genie.name:presto",
+    "ver:0.149",
+    "data:prod",
+    "data:test"
+  ],
+  "version": "0.149",
+  "user": "builds",
+  "name": "presto",
+  "description": "Presto Command",
+  "setupFile": "s3://bucket/builds/bdp-cluster-configs/genie3/commands/presto/0.149/setup.sh",
+  "configs": [],
+  "status": "ACTIVE",
+  "executable": "${PRESTO_CMD} --server ${PRESTO_SERVER} --catalog hive --schema default --debug",
+  "checkDelay": 5000,
+  "memory": null,
+  "_links": {
+    "self": {
+      "href": "https://genieHost/api/v3/commands/presto0149"
+    },
+    "applications": {
+      "href": "https://genieHost/api/v3/commands/presto0149/applications"
+    },
+    "clusters": {
+      "href": "https://genieHost/api/v3/commands/presto0149/clusters"
+    }
+  }
+}
+----
+
+Presto 0.149 Setup File
+
+[source,bash]
+----
+#!/bin/bash
+
+set -o errexit -o nounset -o pipefail
+
+chmod 755 ${GENIE_APPLICATION_DIR}/presto0149/dependencies/presto-cli
+export JAVA_HOME=/apps/bdp-java/java-8-oracle
+export PATH=${JAVA_HOME}/bin/:$PATH
+
+export PRESTO_SERVER="http://${GENIE_CLUSTER_NAME}.rest.of.url"
+export PRESTO_CMD=${GENIE_APPLICATION_DIR}/presto0149/dependencies/presto-wrapper.py
+chmod 755 ${PRESTO_CMD}
+----
+
+====== Spark Submit Prod 1.6.1
+
+[source,json]
+----
+{
+  "id": "prodsparksubmit161",
+  "created": "2016-05-17T16:38:31.152Z",
+  "updated": "2016-12-20T23:28:33.042Z",
+  "tags": [
+    "genie.id:prodsparksubmit161",
+    "genie.name:prodsparksubmit",
+    "ver:1.6",
+    "type:sparksubmit",
+    "data:prod",
+    "ver:1.6.1"
+  ],
+  "version": "1.6.1",
+  "user": "builds",
+  "name": "prodsparksubmit",
+  "description": "Prod Spark Submit Command",
+  "setupFile": "s3://bucket/builds/bdp-cluster-configs/genie3/commands/spark/1.6.1/prod/scripts/spark-1.6.1-prod-submit-cmd.sh",
+  "configs": [
+    "s3://bucket/builds/bdp-cluster-configs/genie3/commands/spark/1.6.1/prod/configs/hive-site.xml"
+  ],
+  "status": "ACTIVE",
+  "executable": "${SPARK_HOME}/bin/dsespark-submit",
+  "checkDelay": 5000,
+  "memory": null,
+  "_links": {
+    "self": {
+      "href": "https://genieHost/api/v3/commands/prodsparksubmit161"
+    },
+    "applications": {
+      "href": "https://genieHost/api/v3/commands/prodsparksubmit161/applications"
+    },
+    "clusters": {
+      "href": "https://genieHost/api/v3/commands/prodsparksubmit161/clusters"
+    }
+  }
+}
+----
+
+Spark Submit Prod 1.6.1 Setup File
+
+[source,bash]
+----
+#!/bin/bash
+
+#set -o errexit -o nounset -o pipefail
+
+export JAVA_HOME=/apps/bdp-java/java-8-oracle
+
+#copy hive-site.xml configuration
+cp ${GENIE_COMMAND_DIR}/config/* ${SPARK_CONF_DIR}
+cp ${GENIE_COMMAND_DIR}/config/* ${HADOOP_CONF_DIR}/
+----
+
+====== Spark Submit Prod 2.0.0
+
+[source,json]
+----
+{
+  "id": "prodsparksubmit200",
+  "created": "2016-10-31T16:59:01.145Z",
+  "updated": "2016-12-20T23:28:47.340Z",
+  "tags": [
+    "ver:2",
+    "genie.name:prodsparksubmit",
+    "ver:2.0",
+    "genie.id:prodsparksubmit200",
+    "ver:2.0.0",
+    "type:sparksubmit",
+    "data:prod"
+  ],
+  "version": "2.0.0",
+  "user": "builds",
+  "name": "prodsparksubmit",
+  "description": "Prod Spark Submit Command",
+  "setupFile": "s3://bucket/builds/bdp-cluster-configs/genie3/commands/spark/2.0.0/prod/copy-config.sh",
+  "configs": [
+    "s3://bucket/builds/bdp-cluster-configs/genie3/commands/spark/2.0.0/prod/configs/hive-site.xml"
+  ],
+  "status": "ACTIVE",
+  "executable": "${SPARK_HOME}/bin/dsespark-submit.py",
+  "checkDelay": 5000,
+  "memory": null,
+  "_links": {
+    "self": {
+      "href": "https://genieHost/api/v3/commands/prodsparksubmit200"
+    },
+    "applications": {
+      "href": "https://genieHost/api/v3/commands/prodsparksubmit200/applications"
+    },
+    "clusters": {
+      "href": "https://genieHost/api/v3/commands/prodsparksubmit200/clusters"
+    }
+  }
+}
+----
+
+Spark Submit 2.0.0 Setup File
+
+[source,bash]
+----
+#!/bin/bash
+
+set -o errexit -o nounset -o pipefail
+
+# copy hive-site.xml configuration
+cp ${GENIE_COMMAND_DIR}/config/* ${SPARK_CONF_DIR}
+----
+
+===== Applications
+
+Below are the applications needed by the above commands. The most important part of these applications are the
+dependencies and the setup file.
+
+The dependencies are effectively the installation package and at Netflix typically are a zip of all binaries needed to
+run a client like Hadoop, Hive, Spark etc. Some of these  zips are generated by builds and placed in S3 and others are
+downloaded from OSS projects and uploaded to S3 periodically. Often minor changes to these dependencies are needed. A
+new file is uploaded to S3 and the Genie caches on each node will be refreshed with this new file on next access. This
+pattern allows us to avoid replacing Genie clusters every time an application changes.
+
+The setup file effectively is the installation script for the aforementioned dependencies. It is sourced by Genie and
+the expectation is that after it is run the application is successfully configured in the job working directory.
+
+====== Hadoop 2.7.2
+
+[source,json]
+----
+{
+  "id": "hadoop272",
+  "created": "2016-08-18T16:58:31.044Z",
+  "updated": "2016-12-21T00:01:08.263Z",
+  "tags": [
+    "type:hadoop",
+    "genie.id:hadoop272",
+    "genie.name:hadoop",
+    "ver:2.7.2"
+  ],
+  "version": "2.7.2",
+  "user": "builds",
+  "name": "hadoop",
+  "description": "Hadoop Application",
+  "setupFile": "s3://bucket/builds/bdp-cluster-configs/genie3/applications/hadoop/2.7.2/setup.sh",
+  "configs": [],
+  "dependencies": [
+    "s3://bucket/hadoop/2.7.2/hadoop-2.7.2.tgz"
+  ],
+  "status": "ACTIVE",
+  "type": "hadoop",
+  "_links": {
+    "self": {
+      "href": "https://genieHost/api/v3/applications/hadoop272"
+    },
+    "commands": {
+      "href": "https://genieHost/api/v3/applications/hadoop272/commands"
+    }
+  }
+}
+----
+
+Hadoop 2.7.2 Setup File
+
+[source,bash]
+----
+#!/bin/bash
+
+set -o errexit -o nounset -o pipefail
+
+export JAVA_HOME=/apps/bdp-java/java-7-oracle
+export APP_ID=hadoop272
+export APP_NAME=hadoop-2.7.2
+export HADOOP_DEPENDENCIES_DIR=$GENIE_APPLICATION_DIR/$APP_ID/dependencies
+export HADOOP_HOME=$HADOOP_DEPENDENCIES_DIR/$APP_NAME
+
+tar -xf "${HADOOP_DEPENDENCIES_DIR}/hadoop-2.7.2.tgz" -C "${HADOOP_DEPENDENCIES_DIR}"
+
+export HADOOP_CONF_DIR="${HADOOP_HOME}/conf"
+export HADOOP_LIBEXEC_DIR="${HADOOP_HOME}/usr/lib/hadoop/libexec"
+export HADOOP_HEAPSIZE=1500
+
+cp ${GENIE_CLUSTER_DIR}/config/* $HADOOP_CONF_DIR/
+
+EXTRA_PROPS=$(echo "<property><name>genie.job.id</name><value>$GENIE_JOB_ID</value></property><property><name>genie.job.name</name><value>$GENIE_JOB_NAME</value></property><property><name>lipstick.uuid.prop.name</name><value>genie.job.id</value></property><property><name>dataoven.job.id</name><value>$GENIE_JOB_ID</value></property><property><name>genie.netflix.environment</name><value>${NETFLIX_ENVIRONMENT:-prod}</value></property><property><name>genie.version</name><value>$GENIE_VERSION</value></property><property><name>genie.netflix.stack</name><value>${NETFLIX_STACK:-none}</value></property>" | sed 's/\//\\\//g')
+
+sed -i "/<\/configuration>/ s/.*/${EXTRA_PROPS}&/" $HADOOP_CONF_DIR/core-site.xml
+
+if [ -d "/apps/s3mper/hlib" ]; then
+export  HADOOP_OPTS="-javaagent:/apps/s3mper/hlib/aspectjweaver-1.7.3.jar ${HADOOP_OPTS:-}"
+fi
+
+# Remove the zip to save space
+rm "${HADOOP_DEPENDENCIES_DIR}/hadoop-2.7.2.tgz"
+----
+
+====== Presto 0.149
+
+[source,json]
+----
+{
+  "id": "presto0149",
+  "created": "2016-08-08T23:21:58.780Z",
+  "updated": "2016-12-21T00:21:10.945Z",
+  "tags": [
+    "genie.id:presto0149",
+    "type:presto",
+    "genie.name:presto",
+    "ver:0.149"
+  ],
+  "version": "0.149",
+  "user": "builds",
+  "name": "presto",
+  "description": "Presto Application",
+  "setupFile": "s3://bucket/builds/bdp-cluster-configs/genie3/applications/presto/0.149/setup.sh",
+  "configs": [],
+  "dependencies": [
+    "s3://bucket/presto/clients/0.149/presto-cli",
+    "s3://bucket/builds/bdp-cluster-configs/genie3/applications/presto/0.149/presto-wrapper.py"
+  ],
+  "status": "ACTIVE",
+  "type": "presto",
+  "_links": {
+    "self": {
+      "href": "https://genieProd/api/v3/applications/presto0149"
+    },
+    "commands": {
+      "href": "https://genieProd/api/v3/applications/presto0149/commands"
+    }
+  }
+}
+----
+
+Presto 0.149 Setup File
+
+[source,bash]
+----
+#!/bin/bash
+
+set -o errexit -o nounset -o pipefail
+
+chmod 755 ${GENIE_APPLICATION_DIR}/presto0149/dependencies/presto-cli
+chmod 755 ${GENIE_APPLICATION_DIR}/presto0149/dependencies/presto-wrapper.py
+export JAVA_HOME=/apps/bdp-java/java-8-oracle
+export PATH=${JAVA_HOME}/bin/:$PATH
+
+# Set the cli path for the commands to use when they invoke presto using this Application
+export PRESTO_CLI_PATH="${GENIE_APPLICATION_DIR}/presto0149/dependencies/presto-cli"
+----
+
+====== Spark 1.6.1
+
+[source,json]
+----
+{
+  "id": "spark161",
+  "created": "2016-05-17T16:32:21.475Z",
+  "updated": "2016-12-21T00:01:07.951Z",
+  "tags": [
+    "genie.id:spark161",
+    "type:spark",
+    "ver:1.6",
+    "ver:1.6.1",
+    "genie.name:spark"
+  ],
+  "version": "1.6.1",
+  "user": "builds",
+  "name": "spark",
+  "description": "Spark Application",
+  "setupFile": "s3://bucket/builds/bdp-cluster-configs/genie3/applications/spark/1.6.1/scripts/spark-1.6.1-app.sh",
+  "configs": [
+    "s3://bucket/builds/bdp-cluster-configs/genie3/applications/spark/1.6.1/configs/spark-env.sh"
+  ],
+  "dependencies": [
+    "s3://bucket/spark/1.6.1/spark-1.6.1.tgz"
+  ],
+  "status": "ACTIVE",
+  "type": "spark",
+  "_links": {
+    "self": {
+      "href": "https://genieHost/api/v3/applications/spark161"
+    },
+    "commands": {
+      "href": "https://genieHost/api/v3/applications/spark161/commands"
+    }
+  }
+}
+----
+
+Spark 1.6.1 Setup File
+
+[source,bash]
+----
+#!/bin/bash
+
+set -o errexit -o nounset -o pipefail
+
+VERSION="1.6.1"
+DEPENDENCY_DOWNLOAD_DIR="${GENIE_APPLICATION_DIR}/spark161/dependencies"
+
+# Unzip all the Spark jars
+tar -xf ${DEPENDENCY_DOWNLOAD_DIR}/spark-${VERSION}.tgz -C ${DEPENDENCY_DOWNLOAD_DIR}
+
+# Set the required environment variable.
+export SPARK_HOME=${DEPENDENCY_DOWNLOAD_DIR}/spark-${VERSION}
+export SPARK_CONF_DIR=${SPARK_HOME}/conf
+export SPARK_LOG_DIR=${GENIE_JOB_DIR}
+export SPARK_LOG_FILE=spark.log
+export SPARK_LOG_FILE_PATH=${GENIE_JOB_DIR}/${SPARK_LOG_FILE}
+export CURRENT_JOB_WORKING_DIR=${GENIE_JOB_DIR}
+export CURRENT_JOB_TMP_DIR=${CURRENT_JOB_WORKING_DIR}/tmp
+
+export JAVA_HOME=/apps/bdp-java/java-8-oracle
+export SPARK_DAEMON_JAVA_OPTS="-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeStamps"
+
+# Make Sure Script is on the Path
+export PATH=$PATH:${SPARK_HOME}/bin
+
+# Delete the zip to save space
+rm ${DEPENDENCY_DOWNLOAD_DIR}/spark-${VERSION}.tgz
+----
+
+Spark 1.6.1 Environment Variable File
+
+[source,bash]
+----
+#!/bin/bash
+
+#set -o errexit -o nounset -o pipefail
+export JAVA_HOME=/apps/bdp-java/java-8-oracle
+export SPARK_DAEMON_JAVA_OPTS="-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeStamps"
+----
+
+====== Spark 2.0.0
+
+[source,json]
+----
+{
+  "id": "spark200",
+  "created": "2016-10-31T16:58:54.155Z",
+  "updated": "2016-12-21T00:01:11.105Z",
+  "tags": [
+    "type:spark",
+    "ver:2.0",
+    "ver:2.0.0",
+    "genie.id:spark200",
+    "genie.name:spark"
+  ],
+  "version": "2.0.0",
+  "user": "builds",
+  "name": "spark",
+  "description": "Spark Application",
+  "setupFile": "s3://bucket/builds/bdp-cluster-configs/genie3/applications/spark/2.0.0/setup.sh",
+  "configs": [],
+  "dependencies": [
+    "s3://bucket/spark-builds/2.0.0/spark-2.0.0.tgz"
+  ],
+  "status": "ACTIVE",
+  "type": "spark",
+  "_links": {
+    "self": {
+      "href": "https://genieHost/api/v3/applications/spark200"
+    },
+    "commands": {
+      "href": "https://genieHost/api/v3/applications/spark200/commands"
+    }
+  }
+}
+----
+
+Spark 2.0.0 Setup File
+
+[source,bash]
+----
+#!/bin/bash
+
+set -o errexit -o nounset -o pipefail
+
+start_dir=`pwd`
+cd `dirname ${BASH_SOURCE[0]}`
+SPARK_BASE=`pwd`
+cd $start_dir
+
+export JAVA_HOME=/apps/bdp-java/java-8-oracle
+export SPARK_DAEMON_JAVA_OPTS="-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeStamps"
+
+SPARK_DEPS=${SPARK_BASE}/dependencies
+
+export SPARK_VERSION="2.0.0"
+
+tar xzf ${SPARK_DEPS}/spark-${SPARK_VERSION}.tgz -C ${SPARK_DEPS}
+
+# Set the required environment variable.
+export SPARK_HOME=${SPARK_DEPS}/spark-${SPARK_VERSION}
+export SPARK_CONF_DIR=${SPARK_HOME}/conf
+export SPARK_LOG_DIR=${GENIE_JOB_DIR}
+export SPARK_LOG_FILE=spark.log
+export SPARK_LOG_FILE_PATH=${GENIE_JOB_DIR}/${SPARK_LOG_FILE}
+export CURRENT_JOB_WORKING_DIR=${GENIE_JOB_DIR}
+export CURRENT_JOB_TMP_DIR=${CURRENT_JOB_WORKING_DIR}/tmp
+
+# Make Sure Script is on the Path
+export PATH=$PATH:${SPARK_HOME}/bin
+
+# Delete the tarball to save space
+rm ${SPARK_DEPS}/spark-${SPARK_VERSION}.tgz
+
+chmod a+x ${SPARK_HOME}/bin/dsespark-submit.py
+----
+
+===== Relationships
+
+Now that all the resources are available they need to be linked together. Commands need to be added to the clusters
+they can be run on and applications need to be added as dependencies for commands.
+
+====== Commands for a Cluster
+
+When commands are added to a cluster they should be in priority order. Meaning if two commands both match a users tags
+for a job the one higher in the list will be used. This allows us to switch defaults quickly and transparently.
+
+Note: The lists below leave out a lot of commands and fields for brevity. Only the id of the command is included so it
+can reference the same command resource defined earlier in this article.
+
+*Hadoop Prod Cluster*
+
+The Hadoop clusters have both currently supported Spark versions added. Spark 1.6.1 is the default but users can
+override to Spark 2 using the `ver` tag.
+
+Note: https://genieHost/api/v3/clusters/bdp_h2prod_20161217_205111/commands
+
+[source,json]
+----
+[
+  ...
+  {
+    "id": "prodsparksubmit161"
+    ...
+  },
+  {
+    "id": "prodsparksubmit200"
+    ...
+  }
+  ...
+]
+----
+
+*Hadoop Adhoc Cluster*
+
+Note: https://genieHost/api/v3/clusters/bdp_h2query_20161108_204556/commands
+
+[source,json]
+----
+[
+  ...
+  {
+    "id": "prodsparksubmit161"
+    ...
+  },
+  {
+    "id": "prodsparksubmit200"
+    ...
+  }
+  ...
+]
+----
+
+*Presto Prod Cluster*
+
+Presto clusters only really support the Presto command but possible that it
+could have multiple backwards compatible versions of the client available.
+
+Note: https://genieHost/api/v3/clusters/presto-prod-v009/commands
+
+[source,json]
+----
+[
+  ...
+  {
+    "id": "presto0149"
+    ...
+  }
+  ...
+]
+----
+
+====== Applications for a Command
+
+Linking applications to a command tells Genie that these applications need to be downloaded and setup in order to
+successfully run the command. The order of the applications will be the order the download and setup is performed so
+dependencies between applications should be managed via this order.
+
+*Presto 0.149*
+
+Presto only needs the corresponding Presto application which contains the Presto Java CLI jar and some setup wrapper
+scripts.
+
+Note: https://genieHost/api/v3/commands/presto0149/applications
+
+[source,json]
+----
+[
+  {
+    "id": "presto0149"
+    ...
+  }
+]
+----
+
+*Spark Submit Prod 1.6.1*
+
+Since we submit Spark jobs to YARN clusters in order to run the Spark submit commands we need both Spark and Hadoop
+applications installed and configured on the job classpath in order to run. Hadoop needs to be setup first so that
+the configurations can be copied to Spark.
+
+Note: https://genieHost/api/v3/commands/prodsparksubmit161/applications
+
+[source,json]
+----
+[
+  {
+    "id": "hadoop272"
+    ...
+  },
+  {
+    "id": "spark161"
+    ...
+  }
+]
+----
+
+*Spark Submit Prod 2.0.0*
+
+Note: https://genieHost/api/v3/commands/prodsparksubmit200/applications
+
+[source,json]
+----
+[
+  {
+    "id": "hadoop272"
+    ...
+  },
+  {
+    "id": "spark200"
+    ...
+  }
+]
+----
+
+==== Job Submission
+
+Everything is now in place for users to submit their jobs. This section will walk through the components and outputs of
+that process. For clarity we're going to show a PySpark job being submitted to show how Genie figures out the cluster
+and command to be used based on what was configured above.
+
+===== The Request
+
+Below is an actual job request (with a few obfuscations) made by a production job here at Netflix to Genie.
+
+[source,json]
+----
+{
+  "id": "SP.CS.FCT_TICKET_0054500815", // <1>
+  "created": "2016-12-21T04:13:07.244Z",
+  "updated": "2016-12-21T04:13:07.244Z",
+  "tags": [ // <2>
+    "submitted.by:call_genie",
+    "scheduler.job_name:SP.CS.FCT_TICKET",
+    "scheduler.run_id:0054500815",
+    "SparkPythonJob",
+    "scheduler.name:uc4"
+  ],
+  "version": "NA",
+  "user": "someNetflixEmployee",
+  "name": "SP.CS.FCT_TICKET",
+  "description": "{\"username\": \"root\", \"host\": \"2d35f0d397fd\", \"client\": \"nflx-kragle-djinn/0.4.3\", \"kragle_version\": \"0.41.11\", \"job_class\": \"SparkPythonJob\"}",
+  "setupFile": null,
+  "commandArgs": "--queue root.sla --py-files dea_pyspark_core-latest.egg fct_ticket.py", // <3>
+  "clusterCriterias": [ // <4>
+    {
+      "tags": [
+        "sched:sla"
+      ]
+    }
+  ],
+  "commandCriteria": [ // <5>
+    "type:sparksubmit",
+    "data:prod"
+  ],
+  "group": null,
+  "disableLogArchival": false,
+  "email": null,
+  "cpu": null,
+  "memory": null,
+  "timeout": null,
+  "dependencies": [ // <6>
+    "s3://bucket/DSE/etl_code/cs/ticket/fct_ticket.py",
+    "s3://bucket/dea/pyspark_core/dea_pyspark_core-latest.egg"
+  ],
+  "applications": [],
+  "_links": {
+    "self": {
+      "href": "https://genieHost/api/v3/jobs/SP.CS.FCT_TICKET_0054500815/request"
+    },
+    "job": {
+      "href": "https://genieHost/api/v3/jobs/SP.CS.FCT_TICKET_0054500815"
+    },
+    "execution": {
+      "href": "https://genieHost/api/v3/jobs/SP.CS.FCT_TICKET_0054500815/execution"
+    },
+    "output": {
+      "href": "https://genieHost/api/v3/jobs/SP.CS.FCT_TICKET_0054500815/output"
+    },
+    "status": {
+      "href": "https://genieHost/api/v3/jobs/SP.CS.FCT_TICKET_0054500815/status"
+    }
+  }
+}
+----
+
+Lets look at a few of the fields of note:
+
+<1> The user set the ID. This is a popular pattern in Netflix for tracking jobs between systems and reattaching to jobs.
+<2> The user added a few tags that will allow them to search for the job later. This is optional but convenient.
+<3> The user specifies some arguments to add to the default set of command arguments specified by the command
+`executable` field. In this case it's what python file to run.
+<4> The user wants this job to run on any cluster that is labeled as having an SLA which also supports the command
+selected using the `commandCriteria`
+<5> User wants the default Spark Submit command (no version specified) and wants to be able to access production data
+<6> Here you can see that they add the two files referenced in the `commandArgs` as dependencies. These files will be
+downloaded in the root job directory parallel to the run script so they are accessible.
+
+===== The Job
+
+In this case the job was accepted by Genie for processing. Below is the actual job object containing fields the user
+might care about. Some are copied from the initial request (like tags) and some are added by Genie.
+
+[source,json]
+----
+{
+  "id": "SP.CS.FCT_TICKET_0054500815",
+  "created": "2016-12-21T04:13:07.245Z",
+  "updated": "2016-12-21T04:20:35.801Z",
+  "tags": [
+    "submitted.by:call_genie",
+    "scheduler.job_name:SP.CS.FCT_TICKET",
+    "scheduler.run_id:0054500815",
+    "SparkPythonJob",
+    "scheduler.name:uc4"
+  ],
+  "version": "NA",
+  "user": "someNetflixEmployee",
+  "name": "SP.CS.FCT_TICKET",
+  "description": "{\"username\": \"root\", \"host\": \"2d35f0d397fd\", \"client\": \"nflx-kragle-djinn/0.4.3\", \"kragle_version\": \"0.41.11\", \"job_class\": \"SparkPythonJob\"}",
+  "status": "SUCCEEDED", // <1>
+  "statusMsg": "Job finished successfully.", // <2>
+  "started": "2016-12-21T04:13:09.025Z", // <3>
+  "finished": "2016-12-21T04:20:35.794Z", // <4>
+  "archiveLocation": "s3://bucket/genie/main/logs/SP.CS.FCT_TICKET_0054500815.tar.gz", // <5>
+  "clusterName": "h2prod", // <6>
+  "commandName": "prodsparksubmit", // <7>
+  "runtime": "PT7M26.769S", // <8>
+  "commandArgs": "--queue root.sla --py-files dea_pyspark_core-latest.egg fct_ticket.py",
+  "_links": {
+    "self": {
+      "href": "https://genieHost/api/v3/jobs/SP.CS.FCT_TICKET_0054500815"
+    },
+    "output": {
+      "href": "https://genieHost/api/v3/jobs/SP.CS.FCT_TICKET_0054500815/output"
+    },
+    "request": {
+      "href": "https://genieHost/api/v3/jobs/SP.CS.FCT_TICKET_0054500815/request"
+    },
+    "execution": {
+      "href": "https://genieHost/api/v3/jobs/SP.CS.FCT_TICKET_0054500815/execution"
+    },
+    "status": {
+      "href": "https://genieHost/api/v3/jobs/SP.CS.FCT_TICKET_0054500815/status"
+    },
+    "cluster": {
+      "href": "https://genieHost/api/v3/jobs/SP.CS.FCT_TICKET_0054500815/cluster"
+    },
+    "command": {
+      "href": "https://genieHost/api/v3/jobs/SP.CS.FCT_TICKET_0054500815/command"
+    },
+    "applications": {
+      "href": "https://genieHost/api/v3/jobs/SP.CS.FCT_TICKET_0054500815/applications"
+    }
+  }
+}
+----
+
+Some fields of note:
+
+<1> The current status of the job. Since this sample was taken after the job was completed it's already marked
+SUCCESSFUL
+<2> This job was successful but if it failed for some reason a more human readable reason would be found here
+<3> The time this job was forked from the Genie process
+<4> The time Genie recognized the job as complete
+<5> Where Genie uploaded a zip of the job directory after the job was completed
+<6> The name of the cluster where this job ran and is de-normalized from the cluster record at the time
+<7> The name of the command used to run this job which is de-normalized from the command record at the time
+<8> The total run time in ISO8601
+
+====== Cluster Selection
+
+Because the user submitted with `sched:sla` this limits the clusters it can run on to any with that tag applied. In our
+example case only the cluster with ID `bdp_h2prod_20161217_205111` has this tag. This isn't enough to make sure this
+job can run (there also needs to be a matching command). If there had been multiple sla clusters Genie would consider
+them all equal and randomly select one.
+
+====== Command Selection
+
+The command criteria states that this job needs to run on a SLA cluster that supports a command of type
+`prodsparksubmit` that can access `prod` data. Two commands (`prodsparksubmit161` and `prodsparksubmit200`) match this
+criteria. Both are linked to the cluster `bdp_h2prod_20161217_205111`. Since both match Genie selects the "default" one
+which is the first on in the list. In this case it was `prodsparksubmit161`.
+
+===== The Job Execution
+
+Below is the job execution resource. This is mainly for system and admin use but it can have some useful information
+for users as well. Mainly it shows which Genie node it actually ran on, how much memory it was allocated, how
+frequently the system polled it for status and when it would have timed out had it kept running.
+
+[source,json]
+----
+{
+  "id": "SP.CS.FCT_TICKET_0054500815",
+  "created": "2016-12-21T04:13:07.245Z",
+  "updated": "2016-12-21T04:20:35.801Z",
+  "hostName": "a.host.com",
+  "processId": 68937,
+  "checkDelay": 5000,
+  "timeout": "2016-12-28T04:13:09.016Z",
+  "exitCode": 0,
+  "memory": 1536,
+  "_links": {
+    "self": {
+      "href": "https://genieHost/api/v3/jobs/SP.CS.FCT_TICKET_0054500815/execution"
+    },
+    "job": {
+      "href": "https://genieHost/api/v3/jobs/SP.CS.FCT_TICKET_0054500815"
+    },
+    "request": {
+      "href": "https://genieHost/api/v3/jobs/SP.CS.FCT_TICKET_0054500815/request"
+    },
+    "output": {
+      "href": "https://genieHost/api/v3/jobs/SP.CS.FCT_TICKET_0054500815/output"
+    },
+    "status": {
+      "href": "https://genieHost/api/v3/jobs/SP.CS.FCT_TICKET_0054500815/status"
+    }
+  }
+}
+----
+
+===== Job Output
+
+Below is an image of the root of the job output directory (displayed via Genie UI) for the above job. Note that the
+dependency files are all downloaded there and some standard files are available (run, stdout, stderr).
+
+NOTE: The URI's in this section point to the UI output endpoint however they are also available via the REST API and
+the UI is really calling this REST API to get the necessary information. Showing the UI endpoints for the better
+looking output and because most users will see this version.
+
+TIP: https://genieHost/output/SP.CS.FCT_TICKET_0054500815/output
+
+TIP: Click image for full size
+
+image::output.png[Genie Output Directory, link="{imagesdir}output.png"]
+
+====== The Run Script
+
+Clicking into the run script shows the below contents. This run script is generated specifically for each individual
+job by Genie. It has some standard bits (error checking, exit process) but also specific information like environment
+variables and what to actually run. Everything is specific to the job working directory. In particular note all the
+`GENIE_*` environment variable exports. These can be used when building your setup and configuration scripts to be more
+flexible.
+
+TIP: https://genieHost/output/SP.CS.FCT_TICKET_0054500815/output/run
+
+[source,bash]
+----
+#!/usr/bin/env bash
+
+set -o nounset -o pipefail
+
+# Set function in case any of the exports or source commands cause an error
+trap "handle_failure" ERR EXIT
+
+function handle_failure {
+  ERROR_CODE=$?
+  # Good exit
+  if [[ ${ERROR_CODE} -eq 0 ]]; then
+  exit 0
+  fi
+  # Bad exit
+  printf '{"exitCode": "%s"}\n' "${ERROR_CODE}" > ./genie/genie.done
+  exit "${ERROR_CODE}"
+}
+
+# Set function for handling kill signal from the job kill service
+trap "handle_kill_request" SIGTERM
+
+function handle_kill_request {
+
+  KILL_EXIT_CODE=999
+  # Disable SIGTERM signal for the script itself
+  trap "" SIGTERM
+
+  echo "Kill signal received"
+
+  ### Write the kill exit code to genie.done file as exit code before doing anything else
+  echo "Generate done file with exit code ${KILL_EXIT_CODE}"
+  printf '{"exitCode": "%s"}\n' "${KILL_EXIT_CODE}" > ./genie/genie.done
+
+  ### Send a kill signal the entire process group
+  echo "Sending a kill signal to the process group"
+  pkill -g $$
+
+  COUNTER=0
+  NUM_CHILD_PROCESSES=`pgrep -g ${SELF_PID} | wc -w`
+
+  # Waiting for 30 seconds for the child processes to die
+  while [[  $COUNTER -lt 30 ]] && [[ "$NUM_CHILD_PROCESSES" -gt 3 ]]; do
+    echo The counter is $COUNTER
+    let COUNTER=COUNTER+1
+    echo "Sleeping now for 1 seconds"
+    sleep 1
+    NUM_CHILD_PROCESSES=`pgrep -g ${SELF_PID} | wc -w`
+  done
+
+  # check if any children are still running. If not just exit.
+  if [ "$NUM_CHILD_PROCESSES" -eq 3  ]
+  then
+    echo "Done"
+    exit
+  fi
+
+  ### Reaching at this point means the children did not die. If so send kill -9 to the entire process group
+  # this is a hard kill and will this process itself as well
+  echo "Sending a kill -9 to children"
+
+  pkill -9 -g $$
+  echo "Done"
+}
+
+SELF_PID=$$
+
+echo Start: `date '+%Y-%m-%d %H:%M:%S'`
+
+export GENIE_JOB_DIR="/mnt/genie/jobs/SP.CS.FCT_TICKET_0054500815"
+
+export GENIE_APPLICATION_DIR="${GENIE_JOB_DIR}/genie/applications"
+
+export GENIE_COMMAND_DIR="${GENIE_JOB_DIR}/genie/command/prodsparksubmit161"
+
+export GENIE_COMMAND_ID="prodsparksubmit161"
+
+export GENIE_COMMAND_NAME="prodsparksubmit"
+
+export GENIE_CLUSTER_DIR="${GENIE_JOB_DIR}/genie/cluster/bdp_h2prod_20161217_205111"
+
+export GENIE_CLUSTER_ID="bdp_h2prod_20161217_205111"
+
+export GENIE_CLUSTER_NAME="h2prod"
+
+export GENIE_JOB_ID="SP.CS.FCT_TICKET_0054500815"
+
+export GENIE_JOB_NAME="SP.CS.FCT_TICKET"
+
+export GENIE_JOB_MEMORY=1536
+
+export GENIE_VERSION=3
+
+# Sourcing setup file from Application: hadoop272
+source ${GENIE_JOB_DIR}/genie/applications/hadoop272/setup.sh
+
+# Sourcing setup file from Application: spark161
+source ${GENIE_JOB_DIR}/genie/applications/spark161/spark-1.6.1-app.sh
+
+# Sourcing setup file from Command: prodsparksubmit161
+source ${GENIE_JOB_DIR}/genie/command/prodsparksubmit161/spark-1.6.1-prod-submit-cmd.sh
+
+# Dump the environment to a env.log file
+env | sort > ${GENIE_JOB_DIR}/genie/logs/env.log
+
+# Kick off the command in background mode and wait for it using its pid
+${SPARK_HOME}/bin/dsespark-submit --queue root.sla --py-files dea_pyspark_core-latest.egg fct_ticket.py > stdout 2> stderr &
+wait $!
+
+# Write the return code from the command in the done file.
+printf '{"exitCode": "%s"}\n' "$?" > ./genie/genie.done
+echo End: `date '+%Y-%m-%d %H:%M:%S'`
+----
+
+====== Genie Dir
+
+Inside the output directory there is a `genie` directory. This directory is where Genie stores all the downloaded
+dependencies and any logs. Everything outside this directory is intended to be user generated other than the run
+script. Some commands or applications may put their logs in the root directory as well if desired (like spark or hive
+logs).
+
+TIP: https://genieHost/output/SP.CS.FCT_TICKET_0054500815/output/genie
+
+TIP: Click image for full size
+
+image::genie-dir.png[Genie Directory, link="{imagesdir}genie-dir.png"]
+
+Genie system logs go into the logs directory.
+
+TIP: https://genieHost/output/SP.CS.FCT_TICKET_0054500815/output/genie/logs
+
+TIP: Click image for full size
+
+image::genie-logs.png[Genie Logs Directory, link="{imagesdir}genie-logs.png"]
+
+Of interest in here is the env dump file. This is convenient for debugging jobs. You can see all the environment
+variables that were available right before Genie executed the final command to run the job in the run script.
+
+You can see this file generated in the run script above on this line:
+
+[source,bash]
+----
+# Dump the environment to a env.log file
+env | sort > ${GENIE_JOB_DIR}/genie/logs/env.log
+----
+
+The contents of this file will look something like the below
+
+TIP: https://genieHost/output/SP.CS.FCT_TICKET_0054500815/output/genie/logs/env.log
+
+[source,bash]
+----
+APP_ID=hadoop272
+APP_NAME=hadoop-2.7.2
+CURRENT_JOB_TMP_DIR=/mnt/genie/jobs/SP.CS.FCT_TICKET_0054500815/tmp
+CURRENT_JOB_WORKING_DIR=/mnt/genie/jobs/SP.CS.FCT_TICKET_0054500815
+EC2_AVAILABILITY_ZONE=us-east-1d
+EC2_REGION=us-east-1
+GENIE_APPLICATION_DIR=/mnt/genie/jobs/SP.CS.FCT_TICKET_0054500815/genie/applications
+GENIE_CLUSTER_DIR=/mnt/genie/jobs/SP.CS.FCT_TICKET_0054500815/genie/cluster/bdp_h2prod_20161217_205111
+GENIE_CLUSTER_ID=bdp_h2prod_20161217_205111
+GENIE_CLUSTER_NAME=h2prod
+GENIE_COMMAND_DIR=/mnt/genie/jobs/SP.CS.FCT_TICKET_0054500815/genie/command/prodsparksubmit161
+GENIE_COMMAND_ID=prodsparksubmit161
+GENIE_COMMAND_NAME=prodsparksubmit
+GENIE_JOB_DIR=/mnt/genie/jobs/SP.CS.FCT_TICKET_0054500815
+GENIE_JOB_ID=SP.CS.FCT_TICKET_0054500815
+GENIE_JOB_MEMORY=1536
+GENIE_JOB_NAME=SP.CS.FCT_TICKET
+GENIE_VERSION=3
+HADOOP_CONF_DIR=/mnt/genie/jobs/SP.CS.FCT_TICKET_0054500815/genie/applications/hadoop272/dependencies/hadoop-2.7.2/conf
+HADOOP_DEPENDENCIES_DIR=/mnt/genie/jobs/SP.CS.FCT_TICKET_0054500815/genie/applications/hadoop272/dependencies
+HADOOP_HEAPSIZE=1500
+HADOOP_HOME=/mnt/genie/jobs/SP.CS.FCT_TICKET_0054500815/genie/applications/hadoop272/dependencies/hadoop-2.7.2
+HADOOP_LIBEXEC_DIR=/mnt/genie/jobs/SP.CS.FCT_TICKET_0054500815/genie/applications/hadoop272/dependencies/hadoop-2.7.2/usr/lib/hadoop/libexec
+HOME=/home/someNetflixUser
+JAVA_HOME=/apps/bdp-java/java-8-oracle
+LANG=en_US.UTF-8
+LOGNAME=someNetflixUser
+MAIL=/var/mail/someNetflixUser
+NETFLIX_ENVIRONMENT=prod
+NETFLIX_STACK=main
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin:/mnt/genie/jobs/SP.CS.FCT_TICKET_0054500815/genie/applications/spark161/dependencies/spark-1.6.1/bin
+PWD=/mnt/genie/jobs/SP.CS.FCT_TICKET_0054500815
+SHELL=/bin/bash
+SHLVL=1
+SPARK_CONF_DIR=/mnt/genie/jobs/SP.CS.FCT_TICKET_0054500815/genie/applications/spark161/dependencies/spark-1.6.1/conf
+SPARK_DAEMON_JAVA_OPTS=-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeStamps
+SPARK_HOME=/mnt/genie/jobs/SP.CS.FCT_TICKET_0054500815/genie/applications/spark161/dependencies/spark-1.6.1
+SPARK_LOG_DIR=/mnt/genie/jobs/SP.CS.FCT_TICKET_0054500815
+SPARK_LOG_FILE_PATH=/mnt/genie/jobs/SP.CS.FCT_TICKET_0054500815/spark.log
+SPARK_LOG_FILE=spark.log
+SUDO_COMMAND=/usr/bin/setsid /mnt/genie/jobs/SP.CS.FCT_TICKET_0054500815/run
+SUDO_GID=60243
+SUDO_UID=60004
+SUDO_USER=genie
+TERM=unknown
+TZ=GMT
+USER=someNetflixUser
+USERNAME=someNetflixUser
+_=/usr/bin/env
+----
+
+Finally inside the applications folder you can see the applications that were downloaded and configured.
+
+TIP: https://genieHost/output/SP.CS.FCT_TICKET_0054500815/output/genie/applications/hadoop272/dependencies/hadoop-2.7.2
+
+TIP: Click image for full size
+
+image::hadoop-application.png[Hadoop App Contents, link="{imagesdir}hadoop-application.png"]
+
+TIP: https://genieHost/output/SP.CS.FCT_TICKET_0054500815/output/genie/applications/spark161/dependencies/spark-1.6.1
+
+TIP: Click image for full size
+
+image::spark-application.png[Hadoop App Contents, link="{imagesdir}spark-application.png"]
+
+==== Wrap Up
+
+Hopefully this section helped shed some light on how Genie is configured by admins at Netflix and how how users submit
+jobs and retrieve their logs and output. Anyone is free to configure Genie however suits their needs in terms of
+tags and applications which are downloaded vs installed already on a Genie node but this method works for us here at
+Netflix.
