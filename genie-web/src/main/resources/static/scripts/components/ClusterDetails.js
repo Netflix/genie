@@ -17,6 +17,10 @@ export default class ClusterDetails extends React.Component {
       cluster: {
         id: '',
         configs: [],
+        _links: {
+          self: '',
+          commands: '',
+        },
       },
       commands: [],
     };
@@ -84,6 +88,15 @@ export default class ClusterDetails extends React.Component {
                       <InfoTable data={this.state.commands} type="commands" />
                       : <div />
                     }
+                  </td>
+                </tr>
+                <tr>
+                  <td className="col-xs-2 align-right">Links:</td>
+                  <td>
+                    <ul>
+                      <li><a href={this.state.cluster._links.self.href}>Json</a></li>
+                      <li><a href={this.state.cluster._links.commands.href}>Commands</a></li>
+                    </ul>
                   </td>
                 </tr>
               </tbody>

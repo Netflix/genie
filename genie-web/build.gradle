@@ -144,7 +144,7 @@ clean {
 task bundle(type: NpmTask) {
     inputs.dir static_project_dir
     outputs.dir static_build_dir
-    args = ["run", "bundle"]
+    args = ["run", "build"]
 }
 
 bundle.dependsOn(npm_install)

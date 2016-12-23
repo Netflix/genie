@@ -1,3 +1,4 @@
+import moment from 'moment';
 import Page from './Page';
 import TableRow from './components/JobTableRow';
 import JobDetails from './components/JobDetails';
@@ -42,6 +43,22 @@ export default class Job extends Page {
         )),
       },
       {
+        label : 'Start Range',
+        name  : 'startTime',
+        value : [],
+        type  : 'timeRange',
+        queryMapping: ['minStarted', 'maxStarted'],
+        mapper: (x) => moment(parseInt(x, 10)).utc(),
+      },
+      {
+        label : 'Finished Range',
+        name  : 'finishedTime',
+        value : [],
+        type  : 'timeRange',
+        queryMapping: ['minFinished', 'maxFinished'],
+        mapper: (x) => moment(parseInt(x, 10)).utc(),
+      },
+      {
         label : 'Size',
         name  : 'size',
         value : 25,
@@ -59,6 +76,12 @@ export default class Job extends Page {
               label: field,
             }
         )),
+      }, {
+        label : 'Order',
+        name  : 'sortOrder',
+        value : 'desc',
+        type  : 'sortOption',
+        optionValues : ['desc', 'asc'],
       },
     ];
   }

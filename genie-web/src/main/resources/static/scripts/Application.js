@@ -46,6 +46,12 @@ export default class Application extends Page {
             label: field,
           }
         )),
+      }, {
+        label : 'Order',
+        name  : 'sortOrder',
+        value : 'desc',
+        type  : 'sortOption',
+        optionValues : ['desc', 'asc'],
       },
     ];
   }

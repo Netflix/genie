@@ -20,7 +20,7 @@ export default class JobDetails extends React.Component {
       command: {
         id: '',
         version: '',
-        name: ''
+        name: '',
       },
       job: {
         id: '',
@@ -55,7 +55,7 @@ export default class JobDetails extends React.Component {
         this.setState({ command });
       })
       .fail(xhr => {
-        this.setState({error: xhr.responseJSON});
+        this.setState({ error: xhr.responseJSON });
       });
     });
   }

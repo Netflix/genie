@@ -5,7 +5,9 @@ var APP_DIR = path.resolve(__dirname, 'src/main/resources/static');
 var BUILD_DIR = APP_DIR + '/build';
 
 var config = {
-  entry: APP_DIR + '/index.js',
+  entry: {
+    app: [APP_DIR + '/index.js'],
+  },
   output: {
     path: BUILD_DIR,
     filename: 'bundle.js',

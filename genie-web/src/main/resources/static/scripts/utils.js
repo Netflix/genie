@@ -30,7 +30,6 @@ export const fetch = (url, data = null, type = 'GET', headers = 'application/hal
 
 export const hasChanged = (o1, o2) => {
   let changed = false;
-  // Clean up
   for (const key of Object.keys(o1)) {
     if ((key === 'src' && o1[key] === 'btn') ||
         (key !== 'showDetails' && (!o2 || o1[key] !== o2[key]))) {
@@ -51,8 +50,15 @@ export const hasChanged = (o1, o2) => {
   return changed;
 };
 
+export const nowUtc = () =>
+  moment().utc();
+
+// stringify moment object
+export const milliSeconds = (momentObj) =>
+  `${momentObj}`;
+
 export const momentFormat = (dateStr, format = 'MM/DD/YYYY, H:mm:ss') =>
-  moment.utc(dateStr).format(format);
+  dateStr ? moment.utc(dateStr).format(format) : '';
 
 // https://github.com/moment/moment/issues/1048
 export const momentDurationFormat = (durationStr, format = ':mm:ss') =>
