@@ -1,11 +1,14 @@
 {
   "name": "genie-web",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "UI for Genie3 [A federated Job Execution Engine]",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "bundle": "webpack -p --config ./webpack.config.js"
+    "server": "node server.js",
+    "build:watch": "webpack -d --watch",
+    "build": "webpack -p --config ./webpack.config.js",
+    "lint": "./node_modules/.bin/eslint ./src/main/resources/static/scripts/; exit 0"
   },
   "repository": {
     "type": "git",
@@ -18,8 +21,12 @@
   },
   "dependencies": {
     "filesize": "^3.3.0",
+    "install": "^0.6.2",
     "jquery": "^2.2.3",
     "moment": "^2.13.0",
+    "npm": "^3.10.10",
+    "rc-calendar": "^7.5.2",
+    "rc-time-picker": "^2.2.1",
     "react": "^15.1.0",
     "react-cookie": "^0.4.5",
     "react-copy-to-clipboard": "^4.1.0",

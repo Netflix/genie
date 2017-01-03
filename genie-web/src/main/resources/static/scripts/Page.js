@@ -63,7 +63,7 @@ export default class Page extends React.Component {
       query = { size: 25 };
     }
     const { rowId = null, showSearchForm = 'true' } = query;
-    this.setState({query, data: []}); //Loading state
+    this.setState({ query, data: [] }); // Loading state
 
     fetch(this.url, query)
     .done(data => {
@@ -131,7 +131,7 @@ export default class Page extends React.Component {
         </div> :
         this.state.noSearchResult ?
           <NoSearchResult /> :
-          <Loading />; //Default to loading...
+          <Loading />; // Default to loading...
     }
 
     return (

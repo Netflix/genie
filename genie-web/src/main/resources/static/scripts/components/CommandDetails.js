@@ -16,6 +16,11 @@ export default class CommandDetails extends React.Component {
     this.state = {
       command: {
         configs: [],
+        _links: {
+          self         : '',
+          clusters     : '',
+          applications : '',
+        },
       },
       clusters     : [],
       applications : [],
@@ -51,7 +56,7 @@ export default class CommandDetails extends React.Component {
       <tr>
         <td colSpan="12">
           <i className="fa fa-sort-desc" aria-hidden="true"></i>
-          <div className="job-detail-row">
+          <div className="commands-detail-row">
             <table className="table job-detail-table">
               <tbody>
                 <tr>
@@ -104,6 +109,16 @@ export default class CommandDetails extends React.Component {
                       <InfoTable data={this.state.applications} type="applications" />
                       : <div />
                     }
+                  </td>
+                </tr>
+                <tr>
+                  <td className="col-xs-2 align-right">Links:</td>
+                  <td>
+                    <ul>
+                      <li><a href={this.state.command._links.self.href}>Json</a></li>
+                      <li><a href={this.state.command._links.applications.href}>Applications</a></li>
+                      <li><a href={this.state.command._links.clusters.href}>Clusters </a></li>
+                    </ul>
                   </td>
                 </tr>
               </tbody>

@@ -17,6 +17,10 @@ export default class ApplicationDetails extends React.Component {
       application: {
         configs      : [],
         dependencies : [],
+        _links: {
+          self         : '',
+          commands     : '',
+        },
       },
       commands: [],
     };
@@ -98,6 +102,15 @@ export default class ApplicationDetails extends React.Component {
                       <InfoTable data={this.state.commands} type="commands" />
                       : <div />
                     }
+                  </td>
+                </tr>
+                <tr>
+                  <td className="col-xs-2 align-right">Links:</td>
+                  <td>
+                    <ul>
+                      <li><a href={this.state.application._links.self.href}>Json</a></li>
+                      <li><a href={this.state.application._links.commands.href}>Commands</a></li>
+                    </ul>
                   </td>
                 </tr>
               </tbody>
