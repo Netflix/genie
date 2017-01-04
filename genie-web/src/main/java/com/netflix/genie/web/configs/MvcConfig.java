@@ -100,7 +100,7 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
     @Bean(name = "genieRestTemplate")
     public RestTemplate restTemplate(
         @Value("${genie.http.connect.timeout:2000}") final int httpConnectTimeout,
-        @Value("${genie.http.connect.timeout:10000}") final int httpReadTimeout
+        @Value("${genie.http.read.timeout:10000}") final int httpReadTimeout
     ) {
         final HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
         factory.setConnectTimeout(httpConnectTimeout);
@@ -112,8 +112,8 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
      * Get RetryTemplate.
      *
      * @param noOfRetries     number of retries
-     * @param initialInterval initial interval for the backoff policy
-     * @param maxInterval     maximum interval for the backoff policy
+     * @param initialInterval initial interval for the back-off policy
+     * @param maxInterval     maximum interval for the back-off policy
      * @return The retry template to use
      */
     @Bean(name = "genieRetryTemplate")

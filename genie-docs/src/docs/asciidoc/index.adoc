@@ -4,17 +4,18 @@ v{revnumber}, {localdate}
 :description: Reference documentation for Netflix OSS Genie
 :keywords: genie, netflix, documentation, big data, cloud, oss, open source software
 :toc: left
-:toclevels: 2
+:toclevels: 3
 :doctype: book
 :sectanchors:
 :sectlinks:
 :sectnums:
+:sectnumlevels: 5
 :linkattrs:
 :icons: font
 :stylesheet: rubygems.css
 :stylesdir: stylesheets
 :source-highlighter: highlight.js
-:imagesdir: images/
+:imagesdir: https://netflix.github.io/genie/images/3.0.0
 
 == Introduction
 
@@ -30,3 +31,5 @@ https://netflix.github.io/genie/docs/{revnumber}/demo[Demo Guide].
 WARNING: Work In Progress
 
 include::concepts/_concepts.adoc[]
+
+include::_properties.adoc[]

@@ -25,7 +25,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 
 /**
  * Beans and configuration specifically for MVC on AWS.
@@ -37,8 +36,6 @@ import java.nio.charset.Charset;
 @Configuration
 @Slf4j
 public class AwsMvcConfig {
-
-    private static final Charset UTF_8 = Charset.forName("UTF-8");
 
     // See: http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AESDG-chapter-instancedata.html
     protected String publicHostNameGet = "http://169.254.169.254/latest/meta-data/public-hostname";
@@ -54,7 +51,7 @@ public class AwsMvcConfig {
      */
     @Bean
     public String hostName(@Qualifier("genieRestTemplate") final RestTemplate restTemplate) throws IOException {
-        String result = null;
+        String result;
         try {
             result = restTemplate.getForObject(publicHostNameGet, String.class);
             log.debug("AWS Public Hostname: {}", result);
