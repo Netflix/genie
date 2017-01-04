@@ -1,0 +1,469 @@
+== Properties
+
+=== Default Properties
+
+==== Genie Properties
+
+|===
+|Property |Description| Default Value
+
+|genie.file.cache.location
+|Where to store cached files on local disk
+|file:///tmp/genie/cache
+
+|genie.health.maxCpuLoadPercent
+|How high the CPU usage needs to get before the node is marked unhealthy
+|80
+
+|genie.http.connect.timeout
+|The number of milliseconds before HTTP calls between Genie nodes should time out on connection
+|2000
+
+|genie.http.read.timeout
+|The number of milliseconds before HTTP calls between Genie nodes should time out on attempting to read data
+|10000
+
+|genie.jobs.cleanup.deleteArchiveFile
+|Whether to delete the job directory zip after it has been backed up to save disk space
+|true
+
+|genie.jobs.cleanup.deleteDependencies
+|Whether or not to delete the dependencies directories for applications to save disk space after job completion
+|true
+
+|genie.jobs.forwarding.enabled
+|Whether or not to attempt to forward kill and get output requests for jobs
+|true
+
+|genie.jobs.forwarding.port
+|The port to forward requests to as it could be different than ELB port
+|8080
+
+|genie.jobs.forwarding.scheme
+|The connection protocol to use (http or https)
+|http
+
+|genie.jobs.locations.archives
+|The default root location where job archives should be stored. Scheme should be included. Created if doesn't exist.
+|file:///tmp/genie/archives/
+
+|genie.jobs.locations.attachments
+|The default root location where job attachments will be temporarily stored. Scheme should be included. Created if
+doesn't exist.
+|file:///tmp/genie/attachments/
+
+|genie.jobs.locations.jobs
+|The default root location where job working directories will be placed. Created by system if doesn't exist.
+|file:///tmp/genie/jobs/
+
+|genie.jobs.max.stdOutSize
+|The maximum number of bytes the job standard output file can grow to before Genie will kill the job
+|8589934592
+
+|genie.jobs.max.stdErrSize
+|The maximum number of bytes the job standard error file can grow to before Genie will kill the job
+|8589934592
+
+|genie.jobs.memory.maxSystemMemory
+|The total number of MB out of the system memory that Genie can use for running jobs
+|30720
+
+|genie.jobs.memory.defaultJobMemory
+|The total number of megabytes Genie will assume a job is allocated if not overridden by a command or user at runtime
+|1024
+
+|genie.jobs.memory.maxJobMemory
+|The maximum amount of memory, in megabytes, that a job client can be allocated
+|10240
+
+|genie.jobs.users.creationEnabled
+|Whether Genie should attempt to create a system user in order to run the job as or not. Genie user must have sudo
+rights for this to work.
+|false
+
+|genie.jobs.users.runAsUserEnabled
+|Whether Genie should run the jobs as the user who submitted the job or not. Genie user must have sudo rights for this
+to work.
+|false
+
+|genie.leader.enabled
+|Whether this node should be the leader of the cluster or not. Should only be used if leadership is not being
+determined by Zookeeper or other mechanism via Spring
+|false
+
+|genie.mail.fromAddress
+|The e-mail address that should be used as the from address when alert emails are sent
+|no-reply-genie@geniehost.com
+
+|genie.mail.user
+|The user to log into the e-mail server with
+|
+
+|genie.mail.password
+|The password for the e-mail server
+|
+
+|genie.redis.enabled
+|Whether to enable storage of HTTP sessions inside Redis via http://projects.spring.io/spring-session/[Spring Session]
+|false
+
+|genie.retry.initialInterval
+|The amount of time to wait after initial failure before retrying the first time in milliseconds
+|10000
+
+|genie.retry.maxInterval
+|The maximum amount of time to wait between retries for the final retry in the back-off policy
+|60000
+
+|genie.retry.noOfRetries
+|The number of times to retry requests to before failure
+|5
+
+|genie.retry.s3.noOfRetries
+|The number of times to retry requests to S3 before failure
+|5
+
+|genie.security.oauth2.enabled
+|Whether to enable oauth2 based security or not for REST APIs
+|false
+
+|genie.security.oauth2.pingfederate.enabled
+|Whether Ping Federate is being used as the OAuth2 server and Genie should assume default configuration for its tokens
+|false
+
+|genie.security.oauth2.pingfederate.jwt.enabled
+|Whether to assume that the bearer tokens coming with API requests are https://jwt.io/[JWT] tokens or not
+|false
+
+|genie.security.oauth2.pingfederate.jwt.keyValue
+|The public key used to verify the JWT signature
+|
+
+|genie.security.saml.enabled
+|Whether SAML security should be turned on to protect access to the user interface
+|false
+
+|genie.security.saml.attributes.user
+|The key in the SAML assertion to get the user name from
+|
+
+|genie.security.saml.attributes.groups.name
+|The key in the SAML assertion to get group information for the user from
+|
+
+|genie.security.saml.attributes.groups.admin
+|The group a user needs to be a member of in order to be granted an admin role
+|
+
+|genie.security.saml.idp.serviceProviderMetadataUrl
+|The URL where metadata for Genie service SAML configuration can be pulled from
+|
+
+|genie.security.saml.keystore.name
+|The name of the keystore file on the classpath for SAML assertions
+|
+
+|genie.security.saml.keystore.password
+|The password for opening the keystore
+|
+
+|genie.security.saml.keystore.defaultKey.name
+|The name of the default key to use for signing the SAML request
+|
+
+|genie.security.saml.keystore.defaultKey.password
+|The password to open the default key
+|
+
+|genie.security.saml.loadBalancer.contextPath
+|The context path for Genie
+|/
+
+|genie.security.saml.loadBalancer.includeServerPortInRequestURL
+|Whether or not to include the port of the load balancer in the redirect request
+|false
+
+|genie.security.saml.loadBalancer.scheme
+|The scheme the load balancer Genie cluster is run behind uses (http or https). Used for SAML post back
+|
+
+|genie.security.saml.loadBalancer.serverName
+|Root context for the Genie load balancer e.g. genie.prod.com
+|
+
+|genie.security.saml.loadBalancer.serverPort
+|The port the load balancer is listening on. Used for SAML post back
+|
+
+|genie.security.saml.sp.entityId
+|The id that Genie is identified by in the identity provider
+|
+
+|genie.security.saml.sp.entityBaseURL
+|Where the SAML assertion should be posted back to. e.g. https://genie.prod.com
+|
+
+|genie.security.x509.enabled
+|Whether to enable x509 certificate security on the REST APIs
+|false
+
+|genie.swagger.enabled
+|Whether to enable http://swagger.io/[Swagger] to be bootstrapped into the Genie service so that the endpoint
+/swagger-ui.html shows API documentation generated by the swagger specification
+|false
+
+|genie.tasks.clusterChecker.healthIndicatorsToIgnore
+|The health indicator groups from the actuator /health endpoint to ignore when determining if a node is lost or not as
+a comma separated list
+|memory,genie,discoveryComposite
+
+|genie.tasks.clusterChecker.lostThreshold
+|The number of times a Genie nodes need to fail health check in order for jobs running on that node to be marked as
+lost and failed by the Genie leader
+|3
+
+|genie.tasks.clusterChecker.port
+|The port to connect to other Genie nodes on
+|8080
+
+|genie.tasks.clusterChecker.rate
+|The number of milliseconds to wait between health checks to other Genie nodes
+|300000
+
+|genie.tasks.clusterChecker.scheme
+|The scheme (http or https) for connecting to other Genie nodes
+|http
+
+|genie.tasks.databaseCleanup.enabled
+|Whether or not to delete old job records from the database
+|true
+
+|genie.tasks.databaseCleanup.expression
+|The cron expression for how often to run the database cleanup task
+|0 0 0 * * *
+
+|genie.tasks.databaseCleanup.retention
+|The number of days to retain jobs in the database
+|90
+
+|genie.tasks.diskCleanup.enabled
+|Whether or not to remove old job directories on the Genie node or not
+|true
+
+|genie.tasks.diskCleanup.expression
+|How often to run the disk cleanup task as a cron expression
+|0 0 0 * * *
+
+|genie.tasks.diskCleanup.retention
+|The number of days to leave old job directories on disk
+|3
+
+|genie.tasks.executor.pool.size
+|The number of executor threads available for tasks to be run on within the node in an adhoc manner. Best to set to the
+number of CPU cores x 2 + 1
+|1
+
+|genie.tasks.scheduler.pool.size
+|The number of available threads for the scheduler to use to run tasks on the node at scheduled intervals. Best to set
+to the number of CPU cores x 2 + 1
+|1
+
+|===
+
+==== Spring Properties
+
+http://docs.spring.io/spring-boot/docs/1.3.8.RELEASE/reference/htmlsingle/#common-application-properties[Spring Properties]
+
+|===
+|Property |Description| Default Value
+
+|banner.location
+|Banner file location
+|genie-banner.txt
+
+|eureka.client.enabled
+|Whether to create a eureka client or not
+|false
+
+|eureka.client.serviceUrl.defaultZone
+|The URL of the Eureka service
+|
+
+|eureka.client.register-with-eureka
+|Whether or not to register this Genie node with the Eureka service. Will only happen if the `eureka.client.enabled`
+property is true
+|true
+
+|info.genie.version
+|The Genie version to be displayed by the UI and returned by the actuator /info endpoint. Set by the build.
+|Current build version
+
+|management.context-path
+|Where the actuator endpoints are mounted within the Genie application
+|/actuator
+
+|management.security.enabled
+|Whether to enable basic security on the actuator endpoints
+|false
+
+|multipart.max-file-size
+|Max attachment file size. Values can use the suffixed "MB" or "KB" to indicate a Megabyte or Kilobyte size.
+|100MB
+
+|multipart.max-request-size
+|Max job request size. Values can use the suffixed "MB" or "KB" to indicate a Megabyte or Kilobyte size.
+|200MB
+
+|security.basic.enabled
+|Enable basic authentication
+|false
+
+|spring.application.name
+|The name of the application in the Spring context
+|genie
+
+|spring.cloud.cluster.leader.enabled
+|Whether to enable leadership election via Spring Cloud Cluster. Means a zookeeper endpoint needs to be available
+|false
+
+|spring.cloud.cluster.zookeeper.connect
+|Comma separated list of Zookeeper nodes to connect to for leadership election
+|
+
+|spring.cloud.cluster.zookeeper.namespace
+|The znode namespace to use for Genie leadership election of a given cluster
+|/genie/leader/
+
+|spring.jackson.date-format
+|Date format string or a fully-qualified date format class name. For instance `yyyy-MM-dd HH:mm:ss` for serializing JSON
+|com.netflix.genie.common.util.GenieDateFormat
+
+|spring.jackson.time-zone
+|Time zone used when formatting dates. For instance `America/Los_Angeles`
+|UTC
+
+|spring.profiles.active
+|The default active profiles when Genie is run
+|dev
+
+|spring.mail.host
+|The hostname of the mail server
+|
+
+|spring.mail.testConnection
+|Whether to check the connection to the mail server on startup
+|false
+
+|spring.redis.host
+|Endpoint for the Redis cluster used to store HTTP session information
+|
+
+|spring.velocity.enabled
+|Whether http://velocity.apache.org/[velocity] should be enabled for Spring MVC
+|false
+
+|===
+
+=== Profile Specific Properties
+
+==== Dev Profile
+
+|===
+|Property |Description| Default Value
+
+|spring.jpa.hibernate.ddl-auto
+|DDL mode. This is actually a shortcut for the "hibernate.hbm2ddl.auto" property. Default to "create-drop" when using
+an embedded database, "none" otherwise.
+|update
+
+|spring.jpa.hibernate.naming-strategy
+|Naming strategy fully qualified name.
+|org.hibernate.cfg.ImprovedNamingStrategy
+
+|spring.datasource.url
+|JDBC URL of the database
+|jdbc:hsqldb:mem:genie-db;shutdown=true
+
+|spring.datasource.username
+|Username for the datasource
+|SA
+
+|spring.datasource.password
+|Database password
+|
+
+|===
+
+==== Prod Profile
+
+|===
+|Property |Description| Default Value
+
+|spring.datasource.url
+|JDBC URL of the database
+|jdbc:mysql://127.0.0.1/genie
+
+|spring.datasource.username
+|Username for the datasource
+|root
+
+|spring.datasource.password
+|Database password
+|
+
+|spring.datasource.min-idle
+|Minimum number of idle connection pool threads
+|5
+
+|spring.datasource.max-idle
+|Maximum number of idle connection pool threads
+|20
+
+|spring.datasource.max-active
+|Maximum number of active database connection pool threads
+|40
+
+|spring.datasource.validation-query
+|Query to use to test a healthy connection
+|select 0;
+
+|spring.datasource.test-on-borrow
+|Test the connection when a new connection is borrowed from the pool
+|true
+
+|spring.datasource.test-on-connect
+|Test the connection health when connecting
+|true
+
+|spring.datasource.test-on-return
+|Test the connection health on return to the pool
+|true
+
+|spring.datasource.test-while-idle
+|Test the connection health of a thread while it is idle
+|true
+
+|spring.datasource.min-evictable-idle-time-millis
+|Time before a connection thread is evicted from the pool if its been idle
+|60000
+
+|spring.datasource.time-between-eviction-run-millis
+|The time between runs of the eviction process
+|10000
+
+|===
+
+==== S3 Profile
+
+|===
+|Property |Description| Default Value
+
+|genie.aws.credentials.file
+|The file path where the AWS credentials are stored
+|
+
+|genie.aws.credentials.role
+|The AWS role ARN to assume when connecting to S3
+|
+
+|===

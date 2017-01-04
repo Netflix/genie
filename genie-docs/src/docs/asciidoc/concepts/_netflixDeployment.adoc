@@ -4,7 +4,7 @@ Many people ask how Genie is deployed at Netflix on AWS. This section tries to e
 used and how Genie integrates into the environment. Below is a diagram of how deployment looks at Netflix.
 
 .Genie Netflix Deployment
-image::deployment.png[Netflix Deployment, link="{imagesdir}deployment.png"]
+image::deployment.png[Netflix Deployment, link="{imagesdir}/deployment.png"]
 
 ==== Components
 

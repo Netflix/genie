@@ -48,13 +48,13 @@ downloaded into the job working directory at runtime.
     "genie.id:bdp_h2prod_20161217_205111",
     "genie.name:h2prod",
     "sched:sla",
-    "ver:2.7.0",
+    "ver:2.7.2",
     "type:yarn",
     "misc:h2bonus3",
     "misc:h2bonus2",
     "misc:h2bonus1"
   ],
-  "version": "2.7.0",
+  "version": "2.7.2",
   "user": "dataeng",
   "name": "h2prod",
   "description": null,
@@ -88,13 +88,13 @@ downloaded into the job working directory at runtime.
   "tags": [
     "sched:adhoc",
     "misc:profiled",
-    "ver:2.4.0",
+    "ver:2.7.2",
     "sched:sting",
     "type:yarn",
     "genie.name:h2query",
     "genie.id:bdp_h2query_20161108_204556"
   ],
-  "version": "2.7.0",
+  "version": "2.7.2",
   "user": "dataeng",
   "name": "h2query",
   "description": null,
@@ -852,7 +852,7 @@ selected using the `commandCriteria`
 <6> Here you can see that they add the two files referenced in the `commandArgs` as dependencies. These files will be
 downloaded in the root job directory parallel to the run script so they are accessible.
 
-===== The Job
+===== *The Job*
 
 In this case the job was accepted by Genie for processing. Below is the actual job object containing fields the user
 might care about. Some are copied from the initial request (like tags) and some are added by Genie.
@@ -989,7 +989,7 @@ TIP: https://genieHost/output/SP.CS.FCT_TICKET_0054500815/output
 
 TIP: Click image for full size
 
-image::output.png[Genie Output Directory, link="{imagesdir}output.png"]
+image::output.png[Genie Output Directory, link="{imagesdir}/output.png"]
 
 ====== The Run Script
 
@@ -1127,7 +1127,7 @@ TIP: https://genieHost/output/SP.CS.FCT_TICKET_0054500815/output/genie
 
 TIP: Click image for full size
 
-image::genie-dir.png[Genie Directory, link="{imagesdir}genie-dir.png"]
+image::genie-dir.png[Genie Directory, link="{imagesdir}/genie-dir.png"]
 
 Genie system logs go into the logs directory.
 
@@ -1135,7 +1135,7 @@ TIP: https://genieHost/output/SP.CS.FCT_TICKET_0054500815/output/genie/logs
 
 TIP: Click image for full size
 
-image::genie-logs.png[Genie Logs Directory, link="{imagesdir}genie-logs.png"]
+image::genie-logs.png[Genie Logs Directory, link="{imagesdir}/genie-logs.png"]
 
 Of interest in here is the env dump file. This is convenient for debugging jobs. You can see all the environment
 variables that were available right before Genie executed the final command to run the job in the run script.
@@ -1211,13 +1211,13 @@ TIP: https://genieHost/output/SP.CS.FCT_TICKET_0054500815/output/genie/applicati
 
 TIP: Click image for full size
 
-image::hadoop-application.png[Hadoop App Contents, link="{imagesdir}hadoop-application.png"]
+image::hadoop-application.png[Hadoop App Contents, link="{imagesdir}/hadoop-application.png"]
 
 TIP: https://genieHost/output/SP.CS.FCT_TICKET_0054500815/output/genie/applications/spark161/dependencies/spark-1.6.1
 
 TIP: Click image for full size
 
-image::spark-application.png[Hadoop App Contents, link="{imagesdir}spark-application.png"]
+image::spark-application.png[Hadoop App Contents, link="{imagesdir}/spark-application.png"]
 
 ==== Wrap Up
 
