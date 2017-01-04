@@ -4,9 +4,7 @@ $('audio,video').mediaelementplayer();
 </script>
 {% endif %}
 
-
 <script src="{{ site.baseurl }}/assets/js/javascript.min.js"></script>
-
 
 {% if page.header.image_fullwidth %}
 <script>
@@ -14,8 +12,6 @@ $('audio,video').mediaelementplayer();
     $("#masthead-with-text").backstretch("{{ page.header.image_fullwidth }}", {fade: 700});
 </script>
 {% endif %}
-
-
 
 {% if site.google_analytics_tracking_id %}
 <script>
@@ -28,27 +24,5 @@ $('audio,video').mediaelementplayer();
   ga('set', 'anonymizeIp', true);
   ga('send', 'pageview');
 
-</script>
-{% endif %}
-
-
-
-{% comment %}
-#  Start of Tawk.to Script
-#
-#  More information in _config.yml
-#
-{% endcomment %}
-{% if site.tawkto_embed_uri and page.tawkto == true %}
-<script type="text/javascript">
-var $_Tawk_API={},$_Tawk_LoadStart=new Date();
-(function(){
-var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-s1.async=true;
-s1.src='{{ site.tawkto_embed_uri }}';
-s1.charset='UTF-8';
-s1.setAttribute('crossorigin','*');
-s0.parentNode.insertBefore(s1,s0);
-})();
 </script>
 {% endif %}

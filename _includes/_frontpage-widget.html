@@ -4,7 +4,7 @@
 		<a href="{{ widget_url }}">
 			{% if include.widget.image %}
 				{% capture widget_image %}{% if include.widget.image contains 'http' %}{{ include.widget.image }}{% else %}{{ site.baseurl }}{{ include.widget.image }}{% endif %}{% endcapture %}
-				<img src="{{widget_image}}" style="display: block; margin: auto; object-fit: contain; width: 100%; height: 100%"/>
+				<img src="{{widget_image}}" alt="widget" style="display: block; margin: auto; object-fit: contain; width: 100%; height: 100%"/>
 			{% elsif include.widget.video %}
 				<a href="#" data-reveal-id="videoModal{{ include.widget.title }}"><img src="{{ include.widget.video.image }}" style="display: block; margin: auto; object-fit: contain; width: 100%; height: 100%"/></a>
 			{% endif %}
