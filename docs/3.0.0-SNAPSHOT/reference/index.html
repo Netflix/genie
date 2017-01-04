@@ -717,7 +717,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 3.0.0-SNAPSHOT,</span>
-<span id="revdate">2017-01-03</span>
+<span id="revdate">2017-01-04</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -725,10 +725,51 @@ b.conum * { color: inherit !important; }
 <li><a href="#_introduction">1. Introduction</a></li>
 <li><a href="#_concepts">2. Concepts</a>
 <ul class="sectlevel2">
-<li><a href="#_data_model">2.1. Data Model</a></li>
-<li><a href="#_how_it_works">2.2. How it Works</a></li>
-<li><a href="#_netflix_example">2.3. Netflix Example</a></li>
-<li><a href="#_netflix_deployment">2.4. Netflix Deployment</a></li>
+<li><a href="#_data_model">2.1. Data Model</a>
+<ul class="sectlevel3">
+<li><a href="#_caveats">2.1.1. Caveats</a></li>
+<li><a href="#_resources">2.1.2. Resources</a></li>
+<li><a href="#_wrap_up">2.1.3. Wrap-up</a></li>
+</ul>
+</li>
+<li><a href="#_how_it_works">2.2. How it Works</a>
+<ul class="sectlevel3">
+<li><a href="#_resource_configuration">2.2.1. Resource Configuration</a></li>
+<li><a href="#_job_submission">2.2.2. Job Submission</a></li>
+<li><a href="#_user_behavior">2.2.3. User Behavior</a></li>
+<li><a href="#_wrap_up_2">2.2.4. Wrap Up</a></li>
+</ul>
+</li>
+<li><a href="#_netflix_example">2.3. Netflix Example</a>
+<ul class="sectlevel3">
+<li><a href="#_configuration">2.3.1. Configuration</a></li>
+<li><a href="#_job_submission_2">2.3.2. Job Submission</a></li>
+<li><a href="#_wrap_up_3">2.3.3. Wrap Up</a></li>
+</ul>
+</li>
+<li><a href="#_netflix_deployment">2.4. Netflix Deployment</a>
+<ul class="sectlevel3">
+<li><a href="#_components">2.4.1. Components</a></li>
+<li><a href="#_wrap_up_4">2.4.2. Wrap Up</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_properties">3. Properties</a>
+<ul class="sectlevel2">
+<li><a href="#_default_properties">3.1. Default Properties</a>
+<ul class="sectlevel3">
+<li><a href="#_genie_properties">3.1.1. Genie Properties</a></li>
+<li><a href="#_spring_properties">3.1.2. Spring Properties</a></li>
+</ul>
+</li>
+<li><a href="#_profile_specific_properties">3.2. Profile Specific Properties</a>
+<ul class="sectlevel3">
+<li><a href="#_dev_profile">3.2.1. Dev Profile</a></li>
+<li><a href="#_prod_profile">3.2.2. Prod Profile</a></li>
+<li><a href="#_s3_profile">3.2.3. S3 Profile</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -846,7 +887,7 @@ will focus on the high level purposes for each resource and how they rely and/or
 the system.</p>
 </div>
 <div class="sect4">
-<h5 id="_tagging"><a class="anchor" href="#_tagging"></a>Tagging</h5>
+<h5 id="_tagging"><a class="anchor" href="#_tagging"></a>2.1.2.1. Tagging</h5>
 <div class="paragraph">
 <p>One important aspect to comment on is tagging of resources. Genie relies heavily on tags for how the system discovers
 resources like clusters and commands for a job. Each of the core resources has a set of tags that can be associated
@@ -909,13 +950,13 @@ some of the following standards for our tags:</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_configuration_resources"><a class="anchor" href="#_configuration_resources"></a>Configuration Resources</h5>
+<h5 id="_configuration_resources"><a class="anchor" href="#_configuration_resources"></a>2.1.2.2. Configuration Resources</h5>
 <div class="paragraph">
 <p>The following resources (applications, commands and clusters) are considered configuration, or admin, resources.
 They&#8217;re generally set up by the Genie administrator and available to all users for user with their jobs.</p>
 </div>
 <div class="sect5">
-<h6 id="_application_resource"><a class="anchor" href="#_application_resource"></a>Application Resource</h6>
+<h6 id="_application_resource"><a class="anchor" href="#_application_resource"></a>2.1.2.2.1. Application Resource</h6>
 <div class="paragraph">
 <p>An application resource represents pretty much what you&#8217;d expect. It is a reusable set of binaries, configuration files
 and setup files that can be used to install and configure (surprise!) an application. Generally these resources are
@@ -948,7 +989,7 @@ flexibility in the trade-off.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="_command_resource"><a class="anchor" href="#_command_resource"></a>Command Resource</h6>
+<h6 id="_command_resource"><a class="anchor" href="#_command_resource"></a>2.1.2.2.2. Command Resource</h6>
 <div class="paragraph">
 <p>Commands resources primarily represent what a user would enter at the command line if you wanted to run a process on a
 cluster and what dependencies (applications) you would need on your PATH to make that possible.</p>
@@ -986,7 +1027,7 @@ execute on. Clusters are explained next.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="_cluster"><a class="anchor" href="#_cluster"></a>Cluster</h6>
+<h6 id="_cluster"><a class="anchor" href="#_cluster"></a>2.1.2.2.3. Cluster</h6>
 <div class="paragraph">
 <p>A cluster stores all the details of an execution cluster including connection information, properties, etc. Some
 cluster examples are Hadoop, Spark, Presto, etc. Every cluster can be linked to a set of commands that it can run.</p>
@@ -1004,7 +1045,7 @@ first one found in the list will be chosen provided all tags match. See <a href=
 </div>
 </div>
 <div class="sect4">
-<h5 id="_job_resources"><a class="anchor" href="#_job_resources"></a>Job Resources</h5>
+<h5 id="_job_resources"><a class="anchor" href="#_job_resources"></a>2.1.2.3. Job Resources</h5>
 <div class="paragraph">
 <p>The following resources all relate to a user submitting and monitoring a given job. They are split up from the Genie 2
 Job idea to provide better separation of concerns as usually a user doesn&#8217;t care about certain things. What node a
@@ -1015,7 +1056,7 @@ job ran on or its Linux process exit code for example.</p>
 only get their current state back from Genie.</p>
 </div>
 <div class="sect5">
-<h6 id="_job_request"><a class="anchor" href="#_job_request"></a>Job Request</h6>
+<h6 id="_job_request"><a class="anchor" href="#_job_request"></a>2.1.2.3.1. Job Request</h6>
 <div class="paragraph">
 <p>This is the resource you use to kick off a job. It contains all the information the system needs to run a job.
 Optionally the REST APIs can take attachments. All attachments and file dependencies are downloaded into the root of
@@ -1025,7 +1066,7 @@ command criteria. These dictate the which cluster, command and arguments will be
 </div>
 </div>
 <div class="sect5">
-<h6 id="_job"><a class="anchor" href="#_job"></a>Job</h6>
+<h6 id="_job"><a class="anchor" href="#_job"></a>2.1.2.3.2. Job</h6>
 <div class="paragraph">
 <p>The job resource is created in the system after a Job Request is received. All the information a typical user would be
 interested in should be contained within this resource. It has links to the command, cluster and applications used to
@@ -1034,7 +1075,7 @@ run the job as well as the meta information like status, start time, end time an
 </div>
 </div>
 <div class="sect5">
-<h6 id="_job_execution"><a class="anchor" href="#_job_execution"></a>Job Execution</h6>
+<h6 id="_job_execution"><a class="anchor" href="#_job_execution"></a>2.1.2.3.3. Job Execution</h6>
 <div class="paragraph">
 <p>The job execution resource contains information about where a job was run and other information that may be more
 interesting to a system admin than a regular user. Frequently useful in debugging.</p>
@@ -1070,7 +1111,7 @@ install and configure the Genie application itself. Rather it is how to configur
 running a job.</p>
 </div>
 <div class="sect4">
-<h5 id="_register_resources"><a class="anchor" href="#_register_resources"></a>Register Resources</h5>
+<h5 id="_register_resources"><a class="anchor" href="#_register_resources"></a>2.2.1.1. Register Resources</h5>
 <div class="paragraph">
 <p>All resources (clusters, commands, applications) should be registered with Genie before attempting to link them
 together. Any files these resources depend on should be uploaded somewhere Genie can access them (S3, web server,
@@ -1085,13 +1126,13 @@ are available they can find what to submit their jobs with so it is routed to th
 </div>
 </div>
 <div class="sect4">
-<h5 id="_linking_resources"><a class="anchor" href="#_linking_resources"></a>Linking Resources</h5>
+<h5 id="_linking_resources"><a class="anchor" href="#_linking_resources"></a>2.2.1.2. Linking Resources</h5>
 <div class="paragraph">
 <p>Once resources are registered they should be linked together. By linking we mean to represent relationships between the
 resources.</p>
 </div>
 <div class="sect5">
-<h6 id="_commands_for_a_cluster"><a class="anchor" href="#_commands_for_a_cluster"></a>Commands for a Cluster</h6>
+<h6 id="_commands_for_a_cluster"><a class="anchor" href="#_commands_for_a_cluster"></a>2.2.1.2.1. Commands for a Cluster</h6>
 <div class="paragraph">
 <p>Adding commands to a cluster means that the administrator acknowledges that this cluster can run a given set of
 commands. If a command is not linked to a cluster it cannot be used to run a job.</p>
@@ -1125,7 +1166,7 @@ would get Spark 1.6.0. However if we later deemed 2.0.0 to be ready to be the de
 </div>
 </div>
 <div class="sect5">
-<h6 id="_applications_for_a_command"><a class="anchor" href="#_applications_for_a_command"></a>Applications for a Command</h6>
+<h6 id="_applications_for_a_command"><a class="anchor" href="#_applications_for_a_command"></a>2.2.1.2.2. Applications for a Command</h6>
 <div class="paragraph">
 <p>Linking application(s) to commands means that a command has a dependency on said application(s). The order of the
 applications added is important because Genie will setup the applications in that order. Meaning if one application
@@ -1143,7 +1184,7 @@ transparent to end users. They just want to run jobs.How does that work? This se
 happens at a high level. The example section lower down will walk through a step by step example.</p>
 </div>
 <div class="sect4">
-<h5 id="_user_submits_a_job_request"><a class="anchor" href="#_user_submits_a_job_request"></a>User Submits a Job Request</h5>
+<h5 id="_user_submits_a_job_request"><a class="anchor" href="#_user_submits_a_job_request"></a>2.2.2.1. User Submits a Job Request</h5>
 <div class="paragraph">
 <p>In order to submit a job request there is some work a user will have to do up front. What kind of job are they running?
 What cluster do they want to run on? What command do they want to use? Do they care about certain details like version
@@ -1176,7 +1217,7 @@ the setup process of all the cluster, command and application setup processes.</
 </div>
 </div>
 <div class="sect4">
-<h5 id="_genie_receives_the_job_request"><a class="anchor" href="#_genie_receives_the_job_request"></a>Genie Receives the Job Request</h5>
+<h5 id="_genie_receives_the_job_request"><a class="anchor" href="#_genie_receives_the_job_request"></a>2.2.2.2. Genie Receives the Job Request</h5>
 <div class="paragraph">
 <p>When Genie receives the job request it does a few things immediately:</p>
 </div>
@@ -1242,7 +1283,7 @@ asynchronously by the system.</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_after_job_accepted"><a class="anchor" href="#_after_job_accepted"></a>After Job Accepted</h5>
+<h5 id="_after_job_accepted"><a class="anchor" href="#_after_job_accepted"></a>2.2.2.3. After Job Accepted</h5>
 <div class="paragraph">
 <p>Once a job has been accepted to run on a Genie node a workflow is executed in order to setup the job working directory
 and launch the job. Some minor steps left out for brevity.</p>
@@ -1313,7 +1354,7 @@ needed</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_after_job_running"><a class="anchor" href="#_after_job_running"></a>After Job Running</h5>
+<h5 id="_after_job_running"><a class="anchor" href="#_after_job_running"></a>2.2.2.4. After Job Running</h5>
 <div class="paragraph">
 <p>Once the job is running Genie will poll the PID periodically waiting for it to no longer be used.</p>
 </div>
@@ -1337,7 +1378,7 @@ killed depending on that code.</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_cleaning_up"><a class="anchor" href="#_cleaning_up"></a>Cleaning Up</h5>
+<h5 id="_cleaning_up"><a class="anchor" href="#_cleaning_up"></a>2.2.2.5. Cleaning Up</h5>
 <div class="paragraph">
 <p>To save disk space Genie will delete application dependencies from the job working directory after a job is completed.
 This can be disabled by an admin. If the job is marked as it should be archived the working directory will be zipped up
@@ -1396,7 +1437,7 @@ This example contains JSON representations of resources.
 configuration.</p>
 </div>
 <div class="sect4">
-<h5 id="_clusters"><a class="anchor" href="#_clusters"></a>Clusters</h5>
+<h5 id="_clusters"><a class="anchor" href="#_clusters"></a>2.3.1.1. Clusters</h5>
 <div class="paragraph">
 <p>At Netflix there are tens of active clusters available at any given time. For this example we&#8217;ll focus on the
 production (SLA) and adhoc <a href="http://hadoop.apache.org/">Hadoop</a> YARN clusters and the production
@@ -1424,7 +1465,7 @@ pipeline the metadata is registered with Genie using the aforementioned Python t
 downloaded into the job working directory at runtime.</p>
 </div>
 <div class="sect5">
-<h6 id="_hadoop_prod_cluster"><a class="anchor" href="#_hadoop_prod_cluster"></a>Hadoop Prod Cluster</h6>
+<h6 id="_hadoop_prod_cluster"><a class="anchor" href="#_hadoop_prod_cluster"></a>2.3.1.1.1. Hadoop Prod Cluster</h6>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
@@ -1435,13 +1476,13 @@ downloaded into the job working directory at runtime.</p>
     "genie.id:bdp_h2prod_20161217_205111",
     "genie.name:h2prod",
     "sched:sla",
-    "ver:2.7.0",
+    "ver:2.7.2",
     "type:yarn",
     "misc:h2bonus3",
     "misc:h2bonus2",
     "misc:h2bonus1"
   ],
-  "version": "2.7.0",
+  "version": "2.7.2",
   "user": "dataeng",
   "name": "h2prod",
   "description": null,
@@ -1466,7 +1507,7 @@ downloaded into the job working directory at runtime.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="_hadoop_adhoc_cluster"><a class="anchor" href="#_hadoop_adhoc_cluster"></a>Hadoop Adhoc Cluster</h6>
+<h6 id="_hadoop_adhoc_cluster"><a class="anchor" href="#_hadoop_adhoc_cluster"></a>2.3.1.1.2. Hadoop Adhoc Cluster</h6>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
@@ -1476,13 +1517,13 @@ downloaded into the job working directory at runtime.</p>
   "tags": [
     "sched:adhoc",
     "misc:profiled",
-    "ver:2.4.0",
+    "ver:2.7.2",
     "sched:sting",
     "type:yarn",
     "genie.name:h2query",
     "genie.id:bdp_h2query_20161108_204556"
   ],
-  "version": "2.7.0",
+  "version": "2.7.2",
   "user": "dataeng",
   "name": "h2query",
   "description": null,
@@ -1507,7 +1548,7 @@ downloaded into the job working directory at runtime.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="_presto_prod_cluster"><a class="anchor" href="#_presto_prod_cluster"></a>Presto Prod Cluster</h6>
+<h6 id="_presto_prod_cluster"><a class="anchor" href="#_presto_prod_cluster"></a>2.3.1.1.3. Presto Prod Cluster</h6>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
@@ -1544,7 +1585,7 @@ downloaded into the job working directory at runtime.</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_commands"><a class="anchor" href="#_commands"></a>Commands</h5>
+<h5 id="_commands"><a class="anchor" href="#_commands"></a>2.3.1.2. Commands</h5>
 <div class="paragraph">
 <p>Commands and applications at Netflix are handled a bit differently than clusters. The source data for these command and
 application resources are not generated dynamically like the cluster configuration files. Instead they are stored in a
@@ -1558,7 +1599,7 @@ commands and applications with Genie via the same python tool set and Genie pyth
 The presto command includes a setup file which allows additional configuration when it is used.</p>
 </div>
 <div class="sect5">
-<h6 id="_presto_0_149"><a class="anchor" href="#_presto_0_149"></a>Presto 0.149</h6>
+<h6 id="_presto_0_149"><a class="anchor" href="#_presto_0_149"></a>2.3.1.2.1. Presto 0.149</h6>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
@@ -1617,7 +1658,7 @@ chmod 755 ${PRESTO_CMD}</code></pre>
 </div>
 </div>
 <div class="sect5">
-<h6 id="_spark_submit_prod_1_6_1"><a class="anchor" href="#_spark_submit_prod_1_6_1"></a>Spark Submit Prod 1.6.1</h6>
+<h6 id="_spark_submit_prod_1_6_1"><a class="anchor" href="#_spark_submit_prod_1_6_1"></a>2.3.1.2.2. Spark Submit Prod 1.6.1</h6>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
@@ -1676,7 +1717,7 @@ cp ${GENIE_COMMAND_DIR}/config/* ${HADOOP_CONF_DIR}/</code></pre>
 </div>
 </div>
 <div class="sect5">
-<h6 id="_spark_submit_prod_2_0_0"><a class="anchor" href="#_spark_submit_prod_2_0_0"></a>Spark Submit Prod 2.0.0</h6>
+<h6 id="_spark_submit_prod_2_0_0"><a class="anchor" href="#_spark_submit_prod_2_0_0"></a>2.3.1.2.3. Spark Submit Prod 2.0.0</h6>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
@@ -1734,7 +1775,7 @@ cp ${GENIE_COMMAND_DIR}/config/* ${SPARK_CONF_DIR}</code></pre>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_applications"><a class="anchor" href="#_applications"></a>Applications</h5>
+<h5 id="_applications"><a class="anchor" href="#_applications"></a>2.3.1.3. Applications</h5>
 <div class="paragraph">
 <p>Below are the applications needed by the above commands. The most important part of these applications are the
 dependencies and the setup file.</p>
@@ -1751,7 +1792,7 @@ pattern allows us to avoid replacing Genie clusters every time an application ch
 the expectation is that after it is run the application is successfully configured in the job working directory.</p>
 </div>
 <div class="sect5">
-<h6 id="_hadoop_2_7_2"><a class="anchor" href="#_hadoop_2_7_2"></a>Hadoop 2.7.2</h6>
+<h6 id="_hadoop_2_7_2"><a class="anchor" href="#_hadoop_2_7_2"></a>2.3.1.3.1. Hadoop 2.7.2</h6>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
@@ -1823,7 +1864,7 @@ rm "${HADOOP_DEPENDENCIES_DIR}/hadoop-2.7.2.tgz"</code></pre>
 </div>
 </div>
 <div class="sect5">
-<h6 id="_presto_0_149_2"><a class="anchor" href="#_presto_0_149_2"></a>Presto 0.149</h6>
+<h6 id="_presto_0_149_2"><a class="anchor" href="#_presto_0_149_2"></a>2.3.1.3.2. Presto 0.149</h6>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
@@ -1879,7 +1920,7 @@ export PRESTO_CLI_PATH="${GENIE_APPLICATION_DIR}/presto0149/dependencies/presto-
 </div>
 </div>
 <div class="sect5">
-<h6 id="_spark_1_6_1"><a class="anchor" href="#_spark_1_6_1"></a>Spark 1.6.1</h6>
+<h6 id="_spark_1_6_1"><a class="anchor" href="#_spark_1_6_1"></a>2.3.1.3.3. Spark 1.6.1</h6>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
@@ -1965,7 +2006,7 @@ export SPARK_DAEMON_JAVA_OPTS="-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeS
 </div>
 </div>
 <div class="sect5">
-<h6 id="_spark_2_0_0"><a class="anchor" href="#_spark_2_0_0"></a>Spark 2.0.0</h6>
+<h6 id="_spark_2_0_0"><a class="anchor" href="#_spark_2_0_0"></a>2.3.1.3.4. Spark 2.0.0</h6>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
@@ -2045,13 +2086,13 @@ chmod a+x ${SPARK_HOME}/bin/dsespark-submit.py</code></pre>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_relationships"><a class="anchor" href="#_relationships"></a>Relationships</h5>
+<h5 id="_relationships"><a class="anchor" href="#_relationships"></a>2.3.1.4. Relationships</h5>
 <div class="paragraph">
 <p>Now that all the resources are available they need to be linked together. Commands need to be added to the clusters
 they can be run on and applications need to be added as dependencies for commands.</p>
 </div>
 <div class="sect5">
-<h6 id="_commands_for_a_cluster_2"><a class="anchor" href="#_commands_for_a_cluster_2"></a>Commands for a Cluster</h6>
+<h6 id="_commands_for_a_cluster_2"><a class="anchor" href="#_commands_for_a_cluster_2"></a>2.3.1.4.1. Commands for a Cluster</h6>
 <div class="paragraph">
 <p>When commands are added to a cluster they should be in priority order. Meaning if two commands both match a users tags
 for a job the one higher in the list will be used. This allows us to switch defaults quickly and transparently.</p>
@@ -2132,7 +2173,7 @@ could have multiple backwards compatible versions of the client available.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="_applications_for_a_command_2"><a class="anchor" href="#_applications_for_a_command_2"></a>Applications for a Command</h6>
+<h6 id="_applications_for_a_command_2"><a class="anchor" href="#_applications_for_a_command_2"></a>2.3.1.4.2. Applications for a Command</h6>
 <div class="paragraph">
 <p>Linking applications to a command tells Genie that these applications need to be downloaded and setup in order to
 successfully run the command. The order of the applications will be the order the download and setup is performed so
@@ -2214,7 +2255,7 @@ that process. For clarity we&#8217;re going to show a PySpark job being submitte
 and command to be used based on what was configured above.</p>
 </div>
 <div class="sect4">
-<h5 id="_the_request"><a class="anchor" href="#_the_request"></a>The Request</h5>
+<h5 id="_the_request"><a class="anchor" href="#_the_request"></a>2.3.2.1. The Request</h5>
 <div class="paragraph">
 <p>Below is an actual job request (with a few obfuscations) made by a production job here at Netflix to Genie.</p>
 </div>
@@ -2315,7 +2356,7 @@ downloaded in the root job directory parallel to the run script so they are acce
 </div>
 </div>
 <div class="sect4">
-<h5 id="_the_job"><a class="anchor" href="#_the_job"></a>The Job</h5>
+<h5 id="__strong_the_job_strong"><a class="anchor" href="#__strong_the_job_strong"></a>2.3.2.2. <strong>The Job</strong></h5>
 <div class="paragraph">
 <p>In this case the job was accepted by Genie for processing. Below is the actual job object containing fields the user
 might care about. Some are copied from the initial request (like tags) and some are added by Genie.</p>
@@ -2416,7 +2457,7 @@ SUCCESSFUL</td>
 </table>
 </div>
 <div class="sect5">
-<h6 id="_cluster_selection"><a class="anchor" href="#_cluster_selection"></a>Cluster Selection</h6>
+<h6 id="_cluster_selection"><a class="anchor" href="#_cluster_selection"></a>2.3.2.2.1. Cluster Selection</h6>
 <div class="paragraph">
 <p>Because the user submitted with <code>sched:sla</code> this limits the clusters it can run on to any with that tag applied. In our
 example case only the cluster with ID <code>bdp_h2prod_20161217_205111</code> has this tag. This isn&#8217;t enough to make sure this
@@ -2425,7 +2466,7 @@ them all equal and randomly select one.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="_command_selection"><a class="anchor" href="#_command_selection"></a>Command Selection</h6>
+<h6 id="_command_selection"><a class="anchor" href="#_command_selection"></a>2.3.2.2.2. Command Selection</h6>
 <div class="paragraph">
 <p>The command criteria states that this job needs to run on a SLA cluster that supports a command of type
 <code>prodsparksubmit</code> that can access <code>prod</code> data. Two commands (<code>prodsparksubmit161</code> and <code>prodsparksubmit200</code>) match this
@@ -2435,7 +2476,7 @@ which is the first on in the list. In this case it was <code>prodsparksubmit161<
 </div>
 </div>
 <div class="sect4">
-<h5 id="_the_job_execution"><a class="anchor" href="#_the_job_execution"></a>The Job Execution</h5>
+<h5 id="_the_job_execution"><a class="anchor" href="#_the_job_execution"></a>2.3.2.3. The Job Execution</h5>
 <div class="paragraph">
 <p>Below is the job execution resource. This is mainly for system and admin use but it can have some useful information
 for users as well. Mainly it shows which Genie node it actually ran on, how much memory it was allocated, how
@@ -2475,7 +2516,7 @@ frequently the system polled it for status and when it would have timed out had 
 </div>
 </div>
 <div class="sect4">
-<h5 id="_job_output"><a class="anchor" href="#_job_output"></a>Job Output</h5>
+<h5 id="_job_output"><a class="anchor" href="#_job_output"></a>2.3.2.4. Job Output</h5>
 <div class="paragraph">
 <p>Below is an image of the root of the job output directory (displayed via Genie UI) for the above job. Note that the
 dependency files are all downloaded there and some standard files are available (run, stdout, stderr).</p>
@@ -2520,11 +2561,11 @@ Click image for full size
 </div>
 <div class="imageblock">
 <div class="content">
-<a class="image" href="images/output.png"><img src="images//output.png" alt="Genie Output Directory"></a>
+<a class="image" href="https://netflix.github.io/genie/images/3.0.0/output.png"><img src="https://netflix.github.io/genie/images/3.0.0/output.png" alt="Genie Output Directory"></a>
 </div>
 </div>
 <div class="sect5">
-<h6 id="_the_run_script"><a class="anchor" href="#_the_run_script"></a>The Run Script</h6>
+<h6 id="_the_run_script"><a class="anchor" href="#_the_run_script"></a>2.3.2.4.1. The Run Script</h6>
 <div class="paragraph">
 <p>Clicking into the run script shows the below contents. This run script is generated specifically for each individual
 job by Genie. It has some standard bits (error checking, exit process) but also specific information like environment
@@ -2661,7 +2702,7 @@ echo End: `date '+%Y-%m-%d %H:%M:%S'`</code></pre>
 </div>
 </div>
 <div class="sect5">
-<h6 id="_genie_dir"><a class="anchor" href="#_genie_dir"></a>Genie Dir</h6>
+<h6 id="_genie_dir"><a class="anchor" href="#_genie_dir"></a>2.3.2.4.2. Genie Dir</h6>
 <div class="paragraph">
 <p>Inside the output directory there is a <code>genie</code> directory. This directory is where Genie stores all the downloaded
 dependencies and any logs. Everything outside this directory is intended to be user generated other than the run
@@ -2694,7 +2735,7 @@ Click image for full size
 </div>
 <div class="imageblock">
 <div class="content">
-<a class="image" href="images/genie-dir.png"><img src="images//genie-dir.png" alt="Genie Directory"></a>
+<a class="image" href="https://netflix.github.io/genie/images/3.0.0/genie-dir.png"><img src="https://netflix.github.io/genie/images/3.0.0/genie-dir.png" alt="Genie Directory"></a>
 </div>
 </div>
 <div class="paragraph">
@@ -2726,7 +2767,7 @@ Click image for full size
 </div>
 <div class="imageblock">
 <div class="content">
-<a class="image" href="images/genie-logs.png"><img src="images//genie-logs.png" alt="Genie Logs Directory"></a>
+<a class="image" href="https://netflix.github.io/genie/images/3.0.0/genie-logs.png"><img src="https://netflix.github.io/genie/images/3.0.0/genie-logs.png" alt="Genie Logs Directory"></a>
 </div>
 </div>
 <div class="paragraph">
@@ -2839,7 +2880,7 @@ Click image for full size
 </div>
 <div class="imageblock">
 <div class="content">
-<a class="image" href="images/hadoop-application.png"><img src="images//hadoop-application.png" alt="Hadoop App Contents"></a>
+<a class="image" href="https://netflix.github.io/genie/images/3.0.0/hadoop-application.png"><img src="https://netflix.github.io/genie/images/3.0.0/hadoop-application.png" alt="Hadoop App Contents"></a>
 </div>
 </div>
 <div class="admonitionblock tip">
@@ -2868,7 +2909,7 @@ Click image for full size
 </div>
 <div class="imageblock">
 <div class="content">
-<a class="image" href="images/spark-application.png"><img src="images//spark-application.png" alt="Hadoop App Contents"></a>
+<a class="image" href="https://netflix.github.io/genie/images/3.0.0/spark-application.png"><img src="https://netflix.github.io/genie/images/3.0.0/spark-application.png" alt="Hadoop App Contents"></a>
 </div>
 </div>
 </div>
@@ -2892,7 +2933,7 @@ used and how Genie integrates into the environment. Below is a diagram of how de
 </div>
 <div class="imageblock">
 <div class="content">
-<a class="image" href="images/deployment.png"><img src="images//deployment.png" alt="Netflix Deployment"></a>
+<a class="image" href="https://netflix.github.io/genie/images/3.0.0/deployment.png"><img src="https://netflix.github.io/genie/images/3.0.0/deployment.png" alt="Netflix Deployment"></a>
 </div>
 <div class="title">Figure 1. Genie Netflix Deployment</div>
 </div>
@@ -2902,7 +2943,7 @@ used and how Genie integrates into the environment. Below is a diagram of how de
 <p>Brief descriptions of all the components.</p>
 </div>
 <div class="sect4">
-<h5 id="_elastic_load_balancer"><a class="anchor" href="#_elastic_load_balancer"></a>Elastic Load Balancer</h5>
+<h5 id="_elastic_load_balancer"><a class="anchor" href="#_elastic_load_balancer"></a>2.4.1.1. Elastic Load Balancer</h5>
 <div class="paragraph">
 <p>The <a href="https://aws.amazon.com/elasticloadbalancing/">Elastic Load Balancer</a> (ELB) is used for a few purposes.</p>
 </div>
@@ -2924,7 +2965,7 @@ used and how Genie integrates into the environment. Below is a diagram of how de
 </div>
 </div>
 <div class="sect4">
-<h5 id="_auto_scaling_group_asg"><a class="anchor" href="#_auto_scaling_group_asg"></a>Auto Scaling Group (ASG)</h5>
+<h5 id="_auto_scaling_group_asg"><a class="anchor" href="#_auto_scaling_group_asg"></a>2.4.1.2. Auto Scaling Group (ASG)</h5>
 <div class="paragraph">
 <p>A cluster of Genie nodes. Each <a href="http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html">AMI</a> contains an Apache
 HTTP server fronting Tomcat 8 via <a href="http://tomcat.apache.org/connectors-doc/index.html">AJP</a>.</p>
@@ -2950,7 +2991,7 @@ smaller size.</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_relational_database_rds"><a class="anchor" href="#_relational_database_rds"></a>Relational Database (RDS)</h5>
+<h5 id="_relational_database_rds"><a class="anchor" href="#_relational_database_rds"></a>2.4.1.3. Relational Database (RDS)</h5>
 <div class="paragraph">
 <p>We currently use an <a href="https://aws.amazon.com/rds/aurora/">Amazon Aurora</a> cluster on db.r3.4xl instances. Aurora is MySQL
 compatible so we use the standard MySQL JDBC driver that is packaged with Genie to talk to the database. We deploy to
@@ -2958,7 +2999,7 @@ a Multi-AZ cluster and we have a reader endpoint that we use for reporting and b
 </div>
 </div>
 <div class="sect4">
-<h5 id="_zookeeper"><a class="anchor" href="#_zookeeper"></a>Zookeeper</h5>
+<h5 id="_zookeeper"><a class="anchor" href="#_zookeeper"></a>2.4.1.4. Zookeeper</h5>
 <div class="paragraph">
 <p>We use an <a href="https://zookeeper.apache.org/">Apache Zookeeper</a> cluster which is deployed and managed by another team within
 Netflix for leadership election within our Genie ASG. When the Genie ASG comes up it (using Spring Cloud Cluster) looks
@@ -2967,7 +3008,7 @@ one.</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_elasticache"><a class="anchor" href="#_elasticache"></a>ElastiCache</h5>
+<h5 id="_elasticache"><a class="anchor" href="#_elasticache"></a>2.4.1.5. ElastiCache</h5>
 <div class="paragraph">
 <p>We use <a href="https://aws.amazon.com/elasticache/">AWS ElastiCache</a> to provide a Redis cluster to store our HTTP sessions (via
 <a href="http://projects.spring.io/spring-session/">Spring Session</a>). This allows us to have the users only sign in via SAML one
@@ -2975,7 +3016,7 @@ time and not have to do it every time the ELB routes them to a new host for the 
 </div>
 </div>
 <div class="sect4">
-<h5 id="_security"><a class="anchor" href="#_security"></a>Security</h5>
+<h5 id="_security"><a class="anchor" href="#_security"></a>2.4.1.6. Security</h5>
 <div class="admonitionblock note">
 <table>
 <tr>
@@ -2997,7 +3038,7 @@ provide authentication and authorization information.</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_spinnaker"><a class="anchor" href="#_spinnaker"></a>Spinnaker</h5>
+<h5 id="_spinnaker"><a class="anchor" href="#_spinnaker"></a>2.4.1.7. Spinnaker</h5>
 <div class="admonitionblock note">
 <table>
 <tr>
@@ -3035,11 +3076,651 @@ TODO
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="_properties"><a class="anchor" href="#_properties"></a>3. Properties</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_default_properties"><a class="anchor" href="#_default_properties"></a>3.1. Default Properties</h3>
+<div class="sect3">
+<h4 id="_genie_properties"><a class="anchor" href="#_genie_properties"></a>3.1.1. Genie Properties</h4>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 33%;">
+<col style="width: 33%;">
+<col style="width: 33%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Property</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Default Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.file.cache.location</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Where to store cached files on local disk</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file:///tmp/genie/cache" class="bare">file:///tmp/genie/cache</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.health.maxCpuLoadPercent</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">How high the CPU usage needs to get before the node is marked unhealthy</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">80</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.http.connect.timeout</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The number of milliseconds before HTTP calls between Genie nodes should time out on connection</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.http.read.timeout</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The number of milliseconds before HTTP calls between Genie nodes should time out on attempting to read data</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.cleanup.deleteArchiveFile</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to delete the job directory zip after it has been backed up to save disk space</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.cleanup.deleteDependencies</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether or not to delete the dependencies directories for applications to save disk space after job completion</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.forwarding.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether or not to attempt to forward kill and get output requests for jobs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.forwarding.port</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The port to forward requests to as it could be different than ELB port</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8080</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.forwarding.scheme</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The connection protocol to use (http or https)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">http</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.locations.archives</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The default root location where job archives should be stored. Scheme should be included. Created if doesn&#8217;t exist.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file:///tmp/genie/archives/" class="bare">file:///tmp/genie/archives/</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.locations.attachments</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The default root location where job attachments will be temporarily stored. Scheme should be included. Created if
+doesn&#8217;t exist.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file:///tmp/genie/attachments/" class="bare">file:///tmp/genie/attachments/</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.locations.jobs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The default root location where job working directories will be placed. Created by system if doesn&#8217;t exist.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file:///tmp/genie/jobs/" class="bare">file:///tmp/genie/jobs/</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.max.stdOutSize</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The maximum number of bytes the job standard output file can grow to before Genie will kill the job</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8589934592</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.max.stdErrSize</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The maximum number of bytes the job standard error file can grow to before Genie will kill the job</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8589934592</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.memory.maxSystemMemory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The total number of MB out of the system memory that Genie can use for running jobs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">30720</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.memory.defaultJobMemory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The total number of megabytes Genie will assume a job is allocated if not overridden by a command or user at runtime</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1024</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.memory.maxJobMemory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The maximum amount of memory, in megabytes, that a job client can be allocated</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10240</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.users.creationEnabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether Genie should attempt to create a system user in order to run the job as or not. Genie user must have sudo
+rights for this to work.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.users.runAsUserEnabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether Genie should run the jobs as the user who submitted the job or not. Genie user must have sudo rights for this
+to work.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.leader.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether this node should be the leader of the cluster or not. Should only be used if leadership is not being
+determined by Zookeeper or other mechanism via Spring</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.mail.fromAddress</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The e-mail address that should be used as the from address when alert emails are sent</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="mailto:no-reply-genie@geniehost.com">no-reply-genie@geniehost.com</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.mail.user</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The user to log into the e-mail server with</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.mail.password</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The password for the e-mail server</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.redis.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable storage of HTTP sessions inside Redis via <a href="http://projects.spring.io/spring-session/">Spring Session</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.retry.initialInterval</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The amount of time to wait after initial failure before retrying the first time in milliseconds</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.retry.maxInterval</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The maximum amount of time to wait between retries for the final retry in the back-off policy</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">60000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.retry.noOfRetries</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The number of times to retry requests to before failure</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.retry.s3.noOfRetries</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The number of times to retry requests to S3 before failure</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.oauth2.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable oauth2 based security or not for REST APIs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.oauth2.pingfederate.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether Ping Federate is being used as the OAuth2 server and Genie should assume default configuration for its tokens</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.oauth2.pingfederate.jwt.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to assume that the bearer tokens coming with API requests are <a href="https://jwt.io/">JWT</a> tokens or not</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.oauth2.pingfederate.jwt.keyValue</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The public key used to verify the JWT signature</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether SAML security should be turned on to protect access to the user interface</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.attributes.user</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The key in the SAML assertion to get the user name from</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.attributes.groups.name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The key in the SAML assertion to get group information for the user from</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.attributes.groups.admin</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The group a user needs to be a member of in order to be granted an admin role</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.idp.serviceProviderMetadataUrl</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The URL where metadata for Genie service SAML configuration can be pulled from</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.keystore.name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the keystore file on the classpath for SAML assertions</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.keystore.password</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The password for opening the keystore</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.keystore.defaultKey.name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the default key to use for signing the SAML request</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.keystore.defaultKey.password</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The password to open the default key</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.loadBalancer.contextPath</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The context path for Genie</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">/</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.loadBalancer.includeServerPortInRequestURL</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether or not to include the port of the load balancer in the redirect request</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.loadBalancer.scheme</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The scheme the load balancer Genie cluster is run behind uses (http or https). Used for SAML post back</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.loadBalancer.serverName</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Root context for the Genie load balancer e.g. genie.prod.com</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.loadBalancer.serverPort</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The port the load balancer is listening on. Used for SAML post back</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.sp.entityId</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The id that Genie is identified by in the identity provider</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.saml.sp.entityBaseURL</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Where the SAML assertion should be posted back to. e.g. <a href="https://genie.prod.com" class="bare">https://genie.prod.com</a></p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.security.x509.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable x509 certificate security on the REST APIs</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.swagger.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable <a href="http://swagger.io/">Swagger</a> to be bootstrapped into the Genie service so that the endpoint
+/swagger-ui.html shows API documentation generated by the swagger specification</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.clusterChecker.healthIndicatorsToIgnore</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The health indicator groups from the actuator /health endpoint to ignore when determining if a node is lost or not as
+a comma separated list</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">memory,genie,discoveryComposite</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.clusterChecker.lostThreshold</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The number of times a Genie nodes need to fail health check in order for jobs running on that node to be marked as
+lost and failed by the Genie leader</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.clusterChecker.port</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The port to connect to other Genie nodes on</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8080</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.clusterChecker.rate</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The number of milliseconds to wait between health checks to other Genie nodes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">300000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.clusterChecker.scheme</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The scheme (http or https) for connecting to other Genie nodes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">http</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.databaseCleanup.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether or not to delete old job records from the database</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.databaseCleanup.expression</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The cron expression for how often to run the database cleanup task</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0 0 0 * * *</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.databaseCleanup.retention</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The number of days to retain jobs in the database</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">90</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.diskCleanup.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether or not to remove old job directories on the Genie node or not</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.diskCleanup.expression</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">How often to run the disk cleanup task as a cron expression</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0 0 0 * * *</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.diskCleanup.retention</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The number of days to leave old job directories on disk</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.executor.pool.size</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The number of executor threads available for tasks to be run on within the node in an adhoc manner. Best to set to the
+number of CPU cores x 2 + 1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.scheduler.pool.size</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The number of available threads for the scheduler to use to run tasks on the node at scheduled intervals. Best to set
+to the number of CPU cores x 2 + 1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_spring_properties"><a class="anchor" href="#_spring_properties"></a>3.1.2. Spring Properties</h4>
+<div class="paragraph">
+<p><a href="http://docs.spring.io/spring-boot/docs/1.3.8.RELEASE/reference/htmlsingle/#common-application-properties">Spring Properties</a></p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 33%;">
+<col style="width: 33%;">
+<col style="width: 33%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Property</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Default Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">banner.location</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Banner file location</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie-banner.txt</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">eureka.client.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to create a eureka client or not</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">eureka.client.serviceUrl.defaultZone</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The URL of the Eureka service</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">eureka.client.register-with-eureka</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether or not to register this Genie node with the Eureka service. Will only happen if the <code>eureka.client.enabled</code>
+property is true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">info.genie.version</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The Genie version to be displayed by the UI and returned by the actuator /info endpoint. Set by the build.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Current build version</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">management.context-path</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Where the actuator endpoints are mounted within the Genie application</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">/actuator</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">management.security.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable basic security on the actuator endpoints</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">multipart.max-file-size</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Max attachment file size. Values can use the suffixed "MB" or "KB" to indicate a Megabyte or Kilobyte size.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">100MB</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">multipart.max-request-size</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Max job request size. Values can use the suffixed "MB" or "KB" to indicate a Megabyte or Kilobyte size.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">200MB</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">security.basic.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enable basic authentication</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.application.name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the application in the Spring context</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.cloud.cluster.leader.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable leadership election via Spring Cloud Cluster. Means a zookeeper endpoint needs to be available</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.cloud.cluster.zookeeper.connect</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Comma separated list of Zookeeper nodes to connect to for leadership election</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.cloud.cluster.zookeeper.namespace</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The znode namespace to use for Genie leadership election of a given cluster</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">/genie/leader/</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.jackson.date-format</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Date format string or a fully-qualified date format class name. For instance <code>yyyy-MM-dd HH:mm:ss</code> for serializing JSON</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">com.netflix.genie.common.util.GenieDateFormat</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.jackson.time-zone</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Time zone used when formatting dates. For instance <code>America/Los_Angeles</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UTC</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.profiles.active</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The default active profiles when Genie is run</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">dev</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.mail.host</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The hostname of the mail server</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.mail.testConnection</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to check the connection to the mail server on startup</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.redis.host</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Endpoint for the Redis cluster used to store HTTP session information</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.velocity.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether <a href="http://velocity.apache.org/">velocity</a> should be enabled for Spring MVC</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_profile_specific_properties"><a class="anchor" href="#_profile_specific_properties"></a>3.2. Profile Specific Properties</h3>
+<div class="sect3">
+<h4 id="_dev_profile"><a class="anchor" href="#_dev_profile"></a>3.2.1. Dev Profile</h4>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 33%;">
+<col style="width: 33%;">
+<col style="width: 33%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Property</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Default Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.jpa.hibernate.ddl-auto</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">DDL mode. This is actually a shortcut for the "hibernate.hbm2ddl.auto" property. Default to "create-drop" when using
+an embedded database, "none" otherwise.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">update</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.jpa.hibernate.naming-strategy</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Naming strategy fully qualified name.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">org.hibernate.cfg.ImprovedNamingStrategy</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.url</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JDBC URL of the database</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jdbc:hsqldb:mem:genie-db;shutdown=true</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.username</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Username for the datasource</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SA</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.password</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Database password</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_prod_profile"><a class="anchor" href="#_prod_profile"></a>3.2.2. Prod Profile</h4>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 33%;">
+<col style="width: 33%;">
+<col style="width: 33%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Property</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Default Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.url</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JDBC URL of the database</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jdbc:mysql://127.0.0.1/genie</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.username</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Username for the datasource</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">root</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.password</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Database password</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.min-idle</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Minimum number of idle connection pool threads</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.max-idle</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Maximum number of idle connection pool threads</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">20</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.max-active</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Maximum number of active database connection pool threads</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">40</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.validation-query</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Query to use to test a healthy connection</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">select 0;</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.test-on-borrow</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Test the connection when a new connection is borrowed from the pool</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.test-on-connect</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Test the connection health when connecting</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.test-on-return</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Test the connection health on return to the pool</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.test-while-idle</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Test the connection health of a thread while it is idle</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.min-evictable-idle-time-millis</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Time before a connection thread is evicted from the pool if its been idle</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">60000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.time-between-eviction-run-millis</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The time between runs of the eviction process</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10000</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_s3_profile"><a class="anchor" href="#_s3_profile"></a>3.2.3. S3 Profile</h4>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 33%;">
+<col style="width: 33%;">
+<col style="width: 33%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Property</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Default Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.aws.credentials.file</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The file path where the AWS credentials are stored</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.aws.credentials.role</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The AWS role ARN to assume when connecting to S3</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
 Version 3.0.0-SNAPSHOT<br>
-Last updated 2017-01-03 18:32:21 +00:00
+Last updated 2017-01-04 01:02:39 +00:00
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
