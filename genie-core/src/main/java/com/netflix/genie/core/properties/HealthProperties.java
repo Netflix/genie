@@ -33,4 +33,8 @@ public class HealthProperties {
      * Default to 80 percentage.
      */
     private double maxCpuLoadPercent = 80;
+    /**
+     * Default to 3.
+     */
+    private int maxCpuLoadConsecutiveOccurrences = 3;
 }
