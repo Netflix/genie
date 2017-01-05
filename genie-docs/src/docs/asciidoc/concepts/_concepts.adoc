@@ -7,3 +7,5 @@ include::_howItWorks.adoc[]
 include::_netflixExample.adoc[]
 
 include::_netflixDeployment.adoc[]
+
+include::_security.adoc[]

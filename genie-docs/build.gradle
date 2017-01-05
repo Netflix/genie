@@ -4,10 +4,12 @@ project.parent.tasks.collectDocumentation.dependsOn project.tasks.asciidoctor
 
 // This is needed cause some things like attributes for asciidoctor don't serialize project.version properly at runtime
 def genieVersion = project.version.toString()
+def isSnapshot = genieVersion.contains("SNAPSHOT")
 
 asciidoctor {
     inputs.dir new File(project.projectDir, "/src/docs/asciidoc")
     attributes \
             "revnumber": genieVersion,
-            "docinfo1": ""
+            "docinfo1": "",
+            "isSnapshot": isSnapshot
 }

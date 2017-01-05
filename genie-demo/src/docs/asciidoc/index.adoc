@@ -23,7 +23,7 @@ can help both administrators and users.
 
 NOTE: For high level concept documentation please see the https://netflix.github.io/genie[website].
 
-NOTE: For how to install this version please see the
+NOTE: For high level information and installation instructions please see the
 https://netflix.github.io/genie/docs/{revnumber}/reference[Reference Guide].
 
 NOTE: For documentation of the REST API for this version of Genie please see the

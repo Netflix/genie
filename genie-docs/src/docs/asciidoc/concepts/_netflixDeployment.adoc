@@ -58,18 +58,16 @@ We use https://aws.amazon.com/elasticache/[AWS ElastiCache] to provide a Redis c
 http://projects.spring.io/spring-session/[Spring Session]). This allows us to have the users only sign in via SAML one
 time and not have to do it every time the ELB routes them to a new host for the UI.
 
-===== Security
+===== Security Configuration
 
-NOTE: Not pictured
-
-Internally Genie is security via OAuth2 (for APIs) and SAML (for UI). We integrate with a Ping Federate IDP service to
+Internally Genie is secured via OAuth2 (for APIs) and SAML (for UI). We integrate with a Ping Federate IDP service to
 provide authentication and authorization information.
 
 HTTPS is enabled to the ELB via a Verisign signed certificate tied to the Route 53 DNS address.
 
-===== Spinnaker
+See <<Security>> for more information.
 
-NOTE: Not pictured
+===== Spinnaker
 
 Genie is deployed using http://www.spinnaker.io/[Spinnaker]. We currently have a few stacks (prod, test, dev, load,
 stage, etc) that we use for different purposes. Spinnaker handles all this for us after we configure the pipelines.
@@ -77,4 +75,6 @@ See the Spinnaker site for more information.
 
 ==== Wrap Up
 
-WARNING: TODO
+This section focussed on how Genie is deployed within Netflix. Hopefully it helps bring clarity to a way that Genie can
+be deployed. Genie certainly is not limited to this deployment model and you are free to come up with your own this
+should only serve as a template or example.
