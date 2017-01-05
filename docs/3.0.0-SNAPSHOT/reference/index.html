@@ -699,6 +699,7 @@ b.conum * { color: inherit !important; }
 
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css">
+<link rel="icon" href="https://netflix.github.io/genie/assets/img/nficon2016.png" />
 <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
                 (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -717,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 3.0.0-SNAPSHOT,</span>
-<span id="revdate">2017-01-04</span>
+<span id="revdate">2017-01-05</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -753,21 +754,43 @@ b.conum * { color: inherit !important; }
 <li><a href="#_wrap_up_4">2.4.2. Wrap Up</a></li>
 </ul>
 </li>
+<li><a href="#_security">2.5. Security</a>
+<ul class="sectlevel3">
+<li><a href="#_architecture">2.5.1. Architecture</a></li>
+<li><a href="#_rest_api_security">2.5.2. REST API Security</a></li>
+<li><a href="#_ui_security">2.5.3. UI Security</a></li>
+<li><a href="#_wrap_up_5">2.5.4. Wrap Up</a></li>
 </ul>
 </li>
-<li><a href="#_properties">3. Properties</a>
+</ul>
+</li>
+<li><a href="#_installation">3. Installation</a>
 <ul class="sectlevel2">
-<li><a href="#_default_properties">3.1. Default Properties</a>
+<li><a href="#_standalone_jar">3.1. Standalone Jar</a></li>
+<li><a href="#_tomcat_deployment">3.2. Tomcat Deployment</a></li>
+<li><a href="#_configuration_2">3.3. Configuration</a>
 <ul class="sectlevel3">
-<li><a href="#_genie_properties">3.1.1. Genie Properties</a></li>
-<li><a href="#_spring_properties">3.1.2. Spring Properties</a></li>
+<li><a href="#_profiles">3.3.1. Profiles</a></li>
+<li><a href="#_database">3.3.2. Database</a></li>
+<li><a href="#_local_directories">3.3.3. Local Directories</a></li>
 </ul>
 </li>
-<li><a href="#_profile_specific_properties">3.2. Profile Specific Properties</a>
+<li><a href="#_wrap_up_6">3.4. Wrap Up</a></li>
+</ul>
+</li>
+<li><a href="#_properties">4. Properties</a>
+<ul class="sectlevel2">
+<li><a href="#_default_properties">4.1. Default Properties</a>
 <ul class="sectlevel3">
-<li><a href="#_dev_profile">3.2.1. Dev Profile</a></li>
-<li><a href="#_prod_profile">3.2.2. Prod Profile</a></li>
-<li><a href="#_s3_profile">3.2.3. S3 Profile</a></li>
+<li><a href="#_genie_properties">4.1.1. Genie Properties</a></li>
+<li><a href="#_spring_properties">4.1.2. Spring Properties</a></li>
+</ul>
+</li>
+<li><a href="#_profile_specific_properties">4.2. Profile Specific Properties</a>
+<ul class="sectlevel3">
+<li><a href="#_dev_profile">4.2.1. Dev Profile</a></li>
+<li><a href="#_prod_profile">4.2.2. Prod Profile</a></li>
+<li><a href="#_s3_profile">4.2.3. S3 Profile</a></li>
 </ul>
 </li>
 </ul>
@@ -782,6 +805,18 @@ b.conum * { color: inherit !important; }
 <div class="paragraph">
 <p>This is the reference documentation for Genie version 3.0.0-SNAPSHOT. Here you will find high level concept documentation
 as well as documentation about how to install and configure this Genie version.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+For more Genie information see the <a href="https://netflix.github.io/genie">website</a>.
+</td>
+</tr>
+</table>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -805,18 +840,6 @@ For documentation of the REST API for this version of Genie please see the
 <td class="content">
 For a demo of this version of Genie please see the
 <a href="https://netflix.github.io/genie/docs/3.0.0-SNAPSHOT/demo">Demo Guide</a>.
-</td>
-</tr>
-</table>
-</div>
-<div class="admonitionblock warning">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-warning" title="Warning"></i>
-</td>
-<td class="content">
-Work In Progress
 </td>
 </tr>
 </table>
@@ -1092,8 +1115,8 @@ system. As a job executes, its details are recorded in the job record within the
 <div class="sect3">
 <h4 id="_wrap_up"><a class="anchor" href="#_wrap_up"></a>2.1.3. Wrap-up</h4>
 <div class="paragraph">
-<p>Hopefully this guide provides insight into how the Genie data model is thought out and works together. It is meant to
-be very generic and support as many use cases as possible without modifications to the Genie codebase.</p>
+<p>This section was intendted to provide insight into how the Genie data model is thought out and works together. It is
+meant to be very generic and support as many use cases as possible without modifications to the Genie codebase.</p>
 </div>
 </div>
 </div>
@@ -1395,17 +1418,10 @@ and stored in the default archive location under the <code>{jobId}.tar.gz</code>
 </div>
 <div class="sect3">
 <h4 id="_wrap_up_2"><a class="anchor" href="#_wrap_up_2"></a>2.2.4. Wrap Up</h4>
-<div class="admonitionblock warning">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-warning" title="Warning"></i>
-</td>
-<td class="content">
-TODO
-</td>
-</tr>
-</table>
+<div class="paragraph">
+<p>This section should have helped you understand how Genie works at a high level from configuration all the way to user
+job submission and monitoring. The design of Genie is intended to make this process repeatable and reliable for all
+users while not hiding any of the details of what is executed at job runtime.</p>
 </div>
 </div>
 </div>
@@ -2918,7 +2934,7 @@ Click image for full size
 <div class="sect3">
 <h4 id="_wrap_up_3"><a class="anchor" href="#_wrap_up_3"></a>2.3.3. Wrap Up</h4>
 <div class="paragraph">
-<p>Hopefully this section helped shed some light on how Genie is configured by admins at Netflix and how how users submit
+<p>This section went over how Genie is configured by admins at Netflix and how how users submit
 jobs and retrieve their logs and output. Anyone is free to configure Genie however suits their needs in terms of
 tags and applications which are downloaded vs installed already on a Genie node but this method works for us here at
 Netflix.</p>
@@ -3016,41 +3032,20 @@ time and not have to do it every time the ELB routes them to a new host for the 
 </div>
 </div>
 <div class="sect4">
-<h5 id="_security"><a class="anchor" href="#_security"></a>2.4.1.6. Security</h5>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-Not pictured
-</td>
-</tr>
-</table>
-</div>
+<h5 id="_security_configuration"><a class="anchor" href="#_security_configuration"></a>2.4.1.6. Security Configuration</h5>
 <div class="paragraph">
-<p>Internally Genie is security via OAuth2 (for APIs) and SAML (for UI). We integrate with a Ping Federate IDP service to
+<p>Internally Genie is secured via OAuth2 (for APIs) and SAML (for UI). We integrate with a Ping Federate IDP service to
 provide authentication and authorization information.</p>
 </div>
 <div class="paragraph">
 <p>HTTPS is enabled to the ELB via a Verisign signed certificate tied to the Route 53 DNS address.</p>
 </div>
+<div class="paragraph">
+<p>See <a href="#_security">Security</a> for more information.</p>
+</div>
 </div>
 <div class="sect4">
 <h5 id="_spinnaker"><a class="anchor" href="#_spinnaker"></a>2.4.1.7. Spinnaker</h5>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-Not pictured
-</td>
-</tr>
-</table>
-</div>
 <div class="paragraph">
 <p>Genie is deployed using <a href="http://www.spinnaker.io/">Spinnaker</a>. We currently have a few stacks (prod, test, dev, load,
 stage, etc) that we use for different purposes. Spinnaker handles all this for us after we configure the pipelines.
@@ -3060,29 +3055,327 @@ See the Spinnaker site for more information.</p>
 </div>
 <div class="sect3">
 <h4 id="_wrap_up_4"><a class="anchor" href="#_wrap_up_4"></a>2.4.2. Wrap Up</h4>
-<div class="admonitionblock warning">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-warning" title="Warning"></i>
-</td>
-<td class="content">
-TODO
-</td>
-</tr>
-</table>
+<div class="paragraph">
+<p>This section focussed on how Genie is deployed within Netflix. Hopefully it helps bring clarity to a way that Genie can
+be deployed. Genie certainly is not limited to this deployment model and you are free to come up with your own this
+should only serve as a template or example.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_security"><a class="anchor" href="#_security"></a>2.5. Security</h3>
+<div class="paragraph">
+<p>A long requested feature for Genie has been adding authentication and authorization support for the UI and particularly
+the REST APIs. Genie 3 development allowed the time and resources to finally implement a solution. Genie security is
+built on top of <a href="https://projects.spring.io/spring-security/">Spring Security</a> which allows the specific security
+solution to be plugged in based on user requirements.</p>
+</div>
+<div class="sect3">
+<h4 id="_architecture"><a class="anchor" href="#_architecture"></a>2.5.1. Architecture</h4>
+<div class="paragraph">
+<p>Out of the box Genie supports securing the REST APIs via OAuth2 and/or x509 certificates and the UI via SAML. Below is
+an image of how this security architecture works within Netflix.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<a class="image" href="https://netflix.github.io/genie/images/3.0.0/security.png"><img src="https://netflix.github.io/genie/images/3.0.0/security.png" alt="Genie Security Architecture"></a>
+</div>
+<div class="title">Figure 2. Genie Security Architecture</div>
+</div>
+<div class="paragraph">
+<p>At a high level you can see that the requests are passed through several security filter chains before they arrive at
+the Genie application code. Based on the URL being accessed different filter chains will be triggered. If the request
+can be authenticated and authorized the security configuration is stored within the Spring Security Context which can
+then be accessed via Genie code if necessary.</p>
+</div>
+<div class="paragraph">
+<p>All the security can be enabled or disabled as desired by system administrators. You can find the various properties
+under <code>genie.security.*</code> in the <a href="#_properties">Properties</a> section. Spring specific properties are also involved but the enabling
+and disabling is done via the <code>genie.security</code> properties.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_rest_api_security"><a class="anchor" href="#_rest_api_security"></a>2.5.2. REST API Security</h4>
+<div class="paragraph">
+<p>The REST APIs described in the <a href="https://netflix.github.io/genie/releases/3.0.0-SNAPSHOT/rest/">REST documentation</a> can be
+secured via OAuth2 and/or x509 out of the box. Both these mechanisms secure everything under <code>/api/*</code> to require a user
+be authenticated to access them. All <code>job</code> and read (e.g. GET) APIs are available to any authenticated user when
+security is enabled. If security is enabled users will need to be granted an <code>admin</code> role in order to use the
+configuration APIs for <code>applications</code>, <code>commands</code> and <code>clusters</code>. By configuration APIs we mean anything that will
+modify the state of these resources like the POST, PUT, PATCH, DELETE APIs.</p>
+</div>
+<div class="sect4">
+<h5 id="_x509"><a class="anchor" href="#_x509"></a>2.5.2.1. x509</h5>
+<div class="paragraph">
+<p>If x509 is enabled it will be checked first (before the OAuth2 filter chain if that is enabled) and if a valid
+certificate is present in the request the user will be authenticated and granted the pertinent role.</p>
+</div>
+<div class="paragraph">
+<p>For this to work out of the box the certicates must be formatted so that the <code>principle</code> field contains a colon
+separated string of format <code>{user}:{role1,role2&#8230;&#8203;}</code>. This is how Genie will determine the user and roles that user
+will be granted within the system.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_oauth2"><a class="anchor" href="#_oauth2"></a>2.5.2.2. OAuth2</h5>
+<div class="paragraph">
+<p><a href="https://oauth.net/2/">OAuth2</a> security is implemented via the
+<a href="https://projects.spring.io/spring-security-oauth/">Spring Security OAuth</a> project. You can read documentation there but
+out of the box support has been extended to include Ping Federate as a provider. This is used within Netflix and there
+are two ways you can have Genie validate tokens. One is if the Bearer token is merely and identifier you can have
+Genie call the Ping Federate server to validate the Bearer token is valid. The other is to configure Ping Federate to
+generated <a href="https://jwt.io/">JWT</a> tokens and all validation can be done within the Genie node. This is the preferrable
+option as you save processing time and unnecessary IO.</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_ui_security"><a class="anchor" href="#_ui_security"></a>2.5.3. UI Security</h4>
+<div class="paragraph">
+<p>The UI and other endpoints can be secured using SAML via <a href="https://projects.spring.io/spring-security-saml/">Spring SAML</a>.
+You can configure Genie where to look in the SAML assertion to parse out user and role information. If only SAML
+security is turned on users won&#8217;t need to authenticate in order to access the APIs. If SAML and one of the REST API
+security methods is enabled and configured if a user authenticates to the UI via SAML they will also be able to access
+the REST APIs within the same HTTP session without aquiring a token or passing a certificate.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_wrap_up_5"><a class="anchor" href="#_wrap_up_5"></a>2.5.4. Wrap Up</h4>
+<div class="paragraph">
+<p>This section is meant to provide a high level overview of how Genie supports authentication and authorization out of
+the box if configured properly. Security is a very large topic and to truly understand how this works reading into
+the various libraries and technologies mentioned in this section is recommended.</p>
 </div>
 </div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_properties"><a class="anchor" href="#_properties"></a>3. Properties</h2>
+<h2 id="_installation"><a class="anchor" href="#_installation"></a>3. Installation</h2>
 <div class="sectionbody">
+<div class="paragraph">
+<p>Installing Genie is easy. You can run Genie either as a standalone application with an embedded Tomcat or by deploying
+the WAR file to an existing Tomcat or other servlet container. There are trade-offs to these two methods as will be
+discussed below.</p>
+</div>
 <div class="sect2">
-<h3 id="_default_properties"><a class="anchor" href="#_default_properties"></a>3.1. Default Properties</h3>
+<h3 id="_standalone_jar"><a class="anchor" href="#_standalone_jar"></a>3.1. Standalone Jar</h3>
+<div class="paragraph">
+<p>The
+<a href="http://oss.jfrog.org/libs-snapshot/com/netflix/genie/genie-app/3.0.0-SNAPSHOT/">standalone jar</a>
+is the simplest to deploy as it has no other real moving parts. Just
+put the jar somewhere on a system and execute <code>java -jar genie-app-3.0.0-SNAPSHOT.jar</code>. The downside is it&#8217;s a little
+harder to configure or add jars to the classpath if you want them.</p>
+</div>
+<div class="paragraph">
+<p>Configuration (application*.yml or application*.properties) files can be loaded from the current working directory or
+from a <code>.genie/</code> directory stored in the users home directory (e.g. <code>~/.genie/application.yml</code>). Classpath items (jars,
+.jks files, etc) can be added to <code>~/.genie/lib/</code> and they will be part of the application classpath.</p>
+</div>
+<div class="paragraph">
+<p>Properties can be passed in on the command line two ways:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><code>java -Dgenie.example.property blah -jar genie-app-3.0.0-SNAPSHOT.jar</code></p>
+</li>
+<li>
+<p><code>java -jar genie-app-3.0.0-SNAPSHOT.jar --genie.example.property=blah</code></p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Property resolution goes in this order:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Command line</p>
+</li>
+<li>
+<p>Classpath profile specific configuration files (e.g. application-prod.yml)</p>
+</li>
+<li>
+<p>Embedded profile specific configuration files</p>
+</li>
+<li>
+<p>Classpath default configuration file (e.g. application.yml)</p>
+</li>
+<li>
+<p>Embedded default configuration file</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>For more details see the
+<a href="http://docs.spring.io/spring-boot/docs/1.3.8.RELEASE/reference/htmlsingle/#boot-features-external-config">Spring Boot</a>
+documentation on external configuration.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_tomcat_deployment"><a class="anchor" href="#_tomcat_deployment"></a>3.2. Tomcat Deployment</h3>
+<div class="paragraph">
+<p>The WAR deployment requires the
+<a href="http://oss.jfrog.org/libs-snapshot/com/netflix/genie/genie-war/3.0.0-SNAPSHOT/">WAR file</a>
+be placed in an existing Tomcat or servlet
+container. At Netflix we use this method as we have existing tuning of Tomcat and a lot of infrastructure in place
+for monitoring of the Tomcat process. We deploy to Tomcat 8.x and rename the WAR file to ROOT.war so that the
+application context root is <code>/</code>.</p>
+</div>
+<div class="paragraph">
+<p>The benefits of deploying to Tomcat are you have more access to the internals of the application and can change
+property files directly or add classpath items to either the Tomcat classpath or in the actual Genie lib directory.</p>
+</div>
+<div class="paragraph">
+<p>The drawback is that you now also have to tune and configure Tomcat or your chosen servlet container in addition to
+Genie and it may be more overhead than you&#8217;re comfortable with.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_configuration_2"><a class="anchor" href="#_configuration_2"></a>3.3. Configuration</h3>
+<div class="paragraph">
+<p>Genie has a lot of available configuration options. For descriptions of specific properties you can see the
+<a href="#_properties">Properties</a> section below. Additionally if you want to know how to configure more parts of the application you
+should have a look at the <a href="http://docs.spring.io/spring-boot/docs/1.3.8.RELEASE/reference/htmlsingle/">Spring Boot</a> docs
+as they will go in depth on how to configure the various Spring components used in Genie.</p>
+</div>
 <div class="sect3">
-<h4 id="_genie_properties"><a class="anchor" href="#_genie_properties"></a>3.1.1. Genie Properties</h4>
+<h4 id="_profiles"><a class="anchor" href="#_profiles"></a>3.3.1. Profiles</h4>
+<div class="paragraph">
+<p>Spring provides a mechanism of segregating parts of application configuration and activating them in certain
+conditions. This mechanism is known as
+<a href="http://docs.spring.io/spring-boot/docs/1.3.8.RELEASE/reference/htmlsingle/#boot-features-profiles">profiles</a>. By default
+Genie will run with the <code>dev</code> profile activated. This means that all the properties in <code>application-dev.yml</code> will be
+appended to, or overwrite, the properties in <code>application.yml</code> which are the defaults. Changing the active profiles is
+easy you just need to change the property <code>spring.profiles.active</code> and pass in a comma separated list of active
+profiles. For example <code>--spring.profiles.active=prod,cloud</code> would activate the prod and cloud profiles.</p>
+</div>
+<div class="paragraph">
+<p>Properties for specific profiles should be stored in files named <code>application-{profileName}.yml</code>. You can make as many
+as you want but Genie ships with <code>dev</code>, <code>s3</code> and <code>prod</code> profiles properties already included. Their properties can be
+seen in the <a href="#_properties">Properties</a> section below.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_database"><a class="anchor" href="#_database"></a>3.3.2. Database</h4>
+<div class="paragraph">
+<p>By default since Genie will launch with the <code>dev</code> profile active it will launch with an in memory database running as
+part of its process. This means when you shut Genie down all data will be lost. It is meant for development only. Genie
+ships with JDBC drivers for <code>MySql</code>, <code>PostgreSQL</code> and <code>HSQLDB</code>. If you want to use a different database you should load
+the JDBC driver jar file somewhere on the Genie classpath.</p>
+</div>
+<div class="paragraph">
+<p>For production you should probably enable the <code>prod</code> profile which creates a connection pool for the database and then
+override the properties <code>spring.datasource.url</code>, <code>spring.datasource.username</code> and <code>spring.datasource.password</code> to match
+your environment. The datasource url needs to be a valid JDBC connection string for your database. You can see examples
+<a href="http://www.java2s.com/Tutorial/Java/0340__Database/AListofJDBCDriversconnectionstringdrivername.htm">here</a> or
+<a href="http://alvinalexander.com/java/jdbc-connection-string-mysql-postgresql-sqlserver">here</a> or search for your database
+and JDBC connection string on your search engine of choice.</p>
+</div>
+<div class="paragraph">
+<p>Genie also ships with database schema scripts for MySQL and PostgreSQL. You will need to load these into your database
+before you run Genie if you use one of these databases. Genie no longer creates the schema dynamically for performance
+reasons. Follow the below sections to load the schemas into your table.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+There exist Genie 2.x to Genie 3.x migration scripts for MySQL and PostgreSQL but it is recommended to start from
+scratch if you can. See the source code for the migration scripts if you want to try to use them.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect4">
+<h5 id="_mysql"><a class="anchor" href="#_mysql"></a>3.3.2.1. MySQL</h5>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+This assumes the MySQL client binaries are installed
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Download the
+<a href="https://github.com/Netflix/genie/blob/master/genie-ddl/src/main/sql/mysql/3.0.0-schema.mysql.sql">MySQL Schema</a>.
+Then run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">mysql -u {username} -p{password} -h {host} -e 'create database genie;'
+mysql -u {username} -p{password} -h {host} genie &lt; 3.0.0-schema.mysql.sql</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_postgresql"><a class="anchor" href="#_postgresql"></a>3.3.2.2. PostgreSQL</h5>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+This assumes the PSQL binaries are installed
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Download the
+<a href="https://github.com/Netflix/genie/blob/master/genie-ddl/src/main/sql/postgresql/3.0.0-schema.postgresql.sql">PostgreSQL Schema</a>
+Then run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">createdb genie
+psql -U {user} -h {host} -d genie -f 3.0.0-schema.postgresql.sql</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_local_directories"><a class="anchor" href="#_local_directories"></a>3.3.3. Local Directories</h4>
+<div class="paragraph">
+<p>Genie requires a few directories to run. By default Genie will place them under <code>/tmp</code> however in production you should
+probably create a larger directory you can store the job working directories and other places in. These correspond to
+the <code>genie.jobs.locations.*</code> properties described below in the <a href="#_properties">Properties</a> section.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_wrap_up_6"><a class="anchor" href="#_wrap_up_6"></a>3.4. Wrap Up</h3>
+<div class="paragraph">
+<p>This section contains the basic setup instructions for Genie. There are other components that can be added to the
+system like Redis, Zookeeper and Security systems that are somewhat outside the scope of an initial setup. You can see
+the <a href="#_properties">Properties</a> section below for the properties you&#8217;d need to configure for these systems.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_properties"><a class="anchor" href="#_properties"></a>4. Properties</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This section describes the various properties that can be set to control the behavior of your Genie node and cluster.
+For more information on Spring properties you should see the
+<a href="http://docs.spring.io/spring-boot/docs/1.3.8.RELEASE/reference/htmlsingle/">Spring Boot</a> reference documentation. The
+Spring properties described here are ones that we have overridden from Spring defaults.</p>
+</div>
+<div class="sect2">
+<h3 id="_default_properties"><a class="anchor" href="#_default_properties"></a>4.1. Default Properties</h3>
+<div class="sect3">
+<h4 id="_genie_properties"><a class="anchor" href="#_genie_properties"></a>4.1.1. Genie Properties</h4>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 33%;">
@@ -3425,7 +3718,7 @@ to the number of CPU cores x 2 + 1</p></td>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_spring_properties"><a class="anchor" href="#_spring_properties"></a>3.1.2. Spring Properties</h4>
+<h4 id="_spring_properties"><a class="anchor" href="#_spring_properties"></a>4.1.2. Spring Properties</h4>
 <div class="paragraph">
 <p><a href="http://docs.spring.io/spring-boot/docs/1.3.8.RELEASE/reference/htmlsingle/#common-application-properties">Spring Properties</a></p>
 </div>
@@ -3554,9 +3847,9 @@ property is true</p></td>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_profile_specific_properties"><a class="anchor" href="#_profile_specific_properties"></a>3.2. Profile Specific Properties</h3>
+<h3 id="_profile_specific_properties"><a class="anchor" href="#_profile_specific_properties"></a>4.2. Profile Specific Properties</h3>
 <div class="sect3">
-<h4 id="_dev_profile"><a class="anchor" href="#_dev_profile"></a>3.2.1. Dev Profile</h4>
+<h4 id="_dev_profile"><a class="anchor" href="#_dev_profile"></a>4.2.1. Dev Profile</h4>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 33%;">
@@ -3601,7 +3894,7 @@ an embedded database, "none" otherwise.</p></td>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_prod_profile"><a class="anchor" href="#_prod_profile"></a>3.2.2. Prod Profile</h4>
+<h4 id="_prod_profile"><a class="anchor" href="#_prod_profile"></a>4.2.2. Prod Profile</h4>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 33%;">
@@ -3685,7 +3978,7 @@ an embedded database, "none" otherwise.</p></td>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_s3_profile"><a class="anchor" href="#_s3_profile"></a>3.2.3. S3 Profile</h4>
+<h4 id="_s3_profile"><a class="anchor" href="#_s3_profile"></a>4.2.3. S3 Profile</h4>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 33%;">
@@ -3720,7 +4013,7 @@ an embedded database, "none" otherwise.</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 3.0.0-SNAPSHOT<br>
-Last updated 2017-01-04 01:02:39 +00:00
+Last updated 2017-01-05 01:36:25 +00:00
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
