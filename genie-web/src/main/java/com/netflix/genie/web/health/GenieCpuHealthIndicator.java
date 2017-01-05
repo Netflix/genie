@@ -79,12 +79,14 @@ public class GenieCpuHealthIndicator implements HealthIndicator {
 
     @Override
     public Health health() {
+        // Use the distribution summary to get an average of the cpu metrics.
         final long cpuCount = summaryCpuMetric.count();
         final long cpuTotal = summaryCpuMetric.totalAmount();
         final double currentCpuLoadPercent = cpuCount == 0 ? 0 : (cpuTotal / (double) cpuCount);
         if (currentCpuLoadPercent > maxCpuLoadPercent) {
             cpuLoadConsecutiveOccurrences++;
         }
+        // Mark the service down only after a consecutive number of cpu load occurrences.
         if (cpuLoadConsecutiveOccurrences >= maxCpuLoadConsecutiveOccurrences) {
             log.warn("CPU usage {} crossed the threshold of {}", currentCpuLoadPercent, maxCpuLoadPercent);
             return Health
