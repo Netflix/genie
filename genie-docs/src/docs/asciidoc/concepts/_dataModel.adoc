@@ -1,26 +1,14 @@
 === Data Model
 
-The Genie 3 data model contains modifications and additions to the
+The Genie 3 data model contains several modifications and additions to the
 https://netflix.github.io/genie/concepts/2/DataModel.html[Genie 2 data model] to enable even more flexibility,
-modularity and meta data retention.
-
-Several limitations of the Genie 2 data model were uncovered in its more than two years of production use at Netflix. A
-few of those limitations were:
-
-* Inability to link multiple applications to a command
-* Lack of insight into what the original user request for a job contained
-* Too much normalization, particularly between tags and jobs, causing inefficient joins and slow performance
-* Lack of system data for job dimensions like attachment size, output size, etc.
-
-The changes made to the data model will become apparent in the following sections.
+modularity and meta data retention. This section will go over the purpose of the various resources available from the
+Genie API and how they interact together.
 
 ==== Caveats
 
-* What we called `entities` in Genie 2 we'll call `resources` in Genie 3 to decouple the idea from database
-implementation to user API level
 * The specific resource fields are *NOT* defined in this document. These fields are available in the
 https://netflix.github.io/genie/docs/{revnumber}/rest/[REST API documentation]
-** This documentation covers the higher level purposes of the resources and not their contents
 
 ==== Resources
 
@@ -31,7 +19,7 @@ the system.
 
 ===== Tagging
 
-One important aspect to comment on is tagging of resources. Genie relies heavily on tags for how the system discovers
+An important concept is the tagging of resources. Genie relies heavily on tags for how the system discovers
 resources like clusters and commands for a job. Each of the core resources has a set of tags that can be associated
 with them. These tags can be of set to whatever you want but it is recommended to come up with some sort of consistent
 structure for your tags to make it easier for users to understand their purpose. For example at Netflix we've adopted
@@ -151,5 +139,5 @@ system. As a job executes, its details are recorded in the job record within the
 
 ==== Wrap-up
 
-This section was intendted to provide insight into how the Genie data model is thought out and works together. It is
+This section was intended to provide insight into how the Genie data model is thought out and works together. It is
 meant to be very generic and support as many use cases as possible without modifications to the Genie codebase.
