@@ -151,5 +151,5 @@ system. As a job executes, its details are recorded in the job record within the
 
 ==== Wrap-up
 
-Hopefully this guide provides insight into how the Genie data model is thought out and works together. It is meant to
-be very generic and support as many use cases as possible without modifications to the Genie codebase.
+This section was intendted to provide insight into how the Genie data model is thought out and works together. It is
+meant to be very generic and support as many use cases as possible without modifications to the Genie codebase.

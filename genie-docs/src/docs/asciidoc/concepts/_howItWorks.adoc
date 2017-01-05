@@ -171,4 +171,6 @@ https://netflix.github.io/genie/docs/{revnumber}/rest/[REST Documentation] for s
 
 ==== Wrap Up
 
-WARNING: TODO
+This section should have helped you understand how Genie works at a high level from configuration all the way to user
+job submission and monitoring. The design of Genie is intended to make this process repeatable and reliable for all
+users while not hiding any of the details of what is executed at job runtime.

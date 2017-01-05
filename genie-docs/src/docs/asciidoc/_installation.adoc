@@ -1,0 +1,151 @@
+== Installation
+
+Installing Genie is easy. You can run Genie either as a standalone application with an embedded Tomcat or by deploying
+the WAR file to an existing Tomcat or other servlet container. There are trade-offs to these two methods as will be
+discussed below.
+
+=== Standalone Jar
+
+The
+ifeval::[{isSnapshot} == true]
+http://oss.jfrog.org/libs-snapshot/com/netflix/genie/genie-app/{revnumber}/[standalone jar]
+endif::[]
+ifeval::[{isSnapshot} == false]
+https://bintray.com/netflixoss/maven/download_file?file_path=com%2Fnetflix%2Fgenie%2Fgenie-app%2F{revnumber}%2Fgenie-app-{revnumber}.jar[standalone jar]
+endif::[]
+is the simplest to deploy as it has no other real moving parts. Just
+put the jar somewhere on a system and execute `java -jar genie-app-{revnumber}.jar`. The downside is it's a little
+harder to configure or add jars to the classpath if you want them.
+
+Configuration (application*.yml or application*.properties) files can be loaded from the current working directory or
+from a `.genie/` directory stored in the users home directory (e.g. `~/.genie/application.yml`). Classpath items (jars,
+.jks files, etc) can be added to `~/.genie/lib/` and they will be part of the application classpath.
+
+Properties can be passed in on the command line two ways:
+
+. `java -Dgenie.example.property blah -jar genie-app-{revnumber}.jar`
+. `java -jar genie-app-{revnumber}.jar --genie.example.property=blah`
+
+Property resolution goes in this order:
+
+. Command line
+. Classpath profile specific configuration files (e.g. application-prod.yml)
+. Embedded profile specific configuration files
+. Classpath default configuration file (e.g. application.yml)
+. Embedded default configuration file
+
+For more details see the
+http://docs.spring.io/spring-boot/docs/1.3.8.RELEASE/reference/htmlsingle/#boot-features-external-config[Spring Boot]
+documentation on external configuration.
+
+=== Tomcat Deployment
+
+The WAR deployment requires the
+ifeval::[{isSnapshot} == true]
+http://oss.jfrog.org/libs-snapshot/com/netflix/genie/genie-war/{revnumber}/[WAR file]
+endif::[]
+ifeval::[{isSnapshot} == false]
+https://bintray.com/netflixoss/maven/download_file?file_path=com%2Fnetflix%2Fgenie%2Fgenie-war%2F{revnumber}%2Fgenie-war-{revnumber}.war[WAR file]
+endif::[]
+be placed in an existing Tomcat or servlet
+container. At Netflix we use this method as we have existing tuning of Tomcat and a lot of infrastructure in place
+for monitoring of the Tomcat process. We deploy to Tomcat 8.x and rename the WAR file to ROOT.war so that the
+application context root is `/`.
+
+The benefits of deploying to Tomcat are you have more access to the internals of the application and can change
+property files directly or add classpath items to either the Tomcat classpath or in the actual Genie lib directory.
+
+The drawback is that you now also have to tune and configure Tomcat or your chosen servlet container in addition to
+Genie and it may be more overhead than you're comfortable with.
+
+=== Configuration
+
+Genie has a lot of available configuration options. For descriptions of specific properties you can see the
+<<Properties>> section below. Additionally if you want to know how to configure more parts of the application you
+should have a look at the http://docs.spring.io/spring-boot/docs/1.3.8.RELEASE/reference/htmlsingle/[Spring Boot] docs
+as they will go in depth on how to configure the various Spring components used in Genie.
+
+==== Profiles
+
+Spring provides a mechanism of segregating parts of application configuration and activating them in certain
+conditions. This mechanism is known as
+http://docs.spring.io/spring-boot/docs/1.3.8.RELEASE/reference/htmlsingle/#boot-features-profiles[profiles]. By default
+Genie will run with the `dev` profile activated. This means that all the properties in `application-dev.yml` will be
+appended to, or overwrite, the properties in `application.yml` which are the defaults. Changing the active profiles is
+easy you just need to change the property `spring.profiles.active` and pass in a comma separated list of active
+profiles. For example `--spring.profiles.active=prod,cloud` would activate the prod and cloud profiles.
+
+Properties for specific profiles should be stored in files named `application-{profileName}.yml`. You can make as many
+as you want but Genie ships with `dev`, `s3` and `prod` profiles properties already included. Their properties can be
+seen in the <<Properties>> section below.
+
+==== Database
+
+By default since Genie will launch with the `dev` profile active it will launch with an in memory database running as
+part of its process. This means when you shut Genie down all data will be lost. It is meant for development only. Genie
+ships with JDBC drivers for `MySql`, `PostgreSQL` and `HSQLDB`. If you want to use a different database you should load
+the JDBC driver jar file somewhere on the Genie classpath.
+
+For production you should probably enable the `prod` profile which creates a connection pool for the database and then
+override the properties `spring.datasource.url`, `spring.datasource.username` and `spring.datasource.password` to match
+your environment. The datasource url needs to be a valid JDBC connection string for your database. You can see examples
+http://www.java2s.com/Tutorial/Java/0340__Database/AListofJDBCDriversconnectionstringdrivername.htm[here] or
+http://alvinalexander.com/java/jdbc-connection-string-mysql-postgresql-sqlserver[here] or search for your database
+and JDBC connection string on your search engine of choice.
+
+Genie also ships with database schema scripts for MySQL and PostgreSQL. You will need to load these into your database
+before you run Genie if you use one of these databases. Genie no longer creates the schema dynamically for performance
+reasons. Follow the below sections to load the schemas into your table.
+
+NOTE: There exist Genie 2.x to Genie 3.x migration scripts for MySQL and PostgreSQL but it is recommended to start from
+scratch if you can. See the source code for the migration scripts if you want to try to use them.
+
+===== MySQL
+
+NOTE: This assumes the MySQL client binaries are installed
+
+Download the
+ifeval::[{isSnapshot} == true]
+https://github.com/Netflix/genie/blob/master/genie-ddl/src/main/sql/mysql/3.0.0-schema.mysql.sql[MySQL Schema].
+endif::[]
+ifeval::[{isSnapshot} == false]
+https://github.com/Netflix/genie/blob/v{revnumber}/genie-ddl/src/main/sql/mysql/3.0.0-schema.mysql.sql[MySQL Schema].
+endif::[]
+Then run:
+
+[source,bash]
+----
+mysql -u {username} -p{password} -h {host} -e 'create database genie;'
+mysql -u {username} -p{password} -h {host} genie < 3.0.0-schema.mysql.sql
+----
+
+===== PostgreSQL
+
+NOTE: This assumes the PSQL binaries are installed
+
+Download the
+ifeval::[{isSnapshot} == true]
+https://github.com/Netflix/genie/blob/master/genie-ddl/src/main/sql/postgresql/3.0.0-schema.postgresql.sql[PostgreSQL Schema]
+endif::[]
+ifeval::[{isSnapshot} == false]
+https://github.com/Netflix/genie/blob/v{revnumber}/genie-ddl/src/main/sql/postgresql/3.0.0-schema.postgresql.sql[PostgreSQL Schema]
+endif::[]
+Then run:
+
+[source,bash]
+----
+createdb genie
+psql -U {user} -h {host} -d genie -f 3.0.0-schema.postgresql.sql
+----
+
+==== Local Directories
+
+Genie requires a few directories to run. By default Genie will place them under `/tmp` however in production you should
+probably create a larger directory you can store the job working directories and other places in. These correspond to
+the `genie.jobs.locations.*` properties described below in the <<Properties>> section.
+
+=== Wrap Up
+
+This section contains the basic setup instructions for Genie. There are other components that can be added to the
+system like Redis, Zookeeper and Security systems that are somewhat outside the scope of an initial setup. You can see
+the <<Properties>> section below for the properties you'd need to configure for these systems.

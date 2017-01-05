@@ -20,9 +20,9 @@ v{revnumber}, {localdate}
 This is the REST API documentation for Genie version {revnumber}. Here you will find specific details of how to invoke
 the Genie REST API and what you can expect as return values.
 
-NOTE: For high level concept documentation please see the https://netflix.github.io/genie[website].
+NOTE: For more Genie information see the https://netflix.github.io/genie[website].
 
-NOTE: For how to install this version please see the
+NOTE: For high level information and installation instructions please see the
 https://netflix.github.io/genie/docs/{revnumber}/reference[reference guide].
 
 NOTE: For a demo of this version of Genie please see

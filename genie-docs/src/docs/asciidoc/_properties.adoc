@@ -1,5 +1,10 @@
 == Properties
 
+This section describes the various properties that can be set to control the behavior of your Genie node and cluster.
+For more information on Spring properties you should see the
+http://docs.spring.io/spring-boot/docs/1.3.8.RELEASE/reference/htmlsingle/[Spring Boot] reference documentation. The
+Spring properties described here are ones that we have overridden from Spring defaults.
+
 === Default Properties
 
 ==== Genie Properties

@@ -1221,7 +1221,7 @@ image::spark-application.png[Hadoop App Contents, link="{imagesdir}/spark-applic
 
 ==== Wrap Up
 
-Hopefully this section helped shed some light on how Genie is configured by admins at Netflix and how how users submit
+This section went over how Genie is configured by admins at Netflix and how how users submit
 jobs and retrieve their logs and output. Anyone is free to configure Genie however suits their needs in terms of
 tags and applications which are downloaded vs installed already on a Genie node but this method works for us here at
 Netflix.
