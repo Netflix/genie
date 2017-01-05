@@ -852,51 +852,18 @@ For a demo of this version of Genie please see the
 <div class="sect2">
 <h3 id="_data_model"><a class="anchor" href="#_data_model"></a>2.1. Data Model</h3>
 <div class="paragraph">
-<p>The Genie 3 data model contains modifications and additions to the
+<p>The Genie 3 data model contains several modifications and additions to the
 <a href="https://netflix.github.io/genie/concepts/2/DataModel.html">Genie 2 data model</a> to enable even more flexibility,
-modularity and meta data retention.</p>
-</div>
-<div class="paragraph">
-<p>Several limitations of the Genie 2 data model were uncovered in its more than two years of production use at Netflix. A
-few of those limitations were:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Inability to link multiple applications to a command</p>
-</li>
-<li>
-<p>Lack of insight into what the original user request for a job contained</p>
-</li>
-<li>
-<p>Too much normalization, particularly between tags and jobs, causing inefficient joins and slow performance</p>
-</li>
-<li>
-<p>Lack of system data for job dimensions like attachment size, output size, etc.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>The changes made to the data model will become apparent in the following sections.</p>
+modularity and meta data retention. This section will go over the purpose of the various resources available from the
+Genie API and how they interact together.</p>
 </div>
 <div class="sect3">
 <h4 id="_caveats"><a class="anchor" href="#_caveats"></a>2.1.1. Caveats</h4>
 <div class="ulist">
 <ul>
 <li>
-<p>What we called <code>entities</code> in Genie 2 we&#8217;ll call <code>resources</code> in Genie 3 to decouple the idea from database
-implementation to user API level</p>
-</li>
-<li>
 <p>The specific resource fields are <strong>NOT</strong> defined in this document. These fields are available in the
 <a href="https://netflix.github.io/genie/docs/3.0.0-SNAPSHOT/rest/">REST API documentation</a></p>
-<div class="ulist">
-<ul>
-<li>
-<p>This documentation covers the higher level purposes of the resources and not their contents</p>
-</li>
-</ul>
-</div>
 </li>
 </ul>
 </div>
@@ -912,7 +879,7 @@ the system.</p>
 <div class="sect4">
 <h5 id="_tagging"><a class="anchor" href="#_tagging"></a>2.1.2.1. Tagging</h5>
 <div class="paragraph">
-<p>One important aspect to comment on is tagging of resources. Genie relies heavily on tags for how the system discovers
+<p>An important concept is the tagging of resources. Genie relies heavily on tags for how the system discovers
 resources like clusters and commands for a job. Each of the core resources has a set of tags that can be associated
 with them. These tags can be of set to whatever you want but it is recommended to come up with some sort of consistent
 structure for your tags to make it easier for users to understand their purpose. For example at Netflix we&#8217;ve adopted
@@ -1115,7 +1082,7 @@ system. As a job executes, its details are recorded in the job record within the
 <div class="sect3">
 <h4 id="_wrap_up"><a class="anchor" href="#_wrap_up"></a>2.1.3. Wrap-up</h4>
 <div class="paragraph">
-<p>This section was intendted to provide insight into how the Genie data model is thought out and works together. It is
+<p>This section was intended to provide insight into how the Genie data model is thought out and works together. It is
 meant to be very generic and support as many use cases as possible without modifications to the Genie codebase.</p>
 </div>
 </div>
@@ -4013,7 +3980,7 @@ an embedded database, "none" otherwise.</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 3.0.0-SNAPSHOT<br>
-Last updated 2017-01-05 01:36:25 +00:00
+Last updated 2017-01-05 20:34:18 +00:00
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
