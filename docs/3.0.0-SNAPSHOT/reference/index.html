@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 3.0.0-SNAPSHOT,</span>
-<span id="revdate">2017-01-05</span>
+<span id="revdate">2017-01-06</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -3363,8 +3363,17 @@ Spring properties described here are ones that we have overridden from Spring de
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file:///tmp/genie/cache" class="bare">file:///tmp/genie/cache</a></p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.health.maxCpuLoadConsecutiveOccurrences</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Defines the threshold of consecutive occurrences of CPU load crossing the &lt;maxCpuLoadPercent&gt;.
+Health of the system is marked unhealthy if the CPU load of a system goes beyond the threshold 'maxCpuLoadPercent'
+for 'maxCpuLoadConsecutiveOccurrences' consecutive times.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.health.maxCpuLoadPercent</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">How high the CPU usage needs to get before the node is marked unhealthy</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Defines the threshold for the maximum CPU load percentage to consider for an instance to be unhealthy.
+Health of the system is marked unhealthy if the CPU load of a system goes beyond this threshold for
+'maxCpuLoadConsecutiveOccurrences' consecutive times.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">80</p></td>
 </tr>
 <tr>
@@ -3980,7 +3989,7 @@ an embedded database, "none" otherwise.</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 3.0.0-SNAPSHOT<br>
-Last updated 2017-01-05 20:34:18 +00:00
+Last updated 2017-01-06 22:36:03 +00:00
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
