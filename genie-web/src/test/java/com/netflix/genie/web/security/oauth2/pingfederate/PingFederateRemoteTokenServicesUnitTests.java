@@ -18,6 +18,7 @@
 package com.netflix.genie.web.security.oauth2.pingfederate;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.core.Options;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -66,7 +67,6 @@ import java.util.concurrent.TimeUnit;
 @Category(UnitTest.class)
 public class PingFederateRemoteTokenServicesUnitTests {
 
-    private static final int MOCK_PORT = 8089;
     private static final String CLIENT_ID = UUID.randomUUID().toString();
     private static final String CLIENT_SECRET = UUID.randomUUID().toString();
     private static final String CHECK_TOKEN_ENDPOINT_URL = UUID.randomUUID().toString();
@@ -76,7 +76,7 @@ public class PingFederateRemoteTokenServicesUnitTests {
      */
     @Rule
     @SuppressFBWarnings("URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD")
-    public WireMockRule wireMockRule = new WireMockRule(MOCK_PORT);
+    public WireMockRule wireMockRule = new WireMockRule(Options.DYNAMIC_PORT);
 
     private ResourceServerProperties resourceServerProperties;
     private Registry registry;
@@ -238,8 +238,8 @@ public class PingFederateRemoteTokenServicesUnitTests {
     @Test
     public void cantLoadAuthenticationOnRestError() {
         final String path = UUID.randomUUID().toString();
-        final String uri = "http://localhost:" + MOCK_PORT + "/" + path;
-        final int status = HttpStatus.INTERNAL_SERVER_ERROR.value();
+        final String uri = "http://localhost:" + this.wireMockRule.port() + "/" + path;
+        final int status = HttpStatus.NOT_FOUND.value();
         WireMock.post(WireMock.urlEqualTo(uri)).willReturn(WireMock.aResponse().withStatus(status));
         final AccessTokenConverter converter = Mockito.mock(AccessTokenConverter.class);
         this.resourceServerProperties = new ResourceServerProperties(CLIENT_ID, CLIENT_SECRET);

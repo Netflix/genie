@@ -19,10 +19,10 @@ package com.netflix.genie.web.tasks.leader;
 
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.cluster.leader.event.AbstractLeaderEvent;
-import org.springframework.cloud.cluster.leader.event.OnGrantedEvent;
-import org.springframework.cloud.cluster.leader.event.OnRevokedEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.integration.leader.event.AbstractLeaderEvent;
+import org.springframework.integration.leader.event.OnGrantedEvent;
+import org.springframework.integration.leader.event.OnRevokedEvent;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.Trigger;
 
@@ -76,8 +76,8 @@ public class LeadershipTasksCoordinator {
      * Synchronized to ensure no race conditions between threads trying to start and stop leadership tasks.
      *
      * @param leaderEvent The leader grant or revoke event
-     * @see org.springframework.cloud.cluster.leader.event.OnGrantedEvent
-     * @see org.springframework.cloud.cluster.leader.event.OnRevokedEvent
+     * @see org.springframework.integration.leader.event.OnGrantedEvent
+     * @see org.springframework.integration.leader.event.OnRevokedEvent
      */
     @EventListener
     public synchronized void onLeaderEvent(final AbstractLeaderEvent leaderEvent) {

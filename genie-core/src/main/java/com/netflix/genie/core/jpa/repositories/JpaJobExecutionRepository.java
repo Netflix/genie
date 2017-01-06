@@ -18,7 +18,6 @@ package com.netflix.genie.core.jpa.repositories;
 import com.netflix.genie.core.jpa.entities.JobExecutionEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.stereotype.Repository;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -29,7 +28,6 @@ import java.util.List;
  * @author tgianos
  * @since 3.0.0
  */
-@Repository
 public interface JpaJobExecutionRepository extends JpaRepository<JobExecutionEntity, String>, JpaSpecificationExecutor {
     /**
      * Deletes all job executions for the given ids.

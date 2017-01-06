@@ -41,7 +41,7 @@ public class RootRestControllerIntegrationTests extends RestControllerIntegratio
         this.mvc
             .perform(MockMvcRequestBuilders.get("/api/v3"))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$.content.description", Matchers.notNullValue()))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH + ".*", Matchers.hasSize(5)))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(SELF_LINK_KEY)))

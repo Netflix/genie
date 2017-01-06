@@ -23,11 +23,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
-import org.springframework.cloud.cluster.leader.event.OnGrantedEvent;
-import org.springframework.cloud.cluster.leader.event.OnRevokedEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.integration.leader.event.OnGrantedEvent;
+import org.springframework.integration.leader.event.OnRevokedEvent;
 
 /**
  * Unit tests for the LocalLeader class.

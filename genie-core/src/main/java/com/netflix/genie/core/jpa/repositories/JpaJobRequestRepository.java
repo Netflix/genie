@@ -18,7 +18,6 @@ package com.netflix.genie.core.jpa.repositories;
 import com.netflix.genie.core.jpa.entities.JobRequestEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.stereotype.Repository;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
@@ -30,7 +29,6 @@ import java.util.List;
  * @author tgianos
  * @since 3.0.0
  */
-@Repository
 public interface JpaJobRequestRepository extends JpaRepository<JobRequestEntity, String>, JpaSpecificationExecutor {
 
     /**

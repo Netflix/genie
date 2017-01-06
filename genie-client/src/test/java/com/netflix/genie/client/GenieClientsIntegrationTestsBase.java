@@ -29,10 +29,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.boot.test.WebIntegrationTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -45,9 +44,8 @@ import java.util.UUID;
  * @since 3.0.0
  */
 @Category(IntegrationTest.class)
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = GenieWeb.class)
-@WebIntegrationTest(randomPort = true)
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = GenieWeb.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("integration")
 public abstract class GenieClientsIntegrationTestsBase {
 
@@ -59,7 +57,7 @@ public abstract class GenieClientsIntegrationTestsBase {
      *
      * @return The genie service url.
      */
-    protected String getBaseUrl() {
+    String getBaseUrl() {
         return "http://localhost:" + port;
     }
 
@@ -69,7 +67,7 @@ public abstract class GenieClientsIntegrationTestsBase {
      * @param id The id of the cluster.
      * @return A cluster object.
      */
-    protected Cluster constructClusterDTO(final String id) {
+    Cluster constructClusterDTO(final String id) {
 
         final String clusterId;
         if (StringUtils.isBlank(id)) {
@@ -101,7 +99,7 @@ public abstract class GenieClientsIntegrationTestsBase {
      * @param id The id of the command.
      * @return A command object.
      */
-    protected Command constructCommandDTO(final String id) {
+    Command constructCommandDTO(final String id) {
 
         final String commandId;
         if (StringUtils.isBlank(id)) {
@@ -133,7 +131,7 @@ public abstract class GenieClientsIntegrationTestsBase {
      * @param id The id of the application.
      * @return An application object.
      */
-    protected Application constructApplicationDTO(final String id) {
+    Application constructApplicationDTO(final String id) {
 
         final String applicationId;
         if (StringUtils.isBlank(id)) {

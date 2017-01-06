@@ -60,7 +60,7 @@ public class UIController {
         if (authentication != null) {
             response.addCookie(new Cookie("genie.user", authentication.getName()));
         } else {
-            response.addCookie(new Cookie("genie.user", "Genie User"));
+            response.addCookie(new Cookie("genie.user", "user@genie"));
         }
         return "index";
     }

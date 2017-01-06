@@ -2,8 +2,9 @@
 
 This section describes the various properties that can be set to control the behavior of your Genie node and cluster.
 For more information on Spring properties you should see the
-http://docs.spring.io/spring-boot/docs/1.3.8.RELEASE/reference/htmlsingle/[Spring Boot] reference documentation. The
-Spring properties described here are ones that we have overridden from Spring defaults.
+http://docs.spring.io/spring-boot/docs/{springBootVersion}/reference/htmlsingle/[Spring Boot] reference documentation
+and the http://cloud.spring.io/spring-cloud-static/{springCloudVersion}/[Spring Cloud] documentation.
+The Spring properties described here are ones that we have overridden from Spring defaults.
 
 === Default Properties
 
@@ -281,11 +282,23 @@ number of CPU cores x 2 + 1
 to the number of CPU cores x 2 + 1
 |1
 
+|genie.zookeeper.enabled
+|Whether to enable connectivity to Zookeeper
+|false
+
+|genie.zookeeper.connectionString
+|Comma separated list of Zookeeper nodes to connect to as `host:port` pairs
+|localhost:2181
+
+|genie.zookeeper.leader.path
+|The namespace to use for Genie leadership election of a given cluster
+|/genie/leader/
+
 |===
 
 ==== Spring Properties
 
-http://docs.spring.io/spring-boot/docs/1.3.8.RELEASE/reference/htmlsingle/#common-application-properties[Spring Properties]
+http://docs.spring.io/spring-boot/docs/{springBootVersion}/reference/htmlsingle/#common-application-properties[Spring Properties]
 
 |===
 |Property |Description| Default Value
@@ -319,14 +332,6 @@ property is true
 |Whether to enable basic security on the actuator endpoints
 |false
 
-|multipart.max-file-size
-|Max attachment file size. Values can use the suffixed "MB" or "KB" to indicate a Megabyte or Kilobyte size.
-|100MB
-
-|multipart.max-request-size
-|Max job request size. Values can use the suffixed "MB" or "KB" to indicate a Megabyte or Kilobyte size.
-|200MB
-
 |security.basic.enabled
 |Enable basic authentication
 |false
@@ -351,17 +356,17 @@ property is true
 |The name of the application in the Spring context
 |genie
 
-|spring.cloud.cluster.leader.enabled
-|Whether to enable leadership election via Spring Cloud Cluster. Means a zookeeper endpoint needs to be available
-|false
+|spring.data.redis.repositories.enabled
+|Whether Spring data repositories should attempt to be created for Redis
+|true
 
-|spring.cloud.cluster.zookeeper.connect
-|Comma separated list of Zookeeper nodes to connect to for leadership election
-|
+|spring.http.multipart.max-file-size
+|Max attachment file size. Values can use the suffixed "MB" or "KB" to indicate a Megabyte or Kilobyte size.
+|100MB
 
-|spring.cloud.cluster.zookeeper.namespace
-|The znode namespace to use for Genie leadership election of a given cluster
-|/genie/leader/
+|spring.http.multipart.max-request-size
+|Max job request size. Values can use the suffixed "MB" or "KB" to indicate a Megabyte or Kilobyte size.
+|200MB
 
 |spring.jackson.date-format
 |Date format string or a fully-qualified date format class name. For instance `yyyy-MM-dd HH:mm:ss` for serializing JSON
@@ -387,6 +392,12 @@ property is true
 |Endpoint for the Redis cluster used to store HTTP session information
 |
 
+|spring.session.store-type
+|The back end storage system for Spring to store HTTP session information. See
+http://docs.spring.io/spring-boot/docs/{springBootVersion}/reference/htmlsingle/#boot-features-session[Spring Boot Session]
+for more information. Currently on classpath only none, hash_map, redis and jdbc will work.
+|hash_map
+
 |spring.velocity.enabled
 |Whether http://velocity.apache.org/[velocity] should be enabled for Spring MVC
 |false
@@ -405,7 +416,7 @@ property is true
 an embedded database, "none" otherwise.
 |update
 
-|spring.jpa.hibernate.naming-strategy
+|spring.jpa.hibernate.naming.strategy
 |Naming strategy fully qualified name.
 |org.hibernate.cfg.ImprovedNamingStrategy
 
@@ -440,43 +451,43 @@ an embedded database, "none" otherwise.
 |Database password
 |
 
-|spring.datasource.min-idle
+|spring.datasource.tomcat.min-idle
 |Minimum number of idle connection pool threads
 |5
 
-|spring.datasource.max-idle
+|spring.datasource.tomcat.max-idle
 |Maximum number of idle connection pool threads
 |20
 
-|spring.datasource.max-active
+|spring.datasource.tomcat.max-active
 |Maximum number of active database connection pool threads
 |40
 
-|spring.datasource.validation-query
+|spring.datasource.tomcat.validation-query
 |Query to use to test a healthy connection
 |select 0;
 
-|spring.datasource.test-on-borrow
+|spring.datasource.tomcat.test-on-borrow
 |Test the connection when a new connection is borrowed from the pool
 |true
 
-|spring.datasource.test-on-connect
+|spring.datasource.tomcat.test-on-connect
 |Test the connection health when connecting
 |true
 
-|spring.datasource.test-on-return
+|spring.datasource.tomcat.test-on-return
 |Test the connection health on return to the pool
 |true
 
-|spring.datasource.test-while-idle
+|spring.datasource.tomcat.test-while-idle
 |Test the connection health of a thread while it is idle
 |true
 
-|spring.datasource.min-evictable-idle-time-millis
+|spring.datasource.tomcat.min-evictable-idle-time-millis
 |Time before a connection thread is evicted from the pool if its been idle
 |60000
 
-|spring.datasource.time-between-eviction-run-millis
+|spring.datasource.tomcat.time-between-eviction-run-millis
 |The time between runs of the eviction process
 |10000
 

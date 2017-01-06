@@ -186,7 +186,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
      */
     @Before
     public void setup() throws Exception {
-        super.setup();
         this.resourceLoader = new DefaultResourceLoader();
         //this.jobsBaseUrl = "http://localhost:" + this.port + "/api/v3/jobs";
         createAnApplication(APP1_ID, APP1_NAME);
@@ -560,7 +559,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         this.mvc
             .perform(RestDocumentationRequestBuilders.get(JOBS_API + "/{id}/status", id))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(JobStatus.SUCCEEDED.toString())))
             .andDo(getResultHandler);
     }
@@ -578,7 +577,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         this.mvc
             .perform(RestDocumentationRequestBuilders.get(JOBS_API + "/{id}", id))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath(ID_PATH, Matchers.is(id)))
             .andExpect(MockMvcResultMatchers.jsonPath(CREATED_PATH, Matchers.notNullValue()))
             .andExpect(MockMvcResultMatchers.jsonPath(UPDATED_PATH, Matchers.notNullValue()))
@@ -634,7 +633,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         this.mvc
             .perform(RestDocumentationRequestBuilders.get(JOBS_API + "/{id}/output/{filePath}", id, ""))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("parent", Matchers.isEmptyOrNullString()))
             .andExpect(MockMvcResultMatchers.jsonPath("$.directories[0].name", Matchers.is("genie/")))
             .andExpect(MockMvcResultMatchers.jsonPath("$.files[0].name", Matchers.is("dep1")))
@@ -672,7 +671,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                 .accept(MediaType.TEXT_HTML)
             )
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaType.TEXT_HTML))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
             .andDo(htmlResultHandler);
 
         // Check getting a file
@@ -873,7 +872,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         this.mvc
             .perform(MockMvcRequestBuilders.get(JOBS_API).param("user", user))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath(JOBS_LIST_PATH, Matchers.hasSize(1)))
             .andExpect(MockMvcResultMatchers.jsonPath(JOBS_LIST_PATH + "[0].id", Matchers.is(id)))
             .andDo(findResultHandler);
@@ -1135,7 +1134,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         this.mvc
             .perform(MockMvcRequestBuilders.get(JOBS_API + "/" + jobId))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath(ID_PATH, Matchers.is(jobId)))
             .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(JobStatus.KILLED.toString())));
 
@@ -1200,7 +1199,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         this.mvc
             .perform(MockMvcRequestBuilders.get(JOBS_API + "/{id}", id))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath(ID_PATH, Matchers.is(id)))
             .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(JobStatus.KILLED.toString())));
     }
@@ -1252,7 +1251,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         this.mvc
             .perform(MockMvcRequestBuilders.get(JOBS_API + "/{id}", id))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath(ID_PATH, Matchers.is(id)))
             .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(JobStatus.FAILED.toString())));
     }
