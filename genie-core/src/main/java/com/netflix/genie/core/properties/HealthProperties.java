@@ -30,10 +30,16 @@ import lombok.Setter;
 @Setter
 public class HealthProperties {
     /**
+     * Defines the threshold for the maximum CPU load percentage. Health of the system is marked OUT_OF_SERVICE if
+     * the CPU load of a system goes beyond this threshold for <code>maxCpuLoadConsecutiveOccurrences</code>
+     * consecutive times.
      * Default to 80 percentage.
      */
     private double maxCpuLoadPercent = 80;
     /**
+     * Defines the threshold of consecutive occurrences of CPU load crossing the <code>maxCpuLoadPercent</code>.
+     * Health of the system is marked OUT_OF_SERVICE if the CPU load of a system goes beyond the threshold
+     * <code>maxCpuLoadPercent</code> for <code>maxCpuLoadConsecutiveOccurrences</code> consecutive times.
      * Default to 3.
      */
     private int maxCpuLoadConsecutiveOccurrences = 3;

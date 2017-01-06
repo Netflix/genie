@@ -1,8 +1,8 @@
 package com.netflix.genie.web.health
 
 import com.netflix.genie.web.configs.PropertiesConfig
-import com.netflix.spectator.api.DefaultRegistry
-import com.netflix.spectator.api.DistributionSummary
+import com.netflix.servo.monitor.BasicDistributionSummary
+import com.netflix.servo.monitor.MonitorConfig
 import com.sun.management.OperatingSystemMXBean
 import org.springframework.boot.actuate.health.Status
 import org.springframework.scheduling.concurrent.DefaultManagedTaskScheduler
@@ -19,11 +19,11 @@ import spock.lang.Unroll
 class GenieCpuHealthIndicatorSpec extends Specification{
     OperatingSystemMXBean operatingSystemMXBean
     GenieCpuHealthIndicator cpuHealthIndicator;
-    DistributionSummary summary;
+    BasicDistributionSummary summary;
 
     def setup(){
         operatingSystemMXBean = Mock(OperatingSystemMXBean)
-        summary = Mock(DistributionSummary)
+        summary = Mock(BasicDistributionSummary)
         def props = new PropertiesConfig().healthProperties()
         cpuHealthIndicator = new GenieCpuHealthIndicator(
                 props.getMaxCpuLoadPercent(),
@@ -35,8 +35,8 @@ class GenieCpuHealthIndicatorSpec extends Specification{
 
     def 'Health should be #status when totalCpuLoad is #cpuLoad'(){
         given:
-        1 * summary.totalAmount() >> cpuLoad
-        1 * summary.count() >> count
+        1 * summary.getTotalAmount() >> cpuLoad
+        1 * summary.getCount() >> count
         expect:
         cpuHealthIndicator.health().getStatus() == status
         where:
@@ -56,14 +56,14 @@ class GenieCpuHealthIndicatorSpec extends Specification{
         def okOperatingSystemMXBean = Mock(OperatingSystemMXBean)
         okOperatingSystemMXBean.getSystemCpuLoad() >> 0.75 >> 0.78
         def indicator = new GenieCpuHealthIndicator( 80, 1, okOperatingSystemMXBean,
-                new DefaultRegistry().distributionSummary('s'), new DefaultManagedTaskScheduler())
+                new BasicDistributionSummary(MonitorConfig.builder('s').build()), new DefaultManagedTaskScheduler())
         then:
         indicator.health().getStatus() == Status.UP
         when:
         def outOperatingSystemMXBean = Mock(OperatingSystemMXBean)
         outOperatingSystemMXBean.getSystemCpuLoad() >> 0.85 >> 0.88
         indicator = new GenieCpuHealthIndicator( 80, 1, outOperatingSystemMXBean,
-                new DefaultRegistry().distributionSummary('s'), new DefaultManagedTaskScheduler())
+                new BasicDistributionSummary(MonitorConfig.builder('s').build()), new DefaultManagedTaskScheduler())
         then:
         indicator.health().getStatus() == Status.OUT_OF_SERVICE
     }
