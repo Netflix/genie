@@ -16,8 +16,16 @@ Spring properties described here are ones that we have overridden from Spring de
 |Where to store cached files on local disk
 |file:///tmp/genie/cache
 
+|genie.health.maxCpuLoadConsecutiveOccurrences
+|Defines the threshold of consecutive occurrences of CPU load crossing the <maxCpuLoadPercent>.
+Health of the system is marked unhealthy if the CPU load of a system goes beyond the threshold 'maxCpuLoadPercent'
+for 'maxCpuLoadConsecutiveOccurrences' consecutive times.
+|3
+
 |genie.health.maxCpuLoadPercent
-|How high the CPU usage needs to get before the node is marked unhealthy
+|Defines the threshold for the maximum CPU load percentage to consider for an instance to be unhealthy.
+Health of the system is marked unhealthy if the CPU load of a system goes beyond this threshold for
+'maxCpuLoadConsecutiveOccurrences' consecutive times.
 |80
 
 |genie.http.connect.timeout
