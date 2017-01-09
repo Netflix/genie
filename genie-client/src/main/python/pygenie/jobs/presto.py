@@ -84,10 +84,11 @@ class PrestoJob(GenieJob):
             '--session {}={}'.format(k, v) \
             for k, v in self._command_options.get('--session', {}).items()])
 
-        return '{sessions} {options} -f {filename}' \
+        return '{sessions} {options} -f {filename} {post_cmd_args}' \
             .format(sessions=sessions_str,
                     options=options_str,
-                    filename=filename) \
+                    filename=filename,
+                    post_cmd_args=' '.join(self._post_cmd_args)) \
             .strip()
 
     def headers(self):

@@ -98,6 +98,35 @@ class TestingPigJob(unittest.TestCase):
             ])
         )
 
+    @patch('pygenie.jobs.pig.is_file')
+    def test_cmd_args_post_cmd_args(self, is_file):
+        """Test PigJob constructed cmd args with post cmd args."""
+
+        is_file.return_value = True
+
+        job = pygenie.jobs.PigJob() \
+            .script('/Users/pig/test.pig') \
+            .parameter('p', 'v') \
+            .parameter_file('/Users/pig/p.params') \
+            .property('p1', 'v1') \
+            .property('p2', 'v2') \
+            .property_file('/Users/pig/p.conf') \
+            .post_cmd_args('a') \
+            .post_cmd_args(['a', 'b', 'c']) \
+            .post_cmd_args('d e f')
+
+        assert_equals(
+            " ".join([
+                "-Dp2=v2 -Dp1=v1",
+                "-P p.conf",
+                "-param_file p.params",
+                "-param_file _pig_parameters.txt",
+                "-f test.pig",
+                "a b c d e f"
+            ]),
+            job.cmd_args
+        )
+
 
 @patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'})
 class TestingPigParameterFile(unittest.TestCase):

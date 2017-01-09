@@ -81,11 +81,12 @@ class HiveJob(GenieJob):
             if self._property_file \
             else ''
 
-        return '{prop_file} {props} {params} -f {filename}' \
+        return '{prop_file} {props} {params} -f {filename} {post_cmd_args}' \
             .format(prop_file=prop_file_str,
                     props=props_str,
                     filename=filename,
-                    params='-i _hive_parameters.txt' if param_str else '') \
+                    params='-i _hive_parameters.txt' if param_str else '',
+                    post_cmd_args=' '.join(self._post_cmd_args)) \
             .strip()
 
     @property

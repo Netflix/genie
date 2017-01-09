@@ -88,12 +88,13 @@ class PigJob(GenieJob):
             if self._property_file \
             else ''
 
-        return '{props} {prop_file} {param_files} {params} -f {filename}' \
+        return '{props} {prop_file} {param_files} {params} -f {filename} {post_cmd_args}' \
             .format(prop_file=prop_file_str,
                     props=props_str,
                     filename=filename,
                     param_files=param_files_str,
-                    params='-param_file _pig_parameters.txt' if param_str else '') \
+                    params='-param_file _pig_parameters.txt' if param_str else '',
+                    post_cmd_args=' '.join(self._post_cmd_args)) \
             .strip()
 
     @property

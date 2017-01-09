@@ -68,9 +68,10 @@ class SqoopJob(GenieJob):
             'data': self._options_file
         })
 
-        return '{cmd} {hadoop_opts} --options-file _sqoop_options.txt' \
+        return '{cmd} {hadoop_opts} --options-file _sqoop_options.txt {post_cmd_args}' \
             .format(cmd=self._cmd,
-                    hadoop_opts=hadoop_opts) \
+                    hadoop_opts=hadoop_opts,
+                    post_cmd_args=' '.join(self._post_cmd_args)) \
             .strip()
 
     @property

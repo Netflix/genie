@@ -72,6 +72,36 @@ class TestingSqoopJob(unittest.TestCase):
             ])
         )
 
+    def test_cmd_args_post_cmd_args(self):
+        """Test SqoopJob constructed cmd args with post cmd args."""
+
+        job = pygenie.jobs.SqoopJob() \
+            .cmd('export') \
+            .option('option1', 'value1') \
+            .option('option2', 'value2') \
+            .option('option3', 'value3') \
+            .option('verbose') \
+            .property('prop1', 'value1') \
+            .property('prop2', 'value2', flag='-X') \
+            .connect('jdbc://test') \
+            .password('passw0rd') \
+            .split_by('col1') \
+            .table('mytable') \
+            .target_dir('/path/to/output') \
+            .post_cmd_args('a') \
+            .post_cmd_args(['a', 'b', 'c']) \
+            .post_cmd_args('d e f')
+
+        assert_equals(
+            ' '.join([
+                'export',
+                '-Dprop1=value1',
+                '--options-file _sqoop_options.txt',
+                'a b c d e f'
+            ]),
+            job.cmd_args
+        )
+
 
 @patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'})
 class TestingSqoopJobRepr(unittest.TestCase):
