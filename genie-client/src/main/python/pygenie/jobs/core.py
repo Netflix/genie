@@ -163,6 +163,7 @@ class GenieJob(object):
         self._job_name = None
         self._job_version = 'NA'
         self._parameters = dict()
+        self._post_cmd_args = list()
         self._setup_file = None
         self._tags = list()
         self._timeout = None
@@ -800,6 +801,30 @@ class GenieJob(object):
     @unicodify
     @arg_list
     @add_to_repr('append')
+    def post_cmd_args(self, _post_cmd_args):
+        """
+        Add arguments, options, etc to the end of the constructed command line.
+
+        Example:
+            >>> job = HiveJob() \\
+            ...     .script('select * from dual') \\
+            ...     .headers() \\
+            ...     .hiveconf('a', 'b') \\
+            ...     .post_cmd_args('some_arg_1') \\
+            ...     .post_cmd_args(['arg_2', 'arg_3'])
+            >>> job.cmd_args
+            "--hiveconf a=b --hiveconf hive.cli.print.header=true -f script.hive some_arg_1 arg_2 arg_3"
+
+        Args:
+            tag (str, list): A tag for the job.
+
+        Returns:
+            :py:class:`GenieJob`: self
+        """
+
+    @unicodify
+    @arg_list
+    @add_to_repr('append')
     def tags(self, _tags):
         """
         Adds a tag for the job. Tagging a job allows for easier searching, etc.
@@ -818,7 +843,6 @@ class GenieJob(object):
         Returns:
             :py:class:`GenieJob`: self
         """
-
 
     def to_dict(self):
         """

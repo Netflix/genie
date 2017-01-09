@@ -39,11 +39,12 @@ class TestingHadoopJob(unittest.TestCase):
 
         job = pygenie.jobs.HadoopJob() \
             .command_arguments('explicitly stating command args') \
-            .script("""this should not be taken""")
+            .script("""this should not be taken""") \
+            .post_cmd_args('should not be used')
 
         assert_equals(
             job.cmd_args,
-            u'explicitly stating command args'
+            'explicitly stating command args'
         )
 
     def test_cmd_args_constructed_script_code(self):
@@ -60,6 +61,28 @@ class TestingHadoopJob(unittest.TestCase):
             u'-conf props.conf ' \
             u'-Dprop1=v1 -Dprop2=v2 ' \
             u'fs -ls /test'
+        )
+
+    def test_cmd_args_post_cmd_args(self):
+        """Test HadoopJob constructed cmd args with post cmd args."""
+
+        job = pygenie.jobs.HadoopJob() \
+            .command("fs -ls /test") \
+            .property('prop1', 'v1') \
+            .property('prop2', 'v2') \
+            .property_file('/Users/hadoop/props.conf') \
+            .post_cmd_args('a') \
+            .post_cmd_args(['a', 'b', 'c']) \
+            .post_cmd_args('d e f')
+
+        assert_equals(
+            ' '.join([
+                '-conf props.conf',
+                '-Dprop1=v1 -Dprop2=v2',
+                'fs -ls /test',
+                'a b c d e f'
+            ]),
+            job.cmd_args
         )
 
 
@@ -99,7 +122,7 @@ class TestingHadoopJobRepr(unittest.TestCase):
             .property('mapred.1', 'p1') \
             .property('mapred.2', 'p2') \
             .property_file('/Users/hadoop/test.conf') \
-            .script('jar testing.jar') \
+            .script('jar testing.jar')
 
         assert_equals(
             str(job),

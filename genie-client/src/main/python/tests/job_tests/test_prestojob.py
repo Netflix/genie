@@ -81,6 +81,28 @@ class TestingPrestoJob(unittest.TestCase):
             u'--session s2=v2 --session s1=v1 --debug --source tester --opt1 val1 -f test.presto'
         )
 
+    @patch('pygenie.jobs.presto.is_file')
+    def test_cmd_args_post_cmd_args(self, is_file):
+        """Test PrestoJob constructed cmd args with post cmd args."""
+
+        is_file.return_value = True
+
+        job = pygenie.jobs.PrestoJob() \
+            .script('/Users/presto/test.presto') \
+            .option('source', 'tester') \
+            .option('opt1', 'val1') \
+            .option('debug') \
+            .session('s1', 'v1') \
+            .session('s2', 'v2') \
+            .post_cmd_args('a') \
+            .post_cmd_args(['a', 'b', 'c']) \
+            .post_cmd_args('d e f')
+
+        assert_equals(
+            '--session s2=v2 --session s1=v1 --debug --source tester --opt1 val1 -f test.presto a b c d e f',
+            job.cmd_args
+        )
+
 
 @patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'})
 class TestingPrestoJobRepr(unittest.TestCase):

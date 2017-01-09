@@ -89,6 +89,32 @@ class TestingHiveJob(unittest.TestCase):
             ])
         )
 
+    @patch('pygenie.jobs.hive.is_file')
+    def test_cmd_args_post_cmd_args(self, is_file):
+        """Test HiveJob constructed cmd args with post cmd args."""
+
+        is_file.return_value = True
+
+        job = pygenie.jobs.HiveJob() \
+            .script('/Users/hive/test.hql') \
+            .parameter('hello', 'hi') \
+            .parameter('goodbye', 'bye') \
+            .property('p1', 'v1') \
+            .property('p2', 'v2') \
+            .post_cmd_args('a') \
+            .post_cmd_args(['a', 'b', 'c']) \
+            .post_cmd_args('d e f')
+
+        assert_equals(
+            " ".join([
+                "--hiveconf p2=v2 --hiveconf p1=v1",
+                "-i _hive_parameters.txt",
+                "-f test.hql",
+                "a b c d e f"
+            ]),
+            job.cmd_args
+        )
+
 
 @patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'})
 class TestingHiveJobParameters(unittest.TestCase):

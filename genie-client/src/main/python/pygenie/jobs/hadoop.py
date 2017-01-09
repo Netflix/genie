@@ -49,10 +49,11 @@ class HadoopJob(GenieJob):
             if self._property_file \
             else ''
 
-        return '{prop_file} {props} {cmd}' \
+        return '{prop_file} {props} {cmd} {post_cmd_args}' \
             .format(prop_file=prop_file_str,
                     props=props_str,
-                    cmd=self._script or '') \
+                    cmd=self._script or '',
+                    post_cmd_args=' '.join(self._post_cmd_args)) \
             .strip()
 
     def command(self, script):
