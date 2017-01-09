@@ -173,7 +173,7 @@ class Genie(object):
 
         """
         path = self.path_application + '/' + application_id
-        resp = _call(path, none_on_404=True) or {}
+        resp = _call(path, none_on_404=True, failure_codes=404) or {}
 
         return resp.get('response')
 
@@ -591,7 +591,7 @@ class Genie(object):
 
         """
         path = self.path_command + '/' + command_id
-        resp = _call(path, none_on_404=True) or {}
+        resp = _call(path, none_on_404=True, failure_codes=404) or {}
 
         if resp.get('response'):
             return DotDict(resp.get('response'))
@@ -787,7 +787,7 @@ class Genie(object):
 
         """
         path = self.path_cluster + '/%s' % cluster_id
-        resp = _call(path, none_on_404=True) or {}
+        resp = _call(path, none_on_404=True, failure_codes=404) or {}
 
         if resp.get('response'):
             return DotDict(resp.get('response'))
@@ -1508,7 +1508,7 @@ class Genie(object):
 
         """
         path = self.path_job + '/' + job_id
-        resp = _call(path, none_on_404=True) or {}
+        resp = _call(path, none_on_404=True, failure_codes=404) or {}
 
         if resp.get('response'):
             return DotDict(resp.get('response'))

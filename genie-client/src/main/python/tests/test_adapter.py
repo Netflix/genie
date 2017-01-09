@@ -11,7 +11,8 @@ from pygenie.adapter.genie_x import substitute
 from pygenie.adapter.genie_3 import (Genie3Adapter,
                                      get_payload)
 from pygenie.jobs import PrestoJob
-from pygenie.exceptions import GenieLogNotFoundError
+from pygenie.exceptions import (GenieHTTPError,
+                                GenieLogNotFoundError)
 
 from .utils import fake_response
 
@@ -55,6 +56,66 @@ class TestStringSubstitution(unittest.TestCase):
                        dict(name='tester4')),
             'hello tester4, goodbye ${last}'
         )
+
+
+@patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'})
+class TestGenie3JobSubmission(unittest.TestCase):
+    """Test Genie 3 job submission."""
+
+    @patch('pygenie.utils.requests.request')
+    def test_job_submit(self, request):
+        """Test Genie 3 adapter job submit."""
+
+        request.return_value = fake_response(None, status_code=202)
+
+        adapter = Genie3Adapter()
+
+        adapter.submit_job(PrestoJob().script("select * from dual"))
+
+        assert_equals(1, request.call_count)
+
+    @patch('pygenie.utils.requests.request')
+    def test_job_submit_409(self, request):
+        """Test Genie 3 adapter job submit (409 response)."""
+
+        request.side_effect = [
+            fake_response(None, status_code=409),
+            fake_response(None, status_code=202),
+            fake_response(None, status_code=503),
+        ]
+
+        adapter = Genie3Adapter()
+
+        with assert_raises(GenieHTTPError):
+            adapter.submit_job(PrestoJob().script("select * from dual"))
+
+        assert_equals(1, request.call_count)
+
+    @patch('pygenie.utils.requests.request')
+    def test_job_submit_various_responses(self, request):
+        """Test Genie 3 adapter job submit (various response codes then 202)."""
+
+        request.side_effect = [
+            fake_response(None, status_code=403),
+            fake_response(None, status_code=404),
+            fake_response(None, status_code=412),
+            fake_response(None, status_code=503),
+            fake_response(None, status_code=504),
+            fake_response(None, status_code=202),
+            fake_response(None, status_code=403),
+            fake_response(None, status_code=404),
+            fake_response(None, status_code=412),
+            fake_response(None, status_code=503),
+            fake_response(None, status_code=504),
+        ]
+
+        adapter = Genie3Adapter()
+
+        adapter.submit_job(PrestoJob().script("select * from dual"),
+                           attempts=15,
+                           backoff=0)
+
+        assert_equals(6, request.call_count)
 
 
 @patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'})

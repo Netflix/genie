@@ -37,53 +37,79 @@ class TestCall(unittest.TestCase):
         assert_equals(1, request.call_count)
 
     @patch('pygenie.utils.time.sleep')
-    def test_503s(self, sleep, request):
-        """Test HTTP request via call() with 503 responses."""
+    def test_various_status_code_retries(self, sleep, request):
+        """Test HTTP request via call() with various non-200 status code responses."""
 
         request.side_effect = [
+            fake_response({}, 403),
+            fake_response({}, 403),
+            fake_response({}, 404),
+            fake_response({}, 404),
+            fake_response({}, 409),
+            fake_response({}, 409),
+            fake_response({}, 412),
             fake_response({}, 503),
             fake_response({}, 503),
-            fake_response({}, 503),
-            fake_response({}, 503),
-            fake_response({}, 503)
+            fake_response({}, 504),
         ]
 
         with assert_raises(GenieHTTPError):
-            call('http://genie-503', attempts=4, backoff=0)
+            call('http://genie-non-200', attempts=10, backoff=0)
 
-        assert_equals(4, request.call_count)
-        assert_equals(3, sleep.call_count)
-
-    @patch('pygenie.utils.time.sleep')
-    def test_503_409(self, sleep, request):
-        """Test HTTP request via call() with 503 then 409 responses."""
-
-        request.side_effect = [
-            fake_response({}, 503),
-            fake_response({}, 409)
-        ]
-
-        with assert_raises(GenieHTTPError):
-            call('http://genie-503-409', attempts=4, backoff=0)
-
-        assert_equals(2, request.call_count)
-        assert_equals(1, sleep.call_count)
+        assert_equals(10, request.call_count)
+        assert_equals(9, sleep.call_count)
 
     @patch('pygenie.utils.time.sleep')
     def test_503_202(self, sleep, request):
-        """Test HTTP request via call() with 503 then 202 responses."""
+        """Test HTTP request via call() with non-200 responses then 202 response."""
 
         request.side_effect = [
+            fake_response({}, 403),
+            fake_response({}, 404),
+            fake_response({}, 409),
+            fake_response({}, 412),
             fake_response({}, 503),
+            fake_response({}, 504),
+            fake_response({}, 202),
+            fake_response({}, 403),
+            fake_response({}, 404),
+            fake_response({}, 409),
+            fake_response({}, 412),
             fake_response({}, 503),
-            fake_response({}, 202)
+            fake_response({}, 504)
         ]
 
-        resp = call('http://genie-503-202', attempts=4, backoff=0)
+        resp = call('http://genie-non-200-202', attempts=10, backoff=0)
 
         assert_equals(202, resp.status_code)
-        assert_equals(3, request.call_count)
-        assert_equals(2, sleep.call_count)
+        assert_equals(7, request.call_count)
+        assert_equals(6, sleep.call_count)
+
+    @patch('pygenie.utils.time.sleep')
+    def test_503_200(self, sleep, request):
+        """Test HTTP request via call() with non-200 responses then 200 response."""
+
+        request.side_effect = [
+            fake_response({}, 403),
+            fake_response({}, 404),
+            fake_response({}, 409),
+            fake_response({}, 412),
+            fake_response({}, 503),
+            fake_response({}, 504),
+            fake_response({}, 200),
+            fake_response({}, 403),
+            fake_response({}, 404),
+            fake_response({}, 409),
+            fake_response({}, 412),
+            fake_response({}, 503),
+            fake_response({}, 504)
+        ]
+
+        resp = call('http://genie-non-200-200', attempts=10, backoff=0)
+
+        assert_equals(200, resp.status_code)
+        assert_equals(7, request.call_count)
+        assert_equals(6, sleep.call_count)
 
     @patch('pygenie.utils.time.sleep')
     def test_404_not_none(self, sleep, request):
@@ -92,7 +118,7 @@ class TestCall(unittest.TestCase):
         request.return_value = fake_response({}, 404)
 
         with assert_raises(GenieHTTPError):
-            call('http://genie-404-raise')
+            call('http://genie-404-raise', attempts=1, backoff=0)
 
         assert_equals(1, request.call_count)
         assert_equals(0, sleep.call_count)
@@ -103,41 +129,53 @@ class TestCall(unittest.TestCase):
 
         request.return_value = fake_response({}, 404)
 
-        resp = call('http://genie-404-none', none_on_404=True)
+        resp = call('http://genie-404-none', none_on_404=True, attempts=1, backoff=0)
 
         assert_equals(None, resp)
         assert_equals(1, request.call_count)
         assert_equals(0, sleep.call_count)
 
     @patch('pygenie.utils.time.sleep')
-    def test_retry_codes(self, sleep, request):
-        """Test HTTP request via call() with retry status codes."""
+    def test_failure_code(self, sleep, request):
+        """Test HTTP request via call() with a failure status code."""
 
         request.side_effect = [
             fake_response({}, 500),
             fake_response({}, 503),
             fake_response({}, 500),
+            fake_response({}, 412),
+            fake_response({}, 503),
+            fake_response({}, 500),
+            fake_response({}, 412),
             fake_response({}, 503),
             fake_response({}, 500)
         ]
 
         with assert_raises(GenieHTTPError):
-            call('http://genie-retry-codes', retry_status_codes=500, attempts=4, backoff=0)
+            call('http://genie-failure-code', failure_codes=412, attempts=10, backoff=0)
 
         assert_equals(4, request.call_count)
         assert_equals(3, sleep.call_count)
 
     @patch('pygenie.utils.time.sleep')
-    def test_retry_codes_2(self, sleep, request):
-        """Test HTTP request via call() with retry status codes (finishing with 202)."""
+    def test_failure_codes(self, sleep, request):
+        """Test HTTP request via call() with failure status codes."""
 
         request.side_effect = [
             fake_response({}, 500),
             fake_response({}, 503),
-            fake_response({}, 202)
+            fake_response({}, 409),
+            fake_response({}, 500),
+            fake_response({}, 412),
+            fake_response({}, 503),
+            fake_response({}, 500),
+            fake_response({}, 412),
+            fake_response({}, 503),
+            fake_response({}, 500)
         ]
 
-        call('http://genie-retry-codes-202', retry_status_codes=500, attempts=4, backoff=0)
+        with assert_raises(GenieHTTPError):
+            call('http://genie-failure-codes', failure_codes=[409, 412], attempts=10, backoff=0)
 
         assert_equals(3, request.call_count)
         assert_equals(2, sleep.call_count)
@@ -150,7 +188,8 @@ class TestCall(unittest.TestCase):
             Timeout,
             ConnectionError,
             timeout,
-            Timeout
+            Timeout,
+            ConnectionError,
         ]
 
         with assert_raises(Timeout):
@@ -178,7 +217,7 @@ class TestCall(unittest.TestCase):
 
     @patch('pygenie.utils.time.sleep')
     def test_retry_timeout_404(self, sleep, request):
-        """Test HTTP request via call() with timeouts (finishing with 404)."""
+        """Test HTTP request via call() with timeouts with failure code."""
 
         request.side_effect = [
             Timeout,
@@ -187,11 +226,14 @@ class TestCall(unittest.TestCase):
             fake_response({}, 404),
             Timeout,
             ConnectionError,
+            timeout,
+            Timeout,
+            ConnectionError,
             timeout
         ]
 
         with assert_raises(GenieHTTPError):
-            call('http://genie-timeout-404', attempts=7, backoff=0)
+            call('http://genie-timeout-404', failure_codes=404, attempts=7, backoff=0)
 
         assert_equals(4, request.call_count)
         assert_equals(3, sleep.call_count)
@@ -213,6 +255,7 @@ class TestCall(unittest.TestCase):
         resp = call('http://genie-timeout-404',
                     attempts=7,
                     backoff=0,
+                    failure_codes=404,
                     none_on_404=True)
 
         assert_equals(4, request.call_count)
