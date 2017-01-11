@@ -48,10 +48,9 @@ class DotDict(dict):
     __delattr__ = dict.__delitem__
 
 
-def call(url, method='get', headers=None, raise_not_status=None,
-         none_on_404=False, auth_handler=None, retry_status_codes=None,
-         attempts=4, backoff=3,
-         *args, **kwargs):
+def call(url, method='get', headers=None, raise_not_status=None, none_on_404=False,
+         auth_handler=None, failure_codes=None, attempts=5, backoff=5, *args,
+         **kwargs):
     """
     Wrap HTTP request calls to the Genie server.
 
@@ -64,17 +63,23 @@ def call(url, method='get', headers=None, raise_not_status=None,
         raise_not_status (int): raise GenieHTTPError if this status is not
             returned by genie.
         none_on_404 (bool): return None if a 404 if returned instead of raising
-            GenieHTTPError.
+            GenieHTTPError (will not retry requests with 404 response).
+        failure_codes (list, optional): list of status codes to break retries and
+            return Response.
     """
 
-    assert isinstance(retry_status_codes, (list, int)) \
-            or retry_status_codes is None, \
-        'retry_status_codes should be an int or list of ints'
+    failure_codes = failure_codes or list()
 
-    retry_status_codes = retry_status_codes or list()
-    if isinstance(retry_status_codes, int):
-        retry_status_codes = [retry_status_codes]
-    retry_status_codes = set(retry_status_codes + [503])
+    assert isinstance(failure_codes, (list, int)), \
+        'failure_codes should be an int or list of ints'
+
+    if isinstance(failure_codes, int):
+        failure_codes = [failure_codes]
+
+    failure_codes = [str(f) for f in failure_codes]
+
+    if none_on_404 and '404' not in failure_codes:
+        failure_codes.append('404')
 
     auth_handler = auth_handler or AuthHandler()
 
@@ -93,28 +98,31 @@ def call(url, method='get', headers=None, raise_not_status=None,
                                     auth=auth_handler.auth,
                                     *args,
                                     **kwargs)
+            if (int(resp.status_code/100) == 2) or (str(resp.status_code) in failure_codes):
+                break
         except (ConnectionError, Timeout, socket.timeout) as err:
             errors.append(err)
             resp = None
 
-        if i < attempts - 1 and (resp is None or resp.status_code in retry_status_codes):
+        if i < attempts - 1:
             msg = ''
             if resp is not None:
                 msg = '-> {}: {}'.format(resp.status_code, resp.text)
             logger.warning('attempt %s %s', i + 1, msg)
             time.sleep(i * backoff)
-        else:
-            break
 
     if resp is not None:
         # Allow us to return None if we receive a 404
         if resp.status_code == 404 and none_on_404:
             return None
+
         if not resp.ok:
             raise GenieHTTPError(resp)
+
         # Raise GenieHTTPError if a particular status code was not returned
         if raise_not_status and resp.status_code != raise_not_status:
             raise GenieHTTPError(resp)
+
         return resp
     elif len(errors) > 0:
         raise errors[-1]

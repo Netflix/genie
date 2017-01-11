@@ -115,6 +115,7 @@ class Genie3Adapter(GenieBaseAdapter):
                             url=url,
                             stream=iterator,
                             auth_handler=self.auth_handler,
+                            failure_codes=404,
                             **kwargs)
             return response.iter_lines() if iterator else response.text
         except GenieHTTPError as err:
@@ -219,7 +220,7 @@ class Genie3Adapter(GenieBaseAdapter):
             return call(method='get',
                         url=url,
                         auth_handler=self.auth_handler,
-                        retry_status_codes=500,
+                        failure_codes=404,
                         **kwargs) \
                    .json()
         except GenieHTTPError as err:
@@ -365,7 +366,7 @@ class Genie3Adapter(GenieBaseAdapter):
                 raise GenieJobNotFoundError("job not found at {}".format(url))
             raise
 
-    def submit_job(self, job, timeout=30):
+    def submit_job(self, job, timeout=30, **kwargs):
         """Submit a job execution to the server."""
 
         payload = {
@@ -396,7 +397,9 @@ class Genie3Adapter(GenieBaseAdapter):
              url='{}/{}'.format(job._conf.genie.url, Genie3Adapter.JOBS_ENDPOINT),
              files=files,
              timeout=None if self.disable_timeout else timeout,
-             auth_handler=self.auth_handler)
+             auth_handler=self.auth_handler,
+             failure_codes=409,
+             **kwargs)
 
 
 @dispatch(GenieJob, namespace=dispatch_ns)
