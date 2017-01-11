@@ -54,14 +54,14 @@ class GenieCpuHealthIndicatorSpec extends Specification{
     def checkHealth(){
         when:
         def okOperatingSystemMXBean = Mock(OperatingSystemMXBean)
-        okOperatingSystemMXBean.getSystemCpuLoad() >> 0.75 >> 0.78
+        okOperatingSystemMXBean.getSystemCpuLoad() >> 0.75
         def indicator = new GenieCpuHealthIndicator( 80, 1, okOperatingSystemMXBean,
                 new BasicDistributionSummary(MonitorConfig.builder('s').build()), new DefaultManagedTaskScheduler())
         then:
         indicator.health().getStatus() == Status.UP
         when:
         def outOperatingSystemMXBean = Mock(OperatingSystemMXBean)
-        outOperatingSystemMXBean.getSystemCpuLoad() >> 0.85 >> 0.88
+        outOperatingSystemMXBean.getSystemCpuLoad() >> 0.85
         indicator = new GenieCpuHealthIndicator( 80, 1, outOperatingSystemMXBean,
                 new BasicDistributionSummary(MonitorConfig.builder('s').build()), new DefaultManagedTaskScheduler())
         then:

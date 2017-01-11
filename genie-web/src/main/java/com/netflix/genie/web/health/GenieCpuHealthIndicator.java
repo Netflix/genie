@@ -27,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.scheduling.TaskScheduler;
-import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
 import java.lang.management.ManagementFactory;
@@ -37,7 +36,6 @@ import java.lang.management.ManagementFactory;
  * @author amajumdar
  * @since 3.0.0
  */
-@Component
 @Slf4j
 public class GenieCpuHealthIndicator implements HealthIndicator {
     private static final String CPU_LOAD = "cpuLoad";
@@ -86,7 +84,7 @@ public class GenieCpuHealthIndicator implements HealthIndicator {
         final long cpuCount = summaryCpuMetric.getCount();
         final long cpuTotal = summaryCpuMetric.getTotalAmount();
         final double currentCpuLoadPercent =
-            cpuCount == 0 ? operatingSystemMXBean.getProcessCpuLoad() : (cpuTotal / (double) cpuCount);
+            cpuCount == 0 ? operatingSystemMXBean.getSystemCpuLoad() : (cpuTotal / (double) cpuCount);
         if (currentCpuLoadPercent > maxCpuLoadPercent) {
             cpuLoadConsecutiveOccurrences++;
         } else {
