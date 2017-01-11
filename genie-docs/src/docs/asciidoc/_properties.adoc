@@ -331,6 +331,22 @@ property is true
 |Enable basic authentication
 |false
 
+|security.oauth2.client.client-id
+|The id of the OAuth2 client
+|
+
+|security.oauth2.client.client-secret
+|The secret for the oauth2 client
+|
+
+|security.oauth2.resource.id
+|Id of the resource server
+|
+
+|security.oauth2.resource.token-info-uri
+|URI where to get token information from
+|
+
 |spring.application.name
 |The name of the application in the Spring context
 |genie
