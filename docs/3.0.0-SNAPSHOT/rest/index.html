@@ -2076,7 +2076,7 @@ Content-Length: 819
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 202 Accepted
-Location: https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7</code></pre>
+Location: https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558</code></pre>
 </div>
 </div>
 <div class="admonitionblock note">
@@ -2251,7 +2251,7 @@ SELECT * FROM your_table JOIN my_table ON your_table.id = my_table.id WHERE x &g
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 202 Accepted
-Location: https://genie.example.com/api/v3/jobs/3fc452fd-51be-478a-b77d-22212b534e3d</code></pre>
+Location: https://genie.example.com/api/v3/jobs/03b707fc-b1ad-4342-a045-f347a40d08e3</code></pre>
 </div>
 </div>
 </div>
@@ -2545,23 +2545,23 @@ Host: genie.example.com</code></pre>
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/hal+json
-Content-Length: 783
+Content-Length: 784
 
 {
   "_embedded" : {
     "jobSearchResultList" : [ {
-      "id" : "07170c41-69cf-4122-adb6-3d1fce014db7",
+      "id" : "9eaa1b92-2a7f-4d1a-b282-0c2d63040558",
       "name" : "List * ... Directories bash job",
       "user" : "genie",
       "status" : "SUCCEEDED",
-      "started" : "2017-01-11T00:57:57.975Z",
-      "finished" : "2017-01-11T00:57:58.025Z",
+      "started" : "2017-01-11T19:13:55.840Z",
+      "finished" : "2017-01-11T19:13:55.867Z",
       "clusterName" : "Local laptop",
       "commandName" : "Unix Bash command",
-      "runtime" : "PT0.05S",
+      "runtime" : "PT0.027S",
       "_links" : {
         "self" : {
-          "href" : "https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7"
+          "href" : "https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558"
         }
       }
     } ]
@@ -2649,7 +2649,7 @@ Content-Length: 783
 <h6 id="_curl_4"><a class="anchor" href="#_curl_4"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7' -i</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558' -i</code></pre>
 </div>
 </div>
 </div>
@@ -2657,7 +2657,7 @@ Content-Length: 783
 <h6 id="_httpie_4"><a class="anchor" href="#_httpie_4"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558'</code></pre>
 </div>
 </div>
 </div>
@@ -2883,7 +2883,7 @@ Content-Length: 783
 <h6 id="_request_4"><a class="anchor" href="#_request_4"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7 HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558 HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -2894,12 +2894,12 @@ Host: genie.example.com</code></pre>
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/hal+json
-Content-Length: 1620
+Content-Length: 1621
 
 {
-  "id" : "07170c41-69cf-4122-adb6-3d1fce014db7",
-  "created" : "2017-01-11T00:57:57.852Z",
-  "updated" : "2017-01-11T00:57:58.033Z",
+  "id" : "9eaa1b92-2a7f-4d1a-b282-0c2d63040558",
+  "created" : "2017-01-11T19:13:55.746Z",
+  "updated" : "2017-01-11T19:13:55.870Z",
   "tags" : [ ],
   "version" : "1.0",
   "user" : "genie",
@@ -2907,37 +2907,37 @@ Content-Length: 1620
   "description" : "Genie 3 Test Job",
   "status" : "SUCCEEDED",
   "statusMsg" : "Job finished successfully.",
-  "started" : "2017-01-11T00:57:57.975Z",
-  "finished" : "2017-01-11T00:57:58.025Z",
+  "started" : "2017-01-11T19:13:55.840Z",
+  "finished" : "2017-01-11T19:13:55.867Z",
   "archiveLocation" : null,
   "clusterName" : "Local laptop",
   "commandName" : "Unix Bash command",
-  "runtime" : "PT0.05S",
+  "runtime" : "PT0.027S",
   "commandArgs" : "-c 'echo hello world'",
   "_links" : {
     "self" : {
-      "href" : "https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7"
+      "href" : "https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558"
     },
     "output" : {
-      "href" : "https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/output"
+      "href" : "https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/output"
     },
     "request" : {
-      "href" : "https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/request"
+      "href" : "https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/request"
     },
     "execution" : {
-      "href" : "https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/execution"
+      "href" : "https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/execution"
     },
     "status" : {
-      "href" : "https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/status"
+      "href" : "https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/status"
     },
     "cluster" : {
-      "href" : "https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/cluster"
+      "href" : "https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/cluster"
     },
     "command" : {
-      "href" : "https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/command"
+      "href" : "https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/command"
     },
     "applications" : {
-      "href" : "https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/applications"
+      "href" : "https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/applications"
     }
   }
 }</code></pre>
@@ -3012,7 +3012,7 @@ Content-Length: 1620
 <h6 id="_curl_5"><a class="anchor" href="#_curl_5"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/jobs/19e38b30-2cfa-4270-89d0-ca4690734b76' -i -X DELETE</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/jobs/1f188bb2-26e4-456d-8ba6-c3e01ef57e8d' -i -X DELETE</code></pre>
 </div>
 </div>
 </div>
@@ -3020,7 +3020,7 @@ Content-Length: 1620
 <h6 id="_httpie_5"><a class="anchor" href="#_httpie_5"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http DELETE 'https://genie.example.com/api/v3/jobs/19e38b30-2cfa-4270-89d0-ca4690734b76'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http DELETE 'https://genie.example.com/api/v3/jobs/1f188bb2-26e4-456d-8ba6-c3e01ef57e8d'</code></pre>
 </div>
 </div>
 </div>
@@ -3052,7 +3052,7 @@ Content-Length: 1620
 <h6 id="_request_5"><a class="anchor" href="#_request_5"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">DELETE /api/v3/jobs/19e38b30-2cfa-4270-89d0-ca4690734b76 HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">DELETE /api/v3/jobs/1f188bb2-26e4-456d-8ba6-c3e01ef57e8d HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -3133,7 +3133,7 @@ Host: genie.example.com</code></pre>
 <h6 id="_curl_6"><a class="anchor" href="#_curl_6"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/status' -i</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/status' -i</code></pre>
 </div>
 </div>
 </div>
@@ -3141,7 +3141,7 @@ Host: genie.example.com</code></pre>
 <h6 id="_httpie_6"><a class="anchor" href="#_httpie_6"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/status'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/status'</code></pre>
 </div>
 </div>
 </div>
@@ -3212,7 +3212,7 @@ Host: genie.example.com</code></pre>
 <h6 id="_request_6"><a class="anchor" href="#_request_6"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/status HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/status HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -3335,7 +3335,7 @@ This is the default behavior for directories if no <code>Accept</code> header is
 <h6 id="_curl_7"><a class="anchor" href="#_curl_7"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/output/' -i</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/output/' -i</code></pre>
 </div>
 </div>
 </div>
@@ -3343,7 +3343,7 @@ This is the default behavior for directories if no <code>Accept</code> header is
 <h6 id="_httpie_7"><a class="anchor" href="#_httpie_7"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/output/'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/output/'</code></pre>
 </div>
 </div>
 </div>
@@ -3512,7 +3512,7 @@ This is the default behavior for directories if no <code>Accept</code> header is
 <h6 id="_request_7"><a class="anchor" href="#_request_7"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/output/ HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/output/ HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -3529,35 +3529,35 @@ Content-Length: 1253
   "parent" : null,
   "directories" : [ {
     "name" : "genie/",
-    "url" : "https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/output/genie/",
+    "url" : "https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/output/genie/",
     "size" : 0,
-    "lastModified" : "2017-01-11T00:57:57.000Z"
+    "lastModified" : "2017-01-11T19:13:55.000Z"
   } ],
   "files" : [ {
     "name" : "dep1",
-    "url" : "https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/output/dep1",
+    "url" : "https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/output/dep1",
     "size" : 0,
-    "lastModified" : "2017-01-11T00:57:57.000Z"
+    "lastModified" : "2017-01-11T19:13:55.000Z"
   }, {
     "name" : "jobsetupfile",
-    "url" : "https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/output/jobsetupfile",
+    "url" : "https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/output/jobsetupfile",
     "size" : 0,
-    "lastModified" : "2017-01-11T00:57:57.000Z"
+    "lastModified" : "2017-01-11T19:13:55.000Z"
   }, {
     "name" : "run",
-    "url" : "https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/output/run",
+    "url" : "https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/output/run",
     "size" : 3346,
-    "lastModified" : "2017-01-11T00:57:57.000Z"
+    "lastModified" : "2017-01-11T19:13:55.000Z"
   }, {
     "name" : "stderr",
-    "url" : "https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/output/stderr",
+    "url" : "https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/output/stderr",
     "size" : 0,
-    "lastModified" : "2017-01-11T00:57:57.000Z"
+    "lastModified" : "2017-01-11T19:13:55.000Z"
   }, {
     "name" : "stdout",
-    "url" : "https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/output/stdout",
+    "url" : "https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/output/stdout",
     "size" : 12,
-    "lastModified" : "2017-01-11T00:57:57.000Z"
+    "lastModified" : "2017-01-11T19:13:55.000Z"
   } ]
 }</code></pre>
 </div>
@@ -3651,7 +3651,7 @@ accept header
 <h6 id="_curl_8"><a class="anchor" href="#_curl_8"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/output/' -i -H 'Accept: text/html'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/output/' -i -H 'Accept: text/html'</code></pre>
 </div>
 </div>
 </div>
@@ -3659,7 +3659,7 @@ accept header
 <h6 id="_httpie_8"><a class="anchor" href="#_httpie_8"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/output/' 'Accept:text/html'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/output/' 'Accept:text/html'</code></pre>
 </div>
 </div>
 </div>
@@ -3706,7 +3706,7 @@ accept header
 <h6 id="_request_8"><a class="anchor" href="#_request_8"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/output/ HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/output/ HTTP/1.1
 Accept: text/html
 Host: genie.example.com</code></pre>
 </div>
@@ -3720,7 +3720,7 @@ Host: genie.example.com</code></pre>
 Content-Type: text/html
 Content-Length: 2816
 
-&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;head&gt;&lt;title&gt;07170c41-69cf-4122-adb6-3d1fce014db7&lt;/title&gt;&lt;style type="text/css"&gt;&lt;!--H1 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;font-size:22px;} H2 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;font-size:16px;} H3 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;font-size:14px;} BODY {font-family:Tahoma,Arial,sans-serif;color:black;background-color:white;} B {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;} P {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:12px;}A {color : black;}A.name {color : black;}.line {height: 1px; background-color: #525D76; border: none;}--&gt;&lt;/style&gt; &lt;/head&gt;&lt;body&gt;&lt;h1&gt;07170c41-69cf-4122-adb6-3d1fce014db7&lt;/h1&gt;&lt;HR size="1" noshade="noshade"&gt;&lt;table width="100%" cellspacing="0" cellpadding="5" align="center"&gt;&lt;tr&gt;&lt;td align="left"&gt;&lt;font size="+1"&gt;&lt;strong&gt;Filename&lt;/strong&gt;&lt;/font&gt;&lt;/td&gt;&lt;td align="right"&gt;&lt;font size="+1"&gt;&lt;strong&gt;Size&lt;/strong&gt;&lt;/font&gt;&lt;/td&gt;&lt;td align="right"&gt;&lt;font size="+1"&gt;&lt;strong&gt;Last Modified&lt;/strong&gt;&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr bgcolor="#eeeeee"&gt;&lt;td align="left"&gt;&amp;nbsp;&amp;nbsp;&lt;a href="https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/output/genie/"&gt;&lt;tt&gt;genie/&lt;/tt&gt;&lt;/a&gt;&lt;/td&gt;&lt;td align="right"&gt;&lt;tt&gt;-&lt;/tt&gt;&lt;/td&gt;&lt;td align="right"&gt;&lt;tt&gt;Wed, 11 Jan 2017 00:57:57 GMT&lt;/tt&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td align="left"&gt;&amp;nbsp;&amp;nbsp;&lt;a href="https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/output/dep1"&gt;&lt;tt&gt;dep1&lt;/tt&gt;&lt;/a&gt;&lt;/td&gt;&lt;td align="right"&gt;&lt;tt&gt;0 bytes&lt;/tt&gt;&lt;/td&gt;&lt;td align="right"&gt;&lt;tt&gt;Wed, 11 Jan 2017 00:57:57 GMT&lt;/tt&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr bgcolor="#eeeeee"&gt;&lt;td align="left"&gt;&amp;nbsp;&amp;nbsp;&lt;a href="https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/output/jobsetupfile"&gt;&lt;tt&gt;jobsetupfile&lt;/tt&gt;&lt;/a&gt;&lt;/td&gt;&lt;td align="right"&gt;&lt;tt&gt;0 bytes&lt;/tt&gt;&lt;/td&gt;&lt;td align="right"&gt;&lt;tt&gt;Wed, 11 Jan 2017 00:57:57 GMT&lt;/tt&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td align="left"&gt;&amp;nbsp;&amp;nbsp;&lt;a href="https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/output/run"&gt;&lt;tt&gt;run&lt;/tt&gt;&lt;/a&gt;&lt;/td&gt;&lt;td align="right"&gt;&lt;tt&gt;3 KB&lt;/tt&gt;&lt;/td&gt;&lt;td align="right"&gt;&lt;tt&gt;Wed, 11 Jan 2017 00:57:57 GMT&lt;/tt&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr bgcolor="#eeeeee"&gt;&lt;td align="left"&gt;&amp;nbsp;&amp;nbsp;&lt;a href="https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/output/stderr"&gt;&lt;tt&gt;stderr&lt;/tt&gt;&lt;/a&gt;&lt;/td&gt;&lt;td align="right"&gt;&lt;tt&gt;0 bytes&lt;/tt&gt;&lt;/td&gt;&lt;td align="right"&gt;&lt;tt&gt;Wed, 11 Jan 2017 00:57:57 GMT&lt;/tt&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td align="left"&gt;&amp;nbsp;&amp;nbsp;&lt;a href="https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/output/stdout"&gt;&lt;tt&gt;stdout&lt;/tt&gt;&lt;/a&gt;&lt;/td&gt;&lt;td align="right"&gt;&lt;tt&gt;12 bytes&lt;/tt&gt;&lt;/td&gt;&lt;td align="right"&gt;&lt;tt&gt;Wed, 11 Jan 2017 00:57:57 GMT&lt;/tt&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;HR size="1" noshade="noshade"&gt;&lt;h3&gt;Apache Tomcat/8.0.37&lt;/h3&gt;&lt;/body&gt;&lt;/html&gt;</code></pre>
+&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;head&gt;&lt;title&gt;9eaa1b92-2a7f-4d1a-b282-0c2d63040558&lt;/title&gt;&lt;style type="text/css"&gt;&lt;!--H1 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;font-size:22px;} H2 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;font-size:16px;} H3 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;font-size:14px;} BODY {font-family:Tahoma,Arial,sans-serif;color:black;background-color:white;} B {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;} P {font-family:Tahoma,Arial,sans-serif;background:white;color:black;font-size:12px;}A {color : black;}A.name {color : black;}.line {height: 1px; background-color: #525D76; border: none;}--&gt;&lt;/style&gt; &lt;/head&gt;&lt;body&gt;&lt;h1&gt;9eaa1b92-2a7f-4d1a-b282-0c2d63040558&lt;/h1&gt;&lt;HR size="1" noshade="noshade"&gt;&lt;table width="100%" cellspacing="0" cellpadding="5" align="center"&gt;&lt;tr&gt;&lt;td align="left"&gt;&lt;font size="+1"&gt;&lt;strong&gt;Filename&lt;/strong&gt;&lt;/font&gt;&lt;/td&gt;&lt;td align="right"&gt;&lt;font size="+1"&gt;&lt;strong&gt;Size&lt;/strong&gt;&lt;/font&gt;&lt;/td&gt;&lt;td align="right"&gt;&lt;font size="+1"&gt;&lt;strong&gt;Last Modified&lt;/strong&gt;&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr bgcolor="#eeeeee"&gt;&lt;td align="left"&gt;&amp;nbsp;&amp;nbsp;&lt;a href="https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/output/genie/"&gt;&lt;tt&gt;genie/&lt;/tt&gt;&lt;/a&gt;&lt;/td&gt;&lt;td align="right"&gt;&lt;tt&gt;-&lt;/tt&gt;&lt;/td&gt;&lt;td align="right"&gt;&lt;tt&gt;Wed, 11 Jan 2017 19:13:55 GMT&lt;/tt&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td align="left"&gt;&amp;nbsp;&amp;nbsp;&lt;a href="https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/output/dep1"&gt;&lt;tt&gt;dep1&lt;/tt&gt;&lt;/a&gt;&lt;/td&gt;&lt;td align="right"&gt;&lt;tt&gt;0 bytes&lt;/tt&gt;&lt;/td&gt;&lt;td align="right"&gt;&lt;tt&gt;Wed, 11 Jan 2017 19:13:55 GMT&lt;/tt&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr bgcolor="#eeeeee"&gt;&lt;td align="left"&gt;&amp;nbsp;&amp;nbsp;&lt;a href="https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/output/jobsetupfile"&gt;&lt;tt&gt;jobsetupfile&lt;/tt&gt;&lt;/a&gt;&lt;/td&gt;&lt;td align="right"&gt;&lt;tt&gt;0 bytes&lt;/tt&gt;&lt;/td&gt;&lt;td align="right"&gt;&lt;tt&gt;Wed, 11 Jan 2017 19:13:55 GMT&lt;/tt&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td align="left"&gt;&amp;nbsp;&amp;nbsp;&lt;a href="https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/output/run"&gt;&lt;tt&gt;run&lt;/tt&gt;&lt;/a&gt;&lt;/td&gt;&lt;td align="right"&gt;&lt;tt&gt;3 KB&lt;/tt&gt;&lt;/td&gt;&lt;td align="right"&gt;&lt;tt&gt;Wed, 11 Jan 2017 19:13:55 GMT&lt;/tt&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr bgcolor="#eeeeee"&gt;&lt;td align="left"&gt;&amp;nbsp;&amp;nbsp;&lt;a href="https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/output/stderr"&gt;&lt;tt&gt;stderr&lt;/tt&gt;&lt;/a&gt;&lt;/td&gt;&lt;td align="right"&gt;&lt;tt&gt;0 bytes&lt;/tt&gt;&lt;/td&gt;&lt;td align="right"&gt;&lt;tt&gt;Wed, 11 Jan 2017 19:13:55 GMT&lt;/tt&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td align="left"&gt;&amp;nbsp;&amp;nbsp;&lt;a href="https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/output/stdout"&gt;&lt;tt&gt;stdout&lt;/tt&gt;&lt;/a&gt;&lt;/td&gt;&lt;td align="right"&gt;&lt;tt&gt;12 bytes&lt;/tt&gt;&lt;/td&gt;&lt;td align="right"&gt;&lt;tt&gt;Wed, 11 Jan 2017 19:13:55 GMT&lt;/tt&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;HR size="1" noshade="noshade"&gt;&lt;h3&gt;Apache Tomcat/8.0.37&lt;/h3&gt;&lt;/body&gt;&lt;/html&gt;</code></pre>
 </div>
 </div>
 </div>
@@ -3800,7 +3800,7 @@ Content-Length: 2816
 <h6 id="_curl_9"><a class="anchor" href="#_curl_9"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/output/run' -i</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/output/run' -i</code></pre>
 </div>
 </div>
 </div>
@@ -3808,7 +3808,7 @@ Content-Length: 2816
 <h6 id="_httpie_9"><a class="anchor" href="#_httpie_9"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/output/run'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/output/run'</code></pre>
 </div>
 </div>
 </div>
@@ -3855,7 +3855,7 @@ Content-Length: 2816
 <h6 id="_request_9"><a class="anchor" href="#_request_9"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/output/run HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/output/run HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -3865,7 +3865,7 @@ Host: genie.example.com</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
-Last-Modified: Wed, 11 Jan 2017 00:57:57 GMT
+Last-Modified: Wed, 11 Jan 2017 19:13:55 GMT
 Content-Length: 3346
 Accept-Ranges: bytes
 
@@ -3937,7 +3937,7 @@ SELF_PID=$$
 
 echo Start: `date '+%Y-%m-%d %H:%M:%S'`
 
-export GENIE_JOB_DIR="/tmp/1484096252131-0/07170c41-69cf-4122-adb6-3d1fce014db7"
+export GENIE_JOB_DIR="/tmp/1484162012087-0/9eaa1b92-2a7f-4d1a-b282-0c2d63040558"
 
 export GENIE_APPLICATION_DIR="${GENIE_JOB_DIR}/genie/applications"
 
@@ -3953,7 +3953,7 @@ export GENIE_CLUSTER_ID="cluster1"
 
 export GENIE_CLUSTER_NAME="Local laptop"
 
-export GENIE_JOB_ID="07170c41-69cf-4122-adb6-3d1fce014db7"
+export GENIE_JOB_ID="9eaa1b92-2a7f-4d1a-b282-0c2d63040558"
 
 export GENIE_JOB_NAME="List * ... Directories bash job"
 
@@ -4057,7 +4057,7 @@ echo End: `date '+%Y-%m-%d %H:%M:%S'`</code></pre>
 <h6 id="_curl_10"><a class="anchor" href="#_curl_10"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/request' -i</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/request' -i</code></pre>
 </div>
 </div>
 </div>
@@ -4065,7 +4065,7 @@ echo End: `date '+%Y-%m-%d %H:%M:%S'`</code></pre>
 <h6 id="_httpie_10"><a class="anchor" href="#_httpie_10"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/request'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/request'</code></pre>
 </div>
 </div>
 </div>
@@ -4300,7 +4300,7 @@ echo End: `date '+%Y-%m-%d %H:%M:%S'`</code></pre>
 <h6 id="_request_10"><a class="anchor" href="#_request_10"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/request HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/request HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -4314,9 +4314,9 @@ Content-Type: application/hal+json
 Content-Length: 1526
 
 {
-  "id" : "07170c41-69cf-4122-adb6-3d1fce014db7",
-  "created" : "2017-01-11T00:57:57.852Z",
-  "updated" : "2017-01-11T00:57:57.852Z",
+  "id" : "9eaa1b92-2a7f-4d1a-b282-0c2d63040558",
+  "created" : "2017-01-11T19:13:55.746Z",
+  "updated" : "2017-01-11T19:13:55.746Z",
   "tags" : [ ],
   "version" : "1.0",
   "user" : "genie",
@@ -4338,19 +4338,19 @@ Content-Length: 1526
   "applications" : [ ],
   "_links" : {
     "self" : {
-      "href" : "https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/request"
+      "href" : "https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/request"
     },
     "job" : {
-      "href" : "https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7"
+      "href" : "https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558"
     },
     "execution" : {
-      "href" : "https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/execution"
+      "href" : "https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/execution"
     },
     "output" : {
-      "href" : "https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/output"
+      "href" : "https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/output"
     },
     "status" : {
-      "href" : "https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/status"
+      "href" : "https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/status"
     }
   }
 }</code></pre>
@@ -4425,7 +4425,7 @@ Content-Length: 1526
 <h6 id="_curl_11"><a class="anchor" href="#_curl_11"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/execution' -i</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/execution' -i</code></pre>
 </div>
 </div>
 </div>
@@ -4433,7 +4433,7 @@ Content-Length: 1526
 <h6 id="_httpie_11"><a class="anchor" href="#_httpie_11"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/execution'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/execution'</code></pre>
 </div>
 </div>
 </div>
@@ -4591,7 +4591,7 @@ Content-Length: 1526
 <h6 id="_request_11"><a class="anchor" href="#_request_11"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/execution HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/execution HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -4605,30 +4605,30 @@ Content-Type: application/hal+json
 Content-Length: 950
 
 {
-  "id" : "07170c41-69cf-4122-adb6-3d1fce014db7",
-  "created" : "2017-01-11T00:57:57.857Z",
-  "updated" : "2017-01-11T00:57:58.033Z",
-  "hostName" : "testing-gce-8162dea7-a7a5-4daa-92dd-8deef5c42a19",
-  "processId" : 6290,
+  "id" : "9eaa1b92-2a7f-4d1a-b282-0c2d63040558",
+  "created" : "2017-01-11T19:13:55.751Z",
+  "updated" : "2017-01-11T19:13:55.870Z",
+  "hostName" : "testing-gce-7fc71194-2b8e-4cff-9eec-6036980ea5d5",
+  "processId" : 6449,
   "checkDelay" : 1,
-  "timeout" : "2017-01-18T00:57:57.952Z",
+  "timeout" : "2017-01-18T19:13:55.833Z",
   "exitCode" : 0,
   "memory" : 1024,
   "_links" : {
     "self" : {
-      "href" : "https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/execution"
+      "href" : "https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/execution"
     },
     "job" : {
-      "href" : "https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7"
+      "href" : "https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558"
     },
     "request" : {
-      "href" : "https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/request"
+      "href" : "https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/request"
     },
     "output" : {
-      "href" : "https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/output"
+      "href" : "https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/output"
     },
     "status" : {
-      "href" : "https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/status"
+      "href" : "https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/status"
     }
   }
 }</code></pre>
@@ -4704,7 +4704,7 @@ job request.</p>
 <h6 id="_curl_12"><a class="anchor" href="#_curl_12"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/cluster' -i</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/cluster' -i</code></pre>
 </div>
 </div>
 </div>
@@ -4712,7 +4712,7 @@ job request.</p>
 <h6 id="_httpie_12"><a class="anchor" href="#_httpie_12"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/cluster'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/cluster'</code></pre>
 </div>
 </div>
 </div>
@@ -4872,7 +4872,7 @@ job request.</p>
 <h6 id="_request_12"><a class="anchor" href="#_request_12"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/cluster HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/cluster HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -4887,8 +4887,8 @@ Content-Length: 998
 
 {
   "id" : "cluster1",
-  "created" : "2017-01-11T00:57:57.736Z",
-  "updated" : "2017-01-11T00:57:57.802Z",
+  "created" : "2017-01-11T19:13:55.637Z",
+  "updated" : "2017-01-11T19:13:55.707Z",
   "tags" : [ "localhost", "genie.id:cluster1", "genie.name:Local laptop" ],
   "version" : "1.0",
   "user" : "genie",
@@ -4978,7 +4978,7 @@ criteria in the job request.</p>
 <h6 id="_curl_13"><a class="anchor" href="#_curl_13"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/command' -i</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/command' -i</code></pre>
 </div>
 </div>
 </div>
@@ -4986,7 +4986,7 @@ criteria in the job request.</p>
 <h6 id="_httpie_13"><a class="anchor" href="#_httpie_13"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/command'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/command'</code></pre>
 </div>
 </div>
 </div>
@@ -5171,7 +5171,7 @@ criteria in the job request.</p>
 <h6 id="_request_13"><a class="anchor" href="#_request_13"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/command HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/command HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -5186,8 +5186,8 @@ Content-Length: 1155
 
 {
   "id" : "cmd1",
-  "created" : "2017-01-11T00:57:57.755Z",
-  "updated" : "2017-01-11T00:57:57.779Z",
+  "created" : "2017-01-11T19:13:55.667Z",
+  "updated" : "2017-01-11T19:13:55.688Z",
   "tags" : [ "genie.name:Unix Bash command", "bash", "genie.id:cmd1" ],
   "version" : "1.0",
   "user" : "genie",
@@ -5282,7 +5282,7 @@ Content-Length: 1155
 <h6 id="_curl_14"><a class="anchor" href="#_curl_14"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/applications' -i</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/applications' -i</code></pre>
 </div>
 </div>
 </div>
@@ -5290,7 +5290,7 @@ Content-Length: 1155
 <h6 id="_httpie_14"><a class="anchor" href="#_httpie_14"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/applications'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/applications'</code></pre>
 </div>
 </div>
 </div>
@@ -5361,7 +5361,7 @@ Content-Length: 1155
 <h6 id="_request_14"><a class="anchor" href="#_request_14"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/jobs/07170c41-69cf-4122-adb6-3d1fce014db7/applications HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/jobs/9eaa1b92-2a7f-4d1a-b282-0c2d63040558/applications HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -5376,8 +5376,8 @@ Content-Length: 2614
 
 [ {
   "id" : "app1",
-  "created" : "2017-01-11T00:57:57.695Z",
-  "updated" : "2017-01-11T00:57:57.695Z",
+  "created" : "2017-01-11T19:13:55.594Z",
+  "updated" : "2017-01-11T19:13:55.594Z",
   "tags" : [ "genie.id:app1", "genie.name:Application 1" ],
   "version" : "1.0",
   "user" : "genie",
@@ -5397,8 +5397,8 @@ Content-Length: 2614
   } ]
 }, {
   "id" : "app2",
-  "created" : "2017-01-11T00:57:57.716Z",
-  "updated" : "2017-01-11T00:57:57.716Z",
+  "created" : "2017-01-11T19:13:55.612Z",
+  "updated" : "2017-01-11T19:13:55.612Z",
   "tags" : [ "genie.id:app2", "genie.name:Application 2" ],
   "version" : "1.0",
   "user" : "genie",
@@ -5724,7 +5724,7 @@ Content-Length: 427
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 201 Created
-Location: https://genie.example.com/api/v3/applications/e94a1488-8dbf-4da4-976a-dc53596a055c</code></pre>
+Location: https://genie.example.com/api/v3/applications/71e4cd1e-72a0-45eb-a71b-502a4302df39</code></pre>
 </div>
 </div>
 </div>
@@ -5796,7 +5796,7 @@ Location: https://genie.example.com/api/v3/applications/e94a1488-8dbf-4da4-976a-
 <h6 id="_curl_16"><a class="anchor" href="#_curl_16"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/applications/e94a1488-8dbf-4da4-976a-dc53596a055c' -i</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/applications/71e4cd1e-72a0-45eb-a71b-502a4302df39' -i</code></pre>
 </div>
 </div>
 </div>
@@ -5804,7 +5804,7 @@ Location: https://genie.example.com/api/v3/applications/e94a1488-8dbf-4da4-976a-
 <h6 id="_httpie_16"><a class="anchor" href="#_httpie_16"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/applications/e94a1488-8dbf-4da4-976a-dc53596a055c'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/applications/71e4cd1e-72a0-45eb-a71b-502a4302df39'</code></pre>
 </div>
 </div>
 </div>
@@ -5978,7 +5978,7 @@ Location: https://genie.example.com/api/v3/applications/e94a1488-8dbf-4da4-976a-
 <h6 id="_request_16"><a class="anchor" href="#_request_16"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/applications/e94a1488-8dbf-4da4-976a-dc53596a055c HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/applications/71e4cd1e-72a0-45eb-a71b-502a4302df39 HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -5992,10 +5992,10 @@ Content-Type: application/hal+json
 Content-Length: 850
 
 {
-  "id" : "e94a1488-8dbf-4da4-976a-dc53596a055c",
-  "created" : "2017-01-11T00:58:13.630Z",
-  "updated" : "2017-01-11T00:58:13.630Z",
-  "tags" : [ "type:spark", "ver:1.5.1", "genie.id:e94a1488-8dbf-4da4-976a-dc53596a055c", "genie.name:spark" ],
+  "id" : "71e4cd1e-72a0-45eb-a71b-502a4302df39",
+  "created" : "2017-01-11T19:14:11.031Z",
+  "updated" : "2017-01-11T19:14:11.031Z",
+  "tags" : [ "genie.id:71e4cd1e-72a0-45eb-a71b-502a4302df39", "type:spark", "ver:1.5.1", "genie.name:spark" ],
   "version" : "1.5.1",
   "user" : "genie",
   "name" : "spark",
@@ -6007,10 +6007,10 @@ Content-Length: 850
   "type" : "spark",
   "_links" : {
     "self" : {
-      "href" : "https://genie.example.com/api/v3/applications/e94a1488-8dbf-4da4-976a-dc53596a055c"
+      "href" : "https://genie.example.com/api/v3/applications/71e4cd1e-72a0-45eb-a71b-502a4302df39"
     },
     "commands" : {
-      "href" : "https://genie.example.com/api/v3/applications/e94a1488-8dbf-4da4-976a-dc53596a055c/commands"
+      "href" : "https://genie.example.com/api/v3/applications/71e4cd1e-72a0-45eb-a71b-502a4302df39/commands"
     }
   }
 }</code></pre>
@@ -6280,10 +6280,10 @@ Content-Length: 5951
 {
   "_embedded" : {
     "applicationList" : [ {
-      "id" : "41946040-b1f7-4f36-b0db-f8a74438d51c",
-      "created" : "2017-01-11T00:58:13.090Z",
-      "updated" : "2017-01-11T00:58:13.090Z",
-      "tags" : [ "genie.name:hive", "type:hive", "genie.id:41946040-b1f7-4f36-b0db-f8a74438d51c", "ver:1.0.0" ],
+      "id" : "7d24165b-0ee7-4d8d-82d3-76b3fd4a63ff",
+      "created" : "2017-01-11T19:14:10.576Z",
+      "updated" : "2017-01-11T19:14:10.576Z",
+      "tags" : [ "genie.name:hive", "type:hive", "genie.id:7d24165b-0ee7-4d8d-82d3-76b3fd4a63ff", "ver:1.0.0" ],
       "version" : "1.0.0",
       "user" : "genieUser7",
       "name" : "hive",
@@ -6295,17 +6295,17 @@ Content-Length: 5951
       "type" : "hive",
       "_links" : {
         "self" : {
-          "href" : "https://genie.example.com/api/v3/applications/41946040-b1f7-4f36-b0db-f8a74438d51c"
+          "href" : "https://genie.example.com/api/v3/applications/7d24165b-0ee7-4d8d-82d3-76b3fd4a63ff"
         },
         "commands" : {
-          "href" : "https://genie.example.com/api/v3/applications/41946040-b1f7-4f36-b0db-f8a74438d51c/commands"
+          "href" : "https://genie.example.com/api/v3/applications/7d24165b-0ee7-4d8d-82d3-76b3fd4a63ff/commands"
         }
       }
     }, {
-      "id" : "81f02f9f-5f6a-437c-b494-61d4a107652c",
-      "created" : "2017-01-11T00:58:13.075Z",
-      "updated" : "2017-01-11T00:58:13.075Z",
-      "tags" : [ "type:pig", "ver:0.15.0", "genie.id:81f02f9f-5f6a-437c-b494-61d4a107652c", "genie.name:spark" ],
+      "id" : "1b068265-d900-4fda-a133-ae192cb22d5c",
+      "created" : "2017-01-11T19:14:10.564Z",
+      "updated" : "2017-01-11T19:14:10.564Z",
+      "tags" : [ "genie.id:1b068265-d900-4fda-a133-ae192cb22d5c", "type:pig", "ver:0.15.0", "genie.name:spark" ],
       "version" : "0.4.0",
       "user" : "genieUser6",
       "name" : "spark",
@@ -6317,17 +6317,17 @@ Content-Length: 5951
       "type" : "pig",
       "_links" : {
         "self" : {
-          "href" : "https://genie.example.com/api/v3/applications/81f02f9f-5f6a-437c-b494-61d4a107652c"
+          "href" : "https://genie.example.com/api/v3/applications/1b068265-d900-4fda-a133-ae192cb22d5c"
         },
         "commands" : {
-          "href" : "https://genie.example.com/api/v3/applications/81f02f9f-5f6a-437c-b494-61d4a107652c/commands"
+          "href" : "https://genie.example.com/api/v3/applications/1b068265-d900-4fda-a133-ae192cb22d5c/commands"
         }
       }
     }, {
-      "id" : "31abb5a0-ed6e-418e-8182-194bf76b7331",
-      "created" : "2017-01-11T00:58:13.061Z",
-      "updated" : "2017-01-11T00:58:13.061Z",
-      "tags" : [ "type:spark", "genie.id:31abb5a0-ed6e-418e-8182-194bf76b7331", "ver:1.3.1", "genie.name:spark" ],
+      "id" : "ca50d9cd-0444-4787-b5ee-595a40cac010",
+      "created" : "2017-01-11T19:14:10.551Z",
+      "updated" : "2017-01-11T19:14:10.551Z",
+      "tags" : [ "genie.id:ca50d9cd-0444-4787-b5ee-595a40cac010", "type:spark", "ver:1.3.1", "genie.name:spark" ],
       "version" : "1.3.1",
       "user" : "genieUser5",
       "name" : "spark",
@@ -6339,17 +6339,17 @@ Content-Length: 5951
       "type" : "spark",
       "_links" : {
         "self" : {
-          "href" : "https://genie.example.com/api/v3/applications/31abb5a0-ed6e-418e-8182-194bf76b7331"
+          "href" : "https://genie.example.com/api/v3/applications/ca50d9cd-0444-4787-b5ee-595a40cac010"
         },
         "commands" : {
-          "href" : "https://genie.example.com/api/v3/applications/31abb5a0-ed6e-418e-8182-194bf76b7331/commands"
+          "href" : "https://genie.example.com/api/v3/applications/ca50d9cd-0444-4787-b5ee-595a40cac010/commands"
         }
       }
     }, {
-      "id" : "036ca138-af59-4c5b-b256-35a7336474b7",
-      "created" : "2017-01-11T00:58:13.046Z",
-      "updated" : "2017-01-11T00:58:13.046Z",
-      "tags" : [ "type:spark", "ver:1.4.0", "genie.id:036ca138-af59-4c5b-b256-35a7336474b7", "genie.name:spark" ],
+      "id" : "59b42307-1522-4317-8cd0-6da308e47676",
+      "created" : "2017-01-11T19:14:10.540Z",
+      "updated" : "2017-01-11T19:14:10.540Z",
+      "tags" : [ "type:spark", "genie.id:59b42307-1522-4317-8cd0-6da308e47676", "ver:1.4.0", "genie.name:spark" ],
       "version" : "1.4.0",
       "user" : "genieUser4",
       "name" : "spark",
@@ -6361,17 +6361,17 @@ Content-Length: 5951
       "type" : "spark",
       "_links" : {
         "self" : {
-          "href" : "https://genie.example.com/api/v3/applications/036ca138-af59-4c5b-b256-35a7336474b7"
+          "href" : "https://genie.example.com/api/v3/applications/59b42307-1522-4317-8cd0-6da308e47676"
         },
         "commands" : {
-          "href" : "https://genie.example.com/api/v3/applications/036ca138-af59-4c5b-b256-35a7336474b7/commands"
+          "href" : "https://genie.example.com/api/v3/applications/59b42307-1522-4317-8cd0-6da308e47676/commands"
         }
       }
     }, {
-      "id" : "026a35d5-0303-4960-80ac-713bc7112e39",
-      "created" : "2017-01-11T00:58:13.015Z",
-      "updated" : "2017-01-11T00:58:13.015Z",
-      "tags" : [ "genie.id:026a35d5-0303-4960-80ac-713bc7112e39", "type:spark", "ver:1.5.0", "genie.name:spark" ],
+      "id" : "381356af-255d-42aa-97a9-30458e19adc5",
+      "created" : "2017-01-11T19:14:10.514Z",
+      "updated" : "2017-01-11T19:14:10.514Z",
+      "tags" : [ "genie.id:381356af-255d-42aa-97a9-30458e19adc5", "type:spark", "ver:1.5.0", "genie.name:spark" ],
       "version" : "1.5.0",
       "user" : "genieUser2",
       "name" : "spark",
@@ -6383,17 +6383,17 @@ Content-Length: 5951
       "type" : "spark",
       "_links" : {
         "self" : {
-          "href" : "https://genie.example.com/api/v3/applications/026a35d5-0303-4960-80ac-713bc7112e39"
+          "href" : "https://genie.example.com/api/v3/applications/381356af-255d-42aa-97a9-30458e19adc5"
         },
         "commands" : {
-          "href" : "https://genie.example.com/api/v3/applications/026a35d5-0303-4960-80ac-713bc7112e39/commands"
+          "href" : "https://genie.example.com/api/v3/applications/381356af-255d-42aa-97a9-30458e19adc5/commands"
         }
       }
     }, {
-      "id" : "9858eb0b-bf69-4041-a253-e6759c40466d",
-      "created" : "2017-01-11T00:58:13.000Z",
-      "updated" : "2017-01-11T00:58:13.000Z",
-      "tags" : [ "genie.id:9858eb0b-bf69-4041-a253-e6759c40466d", "type:spark", "ver:1.5.1", "genie.name:spark" ],
+      "id" : "c5247723-0933-4e24-aed4-e6d8a621d9a3",
+      "created" : "2017-01-11T19:14:10.503Z",
+      "updated" : "2017-01-11T19:14:10.503Z",
+      "tags" : [ "type:spark", "genie.id:c5247723-0933-4e24-aed4-e6d8a621d9a3", "ver:1.5.1", "genie.name:spark" ],
       "version" : "1.5.1",
       "user" : "genieUser1",
       "name" : "spark",
@@ -6405,10 +6405,10 @@ Content-Length: 5951
       "type" : "spark",
       "_links" : {
         "self" : {
-          "href" : "https://genie.example.com/api/v3/applications/9858eb0b-bf69-4041-a253-e6759c40466d"
+          "href" : "https://genie.example.com/api/v3/applications/c5247723-0933-4e24-aed4-e6d8a621d9a3"
         },
         "commands" : {
-          "href" : "https://genie.example.com/api/v3/applications/9858eb0b-bf69-4041-a253-e6759c40466d/commands"
+          "href" : "https://genie.example.com/api/v3/applications/c5247723-0933-4e24-aed4-e6d8a621d9a3/commands"
         }
       }
     } ]
@@ -6632,11 +6632,11 @@ For more fine grained control call the PATCH API.
 <h6 id="_curl_18"><a class="anchor" href="#_curl_18"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade' -i -X PUT -H 'Content-Type: application/json' -d '{
-  "id" : "9c69fb13-cb4a-461f-b5f1-5838de28eade",
-  "created" : "2017-01-11T00:58:14.081Z",
-  "updated" : "2017-01-11T00:58:14.081Z",
-  "tags" : [ "genie.id:9c69fb13-cb4a-461f-b5f1-5838de28eade", "genie.name:spark" ],
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c' -i -X PUT -H 'Content-Type: application/json' -d '{
+  "id" : "912dc323-ffab-4e33-8ce2-104b4b8f2f9c",
+  "created" : "2017-01-11T19:14:11.424Z",
+  "updated" : "2017-01-11T19:14:11.424Z",
+  "tags" : [ "genie.id:912dc323-ffab-4e33-8ce2-104b4b8f2f9c", "genie.name:spark" ],
   "version" : "1.5.1",
   "user" : "genie",
   "name" : "spark",
@@ -6655,10 +6655,10 @@ For more fine grained control call the PATCH API.
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '{
-  "id" : "9c69fb13-cb4a-461f-b5f1-5838de28eade",
-  "created" : "2017-01-11T00:58:14.081Z",
-  "updated" : "2017-01-11T00:58:14.081Z",
-  "tags" : [ "genie.id:9c69fb13-cb4a-461f-b5f1-5838de28eade", "genie.name:spark" ],
+  "id" : "912dc323-ffab-4e33-8ce2-104b4b8f2f9c",
+  "created" : "2017-01-11T19:14:11.424Z",
+  "updated" : "2017-01-11T19:14:11.424Z",
+  "tags" : [ "genie.id:912dc323-ffab-4e33-8ce2-104b4b8f2f9c", "genie.name:spark" ],
   "version" : "1.5.1",
   "user" : "genie",
   "name" : "spark",
@@ -6668,7 +6668,7 @@ For more fine grained control call the PATCH API.
   "dependencies" : [ ],
   "status" : "INACTIVE",
   "type" : null
-}' | http PUT 'https://genie.example.com/api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade' 'Content-Type:application/json'</code></pre>
+}' | http PUT 'https://genie.example.com/api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c' 'Content-Type:application/json'</code></pre>
 </div>
 </div>
 </div>
@@ -6700,16 +6700,16 @@ For more fine grained control call the PATCH API.
 <h6 id="_request_18"><a class="anchor" href="#_request_18"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">PUT /api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">PUT /api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c HTTP/1.1
 Content-Type: application/json
 Host: genie.example.com
 Content-Length: 413
 
 {
-  "id" : "9c69fb13-cb4a-461f-b5f1-5838de28eade",
-  "created" : "2017-01-11T00:58:14.081Z",
-  "updated" : "2017-01-11T00:58:14.081Z",
-  "tags" : [ "genie.id:9c69fb13-cb4a-461f-b5f1-5838de28eade", "genie.name:spark" ],
+  "id" : "912dc323-ffab-4e33-8ce2-104b4b8f2f9c",
+  "created" : "2017-01-11T19:14:11.424Z",
+  "updated" : "2017-01-11T19:14:11.424Z",
+  "tags" : [ "genie.id:912dc323-ffab-4e33-8ce2-104b4b8f2f9c", "genie.name:spark" ],
   "version" : "1.5.1",
   "user" : "genie",
   "name" : "spark",
@@ -6878,10 +6878,10 @@ For more information about JSON Patch RFC see the <a href="http://jsonpatch.com/
 <h6 id="_curl_19"><a class="anchor" href="#_curl_19"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade' -i -X PATCH -H 'Content-Type: application/json' -d '[ {
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c' -i -X PATCH -H 'Content-Type: application/json' -d '[ {
   "op" : "replace",
   "path" : "/user",
-  "value" : "1999d201-9076-4f45-b669-ebdd8ed6ea1c"
+  "value" : "01d84350-e595-4d8c-b60c-bd51529eeb86"
 } ]'</code></pre>
 </div>
 </div>
@@ -6893,8 +6893,8 @@ For more information about JSON Patch RFC see the <a href="http://jsonpatch.com/
 <pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '[ {
   "op" : "replace",
   "path" : "/user",
-  "value" : "1999d201-9076-4f45-b669-ebdd8ed6ea1c"
-} ]' | http PATCH 'https://genie.example.com/api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade' 'Content-Type:application/json'</code></pre>
+  "value" : "01d84350-e595-4d8c-b60c-bd51529eeb86"
+} ]' | http PATCH 'https://genie.example.com/api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c' 'Content-Type:application/json'</code></pre>
 </div>
 </div>
 </div>
@@ -6926,7 +6926,7 @@ For more information about JSON Patch RFC see the <a href="http://jsonpatch.com/
 <h6 id="_request_19"><a class="anchor" href="#_request_19"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">PATCH /api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">PATCH /api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c HTTP/1.1
 Content-Type: application/json
 Host: genie.example.com
 Content-Length: 98
@@ -6934,7 +6934,7 @@ Content-Length: 98
 [ {
   "op" : "replace",
   "path" : "/user",
-  "value" : "1999d201-9076-4f45-b669-ebdd8ed6ea1c"
+  "value" : "01d84350-e595-4d8c-b60c-bd51529eeb86"
 } ]</code></pre>
 </div>
 </div>
@@ -7120,7 +7120,7 @@ Host: genie.example.com</code></pre>
 <h6 id="_curl_21"><a class="anchor" href="#_curl_21"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/applications/35ebc9f8-d666-4dc0-816f-5fb1acc7e5a6' -i -X DELETE</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/applications/f412b8eb-cfb2-4f78-9998-a973130ba029' -i -X DELETE</code></pre>
 </div>
 </div>
 </div>
@@ -7128,7 +7128,7 @@ Host: genie.example.com</code></pre>
 <h6 id="_httpie_21"><a class="anchor" href="#_httpie_21"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http DELETE 'https://genie.example.com/api/v3/applications/35ebc9f8-d666-4dc0-816f-5fb1acc7e5a6'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http DELETE 'https://genie.example.com/api/v3/applications/f412b8eb-cfb2-4f78-9998-a973130ba029'</code></pre>
 </div>
 </div>
 </div>
@@ -7160,7 +7160,7 @@ Host: genie.example.com</code></pre>
 <h6 id="_request_21"><a class="anchor" href="#_request_21"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">DELETE /api/v3/applications/35ebc9f8-d666-4dc0-816f-5fb1acc7e5a6 HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">DELETE /api/v3/applications/f412b8eb-cfb2-4f78-9998-a973130ba029 HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -7241,7 +7241,7 @@ Host: genie.example.com</code></pre>
 <h6 id="_curl_22"><a class="anchor" href="#_curl_22"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/configs' -i</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/configs' -i</code></pre>
 </div>
 </div>
 </div>
@@ -7249,7 +7249,7 @@ Host: genie.example.com</code></pre>
 <h6 id="_httpie_22"><a class="anchor" href="#_httpie_22"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/configs'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/configs'</code></pre>
 </div>
 </div>
 </div>
@@ -7320,7 +7320,7 @@ Host: genie.example.com</code></pre>
 <h6 id="_request_22"><a class="anchor" href="#_request_22"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/configs HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/configs HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -7333,7 +7333,7 @@ Host: genie.example.com</code></pre>
 Content-Type: application/json
 Content-Length: 82
 
-[ "bccd19e1-47fd-4a22-9f4c-377fd114365a", "ef710e61-958d-4446-a6bf-5a9cb83ba464" ]</code></pre>
+[ "1c9889cd-3664-4995-b00a-3c0dfe4e4d67", "a33eaea7-4fde-4eef-a3b1-366200543fc0" ]</code></pre>
 </div>
 </div>
 </div>
@@ -7445,7 +7445,7 @@ be ignored.</p>
 <h6 id="_curl_23"><a class="anchor" href="#_curl_23"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/configs' -i -X POST -H 'Content-Type: application/json' -d '[ "ef710e61-958d-4446-a6bf-5a9cb83ba464", "bccd19e1-47fd-4a22-9f4c-377fd114365a" ]'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/configs' -i -X POST -H 'Content-Type: application/json' -d '[ "1c9889cd-3664-4995-b00a-3c0dfe4e4d67", "a33eaea7-4fde-4eef-a3b1-366200543fc0" ]'</code></pre>
 </div>
 </div>
 </div>
@@ -7453,7 +7453,7 @@ be ignored.</p>
 <h6 id="_httpie_23"><a class="anchor" href="#_httpie_23"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '[ "ef710e61-958d-4446-a6bf-5a9cb83ba464", "bccd19e1-47fd-4a22-9f4c-377fd114365a" ]' | http POST 'https://genie.example.com/api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/configs' 'Content-Type:application/json'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '[ "1c9889cd-3664-4995-b00a-3c0dfe4e4d67", "a33eaea7-4fde-4eef-a3b1-366200543fc0" ]' | http POST 'https://genie.example.com/api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/configs' 'Content-Type:application/json'</code></pre>
 </div>
 </div>
 </div>
@@ -7485,12 +7485,12 @@ be ignored.</p>
 <h6 id="_request_23"><a class="anchor" href="#_request_23"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">POST /api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/configs HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">POST /api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/configs HTTP/1.1
 Content-Type: application/json
 Host: genie.example.com
 Content-Length: 82
 
-[ "ef710e61-958d-4446-a6bf-5a9cb83ba464", "bccd19e1-47fd-4a22-9f4c-377fd114365a" ]</code></pre>
+[ "1c9889cd-3664-4995-b00a-3c0dfe4e4d67", "a33eaea7-4fde-4eef-a3b1-366200543fc0" ]</code></pre>
 </div>
 </div>
 </div>
@@ -7609,7 +7609,7 @@ Content-Length: 82
 <h6 id="_curl_24"><a class="anchor" href="#_curl_24"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/configs' -i -X PUT -H 'Content-Type: application/json' -d '[ "d8792892-95c9-499a-8513-05cf9c79df1f" ]'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/configs' -i -X PUT -H 'Content-Type: application/json' -d '[ "f04f5dd4-53e8-46a6-9443-4ebcb3a0a0ee" ]'</code></pre>
 </div>
 </div>
 </div>
@@ -7617,7 +7617,7 @@ Content-Length: 82
 <h6 id="_httpie_24"><a class="anchor" href="#_httpie_24"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '[ "d8792892-95c9-499a-8513-05cf9c79df1f" ]' | http PUT 'https://genie.example.com/api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/configs' 'Content-Type:application/json'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '[ "f04f5dd4-53e8-46a6-9443-4ebcb3a0a0ee" ]' | http PUT 'https://genie.example.com/api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/configs' 'Content-Type:application/json'</code></pre>
 </div>
 </div>
 </div>
@@ -7649,12 +7649,12 @@ Content-Length: 82
 <h6 id="_request_24"><a class="anchor" href="#_request_24"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">PUT /api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/configs HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">PUT /api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/configs HTTP/1.1
 Content-Type: application/json
 Host: genie.example.com
 Content-Length: 42
 
-[ "d8792892-95c9-499a-8513-05cf9c79df1f" ]</code></pre>
+[ "f04f5dd4-53e8-46a6-9443-4ebcb3a0a0ee" ]</code></pre>
 </div>
 </div>
 </div>
@@ -7734,7 +7734,7 @@ Content-Length: 42
 <h6 id="_curl_25"><a class="anchor" href="#_curl_25"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/configs' -i -X DELETE</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/configs' -i -X DELETE</code></pre>
 </div>
 </div>
 </div>
@@ -7742,7 +7742,7 @@ Content-Length: 42
 <h6 id="_httpie_25"><a class="anchor" href="#_httpie_25"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http DELETE 'https://genie.example.com/api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/configs'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http DELETE 'https://genie.example.com/api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/configs'</code></pre>
 </div>
 </div>
 </div>
@@ -7774,7 +7774,7 @@ Content-Length: 42
 <h6 id="_request_25"><a class="anchor" href="#_request_25"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">DELETE /api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/configs HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">DELETE /api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/configs HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -7855,7 +7855,7 @@ Host: genie.example.com</code></pre>
 <h6 id="_curl_26"><a class="anchor" href="#_curl_26"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/dependencies' -i</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/dependencies' -i</code></pre>
 </div>
 </div>
 </div>
@@ -7863,7 +7863,7 @@ Host: genie.example.com</code></pre>
 <h6 id="_httpie_26"><a class="anchor" href="#_httpie_26"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/dependencies'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/dependencies'</code></pre>
 </div>
 </div>
 </div>
@@ -7934,7 +7934,7 @@ Host: genie.example.com</code></pre>
 <h6 id="_request_26"><a class="anchor" href="#_request_26"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/dependencies HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/dependencies HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -7947,7 +7947,7 @@ Host: genie.example.com</code></pre>
 Content-Type: application/json
 Content-Length: 82
 
-[ "37c840e2-e180-49d8-a706-025b67c3ba2e", "6895906e-7051-4c7e-852d-7a9a3cf6cca4" ]</code></pre>
+[ "9c88b48d-847c-4ee4-ba42-f55800b95eab", "5f4c10b2-796d-4755-beb9-57fcafe9035b" ]</code></pre>
 </div>
 </div>
 </div>
@@ -8058,7 +8058,7 @@ Content-Length: 82
 <h6 id="_curl_27"><a class="anchor" href="#_curl_27"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/dependencies' -i -X POST -H 'Content-Type: application/json' -d '[ "37c840e2-e180-49d8-a706-025b67c3ba2e", "6895906e-7051-4c7e-852d-7a9a3cf6cca4" ]'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/dependencies' -i -X POST -H 'Content-Type: application/json' -d '[ "9c88b48d-847c-4ee4-ba42-f55800b95eab", "5f4c10b2-796d-4755-beb9-57fcafe9035b" ]'</code></pre>
 </div>
 </div>
 </div>
@@ -8066,7 +8066,7 @@ Content-Length: 82
 <h6 id="_httpie_27"><a class="anchor" href="#_httpie_27"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '[ "37c840e2-e180-49d8-a706-025b67c3ba2e", "6895906e-7051-4c7e-852d-7a9a3cf6cca4" ]' | http POST 'https://genie.example.com/api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/dependencies' 'Content-Type:application/json'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '[ "9c88b48d-847c-4ee4-ba42-f55800b95eab", "5f4c10b2-796d-4755-beb9-57fcafe9035b" ]' | http POST 'https://genie.example.com/api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/dependencies' 'Content-Type:application/json'</code></pre>
 </div>
 </div>
 </div>
@@ -8098,12 +8098,12 @@ Content-Length: 82
 <h6 id="_request_27"><a class="anchor" href="#_request_27"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">POST /api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/dependencies HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">POST /api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/dependencies HTTP/1.1
 Content-Type: application/json
 Host: genie.example.com
 Content-Length: 82
 
-[ "37c840e2-e180-49d8-a706-025b67c3ba2e", "6895906e-7051-4c7e-852d-7a9a3cf6cca4" ]</code></pre>
+[ "9c88b48d-847c-4ee4-ba42-f55800b95eab", "5f4c10b2-796d-4755-beb9-57fcafe9035b" ]</code></pre>
 </div>
 </div>
 </div>
@@ -8222,7 +8222,7 @@ Content-Length: 82
 <h6 id="_curl_28"><a class="anchor" href="#_curl_28"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/dependencies' -i -X PUT -H 'Content-Type: application/json' -d '[ "996ec3b0-4657-408c-a45f-98bc58498295" ]'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/dependencies' -i -X PUT -H 'Content-Type: application/json' -d '[ "c6e99813-8508-4dfb-9ab9-1c2ca3787aab" ]'</code></pre>
 </div>
 </div>
 </div>
@@ -8230,7 +8230,7 @@ Content-Length: 82
 <h6 id="_httpie_28"><a class="anchor" href="#_httpie_28"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '[ "996ec3b0-4657-408c-a45f-98bc58498295" ]' | http PUT 'https://genie.example.com/api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/dependencies' 'Content-Type:application/json'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '[ "c6e99813-8508-4dfb-9ab9-1c2ca3787aab" ]' | http PUT 'https://genie.example.com/api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/dependencies' 'Content-Type:application/json'</code></pre>
 </div>
 </div>
 </div>
@@ -8262,12 +8262,12 @@ Content-Length: 82
 <h6 id="_request_28"><a class="anchor" href="#_request_28"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">PUT /api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/dependencies HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">PUT /api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/dependencies HTTP/1.1
 Content-Type: application/json
 Host: genie.example.com
 Content-Length: 42
 
-[ "996ec3b0-4657-408c-a45f-98bc58498295" ]</code></pre>
+[ "c6e99813-8508-4dfb-9ab9-1c2ca3787aab" ]</code></pre>
 </div>
 </div>
 </div>
@@ -8347,7 +8347,7 @@ Content-Length: 42
 <h6 id="_curl_29"><a class="anchor" href="#_curl_29"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/dependencies' -i -X DELETE</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/dependencies' -i -X DELETE</code></pre>
 </div>
 </div>
 </div>
@@ -8355,7 +8355,7 @@ Content-Length: 42
 <h6 id="_httpie_29"><a class="anchor" href="#_httpie_29"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http DELETE 'https://genie.example.com/api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/dependencies'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http DELETE 'https://genie.example.com/api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/dependencies'</code></pre>
 </div>
 </div>
 </div>
@@ -8387,7 +8387,7 @@ Content-Length: 42
 <h6 id="_request_29"><a class="anchor" href="#_request_29"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">DELETE /api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/dependencies HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">DELETE /api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/dependencies HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -8468,7 +8468,7 @@ Host: genie.example.com</code></pre>
 <h6 id="_curl_30"><a class="anchor" href="#_curl_30"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/tags' -i</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/tags' -i</code></pre>
 </div>
 </div>
 </div>
@@ -8476,7 +8476,7 @@ Host: genie.example.com</code></pre>
 <h6 id="_httpie_30"><a class="anchor" href="#_httpie_30"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/tags'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/tags'</code></pre>
 </div>
 </div>
 </div>
@@ -8547,7 +8547,7 @@ Host: genie.example.com</code></pre>
 <h6 id="_request_30"><a class="anchor" href="#_request_30"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/tags HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/tags HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -8560,7 +8560,7 @@ Host: genie.example.com</code></pre>
 Content-Type: application/json
 Content-Length: 151
 
-[ "1a8ceaee-0b25-44c7-8f0e-27331a3842ff", "genie.id:9c69fb13-cb4a-461f-b5f1-5838de28eade", "0859da10-1356-41f4-9f6a-b4296768227b", "genie.name:spark" ]</code></pre>
+[ "genie.id:912dc323-ffab-4e33-8ce2-104b4b8f2f9c", "genie.name:spark", "4ede2714-6293-4b1b-a655-5cb2edaa6b04", "ffa54da1-5070-42d2-bffb-0615c746b5df" ]</code></pre>
 </div>
 </div>
 </div>
@@ -8683,7 +8683,7 @@ Content-Length: 151
 <h6 id="_curl_31"><a class="anchor" href="#_curl_31"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/tags' -i -X POST -H 'Content-Type: application/json' -d '[ "0859da10-1356-41f4-9f6a-b4296768227b", "1a8ceaee-0b25-44c7-8f0e-27331a3842ff" ]'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/tags' -i -X POST -H 'Content-Type: application/json' -d '[ "ffa54da1-5070-42d2-bffb-0615c746b5df", "4ede2714-6293-4b1b-a655-5cb2edaa6b04" ]'</code></pre>
 </div>
 </div>
 </div>
@@ -8691,7 +8691,7 @@ Content-Length: 151
 <h6 id="_httpie_31"><a class="anchor" href="#_httpie_31"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '[ "0859da10-1356-41f4-9f6a-b4296768227b", "1a8ceaee-0b25-44c7-8f0e-27331a3842ff" ]' | http POST 'https://genie.example.com/api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/tags' 'Content-Type:application/json'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '[ "ffa54da1-5070-42d2-bffb-0615c746b5df", "4ede2714-6293-4b1b-a655-5cb2edaa6b04" ]' | http POST 'https://genie.example.com/api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/tags' 'Content-Type:application/json'</code></pre>
 </div>
 </div>
 </div>
@@ -8723,12 +8723,12 @@ Content-Length: 151
 <h6 id="_request_31"><a class="anchor" href="#_request_31"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">POST /api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/tags HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">POST /api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/tags HTTP/1.1
 Content-Type: application/json
 Host: genie.example.com
 Content-Length: 82
 
-[ "0859da10-1356-41f4-9f6a-b4296768227b", "1a8ceaee-0b25-44c7-8f0e-27331a3842ff" ]</code></pre>
+[ "ffa54da1-5070-42d2-bffb-0615c746b5df", "4ede2714-6293-4b1b-a655-5cb2edaa6b04" ]</code></pre>
 </div>
 </div>
 </div>
@@ -8860,7 +8860,7 @@ by the system.
 <h6 id="_curl_32"><a class="anchor" href="#_curl_32"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/tags' -i -X PUT -H 'Content-Type: application/json' -d '[ "09b7a0d3-5e9b-4a37-9a6b-de6437ddac99" ]'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/tags' -i -X PUT -H 'Content-Type: application/json' -d '[ "5670de59-3862-4c06-90a1-6937f12fefd0" ]'</code></pre>
 </div>
 </div>
 </div>
@@ -8868,7 +8868,7 @@ by the system.
 <h6 id="_httpie_32"><a class="anchor" href="#_httpie_32"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '[ "09b7a0d3-5e9b-4a37-9a6b-de6437ddac99" ]' | http PUT 'https://genie.example.com/api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/tags' 'Content-Type:application/json'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '[ "5670de59-3862-4c06-90a1-6937f12fefd0" ]' | http PUT 'https://genie.example.com/api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/tags' 'Content-Type:application/json'</code></pre>
 </div>
 </div>
 </div>
@@ -8900,12 +8900,12 @@ by the system.
 <h6 id="_request_32"><a class="anchor" href="#_request_32"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">PUT /api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/tags HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">PUT /api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/tags HTTP/1.1
 Content-Type: application/json
 Host: genie.example.com
 Content-Length: 42
 
-[ "09b7a0d3-5e9b-4a37-9a6b-de6437ddac99" ]</code></pre>
+[ "5670de59-3862-4c06-90a1-6937f12fefd0" ]</code></pre>
 </div>
 </div>
 </div>
@@ -8997,7 +8997,7 @@ The <code>genie.id:{id}</code> and <code>genie.name:{name}</code> tags will <str
 <h6 id="_curl_33"><a class="anchor" href="#_curl_33"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/tags' -i -X DELETE</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/tags' -i -X DELETE</code></pre>
 </div>
 </div>
 </div>
@@ -9005,7 +9005,7 @@ The <code>genie.id:{id}</code> and <code>genie.name:{name}</code> tags will <str
 <h6 id="_httpie_33"><a class="anchor" href="#_httpie_33"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http DELETE 'https://genie.example.com/api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/tags'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http DELETE 'https://genie.example.com/api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/tags'</code></pre>
 </div>
 </div>
 </div>
@@ -9037,7 +9037,7 @@ The <code>genie.id:{id}</code> and <code>genie.name:{name}</code> tags will <str
 <h6 id="_request_33"><a class="anchor" href="#_request_33"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">DELETE /api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/tags HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">DELETE /api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/tags HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -9134,7 +9134,7 @@ You can&#8217;t remove the <code>genie.id:{id}</code> and <code>genie.name:{name
 <h6 id="_curl_34"><a class="anchor" href="#_curl_34"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/tags/ced4f8f2-8507-4991-922d-16eb476f7e8f' -i -X DELETE</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/tags/097a84e3-dc0f-4e63-ae78-d087acb93f85' -i -X DELETE</code></pre>
 </div>
 </div>
 </div>
@@ -9142,7 +9142,7 @@ You can&#8217;t remove the <code>genie.id:{id}</code> and <code>genie.name:{name
 <h6 id="_httpie_34"><a class="anchor" href="#_httpie_34"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http DELETE 'https://genie.example.com/api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/tags/ced4f8f2-8507-4991-922d-16eb476f7e8f'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http DELETE 'https://genie.example.com/api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/tags/097a84e3-dc0f-4e63-ae78-d087acb93f85'</code></pre>
 </div>
 </div>
 </div>
@@ -9174,7 +9174,7 @@ You can&#8217;t remove the <code>genie.id:{id}</code> and <code>genie.name:{name
 <h6 id="_request_34"><a class="anchor" href="#_request_34"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">DELETE /api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/tags/ced4f8f2-8507-4991-922d-16eb476f7e8f HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">DELETE /api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/tags/097a84e3-dc0f-4e63-ae78-d087acb93f85 HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -9270,7 +9270,7 @@ Host: genie.example.com</code></pre>
 <h6 id="_curl_35"><a class="anchor" href="#_curl_35"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/commands?status=ACTIVE&amp;status=INACTIVE' -i</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/commands?status=ACTIVE&amp;status=INACTIVE' -i</code></pre>
 </div>
 </div>
 </div>
@@ -9278,7 +9278,7 @@ Host: genie.example.com</code></pre>
 <h6 id="_httpie_35"><a class="anchor" href="#_httpie_35"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/commands?status=ACTIVE&amp;status=INACTIVE'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/commands?status=ACTIVE&amp;status=INACTIVE'</code></pre>
 </div>
 </div>
 </div>
@@ -9349,7 +9349,7 @@ Host: genie.example.com</code></pre>
 <h6 id="_request_35"><a class="anchor" href="#_request_35"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/applications/9c69fb13-cb4a-461f-b5f1-5838de28eade/commands?status=ACTIVE&amp;status=INACTIVE HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/applications/912dc323-ffab-4e33-8ce2-104b4b8f2f9c/commands?status=ACTIVE&amp;status=INACTIVE HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -9363,29 +9363,29 @@ Content-Type: application/hal+json
 Content-Length: 1010
 
 [ {
-  "id" : "1bda0319-a031-480e-bb55-f08898fb6acb",
-  "created" : "2017-01-11T00:58:14.273Z",
-  "updated" : "2017-01-11T00:58:14.335Z",
-  "tags" : [ "genie.name:0f618d24-df26-492f-8d46-e5db6c76010b", "genie.id:1bda0319-a031-480e-bb55-f08898fb6acb" ],
-  "version" : "0f618d24-df26-492f-8d46-e5db6c76010b",
-  "user" : "0f618d24-df26-492f-8d46-e5db6c76010b",
-  "name" : "0f618d24-df26-492f-8d46-e5db6c76010b",
+  "id" : "6ad72d6d-d354-41a6-8252-3f8a3fb199d9",
+  "created" : "2017-01-11T19:14:11.606Z",
+  "updated" : "2017-01-11T19:14:11.647Z",
+  "tags" : [ "genie.id:6ad72d6d-d354-41a6-8252-3f8a3fb199d9", "genie.name:6b209ebd-7531-4ac8-b749-e75553535e90" ],
+  "version" : "6b209ebd-7531-4ac8-b749-e75553535e90",
+  "user" : "6b209ebd-7531-4ac8-b749-e75553535e90",
+  "name" : "6b209ebd-7531-4ac8-b749-e75553535e90",
   "description" : null,
   "setupFile" : null,
   "configs" : [ ],
   "status" : "ACTIVE",
-  "executable" : "0f618d24-df26-492f-8d46-e5db6c76010b",
+  "executable" : "6b209ebd-7531-4ac8-b749-e75553535e90",
   "checkDelay" : 1000,
   "memory" : null,
   "links" : [ {
     "rel" : "self",
-    "href" : "https://genie.example.com/api/v3/commands/1bda0319-a031-480e-bb55-f08898fb6acb"
+    "href" : "https://genie.example.com/api/v3/commands/6ad72d6d-d354-41a6-8252-3f8a3fb199d9"
   }, {
     "rel" : "applications",
-    "href" : "https://genie.example.com/api/v3/commands/1bda0319-a031-480e-bb55-f08898fb6acb/applications"
+    "href" : "https://genie.example.com/api/v3/commands/6ad72d6d-d354-41a6-8252-3f8a3fb199d9/applications"
   }, {
     "rel" : "clusters",
-    "href" : "https://genie.example.com/api/v3/commands/1bda0319-a031-480e-bb55-f08898fb6acb/clusters"
+    "href" : "https://genie.example.com/api/v3/commands/6ad72d6d-d354-41a6-8252-3f8a3fb199d9/clusters"
   } ]
 } ]</code></pre>
 </div>
@@ -9675,7 +9675,7 @@ Content-Length: 221
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 201 Created
-Location: https://genie.example.com/api/v3/clusters/c8e328e3-4e9f-444f-b6f7-329949e1b3ce</code></pre>
+Location: https://genie.example.com/api/v3/clusters/bf893f2d-d7fe-4b60-a340-a8667a9b9f28</code></pre>
 </div>
 </div>
 </div>
@@ -9747,7 +9747,7 @@ Location: https://genie.example.com/api/v3/clusters/c8e328e3-4e9f-444f-b6f7-3299
 <h6 id="_curl_37"><a class="anchor" href="#_curl_37"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/clusters/c8e328e3-4e9f-444f-b6f7-329949e1b3ce' -i</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/clusters/bf893f2d-d7fe-4b60-a340-a8667a9b9f28' -i</code></pre>
 </div>
 </div>
 </div>
@@ -9755,7 +9755,7 @@ Location: https://genie.example.com/api/v3/clusters/c8e328e3-4e9f-444f-b6f7-3299
 <h6 id="_httpie_37"><a class="anchor" href="#_httpie_37"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/clusters/c8e328e3-4e9f-444f-b6f7-329949e1b3ce'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/clusters/bf893f2d-d7fe-4b60-a340-a8667a9b9f28'</code></pre>
 </div>
 </div>
 </div>
@@ -9915,7 +9915,7 @@ Location: https://genie.example.com/api/v3/clusters/c8e328e3-4e9f-444f-b6f7-3299
 <h6 id="_request_37"><a class="anchor" href="#_request_37"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/clusters/c8e328e3-4e9f-444f-b6f7-329949e1b3ce HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/clusters/bf893f2d-d7fe-4b60-a340-a8667a9b9f28 HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -9929,10 +9929,10 @@ Content-Type: application/hal+json
 Content-Length: 636
 
 {
-  "id" : "c8e328e3-4e9f-444f-b6f7-329949e1b3ce",
-  "created" : "2017-01-11T00:57:41.889Z",
-  "updated" : "2017-01-11T00:57:41.889Z",
-  "tags" : [ "genie.name:h2prod", "genie.id:c8e328e3-4e9f-444f-b6f7-329949e1b3ce" ],
+  "id" : "bf893f2d-d7fe-4b60-a340-a8667a9b9f28",
+  "created" : "2017-01-11T19:13:40.649Z",
+  "updated" : "2017-01-11T19:13:40.649Z",
+  "tags" : [ "genie.id:bf893f2d-d7fe-4b60-a340-a8667a9b9f28", "genie.name:h2prod" ],
   "version" : "2.7.1",
   "user" : "genie",
   "name" : "h2prod",
@@ -9942,10 +9942,10 @@ Content-Length: 636
   "status" : "UP",
   "_links" : {
     "self" : {
-      "href" : "https://genie.example.com/api/v3/clusters/c8e328e3-4e9f-444f-b6f7-329949e1b3ce"
+      "href" : "https://genie.example.com/api/v3/clusters/bf893f2d-d7fe-4b60-a340-a8667a9b9f28"
     },
     "commands" : {
-      "href" : "https://genie.example.com/api/v3/clusters/c8e328e3-4e9f-444f-b6f7-329949e1b3ce/commands"
+      "href" : "https://genie.example.com/api/v3/clusters/bf893f2d-d7fe-4b60-a340-a8667a9b9f28/commands"
     }
   }
 }</code></pre>
@@ -10047,7 +10047,7 @@ Content-Length: 636
 <h6 id="_curl_38"><a class="anchor" href="#_curl_38"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/clusters?tag=genie.id%3A91803dcf-92c9-4041-b6f6-19009e8b061d' -i</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/clusters?tag=genie.id%3Ab315046f-7d06-430f-810c-c2f3d04da98f' -i</code></pre>
 </div>
 </div>
 </div>
@@ -10055,7 +10055,7 @@ Content-Length: 636
 <h6 id="_httpie_38"><a class="anchor" href="#_httpie_38"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/clusters?tag=genie.id%3A91803dcf-92c9-4041-b6f6-19009e8b061d'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/clusters?tag=genie.id%3Ab315046f-7d06-430f-810c-c2f3d04da98f'</code></pre>
 </div>
 </div>
 </div>
@@ -10199,7 +10199,7 @@ Content-Length: 636
 <h6 id="_request_38"><a class="anchor" href="#_request_38"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/clusters?tag=genie.id%3A91803dcf-92c9-4041-b6f6-19009e8b061d HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/clusters?tag=genie.id%3Ab315046f-7d06-430f-810c-c2f3d04da98f HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -10215,30 +10215,30 @@ Content-Length: 1137
 {
   "_embedded" : {
     "clusterList" : [ {
-      "id" : "91803dcf-92c9-4041-b6f6-19009e8b061d",
-      "created" : "2017-01-11T00:57:49.625Z",
-      "updated" : "2017-01-11T00:57:49.625Z",
-      "tags" : [ "genie.id:91803dcf-92c9-4041-b6f6-19009e8b061d", "genie.name:b284b882-7b20-4560-8c13-cd12a84de114" ],
-      "version" : "322e0c94-8e5e-4d36-ad69-d2a895b5d269",
-      "user" : "715d3ac3-03d4-4fee-92d0-f9e2508e3061",
-      "name" : "b284b882-7b20-4560-8c13-cd12a84de114",
+      "id" : "b315046f-7d06-430f-810c-c2f3d04da98f",
+      "created" : "2017-01-11T19:13:48.089Z",
+      "updated" : "2017-01-11T19:13:48.089Z",
+      "tags" : [ "genie.id:b315046f-7d06-430f-810c-c2f3d04da98f", "genie.name:59ccdd62-aa9d-4372-8569-6c9ae33c9232" ],
+      "version" : "5ef52117-eca1-4751-8017-304c35a0b70a",
+      "user" : "65f80e49-f406-4b11-a996-0f6c97e61035",
+      "name" : "59ccdd62-aa9d-4372-8569-6c9ae33c9232",
       "description" : null,
       "setupFile" : null,
       "configs" : [ ],
       "status" : "UP",
       "_links" : {
         "self" : {
-          "href" : "https://genie.example.com/api/v3/clusters/91803dcf-92c9-4041-b6f6-19009e8b061d"
+          "href" : "https://genie.example.com/api/v3/clusters/b315046f-7d06-430f-810c-c2f3d04da98f"
         },
         "commands" : {
-          "href" : "https://genie.example.com/api/v3/clusters/91803dcf-92c9-4041-b6f6-19009e8b061d/commands"
+          "href" : "https://genie.example.com/api/v3/clusters/b315046f-7d06-430f-810c-c2f3d04da98f/commands"
         }
       }
     } ]
   },
   "_links" : {
     "self" : {
-      "href" : "https://genie.example.com/api/v3/clusters?tag=genie.id:91803dcf-92c9-4041-b6f6-19009e8b061d"
+      "href" : "https://genie.example.com/api/v3/clusters?tag=genie.id:b315046f-7d06-430f-810c-c2f3d04da98f"
     }
   },
   "page" : {
@@ -10441,11 +10441,11 @@ For more fine grained control call the PATCH API.
 <h6 id="_curl_39"><a class="anchor" href="#_curl_39"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd' -i -X PUT -H 'Content-Type: application/json' -d '{
-  "id" : "26e2e585-180b-4477-99eb-4de3caebfedd",
-  "created" : "2017-01-11T00:57:52.194Z",
-  "updated" : "2017-01-11T00:57:52.194Z",
-  "tags" : [ "genie.id:26e2e585-180b-4477-99eb-4de3caebfedd", "genie.name:h2prod" ],
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850' -i -X PUT -H 'Content-Type: application/json' -d '{
+  "id" : "7e42a102-2e8a-40cd-871c-3d55aed29850",
+  "created" : "2017-01-11T19:13:50.504Z",
+  "updated" : "2017-01-11T19:13:50.504Z",
+  "tags" : [ "genie.name:h2prod", "genie.id:7e42a102-2e8a-40cd-871c-3d55aed29850" ],
   "version" : "2.7.1",
   "user" : "genie",
   "name" : "h2prod",
@@ -10462,10 +10462,10 @@ For more fine grained control call the PATCH API.
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '{
-  "id" : "26e2e585-180b-4477-99eb-4de3caebfedd",
-  "created" : "2017-01-11T00:57:52.194Z",
-  "updated" : "2017-01-11T00:57:52.194Z",
-  "tags" : [ "genie.id:26e2e585-180b-4477-99eb-4de3caebfedd", "genie.name:h2prod" ],
+  "id" : "7e42a102-2e8a-40cd-871c-3d55aed29850",
+  "created" : "2017-01-11T19:13:50.504Z",
+  "updated" : "2017-01-11T19:13:50.504Z",
+  "tags" : [ "genie.name:h2prod", "genie.id:7e42a102-2e8a-40cd-871c-3d55aed29850" ],
   "version" : "2.7.1",
   "user" : "genie",
   "name" : "h2prod",
@@ -10473,7 +10473,7 @@ For more fine grained control call the PATCH API.
   "setupFile" : null,
   "configs" : [ ],
   "status" : "OUT_OF_SERVICE"
-}' | http PUT 'https://genie.example.com/api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd' 'Content-Type:application/json'</code></pre>
+}' | http PUT 'https://genie.example.com/api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850' 'Content-Type:application/json'</code></pre>
 </div>
 </div>
 </div>
@@ -10505,16 +10505,16 @@ For more fine grained control call the PATCH API.
 <h6 id="_request_39"><a class="anchor" href="#_request_39"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">PUT /api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">PUT /api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850 HTTP/1.1
 Content-Type: application/json
 Host: genie.example.com
 Content-Length: 380
 
 {
-  "id" : "26e2e585-180b-4477-99eb-4de3caebfedd",
-  "created" : "2017-01-11T00:57:52.194Z",
-  "updated" : "2017-01-11T00:57:52.194Z",
-  "tags" : [ "genie.id:26e2e585-180b-4477-99eb-4de3caebfedd", "genie.name:h2prod" ],
+  "id" : "7e42a102-2e8a-40cd-871c-3d55aed29850",
+  "created" : "2017-01-11T19:13:50.504Z",
+  "updated" : "2017-01-11T19:13:50.504Z",
+  "tags" : [ "genie.name:h2prod", "genie.id:7e42a102-2e8a-40cd-871c-3d55aed29850" ],
   "version" : "2.7.1",
   "user" : "genie",
   "name" : "h2prod",
@@ -10681,10 +10681,10 @@ For more information about JSON Patch RFC see the <a href="http://jsonpatch.com/
 <h6 id="_curl_40"><a class="anchor" href="#_curl_40"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd' -i -X PATCH -H 'Content-Type: application/json' -d '[ {
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850' -i -X PATCH -H 'Content-Type: application/json' -d '[ {
   "op" : "replace",
   "path" : "/name",
-  "value" : "a1da0aee-97ec-46f0-bd42-626c66cd2bb7"
+  "value" : "d07e52fe-067a-48e2-85de-4925d523874e"
 } ]'</code></pre>
 </div>
 </div>
@@ -10696,8 +10696,8 @@ For more information about JSON Patch RFC see the <a href="http://jsonpatch.com/
 <pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '[ {
   "op" : "replace",
   "path" : "/name",
-  "value" : "a1da0aee-97ec-46f0-bd42-626c66cd2bb7"
-} ]' | http PATCH 'https://genie.example.com/api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd' 'Content-Type:application/json'</code></pre>
+  "value" : "d07e52fe-067a-48e2-85de-4925d523874e"
+} ]' | http PATCH 'https://genie.example.com/api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850' 'Content-Type:application/json'</code></pre>
 </div>
 </div>
 </div>
@@ -10729,7 +10729,7 @@ For more information about JSON Patch RFC see the <a href="http://jsonpatch.com/
 <h6 id="_request_40"><a class="anchor" href="#_request_40"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">PATCH /api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">PATCH /api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850 HTTP/1.1
 Content-Type: application/json
 Host: genie.example.com
 Content-Length: 98
@@ -10737,7 +10737,7 @@ Content-Length: 98
 [ {
   "op" : "replace",
   "path" : "/name",
-  "value" : "a1da0aee-97ec-46f0-bd42-626c66cd2bb7"
+  "value" : "d07e52fe-067a-48e2-85de-4925d523874e"
 } ]</code></pre>
 </div>
 </div>
@@ -10923,7 +10923,7 @@ Host: genie.example.com</code></pre>
 <h6 id="_curl_42"><a class="anchor" href="#_curl_42"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/clusters/81c71751-cf89-4175-a464-514dc1438cea' -i -X DELETE</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/clusters/8ae06381-01bb-4b2d-8c50-6569a1a06b9a' -i -X DELETE</code></pre>
 </div>
 </div>
 </div>
@@ -10931,7 +10931,7 @@ Host: genie.example.com</code></pre>
 <h6 id="_httpie_42"><a class="anchor" href="#_httpie_42"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http DELETE 'https://genie.example.com/api/v3/clusters/81c71751-cf89-4175-a464-514dc1438cea'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http DELETE 'https://genie.example.com/api/v3/clusters/8ae06381-01bb-4b2d-8c50-6569a1a06b9a'</code></pre>
 </div>
 </div>
 </div>
@@ -10963,7 +10963,7 @@ Host: genie.example.com</code></pre>
 <h6 id="_request_42"><a class="anchor" href="#_request_42"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">DELETE /api/v3/clusters/81c71751-cf89-4175-a464-514dc1438cea HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">DELETE /api/v3/clusters/8ae06381-01bb-4b2d-8c50-6569a1a06b9a HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -11044,7 +11044,7 @@ Host: genie.example.com</code></pre>
 <h6 id="_curl_43"><a class="anchor" href="#_curl_43"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/configs' -i</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/configs' -i</code></pre>
 </div>
 </div>
 </div>
@@ -11052,7 +11052,7 @@ Host: genie.example.com</code></pre>
 <h6 id="_httpie_43"><a class="anchor" href="#_httpie_43"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/configs'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/configs'</code></pre>
 </div>
 </div>
 </div>
@@ -11123,7 +11123,7 @@ Host: genie.example.com</code></pre>
 <h6 id="_request_43"><a class="anchor" href="#_request_43"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/configs HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/configs HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -11136,7 +11136,7 @@ Host: genie.example.com</code></pre>
 Content-Type: application/json
 Content-Length: 82
 
-[ "7cd5f52a-fb3f-4936-b7a3-5b1ed35e057d", "8e23b496-1235-4980-a524-5513212d020f" ]</code></pre>
+[ "deeef67f-b65f-47b7-9098-b8ce7ea4bbee", "d5d08496-8e65-410d-b380-4683cb8c3996" ]</code></pre>
 </div>
 </div>
 </div>
@@ -11259,7 +11259,7 @@ Configurations are stored as a set so any duplicates will be ignored.
 <h6 id="_curl_44"><a class="anchor" href="#_curl_44"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/configs' -i -X POST -H 'Content-Type: application/json' -d '[ "8e23b496-1235-4980-a524-5513212d020f", "7cd5f52a-fb3f-4936-b7a3-5b1ed35e057d" ]'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/configs' -i -X POST -H 'Content-Type: application/json' -d '[ "d5d08496-8e65-410d-b380-4683cb8c3996", "deeef67f-b65f-47b7-9098-b8ce7ea4bbee" ]'</code></pre>
 </div>
 </div>
 </div>
@@ -11267,7 +11267,7 @@ Configurations are stored as a set so any duplicates will be ignored.
 <h6 id="_httpie_44"><a class="anchor" href="#_httpie_44"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '[ "8e23b496-1235-4980-a524-5513212d020f", "7cd5f52a-fb3f-4936-b7a3-5b1ed35e057d" ]' | http POST 'https://genie.example.com/api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/configs' 'Content-Type:application/json'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '[ "d5d08496-8e65-410d-b380-4683cb8c3996", "deeef67f-b65f-47b7-9098-b8ce7ea4bbee" ]' | http POST 'https://genie.example.com/api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/configs' 'Content-Type:application/json'</code></pre>
 </div>
 </div>
 </div>
@@ -11299,12 +11299,12 @@ Configurations are stored as a set so any duplicates will be ignored.
 <h6 id="_request_44"><a class="anchor" href="#_request_44"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">POST /api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/configs HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">POST /api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/configs HTTP/1.1
 Content-Type: application/json
 Host: genie.example.com
 Content-Length: 82
 
-[ "8e23b496-1235-4980-a524-5513212d020f", "7cd5f52a-fb3f-4936-b7a3-5b1ed35e057d" ]</code></pre>
+[ "d5d08496-8e65-410d-b380-4683cb8c3996", "deeef67f-b65f-47b7-9098-b8ce7ea4bbee" ]</code></pre>
 </div>
 </div>
 </div>
@@ -11423,7 +11423,7 @@ Content-Length: 82
 <h6 id="_curl_45"><a class="anchor" href="#_curl_45"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/configs' -i -X PUT -H 'Content-Type: application/json' -d '[ "07e1aff3-3e6f-496e-b198-e75384f32651" ]'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/configs' -i -X PUT -H 'Content-Type: application/json' -d '[ "d7541c4c-eae2-4251-b292-8cd3f75e3cac" ]'</code></pre>
 </div>
 </div>
 </div>
@@ -11431,7 +11431,7 @@ Content-Length: 82
 <h6 id="_httpie_45"><a class="anchor" href="#_httpie_45"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '[ "07e1aff3-3e6f-496e-b198-e75384f32651" ]' | http PUT 'https://genie.example.com/api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/configs' 'Content-Type:application/json'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '[ "d7541c4c-eae2-4251-b292-8cd3f75e3cac" ]' | http PUT 'https://genie.example.com/api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/configs' 'Content-Type:application/json'</code></pre>
 </div>
 </div>
 </div>
@@ -11463,12 +11463,12 @@ Content-Length: 82
 <h6 id="_request_45"><a class="anchor" href="#_request_45"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">PUT /api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/configs HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">PUT /api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/configs HTTP/1.1
 Content-Type: application/json
 Host: genie.example.com
 Content-Length: 42
 
-[ "07e1aff3-3e6f-496e-b198-e75384f32651" ]</code></pre>
+[ "d7541c4c-eae2-4251-b292-8cd3f75e3cac" ]</code></pre>
 </div>
 </div>
 </div>
@@ -11548,7 +11548,7 @@ Content-Length: 42
 <h6 id="_curl_46"><a class="anchor" href="#_curl_46"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/configs' -i -X DELETE</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/configs' -i -X DELETE</code></pre>
 </div>
 </div>
 </div>
@@ -11556,7 +11556,7 @@ Content-Length: 42
 <h6 id="_httpie_46"><a class="anchor" href="#_httpie_46"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http DELETE 'https://genie.example.com/api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/configs'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http DELETE 'https://genie.example.com/api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/configs'</code></pre>
 </div>
 </div>
 </div>
@@ -11588,7 +11588,7 @@ Content-Length: 42
 <h6 id="_request_46"><a class="anchor" href="#_request_46"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">DELETE /api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/configs HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">DELETE /api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/configs HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -11669,7 +11669,7 @@ Host: genie.example.com</code></pre>
 <h6 id="_curl_47"><a class="anchor" href="#_curl_47"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/tags' -i</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/tags' -i</code></pre>
 </div>
 </div>
 </div>
@@ -11677,7 +11677,7 @@ Host: genie.example.com</code></pre>
 <h6 id="_httpie_47"><a class="anchor" href="#_httpie_47"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/tags'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/tags'</code></pre>
 </div>
 </div>
 </div>
@@ -11748,7 +11748,7 @@ Host: genie.example.com</code></pre>
 <h6 id="_request_47"><a class="anchor" href="#_request_47"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/tags HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/tags HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -11761,7 +11761,7 @@ Host: genie.example.com</code></pre>
 Content-Type: application/json
 Content-Length: 152
 
-[ "genie.id:26e2e585-180b-4477-99eb-4de3caebfedd", "9bfd1c38-ce3b-49c3-ad77-47fdf1d1e981", "6648aaeb-f30b-43ed-a0f3-f59d790e6ee5", "genie.name:h2prod" ]</code></pre>
+[ "24cf4861-7af9-424b-846c-978bcaffd610", "ee644a35-9c64-4876-8304-0d18cca16237", "genie.name:h2prod", "genie.id:7e42a102-2e8a-40cd-871c-3d55aed29850" ]</code></pre>
 </div>
 </div>
 </div>
@@ -11884,7 +11884,7 @@ Content-Length: 152
 <h6 id="_curl_48"><a class="anchor" href="#_curl_48"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/tags' -i -X POST -H 'Content-Type: application/json' -d '[ "6648aaeb-f30b-43ed-a0f3-f59d790e6ee5", "9bfd1c38-ce3b-49c3-ad77-47fdf1d1e981" ]'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/tags' -i -X POST -H 'Content-Type: application/json' -d '[ "ee644a35-9c64-4876-8304-0d18cca16237", "24cf4861-7af9-424b-846c-978bcaffd610" ]'</code></pre>
 </div>
 </div>
 </div>
@@ -11892,7 +11892,7 @@ Content-Length: 152
 <h6 id="_httpie_48"><a class="anchor" href="#_httpie_48"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '[ "6648aaeb-f30b-43ed-a0f3-f59d790e6ee5", "9bfd1c38-ce3b-49c3-ad77-47fdf1d1e981" ]' | http POST 'https://genie.example.com/api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/tags' 'Content-Type:application/json'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '[ "ee644a35-9c64-4876-8304-0d18cca16237", "24cf4861-7af9-424b-846c-978bcaffd610" ]' | http POST 'https://genie.example.com/api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/tags' 'Content-Type:application/json'</code></pre>
 </div>
 </div>
 </div>
@@ -11924,12 +11924,12 @@ Content-Length: 152
 <h6 id="_request_48"><a class="anchor" href="#_request_48"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">POST /api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/tags HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">POST /api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/tags HTTP/1.1
 Content-Type: application/json
 Host: genie.example.com
 Content-Length: 82
 
-[ "6648aaeb-f30b-43ed-a0f3-f59d790e6ee5", "9bfd1c38-ce3b-49c3-ad77-47fdf1d1e981" ]</code></pre>
+[ "ee644a35-9c64-4876-8304-0d18cca16237", "24cf4861-7af9-424b-846c-978bcaffd610" ]</code></pre>
 </div>
 </div>
 </div>
@@ -12061,7 +12061,7 @@ by the system.
 <h6 id="_curl_49"><a class="anchor" href="#_curl_49"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/tags' -i -X PUT -H 'Content-Type: application/json' -d '[ "47db6198-c0dc-4536-8e94-d77e4895f330" ]'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/tags' -i -X PUT -H 'Content-Type: application/json' -d '[ "f2640541-0b97-4777-ac07-b21724f4d3cd" ]'</code></pre>
 </div>
 </div>
 </div>
@@ -12069,7 +12069,7 @@ by the system.
 <h6 id="_httpie_49"><a class="anchor" href="#_httpie_49"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '[ "47db6198-c0dc-4536-8e94-d77e4895f330" ]' | http PUT 'https://genie.example.com/api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/tags' 'Content-Type:application/json'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '[ "f2640541-0b97-4777-ac07-b21724f4d3cd" ]' | http PUT 'https://genie.example.com/api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/tags' 'Content-Type:application/json'</code></pre>
 </div>
 </div>
 </div>
@@ -12101,12 +12101,12 @@ by the system.
 <h6 id="_request_49"><a class="anchor" href="#_request_49"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">PUT /api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/tags HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">PUT /api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/tags HTTP/1.1
 Content-Type: application/json
 Host: genie.example.com
 Content-Length: 42
 
-[ "47db6198-c0dc-4536-8e94-d77e4895f330" ]</code></pre>
+[ "f2640541-0b97-4777-ac07-b21724f4d3cd" ]</code></pre>
 </div>
 </div>
 </div>
@@ -12198,7 +12198,7 @@ The <code>genie.id:{id}</code> and <code>genie.name:{name}</code> tags will <str
 <h6 id="_curl_50"><a class="anchor" href="#_curl_50"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/tags' -i -X DELETE</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/tags' -i -X DELETE</code></pre>
 </div>
 </div>
 </div>
@@ -12206,7 +12206,7 @@ The <code>genie.id:{id}</code> and <code>genie.name:{name}</code> tags will <str
 <h6 id="_httpie_50"><a class="anchor" href="#_httpie_50"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http DELETE 'https://genie.example.com/api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/tags'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http DELETE 'https://genie.example.com/api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/tags'</code></pre>
 </div>
 </div>
 </div>
@@ -12238,7 +12238,7 @@ The <code>genie.id:{id}</code> and <code>genie.name:{name}</code> tags will <str
 <h6 id="_request_50"><a class="anchor" href="#_request_50"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">DELETE /api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/tags HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">DELETE /api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/tags HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -12335,7 +12335,7 @@ You can&#8217;t remove the <code>genie.id:{id}</code> and <code>genie.name:{name
 <h6 id="_curl_51"><a class="anchor" href="#_curl_51"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/tags/f8632def-edaa-4ff3-b897-447376b8bef5' -i -X DELETE</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/tags/ee2bcccd-7991-43aa-b102-bd52ad7c92f7' -i -X DELETE</code></pre>
 </div>
 </div>
 </div>
@@ -12343,7 +12343,7 @@ You can&#8217;t remove the <code>genie.id:{id}</code> and <code>genie.name:{name
 <h6 id="_httpie_51"><a class="anchor" href="#_httpie_51"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http DELETE 'https://genie.example.com/api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/tags/f8632def-edaa-4ff3-b897-447376b8bef5'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http DELETE 'https://genie.example.com/api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/tags/ee2bcccd-7991-43aa-b102-bd52ad7c92f7'</code></pre>
 </div>
 </div>
 </div>
@@ -12375,7 +12375,7 @@ You can&#8217;t remove the <code>genie.id:{id}</code> and <code>genie.name:{name
 <h6 id="_request_51"><a class="anchor" href="#_request_51"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">DELETE /api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/tags/f8632def-edaa-4ff3-b897-447376b8bef5 HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">DELETE /api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/tags/ee2bcccd-7991-43aa-b102-bd52ad7c92f7 HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -12520,7 +12520,7 @@ The commands for the ID&#8217;s must already exist in the system
 <h6 id="_curl_52"><a class="anchor" href="#_curl_52"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/commands' -i -X POST -H 'Content-Type: application/json' -d '[ "d39b3a85-113e-4b7c-ab18-35bbf8a5b44b", "33711e47-d941-48ce-9d48-7c7016bebc57" ]'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/commands' -i -X POST -H 'Content-Type: application/json' -d '[ "c0a58761-871b-4390-a3c9-a391566ddcc6", "ed0fb1c2-4029-4e51-aa89-75dde61d24be" ]'</code></pre>
 </div>
 </div>
 </div>
@@ -12528,7 +12528,7 @@ The commands for the ID&#8217;s must already exist in the system
 <h6 id="_httpie_52"><a class="anchor" href="#_httpie_52"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '[ "d39b3a85-113e-4b7c-ab18-35bbf8a5b44b", "33711e47-d941-48ce-9d48-7c7016bebc57" ]' | http POST 'https://genie.example.com/api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/commands' 'Content-Type:application/json'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '[ "c0a58761-871b-4390-a3c9-a391566ddcc6", "ed0fb1c2-4029-4e51-aa89-75dde61d24be" ]' | http POST 'https://genie.example.com/api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/commands' 'Content-Type:application/json'</code></pre>
 </div>
 </div>
 </div>
@@ -12560,12 +12560,12 @@ The commands for the ID&#8217;s must already exist in the system
 <h6 id="_request_52"><a class="anchor" href="#_request_52"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">POST /api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/commands HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">POST /api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/commands HTTP/1.1
 Content-Type: application/json
 Host: genie.example.com
 Content-Length: 82
 
-[ "d39b3a85-113e-4b7c-ab18-35bbf8a5b44b", "33711e47-d941-48ce-9d48-7c7016bebc57" ]</code></pre>
+[ "c0a58761-871b-4390-a3c9-a391566ddcc6", "ed0fb1c2-4029-4e51-aa89-75dde61d24be" ]</code></pre>
 </div>
 </div>
 </div>
@@ -12673,7 +12673,7 @@ for the given cluster the one earlier in the list will be selected.
 <h6 id="_curl_53"><a class="anchor" href="#_curl_53"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/commands?status=INACTIVE' -i</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/commands?status=INACTIVE' -i</code></pre>
 </div>
 </div>
 </div>
@@ -12681,7 +12681,7 @@ for the given cluster the one earlier in the list will be selected.
 <h6 id="_httpie_53"><a class="anchor" href="#_httpie_53"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/commands?status=INACTIVE'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/commands?status=INACTIVE'</code></pre>
 </div>
 </div>
 </div>
@@ -12752,7 +12752,7 @@ for the given cluster the one earlier in the list will be selected.
 <h6 id="_request_53"><a class="anchor" href="#_request_53"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/commands?status=INACTIVE HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/commands?status=INACTIVE HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -12766,29 +12766,29 @@ Content-Type: application/hal+json
 Content-Length: 1012
 
 [ {
-  "id" : "76785eca-63e8-4b5e-b1da-9350417bbd0b",
-  "created" : "2017-01-11T00:57:43.114Z",
-  "updated" : "2017-01-11T00:57:43.114Z",
-  "tags" : [ "genie.id:76785eca-63e8-4b5e-b1da-9350417bbd0b", "genie.name:887f1236-b4ea-40ca-9fe8-29a15bb28143" ],
-  "version" : "887f1236-b4ea-40ca-9fe8-29a15bb28143",
-  "user" : "887f1236-b4ea-40ca-9fe8-29a15bb28143",
-  "name" : "887f1236-b4ea-40ca-9fe8-29a15bb28143",
+  "id" : "20699dab-7125-4996-8ca9-529a62c3ac28",
+  "created" : "2017-01-11T19:13:41.748Z",
+  "updated" : "2017-01-11T19:13:41.748Z",
+  "tags" : [ "genie.id:20699dab-7125-4996-8ca9-529a62c3ac28", "genie.name:d791dca2-9a5b-4f75-baed-30f829b84bf3" ],
+  "version" : "d791dca2-9a5b-4f75-baed-30f829b84bf3",
+  "user" : "d791dca2-9a5b-4f75-baed-30f829b84bf3",
+  "name" : "d791dca2-9a5b-4f75-baed-30f829b84bf3",
   "description" : null,
   "setupFile" : null,
   "configs" : [ ],
   "status" : "INACTIVE",
-  "executable" : "887f1236-b4ea-40ca-9fe8-29a15bb28143",
+  "executable" : "d791dca2-9a5b-4f75-baed-30f829b84bf3",
   "checkDelay" : 1000,
   "memory" : null,
   "links" : [ {
     "rel" : "self",
-    "href" : "https://genie.example.com/api/v3/commands/76785eca-63e8-4b5e-b1da-9350417bbd0b"
+    "href" : "https://genie.example.com/api/v3/commands/20699dab-7125-4996-8ca9-529a62c3ac28"
   }, {
     "rel" : "applications",
-    "href" : "https://genie.example.com/api/v3/commands/76785eca-63e8-4b5e-b1da-9350417bbd0b/applications"
+    "href" : "https://genie.example.com/api/v3/commands/20699dab-7125-4996-8ca9-529a62c3ac28/applications"
   }, {
     "rel" : "clusters",
-    "href" : "https://genie.example.com/api/v3/commands/76785eca-63e8-4b5e-b1da-9350417bbd0b/clusters"
+    "href" : "https://genie.example.com/api/v3/commands/20699dab-7125-4996-8ca9-529a62c3ac28/clusters"
   } ]
 } ]</code></pre>
 </div>
@@ -12926,7 +12926,7 @@ The commands for the ID&#8217;s must already exist in the system
 <h6 id="_curl_54"><a class="anchor" href="#_curl_54"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/commands' -i -X PUT -H 'Content-Type: application/json' -d '[ "ab8d63d3-0bb9-496f-9911-4c08b879dd7a", "90ed7e28-bee2-4c63-8b6e-ecbf76469bf9" ]'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/commands' -i -X PUT -H 'Content-Type: application/json' -d '[ "c6e7674b-465a-4928-9b2f-bcc25ca9731b", "93d912ce-7fb7-4926-9ca7-486768acc2c0" ]'</code></pre>
 </div>
 </div>
 </div>
@@ -12934,7 +12934,7 @@ The commands for the ID&#8217;s must already exist in the system
 <h6 id="_httpie_54"><a class="anchor" href="#_httpie_54"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '[ "ab8d63d3-0bb9-496f-9911-4c08b879dd7a", "90ed7e28-bee2-4c63-8b6e-ecbf76469bf9" ]' | http PUT 'https://genie.example.com/api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/commands' 'Content-Type:application/json'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '[ "c6e7674b-465a-4928-9b2f-bcc25ca9731b", "93d912ce-7fb7-4926-9ca7-486768acc2c0" ]' | http PUT 'https://genie.example.com/api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/commands' 'Content-Type:application/json'</code></pre>
 </div>
 </div>
 </div>
@@ -12966,12 +12966,12 @@ The commands for the ID&#8217;s must already exist in the system
 <h6 id="_request_54"><a class="anchor" href="#_request_54"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">PUT /api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/commands HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">PUT /api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/commands HTTP/1.1
 Content-Type: application/json
 Host: genie.example.com
 Content-Length: 82
 
-[ "ab8d63d3-0bb9-496f-9911-4c08b879dd7a", "90ed7e28-bee2-4c63-8b6e-ecbf76469bf9" ]</code></pre>
+[ "c6e7674b-465a-4928-9b2f-bcc25ca9731b", "93d912ce-7fb7-4926-9ca7-486768acc2c0" ]</code></pre>
 </div>
 </div>
 </div>
@@ -13063,7 +13063,7 @@ This does <strong>NOT</strong> delete the command(s) from the system just unlink
 <h6 id="_curl_55"><a class="anchor" href="#_curl_55"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/commands' -i -X DELETE</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/commands' -i -X DELETE</code></pre>
 </div>
 </div>
 </div>
@@ -13071,7 +13071,7 @@ This does <strong>NOT</strong> delete the command(s) from the system just unlink
 <h6 id="_httpie_55"><a class="anchor" href="#_httpie_55"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http DELETE 'https://genie.example.com/api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/commands'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http DELETE 'https://genie.example.com/api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/commands'</code></pre>
 </div>
 </div>
 </div>
@@ -13103,7 +13103,7 @@ This does <strong>NOT</strong> delete the command(s) from the system just unlink
 <h6 id="_request_55"><a class="anchor" href="#_request_55"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">DELETE /api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/commands HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">DELETE /api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/commands HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -13200,7 +13200,7 @@ This does <strong>NOT</strong> delete the command from the system just unlinks i
 <h6 id="_curl_56"><a class="anchor" href="#_curl_56"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/commands/14dee8d6-ca87-41c8-98af-21e0c5ef2849' -i -X DELETE</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/commands/f0e5255d-94ab-4ef6-9d63-8c109bd98879' -i -X DELETE</code></pre>
 </div>
 </div>
 </div>
@@ -13208,7 +13208,7 @@ This does <strong>NOT</strong> delete the command from the system just unlinks i
 <h6 id="_httpie_56"><a class="anchor" href="#_httpie_56"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http DELETE 'https://genie.example.com/api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/commands/14dee8d6-ca87-41c8-98af-21e0c5ef2849'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http DELETE 'https://genie.example.com/api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/commands/f0e5255d-94ab-4ef6-9d63-8c109bd98879'</code></pre>
 </div>
 </div>
 </div>
@@ -13240,7 +13240,7 @@ This does <strong>NOT</strong> delete the command from the system just unlinks i
 <h6 id="_request_56"><a class="anchor" href="#_request_56"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">DELETE /api/v3/clusters/26e2e585-180b-4477-99eb-4de3caebfedd/commands/14dee8d6-ca87-41c8-98af-21e0c5ef2849 HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">DELETE /api/v3/clusters/7e42a102-2e8a-40cd-871c-3d55aed29850/commands/f0e5255d-94ab-4ef6-9d63-8c109bd98879 HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -13567,7 +13567,7 @@ Content-Length: 306
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 201 Created
-Location: https://genie.example.com/api/v3/commands/87c6688d-a28d-454d-84df-b3ad0528d9e0</code></pre>
+Location: https://genie.example.com/api/v3/commands/7dec3913-af2e-41eb-924f-f8b58bc585cc</code></pre>
 </div>
 </div>
 </div>
@@ -13639,7 +13639,7 @@ Location: https://genie.example.com/api/v3/commands/87c6688d-a28d-454d-84df-b3ad
 <h6 id="_curl_58"><a class="anchor" href="#_curl_58"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/commands/87c6688d-a28d-454d-84df-b3ad0528d9e0' -i</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/commands/7dec3913-af2e-41eb-924f-f8b58bc585cc' -i</code></pre>
 </div>
 </div>
 </div>
@@ -13647,7 +13647,7 @@ Location: https://genie.example.com/api/v3/commands/87c6688d-a28d-454d-84df-b3ad
 <h6 id="_httpie_58"><a class="anchor" href="#_httpie_58"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/commands/87c6688d-a28d-454d-84df-b3ad0528d9e0'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/commands/7dec3913-af2e-41eb-924f-f8b58bc585cc'</code></pre>
 </div>
 </div>
 </div>
@@ -13832,7 +13832,7 @@ Location: https://genie.example.com/api/v3/commands/87c6688d-a28d-454d-84df-b3ad
 <h6 id="_request_58"><a class="anchor" href="#_request_58"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/commands/87c6688d-a28d-454d-84df-b3ad0528d9e0 HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/commands/7dec3913-af2e-41eb-924f-f8b58bc585cc HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -13846,10 +13846,10 @@ Content-Type: application/hal+json
 Content-Length: 858
 
 {
-  "id" : "87c6688d-a28d-454d-84df-b3ad0528d9e0",
-  "created" : "2017-01-11T00:57:39.365Z",
-  "updated" : "2017-01-11T00:57:39.365Z",
-  "tags" : [ "genie.name:hive", "genie.id:87c6688d-a28d-454d-84df-b3ad0528d9e0" ],
+  "id" : "7dec3913-af2e-41eb-924f-f8b58bc585cc",
+  "created" : "2017-01-11T19:13:38.523Z",
+  "updated" : "2017-01-11T19:13:38.523Z",
+  "tags" : [ "genie.name:hive", "genie.id:7dec3913-af2e-41eb-924f-f8b58bc585cc" ],
   "version" : "1.0.0",
   "user" : "genie",
   "name" : "hive",
@@ -13862,13 +13862,13 @@ Content-Length: 858
   "memory" : null,
   "_links" : {
     "self" : {
-      "href" : "https://genie.example.com/api/v3/commands/87c6688d-a28d-454d-84df-b3ad0528d9e0"
+      "href" : "https://genie.example.com/api/v3/commands/7dec3913-af2e-41eb-924f-f8b58bc585cc"
     },
     "applications" : {
-      "href" : "https://genie.example.com/api/v3/commands/87c6688d-a28d-454d-84df-b3ad0528d9e0/applications"
+      "href" : "https://genie.example.com/api/v3/commands/7dec3913-af2e-41eb-924f-f8b58bc585cc/applications"
     },
     "clusters" : {
-      "href" : "https://genie.example.com/api/v3/commands/87c6688d-a28d-454d-84df-b3ad0528d9e0/clusters"
+      "href" : "https://genie.example.com/api/v3/commands/7dec3913-af2e-41eb-924f-f8b58bc585cc/clusters"
     }
   }
 }</code></pre>
@@ -14134,55 +14134,55 @@ Content-Length: 2493
 {
   "_embedded" : {
     "commandList" : [ {
-      "id" : "2092b131-c46e-4621-8274-7019305d32dc",
-      "created" : "2017-01-11T00:57:37.395Z",
-      "updated" : "2017-01-11T00:57:37.395Z",
-      "tags" : [ "genie.id:2092b131-c46e-4621-8274-7019305d32dc", "genie.name:eac0b2ce-8247-43de-9b18-182c384cc046" ],
-      "version" : "9277d129-62f8-45e9-9ada-95cea130a02c",
-      "user" : "4ab47d64-cfd1-498f-84f1-c202eaf2b3ea",
-      "name" : "eac0b2ce-8247-43de-9b18-182c384cc046",
+      "id" : "14e3356d-9632-4f0f-bb6b-b234ba45ddb3",
+      "created" : "2017-01-11T19:13:36.795Z",
+      "updated" : "2017-01-11T19:13:36.795Z",
+      "tags" : [ "genie.name:db2166ea-fe0e-4886-abce-8f12c397bfc4", "genie.id:14e3356d-9632-4f0f-bb6b-b234ba45ddb3" ],
+      "version" : "b431e1a5-73f5-474d-9056-228a149c7b1e",
+      "user" : "05b48876-b660-4c87-8a03-76f5e5544c52",
+      "name" : "db2166ea-fe0e-4886-abce-8f12c397bfc4",
       "description" : null,
       "setupFile" : null,
       "configs" : [ ],
       "status" : "INACTIVE",
-      "executable" : "c034cddb-ce79-4ea9-a9dd-5379bdd6b562",
+      "executable" : "29c71314-5fc9-4159-8559-04652043a9c7",
       "checkDelay" : 10000,
       "memory" : null,
       "_links" : {
         "self" : {
-          "href" : "https://genie.example.com/api/v3/commands/2092b131-c46e-4621-8274-7019305d32dc"
+          "href" : "https://genie.example.com/api/v3/commands/14e3356d-9632-4f0f-bb6b-b234ba45ddb3"
         },
         "applications" : {
-          "href" : "https://genie.example.com/api/v3/commands/2092b131-c46e-4621-8274-7019305d32dc/applications"
+          "href" : "https://genie.example.com/api/v3/commands/14e3356d-9632-4f0f-bb6b-b234ba45ddb3/applications"
         },
         "clusters" : {
-          "href" : "https://genie.example.com/api/v3/commands/2092b131-c46e-4621-8274-7019305d32dc/clusters"
+          "href" : "https://genie.example.com/api/v3/commands/14e3356d-9632-4f0f-bb6b-b234ba45ddb3/clusters"
         }
       }
     }, {
-      "id" : "e581b498-9a71-4f59-9a89-f9215b8a3370",
-      "created" : "2017-01-11T00:57:35.344Z",
-      "updated" : "2017-01-11T00:57:35.344Z",
-      "tags" : [ "genie.id:e581b498-9a71-4f59-9a89-f9215b8a3370", "genie.name:72bbb787-90a5-44fd-9925-59867f3273aa" ],
-      "version" : "c313e6d9-cafb-4722-a325-efa4256dd402",
-      "user" : "fa7304ed-233d-4ecc-be81-b22bedde263d",
-      "name" : "72bbb787-90a5-44fd-9925-59867f3273aa",
+      "id" : "8f186fb4-a449-4763-b7e3-0838ddbaadfb",
+      "created" : "2017-01-11T19:13:34.753Z",
+      "updated" : "2017-01-11T19:13:34.753Z",
+      "tags" : [ "genie.id:8f186fb4-a449-4763-b7e3-0838ddbaadfb", "genie.name:f104ee14-6654-4bbc-abac-f23a482f56a7" ],
+      "version" : "2db4d7e8-dedd-4627-b6a6-6846a8058ed2",
+      "user" : "31ad3e33-4bbb-49a9-9f31-ffa992c43d61",
+      "name" : "f104ee14-6654-4bbc-abac-f23a482f56a7",
       "description" : null,
       "setupFile" : null,
       "configs" : [ ],
       "status" : "ACTIVE",
-      "executable" : "b48e6b30-04f5-4388-8be9-2dede46c02b8",
+      "executable" : "e0bad93d-35b7-48c0-b589-3e33f9b98853",
       "checkDelay" : 10000,
       "memory" : null,
       "_links" : {
         "self" : {
-          "href" : "https://genie.example.com/api/v3/commands/e581b498-9a71-4f59-9a89-f9215b8a3370"
+          "href" : "https://genie.example.com/api/v3/commands/8f186fb4-a449-4763-b7e3-0838ddbaadfb"
         },
         "applications" : {
-          "href" : "https://genie.example.com/api/v3/commands/e581b498-9a71-4f59-9a89-f9215b8a3370/applications"
+          "href" : "https://genie.example.com/api/v3/commands/8f186fb4-a449-4763-b7e3-0838ddbaadfb/applications"
         },
         "clusters" : {
-          "href" : "https://genie.example.com/api/v3/commands/e581b498-9a71-4f59-9a89-f9215b8a3370/clusters"
+          "href" : "https://genie.example.com/api/v3/commands/8f186fb4-a449-4763-b7e3-0838ddbaadfb/clusters"
         }
       }
     } ]
@@ -14413,11 +14413,11 @@ For more fine grained control call the PATCH API.
 <h6 id="_curl_60"><a class="anchor" href="#_curl_60"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06' -i -X PUT -H 'Content-Type: application/json' -d '{
-  "id" : "a7bc9563-6fde-4339-b85a-0776a1ff5c06",
-  "created" : "2017-01-11T00:57:40.506Z",
-  "updated" : "2017-01-11T00:57:40.506Z",
-  "tags" : [ "genie.id:a7bc9563-6fde-4339-b85a-0776a1ff5c06", "genie.name:hive" ],
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce' -i -X PUT -H 'Content-Type: application/json' -d '{
+  "id" : "f5223450-cfbc-4014-899d-acdc6675e5ce",
+  "created" : "2017-01-11T19:13:39.588Z",
+  "updated" : "2017-01-11T19:13:39.588Z",
+  "tags" : [ "genie.name:hive", "genie.id:f5223450-cfbc-4014-899d-acdc6675e5ce" ],
   "version" : "1.0.0",
   "user" : "genie",
   "name" : "hive",
@@ -14437,10 +14437,10 @@ For more fine grained control call the PATCH API.
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '{
-  "id" : "a7bc9563-6fde-4339-b85a-0776a1ff5c06",
-  "created" : "2017-01-11T00:57:40.506Z",
-  "updated" : "2017-01-11T00:57:40.506Z",
-  "tags" : [ "genie.id:a7bc9563-6fde-4339-b85a-0776a1ff5c06", "genie.name:hive" ],
+  "id" : "f5223450-cfbc-4014-899d-acdc6675e5ce",
+  "created" : "2017-01-11T19:13:39.588Z",
+  "updated" : "2017-01-11T19:13:39.588Z",
+  "tags" : [ "genie.name:hive", "genie.id:f5223450-cfbc-4014-899d-acdc6675e5ce" ],
   "version" : "1.0.0",
   "user" : "genie",
   "name" : "hive",
@@ -14451,7 +14451,7 @@ For more fine grained control call the PATCH API.
   "executable" : "/apps/hive/bin/hive",
   "checkDelay" : 10000,
   "memory" : null
-}' | http PUT 'https://genie.example.com/api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06' 'Content-Type:application/json'</code></pre>
+}' | http PUT 'https://genie.example.com/api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce' 'Content-Type:application/json'</code></pre>
 </div>
 </div>
 </div>
@@ -14483,16 +14483,16 @@ For more fine grained control call the PATCH API.
 <h6 id="_request_60"><a class="anchor" href="#_request_60"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">PUT /api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06 HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">PUT /api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce HTTP/1.1
 Content-Type: application/json
 Host: genie.example.com
 Content-Length: 453
 
 {
-  "id" : "a7bc9563-6fde-4339-b85a-0776a1ff5c06",
-  "created" : "2017-01-11T00:57:40.506Z",
-  "updated" : "2017-01-11T00:57:40.506Z",
-  "tags" : [ "genie.id:a7bc9563-6fde-4339-b85a-0776a1ff5c06", "genie.name:hive" ],
+  "id" : "f5223450-cfbc-4014-899d-acdc6675e5ce",
+  "created" : "2017-01-11T19:13:39.588Z",
+  "updated" : "2017-01-11T19:13:39.588Z",
+  "tags" : [ "genie.name:hive", "genie.id:f5223450-cfbc-4014-899d-acdc6675e5ce" ],
   "version" : "1.0.0",
   "user" : "genie",
   "name" : "hive",
@@ -14662,10 +14662,10 @@ For more information about JSON Patch RFC see the <a href="http://jsonpatch.com/
 <h6 id="_curl_61"><a class="anchor" href="#_curl_61"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06' -i -X PATCH -H 'Content-Type: application/json' -d '[ {
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce' -i -X PATCH -H 'Content-Type: application/json' -d '[ {
   "op" : "replace",
   "path" : "/name",
-  "value" : "ff3da5cb-2f05-44b5-8362-2bf918133915"
+  "value" : "3a59b243-c3fb-4f29-8cbe-0719ef4d3449"
 } ]'</code></pre>
 </div>
 </div>
@@ -14677,8 +14677,8 @@ For more information about JSON Patch RFC see the <a href="http://jsonpatch.com/
 <pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '[ {
   "op" : "replace",
   "path" : "/name",
-  "value" : "ff3da5cb-2f05-44b5-8362-2bf918133915"
-} ]' | http PATCH 'https://genie.example.com/api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06' 'Content-Type:application/json'</code></pre>
+  "value" : "3a59b243-c3fb-4f29-8cbe-0719ef4d3449"
+} ]' | http PATCH 'https://genie.example.com/api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce' 'Content-Type:application/json'</code></pre>
 </div>
 </div>
 </div>
@@ -14710,7 +14710,7 @@ For more information about JSON Patch RFC see the <a href="http://jsonpatch.com/
 <h6 id="_request_61"><a class="anchor" href="#_request_61"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">PATCH /api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06 HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">PATCH /api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce HTTP/1.1
 Content-Type: application/json
 Host: genie.example.com
 Content-Length: 98
@@ -14718,7 +14718,7 @@ Content-Length: 98
 [ {
   "op" : "replace",
   "path" : "/name",
-  "value" : "ff3da5cb-2f05-44b5-8362-2bf918133915"
+  "value" : "3a59b243-c3fb-4f29-8cbe-0719ef4d3449"
 } ]</code></pre>
 </div>
 </div>
@@ -14904,7 +14904,7 @@ Host: genie.example.com</code></pre>
 <h6 id="_curl_63"><a class="anchor" href="#_curl_63"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/commands/6417eecd-f336-4875-bd67-a8de6ab017aa' -i -X DELETE</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/commands/e3bcbb51-543a-4033-845c-9350a57e151b' -i -X DELETE</code></pre>
 </div>
 </div>
 </div>
@@ -14912,7 +14912,7 @@ Host: genie.example.com</code></pre>
 <h6 id="_httpie_63"><a class="anchor" href="#_httpie_63"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http DELETE 'https://genie.example.com/api/v3/commands/6417eecd-f336-4875-bd67-a8de6ab017aa'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http DELETE 'https://genie.example.com/api/v3/commands/e3bcbb51-543a-4033-845c-9350a57e151b'</code></pre>
 </div>
 </div>
 </div>
@@ -14944,7 +14944,7 @@ Host: genie.example.com</code></pre>
 <h6 id="_request_63"><a class="anchor" href="#_request_63"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">DELETE /api/v3/commands/6417eecd-f336-4875-bd67-a8de6ab017aa HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">DELETE /api/v3/commands/e3bcbb51-543a-4033-845c-9350a57e151b HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -15025,7 +15025,7 @@ Host: genie.example.com</code></pre>
 <h6 id="_curl_64"><a class="anchor" href="#_curl_64"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/configs' -i</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/configs' -i</code></pre>
 </div>
 </div>
 </div>
@@ -15033,7 +15033,7 @@ Host: genie.example.com</code></pre>
 <h6 id="_httpie_64"><a class="anchor" href="#_httpie_64"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/configs'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/configs'</code></pre>
 </div>
 </div>
 </div>
@@ -15104,7 +15104,7 @@ Host: genie.example.com</code></pre>
 <h6 id="_request_64"><a class="anchor" href="#_request_64"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/configs HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/configs HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -15117,7 +15117,7 @@ Host: genie.example.com</code></pre>
 Content-Type: application/json
 Content-Length: 82
 
-[ "deabaa31-e4b6-4400-ac3f-fa5f7075ba77", "77dc2589-8165-4881-b4d1-3886bf79e512" ]</code></pre>
+[ "7f79afc1-7da4-4f93-98ce-7b4f1d9bb867", "b7e956a2-3778-4659-8c48-96bbf7698c81" ]</code></pre>
 </div>
 </div>
 </div>
@@ -15240,7 +15240,7 @@ Configurations are stored as a set so any duplicates will be ignored.
 <h6 id="_curl_65"><a class="anchor" href="#_curl_65"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/configs' -i -X POST -H 'Content-Type: application/json' -d '[ "77dc2589-8165-4881-b4d1-3886bf79e512", "deabaa31-e4b6-4400-ac3f-fa5f7075ba77" ]'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/configs' -i -X POST -H 'Content-Type: application/json' -d '[ "b7e956a2-3778-4659-8c48-96bbf7698c81", "7f79afc1-7da4-4f93-98ce-7b4f1d9bb867" ]'</code></pre>
 </div>
 </div>
 </div>
@@ -15248,7 +15248,7 @@ Configurations are stored as a set so any duplicates will be ignored.
 <h6 id="_httpie_65"><a class="anchor" href="#_httpie_65"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '[ "77dc2589-8165-4881-b4d1-3886bf79e512", "deabaa31-e4b6-4400-ac3f-fa5f7075ba77" ]' | http POST 'https://genie.example.com/api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/configs' 'Content-Type:application/json'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '[ "b7e956a2-3778-4659-8c48-96bbf7698c81", "7f79afc1-7da4-4f93-98ce-7b4f1d9bb867" ]' | http POST 'https://genie.example.com/api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/configs' 'Content-Type:application/json'</code></pre>
 </div>
 </div>
 </div>
@@ -15280,12 +15280,12 @@ Configurations are stored as a set so any duplicates will be ignored.
 <h6 id="_request_65"><a class="anchor" href="#_request_65"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">POST /api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/configs HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">POST /api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/configs HTTP/1.1
 Content-Type: application/json
 Host: genie.example.com
 Content-Length: 82
 
-[ "77dc2589-8165-4881-b4d1-3886bf79e512", "deabaa31-e4b6-4400-ac3f-fa5f7075ba77" ]</code></pre>
+[ "b7e956a2-3778-4659-8c48-96bbf7698c81", "7f79afc1-7da4-4f93-98ce-7b4f1d9bb867" ]</code></pre>
 </div>
 </div>
 </div>
@@ -15404,7 +15404,7 @@ Content-Length: 82
 <h6 id="_curl_66"><a class="anchor" href="#_curl_66"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/configs' -i -X PUT -H 'Content-Type: application/json' -d '[ "3dd021d1-ed46-4798-a393-a2d515b6490f" ]'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/configs' -i -X PUT -H 'Content-Type: application/json' -d '[ "e5d9a8a9-2392-4aea-af7d-80e355808ef6" ]'</code></pre>
 </div>
 </div>
 </div>
@@ -15412,7 +15412,7 @@ Content-Length: 82
 <h6 id="_httpie_66"><a class="anchor" href="#_httpie_66"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '[ "3dd021d1-ed46-4798-a393-a2d515b6490f" ]' | http PUT 'https://genie.example.com/api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/configs' 'Content-Type:application/json'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '[ "e5d9a8a9-2392-4aea-af7d-80e355808ef6" ]' | http PUT 'https://genie.example.com/api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/configs' 'Content-Type:application/json'</code></pre>
 </div>
 </div>
 </div>
@@ -15444,12 +15444,12 @@ Content-Length: 82
 <h6 id="_request_66"><a class="anchor" href="#_request_66"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">PUT /api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/configs HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">PUT /api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/configs HTTP/1.1
 Content-Type: application/json
 Host: genie.example.com
 Content-Length: 42
 
-[ "3dd021d1-ed46-4798-a393-a2d515b6490f" ]</code></pre>
+[ "e5d9a8a9-2392-4aea-af7d-80e355808ef6" ]</code></pre>
 </div>
 </div>
 </div>
@@ -15529,7 +15529,7 @@ Content-Length: 42
 <h6 id="_curl_67"><a class="anchor" href="#_curl_67"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/configs' -i -X DELETE</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/configs' -i -X DELETE</code></pre>
 </div>
 </div>
 </div>
@@ -15537,7 +15537,7 @@ Content-Length: 42
 <h6 id="_httpie_67"><a class="anchor" href="#_httpie_67"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http DELETE 'https://genie.example.com/api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/configs'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http DELETE 'https://genie.example.com/api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/configs'</code></pre>
 </div>
 </div>
 </div>
@@ -15569,7 +15569,7 @@ Content-Length: 42
 <h6 id="_request_67"><a class="anchor" href="#_request_67"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">DELETE /api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/configs HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">DELETE /api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/configs HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -15650,7 +15650,7 @@ Host: genie.example.com</code></pre>
 <h6 id="_curl_68"><a class="anchor" href="#_curl_68"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/tags' -i</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/tags' -i</code></pre>
 </div>
 </div>
 </div>
@@ -15658,7 +15658,7 @@ Host: genie.example.com</code></pre>
 <h6 id="_httpie_68"><a class="anchor" href="#_httpie_68"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/tags'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/tags'</code></pre>
 </div>
 </div>
 </div>
@@ -15729,7 +15729,7 @@ Host: genie.example.com</code></pre>
 <h6 id="_request_68"><a class="anchor" href="#_request_68"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/tags HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/tags HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -15742,7 +15742,7 @@ Host: genie.example.com</code></pre>
 Content-Type: application/json
 Content-Length: 150
 
-[ "0b6bd044-7b02-482f-86d9-f6da94a4e20c", "07ed8927-2b49-4d16-b57f-82aa1c33bb4d", "genie.id:a7bc9563-6fde-4339-b85a-0776a1ff5c06", "genie.name:hive" ]</code></pre>
+[ "64bdbf5f-12a3-4145-8cf3-d07173065128", "genie.id:f5223450-cfbc-4014-899d-acdc6675e5ce", "04cd5ec0-eea9-4eeb-afde-5f45cf70a112", "genie.name:hive" ]</code></pre>
 </div>
 </div>
 </div>
@@ -15865,7 +15865,7 @@ Content-Length: 150
 <h6 id="_curl_69"><a class="anchor" href="#_curl_69"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/tags' -i -X POST -H 'Content-Type: application/json' -d '[ "07ed8927-2b49-4d16-b57f-82aa1c33bb4d", "0b6bd044-7b02-482f-86d9-f6da94a4e20c" ]'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/tags' -i -X POST -H 'Content-Type: application/json' -d '[ "04cd5ec0-eea9-4eeb-afde-5f45cf70a112", "64bdbf5f-12a3-4145-8cf3-d07173065128" ]'</code></pre>
 </div>
 </div>
 </div>
@@ -15873,7 +15873,7 @@ Content-Length: 150
 <h6 id="_httpie_69"><a class="anchor" href="#_httpie_69"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '[ "07ed8927-2b49-4d16-b57f-82aa1c33bb4d", "0b6bd044-7b02-482f-86d9-f6da94a4e20c" ]' | http POST 'https://genie.example.com/api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/tags' 'Content-Type:application/json'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '[ "04cd5ec0-eea9-4eeb-afde-5f45cf70a112", "64bdbf5f-12a3-4145-8cf3-d07173065128" ]' | http POST 'https://genie.example.com/api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/tags' 'Content-Type:application/json'</code></pre>
 </div>
 </div>
 </div>
@@ -15905,12 +15905,12 @@ Content-Length: 150
 <h6 id="_request_69"><a class="anchor" href="#_request_69"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">POST /api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/tags HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">POST /api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/tags HTTP/1.1
 Content-Type: application/json
 Host: genie.example.com
 Content-Length: 82
 
-[ "07ed8927-2b49-4d16-b57f-82aa1c33bb4d", "0b6bd044-7b02-482f-86d9-f6da94a4e20c" ]</code></pre>
+[ "04cd5ec0-eea9-4eeb-afde-5f45cf70a112", "64bdbf5f-12a3-4145-8cf3-d07173065128" ]</code></pre>
 </div>
 </div>
 </div>
@@ -16042,7 +16042,7 @@ by the system.
 <h6 id="_curl_70"><a class="anchor" href="#_curl_70"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/tags' -i -X PUT -H 'Content-Type: application/json' -d '[ "9eacec5e-d398-41d6-a64c-fdeeffc63910" ]'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/tags' -i -X PUT -H 'Content-Type: application/json' -d '[ "2bd0a369-a1bc-40c8-8212-b20f63e29dd7" ]'</code></pre>
 </div>
 </div>
 </div>
@@ -16050,7 +16050,7 @@ by the system.
 <h6 id="_httpie_70"><a class="anchor" href="#_httpie_70"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '[ "9eacec5e-d398-41d6-a64c-fdeeffc63910" ]' | http PUT 'https://genie.example.com/api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/tags' 'Content-Type:application/json'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '[ "2bd0a369-a1bc-40c8-8212-b20f63e29dd7" ]' | http PUT 'https://genie.example.com/api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/tags' 'Content-Type:application/json'</code></pre>
 </div>
 </div>
 </div>
@@ -16082,12 +16082,12 @@ by the system.
 <h6 id="_request_70"><a class="anchor" href="#_request_70"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">PUT /api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/tags HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">PUT /api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/tags HTTP/1.1
 Content-Type: application/json
 Host: genie.example.com
 Content-Length: 42
 
-[ "9eacec5e-d398-41d6-a64c-fdeeffc63910" ]</code></pre>
+[ "2bd0a369-a1bc-40c8-8212-b20f63e29dd7" ]</code></pre>
 </div>
 </div>
 </div>
@@ -16179,7 +16179,7 @@ The <code>genie.id:{id}</code> and <code>genie.name:{name}</code> tags will <str
 <h6 id="_curl_71"><a class="anchor" href="#_curl_71"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/tags' -i -X DELETE</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/tags' -i -X DELETE</code></pre>
 </div>
 </div>
 </div>
@@ -16187,7 +16187,7 @@ The <code>genie.id:{id}</code> and <code>genie.name:{name}</code> tags will <str
 <h6 id="_httpie_71"><a class="anchor" href="#_httpie_71"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http DELETE 'https://genie.example.com/api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/tags'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http DELETE 'https://genie.example.com/api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/tags'</code></pre>
 </div>
 </div>
 </div>
@@ -16219,7 +16219,7 @@ The <code>genie.id:{id}</code> and <code>genie.name:{name}</code> tags will <str
 <h6 id="_request_71"><a class="anchor" href="#_request_71"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">DELETE /api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/tags HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">DELETE /api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/tags HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -16316,7 +16316,7 @@ You can&#8217;t remove the <code>genie.id:{id}</code> and <code>genie.name:{name
 <h6 id="_curl_72"><a class="anchor" href="#_curl_72"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/tags/876b1b4d-2d51-440d-8734-4ec0f99d50f1' -i -X DELETE</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/tags/1bcca26d-cb8c-4bd9-907c-9921c7eb876c' -i -X DELETE</code></pre>
 </div>
 </div>
 </div>
@@ -16324,7 +16324,7 @@ You can&#8217;t remove the <code>genie.id:{id}</code> and <code>genie.name:{name
 <h6 id="_httpie_72"><a class="anchor" href="#_httpie_72"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http DELETE 'https://genie.example.com/api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/tags/876b1b4d-2d51-440d-8734-4ec0f99d50f1'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http DELETE 'https://genie.example.com/api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/tags/1bcca26d-cb8c-4bd9-907c-9921c7eb876c'</code></pre>
 </div>
 </div>
 </div>
@@ -16356,7 +16356,7 @@ You can&#8217;t remove the <code>genie.id:{id}</code> and <code>genie.name:{name
 <h6 id="_request_72"><a class="anchor" href="#_request_72"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">DELETE /api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/tags/876b1b4d-2d51-440d-8734-4ec0f99d50f1 HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">DELETE /api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/tags/1bcca26d-cb8c-4bd9-907c-9921c7eb876c HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -16488,7 +16488,7 @@ The applications for the ID&#8217;s must already exist in the system
 <h6 id="_curl_73"><a class="anchor" href="#_curl_73"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/applications' -i -X POST -H 'Content-Type: application/json' -d '[ "08c1d383-6702-4365-9497-077720433027", "e78f0d22-70f4-433f-b4ef-9efe9b5bfcb3" ]'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/applications' -i -X POST -H 'Content-Type: application/json' -d '[ "22f5e162-ec39-479b-a53d-5f16a5cba63a", "0b54d9cc-7af3-46fe-b2c9-52b42ea2a327" ]'</code></pre>
 </div>
 </div>
 </div>
@@ -16496,7 +16496,7 @@ The applications for the ID&#8217;s must already exist in the system
 <h6 id="_httpie_73"><a class="anchor" href="#_httpie_73"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '[ "08c1d383-6702-4365-9497-077720433027", "e78f0d22-70f4-433f-b4ef-9efe9b5bfcb3" ]' | http POST 'https://genie.example.com/api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/applications' 'Content-Type:application/json'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '[ "22f5e162-ec39-479b-a53d-5f16a5cba63a", "0b54d9cc-7af3-46fe-b2c9-52b42ea2a327" ]' | http POST 'https://genie.example.com/api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/applications' 'Content-Type:application/json'</code></pre>
 </div>
 </div>
 </div>
@@ -16528,12 +16528,12 @@ The applications for the ID&#8217;s must already exist in the system
 <h6 id="_request_73"><a class="anchor" href="#_request_73"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">POST /api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/applications HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">POST /api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/applications HTTP/1.1
 Content-Type: application/json
 Host: genie.example.com
 Content-Length: 82
 
-[ "08c1d383-6702-4365-9497-077720433027", "e78f0d22-70f4-433f-b4ef-9efe9b5bfcb3" ]</code></pre>
+[ "22f5e162-ec39-479b-a53d-5f16a5cba63a", "0b54d9cc-7af3-46fe-b2c9-52b42ea2a327" ]</code></pre>
 </div>
 </div>
 </div>
@@ -16614,7 +16614,7 @@ when a job is run with the given command</p>
 <h6 id="_curl_74"><a class="anchor" href="#_curl_74"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/applications' -i</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/applications' -i</code></pre>
 </div>
 </div>
 </div>
@@ -16622,7 +16622,7 @@ when a job is run with the given command</p>
 <h6 id="_httpie_74"><a class="anchor" href="#_httpie_74"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/applications'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/applications'</code></pre>
 </div>
 </div>
 </div>
@@ -16693,7 +16693,7 @@ when a job is run with the given command</p>
 <h6 id="_request_74"><a class="anchor" href="#_request_74"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/applications HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/applications HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -16707,13 +16707,13 @@ Content-Type: application/hal+json
 Content-Length: 2450
 
 [ {
-  "id" : "08c1d383-6702-4365-9497-077720433027",
-  "created" : "2017-01-11T00:57:38.171Z",
-  "updated" : "2017-01-11T00:57:38.171Z",
-  "tags" : [ "genie.name:1364420d-040f-4c68-8c99-d7c8e1212f9e", "genie.id:08c1d383-6702-4365-9497-077720433027" ],
-  "version" : "1364420d-040f-4c68-8c99-d7c8e1212f9e",
-  "user" : "1364420d-040f-4c68-8c99-d7c8e1212f9e",
-  "name" : "1364420d-040f-4c68-8c99-d7c8e1212f9e",
+  "id" : "22f5e162-ec39-479b-a53d-5f16a5cba63a",
+  "created" : "2017-01-11T19:13:37.472Z",
+  "updated" : "2017-01-11T19:13:37.472Z",
+  "tags" : [ "genie.name:53f3d5f1-2ece-4bf2-b6a7-6c2b391ef0b2", "genie.id:22f5e162-ec39-479b-a53d-5f16a5cba63a" ],
+  "version" : "53f3d5f1-2ece-4bf2-b6a7-6c2b391ef0b2",
+  "user" : "53f3d5f1-2ece-4bf2-b6a7-6c2b391ef0b2",
+  "name" : "53f3d5f1-2ece-4bf2-b6a7-6c2b391ef0b2",
   "description" : null,
   "setupFile" : null,
   "configs" : [ ],
@@ -16722,19 +16722,19 @@ Content-Length: 2450
   "type" : null,
   "links" : [ {
     "rel" : "self",
-    "href" : "https://genie.example.com/api/v3/applications/08c1d383-6702-4365-9497-077720433027"
+    "href" : "https://genie.example.com/api/v3/applications/22f5e162-ec39-479b-a53d-5f16a5cba63a"
   }, {
     "rel" : "commands",
-    "href" : "https://genie.example.com/api/v3/applications/08c1d383-6702-4365-9497-077720433027/commands"
+    "href" : "https://genie.example.com/api/v3/applications/22f5e162-ec39-479b-a53d-5f16a5cba63a/commands"
   } ]
 }, {
-  "id" : "e78f0d22-70f4-433f-b4ef-9efe9b5bfcb3",
-  "created" : "2017-01-11T00:57:38.201Z",
-  "updated" : "2017-01-11T00:57:38.201Z",
-  "tags" : [ "genie.name:1364420d-040f-4c68-8c99-d7c8e1212f9e", "genie.id:e78f0d22-70f4-433f-b4ef-9efe9b5bfcb3" ],
-  "version" : "1364420d-040f-4c68-8c99-d7c8e1212f9e",
-  "user" : "1364420d-040f-4c68-8c99-d7c8e1212f9e",
-  "name" : "1364420d-040f-4c68-8c99-d7c8e1212f9e",
+  "id" : "0b54d9cc-7af3-46fe-b2c9-52b42ea2a327",
+  "created" : "2017-01-11T19:13:37.499Z",
+  "updated" : "2017-01-11T19:13:37.499Z",
+  "tags" : [ "genie.name:53f3d5f1-2ece-4bf2-b6a7-6c2b391ef0b2", "genie.id:0b54d9cc-7af3-46fe-b2c9-52b42ea2a327" ],
+  "version" : "53f3d5f1-2ece-4bf2-b6a7-6c2b391ef0b2",
+  "user" : "53f3d5f1-2ece-4bf2-b6a7-6c2b391ef0b2",
+  "name" : "53f3d5f1-2ece-4bf2-b6a7-6c2b391ef0b2",
   "description" : null,
   "setupFile" : null,
   "configs" : [ ],
@@ -16743,19 +16743,19 @@ Content-Length: 2450
   "type" : null,
   "links" : [ {
     "rel" : "self",
-    "href" : "https://genie.example.com/api/v3/applications/e78f0d22-70f4-433f-b4ef-9efe9b5bfcb3"
+    "href" : "https://genie.example.com/api/v3/applications/0b54d9cc-7af3-46fe-b2c9-52b42ea2a327"
   }, {
     "rel" : "commands",
-    "href" : "https://genie.example.com/api/v3/applications/e78f0d22-70f4-433f-b4ef-9efe9b5bfcb3/commands"
+    "href" : "https://genie.example.com/api/v3/applications/0b54d9cc-7af3-46fe-b2c9-52b42ea2a327/commands"
   } ]
 }, {
-  "id" : "53e06c5c-07d8-48aa-bf00-bfcc5e109119",
-  "created" : "2017-01-11T00:57:38.409Z",
-  "updated" : "2017-01-11T00:57:38.409Z",
-  "tags" : [ "genie.name:1364420d-040f-4c68-8c99-d7c8e1212f9e", "genie.id:53e06c5c-07d8-48aa-bf00-bfcc5e109119" ],
-  "version" : "1364420d-040f-4c68-8c99-d7c8e1212f9e",
-  "user" : "1364420d-040f-4c68-8c99-d7c8e1212f9e",
-  "name" : "1364420d-040f-4c68-8c99-d7c8e1212f9e",
+  "id" : "d46dbc13-26e9-4e6b-b527-afad1e926d30",
+  "created" : "2017-01-11T19:13:37.660Z",
+  "updated" : "2017-01-11T19:13:37.660Z",
+  "tags" : [ "genie.id:d46dbc13-26e9-4e6b-b527-afad1e926d30", "genie.name:53f3d5f1-2ece-4bf2-b6a7-6c2b391ef0b2" ],
+  "version" : "53f3d5f1-2ece-4bf2-b6a7-6c2b391ef0b2",
+  "user" : "53f3d5f1-2ece-4bf2-b6a7-6c2b391ef0b2",
+  "name" : "53f3d5f1-2ece-4bf2-b6a7-6c2b391ef0b2",
   "description" : null,
   "setupFile" : null,
   "configs" : [ ],
@@ -16764,10 +16764,10 @@ Content-Length: 2450
   "type" : null,
   "links" : [ {
     "rel" : "self",
-    "href" : "https://genie.example.com/api/v3/applications/53e06c5c-07d8-48aa-bf00-bfcc5e109119"
+    "href" : "https://genie.example.com/api/v3/applications/d46dbc13-26e9-4e6b-b527-afad1e926d30"
   }, {
     "rel" : "commands",
-    "href" : "https://genie.example.com/api/v3/applications/53e06c5c-07d8-48aa-bf00-bfcc5e109119/commands"
+    "href" : "https://genie.example.com/api/v3/applications/d46dbc13-26e9-4e6b-b527-afad1e926d30/commands"
   } ]
 } ]</code></pre>
 </div>
@@ -16892,7 +16892,7 @@ The applications with the ID&#8217;s must already exist in the system
 <h6 id="_curl_75"><a class="anchor" href="#_curl_75"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/applications' -i -X PUT -H 'Content-Type: application/json' -d '[ "5a4484e1-58e7-4a52-8054-1d6aecec9db1", "54263eef-7906-464c-91e2-ceae16865c2c" ]'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/applications' -i -X PUT -H 'Content-Type: application/json' -d '[ "8c1767ed-3267-4e1a-8d73-df26463ce70a", "17c8f5fa-1ea2-4644-8efb-1b0ace4c024d" ]'</code></pre>
 </div>
 </div>
 </div>
@@ -16900,7 +16900,7 @@ The applications with the ID&#8217;s must already exist in the system
 <h6 id="_httpie_75"><a class="anchor" href="#_httpie_75"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '[ "5a4484e1-58e7-4a52-8054-1d6aecec9db1", "54263eef-7906-464c-91e2-ceae16865c2c" ]' | http PUT 'https://genie.example.com/api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/applications' 'Content-Type:application/json'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ echo '[ "8c1767ed-3267-4e1a-8d73-df26463ce70a", "17c8f5fa-1ea2-4644-8efb-1b0ace4c024d" ]' | http PUT 'https://genie.example.com/api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/applications' 'Content-Type:application/json'</code></pre>
 </div>
 </div>
 </div>
@@ -16932,12 +16932,12 @@ The applications with the ID&#8217;s must already exist in the system
 <h6 id="_request_75"><a class="anchor" href="#_request_75"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">PUT /api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/applications HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">PUT /api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/applications HTTP/1.1
 Content-Type: application/json
 Host: genie.example.com
 Content-Length: 82
 
-[ "5a4484e1-58e7-4a52-8054-1d6aecec9db1", "54263eef-7906-464c-91e2-ceae16865c2c" ]</code></pre>
+[ "8c1767ed-3267-4e1a-8d73-df26463ce70a", "17c8f5fa-1ea2-4644-8efb-1b0ace4c024d" ]</code></pre>
 </div>
 </div>
 </div>
@@ -17029,7 +17029,7 @@ This does <strong>NOT</strong> delete the application(s) from the system just un
 <h6 id="_curl_76"><a class="anchor" href="#_curl_76"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/applications' -i -X DELETE</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/applications' -i -X DELETE</code></pre>
 </div>
 </div>
 </div>
@@ -17037,7 +17037,7 @@ This does <strong>NOT</strong> delete the application(s) from the system just un
 <h6 id="_httpie_76"><a class="anchor" href="#_httpie_76"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http DELETE 'https://genie.example.com/api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/applications'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http DELETE 'https://genie.example.com/api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/applications'</code></pre>
 </div>
 </div>
 </div>
@@ -17069,7 +17069,7 @@ This does <strong>NOT</strong> delete the application(s) from the system just un
 <h6 id="_request_76"><a class="anchor" href="#_request_76"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">DELETE /api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/applications HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">DELETE /api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/applications HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -17166,7 +17166,7 @@ This does <strong>NOT</strong> delete the application from the system just un-li
 <h6 id="_curl_77"><a class="anchor" href="#_curl_77"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/applications/e5c9e918-3d92-4712-8305-096331e634c8' -i -X DELETE</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/applications/35b7a437-8552-43bd-a401-fa531f02dfcb' -i -X DELETE</code></pre>
 </div>
 </div>
 </div>
@@ -17174,7 +17174,7 @@ This does <strong>NOT</strong> delete the application from the system just un-li
 <h6 id="_httpie_77"><a class="anchor" href="#_httpie_77"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http DELETE 'https://genie.example.com/api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/applications/e5c9e918-3d92-4712-8305-096331e634c8'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http DELETE 'https://genie.example.com/api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/applications/35b7a437-8552-43bd-a401-fa531f02dfcb'</code></pre>
 </div>
 </div>
 </div>
@@ -17206,7 +17206,7 @@ This does <strong>NOT</strong> delete the application from the system just un-li
 <h6 id="_request_77"><a class="anchor" href="#_request_77"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">DELETE /api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/applications/e5c9e918-3d92-4712-8305-096331e634c8 HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">DELETE /api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/applications/35b7a437-8552-43bd-a401-fa531f02dfcb HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -17302,7 +17302,7 @@ Host: genie.example.com</code></pre>
 <h6 id="_curl_78"><a class="anchor" href="#_curl_78"></a>cURL</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/clusters?status=UP' -i</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ curl 'https://genie.example.com/api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/clusters?status=UP' -i</code></pre>
 </div>
 </div>
 </div>
@@ -17310,7 +17310,7 @@ Host: genie.example.com</code></pre>
 <h6 id="_httpie_78"><a class="anchor" href="#_httpie_78"></a>HTTPie</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/clusters?status=UP'</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">$ http GET 'https://genie.example.com/api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/clusters?status=UP'</code></pre>
 </div>
 </div>
 </div>
@@ -17381,7 +17381,7 @@ Host: genie.example.com</code></pre>
 <h6 id="_request_78"><a class="anchor" href="#_request_78"></a>Request</h6>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/commands/a7bc9563-6fde-4339-b85a-0776a1ff5c06/clusters?status=UP HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http" data-lang="http">GET /api/v3/commands/f5223450-cfbc-4014-899d-acdc6675e5ce/clusters?status=UP HTTP/1.1
 Host: genie.example.com</code></pre>
 </div>
 </div>
@@ -17395,23 +17395,23 @@ Content-Type: application/hal+json
 Content-Length: 765
 
 [ {
-  "id" : "9c759a81-61ca-49bc-be9f-c600b8582cca",
-  "created" : "2017-01-11T00:57:38.906Z",
-  "updated" : "2017-01-11T00:57:38.972Z",
-  "tags" : [ "genie.id:9c759a81-61ca-49bc-be9f-c600b8582cca", "genie.name:0756ffc7-84de-4a5e-bc6f-ff49cea214bd" ],
-  "version" : "0756ffc7-84de-4a5e-bc6f-ff49cea214bd",
-  "user" : "0756ffc7-84de-4a5e-bc6f-ff49cea214bd",
-  "name" : "0756ffc7-84de-4a5e-bc6f-ff49cea214bd",
+  "id" : "580846ea-f75e-4f16-9575-b7aff2879625",
+  "created" : "2017-01-11T19:13:38.181Z",
+  "updated" : "2017-01-11T19:13:38.261Z",
+  "tags" : [ "genie.id:580846ea-f75e-4f16-9575-b7aff2879625", "genie.name:219c7a52-d978-4ee5-8a9a-787be5bd7399" ],
+  "version" : "219c7a52-d978-4ee5-8a9a-787be5bd7399",
+  "user" : "219c7a52-d978-4ee5-8a9a-787be5bd7399",
+  "name" : "219c7a52-d978-4ee5-8a9a-787be5bd7399",
   "description" : null,
   "setupFile" : null,
   "configs" : [ ],
   "status" : "UP",
   "links" : [ {
     "rel" : "self",
-    "href" : "https://genie.example.com/api/v3/clusters/9c759a81-61ca-49bc-be9f-c600b8582cca"
+    "href" : "https://genie.example.com/api/v3/clusters/580846ea-f75e-4f16-9575-b7aff2879625"
   }, {
     "rel" : "commands",
-    "href" : "https://genie.example.com/api/v3/clusters/9c759a81-61ca-49bc-be9f-c600b8582cca/commands"
+    "href" : "https://genie.example.com/api/v3/clusters/580846ea-f75e-4f16-9575-b7aff2879625/commands"
   } ]
 } ]</code></pre>
 </div>
@@ -17426,7 +17426,7 @@ Content-Length: 765
 <div id="footer">
 <div id="footer-text">
 Version 3.0.0-SNAPSHOT<br>
-Last updated 2017-01-11 00:47:11 +00:00
+Last updated 2017-01-11 19:04:08 +00:00
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
