@@ -63,7 +63,7 @@ def call(url, method='get', headers=None, raise_not_status=None, none_on_404=Fal
         raise_not_status (int): raise GenieHTTPError if this status is not
             returned by genie.
         none_on_404 (bool): return None if a 404 if returned instead of raising
-            GenieHTTPError.
+            GenieHTTPError (will not retry requests with 404 response).
         failure_codes (list, optional): list of status codes to break retries and
             return Response.
     """
@@ -75,7 +75,11 @@ def call(url, method='get', headers=None, raise_not_status=None, none_on_404=Fal
 
     if isinstance(failure_codes, int):
         failure_codes = [failure_codes]
+
     failure_codes = [str(f) for f in failure_codes]
+
+    if none_on_404 and '404' not in failure_codes:
+        failure_codes.append('404')
 
     auth_handler = auth_handler or AuthHandler()
 
