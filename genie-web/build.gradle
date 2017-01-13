@@ -32,17 +32,17 @@ dependencies {
 
     // Spring Libs
     compile("org.springframework.boot:spring-boot-starter-actuator")
+    compile("org.springframework.boot:spring-boot-starter-data-redis")
     compile("org.springframework.boot:spring-boot-starter-mail")
     compile("org.springframework.boot:spring-boot-starter-hateoas")
-    compile("org.springframework.boot:spring-boot-starter-redis")
+    compile("org.springframework.boot:spring-boot-starter-integration")
     compile("org.springframework.boot:spring-boot-starter-security")
     compile("org.springframework.boot:spring-boot-starter-thymeleaf")
     compile("org.springframework.boot:spring-boot-starter-tomcat")
     compile("org.springframework.boot:spring-boot-starter-web")
-    compile("org.springframework.cloud:spring-cloud-cluster-autoconfigure:${spring_cloud_cluster_version}")
-    compile("org.springframework.cloud:spring-cloud-cluster-zookeeper:${spring_cloud_cluster_version}")
-    compile("org.springframework.cloud:spring-cloud-starter-eureka:${spring_cloud_netflix_version}")
-    compile("org.springframework.cloud:spring-cloud-starter-spectator:${spring_cloud_netflix_version}")
+    compile("org.springframework.integration:spring-integration-zookeeper")
+    compile("org.springframework.cloud:spring-cloud-starter-eureka")
+    compile("org.springframework.cloud:spring-cloud-starter-spectator")
     compile("org.springframework.security:spring-security-jwt")
     compile("org.springframework.security.extensions:spring-security-saml2-core:${spring_security_saml_version}") {
         exclude group: "org.bouncycastle", module: "bcprov-jdk15"
@@ -61,6 +61,8 @@ dependencies {
      * Optional Dependencies
      *******************************/
 
+    compileOnly("org.springframework.boot:spring-boot-configuration-processor")
+
     /*******************************
      * Runtime Dependencies
      *******************************/
@@ -71,13 +73,14 @@ dependencies {
 
     testCompile(project(":genie-test"))
     testCompile("com.github.springtestdbunit:spring-test-dbunit:${spring_test_dbunit_version}")
+    testCompile("com.github.tomakehurst:wiremock")
     testCompile("com.jayway.jsonpath:json-path")
-    testCompile("org.dbunit:dbunit:${dbunit_version}")
-    testCompile("org.springframework.restdocs:spring-restdocs-core:1.1.2.RELEASE")
-    testCompile("org.springframework.restdocs:spring-restdocs-mockmvc:1.1.2.RELEASE")
-    testCompile("org.springframework.security:spring-security-test")
     testCompile("net.sf.jtidy:jtidy:${jtidy_version}")
-    testCompile("com.github.tomakehurst:wiremock:${wiremock_version}")
+    testCompile("org.dbunit:dbunit:${dbunit_version}")
+    testCompile("org.springframework.boot:spring-boot-starter-jetty")
+    testCompile("org.springframework.restdocs:spring-restdocs-core")
+    testCompile("org.springframework.restdocs:spring-restdocs-mockmvc")
+    testCompile("org.springframework.security:spring-security-test")
 }
 
 license {
@@ -126,6 +129,10 @@ processResources {
             it.replace("GENIE_VERSION", genieVersion)
         }
     }
+}
+
+compileJava {
+    dependsOn processResources
 }
 
 node {

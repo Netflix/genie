@@ -105,10 +105,6 @@ management:
   security:
     enabled: false
 
-multipart:
-  max-file-size: 100MB
-  max-request-size: 200MB
-
 security:
   basic:
     enabled: false
@@ -116,19 +112,16 @@ security:
 spring:
   application:
     name: genie
-  cloud:
-    cluster:
-      leader:
-        enabled: false
-      zookeeper:
-        namespace: /genie/leader/
+  http:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 200MB
   jackson:
     date-format: com.netflix.genie.common.util.GenieDateFormat
     time-zone: UTC
   profiles:
     active: dev
-  mail:
-    #host: localhost
-    #testConnection: true
+  session:
+    store-type: hash_map
   velocity:
     enabled: false

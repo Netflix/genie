@@ -24,10 +24,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
-import org.springframework.cloud.cluster.leader.Context;
-import org.springframework.cloud.cluster.leader.event.AbstractLeaderEvent;
-import org.springframework.cloud.cluster.leader.event.OnGrantedEvent;
-import org.springframework.cloud.cluster.leader.event.OnRevokedEvent;
+import org.springframework.integration.leader.Context;
+import org.springframework.integration.leader.event.AbstractLeaderEvent;
+import org.springframework.integration.leader.event.OnGrantedEvent;
+import org.springframework.integration.leader.event.OnRevokedEvent;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.Trigger;
 

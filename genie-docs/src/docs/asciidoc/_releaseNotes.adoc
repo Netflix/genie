@@ -1,0 +1,98 @@
+== {revnumber} Release Notes
+
+The following are the release notes for Genie {revnumber}.
+
+=== Features
+
+* Spring Session support made more flexible
+** Now can support none (off), Redis, JDBC and HashMap as session data stores based on spring.session.store-type
+property
+
+=== Library Upgrades
+
+* Upgrade Spring Boot from 1.3.8.RELEASE to {springBootVersion}
+** https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-1.4-Release-Notes[Release Notes]
+* Upgrade to Spring Platform IO {springPlatformVersion} for library dependency management
+** http://docs.spring.io/platform/docs/Athens-SR2/reference/htmlsingle/[Reference Docs]
+* Upgrade to Spring Cloud {springCloudVersion} for cloud dependency management
+** http://cloud.spring.io/spring-cloud-static/{springCloudVersion}/[Reference Docs]
+* Removal of Spring Cloud Cluster
+** Spring Cloud Cluster was deprecated and the leadership election functionality previously leveraged by Genie was moved
+to Spring Integration Zookeeper. That library is now used.
+* Tomcat upgraded to 8.5 from 8.0
+
+=== Property Changes
+
+==== Added
+
+|===
+|Property |Description| Default Value
+
+|spring.data.redis.repositories.enabled
+|Whether Spring data repositories should attempt to be created for Redis
+|true
+
+|spring.session.store-type
+|The back end storage system for Spring to store HTTP session information. See
+http://docs.spring.io/spring-boot/docs/{springBootVersion}/reference/htmlsingle/#boot-features-session[Spring Boot Session]
+for more information. Currently on classpath only none, hash_map, redis and jdbc will work.
+|hash_map
+
+|===
+
+==== Removed
+
+==== Renamed
+
+|===
+|Old |New
+
+|multipart.max-file-size
+|spring.http.multipart.max-file-size
+
+|multipart.max-request-size
+|spring.http.multipart.max-file-size
+
+|spring.cloud.cluster.leader.enabled
+|genie.zookeeper.enabled
+
+|spring.cloud.cluster.zookeeper.connect
+|genie.zookeeper.connectionString
+
+|spring.cloud.cluster.zookeeper.namespace
+|genie.zookeeper.leader.path
+
+|spring.datasource.min-idle
+|spring.datasource.tomcat.min-idle
+
+|spring.datasource.max-idle
+|spring.datasource.tomcat.max-idle
+
+|spring.datasource.max-active
+|spring.datasource.tomcat.max-active
+
+|spring.datasource.validation-query
+|spring.datasource.tomcat.validation-query
+
+|spring.datasource.test-on-borrow
+|spring.datasource.tomcat.test-on-borrow
+
+|spring.datasource.test-on-connect
+|spring.datasource.tomcat.test-on-connect
+
+|spring.datasource.test-on-return
+|spring.datasource.tomcat.test-on-return
+
+|spring.datasource.test-while-idle
+|spring.datasource.tomcat.test-while-idle
+
+|spring.datasource.min-evictable-idle-time-millis
+|spring.datasource.tomcat.min-evictable-idle-time-millis
+
+|spring.datasource.time-between-eviction-run-millis
+|spring.datasource.tomcat.time-between-eviction-run-millis
+
+|spring.jpa.hibernate.naming-strategy
+|spring.jpa.hibernate.naming.strategy
+
+|===

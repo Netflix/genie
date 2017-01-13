@@ -14,7 +14,7 @@ dependencies {
     compile project(":genie-common")
 
     // JSON Patch Support
-    compile("com.github.fge:json-patch")
+    compile("com.github.fge:json-patch:${json_patch_version}")
 
     // Commons Libs
     compile("commons-httpclient:commons-httpclient")
@@ -29,10 +29,10 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-data-jpa")
     compile("org.springframework.boot:spring-boot-starter-mail")
     compile("org.springframework.retry:spring-retry")
-    compile("org.springframework.cloud:spring-cloud-aws-context:${spring_aws_context_version}")
+    compile("org.springframework.cloud:spring-cloud-aws-context")
 
     // AWS Libs
-    compile("com.amazonaws:aws-java-sdk-sts:${aws_java_sdk_sts_version}")
+    compile("com.amazonaws:aws-java-sdk-sts")
 
     /*******************************
      * Provided Dependencies
@@ -61,6 +61,8 @@ dependencies {
 
     // Hibernate Metamodel Generator Libraries
     jpaModelGen("org.hibernate:hibernate-jpamodelgen")
+    jpaModelGen("org.projectlombok:lombok")
+    jpaModelGen("com.google.code.findbugs:annotations:${findbugs_annotations_version}")
 }
 
 task generateJPAMetaModel(type: JavaCompile, group: "build", description: "Generate JPA Meta Models") {

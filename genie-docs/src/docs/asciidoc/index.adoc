@@ -30,6 +30,8 @@ https://netflix.github.io/genie/docs/{revnumber}/rest[API Guide].
 NOTE: For a demo of this version of Genie please see the
 https://netflix.github.io/genie/docs/{revnumber}/demo[Demo Guide].
 
+include::_releaseNotes.adoc[]
+
 include::concepts/_concepts.adoc[]
 
 include::_installation.adoc[]

@@ -30,7 +30,8 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-      naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
+      naming:
+        strategy: org.hibernate.cfg.ImprovedNamingStrategy
   datasource:
     url: jdbc:hsqldb:mem:genie-int-db;shutdown=true
     username: SA

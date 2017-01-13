@@ -20,9 +20,9 @@ package com.netflix.genie;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
-import org.springframework.boot.autoconfigure.session.SessionAutoConfiguration;
+import org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.context.web.SpringBootServletInitializer;
+import org.springframework.boot.web.support.SpringBootServletInitializer;
 
 /**
  * A class that serves to set up Spring Boot within a servlet container rather than an embedded one.
@@ -32,8 +32,8 @@ import org.springframework.boot.context.web.SpringBootServletInitializer;
  */
 @SpringBootApplication(
     exclude = {
-        SessionAutoConfiguration.class,
-        RedisAutoConfiguration.class
+        RedisAutoConfiguration.class,
+        RedisRepositoriesAutoConfiguration.class
     }
 )
 public class GenieWar extends SpringBootServletInitializer {

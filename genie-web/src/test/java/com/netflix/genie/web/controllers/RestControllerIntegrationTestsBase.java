@@ -29,27 +29,22 @@ import com.netflix.genie.common.dto.ConfigDTO;
 import com.netflix.genie.common.util.GenieDateFormat;
 import com.netflix.genie.test.categories.IntegrationTest;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Rule;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.boot.test.WebIntegrationTest;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.restdocs.JUnitRestDocumentation;
-import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
 import javax.validation.constraints.NotNull;
 import java.util.Set;
@@ -63,10 +58,16 @@ import java.util.UUID;
  * @since 3.0.0
  */
 @Category(IntegrationTest.class)
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = GenieWeb.class)
-@WebIntegrationTest(randomPort = true)
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = GenieWeb.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(resolver = IntegrationTestActiveProfilesResolver.class)
+@AutoConfigureMockMvc
+@AutoConfigureRestDocs(
+    value = "build/generated-snippets",
+    uriHost = "genie.example.com",
+    uriScheme = "https",
+    uriPort = 443
+)
 public abstract class RestControllerIntegrationTestsBase {
 
     static final String APPLICATIONS_API = "/api/v3/applications";
@@ -95,42 +96,14 @@ public abstract class RestControllerIntegrationTestsBase {
     static final String APPLICATIONS_LINK_KEY = "applications";
     static final String JOBS_LINK_KEY = "jobs";
 
-    /**
-     * Where to put the generated documentation.
-     */
-    @Rule
-    public final JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation("build/generated-snippets");
-
     protected final ObjectMapper objectMapper = new ObjectMapper()
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
         .setTimeZone(TimeZone.getTimeZone("UTC"))
         .setDateFormat(new GenieDateFormat())
         .registerModule(new Jdk8Module());
 
-    protected MockMvc mvc;
-
     @Autowired
-    private WebApplicationContext context;
-
-    /**
-     * Setup for tests.
-     *
-     * @throws Exception If there is an error.
-     */
-    @Before
-    public void setup() throws Exception {
-        this.mvc = MockMvcBuilders
-            .webAppContextSetup(this.context)
-            .apply(
-                MockMvcRestDocumentation
-                    .documentationConfiguration(this.restDocumentation)
-                    .uris()
-                    .withScheme("https")
-                    .withHost("genie.example.com")
-                    .withPort(443)
-            )
-            .build();
-    }
+    protected MockMvc mvc;
 
     void canAddElementsToResource(
         final String api,
@@ -141,7 +114,7 @@ public abstract class RestControllerIntegrationTestsBase {
         this.mvc
             .perform(MockMvcRequestBuilders.get(api, id))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.empty()));
 
         final String element1 = UUID.randomUUID().toString();
@@ -161,7 +134,7 @@ public abstract class RestControllerIntegrationTestsBase {
         this.mvc
             .perform(RestDocumentationRequestBuilders.get(api, id))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem(element1)))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem(element2)))
@@ -199,7 +172,7 @@ public abstract class RestControllerIntegrationTestsBase {
         this.mvc
             .perform(MockMvcRequestBuilders.get(api, id))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(1)))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem(element3)));
     }
@@ -228,7 +201,7 @@ public abstract class RestControllerIntegrationTestsBase {
         this.mvc
             .perform(MockMvcRequestBuilders.get(api, id))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.empty()));
     }
 
@@ -242,7 +215,7 @@ public abstract class RestControllerIntegrationTestsBase {
         this.mvc
             .perform(MockMvcRequestBuilders.get(api, id))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem("genie.id:" + id)))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem("genie.name:" + name)));
@@ -263,7 +236,7 @@ public abstract class RestControllerIntegrationTestsBase {
         this.mvc
             .perform(RestDocumentationRequestBuilders.get(api, id))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(4)))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem("genie.id:" + id)))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem("genie.name:" + name)))
@@ -304,7 +277,7 @@ public abstract class RestControllerIntegrationTestsBase {
         this.mvc
             .perform(MockMvcRequestBuilders.get(api, id))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(3)))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem("genie.id:" + id)))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem("genie.name:" + name)))
@@ -336,7 +309,7 @@ public abstract class RestControllerIntegrationTestsBase {
         this.mvc
             .perform(MockMvcRequestBuilders.get(api, id))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem("genie.id:" + id)))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem("genie.name:" + name)));
@@ -367,7 +340,7 @@ public abstract class RestControllerIntegrationTestsBase {
         this.mvc
             .perform(MockMvcRequestBuilders.get(api, id))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(3)))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem("genie.id:" + id)))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem("genie.name:" + name)))
@@ -394,7 +367,7 @@ public abstract class RestControllerIntegrationTestsBase {
                 MockMvcRequestBuilders
                     .post(endpoint)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsBytes(resource))
+                    .content(this.objectMapper.writeValueAsBytes(resource))
             )
             .andExpect(MockMvcResultMatchers.status().isCreated())
             .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()));

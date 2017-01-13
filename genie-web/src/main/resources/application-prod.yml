@@ -21,13 +21,14 @@ spring:
     url: jdbc:mysql://127.0.0.1/genie
     username: root
     password:
-    min-idle: 5
-    max-idle: 20
-    max-active: 40
-    validation-query: select 0;
-    test-on-borrow: true
-    test-on-connect: true
-    test-on-return: true
-    test-while-idle: true
-    min-evictable-idle-time-millis: 60000
-    time-between-eviction-runs-millis: 10000
+    tomcat:
+      min-idle: 5
+      max-idle: 20
+      max-active: 40
+      validation-query: select 0;
+      test-on-borrow: true
+      test-on-connect: true
+      test-on-return: true
+      test-while-idle: true
+      min-evictable-idle-time-millis: 60000
+      time-between-eviction-runs-millis: 10000

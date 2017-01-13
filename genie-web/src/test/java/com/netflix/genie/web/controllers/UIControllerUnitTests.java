@@ -62,7 +62,7 @@ public class UIControllerUnitTests {
         Assert.assertThat(this.controller.getIndex(response, null), Matchers.is("index"));
         Mockito.verify(response, Mockito.times(1)).addCookie(cookieArgumentCaptor.capture());
         Assert.assertThat(cookieArgumentCaptor.getValue().getName(), Matchers.is("genie.user"));
-        Assert.assertThat(cookieArgumentCaptor.getValue().getValue(), Matchers.is("Genie User"));
+        Assert.assertThat(cookieArgumentCaptor.getValue().getValue(), Matchers.is("user@genie"));
 
         final Authentication authentication = Mockito.mock(Authentication.class);
         final String name = UUID.randomUUID().toString();

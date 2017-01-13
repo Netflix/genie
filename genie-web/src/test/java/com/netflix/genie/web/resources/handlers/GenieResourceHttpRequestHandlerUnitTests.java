@@ -29,7 +29,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.servlet.HandlerMapping;
 
 import javax.servlet.ServletException;
@@ -136,7 +135,7 @@ public class GenieResourceHttpRequestHandlerUnitTests {
      * @throws ServletException On any error
      * @throws IOException      On any error
      */
-    @Test(expected = HttpRequestMethodNotSupportedException.class)
+    @Test
     public void canHandleRequestForFile() throws ServletException, IOException {
         final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
@@ -150,6 +149,8 @@ public class GenieResourceHttpRequestHandlerUnitTests {
         Mockito.when(file.isDirectory()).thenReturn(false);
 
         this.handler.handleRequest(request, response);
+
+        Mockito.verify(response, Mockito.times(1)).sendError(HttpStatus.NOT_FOUND.value());
     }
 
     /**

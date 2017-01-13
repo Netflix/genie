@@ -175,13 +175,15 @@ public class S3FileTransferImplUnitTests {
     public void testPutFileMethodValidS3Path() throws GenieException {
 
         final PutObjectResult putObjectResult = Mockito.mock(PutObjectResult.class);
-        Mockito.when(this.s3Client.putObject(Mockito.any(), Mockito.any(), Mockito.any()))
+        Mockito.when(this.s3Client.putObject(Mockito.any(), Mockito.any(), Mockito.any(File.class)))
             .thenReturn(putObjectResult);
         final ArgumentCaptor<String> bucketArgument = ArgumentCaptor.forClass(String.class);
         final ArgumentCaptor<String> keyArgument = ArgumentCaptor.forClass(String.class);
 
         s3FileTransfer.putFile(LOCAL_PATH, S3_PATH);
-        Mockito.verify(this.s3Client).putObject(bucketArgument.capture(), keyArgument.capture(), Mockito.any());
+        Mockito
+            .verify(this.s3Client)
+            .putObject(bucketArgument.capture(), keyArgument.capture(), Mockito.any(File.class));
         Assert.assertEquals(S3_BUCKET, bucketArgument.getValue());
         Assert.assertEquals(S3_KEY, bucketArgument.getValue());
         Mockito.verify(this.uploadTimer, Mockito.times(1)).record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
@@ -194,8 +196,8 @@ public class S3FileTransferImplUnitTests {
      */
     @Test(expected = GenieServerException.class)
     public void testPutFileMethodFailureToFetch() throws GenieException {
-        Mockito.
-            when(this.s3Client.putObject(Mockito.any(), Mockito.any(), Mockito.any()))
+        Mockito
+            .when(this.s3Client.putObject(Mockito.any(), Mockito.any(), Mockito.any(File.class)))
             .thenThrow(new AmazonS3Exception("something"));
         s3FileTransfer.getFile(LOCAL_PATH, S3_PATH);
         Mockito.verify(this.uploadTimer, Mockito.times(1)).record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));

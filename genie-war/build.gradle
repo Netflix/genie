@@ -11,7 +11,7 @@ dependencies {
      * Provided Dependencies
      *******************************/
 
-    provided("org.springframework.boot:spring-boot-starter-tomcat")
+    compileOnly("org.springframework.boot:spring-boot-starter-tomcat")
 
     /*******************************
      * Optional Dependencies

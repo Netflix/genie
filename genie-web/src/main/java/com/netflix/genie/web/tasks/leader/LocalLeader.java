@@ -18,12 +18,12 @@
 package com.netflix.genie.web.tasks.leader;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.cluster.leader.event.OnGrantedEvent;
-import org.springframework.cloud.cluster.leader.event.OnRevokedEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.integration.leader.event.OnGrantedEvent;
+import org.springframework.integration.leader.event.OnRevokedEvent;
 
 /**
  * A class to control leadership activities when remote leadership isn't enabled and this node has been forcibly

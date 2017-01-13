@@ -6,7 +6,7 @@ dependencies {
     compile project(":genie-common")
 
     compile("commons-beanutils:commons-beanutils")
-    compile("com.squareup.okhttp3:okhttp:${okhttp_version}")
+    compile("com.squareup.okhttp3:okhttp")
     compile("com.squareup.retrofit2:retrofit:${retrofit_version}")
     compile("com.squareup.retrofit2:converter-jackson:${retrofit_version}")
     compile("org.apache.commons:commons-configuration2:${commons_configuration2_version}")
@@ -15,7 +15,7 @@ dependencies {
     compile("org.slf4j:slf4j-api")
 
     // JSON Patch Support
-    compile("com.github.fge:json-patch")
+    compile("com.github.fge:json-patch:${json_patch_version}")
 
     /*******************************
      * Provided Dependencies

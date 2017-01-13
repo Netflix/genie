@@ -124,7 +124,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         this.mvc
             .perform(RestDocumentationRequestBuilders.get(CLUSTERS_API + "/{id}", id))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath(ID_PATH, Matchers.is(id)))
             .andExpect(MockMvcResultMatchers.jsonPath(CREATED_PATH, Matchers.notNullValue()))
             .andExpect(MockMvcResultMatchers.jsonPath(UPDATED_PATH, Matchers.notNullValue()))
@@ -158,7 +158,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         this.mvc
             .perform(MockMvcRequestBuilders.get(CLUSTERS_API + "/" + ID))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath(ID_PATH, Matchers.is(ID)))
             .andExpect(MockMvcResultMatchers.jsonPath(CREATED_PATH, Matchers.notNullValue()))
             .andExpect(MockMvcResultMatchers.jsonPath(UPDATED_PATH, Matchers.notNullValue()))
@@ -243,7 +243,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         this.mvc
             .perform(MockMvcRequestBuilders.get(CLUSTERS_API))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath(CLUSTERS_LIST_PATH, Matchers.hasSize(3)))
             .andDo(findResultHandler);
 
@@ -251,7 +251,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         this.mvc
             .perform(MockMvcRequestBuilders.get(CLUSTERS_API).param("size", "2"))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath(CLUSTERS_LIST_PATH, Matchers.hasSize(2)))
             .andDo(findResultHandler);
 
@@ -259,7 +259,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         this.mvc
             .perform(MockMvcRequestBuilders.get(CLUSTERS_API).param("name", name2))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath(CLUSTERS_LIST_PATH, Matchers.hasSize(1)))
             .andExpect(MockMvcResultMatchers.jsonPath(CLUSTERS_LIST_PATH + "[0].id", Matchers.is(id2)))
             .andDo(findResultHandler);
@@ -272,7 +272,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
                     .param("status", ClusterStatus.UP.toString(), ClusterStatus.TERMINATED.toString())
             )
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath(CLUSTERS_LIST_PATH, Matchers.hasSize(2)))
             .andExpect(MockMvcResultMatchers.jsonPath(CLUSTERS_LIST_PATH + "[0].id", Matchers.is(id3)))
             .andExpect(MockMvcResultMatchers.jsonPath(CLUSTERS_LIST_PATH + "[1].id", Matchers.is(id1)))
@@ -282,7 +282,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         this.mvc
             .perform(MockMvcRequestBuilders.get(CLUSTERS_API).param("tag", "genie.id:" + id1))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath(CLUSTERS_LIST_PATH, Matchers.hasSize(1)))
             .andExpect(MockMvcResultMatchers.jsonPath(CLUSTERS_LIST_PATH + "[0].id", Matchers.is(id1)))
             .andDo(findResultHandler);
@@ -352,7 +352,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         this.mvc
             .perform(MockMvcRequestBuilders.get(clusterResource, ID))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
             .andExpect(
                 MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(ClusterStatus.OUT_OF_SERVICE.toString()))
             );
@@ -403,7 +403,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         this.mvc
             .perform(MockMvcRequestBuilders.get(clusterResource, id))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath(NAME_PATH, Matchers.is(newName)));
         Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(1L));
     }
@@ -702,7 +702,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         this.mvc
             .perform(MockMvcRequestBuilders.get(clusterCommandsAPI, ID))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.empty()));
 
         final String placeholder = UUID.randomUUID().toString();
@@ -750,7 +750,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         this.mvc
             .perform(MockMvcRequestBuilders.get(clusterCommandsAPI, ID))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
             .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(commandId1)))
             .andExpect(MockMvcResultMatchers.jsonPath("$[1].id", Matchers.is(commandId2)));
@@ -785,7 +785,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         this.mvc
             .perform(MockMvcRequestBuilders.get(clusterCommandsAPI, ID))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(3)))
             .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(commandId1)))
             .andExpect(MockMvcResultMatchers.jsonPath("$[1].id", Matchers.is(commandId2)))
@@ -820,7 +820,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
                     .get(clusterCommandsAPI, ID).param("status", CommandStatus.INACTIVE.toString())
             )
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(1)))
             .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(commandId3)))
             .andDo(getResultHandler);
@@ -838,7 +838,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         this.mvc
             .perform(MockMvcRequestBuilders.get(clusterCommandsAPI, ID))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.empty()));
 
         final String placeholder = UUID.randomUUID().toString();
@@ -886,7 +886,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         this.mvc
             .perform(MockMvcRequestBuilders.get(clusterCommandsAPI, ID))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
             .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(commandId1)))
             .andExpect(MockMvcResultMatchers.jsonPath("$[1].id", Matchers.is(commandId2)));
@@ -904,7 +904,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         this.mvc
             .perform(MockMvcRequestBuilders.get(clusterCommandsAPI, ID))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.empty()));
     }
 
@@ -960,7 +960,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         this.mvc
             .perform(MockMvcRequestBuilders.get(clusterCommandsAPI, ID))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.empty()));
     }
 
@@ -1028,7 +1028,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         this.mvc
             .perform(MockMvcRequestBuilders.get(clusterCommandsAPI, ID))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
             .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(commandId1)))
             .andExpect(MockMvcResultMatchers.jsonPath("$[1].id", Matchers.is(commandId3)));
@@ -1037,20 +1037,20 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         this.mvc
             .perform(MockMvcRequestBuilders.get(COMMANDS_API + "/{id}/clusters", commandId1))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(1)))
             .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(ID)));
 
         this.mvc
             .perform(MockMvcRequestBuilders.get(COMMANDS_API + "/{id}/clusters", commandId2))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.empty()));
 
         this.mvc
             .perform(MockMvcRequestBuilders.get(COMMANDS_API + "/{id}/clusters", commandId3))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(1)))
             .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(ID)));
     }
