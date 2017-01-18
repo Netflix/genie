@@ -44,7 +44,7 @@ class PigJob(GenieJob):
         super(PigJob, self).__init__(conf=conf)
 
         self._parameter_files = list()
-        self._property_file = None
+        self._property_files = list()
         self._script = None
 
     @property
@@ -84,8 +84,8 @@ class PigJob(GenieJob):
             for k, v in self._command_options.get('-D', {}).items()
         ])
 
-        prop_file_str = '-P {}'.format(os.path.basename(self._property_file)) \
-            if self._property_file \
+        prop_file_str = ' '.join(['-P {}'.format(os.path.basename(f)) for f in self._property_files]) \
+            if self._property_files \
             else ''
 
         return '{props} {prop_file} {param_files} {params} -f {filename} {post_cmd_args}' \
@@ -168,9 +168,9 @@ class PigJob(GenieJob):
         return self
 
     @unicodify
-    @arg_string
-    @add_to_repr('overwrite')
-    def property_file(self, _property_file):
+    @arg_list
+    @add_to_repr('append')
+    def property_file(self, _property_files):
         """
         Sets a property file to use for specifying properties for the job.
 
@@ -190,7 +190,7 @@ class PigJob(GenieJob):
             :py:class:`PigJob`: self
         """
 
-        self._add_dependency(_property_file)
+        self._add_dependency(_property_files)
 
         return self
 
