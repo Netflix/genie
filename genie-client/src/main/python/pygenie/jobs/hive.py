@@ -14,6 +14,7 @@ import os
 from ..utils import unicodify
 from .core import GenieJob
 from .utils import (add_to_repr,
+                    arg_list,
                     arg_string,
                     is_file)
 
@@ -42,7 +43,7 @@ class HiveJob(GenieJob):
         super(HiveJob, self).__init__(conf=conf)
 
         self._parameters = dict()
-        self._property_file = None
+        self._property_files = list()
         self._script = None
 
     @property
@@ -77,8 +78,8 @@ class HiveJob(GenieJob):
             for k, v in self._command_options.get('--hiveconf', {}).items()
         ])
 
-        prop_file_str = '-i {}'.format(os.path.basename(self._property_file)) \
-            if self._property_file \
+        prop_file_str = ' '.join(['-i {}'.format(os.path.basename(f)) for f in self._property_files]) \
+            if self._property_files \
             else ''
 
         return '{prop_file} {props} {params} -f {filename} {post_cmd_args}' \
@@ -152,15 +153,15 @@ class HiveJob(GenieJob):
         return self.hiveconf(name, value)
 
     @unicodify
-    @arg_string
-    @add_to_repr('overwrite')
-    def property_file(self, _property_file):
+    @arg_list
+    @add_to_repr('append')
+    def property_file(self, _property_files):
         """
         Sets a property file to use for specifying properties for the job.
 
         Using the value passed in, the following will be constructed for the
         command-line when executing:
-        '-P value'
+        '-i value'
 
         Example:
             >>> #hive -i my_properties.prop
@@ -174,7 +175,7 @@ class HiveJob(GenieJob):
             :py:class:`HiveJob`: self
         """
 
-        self._add_dependency(_property_file)
+        self._add_dependency(_property_files)
 
         return self
 
