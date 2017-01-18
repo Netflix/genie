@@ -66,6 +66,8 @@ def set_jobname(func):
                 payload['name'] = script \
                     .replace('${', '{') \
                     .replace(';', '') \
+                    .replace('"', '') \
+                    .replace("'", "") \
                     .replace('\n', ' ')[:40] \
                     .strip()
 
