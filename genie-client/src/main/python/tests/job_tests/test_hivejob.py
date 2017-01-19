@@ -40,7 +40,8 @@ class TestingHiveJob(unittest.TestCase):
         job = pygenie.jobs.HiveJob() \
             .command_arguments('explicitly stating command args') \
             .script('select * from something') \
-            .property('source', 'tester')
+            .property('source', 'tester') \
+            .property_file('properties.hive')
 
         assert_equals(
             job.cmd_args,
@@ -56,15 +57,18 @@ class TestingHiveJob(unittest.TestCase):
             .parameter('bar', 'buzz') \
             .hiveconf('hconf1', 'h1') \
             .property('prop1', 'p1') \
-            .property('prop2', 'p2')
+            .property('prop2', 'p2') \
+            .property_file('properties_1.hive') \
+            .property_file('properties_2.hive')
 
         assert_equals(
-            u" ".join([
-                u"--hiveconf hconf1=h1 --hiveconf prop1=p1 --hiveconf prop2=p2",
-                u"-i _hive_parameters.txt",
-                u"-f script.hive"
-            ]),
-            job.cmd_args
+            job.cmd_args,
+            " ".join([
+                "-i properties_1.hive -i properties_2.hive",
+                "--hiveconf hconf1=h1 --hiveconf prop1=p1 --hiveconf prop2=p2",
+                "-i _hive_parameters.txt",
+                "-f script.hive"
+            ])
         )
 
     @patch('pygenie.jobs.hive.is_file')
@@ -78,15 +82,18 @@ class TestingHiveJob(unittest.TestCase):
             .parameter('hello', 'hi') \
             .parameter('goodbye', 'bye') \
             .property('p1', 'v1') \
-            .property('p2', 'v2')
+            .property('p2', 'v2') \
+            .property_file('props_1.hive') \
+            .property_file('props_2.hive')
 
         assert_equals(
-            job.cmd_args,
-            u" ".join([
-                u"--hiveconf p2=v2 --hiveconf p1=v1",
-                u"-i _hive_parameters.txt",
-                u"-f test.hql"
-            ])
+            " ".join([
+                "-i props_1.hive -i props_2.hive",
+                "--hiveconf p2=v2 --hiveconf p1=v1",
+                "-i _hive_parameters.txt",
+                "-f test.hql"
+            ]),
+            job.cmd_args
         )
 
     @patch('pygenie.jobs.hive.is_file')
@@ -182,11 +189,11 @@ class TestingHiveJobRepr(unittest.TestCase):
             .hiveconf('hconf2', '2') \
             .property('prop1', '1') \
             .property('prop2', '2') \
-            .property_file('/hive/conf.prop') \
+            .property_file('/hive/conf1.prop') \
+            .property_file('/hive/conf2.prop') \
             .script("SELECT * FROM TEST") \
 
         assert_equals(
-            str(job),
             '.'.join([
                 'HiveJob()',
                 'applications("hive.app.1")',
@@ -213,11 +220,13 @@ class TestingHiveJobRepr(unittest.TestCase):
                 'job_version("1.1.5")',
                 'parameter("param1", "pval1")',
                 'parameter("param2", "pval2")',
-                'property_file("/hive/conf.prop")',
+                'property_file("/hive/conf1.prop")',
+                'property_file("/hive/conf2.prop")',
                 'script("SELECT * FROM TEST")',
                 'tags("hive.tag.1")',
                 'tags("hive.tag.2")'
-            ])
+            ]),
+            str(job)
         )
 
 
@@ -379,37 +388,39 @@ class TestingHiveJobAdapters(unittest.TestCase):
             .parameter('b', 'b') \
             .tags('hive.tag.1, hive.tag.2') \
             .property_file('x://properties.conf') \
+            .property_file('/properties_local.conf') \
             .script('SELECT * FROM DUAL')
 
         assert_equals(
-            pygenie.adapter.genie_3.get_payload(job),
             {
-                u'applications': [u'hive.app'],
-                u'attachments': [
-                    (u'hive.file1', u"open file '/hive.file1'"),
-                    (u'hive.file2', u"open file '/hive.file2'"),
-                    (u'script.hive', u'SELECT * FROM DUAL'),
-                    (u'_hive_parameters.txt', u'SET hivevar:a=a;\nSET hivevar:b=b;')
+                'applications': ['hive.app'],
+                'attachments': [
+                    ('hive.file1', "open file '/hive.file1'"),
+                    ('hive.file2', "open file '/hive.file2'"),
+                    ('properties_local.conf', "open file '/properties_local.conf'"),
+                    ('script.hive', 'SELECT * FROM DUAL'),
+                    ('_hive_parameters.txt', 'SET hivevar:a=a;\nSET hivevar:b=b;')
                 ],
-                u'clusterCriterias': [
-                    {u'tags': [u'type:hive.cluster-1', u'type:hive.cluster-2']},
-                    {u'tags': [u'type:hive']}
+                'clusterCriterias': [
+                    {'tags': ['type:hive.cluster-1', 'type:hive.cluster-2']},
+                    {'tags': ['type:hive']}
                 ],
-                u'commandArgs': u'-i properties.conf  -i _hive_parameters.txt -f script.hive',
-                u'commandCriteria': [u'type:hive.cmd.1', u'type:hive.cmd.2'],
-                u'dependencies': [u'x://properties.conf'],
-                u'description': u'this job is to test hivejob adapter',
-                u'disableLogArchival': True,
-                u'email': u'hive@email.com',
-                u'group': u'hive-group',
-                u'id': u'hive-job-1',
-                u'name': u'testing_adapting_hivejob',
-                u'setupFile': u'/hive/setup.sh',
-                u'tags': [u'hive.tag.1', u'hive.tag.2'],
-                u'timeout': 9,
-                u'user': u'hive',
-                u'version': u'0.0.-0'
-            }
+                'commandArgs': '-i properties_local.conf -i properties.conf  -i _hive_parameters.txt -f script.hive',
+                'commandCriteria': ['type:hive.cmd.1', 'type:hive.cmd.2'],
+                'dependencies': ['x://properties.conf'],
+                'description': 'this job is to test hivejob adapter',
+                'disableLogArchival': True,
+                'email': 'hive@email.com',
+                'group': 'hive-group',
+                'id': 'hive-job-1',
+                'name': 'testing_adapting_hivejob',
+                'setupFile': '/hive/setup.sh',
+                'tags': ['hive.tag.1', 'hive.tag.2'],
+                'timeout': 9,
+                'user': 'hive',
+                'version': '0.0.-0'
+            },
+            pygenie.adapter.genie_3.get_payload(job)
         )
 
     @patch('pygenie.adapter.genie_3.open')
@@ -442,37 +453,39 @@ class TestingHiveJobAdapters(unittest.TestCase):
             .parameter('a', 'a') \
             .parameter('b', 'b') \
             .tags('hive.tag.1, hive.tag.2') \
-            .property_file('/properties.conf') \
+            .property_file('/properties1.conf') \
+            .property_file('/properties2.conf') \
             .script('/script.hql')
 
         assert_equals(
-            pygenie.adapter.genie_3.get_payload(job),
             {
-                u'applications': [u'hive.app'],
-                u'attachments': [
-                    (u'hive.file1', u"open file '/hive.file1'"),
-                    (u'hive.file2', u"open file '/hive.file2'"),
-                    (u'properties.conf', u"open file '/properties.conf'"),
-                    (u'script.hql', u"open file '/script.hql'"),
-                    (u'_hive_parameters.txt', u'SET hivevar:a=a;\nSET hivevar:b=b;')
+                'applications': ['hive.app'],
+                'attachments': [
+                    ('hive.file1', "open file '/hive.file1'"),
+                    ('hive.file2', "open file '/hive.file2'"),
+                    ('properties1.conf', "open file '/properties1.conf'"),
+                    ('properties2.conf', "open file '/properties2.conf'"),
+                    ('script.hql', "open file '/script.hql'"),
+                    ('_hive_parameters.txt', 'SET hivevar:a=a;\nSET hivevar:b=b;')
                 ],
-                u'clusterCriterias': [
-                    {u'tags': [u'type:hive.cluster-1', u'type:hive.cluster-2']},
-                    {u'tags': [u'type:hive']}
+                'clusterCriterias': [
+                    {'tags': ['type:hive.cluster-1', 'type:hive.cluster-2']},
+                    {'tags': ['type:hive']}
                 ],
-                u'commandArgs': u'-i properties.conf  -i _hive_parameters.txt -f script.hql',
-                u'commandCriteria': [u'type:hive.cmd.1', u'type:hive.cmd.2'],
-                u'dependencies': [],
-                u'description': u'this job is to test hivejob adapter',
-                u'disableLogArchival': True,
-                u'email': u'hive@email.com',
-                u'group': u'hive-group',
-                u'id': u'hive-job-1',
-                u'name': u'testing_adapting_hivejob',
-                u'setupFile': u'/hive/setup.sh',
-                u'tags': [u'hive.tag.1', u'hive.tag.2'],
-                u'timeout': 9,
-                u'user': u'hive',
-                u'version': u'0.0.-0'
-            }
+                'commandArgs': '-i properties1.conf -i properties2.conf  -i _hive_parameters.txt -f script.hql',
+                'commandCriteria': ['type:hive.cmd.1', 'type:hive.cmd.2'],
+                'dependencies': [],
+                'description': 'this job is to test hivejob adapter',
+                'disableLogArchival': True,
+                'email': 'hive@email.com',
+                'group': 'hive-group',
+                'id': 'hive-job-1',
+                'name': 'testing_adapting_hivejob',
+                'setupFile': '/hive/setup.sh',
+                'tags': ['hive.tag.1', 'hive.tag.2'],
+                'timeout': 9,
+                'user': 'hive',
+                'version': '0.0.-0'
+            },
+            pygenie.adapter.genie_3.get_payload(job)
         )

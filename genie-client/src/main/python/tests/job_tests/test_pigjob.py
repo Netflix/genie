@@ -59,18 +59,19 @@ class TestingPigJob(unittest.TestCase):
             .parameter_file('/Users/pig/params2.param') \
             .property('prop1', 'v1') \
             .property('prop2', 'v2') \
-            .property_file('/Users/pig/props.conf')
+            .property_file('/Users/pig/props1.conf') \
+            .property_file('/Users/pig/props2.conf')
 
         assert_equals(
-            job.cmd_args,
-            u" ".join([
-                u"-Dprop1=v1 -Dprop2=v2",
-                u"-P props.conf",
-                u"-param_file params1.param",
-                u"-param_file params2.param",
-                u"-param_file _pig_parameters.txt",
-                u"-f script.pig"
-            ])
+            " ".join([
+                "-Dprop1=v1 -Dprop2=v2",
+                "-P props1.conf -P props2.conf",
+                "-param_file params1.param",
+                "-param_file params2.param",
+                "-param_file _pig_parameters.txt",
+                "-f script.pig"
+            ]),
+            job.cmd_args
         )
 
     @patch('pygenie.jobs.pig.is_file')
@@ -85,17 +86,18 @@ class TestingPigJob(unittest.TestCase):
             .parameter_file('/Users/pig/p.params') \
             .property('p1', 'v1') \
             .property('p2', 'v2') \
-            .property_file('/Users/pig/p.conf')
+            .property_file('/Users/pig/p1.conf') \
+            .property_file('/Users/pig/p2.conf')
 
         assert_equals(
-            job.cmd_args,
-            u" ".join([
-                u"-Dp2=v2 -Dp1=v1",
-                u"-P p.conf",
-                u"-param_file p.params",
-                u"-param_file _pig_parameters.txt",
-                u"-f test.pig"
-            ])
+            " ".join([
+                "-Dp2=v2 -Dp1=v1",
+                "-P p1.conf -P p2.conf",
+                "-param_file p.params",
+                "-param_file _pig_parameters.txt",
+                "-f test.pig"
+            ]),
+            job.cmd_args
         )
 
     @patch('pygenie.jobs.pig.is_file')
@@ -110,7 +112,8 @@ class TestingPigJob(unittest.TestCase):
             .parameter_file('/Users/pig/p.params') \
             .property('p1', 'v1') \
             .property('p2', 'v2') \
-            .property_file('/Users/pig/p.conf') \
+            .property_file('/Users/pig/p1.conf') \
+            .property_file('/Users/pig/p2.conf') \
             .post_cmd_args('a') \
             .post_cmd_args(['a', 'b', 'c']) \
             .post_cmd_args('d e f')
@@ -118,7 +121,7 @@ class TestingPigJob(unittest.TestCase):
         assert_equals(
             " ".join([
                 "-Dp2=v2 -Dp1=v1",
-                "-P p.conf",
+                "-P p1.conf -P p2.conf",
                 "-param_file p.params",
                 "-param_file _pig_parameters.txt",
                 "-f test.pig",
@@ -197,13 +200,13 @@ class TestingPigJobRepr(unittest.TestCase):
             .parameter_file('/Users/pig/param_2.params') \
             .property('mapred.pig.1', 'p1') \
             .property('mapred.pig.2', 'p2') \
-            .property_file('/Users/pig/test.conf') \
+            .property_file('/Users/pig/test1.conf') \
+            .property_file('/Users/pig/test2.conf') \
             .script('/Users/pig/testscript.pig') \
             .tags('pig_tag_1') \
             .tags('pig_tag_2')
 
         assert_equals(
-            str(job),
             '.'.join([
                 'PigJob()',
                 'applications("pig_app_1")',
@@ -230,11 +233,13 @@ class TestingPigJobRepr(unittest.TestCase):
                 'parameter_file("/Users/pig/param_2.params")',
                 'property("mapred.pig.1", "p1")',
                 'property("mapred.pig.2", "p2")',
-                'property_file("/Users/pig/test.conf")',
+                'property_file("/Users/pig/test1.conf")',
+                'property_file("/Users/pig/test2.conf")',
                 'script("/Users/pig/testscript.pig")',
                 'tags("pig_tag_1")',
                 'tags("pig_tag_2")'
-            ])
+            ]),
+            str(job)
         )
 
 
@@ -406,51 +411,53 @@ class TestingPigJobAdapters(unittest.TestCase):
             .property('mr.p1', 'a') \
             .property('mr.p2', 'b') \
             .property_file('x://external/my_properties.conf') \
+            .property_file('/my_properties_local.conf') \
             .script("""A = LOAD;""") \
             .tags('pigtag1, pigtag2') \
             .job_version('0.0.1pig')
 
         assert_equals(
-            pygenie.adapter.genie_3.get_payload(job),
             {
-                u'applications': [u'pig_app_1'],
-                u'attachments': [
-                    (u'pigfile1', u"open file '/pigfile1'"),
-                    (u'pigfile2', u"open file '/pigfile2'"),
-                    (u'pig_param1.params', u"open file '/pig_param1.params'"),
-                    (u'pig_param2.params', u"open file '/pig_param2.params'"),
-                    (u'script.pig', u'A = LOAD;'),
-                    (u'_pig_parameters.txt', u'param2 = "2"\nparam1 = "1"')
+                'applications': ['pig_app_1'],
+                'attachments': [
+                    ('pigfile1', "open file '/pigfile1'"),
+                    ('pigfile2', "open file '/pigfile2'"),
+                    ('pig_param1.params', "open file '/pig_param1.params'"),
+                    ('pig_param2.params', "open file '/pig_param2.params'"),
+                    ('my_properties_local.conf', "open file '/my_properties_local.conf'"),
+                    ('script.pig', 'A = LOAD;'),
+                    ('_pig_parameters.txt', 'param2 = "2"\nparam1 = "1"')
                 ],
-                u'clusterCriterias': [
-                    {u'tags': [u'type:pig_cluster_1']},
-                    {u'tags': [u'type:pig']}
+                'clusterCriterias': [
+                    {'tags': ['type:pig_cluster_1']},
+                    {'tags': ['type:pig']}
                 ],
-                u'commandArgs': u' '.join([
-                    u'-Dmr.p1=a -Dmr.p2=b',
-                    u'-P my_properties.conf',
-                    u'-param_file pig_param1.params',
-                    u'-param_file pig_param2.params',
-                    u'-param_file _pig_parameters.txt',
-                    u'-f script.pig'
+                'commandArgs': ' '.join([
+                    '-Dmr.p1=a -Dmr.p2=b',
+                    '-P my_properties_local.conf -P my_properties.conf',
+                    '-param_file pig_param1.params',
+                    '-param_file pig_param2.params',
+                    '-param_file _pig_parameters.txt',
+                    '-f script.pig'
                 ]),
-                u'commandCriteria': [u'type:pig'],
-                u'dependencies': [
-                    u'x://externalfile',
-                    u'x://external/my_properties.conf'
+                'commandCriteria': ['type:pig'],
+                'dependencies': [
+                    'x://externalfile',
+                    'x://external/my_properties.conf'
                 ],
-                u'description': u'this job is to test pigjob adapter',
-                u'disableLogArchival': True,
-                u'email': u'pig@email.com',
-                u'group': u'piggroup',
-                u'id': u'pig_job_id_1',
-                u'name': u'testing_adapting_pigjob',
-                u'setupFile': None,
-                u'tags': [u'pigtag1', u'pigtag2'],
-                u'timeout': 1,
-                u'user': u'jpig',
-                u'version': u'0.0.1pig'
-            }
+                'description': 'this job is to test pigjob adapter',
+                'disableLogArchival': True,
+                'email': 'pig@email.com',
+                'group': 'piggroup',
+                'id': 'pig_job_id_1',
+                'name': 'testing_adapting_pigjob',
+                'setupFile': None,
+                'tags': ['pigtag1', 'pigtag2'],
+                'timeout': 1,
+                'user': 'jpig',
+                'version': '0.0.1pig'
+            },
+            pygenie.adapter.genie_3.get_payload(job)
         )
 
     @patch('pygenie.adapter.genie_3.open')
@@ -481,30 +488,30 @@ class TestingPigJobAdapters(unittest.TestCase):
             .job_version('0.0.pig')
 
         assert_equals(
-            pygenie.adapter.genie_3.get_payload(job),
             {
-                u'applications': [u'pigapp1'],
-                u'attachments': [
-                    (u'pigfile1', u"open file '/pigfile1'"),
-                    (u'script.pig', u"open file '/path/to/test/script.pig'")
+                'applications': ['pigapp1'],
+                'attachments': [
+                    ('pigfile1', "open file '/pigfile1'"),
+                    ('script.pig', "open file '/path/to/test/script.pig'")
                 ],
-                u'clusterCriterias': [
-                    {u'tags': [u'type:pigcluster1']},
-                    {u'tags': [u'type:pig']}
+                'clusterCriterias': [
+                    {'tags': ['type:pigcluster1']},
+                    {'tags': ['type:pig']}
                 ],
-                u'commandArgs': u'-f script.pig',
-                u'commandCriteria': [u'type:pigcmd'],
-                u'dependencies': [],
-                u'description': u'this job is to test pigjob adapter',
-                u'disableLogArchival': True,
-                u'email': u'jpig@email.com',
-                u'group': u'piggroup',
-                u'id': u'pigjob1',
-                u'name': u'testing_adapting_pigjob',
-                u'setupFile': None,
-                u'tags': [u'pigtag'],
-                u'timeout': 7,
-                u'user': u'jpig',
-                u'version': u'0.0.pig'
-            }
+                'commandArgs': '-f script.pig',
+                'commandCriteria': ['type:pigcmd'],
+                'dependencies': [],
+                'description': 'this job is to test pigjob adapter',
+                'disableLogArchival': True,
+                'email': 'jpig@email.com',
+                'group': 'piggroup',
+                'id': 'pigjob1',
+                'name': 'testing_adapting_pigjob',
+                'setupFile': None,
+                'tags': ['pigtag'],
+                'timeout': 7,
+                'user': 'jpig',
+                'version': '0.0.pig'
+            },
+            pygenie.adapter.genie_3.get_payload(job)
         )
