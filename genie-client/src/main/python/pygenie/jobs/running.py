@@ -737,11 +737,8 @@ class RunningJob(object):
             interval (int or float, optional): Time (seconds) between updates.
         """
 
-        def write_stderr_stream():
-            self._write_to_stream(self._update_stderr())
-
         while not self.is_done:
             time.sleep(interval)
-            write_stderr_stream()
+            self._write_to_stream(self._update_stderr())
 
-        write_stderr_stream()
+        self._write_to_stream(self._update_stderr())
