@@ -73,6 +73,7 @@ public class ClusterCheckerTaskUnitTests {
     public void setup() {
         this.hostName = UUID.randomUUID().toString();
         final ClusterCheckerProperties properties = new ClusterCheckerProperties();
+        properties.setHealthIndicatorsToIgnore("memory,genie ");
         this.jobSearchService = Mockito.mock(JobSearchService.class);
         this.jobPersistenceService = Mockito.mock(JobPersistenceService.class);
         this.restTemplate = Mockito.mock(RestTemplate.class);
@@ -92,7 +93,6 @@ public class ClusterCheckerTaskUnitTests {
             this.jobPersistenceService,
             this.restTemplate,
             serverProperties,
-            "memory,genie ",
             registry
         );
     }

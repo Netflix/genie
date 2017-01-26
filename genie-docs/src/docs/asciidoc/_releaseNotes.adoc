@@ -40,12 +40,23 @@ for more information. Currently on classpath only none, hash_map, redis and jdbc
 
 |===
 
+==== Changed Default Value
+
+|===
+|Property |Old Default| New Default
+
+|genie.tasks.clusterChecker.healthIndicatorsToIgnore
+|memory,genie,discoveryComposite
+|memory,genieMemory,discoveryComposite
+
+|===
+
 ==== Removed
 
 ==== Renamed
 
 |===
-|Old |New
+|Old Name |New Name
 
 |multipart.max-file-size
 |spring.http.multipart.max-file-size
