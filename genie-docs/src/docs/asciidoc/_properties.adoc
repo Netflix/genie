@@ -229,7 +229,7 @@ determined by Zookeeper or other mechanism via Spring
 |genie.tasks.clusterChecker.healthIndicatorsToIgnore
 |The health indicator groups from the actuator /health endpoint to ignore when determining if a node is lost or not as
 a comma separated list
-|memory,genie,discoveryComposite
+|memory,genieMemory,discoveryComposite
 
 |genie.tasks.clusterChecker.lostThreshold
 |The number of times a Genie nodes need to fail health check in order for jobs running on that node to be marked as

@@ -33,7 +33,6 @@ import com.netflix.spectator.api.Registry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.autoconfigure.ManagementServerProperties;
 import org.springframework.boot.actuate.health.Status;
 import org.springframework.stereotype.Component;
@@ -85,7 +84,6 @@ public class ClusterCheckerTask extends LeadershipTask {
      * @param jobPersistenceService      The job persistence service to use
      * @param restTemplate               The rest template for http calls
      * @param managementServerProperties The properties where Spring actuator is running
-     * @param healthIndicatorsToIgnore   Health indicators to ignore when determining node's health
      * @param registry                   The spectator registry for getting metrics
      */
     @Autowired
@@ -96,8 +94,6 @@ public class ClusterCheckerTask extends LeadershipTask {
         @NotNull final JobPersistenceService jobPersistenceService,
         @Qualifier("genieRestTemplate") @NotNull final RestTemplate restTemplate,
         @NotNull final ManagementServerProperties managementServerProperties,
-        @Value("${genie.tasks.clusterChecker.healthIndicatorsToIgnore:memory,genie,discoveryComposite}")
-        final String healthIndicatorsToIgnore,
         @NotNull final Registry registry
     ) {
         this.hostName = hostName;
@@ -108,7 +104,7 @@ public class ClusterCheckerTask extends LeadershipTask {
         this.scheme = this.properties.getScheme() + "://";
         this.healthEndpoint = ":" + this.properties.getPort() + managementServerProperties.getContextPath() + "/health";
         this.healthIndicatorsToIgnore = Splitter.on(",").omitEmptyStrings()
-            .trimResults().splitToList(healthIndicatorsToIgnore);
+            .trimResults().splitToList(properties.getHealthIndicatorsToIgnore());
         // Keep track of the number of nodes currently unreachable from the the master
         registry.mapSize("genie.tasks.clusterChecker.errorCounts.gauge", this.errorCounts);
         this.lostJobsCounter = registry.counter("genie.tasks.clusterChecker.lostJobs.rate");
@@ -238,7 +234,7 @@ public class ClusterCheckerTask extends LeadershipTask {
      *
      * @return Number of nodes currently in an error state
      */
-    protected int getErrorCountsSize() {
+    int getErrorCountsSize() {
         return this.errorCounts.size();
     }
 }
