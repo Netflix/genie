@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 3.1.0-SNAPSHOT,</span>
-<span id="revdate">2017-01-19</span>
+<span id="revdate">2017-01-26</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -731,8 +731,9 @@ b.conum * { color: inherit !important; }
 <li><a href="#_property_changes">2.3. Property Changes</a>
 <ul class="sectlevel3">
 <li><a href="#_added">2.3.1. Added</a></li>
-<li><a href="#_removed">2.3.2. Removed</a></li>
-<li><a href="#_renamed">2.3.3. Renamed</a></li>
+<li><a href="#_changed_default_value">2.3.2. Changed Default Value</a></li>
+<li><a href="#_removed">2.3.3. Removed</a></li>
+<li><a href="#_renamed">2.3.4. Renamed</a></li>
 </ul>
 </li>
 </ul>
@@ -908,11 +909,11 @@ property</p>
 </div>
 </li>
 <li>
-<p>Upgrade to Spring Cloud Camden.SR3 for cloud dependency management</p>
+<p>Upgrade to Spring Cloud Camden.SR4 for cloud dependency management</p>
 <div class="ulist">
 <ul>
 <li>
-<p><a href="http://cloud.spring.io/spring-cloud-static/Camden.SR3/">Reference Docs</a></p>
+<p><a href="http://cloud.spring.io/spring-cloud-static/Camden.SR4/">Reference Docs</a></p>
 </li>
 </ul>
 </div>
@@ -968,11 +969,35 @@ for more information. Currently on classpath only none, hash_map, redis and jdbc
 </table>
 </div>
 <div class="sect3">
-<h4 id="_removed"><a class="anchor" href="#_removed"></a>2.3.2. Removed</h4>
+<h4 id="_changed_default_value"><a class="anchor" href="#_changed_default_value"></a>2.3.2. Changed Default Value</h4>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 33%;">
+<col style="width: 33%;">
+<col style="width: 33%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Property</th>
+<th class="tableblock halign-left valign-top">Old Default</th>
+<th class="tableblock halign-left valign-top">New Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.clusterChecker.healthIndicatorsToIgnore</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">memory,genie,discoveryComposite</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">memory,genieMemory,discoveryComposite</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_removed"><a class="anchor" href="#_removed"></a>2.3.3. Removed</h4>
 
 </div>
 <div class="sect3">
-<h4 id="_renamed"><a class="anchor" href="#_renamed"></a>2.3.3. Renamed</h4>
+<h4 id="_renamed"><a class="anchor" href="#_renamed"></a>2.3.4. Renamed</h4>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 50%;">
@@ -980,8 +1005,8 @@ for more information. Currently on classpath only none, hash_map, redis and jdbc
 </colgroup>
 <thead>
 <tr>
-<th class="tableblock halign-left valign-top">Old</th>
-<th class="tableblock halign-left valign-top">New</th>
+<th class="tableblock halign-left valign-top">Old Name</th>
+<th class="tableblock halign-left valign-top">New Name</th>
 </tr>
 </thead>
 <tbody>
@@ -3546,7 +3571,7 @@ the <a href="#_properties">Properties</a> section below for the properties you&#
 <p>This section describes the various properties that can be set to control the behavior of your Genie node and cluster.
 For more information on Spring properties you should see the
 <a href="http://docs.spring.io/spring-boot/docs/1.4.3.RELEASE/reference/htmlsingle/">Spring Boot</a> reference documentation
-and the <a href="http://cloud.spring.io/spring-cloud-static/Camden.SR3/">Spring Cloud</a> documentation.
+and the <a href="http://cloud.spring.io/spring-cloud-static/Camden.SR4/">Spring Cloud</a> documentation.
 The Spring properties described here are ones that we have overridden from Spring defaults.</p>
 </div>
 <div class="sect2">
@@ -3835,7 +3860,7 @@ determined by Zookeeper or other mechanism via Spring</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.clusterChecker.healthIndicatorsToIgnore</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The health indicator groups from the actuator /health endpoint to ignore when determining if a node is lost or not as
 a comma separated list</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">memory,genie,discoveryComposite</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">memory,genieMemory,discoveryComposite</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.clusterChecker.lostThreshold</p></td>
@@ -4231,7 +4256,7 @@ an embedded database, "none" otherwise.</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 3.1.0-SNAPSHOT<br>
-Last updated 2017-01-19 19:23:02 +00:00
+Last updated 2017-01-26 05:03:04 +00:00
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
