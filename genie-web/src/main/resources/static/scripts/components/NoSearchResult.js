@@ -1,8 +1,9 @@
-import React from 'react';
+import React from "react";
 
-const NoSearchResult = () =>
+const NoSearchResult = () => (
   <div className="col-xs-4 result-panel-msg">
     No results
-  </div>;
+  </div>
+);
 
 export default NoSearchResult;

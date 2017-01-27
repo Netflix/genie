@@ -1,14 +1,13 @@
-import React, { PropTypes } from 'react';
+import React, { PropTypes } from "react";
 
-const SearchBar = (props) =>
+const SearchBar = props => (
   <div className="side-menu">
     <a href="javascript:void(0)" onClick={() => props.toggleSearchForm()}>
-      <i className="fa fa-search fa-lg" aria-hidden="true"></i>
+      <i className="fa fa-search fa-lg" aria-hidden="true" />
     </a>
-  </div>;
+  </div>
+);
 
-SearchBar.propTypes = {
-  toggleSearchForm: PropTypes.func.isRequired,
-};
+SearchBar.propTypes = { toggleSearchForm: PropTypes.func.isRequired };
 
 export default SearchBar;

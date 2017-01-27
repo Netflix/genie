@@ -1,8 +1,8 @@
-import React, { PropTypes as T } from 'react';
-import { Link } from 'react-router';
+import React, { PropTypes as T } from "react";
+import { Link } from "react-router";
 
-const InfoTable = (props) =>
-  <table className="table" style={{ width: '50%' }}>
+const InfoTable = props => (
+  <table className="table" style={{ width: "50%" }}>
     <thead>
       <tr>
         <td>Id</td>
@@ -10,7 +10,7 @@ const InfoTable = (props) =>
       </tr>
     </thead>
     <tbody>
-      {props.data.map((info, index) =>
+      {props.data.map((info, index) => (
         <tr key={index}>
           <td>
             <Link to={`${props.type}?name=${info.name}&rowId=${info.id}`}>
@@ -19,16 +19,14 @@ const InfoTable = (props) =>
           </td>
           <td>{info.name}</td>
         </tr>
-      )}
+      ))}
     </tbody>
-  </table>;
+  </table>
+);
 
 InfoTable.propTypes = {
-  type : T.string,
-  data: T.arrayOf(T.shape({
-    id   : T.string,
-    name : T.string,
-  })),
+  type: T.string,
+  data: T.arrayOf(T.shape({ id: T.string, name: T.string }))
 };
 
 export default InfoTable;

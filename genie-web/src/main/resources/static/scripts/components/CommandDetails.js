@@ -1,29 +1,21 @@
-import React, { PropTypes as T } from 'react';
+import React, { PropTypes as T } from "react";
+import $ from "jquery";
 
-import { momentFormat, fetch } from '../utils';
-import $ from 'jquery';
-
-import InfoTable from './InfoTable';
+import { momentFormat, fetch } from "../utils";
+import InfoTable from "./InfoTable";
 
 export default class CommandDetails extends React.Component {
-
-  static propTypes = {
-    row : T.object.isRequired,
-  }
+  static propTypes = { row: T.object.isRequired };
 
   constructor(props) {
     super(props);
     this.state = {
       command: {
         configs: [],
-        _links: {
-          self         : '',
-          clusters     : '',
-          applications : '',
-        },
+        _links: { self: "", clusters: "", applications: "" }
       },
-      clusters     : [],
-      applications : [],
+      clusters: [],
+      applications: []
     };
   }
 
@@ -40,13 +32,13 @@ export default class CommandDetails extends React.Component {
     const commandUrl = row._links.self.href;
     const clustersUrl = `${row._links.clusters.href}?status=UP`;
     const applicationsUrl = row._links.applications.href;
-
-    $.when(fetch(commandUrl), fetch(clustersUrl), fetch(applicationsUrl))
+    $
+      .when(fetch(commandUrl), fetch(clustersUrl), fetch(applicationsUrl))
       .done((command, clusters, applications) => {
         this.setState({
-          command      : command[0],
-          clusters     : clusters[0],
-          applications : applications[0],
+          command: command[0],
+          clusters: clusters[0],
+          applications: applications[0]
         });
       });
   }
@@ -55,7 +47,7 @@ export default class CommandDetails extends React.Component {
     return (
       <tr>
         <td colSpan="12">
-          <i className="fa fa-sort-desc" aria-hidden="true"></i>
+          <i className="fa fa-sort-desc" aria-hidden="true" />
           <div className="commands-detail-row">
             <table className="table job-detail-table">
               <tbody>
@@ -79,9 +71,9 @@ export default class CommandDetails extends React.Component {
                   <td className="col-xs-2 align-right">Config:</td>
                   <td>
                     <ul>
-                      {this.state.command.configs.map((config, index) =>
+                      {this.state.command.configs.map((config, index) => (
                         <li key={index}>{config}</li>
-                      )}
+                      ))}
                     </ul>
                   </td>
                 </tr>
@@ -96,18 +88,26 @@ export default class CommandDetails extends React.Component {
                 <tr>
                   <td className="col-xs-2 align-right">Clusters:</td>
                   <td>
-                    {this.state.clusters.length > 0 ?
-                      <InfoTable data={this.state.clusters} type="clusters" />
-                      : <div />
+                    {
+                      this.state.clusters.length > 0
+                        ? <InfoTable
+                          data={this.state.clusters}
+                          type="clusters"
+                        />
+                        : <div />
                     }
                   </td>
                 </tr>
                 <tr>
                   <td className="col-xs-2 align-right">Applications:</td>
                   <td>
-                    {this.state.applications.length > 0 ?
-                      <InfoTable data={this.state.applications} type="applications" />
-                      : <div />
+                    {
+                      this.state.applications.length > 0
+                        ? <InfoTable
+                          data={this.state.applications}
+                          type="applications"
+                        />
+                        : <div />
                     }
                   </td>
                 </tr>
@@ -115,9 +115,19 @@ export default class CommandDetails extends React.Component {
                   <td className="col-xs-2 align-right">Links:</td>
                   <td>
                     <ul>
-                      <li><a href={this.state.command._links.self.href}>Json</a></li>
-                      <li><a href={this.state.command._links.applications.href}>Applications</a></li>
-                      <li><a href={this.state.command._links.clusters.href}>Clusters </a></li>
+                      <li>
+                        <a href={this.state.command._links.self.href}>Json</a>
+                      </li>
+                      <li>
+                        <a href={this.state.command._links.applications.href}>
+                          Applications
+                        </a>
+                      </li>
+                      <li>
+                        <a href={this.state.command._links.clusters.href}>
+                          Clusters
+                        </a>
+                      </li>
                     </ul>
                   </td>
                 </tr>

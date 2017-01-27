@@ -1,14 +1,13 @@
-import React from 'react';
+import React from "react";
 
-const SiteFooter = (props) =>
+const SiteFooter = props => (
   <div className="site-footer">
     <footer>
       <p>{props.version}</p>
     </footer>
-  </div>;
+  </div>
+);
 
-SiteFooter.propTypes = {
-  version: React.PropTypes.string,
-};
+SiteFooter.propTypes = { version: React.PropTypes.string };
 
 export default SiteFooter;

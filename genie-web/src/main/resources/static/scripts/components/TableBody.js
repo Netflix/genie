@@ -1,17 +1,17 @@
-import React, { PropTypes as T } from 'react';
+import React, { PropTypes as T } from "react";
 
-const TableBody = (props) => {
+const TableBody = props => {
   const tableRows = props.rows.map((row, index) => (
     <props.rowType
       key={index}
       row={row}
       toggleRowDetails={props.toggleRowDetails}
-    />)
-  );
+    />
+  ));
 
   if (props.rowId) {
-    const filteredRow = props.rows.find((row) => row.id === props.rowId);
-    const index = props.rows.findIndex((row) => row.id === props.rowId);
+    const filteredRow = props.rows.find(row => row.id === props.rowId);
+    const index = props.rows.findIndex(row => row.id === props.rowId);
 
     tableRows.splice(
       index + 1,
@@ -32,11 +32,11 @@ const TableBody = (props) => {
 };
 
 TableBody.propTypes = {
-  rows             : T.arrayOf(T.object).isRequired,
-  rowId            : T.string,
-  rowType          : T.func.isRequired,
-  detailsTable     : T.func.isRequired,
-  toggleRowDetails : T.func.isRequired,
+  rows: T.arrayOf(T.object).isRequired,
+  rowId: T.string,
+  rowType: T.func.isRequired,
+  detailsTable: T.func.isRequired,
+  toggleRowDetails: T.func.isRequired
 };
 
 export default TableBody;
