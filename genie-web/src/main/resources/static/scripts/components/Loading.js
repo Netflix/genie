@@ -1,9 +1,9 @@
-import React from 'react';
+import React from "react";
 
-const Loading = () =>
+const Loading = () => (
   <div className="col-xs-4 result-panel-msg">
-    <i className="fa fa-spinner fa-spin" aria-hidden="true"></i> Loading...
-  </div>;
+    <i className="fa fa-spinner fa-spin" aria-hidden="true" /> Loading...
+  </div>
+);
 
 export default Loading;
-

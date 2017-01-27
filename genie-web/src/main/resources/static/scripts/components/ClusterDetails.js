@@ -1,28 +1,18 @@
-import React, { PropTypes as T } from 'react';
+import React, { PropTypes as T } from "react";
 
-import { momentFormat, fetch } from '../utils';
-import $ from 'jquery';
+import { momentFormat, fetch } from "../utils";
+import $ from "jquery";
 
-import InfoTable from './InfoTable';
+import InfoTable from "./InfoTable";
 
 export default class ClusterDetails extends React.Component {
-
-  static propTypes = {
-    row : T.object.isRequired,
-  }
+  static propTypes = { row: T.object.isRequired };
 
   constructor(props) {
     super(props);
     this.state = {
-      cluster: {
-        id: '',
-        configs: [],
-        _links: {
-          self: '',
-          commands: '',
-        },
-      },
-      commands: [],
+      cluster: { id: "", configs: [], _links: { self: "", commands: "" } },
+      commands: []
     };
   }
 
@@ -40,10 +30,7 @@ export default class ClusterDetails extends React.Component {
     const commandsUrl = row._links.commands.href;
 
     $.when(fetch(clusterUrl), fetch(commandsUrl)).done((cluster, commands) => {
-      this.setState({
-        cluster: cluster[0],
-        commands: commands[0],
-      });
+      this.setState({ cluster: cluster[0], commands: commands[0] });
     });
   }
 
@@ -51,7 +38,7 @@ export default class ClusterDetails extends React.Component {
     return (
       <tr>
         <td colSpan="12">
-          <i className="fa fa-sort-desc" aria-hidden="true"></i>
+          <i className="fa fa-sort-desc" aria-hidden="true" />
           <div className="job-detail-row">
             <table className="table job-detail-table">
               <tbody>
@@ -67,9 +54,9 @@ export default class ClusterDetails extends React.Component {
                   <td className="col-xs-2 align-right">Config:</td>
                   <td>
                     <ul>
-                      {this.state.cluster.configs.map((config, index) =>
+                      {this.state.cluster.configs.map((config, index) => (
                         <li key={index}>{config}</li>
-                      )}
+                      ))}
                     </ul>
                   </td>
                 </tr>
@@ -84,9 +71,13 @@ export default class ClusterDetails extends React.Component {
                 <tr>
                   <td className="col-xs-2 align-right">Commands:</td>
                   <td>
-                    {this.state.commands.length > 0 ?
-                      <InfoTable data={this.state.commands} type="commands" />
-                      : <div />
+                    {
+                      this.state.commands.length > 0
+                        ? <InfoTable
+                          data={this.state.commands}
+                          type="commands"
+                        />
+                        : <div />
                     }
                   </td>
                 </tr>
@@ -94,8 +85,14 @@ export default class ClusterDetails extends React.Component {
                   <td className="col-xs-2 align-right">Links:</td>
                   <td>
                     <ul>
-                      <li><a href={this.state.cluster._links.self.href}>Json</a></li>
-                      <li><a href={this.state.cluster._links.commands.href}>Commands</a></li>
+                      <li>
+                        <a href={this.state.cluster._links.self.href}>Json</a>
+                      </li>
+                      <li>
+                        <a href={this.state.cluster._links.commands.href}>
+                          Commands
+                        </a>
+                      </li>
                     </ul>
                   </td>
                 </tr>

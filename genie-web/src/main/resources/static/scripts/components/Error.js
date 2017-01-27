@@ -1,6 +1,6 @@
-import React, { PropTypes as T } from 'react';
+import React, { PropTypes as T } from "react";
 
-const Error = (props) =>
+const Error = props => (
   <div className="col-md-10 result-panel-msg">
     <div><h4>{props.error.error}</h4></div>
     <code>
@@ -8,10 +8,9 @@ const Error = (props) =>
       <div>{props.error.exception}</div>
       <div>{props.error.message}</div>
     </code>
-  </div>;
+  </div>
+);
 
-Error.propTypes = {
-  error : T.object,
-};
+Error.propTypes = { error: T.object };
 
 export default Error;
