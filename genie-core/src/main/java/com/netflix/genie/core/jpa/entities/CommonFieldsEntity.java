@@ -62,7 +62,7 @@ public class CommonFieldsEntity extends BaseEntity {
     private String version;
 
     @Basic(optional = false)
-    @Column(name = "user", nullable = false)
+    @Column(name = "\"user\"", nullable = false)
     @NotBlank(message = "User name is missing and is required.")
     @Size(max = 255, message = "Max length in database is 255 characters")
     private String user;
