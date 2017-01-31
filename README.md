@@ -3,6 +3,7 @@
 [![Download](https://api.bintray.com/packages/netflixoss/maven/genie/images/download.svg)](https://bintray.com/netflixoss/maven/genie/_latestVersion)
 [![License](https://img.shields.io/github/license/Netflix/genie.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 [![Issues](https://img.shields.io/github/issues/Netflix/genie.svg)](https://github.com/Netflix/genie/issues)
+[![NetflixOSS Lifecycle](https://img.shields.io/osslifecycle/Netflix/genie.svg)]()
 
 ## Introduction
 
