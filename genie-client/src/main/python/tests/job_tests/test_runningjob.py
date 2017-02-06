@@ -387,3 +387,107 @@ class TestingRunningJobProperties(unittest.TestCase):
             ],
             values
         )
+
+
+@patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'})
+class TestingRunningStderr(unittest.TestCase):
+    """Test RunningJob stderr log."""
+
+    @patch('pygenie.adapter.genie_3.Genie3Adapter.get_stderr')
+    @patch('pygenie.adapter.genie_3.Genie3Adapter.get_status')
+    def test_update_stderr(self, get_status, get_stderr):
+        """Test RunningJob() updating stderr."""
+
+        get_status.side_effect = [
+            'RUNNING',
+            'RUNNING',
+            'SUCCEEDED',
+            'SUCCEEDED'
+        ]
+        get_stderr.side_effect = [
+            "line1\nline2\n",
+            "line3\nline4\n",
+            "line5\nline6\n"
+        ]
+
+        running_job = pygenie.jobs.RunningJob('1234-update-stderr',
+                                              info={'status': 'RUNNING'})
+
+        for i in range(10):
+            running_job.stderr()
+
+        assert_equals(
+            [
+                call('1234-update-stderr', headers={'Range': 'bytes=0-'}),
+                call('1234-update-stderr', headers={'Range': 'bytes=12-'}),
+                call('1234-update-stderr', headers={'Range': 'bytes=24-'})
+            ],
+            get_stderr.call_args_list
+        )
+
+    @patch('pygenie.adapter.genie_3.Genie3Adapter.get_stderr')
+    @patch('pygenie.adapter.genie_3.Genie3Adapter.get_status')
+    def test_stderr_running(self, get_status, get_stderr):
+        """Test RunningJob().stderr() for running job."""
+
+        stderr = [
+            "line1\nline2\n",
+            "line3\nline4\n",
+            "line5\nline6\n",
+            "",
+            "",
+            "",
+            ""
+        ]
+
+        get_status.return_value = 'RUNNING'
+        get_stderr.side_effect = stderr
+
+        running_job = pygenie.jobs.RunningJob('1234-stderr-running',
+                                              info={'status': 'RUNNING'})
+
+        for i in range(len(stderr)):
+            start = len(running_job._cached_stderr or '')
+
+            running_job.stderr()
+
+            get_stderr.assert_called_with(
+                '1234-stderr-running',
+                headers={'Range': 'bytes={}-'.format(start)})
+
+        assert_equals(36, len(running_job._cached_stderr))
+
+    @patch('pygenie.jobs.running.RunningJob._write_to_stream')
+    @patch('pygenie.adapter.genie_3.Genie3Adapter.get_stderr')
+    @patch('pygenie.adapter.genie_3.Genie3Adapter.get_status')
+    def test_stderr_watch(self, get_status, get_stderr, write_to_stream):
+        """Test RunningJob().watch_stderr()."""
+
+        get_status.side_effect = [
+            'RUNNING',
+            'RUNNING',
+            'RUNNING',
+            'RUNNING',
+            'RUNNING',
+            'SUCCEEDED'
+        ]
+        get_stderr.side_effect = [
+            "line1\nline2\n",
+            "line3\nline4\n",
+            "line5\nline6\n"
+        ]
+
+        running_job = pygenie.jobs.RunningJob('1234-watch-stderr',
+                                              info={'status': 'RUNNING'})
+        running_job.watch_stderr(interval=0)
+
+        assert_equals(36, len(running_job._cached_stderr))
+        assert_equals(
+            [
+                call('line1\nline2\n'),
+                call('line3\nline4\n'),
+                call('line5\nline6\n'),
+                call('')
+            ],
+            write_to_stream.call_args_list
+        )

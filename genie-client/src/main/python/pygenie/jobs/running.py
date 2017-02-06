@@ -94,6 +94,8 @@ class RunningJob(object):
         if stream in {'stderr', 'stdout'}:
             self._sys_stream = getattr(sys, stream)
 
+        self.__reload_stderr = True
+
     def __repr__(self):
         return '{cls}("{job_id}", adapter={adapter})'.format(
             cls=self.__class__.__name__,
@@ -519,6 +521,34 @@ class RunningJob(object):
 
         return self._status.upper() if self._status else None
 
+    def _update_stderr(self, **kwargs):
+        """Get new stderr part and update cached stderr."""
+
+        stderr_part = ''
+
+        if self.__reload_stderr:
+            range_start = 0 if self._cached_stderr is None else len(self._cached_stderr)
+
+            logger.debug('getting stderr (Range: bytes=%s-', range_start)
+
+            stderr_part = self._adapter.get_stderr(
+                self._job_id,
+                headers={
+                    'Range': 'bytes={}-'.format(range_start)
+                },
+                **kwargs
+            )
+
+            if self._cached_stderr is None:
+                self._cached_stderr = stderr_part
+            else:
+                self._cached_stderr += stderr_part
+
+        if self.is_done:
+            self.__reload_stderr = False
+
+        return stderr_part
+
     def stderr(self, iterator=False, **kwargs):
         """
         Get the job's stderr as either an iterator or full text.
@@ -536,15 +566,10 @@ class RunningJob(object):
             str or iterator.
         """
 
-        if self.is_done:
-            if not self._cached_stderr:
-                self._cached_stderr = self._adapter.get_stderr(self._job_id,
-                                                               **kwargs)
-            return self._cached_stderr.split('\n') if iterator \
-                else self._cached_stderr
-        return self._adapter.get_stderr(self._job_id,
-                                        iterator=iterator,
-                                        **kwargs)
+        self._update_stderr()
+
+        return self._cached_stderr.split('\n') if iterator \
+            else self._cached_stderr
 
     @property
     def stdout_url(self):
@@ -703,3 +728,17 @@ class RunningJob(object):
         if self._sys_stream is not None:
             self._sys_stream.write(msg)
             self._sys_stream.flush()
+
+    def watch_stderr(self, interval=1):
+        """
+        Tail output of a genie job's stderr to the terminal until the job is done.
+
+        Args:
+            interval (int or float, optional): Time (seconds) between updates.
+        """
+
+        while not self.is_done:
+            time.sleep(interval)
+            self._write_to_stream(self._update_stderr())
+
+        self._write_to_stream(self._update_stderr())
