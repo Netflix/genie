@@ -57,10 +57,8 @@ class TestingHadoopJob(unittest.TestCase):
             .property_file('/Users/hadoop/props.conf')
 
         assert_equals(
-            job.cmd_args,
-            u'-conf props.conf ' \
-            u'-Dprop1=v1 -Dprop2=v2 ' \
-            u'fs -ls /test'
+            'fs -conf props.conf -Dprop1=v1 -Dprop2=v2 -ls /test',
+            job.cmd_args
         )
 
     def test_cmd_args_post_cmd_args(self):
@@ -76,12 +74,7 @@ class TestingHadoopJob(unittest.TestCase):
             .post_cmd_args('d e f')
 
         assert_equals(
-            ' '.join([
-                '-conf props.conf',
-                '-Dprop1=v1 -Dprop2=v2',
-                'fs -ls /test',
-                'a b c d e f'
-            ]),
+            'fs -conf props.conf -Dprop1=v1 -Dprop2=v2 -ls /test a b c d e f',
             job.cmd_args
         )
 
@@ -198,26 +191,26 @@ class TestingHadoopJobAdapters(unittest.TestCase):
         assert_equals(
             pygenie.adapter.genie_2.get_payload(job),
             {
-                u'attachments': [
-                    {u'name': u'hadoopfile1', u'data': u'file contents'}
+                'attachments': [
+                    {'name': 'hadoopfile1', 'data': 'file contents'}
                 ],
-                u'clusterCriterias': [
-                    {u'tags': [u'type:hadoopcluster1']},
-                    {u'tags': [u'type:hadoop']}
+                'clusterCriterias': [
+                    {'tags': ['type:hadoopcluster1']},
+                    {'tags': ['type:hadoop']}
                 ],
-                u'commandArgs': u'fs -ls /testing/adapter',
-                u'commandCriteria': [u'type:hadoopcmd'],
-                u'description': u'this job is to test hadoopjob adapter',
-                u'disableLogArchival': True,
-                u'email': u'jhadoop@email.com',
-                u'envPropFile': None,
-                u'fileDependencies': [],
-                u'group': u'hadoopgroup',
-                u'id': u'hadoopjob1',
-                u'name': u'testing_adapting_hadoopjob',
-                u'tags': [u'hadooptag'],
-                u'user': u'jhadoop',
-                u'version': u'0.0.hadoop-alpha'
+                'commandArgs': 'fs   -ls /testing/adapter',
+                'commandCriteria': ['type:hadoopcmd'],
+                'description': 'this job is to test hadoopjob adapter',
+                'disableLogArchival': True,
+                'email': 'jhadoop@email.com',
+                'envPropFile': None,
+                'fileDependencies': [],
+                'group': 'hadoopgroup',
+                'id': 'hadoopjob1',
+                'name': 'testing_adapting_hadoopjob',
+                'tags': ['hadooptag'],
+                'user': 'jhadoop',
+                'version': '0.0.hadoop-alpha'
             }
         )
 
