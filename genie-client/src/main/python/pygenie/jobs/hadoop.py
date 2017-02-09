@@ -49,7 +49,7 @@ class HadoopJob(GenieJob):
             if self._property_file \
             else ''
 
-        cmd_split = self._script.split(' -', 1)
+        cmd_split = self._script.split(' -', 1) if self._script is not None else ['']
 
         return '{command} {prop_file} {props} {command_options} {post_cmd_args}' \
             .format(prop_file=prop_file_str,
