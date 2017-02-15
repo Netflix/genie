@@ -93,12 +93,12 @@ public abstract class AbstractAPISecurityIntegrationTests {
     private static final String JOBS_API = "/api/v3/jobs";
 
     private static final ResultMatcher OK = MockMvcResultMatchers.status().isOk();
-    private static final ResultMatcher ACCEPTED = MockMvcResultMatchers.status().isAccepted();
     private static final ResultMatcher BAD_REQUEST = MockMvcResultMatchers.status().isBadRequest();
     private static final ResultMatcher CREATED = MockMvcResultMatchers.status().isCreated();
     private static final ResultMatcher NO_CONTENT = MockMvcResultMatchers.status().isNoContent();
     private static final ResultMatcher NOT_FOUND = MockMvcResultMatchers.status().isNotFound();
     private static final ResultMatcher FORBIDDEN = MockMvcResultMatchers.status().isForbidden();
+    private static final ResultMatcher UNAUTHORIZED = MockMvcResultMatchers.status().isUnauthorized();
 
     @Value("${management.context-path}")
     private String actuatorEndpoint;
@@ -149,7 +149,7 @@ public abstract class AbstractAPISecurityIntegrationTests {
         this.get(CLUSTERS_API, expectedUnauthenticatedStatus);
         this.get(COMMANDS_API, expectedUnauthenticatedStatus);
         this.get(JOBS_API, expectedUnauthenticatedStatus);
-        this.checkActuatorEndpoints(OK);
+        this.checkActuatorEndpoints(UNAUTHORIZED);
     }
 
     /**
@@ -183,7 +183,7 @@ public abstract class AbstractAPISecurityIntegrationTests {
         this.get(JOBS_API + "/" + UUID.randomUUID().toString(), NOT_FOUND);
         this.delete(JOBS_API + "/" + UUID.randomUUID().toString(), NOT_FOUND);
 
-        this.checkActuatorEndpoints(OK);
+        this.checkActuatorEndpoints(FORBIDDEN);
     }
 
     /**
@@ -251,11 +251,14 @@ public abstract class AbstractAPISecurityIntegrationTests {
     private void checkActuatorEndpoints(final ResultMatcher expectedResult) throws Exception {
         // See: https://docs.spring.io/spring-boot/docs/current/reference/html/production-ready-endpoints.html
         this.get(this.actuatorEndpoint + "/autoconfig", expectedResult);
+        this.get(this.actuatorEndpoint + "/auditevents", expectedResult);
         this.get(this.actuatorEndpoint + "/beans", expectedResult);
         this.get(this.actuatorEndpoint + "/configprops", expectedResult);
+        this.get(this.actuatorEndpoint + "/dump", expectedResult);
         this.get(this.actuatorEndpoint + "/env", expectedResult);
         this.get(this.actuatorEndpoint + "/health", OK);
-        this.get(this.actuatorEndpoint + "/info", expectedResult);
+        this.get(this.actuatorEndpoint + "/info", OK);
+        this.get(this.actuatorEndpoint + "/loggers", expectedResult);
         this.get(this.actuatorEndpoint + "/mappings", expectedResult);
         this.get(this.actuatorEndpoint + "/metrics", expectedResult);
         this.get(this.actuatorEndpoint + "/trace", expectedResult);

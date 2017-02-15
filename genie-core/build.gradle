@@ -69,7 +69,6 @@ task generateJPAMetaModel(type: JavaCompile, group: "build", description: "Gener
     source = sourceSets.main.java
     outputs.dir generatedSourcesJavaDir
     destinationDir = generatedSourcesJavaDir
-    dependencyCacheDir = compileJava.dependencyCacheDir
     classpath = configurations.compile + configurations.jpaModelGen
     options.compilerArgs = [
             "-proc:only"

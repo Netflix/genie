@@ -25,10 +25,6 @@ genie:
         jwt:
           enabled: false
 
-management:
-  security:
-    enabled: true
-
 security:
   oauth2:
     client:
