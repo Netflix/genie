@@ -7,11 +7,15 @@ The following are the release notes for Genie {revnumber}.
 * Spring Session support made more flexible
 ** Now can support none (off), Redis, JDBC and HashMap as session data stores based on spring.session.store-type
 property
+* Actuator endpoints secured by default
+** Follows new Spring default
+** Turn off by setting `management.security.enabled` to `false`
 
 === Library Upgrades
 
 * Upgrade Spring Boot from 1.3.8.RELEASE to {springBootVersion}
-** https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-1.4-Release-Notes[Release Notes]
+** https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-1.4-Release-Notes[1.4 Release Notes]
+** https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-1.5-Release-Notes[1.5 Release Notes]
 * Upgrade to Spring Platform IO {springPlatformVersion} for library dependency management
 ** http://docs.spring.io/platform/docs/Athens-SR2/reference/htmlsingle/[Reference Docs]
 * Upgrade to Spring Cloud {springCloudVersion} for cloud dependency management
@@ -27,6 +31,14 @@ to Spring Integration Zookeeper. That library is now used.
 
 |===
 |Property |Description| Default Value
+
+|management.security.roles
+|The roles a user needs to have in order to access the Actuator endpoints
+|ADMIN
+
+|security.oauth2.resource.filter-order
+|The order the OAuth2 resource filter is places within the spring security chain
+|3
 
 |spring.data.redis.repositories.enabled
 |Whether Spring data repositories should attempt to be created for Redis
@@ -48,6 +60,10 @@ for more information. Currently on classpath only none, hash_map, redis and jdbc
 |genie.tasks.clusterChecker.healthIndicatorsToIgnore
 |memory,genie,discoveryComposite
 |memory,genieMemory,discoveryComposite
+
+|management.security.enabled
+|false
+|true
 
 |===
 

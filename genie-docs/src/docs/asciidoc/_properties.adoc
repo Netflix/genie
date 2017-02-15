@@ -330,7 +330,11 @@ property is true
 
 |management.security.enabled
 |Whether to enable basic security on the actuator endpoints
-|false
+|true
+
+|management.security.roles
+|The roles a user needs to have in order to access the Actuator endpoints
+|ADMIN
 
 |security.basic.enabled
 |Enable basic authentication
@@ -343,6 +347,10 @@ property is true
 |security.oauth2.client.client-secret
 |The secret for the oauth2 client
 |
+
+|security.oauth2.resource.filter-order
+|The order the OAuth2 resource filter is places within the spring security chain
+|3
 
 |security.oauth2.resource.id
 |Id of the resource server

@@ -104,11 +104,14 @@ info:
 management:
   context-path: /actuator
   security:
-    enabled: false
+    roles: ADMIN
 
 security:
   basic:
     enabled: false
+  oauth2:
+    resource:
+      filter-order: 3
 
 spring:
   application:
