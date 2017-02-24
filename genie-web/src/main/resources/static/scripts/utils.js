@@ -7,12 +7,12 @@ import moment from "moment";
 $.ajaxSettings.traditional = true;
 
 export const genieJobsUrl = url => {
-  const [ ignored, path ] = url.split("/api/v3/jobs", 2);
+  const [ignored, path] = url.split("/api/v3/jobs", 2);
   return `/output${path}`;
 };
 
 export const fileUrl = url => {
-  const [ ignored, path ] = url.split("/api/v3/jobs", 2);
+  const [ignored, path] = url.split("/api/v3/jobs", 2);
   return `/file${path}`;
 };
 
@@ -28,8 +28,8 @@ export const hasChanged = (o1, o2) => {
   let changed = false;
   for (const key of Object.keys(o1)) {
     if (
-      key === "src" && o1[key] === "btn" ||
-        key !== "showDetails" && (!o2 || o1[key] !== o2[key])
+      (key === "src" && o1[key] === "btn") ||
+      (key !== "showDetails" && (!o2 || o1[key] !== o2[key]))
     ) {
       changed = true;
       break;
@@ -59,4 +59,4 @@ export const momentFormat = (dateStr, format = "MM/DD/YYYY, H:mm:ss") =>
 // https://github.com/moment/moment/issues/1048
 export const momentDurationFormat = (durationStr, format = ":mm:ss") =>
   Math.floor(moment.duration(durationStr).asHours()) +
-    moment.utc(moment.duration(durationStr).asMilliseconds()).format(format);
+  moment.utc(moment.duration(durationStr).asMilliseconds()).format(format);

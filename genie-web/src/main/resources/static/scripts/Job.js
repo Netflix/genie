@@ -36,7 +36,7 @@ export default class Job extends Page {
         name: "startTime",
         value: [],
         type: "timeRange",
-        queryMapping: [ "minStarted", "maxStarted" ],
+        queryMapping: ["minStarted", "maxStarted"],
         mapper: x => moment(parseInt(x, 10)).utc()
       },
       {
@@ -44,7 +44,7 @@ export default class Job extends Page {
         name: "finishedTime",
         value: [],
         type: "timeRange",
-        queryMapping: [ "minFinished", "maxFinished" ],
+        queryMapping: ["minFinished", "maxFinished"],
         mapper: x => moment(parseInt(x, 10)).utc()
       },
       {
@@ -52,7 +52,7 @@ export default class Job extends Page {
         name: "size",
         value: 25,
         type: "option",
-        optionValues: [ 10, 25, 50, 100 ]
+        optionValues: [10, 25, 50, 100]
       },
       {
         label: "Sort By",
@@ -76,7 +76,7 @@ export default class Job extends Page {
         name: "sortOrder",
         value: "desc",
         type: "sortOption",
-        optionValues: [ "desc", "asc" ]
+        optionValues: ["desc", "asc"]
       }
     ];
   }

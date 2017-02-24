@@ -55,11 +55,9 @@ export default class TableRow extends React.Component {
               <i className="fa fa-share-alt" aria-hidden="true" />
             </button>
           </CopyToClipboard>
-          {
-            this.state.copied
-              ? <p className="text-muted copied-text">Copied</p>
-              : null
-          }
+          {this.state.copied
+            ? <p className="text-muted copied-text">Copied</p>
+            : null}
         </td>
         <td onClick={() => this.props.toggleRowDetails(this.props.row.id)}>
           {this.props.row.user}

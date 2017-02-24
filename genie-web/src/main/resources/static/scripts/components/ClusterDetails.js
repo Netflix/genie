@@ -71,14 +71,9 @@ export default class ClusterDetails extends React.Component {
                 <tr>
                   <td className="col-xs-2 align-right">Commands:</td>
                   <td>
-                    {
-                      this.state.commands.length > 0
-                        ? <InfoTable
-                          data={this.state.commands}
-                          type="commands"
-                        />
-                        : <div />
-                    }
+                    {this.state.commands.length > 0
+                      ? <InfoTable data={this.state.commands} type="commands" />
+                      : <div />}
                   </td>
                 </tr>
                 <tr>

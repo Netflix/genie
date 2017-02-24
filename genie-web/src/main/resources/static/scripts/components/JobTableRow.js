@@ -62,11 +62,9 @@ export default class TableRow extends React.Component {
               <i className="fa fa-share-alt" aria-hidden="true" />
             </button>
           </CopyToClipboard>
-          {
-            this.state.copied
-              ? <p className="text-muted copied-text">Copied</p>
-              : null
-          }
+          {this.state.copied
+            ? <p className="text-muted copied-text">Copied</p>
+            : null}
         </td>
         <td onClick={() => this.props.toggleRowDetails(this.props.row.id)}>
           {this.props.row.user}
@@ -87,21 +85,17 @@ export default class TableRow extends React.Component {
           onClick={() => this.props.toggleRowDetails(this.props.row.id)}
           className="col-xs-1"
         >
-          {
-            this.props.row.finished
-              ? momentFormat(this.props.row.finished)
-              : "NA"
-          }
+          {this.props.row.finished
+            ? momentFormat(this.props.row.finished)
+            : "NA"}
         </td>
         <td
           onClick={() => this.props.toggleRowDetails(this.props.row.id)}
           className="col-xs-1"
         >
-          {
-            this.props.row.started
-              ? momentDurationFormat(this.props.row.runtime)
-              : "NA"
-          }
+          {this.props.row.started
+            ? momentDurationFormat(this.props.row.runtime)
+            : "NA"}
         </td>
       </tr>
     );
