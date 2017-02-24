@@ -19,7 +19,7 @@ export default class Cluster extends Page {
         name: "status",
         value: "",
         type: "option",
-        optionValues: [ "", "UP", "OUT_OF_SERVICE", "TERMINATED" ]
+        optionValues: ["", "UP", "OUT_OF_SERVICE", "TERMINATED"]
       },
       { label: "Tag", name: "tag", value: "", type: "input" },
       {
@@ -27,7 +27,7 @@ export default class Cluster extends Page {
         name: "sort",
         value: "",
         type: "select",
-        selectFields: [ "name", "status", "tag" ].map(field => ({
+        selectFields: ["name", "status", "tag"].map(field => ({
           value: field,
           label: field
         }))
@@ -37,7 +37,7 @@ export default class Cluster extends Page {
         name: "sortOrder",
         value: "desc",
         type: "sortOption",
-        optionValues: [ "desc", "asc" ]
+        optionValues: ["desc", "asc"]
       }
     ];
   }

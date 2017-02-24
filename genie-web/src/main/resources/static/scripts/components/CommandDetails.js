@@ -32,15 +32,17 @@ export default class CommandDetails extends React.Component {
     const commandUrl = row._links.self.href;
     const clustersUrl = `${row._links.clusters.href}?status=UP`;
     const applicationsUrl = row._links.applications.href;
-    $
-      .when(fetch(commandUrl), fetch(clustersUrl), fetch(applicationsUrl))
-      .done((command, clusters, applications) => {
-        this.setState({
-          command: command[0],
-          clusters: clusters[0],
-          applications: applications[0]
-        });
+    $.when(fetch(commandUrl), fetch(clustersUrl), fetch(applicationsUrl)).done((
+      command,
+      clusters,
+      applications
+    ) => {
+      this.setState({
+        command: command[0],
+        clusters: clusters[0],
+        applications: applications[0]
       });
+    });
   }
 
   render() {
@@ -88,27 +90,20 @@ export default class CommandDetails extends React.Component {
                 <tr>
                   <td className="col-xs-2 align-right">Clusters:</td>
                   <td>
-                    {
-                      this.state.clusters.length > 0
-                        ? <InfoTable
-                          data={this.state.clusters}
-                          type="clusters"
-                        />
-                        : <div />
-                    }
+                    {this.state.clusters.length > 0
+                      ? <InfoTable data={this.state.clusters} type="clusters" />
+                      : <div />}
                   </td>
                 </tr>
                 <tr>
                   <td className="col-xs-2 align-right">Applications:</td>
                   <td>
-                    {
-                      this.state.applications.length > 0
-                        ? <InfoTable
+                    {this.state.applications.length > 0
+                      ? <InfoTable
                           data={this.state.applications}
                           type="applications"
                         />
-                        : <div />
-                    }
+                      : <div />}
                   </td>
                 </tr>
                 <tr>

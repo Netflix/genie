@@ -20,7 +20,7 @@ export default class Command extends Page {
         name: "status",
         value: "",
         type: "option",
-        optionValues: [ "", "ACTIVE", "DEPRECATED", "INACTIVE" ]
+        optionValues: ["", "ACTIVE", "DEPRECATED", "INACTIVE"]
       },
       { label: "Tag", name: "tag", value: "", type: "input" },
       {
@@ -28,7 +28,7 @@ export default class Command extends Page {
         name: "sort",
         value: "",
         type: "select",
-        selectFields: [ "name", "user", "status", "tag" ].map(field => ({
+        selectFields: ["name", "user", "status", "tag"].map(field => ({
           value: field,
           label: field
         }))
@@ -38,7 +38,7 @@ export default class Command extends Page {
         name: "sortOrder",
         value: "desc",
         type: "sortOption",
-        optionValues: [ "desc", "asc" ]
+        optionValues: ["desc", "asc"]
       }
     ];
   }

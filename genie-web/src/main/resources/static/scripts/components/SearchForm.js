@@ -52,7 +52,7 @@ export default class SearchForm extends React.Component {
           formFields[name].value = query[name];
         } else if (
           formFields[name].queryMapping &&
-            this.includes(formFields[name].queryMapping, query)
+          this.includes(formFields[name].queryMapping, query)
         ) {
           const { mapper, queryMapping } = formFields[name];
           const queryValues = queryMapping.map(x => query[x]);
@@ -65,7 +65,7 @@ export default class SearchForm extends React.Component {
 
   getDefaultFormState(props) {
     const formFields = {};
-    for (const field of [ ...props.formFields, ...props.hiddenFormFields ]) {
+    for (const field of [...props.formFields, ...props.hiddenFormFields]) {
       formFields[field.name] = Object.assign({}, field); // new copy
     }
     return {
@@ -119,7 +119,7 @@ export default class SearchForm extends React.Component {
   handleSearch = e => {
     e.preventDefault();
     const query = { src: "btn" };
-    for (const [ name, field ] of Object.entries(this.state.formFields)) {
+    for (const [name, field] of Object.entries(this.state.formFields)) {
       if (this.hasValue(field)) {
         if (name === "sortOrder") {
           const { sort } = this.state.formFields;
@@ -211,8 +211,8 @@ export default class SearchForm extends React.Component {
                 const calendar = (
                   <RangeCalendar
                     showWeekNumber={false}
-                    dateInputPlaceholder={[ "min", "max" ]}
-                    defaultValue={[ nowUtc(), nowUtc() ]}
+                    dateInputPlaceholder={["min", "max"]}
+                    defaultValue={[nowUtc(), nowUtc()]}
                     locale={enUS}
                     timePicker={<Panel />}
                   />
@@ -233,10 +233,8 @@ export default class SearchForm extends React.Component {
                           <input
                             className="form-control ant-calendar-picker-input ant-input"
                             value={
-                              this.isValidRange(value) &&
-                                `${momentFormat(value[0])} - ${momentFormat(
-                                  value[1]
-                                )}` ||
+                              (this.isValidRange(value) &&
+                                `${momentFormat(value[0])} - ${momentFormat(value[1])}`) ||
                                 ""
                             }
                           />
@@ -291,13 +289,13 @@ export default class SearchForm extends React.Component {
               </div>
             ))}
           </div>
-          {
-            this.state.hasHiddenFormFields ? <div className="form-group">
+          {this.state.hasHiddenFormFields
+            ? <div className="form-group">
                 <a href="javascript:void(0)" onClick={this.toggleFormFields}>
                   Show {this.state.linkText}
                 </a>
-              </div> : null
-          }
+              </div>
+            : null}
           <div className="form-group">
             <button
               type="submit"

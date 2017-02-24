@@ -32,11 +32,12 @@ export default class ApplicationDetails extends React.Component {
     const { row } = props;
     const applicationUrl = row._links.self.href;
     const commandsUrl = row._links.commands.href;
-    $
-      .when(fetch(applicationUrl), fetch(commandsUrl))
-      .done((application, commands) => {
-        this.setState({ application: application[0], commands: commands[0] });
-      });
+    $.when(fetch(applicationUrl), fetch(commandsUrl)).done((
+      application,
+      commands
+    ) => {
+      this.setState({ application: application[0], commands: commands[0] });
+    });
   }
 
   render() {
@@ -91,14 +92,9 @@ export default class ApplicationDetails extends React.Component {
                 <tr>
                   <td className="col-xs-2 align-right">Commands:</td>
                   <td>
-                    {
-                      this.state.commands.length > 0
-                        ? <InfoTable
-                          data={this.state.commands}
-                          type="commands"
-                        />
-                        : <div />
-                    }
+                    {this.state.commands.length > 0
+                      ? <InfoTable data={this.state.commands} type="commands" />
+                      : <div />}
                   </td>
                 </tr>
                 <tr>

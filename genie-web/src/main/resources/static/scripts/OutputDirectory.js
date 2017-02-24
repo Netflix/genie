@@ -35,13 +35,13 @@ export default class OutputDirectory extends React.Component {
   }
 
   get headers() {
-    return [ { url: "#", name: "GENIE", className: "supress" } ];
+    return [{ url: "#", name: "GENIE", className: "supress" }];
   }
 
   loadData(url) {
     fetch(`/api/v3/jobs/${url}`)
       .done(output => {
-        const [ jobId, ...ignored ] = url.split("/");
+        const [jobId, ...ignored] = url.split("/");
         this.setState({
           output,
           jobId,
@@ -71,38 +71,32 @@ export default class OutputDirectory extends React.Component {
     return (
       <div>
         <SiteHeader headers={this.state.headers} infos={this.state.infos} />
-        {
-          this.state.error ? <div className="container job-output-directory">
+        {this.state.error
+          ? <div className="container job-output-directory">
               Output not found
               <div>
                 <Link to="/jobs">← back</Link>
               </div>
-            </div> : <div className="container job-output-directory">
-              {
-                this.state.fetching && !this.state.error ? <Loading /> : <div>
+            </div>
+          : <div className="container job-output-directory">
+              {this.state.fetching && !this.state.error
+                ? <Loading />
+                : <div>
                     <Navigation url={this.state.url} />
-                    {
-                      this.state.output.files.length === 0 &&
-                        this.state.output.directories.length === 0
-                        ? <div>Empty directory</div>
-                        : <div>
+                    {this.state.output.files.length === 0 &&
+                      this.state.output.directories.length === 0
+                      ? <div>Empty directory</div>
+                      : <div>
                           <Table>
                             <TableHeader
-                              headers={[
-                                "Name",
-                                "Size",
-                                "Last Modified (UTC)"
-                              ]}
+                              headers={["Name", "Size", "Last Modified (UTC)"]}
                             />
                             <TableBody output={this.state.output} />
                           </Table>
                           <DirectoryInfo output={this.state.output} />
-                        </div>
-                    }
-                  </div>
-              }
-            </div>
-        }
+                        </div>}
+                  </div>}
+            </div>}
         <SiteFooter />
       </div>
     );
@@ -195,7 +189,7 @@ DirectoryInfo.propTypes = {
 };
 
 const Navigation = props => {
-  const [ jobId, output, ...path ] = props.url.split("/");
+  const [jobId, output, ...path] = props.url.split("/");
   let breadCrumbs = [];
   // Home Button
   breadCrumbs.push(

@@ -17,6 +17,7 @@ export default class JobDetails extends React.Component {
       command: { id: "", version: "", name: "" },
       job: {
         id: "",
+        tags: [],
         _links: {
           output: "",
           request: "",
@@ -111,7 +112,7 @@ export default class JobDetails extends React.Component {
                 </tr>
                 <tr>
                   <td className="col-xs-2 align-right">Tags:</td>
-                  <td>{this.state.job.tags}</td>
+                  <td>{this.state.job.tags.join(",")}</td>
                 </tr>
                 <tr>
                   <td className="col-xs-2 align-right">Status:</td>
@@ -212,11 +213,10 @@ export default class JobDetails extends React.Component {
                     </ul>
                   </td>
                 </tr>
-                {
-                  (this.state.job.status === "RUNNING" ||
-                    this.state.job.status === "INIT") &&
-                    !this.state.killJobRequestSent
-                    ? <tr>
+                {(this.state.job.status === "RUNNING" ||
+                  this.state.job.status === "INIT") &&
+                  !this.state.killJobRequestSent
+                  ? <tr>
                       <td>
                         <button
                           type="button"
@@ -262,19 +262,16 @@ export default class JobDetails extends React.Component {
                         </Modal>
                       </td>
                     </tr>
-                    : null
-                }
+                  : null}
               </tbody>
             </table>
-            {
-              this.state.killJobRequestSent && !this.state.killRequestError
-                ? <small>
+            {this.state.killJobRequestSent && !this.state.killRequestError
+              ? <small>
                   *Request accepted. Please refresh the page in a few seconds to see the status change.
                 </small>
-                : null
-            }
-            {
-              this.state.killRequestError ? <div>
+              : null}
+            {this.state.killRequestError
+              ? <div>
                   <div>
                     <small>
                       *Request failed. Please refresh the page and try again.
@@ -285,16 +282,16 @@ export default class JobDetails extends React.Component {
                       <code>{this.state.killRequestError.message}.</code>
                     </small>
                   </div>
-                </div> : null
-            }
-            {
-              this.state.error ? <div>
+                </div>
+              : null}
+            {this.state.error
+              ? <div>
                   <div>
                     <span>Failed to load Command details:</span>
                   </div>
                   <Error error={this.state.error} />
-                </div> : null
-            }
+                </div>
+              : null}
           </div>
         </td>
       </tr>

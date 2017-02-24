@@ -57,7 +57,6 @@ export default class Page extends React.Component {
     const { rowId = null, showSearchForm = "true" } = query;
     this.setState({ query, data: [] });
 
-    // Loading state
     fetch(this.url, query)
       .done(data => {
         if (data.hasOwnProperty("_embedded")) {
@@ -83,12 +82,12 @@ export default class Page extends React.Component {
   render() {
     const sideBar = this.state.showSearchForm
       ? <SearchForm
-        query={this.state.query}
-        formFields={this.formFields}
-        hiddenFormFields={this.hiddenFormFields}
-        toggleSearchForm={this.toggleSearchForm}
-        searchPath={this.searchPath}
-      />
+          query={this.state.query}
+          formFields={this.formFields}
+          hiddenFormFields={this.hiddenFormFields}
+          toggleSearchForm={this.toggleSearchForm}
+          searchPath={this.searchPath}
+        />
       : <SearchBar toggleSearchForm={this.toggleSearchForm} />;
 
     let resultPanel = null;
@@ -97,27 +96,25 @@ export default class Page extends React.Component {
     } else {
       resultPanel = this.state.data.length > 0
         ? <div
-          className={this.state.showSearchForm ? "col-md-10" : "col-md-12"}
-        >
-          <Table>
-            <TableHeader headers={this.tableHeader} />
-            <TableBody
-              rows={this.state.data}
-              rowId={this.state.rowId}
-              rowType={this.rowType}
-              detailsTable={this.detailsTable}
-              toggleRowDetails={this.toggleRowDetails}
+            className={this.state.showSearchForm ? "col-md-10" : "col-md-12"}
+          >
+            <Table>
+              <TableHeader headers={this.tableHeader} />
+              <TableBody
+                rows={this.state.data}
+                rowId={this.state.rowId}
+                rowType={this.rowType}
+                detailsTable={this.detailsTable}
+                toggleRowDetails={this.toggleRowDetails}
+              />
+            </Table>
+            <Pagination
+              page={this.state.page}
+              pageType={this.searchPath}
+              links={this.state.links}
             />
-          </Table>
-          <Pagination
-            page={this.state.page}
-            pageType={this.searchPath}
-            links={this.state.links}
-          />
-        </div>
-        : this.state.noSearchResult
-          ? <NoSearchResult />
-          : <Loading />; // Default to loading...
+          </div>
+        : this.state.noSearchResult ? <NoSearchResult /> : <Loading />; // Default to loading...
     }
 
     return (
