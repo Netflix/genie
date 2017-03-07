@@ -15,10 +15,10 @@
  */
 package com.netflix.genie.core.jpa.specifications;
 
-import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity_;
+import com.netflix.genie.test.categories.UnitTest;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -76,21 +76,23 @@ public class JpaCommandSpecsUnitTests {
 
         final Path<String> commandNamePath = (Path<String>) Mockito.mock(Path.class);
         final Predicate equalNamePredicate = Mockito.mock(Predicate.class);
+        final Predicate likeNamePredicate = Mockito.mock(Predicate.class);
         Mockito.when(this.root.get(CommandEntity_.name)).thenReturn(commandNamePath);
-        Mockito.when(this.cb.equal(commandNamePath, NAME))
-                .thenReturn(equalNamePredicate);
+        Mockito.when(this.cb.equal(commandNamePath, NAME)).thenReturn(equalNamePredicate);
+        Mockito.when(this.cb.like(commandNamePath, NAME)).thenReturn(likeNamePredicate);
 
         final Path<String> userNamePath = (Path<String>) Mockito.mock(Path.class);
         final Predicate equalUserNamePredicate = Mockito.mock(Predicate.class);
+        final Predicate likeUserNamePredicate = Mockito.mock(Predicate.class);
         Mockito.when(this.root.get(CommandEntity_.user)).thenReturn(userNamePath);
-        Mockito.when(this.cb.equal(userNamePath, USER_NAME))
-                .thenReturn(equalUserNamePredicate);
+        Mockito.when(this.cb.equal(userNamePath, USER_NAME)).thenReturn(equalUserNamePredicate);
+        Mockito.when(this.cb.like(userNamePath, USER_NAME)).thenReturn(likeUserNamePredicate);
 
         final Path<CommandStatus> statusPath = (Path<CommandStatus>) Mockito.mock(Path.class);
         final Predicate equalStatusPredicate = Mockito.mock(Predicate.class);
         Mockito.when(this.root.get(CommandEntity_.status)).thenReturn(statusPath);
         Mockito.when(this.cb.equal(Mockito.eq(statusPath), Mockito.any(CommandStatus.class)))
-                .thenReturn(equalStatusPredicate);
+            .thenReturn(equalStatusPredicate);
 
         final Path<String> tagPath = (Path<String>) Mockito.mock(Path.class);
         final Predicate likeTagPredicate = Mockito.mock(Predicate.class);
@@ -106,20 +108,44 @@ public class JpaCommandSpecsUnitTests {
     @Test
     public void testFindAll() {
         final Specification<CommandEntity> spec = JpaCommandSpecs.find(
-                NAME, USER_NAME, STATUSES, TAGS
+            NAME, USER_NAME, STATUSES, TAGS
         );
 
         spec.toPredicate(this.root, this.cq, this.cb);
         Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(CommandEntity_.name), NAME);
+            .equal(this.root.get(CommandEntity_.name), NAME);
         Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(CommandEntity_.user), USER_NAME);
+            .equal(this.root.get(CommandEntity_.user), USER_NAME);
         for (final CommandStatus status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1))
-                    .equal(this.root.get(CommandEntity_.status), status);
+                .equal(this.root.get(CommandEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(CommandEntity_.tags), this.tagLikeStatement);
+            .like(this.root.get(CommandEntity_.tags), this.tagLikeStatement);
+    }
+
+    /**
+     * Test the find specification.
+     */
+    @Test
+    public void testFindAllLike() {
+        final String newName = NAME + "%";
+        final String newUser = USER_NAME + "%";
+        final Specification<CommandEntity> spec = JpaCommandSpecs.find(
+            newName, newUser, STATUSES, TAGS
+        );
+
+        spec.toPredicate(this.root, this.cq, this.cb);
+        Mockito.verify(this.cb, Mockito.times(1))
+            .like(this.root.get(CommandEntity_.name), newName);
+        Mockito.verify(this.cb, Mockito.times(1))
+            .like(this.root.get(CommandEntity_.user), newUser);
+        for (final CommandStatus status : STATUSES) {
+            Mockito.verify(this.cb, Mockito.times(1))
+                .equal(this.root.get(CommandEntity_.status), status);
+        }
+        Mockito.verify(this.cb, Mockito.times(1))
+            .like(this.root.get(CommandEntity_.tags), this.tagLikeStatement);
     }
 
     /**
@@ -128,20 +154,20 @@ public class JpaCommandSpecsUnitTests {
     @Test
     public void testFindNoName() {
         final Specification<CommandEntity> spec = JpaCommandSpecs.find(
-                null, USER_NAME, STATUSES, TAGS
+            null, USER_NAME, STATUSES, TAGS
         );
 
         spec.toPredicate(this.root, this.cq, this.cb);
         Mockito.verify(this.cb, Mockito.never())
-                .equal(this.root.get(CommandEntity_.name), NAME);
+            .equal(this.root.get(CommandEntity_.name), NAME);
         Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(CommandEntity_.user), USER_NAME);
+            .equal(this.root.get(CommandEntity_.user), USER_NAME);
         for (final CommandStatus status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1))
-                    .equal(this.root.get(CommandEntity_.status), status);
+                .equal(this.root.get(CommandEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(CommandEntity_.tags), this.tagLikeStatement);
+            .like(this.root.get(CommandEntity_.tags), this.tagLikeStatement);
     }
 
     /**
@@ -150,20 +176,20 @@ public class JpaCommandSpecsUnitTests {
     @Test
     public void testFindNoUserName() {
         final Specification<CommandEntity> spec = JpaCommandSpecs.find(
-                NAME, null, STATUSES, TAGS
+            NAME, null, STATUSES, TAGS
         );
 
         spec.toPredicate(this.root, this.cq, this.cb);
         Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(CommandEntity_.name), NAME);
+            .equal(this.root.get(CommandEntity_.name), NAME);
         Mockito.verify(this.cb, Mockito.never())
-                .equal(this.root.get(CommandEntity_.user), USER_NAME);
+            .equal(this.root.get(CommandEntity_.user), USER_NAME);
         for (final CommandStatus status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1))
-                    .equal(this.root.get(CommandEntity_.status), status);
+                .equal(this.root.get(CommandEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(CommandEntity_.tags), this.tagLikeStatement);
+            .like(this.root.get(CommandEntity_.tags), this.tagLikeStatement);
     }
 
     /**
@@ -172,20 +198,20 @@ public class JpaCommandSpecsUnitTests {
     @Test
     public void testFindNoTags() {
         final Specification<CommandEntity> spec = JpaCommandSpecs.find(
-                NAME, USER_NAME, STATUSES, null
+            NAME, USER_NAME, STATUSES, null
         );
 
         spec.toPredicate(this.root, this.cq, this.cb);
         Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(CommandEntity_.name), NAME);
+            .equal(this.root.get(CommandEntity_.name), NAME);
         Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(CommandEntity_.user), USER_NAME);
+            .equal(this.root.get(CommandEntity_.user), USER_NAME);
         for (final CommandStatus status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1))
-                    .equal(this.root.get(CommandEntity_.status), status);
+                .equal(this.root.get(CommandEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.never())
-                .like(this.root.get(CommandEntity_.tags), this.tagLikeStatement);
+            .like(this.root.get(CommandEntity_.tags), this.tagLikeStatement);
     }
 
     /**
@@ -195,20 +221,20 @@ public class JpaCommandSpecsUnitTests {
     public void testFindEmptyTag() {
         TAGS.add("");
         final Specification<CommandEntity> spec = JpaCommandSpecs.find(
-                NAME, USER_NAME, STATUSES, TAGS
+            NAME, USER_NAME, STATUSES, TAGS
         );
 
         spec.toPredicate(this.root, this.cq, this.cb);
         Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(CommandEntity_.name), NAME);
+            .equal(this.root.get(CommandEntity_.name), NAME);
         Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(CommandEntity_.user), USER_NAME);
+            .equal(this.root.get(CommandEntity_.user), USER_NAME);
         for (final CommandStatus status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1))
-                    .equal(this.root.get(CommandEntity_.status), status);
+                .equal(this.root.get(CommandEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(CommandEntity_.tags), this.tagLikeStatement);
+            .like(this.root.get(CommandEntity_.tags), this.tagLikeStatement);
     }
 
     /**
@@ -217,19 +243,19 @@ public class JpaCommandSpecsUnitTests {
     @Test
     public void testFindNoStatuses() {
         final Specification<CommandEntity> spec = JpaCommandSpecs
-                .find(NAME, USER_NAME, null, TAGS);
+            .find(NAME, USER_NAME, null, TAGS);
 
         spec.toPredicate(this.root, this.cq, this.cb);
         Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(CommandEntity_.name), NAME);
+            .equal(this.root.get(CommandEntity_.name), NAME);
         Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(CommandEntity_.user), USER_NAME);
+            .equal(this.root.get(CommandEntity_.user), USER_NAME);
         for (final CommandStatus status : STATUSES) {
             Mockito.verify(this.cb, Mockito.never())
-                    .equal(this.root.get(CommandEntity_.status), status);
+                .equal(this.root.get(CommandEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(CommandEntity_.tags), this.tagLikeStatement);
+            .like(this.root.get(CommandEntity_.tags), this.tagLikeStatement);
     }
 
     /**
@@ -238,19 +264,19 @@ public class JpaCommandSpecsUnitTests {
     @Test
     public void testFindEmptyStatuses() {
         final Specification<CommandEntity> spec = JpaCommandSpecs
-                .find(NAME, USER_NAME, new HashSet<>(), TAGS);
+            .find(NAME, USER_NAME, new HashSet<>(), TAGS);
 
         spec.toPredicate(this.root, this.cq, this.cb);
         Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(CommandEntity_.name), NAME);
+            .equal(this.root.get(CommandEntity_.name), NAME);
         Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(CommandEntity_.user), USER_NAME);
+            .equal(this.root.get(CommandEntity_.user), USER_NAME);
         for (final CommandStatus status : STATUSES) {
             Mockito.verify(this.cb, Mockito.never())
-                    .equal(this.root.get(CommandEntity_.status), status);
+                .equal(this.root.get(CommandEntity_.status), status);
         }
         Mockito.verify(this.cb, Mockito.times(1))
-                .like(this.root.get(CommandEntity_.tags), this.tagLikeStatement);
+            .like(this.root.get(CommandEntity_.tags), this.tagLikeStatement);
     }
 
     /**

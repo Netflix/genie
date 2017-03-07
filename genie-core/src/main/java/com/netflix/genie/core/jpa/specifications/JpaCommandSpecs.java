@@ -65,10 +65,14 @@ public final class JpaCommandSpecs {
         return (final Root<CommandEntity> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
             final List<Predicate> predicates = new ArrayList<>();
             if (StringUtils.isNotBlank(name)) {
-                predicates.add(cb.equal(root.get(CommandEntity_.name), name));
+                predicates.add(
+                    JpaSpecificationUtils.getStringLikeOrEqualPredicate(cb, root.get(CommandEntity_.name), name)
+                );
             }
             if (StringUtils.isNotBlank(user)) {
-                predicates.add(cb.equal(root.get(CommandEntity_.user), user));
+                predicates.add(
+                    JpaSpecificationUtils.getStringLikeOrEqualPredicate(cb, root.get(CommandEntity_.user), user)
+                );
             }
             if (statuses != null && !statuses.isEmpty()) {
                 final List<Predicate> orPredicates =

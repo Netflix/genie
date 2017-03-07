@@ -84,13 +84,13 @@ public final class JpaJobSpecs {
     ) {
         final List<Predicate> predicates = new ArrayList<>();
         if (StringUtils.isNotBlank(id)) {
-            predicates.add(cb.like(root.get(JobEntity_.id), id));
+            predicates.add(JpaSpecificationUtils.getStringLikeOrEqualPredicate(cb, root.get(JobEntity_.id), id));
         }
         if (StringUtils.isNotBlank(name)) {
-            predicates.add(cb.like(root.get(JobEntity_.name), name));
+            predicates.add(JpaSpecificationUtils.getStringLikeOrEqualPredicate(cb, root.get(JobEntity_.name), name));
         }
         if (StringUtils.isNotBlank(user)) {
-            predicates.add(cb.equal(root.get(JobEntity_.user), user));
+            predicates.add(JpaSpecificationUtils.getStringLikeOrEqualPredicate(cb, root.get(JobEntity_.user), user));
         }
         if (statuses != null && !statuses.isEmpty()) {
             final List<Predicate> orPredicates =
@@ -107,13 +107,17 @@ public final class JpaJobSpecs {
             predicates.add(cb.equal(root.get(JobEntity_.cluster), cluster));
         }
         if (StringUtils.isNotBlank(clusterName)) {
-            predicates.add(cb.equal(root.get(JobEntity_.clusterName), clusterName));
+            predicates.add(
+                JpaSpecificationUtils.getStringLikeOrEqualPredicate(cb, root.get(JobEntity_.clusterName), clusterName)
+            );
         }
         if (command != null) {
             predicates.add(cb.equal(root.get(JobEntity_.command), command));
         }
         if (StringUtils.isNotBlank(commandName)) {
-            predicates.add(cb.equal(root.get(JobEntity_.commandName), commandName));
+            predicates.add(
+                JpaSpecificationUtils.getStringLikeOrEqualPredicate(cb, root.get(JobEntity_.commandName), commandName)
+            );
         }
         if (minStarted != null) {
             predicates.add(cb.greaterThanOrEqualTo(root.get(JobEntity_.started), minStarted));
