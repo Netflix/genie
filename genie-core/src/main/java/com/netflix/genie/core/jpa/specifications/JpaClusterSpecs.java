@@ -70,7 +70,9 @@ public final class JpaClusterSpecs {
         return (final Root<ClusterEntity> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
             final List<Predicate> predicates = new ArrayList<>();
             if (StringUtils.isNotBlank(name)) {
-                predicates.add(cb.like(root.get(ClusterEntity_.name), name));
+                predicates.add(
+                    JpaSpecificationUtils.getStringLikeOrEqualPredicate(cb, root.get(ClusterEntity_.name), name)
+                );
             }
             if (minUpdateTime != null) {
                 predicates.add(cb.greaterThanOrEqualTo(root.get(ClusterEntity_.updated), minUpdateTime));
