@@ -64,10 +64,14 @@ public final class JpaApplicationSpecs {
         return (final Root<ApplicationEntity> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
             final List<Predicate> predicates = new ArrayList<>();
             if (StringUtils.isNotBlank(name)) {
-                predicates.add(cb.equal(root.get(ApplicationEntity_.name), name));
+                predicates.add(
+                    JpaSpecificationUtils.getStringLikeOrEqualPredicate(cb, root.get(ApplicationEntity_.name), name)
+                );
             }
             if (StringUtils.isNotBlank(user)) {
-                predicates.add(cb.equal(root.get(ApplicationEntity_.user), user));
+                predicates.add(
+                    JpaSpecificationUtils.getStringLikeOrEqualPredicate(cb, root.get(ApplicationEntity_.user), user)
+                );
             }
             if (statuses != null && !statuses.isEmpty()) {
                 final List<Predicate> orPredicates =
@@ -86,7 +90,9 @@ public final class JpaApplicationSpecs {
                 );
             }
             if (StringUtils.isNotBlank(type)) {
-                predicates.add(cb.equal(root.get(ApplicationEntity_.type), type));
+                predicates.add(
+                    JpaSpecificationUtils.getStringLikeOrEqualPredicate(cb, root.get(ApplicationEntity_.type), type)
+                );
             }
             return cb.and(predicates.toArray(new Predicate[predicates.size()]));
         };
