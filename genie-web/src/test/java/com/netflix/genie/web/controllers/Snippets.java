@@ -243,11 +243,11 @@ final class Snippets {
             getCommonSearchParameters(),
             RequestDocumentation
                 .parameterWithName("name")
-                .description("The name of the applications to find.")
+                .description("The name of the applications to find. Use % to perform a regex like query")
                 .optional(),
             RequestDocumentation
                 .parameterWithName("user")
-                .description("The user of the applications to find.")
+                .description("The user of the applications to find. Use % to perform a regex like query")
                 .optional(),
             RequestDocumentation
                 .parameterWithName("status")
@@ -262,7 +262,7 @@ final class Snippets {
                 .optional(),
             RequestDocumentation
                 .parameterWithName("type")
-                .description("The type of the applications to find.")
+                .description("The type of the applications to find. Use % to perform a regex like query")
                 .optional()
         )
     );
@@ -299,11 +299,11 @@ final class Snippets {
             getCommonSearchParameters(),
             RequestDocumentation
                 .parameterWithName("name")
-                .description("The name of the commands to find.")
+                .description("The name of the commands to find. Use % to perform a regex like query")
                 .optional(),
             RequestDocumentation
                 .parameterWithName("user")
-                .description("The user of the commands to find.")
+                .description("The user of the commands to find. Use % to perform a regex like query")
                 .optional(),
             RequestDocumentation
                 .parameterWithName("status")
@@ -331,7 +331,7 @@ final class Snippets {
                 .optional(),
             RequestDocumentation
                 .parameterWithName("user")
-                .description("The user of the jobs to find.")
+                .description("The user of the jobs to find. Use % symbol for regex like search.")
                 .optional(),
             RequestDocumentation
                 .parameterWithName("status")
@@ -346,7 +346,7 @@ final class Snippets {
                 .optional(),
             RequestDocumentation
                 .parameterWithName("clusterName")
-                .description("The name of the cluster on which the jobs ran.")
+                .description("The name of the cluster on which the jobs ran. Use % symbol for regex like search.")
                 .optional(),
             RequestDocumentation
                 .parameterWithName("clusterId")
@@ -354,7 +354,9 @@ final class Snippets {
                 .optional(),
             RequestDocumentation
                 .parameterWithName("commandName")
-                .description("The name of the command which was executed by the job.")
+                .description(
+                    "The name of the command which was executed by the job. Use % symbol for regex like search."
+                )
                 .optional(),
             RequestDocumentation
                 .parameterWithName("commandId")
