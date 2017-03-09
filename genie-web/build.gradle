@@ -97,14 +97,13 @@ def genieVersion = project.version.toString()
 asciidoctor {
     dependsOn test
     inputs.dir snippetsDir
-    attributes \
-            "snippets": snippetsDir,
+    attributes  \
+             "snippets": snippetsDir,
             "revnumber": genieVersion,
             "docinfo1": ""
 
-
     // See: https://github.com/asciidoctor/asciidoctor-gradle-plugin/issues/154
-    def capturedOutput = [ ]
+    def capturedOutput = []
     def listener = { capturedOutput << it } as StandardOutputListener
 
     logging.addStandardErrorListener(listener)
