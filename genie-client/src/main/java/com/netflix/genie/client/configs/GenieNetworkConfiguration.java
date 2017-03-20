@@ -35,6 +35,11 @@ public class GenieNetworkConfiguration {
      */
     public static final long DEFAULT_TIMEOUT = -1;
 
+    /**
+     * The default number of times to retry connections if desired.
+     */
+    public static final int DEFAULT_NUM_RETRIES = 5;
+
     // The default read timeout for new connections.
     private long readTimeout = DEFAULT_TIMEOUT;
 
@@ -46,4 +51,7 @@ public class GenieNetworkConfiguration {
 
     // Whether to retry on connection failures: https://goo.gl/2A8EoO
     private boolean retryOnConnectionFailure = true;
+
+    // The number of times to retry checks for job status within wait for completion
+    private int maxStatusRetries = DEFAULT_NUM_RETRIES;
 }
