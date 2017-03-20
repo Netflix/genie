@@ -173,26 +173,26 @@ public class JobCompletionService {
             // Make sure the job isn't already done before doing something
             if (status.isActive()) {
                 try {
-                    retryTemplate.execute(context -> updateJob(job, event, tags));
+                    this.retryTemplate.execute(context -> updateJob(job, event, tags));
                 } catch (Exception e) {
                     log.error("Failed updating for job: {}", jobId, e);
                     tags.put(ERROR_TAG, "JOB_UPDATE_FAILURE");
-                    finalStatusUpdateFailureRate.increment();
+                    this.finalStatusUpdateFailureRate.increment();
                 }
                 // Things that should be done either way
                 try {
-                    retryTemplate.execute(context -> processJobDir(job));
+                    this.retryTemplate.execute(context -> processJobDir(job));
                 } catch (Exception e) {
                     log.error("Failed archiving directory for job: {}", jobId, e);
                     tags.put(ERROR_TAG, "JOB_DIRECTORY_FAILURE");
-                    archivalFailureRate.increment();
+                    this.archivalFailureRate.increment();
                 }
                 try {
-                    retryTemplate.execute(context -> sendEmail(jobId));
+                    this.retryTemplate.execute(context -> sendEmail(jobId));
                 } catch (Exception e) {
                     log.error("Failed sending email for job: {}", jobId, e);
                     tags.put(ERROR_TAG, "SEND_EMAIL_FAILURE");
-                    emailFailureRate.increment();
+                    this.emailFailureRate.increment();
                 }
             }
         } catch (Exception e) {
@@ -239,7 +239,7 @@ public class JobCompletionService {
             if (event.getReason() != JobFinishedReason.SYSTEM_CRASH) {
                 try {
                     final String finalStatus =
-                        retryTemplate.execute(context -> updateFinalStatusForJob(jobId).toString());
+                        this.retryTemplate.execute(context -> updateFinalStatusForJob(jobId).toString());
                     tags.put(STATUS_TAG, finalStatus);
                     cleanupProcesses(jobId);
                 } catch (Exception e) {
@@ -273,12 +273,12 @@ public class JobCompletionService {
                         final CommandLine commandLine = new CommandLine(JobConstants.UNIX_PKILL_COMMAND);
                         commandLine.addArgument(JobConstants.getKillFlag());
                         commandLine.addArgument(Integer.toString(pid));
-                        executor.execute(commandLine);
+                        this.executor.execute(commandLine);
 
                         // The process group should not exist and the above code should always throw and exception.
                         // If it does not then the bash script is not cleaning up stuff well during kills
                         // or the script is done but child processes are still remaining. This metric tracks all that.
-                        processGroupCleanupFailureRate.increment();
+                        this.processGroupCleanupFailureRate.increment();
                     } catch (final Exception e) {
                         log.debug("Received expected exception. Ignoring.");
                     }
@@ -302,7 +302,7 @@ public class JobCompletionService {
 
         try {
             final File jobDir = new File(this.baseWorkingDir, id);
-            final JobDoneFile jobDoneFile = objectMapper.readValue(
+            final JobDoneFile jobDoneFile = this.objectMapper.readValue(
                 new File(this.baseWorkingDir + "/" + id + "/genie/genie.done"),
                 JobDoneFile.class
             );
@@ -442,8 +442,13 @@ public class JobCompletionService {
                     // Create the tar file
                     final File localArchiveFile = new File(jobDir, "genie/logs/" + jobId + ".tar.gz");
 
-                    final CommandLine commandLine = new CommandLine("sudo");
-                    commandLine.addArgument("tar");
+                    final CommandLine commandLine;
+                    if (this.runAsUserEnabled) {
+                        commandLine = new CommandLine("sudo");
+                        commandLine.addArgument("tar");
+                    } else {
+                        commandLine = new CommandLine("tar");
+                    }
                     commandLine.addArgument("-c");
                     commandLine.addArgument("-z");
                     commandLine.addArgument("-f");
@@ -463,7 +468,16 @@ public class JobCompletionService {
                     if (this.deleteArchiveFile) {
                         log.debug("Deleting archive file");
                         try {
-                            if (!localArchiveFile.delete()) {
+                            if (this.runAsUserEnabled) {
+                                final CommandLine deleteCommand = new CommandLine("sudo");
+                                deleteCommand.addArgument("rm");
+                                deleteCommand.addArgument("-f");
+                                deleteCommand.addArgument(localArchiveFile.getCanonicalPath());
+
+                                this.executor.setWorkingDirectory(jobDir);
+                                log.debug("Delete command: {}", deleteCommand.toString());
+                                this.executor.execute(deleteCommand);
+                            } else if (!localArchiveFile.delete()) {
                                 log.error("Failed to delete archive file for job: {}", jobId);
                                 this.archiveFileDeletionFailure.increment();
                             }
