@@ -62,6 +62,7 @@ public class JobClient extends BaseGenieClient {
     private static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
 
     private final JobService jobService;
+    private final int maxStatusRetries;
 
     /**
      * Constructor.
@@ -78,6 +79,9 @@ public class JobClient extends BaseGenieClient {
     ) throws GenieClientException {
         super(url, interceptors, genieNetworkConfiguration);
         this.jobService = this.getService(JobService.class);
+        this.maxStatusRetries = genieNetworkConfiguration == null
+            ? GenieNetworkConfiguration.DEFAULT_NUM_RETRIES
+            : genieNetworkConfiguration.getMaxStatusRetries();
     }
 
     /**
@@ -412,14 +416,25 @@ public class JobClient extends BaseGenieClient {
         }
 
         final long startTime = System.currentTimeMillis();
+        int errorCount = 0;
 
         // wait for job to finish
         while (true) {
+            try {
+                final JobStatus status = this.getJobStatus(jobId);
 
-            final JobStatus status = this.getJobStatus(jobId);
+                if (status.isFinished()) {
+                    return status;
+                }
 
-            if (status.isFinished()) {
-                return status;
+                // reset the error count
+                errorCount = 0;
+            } catch (final IOException ioe) {
+                errorCount++;
+                // Ignore for 5 times in a row
+                if (errorCount >= this.maxStatusRetries) {
+                    throw ioe;
+                }
             }
 
             if (System.currentTimeMillis() - startTime < blockTimeout) {
@@ -447,7 +462,7 @@ public class JobClient extends BaseGenieClient {
         if (StringUtils.isEmpty(jobId)) {
             throw new IllegalArgumentException("Missing required parameter: jobId.");
         }
-        final long pollTime = 10000;
+        final long pollTime = 10000L;
         return waitForCompletion(jobId, blockTimeout, pollTime);
     }
 }
