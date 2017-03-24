@@ -62,7 +62,7 @@ dependencies {
     // Hibernate Metamodel Generator Libraries
     jpaModelGen("org.hibernate:hibernate-jpamodelgen")
     jpaModelGen("org.projectlombok:lombok")
-    jpaModelGen("com.google.code.findbugs:annotations:${findbugs_annotations_version}")
+    jpaModelGen("com.google.code.findbugs:annotations")
 }
 
 task generateJPAMetaModel(type: JavaCompile, group: "build", description: "Generate JPA Meta Models") {

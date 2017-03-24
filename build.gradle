@@ -17,7 +17,7 @@ buildscript {
 
 plugins {
     id "com.github.kt3k.coveralls" version "2.7.1"
-    id "nebula.netflixoss" version "3.5.2"
+    id "nebula.netflixoss" version "3.6.0"
     id "org.ajoberstar.github-pages" version "1.6.0"
 }
 
@@ -109,7 +109,7 @@ configure(javaProjects) {
          *******************************/
 
         compileOnly("org.projectlombok:lombok")
-        compileOnly("com.google.code.findbugs:annotations:${findbugs_annotations_version}")
+        compileOnly("com.google.code.findbugs:annotations")
 
         /*******************************
          * Runtime Dependencies
@@ -125,7 +125,7 @@ configure(javaProjects) {
         testCompile("org.springframework.boot:spring-boot-starter-test")
 
         testCompileOnly("org.projectlombok:lombok")
-        testCompileOnly("com.google.code.findbugs:annotations:${findbugs_annotations_version}")
+        testCompileOnly("com.google.code.findbugs:annotations")
 
         testRuntime("javax.el:javax.el-api")
         testRuntime("org.glassfish:javax.el")
