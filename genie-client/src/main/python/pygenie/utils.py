@@ -107,7 +107,11 @@ def call(url, method='get', headers=None, raise_not_status=None, none_on_404=Fal
         if i < attempts - 1:
             msg = ''
             if resp is not None:
-                msg = '-> {}: {}'.format(resp.status_code, resp.text)
+                msg = '-> {method} {url} ({code}): {text}'\
+                    .format(method=resp.request.method,
+                            url=resp.url,
+                            code=resp.status_code,
+                            text=resp.text)
             logger.warning('attempt %s %s', i + 1, msg)
             time.sleep(i * backoff)
 
