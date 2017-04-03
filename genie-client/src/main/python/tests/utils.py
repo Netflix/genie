@@ -6,10 +6,14 @@ import requests
 import uuid
 
 
-def fake_response(content, status_code=200):
+def fake_response(content, status_code=200, method='GET'):
     response = requests.Response()
+    response.request = requests.Request()
+
     response.status_code = status_code
     response._content = json.dumps(content)
+    response.request.method = method
+
     return response
 
 
