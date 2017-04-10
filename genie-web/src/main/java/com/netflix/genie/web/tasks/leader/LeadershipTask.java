@@ -18,6 +18,7 @@
 package com.netflix.genie.web.tasks.leader;
 
 import com.netflix.genie.web.tasks.GenieTask;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Interface for any task that a node elected as the leader of a Genie cluster should run.
@@ -25,5 +26,13 @@ import com.netflix.genie.web.tasks.GenieTask;
  * @author tgianos
  * @since 3.0.0
  */
+@Slf4j
 public abstract class LeadershipTask extends GenieTask {
+
+    /**
+     * Any cleanup that needs to be performed when this task is stopped due to leadership being revoked.
+     */
+    public void cleanup() {
+        log.info("Task cleanup called. Nothing to do.");
+    }
 }

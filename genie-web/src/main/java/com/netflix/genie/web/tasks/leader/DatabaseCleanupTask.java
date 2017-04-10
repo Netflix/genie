@@ -103,4 +103,12 @@ public class DatabaseCleanupTask extends LeadershipTask {
         log.info("Deleted {} jobs from before {}", numberDeletedJobs, this.dateFormat.format(retentionLimit));
         this.numDeletedJobs.set(numberDeletedJobs);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void cleanup() {
+        this.numDeletedJobs.set(0L);
+    }
 }
