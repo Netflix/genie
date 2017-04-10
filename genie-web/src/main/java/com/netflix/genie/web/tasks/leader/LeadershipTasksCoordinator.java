@@ -87,7 +87,7 @@ public class LeadershipTasksCoordinator {
             }
             log.info("Leadership granted.");
             this.isRunning = true;
-            this.tasks.stream().forEach(
+            this.tasks.forEach(
                 task -> {
                     switch (task.getScheduleType()) {
                         case TRIGGER:
@@ -146,5 +146,6 @@ public class LeadershipTasksCoordinator {
 
         // Clear out the tasks
         this.futures.clear();
+        this.tasks.forEach(LeadershipTask::cleanup);
     }
 }
