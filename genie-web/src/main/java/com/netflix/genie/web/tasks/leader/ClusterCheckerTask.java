@@ -234,11 +234,19 @@ public class ClusterCheckerTask extends LeadershipTask {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void cleanup() {
+        this.errorCounts.clear();
+    }
+
+    /**
      * Get the current size of error counts. Mainly used for testing.
      *
      * @return Number of nodes currently in an error state
      */
-    protected int getErrorCountsSize() {
+    int getErrorCountsSize() {
         return this.errorCounts.size();
     }
 }
