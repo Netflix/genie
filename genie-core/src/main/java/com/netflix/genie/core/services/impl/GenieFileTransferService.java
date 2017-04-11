@@ -90,7 +90,7 @@ public class GenieFileTransferService {
     }
 
     protected FileTransfer getFileTransfer(final String path) throws GenieNotFoundException {
-        FileTransfer result;
+        final FileTransfer result;
         try {
             final URI uri = new URI(path);
             result = fileTransferFactory.get(BEAN_NAME_FILE_SYSTEM_PREFIX + uri.getScheme());

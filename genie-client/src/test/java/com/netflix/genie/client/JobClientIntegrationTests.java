@@ -193,7 +193,7 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
             .build();
 
         final ExecutorService executors = Executors.newFixedThreadPool(2);
-        Future<String> jobFuture;
+        final Future<String> jobFuture;
         try {
             jobFuture = executors.submit(() -> jobClient.submitJob(jobRequest));
             executors.submit(() -> {
