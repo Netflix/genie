@@ -28,7 +28,6 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.jpa.entities.ApplicationEntity;
-import com.netflix.genie.core.jpa.entities.BaseEntity;
 import com.netflix.genie.core.jpa.entities.ClusterEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.entities.JobEntity;
@@ -53,7 +52,6 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * JPA implementation of the job persistence service.
@@ -297,11 +295,10 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
      */
     @Override
     public long deleteAllJobsCreatedBeforeDate(@NotNull final Date date) {
-        final List<JobRequestEntity> requests = jobRequestRepo.findByCreatedBefore(date);
-        final List<String> ids = requests.stream().map(BaseEntity::getId).collect(Collectors.toList());
-        jobExecutionRepo.deleteByIdIn(ids);
-        jobMetadataRepository.deleteByIdIn(ids);
-        jobRepo.deleteByIdIn(ids);
+        final List<String> ids = this.jobRequestRepo.findByCreatedBefore(date);
+        this.jobExecutionRepo.deleteByIdIn(ids);
+        this.jobMetadataRepository.deleteByIdIn(ids);
+        this.jobRepo.deleteByIdIn(ids);
         return jobRequestRepo.deleteByIdIn(ids);
     }
 

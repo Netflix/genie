@@ -18,13 +18,11 @@ package com.netflix.genie.core.jpa.repositories;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.stereotype.Repository;
 
 /**
  * Command repository.
  *
  * @author tgianos
  */
-@Repository
 public interface JpaCommandRepository extends JpaRepository<CommandEntity, String>, JpaSpecificationExecutor {
 }
