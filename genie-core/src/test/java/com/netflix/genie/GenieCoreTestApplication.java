@@ -91,7 +91,7 @@ public class GenieCoreTestApplication {
      * Get the jobs dir as a Spring Resource. Will create if it doesn't exist.
      *
      * @return The job dir as a resource
-     * @throws IOException on error reading or creading the directory
+     * @throws IOException on error reading or creating the directory
      */
     @Bean
     @ConditionalOnMissingBean

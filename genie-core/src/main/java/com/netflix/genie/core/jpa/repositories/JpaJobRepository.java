@@ -30,6 +30,7 @@ import java.util.List;
 public interface JpaJobRepository extends JpaRepository<JobEntity, String>, JpaSpecificationExecutor {
     /**
      * Deletes all jobs for the given ids.
+     *
      * @param ids list of ids for which the jobs should be deleted
      * @return no. of jobs deleted
      */

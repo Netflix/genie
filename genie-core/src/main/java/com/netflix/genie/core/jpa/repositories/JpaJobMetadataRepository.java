@@ -31,6 +31,7 @@ import java.util.List;
 public interface JpaJobMetadataRepository extends JpaRepository<JobMetadataEntity, String>, JpaSpecificationExecutor {
     /**
      * Deletes all job metadatas for the given ids.
+     *
      * @param ids list of ids for which the job requests should be deleted
      * @return no. of metadatas deleted
      */
