@@ -23,7 +23,7 @@ description: "Homepage for Genie by Netflix OSS. You'll find documentation and h
 author: tgianos
 
 introduction: >
-  Genie is a completely open source federated job orchestration engine developed
+  Genie is a completely open source distributed job orchestration engine developed
   by Netflix. Genie provides REST-ful APIs to run a variety of big data jobs
   like Hadoop, Pig, Hive, Spark, Presto, Sqoop and more. It also provides APIs
   for managing the metadata of many distributed processing clusters and the
