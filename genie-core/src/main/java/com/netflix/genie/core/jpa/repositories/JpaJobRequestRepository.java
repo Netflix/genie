@@ -18,6 +18,8 @@ package com.netflix.genie.core.jpa.repositories;
 import com.netflix.genie.core.jpa.entities.JobRequestEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
@@ -37,10 +39,12 @@ public interface JpaJobRequestRepository extends JpaRepository<JobRequestEntity,
      * @param date The date before which all job requests were created.
      * @return List of job requests
      */
-    List<JobRequestEntity> findByCreatedBefore(@NotNull final Date date);
+    @Query("SELECT e.id FROM JobRequestEntity e WHERE e.created < :date")
+    List<String> findByCreatedBefore(@NotNull @Param("date") final Date date);
 
     /**
      * Deletes all job requests for the given ids.
+     *
      * @param ids list of ids for which the job requests should be deleted
      * @return no. of requests deleted
      */
