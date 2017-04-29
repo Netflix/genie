@@ -15,7 +15,7 @@ import pygenie
 
 def mock_to_attachment(att):
     if isinstance(att, dict):
-        return {u'name': unicode(att['name']), u'data': unicode(att['data'])}
+        return {u'name': att['name'], u'data': att['data']}
     else:
         return {u'name': os.path.basename(att), u'data': u'file contents'}
 
@@ -89,7 +89,7 @@ class TestingHiveJob(unittest.TestCase):
         assert_equals(
             " ".join([
                 "-i props_1.hive -i props_2.hive",
-                "--hiveconf p2=v2 --hiveconf p1=v1",
+                "--hiveconf p1=v1 --hiveconf p2=v2",
                 "-i _hive_parameters.txt",
                 "-f test.hql"
             ]),
@@ -114,7 +114,7 @@ class TestingHiveJob(unittest.TestCase):
 
         assert_equals(
             " ".join([
-                "--hiveconf p2=v2 --hiveconf p1=v1",
+                "--hiveconf p1=v1 --hiveconf p2=v2",
                 "-i _hive_parameters.txt",
                 "-f test.hql",
                 "a b c d e f"
@@ -139,9 +139,9 @@ class TestingHiveJobParameters(unittest.TestCase):
 
         assert_equals(
             '\n'.join([
-                "SET hivevar:escaped_single_quotes=Barney\\\'s Adventure;",
                 "SET hivevar:spaces=this has spaces;",
                 "SET hivevar:single_quotes=test' test';",
+                "SET hivevar:escaped_single_quotes=Barney\\\'s Adventure;",
                 "SET hivevar:unicode=\xf3\xf3\xf3;",
                 "SET hivevar:number=8;"
             ]),

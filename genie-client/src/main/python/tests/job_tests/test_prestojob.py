@@ -14,7 +14,7 @@ assert_equals.__self__.maxDiff = None
 
 def mock_to_attachment(att):
     if isinstance(att, dict):
-        return {u'name': unicode(att['name']), u'data': unicode(att['data'])}
+        return {u'name': att['name'], u'data': att['data']}
     else:
         return {u'name': os.path.basename(att), u'data': u'file contents'}
 
@@ -51,15 +51,15 @@ class TestingPrestoJob(unittest.TestCase):
 
         job = pygenie.jobs.PrestoJob() \
             .script('select * from something') \
-            .option('source', 'tester') \
-            .option('opt1', 'val1') \
             .option('debug') \
+            .option('opt1', 'val1') \
+            .option('source', 'tester') \
             .session('s1', 'v1') \
             .session('s2', 'v2')
 
         assert_equals(
             job.cmd_args,
-            u'--session s2=v2 --session s1=v1 --debug --source tester --opt1 val1 -f script.presto'
+            u'--session s1=v1 --session s2=v2 --debug --opt1 val1 --source tester -f script.presto'
         )
 
     @patch('pygenie.jobs.presto.is_file')
@@ -70,15 +70,15 @@ class TestingPrestoJob(unittest.TestCase):
 
         job = pygenie.jobs.PrestoJob() \
             .script('/Users/presto/test.presto') \
-            .option('source', 'tester') \
-            .option('opt1', 'val1') \
-            .option('debug') \
             .session('s1', 'v1') \
-            .session('s2', 'v2')
+            .session('s2', 'v2') \
+            .option('debug') \
+            .option('opt1', 'val1') \
+            .option('source', 'tester')
 
         assert_equals(
             job.cmd_args,
-            u'--session s2=v2 --session s1=v1 --debug --source tester --opt1 val1 -f test.presto'
+            u'--session s1=v1 --session s2=v2 --debug --opt1 val1 --source tester -f test.presto'
         )
 
     @patch('pygenie.jobs.presto.is_file')
@@ -89,17 +89,17 @@ class TestingPrestoJob(unittest.TestCase):
 
         job = pygenie.jobs.PrestoJob() \
             .script('/Users/presto/test.presto') \
-            .option('source', 'tester') \
-            .option('opt1', 'val1') \
             .option('debug') \
             .session('s1', 'v1') \
             .session('s2', 'v2') \
+            .option('opt1', 'val1') \
+            .option('source', 'tester') \
             .post_cmd_args('a') \
             .post_cmd_args(['a', 'b', 'c']) \
             .post_cmd_args('d e f')
 
         assert_equals(
-            '--session s2=v2 --session s1=v1 --debug --source tester --opt1 val1 -f test.presto a b c d e f',
+            '--session s1=v1 --session s2=v2 --debug --opt1 val1 --source tester -f test.presto a b c d e f',
             job.cmd_args
         )
 

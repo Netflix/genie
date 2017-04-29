@@ -14,7 +14,10 @@ import os
 
 from functools import wraps
 from multipledispatch import dispatch
-from urlparse import urlparse
+try:
+    from urlparse import urlparse
+except ImportError:
+    from urllib.parse import urlparse
 
 from ..auth import AuthHandler
 from ..utils import (call,
@@ -78,7 +81,7 @@ def set_jobname(func):
 
 def to_attachment(att):
     if is_str(att) and os.path.isfile(att):
-        return (unicode(os.path.basename(att)), open(att, 'rb'))
+        return (os.path.basename(att), open(att, 'rb'))
     elif is_str(att) and os.path.isdir(att):
         _files = list()
         for local_file in [os.path.join(att, d) for d in os.listdir(att)]:
@@ -86,12 +89,12 @@ def to_attachment(att):
                     os.path.getsize(local_file) > 0 and \
                     not os.path.basename(local_file).startswith('.'):
                 _files.append(
-                    (unicode(os.path.basename(local_file)), open(local_file, 'rb'))
+                    (os.path.basename(local_file), open(local_file, 'rb'))
                 )
         return _files
     elif isinstance(att, dict):
         try:
-            return (unicode(att['name']), unicode(att['data']))
+            return (att['name'], att['data'])
         except KeyError:
             raise GenieAttachmentError("in-line attachment is missing required keys ('name', 'data') ({})".format(att))
     raise GenieAttachmentError("cannot handle attachment '{}'".format(att))
@@ -372,7 +375,7 @@ class Genie3Adapter(GenieBaseAdapter):
         """Submit a job execution to the server."""
 
         payload = {
-            key: value for key, value in get_payload(job).iteritems() \
+            key: value for key, value in get_payload(job).items() \
             if value is not None \
                 and value != [] \
                 and value != {} \

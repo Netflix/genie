@@ -52,7 +52,7 @@ class GenieHTTPError(GenieError):
         super(GenieHTTPError, self).__init__('{}: {}, {}' \
                                                  .format(response.status_code,
                                                          response.reason,
-                                                         response.text))
+                                                         response.content))
         self.response = response
 
 

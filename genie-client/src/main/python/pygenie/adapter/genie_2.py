@@ -281,7 +281,7 @@ class Genie2Adapter(GenieBaseAdapter):
         """Submit a job execution to the server."""
 
         payload = {
-            key: value for key, value in get_payload(job).iteritems() \
+            key: value for key, value in get_payload(job).items() \
             if value is not None \
                 and value != [] \
                 and value != {} \

@@ -151,6 +151,8 @@ class TestGenie3Adapter(unittest.TestCase):
     def test_get_info_for_rj_all(self, get):
         """Test Genie 3 adapter get info call for job (all)."""
 
+        get.side_effect = [{'_links':{'self':{'href':'http://example.com'}}},{},[],{},{},{}]
+
         adapter = Genie3Adapter()
         adapter.get_info_for_rj('111-all')
 
@@ -170,6 +172,8 @@ class TestGenie3Adapter(unittest.TestCase):
     def test_get_info_for_rj_all_timeout(self, get):
         """Test Genie 3 adapter get info call for job (all) (with timeout)."""
 
+
+        get.side_effect = [{'_links':{'self':{'href':'http://example.com'}}},{},[],{},{},{}]
         adapter = Genie3Adapter()
         adapter.get_info_for_rj('111-all-timeout', timeout=1)
 
@@ -188,6 +192,8 @@ class TestGenie3Adapter(unittest.TestCase):
     @patch('pygenie.adapter.genie_3.Genie3Adapter.get')
     def test_get_info_for_rj_job(self, get):
         """Test Genie 3 adapter get info call for job (job section)."""
+
+        get.side_effect = [{'_links':{'self':{'href':'http://example.com'}}}]
 
         adapter = Genie3Adapter()
         adapter.get_info_for_rj('111-job', job=True)
@@ -242,7 +248,7 @@ class TestGenie3AdapterDisableTimeout(unittest.TestCase):
     def test_get_info_for_rj_disabled_timeout(self, genie_call):
         """Test Genie 3 adapter get_info_for_rj() (disabled timeout)."""
 
-        self.adapter.get_info_for_rj('job-3333', timeout=333)
+        self.adapter.get_info_for_rj('job-3333', execution=True, timeout=333)
 
         assert_equals(
             False,

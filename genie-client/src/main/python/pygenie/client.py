@@ -38,8 +38,7 @@ def _call(url, *args, **kwargs):
         return None
 
     response = {}
-    content = resp.content or '{}'
-    content = json.loads(content)
+    content = resp.json() if resp.content else {}
 
     # Genie nests the responses differently depending on whether the type is a
     # list, dict, or string response type
@@ -816,7 +815,7 @@ class Genie(object):
         # backwards compatibility with genie2 clients
         if cluster.__class__.__name__ == "Cluster":
             new_cluster = {}
-            for key, val in cluster.__dict__.iteritems():
+            for key, val in cluster.__dict__.items():
                 if key in ['updated', 'created']:
                     val = cluster.updated.strftime("%Y-%m-%dT%H:%M:%S.000Z")
                 new_cluster[key] = val

@@ -10,6 +10,9 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import logging
 import os
+import sys
+
+from collections import OrderedDict
 
 from ..utils import unicodify
 from .core import GenieJob
@@ -42,7 +45,7 @@ class HiveJob(GenieJob):
     def __init__(self, conf=None):
         super(HiveJob, self).__init__(conf=conf)
 
-        self._parameters = dict()
+        self._parameters = OrderedDict()
         self._property_files = list()
         self._script = None
 
@@ -97,10 +100,12 @@ class HiveJob(GenieJob):
         param_file = ""
 
         for name, value in self._parameters.items():
+            if sys.version_info < (3,):
+                value = unicode(value)
             param_file = '{p}SET hivevar:{name}={value};\n' \
                 .format(p=param_file,
                         name=name,
-                        value=unicode(value))
+                        value=value)
 
         return param_file.strip()
 

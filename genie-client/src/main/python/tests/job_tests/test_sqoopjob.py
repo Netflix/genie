@@ -14,7 +14,7 @@ assert_equals.__self__.maxDiff = None
 
 def mock_to_attachment(att):
     if isinstance(att, dict):
-        return {u'name': unicode(att['name']), u'data': unicode(att['data'])}
+        return {u'name': att['name'], u'data': att['data']}
     else:
         return {u'name': os.path.basename(att), u'data': u'file contents'}
 
@@ -171,26 +171,26 @@ class TestingSqoopOptionsFile(unittest.TestCase):
 
         assert_equals(
             "\n".join([
-                "--username",
-                "'testsqoop'",
-                "--verbose",
-                "--null-non-string",
-                "''",
-                "--target-dir",
-                "'s3://xyz/1'",
-                "--direct",
                 "--connect",
                 "'jdbc:oracle@ZZZZZ'",
-                "--null-string",
-                "'\\\\N'",
-                "--query",
-                "'select * from table'",
+                "--username",
+                "'testsqoop'",
                 "--password",
                 "'testsqooppw'",
+                "--target-dir",
+                "'s3://xyz/1'",
                 "--num-mappers",
                 "'1'",
                 "--fields-terminated-by",
-                "'\\001'"
+                "'\\001'",
+                "--query",
+                "'select * from table'",
+                "--null-string",
+                "'\\\\N'",
+                "--null-non-string",
+                "''",
+                "--verbose",
+                "--direct",
             ]) + "\n",
             job._options_file
         )
@@ -256,11 +256,11 @@ class TestingSqoopJobAdapters(unittest.TestCase):
             .tags('sqooptag1, sqooptag2') \
             .username('jsqoop') \
             .cmd('test-export') \
-            .option('opt1', 'val1') \
             .option('username', 'user') \
+            .password('t3st') \
+            .option('opt1', 'val1') \
             .property('prop1', 'pval1') \
-            .connect('jdbc://test') \
-            .password('t3st')
+            .connect('jdbc://test')
 
         assert_equals(
             pygenie.adapter.genie_2.get_payload(job),
@@ -319,11 +319,11 @@ class TestingSqoopJobAdapters(unittest.TestCase):
             .tags('sqooptag1-g3, sqooptag2-g3') \
             .username('jsqoop-g3') \
             .cmd('test-export-g3') \
-            .option('opt1-g3', 'val1-g3') \
             .option('username', 'user-g3') \
+            .password('t3st-g3') \
+            .option('opt1-g3', 'val1-g3') \
             .property('prop1-g3', 'pval1-g3') \
-            .connect('jdbc://test-g3') \
-            .password('t3st-g3')
+            .connect('jdbc://test-g3')
 
         assert_equals(
             pygenie.adapter.genie_3.get_payload(job),

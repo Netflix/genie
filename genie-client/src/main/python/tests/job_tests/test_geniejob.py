@@ -89,6 +89,7 @@ class TestingGenieJobRepr(unittest.TestCase):
             .post_cmd_args('post1') \
             .post_cmd_args(['post2', 'post3']) \
             .tags('tag1') \
+            .tags(['tag3', 'tag4']) \
             .tags('tag2')
 
         assert_equals(
@@ -120,9 +121,10 @@ class TestingGenieJobRepr(unittest.TestCase):
                 'parameter("param3", "pval3")',
                 'parameter("param4", "pval4")',
                 'post_cmd_args("post1")',
-                "post_cmd_args([u'post2', u'post3'])",
+                "post_cmd_args(['post2', 'post3'])",
                 'tags("tag1")',
-                'tags("tag2")'
+                'tags("tag2")',
+                "tags(['tag3', 'tag4'])"
             ])
         )
 
