@@ -354,7 +354,7 @@ public class JobCompletionService {
             this.doneFileProcessingFailureRate.increment();
             // The run.sh should theoretically ALWAYS generate a done file so we should never hit this code.
             // But if we do handle it generate a metric for it which we can track
-            log.error("Could not load the done file for job {}. Marking it as failed.", id);
+            log.error("Could not load the done file for job {}. Marking it as failed.", id, ioe);
             this.jobPersistenceService.updateJobStatus(
                 id,
                 JobStatus.FAILED,
