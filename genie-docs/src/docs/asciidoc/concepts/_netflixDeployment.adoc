@@ -52,6 +52,8 @@ Netflix for leadership election within our Genie ASG. When the Genie ASG comes u
 in Zookeeper to see if there already is a leader for the app/cluster/stack combination. If there isn't it elects a new
 one.
 
+The leader is not involved in serving incoming requests, it performs background cleanup task for the entire cluster.
+
 ===== ElastiCache
 
 We use https://aws.amazon.com/elasticache/[AWS ElastiCache] to provide a Redis cluster to store our HTTP sessions (via
