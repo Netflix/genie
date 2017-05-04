@@ -8,7 +8,6 @@ buildscript {
 
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${spring_boot_version}")
-        classpath("io.spring.gradle:dependency-management-plugin:1.0.0.RELEASE")
         classpath("org.asciidoctor:asciidoctor-gradle-plugin:1.5.3")
         classpath("gradle.plugin.com.gorylenko.gradle-git-properties:gradle-git-properties:1.4.17")
         classpath("com.netflix.nebula:gradle-aggregate-javadocs-plugin:3.0.1")
@@ -17,6 +16,7 @@ buildscript {
 
 plugins {
     id "com.github.kt3k.coveralls" version "2.7.1"
+    id "io.spring.dependency-management" version "1.0.2.RELEASE"
     id "nebula.netflixoss" version "3.6.0"
     id "org.ajoberstar.github-pages" version "1.6.0"
 }
