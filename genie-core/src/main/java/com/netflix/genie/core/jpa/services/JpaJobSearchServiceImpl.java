@@ -196,7 +196,7 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
 
             return new PageImpl<>(results, page, count);
         } else {
-            return new PageImpl<>(Lists.newArrayList());
+            return new PageImpl<>(Lists.newArrayList(), page, count);
         }
     }
 
