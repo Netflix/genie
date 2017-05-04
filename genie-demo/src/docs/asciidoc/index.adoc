@@ -50,8 +50,8 @@ For reference here is the machine specs that this demo was developed and tested 
 ** MacOS Sierra 10.12.1
 * 2.5 GHz Intel Core i7
 * 16 GB 1600 MHz DDR3
-* Docker 1.12.3
-* Docker Compose 1.8.1
+* Docker 17.03.1-ce-mac5
+* Docker Compose 1.11.2
 
 === Caveats
 
@@ -154,9 +154,6 @@ click a link in the UI and it doesn't work try swapping in localhost for the hos
 . Go to your working directory
 .. Wherever you downloaded the `docker-compose.yml` to
 .. `cd YourWorkDir`
-.. Note the name of your working directory. When you bring up the demo this will become the first part of your
-container names
-... For Example
 . Start the demo containers
 .. `docker-compose up -d`
 ... The first time you run this it could take quite a while as it has to download 4 large images
