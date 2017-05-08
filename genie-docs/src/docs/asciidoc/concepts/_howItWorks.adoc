@@ -62,11 +62,11 @@ applications must successfully be installed before Genie will start running the 
 
 ==== Job Submission
 
-OK. The system admin has everything registered and linked together. Things could obviously change but that's mostly
-transparent to end users. They just want to run jobs.How does that work? This section attempts to walk through what
-happens at a high level. The example section lower down will walk through a step by step example.
+The system admin has everything registered and linked together. Things could change but that's mostly
+transparent to end users, who just want to run jobs. How does that work? This section walks through what
+happens at a high level when a job is submitted.
 
-===== User Submits a Job Request
+===== Cluster and command matching
 
 In order to submit a job request there is some work a user will have to do up front. What kind of job are they running?
 What cluster do they want to run on? What command do they want to use? Do they care about certain details like version
@@ -77,15 +77,64 @@ General rule of thumb for these fields is to use the lowest common denominator o
 requires. This will allow the most flexibility for the job to be moved to different clusters or commands as need be.
 For example if they want to run a Spark job and don't really care about version it is better to just say
 "type:sparksubmit" (assuming this is tagging structure at your organization) only instead of that *and* "ver:2.0.0".
-This way when version 2.0.1 or 2.1.0 comes down the pipe the job moves along with the new default. Obviously if they do
+This way when versions 2.0.1 or 2.1.0 become available, the job moves along with the new default. Obviously if they do
 care about version they should set it or any other specific tag.
 
-The `clusterCriterias` field is an array of `ClusterCriteria` objects. This is done to provide a fallback mechanism. If
-the no match is found for the first `ClusterCriteria` and `commandCriteria` combination it will move onto the second
+The `clusterCriterias` field is an array of `ClusterCriteria` objects. This is done to provide a fallback mechanism.
+If no match is found for the first `ClusterCriteria` and `commandCriteria` combination it will move onto the second
 and so on until all options are exhausted. This is handy if it is desirable to run a job on some cluster that is only
 up some of the time but other times it isn't and its fine to run it on some other cluster that is always available.
 
-Other things a user needs to consider when submitting a job. All dependencies which aren't sent as attachments must
+====== Cluster matching example
+
+Say the following 3 clusters exists tagged as follows:
+
+PrestoTestCluster:
+. sched:test
+. type:presto
+. ver:0.149
+
+HadoopProdCluster:
+. sched:sla
+. type:yarn
+. ver:2.7.0
+. ver:2.7
+
+HadoopTestCluster:
+. sched:test
+. type:yarn
+. ver:2.7.1
+. ver:2.7
+
+
+|===
+| Criteria | Match | Reason
+
+| `type:yarn, ver:2.7, sched:sla`
+| HadoopProdCluster
+| HadoopProdCluster satisfies all criteria
+
+| `type:yarn, ver:2.7`
+| HadoopProdCluster or HadoopTestCluster
+| Two clusters satisfy the criteria, a choice behavior is unspecified
+
+| `type:yarn, ver:2.7.1`
+| HadoopTestCluster
+| HadoopTestCluster satisfies all criteria
+
+| `type:presto, ver:0.150`
+| -
+| No cluster matches all criteria
+
+| `[type:presto, ver:0.150], [type:presto]`
+| PrestoTestCluster
+| The first criteria does not match any cluster, so fallback happens to the second, less restrictive criteria ("any presto cluster").
+
+|===
+
+===== User Submits a Job Request
+
+There are other things a user needs to consider when submitting a job. All dependencies which aren't sent as attachments must
 already be uploaded somewhere Genie can access them. Somewhere like S3, web server, shared disk, etc.
 
 Users should familiarize themselves with whatever the `executable` for their desired command includes. It's possible
@@ -111,19 +160,18 @@ check the amount of client memory the job requires against the available memory 
 enough the job will be accepted and will be run on this node and the jobs memory is subtracted from the available pool.
 If not it will be rejected with a 503 error message and user should retry later.
 
-The order of priority for how memory for a job is determined is:
+The amount of memory used by a job is not strictly enforced or even monitored. Such size is determined as follows:
 
-. The memory a user requested in the job request
-.. Cannot exceed the max memory allowed by system admin for a given job
-. The memory set as the default for a given command by the admins
-. The default memory size for a job as set by the system admin
+. Account for the amount requested in the job request (which must be below an admin-defined threshold)
+. If not provided in the request, use the number provided by the admins for the given command
+. If not provided in the command, use a global default set by the admins
 
 Successful job submission results in a 202 message to the user stating it's accepted and will be processed
 asynchronously by the system.
 
-===== After Job Accepted
+===== Genie Performs Job Setup
 
-Once a job has been accepted to run on a Genie node a workflow is executed in order to setup the job working directory
+Once a job has been accepted to run on a Genie node, a workflow is executed in order to setup the job working directory
 and launch the job. Some minor steps left out for brevity.
 
 . Job is marked in `INIT` state in the database
@@ -143,11 +191,14 @@ needed
 . Command related variables are written into the run script
 . All job dependency files (including attachments) are downloaded into the job working directory
 . Job related variables are written into the run script
-. Job script is executed in a forked process.
+
+===== Genie Launches and Monitors the Job Execution
+
+Assuming no errors occurred during the setup, the job is launched.
+
+. Job `run` script is executed in a forked process.
 . Script `pid` stored in database `job_executions` table and job marked as `RUNNING` in database
 . Monitoring process created for pid
-
-===== After Job Running
 
 Once the job is running Genie will poll the PID periodically waiting for it to no longer be used.
 
@@ -158,11 +209,11 @@ Genie node will run.
 Once the pid no longer exists Genie checks the done file for the exit code. It marks the job succeeded, failed or
 killed depending on that code.
 
-===== Cleaning Up
+===== Genie Performs Job Clean-Up
 
 To save disk space Genie will delete application dependencies from the job working directory after a job is completed.
 This can be disabled by an admin. If the job is marked as it should be archived the working directory will be zipped up
-and stored in the default archive location under the `{jobId}.tar.gz`.
+and stored in the default archive location as `{jobId}.tar.gz`.
 
 ==== User Behavior
 
