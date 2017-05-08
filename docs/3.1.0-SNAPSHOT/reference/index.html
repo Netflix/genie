@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 3.1.0-SNAPSHOT,</span>
-<span id="revdate">2017-05-04</span>
+<span id="revdate">2017-05-08</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -1434,12 +1434,12 @@ applications must successfully be installed before Genie will start running the 
 <div class="sect3">
 <h4 id="_job_submission"><a class="anchor" href="#_job_submission"></a>3.2.2. Job Submission</h4>
 <div class="paragraph">
-<p>OK. The system admin has everything registered and linked together. Things could obviously change but that&#8217;s mostly
-transparent to end users. They just want to run jobs.How does that work? This section attempts to walk through what
-happens at a high level. The example section lower down will walk through a step by step example.</p>
+<p>The system admin has everything registered and linked together. Things could change but that&#8217;s mostly
+transparent to end users, who just want to run jobs. How does that work? This section walks through what
+happens at a high level when a job is submitted.</p>
 </div>
 <div class="sect4">
-<h5 id="_user_submits_a_job_request"><a class="anchor" href="#_user_submits_a_job_request"></a>3.2.2.1. User Submits a Job Request</h5>
+<h5 id="_cluster_and_command_matching"><a class="anchor" href="#_cluster_and_command_matching"></a>3.2.2.1. Cluster and command matching</h5>
 <div class="paragraph">
 <p>In order to submit a job request there is some work a user will have to do up front. What kind of job are they running?
 What cluster do they want to run on? What command do they want to use? Do they care about certain details like version
@@ -1451,17 +1451,87 @@ job request for the <code>clusterCriterias</code> and <code>commandCriteria</cod
 requires. This will allow the most flexibility for the job to be moved to different clusters or commands as need be.
 For example if they want to run a Spark job and don&#8217;t really care about version it is better to just say
 "type:sparksubmit" (assuming this is tagging structure at your organization) only instead of that <strong>and</strong> "ver:2.0.0".
-This way when version 2.0.1 or 2.1.0 comes down the pipe the job moves along with the new default. Obviously if they do
+This way when versions 2.0.1 or 2.1.0 become available, the job moves along with the new default. Obviously if they do
 care about version they should set it or any other specific tag.</p>
 </div>
 <div class="paragraph">
-<p>The <code>clusterCriterias</code> field is an array of <code>ClusterCriteria</code> objects. This is done to provide a fallback mechanism. If
-the no match is found for the first <code>ClusterCriteria</code> and <code>commandCriteria</code> combination it will move onto the second
+<p>The <code>clusterCriterias</code> field is an array of <code>ClusterCriteria</code> objects. This is done to provide a fallback mechanism.
+If no match is found for the first <code>ClusterCriteria</code> and <code>commandCriteria</code> combination it will move onto the second
 and so on until all options are exhausted. This is handy if it is desirable to run a job on some cluster that is only
 up some of the time but other times it isn&#8217;t and its fine to run it on some other cluster that is always available.</p>
 </div>
+<div class="sect5">
+<h6 id="_cluster_matching_example"><a class="anchor" href="#_cluster_matching_example"></a>3.2.2.1.1. Cluster matching example</h6>
 <div class="paragraph">
-<p>Other things a user needs to consider when submitting a job. All dependencies which aren&#8217;t sent as attachments must
+<p>Say the following 3 clusters exists tagged as follows:</p>
+</div>
+<div class="paragraph">
+<p>PrestoTestCluster:
+. sched:test
+. type:presto
+. ver:0.149</p>
+</div>
+<div class="paragraph">
+<p>HadoopProdCluster:
+. sched:sla
+. type:yarn
+. ver:2.7.0
+. ver:2.7</p>
+</div>
+<div class="paragraph">
+<p>HadoopTestCluster:
+. sched:test
+. type:yarn
+. ver:2.7.1
+. ver:2.7</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 33%;">
+<col style="width: 33%;">
+<col style="width: 33%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Criteria</th>
+<th class="tableblock halign-left valign-top">Match</th>
+<th class="tableblock halign-left valign-top">Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>type:yarn, ver:2.7, sched:sla</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">HadoopProdCluster</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">HadoopProdCluster satisfies all criteria</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>type:yarn, ver:2.7</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">HadoopProdCluster or HadoopTestCluster</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Two clusters satisfy the criteria, a choice behavior is unspecified</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>type:yarn, ver:2.7.1</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">HadoopTestCluster</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">HadoopTestCluster satisfies all criteria</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>type:presto, ver:0.150</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No cluster matches all criteria</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[type:presto, ver:0.150], [type:presto]</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">PrestoTestCluster</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The first criteria does not match any cluster, so fallback happens to the second, less restrictive criteria ("any presto cluster").</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_user_submits_a_job_request"><a class="anchor" href="#_user_submits_a_job_request"></a>3.2.2.2. User Submits a Job Request</h5>
+<div class="paragraph">
+<p>There are other things a user needs to consider when submitting a job. All dependencies which aren&#8217;t sent as attachments must
 already be uploaded somewhere Genie can access them. Somewhere like S3, web server, shared disk, etc.</p>
 </div>
 <div class="paragraph">
@@ -1472,7 +1542,7 @@ the setup process of all the cluster, command and application setup processes.</
 </div>
 </div>
 <div class="sect4">
-<h5 id="_genie_receives_the_job_request"><a class="anchor" href="#_genie_receives_the_job_request"></a>3.2.2.2. Genie Receives the Job Request</h5>
+<h5 id="_genie_receives_the_job_request"><a class="anchor" href="#_genie_receives_the_job_request"></a>3.2.2.3. Genie Receives the Job Request</h5>
 <div class="paragraph">
 <p>When Genie receives the job request it does a few things immediately:</p>
 </div>
@@ -1510,25 +1580,18 @@ enough the job will be accepted and will be run on this node and the jobs memory
 If not it will be rejected with a 503 error message and user should retry later.</p>
 </div>
 <div class="paragraph">
-<p>The order of priority for how memory for a job is determined is:</p>
+<p>The amount of memory used by a job is not strictly enforced or even monitored. Such size is determined as follows:</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>The memory a user requested in the job request</p>
-<div class="olist loweralpha">
-<ol class="loweralpha" type="a">
-<li>
-<p>Cannot exceed the max memory allowed by system admin for a given job</p>
-</li>
-</ol>
-</div>
+<p>Account for the amount requested in the job request (which must be below an admin-defined threshold)</p>
 </li>
 <li>
-<p>The memory set as the default for a given command by the admins</p>
+<p>If not provided in the request, use the number provided by the admins for the given command</p>
 </li>
 <li>
-<p>The default memory size for a job as set by the system admin</p>
+<p>If not provided in the command, use a global default set by the admins</p>
 </li>
 </ol>
 </div>
@@ -1538,9 +1601,9 @@ asynchronously by the system.</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_after_job_accepted"><a class="anchor" href="#_after_job_accepted"></a>3.2.2.3. After Job Accepted</h5>
+<h5 id="_genie_performs_job_setup"><a class="anchor" href="#_genie_performs_job_setup"></a>3.2.2.4. Genie Performs Job Setup</h5>
 <div class="paragraph">
-<p>Once a job has been accepted to run on a Genie node a workflow is executed in order to setup the job working directory
+<p>Once a job has been accepted to run on a Genie node, a workflow is executed in order to setup the job working directory
 and launch the job. Some minor steps left out for brevity.</p>
 </div>
 <div class="olist arabic">
@@ -1596,8 +1659,18 @@ needed</p>
 <li>
 <p>Job related variables are written into the run script</p>
 </li>
+</ol>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_genie_launches_and_monitors_the_job_execution"><a class="anchor" href="#_genie_launches_and_monitors_the_job_execution"></a>3.2.2.5. Genie Launches and Monitors the Job Execution</h5>
+<div class="paragraph">
+<p>Assuming no errors occurred during the setup, the job is launched.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
 <li>
-<p>Job script is executed in a forked process.</p>
+<p>Job <code>run</code> script is executed in a forked process.</p>
 </li>
 <li>
 <p>Script <code>pid</code> stored in database <code>job_executions</code> table and job marked as <code>RUNNING</code> in database</p>
@@ -1607,9 +1680,6 @@ needed</p>
 </li>
 </ol>
 </div>
-</div>
-<div class="sect4">
-<h5 id="_after_job_running"><a class="anchor" href="#_after_job_running"></a>3.2.2.4. After Job Running</h5>
 <div class="paragraph">
 <p>Once the job is running Genie will poll the PID periodically waiting for it to no longer be used.</p>
 </div>
@@ -1633,11 +1703,11 @@ killed depending on that code.</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_cleaning_up"><a class="anchor" href="#_cleaning_up"></a>3.2.2.5. Cleaning Up</h5>
+<h5 id="_genie_performs_job_clean_up"><a class="anchor" href="#_genie_performs_job_clean_up"></a>3.2.2.6. Genie Performs Job Clean-Up</h5>
 <div class="paragraph">
 <p>To save disk space Genie will delete application dependencies from the job working directory after a job is completed.
 This can be disabled by an admin. If the job is marked as it should be archived the working directory will be zipped up
-and stored in the default archive location under the <code>{jobId}.tar.gz</code>.</p>
+and stored in the default archive location as <code>{jobId}.tar.gz</code>.</p>
 </div>
 </div>
 </div>
@@ -2033,7 +2103,7 @@ dependencies and the setup file.</p>
 run a client like Hadoop, Hive, Spark etc. Some of these  zips are generated by builds and placed in S3 and others are
 downloaded from OSS projects and uploaded to S3 periodically. Often minor changes to these dependencies are needed. A
 new file is uploaded to S3 and the Genie caches on each node will be refreshed with this new file on next access. This
-pattern allows us to avoid replacing Genie clusters every time an application changes.</p>
+pattern allows us to avoid upgrade of Genie clusters every time an application changes.</p>
 </div>
 <div class="paragraph">
 <p>The setup file effectively is the installation script for the aforementioned dependencies. It is sourced by Genie and
@@ -3254,6 +3324,9 @@ Netflix for leadership election within our Genie ASG. When the Genie ASG comes u
 in Zookeeper to see if there already is a leader for the app/cluster/stack combination. If there isn&#8217;t it elects a new
 one.</p>
 </div>
+<div class="paragraph">
+<p>The leader is not involved in serving incoming requests, it performs background cleanup task for the entire cluster.</p>
+</div>
 </div>
 <div class="sect4">
 <h5 id="_elasticache"><a class="anchor" href="#_elasticache"></a>3.4.1.5. ElastiCache</h5>
@@ -4297,7 +4370,7 @@ an embedded database, "none" otherwise.</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 3.1.0-SNAPSHOT<br>
-Last updated 2017-05-04 20:46:00 +00:00
+Last updated 2017-05-08 23:11:15 +00:00
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
