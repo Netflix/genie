@@ -50,8 +50,8 @@ For reference here is the machine specs that this demo was developed and tested 
 ** MacOS Sierra 10.12.1
 * 2.5 GHz Intel Core i7
 * 16 GB 1600 MHz DDR3
-* Docker 1.12.3
-* Docker Compose 1.8.1
+* Docker 17.03.1-ce-mac5
+* Docker Compose 1.11.2
 
 === Caveats
 
@@ -154,9 +154,6 @@ click a link in the UI and it doesn't work try swapping in localhost for the hos
 . Go to your working directory
 .. Wherever you downloaded the `docker-compose.yml` to
 .. `cd YourWorkDir`
-.. Note the name of your working directory. When you bring up the demo this will become the first part of your
-container names
-... For Example
 . Start the demo containers
 .. `docker-compose up -d`
 ... The first time you run this it could take quite a while as it has to download 4 large images
@@ -197,11 +194,13 @@ yarn, spark-submit, spark-shell) and two application (hadoop, spark)
 .. In the browser browse the Genie UI again and verify that now `Clusters`, `Commands` and `Applications` have data in
 them
 . Run some jobs
-.. Recommend running the Hadoop job before `yarn` or `hdfs` so others they have something interesting to show
-.. Sub in the environment env for desired cluster
-... `sla` for the Prod cluster
-... `test` for the Test cluster
 .. See the `Job Scripts` table for available commands
+.. For example:
+... `./run_hadoop_job.py test`
+... `./run_yarn_job.py test`
+... `./run_hdfs_job.py test`
+.. Replace `test` with, `sla` to run the jobs against the Prod cluster
+.. If any of the Docker container crashes, you may need to increase the default memory available in the Docker preferences. The current default for a fresh install is 2GB, which is not sufficient for this demo. Use `docker stats` to verify the limit is 4GB or higher.
 . For each of these jobs you can see their status, output and other information via the UI's
 .. In the `Jobs` tab of the Genie UI you can see all the job history
 ... Clicking any row will expand that job information and provide more links
