@@ -11,12 +11,14 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import json
 import logging
 import re
+import sys
 
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 
 from ..conf import GenieConf
 from ..utils import (convert_to_unicode,
                      is_str,
+                     normalize_list,
                      str_to_list,
                      unicodify,
                      uuid_str)
@@ -43,10 +45,10 @@ class Repr(object):
         self.__repr_list = list()
 
     def __repr__(self):
-        return str(self)
+        return self.__unicode__()
 
     def __str__(self):
-        return unicode(self).encode('utf-8')
+        return self.__unicode__()
 
     def __unicode__(self):
         return '.'.join(self.repr_list)
@@ -84,9 +86,12 @@ class Repr(object):
         if args is not None:
             results = list()
             for arg in [convert_to_unicode(a) for a in args]:
+                value = arg
+                if isinstance(arg, list):
+                    value = normalize_list(arg)
                 results.append('{qu}{val}{qu}' \
-                    .format(val=arg,
-                            qu=self.__quote(arg) if is_str(arg) else ''))
+                    .format(val=value,
+                            qu=self.__quote(value) if is_str(arg) else ''))
             return ', '.join(results)
 
         return ''
@@ -151,7 +156,7 @@ class GenieJob(object):
         self._archive = True
         self._cluster_tag_mapping = defaultdict(list)
         self._command_arguments = None
-        self._command_options = defaultdict(dict)
+        self._command_options = defaultdict(OrderedDict)
         self._command_tags = list()
         self._dependencies = list()
         self._description = None
@@ -162,7 +167,7 @@ class GenieJob(object):
         self._job_id = uuid_str()
         self._job_name = None
         self._job_version = 'NA'
-        self._parameters = dict()
+        self._parameters = OrderedDict()
         self._post_cmd_args = list()
         self._setup_file = None
         self._tags = list()
@@ -174,16 +179,18 @@ class GenieJob(object):
         self.repr_obj.append('genie_username', (self._username,))
 
         #initialize cluster tags with default set of tags
-        self._cluster_tag_mapping['default'] = self.default_cluster_tags
+        self._cluster_tag_mapping[99999] = self.default_cluster_tags
 
     def __repr__(self):
-        return str(self)
+        return self.__unicode__()
 
     def __str__(self):
-        return unicode(self).encode('utf-8')
+        return self.__unicode__()
 
     def __unicode__(self):
-        return unicode(self.repr_obj)
+        if sys.version_info < (3,):
+            return unicode(self.repr_obj)
+        return str(self.repr_obj)
 
     def _add_dependency(self, dep):
         """
@@ -857,7 +864,7 @@ class GenieJob(object):
         """
 
         _dict = self.__dict__.copy()
-        _dict['repr'] = unicode(self.repr_obj)
+        _dict['repr'] = self.repr_obj
         del _dict['_conf']
         del _dict['repr_obj']
         return {

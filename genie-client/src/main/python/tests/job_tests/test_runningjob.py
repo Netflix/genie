@@ -7,6 +7,7 @@ from nose.tools import assert_equals, assert_raises
 
 import pygenie
 
+from ..utils import fake_response
 
 assert_equals.__self__.maxDiff = None
 
@@ -118,6 +119,8 @@ class TestingRunningJobUpdate(unittest.TestCase):
     def test_update_timeout(self, get):
         """Test calling update for RunningJob (with timeout)."""
 
+        get.side_effect = [{'_links':{'self':{'href':'http://example.com'}}},{},[],{},{},{}]
+
         running_job = pygenie.jobs.RunningJob('1234-update-timeout')
         running_job.update(timeout=3)
 
@@ -136,6 +139,8 @@ class TestingRunningJobUpdate(unittest.TestCase):
     @patch('pygenie.adapter.genie_3.Genie3Adapter.get')
     def test_update_section(self, get):
         """Test calling update section for RunningJob."""
+
+        get.side_effect = [{'_links':{'self':{'href':'http://example.com'}}}]
 
         running_job = pygenie.jobs.RunningJob('1234-update-section')
         running_job.update(info_section='job')

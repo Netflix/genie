@@ -47,7 +47,7 @@ class ApiClient:
         url = self.api_server + resource_path
         headers = {}
         if header_params:
-            for param, value in header_params.iteritems():
+            for param, value in header_params.items():
                 headers[param] = value
 
         if self.api_key is not None:
@@ -131,7 +131,7 @@ class ApiClient:
                 obj_dict = obj.__dict__
             return {
                 key: self.sanitizeForSerialization(val)
-                for (key, val) in obj_dict.iteritems()
+                for (key, val) in obj_dict.items()
                 if key != 'swaggerTypes' and not key[0:2] == '__' and val is not None
             }
 
@@ -172,7 +172,7 @@ class ApiClient:
 
         instance = obj_class()
 
-        for attr, attrType in instance.swaggerTypes.iteritems():
+        for attr, attrType in instance.swaggerTypes.items():
             if obj is not None and attr in obj and type(obj) in [list, dict]:
                 value = obj[attr]
                 if attrType in ['str', 'int', 'long', 'float', 'bool']:

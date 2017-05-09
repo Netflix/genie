@@ -15,7 +15,7 @@ import pygenie
 
 def mock_to_attachment(att):
     if isinstance(att, dict):
-        return {u'name': unicode(att['name']), u'data': unicode(att['data'])}
+        return {u'name': att['name'], u'data': att['data']}
     else:
         return {u'name': os.path.basename(att), u'data': u'file contents'}
 
@@ -91,7 +91,7 @@ class TestingPigJob(unittest.TestCase):
 
         assert_equals(
             " ".join([
-                "-Dp2=v2 -Dp1=v1",
+                "-Dp1=v1 -Dp2=v2",
                 "-P p1.conf -P p2.conf",
                 "-param_file p.params",
                 "-param_file _pig_parameters.txt",
@@ -120,7 +120,7 @@ class TestingPigJob(unittest.TestCase):
 
         assert_equals(
             " ".join([
-                "-Dp2=v2 -Dp1=v1",
+                "-Dp1=v1 -Dp2=v2",
                 "-P p1.conf -P p2.conf",
                 "-param_file p.params",
                 "-param_file _pig_parameters.txt",
@@ -149,13 +149,13 @@ class TestingPigParameterFile(unittest.TestCase):
 
         param_file = \
 """\
-filter_ts = "ts >= '2000-01-01 00:00:00' AND ts < '2000-12-31 00:00:00'"
-single_quotes = "test' test'"
-number = "8"
 spaces = "this has spaces"
+single_quotes = "test' test'"
 double_quotes = "Something: \\"Episode 189\\""
+escaped_single_quotes = "Barney\\'s Adventure"
+number = "8"
 unicode = "\u0147\u0147\u0147"
-escaped_single_quotes = "Barney\\'s Adventure"\
+filter_ts = "ts >= '2000-01-01 00:00:00' AND ts < '2000-12-31 00:00:00'"\
 """
 
         assert_equals(
@@ -297,7 +297,7 @@ class TestingPigJobAdapters(unittest.TestCase):
                     {u'data': u'file contents', u'name': u'pig_param1.params'},
                     {u'data': u'file contents', u'name': u'pig_param2.params'},
                     {u'data': u'A = LOAD;', u'name': u'script.pig'},
-                    {u'data': u'param2 = "2"\nparam1 = "1"', u'name': u'_pig_parameters.txt'}
+                    {u'data': u'param1 = "1"\nparam2 = "2"', u'name': u'_pig_parameters.txt'}
                 ],
                 u'clusterCriterias': [
                     {u'tags': [u'type:pig_cluster_1']},
@@ -426,7 +426,7 @@ class TestingPigJobAdapters(unittest.TestCase):
                     ('pig_param2.params', "open file '/pig_param2.params'"),
                     ('my_properties_local.conf', "open file '/my_properties_local.conf'"),
                     ('script.pig', 'A = LOAD;'),
-                    ('_pig_parameters.txt', 'param2 = "2"\nparam1 = "1"')
+                    ('_pig_parameters.txt', 'param1 = "1"\nparam2 = "2"')
                 ],
                 'clusterCriterias': [
                     {'tags': ['type:pig_cluster_1']},

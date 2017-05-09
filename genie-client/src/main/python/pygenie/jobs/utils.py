@@ -11,6 +11,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import inspect
 import logging
 import os
+import sys
 
 from decorator import decorator
 from functools import wraps
@@ -200,7 +201,7 @@ def generate_job_id(job_id, return_success=True, conf=None):
                 return running_job.job_id
             id_parts = running_job.job_id.split('-')
             if id_parts[-1].isdigit():
-                id_parts[-1] = unicode(int(id_parts[-1]) + 1)
+                id_parts[-1] = str(int(id_parts[-1]) + 1)
             else:
                 id_parts.append('1')
             job_id = '-'.join(id_parts)
@@ -224,8 +225,10 @@ def is_file(path):
 
     path = convert_to_unicode(path)
 
+    if sys.version_info < (3,):
+        path = path.encode('utf-8')
     return path is not None and \
-        (os.path.isfile(path.encode('utf-8')) \
+        (os.path.isfile(path) \
          or path.startswith('s3://') \
          or path.startswith('s3n://'))
 

@@ -33,7 +33,7 @@ class V2Api(object):
         allParams = ['body']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method createCluster" % key)
             params[key] = val
@@ -87,7 +87,7 @@ class V2Api(object):
         allParams = ['name', 'status', 'tag', 'minUpdateTime', 'maxUpdateTime', 'page', 'limit']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method getClusters" % key)
             params[key] = val
@@ -141,7 +141,7 @@ class V2Api(object):
         allParams = []
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method deleteAllClusters" % key)
             params[key] = val
@@ -181,7 +181,7 @@ class V2Api(object):
         allParams = ['id', 'body']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method updateCluster" % key)
             params[key] = val
@@ -223,7 +223,7 @@ class V2Api(object):
         allParams = ['id']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method deleteCluster" % key)
             params[key] = val
@@ -265,7 +265,7 @@ class V2Api(object):
         allParams = ['id']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method getCluster" % key)
             params[key] = val
@@ -309,7 +309,7 @@ class V2Api(object):
         allParams = ['id', 'body']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method addConfigsForCluster" % key)
             params[key] = val
@@ -351,7 +351,7 @@ class V2Api(object):
         allParams = ['id']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method getConfigsForCluster" % key)
             params[key] = val
@@ -395,7 +395,7 @@ class V2Api(object):
         allParams = ['id', 'body']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method updateConfigsForCluster" % key)
             params[key] = val
@@ -439,7 +439,7 @@ class V2Api(object):
         allParams = ['id', 'body']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method addCommandsForCluster" % key)
             params[key] = val
@@ -481,7 +481,7 @@ class V2Api(object):
         allParams = ['id']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method getCommandsForCluster" % key)
             params[key] = val
@@ -525,7 +525,7 @@ class V2Api(object):
         allParams = ['id', 'body']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method updateCommandsForCluster" % key)
             params[key] = val
@@ -567,7 +567,7 @@ class V2Api(object):
         allParams = ['id']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method removeAllCommandsForCluster" % key)
             params[key] = val
@@ -611,7 +611,7 @@ class V2Api(object):
         allParams = ['id', 'cmdId']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method removeCommandForCluster" % key)
             params[key] = val
@@ -659,7 +659,7 @@ class V2Api(object):
         allParams = ['id', 'body']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method addTagsForCluster" % key)
             params[key] = val
@@ -701,7 +701,7 @@ class V2Api(object):
         allParams = ['id']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method getTagsForCluster" % key)
             params[key] = val
@@ -745,7 +745,7 @@ class V2Api(object):
         allParams = ['id', 'body']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method updateTagsForCluster" % key)
             params[key] = val
@@ -787,7 +787,7 @@ class V2Api(object):
         allParams = ['id']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method removeAllTagsForCluster" % key)
             params[key] = val
@@ -831,7 +831,7 @@ class V2Api(object):
         allParams = ['id', 'tag']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method removeTagForCluster" % key)
             params[key] = val
@@ -877,7 +877,7 @@ class V2Api(object):
         allParams = ['body']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method createCommand" % key)
             params[key] = val
@@ -929,7 +929,7 @@ class V2Api(object):
         allParams = ['name', 'userName', 'status', 'tag', 'page', 'limit']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method getCommands" % key)
             params[key] = val
@@ -981,7 +981,7 @@ class V2Api(object):
         allParams = []
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method deleteAllCommands" % key)
             params[key] = val
@@ -1019,7 +1019,7 @@ class V2Api(object):
         allParams = ['id']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method getCommand" % key)
             params[key] = val
@@ -1063,7 +1063,7 @@ class V2Api(object):
         allParams = ['id', 'body']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method updateCommand" % key)
             params[key] = val
@@ -1105,7 +1105,7 @@ class V2Api(object):
         allParams = ['id']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method deleteCommand" % key)
             params[key] = val
@@ -1149,7 +1149,7 @@ class V2Api(object):
         allParams = ['id', 'body']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method addConfigsForCommand" % key)
             params[key] = val
@@ -1191,7 +1191,7 @@ class V2Api(object):
         allParams = ['id']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method getConfigsForCommand" % key)
             params[key] = val
@@ -1235,7 +1235,7 @@ class V2Api(object):
         allParams = ['id', 'body']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method updateConfigsForCommand" % key)
             params[key] = val
@@ -1277,7 +1277,7 @@ class V2Api(object):
         allParams = ['id']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method removeAllConfigsForCommand" % key)
             params[key] = val
@@ -1321,7 +1321,7 @@ class V2Api(object):
         allParams = ['id', 'body']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method addTagsForCommand" % key)
             params[key] = val
@@ -1363,7 +1363,7 @@ class V2Api(object):
         allParams = ['id']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method getTagsForCommand" % key)
             params[key] = val
@@ -1407,7 +1407,7 @@ class V2Api(object):
         allParams = ['id', 'body']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method updateTagsForCommand" % key)
             params[key] = val
@@ -1449,7 +1449,7 @@ class V2Api(object):
         allParams = ['id']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method removeAllTagsForCommand" % key)
             params[key] = val
@@ -1493,7 +1493,7 @@ class V2Api(object):
         allParams = ['id', 'body']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method setApplicationForCommand" % key)
             params[key] = val
@@ -1535,7 +1535,7 @@ class V2Api(object):
         allParams = ['id']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method getApplicationForCommand" % key)
             params[key] = val
@@ -1577,7 +1577,7 @@ class V2Api(object):
         allParams = ['id']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method removeApplicationForCommand" % key)
             params[key] = val
@@ -1619,7 +1619,7 @@ class V2Api(object):
         allParams = ['id']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method getClustersForCommand" % key)
             params[key] = val
@@ -1663,7 +1663,7 @@ class V2Api(object):
         allParams = ['id', 'tag']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method removeTagForCommand" % key)
             params[key] = val
@@ -1709,7 +1709,7 @@ class V2Api(object):
         allParams = ['id']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method getJob" % key)
             params[key] = val
@@ -1751,7 +1751,7 @@ class V2Api(object):
         allParams = ['id']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method killJob" % key)
             params[key] = val
@@ -1793,7 +1793,7 @@ class V2Api(object):
         allParams = ['id']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method getJobStatus" % key)
             params[key] = val
@@ -1856,7 +1856,7 @@ class V2Api(object):
                      'limit']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method getJobs" % key)
             params[key] = val
@@ -1916,7 +1916,7 @@ class V2Api(object):
         allParams = ['body']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method submitJob" % key)
             params[key] = val
@@ -1956,7 +1956,7 @@ class V2Api(object):
         allParams = ['id', 'body']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method addTagsForJob" % key)
             params[key] = val
@@ -1998,7 +1998,7 @@ class V2Api(object):
         allParams = ['id']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method getTagsForJob" % key)
             params[key] = val
@@ -2042,7 +2042,7 @@ class V2Api(object):
         allParams = ['id', 'body']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method updateTagsForJob" % key)
             params[key] = val
@@ -2084,7 +2084,7 @@ class V2Api(object):
         allParams = ['id']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method removeAllTagsForJob" % key)
             params[key] = val
@@ -2128,7 +2128,7 @@ class V2Api(object):
         allParams = ['id', 'tag']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method removeTagForJob" % key)
             params[key] = val
@@ -2174,7 +2174,7 @@ class V2Api(object):
         allParams = ['id']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method getApplication" % key)
             params[key] = val
@@ -2218,7 +2218,7 @@ class V2Api(object):
         allParams = ['id', 'body']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method updateApplication" % key)
             params[key] = val
@@ -2260,7 +2260,7 @@ class V2Api(object):
         allParams = ['id']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method deleteApplication" % key)
             params[key] = val
@@ -2316,7 +2316,7 @@ class V2Api(object):
         allParams = ['name', 'userName', 'status', 'tag', 'page', 'limit']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method getApplications" % key)
             params[key] = val
@@ -2370,7 +2370,7 @@ class V2Api(object):
         allParams = ['body']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method createApplication" % key)
             params[key] = val
@@ -2406,7 +2406,7 @@ class V2Api(object):
         allParams = []
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method deleteAllApplications" % key)
             params[key] = val
@@ -2446,7 +2446,7 @@ class V2Api(object):
         allParams = ['id', 'body']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method addConfigsToApplication" % key)
             params[key] = val
@@ -2488,7 +2488,7 @@ class V2Api(object):
         allParams = ['id']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method getConfigsForApplication" % key)
             params[key] = val
@@ -2532,7 +2532,7 @@ class V2Api(object):
         allParams = ['id', 'body']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method updateConfigsForApplication" % key)
             params[key] = val
@@ -2574,7 +2574,7 @@ class V2Api(object):
         allParams = ['id']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s' to method removeAllConfigsForApplication" % key)
@@ -2619,7 +2619,7 @@ class V2Api(object):
         allParams = ['id', 'body']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method addJarsForApplication" % key)
             params[key] = val
@@ -2661,7 +2661,7 @@ class V2Api(object):
         allParams = ['id']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method getJarsForApplication" % key)
             params[key] = val
@@ -2705,7 +2705,7 @@ class V2Api(object):
         allParams = ['id', 'body']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method updateJarsForApplication" % key)
             params[key] = val
@@ -2747,7 +2747,7 @@ class V2Api(object):
         allParams = ['id']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method removeAllJarsForApplication" % key)
             params[key] = val
@@ -2791,7 +2791,7 @@ class V2Api(object):
         allParams = ['id', 'body']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method addTagsForApplication" % key)
             params[key] = val
@@ -2833,7 +2833,7 @@ class V2Api(object):
         allParams = ['id']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method getTagsForApplication" % key)
             params[key] = val
@@ -2877,7 +2877,7 @@ class V2Api(object):
         allParams = ['id', 'body']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method updateTagsForApplication" % key)
             params[key] = val
@@ -2919,7 +2919,7 @@ class V2Api(object):
         allParams = ['id']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method removeAllTagsForApplication" % key)
             params[key] = val
@@ -2961,7 +2961,7 @@ class V2Api(object):
         allParams = ['id']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method getCommandsForApplication" % key)
             params[key] = val
@@ -3005,7 +3005,7 @@ class V2Api(object):
         allParams = ['id', 'tag']
 
         params = locals()
-        for (key, val) in params['kwargs'].iteritems():
+        for (key, val) in params['kwargs'].items():
             if key not in allParams:
                 raise TypeError("Got an unexpected keyword argument '%s' to method removeTagForApplication" % key)
             params[key] = val

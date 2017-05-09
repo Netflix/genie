@@ -230,9 +230,9 @@ class GenieConf(object):
             dict: A mapping of attributes and configs to values.
         """
 
-        _dict = {attr: value for attr, value in self.__dict__.iteritems() \
+        _dict = {attr: value for attr, value in self.__dict__.items() \
            if not attr.startswith('_')}
-        for attr_name, attr_value in _dict.iteritems():
+        for attr_name, attr_value in _dict.items():
             if isinstance(attr_value, GenieConfSection):
                 _dict[attr_name] = attr_value.to_dict()
         return _dict

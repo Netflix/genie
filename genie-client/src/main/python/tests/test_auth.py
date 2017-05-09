@@ -23,8 +23,8 @@ import pygenie
 def check_request_auth_kwargs(*args, **kwargs):
     auth = kwargs.get('auth')
     assert auth is not None
-    assert_equals(unicode(auth.username), u'auth_user')
-    assert_equals(unicode(auth.password), u'1234!!!')
+    assert_equals(auth.username, u'auth_user')
+    assert_equals(auth.password, u'1234!!!')
     return fake_response('content')
 
 

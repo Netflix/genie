@@ -13,6 +13,7 @@ import logging
 import pkg_resources
 import six
 import socket
+import sys
 import time
 import uuid
 
@@ -111,7 +112,7 @@ def call(url, method='get', headers=None, raise_not_status=None, none_on_404=Fal
                     .format(method=resp.request.method,
                             url=resp.url,
                             code=resp.status_code,
-                            text=resp.text)
+                            text=resp.content)
             logger.warning('attempt %s %s', i + 1, msg)
             time.sleep(i * backoff)
 
@@ -135,11 +136,15 @@ def call(url, method='get', headers=None, raise_not_status=None, none_on_404=Fal
 def convert_to_unicode(value):
     """Convert value to unicode."""
 
-    if is_str(value) and not isinstance(value, unicode):
+    if sys.version_info < (3,) and is_str(value) and not isinstance(value, unicode):
         return value.decode('utf-8')
 
     return value
 
+def normalize_list(l):
+    if not l:
+        return ''
+    return "['{}']".format("', '".join(l))
 
 def unicodify(func):
     """
@@ -208,4 +213,4 @@ def uuid_str():
         str: A unique id.
     """
 
-    return unicode(uuid.uuid1())
+    return str(uuid.uuid1())
