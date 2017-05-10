@@ -33,7 +33,9 @@
     "react-dom": "^15.0.1",
     "react-modal": "^1.4.0",
     "react-router": "^2.3.0",
-    "react-select": "^1.0.0-beta13"
+    "react-select": "^1.0.0-beta13",
+    "prop-types": "^15.5.9",
+    "create-react-class": "^15.5.3"
   },
   "devDependencies": {
     "babel-eslint": "^6.0.4",
