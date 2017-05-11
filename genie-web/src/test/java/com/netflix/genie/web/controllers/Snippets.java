@@ -364,19 +364,19 @@ final class Snippets {
                 .optional(),
             RequestDocumentation
                 .parameterWithName("minStarted")
-                .description("The minimum started time of the job in milliseconds since epoch.")
+                .description("The minimum started time of the job in milliseconds since epoch. (inclusive)")
                 .optional(),
             RequestDocumentation
                 .parameterWithName("maxStarted")
-                .description("The maximum started time of the job in milliseconds since epoch.")
+                .description("The maximum started time of the job in milliseconds since epoch. (exclusive)")
                 .optional(),
             RequestDocumentation
                 .parameterWithName("minFinished")
-                .description("The minimum finished time of the job in milliseconds since epoch.")
+                .description("The minimum finished time of the job in milliseconds since epoch. (inclusive)")
                 .optional(),
             RequestDocumentation
                 .parameterWithName("maxFinished")
-                .description("The maximum finished time of the job in milliseconds since epoch.")
+                .description("The maximum finished time of the job in milliseconds since epoch. (exclusive)")
                 .optional()
         )
     );
