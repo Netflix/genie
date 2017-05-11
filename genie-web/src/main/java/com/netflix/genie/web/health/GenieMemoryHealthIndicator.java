@@ -84,8 +84,12 @@ public class GenieMemoryHealthIndicator implements HealthIndicator {
             .withDetail(NUMBER_RUNNING_JOBS_KEY, this.jobMetricsService.getNumActiveJobs())
             .withDetail(USED_MEMORY_KEY, usedMemory)
             .withDetail(AVAILABLE_MEMORY, availableMemory)
-            .withDetail(AVAILABLE_DEFAULT_JOB_CAPACITY, availableMemory % defaultJobMemory)
-            .withDetail(AVAILABLE_MAX_JOB_CAPACITY, availableMemory % maxJobMemory)
+            .withDetail(
+                AVAILABLE_DEFAULT_JOB_CAPACITY,
+                (availableMemory >= 0 && defaultJobMemory > 0) ? (availableMemory / defaultJobMemory) : 0)
+            .withDetail(
+                AVAILABLE_MAX_JOB_CAPACITY,
+                (availableMemory >= 0 && maxJobMemory > 0) ? (availableMemory / maxJobMemory) : 0)
             .build();
     }
 }
