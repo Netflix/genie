@@ -144,6 +144,28 @@ Genie requires a few directories to run. By default Genie will place them under 
 probably create a larger directory you can store the job working directories and other places in. These correspond to
 the `genie.jobs.locations.*` properties described below in the <<Properties>> section.
 
+===== S3
+
+If your commands, applications, or jobs depend on artifacts referenced via S3 URI, you will need to configure the S3 subsystem.
+
+1. Make sure `application-s3.yml` exists in `~/.genie` (or at a custom location, referenced by `--spring.config.location=`)
+2. An example of `application-s3.yml` is available below. Set either `credentials.file` or `credentials.role`
+  * For `credentials.file`, provide a filename of a file **in classpath** that contains the AWS access key and secret. A convenient location to place this file is `~/.genie/lib`.
+  * For `credentials.role`, provide an inline role value.
+3. Enable the Spring Boot `s3` profile during Genie launch, for example via command-line: `--spring.profiles.active=prod,s3`
+4. To confirm things are properly configured, head to `/actuator/beans` and verify that the `file.system.s3` bean was created
+
+Example `application-s3.yml`
+```
+genie:
+  aws:
+    credentials:
+      # File in classpath containing aws credentials, i.e. accessKey and secretKey
+      #file: <AWS CREDENTIALS FILENAME>
+      # OR role arn string
+      #role: <AWS ROLE ARN>
+```
+
 === Wrap Up
 
 This section contains the basic setup instructions for Genie. There are other components that can be added to the
