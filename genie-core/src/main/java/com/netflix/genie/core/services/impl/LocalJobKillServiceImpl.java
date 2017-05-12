@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.core.services.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
@@ -26,6 +27,7 @@ import com.netflix.genie.core.events.JobFinishedEvent;
 import com.netflix.genie.core.events.JobFinishedReason;
 import com.netflix.genie.core.events.KillJobEvent;
 import com.netflix.genie.core.jobs.JobConstants;
+import com.netflix.genie.core.jobs.JobKillReasonFile;
 import com.netflix.genie.core.services.JobKillService;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.util.ProcessChecker;
@@ -38,8 +40,10 @@ import org.apache.commons.lang3.SystemUtils;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.io.Resource;
 
 import javax.validation.constraints.NotNull;
+import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
 
@@ -57,6 +61,8 @@ public class LocalJobKillServiceImpl implements JobKillService {
     private final Executor executor;
     private final boolean runAsUser;
     private final ApplicationEventPublisher eventPublisher;
+    private final File baseWorkingDir;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * Constructor.
@@ -66,19 +72,27 @@ public class LocalJobKillServiceImpl implements JobKillService {
      * @param executor         The executor to use to run system processes
      * @param runAsUser        True if jobs are run as the user who submitted the job
      * @param eventPublisher   The system event publisher to use
+     * @param genieWorkingDir  The working directory where all job directories are created.
      */
     public LocalJobKillServiceImpl(
         @NotBlank final String hostName,
         @NotNull final JobSearchService jobSearchService,
         @NotNull final Executor executor,
         final boolean runAsUser,
-        @NotNull final ApplicationEventPublisher eventPublisher
+        @NotNull final ApplicationEventPublisher eventPublisher,
+        @NotNull final Resource genieWorkingDir
     ) {
         this.hostName = hostName;
         this.jobSearchService = jobSearchService;
         this.executor = executor;
         this.runAsUser = runAsUser;
         this.eventPublisher = eventPublisher;
+
+        try {
+            this.baseWorkingDir = genieWorkingDir.getFile();
+        } catch (IOException gse) {
+            throw new RuntimeException("Could not load the base path from resource", gse);
+        }
     }
 
     /**
@@ -86,7 +100,8 @@ public class LocalJobKillServiceImpl implements JobKillService {
      */
     @Override
     public void killJob(
-        @NotBlank(message = "No id entered. Unable to kill job.") final String id
+        @NotBlank(message = "No id entered. Unable to kill job.") final String id,
+        @NotBlank(message = "No reason provided.") final String reason
     ) throws GenieException {
         // Will throw exception if not found
         // TODO: Could instead check JobMonitorCoordinator eventually for in memory check
@@ -131,6 +146,15 @@ public class LocalJobKillServiceImpl implements JobKillService {
                 // Windows, etc. May support later
                 throw new java.lang.UnsupportedOperationException("Genie isn't currently supported on this OS");
             }
+
+            // Write additional file with kill reason
+            try {
+                this.objectMapper.writeValue(
+                    new File(this.baseWorkingDir + "/" + id + "/genie/kill-reason"),
+                    new JobKillReasonFile(reason));
+            } catch (IOException e) {
+                throw new GenieServerException("Failed to write job kill reason file", e);
+            }
         }
     }
 
@@ -142,7 +166,7 @@ public class LocalJobKillServiceImpl implements JobKillService {
      */
     @EventListener
     public void onKillJobEvent(@NotNull final KillJobEvent event) throws GenieException {
-        this.killJob(event.getId());
+        this.killJob(event.getId(), event.getReason());
     }
 
     private void killJobOnUnix(final int pid) throws GenieException {

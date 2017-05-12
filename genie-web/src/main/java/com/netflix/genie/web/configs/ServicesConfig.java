@@ -223,6 +223,7 @@ public class ServicesConfig {
      * @param executor         The executor to use to run system processes.
      * @param jobsProperties   The jobs properties to use
      * @param eventPublisher   The application event publisher to use to publish system wide events
+     * @param genieWorkingDir       Working directory for genie where it creates jobs directories.
      * @return A job kill service instance.
      */
     @Bean
@@ -231,15 +232,17 @@ public class ServicesConfig {
         final JobSearchService jobSearchService,
         final Executor executor,
         final JobsProperties jobsProperties,
-        final ApplicationEventPublisher eventPublisher
+        final ApplicationEventPublisher eventPublisher,
+        @Qualifier("jobsDir")
+        final Resource genieWorkingDir
     ) {
         return new LocalJobKillServiceImpl(
             hostName,
             jobSearchService,
             executor,
             jobsProperties.getUsers().isRunAsUserEnabled(),
-            eventPublisher
-        );
+            eventPublisher,
+            genieWorkingDir);
     }
 
     /**

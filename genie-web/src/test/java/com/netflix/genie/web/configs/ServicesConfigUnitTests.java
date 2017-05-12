@@ -45,6 +45,7 @@ import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.ApplicationEventMulticaster;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.mail.javamail.JavaMailSender;
 
@@ -252,7 +253,8 @@ public class ServicesConfigUnitTests {
                 this.jobSearchService,
                 Mockito.mock(Executor.class),
                 new JobsProperties(),
-                Mockito.mock(ApplicationEventPublisher.class)
+                Mockito.mock(ApplicationEventPublisher.class),
+                Mockito.mock(FileSystemResource.class)
             )
         );
     }

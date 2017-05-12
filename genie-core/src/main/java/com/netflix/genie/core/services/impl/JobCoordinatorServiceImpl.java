@@ -272,8 +272,8 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
      * {@inheritDoc}
      */
     @Override
-    public void killJob(@NotBlank final String jobId) throws GenieException {
-        this.jobKillService.killJob(jobId);
+    public void killJob(@NotBlank final String jobId, @NotBlank final String reason) throws GenieException {
+        this.jobKillService.killJob(jobId, reason);
     }
 
     private void setRuntimeEnvironment(
