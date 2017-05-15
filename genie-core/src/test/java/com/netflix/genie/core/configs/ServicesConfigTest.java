@@ -57,6 +57,7 @@ import com.netflix.spectator.api.DefaultRegistry;
 import com.netflix.spectator.api.Registry;
 import org.apache.commons.exec.Executor;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.ServiceLocatorFactoryBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationEventPublisher;
@@ -249,6 +250,7 @@ public class ServicesConfigTest {
         final ApplicationEventPublisher eventPublisher,
         final ApplicationEventMulticaster eventMulticaster,
         final List<WorkflowTask> workflowTasks,
+        @Qualifier("jobsDir")
         final Resource genieWorkingDir,
         final Registry registry
     ) {

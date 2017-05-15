@@ -305,6 +305,7 @@ public class ServicesConfig {
         final ApplicationEventPublisher eventPublisher,
         final ApplicationEventMulticaster eventMulticaster,
         final List<WorkflowTask> workflowTasks,
+        @Qualifier("jobsDir")
         final Resource genieWorkingDir,
         final Registry registry
     ) {

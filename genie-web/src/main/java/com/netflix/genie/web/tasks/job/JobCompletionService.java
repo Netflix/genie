@@ -116,7 +116,7 @@ public class JobCompletionService {
         final JobPersistenceService jobPersistenceService,
         final JobSearchService jobSearchService,
         final GenieFileTransferService genieFileTransferService,
-        final Resource genieWorkingDir,
+        @Qualifier("jobsDir") final Resource genieWorkingDir,
         final MailService mailServiceImpl,
         final Registry registry,
         final JobsProperties jobsProperties,
