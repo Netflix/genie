@@ -364,3 +364,35 @@ class TestingSetJobName(unittest.TestCase):
             set_jobname(pygenie.jobs.PrestoJob() \
                 .script("min(\"values\") r = 'foo' order by date, hour;"))
         )
+
+
+@patch.dict('os.environ', {'GENIE_BYPASS_HOME_CONFIG': '1'})
+class TestingSetGenieUrl(unittest.TestCase):
+    """Test setting genie url."""
+
+    def test_set_genie_url(self):
+        """Test setting genie url."""
+
+        url = 'http://www.test-genie-url.com:7001'
+
+        job = pygenie.jobs.GenieJob() \
+            .genie_url(url)
+
+        assert_equals(
+            url,
+            job._conf.genie.url
+        )
+
+    def test_set_genie_url_trailing_slash(self):
+        """Test setting genie url with trailing slash."""
+
+        url = 'http://www.test-genie-url.com:7001/'
+        url_clean = url.rstrip('/')
+
+        job = pygenie.jobs.GenieJob() \
+            .genie_url(url)
+
+        assert_equals(
+            url_clean,
+            job._conf.genie.url
+        )
