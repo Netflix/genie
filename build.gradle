@@ -352,3 +352,10 @@ task dockerLogin(type: Exec, group: "Docker", description: "Login to docker hub 
     dependsOn tasks.dockerLogout
     commandLine "docker", "login", "-u", System.getenv("DOCKER_USER"), "-p", System.getenv("DOCKER_PASSWORD")
 }
+
+task dockerBuildAllImages(group: "Docker", description: "Container task for all docker image builds") {
+    dependsOn ":genie-app:dockerBuildAppImage"
+    dependsOn ":genie-demo:dockerBuildApacheImage"
+    dependsOn ":genie-demo:dockerBuildClientImage"
+    dependsOn ":genie-war:dockerBuildWarImage"
+}
