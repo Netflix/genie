@@ -589,7 +589,7 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
         reader1.close();
         inputStream1.close();
 
-        Assert.assertEquals("ls: foo: No such file or directory", sb.toString());
+        Assert.assertTrue(sb.toString().contains("No such file or directory"));
     }
 
     /**
