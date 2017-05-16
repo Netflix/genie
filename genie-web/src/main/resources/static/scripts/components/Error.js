@@ -1,4 +1,5 @@
-import React, { PropTypes as T } from 'react';
+import T from 'prop-types';
+import React from 'react';
 
 const Error = (props) =>
   <div className="col-md-10 result-panel-msg">
