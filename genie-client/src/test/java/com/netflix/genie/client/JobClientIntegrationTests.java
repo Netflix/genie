@@ -34,7 +34,6 @@ import com.netflix.genie.common.dto.search.JobSearchResult;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.ResourceLoader;
@@ -51,10 +50,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -64,7 +59,6 @@ import java.util.stream.Collectors;
  * @since 3.0.0
  */
 @Slf4j
-@Ignore
 public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase {
 
     private static final String JOB_NAME = "List Directories bash job";
@@ -152,70 +146,6 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
 
         Assert.assertEquals(CLUSTER_NAME, jobClient.getJobCluster(jobId).getName());
         Assert.assertEquals(COMMAND_NAME, jobClient.getJobCommand(jobId).getName());
-    }
-
-    /**
-     * Method to test submitting/killing a job.
-     *
-     * @throws Exception If there is any problem.
-     */
-    @Test
-    public void submitAndKillJob() throws Exception {
-
-        createClusterAndCommandForTest();
-
-        final String jobId = UUID.randomUUID().toString();
-
-        final List<ClusterCriteria> clusterCriteriaList
-            = Lists.newArrayList(new ClusterCriteria(Sets.newHashSet("laptop")));
-
-        final Set<String> commandCriteria = Sets.newHashSet("bash");
-
-        final String depFile1
-            = this.resourceLoader.getResource("/dep1").getFile().getAbsolutePath();
-        final Set<String> dependencies = Sets.newHashSet(depFile1);
-
-        final String setUpFile = this.resourceLoader.getResource("/setupfile").getFile().getAbsolutePath();
-
-        final JobRequest jobRequest = new JobRequest.Builder(
-            JOB_NAME,
-            JOB_USER,
-            JOB_VERSION,
-            "-c 'echo HELLO WORLD!!!'",
-            clusterCriteriaList,
-            commandCriteria
-        )
-            .withId(jobId)
-            .withDisableLogArchival(true)
-            .withSetupFile(setUpFile)
-            .withDependencies(dependencies)
-            .withDescription(JOB_DESCRIPTION)
-            .build();
-
-        final ExecutorService executors = Executors.newFixedThreadPool(2);
-        final Future<String> jobFuture;
-        try {
-            jobFuture = executors.submit(() -> jobClient.submitJob(jobRequest));
-            executors.submit(() -> {
-                boolean result = true;
-                while (result) {
-                    try {
-                        jobClient.getJob(jobId);
-                        jobClient.killJob(jobId);
-                        Thread.sleep(1000);
-                        result = false;
-                    } catch (Exception ignored) {
-                        result = true;
-                    }
-                }
-            });
-        } finally {
-            executors.shutdown();
-            executors.awaitTermination(Integer.MAX_VALUE, TimeUnit.HOURS);
-        }
-        final Job job = jobClient.getJob(jobId);
-        Assert.assertEquals(jobId, jobFuture.get());
-        Assert.assertEquals(JobStatus.KILLED, job.getStatus());
     }
 
     /**
