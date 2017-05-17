@@ -1,4 +1,5 @@
-import React, { PropTypes as T } from "react";
+import T from 'prop-types';
+import React from 'react';
 
 const TableBody = props => {
   const tableRows = props.rows.map((row, index) => (

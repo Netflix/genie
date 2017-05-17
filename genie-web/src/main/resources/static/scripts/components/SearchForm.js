@@ -1,4 +1,4 @@
-import React, { PropTypes as T } from "react";
+import React from 'react';
 
 import Select from "react-select";
 
@@ -9,8 +9,10 @@ import Panel from "rc-time-picker/lib/Panel";
 
 import { momentFormat, milliSeconds, nowUtc } from "./../utils";
 
-import "rc-calendar/assets/index.css";
-import "rc-time-picker/assets/index.css";
+import T from 'prop-types';
+
+import 'rc-calendar/assets/index.css';
+import 'rc-time-picker/assets/index.css';
 
 export default class SearchForm extends React.Component {
   static contextTypes = { router: T.object.isRequired };

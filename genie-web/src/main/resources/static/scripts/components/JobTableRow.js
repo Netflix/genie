@@ -1,6 +1,7 @@
-import React, { PropTypes as T } from "react";
-import { momentFormat, momentDurationFormat } from "../utils";
-import CopyToClipboard from "react-copy-to-clipboard";
+import T from 'prop-types';
+import React from 'react';
+import { momentFormat, momentDurationFormat } from '../utils';
+import CopyToClipboard from 'react-copy-to-clipboard';
 
 export default class TableRow extends React.Component {
   static propTypes = {
