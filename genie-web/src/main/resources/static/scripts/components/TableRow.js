@@ -1,5 +1,6 @@
-import React, { PropTypes as T } from "react";
-import { momentFormat } from "../utils";
+import T from 'prop-types';
+import React from 'react';
+import { momentFormat } from '../utils';
 
 import CopyToClipboard from "react-copy-to-clipboard";
 
