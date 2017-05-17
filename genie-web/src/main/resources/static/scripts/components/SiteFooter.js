@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 const SiteFooter = (props) =>
@@ -8,7 +9,7 @@ const SiteFooter = (props) =>
   </div>;
 
 SiteFooter.propTypes = {
-  version: React.PropTypes.string,
+  version: PropTypes.string,
 };
 
 export default SiteFooter;

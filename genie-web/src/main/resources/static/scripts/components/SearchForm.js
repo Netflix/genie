@@ -1,4 +1,4 @@
-import React, { PropTypes as T } from 'react';
+import React from 'react';
 
 import Select from 'react-select';
 
@@ -8,6 +8,8 @@ import enUS from 'rc-calendar/lib/locale/en_US';
 import Panel from 'rc-time-picker/lib/Panel';
 
 import { momentFormat, milliSeconds, nowUtc } from './../utils';
+
+import T from 'prop-types';
 
 import 'rc-calendar/assets/index.css';
 import 'rc-time-picker/assets/index.css';

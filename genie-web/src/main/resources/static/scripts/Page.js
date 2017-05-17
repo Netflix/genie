@@ -1,4 +1,5 @@
-import React, { PropTypes as T } from 'react';
+import T from 'prop-types';
+import React from 'react';
 import $ from 'jquery';
 
 import SearchForm from './components/SearchForm';
