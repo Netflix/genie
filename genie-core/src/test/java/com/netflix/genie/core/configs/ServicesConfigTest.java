@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.core.configs;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.Files;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
@@ -213,7 +214,7 @@ public class ServicesConfigTest {
         @Qualifier("jobsDir") final Resource genieWorkingDir
     ) {
         return new LocalJobKillServiceImpl(hostname, jobSearchService, executor, false, eventPublisher,
-            genieWorkingDir);
+            genieWorkingDir, new ObjectMapper());
     }
 
     /**

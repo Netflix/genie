@@ -62,7 +62,7 @@ public class LocalJobKillServiceImpl implements JobKillService {
     private final boolean runAsUser;
     private final ApplicationEventPublisher eventPublisher;
     private final File baseWorkingDir;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
 
     /**
      * Constructor.
@@ -73,6 +73,7 @@ public class LocalJobKillServiceImpl implements JobKillService {
      * @param runAsUser        True if jobs are run as the user who submitted the job
      * @param eventPublisher   The system event publisher to use
      * @param genieWorkingDir  The working directory where all job directories are created.
+     * @param objectMapper     The Jackson ObjectMapper used to serialize from/to JSON
      */
     public LocalJobKillServiceImpl(
         @NotBlank final String hostName,
@@ -80,13 +81,14 @@ public class LocalJobKillServiceImpl implements JobKillService {
         @NotNull final Executor executor,
         final boolean runAsUser,
         @NotNull final ApplicationEventPublisher eventPublisher,
-        @NotNull final Resource genieWorkingDir
-    ) {
+        @NotNull final Resource genieWorkingDir,
+        @NotNull final ObjectMapper objectMapper) {
         this.hostName = hostName;
         this.jobSearchService = jobSearchService;
         this.executor = executor;
         this.runAsUser = runAsUser;
         this.eventPublisher = eventPublisher;
+        this.objectMapper = objectMapper;
 
         try {
             this.baseWorkingDir = genieWorkingDir.getFile();
@@ -150,7 +152,9 @@ public class LocalJobKillServiceImpl implements JobKillService {
             // Write additional file with kill reason
             try {
                 this.objectMapper.writeValue(
-                    new File(this.baseWorkingDir + "/" + id + "/genie/kill-reason"),
+                    new File(this.baseWorkingDir + "/"
+                        + id + "/"
+                        + JobConstants.GENIE_KILL_REASON_FILE_NAME),
                     new JobKillReasonFile(reason));
             } catch (IOException e) {
                 throw new GenieServerException("Failed to write job kill reason file", e);

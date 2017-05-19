@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.configs;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
@@ -254,7 +255,8 @@ public class ServicesConfigUnitTests {
                 Mockito.mock(Executor.class),
                 new JobsProperties(),
                 Mockito.mock(ApplicationEventPublisher.class),
-                Mockito.mock(FileSystemResource.class)
+                Mockito.mock(FileSystemResource.class),
+                new ObjectMapper()
             )
         );
     }

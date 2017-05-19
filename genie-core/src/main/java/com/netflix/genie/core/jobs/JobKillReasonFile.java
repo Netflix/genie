@@ -17,21 +17,27 @@
  */
 package com.netflix.genie.core.jobs;
 
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 /**
  * Class that represents the structure of the kill-reason file created when a job is killed.
  *
  * @author mprimi
- * @since 3.0.8
+ * @since 3.0.7
  */
 @Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
 public class JobKillReasonFile {
-    private String killReason;
+
+    private final String killReason;
+
+    /**
+     * Constructor, annotated for Jackson.
+     * @param killReason stores a string with the reason a given job was killed
+     */
+    @JsonCreator
+    public JobKillReasonFile(@JsonProperty("killReason") final String killReason) {
+        this.killReason = killReason;
+    }
 }

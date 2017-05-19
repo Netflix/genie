@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.core.services.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.Files;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobStatus;
@@ -81,7 +82,7 @@ public class LocalJobKillServiceImplUnitTests {
         this.executor = Mockito.mock(Executor.class);
         this.eventPublisher = Mockito.mock(ApplicationEventPublisher.class);
         this.service = new LocalJobKillServiceImpl(HOSTNAME, this.jobSearchService, this.executor, false,
-            this.eventPublisher, genieWorkingDir);
+            this.eventPublisher, genieWorkingDir, new ObjectMapper());
 
         this.killCommand = new CommandLine("kill");
         this.killCommand.addArguments(Integer.toString(PID));
@@ -211,7 +212,7 @@ public class LocalJobKillServiceImplUnitTests {
     public void canKillJobRunningAsUser() throws GenieException, IOException {
         this.service
             = new LocalJobKillServiceImpl(HOSTNAME, this.jobSearchService, this.executor, true,
-            this.eventPublisher, genieWorkingDir);
+            this.eventPublisher, genieWorkingDir, new ObjectMapper());
 
         final JobExecution jobExecution = Mockito.mock(JobExecution.class);
         Mockito.when(jobExecution.getExitCode()).thenReturn(Optional.empty());

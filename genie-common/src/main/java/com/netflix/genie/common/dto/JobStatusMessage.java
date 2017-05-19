@@ -21,8 +21,10 @@ package com.netflix.genie.common.dto;
  * Constant strings for status message attached to a job after it terminates.
  *
  * @author mprimi
+ * @since 3.0.7
  */
 public final class JobStatusMessage {
+    //TODO this class could go away and we could fold this into JobStatus
 
     /**
      * Job killed because maximum stdout lenght was exceeded.

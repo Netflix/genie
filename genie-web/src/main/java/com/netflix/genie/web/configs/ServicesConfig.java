@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.configs;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
@@ -223,7 +224,8 @@ public class ServicesConfig {
      * @param executor         The executor to use to run system processes.
      * @param jobsProperties   The jobs properties to use
      * @param eventPublisher   The application event publisher to use to publish system wide events
-     * @param genieWorkingDir       Working directory for genie where it creates jobs directories.
+     * @param genieWorkingDir  Working directory for genie where it creates jobs directories.
+     * @param objectMapper     The Jackson ObjectMapper used to serialize from/to JSON
      * @return A job kill service instance.
      */
     @Bean
@@ -234,7 +236,8 @@ public class ServicesConfig {
         final JobsProperties jobsProperties,
         final ApplicationEventPublisher eventPublisher,
         @Qualifier("jobsDir")
-        final Resource genieWorkingDir
+        final Resource genieWorkingDir,
+        final ObjectMapper objectMapper
     ) {
         return new LocalJobKillServiceImpl(
             hostName,
@@ -242,7 +245,8 @@ public class ServicesConfig {
             executor,
             jobsProperties.getUsers().isRunAsUserEnabled(),
             eventPublisher,
-            genieWorkingDir);
+            genieWorkingDir,
+            new ObjectMapper());
     }
 
     /**

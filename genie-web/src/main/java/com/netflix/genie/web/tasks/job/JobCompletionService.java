@@ -305,12 +305,14 @@ public class JobCompletionService {
         try {
             final File jobDir = new File(this.baseWorkingDir, id);
             final JobDoneFile jobDoneFile = this.objectMapper.readValue(
-                new File(this.baseWorkingDir + "/" + id + "/genie/genie.done"),
+                new File(this.baseWorkingDir + "/" + id + "/" + JobConstants.GENIE_DONE_FILE_NAME),
                 JobDoneFile.class
             );
 
             final String killedStatusMessages;
-            final File killReasonFile = new File(this.baseWorkingDir + "/" + id + "/genie/kill-reason");
+            final File killReasonFile = new File(this.baseWorkingDir + "/"
+                + id + "/"
+                + JobConstants.GENIE_KILL_REASON_FILE_NAME);
             if (killReasonFile.exists()) {
                 killedStatusMessages = this.objectMapper.readValue(
                     killReasonFile,

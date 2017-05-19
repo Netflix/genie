@@ -17,6 +17,8 @@ import java.io.IOException;
 @Category(UnitTest.class)
 public class JobKillReasonFileTest {
 
+    private static final String KILL_REASON_STRING = "Test";
+
     /**
      * Test serialization and deserialization of JobKillReasonFile.
      * @throws IOException in case of serialization error
@@ -26,12 +28,14 @@ public class JobKillReasonFileTest {
 
         final ObjectMapper objectMapper = new ObjectMapper();
 
-        final JobKillReasonFile orignalJobKillReasonFile = new JobKillReasonFile("Test");
+        final JobKillReasonFile orignalJobKillReasonFile = new JobKillReasonFile(KILL_REASON_STRING);
+
+        Assert.assertEquals(KILL_REASON_STRING, orignalJobKillReasonFile.getKillReason());
 
         final byte[] bytes = objectMapper.writeValueAsBytes(orignalJobKillReasonFile);
 
         final JobKillReasonFile loadedJobKillReasonFile = objectMapper.readValue(bytes, JobKillReasonFile.class);
 
-        Assert.assertEquals(orignalJobKillReasonFile.getKillReason(), loadedJobKillReasonFile.getKillReason());
+        Assert.assertEquals(KILL_REASON_STRING, loadedJobKillReasonFile.getKillReason());
     }
 }
