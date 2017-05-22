@@ -246,7 +246,7 @@ public class ServicesConfig {
             jobsProperties.getUsers().isRunAsUserEnabled(),
             eventPublisher,
             genieWorkingDir,
-            new ObjectMapper());
+            objectMapper);
     }
 
     /**

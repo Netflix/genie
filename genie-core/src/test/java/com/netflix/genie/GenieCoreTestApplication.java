@@ -17,6 +17,7 @@
  */
 package com.netflix.genie;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.Files;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.Executor;
@@ -115,5 +116,16 @@ public class GenieCoreTestApplication {
     @ConditionalOnMissingBean
     public Resource jobsDir() throws IOException {
         return new FileSystemResource(temporaryFolder.toString());
+    }
+
+    /**
+     * Get a Jackson ObjectMapper.
+     *
+     * @return a new ObjectMapper with default options
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
     }
 }

@@ -199,6 +199,7 @@ public class ServicesConfigTest {
      * @param executor         The executor to use to run system processes.
      * @param eventPublisher   The event publisher to use
      * @param genieWorkingDir  Working directory for genie where it creates jobs directories.
+     * @param objectMapper     The Jackson ObjectMapper used to serialize from/to JSON
      * @return A job kill service instance.
      */
     @Bean
@@ -207,7 +208,8 @@ public class ServicesConfigTest {
         final JobSearchService jobSearchService,
         final Executor executor,
         final ApplicationEventPublisher eventPublisher,
-        @Qualifier("jobsDir") final Resource genieWorkingDir
+        @Qualifier("jobsDir") final Resource genieWorkingDir,
+        final ObjectMapper objectMapper
     ) {
         return new LocalJobKillServiceImpl(
             hostname,
@@ -216,7 +218,7 @@ public class ServicesConfigTest {
             false,
             eventPublisher,
             genieWorkingDir,
-            new ObjectMapper()
+            objectMapper
         );
     }
 
