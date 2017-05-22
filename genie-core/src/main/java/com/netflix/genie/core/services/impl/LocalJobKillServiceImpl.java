@@ -82,7 +82,8 @@ public class LocalJobKillServiceImpl implements JobKillService {
         final boolean runAsUser,
         @NotNull final ApplicationEventPublisher eventPublisher,
         @NotNull final Resource genieWorkingDir,
-        @NotNull final ObjectMapper objectMapper) {
+        @NotNull final ObjectMapper objectMapper
+    ) {
         this.hostName = hostName;
         this.jobSearchService = jobSearchService;
         this.executor = executor;
