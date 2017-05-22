@@ -17,6 +17,7 @@
  */
 package com.netflix.genie;
 
+import com.google.common.io.Files;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.exec.PumpStreamHandler;
@@ -25,12 +26,14 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 
+import javax.annotation.PreDestroy;
 import javax.validation.Validator;
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -42,6 +45,21 @@ import java.io.IOException;
 @EnableAutoConfiguration
 @ComponentScan
 public class GenieCoreTestApplication {
+
+    private final File temporaryFolder = Files.createTempDir();
+
+    /**
+     * Clean up for beans and resources created in this test context.
+     */
+    @PreDestroy
+    @SuppressWarnings("PMD.CollapsibleIfStatements") // Collapsing inner `if` statement is not equivalent to this.
+    public void cleanUp() {
+        if (temporaryFolder != null && temporaryFolder.exists()) {
+            if (!temporaryFolder.delete()) {
+                throw new RuntimeException("Temporary folder not deleted: " + temporaryFolder.toString());
+            }
+        }
+    }
 
     /**
      * Setup bean validation.
@@ -95,8 +113,7 @@ public class GenieCoreTestApplication {
      */
     @Bean
     @ConditionalOnMissingBean
-    public Resource jobsDir(
-    ) throws IOException {
-        return new DefaultResourceLoader().getResource("/tmp");
+    public Resource jobsDir() throws IOException {
+        return new FileSystemResource(temporaryFolder.toString());
     }
 }

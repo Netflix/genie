@@ -18,7 +18,6 @@
 package com.netflix.genie.core.configs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.io.Files;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
@@ -67,7 +66,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.context.event.SimpleApplicationEventMulticaster;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
@@ -75,8 +73,6 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -213,8 +209,15 @@ public class ServicesConfigTest {
         final ApplicationEventPublisher eventPublisher,
         @Qualifier("jobsDir") final Resource genieWorkingDir
     ) {
-        return new LocalJobKillServiceImpl(hostname, jobSearchService, executor, false, eventPublisher,
-            genieWorkingDir, new ObjectMapper());
+        return new LocalJobKillServiceImpl(
+            hostname,
+            jobSearchService,
+            executor,
+            false,
+            eventPublisher,
+            genieWorkingDir,
+            new ObjectMapper()
+        );
     }
 
     /**
@@ -419,25 +422,4 @@ public class ServicesConfigTest {
         return new JobsProperties();
     }
 
-    /**
-     * Returns a temporary directory as the jobs resource.
-     *
-     * @return The job dir as a resource.
-     * @throws IOException If there is a problem.
-     */
-    @Bean
-    public Resource jobsDir() throws IOException {
-        final File jobsDir = Files.createTempDir();
-        if (!jobsDir.exists() && !jobsDir.mkdirs()) {
-            throw new IllegalArgumentException("Unable to create directories: " + jobsDir);
-        }
-
-        String jobsDirPath = jobsDir.getAbsolutePath();
-        final String slash = "/";
-        if (!jobsDirPath.endsWith(slash)) {
-            jobsDirPath = jobsDirPath + slash;
-        }
-
-        return new FileSystemResource(jobsDirPath);
-    }
 }
