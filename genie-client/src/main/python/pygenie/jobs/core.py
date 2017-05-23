@@ -626,7 +626,7 @@ class GenieJob(object):
             :py:class:`GenieJob`: self
         """
 
-        self._conf.genie.url = url
+        self._conf.genie.url = url[:-1] if url.endswith('/') else url
 
         return self
 
