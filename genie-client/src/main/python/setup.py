@@ -32,11 +32,7 @@ setup(
     keywords='genie hadoop cloud netflix client bigdata presto',
     packages=['pygenie',
               'pygenie.adapter',
-              'pygenie.jobs',
-              'genie2',
-              'genie2.client',
-              'genie2.exception',
-              'genie2.model'],
+              'pygenie.jobs'],
     package_data={
         'pygenie': ['genie.ini']
     },
