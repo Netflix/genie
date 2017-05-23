@@ -71,6 +71,7 @@ public class JobCoordinatorServiceImplUnitTests {
     private static final String BASE_ARCHIVE_LOCATION = "file://baselocation";
     private static final String HOST_NAME = UUID.randomUUID().toString();
     private static final int MEMORY = 1_512;
+    private static final String KILL_REASON = "Killed by test";
 
     private JobCoordinatorServiceImpl jobCoordinatorService;
     private JobPersistenceService jobPersistenceService;
@@ -503,8 +504,8 @@ public class JobCoordinatorServiceImplUnitTests {
     @Test
     public void canKillJob() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.doNothing().when(this.jobKillService).killJob(id);
-        this.jobCoordinatorService.killJob(id);
+        Mockito.doNothing().when(this.jobKillService).killJob(id, KILL_REASON);
+        this.jobCoordinatorService.killJob(id, KILL_REASON);
     }
 
     /**
@@ -515,8 +516,8 @@ public class JobCoordinatorServiceImplUnitTests {
     @Test(expected = GenieException.class)
     public void cantKillJob() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.doThrow(new GenieException(123, "fake")).when(this.jobKillService).killJob(id);
-        this.jobCoordinatorService.killJob(id);
+        Mockito.doThrow(new GenieException(123, "fake")).when(this.jobKillService).killJob(id, KILL_REASON);
+        this.jobCoordinatorService.killJob(id, KILL_REASON);
     }
 
     private JobRequest getJobRequest(

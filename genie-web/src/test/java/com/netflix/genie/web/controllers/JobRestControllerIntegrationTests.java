@@ -29,6 +29,7 @@ import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.dto.JobStatusMessage;
 import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
@@ -124,7 +125,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     private static final String JOB_USER = "genie";
     private static final String JOB_VERSION = "1.0";
     private static final String JOB_DESCRIPTION = "Genie 3 Test Job";
-    private static final String JOB_STATUS_MSG = "Job finished successfully.";
+    private static final String JOB_STATUS_MSG = JobStatusMessage.JOB_FINISHED_SUCCESSFULLY;
 
     private static final String APP1_ID = "app1";
     private static final String APP1_NAME = "Application 1";
@@ -1137,7 +1138,10 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath(ID_PATH, Matchers.is(jobId)))
-            .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(JobStatus.KILLED.toString())));
+            .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(JobStatus.KILLED.toString())))
+            .andExpect(MockMvcResultMatchers.jsonPath(
+                STATUS_MESSAGE_PATH, Matchers.is(JobStatusMessage.JOB_KILLED_BY_USER)
+            ));
 
         // Kill the job again to make sure it doesn't cause a problem.
         this.mvc
@@ -1202,7 +1206,8 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath(ID_PATH, Matchers.is(id)))
-            .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(JobStatus.KILLED.toString())));
+            .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(JobStatus.KILLED.toString())))
+            .andExpect(MockMvcResultMatchers.jsonPath(STATUS_MESSAGE_PATH, Matchers.is("Job exceeded timeout.")));
     }
 
     /**
@@ -1254,7 +1259,8 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentType(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath(ID_PATH, Matchers.is(id)))
-            .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(JobStatus.FAILED.toString())));
+            .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(JobStatus.FAILED.toString())))
+            .andExpect(MockMvcResultMatchers.jsonPath(STATUS_MESSAGE_PATH, Matchers.is(JobStatusMessage.JOB_FAILED)));
     }
 
     private String getIdFromLocation(final String location) {

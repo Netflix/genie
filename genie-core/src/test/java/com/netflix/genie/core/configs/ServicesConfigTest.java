@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.core.configs;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
@@ -57,6 +58,7 @@ import com.netflix.spectator.api.DefaultRegistry;
 import com.netflix.spectator.api.Registry;
 import org.apache.commons.exec.Executor;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.ServiceLocatorFactoryBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationEventPublisher;
@@ -196,6 +198,8 @@ public class ServicesConfigTest {
      * @param jobSearchService The job search service to use to locate job information.
      * @param executor         The executor to use to run system processes.
      * @param eventPublisher   The event publisher to use
+     * @param genieWorkingDir  Working directory for genie where it creates jobs directories.
+     * @param objectMapper     The Jackson ObjectMapper used to serialize from/to JSON
      * @return A job kill service instance.
      */
     @Bean
@@ -203,9 +207,19 @@ public class ServicesConfigTest {
         final String hostname,
         final JobSearchService jobSearchService,
         final Executor executor,
-        final ApplicationEventPublisher eventPublisher
+        final ApplicationEventPublisher eventPublisher,
+        @Qualifier("jobsDir") final Resource genieWorkingDir,
+        final ObjectMapper objectMapper
     ) {
-        return new LocalJobKillServiceImpl(hostname, jobSearchService, executor, false, eventPublisher);
+        return new LocalJobKillServiceImpl(
+            hostname,
+            jobSearchService,
+            executor,
+            false,
+            eventPublisher,
+            genieWorkingDir,
+            objectMapper
+        );
     }
 
     /**
@@ -249,6 +263,7 @@ public class ServicesConfigTest {
         final ApplicationEventPublisher eventPublisher,
         final ApplicationEventMulticaster eventMulticaster,
         final List<WorkflowTask> workflowTasks,
+        @Qualifier("jobsDir")
         final Resource genieWorkingDir,
         final Registry registry
     ) {
@@ -408,4 +423,5 @@ public class ServicesConfigTest {
     public JobsProperties jobsProperties() {
         return new JobsProperties();
     }
+
 }
