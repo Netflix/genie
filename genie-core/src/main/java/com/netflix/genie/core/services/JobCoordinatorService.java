@@ -54,7 +54,8 @@ public interface JobCoordinatorService {
      * Kill the job identified by the given id.
      *
      * @param jobId id of the job to kill
+     * @param reason brief reason for requesting the job be killed
      * @throws GenieException if there is an error
      */
-    void killJob(@NotBlank final String jobId) throws GenieException;
+    void killJob(@NotBlank final String jobId, @NotBlank final String reason) throws GenieException;
 }

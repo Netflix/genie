@@ -160,7 +160,7 @@ public class JobTask extends GenieBaseTask {
             // capture exit code and write to genie.done file
             writer.write("# Write the return code from the command in the done file." + System.lineSeparator());
             writer.write(JobConstants.GENIE_DONE_FILE_CONTENT_PREFIX
-                + JobConstants.GENIE_DONE_FILE_NAME
+                + "./" + JobConstants.GENIE_DONE_FILE_NAME
                 + System.lineSeparator());
 
             // Print the timestamp once its done running.

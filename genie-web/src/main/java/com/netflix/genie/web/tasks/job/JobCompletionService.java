@@ -25,12 +25,14 @@ import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.dto.JobStatusMessage;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.events.JobFinishedEvent;
 import com.netflix.genie.core.events.JobFinishedReason;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.jobs.JobDoneFile;
+import com.netflix.genie.core.jobs.JobKillReasonFile;
 import com.netflix.genie.core.properties.JobsProperties;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
@@ -116,7 +118,7 @@ public class JobCompletionService {
         final JobPersistenceService jobPersistenceService,
         final JobSearchService jobSearchService,
         final GenieFileTransferService genieFileTransferService,
-        final Resource genieWorkingDir,
+        @Qualifier("jobsDir") final Resource genieWorkingDir,
         final MailService mailServiceImpl,
         final Registry registry,
         final JobsProperties jobsProperties,
@@ -303,9 +305,22 @@ public class JobCompletionService {
         try {
             final File jobDir = new File(this.baseWorkingDir, id);
             final JobDoneFile jobDoneFile = this.objectMapper.readValue(
-                new File(this.baseWorkingDir + "/" + id + "/genie/genie.done"),
+                new File(this.baseWorkingDir + "/" + id + "/" + JobConstants.GENIE_DONE_FILE_NAME),
                 JobDoneFile.class
             );
+
+            final String killedStatusMessages;
+            final File killReasonFile = new File(this.baseWorkingDir + "/"
+                + id + "/"
+                + JobConstants.GENIE_KILL_REASON_FILE_NAME);
+            if (killReasonFile.exists()) {
+                killedStatusMessages = this.objectMapper.readValue(
+                    killReasonFile,
+                    JobKillReasonFile.class
+                ).getKillReason();
+            } else {
+                 killedStatusMessages = JobStatusMessage.JOB_KILLED_BY_USER;
+            }
             final int exitCode = jobDoneFile.getExitCode();
             // Read the size of STD OUT and STD ERR files
             final File stdOut = new File(jobDir, JobConstants.STDOUT_LOG_FILE_NAME);
@@ -319,7 +334,7 @@ public class JobCompletionService {
                         id,
                         exitCode,
                         JobStatus.KILLED,
-                        "Job was killed.",
+                        killedStatusMessages,
                         stdOutSize,
                         stdErrSize
                     );
@@ -330,7 +345,7 @@ public class JobCompletionService {
                         id,
                         exitCode,
                         JobStatus.SUCCEEDED,
-                        "Job finished successfully.",
+                        JobStatusMessage.JOB_FINISHED_SUCCESSFULLY,
                         stdOutSize,
                         stdErrSize
                     );
@@ -342,7 +357,7 @@ public class JobCompletionService {
                         id,
                         exitCode,
                         JobStatus.FAILED,
-                        "Job failed.",
+                        JobStatusMessage.JOB_FAILED,
                         stdOutSize,
                         stdErrSize
                     );
@@ -358,7 +373,7 @@ public class JobCompletionService {
             this.jobPersistenceService.updateJobStatus(
                 id,
                 JobStatus.FAILED,
-                "Genie could not load done file."
+                JobStatusMessage.COULD_NOT_LOAD_DONE_FILE
             );
             return JobStatus.FAILED;
         }

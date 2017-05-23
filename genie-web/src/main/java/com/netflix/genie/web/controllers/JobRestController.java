@@ -23,6 +23,7 @@ import com.google.common.io.ByteStreams;
 import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.dto.JobStatusMessage;
 import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
@@ -561,7 +562,7 @@ public class JobRestController {
 
         log.info("Job {} is on this node. Attempting to kill.", id);
         // Job is on this node so try to kill it
-        this.jobCoordinatorService.killJob(id);
+        this.jobCoordinatorService.killJob(id, JobStatusMessage.JOB_KILLED_BY_USER);
         response.setStatus(HttpStatus.ACCEPTED.value());
     }
 
