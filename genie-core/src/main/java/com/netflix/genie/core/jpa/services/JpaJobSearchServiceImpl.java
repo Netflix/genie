@@ -28,6 +28,7 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
+import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.jpa.entities.ApplicationEntity;
 import com.netflix.genie.core.jpa.entities.ClusterEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
@@ -49,6 +50,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -73,6 +75,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Transactional(readOnly = true)
+@Validated
 public class JpaJobSearchServiceImpl implements JobSearchService {
 
     private final JpaJobRepository jobRepository;
@@ -361,5 +364,23 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
         } else {
             throw new GenieNotFoundException("No job execution found for id " + jobId);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getActiveJobCountForUser(@NotBlank final String user) throws GenieException {
+        log.debug("Called for jobs with user {}", user);
+        final Long count = this.jobRepository.countJobsByUserAndStatusIn(user, JobStatus.getActiveStatuses());
+        if (count == null || count < 0) {
+            throw new GenieServerException(
+                "Count query for user "
+                    + user
+                    + "produced an unexpected result: "
+                    + count
+            );
+        }
+        return count;
     }
 }

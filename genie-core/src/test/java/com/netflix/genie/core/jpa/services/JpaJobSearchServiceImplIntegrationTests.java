@@ -324,4 +324,15 @@ public class JpaJobSearchServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertThat(applications.get(0).getId().orElseGet(RandomSuppliers.STRING), Matchers.is("app1"));
         Assert.assertThat(applications.get(1).getId().orElseGet(RandomSuppliers.STRING), Matchers.is("app2"));
     }
+
+    /**
+     * Make sure we can get the correct number of jobs which are active for a given user.
+     *
+     * @throws GenieException on error
+     */
+    @Test
+    public void canGetActiveJobCountForUser() throws GenieException {
+        Assert.assertThat(this.service.getActiveJobCountForUser("nobody"), Matchers.is(0L));
+        Assert.assertThat(this.service.getActiveJobCountForUser("tgianos"), Matchers.is(2L));
+    }
 }
