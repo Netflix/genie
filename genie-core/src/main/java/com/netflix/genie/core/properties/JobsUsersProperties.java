@@ -31,4 +31,6 @@ import lombok.Setter;
 public class JobsUsersProperties {
     private boolean creationEnabled;
     private boolean runAsUserEnabled;
+    private boolean activeJobsLimitEnabled;
+    private int activeJobsLimit;
 }
