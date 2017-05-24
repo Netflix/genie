@@ -71,6 +71,11 @@ public final class MetricsConstants {
     public static final String GENIE_EXCEPTIONS_CONSTRAINT_VIOLATION_RATE = "genie.exceptions.constraintViolation.rate";
 
     /**
+     * For counting how often requests are rejected due to user exceeding limits.
+     */
+    public static final String GENIE_EXCEPTIONS_USER_LIMIT_EXCEEDED_RATE = "genie.exceptions.userLimitExceeded.rate";
+
+    /**
      * Utility class protected constructor.
      */
     protected MetricsConstants() {
