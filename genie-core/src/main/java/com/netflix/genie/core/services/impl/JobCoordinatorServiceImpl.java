@@ -34,6 +34,7 @@ import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
 import com.netflix.genie.common.exceptions.GenieUserLimitExceededException;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.properties.JobsProperties;
+import com.netflix.genie.core.properties.JobsUsersActiveLimitProperties;
 import com.netflix.genie.core.services.ApplicationService;
 import com.netflix.genie.core.services.ClusterLoadBalancer;
 import com.netflix.genie.core.services.ClusterService;
@@ -214,6 +215,19 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                         + maxJobMemory
                         + " MB allowed"
                 );
+            }
+
+            log.info("Checking if can run job {} from user {}", jobRequest.getId(), jobRequest.getUser());
+            final JobsUsersActiveLimitProperties activeLimit = this.jobsProperties.getUsers().getActiveLimit();
+            if (activeLimit.isEnabled()) {
+                final long activeJobsLimit = activeLimit.getCount();
+                final long activeJobsCount = this.jobSearchService.getActiveJobCountForUser(jobRequest.getUser());
+                if (activeJobsCount >= activeJobsLimit) {
+                    throw GenieUserLimitExceededException.createForActiveJobsLimit(
+                        jobRequest.getUser(),
+                        activeJobsCount,
+                        activeJobsLimit);
+                }
             }
 
             synchronized (this) {
