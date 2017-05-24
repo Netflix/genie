@@ -332,6 +332,7 @@ public class ServicesConfig {
      * @param jobPersistenceService implementation of job persistence service interface
      * @param jobKillService        The job kill service to use
      * @param jobStateService     The running job metrics service to use
+     * @param jobSearchService      Implementation of job search service interface
      * @param jobsProperties        The jobs properties to use
      * @param applicationService    Implementation of application service interface
      * @param clusterService        Implementation of cluster service interface
@@ -345,8 +346,8 @@ public class ServicesConfig {
     public JobCoordinatorService jobCoordinatorService(
         final JobPersistenceService jobPersistenceService,
         final JobKillService jobKillService,
-        @Qualifier("jobMonitoringCoordinator")
-        final JobStateService jobStateService,
+        @Qualifier("jobMonitoringCoordinator") final JobStateService jobStateService,
+        final JobSearchService jobSearchService,
         final JobsProperties jobsProperties,
         final ApplicationService applicationService,
         final ClusterService clusterService,
@@ -361,6 +362,7 @@ public class ServicesConfig {
             jobStateService,
             jobsProperties,
             applicationService,
+            jobSearchService,
             clusterService,
             commandService,
             clusterLoadBalancer,

@@ -352,8 +352,9 @@ public class ServicesConfigTest {
      * Get an instance of the JobCoordinatorService.
      *
      * @param jobPersistenceService implementation of job persistence service interface.
-     * @param jobStateService       implementation of job state service interface
      * @param jobKillService        The job kill service to use.
+     * @param jobStateService       implementation of job state service interface
+     * @param jobSearchService      implementation of job search service interface
      * @param jobsProperties        The jobs properties to use
      * @param applicationService    Implementation of application service interface
      * @param clusterService        Implementation of cluster service interface
@@ -368,6 +369,7 @@ public class ServicesConfigTest {
         final JobPersistenceService jobPersistenceService,
         final JobKillService jobKillService,
         final JobStateService jobStateService,
+        final JobSearchService jobSearchService,
         final JobsProperties jobsProperties,
         final ApplicationService applicationService,
         final ClusterService clusterService,
@@ -382,6 +384,7 @@ public class ServicesConfigTest {
             jobStateService,
             jobsProperties,
             applicationService,
+            jobSearchService,
             clusterService,
             commandService,
             clusterLoadBalancer,

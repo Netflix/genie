@@ -40,6 +40,7 @@ import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;
 import com.netflix.genie.core.services.JobKillService;
 import com.netflix.genie.core.services.JobPersistenceService;
+import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobStateService;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.spectator.api.Registry;
@@ -47,6 +48,7 @@ import com.netflix.spectator.api.Timer;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import java.util.HashSet;
@@ -77,6 +79,7 @@ public class JobCoordinatorServiceImplUnitTests {
     private JobPersistenceService jobPersistenceService;
     private JobKillService jobKillService;
     private JobStateService jobStateService;
+    private JobSearchService jobSearchService;
     private ApplicationService applicationService;
     private ClusterService clusterService;
     private CommandService commandService;
@@ -91,6 +94,7 @@ public class JobCoordinatorServiceImplUnitTests {
         this.jobPersistenceService = Mockito.mock(JobPersistenceService.class);
         this.jobKillService = Mockito.mock(JobKillService.class);
         this.jobStateService = Mockito.mock(JobStateService.class);
+        this.jobSearchService = Mockito.mock(JobSearchService.class);
         this.jobsProperties = new JobsProperties();
         this.jobsProperties.getLocations().setArchives(BASE_ARCHIVE_LOCATION);
         this.jobsProperties.getMemory().setDefaultJobMemory(MEMORY);
@@ -108,6 +112,7 @@ public class JobCoordinatorServiceImplUnitTests {
             this.jobStateService,
             jobsProperties,
             this.applicationService,
+            this.jobSearchService,
             this.clusterService,
             this.commandService,
             this.clusterLoadBalancer,
