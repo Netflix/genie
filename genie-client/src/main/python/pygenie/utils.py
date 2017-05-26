@@ -9,6 +9,7 @@ This module contains utility functions.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import datetime
+import json
 import logging
 import pkg_resources
 import six
@@ -144,7 +145,7 @@ def convert_to_unicode(value):
 def normalize_list(l):
     if not l:
         return ''
-    return "['{}']".format("', '".join(l))
+    return json.dumps(l)
 
 def unicodify(func):
     """
