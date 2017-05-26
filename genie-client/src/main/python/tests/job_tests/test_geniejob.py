@@ -121,10 +121,10 @@ class TestingGenieJobRepr(unittest.TestCase):
                 'parameter("param3", "pval3")',
                 'parameter("param4", "pval4")',
                 'post_cmd_args("post1")',
-                "post_cmd_args(['post2', 'post3'])",
+                'post_cmd_args(["post2", "post3"])',
                 'tags("tag1")',
                 'tags("tag2")',
-                "tags(['tag3', 'tag4'])"
+                'tags(["tag3", "tag4"])'
             ])
         )
 

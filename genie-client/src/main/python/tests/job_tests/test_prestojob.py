@@ -108,6 +108,22 @@ class TestingPrestoJob(unittest.TestCase):
 class TestingPrestoJobRepr(unittest.TestCase):
     """Test PrestoJob repr."""
 
+    def test_attachment_repr(self):
+        job = pygenie.jobs.PrestoJob() \
+            .dependencies([{"data": "blah", "name": "blah"}]) \
+            .job_id('prestojob_repr') \
+            .genie_username('testuser')
+
+        assert_equals(
+            str(job),
+            '.'.join([
+                'PrestoJob()',
+                'dependencies([{"data": "blah", "name": "blah"}])',
+                'genie_username("testuser")',
+                'job_id("prestojob_repr")'
+                ])
+        )
+
     @patch('pygenie.jobs.core.is_file')
     def test_repr(self, is_file):
         """Test PrestoJob repr."""
