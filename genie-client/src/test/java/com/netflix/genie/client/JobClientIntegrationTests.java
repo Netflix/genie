@@ -30,6 +30,7 @@ import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.dto.JobStatusMessage;
 import com.netflix.genie.common.dto.search.JobSearchResult;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
@@ -360,6 +361,53 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
             = jobClient.waitForCompletion(jobRequest1.getId().orElseThrow(IllegalArgumentException::new), 600000, 5000);
 
         Assert.assertEquals(JobStatus.KILLED, jobStatus);
+        Assert.assertEquals(
+            JobStatusMessage.JOB_KILLED_BY_USER,
+            jobClient.getJob(jobRequest1.getId().orElseThrow(IllegalArgumentException::new))
+                .getStatusMsg().orElseThrow(IllegalArgumentException::new)
+        );
+
+    }
+
+    /**
+     * Method to test job getting killed by JobMonitor due to timeout.
+     *
+     * @throws Exception If there is any problem.
+     */
+    @Test
+    public void testJobKillDueToTimeout() throws Exception {
+        createClusterAndCommandForTest();
+
+        final List<ClusterCriteria> clusterCriteriaList
+            = Lists.newArrayList(new ClusterCriteria(Sets.newHashSet("laptop")));
+
+        final Set<String> commandCriteria = Sets.newHashSet("bash");
+
+        final JobRequest jobRequest1 = new JobRequest.Builder(
+            JOB_NAME,
+            JOB_USER,
+            JOB_VERSION,
+            "-c 'sleep 60'",
+            clusterCriteriaList,
+            commandCriteria
+        )
+            .withId(UUID.randomUUID().toString())
+            .withDisableLogArchival(true)
+            .withTimeout(1)
+            .build();
+
+        jobClient.submitJob(jobRequest1);
+        Thread.sleep(2000);
+
+        final JobStatus jobStatus
+            = jobClient.waitForCompletion(jobRequest1.getId().orElseThrow(IllegalArgumentException::new), 600000, 5000);
+
+        Assert.assertEquals(JobStatus.KILLED, jobStatus);
+        Assert.assertEquals(
+            "Job exceeded timeout.",
+            jobClient.getJob(jobRequest1.getId().orElseThrow(IllegalArgumentException::new))
+                .getStatusMsg().orElseThrow(IllegalArgumentException::new)
+        );
     }
 
     /**
