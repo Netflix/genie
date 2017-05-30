@@ -20,16 +20,28 @@ package com.netflix.genie.core.properties;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.Min;
+
 /**
- * Properties related to users running jobs.
+ * Properties related to user limits in number of active jobs.
  *
- * @author tgianos
- * @since 3.0.0
+ * @author mprimi
+ * @since 3.1.0
  */
 @Getter
 @Setter
-public class JobsUsersProperties {
-    private boolean creationEnabled;
-    private boolean runAsUserEnabled;
-    private JobsUsersActiveLimitProperties activeLimit = new JobsUsersActiveLimitProperties();
+public class JobsUsersActiveLimitProperties {
+    /**
+     * Default value for active user job limit enabled.
+     */
+    public static final boolean DEFAULT_ENABLED = false;
+
+    /**
+     * Default value for active user job limit count.
+     */
+    public static final int DEFAULT_COUNT = 100;
+
+    private boolean enabled = DEFAULT_ENABLED;
+    @Min(value = 1)
+    private int count = DEFAULT_COUNT;
 }

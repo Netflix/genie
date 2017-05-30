@@ -66,6 +66,8 @@ public class PropertiesConfigIntegrationTest {
         Assert.assertThat(jobsProperties.getMax().getStdOutSize(), Matchers.is(512L));
         Assert.assertThat(jobsProperties.getMemory().getMaxSystemMemory(), Matchers.is(1024));
         Assert.assertThat(jobsProperties.getUsers().isCreationEnabled(), Matchers.is(true));
+        Assert.assertThat(jobsProperties.getUsers().getActiveLimit().isEnabled(), Matchers.is(true));
+        Assert.assertThat(jobsProperties.getUsers().getActiveLimit().getCount(), Matchers.is(15));
 
         Assert.assertNotNull(dataServiceRetryProperties);
         Assert.assertThat(dataServiceRetryProperties.getInitialInterval(), Matchers.is(200L));

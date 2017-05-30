@@ -100,13 +100,13 @@ rights for this to work.
 to work.
 |false
 
-|genie.jobs.users.activeJobsLimitEnabled
-|Enables the per-user active job limit. The number of jobs is controlled by the `genie.jobs.users.activeJobsLimit` property.
+|genie.jobs.users.activeLimit.enabled
+|Enables the per-user active job limit. The number of jobs is controlled by the `genie.jobs.users.activeLimit.count` property.
 |false
 
-|genie.jobs.users.activeJobsLimit
-|The maximum number of active jobs a user is allowed to have. Once a user hits this limit, jobs submitted are rejected. This is property is ignored unless `genie.jobs.users.activeJobsLimitEnabled` is set to true.
-|0
+|genie.jobs.users.activeLimit.count
+|The maximum number of active jobs a user is allowed to have. Once a user hits this limit, jobs submitted are rejected. This is property is ignored unless `genie.jobs.users.activeLimit.enabled` is set to true.
+|100
 
 |genie.leader.enabled
 |Whether this node should be the leader of the cluster or not. Should only be used if leadership is not being
