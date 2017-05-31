@@ -39,7 +39,7 @@ import org.springframework.test.context.junit4.SpringRunner;
  */
 @Category(IntegrationTest.class)
 @RunWith(SpringRunner.class)
-@TestPropertySource(locations = "classpath:/com/netflix/genie/web/configs/PropertiesConfigIntegrationTest.properties")
+@TestPropertySource(locations = "classpath:/PropertiesConfigIntegrationTest.properties")
 @SpringBootTest()
 public class PropertiesConfigIntegrationTest {
 
