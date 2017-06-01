@@ -167,4 +167,13 @@ public interface JobSearchService {
      * @throws GenieException If the job isn't found or any other error
      */
     String getJobHost(@NotBlank final String jobId) throws GenieException;
+
+    /**
+     * Get the count of 'active' jobs for a given user across all instances.
+     *
+     * @param user The user name
+     * @return the number of active jobs for a given user
+     * @throws GenieException If any error occurs
+     */
+    long getActiveJobCountForUser(@NotBlank final String user) throws GenieException;
 }

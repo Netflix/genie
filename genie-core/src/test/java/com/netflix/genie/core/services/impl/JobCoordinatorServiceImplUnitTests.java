@@ -33,6 +33,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
+import com.netflix.genie.common.exceptions.GenieUserLimitExceededException;
 import com.netflix.genie.core.properties.JobsProperties;
 import com.netflix.genie.core.services.ApplicationService;
 import com.netflix.genie.core.services.ClusterLoadBalancer;
@@ -40,6 +41,7 @@ import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;
 import com.netflix.genie.core.services.JobKillService;
 import com.netflix.genie.core.services.JobPersistenceService;
+import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobStateService;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.spectator.api.Registry;
@@ -72,11 +74,13 @@ public class JobCoordinatorServiceImplUnitTests {
     private static final String HOST_NAME = UUID.randomUUID().toString();
     private static final int MEMORY = 1_512;
     private static final String KILL_REASON = "Killed by test";
+    private static final boolean ACTIVE_JOBS_LIMIT_ENABLED = false;
 
     private JobCoordinatorServiceImpl jobCoordinatorService;
     private JobPersistenceService jobPersistenceService;
     private JobKillService jobKillService;
     private JobStateService jobStateService;
+    private JobSearchService jobSearchService;
     private ApplicationService applicationService;
     private ClusterService clusterService;
     private CommandService commandService;
@@ -91,9 +95,11 @@ public class JobCoordinatorServiceImplUnitTests {
         this.jobPersistenceService = Mockito.mock(JobPersistenceService.class);
         this.jobKillService = Mockito.mock(JobKillService.class);
         this.jobStateService = Mockito.mock(JobStateService.class);
+        this.jobSearchService = Mockito.mock(JobSearchService.class);
         this.jobsProperties = new JobsProperties();
         this.jobsProperties.getLocations().setArchives(BASE_ARCHIVE_LOCATION);
         this.jobsProperties.getMemory().setDefaultJobMemory(MEMORY);
+        this.jobsProperties.getUsers().getActiveLimit().setEnabled(ACTIVE_JOBS_LIMIT_ENABLED);
         this.applicationService = Mockito.mock(ApplicationService.class);
         this.clusterService = Mockito.mock(ClusterService.class);
         this.commandService = Mockito.mock(CommandService.class);
@@ -108,6 +114,7 @@ public class JobCoordinatorServiceImplUnitTests {
             this.jobStateService,
             jobsProperties,
             this.applicationService,
+            this.jobSearchService,
             this.clusterService,
             this.commandService,
             this.clusterLoadBalancer,
@@ -362,6 +369,125 @@ public class JobCoordinatorServiceImplUnitTests {
         Mockito
             .verify(this.jobPersistenceService, Mockito.times(1))
             .updateJobStatus(Mockito.eq(JOB_1_ID), Mockito.eq(JobStatus.FAILED), Mockito.anyString());
+    }
+
+    /**
+     * Test the coordinate job method allows a job through if the job user limit is exceeded but the limit itself is
+     * disabled.
+     *
+     * @throws GenieException If there is any problem
+     */
+    @Test
+    public void canCoordinateJobUserJobLimitIsDisabled() throws GenieException {
+        final int userActiveJobsLimit = 5;
+        this.jobsProperties.getUsers().getActiveLimit().setEnabled(false);
+        this.jobsProperties.getUsers().getActiveLimit().setCount(userActiveJobsLimit);
+
+        final Set<String> commandCriteria = Sets.newHashSet(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
+        );
+
+        final JobRequest jobRequest = this.getJobRequest(false, commandCriteria, null, null);
+        final JobMetadata jobMetadata = this.getJobMetadata();
+
+        final String clusterId = UUID.randomUUID().toString();
+        final Cluster cluster = Mockito.mock(Cluster.class);
+        final List<Cluster> clusters = Lists.newArrayList(cluster);
+        Mockito.when(cluster.getId()).thenReturn(Optional.of(clusterId));
+
+        Mockito
+            .when(this.clusterService.chooseClusterForJobRequest(jobRequest))
+            .thenReturn(clusters);
+
+        Mockito.when(this.clusterLoadBalancer.selectCluster(clusters)).thenReturn(cluster);
+
+        final String commandId = UUID.randomUUID().toString();
+        final Command command = Mockito.mock(Command.class);
+        Mockito.when(command.getId()).thenReturn(Optional.of(commandId));
+        Mockito.when(command.getMemory()).thenReturn(Optional.of(1));
+        final Set<String> commandTags = Sets.newHashSet(UUID.randomUUID().toString());
+        commandTags.addAll(commandCriteria);
+        Mockito.when(command.getTags()).thenReturn(commandTags);
+
+        Mockito
+            .when(
+                this.clusterService.getCommandsForCluster(Mockito.eq(clusterId), Mockito.anySetOf(CommandStatus.class))
+            )
+            .thenReturn(Lists.newArrayList(command));
+
+        final String applicationId = UUID.randomUUID().toString();
+        final Application application = Mockito.mock(Application.class);
+        Mockito.when(application.getId()).thenReturn(Optional.of(applicationId));
+        final List<Application> applications = Lists.newArrayList(application);
+
+        Mockito.when(this.commandService.getApplicationsForCommand(commandId)).thenReturn(applications);
+
+        Mockito
+            .when(this.jobSearchService.getActiveJobCountForUser(Mockito.any(String.class)))
+            .thenReturn(Long.valueOf(userActiveJobsLimit));
+
+        this.jobCoordinatorService.coordinateJob(jobRequest, jobMetadata);
+    }
+
+    /**
+     * Test the coordinate job method reject to accept a job if the user has reached the limit of allowed active jobs.
+     *
+     * @throws GenieException If there is any problem
+     */
+    @Test(expected = GenieUserLimitExceededException.class)
+    public void cantCoordinateJobUserJobLimitIsExceeded() throws GenieException {
+        final int userActiveJobsLimit = 5;
+        this.jobsProperties.getUsers().getActiveLimit().setEnabled(true);
+        this.jobsProperties.getUsers().getActiveLimit().setCount(userActiveJobsLimit);
+
+        final Set<String> commandCriteria = Sets.newHashSet(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
+        );
+
+        final JobRequest jobRequest = this.getJobRequest(false, commandCriteria, null, null);
+        final JobMetadata jobMetadata = this.getJobMetadata();
+
+        final String clusterId = UUID.randomUUID().toString();
+        final Cluster cluster = Mockito.mock(Cluster.class);
+        final List<Cluster> clusters = Lists.newArrayList(cluster);
+        Mockito.when(cluster.getId()).thenReturn(Optional.of(clusterId));
+
+        Mockito
+            .when(this.clusterService.chooseClusterForJobRequest(jobRequest))
+            .thenReturn(clusters);
+
+        Mockito.when(this.clusterLoadBalancer.selectCluster(clusters)).thenReturn(cluster);
+
+        final String commandId = UUID.randomUUID().toString();
+        final Command command = Mockito.mock(Command.class);
+        Mockito.when(command.getId()).thenReturn(Optional.of(commandId));
+        Mockito.when(command.getMemory()).thenReturn(Optional.of(1));
+        final Set<String> commandTags = Sets.newHashSet(UUID.randomUUID().toString());
+        commandTags.addAll(commandCriteria);
+        Mockito.when(command.getTags()).thenReturn(commandTags);
+
+        Mockito
+            .when(
+                this.clusterService.getCommandsForCluster(Mockito.eq(clusterId), Mockito.anySetOf(CommandStatus.class))
+            )
+            .thenReturn(Lists.newArrayList(command));
+
+        final String applicationId = UUID.randomUUID().toString();
+        final Application application = Mockito.mock(Application.class);
+        Mockito.when(application.getId()).thenReturn(Optional.of(applicationId));
+        final List<Application> applications = Lists.newArrayList(application);
+
+        Mockito.when(this.commandService.getApplicationsForCommand(commandId)).thenReturn(applications);
+
+        Mockito
+            .when(this.jobSearchService.getActiveJobCountForUser(Mockito.any(String.class)))
+            .thenReturn(Long.valueOf(userActiveJobsLimit));
+
+        this.jobCoordinatorService.coordinateJob(jobRequest, jobMetadata);
     }
 
     /**

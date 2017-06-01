@@ -31,8 +31,10 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
+import com.netflix.genie.common.exceptions.GenieUserLimitExceededException;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.properties.JobsProperties;
+import com.netflix.genie.core.properties.JobsUsersActiveLimitProperties;
 import com.netflix.genie.core.services.ApplicationService;
 import com.netflix.genie.core.services.ClusterLoadBalancer;
 import com.netflix.genie.core.services.ClusterService;
@@ -40,6 +42,7 @@ import com.netflix.genie.core.services.CommandService;
 import com.netflix.genie.core.services.JobCoordinatorService;
 import com.netflix.genie.core.services.JobKillService;
 import com.netflix.genie.core.services.JobPersistenceService;
+import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobStateService;
 import com.netflix.spectator.api.Registry;
 import com.netflix.spectator.api.Timer;
@@ -71,6 +74,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
     private final JobKillService jobKillService;
     private final JobStateService jobStateService;
     private final ApplicationService applicationService;
+    private final JobSearchService jobSearchService;
     private final ClusterService clusterService;
     private final CommandService commandService;
     private final ClusterLoadBalancer clusterLoadBalancer;
@@ -96,6 +100,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
      *                              jobs currently running
      * @param jobsProperties        The jobs properties to use
      * @param applicationService    Implementation of application service interface
+     * @param jobSearchService      Implementation of job search service
      * @param clusterService        Implementation of cluster service interface
      * @param commandService        Implementation of command service interface
      * @param clusterLoadBalancer   Implementation of the cluster load balancer interface
@@ -108,6 +113,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
         @NotNull final JobStateService jobStateService,
         @NotNull final JobsProperties jobsProperties,
         @NotNull final ApplicationService applicationService,
+        @NotNull final JobSearchService jobSearchService,
         @NotNull final ClusterService clusterService,
         @NotNull final CommandService commandService,
         @NotNull final ClusterLoadBalancer clusterLoadBalancer,
@@ -118,6 +124,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
         this.jobKillService = jobKillService;
         this.jobStateService = jobStateService;
         this.applicationService = applicationService;
+        this.jobSearchService = jobSearchService;
         this.clusterService = clusterService;
         this.commandService = commandService;
         this.clusterLoadBalancer = clusterLoadBalancer;
@@ -208,6 +215,19 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                         + maxJobMemory
                         + " MB allowed"
                 );
+            }
+
+            log.info("Checking if can run job {} from user {}", jobRequest.getId(), jobRequest.getUser());
+            final JobsUsersActiveLimitProperties activeLimit = this.jobsProperties.getUsers().getActiveLimit();
+            if (activeLimit.isEnabled()) {
+                final long activeJobsLimit = activeLimit.getCount();
+                final long activeJobsCount = this.jobSearchService.getActiveJobCountForUser(jobRequest.getUser());
+                if (activeJobsCount >= activeJobsLimit) {
+                    throw GenieUserLimitExceededException.createForActiveJobsLimit(
+                        jobRequest.getUser(),
+                        activeJobsCount,
+                        activeJobsLimit);
+                }
             }
 
             synchronized (this) {

@@ -25,8 +25,10 @@ import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
 import com.netflix.genie.common.exceptions.GenieTimeoutException;
+import com.netflix.genie.common.exceptions.GenieUserLimitExceededException;
 import com.netflix.genie.core.util.MetricsConstants;
 import com.netflix.spectator.api.Counter;
+import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Registry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +53,7 @@ public class GenieExceptionMapper {
 
     private static final String NEW_LINE = "\n";
 
+    private final Registry registry;
     private final Counter badRequestRate;
     private final Counter conflictRate;
     private final Counter notFoundRate;
@@ -60,6 +63,7 @@ public class GenieExceptionMapper {
     private final Counter timeoutRate;
     private final Counter genieRate;
     private final Counter constraintViolationRate;
+    private final Id userLimitExceededRateId;
 
     /**
      * Constructor.
@@ -68,6 +72,7 @@ public class GenieExceptionMapper {
      */
     @Autowired
     public GenieExceptionMapper(final Registry registry) {
+        this.registry = registry;
         this.badRequestRate = registry.counter(MetricsConstants.GENIE_EXCEPTIONS_BAD_REQUEST_RATE);
         this.conflictRate = registry.counter(MetricsConstants.GENIE_EXCEPTIONS_CONFLICT_RATE);
         this.notFoundRate = registry.counter(MetricsConstants.GENIE_EXCEPTIONS_NOT_FOUND_RATE);
@@ -77,6 +82,7 @@ public class GenieExceptionMapper {
         this.timeoutRate = registry.counter(MetricsConstants.GENIE_EXCEPTIONS_TIMEOUT_RATE);
         this.genieRate = registry.counter(MetricsConstants.GENIE_EXCEPTIONS_OTHER_RATE);
         this.constraintViolationRate = registry.counter(MetricsConstants.GENIE_EXCEPTIONS_CONSTRAINT_VIOLATION_RATE);
+        this.userLimitExceededRateId = registry.createId(MetricsConstants.GENIE_EXCEPTIONS_USER_LIMIT_EXCEEDED_RATE);
     }
 
     /**
@@ -105,6 +111,12 @@ public class GenieExceptionMapper {
             this.serverUnavailableRate.increment();
         } else if (e instanceof GenieTimeoutException) {
             this.timeoutRate.increment();
+        } else if (e instanceof GenieUserLimitExceededException) {
+            final GenieUserLimitExceededException userLimitExceededException = (GenieUserLimitExceededException) e;
+            final Id taggedId = this.userLimitExceededRateId
+                .withTag("user", userLimitExceededException.getUser())
+                .withTag("limit", userLimitExceededException.getExceededLimitName());
+            this.registry.counter(taggedId).increment();
         } else {
             this.genieRate.increment();
         }

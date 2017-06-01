@@ -232,6 +232,7 @@ public class ServicesConfigUnitTests {
                 Mockito.mock(JobPersistenceService.class),
                 Mockito.mock(JobKillService.class),
                 Mockito.mock(JobStateService.class),
+                Mockito.mock(JobSearchService.class),
                 new JobsProperties(),
                 Mockito.mock(ApplicationService.class),
                 Mockito.mock(ClusterService.class),
