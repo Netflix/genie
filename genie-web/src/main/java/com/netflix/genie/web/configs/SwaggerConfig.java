@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.configs;
 
+import com.google.common.collect.Lists;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,8 +33,9 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
  * Spring configuration for Swagger via SpringFox.
- *
+ * <p>
  * see: https://github.com/springfox/springfox
+ *
  * @author tgianos
  * @since 3.0.0
  */
@@ -64,7 +66,8 @@ public class SwaggerConfig {
                     null,
                     new Contact("Netflix, Inc.", "https://jobs.netflix.com/", null),
                     "Apache 2.0",
-                    "http://www.apache.org/licenses/LICENSE-2.0"
+                    "http://www.apache.org/licenses/LICENSE-2.0",
+                    Lists.newArrayList()
                 )
             )
             .select()
