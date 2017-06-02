@@ -74,6 +74,28 @@ configure(javaProjects) {
             mavenBom "io.spring.platform:platform-bom:${spring_platform_version}"
             mavenBom "org.springframework.cloud:spring-cloud-dependencies:${spring_cloud_version}"
         }
+        dependencies {
+            dependency("cglib:cglib-nodep:3.2.4")
+            dependency("com.github.fge:json-patch:1.9")
+            dependency("com.github.springtestdbunit:spring-test-dbunit:1.3.0")
+            dependencySet(group: "com.squareup.retrofit2", version: "2.1.0") {
+                entry "retrofit"
+                entry "converter-jackson"
+            }
+            dependency("com.netflix.spectator:spectator-api:0.30.0")
+            dependencySet(group: "io.springfox", version: "2.7.0") {
+                entry "springfox-swagger2"
+                entry "springfox-swagger-ui"
+                entry "springfox-bean-validators"
+            }
+            dependency("commons-validator:commons-validator:1.5.1")
+            dependency("net.sf.jtidy:jtidy:r938")
+            dependency("org.apache.commons:commons-configuration2:2.1")
+            dependency("org.apache.commons:commons-exec:1.3")
+            dependency("org.bitbucket.b_c:jose4j:0.5.4")
+            dependency("org.dbunit:dbunit:2.5.3")
+            dependency("org.springframework.security.extensions:spring-security-saml2-core:1.0.2.RELEASE")
+        }
     }
 
     ext {
@@ -119,7 +141,7 @@ configure(javaProjects) {
          * Test Dependencies
          *******************************/
 
-        testCompile("cglib:cglib-nodep:${cglib_nodep_version}")
+        testCompile("cglib:cglib-nodep")
         testCompile("org.spockframework:spock-core")
         testCompile("org.spockframework:spock-spring")
         testCompile("org.springframework.boot:spring-boot-starter-test")
