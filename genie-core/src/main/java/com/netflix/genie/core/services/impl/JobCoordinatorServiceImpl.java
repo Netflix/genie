@@ -284,7 +284,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
             }
             throw new GenieServerException(e);
         } finally {
-            this.coordinationTimer.record(System.nanoTime() - coordinationStart, TimeUnit.MILLISECONDS);
+            this.coordinationTimer.record(System.nanoTime() - coordinationStart, TimeUnit.NANOSECONDS);
         }
     }
 
