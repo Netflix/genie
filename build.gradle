@@ -80,6 +80,14 @@ configure(javaProjects) {
         }
     }
 
+    test {
+        testLogging {
+            events "passed", "skipped", "failed"
+        }
+        forkEvery 1
+        maxParallelForks 4
+    }
+
     ext {
         generatedSourcesDir = new File("${projectDir}/src/generated")
         generatedSourcesJavaDir = new File(generatedSourcesDir, "/java")
