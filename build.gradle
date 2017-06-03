@@ -98,6 +98,12 @@ configure(javaProjects) {
         }
     }
 
+    test {
+        testLogging {
+            events "passed", "skipped", "failed"
+        }
+    }
+
     ext {
         generatedSourcesDir = new File("${projectDir}/src/generated")
         generatedSourcesJavaDir = new File(generatedSourcesDir, "/java")
