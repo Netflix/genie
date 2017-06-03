@@ -18,17 +18,17 @@ dependencies {
     compile(project(":genie-core"))
 
     // Swagger libs
-    compile("io.springfox:springfox-swagger2:${springfox_version}")
-    compile("io.springfox:springfox-swagger-ui:${springfox_version}")
-    compile("io.springfox:springfox-bean-validators:${springfox_version}")
+    compile("io.springfox:springfox-swagger2")
+    compile("io.springfox:springfox-swagger-ui")
+    compile("io.springfox:springfox-bean-validators")
 
     // Commons
-    compile("org.apache.commons:commons-exec:${commons_exec_version}")
+    compile("org.apache.commons:commons-exec")
     compile("org.apache.httpcomponents:httpclient")
-    compile("commons-validator:commons-validator:${commons_validator_version}")
+    compile("commons-validator:commons-validator")
 
     // JWT JOSE implementation lib
-    compile("org.bitbucket.b_c:jose4j:${jose4j_version}")
+    compile("org.bitbucket.b_c:jose4j")
 
     // Spring Libs
     compile("org.springframework.boot:spring-boot-starter-actuator")
@@ -44,7 +44,7 @@ dependencies {
     compile("org.springframework.cloud:spring-cloud-starter-eureka")
     compile("org.springframework.cloud:spring-cloud-starter-spectator")
     compile("org.springframework.security:spring-security-jwt")
-    compile("org.springframework.security.extensions:spring-security-saml2-core:${spring_security_saml_version}") {
+    compile("org.springframework.security.extensions:spring-security-saml2-core") {
         exclude group: "org.bouncycastle", module: "bcprov-jdk15"
     }
     compile("org.springframework.security.oauth:spring-security-oauth2")
@@ -72,11 +72,11 @@ dependencies {
      *******************************/
 
     testCompile(project(":genie-test"))
-    testCompile("com.github.springtestdbunit:spring-test-dbunit:${spring_test_dbunit_version}")
+    testCompile("com.github.springtestdbunit:spring-test-dbunit")
     testCompile("com.github.tomakehurst:wiremock")
     testCompile("com.jayway.jsonpath:json-path")
-    testCompile("net.sf.jtidy:jtidy:${jtidy_version}")
-    testCompile("org.dbunit:dbunit:${dbunit_version}")
+    testCompile("net.sf.jtidy:jtidy")
+    testCompile("org.dbunit:dbunit")
     testCompile("org.springframework.boot:spring-boot-starter-jetty")
     testCompile("org.springframework.restdocs:spring-restdocs-core")
     testCompile("org.springframework.restdocs:spring-restdocs-mockmvc")
