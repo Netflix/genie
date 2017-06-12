@@ -67,6 +67,39 @@ public final class JobStatusMessage {
     public static final String JOB_PROCESS_NOT_FOUND = "Couldn't check job process status.";
 
     /**
+     * Job PID terminated, exist status is yet to be verified.
+     */
+    public static final String PROCESS_DETECTED_TO_BE_COMPLETE = "Process detected to be complete";
+
+    /**
+     * Job is undefined intermediate state caused by a crash during setup.
+     */
+    public static final String SYSTEM_CRASHED_WHILE_JOB_STARTING = "System crashed while job starting";
+
+    /**
+     * Job was launched before Genie stopped, and it cannot be re-attached after restart.
+     */
+    public static final String UNABLE_TO_RE_ATTACH_ON_STARTUP = "Unable to re-attach on startup";
+
+    /**
+     * Job was killed by user before even starting.
+     */
+    public static final String USER_REQUESTED_JOB_BE_KILLED_DURING_INITIALIZATION =
+        "User requested job be killed during initialization";
+
+    /**
+     * Job precondition was not satisfied during initialization.
+     */
+    public static final String SUBMIT_PRECONDITION_FAILURE =
+        "Job validation failed, further details available in the job output directory";
+
+    /**
+     * Job failed with unexpected exception during initialization.
+     */
+    public static final String SUBMIT_INIT_FAILURE =
+        "Job initialization failed, further details available in the job output directory";
+
+    /**
      * Private constructor, this class is not meant to be instantiated.
      */
     private JobStatusMessage() {

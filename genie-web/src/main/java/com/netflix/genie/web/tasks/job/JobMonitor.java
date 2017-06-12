@@ -166,7 +166,7 @@ public class JobMonitor extends NodeTask {
                 new JobFinishedEvent(
                     this.id,
                     JobFinishedReason.PROCESS_COMPLETED,
-                    "Process detected to be complete",
+                    JobStatusMessage.PROCESS_DETECTED_TO_BE_COMPLETE,
                     this
                 )
             );
