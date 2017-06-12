@@ -135,6 +135,11 @@ public final class JobConstants {
     public static final String GENIE_KILL_REASON_FILE_NAME = "genie/kill-reason";
 
     /**
+     * File created by Genie with details and trace for a job that failed to initialize.
+     **/
+    public static final String GENIE_INIT_FAILURE_MESSAGE_FILE_NAME = "init-failure-details";
+
+    /**
      * Genie log file path.
      **/
     public static final String GENIE_LOG_PATH = "/genie/logs/genie.log";
