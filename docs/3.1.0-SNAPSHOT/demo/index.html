@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 3.1.0-SNAPSHOT,</span>
-<span id="revdate">2017-06-03</span>
+<span id="revdate">2017-06-13</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -1237,29 +1237,23 @@ them</p>
 <div class="olist loweralpha">
 <ol class="loweralpha" type="a">
 <li>
-<p>See the <code>Job Scripts</code> table for available commands</p>
+<p>Recommend running the Hadoop job before <code>yarn</code> or <code>hdfs</code> so others they have something interesting to show</p>
 </li>
 <li>
-<p>For example:</p>
+<p>Sub in the environment env for desired cluster</p>
 <div class="olist lowerroman">
 <ol class="lowerroman" type="i">
 <li>
-<p><code>./run_hadoop_job.py test</code></p>
+<p><code>sla</code> for the Prod cluster</p>
 </li>
 <li>
-<p><code>./run_yarn_job.py test</code></p>
-</li>
-<li>
-<p><code>./run_hdfs_job.py test</code></p>
+<p><code>test</code> for the Test cluster</p>
 </li>
 </ol>
 </div>
 </li>
 <li>
-<p>Replace <code>test</code> with, <code>sla</code> to run the jobs against the Prod cluster</p>
-</li>
-<li>
-<p>If any of the Docker container crashes, you may need to increase the default memory available in the Docker preferences. The current default for a fresh install is 2GB, which is not sufficient for this demo. Use <code>docker stats</code> to verify the limit is 4GB or higher.</p>
+<p>See the <code>Job Scripts</code> table for available commands</p>
 </li>
 </ol>
 </div>
@@ -1402,7 +1396,7 @@ methods listed in the <a href="https://netflix.github.io/genie/contact/">Contact
 <div id="footer">
 <div id="footer-text">
 Version 3.1.0-SNAPSHOT<br>
-Last updated 2017-06-03 00:59:46 +00:00
+Last updated 2017-06-13 20:26:32 +00:00
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
