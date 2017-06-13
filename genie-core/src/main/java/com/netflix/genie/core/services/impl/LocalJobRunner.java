@@ -225,16 +225,17 @@ public class LocalJobRunner implements JobSubmitterService {
                 if (detailsFileExists) {
                     log.warn("Init failure details file exists");
                 }
-                try (final Writer writer = new OutputStreamWriter(new FileOutputStream(detailsFile), "UTF-8")) {
-
-                    writer.write("Job "  + id + " failed initialization due to: " + e.getMessage());
-                    writer.write(System.lineSeparator());
-                    writer.write("Exception: " + e.getClass().getCanonicalName());
-                    writer.write(System.lineSeparator());
-                    writer.write("Trace:");
-                    writer.write(System.lineSeparator());
-                    e.printStackTrace(new PrintWriter(writer));
-                    writer.write(System.lineSeparator());
+                try (
+                    final PrintWriter p = new PrintWriter(new OutputStreamWriter(
+                        new FileOutputStream(detailsFile), "UTF-8")
+                    )
+                ) {
+                    p.format(" *** Initialization failure for job: %s ***%n"
+                            + "%n"
+                            + "Exception: %s - %s%n"
+                            + "Trace:%n",
+                        id, e.getClass().getCanonicalName(), e.getMessage());
+                    e.printStackTrace(p);
                 }
                 log.info("Created init failure details file {}", detailsFile);
             } else {

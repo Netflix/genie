@@ -137,7 +137,7 @@ public final class JobConstants {
     /**
      * File created by Genie with details and trace for a job that failed to initialize.
      **/
-    public static final String GENIE_INIT_FAILURE_MESSAGE_FILE_NAME = "init-failure-details";
+    public static final String GENIE_INIT_FAILURE_MESSAGE_FILE_NAME = "initFailureDetails.txt";
 
     /**
      * Genie log file path.
