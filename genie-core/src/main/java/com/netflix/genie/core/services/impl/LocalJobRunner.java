@@ -22,6 +22,7 @@ import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
+import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
@@ -48,7 +49,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,6 +79,7 @@ public class LocalJobRunner implements JobSubmitterService {
     private final Timer executeJobTimer;
     private final Timer saveJobExecutionTimer;
     private final Timer publishJobStartedEventTimer;
+    private final Timer createInitFailureDetailsFileTimer;
 
     /**
      * Constructor create the object.
@@ -108,6 +112,9 @@ public class LocalJobRunner implements JobSubmitterService {
         this.executeJobTimer = registry.timer("genie.jobs.submit.localRunner.executeJob.timer");
         this.saveJobExecutionTimer = registry.timer("genie.jobs.submit.localRunner.saveJobExecution.timer");
         this.publishJobStartedEventTimer = registry.timer("genie.jobs.submit.localRunner.publishJobStartedEvent.timer");
+        this.createInitFailureDetailsFileTimer = registry.timer(
+            "genie.jobs.submit.localRunner.createInitFailureDetailsFile.timer"
+        );
     }
 
     /**
@@ -187,19 +194,58 @@ public class LocalJobRunner implements JobSubmitterService {
                 }
             } catch (final GeniePreconditionException gpe) {
                 log.error(gpe.getMessage(), gpe);
+                this.createInitFailureDetailsFile(id, gpe);
                 this.eventMulticaster.multicastEvent(
-                    new JobFinishedEvent(id, JobFinishedReason.INVALID, gpe.getMessage(), this)
+                    new JobFinishedEvent(
+                        id, JobFinishedReason.INVALID, JobStatusMessages.SUBMIT_PRECONDITION_FAILURE, this
+                    )
                 );
                 throw gpe;
             } catch (final Exception e) {
                 log.error(e.getMessage(), e);
+                this.createInitFailureDetailsFile(id, e);
                 this.eventMulticaster.multicastEvent(
-                    new JobFinishedEvent(id, JobFinishedReason.FAILED_TO_INIT, e.getMessage(), this)
+                    new JobFinishedEvent(
+                        id, JobFinishedReason.FAILED_TO_INIT, JobStatusMessages.SUBMIT_INIT_FAILURE, this
+                    )
                 );
                 throw e;
             }
         } finally {
             this.overallSubmitTimer.record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+        }
+    }
+
+    private void createInitFailureDetailsFile(final String id, final Exception e) {
+        final long start = System.nanoTime();
+        try {
+            final File jobDir = new File(this.baseWorkingDirPath.getFile(), id);
+            if (jobDir.exists()) {
+                final File detailsFile = new File(jobDir, JobConstants.GENIE_INIT_FAILURE_MESSAGE_FILE_NAME);
+                final boolean detailsFileExists = !detailsFile.createNewFile();
+                if (detailsFileExists) {
+                    log.warn("Init failure details file exists");
+                }
+                try (
+                    final PrintWriter p = new PrintWriter(new OutputStreamWriter(
+                        new FileOutputStream(detailsFile), StandardCharsets.UTF_8)
+                    )
+                ) {
+                    p.format(" *** Initialization failure for job: %s ***%n"
+                            + "%n"
+                            + "Exception: %s - %s%n"
+                            + "Trace:%n",
+                        id, e.getClass().getCanonicalName(), e.getMessage());
+                    e.printStackTrace(p);
+                }
+                log.info("Created init failure details file {}", detailsFile);
+            } else {
+                log.error("Could not create init failure details file, job directory does not exist");
+            }
+        } catch (Throwable t) {
+            log.error("Failed to create init failure details file", t);
+        } finally {
+            this.createInitFailureDetailsFileTimer.record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
     }
 
@@ -273,7 +319,7 @@ public class LocalJobRunner implements JobSubmitterService {
 
     private JobExecution executeJob(final Map<String, Object> context, final File runScript) throws GenieException {
         final long start = System.nanoTime();
-        try (final Writer writer = new OutputStreamWriter(new FileOutputStream(runScript), "UTF-8")) {
+        try (final Writer writer = new OutputStreamWriter(new FileOutputStream(runScript), StandardCharsets.UTF_8)) {
             final String jobId = ((JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY))
                 .getJobRequest()
                 .getId()
