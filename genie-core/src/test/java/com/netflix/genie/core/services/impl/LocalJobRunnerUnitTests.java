@@ -27,12 +27,14 @@ import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSubmitterService;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.spectator.api.Registry;
 import com.netflix.spectator.api.Timer;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -79,6 +81,7 @@ public class LocalJobRunnerUnitTests {
 
     private JobSubmitterService jobSubmitterService;
     private WorkflowTask task2;
+    private File tmpFolder;
 
     /**
      * Setup for the tests.
@@ -96,7 +99,7 @@ public class LocalJobRunnerUnitTests {
         jobWorkflowTasks.add(task1);
         jobWorkflowTasks.add(this.task2);
 
-        final File tmpFolder = this.folder.newFolder();
+        tmpFolder = this.folder.newFolder();
         final Resource baseWorkingDirResource = Mockito.mock(Resource.class);
         Mockito.when(baseWorkingDirResource.getFile()).thenReturn(tmpFolder);
 
@@ -179,6 +182,15 @@ public class LocalJobRunnerUnitTests {
 
         Mockito.doThrow(new IOException("something bad")).when(this.task2).executeTask(Mockito.anyMap());
 
-        this.jobSubmitterService.submitJob(jobRequest, cluster, command, applications, memory);
+        try {
+            this.jobSubmitterService.submitJob(jobRequest, cluster, command, applications, memory);
+        } catch (Throwable t) {
+            final File jobDirectory = new File(tmpFolder, JOB_1_ID);
+            Assert.assertTrue(jobDirectory.exists());
+            final File initFailureFile = new File(jobDirectory, JobConstants.GENIE_INIT_FAILURE_MESSAGE_FILE_NAME);
+            Assert.assertTrue(initFailureFile.exists());
+            Assert.assertTrue(initFailureFile.length() > 0);
+            throw t;
+        }
     }
 }

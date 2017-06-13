@@ -20,6 +20,7 @@ package com.netflix.genie.core.services.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
@@ -115,7 +116,7 @@ public class LocalJobKillServiceImpl implements JobKillService {
                 new JobFinishedEvent(
                     id,
                     JobFinishedReason.KILLED,
-                    "User requested job be killed during initialization",
+                    JobStatusMessages.USER_REQUESTED_JOB_BE_KILLED_DURING_INITIALIZATION,
                     this
                 )
             );

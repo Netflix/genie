@@ -21,6 +21,7 @@ import lombok.Getter;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  * An event thrown when a job is completed.
@@ -45,7 +46,7 @@ public class JobFinishedEvent extends BaseJobEvent {
     public JobFinishedEvent(
         @NotEmpty final String id,
         @NotNull final JobFinishedReason reason,
-        @NotEmpty final String message,
+        @NotEmpty @Size(max = 255, min = 1) final String message,
         @NotNull final Object source
     ) {
         super(id, source);
