@@ -30,7 +30,7 @@ import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
-import com.netflix.genie.common.dto.JobStatusMessage;
+import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.dto.search.JobSearchResult;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
@@ -362,7 +362,7 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
 
         Assert.assertEquals(JobStatus.KILLED, jobStatus);
         Assert.assertEquals(
-            JobStatusMessage.JOB_KILLED_BY_USER,
+            JobStatusMessages.JOB_KILLED_BY_USER,
             jobClient.getJob(jobRequest1.getId().orElseThrow(IllegalArgumentException::new))
                 .getStatusMsg().orElseThrow(IllegalArgumentException::new)
         );
