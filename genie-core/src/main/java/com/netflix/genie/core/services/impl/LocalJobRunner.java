@@ -22,7 +22,7 @@ import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
-import com.netflix.genie.common.dto.JobStatusMessage;
+import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
@@ -196,7 +196,7 @@ public class LocalJobRunner implements JobSubmitterService {
                 this.createInitFailureDetailsFile(id, gpe);
                 this.eventMulticaster.multicastEvent(
                     new JobFinishedEvent(
-                        id, JobFinishedReason.INVALID, JobStatusMessage.SUBMIT_PRECONDITION_FAILURE, this
+                        id, JobFinishedReason.INVALID, JobStatusMessages.SUBMIT_PRECONDITION_FAILURE, this
                     )
                 );
                 throw gpe;
@@ -205,7 +205,7 @@ public class LocalJobRunner implements JobSubmitterService {
                 this.createInitFailureDetailsFile(id, e);
                 this.eventMulticaster.multicastEvent(
                     new JobFinishedEvent(
-                        id, JobFinishedReason.FAILED_TO_INIT, JobStatusMessage.SUBMIT_INIT_FAILURE, this
+                        id, JobFinishedReason.FAILED_TO_INIT, JobStatusMessages.SUBMIT_INIT_FAILURE, this
                     )
                 );
                 throw e;

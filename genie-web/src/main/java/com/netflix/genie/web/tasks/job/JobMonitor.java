@@ -18,7 +18,7 @@
 package com.netflix.genie.web.tasks.job;
 
 import com.netflix.genie.common.dto.JobExecution;
-import com.netflix.genie.common.dto.JobStatusMessage;
+import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.exceptions.GenieTimeoutException;
 import com.netflix.genie.core.events.JobFinishedEvent;
 import com.netflix.genie.core.events.JobFinishedReason;
@@ -140,7 +140,7 @@ public class JobMonitor extends NodeTask {
 
             if (this.stdOut.exists() && this.stdOut.length() > this.maxStdOutLength) {
                 this.publisher.publishEvent(
-                    new KillJobEvent(this.id, JobStatusMessage.JOB_EXCEEDED_STDOUT_LENGTH, this)
+                    new KillJobEvent(this.id, JobStatusMessages.JOB_EXCEEDED_STDOUT_LENGTH, this)
                 );
                 this.stdOutTooLarge.increment();
                 return;
@@ -148,7 +148,7 @@ public class JobMonitor extends NodeTask {
 
             if (this.stdErr.exists() && this.stdErr.length() > this.maxStdErrLength) {
                 this.publisher.publishEvent(
-                    new KillJobEvent(this.id, JobStatusMessage.JOB_EXCEEDED_STDERR_LENGTH, this)
+                    new KillJobEvent(this.id, JobStatusMessages.JOB_EXCEEDED_STDERR_LENGTH, this)
                 );
                 this.stdErrTooLarge.increment();
                 return;
@@ -158,7 +158,7 @@ public class JobMonitor extends NodeTask {
         } catch (final GenieTimeoutException gte) {
             log.info("Job {} has timed out", this.execution.getId(), gte);
             this.timeoutRate.increment();
-            this.publisher.publishEvent(new KillJobEvent(this.id, JobStatusMessage.JOB_EXCEEDED_TIMEOUT, this));
+            this.publisher.publishEvent(new KillJobEvent(this.id, JobStatusMessages.JOB_EXCEEDED_TIMEOUT, this));
         } catch (final ExecuteException ee) {
             log.info("Job {} has finished", this.id);
             this.finishedRate.increment();
@@ -166,7 +166,7 @@ public class JobMonitor extends NodeTask {
                 new JobFinishedEvent(
                     this.id,
                     JobFinishedReason.PROCESS_COMPLETED,
-                    JobStatusMessage.PROCESS_DETECTED_TO_BE_COMPLETE,
+                    JobStatusMessages.PROCESS_DETECTED_TO_BE_COMPLETE,
                     this
                 )
             );
@@ -185,7 +185,7 @@ public class JobMonitor extends NodeTask {
                 this.publisher.publishEvent(
                     new KillJobEvent(
                         this.id,
-                        JobStatusMessage.JOB_PROCESS_NOT_FOUND,
+                        JobStatusMessages.JOB_PROCESS_NOT_FOUND,
                         this
                     )
                 );
@@ -194,7 +194,7 @@ public class JobMonitor extends NodeTask {
                     new JobFinishedEvent(
                         this.id,
                         JobFinishedReason.KILLED,
-                        JobStatusMessage.JOB_PROCESS_NOT_FOUND,
+                        JobStatusMessages.JOB_PROCESS_NOT_FOUND,
                         this
                     )
                 );

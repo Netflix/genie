@@ -23,7 +23,7 @@ package com.netflix.genie.common.dto;
  * @author mprimi
  * @since 3.0.7
  */
-public final class JobStatusMessage {
+public final class JobStatusMessages {
     //TODO this class could go away and we could fold this into JobStatus
 
     /**
@@ -102,6 +102,6 @@ public final class JobStatusMessage {
     /**
      * Private constructor, this class is not meant to be instantiated.
      */
-    private JobStatusMessage() {
+    private JobStatusMessages() {
     }
 }

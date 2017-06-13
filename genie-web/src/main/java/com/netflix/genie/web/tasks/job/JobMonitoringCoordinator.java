@@ -20,7 +20,7 @@ package com.netflix.genie.web.tasks.job;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobStatus;
-import com.netflix.genie.common.dto.JobStatusMessage;
+import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.events.JobFinishedEvent;
@@ -165,7 +165,7 @@ public class JobMonitoringCoordinator extends JobStateServiceImpl {
             } else if (job.getStatus() != JobStatus.RUNNING) {
                 this.eventMulticaster.multicastEvent(
                     new JobFinishedEvent(
-                        id, JobFinishedReason.SYSTEM_CRASH, JobStatusMessage.SYSTEM_CRASHED_WHILE_JOB_STARTING, this
+                        id, JobFinishedReason.SYSTEM_CRASH, JobStatusMessages.SYSTEM_CRASHED_WHILE_JOB_STARTING, this
                     )
                 );
             } else {
@@ -178,7 +178,7 @@ public class JobMonitoringCoordinator extends JobStateServiceImpl {
                     log.error("Unable to re-attach to job {}.", id);
                     this.eventMulticaster.multicastEvent(
                         new JobFinishedEvent(
-                            id, JobFinishedReason.SYSTEM_CRASH, JobStatusMessage.UNABLE_TO_RE_ATTACH_ON_STARTUP, this
+                            id, JobFinishedReason.SYSTEM_CRASH, JobStatusMessages.UNABLE_TO_RE_ATTACH_ON_STARTUP, this
                         )
                     );
                     this.unableToReAttach.increment();
