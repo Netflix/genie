@@ -51,6 +51,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -227,7 +228,7 @@ public class LocalJobRunner implements JobSubmitterService {
                 }
                 try (
                     final PrintWriter p = new PrintWriter(new OutputStreamWriter(
-                        new FileOutputStream(detailsFile), "UTF-8")
+                        new FileOutputStream(detailsFile), StandardCharsets.UTF_8)
                     )
                 ) {
                     p.format(" *** Initialization failure for job: %s ***%n"
@@ -318,7 +319,7 @@ public class LocalJobRunner implements JobSubmitterService {
 
     private JobExecution executeJob(final Map<String, Object> context, final File runScript) throws GenieException {
         final long start = System.nanoTime();
-        try (final Writer writer = new OutputStreamWriter(new FileOutputStream(runScript), "UTF-8")) {
+        try (final Writer writer = new OutputStreamWriter(new FileOutputStream(runScript), StandardCharsets.UTF_8)) {
             final String jobId = ((JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY))
                 .getJobRequest()
                 .getId()
