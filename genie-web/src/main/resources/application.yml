@@ -91,10 +91,10 @@ genie:
       retention: 3
     executor:
       pool:
-        size: 1
+        size: 5
     scheduler:
       pool:
-        size: 1
+        size: 5
 
 info:
   genie:
