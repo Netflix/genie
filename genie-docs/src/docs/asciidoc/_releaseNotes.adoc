@@ -17,7 +17,7 @@ property
 ** https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-1.4-Release-Notes[1.4 Release Notes]
 ** https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-1.5-Release-Notes[1.5 Release Notes]
 * Upgrade to Spring Platform IO {springPlatformVersion} for library dependency management
-** http://docs.spring.io/platform/docs/Athens-SR2/reference/htmlsingle/[Reference Docs]
+** http://docs.spring.io/platform/docs/{springPlatformVersion}/reference/htmlsingle/[Reference Docs]
 * Upgrade to Spring Cloud {springCloudVersion} for cloud dependency management
 ** http://cloud.spring.io/spring-cloud-static/{springCloudVersion}/[Reference Docs]
 * Removal of Spring Cloud Cluster
