@@ -18,7 +18,7 @@
 package com.netflix.genie.web.tasks.job;
 
 import com.netflix.genie.common.dto.JobExecution;
-import com.netflix.genie.common.dto.JobStatusMessage;
+import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.core.events.JobFinishedEvent;
 import com.netflix.genie.core.events.KillJobEvent;
 import com.netflix.genie.core.jobs.JobConstants;
@@ -302,7 +302,7 @@ public class JobMonitorUnitTests {
             captor.getValue().getId(),
             Matchers.is(jobId)
         );
-        Assert.assertThat(captor.getValue().getReason(), Matchers.is(JobStatusMessage.JOB_EXCEEDED_TIMEOUT));
+        Assert.assertThat(captor.getValue().getReason(), Matchers.is(JobStatusMessages.JOB_EXCEEDED_TIMEOUT));
         Assert.assertThat(captor.getValue().getSource(), Matchers.is(this.monitor));
         Mockito.verify(this.timeoutRate, Mockito.times(1)).increment();
     }

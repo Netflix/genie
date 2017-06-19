@@ -25,7 +25,7 @@ import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
-import com.netflix.genie.common.dto.JobStatusMessage;
+import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.events.JobFinishedEvent;
@@ -319,7 +319,7 @@ public class JobCompletionService {
                     JobKillReasonFile.class
                 ).getKillReason();
             } else {
-                 killedStatusMessages = JobStatusMessage.JOB_KILLED_BY_USER;
+                 killedStatusMessages = JobStatusMessages.JOB_KILLED_BY_USER;
             }
             final int exitCode = jobDoneFile.getExitCode();
             // Read the size of STD OUT and STD ERR files
@@ -345,7 +345,7 @@ public class JobCompletionService {
                         id,
                         exitCode,
                         JobStatus.SUCCEEDED,
-                        JobStatusMessage.JOB_FINISHED_SUCCESSFULLY,
+                        JobStatusMessages.JOB_FINISHED_SUCCESSFULLY,
                         stdOutSize,
                         stdErrSize
                     );
@@ -357,7 +357,7 @@ public class JobCompletionService {
                         id,
                         exitCode,
                         JobStatus.FAILED,
-                        JobStatusMessage.JOB_FAILED,
+                        JobStatusMessages.JOB_FAILED,
                         stdOutSize,
                         stdErrSize
                     );
@@ -373,7 +373,7 @@ public class JobCompletionService {
             this.jobPersistenceService.updateJobStatus(
                 id,
                 JobStatus.FAILED,
-                JobStatusMessage.COULD_NOT_LOAD_DONE_FILE
+                JobStatusMessages.COULD_NOT_LOAD_DONE_FILE
             );
             return JobStatus.FAILED;
         }
