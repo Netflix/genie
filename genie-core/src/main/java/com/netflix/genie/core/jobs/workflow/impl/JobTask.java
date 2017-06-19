@@ -144,23 +144,37 @@ public class JobTask extends GenieBaseTask {
                     + JobConstants.WHITE_SPACE
                     + jobExecEnv.getJobRequest().getCommandArgs()
                     + JobConstants.STDOUT_REDIRECT
-                    + JobConstants.STDOUT_LOG_FILE_NAME
+                    + "${" + JobConstants.GENIE_JOB_DIR_ENV_VAR + "}/" + JobConstants.STDOUT_LOG_FILE_NAME
                     + JobConstants.STDERR_REDIRECT
-                    + JobConstants.STDERR_LOG_FILE_NAME
+                    + "${" + JobConstants.GENIE_JOB_DIR_ENV_VAR + "}/" + JobConstants.STDERR_LOG_FILE_NAME
                     + " &"
                     + System.lineSeparator()
             );
 
+            // Save PID of children process, used in trap handlers to kill and verify termination
+            writer.write(JobConstants.EXPORT + JobConstants.CHILDREN_PID_ENV_VAR + "=$!"
+                + System.lineSeparator());
             // Wait for the above process started in background mode. Wait lets us get interrupted by kill signals.
-            writer.write("wait $!" + System.lineSeparator());
+            writer.write("wait ${" + JobConstants.CHILDREN_PID_ENV_VAR + "}" + System.lineSeparator());
 
             // Append new line
             writer.write(System.lineSeparator());
 
-            // capture exit code and write to genie.done file
+            // capture exit code and write to temporary genie.done
             writer.write("# Write the return code from the command in the done file." + System.lineSeparator());
             writer.write(JobConstants.GENIE_DONE_FILE_CONTENT_PREFIX
-                + "./" + JobConstants.GENIE_DONE_FILE_NAME
+                + "${" + JobConstants.GENIE_JOB_DIR_ENV_VAR + "}"
+                + "/" + JobConstants.GENIE_TEMPORARY_DONE_FILE_NAME
+                + System.lineSeparator());
+
+            // atomically swap temporary and actual genie.done file if one doesn't exist
+            writer.write("# Swapping done file, unless one exist created by trap handler." + System.lineSeparator());
+            writer.write("mv -n "
+                + "${" + JobConstants.GENIE_JOB_DIR_ENV_VAR + "}"
+                + "/" + JobConstants.GENIE_TEMPORARY_DONE_FILE_NAME
+                + " "
+                + "${" + JobConstants.GENIE_JOB_DIR_ENV_VAR + "}"
+                + "/" + JobConstants.GENIE_DONE_FILE_NAME
                 + System.lineSeparator());
 
             // Print the timestamp once its done running.

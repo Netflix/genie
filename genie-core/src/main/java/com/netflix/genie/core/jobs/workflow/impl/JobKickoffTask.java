@@ -122,8 +122,15 @@ public class JobKickoffTask extends GenieBaseTask {
             if (isUserCreationEnabled) {
                 createUser(user, jobRequest.getGroup().orElse(null));
             }
-            // Set the ownership to the user and run as the user, if enabled
             final List<String> command = new ArrayList<>();
+
+            // If the OS is linux use setsid to launch the process so that the entire process tree
+            // is launched in process group id which is the same as the pid of the parent process
+            if (SystemUtils.IS_OS_LINUX) {
+                command.add("setsid");
+            }
+
+            // Set the ownership to the user and run as the user, if enabled
             if (isRunAsUserEnabled) {
                 changeOwnershipOfDirectory(jobWorkingDirectory, user);
 
@@ -132,12 +139,6 @@ public class JobKickoffTask extends GenieBaseTask {
                 command.add("sudo");
                 command.add("-u");
                 command.add(user);
-            }
-
-            // If the OS is linux use setsid to launch the process so that the entire process tree
-            // is launched in process group id which is the same as the pid of the parent process
-            if (SystemUtils.IS_OS_LINUX) {
-                command.add("setsid");
             }
 
             final String runScript = jobWorkingDirectory
