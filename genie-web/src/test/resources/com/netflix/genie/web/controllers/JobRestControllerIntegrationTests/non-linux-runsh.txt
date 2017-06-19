@@ -111,7 +111,7 @@ export CHILDREN_PID=$!
 wait ${CHILDREN_PID}
 
 # Write the return code from the command in the done file.
-printf '{"exitCode": "%s"}\n' "$?" > ${GENIE_JOB_DIR}/genie/temp.genie.done
+printf '{"exitCode": "%s"}\n' "$?" > ${GENIE_JOB_DIR}/genie/genie.done.temp
 # Swapping done file, unless one exist created by trap handler.
-mv -n ${GENIE_JOB_DIR}/genie/temp.genie.done ${GENIE_JOB_DIR}/genie/genie.done
+mv -n ${GENIE_JOB_DIR}/genie/genie.done.temp ${GENIE_JOB_DIR}/genie/genie.done
 echo End: `date '+%Y-%m-%d %H:%M:%S'`
