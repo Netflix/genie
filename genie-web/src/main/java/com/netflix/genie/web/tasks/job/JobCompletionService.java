@@ -537,8 +537,8 @@ public class JobCompletionService {
                 .append("Name: [" + jobRequest.getName() + "]\n")
                 .append("Status: [" + status + "]\n")
                 .append("User: [" + jobRequest.getUser() + "]\n")
-                .append("Description: [" + jobRequest.getDescription() + "]\n")
                 .append("Tags: " + jobRequest.getTags() + "\n");
+            jobRequest.getDescription().ifPresent(description -> body.append("[" + description + "]"));
 
             this.mailServiceImpl.sendEmail(
                 email.get(),
