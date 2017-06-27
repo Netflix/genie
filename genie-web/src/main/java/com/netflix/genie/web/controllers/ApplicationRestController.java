@@ -41,10 +41,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -94,7 +98,7 @@ public class ApplicationRestController {
      * @return The created application configuration
      * @throws GenieException For any error
      */
-    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Void> createApplication(@RequestBody final Application app) throws GenieException {
         log.debug("Called to create new application");
@@ -115,7 +119,7 @@ public class ApplicationRestController {
      *
      * @throws GenieException For any error
      */
-    @RequestMapping(method = RequestMethod.DELETE)
+    @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteAllApplications() throws GenieException {
         log.debug("Delete all Applications");
@@ -135,7 +139,7 @@ public class ApplicationRestController {
      * @return All applications matching the criteria
      * @throws GenieException For any error
      */
-    @RequestMapping(method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public PagedResources<ApplicationResource> getApplications(
         @RequestParam(value = "name", required = false) final String name,
@@ -177,7 +181,7 @@ public class ApplicationRestController {
      * @return The application configuration
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public ApplicationResource getApplication(@PathVariable("id") final String id) throws GenieException {
         log.debug("Called to get Application for id {}", id);
@@ -191,7 +195,7 @@ public class ApplicationRestController {
      * @param updateApp contains the application information to update
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateApplication(
         @PathVariable("id") final String id,
@@ -208,7 +212,7 @@ public class ApplicationRestController {
      * @param patch The JSON Patch instructions
      * @throws GenieException On error
      */
-    @RequestMapping(value = "/{id}", method = RequestMethod.PATCH, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void patchApplication(
         @PathVariable("id") final String id,
@@ -224,7 +228,7 @@ public class ApplicationRestController {
      * @param id unique id of configuration to delete
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteApplication(@PathVariable("id") final String id) throws GenieException {
         log.debug("Delete an application with id {}", id);
@@ -239,7 +243,7 @@ public class ApplicationRestController {
      * @param configs The configuration files to add. Not null/empty/blank.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/configs", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/{id}/configs", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addConfigsToApplication(
         @PathVariable("id") final String id,
@@ -257,7 +261,7 @@ public class ApplicationRestController {
      * @return The active set of configuration files.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/configs", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/configs", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public Set<String> getConfigsForApplication(@PathVariable("id") final String id) throws GenieException {
         log.debug("Called with id {}", id);
@@ -273,7 +277,7 @@ public class ApplicationRestController {
      *                files with. Not null/empty/blank.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/configs", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/{id}/configs", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateConfigsForApplication(
         @PathVariable("id") final String id,
@@ -290,7 +294,7 @@ public class ApplicationRestController {
      *           from. Not null/empty/blank.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/configs", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/{id}/configs")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeAllConfigsForApplication(@PathVariable("id") final String id) throws GenieException {
         log.debug("Called with id {}", id);
@@ -305,9 +309,7 @@ public class ApplicationRestController {
      * @param dependencies The dependency files to add. Not null.
      * @throws GenieException For any error
      */
-    @RequestMapping(
-        value = "/{id}/dependencies", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE
-    )
+    @PostMapping(value = "/{id}/dependencies", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addDependenciesForApplication(
         @PathVariable("id") final String id,
@@ -325,9 +327,7 @@ public class ApplicationRestController {
      * @return The set of dependency files.
      * @throws GenieException For any error
      */
-    @RequestMapping(
-        value = "/{id}/dependencies", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE
-    )
+    @GetMapping(value = "/{id}/dependencies", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public Set<String> getDependenciesForApplication(@PathVariable("id") final String id) throws GenieException {
         log.debug("Called with id {}", id);
@@ -343,9 +343,7 @@ public class ApplicationRestController {
      *                     null/empty/blank.
      * @throws GenieException For any error
      */
-    @RequestMapping(
-        value = "/{id}/dependencies", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE
-    )
+    @PutMapping(value = "/{id}/dependencies", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateDependenciesForApplication(
         @PathVariable("id") final String id,
@@ -362,7 +360,7 @@ public class ApplicationRestController {
      *           null/empty/blank.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/dependencies", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/{id}/dependencies")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeAllDependenciesForApplication(@PathVariable("id") final String id) throws GenieException {
         log.debug("Called with id {}", id);
@@ -377,7 +375,7 @@ public class ApplicationRestController {
      * @param tags The tags to add. Not null/empty/blank.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/tags", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/{id}/tags", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addTagsForApplication(
         @PathVariable("id") final String id,
@@ -395,7 +393,7 @@ public class ApplicationRestController {
      * @return The active set of tags.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/tags", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/tags", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public Set<String> getTagsForApplication(@PathVariable("id") final String id) throws GenieException {
         log.debug("Called with id {}", id);
@@ -411,7 +409,7 @@ public class ApplicationRestController {
      *             files with. Not null/empty/blank.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/tags", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/{id}/tags", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateTagsForApplication(
         @PathVariable("id") final String id,
@@ -428,7 +426,7 @@ public class ApplicationRestController {
      *           Not null/empty/blank.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/tags", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/{id}/tags")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeAllTagsForApplication(@PathVariable("id") final String id) throws GenieException {
         log.debug("Called with id {}", id);
@@ -443,7 +441,7 @@ public class ApplicationRestController {
      * @param tag The tag to remove. Not null/empty/blank.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/tags/{tag}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/{id}/tags/{tag}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeTagForApplication(
         @PathVariable("id") final String id,
@@ -462,7 +460,7 @@ public class ApplicationRestController {
      * @return The set of commands.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/commands", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @GetMapping(value = "/{id}/commands", produces = MediaTypes.HAL_JSON_VALUE)
     public Set<CommandResource> getCommandsForApplication(
         @PathVariable("id") final String id,
         @RequestParam(value = "status", required = false) final Set<String> statuses

@@ -4,6 +4,9 @@
 
 Delete a command currently configured in the system.
 
+NOTE: You won't be able to delete a command that has been used by any job that is still in the system to maintain the
+ability for users to look up information about their job (where it ran, what it ran, etc)
+
 ==== Endpoint
 
 `DELETE /api/v3/commands/{id}`

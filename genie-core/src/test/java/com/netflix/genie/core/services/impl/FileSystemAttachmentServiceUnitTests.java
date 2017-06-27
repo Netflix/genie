@@ -32,6 +32,7 @@ import org.mockito.Mockito;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -153,7 +154,11 @@ public class FileSystemAttachmentServiceUnitTests {
         FileInputStream fis = null;
         try {
             final File attachment = this.folder.newFile(UUID.randomUUID().toString() + ".q");
-            FileUtils.write(attachment, "SELECT * FROM my_table WHERE id = '" + UUID.randomUUID().toString() + "';");
+            FileUtils.write(
+                attachment,
+                "SELECT * FROM my_table WHERE id = '" + UUID.randomUUID().toString() + "';",
+                Charset.forName("UTF-8")
+            );
             fis = new FileInputStream(attachment);
             this.service.save(jobId, attachment.getName(), fis);
             return attachment;

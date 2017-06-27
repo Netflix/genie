@@ -22,7 +22,9 @@ import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.ClasspathPropertiesFileCredentialsProvider;
 import com.amazonaws.auth.STSAssumeRoleSessionCredentialsProvider;
 import com.amazonaws.retry.PredefinedRetryPolicies;
+import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.services.FileTransfer;
 import com.netflix.genie.core.services.impl.S3FileTransferImpl;
@@ -57,8 +59,7 @@ public class AwsS3Config {
     @Bean
     @ConditionalOnProperty(value = "genie.aws.credentials.file")
     public ClasspathPropertiesFileCredentialsProvider awsCredentialsFromFile(
-        @Value("${genie.aws.credentials.file}")
-        final String credentialsFilePath
+        @Value("${genie.aws.credentials.file}") final String credentialsFilePath
     ) {
         log.info("Creating file credentials provider bean");
         return new ClasspathPropertiesFileCredentialsProvider(credentialsFilePath);
@@ -73,11 +74,10 @@ public class AwsS3Config {
     @Bean
     @ConditionalOnProperty(value = "genie.aws.credentials.role")
     public STSAssumeRoleSessionCredentialsProvider awsCredentialsProvider(
-        @Value("${genie.aws.credentials.role}")
-        final String roleArn
+        @Value("${genie.aws.credentials.role}") final String roleArn
     ) {
         log.info("Creating STS Assume Role Session Credentials provider bean");
-        return new STSAssumeRoleSessionCredentialsProvider(roleArn, "Genie");
+        return new STSAssumeRoleSessionCredentialsProvider.Builder(roleArn, "Genie").build();
     }
 
     /**
@@ -89,13 +89,17 @@ public class AwsS3Config {
      */
     @Bean
     @ConditionalOnBean(AWSCredentialsProvider.class)
-    public AmazonS3Client genieS3Client(
+    public AmazonS3 genieS3Client(
         @Value("${genie.retry.s3.noOfRetries:5}") final int noOfS3Retries,
         final AWSCredentialsProvider awsCredentialsProvider
     ) {
         final ClientConfiguration clientConfiguration = new ClientConfiguration()
             .withRetryPolicy(PredefinedRetryPolicies.getDefaultRetryPolicyWithCustomMaxRetries(noOfS3Retries));
-        return new AmazonS3Client(awsCredentialsProvider, clientConfiguration);
+        return AmazonS3ClientBuilder
+            .standard()
+            .withCredentials(awsCredentialsProvider)
+            .withClientConfiguration(clientConfiguration)
+            .build();
     }
 
     /**
@@ -109,10 +113,7 @@ public class AwsS3Config {
     @Bean(name = {"file.system.s3", "file.system.s3n", "file.system.s3a"})
     @Order(value = 1)
     @ConditionalOnBean(AmazonS3Client.class)
-    public FileTransfer s3FileTransferImpl(
-        final AmazonS3Client s3Client,
-        final Registry registry
-    ) throws GenieException {
+    public FileTransfer s3FileTransferImpl(final AmazonS3 s3Client, final Registry registry) throws GenieException {
         return new S3FileTransferImpl(s3Client, registry);
     }
 }

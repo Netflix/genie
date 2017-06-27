@@ -179,12 +179,12 @@ configure(javaProjects) {
     }
 
     compileJava {
-//        options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+        options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
         options.incremental = true
     }
 
     compileTestJava {
-//        options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+        options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
     }
 
     tasks.withType(Test) {

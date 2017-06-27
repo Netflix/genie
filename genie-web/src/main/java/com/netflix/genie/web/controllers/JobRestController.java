@@ -69,11 +69,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -203,7 +205,7 @@ public class JobRestController {
      * @return The submitted job
      * @throws GenieException For any error
      */
-    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity<Void> submitJob(
         @Valid
@@ -231,7 +233,7 @@ public class JobRestController {
      * @return The submitted job
      * @throws GenieException For any error
      */
-    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity<Void> submitJob(
         @Valid
@@ -349,7 +351,7 @@ public class JobRestController {
      * @return the Job
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     public JobResource getJob(
         @PathVariable("id")
         final String id) throws GenieException {
@@ -364,7 +366,7 @@ public class JobRestController {
      * @return The status of the job as one of: {@link JobStatus}
      * @throws GenieException on error
      */
-    @RequestMapping(value = "/{id}/status", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/status", produces = MediaType.APPLICATION_JSON_VALUE)
     public JsonNode getJobStatus(
         @PathVariable("id")
         final String id) throws GenieException {
@@ -396,7 +398,7 @@ public class JobRestController {
      * @return successful response, or one with HTTP error code
      * @throws GenieException For any error
      */
-    @RequestMapping(method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public PagedResources<JobSearchResultResource> findJobs(
         @RequestParam(value = "id", required = false)
@@ -519,7 +521,7 @@ public class JobRestController {
      * @throws IOException      on redirect error
      * @throws ServletException when trying to handle the request
      */
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void killJob(
         @PathVariable("id")
@@ -573,7 +575,7 @@ public class JobRestController {
      * @return The job request
      * @throws GenieException On any internal error
      */
-    @RequestMapping(value = "/{id}/request", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @GetMapping(value = "/{id}/request", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public JobRequestResource getJobRequest(
         @PathVariable("id")
@@ -589,7 +591,7 @@ public class JobRestController {
      * @return The job execution
      * @throws GenieException On any internal error
      */
-    @RequestMapping(value = "/{id}/execution", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @GetMapping(value = "/{id}/execution", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public JobExecutionResource getJobExecution(
         @PathVariable("id")
@@ -606,7 +608,7 @@ public class JobRestController {
      * @return The cluster
      * @throws GenieException Usually GenieNotFound exception when either the job or the cluster aren't found
      */
-    @RequestMapping(value = "/{id}/cluster", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @GetMapping(value = "/{id}/cluster", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public ClusterResource getJobCluster(
         @PathVariable("id")
@@ -623,7 +625,7 @@ public class JobRestController {
      * @return The command
      * @throws GenieException Usually GenieNotFound exception when either the job or the command aren't found
      */
-    @RequestMapping(value = "/{id}/command", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @GetMapping(value = "/{id}/command", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public CommandResource getJobCommand(
         @PathVariable("id")
@@ -639,7 +641,7 @@ public class JobRestController {
      * @return The applications
      * @throws GenieException Usually GenieNotFound exception when either the job or the applications aren't found
      */
-    @RequestMapping(value = "/{id}/applications", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @GetMapping(value = "/{id}/applications", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public List<ApplicationResource> getJobApplications(
         @PathVariable("id")
@@ -664,13 +666,12 @@ public class JobRestController {
      * @throws ServletException when trying to handle the request
      * @throws GenieException   on any Genie internal error
      */
-    @RequestMapping(
+    @GetMapping(
         value = {
             "/{id}/output",
             "/{id}/output/",
             "/{id}/output/**"
         },
-        method = RequestMethod.GET,
         produces = MediaType.ALL_VALUE
     )
     public void getJobOutput(

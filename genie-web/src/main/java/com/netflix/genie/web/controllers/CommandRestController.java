@@ -43,10 +43,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -79,7 +83,7 @@ public class CommandRestController {
      *
      * @param commandService               The command configuration service to use.
      * @param commandResourceAssembler     The assembler to use to convert commands to command HAL resources
-     * @param applicationResourceAssembler The assembler to use to convert applicaitons to application HAL resources
+     * @param applicationResourceAssembler The assembler to use to convert applications to application HAL resources
      * @param clusterResourceAssembler     The assembler to use to convert clusters to cluster HAL resources
      */
     @Autowired
@@ -102,7 +106,7 @@ public class CommandRestController {
      * @return The command created
      * @throws GenieException For any error
      */
-    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Void> createCommand(@RequestBody final Command command) throws GenieException {
         log.debug("called to create new command configuration {}", command);
@@ -125,7 +129,7 @@ public class CommandRestController {
      * @return The command configuration
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public CommandResource getCommand(@PathVariable("id") final String id) throws GenieException {
         log.debug("Called to get command with id {}", id);
@@ -144,7 +148,7 @@ public class CommandRestController {
      * @return All the Commands matching the criteria or all if no criteria
      * @throws GenieException For any error
      */
-    @RequestMapping(method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public PagedResources<CommandResource> getCommands(
         @RequestParam(value = "name", required = false) final String name,
@@ -194,7 +198,7 @@ public class CommandRestController {
      * @param updateCommand the information to update the command with
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateCommand(
         @PathVariable("id") final String id,
@@ -211,7 +215,7 @@ public class CommandRestController {
      * @param patch The JSON Patch instructions
      * @throws GenieException On error
      */
-    @RequestMapping(value = "/{id}", method = RequestMethod.PATCH, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void patchCommand(
         @PathVariable("id") final String id,
@@ -226,7 +230,7 @@ public class CommandRestController {
      *
      * @throws GenieException For any error
      */
-    @RequestMapping(method = RequestMethod.DELETE)
+    @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteAllCommands() throws GenieException {
         log.debug("called to delete all commands.");
@@ -239,7 +243,7 @@ public class CommandRestController {
      * @param id unique id for configuration to delete
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCommand(@PathVariable("id") final String id) throws GenieException {
         log.debug("Called to delete command with id {}", id);
@@ -254,7 +258,7 @@ public class CommandRestController {
      * @param configs The configuration files to add. Not null/empty/blank.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/configs", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/{id}/configs", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addConfigsForCommand(
         @PathVariable("id") final String id,
@@ -272,7 +276,7 @@ public class CommandRestController {
      * @return The active set of configuration files.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/configs", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/configs", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public Set<String> getConfigsForCommand(@PathVariable("id") final String id) throws GenieException {
         log.debug("Called with id {}", id);
@@ -288,7 +292,7 @@ public class CommandRestController {
      *                files with. Not null/empty/blank.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/configs", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/{id}/configs", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateConfigsForCommand(
         @PathVariable("id") final String id,
@@ -305,7 +309,7 @@ public class CommandRestController {
      *           Not null/empty/blank.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/configs", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/{id}/configs")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeAllConfigsForCommand(@PathVariable("id") final String id) throws GenieException {
         log.debug("Called with id {}", id);
@@ -320,7 +324,7 @@ public class CommandRestController {
      * @param tags The tags to add. Not null/empty/blank.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/tags", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/{id}/tags", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addTagsForCommand(
         @PathVariable("id") final String id,
@@ -338,7 +342,7 @@ public class CommandRestController {
      * @return The active set of tags.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/tags", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/tags", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public Set<String> getTagsForCommand(@PathVariable("id") final String id) throws GenieException {
         log.debug("Called with id {}", id);
@@ -354,7 +358,7 @@ public class CommandRestController {
      *             files with. Not null/empty/blank.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/tags", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/{id}/tags", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateTagsForCommand(
         @PathVariable("id") final String id,
@@ -371,7 +375,7 @@ public class CommandRestController {
      *           Not null/empty/blank.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/tags", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/{id}/tags")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeAllTagsForCommand(@PathVariable("id") final String id) throws GenieException {
         log.debug("Called with id {}", id);
@@ -386,7 +390,7 @@ public class CommandRestController {
      * @param tag The tag to remove. Not null/empty/blank.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/tags/{tag}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/{id}/tags/{tag}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeTagForCommand(
         @PathVariable("id") final String id,
@@ -404,9 +408,7 @@ public class CommandRestController {
      * @param applicationIds The ids of the applications to add. Not null.
      * @throws GenieException For any error
      */
-    @RequestMapping(
-        value = "/{id}/applications", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE
-    )
+    @PostMapping(value = "/{id}/applications", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addApplicationsForCommand(
         @PathVariable("id") final String id,
@@ -424,7 +426,7 @@ public class CommandRestController {
      * @return The active applications for the command.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/applications", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @GetMapping(value = "/{id}/applications", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public List<ApplicationResource> getApplicationsForCommand(
         @PathVariable("id") final String id
@@ -444,9 +446,7 @@ public class CommandRestController {
      * @param applicationIds The ids of the applications to set in order. Not null.
      * @throws GenieException For any error
      */
-    @RequestMapping(
-        value = "/{id}/applications", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE
-    )
+    @PutMapping(value = "/{id}/applications", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void setApplicationsForCommand(
         @PathVariable("id") final String id,
@@ -463,7 +463,7 @@ public class CommandRestController {
      *           null/empty/blank.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/applications", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/{id}/applications")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeAllApplicationsForCommand(@PathVariable("id") final String id) throws GenieException {
         log.debug("Called with id '{}'.", id);
@@ -478,7 +478,7 @@ public class CommandRestController {
      * @param appId The id of the application to remove from the command. Not null/empty/blank.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/applications/{appId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/{id}/applications/{appId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeApplicationForCommand(
         @PathVariable("id") final String id,
@@ -497,7 +497,7 @@ public class CommandRestController {
      * @return The list of clusters.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/clusters", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @GetMapping(value = "/{id}/clusters", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public Set<ClusterResource> getClustersForCommand(
         @PathVariable("id") final String id,
