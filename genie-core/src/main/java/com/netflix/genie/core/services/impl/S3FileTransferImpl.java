@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.core.services.impl;
 
-import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -47,7 +47,7 @@ public class S3FileTransferImpl implements FileTransfer {
 
     private final Pattern s3FilePattern = Pattern.compile("^(s3[n]?://)(.*?)/(.*/.*)");
     private final Pattern s3PrefixPattern = Pattern.compile("^s3[n]?://.*$");
-    private AmazonS3Client s3Client;
+    private AmazonS3 s3Client;
     private Timer downloadTimer;
     private Timer uploadTimer;
     private Timer getTimer;
@@ -58,7 +58,7 @@ public class S3FileTransferImpl implements FileTransfer {
      * @param amazonS3Client An amazon s3 client object
      * @param registry       The metrics registry to use
      */
-    public S3FileTransferImpl(@NotNull final AmazonS3Client amazonS3Client, @NotNull final Registry registry) {
+    public S3FileTransferImpl(@NotNull final AmazonS3 amazonS3Client, @NotNull final Registry registry) {
         this.s3Client = amazonS3Client;
         this.downloadTimer = registry.timer("genie.files.s3.download.timer");
         this.uploadTimer = registry.timer("genie.files.s3.upload.timer");

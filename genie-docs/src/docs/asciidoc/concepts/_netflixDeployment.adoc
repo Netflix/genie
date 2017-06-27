@@ -77,6 +77,6 @@ See the Spinnaker site for more information.
 
 ==== Wrap Up
 
-This section focussed on how Genie is deployed within Netflix. Hopefully it helps bring clarity to a way that Genie can
+This section focused on how Genie is deployed within Netflix. Hopefully it helps bring clarity to a way that Genie can
 be deployed. Genie certainly is not limited to this deployment model and you are free to come up with your own this
 should only serve as a template or example.

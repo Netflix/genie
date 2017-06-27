@@ -19,9 +19,8 @@ package com.netflix.genie.web.controllers;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.annotation.Nullable;
 import javax.servlet.http.Cookie;
@@ -45,7 +44,7 @@ public class UIController {
      * @param authentication The Spring Security authentication if present
      * @return getIndex
      */
-    @RequestMapping(
+    @GetMapping(
         value = {
             "/",
             "/applications/**",
@@ -53,8 +52,7 @@ public class UIController {
             "/commands/**",
             "/jobs/**",
             "/output/**"
-        },
-        method = RequestMethod.GET
+        }
     )
     public String getIndex(@NotNull final HttpServletResponse response, @Nullable final Authentication authentication) {
         if (authentication != null) {
@@ -72,7 +70,7 @@ public class UIController {
      * @param request the servlet request to get path information from
      * @return The forward address to go to at the API endpoint
      */
-    @RequestMapping(value = "/file/{id}/**", method = RequestMethod.GET)
+    @GetMapping(value = "/file/{id}/**")
     public String getFile(@PathVariable("id") final String id, final HttpServletRequest request) {
         return "forward:/api/v3/jobs/" + id + "/" + ControllerUtils.getRemainingPath(request);
     }

@@ -85,6 +85,9 @@ If no match is found for the first `ClusterCriteria` and `commandCriteria` combi
 and so on until all options are exhausted. This is handy if it is desirable to run a job on some cluster that is only
 up some of the time but other times it isn't and its fine to run it on some other cluster that is always available.
 
+NOTE: Only clusters with status `UP` and commands with status `ACTIVE` will be considered during the selection process
+all others are ignored.
+
 ====== Cluster matching example
 
 Say the following 3 clusters exists tagged as follows:
@@ -128,14 +131,15 @@ HadoopTestCluster:
 
 | `[type:presto, ver:0.150], [type:presto]`
 | PrestoTestCluster
-| The first criteria does not match any cluster, so fallback happens to the second, less restrictive criteria ("any presto cluster").
+| The first criteria does not match any cluster, so fallback happens to the second, less restrictive criteria
+("any presto cluster").
 
 |===
 
 ===== User Submits a Job Request
 
-There are other things a user needs to consider when submitting a job. All dependencies which aren't sent as attachments must
-already be uploaded somewhere Genie can access them. Somewhere like S3, web server, shared disk, etc.
+There are other things a user needs to consider when submitting a job. All dependencies which aren't sent as attachments
+must already be uploaded somewhere Genie can access them. Somewhere like S3, web server, shared disk, etc.
 
 Users should familiarize themselves with whatever the `executable` for their desired command includes. It's possible
 the system admin has setup some default parameters they should know are there so as to avoid duplication or unexpected

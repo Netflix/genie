@@ -41,10 +41,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -97,7 +101,7 @@ ClusterRestController {
      * @return The created cluster
      * @throws GenieException For any error
      */
-    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Void> createCluster(@RequestBody final Cluster cluster) throws GenieException {
         log.debug("Called to create new cluster {}", cluster);
@@ -120,7 +124,7 @@ ClusterRestController {
      * @return the cluster
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @GetMapping(value = "/{id}", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public ClusterResource getCluster(@PathVariable("id") final String id) throws GenieException {
         log.debug("Called with id: {}", id);
@@ -141,7 +145,7 @@ ClusterRestController {
      * @return the Clusters found matching the criteria
      * @throws GenieException For any error
      */
-    @RequestMapping(method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public PagedResources<ClusterResource> getClusters(
         @RequestParam(value = "name", required = false) final String name,
@@ -200,7 +204,7 @@ ClusterRestController {
      * @param updateCluster contains the cluster information to update
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateCluster(
         @PathVariable("id") final String id,
@@ -215,9 +219,9 @@ ClusterRestController {
      *
      * @param id    The id of the cluster to patch
      * @param patch The JSON Patch instructions
-     * @throws GenieException     On error
+     * @throws GenieException On error
      */
-    @RequestMapping(value = "/{id}", method = RequestMethod.PATCH, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void patchCluster(
         @PathVariable("id") final String id,
@@ -233,7 +237,7 @@ ClusterRestController {
      * @param id unique id for cluster to delete
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCluster(@PathVariable("id") final String id) throws GenieException {
         log.debug("Delete called for id: {}", id);
@@ -245,7 +249,7 @@ ClusterRestController {
      *
      * @throws GenieException For any error
      */
-    @RequestMapping(method = RequestMethod.DELETE)
+    @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteAllClusters() throws GenieException {
         log.debug("called");
@@ -260,7 +264,7 @@ ClusterRestController {
      * @param configs The configuration files to add. Not null/empty/blank.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/configs", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/{id}/configs", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addConfigsForCluster(
         @PathVariable("id") final String id,
@@ -278,7 +282,7 @@ ClusterRestController {
      * @return The active set of configuration files.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/configs", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/configs", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public Set<String> getConfigsForCluster(@PathVariable("id") final String id) throws GenieException {
         log.debug("Called with id {}", id);
@@ -294,7 +298,7 @@ ClusterRestController {
      *                files with. Not null/empty/blank.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/configs", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/{id}/configs", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateConfigsForCluster(
         @PathVariable("id") final String id,
@@ -311,7 +315,7 @@ ClusterRestController {
      *           Not null/empty/blank.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/configs", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/{id}/configs")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeAllConfigsForCluster(@PathVariable("id") final String id) throws GenieException {
         log.debug("Called with id {}", id);
@@ -326,7 +330,7 @@ ClusterRestController {
      * @param tags The tags to add. Not null/empty/blank.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/tags", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/{id}/tags", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addTagsForCluster(
         @PathVariable("id") final String id,
@@ -344,7 +348,7 @@ ClusterRestController {
      * @return The active set of tags.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/tags", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/tags", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public Set<String> getTagsForCluster(
         @PathVariable("id") final String id
@@ -362,7 +366,7 @@ ClusterRestController {
      *             files with. Not null/empty/blank.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/tags", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/{id}/tags", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateTagsForCluster(
         @PathVariable("id") final String id,
@@ -379,7 +383,7 @@ ClusterRestController {
      *           Not null/empty/blank.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/tags", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/{id}/tags")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeAllTagsForCluster(@PathVariable("id") final String id) throws GenieException {
         log.debug("Called with id {}", id);
@@ -394,7 +398,7 @@ ClusterRestController {
      * @param tag The tag to remove. Not null/empty/blank.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/tags/{tag}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/{id}/tags/{tag}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeTagForCluster(
         @PathVariable("id") final String id,
@@ -412,7 +416,7 @@ ClusterRestController {
      * @param commandIds The ids of the commandIds to add. Not null.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/commands", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/{id}/commands", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addCommandsForCluster(
         @PathVariable("id") final String id,
@@ -431,7 +435,7 @@ ClusterRestController {
      * @return The active set of commandIds for the cluster.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/commands", method = RequestMethod.GET, produces = MediaTypes.HAL_JSON_VALUE)
+    @GetMapping(value = "/{id}/commands", produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public List<CommandResource> getCommandsForCluster(
         @PathVariable("id") final String id,
@@ -462,7 +466,7 @@ ClusterRestController {
      *                   null/empty/blank.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/commands", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/{id}/commands", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void setCommandsForCluster(
         @PathVariable("id") final String id,
@@ -479,7 +483,7 @@ ClusterRestController {
      *           null/empty/blank.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/commands", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/{id}/commands")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeAllCommandsForCluster(@PathVariable("id") final String id) throws GenieException {
         log.debug("Called with id {}", id);
@@ -494,7 +498,7 @@ ClusterRestController {
      * @param commandId The id of the command to remove. Not null/empty/blank.
      * @throws GenieException For any error
      */
-    @RequestMapping(value = "/{id}/commands/{commandId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/{id}/commands/{commandId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeCommandForCluster(
         @PathVariable("id") final String id,
