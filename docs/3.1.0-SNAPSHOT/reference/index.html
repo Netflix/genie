@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 3.1.0-SNAPSHOT,</span>
-<span id="revdate">2017-06-22</span>
+<span id="revdate">2017-06-27</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -1460,6 +1460,19 @@ If no match is found for the first <code>ClusterCriteria</code> and <code>comman
 and so on until all options are exhausted. This is handy if it is desirable to run a job on some cluster that is only
 up some of the time but other times it isn&#8217;t and its fine to run it on some other cluster that is always available.</p>
 </div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Only clusters with status <code>UP</code> and commands with status <code>ACTIVE</code> will be considered during the selection process
+all others are ignored.
+</td>
+</tr>
+</table>
+</div>
 <div class="sect5">
 <h6 id="_cluster_matching_example"><a class="anchor" href="#_cluster_matching_example"></a>3.2.2.1.1. Cluster matching example</h6>
 <div class="paragraph">
@@ -1522,7 +1535,8 @@ up some of the time but other times it isn&#8217;t and its fine to run it on som
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>[type:presto, ver:0.150], [type:presto]</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">PrestoTestCluster</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The first criteria does not match any cluster, so fallback happens to the second, less restrictive criteria ("any presto cluster").</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The first criteria does not match any cluster, so fallback happens to the second, less restrictive criteria
+("any presto cluster").</p></td>
 </tr>
 </tbody>
 </table>
@@ -1531,8 +1545,8 @@ up some of the time but other times it isn&#8217;t and its fine to run it on som
 <div class="sect4">
 <h5 id="_user_submits_a_job_request"><a class="anchor" href="#_user_submits_a_job_request"></a>3.2.2.2. User Submits a Job Request</h5>
 <div class="paragraph">
-<p>There are other things a user needs to consider when submitting a job. All dependencies which aren&#8217;t sent as attachments must
-already be uploaded somewhere Genie can access them. Somewhere like S3, web server, shared disk, etc.</p>
+<p>There are other things a user needs to consider when submitting a job. All dependencies which aren&#8217;t sent as attachments
+must already be uploaded somewhere Genie can access them. Somewhere like S3, web server, shared disk, etc.</p>
 </div>
 <div class="paragraph">
 <p>Users should familiarize themselves with whatever the <code>executable</code> for their desired command includes. It&#8217;s possible
@@ -3361,7 +3375,7 @@ See the Spinnaker site for more information.</p>
 <div class="sect3">
 <h4 id="_wrap_up_4"><a class="anchor" href="#_wrap_up_4"></a>3.4.2. Wrap Up</h4>
 <div class="paragraph">
-<p>This section focussed on how Genie is deployed within Netflix. Hopefully it helps bring clarity to a way that Genie can
+<p>This section focused on how Genie is deployed within Netflix. Hopefully it helps bring clarity to a way that Genie can
 be deployed. Genie certainly is not limited to this deployment model and you are free to come up with your own this
 should only serve as a template or example.</p>
 </div>
@@ -4426,7 +4440,7 @@ an embedded database, "none" otherwise.</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 3.1.0-SNAPSHOT<br>
-Last updated 2017-06-22 00:56:59 +00:00
+Last updated 2017-06-27 23:16:28 +00:00
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
