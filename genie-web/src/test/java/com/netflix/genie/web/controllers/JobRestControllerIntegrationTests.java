@@ -121,6 +121,9 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         = "com/netflix/genie/web/controllers/JobRestControllerIntegrationTests/";
     private static final String FILE_DELIMITER = "/";
 
+    private static final String LOCALHOST_CLUSTER_TAG = "localhost";
+    private static final String BASH_COMMAND_TAG = "bash";
+
     private static final String JOB_NAME = "List * ... Directories bash job";
     private static final String JOB_USER = "genie";
     private static final String JOB_VERSION = "1.0";
@@ -140,13 +143,22 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     private static final String CMD1_USER = "genie";
     private static final String CMD1_VERSION = "1.0";
     private static final String CMD1_EXECUTABLE = "/bin/bash";
+    private static final String CMD1_TAGS
+        = BASH_COMMAND_TAG + ","
+        + "genie.id:" + CMD1_ID + ","
+        + "genie.name:" + CMD1_NAME;
 
     private static final String CLUSTER1_ID = "cluster1";
     private static final String CLUSTER1_NAME = "Local laptop";
     private static final String CLUSTER1_USER = "genie";
     private static final String CLUSTER1_VERSION = "1.0";
+    private static final String CLUSTER1_TAGS
+        = "genie.id:" + CLUSTER1_ID + ","
+        + "genie.name:" + CLUSTER1_NAME + ","
+        + LOCALHOST_CLUSTER_TAG;
 
     private static final String JOBS_LIST_PATH = EMBEDDED_PATH + ".jobSearchResultList";
+
 
     private ResourceLoader resourceLoader;
 
@@ -300,7 +312,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         configs.add(configFile2);
 
         final Set<String> tags = new HashSet<>();
-        tags.add("localhost");
+        tags.add(LOCALHOST_CLUSTER_TAG);
 
         final Cluster cluster = new Cluster.Builder(
             CLUSTER1_NAME,
@@ -341,7 +353,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         configs.add(configFile2);
 
         final Set<String> tags = new HashSet<>();
-        tags.add("bash");
+        tags.add(BASH_COMMAND_TAG);
 
         final Command cmd = new Command.Builder(
             CMD1_NAME,
@@ -398,7 +410,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
         final String commandArgs = "-c 'echo hello world'";
 
-        final String clusterTag = "localhost";
+        final String clusterTag = LOCALHOST_CLUSTER_TAG;
         final List<ClusterCriteria> clusterCriteriaList = Lists.newArrayList(
             new ClusterCriteria(Sets.newHashSet(clusterTag))
         );
@@ -414,7 +426,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .getAbsolutePath();
         final Set<String> dependencies = Sets.newHashSet(depFile1);
 
-        final String commandTag = "bash";
+        final String commandTag = BASH_COMMAND_TAG;
         final Set<String> commandCriteria = Sets.newHashSet(commandTag);
         final JobRequest jobRequest = new JobRequest.Builder(
             JOB_NAME,
@@ -929,7 +941,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     public void canSubmitJobWithAttachments() throws Exception {
         final String commandArgs = "-c 'echo hello world'";
 
-        final String clusterTag = "localhost";
+        final String clusterTag = LOCALHOST_CLUSTER_TAG;
         final List<ClusterCriteria> clusterCriteriaList = Lists.newArrayList(
             new ClusterCriteria(Sets.newHashSet(clusterTag))
         );
@@ -966,7 +978,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                 is
             );
         }
-        final Set<String> commandCriteria = Sets.newHashSet("bash");
+        final Set<String> commandCriteria = Sets.newHashSet(BASH_COMMAND_TAG);
         final JobRequest jobRequest = new JobRequest.Builder(
             JOB_NAME,
             JOB_USER,
@@ -1002,7 +1014,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         final String jobId = UUID.randomUUID().toString();
 
         final Set<String> commandCriteria = new HashSet<>();
-        commandCriteria.add("bash");
+        commandCriteria.add(BASH_COMMAND_TAG);
         final JobRequest jobRequest = new JobRequest.Builder(
             JOB_NAME,
             JOB_USER,
@@ -1040,7 +1052,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
 
         final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
         final Set<String> clusterTags = new HashSet<>();
-        clusterTags.add("localhost");
+        clusterTags.add(LOCALHOST_CLUSTER_TAG);
         final ClusterCriteria clusterCriteria = new ClusterCriteria(clusterTags);
         clusterCriteriaList.add(clusterCriteria);
 
@@ -1084,12 +1096,12 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
 
         final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
         final Set<String> clusterTags = new HashSet<>();
-        clusterTags.add("localhost");
+        clusterTags.add(LOCALHOST_CLUSTER_TAG);
         final ClusterCriteria clusterCriteria = new ClusterCriteria(clusterTags);
         clusterCriteriaList.add(clusterCriteria);
 
         final Set<String> commandCriteria = new HashSet<>();
-        commandCriteria.add("bash");
+        commandCriteria.add(BASH_COMMAND_TAG);
         final JobRequest jobRequest = new JobRequest.Builder(
             JOB_NAME,
             JOB_USER,
@@ -1160,12 +1172,12 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
 
         final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
         final Set<String> clusterTags = new HashSet<>();
-        clusterTags.add("localhost");
+        clusterTags.add(LOCALHOST_CLUSTER_TAG);
         final ClusterCriteria clusterCriteria = new ClusterCriteria(clusterTags);
         clusterCriteriaList.add(clusterCriteria);
 
         final Set<String> commandCriteria = new HashSet<>();
-        commandCriteria.add("bash");
+        commandCriteria.add(BASH_COMMAND_TAG);
         final JobRequest jobRequest = new JobRequest.Builder(
             JOB_NAME,
             JOB_USER,
@@ -1221,12 +1233,12 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
 
         final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
         final Set<String> clusterTags = new HashSet<>();
-        clusterTags.add("localhost");
+        clusterTags.add(LOCALHOST_CLUSTER_TAG);
         final ClusterCriteria clusterCriteria = new ClusterCriteria(clusterTags);
         clusterCriteriaList.add(clusterCriteria);
 
         final Set<String> commandCriteria = new HashSet<>();
-        commandCriteria.add("bash");
+        commandCriteria.add(BASH_COMMAND_TAG);
         final JobRequest jobRequest = new JobRequest.Builder(
             JOB_NAME,
             JOB_USER,
@@ -1337,8 +1349,10 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .replace("JOB_ID_PLACEHOLDER", jobId)
             .replace("COMMAND_ID_PLACEHOLDER", CMD1_ID)
             .replace("COMMAND_NAME_PLACEHOLDER", CMD1_NAME)
+            .replace("COMMAND_TAGS_PLACEHOLDER", CMD1_TAGS)
             .replace("CLUSTER_ID_PLACEHOLDER", CLUSTER1_ID)
-            .replace("CLUSTER_NAME_PLACEHOLDER", CLUSTER1_NAME);
+            .replace("CLUSTER_NAME_PLACEHOLDER", CLUSTER1_NAME)
+            .replace("CLUSTER_TAGS_PLACEHOLDER", CLUSTER1_TAGS);
     }
 
     private String getStatus(final String jobId) throws Exception {

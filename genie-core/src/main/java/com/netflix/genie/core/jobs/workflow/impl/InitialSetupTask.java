@@ -27,12 +27,17 @@ import com.netflix.genie.core.jobs.JobExecutionEnvironment;
 import com.netflix.spectator.api.Registry;
 import com.netflix.spectator.api.Timer;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -236,6 +241,19 @@ public class InitialSetupTask extends GenieBaseTask {
 
         // Append new line
         writer.write(System.lineSeparator());
+
+        writer.write(
+            JobConstants.EXPORT
+                + JobConstants.GENIE_COMMAND_TAGS_ENV_VAR
+                + JobConstants.EQUALS_SYMBOL
+                + JobConstants.DOUBLE_QUOTE_SYMBOL
+                + tagsToString(command.getTags())
+                + JobConstants.DOUBLE_QUOTE_SYMBOL
+                + LINE_SEPARATOR
+        );
+
+        // Append new line
+        writer.write(System.lineSeparator());
     }
 
     private void createClusterEnvironmentVariables(final Writer writer, final Cluster cluster)
@@ -286,6 +304,19 @@ public class InitialSetupTask extends GenieBaseTask {
 
         // Append new line
         writer.write(System.lineSeparator());
+
+        writer.write(
+            JobConstants.EXPORT
+                + JobConstants.GENIE_CLUSTER_TAGS_ENV_VAR
+                + JobConstants.EQUALS_SYMBOL
+                + JobConstants.DOUBLE_QUOTE_SYMBOL
+                + this.tagsToString(cluster.getTags())
+                + JobConstants.DOUBLE_QUOTE_SYMBOL
+                + LINE_SEPARATOR
+        );
+
+        // Append new line
+        writer.write(System.lineSeparator());
     }
 
     private void createJobEnvironmentVariables(
@@ -328,5 +359,21 @@ public class InitialSetupTask extends GenieBaseTask {
 
         // Append new line
         writer.write(LINE_SEPARATOR);
+    }
+
+    /**
+     * Helper to convert a set of tags into a string that is a suitable value for a shell environment variable.
+     * Adds double quotes as necessary (i.e. in case of spaces, newlines), performs escaping of in-tag quotes.
+     * Input tags are sorted to produce a deterministic output value.
+     * @param tags a set of tags or null
+     * @return a CSV string
+     */
+    String tagsToString(final Set<String> tags) {
+        final ArrayList<String> sortedTags = new ArrayList<>(tags == null ? Collections.emptySet() : tags);
+        // Sort tags for the sake of determinism (e.g., tests)
+        sortedTags.sort(Comparator.naturalOrder());
+        final String joinedString = StringUtils.join(sortedTags, ',');
+        // Escape quotes
+        return StringUtils.replaceAll(StringUtils.replaceAll(joinedString, "\'", "\\\'"), "\"", "\\\"");
     }
 }
