@@ -23,7 +23,6 @@ import com.amazonaws.auth.ClasspathPropertiesFileCredentialsProvider;
 import com.amazonaws.auth.STSAssumeRoleSessionCredentialsProvider;
 import com.amazonaws.retry.PredefinedRetryPolicies;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.services.FileTransfer;
@@ -112,7 +111,7 @@ public class AwsS3Config {
      */
     @Bean(name = {"file.system.s3", "file.system.s3n", "file.system.s3a"})
     @Order(value = 1)
-    @ConditionalOnBean(AmazonS3Client.class)
+    @ConditionalOnBean(AmazonS3.class)
     public FileTransfer s3FileTransferImpl(final AmazonS3 s3Client, final Registry registry) throws GenieException {
         return new S3FileTransferImpl(s3Client, registry);
     }
