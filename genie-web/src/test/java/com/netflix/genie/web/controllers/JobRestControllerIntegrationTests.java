@@ -1262,6 +1262,67 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andExpect(MockMvcResultMatchers.jsonPath(STATUS_MESSAGE_PATH, Matchers.is(JobStatusMessages.JOB_FAILED)));
     }
 
+    /**
+     * Test the job submit method for success.
+     *
+     * @throws Exception If there is a problem.
+     */
+    @Test
+    public void testResponseContentType() throws Exception {
+        Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
+        final String commandArgs = "-c 'echo hello'";
+
+        final JobRequest jobRequest = new JobRequest.Builder(
+            JOB_NAME,
+            JOB_USER,
+            JOB_VERSION,
+            commandArgs,
+            Lists.newArrayList(new ClusterCriteria(Sets.newHashSet("localhost"))),
+            Sets.newHashSet("bash")
+        )
+            .withDisableLogArchival(true)
+            .build();
+
+        final MvcResult result = this.mvc
+            .perform(
+                MockMvcRequestBuilders
+                    .post(JOBS_API)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(this.objectMapper.writeValueAsBytes(jobRequest))
+            )
+            .andExpect(MockMvcResultMatchers.status().isAccepted())
+            .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()))
+            .andReturn();
+
+        final String jobId = this.getIdFromLocation(result.getResponse().getHeader(HttpHeaders.LOCATION));
+        this.waitForDone(jobId);
+
+        this.mvc
+            .perform(MockMvcRequestBuilders.get(JOBS_API + "/" + jobId + "/output/genie/logs/env.log"))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE));
+
+        this.mvc
+            .perform(MockMvcRequestBuilders.get(JOBS_API + "/" + jobId + "/output/genie/logs/genie.log"))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE));
+
+        this.mvc
+            .perform(MockMvcRequestBuilders.get(JOBS_API + "/" + jobId + "/output/genie/genie.done"))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE));
+
+        this.mvc
+            .perform(MockMvcRequestBuilders.get(JOBS_API + "/" + jobId + "/output/stdout").accept(MediaType.ALL))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE));
+
+        this.mvc
+            .perform(MockMvcRequestBuilders.get(JOBS_API + "/" + jobId + "/output/stderr").accept(MediaType.ALL))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE));
+    }
+
     private String getIdFromLocation(final String location) {
         return location.substring(location.lastIndexOf("/") + 1);
     }
