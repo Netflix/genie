@@ -166,4 +166,15 @@ public class GenieResourceHttpRequestHandler extends ResourceHttpRequestHandler 
         }
         response.setHeader(HttpHeaders.ACCEPT_RANGES, BYTES);
     }
+
+    /**
+     * {@inheritDoc}
+     *
+     * Overriding to handle case where media type was unknown to default to Text
+     */
+    @Override
+    protected MediaType getMediaType(final HttpServletRequest request, final Resource resource) {
+        final MediaType mediaType = super.getMediaType(request, resource);
+        return mediaType == null ? MediaType.TEXT_PLAIN : mediaType;
+    }
 }
