@@ -17,7 +17,11 @@ export default class ClusterDetails extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      cluster: { id: "", configs: [], _links: { self: "", commands: "" } },
+      cluster: {
+        id: "",
+        configs: [],
+        dependencies: [],
+        _links: { self: "", commands: "" } },
       commands: []
     };
   }
@@ -67,6 +71,18 @@ export default class ClusterDetails extends React.Component {
                       {this.state.cluster.configs.map((config, index) =>
                         <li key={index}>
                           {config}
+                        </li>
+                      )}
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <td className="col-xs-2 align-right">Dependencies:</td>
+                  <td>
+                    <ul>
+                      {this.state.cluster.dependencies.map((data,index) =>
+                        <li key={index}>
+                          {data}
                         </li>
                       )}
                     </ul>

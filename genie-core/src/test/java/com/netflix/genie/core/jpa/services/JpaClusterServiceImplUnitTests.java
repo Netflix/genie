@@ -105,7 +105,7 @@ public class JpaClusterServiceImplUnitTests {
     }
 
     /**
-     * Test to update an cluster.
+     * Test to update a cluster.
      *
      * @throws GenieException For any problem
      */
@@ -117,7 +117,7 @@ public class JpaClusterServiceImplUnitTests {
     }
 
     /**
-     * Test to update an cluster.
+     * Test to update a cluster.
      *
      * @throws GenieException For any problem
      */
@@ -176,6 +176,66 @@ public class JpaClusterServiceImplUnitTests {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaClusterRepository.findOne(id)).thenReturn(null);
         this.service.getConfigsForCluster(id);
+    }
+
+    /**
+     * Test add dependencies to cluster.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test(expected = GenieNotFoundException.class)
+    public void testAddDepsToClusterNoCluster() throws GenieException {
+        final String id = UUID.randomUUID().toString();
+        Mockito.when(this.jpaClusterRepository.findOne(id)).thenReturn(null);
+        this.service.addDependenciesForCluster(UUID.randomUUID().toString(), Sets.newHashSet());
+    }
+
+    /**
+     * Test update dependencies of cluster.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test(expected = GenieNotFoundException.class)
+    public void testUpdateDepsForClusterNoCluster() throws GenieException {
+        final String id = UUID.randomUUID().toString();
+        Mockito.when(this.jpaClusterRepository.findOne(id)).thenReturn(null);
+        this.service.updateDependenciesForCluster(UUID.randomUUID().toString(), Sets.newHashSet());
+    }
+
+    /**
+     * Test get dependencies from cluster.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test(expected = GenieNotFoundException.class)
+    public void testGetDepsForClusterNoCluster() throws GenieException {
+        final String id = UUID.randomUUID().toString();
+        Mockito.when(this.jpaClusterRepository.findOne(id)).thenReturn(null);
+        this.service.getDependenciesForCluster(id);
+    }
+
+    /**
+     * Test remove all dependencies from cluster.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test(expected = GenieNotFoundException.class)
+    public void testRemoveAllDepsFromClusterNoCluster() throws GenieException {
+        final String id = UUID.randomUUID().toString();
+        Mockito.when(this.jpaClusterRepository.findOne(id)).thenReturn(null);
+        this.service.removeAllDependenciesForCluster(id);
+    }
+
+    /**
+     * Test remove dependency from cluster.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test(expected = GenieNotFoundException.class)
+    public void testRemoveDepFromClusterNoCluster() throws GenieException {
+        final String id = UUID.randomUUID().toString();
+        Mockito.when(this.jpaClusterRepository.findOne(id)).thenReturn(null);
+        this.service.removeDependencyForCluster(id, "something");
     }
 
     /**

@@ -205,6 +205,77 @@ public interface ClusterService {
     ) throws GenieException;
 
     /**
+     * Add dependency files to the cluster.
+     *
+     * @param id           The id of the cluster to add the dependency file to. Not
+     *                     null/empty/blank.
+     * @param dependencies The dependency files to add. Not null.
+     * @throws GenieException if there is an error
+     */
+    void addDependenciesForCluster(
+        @NotBlank(message = "No cluster id entered. Unable to add dependencies.")
+        final String id,
+        @NotEmpty(message = "No dependencies entered. Unable to add dependencies.")
+        final Set<String> dependencies
+    ) throws GenieException;
+
+    /**
+     * Get the set of dependency files associated with the cluster with given id.
+     *
+     * @param id The id of the cluster to get the dependency files for. Not
+     *           null/empty/blank.
+     * @return The set of dependency files as paths
+     * @throws GenieException if there is an error
+     */
+    Set<String> getDependenciesForCluster(
+        @NotBlank(message = "No cluster id entered. Unable to get dependencies.")
+        final String id
+    ) throws GenieException;
+
+    /**
+     * Update the set of dependency files associated with the cluster with given
+     * id.
+     *
+     * @param id           The id of the cluster to update the dependency files for. Not
+     *                     null/empty/blank.
+     * @param dependencies The dependency files to replace existing dependencies with. Not null/empty.
+     * @throws GenieException if there is an error
+     */
+    void updateDependenciesForCluster(
+        @NotBlank(message = "No cluster id entered. Unable to update dependencies.")
+        final String id,
+        @NotNull(message = "No dependencies entered. Unable to update.")
+        final Set<String> dependencies
+    ) throws GenieException;
+
+    /**
+     * Remove all dependency files from the cluster.
+     *
+     * @param id The id of the cluster to remove the configuration file
+     *           from. Not null/empty/blank.
+     * @throws GenieException if there is an error
+     */
+    void removeAllDependenciesForCluster(
+        @NotBlank(message = "No cluster id entered. Unable to remove dependencies.")
+        final String id
+    ) throws GenieException;
+
+    /**
+     * Remove a dependency file from the cluster.
+     *
+     * @param id         The id of the cluster to remove the dependency file from. Not
+     *                   null/empty/blank.
+     * @param dependency The dependency file to remove. Not null/empty/blank.
+     * @throws GenieException if there is an error
+     */
+    void removeDependencyForCluster(
+        @NotBlank(message = "No cluster id entered. Unable to remove dependency.")
+        final String id,
+        @NotBlank(message = "No dependency entered. Unable to remove dependency.")
+        final String dependency
+    ) throws GenieException;
+
+    /**
      * Add tags to the cluster.
      *
      * @param id   The id of the cluster to add the tags to. Not

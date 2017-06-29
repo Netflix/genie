@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.core.jobs.workflow.impl;
 
+import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.jobs.AdminResources;
@@ -75,6 +76,7 @@ public class ClusterTask extends GenieBaseTask {
                 + JobConstants.FILE_PATH_DELIMITER
                 + JobConstants.GENIE_PATH_VAR;
             final Writer writer = (Writer) context.get(JobConstants.WRITER_KEY);
+            final Cluster cluster = jobExecEnv.getCluster();
             log.info("Starting Cluster Task for job {}", jobExecEnv.getJobRequest().getId());
 
             final String clusterId = jobExecEnv
@@ -91,6 +93,13 @@ public class ClusterTask extends GenieBaseTask {
 
             // Create the config directory for this id
             createEntityInstanceConfigDirectory(
+                genieDir,
+                clusterId,
+                AdminResources.CLUSTER
+            );
+
+            // Create the dependencies directory for this id
+            createEntityInstanceDependenciesDirectory(
                 genieDir,
                 clusterId,
                 AdminResources.CLUSTER
@@ -130,6 +139,18 @@ public class ClusterTask extends GenieBaseTask {
                     AdminResources.CLUSTER
                 );
                 fts.getFile(configFile, localPath);
+            }
+
+            // Iterate over and get all dependencies
+            for (final String dependencyFile : cluster.getDependencies()) {
+                final String localPath = super.buildLocalFilePath(
+                    jobWorkingDirectory,
+                    clusterId,
+                    dependencyFile,
+                    FileType.DEPENDENCIES,
+                    AdminResources.CLUSTER
+                );
+                fts.getFile(dependencyFile, localPath);
             }
             log.info("Finished Cluster Task for job {}", jobExecEnv.getJobRequest().getId());
         } finally {

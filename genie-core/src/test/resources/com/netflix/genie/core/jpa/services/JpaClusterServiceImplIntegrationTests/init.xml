@@ -97,6 +97,13 @@
         command_id="command3"
         command_order="1"/>
 
+    <cluster_dependencies
+        cluster_id="cluster1"
+        dependency="s3://some/config/cluster1/foo.json"/>
+    <cluster_dependencies
+        cluster_id="cluster1"
+        dependency="s3://some/config/cluster1/bar.json"/>
+
     <clusters
         id="cluster2"
         created="2014-07-09 01:49:00"

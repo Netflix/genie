@@ -17,6 +17,7 @@
 <dataset>
     <clusters/>
     <cluster_configs/>
+    <cluster_dependencies/>
     <commands/>
     <command_configs/>
     <clusters_commands/>

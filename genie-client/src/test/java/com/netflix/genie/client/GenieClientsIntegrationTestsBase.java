@@ -80,12 +80,15 @@ public abstract class GenieClientsIntegrationTestsBase {
 
         final Set<String> configList = Sets.newHashSet("config1", "configs2");
 
+        final Set<String> dependenciesList = Sets.newHashSet("cluster-dep1", "cluster-dep2");
+
         return new Cluster.Builder("name", "user", "1.0", ClusterStatus.UP)
             .withId(clusterId)
             .withDescription("client Test")
             .withSetupFile("path to set up file")
             .withTags(tags)
             .withConfigs(configList)
+            .withDependencies(dependenciesList)
             .build();
     }
 

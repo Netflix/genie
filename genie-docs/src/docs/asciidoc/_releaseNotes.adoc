@@ -11,6 +11,7 @@ property
 ** Follows new Spring default
 ** Turn off by setting `management.security.enabled` to `false`
 * Optional cluster load balancer via Admin supplied script
+* Add dependencies to the Cluster entity
 
 === Library Upgrades
 
@@ -148,3 +149,7 @@ for more information. Currently on classpath only none, hash_map, redis and jdbc
 |spring.jpa.hibernate.naming.strategy
 
 |===
+
+=== Database Upgrades
+
+* Add cluster dependencies table

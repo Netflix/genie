@@ -409,23 +409,64 @@ public class JobCompletionService {
                             + JobConstants.DEPENDENCY_FILE_PATH_PREFIX
                     );
 
-                    if (appDependencyDir.exists()) {
-                        if (this.runAsUserEnabled) {
-                            final CommandLine deleteCommand = new CommandLine("sudo");
-                            deleteCommand.addArgument("rm");
-                            deleteCommand.addArgument("-rf");
-                            deleteCommand.addArgument(appDependencyDir.getCanonicalPath());
-                            log.debug("Delete command is {}", deleteCommand.toString());
-                            this.executor.execute(deleteCommand);
-                        } else {
-                            FileUtils.deleteDirectory(appDependencyDir);
-                        }
-                    }
+                    deleteDependenciesDirectory(appDependencyDir);
                 }
+
             } catch (Exception e) {
                 log.error("Could not delete job dependencies after completion for job: {} due to error {}",
                     jobId, e);
                 this.deleteDependenciesFailure.increment();
+            }
+        }
+    }
+
+    /**
+     * Delete the cluster dependencies off disk to save space.
+     *
+     * @param jobId  The ID of the job to delete dependencies for
+     * @param jobDir The job working directory
+     */
+    private void deleteClusterDependencies(final String jobId, final File jobDir) {
+        log.debug("Deleting dependencies as its enabled.");
+        if (jobDir.exists()) {
+            try {
+                final String clusterId = this.jobSearchService
+                    .getJobCluster(jobId)
+                    .getId()
+                    .orElseThrow(IllegalStateException::new);
+
+                final File clusterDependencyDir = new File(
+                    jobDir,
+                    JobConstants.GENIE_PATH_VAR
+                        + JobConstants.FILE_PATH_DELIMITER
+                        + JobConstants.CLUSTER_PATH_VAR
+                        + JobConstants.FILE_PATH_DELIMITER
+                        + clusterId
+                        + JobConstants.FILE_PATH_DELIMITER
+                        + JobConstants.DEPENDENCY_FILE_PATH_PREFIX
+                );
+
+                deleteDependenciesDirectory(clusterDependencyDir);
+
+            } catch (Exception e) {
+                log.error("Could not delete job dependencies after completion for job: {} due to error {}",
+                    jobId, e);
+                this.deleteDependenciesFailure.increment();
+            }
+        }
+    }
+
+    private void deleteDependenciesDirectory(final File dependencyDirectory) throws IOException {
+        if (dependencyDirectory.exists()) {
+            if (this.runAsUserEnabled) {
+                final CommandLine deleteCommand = new CommandLine("sudo");
+                deleteCommand.addArgument("rm");
+                deleteCommand.addArgument("-rf");
+                deleteCommand.addArgument(dependencyDirectory.getCanonicalPath());
+                log.debug("Delete command is {}", deleteCommand.toString());
+                this.executor.execute(deleteCommand);
+            } else {
+                FileUtils.deleteDirectory(dependencyDirectory);
             }
         }
     }
@@ -449,6 +490,7 @@ public class JobCompletionService {
             if (jobDir.exists()) {
                 if (this.deleteDependencies) {
                     this.deleteApplicationDependencies(jobId, jobDir);
+                    this.deleteClusterDependencies(jobId, jobDir);
                 }
 
                 final Optional<String> archiveLocation = job.getArchiveLocation();

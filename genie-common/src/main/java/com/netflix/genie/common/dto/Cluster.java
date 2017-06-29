@@ -22,6 +22,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Getter;
 
 import javax.validation.constraints.NotNull;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Cluster DTO object. Read only after construction.
@@ -37,6 +40,7 @@ public class Cluster extends ConfigDTO {
 
     @NotNull(message = "A valid cluster status is required")
     private final ClusterStatus status;
+    private final Set<String> dependencies = new HashSet<>();
 
     /**
      * Constructor used only by the build() method of the builder.
@@ -46,6 +50,16 @@ public class Cluster extends ConfigDTO {
     protected Cluster(final Builder builder) {
         super(builder);
         this.status = builder.bStatus;
+        this.dependencies.addAll(builder.bDependencies);
+    }
+
+    /**
+     * Get the set of dependencies for the cluster.
+     *
+     * @return The dependencies for the cluster as a read-only set.
+     */
+    public Set<String> getDependencies() {
+        return Collections.unmodifiableSet(this.dependencies);
     }
 
     /**
@@ -57,6 +71,7 @@ public class Cluster extends ConfigDTO {
     public static class Builder extends ConfigDTO.Builder<Builder> {
 
         private final ClusterStatus bStatus;
+        private final Set<String> bDependencies = new HashSet<>();
 
         /**
          * Constructor which has required fields.
@@ -82,6 +97,19 @@ public class Cluster extends ConfigDTO {
             } else {
                 this.bStatus = ClusterStatus.OUT_OF_SERVICE;
             }
+        }
+
+        /**
+         * Set the dependencies for the cluster if desired.
+         *
+         * @param dependencies The dependencies
+         * @return The builder
+         */
+        public Cluster.Builder withDependencies(final Set<String> dependencies) {
+            if (dependencies != null) {
+                this.bDependencies.addAll(dependencies);
+            }
+            return this;
         }
 
         /**

@@ -191,6 +191,7 @@ directory
 . Application configuration and dependency files are downloaded and stored in the job directory if any applications are
 needed
 . Application related variables are written into the run script
+. Cluster configuration and dependency files are downloaded and store in the job directory
 . Command configuration and dependency files are downloaded and store in the job directory
 . Command related variables are written into the run script
 . All job dependency files (including attachments) are downloaded into the job working directory
@@ -215,7 +216,7 @@ killed depending on that code.
 
 ===== Genie Performs Job Clean-Up
 
-To save disk space Genie will delete application dependencies from the job working directory after a job is completed.
+To save disk space Genie will delete application, cluster, job dependencies from the job working directory after a job is completed.
 This can be disabled by an admin. If the job is marked as it should be archived the working directory will be zipped up
 and stored in the default archive location as `{jobId}.tar.gz`.
 
