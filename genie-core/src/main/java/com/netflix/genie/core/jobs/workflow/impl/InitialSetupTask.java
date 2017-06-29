@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.core.jobs.workflow.impl;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.exceptions.GenieException;
@@ -113,7 +114,8 @@ public class InitialSetupTask extends GenieBaseTask {
         }
     }
 
-    private void createJobDirStructure(final String jobWorkingDirectory) throws GenieException, IOException {
+    @VisibleForTesting
+    void createJobDirStructure(final String jobWorkingDirectory) throws GenieException, IOException {
         // create top level directory structure for the job
 
         // Genie Directory {basedir/genie}
@@ -158,7 +160,8 @@ public class InitialSetupTask extends GenieBaseTask {
         }
     }
 
-    private void createJobDirEnvironmentVariables(final Writer writer, final String jobWorkingDirectory)
+    @VisibleForTesting
+    void createJobDirEnvironmentVariables(final Writer writer, final String jobWorkingDirectory)
         throws GenieException, IOException {
         // set environment variable for the job directory
         writer.write(JobConstants.EXPORT
@@ -173,7 +176,8 @@ public class InitialSetupTask extends GenieBaseTask {
         writer.write(LINE_SEPARATOR);
     }
 
-    private void createApplicationEnvironmentVariables(final Writer writer)
+    @VisibleForTesting
+    void createApplicationEnvironmentVariables(final Writer writer)
         throws GenieException, IOException {
         // create environment variable for the application directory
         writer.write(JobConstants.EXPORT
@@ -194,7 +198,8 @@ public class InitialSetupTask extends GenieBaseTask {
         writer.write(LINE_SEPARATOR);
     }
 
-    private void createCommandEnvironmentVariables(final Writer writer, final Command command)
+    @VisibleForTesting
+    void createCommandEnvironmentVariables(final Writer writer, final Command command)
         throws GenieException, IOException {
         final String commandId = command.getId().orElseThrow(() -> new GenieServerException("No command id"));
         writer.write(JobConstants.EXPORT
@@ -256,7 +261,8 @@ public class InitialSetupTask extends GenieBaseTask {
         writer.write(System.lineSeparator());
     }
 
-    private void createClusterEnvironmentVariables(final Writer writer, final Cluster cluster)
+    @VisibleForTesting
+    void createClusterEnvironmentVariables(final Writer writer, final Cluster cluster)
         throws GenieException, IOException {
         final String clusterId = cluster.getId().orElseThrow(() -> new GenieServerException("No cluster id"));
 
@@ -319,7 +325,8 @@ public class InitialSetupTask extends GenieBaseTask {
         writer.write(System.lineSeparator());
     }
 
-    private void createJobEnvironmentVariables(
+    @VisibleForTesting
+    void createJobEnvironmentVariables(
         final Writer writer,
         final String jobId,
         final String jobName,
@@ -368,6 +375,7 @@ public class InitialSetupTask extends GenieBaseTask {
      * @param tags a set of tags or null
      * @return a CSV string
      */
+    @VisibleForTesting
     String tagsToString(final Set<String> tags) {
         final ArrayList<String> sortedTags = new ArrayList<>(tags == null ? Collections.emptySet() : tags);
         // Sort tags for the sake of determinism (e.g., tests)
