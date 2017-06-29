@@ -48,8 +48,8 @@ An application resource represents pretty much what you'd expect. It is a reusab
 and setup files that can be used to install and configure (surprise!) an application. Generally these resources are
 used when an application isn't already installed and on the `PATH` on a Genie node.
 
-When a job is run and applications are involved in running the job Genie will download all the dependencies,
-configuration files and setup files of each application and store it all in the job working directory. It will then
+When a job is run the job Genie will download all the dependencies, configuration files and
+setup files of each application and cluster and store it all in the job working directory. It will then
 execute the setup script in order to install that application for that job. Genie is "dumb" as to the contents or
 purpose of any of these files so the onus is on the administrators to create and test these packages.
 
@@ -83,9 +83,10 @@ run Hive you generally need a few things:
 . Hadoop configurations and binaries
 
 So a typical setup for Hive in Genie would be to have one, or many, Hive commands configured. Each command would have
-its own hive-site.xml pointing to a specific metastore (prod, test, etc). The command would depend on Hadoop and Hive
-applications already configured which would have all the default Hadoop and Hive binaries and configurations. All this
-would be combined in the job working directory in order to run Hive.
+its own hive-site.xml pointing to a specific metastore (prod, test, etc). Alternatively, site-specific configuration
+can be associated to clusters and will be available to all commands executing against it.
+The command would depend on Hadoop and Hive applications already configured which would have all the default
+Hadoop and Hive binaries and configurations. All this would be combined in the job working directory in order to run Hive.
 
 You can have any number of commands configured in the system. They should then be linked to the clusters they can
 execute on. Clusters are explained next.
