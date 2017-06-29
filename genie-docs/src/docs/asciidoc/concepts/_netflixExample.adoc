@@ -65,6 +65,7 @@ downloaded into the job working directory at runtime.
     "s3://bucket/users/bdp/h2prod/20161217/205111/genie/hdfs-site.xml",
     "s3://bucket/users/bdp/h2prod/20161217/205111/genie/core-site.xml"
   ],
+  "dependencies": [],
   "status": "UP",
   "_links": {
     "self": {
@@ -105,6 +106,7 @@ downloaded into the job working directory at runtime.
     "s3://bucket/users/bdp/h2query/20161108/204556/genie/mapred-site.xml",
     "s3://bucket/users/bdp/h2query/20161108/204556/genie/yarn-site.xml"
   ],
+  "dependencies": [],
   "status": "UP",
   "_links": {
     "self": {
@@ -140,6 +142,7 @@ downloaded into the job working directory at runtime.
   "description": null,
   "setupFile": null,
   "configs": [],
+  "dependencies": [],
   "status": "UP",
   "_links": {
     "self": {

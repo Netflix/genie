@@ -52,6 +52,7 @@ public class ClusterUnitTests {
         Assert.assertThat(cluster.getVersion(), Matchers.is(VERSION));
         Assert.assertThat(cluster.getStatus(), Matchers.is(ClusterStatus.UP));
         Assert.assertThat(cluster.getConfigs(), Matchers.empty());
+        Assert.assertThat(cluster.getDependencies(), Matchers.empty());
         Assert.assertFalse(cluster.getCreated().isPresent());
         Assert.assertFalse(cluster.getDescription().isPresent());
         Assert.assertFalse(cluster.getSetupFile().isPresent());
@@ -71,6 +72,9 @@ public class ClusterUnitTests {
 
         final Set<String> configs = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
         builder.withConfigs(configs);
+
+        final Set<String> dependencies = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
+        builder.withDependencies(dependencies);
 
         final Date created = new Date();
         builder.withCreated(created);
@@ -93,6 +97,7 @@ public class ClusterUnitTests {
         Assert.assertThat(cluster.getVersion(), Matchers.is(VERSION));
         Assert.assertThat(cluster.getStatus(), Matchers.is(ClusterStatus.UP));
         Assert.assertThat(cluster.getConfigs(), Matchers.is(configs));
+        Assert.assertThat(cluster.getDependencies(), Matchers.is(dependencies));
         Assert.assertThat(cluster.getCreated().orElseThrow(IllegalArgumentException::new), Matchers.is(created));
         Assert.assertThat(
             cluster.getDescription().orElseThrow(IllegalArgumentException::new), Matchers.is(description)
@@ -109,6 +114,7 @@ public class ClusterUnitTests {
     public void canBuildClusterNullOptionals() {
         final Cluster.Builder builder = new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP);
         builder.withConfigs(null);
+        builder.withDependencies(null);
         builder.withCreated(null);
         builder.withDescription(null);
         builder.withId(null);
@@ -121,6 +127,7 @@ public class ClusterUnitTests {
         Assert.assertThat(cluster.getVersion(), Matchers.is(VERSION));
         Assert.assertThat(cluster.getStatus(), Matchers.is(ClusterStatus.UP));
         Assert.assertThat(cluster.getConfigs(), Matchers.empty());
+        Assert.assertThat(cluster.getDependencies(), Matchers.empty());
         Assert.assertFalse(cluster.getCreated().isPresent());
         Assert.assertFalse(cluster.getDescription().isPresent());
         Assert.assertFalse(cluster.getSetupFile().isPresent());
@@ -136,6 +143,7 @@ public class ClusterUnitTests {
     public void canFindEquality() {
         final Cluster.Builder builder = new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP);
         builder.withConfigs(null);
+        builder.withDependencies(null);
         builder.withCreated(null);
         builder.withDescription(null);
         builder.withId(UUID.randomUUID().toString());
@@ -161,6 +169,7 @@ public class ClusterUnitTests {
     public void canUseHashCode() {
         final Cluster.Builder builder = new Cluster.Builder(NAME, USER, VERSION, null);
         builder.withConfigs(null);
+        builder.withDependencies(null);
         builder.withCreated(null);
         builder.withDescription(null);
         builder.withId(UUID.randomUUID().toString());

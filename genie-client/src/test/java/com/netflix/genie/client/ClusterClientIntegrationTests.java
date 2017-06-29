@@ -375,6 +375,54 @@ public class ClusterClientIntegrationTests extends GenieClientsIntegrationTestsB
     }
 
     /**
+     * Test all the methods that manipulate dependencies for a cluster in genie.
+     *
+     * @throws Exception If there is any problem.
+     */
+    @Test
+    public void testClusterDependenciesMethods() throws Exception {
+
+        final Set<String> initialDependencies = Sets.newHashSet("foo", "bar");
+
+        final Cluster cluster = new Cluster.Builder("name", "user", "1.0", ClusterStatus.UP)
+            .withId("cluster1")
+            .withDescription("client Test")
+            .withSetupFile("path to set up file")
+            .withDependencies(initialDependencies)
+            .build();
+
+        clusterClient.createCluster(cluster);
+
+        // Test getDependencies for cluster
+        Set<String> dependencies = clusterClient.getDependenciesForCluster("cluster1");
+        Assert.assertEquals(2, dependencies.size());
+        Assert.assertEquals(dependencies.contains("foo"), true);
+        Assert.assertEquals(dependencies.contains("bar"), true);
+
+        // Test adding a dependency for cluster
+        final Set<String> moreDependencies = Sets.newHashSet("pi");
+
+        clusterClient.addDependenciesToCluster("cluster1", moreDependencies);
+        dependencies = clusterClient.getDependenciesForCluster("cluster1");
+        Assert.assertEquals(3, dependencies.size());
+        Assert.assertEquals(dependencies.contains("foo"), true);
+        Assert.assertEquals(dependencies.contains("bar"), true);
+        Assert.assertEquals(dependencies.contains("pi"), true);
+
+        // Test update dependencies for a cluster
+        clusterClient.updateDependenciesForCluster("cluster1", initialDependencies);
+        dependencies = clusterClient.getDependenciesForCluster("cluster1");
+        Assert.assertEquals(2, dependencies.size());
+        Assert.assertEquals(dependencies.contains("foo"), true);
+        Assert.assertEquals(dependencies.contains("bar"), true);
+
+        // Test delete all dependencies in a cluster
+        clusterClient.removeAllDependenciesForCluster("cluster1");
+        dependencies = clusterClient.getDependenciesForCluster("cluster1");
+        Assert.assertEquals(0, dependencies.size());
+    }
+
+    /**
      * Test all the methods that manipulate commands for a cluster in genie.
      *
      * @throws Exception If there is any problem.

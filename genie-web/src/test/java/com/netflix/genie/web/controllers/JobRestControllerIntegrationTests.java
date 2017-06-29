@@ -306,6 +306,19 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         ).getFile().getAbsolutePath();
         final Set<String> configs = Sets.newHashSet(configFile1, configFile2);
 
+        final String depFile1 = this.resourceLoader.getResource(
+            BASE_DIR
+                + CLUSTER1_ID
+                + FILE_DELIMITER
+                + "dep1"
+        ).getFile().getAbsolutePath();
+        final String depFile2 = this.resourceLoader.getResource(
+            BASE_DIR
+                + CLUSTER1_ID
+                + FILE_DELIMITER
+                + "dep2"
+        ).getFile().getAbsolutePath();
+        final Set<String> clusterDependencies = Sets.newHashSet(depFile1, depFile2);
         final Set<String> tags = Sets.newHashSet(LOCALHOST_CLUSTER_TAG);
 
         final Cluster cluster = new Cluster.Builder(
@@ -317,6 +330,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .withId(CLUSTER1_ID)
             .withSetupFile(setUpFile)
             .withConfigs(configs)
+            .withDependencies(clusterDependencies)
             .withTags(tags)
             .build();
 

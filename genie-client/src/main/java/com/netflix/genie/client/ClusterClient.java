@@ -312,6 +312,86 @@ public class ClusterClient extends BaseGenieClient {
         clusterService.removeAllConfigsForCluster(clusterId).execute();
     }
 
+    /****************** Methods to manipulate dependencies for a cluster   *********************/
+
+    /**
+     * Method to get all the dependency files for an cluster.
+     *
+     * @param clusterId The id of the cluster.
+     * @return The set of dependencies for the cluster.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException          For Network and other IO issues
+     */
+    public Set<String> getDependenciesForCluster(final String clusterId) throws IOException,
+        GenieClientException {
+        if (StringUtils.isEmpty(clusterId)) {
+            throw new IllegalArgumentException("Missing required parameter: clusterId.");
+        }
+
+        return clusterService.getDependenciesForCluster(clusterId).execute().body();
+    }
+
+    /**
+     * Method to add dependencies to a cluster.
+     *
+     * @param clusterId The id of the cluster.
+     * @param dependencies  The set of dependencies to add.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException          For Network and other IO issues
+     */
+    public void addDependenciesToCluster(
+        final String clusterId, final Set<String> dependencies
+    ) throws IOException, GenieClientException {
+        if (StringUtils.isEmpty(clusterId)) {
+            throw new IllegalArgumentException("Missing required parameter: clusterId.");
+        }
+
+        if (dependencies == null || dependencies.isEmpty()) {
+            throw new IllegalArgumentException("Dependencies cannot be null or empty");
+        }
+
+        clusterService.addDependenciesToCluster(clusterId, dependencies).execute();
+    }
+
+    /**
+     * Method to update dependencies for a cluster.
+     *
+     * @param clusterId The id of the cluster.
+     * @param dependencies  The set of dependencies to add.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException          For Network and other IO issues
+     */
+    public void updateDependenciesForCluster(
+        final String clusterId, final Set<String> dependencies
+    ) throws IOException, GenieClientException {
+        if (StringUtils.isEmpty(clusterId)) {
+            throw new IllegalArgumentException("Missing required parameter: clusterId.");
+        }
+
+        if (dependencies == null || dependencies.isEmpty()) {
+            throw new IllegalArgumentException("Dependencies cannot be null or empty");
+        }
+
+        clusterService.updateDependenciesForCluster(clusterId, dependencies).execute();
+    }
+
+    /**
+     * Remove all dependencies for this cluster.
+     *
+     * @param clusterId The id of the cluster.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException          For Network and other IO issues
+     */
+    public void removeAllDependenciesForCluster(
+        final String clusterId
+    ) throws IOException, GenieClientException {
+        if (StringUtils.isEmpty(clusterId)) {
+            throw new IllegalArgumentException("Missing required parameter: clusterId.");
+        }
+
+        clusterService.removeAllDependenciesForCluster(clusterId).execute();
+    }
+
     /****************** Methods to manipulate commands for a cluster   *********************/
 
     /**

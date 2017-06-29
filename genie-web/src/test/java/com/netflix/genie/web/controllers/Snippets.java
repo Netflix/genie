@@ -639,7 +639,12 @@ final class Snippets {
                 .attributes(getConstraintsForField(CLUSTER_CONSTRAINTS, "status"))
                 .description(
                     "The status of the cluster. Options: " + Arrays.toString(ClusterStatus.values())
-                )
+                ),
+            PayloadDocumentation
+                .fieldWithPath("dependencies")
+                .attributes(getConstraintsForField(CLUSTER_CONSTRAINTS, "dependencies"))
+                .description("The dependencies for the cluster")
+                .optional()
         );
     }
 

@@ -318,6 +318,68 @@ public class JpaClusterServiceImpl implements ClusterService {
      * {@inheritDoc}
      */
     @Override
+    public void addDependenciesForCluster(
+        @NotBlank(message = "No cluster id entered. Unable to add dependencies.")
+        final String id,
+        @NotEmpty(message = "No dependencies entered. Unable to add dependencies.")
+        final Set<String> dependencies
+    ) throws GenieException {
+        this.findCluster(id).getDependencies().addAll(dependencies);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Set<String> getDependenciesForCluster(
+        @NotBlank(message = "No cluster id entered. Unable to get dependencies.")
+        final String id
+    ) throws GenieException {
+        return this.findCluster(id).getDependencies();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateDependenciesForCluster(
+        @NotBlank(message = "No cluster id entered. Unable to update dependencies.")
+        final String id,
+        @NotNull(message = "No dependencies entered. Unable to update.")
+        final Set<String> dependencies
+    ) throws GenieException {
+        this.findCluster(id).setDependencies(dependencies);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeAllDependenciesForCluster(
+        @NotBlank(message = "No cluster id entered. Unable to remove dependencies.")
+        final String id
+    ) throws GenieException {
+        this.findCluster(id).getDependencies().clear();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeDependencyForCluster(
+        @NotBlank(message = "No cluster id entered. Unable to remove dependency.")
+        final String id,
+        @NotBlank(message = "No dependency entered. Unable to remove dependency.")
+        final String dependency
+    ) throws GenieException {
+        this.findCluster(id).getDependencies().remove(dependency);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void addTagsForCluster(
         @NotBlank(message = "No cluster id entered. Unable to add tags.")
         final String id,
@@ -498,6 +560,7 @@ public class JpaClusterServiceImpl implements ClusterService {
         clusterEntity.setDescription(description.orElse(null));
         clusterEntity.setStatus(updateCluster.getStatus());
         clusterEntity.setConfigs(updateCluster.getConfigs());
+        clusterEntity.setDependencies(updateCluster.getDependencies());
         clusterEntity.setTags(updateCluster.getTags());
         final Optional<String> setupFile = updateCluster.getSetupFile();
         clusterEntity.setSetupFile(setupFile.orElse(null));

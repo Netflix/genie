@@ -75,6 +75,14 @@ public class ClusterEntity extends SetupFileEntity {
     @Column(name = "config", nullable = false, length = 1024)
     private Set<String> configs = new HashSet<>();
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+        name = "cluster_dependencies",
+        joinColumns = @JoinColumn(name = "cluster_id", referencedColumnName = "id")
+    )
+    @Column(name = "dependency", nullable = false, length = 1024)
+    private Set<String> dependencies = new HashSet<>();
+
     // TODO: Make lazy?
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -187,6 +195,19 @@ public class ClusterEntity extends SetupFileEntity {
     }
 
     /**
+     * Sets the dependencies needed for this cluster.
+     *
+     * @param dependencies All dependencies needed for execution in this cluster
+     */
+    public void setDependencies(final Set<String> dependencies) {
+        this.dependencies.clear();
+        if (dependencies != null) {
+            this.dependencies.addAll(dependencies);
+        }
+    }
+
+
+    /**
      * Get a DTO from the contents of this entity.
      *
      * @return The DTO
@@ -202,7 +223,8 @@ public class ClusterEntity extends SetupFileEntity {
             .withCreated(this.getCreated())
             .withUpdated(this.getUpdated())
             .withTags(this.getTags())
-            .withConfigs(this.configs);
+            .withConfigs(this.configs)
+            .withDependencies(this.dependencies);
 
         this.getDescription().ifPresent(builder::withDescription);
         this.getSetupFile().ifPresent(builder::withSetupFile);
