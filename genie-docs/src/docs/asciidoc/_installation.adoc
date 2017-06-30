@@ -106,17 +106,17 @@ NOTE: This assumes the MySQL client binaries are installed
 
 Download the
 ifeval::[{isSnapshot} == true]
-https://github.com/Netflix/genie/blob/master/genie-ddl/src/main/sql/mysql/3.0.0-schema.mysql.sql[MySQL Schema].
+https://github.com/Netflix/genie/blob/master/genie-ddl/src/main/sql/mysql/schema.mysql.sql[MySQL Schema].
 endif::[]
 ifeval::[{isSnapshot} == false]
-https://github.com/Netflix/genie/blob/v{revnumber}/genie-ddl/src/main/sql/mysql/3.0.0-schema.mysql.sql[MySQL Schema].
+https://github.com/Netflix/genie/blob/v{revnumber}/genie-ddl/src/main/sql/mysql/schema.mysql.sql[MySQL Schema].
 endif::[]
 Then run:
 
 [source,bash]
 ----
 mysql -u {username} -p{password} -h {host} -e 'create database genie;'
-mysql -u {username} -p{password} -h {host} genie < 3.0.0-schema.mysql.sql
+mysql -u {username} -p{password} -h {host} genie < schema.mysql.sql
 ----
 
 ===== PostgreSQL
@@ -125,17 +125,17 @@ NOTE: This assumes the PSQL binaries are installed
 
 Download the
 ifeval::[{isSnapshot} == true]
-https://github.com/Netflix/genie/blob/master/genie-ddl/src/main/sql/postgresql/3.0.0-schema.postgresql.sql[PostgreSQL Schema]
+https://github.com/Netflix/genie/blob/master/genie-ddl/src/main/sql/postgresql/schema.postgresql.sql[PostgreSQL Schema]
 endif::[]
 ifeval::[{isSnapshot} == false]
-https://github.com/Netflix/genie/blob/v{revnumber}/genie-ddl/src/main/sql/postgresql/3.0.0-schema.postgresql.sql[PostgreSQL Schema]
+https://github.com/Netflix/genie/blob/v{revnumber}/genie-ddl/src/main/sql/postgresql/schema.postgresql.sql[PostgreSQL Schema]
 endif::[]
 Then run:
 
 [source,bash]
 ----
 createdb genie
-psql -U {user} -h {host} -d genie -f 3.0.0-schema.postgresql.sql
+psql -U {user} -h {host} -d genie -f schema.postgresql.sql
 ----
 
 ==== Local Directories
