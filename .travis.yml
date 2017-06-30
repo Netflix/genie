@@ -19,7 +19,7 @@ git:
 install: true
 before_script:
 - mysql -u root -e 'create database genie;'
-- mysql -u root genie < genie-ddl/src/main/sql/mysql/3.1.0-schema.mysql.sql
+- mysql -u root genie < genie-ddl/src/main/sql/mysql/schema.mysql.sql
 script: ./gradle/buildViaTravis.sh
 before_cache:
 - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
