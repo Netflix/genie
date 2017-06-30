@@ -153,3 +153,4 @@ for more information. Currently on classpath only none, hash_map, redis and jdbc
 === Database Upgrades
 
 * Add cluster dependencies table
+* Rename MySQL and PostgreSQL schema files 
