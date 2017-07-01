@@ -47,7 +47,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -746,8 +745,7 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
      */
     private void createClusterAndCommandForTest() throws Exception {
 
-        final Set<String> tags = new HashSet<>();
-        tags.add("laptop");
+        final Set<String> tags = Sets.newHashSet("laptop");
 
         final Cluster cluster = new Cluster.Builder(
             CLUSTER_NAME,

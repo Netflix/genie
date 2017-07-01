@@ -53,7 +53,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -778,9 +777,7 @@ public class JobCoordinatorServiceImplUnitTests {
         final String setupFile = "setupFilePath";
         final String group = "group";
         final String description = "job description";
-        final Set<String> tags = new HashSet<>();
-        tags.add("foo");
-        tags.add("bar");
+        final Set<String> tags = Sets.newHashSet("foo", "bar");
 
         return new JobRequest.Builder(
             JOB_1_NAME,

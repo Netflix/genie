@@ -20,6 +20,7 @@ package com.netflix.genie.client;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
@@ -33,7 +34,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -109,13 +109,9 @@ public class ClusterClientIntegrationTests extends GenieClientsIntegrationTestsB
         final String cluster1Id = UUID.randomUUID().toString();
         final String cluster2Id = UUID.randomUUID().toString();
 
-        final Set<String> cluster1Tags = new HashSet<>();
-        cluster1Tags.add("foo");
-        cluster1Tags.add("pi");
+        final Set<String> cluster1Tags = Sets.newHashSet("foo", "pi");
 
-        final Set<String> cluster2Tags = new HashSet<>();
-        cluster2Tags.add("bar");
-        cluster2Tags.add("pi");
+        final Set<String> cluster2Tags = Sets.newHashSet("bar", "pi");
 
 
         final Cluster cluster1 = new Cluster.Builder("cluster1name", "cluster1user", "1.0", ClusterStatus.UP)
@@ -281,13 +277,8 @@ public class ClusterClientIntegrationTests extends GenieClientsIntegrationTestsB
     @Test
     public void testClusterTagsMethods() throws Exception {
 
-        final Set<String> initialTags = new HashSet<>();
-        initialTags.add("foo");
-        initialTags.add("bar");
-
-        final Set<String> configList = new HashSet<>();
-        configList.add("config1");
-        configList.add("configs2");
+        final Set<String> initialTags = Sets.newHashSet("foo", "bar");
+        final Set<String> configList = Sets.newHashSet("config1", "configs2");
 
         final Cluster cluster = new Cluster.Builder("name", "user", "1.0", ClusterStatus.UP)
             .withId("cluster1")
@@ -306,8 +297,7 @@ public class ClusterClientIntegrationTests extends GenieClientsIntegrationTestsB
         Assert.assertEquals(tags.contains("bar"), true);
 
         // Test adding a tag for cluster
-        final Set<String> moreTags = new HashSet<>();
-        moreTags.add("pi");
+        final Set<String> moreTags = Sets.newHashSet("pi");
 
         clusterClient.addTagsToCluster("cluster1", moreTags);
         tags = clusterClient.getTagsForCluster("cluster1");
@@ -344,9 +334,7 @@ public class ClusterClientIntegrationTests extends GenieClientsIntegrationTestsB
     @Test
     public void testClusterConfigsMethods() throws Exception {
 
-        final Set<String> initialConfigs = new HashSet<>();
-        initialConfigs.add("foo");
-        initialConfigs.add("bar");
+        final Set<String> initialConfigs = Sets.newHashSet("foo", "bar");
 
         final Cluster cluster = new Cluster.Builder("name", "user", "1.0", ClusterStatus.UP)
             .withId("cluster1")
@@ -364,8 +352,7 @@ public class ClusterClientIntegrationTests extends GenieClientsIntegrationTestsB
         Assert.assertEquals(configs.contains("bar"), true);
 
         // Test adding a config for cluster
-        final Set<String> moreConfigs = new HashSet<>();
-        moreConfigs.add("pi");
+        final Set<String> moreConfigs = Sets.newHashSet("pi");
 
         clusterClient.addConfigsToCluster("cluster1", moreConfigs);
         configs = clusterClient.getConfigsForCluster("cluster1");
