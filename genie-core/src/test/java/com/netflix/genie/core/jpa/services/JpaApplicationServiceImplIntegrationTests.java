@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseTearDown;
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.dto.Command;
@@ -46,7 +47,6 @@ import javax.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -181,9 +181,7 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void testGetApplicationsByStatuses() {
-        final Set<ApplicationStatus> statuses = new HashSet<>();
-        statuses.add(ApplicationStatus.ACTIVE);
-        statuses.add(ApplicationStatus.INACTIVE);
+        final Set<ApplicationStatus> statuses = Sets.newHashSet(ApplicationStatus.ACTIVE, ApplicationStatus.INACTIVE);
         final Page<Application> apps = this.appService.getApplications(null, null, statuses, null, null, PAGEABLE);
         Assert.assertEquals(2, apps.getNumberOfElements());
         Assert.assertEquals(APP_2_ID, apps.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new));
@@ -195,8 +193,7 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void testGetApplicationsByTags() {
-        final Set<String> tags = new HashSet<>();
-        tags.add("prod");
+        final Set<String> tags = Sets.newHashSet("prod");
         Page<Application> apps = this.appService.getApplications(null, null, null, tags, null, PAGEABLE);
         Assert.assertEquals(3, apps.getNumberOfElements());
         Assert.assertEquals(APP_3_ID, apps.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new));
@@ -429,11 +426,8 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(3, getApp.getTags().size());
         final Date updateTime = getApp.getUpdated().orElseThrow(IllegalArgumentException::new);
 
-        final Set<String> tags = new HashSet<>(getApp.getTags());
-        tags.add("prod");
-        tags.add("tez");
-        tags.add("yarn");
-        tags.add("hadoop");
+        final Set<String> tags = Sets.newHashSet("prod", "tez", "yarn", "hadoop");
+        tags.addAll(getApp.getTags());
         final Application.Builder updateApp = new Application
             .Builder(getApp.getName(), APP_2_USER, getApp.getVersion(), ApplicationStatus.ACTIVE)
             .withId(getApp.getId().orElseThrow(IllegalArgumentException::new))
@@ -484,6 +478,9 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(created, updatedApp.getCreated().orElseThrow(IllegalArgumentException::new));
         Assert.assertThat(updatedApp.getUpdated(), Matchers.not(updated));
         Assert.assertNotEquals(new Date(0), updatedApp.getUpdated());
+        Assert.assertEquals(init.getTags(), updatedApp.getTags());
+        Assert.assertEquals(init.getConfigs(), updatedApp.getConfigs());
+        Assert.assertEquals(init.getDependencies(), updatedApp.getDependencies());
     }
 
     /**
@@ -585,10 +582,7 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
         final String newConfig2 = UUID.randomUUID().toString();
         final String newConfig3 = UUID.randomUUID().toString();
 
-        final Set<String> newConfigs = new HashSet<>();
-        newConfigs.add(newConfig1);
-        newConfigs.add(newConfig2);
-        newConfigs.add(newConfig3);
+        final Set<String> newConfigs = Sets.newHashSet(newConfig1, newConfig2, newConfig3);
 
         Assert.assertEquals(2, this.appService.getConfigsForApplication(APP_1_ID).size());
         this.appService.addConfigsToApplication(APP_1_ID, newConfigs);
@@ -606,7 +600,7 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testAddConfigsToApplicationNoId() throws GenieException {
-        this.appService.addConfigsToApplication(null, new HashSet<>());
+        this.appService.addConfigsToApplication(null, Sets.newHashSet());
     }
 
     /**
@@ -630,10 +624,7 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
         final String newConfig2 = UUID.randomUUID().toString();
         final String newConfig3 = UUID.randomUUID().toString();
 
-        final Set<String> newConfigs = new HashSet<>();
-        newConfigs.add(newConfig1);
-        newConfigs.add(newConfig2);
-        newConfigs.add(newConfig3);
+        final Set<String> newConfigs = Sets.newHashSet(newConfig1, newConfig2, newConfig3);
 
         Assert.assertEquals(2, this.appService.getConfigsForApplication(APP_1_ID).size());
         this.appService.updateConfigsForApplication(APP_1_ID, newConfigs);
@@ -651,7 +642,7 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testUpdateConfigsForApplicationNoId() throws GenieException {
-        this.appService.updateConfigsForApplication(null, new HashSet<>());
+        this.appService.updateConfigsForApplication(null, Sets.newHashSet());
     }
 
     /**
@@ -741,10 +732,7 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
         final String newDependency2 = UUID.randomUUID().toString();
         final String newDependency3 = UUID.randomUUID().toString();
 
-        final Set<String> newDependencies = new HashSet<>();
-        newDependencies.add(newDependency1);
-        newDependencies.add(newDependency2);
-        newDependencies.add(newDependency3);
+        final Set<String> newDependencies = Sets.newHashSet(newDependency1, newDependency2, newDependency3);
 
         Assert.assertEquals(2, this.appService.getDependenciesForApplication(APP_1_ID).size());
         this.appService.addDependenciesForApplication(APP_1_ID, newDependencies);
@@ -762,7 +750,7 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testAddDependenciesToApplicationNoId() throws GenieException {
-        this.appService.addDependenciesForApplication(null, new HashSet<>());
+        this.appService.addDependenciesForApplication(null, Sets.newHashSet());
     }
 
     /**
@@ -786,10 +774,7 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
         final String newDependency2 = UUID.randomUUID().toString();
         final String newDependency3 = UUID.randomUUID().toString();
 
-        final Set<String> newDependencies = new HashSet<>();
-        newDependencies.add(newDependency1);
-        newDependencies.add(newDependency2);
-        newDependencies.add(newDependency3);
+        final Set<String> newDependencies = Sets.newHashSet(newDependency1, newDependency2, newDependency3);
 
         Assert.assertEquals(2, this.appService.getDependenciesForApplication(APP_1_ID).size());
         this.appService.updateDependenciesForApplication(APP_1_ID, newDependencies);
@@ -807,7 +792,7 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testUpdateDependenciesForApplicationNoId() throws GenieException {
-        this.appService.updateDependenciesForApplication(null, new HashSet<>());
+        this.appService.updateDependenciesForApplication(null, Sets.newHashSet());
     }
 
     /**
@@ -898,10 +883,7 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
         final String newTag2 = UUID.randomUUID().toString();
         final String newTag3 = UUID.randomUUID().toString();
 
-        final Set<String> newTags = new HashSet<>();
-        newTags.add(newTag1);
-        newTags.add(newTag2);
-        newTags.add(newTag3);
+        final Set<String> newTags = Sets.newHashSet(newTag1, newTag2, newTag3);
 
         Assert.assertEquals(3, this.appService.getTagsForApplication(APP_1_ID).size());
         this.appService.addTagsForApplication(APP_1_ID, newTags);
@@ -919,7 +901,7 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testAddTagsToApplicationNoId() throws GenieException {
-        this.appService.addTagsForApplication(null, new HashSet<>());
+        this.appService.addTagsForApplication(null, Sets.newHashSet());
     }
 
     /**
@@ -943,10 +925,7 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
         final String newTag2 = UUID.randomUUID().toString();
         final String newTag3 = UUID.randomUUID().toString();
 
-        final Set<String> newTags = new HashSet<>();
-        newTags.add(newTag1);
-        newTags.add(newTag2);
-        newTags.add(newTag3);
+        final Set<String> newTags = Sets.newHashSet(newTag1, newTag2, newTag3);
 
         Assert.assertEquals(3, this.appService.getTagsForApplication(APP_1_ID).size());
         this.appService.updateTagsForApplication(APP_1_ID, newTags);
@@ -964,7 +943,7 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testUpdateTagsForApplicationNoId() throws GenieException {
-        this.appService.updateTagsForApplication(null, new HashSet<>());
+        this.appService.updateTagsForApplication(null, Sets.newHashSet());
     }
 
     /**

@@ -64,7 +64,6 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
     private static final String VERSION = "1.5.1";
     private static final String TYPE = "spark";
 
-    private static final String DEPENDENCIES_PATH = "$.dependencies";
     private static final String TYPE_PATH = "$.type";
 
     private static final String APPLICATIONS_LIST_PATH = EMBEDDED_PATH + ".applicationList";

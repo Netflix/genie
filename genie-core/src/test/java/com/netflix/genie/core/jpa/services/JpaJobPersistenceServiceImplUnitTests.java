@@ -52,7 +52,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -120,9 +119,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
         final String setupFile = "setupFilePath";
         final String group = "group";
         final String description = "job description";
-        final Set<String> tags = new HashSet<>();
-        tags.add("foo");
-        tags.add("bar");
+        final Set<String> tags = Sets.newHashSet("foo", "bar");
 
         final JobRequest jobRequest = new JobRequest.Builder(
             JOB_1_NAME,

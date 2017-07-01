@@ -42,7 +42,6 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.Date;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -61,12 +60,12 @@ public class JpaClusterSpecsUnitTests {
     private static final String COMMAND_CRITERIA_TAG_2 = "prod";
     private static final ClusterStatus STATUS_1 = ClusterStatus.UP;
     private static final ClusterStatus STATUS_2 = ClusterStatus.OUT_OF_SERVICE;
-    private static final Set<String> TAGS = new HashSet<>();
+    private static final Set<String> TAGS = Sets.newHashSet();
     private static final Set<ClusterStatus> STATUSES = EnumSet.noneOf(ClusterStatus.class);
     private static final Date MIN_UPDATE_TIME = new Date(123467L);
     private static final Date MAX_UPDATE_TIME = new Date(1234643L);
-    private static final Set<String> CLUSTER_CRITERIA_TAGS = new HashSet<>();
-    private static final Set<String> COMMAND_CRITERIA = new HashSet<>();
+    private static final Set<String> CLUSTER_CRITERIA_TAGS = Sets.newHashSet();
+    private static final Set<String> COMMAND_CRITERIA = Sets.newHashSet();
 
     private Root<ClusterEntity> root;
     private CriteriaQuery<?> cq;

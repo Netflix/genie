@@ -31,7 +31,6 @@ import org.junit.experimental.categories.Category;
 
 import javax.validation.ConstraintViolationException;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -167,8 +166,7 @@ public class ApplicationEntityUnitTests extends EntityTestsBase {
     @Test
     public void testSetConfigs() {
         Assert.assertNotNull(this.a.getConfigs());
-        final Set<String> configs = new HashSet<>();
-        configs.add("s3://netflix.configFile");
+        final Set<String> configs = Sets.newHashSet("s3://netflix.configFile");
         this.a.setConfigs(configs);
         Assert.assertEquals(configs, this.a.getConfigs());
 
@@ -182,8 +180,7 @@ public class ApplicationEntityUnitTests extends EntityTestsBase {
     @Test
     public void testSetDependencies() {
         Assert.assertNotNull(this.a.getDependencies());
-        final Set<String> dependencies = new HashSet<>();
-        dependencies.add("s3://netflix/jars/myJar.jar");
+        final Set<String> dependencies = Sets.newHashSet("s3://netflix/jars/myJar.jar");
         this.a.setDependencies(dependencies);
         Assert.assertEquals(dependencies, this.a.getDependencies());
 
@@ -197,9 +194,7 @@ public class ApplicationEntityUnitTests extends EntityTestsBase {
     @Test
     public void testSetTags() {
         Assert.assertNotNull(this.a.getTags());
-        final Set<String> tags = new HashSet<>();
-        tags.add("tag1");
-        tags.add("tag2");
+        final Set<String> tags = Sets.newHashSet("tag1", "tag2");
         this.a.setTags(tags);
         Assert.assertEquals(tags, this.a.getTags());
 
@@ -213,8 +208,7 @@ public class ApplicationEntityUnitTests extends EntityTestsBase {
     @Test
     public void testSetCommands() {
         Assert.assertNotNull(this.a.getCommands());
-        final Set<CommandEntity> commandEntities = new HashSet<>();
-        commandEntities.add(new CommandEntity());
+        final Set<CommandEntity> commandEntities = Sets.newHashSet(new CommandEntity());
         this.a.setCommands(commandEntities);
         Assert.assertEquals(commandEntities, this.a.getCommands());
 

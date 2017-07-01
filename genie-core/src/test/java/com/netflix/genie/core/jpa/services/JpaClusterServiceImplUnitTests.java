@@ -18,6 +18,7 @@
 package com.netflix.genie.core.jpa.services;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.exceptions.GenieBadRequestException;
@@ -36,7 +37,6 @@ import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -89,10 +89,7 @@ public class JpaClusterServiceImplUnitTests {
      */
     @Test(expected = GenieConflictException.class)
     public void testCreateClusterAlreadyExists() throws GenieException {
-        final Set<String> configs = new HashSet<>();
-        configs.add("a config");
-        configs.add("another config");
-        configs.add("yet another config");
+        final Set<String> configs = Sets.newHashSet("a config", "another config", "yet another config");
         final Cluster cluster = new Cluster.Builder(
             CLUSTER_1_NAME,
             CLUSTER_1_USER,
@@ -154,7 +151,7 @@ public class JpaClusterServiceImplUnitTests {
     public void testAddConfigsToClusterNoCluster() throws GenieException {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaClusterRepository.findOne(id)).thenReturn(null);
-        this.service.addConfigsForCluster(UUID.randomUUID().toString(), new HashSet<>());
+        this.service.addConfigsForCluster(UUID.randomUUID().toString(), Sets.newHashSet());
     }
 
     /**
@@ -166,7 +163,7 @@ public class JpaClusterServiceImplUnitTests {
     public void testUpdateConfigsForClusterNoCluster() throws GenieException {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaClusterRepository.findOne(id)).thenReturn(null);
-        this.service.updateConfigsForCluster(UUID.randomUUID().toString(), new HashSet<>());
+        this.service.updateConfigsForCluster(UUID.randomUUID().toString(), Sets.newHashSet());
     }
 
     /**
@@ -339,7 +336,7 @@ public class JpaClusterServiceImplUnitTests {
     public void testAddTagsForClusterNoCluster() throws GenieException {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaClusterRepository.findOne(id)).thenReturn(null);
-        this.service.addTagsForCluster(UUID.randomUUID().toString(), new HashSet<>());
+        this.service.addTagsForCluster(UUID.randomUUID().toString(), Sets.newHashSet());
     }
 
     /**
@@ -351,7 +348,7 @@ public class JpaClusterServiceImplUnitTests {
     public void testUpdateTagsForClusterNoCluster() throws GenieException {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaClusterRepository.findOne(id)).thenReturn(null);
-        this.service.updateTagsForCluster(UUID.randomUUID().toString(), new HashSet<>());
+        this.service.updateTagsForCluster(UUID.randomUUID().toString(), Sets.newHashSet());
     }
 
     /**
