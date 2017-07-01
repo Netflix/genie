@@ -18,6 +18,7 @@
 package com.netflix.genie.core.jpa.services;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieBadRequestException;
@@ -36,7 +37,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -160,7 +160,7 @@ public class JpaCommandServiceImplUnitTests {
     public void testAddConfigsToCommandNoCommand() throws GenieException {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaCommandRepository.findOne(id)).thenReturn(null);
-        this.service.addConfigsForCommand(id, new HashSet<>());
+        this.service.addConfigsForCommand(id, Sets.newHashSet());
     }
 
     /**
@@ -172,7 +172,7 @@ public class JpaCommandServiceImplUnitTests {
     public void testUpdateConfigsForCommandNoCommand() throws GenieException {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaCommandRepository.findOne(id)).thenReturn(null);
-        this.service.updateConfigsForCommand(UUID.randomUUID().toString(), new HashSet<>());
+        this.service.updateConfigsForCommand(UUID.randomUUID().toString(), Sets.newHashSet());
     }
 
     /**
@@ -319,7 +319,7 @@ public class JpaCommandServiceImplUnitTests {
     public void testAddTagsForCommandNoCommand() throws GenieException {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaCommandRepository.findOne(id)).thenReturn(null);
-        this.service.addTagsForCommand(id, new HashSet<>());
+        this.service.addTagsForCommand(id, Sets.newHashSet());
     }
 
     /**
@@ -331,7 +331,7 @@ public class JpaCommandServiceImplUnitTests {
     public void testUpdateTagsForCommandNoCommand() throws GenieException {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaCommandRepository.findOne(id)).thenReturn(null);
-        this.service.updateTagsForCommand(UUID.randomUUID().toString(), new HashSet<>());
+        this.service.updateTagsForCommand(UUID.randomUUID().toString(), Sets.newHashSet());
     }
 
     /**

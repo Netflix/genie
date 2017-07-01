@@ -15,6 +15,7 @@
  */
 package com.netflix.genie.core.jpa.specifications;
 
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity_;
@@ -31,7 +32,6 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -47,8 +47,8 @@ public class JpaCommandSpecsUnitTests {
     private static final String TAG_1 = "prod";
     private static final String TAG_2 = "hive";
     private static final String TAG_3 = "11";
-    private static final Set<String> TAGS = new HashSet<>();
-    private static final Set<CommandStatus> STATUSES = new HashSet<>();
+    private static final Set<String> TAGS = Sets.newHashSet();
+    private static final Set<CommandStatus> STATUSES = Sets.newHashSet();
 
     private Root<CommandEntity> root;
     private CriteriaQuery<?> cq;
@@ -264,7 +264,7 @@ public class JpaCommandSpecsUnitTests {
     @Test
     public void testFindEmptyStatuses() {
         final Specification<CommandEntity> spec = JpaCommandSpecs
-            .find(NAME, USER_NAME, new HashSet<>(), TAGS);
+            .find(NAME, USER_NAME, Sets.newHashSet(), TAGS);
 
         spec.toPredicate(this.root, this.cq, this.cb);
         Mockito.verify(this.cb, Mockito.times(1))

@@ -34,7 +34,6 @@ import org.junit.experimental.categories.Category;
 import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -61,8 +60,7 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
     @Before
     public void setup() {
         this.c = new ClusterEntity();
-        this.configs = new HashSet<>();
-        this.configs.add(CONFIG);
+        this.configs = Sets.newHashSet(CONFIG);
         this.c.setName(NAME);
         this.c.setUser(USER);
         this.c.setVersion(VERSION);
@@ -161,9 +159,7 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
     @Test
     public void testSetTags() throws GeniePreconditionException {
         Assert.assertNotNull(this.c.getTags());
-        final Set<String> tags = new HashSet<>();
-        tags.add("prod");
-        tags.add("sla");
+        final Set<String> tags = Sets.newHashSet("prod", "sla");
         this.c.setTags(tags);
         Assert.assertEquals(tags, this.c.getTags());
 

@@ -35,7 +35,6 @@ import org.mockito.Mockito;
 import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -228,8 +227,7 @@ public class CommandEntityUnitTests extends EntityTestsBase {
     public void testSetConfigs() {
         Assert.assertNotNull(this.c.getConfigs());
         Assert.assertTrue(this.c.getConfigs().isEmpty());
-        final Set<String> configs = new HashSet<>();
-        configs.add("s3://netflix.configFile");
+        final Set<String> configs = Sets.newHashSet("s3://netflix.configFile");
         this.c.setConfigs(configs);
         Assert.assertEquals(configs, this.c.getConfigs());
 
@@ -244,9 +242,7 @@ public class CommandEntityUnitTests extends EntityTestsBase {
     public void testSetTags() {
         Assert.assertNotNull(this.c.getTags());
         Assert.assertTrue(this.c.getTags().isEmpty());
-        final Set<String> tags = new HashSet<>();
-        tags.add("tag1");
-        tags.add("tag2");
+        final Set<String> tags = Sets.newHashSet("tag1", "tag2");
         this.c.setTags(tags);
         Assert.assertEquals(tags, this.c.getTags());
 
@@ -388,8 +384,7 @@ public class CommandEntityUnitTests extends EntityTestsBase {
     public void testSetClusters() {
         Assert.assertNotNull(this.c.getClusters());
         Assert.assertTrue(this.c.getClusters().isEmpty());
-        final Set<ClusterEntity> clusterEntities = new HashSet<>();
-        clusterEntities.add(new ClusterEntity());
+        final Set<ClusterEntity> clusterEntities = Sets.newHashSet(new ClusterEntity());
         this.c.setClusters(clusterEntities);
         Assert.assertEquals(clusterEntities, this.c.getClusters());
 

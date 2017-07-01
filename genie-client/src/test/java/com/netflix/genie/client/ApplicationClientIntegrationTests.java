@@ -20,6 +20,7 @@ package com.netflix.genie.client;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.dto.Command;
@@ -31,7 +32,6 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -107,14 +107,8 @@ public class ApplicationClientIntegrationTests extends GenieClientsIntegrationTe
         final String application1Id = UUID.randomUUID().toString();
         final String application2Id = UUID.randomUUID().toString();
 
-        final Set<String> application1Tags = new HashSet<>();
-        application1Tags.add("foo");
-        application1Tags.add("pi");
-
-        final Set<String> application2Tags = new HashSet<>();
-        application2Tags.add("bar");
-        application2Tags.add("pi");
-
+        final Set<String> application1Tags = Sets.newHashSet("foo", "pi");
+        final Set<String> application2Tags = Sets.newHashSet("bar", "pi");
 
         final Application application1 = new Application.Builder(
             "application1name",
@@ -293,13 +287,8 @@ public class ApplicationClientIntegrationTests extends GenieClientsIntegrationTe
     @Test
     public void testApplicationTagsMethods() throws Exception {
 
-        final Set<String> initialTags = new HashSet<>();
-        initialTags.add("foo");
-        initialTags.add("bar");
-
-        final Set<String> configList = new HashSet<>();
-        configList.add("config1");
-        configList.add("configs2");
+        final Set<String> initialTags = Sets.newHashSet("foo", "bar");
+        final Set<String> configList = Sets.newHashSet("config1", "configs2");
 
         final Application application = new Application.Builder("name", "user", "1.0", ApplicationStatus.ACTIVE)
             .withId("application1")
@@ -318,8 +307,7 @@ public class ApplicationClientIntegrationTests extends GenieClientsIntegrationTe
         Assert.assertEquals(tags.contains("bar"), true);
 
         // Test adding a tag for application
-        final Set<String> moreTags = new HashSet<>();
-        moreTags.add("pi");
+        final Set<String> moreTags = Sets.newHashSet("pi");
 
         applicationClient.addTagsToApplication("application1", moreTags);
         tags = applicationClient.getTagsForApplication("application1");
@@ -356,9 +344,7 @@ public class ApplicationClientIntegrationTests extends GenieClientsIntegrationTe
     @Test
     public void testApplicationConfigsMethods() throws Exception {
 
-        final Set<String> initialConfigs = new HashSet<>();
-        initialConfigs.add("foo");
-        initialConfigs.add("bar");
+        final Set<String> initialConfigs = Sets.newHashSet("foo", "bar");
 
         final Application application = new Application.Builder("name", "user", "1.0", ApplicationStatus.ACTIVE)
             .withId("application1")
@@ -376,8 +362,7 @@ public class ApplicationClientIntegrationTests extends GenieClientsIntegrationTe
         Assert.assertEquals(configs.contains("bar"), true);
 
         // Test adding a config for application
-        final Set<String> moreConfigs = new HashSet<>();
-        moreConfigs.add("pi");
+        final Set<String> moreConfigs = Sets.newHashSet("pi");
 
         applicationClient.addConfigsToApplication("application1", moreConfigs);
         configs = applicationClient.getConfigsForApplication("application1");
@@ -397,6 +382,54 @@ public class ApplicationClientIntegrationTests extends GenieClientsIntegrationTe
         applicationClient.removeAllConfigsForApplication("application1");
         configs = applicationClient.getConfigsForApplication("application1");
         Assert.assertEquals(0, configs.size());
+    }
+
+    /**
+     * Test all the methods that manipulate dependencies for a application in genie.
+     *
+     * @throws Exception If there is any problem.
+     */
+    @Test
+    public void testApplicationDependenciesMethods() throws Exception {
+
+        final Set<String> initialDependencies = Sets.newHashSet("foo", "bar");
+
+        final Application application = new Application.Builder("name", "user", "1.0", ApplicationStatus.ACTIVE)
+            .withId("application1")
+            .withDescription("client Test")
+            .withSetupFile("path to set up file")
+            .withDependencies(initialDependencies)
+            .build();
+
+        applicationClient.createApplication(application);
+
+        // Test getDependencies for application
+        Set<String> dependencies = applicationClient.getDependenciesForApplication("application1");
+        Assert.assertEquals(2, dependencies.size());
+        Assert.assertEquals(dependencies.contains("foo"), true);
+        Assert.assertEquals(dependencies.contains("bar"), true);
+
+        // Test adding a dependency for application
+        final Set<String> moreDependencies = Sets.newHashSet("pi");
+
+        applicationClient.addDependenciesToApplication("application1", moreDependencies);
+        dependencies = applicationClient.getDependenciesForApplication("application1");
+        Assert.assertEquals(3, dependencies.size());
+        Assert.assertEquals(dependencies.contains("foo"), true);
+        Assert.assertEquals(dependencies.contains("bar"), true);
+        Assert.assertEquals(dependencies.contains("pi"), true);
+
+        // Test update dependencies for a application
+        applicationClient.updateDependenciesForApplication("application1", initialDependencies);
+        dependencies = applicationClient.getDependenciesForApplication("application1");
+        Assert.assertEquals(2, dependencies.size());
+        Assert.assertEquals(dependencies.contains("foo"), true);
+        Assert.assertEquals(dependencies.contains("bar"), true);
+
+        // Test delete all dependencies in a application
+        applicationClient.removeAllDependenciesForApplication("application1");
+        dependencies = applicationClient.getDependenciesForApplication("application1");
+        Assert.assertEquals(0, dependencies.size());
     }
 
     /**

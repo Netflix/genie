@@ -15,6 +15,7 @@
  */
 package com.netflix.genie.core.jpa.specifications;
 
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.core.jpa.entities.ApplicationEntity;
 import com.netflix.genie.core.jpa.entities.ApplicationEntity_;
@@ -31,7 +32,6 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -48,8 +48,8 @@ public class JpaApplicationSpecsUnitTests {
     private static final String TAG_1 = "tez";
     private static final String TAG_2 = "yarn";
     private static final String TAG_3 = "hadoop";
-    private static final Set<String> TAGS = new HashSet<>();
-    private static final Set<ApplicationStatus> STATUSES = new HashSet<>();
+    private static final Set<String> TAGS = Sets.newHashSet();
+    private static final Set<ApplicationStatus> STATUSES = Sets.newHashSet();
     private static final String TYPE = UUID.randomUUID().toString();
 
     private Root<ApplicationEntity> root;
@@ -207,7 +207,7 @@ public class JpaApplicationSpecsUnitTests {
     @Test
     public void testFindEmptyStatuses() {
         final Specification<ApplicationEntity> spec
-            = JpaApplicationSpecs.find(NAME, USER_NAME, new HashSet<>(), TAGS, TYPE);
+            = JpaApplicationSpecs.find(NAME, USER_NAME, Sets.newHashSet(), TAGS, TYPE);
 
         spec.toPredicate(this.root, this.cq, this.cb);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.name), NAME);
