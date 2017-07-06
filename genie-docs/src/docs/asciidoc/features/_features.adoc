@@ -1,0 +1,5 @@
+== Features
+
+This section has documentation pertaining to specific features of Genie that may need specific examples.
+
+include::_clusterLoadBalancing.adoc[]

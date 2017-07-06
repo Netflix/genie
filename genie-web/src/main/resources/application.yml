@@ -33,6 +33,14 @@ genie:
     cleanup:
       deleteArchiveFile: true
       deleteDependencies: true
+    clusters:
+      loadBalancers:
+        script:
+          destination: file:///tmp/genie/loadbalancers/script/destination/
+          enabled: false
+          refreshRate: 300000
+          source: file:///tmp/genie/loadBalancers/script/source/loadBalance.js
+          timeout: 5000
     forwarding:
       enabled: true
       port: 8080

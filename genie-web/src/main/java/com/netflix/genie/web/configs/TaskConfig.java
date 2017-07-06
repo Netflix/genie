@@ -28,6 +28,7 @@ import org.springframework.context.event.SimpleApplicationEventMulticaster;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
@@ -38,6 +39,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
  * @since 3.0.0
  */
 @Configuration
+@EnableScheduling
 public class TaskConfig {
 
     /**

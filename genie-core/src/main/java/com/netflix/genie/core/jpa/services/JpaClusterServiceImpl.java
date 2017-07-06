@@ -153,7 +153,7 @@ public class JpaClusterServiceImpl implements ClusterService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public List<Cluster> chooseClusterForJobRequest(
         @NotNull(message = "JobRequest object is null. Unable to continue.")
         final JobRequest jobRequest
@@ -495,12 +495,12 @@ public class JpaClusterServiceImpl implements ClusterService {
         clusterEntity.setUser(updateCluster.getUser());
         clusterEntity.setVersion(updateCluster.getVersion());
         final Optional<String> description = updateCluster.getDescription();
-        clusterEntity.setDescription(description.isPresent() ? description.get() : null);
+        clusterEntity.setDescription(description.orElse(null));
         clusterEntity.setStatus(updateCluster.getStatus());
         clusterEntity.setConfigs(updateCluster.getConfigs());
         clusterEntity.setTags(updateCluster.getTags());
         final Optional<String> setupFile = updateCluster.getSetupFile();
-        clusterEntity.setSetupFile(setupFile.isPresent() ? setupFile.get() : null);
+        clusterEntity.setSetupFile(setupFile.orElse(null));
 
         this.clusterRepo.save(clusterEntity);
     }

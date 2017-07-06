@@ -39,6 +39,7 @@ import com.netflix.genie.core.services.JobStateService;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.spectator.api.Registry;
 import org.apache.commons.exec.Executor;
+import org.assertj.core.util.Lists;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -237,7 +238,7 @@ public class ServicesConfigUnitTests {
                 Mockito.mock(ApplicationService.class),
                 Mockito.mock(ClusterService.class),
                 Mockito.mock(CommandService.class),
-                Mockito.mock(ClusterLoadBalancer.class),
+                Lists.newArrayList(Mockito.mock(ClusterLoadBalancer.class)),
                 Mockito.mock(Registry.class),
                 UUID.randomUUID().toString()
             )

@@ -41,8 +41,8 @@ import java.util.Map;
 @EnableAspectJAutoProxy
 public class GenieWeb {
 
-    protected static final String SPRING_CONFIG_LOCATION = "spring.config.location";
-    protected static final String USER_HOME_GENIE = "${user.home}/.genie/";
+    static final String SPRING_CONFIG_LOCATION = "spring.config.location";
+    static final String USER_HOME_GENIE = "${user.home}/.genie/";
 
     /**
      * Protected constructor.
@@ -62,7 +62,7 @@ public class GenieWeb {
         genie.run(args);
     }
 
-    protected static Map<String, Object> getDefaultProperties() {
+    static Map<String, Object> getDefaultProperties() {
         final Map<String, Object> defaultProperties = Maps.newHashMap();
         defaultProperties.put(SPRING_CONFIG_LOCATION, USER_HOME_GENIE);
         return defaultProperties;

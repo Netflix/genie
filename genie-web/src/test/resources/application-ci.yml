@@ -30,6 +30,10 @@ genie:
   health:
     maxCpuLoadPercent: 100
   jobs:
+    clusters:
+      loadBalancers:
+        script:
+          enabled: true
     dir:
       location: "file:///tmp/"
 

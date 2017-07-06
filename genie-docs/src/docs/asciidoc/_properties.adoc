@@ -45,6 +45,30 @@ Health of the system is marked unhealthy if the CPU load of a system goes beyond
 |Whether or not to delete the dependencies directories for applications to save disk space after job completion
 |true
 
+|genie.jobs.clusters.loadBalancers.script.destination
+|The location on disk where the script source file should be stored after it is downloaded from
+`genie.jobs.clusters.loadBalancers.script.source`. The file will be given the same name.
+|file:///tmp/genie/loadbalancers/script/destination/
+
+|genie.jobs.clusters.loadBalancers.script.enabled
+|Whether the script based load balancer should be enabled for the system or not.
+See also: `genie.jobs.clusters.loadBalancers.script.source`
+See also: `genie.jobs.clusters.loadBalancers.script.destination`
+|false
+
+|genie.jobs.clusters.loadBalancers.script.refreshRate
+|How frequently to refresh the load balancer script (in milliseconds)
+|300000
+
+|genie.jobs.clusters.loadBalancers.script.source
+|The location of the script the load balancer should load to evaluate which cluster to use for a job request
+|file:///tmp/genie/loadBalancers/script/source/loadBalance.js
+
+|genie.jobs.clusters.loadBalancers.script.timeout
+|The amount of time (in milliseconds) that the system will attempt to run the cluster load balancer script before it
+forces a timeout
+|5000
+
 |genie.jobs.forwarding.enabled
 |Whether or not to attempt to forward kill and get output requests for jobs
 |true
