@@ -28,7 +28,10 @@ import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.ConfigDTO;
 import com.netflix.genie.common.util.GenieDateFormat;
 import com.netflix.genie.test.categories.IntegrationTest;
+import org.apache.commons.lang3.StringUtils;
+import org.hamcrest.Description;
 import org.hamcrest.Matchers;
+import org.hamcrest.TypeSafeMatcher;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +50,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import javax.validation.constraints.NotNull;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.UUID;
@@ -64,11 +69,14 @@ import java.util.UUID;
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs(
     value = "build/generated-snippets",
-    uriHost = "genie.example.com",
-    uriScheme = "https",
+    uriHost = RestControllerIntegrationTestsBase.URI_HOST,
+    uriScheme = RestControllerIntegrationTestsBase.URI_SCHEME,
     uriPort = 443
 )
 public abstract class RestControllerIntegrationTestsBase {
+
+    static final String URI_HOST = "genie.example.com";
+    static final String URI_SCHEME = "https";
 
     static final String APPLICATIONS_API = "/api/v3/applications";
     static final String CLUSTERS_API = "/api/v3/clusters";
@@ -95,6 +103,9 @@ public abstract class RestControllerIntegrationTestsBase {
     static final String CLUSTERS_LINK_KEY = "clusters";
     static final String APPLICATIONS_LINK_KEY = "applications";
     static final String JOBS_LINK_KEY = "jobs";
+
+    static final Set<String> CLUSTERS_OPTIONAL_HAL_LINK_PARAMETERS = Sets.newHashSet("status");
+    static final Set<String> COMMANDS_OPTIONAL_HAL_LINK_PARAMETERS = Sets.newHashSet("status");
 
     protected final ObjectMapper objectMapper = new ObjectMapper()
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
@@ -381,5 +392,119 @@ public abstract class RestControllerIntegrationTestsBase {
 
     private String getIdFromLocation(final String location) {
         return location.substring(location.lastIndexOf("/") + 1);
+    }
+
+    private static String getLinkedResourceExpectedUri(
+        final String entityApi,
+        final String entityId,
+        final Set<String> optionalHalParams,
+        final String linkedEntityType) throws URISyntaxException {
+        final String uriPath = new StringBuilder()
+            .append(entityApi)
+            .append("/")
+            .append(entityId)
+            .append("/")
+            .append(linkedEntityType)
+            .toString();
+        final String uriString = new URI(URI_SCHEME, URI_HOST, uriPath, null).toString();
+
+        // Append HAL parameters separately to avoid URI encoding
+        final StringBuilder halParamsStringBuilder = new StringBuilder();
+        if (optionalHalParams != null && !optionalHalParams.isEmpty()) {
+            halParamsStringBuilder
+                .append("{?")
+                .append(StringUtils.join(optionalHalParams, ","))
+                .append("}")
+                .toString();
+        }
+        return uriString + halParamsStringBuilder.toString();
+    }
+
+    static class EntityLinkMatcher extends TypeSafeMatcher<String> {
+
+        private final String expectedUri;
+        private String descriptionString = "Not evaluated";
+
+        EntityLinkMatcher(final String expectedUri) {
+            this.expectedUri = expectedUri;
+        }
+
+        @Override
+        protected boolean matchesSafely(final String actualUrl) {
+            if (!this.expectedUri.equals(actualUrl)) {
+                this.descriptionString = "Expected: " + this.expectedUri + " got: " + actualUrl;
+                return false;
+            } else {
+                this.descriptionString = "Successfully matched: " + this.expectedUri;
+                return true;
+            }
+        }
+
+        @Override
+        public void describeTo(final Description description) {
+            description.appendText(this.descriptionString);
+        }
+
+        static EntityLinkMatcher matchUri(
+            final String entityApi,
+            final String linkedEntityKey,
+            final Set<String> optionalHalParams,
+            final String entityId)
+            throws URISyntaxException {
+            return new EntityLinkMatcher(
+                getLinkedResourceExpectedUri(entityApi, entityId, optionalHalParams, linkedEntityKey)
+            );
+        }
+    }
+
+    static class EntitiesLinksMatcher extends TypeSafeMatcher<Iterable<String>> {
+
+        private final Set<String> expectedUris;
+        private String mismatchDescription = "Not evaluated";
+
+        EntitiesLinksMatcher(final Set<String> expectedUris) throws URISyntaxException {
+            this.expectedUris = expectedUris;
+        }
+
+        @Override
+        protected boolean matchesSafely(final Iterable<String> inputUrls) {
+            final Set<String> urisToMatch = Sets.newHashSet(expectedUris);
+            for (String inputUri : inputUrls) {
+                if (!urisToMatch.contains(inputUri)) {
+                    if (!expectedUris.contains(inputUri)) {
+                        mismatchDescription = "Unexpected input URL: " + inputUri;
+                    } else {
+                        mismatchDescription = "Duplicate input URL: " + inputUri;
+                    }
+                    return false;
+                } else {
+                    urisToMatch.remove(inputUri);
+                }
+            }
+            if (!urisToMatch.isEmpty()) {
+                mismatchDescription = "Unmatched URLs: " + urisToMatch.toString();
+                return false;
+            }
+            mismatchDescription = "Successfully matched";
+            return true;
+        }
+
+        @Override
+        public void describeTo(final Description description) {
+            description.appendText(mismatchDescription);
+        }
+
+        static EntitiesLinksMatcher matchUrisAnyOrder(
+            final String entityApi,
+            final String linkedEntityKey,
+            final Set<String> optionalHalParams,
+            final Iterable<String> entityIds)
+            throws URISyntaxException {
+            final Set<String> expectedUris = Sets.newHashSet();
+            for (String entityId : entityIds) {
+                expectedUris.add(getLinkedResourceExpectedUri(entityApi, entityId, optionalHalParams, linkedEntityKey));
+            }
+            return new EntitiesLinksMatcher(expectedUris);
+        }
     }
 }

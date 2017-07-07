@@ -70,6 +70,11 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
     private static final String EXECUTABLE_PATH = "$.executable";
     private static final String CHECK_DELAY_PATH = "$.checkDelay";
     private static final String COMMANDS_LIST_PATH = EMBEDDED_PATH + ".commandList";
+    private static final String COMMAND_APPS_LINK_PATH = "$._links.applications.href";
+    private static final String COMMANDS_APPS_LINK_PATH = "$.._links.applications.href";
+    private static final String COMMAND_CLUSTERS_LINK_PATH = "$._links.clusters.href";
+    private static final String COMMANDS_CLUSTERS_LINK_PATH = "$.._links.clusters.href";
+    private static final String COMMANDS_ID_LIST_PATH = EMBEDDED_PATH + ".commandList..id";
 
     @Autowired
     private JpaApplicationRepository jpaApplicationRepository;
@@ -143,6 +148,11 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(SELF_LINK_KEY)))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(CLUSTERS_LINK_KEY)))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(APPLICATIONS_LINK_KEY)))
+            .andExpect(MockMvcResultMatchers.jsonPath(COMMAND_CLUSTERS_LINK_PATH,
+                EntityLinkMatcher.matchUri(
+                    COMMANDS_API, CLUSTERS_LINK_KEY, CLUSTERS_OPTIONAL_HAL_LINK_PARAMETERS, id)))
+            .andExpect(MockMvcResultMatchers.jsonPath(COMMAND_APPS_LINK_PATH,
+                EntityLinkMatcher.matchUri(COMMANDS_API, APPLICATIONS_LINK_KEY, null, id)))
             .andDo(getResultHandler);
 
         Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(1L));
@@ -180,7 +190,12 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH + ".*", Matchers.hasSize(3)))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(SELF_LINK_KEY)))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(CLUSTERS_LINK_KEY)))
-            .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(APPLICATIONS_LINK_KEY)));
+            .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(APPLICATIONS_LINK_KEY)))
+            .andExpect(MockMvcResultMatchers.jsonPath(COMMAND_CLUSTERS_LINK_PATH,
+                EntityLinkMatcher.matchUri(
+                    COMMANDS_API, CLUSTERS_LINK_KEY, CLUSTERS_OPTIONAL_HAL_LINK_PARAMETERS, ID)))
+            .andExpect(MockMvcResultMatchers.jsonPath(COMMAND_APPS_LINK_PATH,
+                EntityLinkMatcher.matchUri(COMMANDS_API, APPLICATIONS_LINK_KEY, null, ID)));
 
         Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(1L));
     }
@@ -267,6 +282,14 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath(COMMANDS_LIST_PATH, Matchers.hasSize(3)))
+            .andExpect(MockMvcResultMatchers.jsonPath(COMMANDS_ID_LIST_PATH, Matchers.containsInAnyOrder(
+                id1, id2, id3)))
+            .andExpect(MockMvcResultMatchers.jsonPath(COMMANDS_APPS_LINK_PATH,
+                EntitiesLinksMatcher.matchUrisAnyOrder(COMMANDS_API, APPLICATIONS_LINK_KEY,
+                    null, Lists.newArrayList(id1, id2, id3))))
+            .andExpect(MockMvcResultMatchers.jsonPath(COMMANDS_CLUSTERS_LINK_PATH,
+                EntitiesLinksMatcher.matchUrisAnyOrder(COMMANDS_API, CLUSTERS_LINK_KEY,
+                    CLUSTERS_OPTIONAL_HAL_LINK_PARAMETERS, Lists.newArrayList(id1, id2, id3))))
             .andDo(findResultHandler);
 
         // Try to limit the number of results
