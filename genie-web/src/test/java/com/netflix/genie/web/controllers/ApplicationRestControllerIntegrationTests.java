@@ -18,6 +18,7 @@
 package com.netflix.genie.web.controllers;
 
 import com.github.fge.jsonpatch.JsonPatch;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
@@ -44,6 +45,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -66,6 +68,9 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
     private static final String TYPE_PATH = "$.type";
 
     private static final String APPLICATIONS_LIST_PATH = EMBEDDED_PATH + ".applicationList";
+    private static final String APPLICATIONS_ID_LIST_PATH = EMBEDDED_PATH + ".applicationList..id";
+    private static final String APPLICATION_COMMANDS_LINK_PATH = "$._links.commands.href";
+    private static final String APPLICATIONS_COMMANDS_LINK_PATH = "$.._links.commands.href";
 
     @Autowired
     private JpaApplicationRepository jpaApplicationRepository;
@@ -162,6 +167,9 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH + ".*", Matchers.hasSize(2)))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(SELF_LINK_KEY)))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(COMMANDS_LINK_KEY)))
+            .andExpect(MockMvcResultMatchers.jsonPath(APPLICATION_COMMANDS_LINK_PATH,
+                EntityLinkMatcher.matchUri(
+                    APPLICATIONS_API, COMMANDS_LINK_KEY, COMMANDS_OPTIONAL_HAL_LINK_PARAMETERS, id)))
             .andDo(getResultHandler);
 
         Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(1L));
@@ -228,7 +236,10 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             .andExpect(MockMvcResultMatchers.jsonPath(TYPE_PATH, Matchers.is(TYPE)))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH + ".*", Matchers.hasSize(2)))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(SELF_LINK_KEY)))
-            .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(COMMANDS_LINK_KEY)));
+            .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(COMMANDS_LINK_KEY)))
+            .andExpect(MockMvcResultMatchers.jsonPath(APPLICATION_COMMANDS_LINK_PATH,
+                EntityLinkMatcher.matchUri(
+                    APPLICATIONS_API, COMMANDS_LINK_KEY, COMMANDS_OPTIONAL_HAL_LINK_PARAMETERS, ID)));
 
         Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(1L));
     }
@@ -334,6 +345,9 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
         final String pigId = this.createConfigResource(pig, null);
         final String hiveId = this.createConfigResource(hive, null);
 
+        final List<String> appIds = Lists.newArrayList(
+            spark151Id, spark150Id, spark141Id, spark140Id, spark131Id, pigId, hiveId);
+
         final RestDocumentationResultHandler documentationResultHandler = MockMvcRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
             Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
@@ -350,6 +364,12 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath(APPLICATIONS_LIST_PATH, Matchers.hasSize(7)))
+            .andExpect(MockMvcResultMatchers.jsonPath(APPLICATIONS_ID_LIST_PATH, Matchers.hasSize(7)))
+            .andExpect(MockMvcResultMatchers.jsonPath(APPLICATIONS_ID_LIST_PATH, Matchers.containsInAnyOrder(
+                spark151Id, spark150Id, spark141Id, spark140Id, spark131Id, pigId, hiveId)))
+            .andExpect(MockMvcResultMatchers.jsonPath(APPLICATIONS_COMMANDS_LINK_PATH,
+                EntitiesLinksMatcher.matchUrisAnyOrder(
+                    APPLICATIONS_API, COMMANDS_LINK_KEY, COMMANDS_OPTIONAL_HAL_LINK_PARAMETERS, appIds)))
             .andDo(documentationResultHandler);
 
         // Limit the size

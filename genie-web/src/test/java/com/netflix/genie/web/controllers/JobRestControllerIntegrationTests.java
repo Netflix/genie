@@ -114,6 +114,11 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     private static final String PROCESS_ID_PATH = "$.processId";
     private static final String CHECK_DELAY_PATH = "$.checkDelay";
     private static final String EXIT_CODE_PATH = "$.exitCode";
+    private static final String JOBS_LIST_PATH = EMBEDDED_PATH + ".jobSearchResultList";
+    private static final String JOB_COMMAND_LINK_PATH = "$._links.command.href";
+    private static final String JOB_CLUSTER_LINK_PATH = "$._links.cluster.href";
+    private static final String JOB_APPLICATIONS_LINK_PATH = "$._links.applications.href";
+
 
     private static final long CHECK_DELAY = 1L;
 
@@ -156,8 +161,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         = "genie.id:" + CLUSTER1_ID + ","
         + "genie.name:" + CLUSTER1_NAME + ","
         + LOCALHOST_CLUSTER_TAG;
-
-    private static final String JOBS_LIST_PATH = EMBEDDED_PATH + ".jobSearchResultList";
 
 
     private ResourceLoader resourceLoader;
@@ -615,6 +618,12 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey("cluster")))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey("command")))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey("applications")))
+            .andExpect(MockMvcResultMatchers.jsonPath(JOB_CLUSTER_LINK_PATH,
+                EntityLinkMatcher.matchUri(JOBS_API, "cluster", null, id)))
+            .andExpect(MockMvcResultMatchers.jsonPath(JOB_COMMAND_LINK_PATH,
+                EntityLinkMatcher.matchUri(JOBS_API, "command", null, id)))
+            .andExpect(MockMvcResultMatchers.jsonPath(JOB_APPLICATIONS_LINK_PATH,
+                EntityLinkMatcher.matchUri(JOBS_API, APPLICATIONS_LINK_KEY, null, id)))
             .andDo(getResultHandler);
     }
 

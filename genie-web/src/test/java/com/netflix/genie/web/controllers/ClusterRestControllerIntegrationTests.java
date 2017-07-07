@@ -66,6 +66,9 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
     private static final String VERSION = "2.7.1";
 
     private static final String CLUSTERS_LIST_PATH = EMBEDDED_PATH + ".clusterList";
+    private static final String CLUSTERS_ID_LIST_PATH = EMBEDDED_PATH + ".clusterList..id";
+    private static final String CLUSTER_COMMANDS_LINK_PATH = "$._links.commands.href";
+    private static final String CLUSTERS_COMMANDS_LINK_PATH = "$.._links.commands.href";
 
     @Autowired
     private JpaClusterRepository jpaClusterRepository;
@@ -138,6 +141,9 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH + ".*", Matchers.hasSize(2)))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(SELF_LINK_KEY)))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(COMMANDS_LINK_KEY)))
+            .andExpect(MockMvcResultMatchers.jsonPath(CLUSTER_COMMANDS_LINK_PATH,
+                EntityLinkMatcher.matchUri(
+                    CLUSTERS_API, COMMANDS_LINK_KEY, COMMANDS_OPTIONAL_HAL_LINK_PARAMETERS, id)))
             .andDo(getResultHandler);
 
         Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(1L));
@@ -171,7 +177,10 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
             .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(ClusterStatus.UP.toString())))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH + ".*", Matchers.hasSize(2)))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(SELF_LINK_KEY)))
-            .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(COMMANDS_LINK_KEY)));
+            .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(COMMANDS_LINK_KEY)))
+            .andExpect(MockMvcResultMatchers.jsonPath(CLUSTER_COMMANDS_LINK_PATH,
+                EntityLinkMatcher.matchUri(
+                    CLUSTERS_API, COMMANDS_LINK_KEY, COMMANDS_OPTIONAL_HAL_LINK_PARAMETERS, ID)));
         Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(1L));
     }
 
@@ -245,6 +254,11 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath(CLUSTERS_LIST_PATH, Matchers.hasSize(3)))
+            .andExpect(MockMvcResultMatchers.jsonPath(CLUSTERS_ID_LIST_PATH, Matchers.containsInAnyOrder(
+                id1, id2, id3)))
+            .andExpect(MockMvcResultMatchers.jsonPath(CLUSTERS_COMMANDS_LINK_PATH,
+                EntitiesLinksMatcher.matchUrisAnyOrder(CLUSTERS_API, COMMANDS_LINK_KEY,
+                    COMMANDS_OPTIONAL_HAL_LINK_PARAMETERS, Lists.newArrayList(id1, id2, id3))))
             .andDo(findResultHandler);
 
         // Try to limit the number of results
