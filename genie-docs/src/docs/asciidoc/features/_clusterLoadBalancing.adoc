@@ -15,7 +15,7 @@ cluster selection. The interface has two methods one from Genie:
 /**
  * Return best cluster to run job on.
  *
- * @param clusters   The list of available clusters to choose from
+ * @param clusters   An immutable, non-empty list of available clusters to choose from
  * @param jobRequest The job request these clusters are being load balanced for
  * @return the "best" cluster to run job on or null if no cluster selected
  * @throws GenieException if there is any error
@@ -112,7 +112,7 @@ The contract between the script and the Java code is as follows:
 |Parameter |Description
 
 |clusters
-|JSON array of cluster objects (serialized as a string) of the clusters to be evaluated
+|Non-empty JSON array of cluster objects (serialized as a string) of the clusters to be evaluated
 
 |jobRequest
 |JSON object (serialized as a string) of the job request that kicked off this evaluation

@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.core.services.impl;
 
+import com.google.common.collect.ImmutableList;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
@@ -44,6 +45,7 @@ import com.netflix.genie.core.services.JobKillService;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobStateService;
+import com.netflix.spectator.api.Counter;
 import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Registry;
 import com.netflix.spectator.api.Timer;
@@ -76,8 +78,9 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
     private static final String LOAD_BALANCER_CLASS_TAG = "class";
     private static final String LOAD_BALANCER_STATUS_TAG = "status";
     private static final String LOAD_BALANCER_STATUS_SUCCESS = "success";
-    private static final String LOAD_BALANCER_STATUS_FAILURE = "failure";
+    private static final String LOAD_BALANCER_STATUS_NO_PREFERENCE = "no preference";
     private static final String LOAD_BALANCER_STATUS_EXCEPTION = "exception";
+    private static final String LOAD_BALANCER_STATUS_INVALID = "invalid";
 
     private final JobPersistenceService jobPersistenceService;
     private final JobKillService jobKillService;
@@ -100,6 +103,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
     private final Timer selectCommandTimer;
     private final Timer selectApplicationsTimer;
     private final Timer setJobEnvironmentTimer;
+    private final Counter noClusterFoundCounter;
     private final Id loadBalancerId;
 
     /**
@@ -153,7 +157,8 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
         this.selectCommandTimer = registry.timer("genie.jobs.submit.localRunner.selectCommand.timer");
         this.selectApplicationsTimer = registry.timer("genie.jobs.submit.localRunner.selectApplications.timer");
         this.setJobEnvironmentTimer = registry.timer("genie.jobs.submit.localRunner.setJobEnvironment.timer");
-        this.loadBalancerId = registry.createId("genie.jobs.submit.selectCluster.loadBalancer");
+        this.loadBalancerId = registry.createId("genie.jobs.submit.selectCluster.loadBalancer.counter");
+        this.noClusterFoundCounter = registry.counter("genie.jobs.submit.selectCluster.notFound.counter");
     }
 
     /**
@@ -343,7 +348,9 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
         final long start = System.nanoTime();
         try {
             log.info("Selecting cluster for job {}", jobRequest.getId().orElse(NO_ID_FOUND));
-            final List<Cluster> clusters = this.clusterService.chooseClusterForJobRequest(jobRequest);
+            final List<Cluster> clusters = ImmutableList.copyOf(
+                this.clusterService.chooseClusterForJobRequest(jobRequest)
+            );
             Cluster cluster = null;
             if (clusters.isEmpty()) {
                 throw new GeniePreconditionException(
@@ -357,24 +364,46 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                     try {
                         final Cluster selectedCluster = loadBalancer.selectCluster(clusters, jobRequest);
                         if (selectedCluster != null) {
-                            log.debug(
-                                "Successfully selected cluster {} using load balancer {}",
-                                selectedCluster.getId().orElse(NO_ID_FOUND),
-                                loadBalancerClass
-                            );
-                            this.registry.counter(
-                                this.loadBalancerId
-                                    .withTag(
-                                        LOAD_BALANCER_CLASS_TAG,
-                                        loadBalancerClass
-                                    )
-                                    .withTag(
-                                        LOAD_BALANCER_STATUS_TAG,
-                                        LOAD_BALANCER_STATUS_SUCCESS
-                                    )
-                            ).increment();
-                            cluster = selectedCluster;
-                            break;
+                            // Make sure the cluster existed in the original list of clusters
+                            if (clusters.contains(selectedCluster)) {
+                                log.debug(
+                                    "Successfully selected cluster {} using load balancer {}",
+                                    selectedCluster.getId().orElse(NO_ID_FOUND),
+                                    loadBalancerClass
+                                );
+                                this.registry.counter(
+                                    this.loadBalancerId
+                                        .withTag(
+                                            LOAD_BALANCER_CLASS_TAG,
+                                            loadBalancerClass
+                                        )
+                                        .withTag(
+                                            LOAD_BALANCER_STATUS_TAG,
+                                            LOAD_BALANCER_STATUS_SUCCESS
+                                        )
+                                ).increment();
+                                cluster = selectedCluster;
+                                break;
+                            } else {
+                                log.error(
+                                    "Successfully selected cluster {} using load balancer {} but "
+                                        + "it wasn't in original cluster list {}",
+                                    selectedCluster.getId().orElse(NO_ID_FOUND),
+                                    loadBalancerClass,
+                                    clusters
+                                );
+                                this.registry.counter(
+                                    this.loadBalancerId
+                                        .withTag(
+                                            LOAD_BALANCER_CLASS_TAG,
+                                            loadBalancerClass
+                                        )
+                                        .withTag(
+                                            LOAD_BALANCER_STATUS_TAG,
+                                            LOAD_BALANCER_STATUS_INVALID
+                                        )
+                                ).increment();
+                            }
                         } else {
                             this.registry.counter(
                                 this.loadBalancerId
@@ -384,7 +413,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                                     )
                                     .withTag(
                                         LOAD_BALANCER_STATUS_TAG,
-                                        LOAD_BALANCER_STATUS_FAILURE
+                                        LOAD_BALANCER_STATUS_NO_PREFERENCE
                                     )
                             ).increment();
                         }
@@ -406,6 +435,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
 
                 // Make sure we found a cluster
                 if (cluster == null) {
+                    this.noClusterFoundCounter.increment();
                     throw new GeniePreconditionException(
                         "Unable to select a cluster from using any of the available load balancers."
                     );

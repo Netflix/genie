@@ -38,7 +38,7 @@ public interface ClusterLoadBalancer extends Ordered {
     /**
      * Return best cluster to run job on.
      *
-     * @param clusters   The list of available clusters to choose from
+     * @param clusters   An immutable, non-empty list of available clusters to choose from
      * @param jobRequest The job request these clusters are being load balanced for
      * @return the "best" cluster to run job on or null if no cluster selected
      * @throws GenieException if there is any error

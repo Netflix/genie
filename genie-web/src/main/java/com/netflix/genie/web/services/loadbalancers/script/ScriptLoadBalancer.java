@@ -51,11 +51,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * An implementation of the ClusterLoadBalancer interface which uses user a supplied script to make decisions based
  * on the list of clusters and the job request supplied.
- *
+ * <p>
  * The contract between the script and the Java code is that the script will be supplied global variables
  * {@code clusters} and {@code jobRequest} which will be JSON strings representing the list (array) of clusters
  * matching the cluster criteria tags and the job request that kicked off this evaluation. The code expects the script
@@ -104,8 +106,8 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
     private final ObjectMapper mapper;
     private final Registry registry;
 
-    private CompiledScript script;
-    private long timeoutLength = DEFAULT_TIMEOUT_LENGTH;
+    private final AtomicReference<CompiledScript> script = new AtomicReference<>(null);
+    private final AtomicLong timeoutLength = new AtomicLong(DEFAULT_TIMEOUT_LENGTH);
 
     /**
      * Constructor.
@@ -150,15 +152,15 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
         final long selectStart = System.nanoTime();
         final Map<String, String> tags = Maps.newHashMap();
         try {
-            if (this.isConfigured.get() && this.script != null) {
+            if (this.isConfigured.get() && this.script != null && this.script.get() != null) {
                 final Bindings bindings = new SimpleBindings();
                 bindings.put(CLUSTERS_BINDING, this.mapper.writeValueAsString(clusters));
                 bindings.put(JOB_REQUEST_BINDING, this.mapper.writeValueAsString(jobRequest));
 
                 // Run as callable and timeout after the configured timeout length
                 final String clusterId = this.taskExecutor
-                    .submit(() -> (String) this.script.eval(bindings))
-                    .get(this.timeoutLength, TimeUnit.MILLISECONDS);
+                    .submit(() -> (String) this.script.get().eval(bindings))
+                    .get(this.timeoutLength.get(), TimeUnit.MILLISECONDS);
 
                 // Find the cluster if not null
                 if (clusterId != null) {
@@ -202,17 +204,19 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
      */
     public void refresh() {
         final long updateStart = System.nanoTime();
-        this.isUpdating.set(true);
-
-        // Update the script timeout
-        this.timeoutLength = this.environment.getProperty(
-            SCRIPT_TIMEOUT_PROPERTY_KEY,
-            Long.class,
-            DEFAULT_TIMEOUT_LENGTH
-        );
-
         final Map<String, String> tags = Maps.newHashMap();
         try {
+            this.isUpdating.set(true);
+
+            // Update the script timeout
+            this.timeoutLength.set(
+                this.environment.getProperty(
+                    SCRIPT_TIMEOUT_PROPERTY_KEY,
+                    Long.class,
+                    DEFAULT_TIMEOUT_LENGTH
+                )
+            );
+
             final String scriptFileSource = this.environment.getProperty(SCRIPT_FILE_SOURCE_PROPERTY_KEY);
             if (scriptFileSource == null) {
                 throw new IllegalStateException(
@@ -254,7 +258,7 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
                 final FileInputStream fis = new FileInputStream(scriptFileDestination);
                 final InputStreamReader reader = new InputStreamReader(fis, UTF_8)
             ) {
-                this.script = compilable.compile(reader);
+                this.script.set(compilable.compile(reader));
             }
 
             tags.put(STATUS_TAG_KEY, STATUS_TAG_OK);

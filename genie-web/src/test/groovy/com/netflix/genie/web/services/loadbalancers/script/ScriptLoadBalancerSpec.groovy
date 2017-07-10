@@ -254,5 +254,6 @@ class ScriptLoadBalancerSpec extends Specification {
         type         | file
         "JavaScript" | this.class.getResource("loadBalance.js").file
         "Groovy"     | this.class.getResource("loadBalance.groovy").file
+//        "Python"     | this.class.getResource("loadBalance.py").file
     }
 }
