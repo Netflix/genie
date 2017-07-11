@@ -18,10 +18,12 @@
 package com.netflix.genie.core.services.impl;
 
 import com.netflix.genie.common.dto.Cluster;
+import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.services.ClusterLoadBalancer;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.Ordered;
 
 import java.util.List;
 import java.util.Random;
@@ -39,7 +41,7 @@ public class RandomizedClusterLoadBalancerImpl implements ClusterLoadBalancer {
      * {@inheritDoc}
      */
     @Override
-    public Cluster selectCluster(final List<Cluster> clusters) throws GenieException {
+    public Cluster selectCluster(final List<Cluster> clusters, final JobRequest jobRequest) throws GenieException {
         log.debug("called");
 
         if (clusters == null || clusters.isEmpty()) {
@@ -51,5 +53,13 @@ public class RandomizedClusterLoadBalancerImpl implements ClusterLoadBalancer {
         // return a random one
         final Random rand = new Random();
         return clusters.get(Math.abs(rand.nextInt(clusters.size())));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getOrder() {
+        return Ordered.LOWEST_PRECEDENCE;
     }
 }

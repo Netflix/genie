@@ -44,6 +44,8 @@ import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobStateService;
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.spectator.api.Counter;
+import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Registry;
 import com.netflix.spectator.api.Timer;
 import org.junit.Before;
@@ -84,7 +86,10 @@ public class JobCoordinatorServiceImplUnitTests {
     private ApplicationService applicationService;
     private ClusterService clusterService;
     private CommandService commandService;
-    private ClusterLoadBalancer clusterLoadBalancer;
+    private ClusterLoadBalancer clusterLoadBalancer1;
+    private ClusterLoadBalancer clusterLoadBalancer2;
+    private ClusterLoadBalancer clusterLoadBalancer3;
+    private ClusterLoadBalancer clusterLoadBalancer4;
     private JobsProperties jobsProperties;
 
     /**
@@ -103,10 +108,17 @@ public class JobCoordinatorServiceImplUnitTests {
         this.applicationService = Mockito.mock(ApplicationService.class);
         this.clusterService = Mockito.mock(ClusterService.class);
         this.commandService = Mockito.mock(CommandService.class);
-        this.clusterLoadBalancer = Mockito.mock(ClusterLoadBalancer.class);
+        this.clusterLoadBalancer1 = Mockito.mock(ClusterLoadBalancer.class);
+        this.clusterLoadBalancer2 = Mockito.mock(ClusterLoadBalancer.class);
+        this.clusterLoadBalancer3 = Mockito.mock(ClusterLoadBalancer.class);
+        this.clusterLoadBalancer4 = Mockito.mock(ClusterLoadBalancer.class);
 
         final Registry registry = Mockito.mock(Registry.class);
+        final Id loadBalancerId = Mockito.mock(Id.class);
         Mockito.when(registry.timer(Mockito.anyString())).thenReturn(Mockito.mock(Timer.class));
+        Mockito.when(registry.createId(Mockito.anyString())).thenReturn(loadBalancerId);
+        Mockito.when(loadBalancerId.withTag(Mockito.anyString(), Mockito.anyString())).thenReturn(loadBalancerId);
+        Mockito.when(registry.counter(loadBalancerId)).thenReturn(Mockito.mock(Counter.class));
 
         this.jobCoordinatorService = new JobCoordinatorServiceImpl(
             this.jobPersistenceService,
@@ -117,7 +129,12 @@ public class JobCoordinatorServiceImplUnitTests {
             this.jobSearchService,
             this.clusterService,
             this.commandService,
-            this.clusterLoadBalancer,
+            Lists.newArrayList(
+                this.clusterLoadBalancer1,
+                this.clusterLoadBalancer2,
+                this.clusterLoadBalancer3,
+                this.clusterLoadBalancer4
+            ),
             registry,
             HOST_NAME
         );
@@ -128,8 +145,31 @@ public class JobCoordinatorServiceImplUnitTests {
      *
      * @throws GenieException If there is any problem
      */
+    @Test(expected = GeniePreconditionException.class)
+    public void cantCoordinateJobIfNoClustersFound() throws GenieException {
+        final Set<String> commandCriteria = Sets.newHashSet(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
+        );
+
+        final JobRequest jobRequest = this.getJobRequest(true, commandCriteria, null, null);
+        final JobMetadata jobMetadata = this.getJobMetadata();
+
+        Mockito
+            .when(this.clusterService.chooseClusterForJobRequest(jobRequest))
+            .thenReturn(Lists.newArrayList());
+
+        this.jobCoordinatorService.coordinateJob(jobRequest, jobMetadata);
+    }
+
+    /**
+     * Test the coordinate job method.
+     *
+     * @throws GenieException If there is any problem
+     */
     @Test
-    public void canCoordinateJob() throws GenieException {
+    public void canCoordinateJobForSingleCluster() throws GenieException {
         final Set<String> commandCriteria = Sets.newHashSet(
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
@@ -148,7 +188,84 @@ public class JobCoordinatorServiceImplUnitTests {
             .when(this.clusterService.chooseClusterForJobRequest(jobRequest))
             .thenReturn(clusters);
 
-        Mockito.when(this.clusterLoadBalancer.selectCluster(clusters)).thenReturn(cluster);
+        final String commandId = UUID.randomUUID().toString();
+        final Command command = Mockito.mock(Command.class);
+        Mockito.when(command.getId()).thenReturn(Optional.of(commandId));
+        Mockito.when(command.getMemory()).thenReturn(Optional.empty());
+        final Set<String> commandTags = Sets.newHashSet(UUID.randomUUID().toString());
+        commandTags.addAll(commandCriteria);
+        Mockito.when(command.getTags()).thenReturn(commandTags);
+
+        Mockito
+            .when(
+                this.clusterService.getCommandsForCluster(Mockito.eq(clusterId), Mockito.anySetOf(CommandStatus.class))
+            )
+            .thenReturn(Lists.newArrayList(command));
+
+        final String applicationId = UUID.randomUUID().toString();
+        final Application application = Mockito.mock(Application.class);
+        Mockito.when(application.getId()).thenReturn(Optional.of(applicationId));
+        final List<Application> applications = Lists.newArrayList(application);
+
+        Mockito.when(this.commandService.getApplicationsForCommand(commandId)).thenReturn(applications);
+
+        Mockito.when(this.jobStateService.getUsedMemory()).thenReturn(0);
+
+        this.jobCoordinatorService.coordinateJob(jobRequest, jobMetadata);
+
+        Mockito.verify(this.jobPersistenceService, Mockito.times(1))
+            .createJob(
+                Mockito.any(JobRequest.class),
+                Mockito.any(JobMetadata.class),
+                Mockito.any(Job.class),
+                Mockito.any(JobExecution.class)
+            );
+
+        Mockito.verify(
+            this.jobPersistenceService,
+            Mockito.times(1)
+        ).updateJobWithRuntimeEnvironment(JOB_1_ID, clusterId, commandId, Lists.newArrayList(applicationId), MEMORY);
+
+        Mockito.verify(
+            this.jobStateService,
+            Mockito.times(1)
+        ).schedule(JOB_1_ID, jobRequest, cluster, command, applications, MEMORY);
+
+        Mockito.verify(this.clusterLoadBalancer1, Mockito.never()).selectCluster(Mockito.any(), Mockito.any());
+        Mockito.verify(this.clusterLoadBalancer2, Mockito.never()).selectCluster(Mockito.any(), Mockito.any());
+        Mockito.verify(this.clusterLoadBalancer3, Mockito.never()).selectCluster(Mockito.any(), Mockito.any());
+        Mockito.verify(this.clusterLoadBalancer4, Mockito.never()).selectCluster(Mockito.any(), Mockito.any());
+    }
+
+    /**
+     * Test the coordinate job method.
+     *
+     * @throws GenieException If there is any problem
+     */
+    @Test
+    public void canCoordinateJobForMultipleClusters() throws GenieException {
+        final Set<String> commandCriteria = Sets.newHashSet(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
+        );
+
+        final JobRequest jobRequest = this.getJobRequest(true, commandCriteria, null, null);
+        final JobMetadata jobMetadata = this.getJobMetadata();
+
+        final String clusterId = UUID.randomUUID().toString();
+        final Cluster cluster1 = Mockito.mock(Cluster.class);
+        final Cluster cluster2 = Mockito.mock(Cluster.class);
+        final List<Cluster> clusters = Lists.newArrayList(cluster1, cluster2);
+        Mockito.when(cluster1.getId()).thenReturn(Optional.of(clusterId));
+
+        Mockito
+            .when(this.clusterService.chooseClusterForJobRequest(jobRequest))
+            .thenReturn(clusters);
+
+        Mockito.when(this.clusterLoadBalancer1.selectCluster(clusters, jobRequest)).thenReturn(null);
+        Mockito.when(this.clusterLoadBalancer2.selectCluster(clusters, jobRequest)).thenThrow(new RuntimeException());
+        Mockito.when(this.clusterLoadBalancer3.selectCluster(clusters, jobRequest)).thenReturn(cluster1);
 
         final String commandId = UUID.randomUUID().toString();
         final Command command = Mockito.mock(Command.class);
@@ -186,8 +303,13 @@ public class JobCoordinatorServiceImplUnitTests {
         Mockito.verify(this.jobPersistenceService, Mockito.times(1))
             .updateJobWithRuntimeEnvironment(JOB_1_ID, clusterId, commandId, Lists.newArrayList(applicationId), MEMORY);
 
-        Mockito.verify(this.jobStateService, Mockito.times(1)).schedule(JOB_1_ID, jobRequest, cluster,
+        Mockito.verify(this.jobStateService, Mockito.times(1)).schedule(JOB_1_ID, jobRequest, cluster1,
             command, applications, MEMORY);
+
+        Mockito.verify(this.clusterLoadBalancer1, Mockito.times(1)).selectCluster(Mockito.any(), Mockito.any());
+        Mockito.verify(this.clusterLoadBalancer2, Mockito.times(1)).selectCluster(Mockito.any(), Mockito.any());
+        Mockito.verify(this.clusterLoadBalancer3, Mockito.times(1)).selectCluster(Mockito.any(), Mockito.any());
+        Mockito.verify(this.clusterLoadBalancer4, Mockito.never()).selectCluster(Mockito.any(), Mockito.any());
     }
 
     /**
@@ -217,7 +339,7 @@ public class JobCoordinatorServiceImplUnitTests {
             .when(this.clusterService.chooseClusterForJobRequest(jobRequest))
             .thenReturn(clusters);
 
-        Mockito.when(this.clusterLoadBalancer.selectCluster(clusters)).thenReturn(cluster);
+        Mockito.when(this.clusterLoadBalancer1.selectCluster(clusters, jobRequest)).thenReturn(cluster);
 
         final String commandId = UUID.randomUUID().toString();
         final Command command = Mockito.mock(Command.class);
@@ -283,7 +405,7 @@ public class JobCoordinatorServiceImplUnitTests {
             .when(this.clusterService.chooseClusterForJobRequest(jobRequest))
             .thenReturn(clusters);
 
-        Mockito.when(this.clusterLoadBalancer.selectCluster(clusters)).thenReturn(cluster);
+        Mockito.when(this.clusterLoadBalancer1.selectCluster(clusters, jobRequest)).thenReturn(cluster);
 
         final String commandId = UUID.randomUUID().toString();
         final Command command = Mockito.mock(Command.class);
@@ -336,7 +458,7 @@ public class JobCoordinatorServiceImplUnitTests {
             .when(this.clusterService.chooseClusterForJobRequest(jobRequest))
             .thenReturn(clusters);
 
-        Mockito.when(this.clusterLoadBalancer.selectCluster(clusters)).thenReturn(cluster);
+        Mockito.when(this.clusterLoadBalancer1.selectCluster(clusters, jobRequest)).thenReturn(cluster);
 
         final String commandId = UUID.randomUUID().toString();
         final Command command = Mockito.mock(Command.class);
@@ -401,7 +523,7 @@ public class JobCoordinatorServiceImplUnitTests {
             .when(this.clusterService.chooseClusterForJobRequest(jobRequest))
             .thenReturn(clusters);
 
-        Mockito.when(this.clusterLoadBalancer.selectCluster(clusters)).thenReturn(cluster);
+        Mockito.when(this.clusterLoadBalancer1.selectCluster(clusters, jobRequest)).thenReturn(cluster);
 
         final String commandId = UUID.randomUUID().toString();
         final Command command = Mockito.mock(Command.class);
@@ -460,7 +582,7 @@ public class JobCoordinatorServiceImplUnitTests {
             .when(this.clusterService.chooseClusterForJobRequest(jobRequest))
             .thenReturn(clusters);
 
-        Mockito.when(this.clusterLoadBalancer.selectCluster(clusters)).thenReturn(cluster);
+        Mockito.when(this.clusterLoadBalancer1.selectCluster(clusters, jobRequest)).thenReturn(cluster);
 
         final String commandId = UUID.randomUUID().toString();
         final Command command = Mockito.mock(Command.class);
@@ -515,7 +637,7 @@ public class JobCoordinatorServiceImplUnitTests {
             .when(this.clusterService.chooseClusterForJobRequest(jobRequest))
             .thenReturn(clusters);
 
-        Mockito.when(this.clusterLoadBalancer.selectCluster(clusters)).thenReturn(cluster);
+        Mockito.when(this.clusterLoadBalancer1.selectCluster(clusters, jobRequest)).thenReturn(cluster);
 
         final String commandId = UUID.randomUUID().toString();
         final Command command = Mockito.mock(Command.class);
@@ -576,7 +698,7 @@ public class JobCoordinatorServiceImplUnitTests {
             .when(this.clusterService.chooseClusterForJobRequest(jobRequest))
             .thenReturn(clusters);
 
-        Mockito.when(this.clusterLoadBalancer.selectCluster(clusters)).thenReturn(cluster);
+        Mockito.when(this.clusterLoadBalancer1.selectCluster(clusters, jobRequest)).thenReturn(cluster);
 
         final String commandId = UUID.randomUUID().toString();
         final Command command = Mockito.mock(Command.class);

@@ -263,8 +263,7 @@ public class ServicesConfigTest {
         final ApplicationEventPublisher eventPublisher,
         final ApplicationEventMulticaster eventMulticaster,
         final List<WorkflowTask> workflowTasks,
-        @Qualifier("jobsDir")
-        final Resource genieWorkingDir,
+        @Qualifier("jobsDir") final Resource genieWorkingDir,
         final Registry registry
     ) {
         return new LocalJobRunner(
@@ -291,6 +290,7 @@ public class ServicesConfigTest {
 
     /**
      * Default task scheduler.
+     *
      * @return task scheduler
      */
     @Bean
@@ -359,7 +359,7 @@ public class ServicesConfigTest {
      * @param applicationService    Implementation of application service interface
      * @param clusterService        Implementation of cluster service interface
      * @param commandService        Implementation of command service interface
-     * @param clusterLoadBalancer   Implementation of the cluster load balancer interface
+     * @param clusterLoadBalancers  Implementations of the cluster load balancer interface
      * @param registry              The registry to use
      * @param hostName              The host name to use
      * @return An instance of the JobCoordinatorService.
@@ -374,7 +374,7 @@ public class ServicesConfigTest {
         final ApplicationService applicationService,
         final ClusterService clusterService,
         final CommandService commandService,
-        final ClusterLoadBalancer clusterLoadBalancer,
+        final List<ClusterLoadBalancer> clusterLoadBalancers,
         final Registry registry,
         final String hostName
     ) {
@@ -387,7 +387,7 @@ public class ServicesConfigTest {
             jobSearchService,
             clusterService,
             commandService,
-            clusterLoadBalancer,
+            clusterLoadBalancers,
             registry,
             hostName
         );

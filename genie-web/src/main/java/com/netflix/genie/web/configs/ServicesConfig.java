@@ -235,8 +235,7 @@ public class ServicesConfig {
         final Executor executor,
         final JobsProperties jobsProperties,
         final ApplicationEventPublisher eventPublisher,
-        @Qualifier("jobsDir")
-        final Resource genieWorkingDir,
+        @Qualifier("jobsDir") final Resource genieWorkingDir,
         final ObjectMapper objectMapper
     ) {
         return new LocalJobKillServiceImpl(
@@ -286,10 +285,8 @@ public class ServicesConfig {
     @Bean
     public GenieFileTransferService cacheGenieFileTransferService(
         final FileTransferFactory fileTransferFactory,
-        @Value("${genie.file.cache.location}")
-        final String baseCacheLocation,
-        @Qualifier("file.system.file")
-        final FileTransfer localFileTransfer,
+        @Value("${genie.file.cache.location}") final String baseCacheLocation,
+        @Qualifier("file.system.file") final FileTransfer localFileTransfer,
         final Registry registry
     ) throws GenieException {
         return new CacheGenieFileTransferService(fileTransferFactory, baseCacheLocation, localFileTransfer, registry);
@@ -312,8 +309,7 @@ public class ServicesConfig {
         final ApplicationEventPublisher eventPublisher,
         final ApplicationEventMulticaster eventMulticaster,
         final List<WorkflowTask> workflowTasks,
-        @Qualifier("jobsDir")
-        final Resource genieWorkingDir,
+        @Qualifier("jobsDir") final Resource genieWorkingDir,
         final Registry registry
     ) {
         return new LocalJobRunner(
@@ -331,13 +327,13 @@ public class ServicesConfig {
      *
      * @param jobPersistenceService implementation of job persistence service interface
      * @param jobKillService        The job kill service to use
-     * @param jobStateService     The running job metrics service to use
+     * @param jobStateService       The running job metrics service to use
      * @param jobSearchService      Implementation of job search service interface
      * @param jobsProperties        The jobs properties to use
      * @param applicationService    Implementation of application service interface
      * @param clusterService        Implementation of cluster service interface
      * @param commandService        Implementation of command service interface
-     * @param clusterLoadBalancer   Implementation of the cluster load balancer interface
+     * @param clusterLoadBalancers  Implementations of the cluster load balancer interface in invocation order
      * @param registry              The metrics registry to use
      * @param hostName              The host this Genie instance is running on
      * @return An instance of the JobCoordinatorService.
@@ -352,7 +348,7 @@ public class ServicesConfig {
         final ApplicationService applicationService,
         final ClusterService clusterService,
         final CommandService commandService,
-        final ClusterLoadBalancer clusterLoadBalancer,
+        final List<ClusterLoadBalancer> clusterLoadBalancers,
         final Registry registry,
         final String hostName
     ) {
@@ -365,7 +361,7 @@ public class ServicesConfig {
             jobSearchService,
             clusterService,
             commandService,
-            clusterLoadBalancer,
+            clusterLoadBalancers,
             registry,
             hostName
         );

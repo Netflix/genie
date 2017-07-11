@@ -18,9 +18,12 @@
 package com.netflix.genie.core.services;
 
 import com.netflix.genie.common.dto.Cluster;
+import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
+import org.springframework.core.Ordered;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 /**
@@ -30,14 +33,16 @@ import java.util.List;
  * @author tgianos
  */
 @Validated
-public interface ClusterLoadBalancer {
+public interface ClusterLoadBalancer extends Ordered {
 
     /**
      * Return best cluster to run job on.
      *
-     * @param clusters The list of available clusters to choose from
-     * @return the "best" cluster to run job on
+     * @param clusters   An immutable, non-empty list of available clusters to choose from
+     * @param jobRequest The job request these clusters are being load balanced for
+     * @return the "best" cluster to run job on or null if no cluster selected
      * @throws GenieException if there is any error
      */
-    Cluster selectCluster(final List<Cluster> clusters) throws GenieException;
+    @Nullable
+    Cluster selectCluster(final List<Cluster> clusters, final JobRequest jobRequest) throws GenieException;
 }

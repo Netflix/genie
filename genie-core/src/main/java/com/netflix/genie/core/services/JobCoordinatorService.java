@@ -44,9 +44,9 @@ public interface JobCoordinatorService {
      * @throws GenieException if there is an error
      */
     String coordinateJob(
-        @NotNull(message = "No job request provided. Unable to submit job for execution.")
+        @NotNull(message = "No job request provided. Unable to execute.")
         @Valid final JobRequest jobRequest,
-        @NotNull(message = "No job metadata provided. Unable to submit job for execution.")
+        @NotNull(message = "No job metadata provided. Unable to execute.")
         @Valid final JobMetadata jobMetadata
     ) throws GenieException;
 

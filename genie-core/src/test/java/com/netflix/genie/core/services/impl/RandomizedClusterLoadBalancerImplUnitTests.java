@@ -18,10 +18,11 @@
 package com.netflix.genie.core.services.impl;
 
 import com.google.common.collect.Lists;
-import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.common.dto.Cluster;
+import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.test.categories.UnitTest;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -58,7 +59,12 @@ public class RandomizedClusterLoadBalancerImplUnitTests {
         final Cluster cluster1 = Mockito.mock(Cluster.class);
         final Cluster cluster2 = Mockito.mock(Cluster.class);
         final Cluster cluster3 = Mockito.mock(Cluster.class);
-        Assert.assertNotNull(this.clb.selectCluster(Lists.newArrayList(cluster1, cluster2, cluster3)));
+        Assert.assertNotNull(
+            this.clb.selectCluster(
+                Lists.newArrayList(cluster1, cluster2, cluster3),
+                Mockito.mock(JobRequest.class)
+            )
+        );
     }
 
     /**
@@ -68,7 +74,7 @@ public class RandomizedClusterLoadBalancerImplUnitTests {
      */
     @Test(expected = GeniePreconditionException.class)
     public void testEmptyList() throws GenieException {
-        this.clb.selectCluster(new ArrayList<>());
+        this.clb.selectCluster(new ArrayList<>(), Mockito.mock(JobRequest.class));
     }
 
     /**
@@ -78,6 +84,6 @@ public class RandomizedClusterLoadBalancerImplUnitTests {
      */
     @Test(expected = GeniePreconditionException.class)
     public void testNullList() throws GenieException {
-        this.clb.selectCluster(null);
+        this.clb.selectCluster(null, Mockito.mock(JobRequest.class));
     }
 }
