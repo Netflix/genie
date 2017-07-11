@@ -1,7 +1,7 @@
-import T from 'prop-types';
-import React from 'react';
+import T from "prop-types";
+import React from "react";
 
-import { momentFormat, fetch } from "../utils";
+import { momentFormat, fetch, activeClusterUrl } from "../utils";
 import $ from "jquery";
 
 import InfoTable from "./InfoTable";
@@ -32,13 +32,13 @@ export default class CommandDetails extends React.Component {
   loadData(props) {
     const { row } = props;
     const commandUrl = row._links.self.href;
-    const clustersUrl = `${row._links.clusters.href}?status=UP`;
+    const clustersUrl = activeClusterUrl(row._links.clusters.href);
     const applicationsUrl = row._links.applications.href;
-    $.when(fetch(commandUrl), fetch(clustersUrl), fetch(applicationsUrl)).done((
-      command,
-      clusters,
-      applications
-    ) => {
+    $.when(
+      fetch(commandUrl),
+      fetch(clustersUrl),
+      fetch(applicationsUrl)
+    ).done((command, clusters, applications) => {
       this.setState({
         command: command[0],
         clusters: clusters[0],
@@ -57,40 +57,54 @@ export default class CommandDetails extends React.Component {
               <tbody>
                 <tr>
                   <td className="col-xs-2 align-right">Description:</td>
-                  <td>{this.state.command.description}</td>
+                  <td>
+                    {this.state.command.description}
+                  </td>
                 </tr>
                 <tr>
                   <td className="col-xs-2 align-right">Check Delay:</td>
-                  <td>{this.state.command.checkDelay}</td>
+                  <td>
+                    {this.state.command.checkDelay}
+                  </td>
                 </tr>
                 <tr>
                   <td className="col-xs-2 align-right">Setup File:</td>
-                  <td>{this.state.command.setupFile}</td>
+                  <td>
+                    {this.state.command.setupFile}
+                  </td>
                 </tr>
                 <tr>
                   <td className="col-xs-2 align-right">Executable:</td>
-                  <td>{this.state.command.executable}</td>
+                  <td>
+                    {this.state.command.executable}
+                  </td>
                 </tr>
                 <tr>
                   <td className="col-xs-2 align-right">Config:</td>
                   <td>
                     <ul>
-                      {this.state.command.configs.map((config, index) => (
-                        <li key={index}>{config}</li>
-                      ))}
+                      {this.state.command.configs.map((config, index) =>
+                        <li key={index}>
+                          {config}
+                        </li>
+                      )}
                     </ul>
                   </td>
                 </tr>
                 <tr>
                   <td className="col-xs-2 align-right">Created:</td>
-                  <td>{momentFormat(this.state.command.created)}</td>
+                  <td>
+                    {momentFormat(this.state.command.created)}
+                  </td>
                 </tr>
                 <tr>
                   <td className="col-xs-2 align-right">Updated:</td>
-                  <td>{momentFormat(this.state.command.updated)}</td>
+                  <td>
+                    {momentFormat(this.state.command.updated)}
+                  </td>
                 </tr>
                 <tr>
-                  <td className="col-xs-2 align-right">Clusters:</td>
+                  <td className="col-xs-2 align-right">Active Clusters:</td>
                   <td>
                     {this.state.clusters.length > 0
                       ? <InfoTable data={this.state.clusters} type="clusters" />
