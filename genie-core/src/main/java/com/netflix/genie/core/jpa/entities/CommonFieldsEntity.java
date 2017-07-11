@@ -81,8 +81,8 @@ public class CommonFieldsEntity extends BaseEntity {
     private String description;
 
     @Basic
-    @Column(name = "tags", length = 2048)
-    @Size(max = 2048, message = "Max length in database is 2048 characters")
+    @Column(name = "tags", length = 10000)
+    @Size(max = 10000, message = "Max length in database is 10000 characters")
     private String tags;
 
     /**

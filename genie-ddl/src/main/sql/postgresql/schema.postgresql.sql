@@ -71,7 +71,7 @@ CREATE TABLE applications (
     status character varying(20) DEFAULT 'INACTIVE'::character varying NOT NULL,
     entity_version integer DEFAULT 0 NOT NULL,
     description text DEFAULT NULL,
-    tags character varying(2048) DEFAULT NULL::character varying,
+    tags character varying(10000) DEFAULT NULL::character varying,
     type character varying(255) DEFAULT NULL::character varying
 );
 
@@ -110,7 +110,7 @@ CREATE TABLE clusters (
     status character varying(20) DEFAULT 'OUT_OF_SERVICE'::character varying NOT NULL,
     entity_version integer DEFAULT 0 NOT NULL,
     description text DEFAULT NULL,
-    tags character varying(2048) DEFAULT NULL::character varying,
+    tags character varying(10000) DEFAULT NULL::character varying,
     setup_file character varying(1024) DEFAULT NULL::character varying
 );
 
@@ -152,7 +152,7 @@ CREATE TABLE commands (
     status character varying(20) DEFAULT 'INACTIVE'::character varying NOT NULL,
     entity_version integer DEFAULT 0 NOT NULL,
     description text DEFAULT NULL,
-    tags character varying(2048) DEFAULT NULL::character varying,
+    tags character varying(10000) DEFAULT NULL::character varying,
     check_delay bigint DEFAULT 10000 NOT NULL,
     memory integer
 );
@@ -226,7 +226,7 @@ CREATE TABLE job_requests (
     dependencies character varying(30000) DEFAULT NULL::character varying NOT NULL,
     disable_log_archival boolean DEFAULT false NOT NULL,
     email character varying(255) DEFAULT NULL::character varying,
-    tags character varying(2048) DEFAULT NULL::character varying,
+    tags character varying(10000) DEFAULT NULL::character varying,
     cpu integer,
     memory integer,
     applications character varying(2048) DEFAULT '[]'::character varying NOT NULL,
@@ -257,7 +257,7 @@ CREATE TABLE jobs (
     status character varying(20) DEFAULT 'INIT'::character varying NOT NULL,
     status_msg character varying(255) NOT NULL,
     entity_version integer DEFAULT 0 NOT NULL,
-    tags character varying(2048) DEFAULT NULL::character varying
+    tags character varying(10000) DEFAULT NULL::character varying
 );
 
 
