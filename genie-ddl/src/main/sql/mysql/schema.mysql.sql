@@ -324,6 +324,7 @@ CREATE TABLE `jobs` (
   KEY `id` (`id`),
   KEY `cluster_id` (`cluster_id`),
   KEY `command_id` (`command_id`),
+  KEY `JOBS_NAME_INDEX` (`name`),
   KEY `JOBS_STARTED_INDEX` (`started`),
   KEY `JOBS_FINISHED_INDEX` (`finished`),
   KEY `JOBS_STATUS_INDEX` (`status`),

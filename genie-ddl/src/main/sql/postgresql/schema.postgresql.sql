@@ -460,6 +460,14 @@ CREATE INDEX jobs_user_index ON jobs USING btree (genie_user);
 
 
 --
+-- Name: jobs_name_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX jobs_name_index ON jobs USING btree (name);
+
+
+--
+--
 -- Name: application_configs application_configs_application_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
