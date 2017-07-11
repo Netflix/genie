@@ -16,13 +16,17 @@ export const fileUrl = url => {
   return `/file${path}`;
 };
 
+export const activeClusterUrl = url => url.replace("{?status}", "?status=UP");
+
+export const activeCommandUrl = url =>
+  url.replace("{?status}", "?status=ACTIVE");
+
 export const fetch = (
   url,
   data = null,
   type = "GET",
   headers = "application/hal+json"
-) =>
-  $.ajax({ global: false, type, headers: { Accept: headers }, url, data });
+) => $.ajax({ global: false, type, headers: { Accept: headers }, url, data });
 
 export const hasChanged = (o1, o2) => {
   let changed = false;
