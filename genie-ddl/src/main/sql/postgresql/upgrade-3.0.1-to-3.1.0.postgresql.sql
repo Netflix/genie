@@ -9,5 +9,7 @@ CREATE TABLE cluster_dependencies (
 ALTER TABLE cluster_dependencies
   ADD CONSTRAINT cluster_dependencies_cluster_id_fkey FOREIGN KEY (cluster_id) REFERENCES clusters(id) ON DELETE CASCADE;
 
+CREATE INDEX JOBS_NAME_INDEX ON jobs (name);
+
 SELECT CURRENT_TIMESTAMP, 'Finished upgrading from 3.0.1 schema to 3.1.0 schema';
 COMMIT;

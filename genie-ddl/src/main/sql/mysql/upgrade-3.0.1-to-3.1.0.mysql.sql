@@ -8,5 +8,8 @@ CREATE TABLE `cluster_dependencies` (
   CONSTRAINT `cluster_dependencies_ibfk_1` FOREIGN KEY (`cluster_id`) REFERENCES `clusters` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+ALTER TABLE `jobs`
+  ADD INDEX `JOBS_NAME_INDEX` (`name`);
+
 SELECT CURRENT_TIMESTAMP AS '', 'Finished upgrading from 3.0.1 schema to 3.1.0 schema' AS '';
 COMMIT;
