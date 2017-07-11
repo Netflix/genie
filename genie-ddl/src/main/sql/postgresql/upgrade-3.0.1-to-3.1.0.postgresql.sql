@@ -39,5 +39,23 @@ ALTER TABLE job_requests
   ALTER COLUMN description TYPE text,
   ALTER COLUMN description SET DEFAULT NULL;
 
+ALTER TABLE applications
+  ALTER COLUMN tags TYPE character varying(10000),
+  ALTER COLUMN tags SET DEFAULT NULL;
+
+ALTER TABLE clusters
+  ALTER COLUMN tags TYPE character varying(10000),
+  ALTER COLUMN tags SET DEFAULT NULL;
+
+ALTER TABLE commands
+  ALTER COLUMN tags TYPE character varying(10000),
+  ALTER COLUMN tags SET DEFAULT NULL;
+
+ALTER TABLE jobs
+  ALTER COLUMN tags TYPE character varying(10000);
+
+ALTER TABLE job_requests
+  ALTER COLUMN tags TYPE character varying(10000);
+
 SELECT CURRENT_TIMESTAMP, 'Finished upgrading from 3.0.1 schema to 3.1.0 schema';
 COMMIT;

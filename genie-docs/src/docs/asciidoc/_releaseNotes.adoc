@@ -163,3 +163,4 @@ for more information. Currently on classpath only none, hash_map, redis and jdbc
 * Index 'name' column of Jobs table
 * Switch Job and JobRequest tables 'description' column to text
 * Switch Applications' table 'cluster_criterias' and 'command_criteria' columns to text
+* Increase the size of 'tags' column for applications, clusters, commands, jobs, job_requests
