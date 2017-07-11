@@ -11,5 +11,9 @@ CREATE TABLE `cluster_dependencies` (
 ALTER TABLE `jobs`
   ADD INDEX `JOBS_NAME_INDEX` (`name`);
 
+ALTER TABLE `job_requests`
+  MODIFY COLUMN `cluster_criterias` TEXT NOT NULL,
+  MODIFY COLUMN `command_criteria` TEXT NOT NULL;
+
 SELECT CURRENT_TIMESTAMP AS '', 'Finished upgrading from 3.0.1 schema to 3.1.0 schema' AS '';
 COMMIT;

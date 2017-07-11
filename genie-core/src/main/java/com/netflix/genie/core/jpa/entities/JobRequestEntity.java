@@ -24,12 +24,13 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.util.JsonUtils;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.validator.constraints.NotBlank;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
@@ -69,14 +70,16 @@ public class JobRequestEntity extends SetupFileEntity {
     @Size(max = 255, message = "Max length in database is 255 characters")
     private String group;
 
+    @Lob
     @Basic(optional = false)
-    @Column(name = "cluster_criterias", nullable = false, length = 2048)
-    @Size(min = 1, max = 2048, message = "Maximum length is 1024 characters min 1")
+    @Column(name = "cluster_criterias", nullable = false)
+    @Size(min = 1, message = "Cluster criterias cannot be empty")
     private String clusterCriterias = EMPTY_JSON_ARRAY;
 
+    @Lob
     @Basic(optional = false)
-    @Column(name = "command_criteria", nullable = false, length = 1024)
-    @Size(min = 1, max = 1024, message = "Maximum length is 1024 characters min 1")
+    @Column(name = "command_criteria", nullable = false)
+    @Size(min = 1, message = "Command criteria cannot be empty")
     private String commandCriteria = EMPTY_JSON_ARRAY;
 
     @Basic
@@ -159,8 +162,8 @@ public class JobRequestEntity extends SetupFileEntity {
      *
      * @param clusterCriterias The cluster criterias.
      */
-    protected void setClusterCriterias(@NotBlank final String clusterCriterias) {
-        this.clusterCriterias = clusterCriterias;
+    protected void setClusterCriterias(final String clusterCriterias) {
+        this.clusterCriterias = StringUtils.isBlank(clusterCriterias) ? EMPTY_JSON_ARRAY : clusterCriterias;
     }
 
     /**
@@ -246,7 +249,7 @@ public class JobRequestEntity extends SetupFileEntity {
      * @param commandCriteria A set of command criteria tags as a JSON array
      */
     protected void setCommandCriteria(final String commandCriteria) {
-        this.commandCriteria = commandCriteria;
+        this.commandCriteria = StringUtils.isBlank(commandCriteria) ? EMPTY_JSON_ARRAY : commandCriteria;
     }
 
     /**
