@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 3.1.0-SNAPSHOT,</span>
-<span id="revdate">2017-07-05</span>
+<span id="revdate">2017-07-11</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -778,33 +778,44 @@ b.conum * { color: inherit !important; }
 </li>
 </ul>
 </li>
-<li><a href="#_installation">4. Installation</a>
+<li><a href="#_features_2">4. Features</a>
 <ul class="sectlevel2">
-<li><a href="#_standalone_jar">4.1. Standalone Jar</a></li>
-<li><a href="#_tomcat_deployment">4.2. Tomcat Deployment</a></li>
-<li><a href="#_configuration_2">4.3. Configuration</a>
+<li><a href="#_cluster_load_balancing">4.1. Cluster Load Balancing</a>
 <ul class="sectlevel3">
-<li><a href="#_profiles">4.3.1. Profiles</a></li>
-<li><a href="#_database">4.3.2. Database</a></li>
-<li><a href="#_local_directories">4.3.3. Local Directories</a></li>
+<li><a href="#_randomizedclusterloadbalancerimpl">4.1.1. RandomizedClusterLoadBalancerImpl</a></li>
+<li><a href="#_scriptloadbalancer">4.1.2. ScriptLoadBalancer</a></li>
+<li><a href="#_wrap_up_6">4.1.3. Wrap Up</a></li>
 </ul>
 </li>
-<li><a href="#_wrap_up_6">4.4. Wrap Up</a></li>
 </ul>
 </li>
-<li><a href="#_properties">5. Properties</a>
+<li><a href="#_installation">5. Installation</a>
 <ul class="sectlevel2">
-<li><a href="#_default_properties">5.1. Default Properties</a>
+<li><a href="#_standalone_jar">5.1. Standalone Jar</a></li>
+<li><a href="#_tomcat_deployment">5.2. Tomcat Deployment</a></li>
+<li><a href="#_configuration_3">5.3. Configuration</a>
 <ul class="sectlevel3">
-<li><a href="#_genie_properties">5.1.1. Genie Properties</a></li>
-<li><a href="#_spring_properties">5.1.2. Spring Properties</a></li>
+<li><a href="#_profiles">5.3.1. Profiles</a></li>
+<li><a href="#_database">5.3.2. Database</a></li>
+<li><a href="#_local_directories">5.3.3. Local Directories</a></li>
 </ul>
 </li>
-<li><a href="#_profile_specific_properties">5.2. Profile Specific Properties</a>
+<li><a href="#_wrap_up_7">5.4. Wrap Up</a></li>
+</ul>
+</li>
+<li><a href="#_properties">6. Properties</a>
+<ul class="sectlevel2">
+<li><a href="#_default_properties">6.1. Default Properties</a>
 <ul class="sectlevel3">
-<li><a href="#_dev_profile">5.2.1. Dev Profile</a></li>
-<li><a href="#_prod_profile">5.2.2. Prod Profile</a></li>
-<li><a href="#_s3_profile">5.2.3. S3 Profile</a></li>
+<li><a href="#_genie_properties">6.1.1. Genie Properties</a></li>
+<li><a href="#_spring_properties">6.1.2. Spring Properties</a></li>
+</ul>
+</li>
+<li><a href="#_profile_specific_properties">6.2. Profile Specific Properties</a>
+<ul class="sectlevel3">
+<li><a href="#_dev_profile">6.2.1. Dev Profile</a></li>
+<li><a href="#_prod_profile">6.2.2. Prod Profile</a></li>
+<li><a href="#_s3_profile">6.2.3. S3 Profile</a></li>
 </ul>
 </li>
 </ul>
@@ -894,6 +905,9 @@ property</p>
 </ul>
 </div>
 </li>
+<li>
+<p>Optional cluster load balancer via Admin supplied script</p>
+</li>
 </ul>
 </div>
 </div>
@@ -969,6 +983,35 @@ to Spring Integration Zookeeper. That library is now used.</p>
 </tr>
 </thead>
 <tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.loadBalancers.script.destination</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The location on disk where the script source file should be stored after it is downloaded from
+<code>genie.jobs.clusters.loadBalancers.script.source</code>. The file will be given the same name.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file:///tmp/genie/loadbalancers/script/destination/" class="bare">file:///tmp/genie/loadbalancers/script/destination/</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.loadBalancers.script.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether the script based load balancer should be enabled for the system or not.
+See also: <code>genie.jobs.clusters.loadBalancers.script.source</code>
+See also: <code>genie.jobs.clusters.loadBalancers.script.destination</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.loadBalancers.script.refreshRate</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">How frequently to refresh the load balancer script (in milliseconds)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">300000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.loadBalancers.script.source</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The location of the script the load balancer should load to evaluate which cluster to use for a job request</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file:///tmp/genie/loadBalancers/script/source/loadBalance.js" class="bare">file:///tmp/genie/loadBalancers/script/source/loadBalance.js</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.loadBalancers.script.timeout</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The amount of time (in milliseconds) that the system will attempt to run the cluster load balancer script before it
+forces a timeout</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5000</p></td>
+</tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">management.security.roles</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The roles a user needs to have in order to access the Actuator endpoints</p></td>
@@ -3470,7 +3513,272 @@ the various libraries and technologies mentioned in this section is recommended.
 </div>
 </div>
 <div class="sect1">
-<h2 id="_installation"><a class="anchor" href="#_installation"></a>4. Installation</h2>
+<h2 id="_features_2"><a class="anchor" href="#_features_2"></a>4. Features</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This section has documentation pertaining to specific features of Genie that may need specific examples.</p>
+</div>
+<div class="sect2">
+<h3 id="_cluster_load_balancing"><a class="anchor" href="#_cluster_load_balancing"></a>4.1. Cluster Load Balancing</h3>
+<div class="paragraph">
+<p>Genie allows administrators to tag clusters with multiple tags that could reflect any type of domain modeling the
+admins wish to accomplish. Purpose of the cluster, types of data the cluster can access, workload expected are just
+some examples of ways tags could be used to classify clusters. Users submit jobs with a series of tags that help
+Genie identify which cluster to run a job on. Sometimes the tags submitted by the job match multiple clusters. At this
+point Genie needs a mechanism to chose a final runtime target from the set of clusters selected. This is where the
+cluster load balancing feature of Genie comes into play.</p>
+</div>
+<div class="paragraph">
+<p>Genie has an interface <code>ClusterLoadBalancer</code> which can be implemented to provide plugin functionality of algorithms for
+cluster selection. The interface has two methods one from Genie:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java" data-lang="java">/**
+ * Return best cluster to run job on.
+ *
+ * @param clusters   An immutable, non-empty list of available clusters to choose from
+ * @param jobRequest The job request these clusters are being load balanced for
+ * @return the "best" cluster to run job on or null if no cluster selected
+ * @throws GenieException if there is any error
+ */
+@Nullable
+Cluster selectCluster(final List&lt;Cluster&gt; clusters, final JobRequest jobRequest) throws GenieException;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And one inherited from Spring&#8217;s
+<a href="http://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/core/Ordered.html">Ordered</a>
+interface:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java" data-lang="java">/**
+ * Get the order value of this object.
+ * &lt;p&gt;Higher values are interpreted as lower priority. As a consequence,
+ * the object with the lowest value has the highest priority (somewhat
+ * analogous to Servlet {@code load-on-startup} values).
+ * &lt;p&gt;Same order values will result in arbitrary sort positions for the
+ * affected objects.
+ * @return the order value
+ * @see #HIGHEST_PRECEDENCE
+ * @see #LOWEST_PRECEDENCE
+ */
+int getOrder();</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>At startup Genie will collect all beans that implement the <code>ClusterLoadBalancer</code> interface and based on their order
+store them in an invocation order list. Meaning that when multiple clusters are selected from the database based on tags
+Genie will send the list of clusters to the implementations in preference order until one of them returns the cluster to
+use.</p>
+</div>
+<div class="paragraph">
+<p>Genie currently ships with two implementations of this interface which are described below.</p>
+</div>
+<div class="sect3">
+<h4 id="_randomizedclusterloadbalancerimpl"><a class="anchor" href="#_randomizedclusterloadbalancerimpl"></a>4.1.1. RandomizedClusterLoadBalancerImpl</h4>
+<div class="paragraph">
+<p>As the name indicates this load balancer simply uses a random number generator to select a cluster from the list by
+index. There is no intelligence to this load balancer algorithm but it does provide very close to an equal distribution
+between clusters if the same tags are always used.</p>
+</div>
+<div class="paragraph">
+<p>This implementation is the "default" implementation. It has the lowest priority order so if all other active
+implementations fail to select a cluster this implementation will be invoked and chose randomly.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_scriptloadbalancer"><a class="anchor" href="#_scriptloadbalancer"></a>4.1.2. ScriptLoadBalancer</h4>
+<div class="paragraph">
+<p>This implementation, first introduced in 3.1.0, allows administrators to provide a script to be invoked at runtime to
+decide which cluster to select. Currently <code>JavaScript</code> and <code>Groovy</code> are supported out of the box but others (like
+<code>Python</code>, <code>Ruby</code>, etc) could be supported by adding their implementations of the
+<a href="https://docs.oracle.com/javase/8/docs/api/javax/script/ScriptEngine.html">ScriptEngine</a> interface to the Genie classpath.</p>
+</div>
+<div class="sect4">
+<h5 id="_configuration_2"><a class="anchor" href="#_configuration_2"></a>4.1.2.1. Configuration</h5>
+<div class="paragraph">
+<p>The script load balancer is disabled by default. To enable it an admin must set the property
+<code>genie.jobs.clusters.loadBalancers.script.enabled</code> to true.</p>
+</div>
+<div class="paragraph">
+<p>Other properties:</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 33%;">
+<col style="width: 33%;">
+<col style="width: 33%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Property</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Default Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.loadBalancers.script.destination</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The location on disk where the script source file should be stored after it is downloaded from
+<code>genie.jobs.clusters.loadBalancers.script.source</code>. The file will be given the same name.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file:///tmp/genie/loadbalancers/script/destination/" class="bare">file:///tmp/genie/loadbalancers/script/destination/</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.loadBalancers.script.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether the script based load balancer should be enabled for the system or not.
+See also: <code>genie.jobs.clusters.loadBalancers.script.source</code>
+See also: <code>genie.jobs.clusters.loadBalancers.script.destination</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.loadBalancers.script.refreshRate</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">How frequently to refresh the load balancer script (in milliseconds)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">300000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.loadBalancers.script.source</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The location of the script the load balancer should load to evaluate which cluster to use for a job request</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file:///tmp/genie/loadBalancers/script/source/loadBalance.js" class="bare">file:///tmp/genie/loadBalancers/script/source/loadBalance.js</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.loadBalancers.script.timeout</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The amount of time (in milliseconds) that the system will attempt to run the cluster load balancer script before it
+forces a timeout</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5000</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect4">
+<h5 id="_script_contract"><a class="anchor" href="#_script_contract"></a>4.1.2.2. Script Contract</h5>
+<div class="paragraph">
+<p>The contract between the script and the Java code is as follows:</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Table 1. Script Inputs</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">clusters</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Non-empty JSON array of cluster objects (serialized as a string) of the clusters to be evaluated</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jobRequest</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JSON object (serialized as a string) of the job request that kicked off this evaluation</p></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Table 2. Script Output</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Result</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The id of the cluster selected by the script algorithm that should be used to run the job</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">null</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No cluster was selected and the evaluation should fall back to another cluster load balancing algorithm</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>For most of the script engines the last statement will be the return value.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_script_examples"><a class="anchor" href="#_script_examples"></a>4.1.2.3. Script Examples</h5>
+<div class="paragraph">
+<p>Some simple script examples</p>
+</div>
+<div class="sect5">
+<h6 id="_javascript"><a class="anchor" href="#_javascript"></a>4.1.2.3.1. Javascript</h6>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-javascript" data-lang="javascript">var cJson = JSON.parse(clusters);
+var jJson = JSON.parse(jobRequest);
+
+var index;
+for (index = 0; index &lt; cJson.length; index++) {
+    var cluster = cJson[index];
+    if (cluster.user === "h") {
+        break;
+    }
+}
+
+index &lt; cJson.length ? cJson[index].id : null;</code></pre>
+</div>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_groovy"><a class="anchor" href="#_groovy"></a>4.1.2.3.2. Groovy</h6>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-groovy" data-lang="groovy">import groovy.json.JsonSlurper
+
+def jsonSlurper = new JsonSlurper()
+def cJson = jsonSlurper.parseText(clusters)
+def jJson = jsonSlurper.parseText(jobRequest)
+
+def index = cJson.findIndexOf {
+    cluster -&gt; cluster.user == "h"
+}
+
+index == -1 ? null : cJson[index].id</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_caveats_2"><a class="anchor" href="#_caveats_2"></a>4.1.2.4. Caveats</h5>
+<div class="paragraph">
+<p>The script load balancer provides great flexibility for system administrators to test algorithms for cluster load
+balancing at runtime. Since the script is refreshed periodically it can even be changed after Genie is running. With
+this flexibility comes the trade off that script evaluation is going to be slower than code running direct JVM byte
+code. The load balancer tries to offset this by compiling and caching the script code in between refresh invocations. It
+is recommended that once an algorithm is well tested it be converted to a true implementation of the
+<code>ClusterLoadBalancer</code> interface if performance is desired.</p>
+</div>
+<div class="paragraph">
+<p>Additionally if a script error is made the <code>ScriptLoadBalancer</code> will swallow the exceptions and simply return <code>null</code>
+from all calls to <code>selectCluster</code> until the script is fixed and <code>refresh</code> is invoked again. The metric
+<code>genie.jobs.clusters.loadBalancers.script.select.timer</code> with tag <code>status</code> and value <code>failed</code> can be used to monitor
+this situation.</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_wrap_up_6"><a class="anchor" href="#_wrap_up_6"></a>4.1.3. Wrap Up</h4>
+<div class="paragraph">
+<p>This section went over the cluster load balancing feature of Genie. This interface provides an extension point for
+administrators of Genie to tweak Genie&#8217;s runtime behavior to suit their needs.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_installation"><a class="anchor" href="#_installation"></a>5. Installation</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Installing Genie is easy. You can run Genie either as a standalone application with an embedded Tomcat or by deploying
@@ -3478,7 +3786,7 @@ the WAR file to an existing Tomcat or other servlet container. There are trade-o
 discussed below.</p>
 </div>
 <div class="sect2">
-<h3 id="_standalone_jar"><a class="anchor" href="#_standalone_jar"></a>4.1. Standalone Jar</h3>
+<h3 id="_standalone_jar"><a class="anchor" href="#_standalone_jar"></a>5.1. Standalone Jar</h3>
 <div class="paragraph">
 <p>The
 <a href="http://oss.jfrog.org/libs-snapshot/com/netflix/genie/genie-app/3.1.0-SNAPSHOT/">standalone jar</a>
@@ -3533,7 +3841,7 @@ documentation on external configuration.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_tomcat_deployment"><a class="anchor" href="#_tomcat_deployment"></a>4.2. Tomcat Deployment</h3>
+<h3 id="_tomcat_deployment"><a class="anchor" href="#_tomcat_deployment"></a>5.2. Tomcat Deployment</h3>
 <div class="paragraph">
 <p>The WAR deployment requires the
 <a href="http://oss.jfrog.org/libs-snapshot/com/netflix/genie/genie-war/3.1.0-SNAPSHOT/">WAR file</a>
@@ -3552,7 +3860,7 @@ Genie and it may be more overhead than you&#8217;re comfortable with.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_configuration_2"><a class="anchor" href="#_configuration_2"></a>4.3. Configuration</h3>
+<h3 id="_configuration_3"><a class="anchor" href="#_configuration_3"></a>5.3. Configuration</h3>
 <div class="paragraph">
 <p>Genie has a lot of available configuration options. For descriptions of specific properties you can see the
 <a href="#_properties">Properties</a> section below. Additionally if you want to know how to configure more parts of the application you
@@ -3560,7 +3868,7 @@ should have a look at the <a href="http://docs.spring.io/spring-boot/docs/1.5.4.
 as they will go in depth on how to configure the various Spring components used in Genie.</p>
 </div>
 <div class="sect3">
-<h4 id="_profiles"><a class="anchor" href="#_profiles"></a>4.3.1. Profiles</h4>
+<h4 id="_profiles"><a class="anchor" href="#_profiles"></a>5.3.1. Profiles</h4>
 <div class="paragraph">
 <p>Spring provides a mechanism of segregating parts of application configuration and activating them in certain
 conditions. This mechanism is known as
@@ -3577,7 +3885,7 @@ seen in the <a href="#_properties">Properties</a> section below.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_database"><a class="anchor" href="#_database"></a>4.3.2. Database</h4>
+<h4 id="_database"><a class="anchor" href="#_database"></a>5.3.2. Database</h4>
 <div class="paragraph">
 <p>By default since Genie will launch with the <code>dev</code> profile active it will launch with an in memory database running as
 part of its process. This means when you shut Genie down all data will be lost. It is meant for development only. Genie
@@ -3611,7 +3919,7 @@ scratch if you can. See the source code for the migration scripts if you want to
 </table>
 </div>
 <div class="sect4">
-<h5 id="_mysql"><a class="anchor" href="#_mysql"></a>4.3.2.1. MySQL</h5>
+<h5 id="_mysql"><a class="anchor" href="#_mysql"></a>5.3.2.1. MySQL</h5>
 <div class="admonitionblock note">
 <table>
 <tr>
@@ -3637,7 +3945,7 @@ mysql -u {username} -p{password} -h {host} genie &lt; 3.0.0-schema.mysql.sql</co
 </div>
 </div>
 <div class="sect4">
-<h5 id="_postgresql"><a class="anchor" href="#_postgresql"></a>4.3.2.2. PostgreSQL</h5>
+<h5 id="_postgresql"><a class="anchor" href="#_postgresql"></a>5.3.2.2. PostgreSQL</h5>
 <div class="admonitionblock note">
 <table>
 <tr>
@@ -3664,14 +3972,14 @@ psql -U {user} -h {host} -d genie -f 3.0.0-schema.postgresql.sql</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_local_directories"><a class="anchor" href="#_local_directories"></a>4.3.3. Local Directories</h4>
+<h4 id="_local_directories"><a class="anchor" href="#_local_directories"></a>5.3.3. Local Directories</h4>
 <div class="paragraph">
 <p>Genie requires a few directories to run. By default Genie will place them under <code>/tmp</code> however in production you should
 probably create a larger directory you can store the job working directories and other places in. These correspond to
 the <code>genie.jobs.locations.*</code> properties described below in the <a href="#_properties">Properties</a> section.</p>
 </div>
 <div class="sect4">
-<h5 id="_s3"><a class="anchor" href="#_s3"></a>4.3.3.1. S3</h5>
+<h5 id="_s3"><a class="anchor" href="#_s3"></a>5.3.3.1. S3</h5>
 <div class="paragraph">
 <p>If your commands, applications, or jobs depend on artifacts referenced via S3 URI, you will need to configure the S3 subsystem.</p>
 </div>
@@ -3719,7 +4027,7 @@ the <code>genie.jobs.locations.*</code> properties described below in the <a hre
 </div>
 </div>
 <div class="sect2">
-<h3 id="_wrap_up_6"><a class="anchor" href="#_wrap_up_6"></a>4.4. Wrap Up</h3>
+<h3 id="_wrap_up_7"><a class="anchor" href="#_wrap_up_7"></a>5.4. Wrap Up</h3>
 <div class="paragraph">
 <p>This section contains the basic setup instructions for Genie. There are other components that can be added to the
 system like Redis, Zookeeper and Security systems that are somewhat outside the scope of an initial setup. You can see
@@ -3729,7 +4037,7 @@ the <a href="#_properties">Properties</a> section below for the properties you&#
 </div>
 </div>
 <div class="sect1">
-<h2 id="_properties"><a class="anchor" href="#_properties"></a>5. Properties</h2>
+<h2 id="_properties"><a class="anchor" href="#_properties"></a>6. Properties</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>This section describes the various properties that can be set to control the behavior of your Genie node and cluster.
@@ -3739,9 +4047,9 @@ and the <a href="http://cloud.spring.io/spring-cloud-static/Dalston.SR1/">Spring
 The Spring properties described here are ones that we have overridden from Spring defaults.</p>
 </div>
 <div class="sect2">
-<h3 id="_default_properties"><a class="anchor" href="#_default_properties"></a>5.1. Default Properties</h3>
+<h3 id="_default_properties"><a class="anchor" href="#_default_properties"></a>6.1. Default Properties</h3>
 <div class="sect3">
-<h4 id="_genie_properties"><a class="anchor" href="#_genie_properties"></a>5.1.1. Genie Properties</h4>
+<h4 id="_genie_properties"><a class="anchor" href="#_genie_properties"></a>6.1.1. Genie Properties</h4>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 33%;">
@@ -3794,6 +4102,35 @@ Health of the system is marked unhealthy if the CPU load of a system goes beyond
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.cleanup.deleteDependencies</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether or not to delete the dependencies directories for applications to save disk space after job completion</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.loadBalancers.script.destination</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The location on disk where the script source file should be stored after it is downloaded from
+<code>genie.jobs.clusters.loadBalancers.script.source</code>. The file will be given the same name.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file:///tmp/genie/loadbalancers/script/destination/" class="bare">file:///tmp/genie/loadbalancers/script/destination/</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.loadBalancers.script.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether the script based load balancer should be enabled for the system or not.
+See also: <code>genie.jobs.clusters.loadBalancers.script.source</code>
+See also: <code>genie.jobs.clusters.loadBalancers.script.destination</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.loadBalancers.script.refreshRate</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">How frequently to refresh the load balancer script (in milliseconds)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">300000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.loadBalancers.script.source</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The location of the script the load balancer should load to evaluate which cluster to use for a job request</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file:///tmp/genie/loadBalancers/script/source/loadBalance.js" class="bare">file:///tmp/genie/loadBalancers/script/source/loadBalance.js</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.loadBalancers.script.timeout</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The amount of time (in milliseconds) that the system will attempt to run the cluster load balancer script before it
+forces a timeout</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5000</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.forwarding.enabled</p></td>
@@ -4118,7 +4455,7 @@ to the number of CPU cores x 2 + 1</p></td>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_spring_properties"><a class="anchor" href="#_spring_properties"></a>5.1.2. Spring Properties</h4>
+<h4 id="_spring_properties"><a class="anchor" href="#_spring_properties"></a>6.1.2. Spring Properties</h4>
 <div class="paragraph">
 <p><a href="http://docs.spring.io/spring-boot/docs/1.5.4.RELEASE/reference/htmlsingle/#common-application-properties">Spring Properties</a></p>
 </div>
@@ -4274,9 +4611,9 @@ for more information. Currently on classpath only none, hash_map, redis and jdbc
 </div>
 </div>
 <div class="sect2">
-<h3 id="_profile_specific_properties"><a class="anchor" href="#_profile_specific_properties"></a>5.2. Profile Specific Properties</h3>
+<h3 id="_profile_specific_properties"><a class="anchor" href="#_profile_specific_properties"></a>6.2. Profile Specific Properties</h3>
 <div class="sect3">
-<h4 id="_dev_profile"><a class="anchor" href="#_dev_profile"></a>5.2.1. Dev Profile</h4>
+<h4 id="_dev_profile"><a class="anchor" href="#_dev_profile"></a>6.2.1. Dev Profile</h4>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 33%;">
@@ -4321,7 +4658,7 @@ an embedded database, "none" otherwise.</p></td>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_prod_profile"><a class="anchor" href="#_prod_profile"></a>5.2.2. Prod Profile</h4>
+<h4 id="_prod_profile"><a class="anchor" href="#_prod_profile"></a>6.2.2. Prod Profile</h4>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 33%;">
@@ -4405,7 +4742,7 @@ an embedded database, "none" otherwise.</p></td>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_s3_profile"><a class="anchor" href="#_s3_profile"></a>5.2.3. S3 Profile</h4>
+<h4 id="_s3_profile"><a class="anchor" href="#_s3_profile"></a>6.2.3. S3 Profile</h4>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 33%;">
@@ -4440,7 +4777,7 @@ an embedded database, "none" otherwise.</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 3.1.0-SNAPSHOT<br>
-Last updated 2017-07-05 19:45:32 +00:00
+Last updated 2017-07-11 17:16:14 +00:00
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
