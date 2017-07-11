@@ -52,6 +52,7 @@ import com.netflix.spectator.api.Timer;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.aop.TargetClassAware;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -360,7 +361,12 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                 cluster = clusters.get(0);
             } else {
                 for (final ClusterLoadBalancer loadBalancer : this.clusterLoadBalancers) {
-                    final String loadBalancerClass = loadBalancer.getClass().getCanonicalName();
+                    final String loadBalancerClass =
+                        (
+                            loadBalancer instanceof TargetClassAware
+                                ? ((TargetClassAware) loadBalancer).getTargetClass()
+                                : loadBalancer.getClass()
+                        ).getCanonicalName();
                     try {
                         final Cluster selectedCluster = loadBalancer.selectCluster(clusters, jobRequest);
                         if (selectedCluster != null) {
