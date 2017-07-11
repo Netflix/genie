@@ -20,11 +20,13 @@ package com.netflix.genie.core.services.impl;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.services.ClusterLoadBalancer;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.core.Ordered;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Random;
 
@@ -41,14 +43,11 @@ public class RandomizedClusterLoadBalancerImpl implements ClusterLoadBalancer {
      * {@inheritDoc}
      */
     @Override
-    public Cluster selectCluster(final List<Cluster> clusters, final JobRequest jobRequest) throws GenieException {
+    public Cluster selectCluster(
+        @Nonnull @NonNull @NotEmpty final List<Cluster> clusters,
+        @Nonnull @NonNull final JobRequest jobRequest
+    ) throws GenieException {
         log.debug("called");
-
-        if (clusters == null || clusters.isEmpty()) {
-            final String msg = "No cluster configuration found for supplied cluster criteria";
-            log.error(msg);
-            throw new GeniePreconditionException(msg);
-        }
 
         // return a random one
         final Random rand = new Random();

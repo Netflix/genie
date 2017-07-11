@@ -20,9 +20,12 @@ package com.netflix.genie.core.services;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
+import lombok.NonNull;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.core.Ordered;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
@@ -31,9 +34,18 @@ import java.util.List;
  * run job on from an array of candidates.
  *
  * @author tgianos
+ * @since 2.0.0
  */
 @Validated
 public interface ClusterLoadBalancer extends Ordered {
+
+    /**
+     * The default order to apply to any implementation that doesn't explicitly set one.
+     *
+     * @see org.springframework.core.Ordered
+     * @see org.springframework.core.OrderComparator
+     */
+    int DEFAULT_ORDER = Ordered.LOWEST_PRECEDENCE - 1;
 
     /**
      * Return best cluster to run job on.
@@ -44,5 +56,16 @@ public interface ClusterLoadBalancer extends Ordered {
      * @throws GenieException if there is any error
      */
     @Nullable
-    Cluster selectCluster(final List<Cluster> clusters, final JobRequest jobRequest) throws GenieException;
+    Cluster selectCluster(
+        @Nonnull @NonNull @NotEmpty final List<Cluster> clusters,
+        @Nonnull @NonNull final JobRequest jobRequest
+    ) throws GenieException;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    default int getOrder() {
+        return DEFAULT_ORDER;
+    }
 }

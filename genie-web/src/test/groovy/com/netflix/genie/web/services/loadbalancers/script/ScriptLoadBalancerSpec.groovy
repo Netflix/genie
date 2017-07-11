@@ -27,6 +27,7 @@ import com.netflix.genie.common.dto.ClusterCriteria
 import com.netflix.genie.common.dto.ClusterStatus
 import com.netflix.genie.common.dto.JobRequest
 import com.netflix.genie.common.util.GenieDateFormat
+import com.netflix.genie.core.services.ClusterLoadBalancer
 import com.netflix.genie.core.services.impl.GenieFileTransferService
 import com.netflix.genie.test.categories.UnitTest
 import com.netflix.spectator.api.Id
@@ -34,7 +35,6 @@ import com.netflix.spectator.api.Registry
 import com.netflix.spectator.api.Timer
 import org.apache.commons.lang.StringUtils
 import org.junit.experimental.categories.Category
-import org.springframework.core.Ordered
 import org.springframework.core.env.Environment
 import org.springframework.core.task.AsyncTaskExecutor
 import org.springframework.scheduling.TaskScheduler
@@ -98,29 +98,48 @@ class ScriptLoadBalancerSpec extends Specification {
         this.executor.shutdown()
     }
 
-    def "Order should be before lowest precedence"() {
+    @Unroll
+    def "Order should be #order"() {
         def loadBalancer = new ScriptLoadBalancer(
                 Mock(AsyncTaskExecutor),
                 Mock(TaskScheduler) {
                     1 * scheduleWithFixedDelay(_ as Runnable, 300_000L)
                 },
                 Mock(GenieFileTransferService),
-                Mock(Environment) {
-                    1 * getProperty(
-                            ScriptLoadBalancer.SCRIPT_REFRESH_RATE_PROPERTY_KEY,
-                            Long.class,
-                            300_000L
-                    ) >> 300_000L
-                },
+                environment,
                 Mock(ObjectMapper),
                 Mock(Registry)
         )
 
-        when:
-        def order = loadBalancer.getOrder()
+        expect:
+        loadBalancer.getOrder() == order
 
-        then:
-        order == Ordered.LOWEST_PRECEDENCE - 1
+        where:
+        environment | order
+        Mock(Environment) {
+            1 * getProperty(
+                    ScriptLoadBalancer.SCRIPT_REFRESH_RATE_PROPERTY_KEY,
+                    Long.class,
+                    300_000L
+            ) >> 300_000L
+            1 * getProperty(
+                    ScriptLoadBalancer.SCRIPT_LOAD_BALANCER_ORDER_PROPERTY_KEY,
+                    Integer.class,
+                    ClusterLoadBalancer.DEFAULT_ORDER
+            ) >> ClusterLoadBalancer.DEFAULT_ORDER
+        }           | ClusterLoadBalancer.DEFAULT_ORDER
+        Mock(Environment) {
+            1 * getProperty(
+                    ScriptLoadBalancer.SCRIPT_REFRESH_RATE_PROPERTY_KEY,
+                    Long.class,
+                    300_000L
+            ) >> 300_000L
+            1 * getProperty(
+                    ScriptLoadBalancer.SCRIPT_LOAD_BALANCER_ORDER_PROPERTY_KEY,
+                    Integer.class,
+                    _ as Integer
+            ) >> 3
+        }           | 3
     }
 
     @Unroll
@@ -151,6 +170,11 @@ class ScriptLoadBalancerSpec extends Specification {
                 Long.class,
                 300_000L
         ) >> 300_000L
+        1 * environment.getProperty(
+                ScriptLoadBalancer.SCRIPT_LOAD_BALANCER_ORDER_PROPERTY_KEY,
+                Integer.class,
+                _ as Integer
+        ) >> 3
         1 * scheduler.scheduleWithFixedDelay(_ as Runnable, 300_000L)
 
         when: "Try to select after before update"

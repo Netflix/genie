@@ -21,15 +21,13 @@ import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.test.categories.UnitTest;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
-
-import java.util.ArrayList;
+import org.springframework.core.Ordered;
 
 /**
  * Test for the cluster load balancer.
@@ -55,7 +53,7 @@ public class RandomizedClusterLoadBalancerImplUnitTests {
      * @throws GenieException For any problem if anything went wrong with the test.
      */
     @Test
-    public void testValidCluster() throws GenieException {
+    public void testValidClusterList() throws GenieException {
         final Cluster cluster1 = Mockito.mock(Cluster.class);
         final Cluster cluster2 = Mockito.mock(Cluster.class);
         final Cluster cluster3 = Mockito.mock(Cluster.class);
@@ -68,22 +66,28 @@ public class RandomizedClusterLoadBalancerImplUnitTests {
     }
 
     /**
-     * Ensure exception is thrown if no cluster is found.
+     * Test whether a cluster is returned from a set of candidates.
      *
-     * @throws GenieException For any problem
+     * @throws GenieException For any problem if anything went wrong with the test.
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void testEmptyList() throws GenieException {
-        this.clb.selectCluster(new ArrayList<>(), Mockito.mock(JobRequest.class));
+    @Test
+    public void testValidClusterListOfOne() throws GenieException {
+        final Cluster cluster1 = Mockito.mock(Cluster.class);
+        Assert.assertEquals(
+            cluster1,
+            this.clb.selectCluster(
+                Lists.newArrayList(cluster1),
+                Mockito.mock(JobRequest.class)
+            )
+        );
     }
 
     /**
-     * Ensure exception is thrown if no cluster is found.
-     *
-     * @throws GenieException For any problem
+     * Make sure the order for the RandomizedLoadBalancer is the lowest precedence as the fallback for all other
+     * options.
      */
-    @Test(expected = GeniePreconditionException.class)
-    public void testNullList() throws GenieException {
-        this.clb.selectCluster(null, Mockito.mock(JobRequest.class));
+    @Test
+    public void testOrderIsLowestPrecedence() {
+        Assert.assertEquals(this.clb.getOrder(), Ordered.LOWEST_PRECEDENCE);
     }
 }
