@@ -161,6 +161,15 @@ public class JobRequestEntityUnitTests {
     }
 
     /**
+     * Make sure the setter for the entity class works for JPA for null cluster criterias.
+     */
+    @Test
+    public void canSetNullClusterCriterias() {
+        this.entity.setClusterCriterias(null);
+        Assert.assertThat(this.entity.getClusterCriterias(), Matchers.is(EMPTY_JSON_ARRAY));
+    }
+
+    /**
      * Make sure can set the command args for the job.
      */
     @Test
@@ -262,6 +271,15 @@ public class JobRequestEntityUnitTests {
         final String commandCriteria = UUID.randomUUID().toString();
         this.entity.setCommandCriteria(commandCriteria);
         Assert.assertThat(this.entity.getCommandCriteria(), Matchers.is(commandCriteria));
+    }
+
+    /**
+     * Make sure the setter for the entity class works for JPA for null command criteria.
+     */
+    @Test
+    public void canSetNullCommandCriteria() {
+        this.entity.setCommandCriteria(null);
+        Assert.assertThat(this.entity.getCommandCriteria(), Matchers.is(EMPTY_JSON_ARRAY));
     }
 
     /**

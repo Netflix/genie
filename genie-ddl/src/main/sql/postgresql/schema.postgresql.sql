@@ -221,8 +221,8 @@ CREATE TABLE job_requests (
     command_args character varying(10000) NOT NULL,
     group_name character varying(255) DEFAULT NULL::character varying,
     setup_file character varying(1024) DEFAULT NULL::character varying,
-    cluster_criterias character varying(2048) DEFAULT '[]'::character varying NOT NULL,
-    command_criteria character varying(1024) DEFAULT '[]'::character varying NOT NULL,
+    cluster_criterias text DEFAULT ''::character varying NOT NULL,
+    command_criteria text DEFAULT ''::character varying NOT NULL,
     dependencies character varying(30000) DEFAULT NULL::character varying NOT NULL,
     disable_log_archival boolean DEFAULT false NOT NULL,
     email character varying(255) DEFAULT NULL::character varying,
@@ -600,4 +600,3 @@ ALTER TABLE ONLY jobs
 --
 -- PostgreSQL database dump complete
 --
-
