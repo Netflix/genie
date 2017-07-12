@@ -25,17 +25,19 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.services.ClusterLoadBalancer;
 import com.netflix.genie.core.services.impl.GenieFileTransferService;
 import com.netflix.spectator.api.Registry;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.core.Ordered;
 import org.springframework.core.env.Environment;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Nonnull;
 import javax.script.Bindings;
 import javax.script.Compilable;
 import javax.script.CompiledScript;
@@ -78,6 +80,8 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
         = "genie.jobs.clusters.loadBalancers.script.destination";
     static final String SCRIPT_REFRESH_RATE_PROPERTY_KEY
         = "genie.jobs.clusters.loadBalancers.script.refreshRate";
+    static final String SCRIPT_LOAD_BALANCER_ORDER_PROPERTY_KEY
+        = "genie.jobs.clusters.loadBalancers.script.order";
     static final String SELECT_TIMER_NAME = "genie.jobs.clusters.loadBalancers.script.select.timer";
     static final String UPDATE_TIMER_NAME = "genie.jobs.clusters.loadBalancers.script.update.timer";
     static final String STATUS_TAG_KEY = "status";
@@ -92,7 +96,6 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
     private static final Charset UTF_8 = Charset.forName("UTF-8");
     private static final String SLASH = "/";
     private static final String PERIOD = ".";
-    private static final int ORDER = Ordered.LOWEST_PRECEDENCE - 1;
     private static final String CLUSTERS_BINDING = "clusters";
     private static final String JOB_REQUEST_BINDING = "jobRequest";
 
@@ -105,6 +108,7 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
     private final Environment environment;
     private final ObjectMapper mapper;
     private final Registry registry;
+    private final int order;
 
     private final AtomicReference<CompiledScript> script = new AtomicReference<>(null);
     private final AtomicLong timeoutLength = new AtomicLong(DEFAULT_TIMEOUT_LENGTH);
@@ -134,6 +138,12 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
         this.mapper = mapper;
         this.registry = registry;
 
+        this.order = this.environment.getProperty(
+            SCRIPT_LOAD_BALANCER_ORDER_PROPERTY_KEY,
+            Integer.class,
+            ClusterLoadBalancer.DEFAULT_ORDER
+        );
+
         // Schedule the task to run with the configured refresh rate
         // Task will be stopped when the system stops
         final long refreshRate = this.environment.getProperty(
@@ -148,8 +158,12 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
      * {@inheritDoc}
      */
     @Override
-    public Cluster selectCluster(final List<Cluster> clusters, final JobRequest jobRequest) throws GenieException {
+    public Cluster selectCluster(
+        @Nonnull @NonNull @NotEmpty final List<Cluster> clusters,
+        @Nonnull @NonNull final JobRequest jobRequest
+    ) throws GenieException {
         final long selectStart = System.nanoTime();
+        log.debug("Called");
         final Map<String, String> tags = Maps.newHashMap();
         try {
             if (this.isConfigured.get() && this.script != null && this.script.get() != null) {
@@ -196,7 +210,7 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
      */
     @Override
     public int getOrder() {
-        return ORDER;
+        return this.order;
     }
 
     /**

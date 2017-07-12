@@ -378,6 +378,9 @@ public class ServicesConfigTest {
         final Registry registry,
         final String hostName
     ) {
+        if (clusterLoadBalancers.isEmpty()) {
+            throw new IllegalStateException("Must have at least one active implementation of ClusterLoadBalancer");
+        }
         return new JobCoordinatorServiceImpl(
             jobPersistenceService,
             jobKillService,

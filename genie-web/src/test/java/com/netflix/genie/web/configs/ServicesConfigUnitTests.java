@@ -246,6 +246,28 @@ public class ServicesConfigUnitTests {
     }
 
     /**
+     * Can't get a bean for Job Coordinator Service.
+     */
+    @Test(expected = IllegalStateException.class)
+    public void cantGetJobCoordinatorServiceBeanWhenNoClusterLoadBalancers() {
+        Assert.assertNotNull(
+            this.servicesConfig.jobCoordinatorService(
+                Mockito.mock(JobPersistenceService.class),
+                Mockito.mock(JobKillService.class),
+                Mockito.mock(JobStateService.class),
+                Mockito.mock(JobSearchService.class),
+                new JobsProperties(),
+                Mockito.mock(ApplicationService.class),
+                Mockito.mock(ClusterService.class),
+                Mockito.mock(CommandService.class),
+                Lists.newArrayList(),
+                Mockito.mock(Registry.class),
+                UUID.randomUUID().toString()
+            )
+        );
+    }
+
+    /**
      * Can get a bean for Job Kill Service.
      */
     @Test
