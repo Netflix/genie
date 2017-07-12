@@ -24,7 +24,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.util.JsonUtils;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.validator.constraints.NotBlank;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.Basic;
@@ -159,8 +159,8 @@ public class JobRequestEntity extends SetupFileEntity {
      *
      * @param clusterCriterias The cluster criterias.
      */
-    protected void setClusterCriterias(@NotBlank final String clusterCriterias) {
-        this.clusterCriterias = clusterCriterias;
+    protected void setClusterCriterias(final String clusterCriterias) {
+        this.clusterCriterias = StringUtils.isBlank(clusterCriterias) ? EMPTY_JSON_ARRAY : clusterCriterias;
     }
 
     /**
@@ -246,7 +246,7 @@ public class JobRequestEntity extends SetupFileEntity {
      * @param commandCriteria A set of command criteria tags as a JSON array
      */
     protected void setCommandCriteria(final String commandCriteria) {
-        this.commandCriteria = commandCriteria;
+        this.commandCriteria = StringUtils.isBlank(commandCriteria) ? EMPTY_JSON_ARRAY : commandCriteria;
     }
 
     /**
