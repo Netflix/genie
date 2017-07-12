@@ -31,6 +31,7 @@ import com.netflix.spectator.api.Registry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -60,6 +61,7 @@ public class GenieExceptionMapper {
     private final Counter timeoutRate;
     private final Counter genieRate;
     private final Counter constraintViolationRate;
+    private final Counter methodArgumentNotValidRate;
 
     /**
      * Constructor.
@@ -77,6 +79,8 @@ public class GenieExceptionMapper {
         this.timeoutRate = registry.counter(MetricsConstants.GENIE_EXCEPTIONS_TIMEOUT_RATE);
         this.genieRate = registry.counter(MetricsConstants.GENIE_EXCEPTIONS_OTHER_RATE);
         this.constraintViolationRate = registry.counter(MetricsConstants.GENIE_EXCEPTIONS_CONSTRAINT_VIOLATION_RATE);
+        this.methodArgumentNotValidRate
+            = registry.counter(MetricsConstants.GENIE_EXCEPTIONS_METHOD_ARGUMENT_NOT_VALID_RATE);
     }
 
     /**
@@ -136,5 +140,22 @@ public class GenieExceptionMapper {
         this.constraintViolationRate.increment();
         log.error(cve.getLocalizedMessage(), cve);
         response.sendError(HttpStatus.PRECONDITION_FAILED.value(), builder.toString());
+    }
+
+    /**
+     * Handle MethodArgumentNotValid  exceptions.
+     *
+     * @param response The HTTP response
+     * @param e        The exception to handle
+     * @throws IOException on error in sending error
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public void handleMethodArgumentNotValidException(
+        final HttpServletResponse response,
+        final MethodArgumentNotValidException e
+    ) throws IOException {
+        this.methodArgumentNotValidRate.increment();
+        log.error(e.getMessage(), e);
+        response.sendError(HttpStatus.PRECONDITION_FAILED.value(), e.getMessage());
     }
 }

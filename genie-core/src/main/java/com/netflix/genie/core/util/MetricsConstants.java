@@ -71,6 +71,12 @@ public final class MetricsConstants {
     public static final String GENIE_EXCEPTIONS_CONSTRAINT_VIOLATION_RATE = "genie.exceptions.constraintViolation.rate";
 
     /**
+     * For counting how often method argument not valid exceptions happen in the system.
+     */
+    public static final String GENIE_EXCEPTIONS_METHOD_ARGUMENT_NOT_VALID_RATE
+        = "genie.exceptions.methodArgumentNotValid.rate";
+
+    /**
      * Utility class protected constructor.
      */
     protected MetricsConstants() {

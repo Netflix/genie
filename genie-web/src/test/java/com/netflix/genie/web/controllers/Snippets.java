@@ -683,13 +683,16 @@ final class Snippets {
                 .fieldWithPath("clusterCriterias")
                 .attributes(getConstraintsForField(JOB_REQUEST_CONSTRAINTS, "clusterCriterias"))
                 .description(
-                    "List of cluster criteria's for which a match will be attempted with register cluster tags"
+                    "List of cluster criteria's for which a match will be attempted with register cluster tags."
+                        + " Each set of tags within a given cluster criteria must have at least one non-blank "
+                        + "(e.g. ' ', '    ', null) tag."
                 ),
             PayloadDocumentation
                 .fieldWithPath("commandCriteria")
                 .attributes(getConstraintsForField(JOB_REQUEST_CONSTRAINTS, "commandCriteria"))
                 .description(
-                    "List of tags which will attempt to match against the commands linked to selected cluster"
+                    "Set of tags which will attempt to match against the commands linked to selected cluster."
+                     + " There must be at least one non-blank (e.g. ' ', '   ', null) criteria within the set"
                 ),
             PayloadDocumentation
                 .fieldWithPath("group")
