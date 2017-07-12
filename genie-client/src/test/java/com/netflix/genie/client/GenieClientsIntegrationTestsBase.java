@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.client;
 
+import com.google.common.collect.Sets;
 import com.netflix.genie.GenieWeb;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
@@ -33,7 +34,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -76,13 +76,11 @@ public abstract class GenieClientsIntegrationTestsBase {
             clusterId = id;
         }
 
-        final Set<String> tags = new HashSet<>();
-        tags.add("foo");
-        tags.add("bar");
+        final Set<String> tags = Sets.newHashSet("foo", "bar");
 
-        final Set<String> configList = new HashSet<>();
-        configList.add("config1");
-        configList.add("configs2");
+        final Set<String> configList = Sets.newHashSet("config1", "configs2");
+
+        final Set<String> dependenciesList = Sets.newHashSet("cluster-dep1", "cluster-dep2");
 
         return new Cluster.Builder("name", "user", "1.0", ClusterStatus.UP)
             .withId(clusterId)
@@ -90,6 +88,7 @@ public abstract class GenieClientsIntegrationTestsBase {
             .withSetupFile("path to set up file")
             .withTags(tags)
             .withConfigs(configList)
+            .withDependencies(dependenciesList)
             .build();
     }
 
@@ -108,13 +107,8 @@ public abstract class GenieClientsIntegrationTestsBase {
             commandId = id;
         }
 
-        final Set<String> tags = new HashSet<>();
-        tags.add("foo");
-        tags.add("bar");
-
-        final Set<String> configList = new HashSet<>();
-        configList.add("config1");
-        configList.add("configs2");
+        final Set<String> tags = Sets.newHashSet("foo", "bar");
+        final Set<String> configList = Sets.newHashSet("config1", "configs2");
 
         return new Command.Builder("name", "user", "1.0", CommandStatus.ACTIVE, "exec", 1000)
             .withId(commandId)
@@ -140,17 +134,9 @@ public abstract class GenieClientsIntegrationTestsBase {
             applicationId = id;
         }
 
-        final Set<String> tags = new HashSet<>();
-        tags.add("foo");
-        tags.add("bar");
-
-        final Set<String> configList = new HashSet<>();
-        configList.add("config1");
-        configList.add("configs2");
-
-        final Set<String> dependenciesList = new HashSet<>();
-        dependenciesList.add("dep1");
-        dependenciesList.add("dep2");
+        final Set<String> tags = Sets.newHashSet("foo", "bar");
+        final Set<String> configList = Sets.newHashSet("config1", "configs2");
+        final Set<String> dependenciesList = Sets.newHashSet("dep1", "dep2");
 
         return new Application.Builder("name", "user", "1.0", ApplicationStatus.ACTIVE)
             .withId(applicationId)

@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.7.15, for osx10.11 (x86_64)
+-- MySQL dump 10.13  Distrib 5.7.17, for macos10.12 (x86_64)
 --
 -- Host: localhost    Database: genie
 -- ------------------------------------------------------
--- Server version	5.7.15
+-- Server version	5.6.35
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -14,6 +14,9 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+CREATE DATABASE  IF NOT EXISTS `genie`;
+USE `genie`;
 
 --
 -- Table structure for table `application_configs`
@@ -57,7 +60,7 @@ CREATE TABLE `applications` (
   `created` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `updated` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
   `name` varchar(255) NOT NULL,
-  `user` varchar(255) NOT NULL,
+  `genie_user` varchar(255) NOT NULL,
   `version` varchar(255) NOT NULL,
   `description` varchar(10000) DEFAULT NULL,
   `tags` varchar(2048) DEFAULT NULL,
@@ -89,6 +92,21 @@ CREATE TABLE `cluster_configs` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `cluster_dependencies`
+--
+
+DROP TABLE IF EXISTS `cluster_dependencies`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `cluster_dependencies` (
+  `cluster_id` varchar(255) NOT NULL,
+  `dependency` varchar(1024) NOT NULL,
+  KEY `cluster_id` (`cluster_id`),
+  CONSTRAINT `cluster_dependencies_ibfk_1` FOREIGN KEY (`cluster_id`) REFERENCES `clusters` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `clusters`
 --
 
@@ -100,7 +118,7 @@ CREATE TABLE `clusters` (
   `created` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `updated` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
   `name` varchar(255) NOT NULL,
-  `user` varchar(255) NOT NULL,
+  `genie_user` varchar(255) NOT NULL,
   `version` varchar(255) NOT NULL,
   `description` varchar(10000) DEFAULT NULL,
   `tags` varchar(2048) DEFAULT NULL,
@@ -159,7 +177,7 @@ CREATE TABLE `commands` (
   `created` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `updated` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
   `name` varchar(255) NOT NULL,
-  `user` varchar(255) NOT NULL,
+  `genie_user` varchar(255) NOT NULL,
   `version` varchar(255) NOT NULL,
   `description` varchar(10000) DEFAULT NULL,
   `tags` varchar(2048) DEFAULT NULL,
@@ -254,7 +272,7 @@ CREATE TABLE `job_requests` (
   `created` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `updated` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
   `name` varchar(255) NOT NULL,
-  `user` varchar(255) NOT NULL,
+  `genie_user` varchar(255) NOT NULL,
   `version` varchar(255) NOT NULL,
   `description` varchar(10000) DEFAULT NULL,
   `entity_version` int(11) NOT NULL DEFAULT '0',
@@ -288,7 +306,7 @@ CREATE TABLE `jobs` (
   `created` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
   `updated` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
   `name` varchar(255) NOT NULL,
-  `user` varchar(255) NOT NULL,
+  `genie_user` varchar(255) NOT NULL,
   `version` varchar(255) NOT NULL,
   `archive_location` varchar(1024) DEFAULT NULL,
   `command_args` varchar(10000) NOT NULL,
@@ -309,7 +327,7 @@ CREATE TABLE `jobs` (
   KEY `JOBS_STARTED_INDEX` (`started`),
   KEY `JOBS_FINISHED_INDEX` (`finished`),
   KEY `JOBS_STATUS_INDEX` (`status`),
-  KEY `JOBS_USER_INDEX` (`user`),
+  KEY `JOBS_USER_INDEX` (`genie_user`),
   KEY `JOBS_CREATED_INDEX` (`created`),
   KEY `JOBS_CLUSTER_NAME_INDEX` (`cluster_name`),
   KEY `JOBS_COMMAND_NAME_INDEX` (`command_name`),
@@ -347,4 +365,4 @@ CREATE TABLE `jobs_applications` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-10-04 10:52:41
+-- Dump completed on 2017-06-30 10:15:56

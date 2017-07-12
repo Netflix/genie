@@ -138,6 +138,8 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
             .andExpect(MockMvcResultMatchers.jsonPath(TAGS_PATH, Matchers.hasItem("genie.name:" + NAME)))
             .andExpect(MockMvcResultMatchers.jsonPath(SETUP_FILE_PATH, Matchers.nullValue()))
             .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(ClusterStatus.UP.toString())))
+            .andExpect(MockMvcResultMatchers.jsonPath(CONFIGS_PATH, Matchers.hasSize(0)))
+            .andExpect(MockMvcResultMatchers.jsonPath(DEPENDENCIES_PATH, Matchers.hasSize(0)))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH + ".*", Matchers.hasSize(2)))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(SELF_LINK_KEY)))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(COMMANDS_LINK_KEY)))
@@ -175,6 +177,8 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
             .andExpect(MockMvcResultMatchers.jsonPath(TAGS_PATH, Matchers.hasItem("genie.name:" + NAME)))
             .andExpect(MockMvcResultMatchers.jsonPath(SETUP_FILE_PATH, Matchers.nullValue()))
             .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(ClusterStatus.UP.toString())))
+            .andExpect(MockMvcResultMatchers.jsonPath(CONFIGS_PATH, Matchers.hasSize(0)))
+            .andExpect(MockMvcResultMatchers.jsonPath(DEPENDENCIES_PATH, Matchers.hasSize(0)))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH + ".*", Matchers.hasSize(2)))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(SELF_LINK_KEY)))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(COMMANDS_LINK_KEY)))
@@ -340,7 +344,8 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
             .withCreated(createdCluster.getCreated().orElseThrow(IllegalArgumentException::new))
             .withUpdated(createdCluster.getUpdated().orElseThrow(IllegalArgumentException::new))
             .withTags(createdCluster.getTags())
-            .withConfigs(createdCluster.getConfigs());
+            .withConfigs(createdCluster.getConfigs())
+            .withDependencies(createdCluster.getDependencies());
 
         createdCluster.getDescription().ifPresent(updateCluster::withDescription);
         createdCluster.getSetupFile().ifPresent(updateCluster::withSetupFile);
@@ -609,6 +614,75 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
             Snippets.ID_PATH_PARAM
         );
         this.canDeleteElementsFromResource(CLUSTERS_API + "/{id}/configs", ID, deleteResultHandler);
+    }
+
+    /**
+     * Test to make sure we can add dependencies to the cluster after it is created.
+     *
+     * @throws Exception on configuration problems
+     */
+    @Test
+    public void canAddDependenciesToCluster() throws Exception {
+        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
+        this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
+
+        final RestDocumentationResultHandler addResultHandler = MockMvcRestDocumentation.document(
+            "{class-name}/{method-name}/{step}/",
+            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            Snippets.ID_PATH_PARAM, // path params
+            Snippets.CONTENT_TYPE_HEADER, // request header
+            PayloadDocumentation.requestFields(Snippets.DEPENDENCIES_FIELDS) // response fields
+        );
+        final RestDocumentationResultHandler getResultHandler = MockMvcRestDocumentation.document(
+            "{class-name}/{method-name}/{step}/",
+            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            Snippets.ID_PATH_PARAM, // path params
+            Snippets.JSON_CONTENT_TYPE_HEADER, // response headers
+            PayloadDocumentation.responseFields(Snippets.DEPENDENCIES_FIELDS) // response fields
+        );
+        this.canAddElementsToResource(CLUSTERS_API + "/{id}/dependencies", ID, addResultHandler, getResultHandler);
+    }
+
+    /**
+     * Test to make sure we can update the dependencies for a cluster after it is created.
+     *
+     * @throws Exception on configuration problems
+     */
+    @Test
+    public void canUpdateDependenciesForCluster() throws Exception {
+        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
+        this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
+
+        final RestDocumentationResultHandler updateResultHandler = MockMvcRestDocumentation.document(
+            "{class-name}/{method-name}/{step}/",
+            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            Snippets.CONTENT_TYPE_HEADER, // Request header
+            Snippets.ID_PATH_PARAM, // Path parameters
+            PayloadDocumentation.requestFields(Snippets.DEPENDENCIES_FIELDS) // Request fields
+        );
+        this.canUpdateElementsForResource(CLUSTERS_API + "/{id}/configs", ID, updateResultHandler);
+    }
+
+    /**
+     * Test to make sure we can delete the dependencies for a cluster after it is created.
+     *
+     * @throws Exception on configuration problems
+     */
+    @Test
+    public void canDeleteDependenciesForCluster() throws Exception {
+        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
+        this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
+
+        final RestDocumentationResultHandler deleteResultHandler = MockMvcRestDocumentation.document(
+            "{class-name}/{method-name}/{step}/",
+            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            Snippets.ID_PATH_PARAM
+        );
+        this.canDeleteElementsFromResource(CLUSTERS_API + "/{id}/dependencies", ID, deleteResultHandler);
     }
 
     /**

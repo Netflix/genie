@@ -20,6 +20,7 @@ package com.netflix.genie.client;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.dto.Cluster;
@@ -34,7 +35,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -113,14 +113,8 @@ public class CommandClientIntegrationTests extends GenieClientsIntegrationTestsB
         final String command1Id = UUID.randomUUID().toString();
         final String command2Id = UUID.randomUUID().toString();
 
-        final Set<String> command1Tags = new HashSet<>();
-        command1Tags.add("foo");
-        command1Tags.add("pi");
-
-        final Set<String> command2Tags = new HashSet<>();
-        command2Tags.add("bar");
-        command2Tags.add("pi");
-
+        final Set<String> command1Tags = Sets.newHashSet("foo", "pi");
+        final Set<String> command2Tags = Sets.newHashSet("bar", "pi");
 
         final Command command1 = new Command.Builder(
             "command1name",
@@ -294,13 +288,8 @@ public class CommandClientIntegrationTests extends GenieClientsIntegrationTestsB
     @Test
     public void testCommandTagsMethods() throws Exception {
 
-        final Set<String> initialTags = new HashSet<>();
-        initialTags.add("foo");
-        initialTags.add("bar");
-
-        final Set<String> configList = new HashSet<>();
-        configList.add("config1");
-        configList.add("configs2");
+        final Set<String> initialTags = Sets.newHashSet("foo", "bar");
+        final Set<String> configList = Sets.newHashSet("config1", "configs2");
 
         final Command command = new Command.Builder("name", "user", "1.0", CommandStatus.ACTIVE, "exec", 1000)
             .withId("command1")
@@ -319,8 +308,7 @@ public class CommandClientIntegrationTests extends GenieClientsIntegrationTestsB
         Assert.assertEquals(tags.contains("bar"), true);
 
         // Test adding a tag for command
-        final Set<String> moreTags = new HashSet<>();
-        moreTags.add("pi");
+        final Set<String> moreTags = Sets.newHashSet("pi");
 
         commandClient.addTagsToCommand("command1", moreTags);
         tags = commandClient.getTagsForCommand("command1");
@@ -357,9 +345,7 @@ public class CommandClientIntegrationTests extends GenieClientsIntegrationTestsB
     @Test
     public void testCommandConfigsMethods() throws Exception {
 
-        final Set<String> initialConfigs = new HashSet<>();
-        initialConfigs.add("foo");
-        initialConfigs.add("bar");
+        final Set<String> initialConfigs = Sets.newHashSet("foo", "bar");
 
         final Command command = new Command.Builder("name", "user", "1.0", CommandStatus.ACTIVE, "exec", 1000)
             .withId("command1")
@@ -377,8 +363,7 @@ public class CommandClientIntegrationTests extends GenieClientsIntegrationTestsB
         Assert.assertEquals(configs.contains("bar"), true);
 
         // Test adding a config for command
-        final Set<String> moreConfigs = new HashSet<>();
-        moreConfigs.add("pi");
+        final Set<String> moreConfigs = Sets.newHashSet("pi");
 
         commandClient.addConfigsToCommand("command1", moreConfigs);
         configs = commandClient.getConfigsForCommand("command1");

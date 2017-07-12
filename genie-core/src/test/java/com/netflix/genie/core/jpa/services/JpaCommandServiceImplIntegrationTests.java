@@ -22,6 +22,7 @@ import com.github.fge.jsonpatch.JsonPatch;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseTearDown;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
@@ -48,7 +49,6 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -179,9 +179,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void testGetCommandsByStatuses() {
-        final Set<CommandStatus> statuses = new HashSet<>();
-        statuses.add(CommandStatus.INACTIVE);
-        statuses.add(CommandStatus.DEPRECATED);
+        final Set<CommandStatus> statuses = Sets.newHashSet(CommandStatus.INACTIVE, CommandStatus.DEPRECATED);
         final Page<Command> commands = this.service.getCommands(null, null, statuses, null, PAGE);
         Assert.assertEquals(2, commands.getNumberOfElements());
         Assert.assertEquals(
@@ -197,8 +195,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void testGetCommandsByTags() {
-        final Set<String> tags = new HashSet<>();
-        tags.add("prod");
+        final Set<String> tags = Sets.newHashSet("prod");
         Page<Command> commands = this.service.getCommands(null, null, null, tags, PAGE);
         Assert.assertEquals(3, commands.getNumberOfElements());
         Assert.assertEquals(
@@ -446,9 +443,8 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(CommandStatus.ACTIVE, command.getStatus());
         Assert.assertEquals(5, command.getTags().size());
         Assert.assertFalse(command.getMemory().isPresent());
-        final Set<String> tags = new HashSet<>(command.getTags());
-        tags.add("yarn");
-        tags.add("hadoop");
+        final Set<String> tags = Sets.newHashSet("yarn", "hadoop");
+        tags.addAll(command.getTags());
 
         final int memory = 1_024;
         final Command.Builder updateCommand = new Command.Builder(
@@ -663,10 +659,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         final String newConfig2 = UUID.randomUUID().toString();
         final String newConfig3 = UUID.randomUUID().toString();
 
-        final Set<String> newConfigs = new HashSet<>();
-        newConfigs.add(newConfig1);
-        newConfigs.add(newConfig2);
-        newConfigs.add(newConfig3);
+        final Set<String> newConfigs = Sets.newHashSet(newConfig1, newConfig2, newConfig3);
 
         Assert.assertEquals(2, this.service.getConfigsForCommand(COMMAND_1_ID).size());
         this.service.addConfigsForCommand(COMMAND_1_ID, newConfigs);
@@ -684,7 +677,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testAddConfigsToCommandNoId() throws GenieException {
-        this.service.addConfigsForCommand(null, new HashSet<>());
+        this.service.addConfigsForCommand(null, Sets.newHashSet());
     }
 
     /**
@@ -708,10 +701,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         final String newConfig2 = UUID.randomUUID().toString();
         final String newConfig3 = UUID.randomUUID().toString();
 
-        final Set<String> newConfigs = new HashSet<>();
-        newConfigs.add(newConfig1);
-        newConfigs.add(newConfig2);
-        newConfigs.add(newConfig3);
+        final Set<String> newConfigs = Sets.newHashSet(newConfig1, newConfig2, newConfig3);
 
         Assert.assertEquals(2, this.service.getConfigsForCommand(COMMAND_1_ID).size());
         this.service.updateConfigsForCommand(COMMAND_1_ID, newConfigs);
@@ -729,7 +719,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testUpdateConfigsForCommandNoId() throws GenieException {
-        this.service.updateConfigsForCommand(null, new HashSet<>());
+        this.service.updateConfigsForCommand(null, Sets.newHashSet());
     }
 
     /**
@@ -961,10 +951,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         final String newTag2 = UUID.randomUUID().toString();
         final String newTag3 = UUID.randomUUID().toString();
 
-        final Set<String> newTags = new HashSet<>();
-        newTags.add(newTag1);
-        newTags.add(newTag2);
-        newTags.add(newTag3);
+        final Set<String> newTags = Sets.newHashSet(newTag1, newTag2, newTag3);
 
         Assert.assertEquals(5, this.service.getTagsForCommand(COMMAND_1_ID).size());
         this.service.addTagsForCommand(COMMAND_1_ID, newTags);
@@ -982,7 +969,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testAddTagsToCommandNoId() throws GenieException {
-        this.service.addTagsForCommand(null, new HashSet<>());
+        this.service.addTagsForCommand(null, Sets.newHashSet());
     }
 
     /**
@@ -1006,10 +993,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         final String newTag2 = UUID.randomUUID().toString();
         final String newTag3 = UUID.randomUUID().toString();
 
-        final Set<String> newTags = new HashSet<>();
-        newTags.add(newTag1);
-        newTags.add(newTag2);
-        newTags.add(newTag3);
+        final Set<String> newTags = Sets.newHashSet(newTag1, newTag2, newTag3);
 
         Assert.assertEquals(5, this.service.getTagsForCommand(COMMAND_1_ID).size());
         this.service.updateTagsForCommand(COMMAND_1_ID, newTags);
@@ -1027,7 +1011,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testUpdateTagsForCommandNoId() throws GenieException {
-        this.service.updateTagsForCommand(null, new HashSet<>());
+        this.service.updateTagsForCommand(null, Sets.newHashSet());
     }
 
     /**

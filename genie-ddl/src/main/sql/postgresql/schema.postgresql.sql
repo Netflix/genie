@@ -2,8 +2,10 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.6.1
--- Dumped by pg_dump version 9.6.1
+-- Dumped from database version 9.6.3
+-- Dumped by pg_dump version 9.6.3
+
+-- Started on 2017-07-06 10:33:35 PDT
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -81,6 +83,16 @@ CREATE TABLE applications (
 CREATE TABLE cluster_configs (
     cluster_id character varying(255) NOT NULL,
     config character varying(1024) NOT NULL
+);
+
+
+--
+-- Name: cluster_dependencies; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE cluster_dependencies (
+    cluster_id character varying(255) NOT NULL,
+    dependency character varying(1024) NOT NULL
 );
 
 
@@ -472,6 +484,14 @@ ALTER TABLE ONLY cluster_configs
 
 
 --
+-- Name: cluster_dependencies cluster_dependencies_cluster_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY cluster_dependencies
+    ADD CONSTRAINT cluster_dependencies_cluster_id_fkey FOREIGN KEY (cluster_id) REFERENCES clusters(id) ON DELETE CASCADE;
+
+
+--
 -- Name: clusters_commands clusters_commands_cluster_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -566,6 +586,8 @@ ALTER TABLE ONLY jobs
 ALTER TABLE ONLY jobs
     ADD CONSTRAINT jobs_id_fkey FOREIGN KEY (id) REFERENCES job_requests(id) ON DELETE CASCADE;
 
+
+-- Completed on 2017-07-06 10:33:36 PDT
 
 --
 -- PostgreSQL database dump complete

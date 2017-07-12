@@ -33,7 +33,6 @@ import org.junit.experimental.categories.Category;
 
 import javax.validation.ConstraintViolationException;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -258,9 +257,7 @@ public class JobEntityUnitTests extends EntityTestsBase {
     public void testSetGetTags() {
         Assert.assertNotNull(this.jobEntity.getTags());
         Assert.assertTrue(this.jobEntity.getTags().isEmpty());
-        final Set<String> tags = new HashSet<>();
-        tags.add("someTag");
-        tags.add("someOtherTag");
+        final Set<String> tags = Sets.newHashSet("someTag", "someOtherTag");
         this.jobEntity.setTags(tags);
         Assert.assertEquals(tags, this.jobEntity.getTags());
 

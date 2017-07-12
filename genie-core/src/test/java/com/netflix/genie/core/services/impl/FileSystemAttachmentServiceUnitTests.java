@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.core.services.impl;
 
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.test.categories.UnitTest;
@@ -33,7 +34,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -138,7 +138,7 @@ public class FileSystemAttachmentServiceUnitTests {
     }
 
     private Set<File> saveAttachments(final String jobId) throws GenieException, IOException {
-        final Set<File> attachments = new HashSet<>();
+        final Set<File> attachments = Sets.newHashSet();
         for (int i = 0; i < 10; i++) {
             final File original = saveAttachment(jobId);
             final File saved = new File(

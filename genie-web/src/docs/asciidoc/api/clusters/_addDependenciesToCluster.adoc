@@ -1,0 +1,25 @@
+=== Add Dependencies to Cluster
+
+==== Description
+
+Add dependency file locations to an existing cluster. Stored as a set so all duplicates are ignored.
+
+==== Endpoint
+
+`POST /api/v3/clusters/{id}/dependencies`
+
+:snippet-base: {snippets}/cluster-rest-controller-integration-tests/can-add-dependencies-to-cluster/3
+:id-base: add-dependencies-to-cluster
+:request-headers: {snippet-base}/request-headers.adoc
+:request-path-params: {snippet-base}/path-parameters.adoc
+:!request-query-params:
+:request-fields: {snippet-base}/request-fields.adoc
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:!response-headers:
+:!response-fields:
+:!response-links:
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]

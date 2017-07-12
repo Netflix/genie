@@ -94,6 +94,7 @@ public abstract class RestControllerIntegrationTestsBase {
     static final String SETUP_FILE_PATH = "$.setupFile";
     static final String STATUS_PATH = "$.status";
     static final String CONFIGS_PATH = "$.configs";
+    static final String DEPENDENCIES_PATH = "$.dependencies";
     static final String LINKS_PATH = "$._links";
     static final String EMBEDDED_PATH = "$._embedded";
 

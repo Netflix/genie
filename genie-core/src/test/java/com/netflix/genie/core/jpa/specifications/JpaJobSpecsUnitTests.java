@@ -15,6 +15,7 @@
  */
 package com.netflix.genie.core.jpa.specifications;
 
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.core.jpa.entities.ClusterEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
@@ -32,7 +33,6 @@ import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -51,8 +51,8 @@ public class JpaJobSpecsUnitTests {
     private static final ClusterEntity CLUSTER = Mockito.mock(ClusterEntity.class);
     private static final String COMMAND_NAME = "pig";
     private static final CommandEntity COMMAND = Mockito.mock(CommandEntity.class);
-    private static final Set<String> TAGS = new HashSet<>();
-    private static final Set<JobStatus> STATUSES = new HashSet<>();
+    private static final Set<String> TAGS = Sets.newHashSet();
+    private static final Set<JobStatus> STATUSES = Sets.newHashSet();
     private static final String TAG = UUID.randomUUID().toString();
     private static final Date MIN_STARTED = new Date();
     private static final Date MAX_STARTED = new Date(MIN_STARTED.getTime() + 10);
@@ -427,7 +427,7 @@ public class JpaJobSpecsUnitTests {
             ID,
             JOB_NAME,
             USER_NAME,
-            new HashSet<>(),
+            Sets.newHashSet(),
             TAGS,
             CLUSTER_NAME,
             CLUSTER,

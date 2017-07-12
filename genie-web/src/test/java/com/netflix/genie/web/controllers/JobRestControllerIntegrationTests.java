@@ -77,7 +77,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -108,7 +107,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     private static final String EMAIL_PATH = "$.email";
     private static final String CPU_PATH = "$.cpu";
     private static final String MEMORY_PATH = "$.memory";
-    private static final String DEPENDENCIES_PATH = "$.dependencies";
     private static final String APPLICATIONS_PATH = "$.applications";
     private static final String HOST_NAME_PATH = "$.hostName";
     private static final String PROCESS_ID_PATH = "$.processId";
@@ -245,7 +243,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                 + "setupfile"
         ).getFile().getAbsolutePath();
 
-        final Set<String> app1Dependencies = new HashSet<>();
         final String depFile1 = this.resourceLoader.getResource(
             BASE_DIR
                 + id
@@ -258,10 +255,8 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                 + FILE_DELIMITER
                 + "dep2"
         ).getFile().getAbsolutePath();
-        app1Dependencies.add(depFile1);
-        app1Dependencies.add(depFile2);
+        final Set<String> app1Dependencies = Sets.newHashSet(depFile1, depFile2);
 
-        final Set<String> app1Configs = new HashSet<>();
         final String configFile1 = this.resourceLoader.getResource(
             BASE_DIR
                 + id
@@ -274,8 +269,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                 + FILE_DELIMITER
                 + "config2"
         ).getFile().getAbsolutePath();
-        app1Configs.add(configFile1);
-        app1Configs.add(configFile2);
+        final Set<String> app1Configs = Sets.newHashSet(configFile1, configFile2);
 
         final Application app = new Application.Builder(
             appName,
@@ -304,18 +298,28 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             BASE_DIR + CLUSTER1_ID + FILE_DELIMITER + "setupfile"
         ).getFile().getAbsolutePath();
 
-        final Set<String> configs = new HashSet<>();
         final String configFile1 = this.resourceLoader.getResource(
             BASE_DIR + CLUSTER1_ID + FILE_DELIMITER + "config1"
         ).getFile().getAbsolutePath();
         final String configFile2 = this.resourceLoader.getResource(
             BASE_DIR + CLUSTER1_ID + FILE_DELIMITER + "config2"
         ).getFile().getAbsolutePath();
-        configs.add(configFile1);
-        configs.add(configFile2);
+        final Set<String> configs = Sets.newHashSet(configFile1, configFile2);
 
-        final Set<String> tags = new HashSet<>();
-        tags.add(LOCALHOST_CLUSTER_TAG);
+        final String depFile1 = this.resourceLoader.getResource(
+            BASE_DIR
+                + CLUSTER1_ID
+                + FILE_DELIMITER
+                + "dep1"
+        ).getFile().getAbsolutePath();
+        final String depFile2 = this.resourceLoader.getResource(
+            BASE_DIR
+                + CLUSTER1_ID
+                + FILE_DELIMITER
+                + "dep2"
+        ).getFile().getAbsolutePath();
+        final Set<String> clusterDependencies = Sets.newHashSet(depFile1, depFile2);
+        final Set<String> tags = Sets.newHashSet(LOCALHOST_CLUSTER_TAG);
 
         final Cluster cluster = new Cluster.Builder(
             CLUSTER1_NAME,
@@ -326,6 +330,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .withId(CLUSTER1_ID)
             .withSetupFile(setUpFile)
             .withConfigs(configs)
+            .withDependencies(clusterDependencies)
             .withTags(tags)
             .build();
 
@@ -345,18 +350,15 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             BASE_DIR + CMD1_ID + FILE_DELIMITER + "setupfile"
         ).getFile().getAbsolutePath();
 
-        final Set<String> configs = new HashSet<>();
         final String configFile1 = this.resourceLoader.getResource(
             BASE_DIR + CMD1_ID + FILE_DELIMITER + "config1"
         ).getFile().getAbsolutePath();
         final String configFile2 = this.resourceLoader.getResource(
             BASE_DIR + CMD1_ID + FILE_DELIMITER + "config2"
         ).getFile().getAbsolutePath();
-        configs.add(configFile1);
-        configs.add(configFile2);
+        final Set<String> configs = Sets.newHashSet(configFile1, configFile2);
 
-        final Set<String> tags = new HashSet<>();
-        tags.add(BASH_COMMAND_TAG);
+        final Set<String> tags = Sets.newHashSet(BASH_COMMAND_TAG);
 
         final Command cmd = new Command.Builder(
             CMD1_NAME,
@@ -1015,15 +1017,13 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         final String commandArgs = "-c 'echo hello world'";
 
         final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
-        final Set<String> clusterTags = new HashSet<>();
-        clusterTags.add("undefined");
+        final Set<String> clusterTags = Sets.newHashSet("undefined");
         final ClusterCriteria clusterCriteria = new ClusterCriteria(clusterTags);
         clusterCriteriaList.add(clusterCriteria);
 
         final String jobId = UUID.randomUUID().toString();
 
-        final Set<String> commandCriteria = new HashSet<>();
-        commandCriteria.add(BASH_COMMAND_TAG);
+        final Set<String> commandCriteria = Sets.newHashSet(BASH_COMMAND_TAG);
         final JobRequest jobRequest = new JobRequest.Builder(
             JOB_NAME,
             JOB_USER,
@@ -1060,15 +1060,13 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         final String commandArgs = "-c 'echo hello world'";
 
         final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
-        final Set<String> clusterTags = new HashSet<>();
-        clusterTags.add(LOCALHOST_CLUSTER_TAG);
+        final Set<String> clusterTags = Sets.newHashSet(LOCALHOST_CLUSTER_TAG);
         final ClusterCriteria clusterCriteria = new ClusterCriteria(clusterTags);
         clusterCriteriaList.add(clusterCriteria);
 
         final String jobId = UUID.randomUUID().toString();
 
-        final Set<String> commandCriteria = new HashSet<>();
-        commandCriteria.add("undefined");
+        final Set<String> commandCriteria = Sets.newHashSet("undefined");
         final JobRequest jobRequest = new JobRequest.Builder(
             JOB_NAME,
             JOB_USER,
@@ -1104,13 +1102,11 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         final String commandArgs = "-c 'sleep 60'";
 
         final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
-        final Set<String> clusterTags = new HashSet<>();
-        clusterTags.add(LOCALHOST_CLUSTER_TAG);
+        final Set<String> clusterTags = Sets.newHashSet(LOCALHOST_CLUSTER_TAG);
         final ClusterCriteria clusterCriteria = new ClusterCriteria(clusterTags);
         clusterCriteriaList.add(clusterCriteria);
 
-        final Set<String> commandCriteria = new HashSet<>();
-        commandCriteria.add(BASH_COMMAND_TAG);
+        final Set<String> commandCriteria = Sets.newHashSet(BASH_COMMAND_TAG);
         final JobRequest jobRequest = new JobRequest.Builder(
             JOB_NAME,
             JOB_USER,
@@ -1180,13 +1176,11 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         final String commandArgs = "-c 'sleep 60'";
 
         final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
-        final Set<String> clusterTags = new HashSet<>();
-        clusterTags.add(LOCALHOST_CLUSTER_TAG);
+        final Set<String> clusterTags = Sets.newHashSet(LOCALHOST_CLUSTER_TAG);
         final ClusterCriteria clusterCriteria = new ClusterCriteria(clusterTags);
         clusterCriteriaList.add(clusterCriteria);
 
-        final Set<String> commandCriteria = new HashSet<>();
-        commandCriteria.add(BASH_COMMAND_TAG);
+        final Set<String> commandCriteria = Sets.newHashSet(BASH_COMMAND_TAG);
         final JobRequest jobRequest = new JobRequest.Builder(
             JOB_NAME,
             JOB_USER,
@@ -1241,13 +1235,11 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         final String commandArgs = "-c 'exit 1'";
 
         final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
-        final Set<String> clusterTags = new HashSet<>();
-        clusterTags.add(LOCALHOST_CLUSTER_TAG);
+        final Set<String> clusterTags = Sets.newHashSet(LOCALHOST_CLUSTER_TAG);
         final ClusterCriteria clusterCriteria = new ClusterCriteria(clusterTags);
         clusterCriteriaList.add(clusterCriteria);
 
-        final Set<String> commandCriteria = new HashSet<>();
-        commandCriteria.add(BASH_COMMAND_TAG);
+        final Set<String> commandCriteria = Sets.newHashSet(BASH_COMMAND_TAG);
         final JobRequest jobRequest = new JobRequest.Builder(
             JOB_NAME,
             JOB_USER,

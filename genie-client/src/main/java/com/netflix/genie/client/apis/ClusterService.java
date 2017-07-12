@@ -188,6 +188,51 @@ public interface ClusterService {
     @DELETE(CLUSTER_URL_SUFFIX + "/{id}/commands")
     Call<Void> removeAllCommandsForCluster(@Path("id") final String clusterId);
 
+    /****************** Methods to manipulate dependencies for a cluster   *********************/
+
+    /**
+     * Method to get dependency files for a cluster in Genie.
+     *
+     * @param clusterId The id of the cluster.
+     * @return A callable object.
+     */
+    @GET(CLUSTER_URL_SUFFIX + "/{id}/dependencies")
+    Call<Set<String>> getDependenciesForCluster(@Path("id") final String clusterId);
+
+    /**
+     * Method to add dependencies to a cluster in Genie.
+     *
+     * @param clusterId The id of the cluster..
+     * @param dependencies The dependencies to be added.
+     * @return A callable object.
+     */
+    @POST(CLUSTER_URL_SUFFIX + "/{id}/dependencies")
+    Call<Void> addDependenciesToCluster(
+        @Path("id") final String clusterId,
+        @Body final Set<String> dependencies
+    );
+
+    /**
+     * Method to update dependencies for a cluster in Genie.
+     *
+     * @param clusterId The id of the cluster..
+     * @param dependencies The dependencies to be added.
+     * @return A callable object.
+     */
+    @PUT(CLUSTER_URL_SUFFIX + "/{id}/dependencies")
+    Call<Void> updateDependenciesForCluster(
+        @Path("id") final String clusterId,
+        @Body final Set<String> dependencies
+    );
+
+    /**
+     * Method to delete all dependencies for a cluster in Genie.
+     *
+     * @param clusterId The id of the cluster.
+     * @return A callable object.
+     */
+    @DELETE(CLUSTER_URL_SUFFIX + "/{id}/dependencies")
+    Call<Void> removeAllDependenciesForCluster(@Path("id") final String clusterId);
 
     /****************** Methods to manipulate configs for a cluster   *********************/
 

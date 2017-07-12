@@ -42,6 +42,7 @@ import java.util.concurrent.TimeUnit;
  * @author amsharma
  * @since 3.0.0
  */
+//TODO add unit test for this Task (see InitialSetupTaskUnitTest for reference)
 @Slf4j
 public class CommandTask extends GenieBaseTask {
 

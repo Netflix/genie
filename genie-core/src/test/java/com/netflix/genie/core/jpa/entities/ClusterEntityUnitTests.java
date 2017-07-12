@@ -34,7 +34,6 @@ import org.junit.experimental.categories.Category;
 import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -61,8 +60,7 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
     @Before
     public void setup() {
         this.c = new ClusterEntity();
-        this.configs = new HashSet<>();
-        this.configs.add(CONFIG);
+        this.configs = Sets.newHashSet(CONFIG);
         this.c.setName(NAME);
         this.c.setUser(USER);
         this.c.setVersion(VERSION);
@@ -81,6 +79,8 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
         Assert.assertNull(entity.getVersion());
         Assert.assertNotNull(entity.getConfigs());
         Assert.assertTrue(entity.getConfigs().isEmpty());
+        Assert.assertNotNull(entity.getDependencies());
+        Assert.assertTrue(entity.getDependencies().isEmpty());
         Assert.assertNotNull(entity.getTags());
         Assert.assertTrue(entity.getTags().isEmpty());
         Assert.assertNotNull(entity.getCommands());
@@ -161,9 +161,7 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
     @Test
     public void testSetTags() throws GeniePreconditionException {
         Assert.assertNotNull(this.c.getTags());
-        final Set<String> tags = new HashSet<>();
-        tags.add("prod");
-        tags.add("sla");
+        final Set<String> tags = Sets.newHashSet("prod", "sla");
         this.c.setTags(tags);
         Assert.assertEquals(tags, this.c.getTags());
 
@@ -182,6 +180,21 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
 
         this.c.setConfigs(null);
         Assert.assertThat(c.getConfigs(), Matchers.empty());
+    }
+
+    /**
+     * Test setting the dependencies.
+     */
+    @Test
+    public void testSetDependencies() {
+        Assert.assertNotNull(this.c.getDependencies());
+        final Set<String> dependencies = Sets.newHashSet();
+        dependencies.add("s3://netflix/jars/myJar.jar");
+        this.c.setDependencies(dependencies);
+        Assert.assertEquals(dependencies, this.c.getDependencies());
+
+        this.c.setDependencies(null);
+        Assert.assertThat(this.c.getDependencies(), Matchers.empty());
     }
 
     /**
@@ -359,6 +372,8 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
         entity.setTags(tags);
         final Set<String> confs = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
         entity.setConfigs(confs);
+        final Set<String> dependencies = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
+        entity.setDependencies(dependencies);
 
         final Cluster cluster = entity.getDTO();
         Assert.assertThat(cluster.getId().orElseGet(RandomSuppliers.STRING), Matchers.is(id));
@@ -371,5 +386,6 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
         Assert.assertThat(cluster.getUpdated().orElseGet(RandomSuppliers.DATE), Matchers.is(updated));
         Assert.assertThat(cluster.getTags(), Matchers.is(tags));
         Assert.assertThat(cluster.getConfigs(), Matchers.is(confs));
+        Assert.assertThat(cluster.getDependencies(), Matchers.is(dependencies));
     }
 }

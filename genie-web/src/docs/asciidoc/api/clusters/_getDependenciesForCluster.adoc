@@ -1,0 +1,25 @@
+=== Get Dependencies For an Cluster
+
+==== Description
+
+Get the dependency file locations for a cluster.
+
+==== Endpoint
+
+`GET /api/v3/clusters/{id}/dependencies`
+
+:snippet-base: {snippets}/cluster-rest-controller-integration-tests/can-add-dependencies-to-cluster/4
+:id-base: get-dependencies-for-cluster
+:!request-headers:
+:request-path-params: {snippet-base}/path-parameters.adoc
+:!request-query-params:
+:!request-fields:
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:response-headers: {snippet-base}/response-headers.adoc
+:response-fields: {snippet-base}/response-fields.adoc
+:!response-links:
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]

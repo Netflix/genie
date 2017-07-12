@@ -52,7 +52,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -107,6 +106,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(CLUSTER_1_STATUS, cluster1.getStatus());
         Assert.assertEquals(5, cluster1.getTags().size());
         Assert.assertEquals(1, cluster1.getConfigs().size());
+        Assert.assertEquals(2, cluster1.getDependencies().size());
 
         final Cluster cluster2 = this.service.getCluster(CLUSTER_2_ID);
         Assert.assertEquals(CLUSTER_2_ID, cluster2.getId().orElseThrow(IllegalArgumentException::new));
@@ -116,6 +116,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(CLUSTER_2_STATUS, cluster2.getStatus());
         Assert.assertEquals(5, cluster2.getTags().size());
         Assert.assertEquals(2, cluster2.getConfigs().size());
+        Assert.assertEquals(0, cluster2.getDependencies().size());
     }
 
     /**
@@ -162,8 +163,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void testGetClustersByTags() {
-        final Set<String> tags = new HashSet<>();
-        tags.add("prod");
+        final Set<String> tags = Sets.newHashSet("prod");
         Page<Cluster> clusters = this.service.getClusters(null, null, tags, null, null, PAGE);
         Assert.assertEquals(1, clusters.getNumberOfElements());
         Assert.assertEquals(
@@ -365,10 +365,8 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void testCreateCluster() throws GenieException {
-        final Set<String> configs = new HashSet<>();
-        configs.add("a config");
-        configs.add("another config");
-        configs.add("yet another config");
+        final Set<String> configs = Sets.newHashSet("a config", "another config", "yet another config");
+        final Set<String> dependencies = Sets.newHashSet("a dependency");
         final String id = UUID.randomUUID().toString();
         final Cluster cluster = new Cluster.Builder(
             CLUSTER_1_NAME,
@@ -378,6 +376,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         )
             .withId(id)
             .withConfigs(configs)
+            .withDependencies(dependencies)
             .build();
         this.service.createCluster(cluster);
         final Cluster created = this.service.getCluster(id);
@@ -387,6 +386,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(CLUSTER_1_USER, created.getUser());
         Assert.assertEquals(ClusterStatus.OUT_OF_SERVICE, created.getStatus());
         Assert.assertEquals(3, created.getConfigs().size());
+        Assert.assertEquals(1, created.getDependencies().size());
         this.service.deleteCluster(id);
         try {
             this.service.getCluster(id);
@@ -406,10 +406,8 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void testCreateClusterNoId() throws GenieException {
-        final Set<String> configs = new HashSet<>();
-        configs.add("a config");
-        configs.add("another config");
-        configs.add("yet another config");
+        final Set<String> configs = Sets.newHashSet("a config", "another config", "yet another config");
+        final Set<String> dependencies = Sets.newHashSet("a dependency");
         final Cluster cluster = new Cluster.Builder(
             CLUSTER_1_NAME,
             CLUSTER_1_USER,
@@ -417,6 +415,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
             ClusterStatus.OUT_OF_SERVICE
         )
             .withConfigs(configs)
+            .withDependencies(dependencies)
             .build();
         final String id = this.service.createCluster(cluster);
         final Cluster created = this.service.getCluster(id);
@@ -424,6 +423,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(CLUSTER_1_USER, created.getUser());
         Assert.assertEquals(ClusterStatus.OUT_OF_SERVICE, created.getStatus());
         Assert.assertEquals(3, created.getConfigs().size());
+        Assert.assertEquals(1, created.getDependencies().size());
         this.service.deleteCluster(created.getId().orElseThrow(IllegalArgumentException::new));
         try {
             this.service.getCluster(created.getId().orElseThrow(IllegalArgumentException::new));
@@ -447,7 +447,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
-     * Test to update an cluster.
+     * Test to update a cluster.
      *
      * @throws GenieException For any problem
      */
@@ -458,10 +458,8 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(ClusterStatus.UP, getCluster.getStatus());
         Assert.assertEquals(5, getCluster.getTags().size());
 
-        final Set<String> tags = new HashSet<>(getCluster.getTags());
-        tags.add("tez");
-        tags.add("yarn");
-        tags.add("hadoop");
+        final Set<String> tags = Sets.newHashSet("tez", "yarn", "hadoop");
+        tags.addAll(getCluster.getTags());
 
         final Cluster.Builder updateCluster = new Cluster.Builder(
             getCluster.getName(),
@@ -487,7 +485,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
-     * Test to update an cluster with invalid content. Should throw ConstraintViolationException from JPA layer.
+     * Test to update a cluster with invalid content. Should throw ConstraintViolationException from JPA layer.
      *
      * @throws GenieException For any problem
      */
@@ -531,7 +529,8 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
             .withCreated(new Date())
             .withUpdated(new Date(0))
             .withTags(getCluster.getTags())
-            .withConfigs(getCluster.getConfigs());
+            .withConfigs(getCluster.getConfigs())
+            .withDependencies(getCluster.getDependencies());
 
         getCluster.getDescription().ifPresent(updateCluster::withDescription);
         getCluster.getSetupFile().ifPresent(updateCluster::withSetupFile);
@@ -541,10 +540,13 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(created, updatedCluster.getCreated().orElseThrow(IllegalArgumentException::new));
         Assert.assertNotEquals(updated, updatedCluster.getUpdated());
         Assert.assertNotEquals(new Date(0), updatedCluster.getUpdated());
+        Assert.assertEquals(getCluster.getTags(), updatedCluster.getTags());
+        Assert.assertEquals(getCluster.getConfigs(), updatedCluster.getConfigs());
+        Assert.assertEquals(getCluster.getDependencies(), updatedCluster.getDependencies());
     }
 
     /**
-     * Test to update an cluster.
+     * Test to update a cluster.
      *
      * @throws GenieException For any problem
      */
@@ -554,7 +556,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
-     * Test to update an cluster.
+     * Test to update a cluster.
      *
      * @throws GenieException For any problem
      */
@@ -656,10 +658,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         final String newConfig2 = UUID.randomUUID().toString();
         final String newConfig3 = UUID.randomUUID().toString();
 
-        final Set<String> newConfigs = new HashSet<>();
-        newConfigs.add(newConfig1);
-        newConfigs.add(newConfig2);
-        newConfigs.add(newConfig3);
+        final Set<String> newConfigs = Sets.newHashSet(newConfig1, newConfig2, newConfig3);
 
         Assert.assertEquals(1, this.service.getConfigsForCluster(CLUSTER_1_ID).size());
         this.service.addConfigsForCluster(CLUSTER_1_ID, newConfigs);
@@ -677,7 +676,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testAddConfigsToClusterNoId() throws GenieException {
-        this.service.addConfigsForCluster(null, new HashSet<>());
+        this.service.addConfigsForCluster(null, Sets.newHashSet());
     }
 
     /**
@@ -691,7 +690,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
-     * Test update configurations for cluster.
+     * Test update dependencies for cluster.
      *
      * @throws GenieException For any problem
      */
@@ -701,10 +700,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         final String newConfig2 = UUID.randomUUID().toString();
         final String newConfig3 = UUID.randomUUID().toString();
 
-        final Set<String> newConfigs = new HashSet<>();
-        newConfigs.add(newConfig1);
-        newConfigs.add(newConfig2);
-        newConfigs.add(newConfig3);
+        final Set<String> newConfigs = Sets.newHashSet(newConfig1, newConfig2, newConfig3);
 
         Assert.assertEquals(1, this.service.getConfigsForCluster(CLUSTER_1_ID).size());
         this.service.updateConfigsForCluster(CLUSTER_1_ID, newConfigs);
@@ -722,7 +718,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testUpdateConfigsForClusterNoId() throws GenieException {
-        this.service.updateConfigsForCluster(null, new HashSet<>());
+        this.service.updateConfigsForCluster(null, Sets.newHashSet());
     }
 
     /**
@@ -744,6 +740,101 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
     @Test(expected = ConstraintViolationException.class)
     public void testGetConfigsForClusterNoId() throws GenieException {
         this.service.getConfigsForCluster(null);
+    }
+
+    /**
+     * Test add dependencies to cluster.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test
+    public void testAddDependenciesToCluster() throws GenieException {
+        final String newDep1 = UUID.randomUUID().toString();
+        final String newDep2 = UUID.randomUUID().toString();
+        final String newDep3 = UUID.randomUUID().toString();
+
+        final Set<String> newDeps = Sets.newHashSet(newDep1, newDep2, newDep3);
+
+        Assert.assertEquals(2, this.service.getDependenciesForCluster(CLUSTER_1_ID).size());
+        this.service.addDependenciesForCluster(CLUSTER_1_ID, newDeps);
+        final Set<String> finalDeps = this.service.getDependenciesForCluster(CLUSTER_1_ID);
+        Assert.assertEquals(5, finalDeps.size());
+        Assert.assertTrue(finalDeps.contains(newDep1));
+        Assert.assertTrue(finalDeps.contains(newDep2));
+        Assert.assertTrue(finalDeps.contains(newDep3));
+    }
+
+    /**
+     * Test add dependencies to cluster.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test(expected = ConstraintViolationException.class)
+    public void testAddDependenciesToClusterNoId() throws GenieException {
+        this.service.addDependenciesForCluster(null, Sets.newHashSet());
+    }
+
+    /**
+     * Test add dependencies to cluster.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test(expected = ConstraintViolationException.class)
+    public void testAddDependenciesToClusterNoDependencies() throws GenieException {
+        this.service.addDependenciesForCluster(CLUSTER_1_ID, null);
+    }
+
+    /**
+     * Test update configurations for cluster.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test
+    public void testUpdateDependenciesForCluster() throws GenieException {
+        final String newDep1 = UUID.randomUUID().toString();
+        final String newDep2 = UUID.randomUUID().toString();
+        final String newDep3 = UUID.randomUUID().toString();
+
+        final Set<String> newDependencies = Sets.newHashSet(newDep1, newDep2, newDep3);
+
+        Assert.assertEquals(2, this.service.getDependenciesForCluster(CLUSTER_1_ID).size());
+        this.service.updateDependenciesForCluster(CLUSTER_1_ID, newDependencies);
+        final Set<String> finalConfigs = this.service.getDependenciesForCluster(CLUSTER_1_ID);
+        Assert.assertEquals(3, finalConfigs.size());
+        Assert.assertTrue(finalConfigs.contains(newDep1));
+        Assert.assertTrue(finalConfigs.contains(newDep2));
+        Assert.assertTrue(finalConfigs.contains(newDep3));
+    }
+
+    /**
+     * Test update configurations for cluster.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test(expected = ConstraintViolationException.class)
+    public void testUpdateDependenciesForClusterNoId() throws GenieException {
+        this.service.updateDependenciesForCluster(null, Sets.newHashSet());
+    }
+
+    /**
+     * Test get configurations for cluster.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test
+    public void testGetDependenciesForCluster() throws GenieException {
+        Assert.assertEquals(2,
+            this.service.getDependenciesForCluster(CLUSTER_1_ID).size());
+    }
+
+    /**
+     * Test get configurations to cluster.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test(expected = ConstraintViolationException.class)
+    public void testGetDependenciesForClusterNoId() throws GenieException {
+        this.service.getDependenciesForCluster(null);
     }
 
     /**
@@ -952,10 +1043,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         final String newTag2 = UUID.randomUUID().toString();
         final String newTag3 = UUID.randomUUID().toString();
 
-        final Set<String> newTags = new HashSet<>();
-        newTags.add(newTag1);
-        newTags.add(newTag2);
-        newTags.add(newTag3);
+        final Set<String> newTags = Sets.newHashSet(newTag1, newTag2, newTag3);
 
         Assert.assertEquals(5, this.service.getTagsForCluster(CLUSTER_1_ID).size());
         this.service.addTagsForCluster(CLUSTER_1_ID, newTags);
@@ -973,7 +1061,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testAddTagsToClusterNoId() throws GenieException {
-        this.service.addTagsForCluster(null, new HashSet<>());
+        this.service.addTagsForCluster(null, Sets.newHashSet());
     }
 
     /**
@@ -997,10 +1085,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         final String newTag2 = UUID.randomUUID().toString();
         final String newTag3 = UUID.randomUUID().toString();
 
-        final Set<String> newTags = new HashSet<>();
-        newTags.add(newTag1);
-        newTags.add(newTag2);
-        newTags.add(newTag3);
+        final Set<String> newTags = Sets.newHashSet(newTag1, newTag2, newTag3);
 
         Assert.assertEquals(5, this.service.getTagsForCluster(CLUSTER_1_ID).size());
         this.service.updateTagsForCluster(CLUSTER_1_ID, newTags);
@@ -1018,7 +1103,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testUpdateTagsForClusterNoId() throws GenieException {
-        this.service.updateTagsForCluster(null, new HashSet<>());
+        this.service.updateTagsForCluster(null, Sets.newHashSet());
     }
 
     /**
