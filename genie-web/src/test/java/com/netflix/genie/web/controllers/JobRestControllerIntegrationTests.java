@@ -1050,6 +1050,91 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     }
 
     /**
+     * Test the job submit method for incorrect cluster criteria.
+     *
+     * @throws Exception If there is a problem.
+     */
+    @Test
+    public void testSubmitJobMethodInvalidClusterCriteria() throws Exception {
+        Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
+        final String commandArgs = "-c 'echo hello world'";
+
+        final List<ClusterCriteria> clusterCriteriaList
+            = Lists.newArrayList(new ClusterCriteria(Sets.newHashSet(" ", "", null)));
+
+        final String jobId = UUID.randomUUID().toString();
+
+        final Set<String> commandCriteria = Sets.newHashSet("bash");
+        final JobRequest jobRequest = new JobRequest.Builder(
+            JOB_NAME,
+            JOB_USER,
+            JOB_VERSION,
+            commandArgs,
+            clusterCriteriaList,
+            commandCriteria
+        )
+            .withId(jobId)
+            .withDisableLogArchival(true)
+            .build();
+
+        this.mvc
+            .perform(
+                MockMvcRequestBuilders
+                    .post(JOBS_API)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(this.objectMapper.writeValueAsBytes(jobRequest))
+                    .accept(MediaType.APPLICATION_JSON)
+            )
+            .andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
+
+        this.mvc
+            .perform(MockMvcRequestBuilders.get(JOBS_API + "/{id}/status", jobId))
+            .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+
+    /**
+     * Test the job submit method for incorrect cluster criteria.
+     *
+     * @throws Exception If there is a problem.
+     */
+    @Test
+    public void testSubmitJobMethodInvalidCommandCriteria() throws Exception {
+        Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
+        final String commandArgs = "-c 'echo hello world'";
+
+        final List<ClusterCriteria> clusterCriteriaList
+            = Lists.newArrayList(new ClusterCriteria(Sets.newHashSet("ok")));
+
+        final String jobId = UUID.randomUUID().toString();
+
+        final Set<String> commandCriteria = Sets.newHashSet(" ", "", null);
+        final JobRequest jobRequest = new JobRequest.Builder(
+            JOB_NAME,
+            JOB_USER,
+            JOB_VERSION,
+            commandArgs,
+            clusterCriteriaList,
+            commandCriteria
+        )
+            .withId(jobId)
+            .withDisableLogArchival(true)
+            .build();
+
+        this.mvc
+            .perform(
+                MockMvcRequestBuilders
+                    .post(JOBS_API)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(this.objectMapper.writeValueAsBytes(jobRequest))
+                    .accept(MediaType.APPLICATION_JSON)
+            ).andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
+
+        this.mvc
+            .perform(MockMvcRequestBuilders.get(JOBS_API + "/{id}/status", jobId))
+            .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+
+    /**
      * Test the job submit method for incorrect command resolved.
      *
      * @throws Exception If there is a problem.

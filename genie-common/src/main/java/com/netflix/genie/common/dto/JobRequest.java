@@ -20,6 +20,7 @@ package com.netflix.genie.common.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -54,9 +55,10 @@ public class JobRequest extends SetupFileDTO {
     @NotNull
     @Size(min = 1, max = 10000, message = "Command arguments are required and max at 10000 characters")
     private final String commandArgs;
+    @Valid
     @NotEmpty(message = "At least one cluster criteria is required")
     private final List<ClusterCriteria> clusterCriterias = new ArrayList<>();
-    @NotEmpty(message = "At least one command criteria is required")
+    @NotEmpty(message = "At least one valid (e.g. non-blank) command criteria is required")
     private final Set<String> commandCriteria = new HashSet<>();
     @Size(max = 255, message = "Max length of the group is 255 characters")
     private final String group;
@@ -225,7 +227,13 @@ public class JobRequest extends SetupFileDTO {
                 this.bClusterCriterias.addAll(clusterCriterias);
             }
             if (commandCriteria != null) {
-                this.bCommandCriteria.addAll(commandCriteria);
+                commandCriteria.forEach(
+                    criteria -> {
+                        if (StringUtils.isNotBlank(criteria)) {
+                            this.bCommandCriteria.add(criteria);
+                        }
+                    }
+                );
             }
         }
 
