@@ -15,5 +15,20 @@ ALTER TABLE `job_requests`
   MODIFY COLUMN `cluster_criterias` TEXT NOT NULL,
   MODIFY COLUMN `command_criteria` TEXT NOT NULL;
 
+ALTER TABLE `clusters`
+  MODIFY COLUMN `description` TEXT;
+
+ALTER TABLE `applications`
+  MODIFY COLUMN `description` TEXT;
+
+ALTER TABLE `commands`
+  MODIFY COLUMN `description` TEXT;
+
+ALTER TABLE `jobs`
+  MODIFY COLUMN `description` TEXT;
+
+ALTER TABLE `job_requests`
+  MODIFY COLUMN `description` TEXT;
+
 SELECT CURRENT_TIMESTAMP AS '', 'Finished upgrading from 3.0.1 schema to 3.1.0 schema' AS '';
 COMMIT;
