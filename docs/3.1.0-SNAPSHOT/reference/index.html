@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 3.1.0-SNAPSHOT,</span>
-<span id="revdate">2017-07-11</span>
+<span id="revdate">2017-07-12</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -995,6 +995,13 @@ to Spring Integration Zookeeper. That library is now used.</p>
 See also: <code>genie.jobs.clusters.loadBalancers.script.source</code>
 See also: <code>genie.jobs.clusters.loadBalancers.script.destination</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.loadBalancers.script.order</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The order which the script load balancer should be evaluated. The lower this number the sooner it is evaluated. 0
+would be the first thing evaluated if nothing else is set to 0 as well. Must be &lt; 2147483647 (Integer.MAX_VALUE). If
+no value set will be given Integer.MAX_VALUE - 1 (default).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2147483646</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.loadBalancers.script.refreshRate</p></td>
@@ -3633,6 +3640,13 @@ See also: <code>genie.jobs.clusters.loadBalancers.script.destination</code></p><
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.loadBalancers.script.order</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The order which the script load balancer should be evaluated. The lower this number the sooner it is evaluated. 0
+would be the first thing evaluated if nothing else is set to 0 as well. Must be &lt; 2147483647 (Integer.MAX_VALUE). If
+no value set will be given Integer.MAX_VALUE - 1 (default).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2147483646</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.loadBalancers.script.refreshRate</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">How frequently to refresh the load balancer script (in milliseconds)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">300000</p></td>
@@ -4115,6 +4129,13 @@ Health of the system is marked unhealthy if the CPU load of a system goes beyond
 See also: <code>genie.jobs.clusters.loadBalancers.script.source</code>
 See also: <code>genie.jobs.clusters.loadBalancers.script.destination</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.loadBalancers.script.order</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The order which the script load balancer should be evaluated. The lower this number the sooner it is evaluated. 0
+would be the first thing evaluated if nothing else is set to 0 as well. Must be &lt; 2147483647 (Integer.MAX_VALUE). If
+no value set will be given Integer.MAX_VALUE - 1 (default).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2147483646</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.loadBalancers.script.refreshRate</p></td>
@@ -4777,7 +4798,7 @@ an embedded database, "none" otherwise.</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 3.1.0-SNAPSHOT<br>
-Last updated 2017-07-11 21:08:34 +00:00
+Last updated 2017-07-12 00:26:57 +00:00
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
