@@ -161,4 +161,5 @@ for more information. Currently on classpath only none, hash_map, redis and jdbc
 * Add cluster dependencies table
 * Rename MySQL and PostgreSQL schema files
 * Index 'name' column of Jobs table
+* Switch Job and JobRequest tables 'description' column to text
 * Switch Applications' table 'cluster_criterias' and 'command_criteria' columns to text

@@ -25,6 +25,8 @@ import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
+import javax.persistence.FetchType;
+import javax.persistence.Lob;
 import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -73,9 +75,9 @@ public class CommonFieldsEntity extends BaseEntity {
     @Size(max = 255, message = "Max length in database is 255 characters")
     private String name;
 
-    @Basic
-    @Column(name = "description", length = 10000)
-    @Size(max = 10000, message = "Max length in database is 10000 characters")
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "description")
     private String description;
 
     @Basic
