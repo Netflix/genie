@@ -20,6 +20,7 @@ package com.netflix.genie.common.dto;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.EqualsAndHashCode;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import java.io.Serializable;
@@ -39,13 +40,13 @@ public class ClusterCriteria implements Serializable {
 
     private static final long serialVersionUID = 1782794735938665541L;
 
-    @NotEmpty(message = "No tags passed in to set and are required")
+    @NotEmpty(message = "No valid (e.g. non-blank) tags present")
     private Set<String> tags = new HashSet<>();
 
     /**
      * Create a cluster criteria object with the included tags.
      *
-     * @param tags The tags to add. Not null or empty.
+     * @param tags The tags to add. Not null or empty and must have at least one non-empty tag.
      */
     @JsonCreator
     public ClusterCriteria(
@@ -53,7 +54,13 @@ public class ClusterCriteria implements Serializable {
         final Set<String> tags
     ) {
         if (tags != null) {
-            this.tags.addAll(tags);
+            tags.forEach(
+                tag -> {
+                    if (StringUtils.isNotBlank(tag)) {
+                        this.tags.add(tag);
+                    }
+                }
+            );
         }
     }
 
