@@ -137,6 +137,16 @@ CREATE TABLE command_configs (
 
 
 --
+-- Name: command_dependencies; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE command_dependencies (
+    command_id character varying(255) NOT NULL,
+    dependency character varying(1024) NOT NULL
+);
+
+
+--
 -- Name: commands; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -521,6 +531,14 @@ ALTER TABLE ONLY clusters_commands
 
 ALTER TABLE ONLY command_configs
     ADD CONSTRAINT command_configs_command_id_fkey FOREIGN KEY (command_id) REFERENCES commands(id) ON DELETE CASCADE;
+
+
+--
+-- Name: command_dependencies command_dependencies_command_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY command_dependencies
+    ADD CONSTRAINT command_dependencies_command_id_fkey FOREIGN KEY (command_id) REFERENCES commands(id) ON DELETE CASCADE;
 
 
 --

@@ -43,7 +43,7 @@ import java.util.Set;
  */
 @Getter
 @JsonDeserialize(builder = JobRequest.Builder.class)
-public class JobRequest extends SetupFileDTO {
+public class JobRequest extends SetupFileAndDependenciesDTO {
 
     /**
      * The default number of seconds from start before a job times out.
@@ -72,7 +72,6 @@ public class JobRequest extends SetupFileDTO {
     private final Integer memory;
     @Min(value = 1, message = "The timeout must be at least 1 second, preferably much more.")
     private final Integer timeout;
-    private final Set<String> dependencies = new HashSet<>();
     private final List<String> applications = new ArrayList<>();
 
     /**
@@ -87,7 +86,6 @@ public class JobRequest extends SetupFileDTO {
         this.clusterCriterias.addAll(builder.bClusterCriterias);
         this.commandCriteria.addAll(builder.bCommandCriteria);
         this.group = builder.bGroup;
-        this.dependencies.addAll(builder.bDependencies);
         this.disableLogArchival = builder.bDisableLogArchival;
         this.email = builder.bEmail;
         this.cpu = builder.bCpu;
@@ -160,15 +158,6 @@ public class JobRequest extends SetupFileDTO {
     }
 
     /**
-     * Get the dependencies that should be downloaded for this job.
-     *
-     * @return The file dependencies as a read-only set or null if none. Attempts to modify will throw exception
-     */
-    public Set<String> getDependencies() {
-        return Collections.unmodifiableSet(this.dependencies);
-    }
-
-    /**
      * Get the list of application id's this job is requesting to override the default applications with.
      *
      * @return The application ids as an read-only list. Attempts to modify with throw runtime exception.
@@ -183,12 +172,11 @@ public class JobRequest extends SetupFileDTO {
      * @author tgianos
      * @since 3.0.0
      */
-    public static class Builder extends SetupFileDTO.Builder<Builder> {
+    public static class Builder extends SetupFileAndDependenciesDTO.Builder<Builder> {
 
         private final String bCommandArgs;
         private final List<ClusterCriteria> bClusterCriterias = new ArrayList<>();
         private final Set<String> bCommandCriteria = new HashSet<>();
-        private final Set<String> bDependencies = new HashSet<>();
         private final List<String> bApplications = new ArrayList<>();
         private String bGroup;
         private boolean bDisableLogArchival;
@@ -245,20 +233,6 @@ public class JobRequest extends SetupFileDTO {
          */
         public Builder withGroup(final String group) {
             this.bGroup = group;
-            return this;
-        }
-
-        /**
-         * Set the file dependencies needed to run the job.
-         *
-         * @param dependencies The file dependencies
-         * @return The builder
-         */
-        public Builder withDependencies(final Set<String> dependencies) {
-            this.bDependencies.clear();
-            if (dependencies != null) {
-                this.bDependencies.addAll(dependencies);
-            }
             return this;
         }
 

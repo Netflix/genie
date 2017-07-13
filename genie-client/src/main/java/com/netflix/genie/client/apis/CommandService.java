@@ -228,6 +228,52 @@ public interface CommandService {
     @DELETE(COMMAND_URL_SUFFIX + "/{id}/configs")
     Call<Void> removeAllConfigsForCommand(@Path("id") final String commandId);
 
+    /****************** Methods to manipulate dependencies for a command   *********************/
+
+    /**
+     * Method to get dependency files for a command in Genie.
+     *
+     * @param commandId The id of the command.
+     * @return A callable object.
+     */
+    @GET(COMMAND_URL_SUFFIX + "/{id}/dependencies")
+    Call<Set<String>> getDependenciesForCommand(@Path("id") final String commandId);
+
+    /**
+     * Method to add dependencies to a command in Genie.
+     *
+     * @param commandId The id of the command..
+     * @param dependencies The dependencies to be added.
+     * @return A callable object.
+     */
+    @POST(COMMAND_URL_SUFFIX + "/{id}/dependencies")
+    Call<Void> addDependenciesToCommand(
+        @Path("id") final String commandId,
+        @Body final Set<String> dependencies
+    );
+
+    /**
+     * Method to update dependencies for a command in Genie.
+     *
+     * @param commandId The id of the command..
+     * @param dependencies The dependencies to be added.
+     * @return A callable object.
+     */
+    @PUT(COMMAND_URL_SUFFIX + "/{id}/dependencies")
+    Call<Void> updateDependenciesForCommand(
+        @Path("id") final String commandId,
+        @Body final Set<String> dependencies
+    );
+
+    /**
+     * Method to delete all dependencies for a command in Genie.
+     *
+     * @param commandId The id of the command.
+     * @return A callable object.
+     */
+    @DELETE(COMMAND_URL_SUFFIX + "/{id}/dependencies")
+    Call<Void> removeAllDependenciesForCommand(@Path("id") final String commandId);
+
     /****************** Methods to manipulate tags for a command   *********************/
 
     /**

@@ -96,6 +96,13 @@ public class CommandTask extends GenieBaseTask {
                 AdminResources.COMMAND
             );
 
+            // Create the dependencies directory for this id
+            createEntityInstanceDependenciesDirectory(
+                genieDir,
+                commandId,
+                AdminResources.COMMAND
+            );
+
             // Get the setup file if specified and add it as source command in launcher script
             final Optional<String> setupFile = jobExecEnv.getCommand().getSetupFile();
             if (setupFile.isPresent()) {
@@ -130,6 +137,18 @@ public class CommandTask extends GenieBaseTask {
                     AdminResources.COMMAND
                 );
                 fts.getFile(configFile, localPath);
+            }
+
+            // Iterate over and get all dependencies
+            for (final String dependencyFile : jobExecEnv.getCommand().getDependencies()) {
+                final String localPath = super.buildLocalFilePath(
+                    jobWorkingDirectory,
+                    commandId,
+                    dependencyFile,
+                    FileType.DEPENDENCIES,
+                    AdminResources.COMMAND
+                );
+                fts.getFile(dependencyFile, localPath);
             }
             log.info("Finished Command Task for job {}", jobExecEnv.getJobRequest().getId());
         } finally {

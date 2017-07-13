@@ -85,6 +85,8 @@ public class CommandEntityUnitTests extends EntityTestsBase {
         Assert.assertNull(entity.getVersion());
         Assert.assertNotNull(entity.getConfigs());
         Assert.assertTrue(entity.getConfigs().isEmpty());
+        Assert.assertNotNull(entity.getDependencies());
+        Assert.assertTrue(entity.getDependencies().isEmpty());
         Assert.assertNotNull(entity.getTags());
         Assert.assertTrue(entity.getTags().isEmpty());
         Assert.assertNotNull(entity.getClusters());
@@ -233,6 +235,21 @@ public class CommandEntityUnitTests extends EntityTestsBase {
 
         this.c.setConfigs(null);
         Assert.assertThat(this.c.getConfigs(), Matchers.empty());
+    }
+
+    /**
+     * Test setting the dependencies.
+     */
+    @Test
+    public void testSetDependencies() {
+        Assert.assertNotNull(this.c.getDependencies());
+        Assert.assertTrue(this.c.getDependencies().isEmpty());
+        final Set<String> dependencies = Sets.newHashSet("dep1");
+        this.c.setDependencies(dependencies);
+        Assert.assertEquals(dependencies, this.c.getDependencies());
+
+        this.c.setDependencies(null);
+        Assert.assertThat(this.c.getDependencies(), Matchers.empty());
     }
 
     /**
@@ -417,6 +434,8 @@ public class CommandEntityUnitTests extends EntityTestsBase {
         entity.setTags(tags);
         final Set<String> configs = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
         entity.setConfigs(configs);
+        final Set<String> dependencies = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
+        entity.setDependencies(dependencies);
         final String setupFile = UUID.randomUUID().toString();
         entity.setSetupFile(setupFile);
         final String executable = UUID.randomUUID().toString();
@@ -440,6 +459,7 @@ public class CommandEntityUnitTests extends EntityTestsBase {
         Assert.assertThat(command.getTags(), Matchers.is(tags));
         Assert.assertThat(command.getSetupFile().orElseGet(RandomSuppliers.STRING), Matchers.is(setupFile));
         Assert.assertThat(command.getConfigs(), Matchers.is(configs));
+        Assert.assertThat(command.getDependencies(), Matchers.is(dependencies));
         Assert.assertThat(command.getMemory().orElseGet(RandomSuppliers.INT), Matchers.is(memory));
     }
 }

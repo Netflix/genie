@@ -189,6 +189,7 @@ The presto command includes a setup file which allows additional configuration w
   "description": "Presto Command",
   "setupFile": "s3://bucket/builds/bdp-cluster-configs/genie3/commands/presto/0.149/setup.sh",
   "configs": [],
+  "dependencies": [],
   "status": "ACTIVE",
   "executable": "${PRESTO_CMD} --server ${PRESTO_SERVER} --catalog hive --schema default --debug",
   "checkDelay": 5000,
@@ -248,6 +249,7 @@ chmod 755 ${PRESTO_CMD}
   "configs": [
     "s3://bucket/builds/bdp-cluster-configs/genie3/commands/spark/1.6.1/prod/configs/hive-site.xml"
   ],
+  "dependencies": [],
   "status": "ACTIVE",
   "executable": "${SPARK_HOME}/bin/dsespark-submit",
   "checkDelay": 5000,
@@ -306,6 +308,7 @@ cp ${GENIE_COMMAND_DIR}/config/* ${HADOOP_CONF_DIR}/
   "configs": [
     "s3://bucket/builds/bdp-cluster-configs/genie3/commands/spark/2.0.0/prod/configs/hive-site.xml"
   ],
+  "dependencies": [],
   "status": "ACTIVE",
   "executable": "${SPARK_HOME}/bin/dsespark-submit.py",
   "checkDelay": 5000,

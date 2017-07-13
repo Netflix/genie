@@ -14,6 +14,7 @@ export default class CommandDetails extends React.Component {
     this.state = {
       command: {
         configs: [],
+        dependencies: [],
         _links: { self: "", clusters: "", applications: "" }
       },
       clusters: [],
@@ -86,6 +87,18 @@ export default class CommandDetails extends React.Component {
                       {this.state.command.configs.map((config, index) =>
                         <li key={index}>
                           {config}
+                        </li>
+                      )}
+                    </ul>
+                  </td>
+                </tr>
+                <tr>
+                  <td className="col-xs-2 align-right">Dependencies:</td>
+                  <td>
+                    <ul>
+                      {this.state.command.dependencies.map((dependency, index) =>
+                        <li key={index}>
+                          {dependency}
                         </li>
                       )}
                     </ul>

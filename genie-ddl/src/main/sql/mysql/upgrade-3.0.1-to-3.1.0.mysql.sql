@@ -8,6 +8,13 @@ CREATE TABLE `cluster_dependencies` (
   CONSTRAINT `cluster_dependencies_ibfk_1` FOREIGN KEY (`cluster_id`) REFERENCES `clusters` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+CREATE TABLE `command_dependencies` (
+  `command_id` varchar(255) NOT NULL,
+  `dependency` varchar(1024) NOT NULL,
+  KEY `command_id` (`command_id`),
+  CONSTRAINT `command_dependencies_ibfk_1` FOREIGN KEY (`command_id`) REFERENCES `commands` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
 ALTER TABLE `jobs`
   ADD INDEX `JOBS_NAME_INDEX` (`name`);
 

@@ -42,7 +42,7 @@ Health of the system is marked unhealthy if the CPU load of a system goes beyond
 |true
 
 |genie.jobs.cleanup.deleteDependencies
-|Whether or not to delete the dependencies directories for applications and clusters to save disk space after job completion
+|Whether or not to delete the dependencies directories for applications, cluster, command to save disk space after job completion
 |true
 
 |genie.jobs.clusters.loadBalancers.script.destination

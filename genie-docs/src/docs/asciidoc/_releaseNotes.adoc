@@ -11,7 +11,7 @@ property
 ** Follows new Spring default
 ** Turn off by setting `management.security.enabled` to `false`
 * Optional cluster load balancer via Admin supplied script
-* Add dependencies to the Cluster entity
+* Add dependencies to the Cluster and Command entities
 
 === Library Upgrades
 
@@ -158,7 +158,7 @@ for more information. Currently on classpath only none, hash_map, redis and jdbc
 
 === Database Upgrades
 
-* Add cluster dependencies table
+* Add cluster and command dependencies table
 * Rename MySQL and PostgreSQL schema files
 * Index 'name' column of Jobs table
 * Switch Job and JobRequest tables 'description' column to text

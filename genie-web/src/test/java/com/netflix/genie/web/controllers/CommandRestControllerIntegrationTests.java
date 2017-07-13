@@ -19,6 +19,7 @@ package com.netflix.genie.web.controllers;
 
 import com.github.fge.jsonpatch.JsonPatch;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.dto.Cluster;
@@ -49,6 +50,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -66,9 +68,21 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
     private static final String VERSION = "1.0.0";
     private static final String EXECUTABLE = "/apps/hive/bin/hive";
     private static final long CHECK_DELAY = 10000L;
+    private static final String DESCRIPTION = "Hive command v" + VERSION;
+    private static final int MEMORY = 1024;
+    private static final String CONFIG_1 = "s3:///path/to/config-foo";
+    private static final String CONFIG_2 = "s3:///path/to/config-bar";
+    private static final Set<String> CONFIGS = Sets.newHashSet(CONFIG_1, CONFIG_2);
+    private static final String DEP_1 = "/path/to/file/foo";
+    private static final String DEP_2 = "/path/to/file/bar";
+    private static final Set<String> DEPENDENCIES = Sets.newHashSet(DEP_1, DEP_2);
+    private static final String TAG_1 = "tag:foo";
+    private static final String TAG_2 = "tag:bar";
+    private static final Set<String> TAGS = Sets.newHashSet(TAG_1, TAG_2);
 
     private static final String EXECUTABLE_PATH = "$.executable";
     private static final String CHECK_DELAY_PATH = "$.checkDelay";
+    private static final String MEMORY_PATH = "$.memory";
     private static final String COMMANDS_LIST_PATH = EMBEDDED_PATH + ".commandList";
     private static final String COMMAND_APPS_LINK_PATH = "$._links.applications.href";
     private static final String COMMANDS_APPS_LINK_PATH = "$.._links.applications.href";
@@ -114,7 +128,13 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
         );
 
         final String id = this.createConfigResource(
-            new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY).build(),
+            new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
+                .withDescription(DESCRIPTION)
+                .withMemory(MEMORY)
+                .withConfigs(CONFIGS)
+                .withDependencies(DEPENDENCIES)
+                .withTags(TAGS)
+                .build(),
             creationResultHandler
         );
 
@@ -141,9 +161,16 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(CommandStatus.ACTIVE.toString())))
             .andExpect(MockMvcResultMatchers.jsonPath(EXECUTABLE_PATH, Matchers.is(EXECUTABLE)))
             .andExpect(MockMvcResultMatchers.jsonPath(CHECK_DELAY_PATH, Matchers.is((int) CHECK_DELAY)))
-            .andExpect(MockMvcResultMatchers.jsonPath(TAGS_PATH, Matchers.hasSize(2)))
+            .andExpect(MockMvcResultMatchers.jsonPath(DESCRIPTION_PATH, Matchers.is(DESCRIPTION)))
+            .andExpect(MockMvcResultMatchers.jsonPath(MEMORY_PATH, Matchers.is(MEMORY)))
+            .andExpect(MockMvcResultMatchers.jsonPath(CONFIGS_PATH, Matchers.hasSize(2)))
+            .andExpect(MockMvcResultMatchers.jsonPath(CONFIGS_PATH, Matchers.hasItems(CONFIG_1, CONFIG_2)))
+            .andExpect(MockMvcResultMatchers.jsonPath(DEPENDENCIES_PATH, Matchers.hasSize(2)))
+            .andExpect(MockMvcResultMatchers.jsonPath(DEPENDENCIES_PATH, Matchers.hasItems(DEP_1, DEP_2)))
+            .andExpect(MockMvcResultMatchers.jsonPath(TAGS_PATH, Matchers.hasSize(4)))
             .andExpect(MockMvcResultMatchers.jsonPath(TAGS_PATH, Matchers.hasItem("genie.id:" + id)))
             .andExpect(MockMvcResultMatchers.jsonPath(TAGS_PATH, Matchers.hasItem("genie.name:" + NAME)))
+            .andExpect(MockMvcResultMatchers.jsonPath(TAGS_PATH, Matchers.hasItems(TAG_1, TAG_2)))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH + ".*", Matchers.hasSize(3)))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(SELF_LINK_KEY)))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(CLUSTERS_LINK_KEY)))
@@ -167,7 +194,14 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
     public void canCreateCommandWithId() throws Exception {
         Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
         this.createConfigResource(
-            new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY).withId(ID).build(),
+            new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
+                .withId(ID)
+                .withDescription(DESCRIPTION)
+                .withMemory(MEMORY)
+                .withConfigs(CONFIGS)
+                .withDependencies(DEPENDENCIES)
+                .withTags(TAGS)
+                .build(),
             null
         );
 
@@ -184,9 +218,16 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(CommandStatus.ACTIVE.toString())))
             .andExpect(MockMvcResultMatchers.jsonPath(EXECUTABLE_PATH, Matchers.is(EXECUTABLE)))
             .andExpect(MockMvcResultMatchers.jsonPath(CHECK_DELAY_PATH, Matchers.is((int) CHECK_DELAY)))
-            .andExpect(MockMvcResultMatchers.jsonPath(TAGS_PATH, Matchers.hasSize(2)))
+            .andExpect(MockMvcResultMatchers.jsonPath(DESCRIPTION_PATH, Matchers.is(DESCRIPTION)))
+            .andExpect(MockMvcResultMatchers.jsonPath(MEMORY_PATH, Matchers.is(MEMORY)))
+            .andExpect(MockMvcResultMatchers.jsonPath(CONFIGS_PATH, Matchers.hasSize(2)))
+            .andExpect(MockMvcResultMatchers.jsonPath(CONFIGS_PATH, Matchers.hasItems(CONFIG_1, CONFIG_2)))
+            .andExpect(MockMvcResultMatchers.jsonPath(DEPENDENCIES_PATH, Matchers.hasSize(2)))
+            .andExpect(MockMvcResultMatchers.jsonPath(DEPENDENCIES_PATH, Matchers.hasItems(DEP_1, DEP_2)))
+            .andExpect(MockMvcResultMatchers.jsonPath(TAGS_PATH, Matchers.hasSize(4)))
             .andExpect(MockMvcResultMatchers.jsonPath(TAGS_PATH, Matchers.hasItem("genie.id:" + ID)))
             .andExpect(MockMvcResultMatchers.jsonPath(TAGS_PATH, Matchers.hasItem("genie.name:" + NAME)))
+            .andExpect(MockMvcResultMatchers.jsonPath(TAGS_PATH, Matchers.hasItems(TAG_1, TAG_2)))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH + ".*", Matchers.hasSize(3)))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(SELF_LINK_KEY)))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(CLUSTERS_LINK_KEY)))
@@ -386,7 +427,8 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             .withCreated(createdCommand.getCreated().orElseThrow(IllegalArgumentException::new))
             .withUpdated(createdCommand.getUpdated().orElseThrow(IllegalArgumentException::new))
             .withTags(createdCommand.getTags())
-            .withConfigs(createdCommand.getConfigs());
+            .withConfigs(createdCommand.getConfigs())
+            .withDependencies(createdCommand.getDependencies());
 
         createdCommand.getDescription().ifPresent(updateCommand::withDescription);
         createdCommand.getSetupFile().ifPresent(updateCommand::withSetupFile);
@@ -665,6 +707,103 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             Snippets.ID_PATH_PARAM
         );
         this.canDeleteElementsFromResource(COMMANDS_API + "/{id}/configs", ID, deleteResultHandler);
+    }
+
+    /**
+     * Test to make sure we can add dependencies to the command after it is created.
+     *
+     * @throws Exception on configuration problems
+     */
+    @Test
+    public void canAddDependenciesToCommand() throws Exception {
+        Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
+        this.createConfigResource(
+            new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
+                .withId(ID)
+                .build(),
+            null
+        );
+
+        final RestDocumentationResultHandler addResultHandler = MockMvcRestDocumentation.document(
+            "{class-name}/{method-name}/{step}/",
+            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            Snippets.ID_PATH_PARAM, // path params
+            Snippets.CONTENT_TYPE_HEADER, // request header
+            PayloadDocumentation.requestFields(Snippets.DEPENDENCIES_FIELDS) // response fields
+        );
+        final RestDocumentationResultHandler getResultHandler = MockMvcRestDocumentation.document(
+            "{class-name}/{method-name}/{step}/",
+            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            Snippets.ID_PATH_PARAM, // path params
+            Snippets.JSON_CONTENT_TYPE_HEADER, // response headers
+            PayloadDocumentation.responseFields(Snippets.DEPENDENCIES_FIELDS) // response fields
+        );
+        this.canAddElementsToResource(
+            COMMANDS_API + "/{id}/dependencies",
+            ID,
+            addResultHandler,
+            getResultHandler
+        );
+    }
+
+    /**
+     * Test to make sure we can update the dependencies for an command after it is created.
+     *
+     * @throws Exception on configuration problems
+     */
+    @Test
+    public void canUpdateDependenciesForCommand() throws Exception {
+        Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
+        this.createConfigResource(
+            new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
+                .withId(ID)
+                .build(),
+            null
+        );
+
+        final RestDocumentationResultHandler updateResultHandler = MockMvcRestDocumentation.document(
+            "{class-name}/{method-name}/{step}/",
+            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            Snippets.CONTENT_TYPE_HEADER, // Request header
+            Snippets.ID_PATH_PARAM, // Path parameters
+            PayloadDocumentation.requestFields(Snippets.DEPENDENCIES_FIELDS) // Request fields
+        );
+        this.canUpdateElementsForResource(
+            COMMANDS_API + "/{id}/dependencies",
+            ID,
+            updateResultHandler
+        );
+    }
+
+    /**
+     * Test to make sure we can delete the dependencies for an command after it is created.
+     *
+     * @throws Exception on configuration problems
+     */
+    @Test
+    public void canDeleteDependenciesForCommand() throws Exception {
+        Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
+        this.createConfigResource(
+            new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
+                .withId(ID)
+                .build(),
+            null
+        );
+
+        final RestDocumentationResultHandler deleteResultHandler = MockMvcRestDocumentation.document(
+            "{class-name}/{method-name}/{step}/",
+            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            Snippets.ID_PATH_PARAM // Path variables
+        );
+        this.canDeleteElementsFromResource(
+            COMMANDS_API + "/{id}/dependencies",
+            ID,
+            deleteResultHandler
+        );
     }
 
     /**

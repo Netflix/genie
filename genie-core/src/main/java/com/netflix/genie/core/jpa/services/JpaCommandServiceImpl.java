@@ -308,6 +308,68 @@ public class JpaCommandServiceImpl implements CommandService {
      * {@inheritDoc}
      */
     @Override
+    public void addDependenciesForCommand(
+        @NotBlank(message = "No command id entered. Unable to add dependencies.")
+        final String id,
+        @NotEmpty(message = "No dependencies entered. Unable to add dependencies.")
+        final Set<String> dependencies
+    ) throws GenieException {
+        this.findCommand(id).getDependencies().addAll(dependencies);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Set<String> getDependenciesForCommand(
+        @NotBlank(message = "No command id entered. Unable to get dependencies.")
+        final String id
+    ) throws GenieException {
+        return this.findCommand(id).getDependencies();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateDependenciesForCommand(
+        @NotBlank(message = "No command id entered. Unable to update dependencies.")
+        final String id,
+        @NotNull(message = "No dependencies entered. Unable to update.")
+        final Set<String> dependencies
+    ) throws GenieException {
+        this.findCommand(id).setDependencies(dependencies);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeAllDependenciesForCommand(
+        @NotBlank(message = "No command id entered. Unable to remove dependencies.")
+        final String id
+    ) throws GenieException {
+        this.findCommand(id).getDependencies().clear();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeDependencyForCommand(
+        @NotBlank(message = "No command id entered. Unable to remove dependency.")
+        final String id,
+        @NotBlank(message = "No dependency entered. Unable to remove dependency.")
+        final String dependency
+    ) throws GenieException {
+        this.findCommand(id).getDependencies().remove(dependency);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void addTagsForCommand(
         @NotBlank(message = "No command id entered. Unable to add tags.")
         final String id,
@@ -512,6 +574,7 @@ public class JpaCommandServiceImpl implements CommandService {
         commandEntity.setExecutable(command.getExecutable());
         commandEntity.setCheckDelay(command.getCheckDelay());
         commandEntity.setConfigs(command.getConfigs());
+        commandEntity.setDependencies(command.getDependencies());
         final Optional<String> setupFile = command.getSetupFile();
         commandEntity.setSetupFile(setupFile.isPresent() ? setupFile.get() : null);
         commandEntity.setStatus(command.getStatus());

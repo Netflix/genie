@@ -30,7 +30,7 @@ import java.util.Set;
  * @since 3.0.0
  */
 @Getter
-public abstract class ConfigDTO extends SetupFileDTO {
+public abstract class ConfigDTO extends SetupFileAndDependenciesDTO {
 
     private static final long serialVersionUID = 147545317805515362L;
 
@@ -64,7 +64,7 @@ public abstract class ConfigDTO extends SetupFileDTO {
      * @since 3.0.0
      */
     @SuppressWarnings("unchecked")
-    protected abstract static class Builder<T extends Builder> extends SetupFileDTO.Builder<T> {
+    protected abstract static class Builder<T extends Builder> extends SetupFileAndDependenciesDTO.Builder<T> {
 
         private Set<String> bConfigs = new HashSet<>();
 

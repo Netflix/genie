@@ -22,10 +22,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Getter;
 
 import javax.validation.constraints.NotNull;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * Application DTO.
@@ -39,7 +36,6 @@ public class Application extends ConfigDTO {
 
     private static final long serialVersionUID = 212266105066344180L;
 
-    private final Set<String> dependencies = new HashSet<>();
     @NotNull(message = "An application status is required")
     private final ApplicationStatus status;
     private final String type;
@@ -52,7 +48,6 @@ public class Application extends ConfigDTO {
     protected Application(final Builder builder) {
         super(builder);
         this.status = builder.bStatus;
-        this.dependencies.addAll(builder.bDependencies);
         this.type = builder.bType;
     }
 
@@ -66,15 +61,6 @@ public class Application extends ConfigDTO {
     }
 
     /**
-     * Get the set of dependencies for the application.
-     *
-     * @return The dependencies for the applicatoin as a read-only set.
-     */
-    public Set<String> getDependencies() {
-        return Collections.unmodifiableSet(this.dependencies);
-    }
-
-    /**
      * A builder to create applications.
      *
      * @author tgianos
@@ -83,7 +69,6 @@ public class Application extends ConfigDTO {
     public static class Builder extends ConfigDTO.Builder<Builder> {
 
         private final ApplicationStatus bStatus;
-        private final Set<String> bDependencies = new HashSet<>();
         private String bType;
 
         /**
@@ -110,19 +95,6 @@ public class Application extends ConfigDTO {
             } else {
                 this.bStatus = ApplicationStatus.INACTIVE;
             }
-        }
-
-        /**
-         * Set the dependencies for the application if desired.
-         *
-         * @param dependencies The dependencies
-         * @return The builder
-         */
-        public Builder withDependencies(final Set<String> dependencies) {
-            if (dependencies != null) {
-                this.bDependencies.addAll(dependencies);
-            }
-            return this;
         }
 
         /**

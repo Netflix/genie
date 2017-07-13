@@ -20,7 +20,10 @@ package com.netflix.genie.common.dto;
 import lombok.Getter;
 
 import javax.validation.constraints.Size;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Base class DTO for DTOs which require a setup file.
@@ -29,9 +32,10 @@ import java.util.Optional;
  * @since 3.0.0
  */
 @Getter
-public abstract class SetupFileDTO extends CommonDTO {
+public abstract class SetupFileAndDependenciesDTO extends CommonDTO {
 
     private static final long serialVersionUID = 2116254045303538065L;
+    protected final Set<String> dependencies = new HashSet<>();
     @Size(max = 1024, message = "Max length of the setup file is 1024 characters")
     private final String setupFile;
 
@@ -41,9 +45,10 @@ public abstract class SetupFileDTO extends CommonDTO {
      * @param builder The builder to use
      */
     @SuppressWarnings("unchecked")
-    protected SetupFileDTO(final Builder builder) {
+    protected SetupFileAndDependenciesDTO(final Builder builder) {
         super(builder);
         this.setupFile = builder.bSetupFile;
+        this.dependencies.addAll(builder.bDependencies);
     }
 
     /**
@@ -56,6 +61,15 @@ public abstract class SetupFileDTO extends CommonDTO {
     }
 
     /**
+     * Get the set of dependencies for the entity.
+     *
+     * @return The dependencies for the entity as a read-only set.
+     */
+    public Set<String> getDependencies() {
+        return Collections.unmodifiableSet(this.dependencies);
+    }
+
+    /**
      * A builder for helping to create instances.
      *
      * @param <T> The type of builder that extends this builder for final implementation
@@ -65,6 +79,7 @@ public abstract class SetupFileDTO extends CommonDTO {
     @SuppressWarnings("unchecked")
     protected abstract static class Builder<T extends Builder> extends CommonDTO.Builder<T> {
 
+        private final Set<String> bDependencies = new HashSet<>();
         private String bSetupFile;
 
         /**
@@ -86,6 +101,19 @@ public abstract class SetupFileDTO extends CommonDTO {
          */
         public T withSetupFile(final String setupFile) {
             this.bSetupFile = setupFile;
+            return (T) this;
+        }
+
+        /**
+         * Set the dependencies for the entity if desired.
+         *
+         * @param dependencies The dependencies
+         * @return The builder
+         */
+        public T withDependencies(final Set<String> dependencies) {
+            if (dependencies != null) {
+                this.bDependencies.addAll(dependencies);
+            }
             return (T) this;
         }
     }
