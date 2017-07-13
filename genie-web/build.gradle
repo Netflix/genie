@@ -67,6 +67,8 @@ dependencies {
      * Runtime Dependencies
      *******************************/
 
+    runtime("org.codehaus.groovy:groovy-all")
+
     /*******************************
      * Test Dependencies
      *******************************/
