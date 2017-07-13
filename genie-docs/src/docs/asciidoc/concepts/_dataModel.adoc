@@ -71,9 +71,9 @@ flexibility in the trade-off.
 ====== Command Resource
 
 Commands resources primarily represent what a user would enter at the command line if you wanted to run a process on a
-cluster and what dependencies (applications) you would need on your PATH to make that possible.
+cluster and what binaries (i.e., applications) you would need on your PATH to make that possible.
 
-Commands can have configuration and setup files just like applications but primarily they should have an ordered list
+Commands can have configuration, setup and dependencies files just like applications but primarily they should have an ordered list
 of applications associated with them if necessary. For example lets take a typical scenario involving running Hive. To
 run Hive you generally need a few things:
 

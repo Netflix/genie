@@ -110,6 +110,14 @@ public class CommandEntity extends SetupFileEntity {
     @ManyToMany(mappedBy = "commands", fetch = FetchType.LAZY)
     private Set<ClusterEntity> clusters = new HashSet<>();
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+        name = "command_dependencies",
+        joinColumns = @JoinColumn(name = "command_id", referencedColumnName = "id")
+    )
+    @Column(name = "dependency", nullable = false, length = 1024)
+    private Set<String> dependencies = new HashSet<>();
+
     /**
      * Default Constructor.
      */
@@ -222,6 +230,18 @@ public class CommandEntity extends SetupFileEntity {
     }
 
     /**
+     * Sets the dependencies needed for this command.
+     *
+     * @param dependencies All dependencies needed for execution of this command
+     */
+    public void setDependencies(final Set<String> dependencies) {
+        this.dependencies.clear();
+        if (dependencies != null) {
+            this.dependencies.addAll(dependencies);
+        }
+    }
+
+    /**
      * Get a dto based on the information in this entity.
      *
      * @return The dto
@@ -240,7 +260,8 @@ public class CommandEntity extends SetupFileEntity {
             .withUpdated(this.getUpdated())
             .withTags(this.getTags())
             .withConfigs(this.configs)
-            .withMemory(this.memory);
+            .withMemory(this.memory)
+            .withDependencies(this.dependencies);
 
         this.getDescription().ifPresent(builder::withDescription);
         this.getSetupFile().ifPresent(builder::withSetupFile);

@@ -386,6 +386,54 @@ public class CommandClientIntegrationTests extends GenieClientsIntegrationTestsB
     }
 
     /**
+     * Test all the methods that manipulate dependencies for a command in genie.
+     *
+     * @throws Exception If there is any problem.
+     */
+    @Test
+    public void testCommandDependenciesMethods() throws Exception {
+
+        final Set<String> initialDependencies = Sets.newHashSet("foo", "bar");
+
+        final Command command = new Command.Builder("name", "user", "1.0", CommandStatus.ACTIVE, "exec", 1000)
+            .withId("command1")
+            .withDescription("client Test")
+            .withSetupFile("path to set up file")
+            .withDependencies(initialDependencies)
+            .build();
+
+        commandClient.createCommand(command);
+
+        // Test getDependencies for command
+        Set<String> dependencies = commandClient.getDependenciesForCommand("command1");
+        Assert.assertEquals(2, dependencies.size());
+        Assert.assertEquals(dependencies.contains("foo"), true);
+        Assert.assertEquals(dependencies.contains("bar"), true);
+
+        // Test adding a dependency for command
+        final Set<String> moreDependencies = Sets.newHashSet("pi");
+
+        commandClient.addDependenciesToCommand("command1", moreDependencies);
+        dependencies = commandClient.getDependenciesForCommand("command1");
+        Assert.assertEquals(3, dependencies.size());
+        Assert.assertEquals(dependencies.contains("foo"), true);
+        Assert.assertEquals(dependencies.contains("bar"), true);
+        Assert.assertEquals(dependencies.contains("pi"), true);
+
+        // Test update dependencies for a command
+        commandClient.updateDependenciesForCommand("command1", initialDependencies);
+        dependencies = commandClient.getDependenciesForCommand("command1");
+        Assert.assertEquals(2, dependencies.size());
+        Assert.assertEquals(dependencies.contains("foo"), true);
+        Assert.assertEquals(dependencies.contains("bar"), true);
+
+        // Test delete all dependencies in a command
+        commandClient.removeAllDependenciesForCommand("command1");
+        dependencies = commandClient.getDependenciesForCommand("command1");
+        Assert.assertEquals(0, dependencies.size());
+    }
+
+    /**
      * Test all the methods that manipulate applications for a command in genie.
      *
      * @throws Exception If there is any problem.

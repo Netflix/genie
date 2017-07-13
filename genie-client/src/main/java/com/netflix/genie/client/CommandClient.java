@@ -302,6 +302,86 @@ public class CommandClient extends BaseGenieClient {
         commandService.removeAllConfigsForCommand(commandId).execute();
     }
 
+    /****************** Methods to manipulate dependencies for a command   *********************/
+
+    /**
+     * Method to get all the dependency files for an command.
+     *
+     * @param commandId The id of the command.
+     * @return The set of dependencies for the command.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException          For Network and other IO issues
+     */
+    public Set<String> getDependenciesForCommand(final String commandId) throws IOException,
+        GenieClientException {
+        if (StringUtils.isEmpty(commandId)) {
+            throw new IllegalArgumentException("Missing required parameter: commandId.");
+        }
+
+        return commandService.getDependenciesForCommand(commandId).execute().body();
+    }
+
+    /**
+     * Method to add dependencies to a command.
+     *
+     * @param commandId The id of the command.
+     * @param dependencies  The set of dependencies to add.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException          For Network and other IO issues
+     */
+    public void addDependenciesToCommand(
+        final String commandId, final Set<String> dependencies
+    ) throws IOException, GenieClientException {
+        if (StringUtils.isEmpty(commandId)) {
+            throw new IllegalArgumentException("Missing required parameter: commandId.");
+        }
+
+        if (dependencies == null || dependencies.isEmpty()) {
+            throw new IllegalArgumentException("Dependencies cannot be null or empty");
+        }
+
+        commandService.addDependenciesToCommand(commandId, dependencies).execute();
+    }
+
+    /**
+     * Method to update dependencies for a command.
+     *
+     * @param commandId The id of the command.
+     * @param dependencies  The set of dependencies to add.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException          For Network and other IO issues
+     */
+    public void updateDependenciesForCommand(
+        final String commandId, final Set<String> dependencies
+    ) throws IOException, GenieClientException {
+        if (StringUtils.isEmpty(commandId)) {
+            throw new IllegalArgumentException("Missing required parameter: commandId.");
+        }
+
+        if (dependencies == null || dependencies.isEmpty()) {
+            throw new IllegalArgumentException("Dependencies cannot be null or empty");
+        }
+
+        commandService.updateDependenciesForCommand(commandId, dependencies).execute();
+    }
+
+    /**
+     * Remove all dependencies for this command.
+     *
+     * @param commandId The id of the command.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException          For Network and other IO issues
+     */
+    public void removeAllDependenciesForCommand(
+        final String commandId
+    ) throws IOException, GenieClientException {
+        if (StringUtils.isEmpty(commandId)) {
+            throw new IllegalArgumentException("Missing required parameter: commandId.");
+        }
+
+        commandService.removeAllDependenciesForCommand(commandId).execute();
+    }
+
     /****************** Methods to manipulate applications for a command   *********************/
 
     /**

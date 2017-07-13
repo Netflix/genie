@@ -166,6 +166,21 @@ CREATE TABLE `command_configs` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `command_dependencies`
+--
+
+DROP TABLE IF EXISTS `command_dependencies`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `command_dependencies` (
+  `command_id` varchar(255) NOT NULL,
+  `dependency` varchar(1024) NOT NULL,
+  KEY `command_id` (`command_id`),
+  CONSTRAINT `command_dependencies_ibfk_1` FOREIGN KEY (`command_id`) REFERENCES `commands` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `commands`
 --
 

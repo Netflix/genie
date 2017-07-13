@@ -115,6 +115,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(COMMAND_1_EXECUTABLE, command1.getExecutable());
         Assert.assertEquals(5, command1.getTags().size());
         Assert.assertEquals(2, command1.getConfigs().size());
+        Assert.assertEquals(0, command1.getDependencies().size());
 
         final Command command2 = this.service.getCommand(COMMAND_2_ID);
         Assert.assertEquals(COMMAND_2_ID, command2.getId().orElseThrow(IllegalArgumentException::new));
@@ -125,6 +126,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(COMMAND_2_EXECUTABLE, command2.getExecutable());
         Assert.assertEquals(4, command2.getTags().size());
         Assert.assertEquals(1, command2.getConfigs().size());
+        Assert.assertEquals(1, command2.getDependencies().size());
 
         final Command command3 = this.service.getCommand(COMMAND_3_ID);
         Assert.assertEquals(COMMAND_3_ID, command3.getId().orElseThrow(IllegalArgumentException::new));
@@ -135,6 +137,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(COMMAND_3_EXECUTABLE, command3.getExecutable());
         Assert.assertEquals(5, command3.getTags().size());
         Assert.assertEquals(1, command3.getConfigs().size());
+        Assert.assertEquals(2, command3.getDependencies().size());
     }
 
     /**
@@ -460,6 +463,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
             .withUpdated(command.getUpdated().orElseThrow(IllegalArgumentException::new))
             .withTags(tags)
             .withConfigs(command.getConfigs())
+            .withDependencies(command.getDependencies())
             .withMemory(memory);
 
         command.getDescription().ifPresent(updateCommand::withDescription);
@@ -521,7 +525,8 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
             .withCreated(new Date())
             .withUpdated(new Date(0))
             .withTags(init.getTags())
-            .withConfigs(init.getConfigs());
+            .withConfigs(init.getConfigs())
+            .withDependencies(init.getDependencies());
 
         init.getDescription().ifPresent(updateCommand::withDescription);
         init.getSetupFile().ifPresent(updateCommand::withSetupFile);
@@ -531,6 +536,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(created, updatedCommand.getCreated().orElseThrow(IllegalArgumentException::new));
         Assert.assertNotEquals(updated, updatedCommand.getUpdated().orElseThrow(IllegalArgumentException::new));
         Assert.assertNotEquals(new Date(0), updatedCommand.getUpdated().orElseThrow(IllegalArgumentException::new));
+        Assert.assertEquals(init.getDependencies(), updatedCommand.getDependencies());
     }
 
     /**
@@ -797,6 +803,157 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     @Test(expected = ConstraintViolationException.class)
     public void testRemoveConfigForCommandNoId() throws GenieException {
         this.service.removeConfigForCommand(null, "something");
+    }
+
+    /**
+     * Test add dependencies to command.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test
+    public void testAddDependenciesToCommand() throws GenieException {
+        final String newDependency1 = UUID.randomUUID().toString();
+        final String newDependency2 = UUID.randomUUID().toString();
+        final String newDependency3 = UUID.randomUUID().toString();
+
+        final Set<String> newDependencies = Sets.newHashSet(newDependency1, newDependency2, newDependency3);
+
+        Assert.assertEquals(2, this.service.getDependenciesForCommand(COMMAND_3_ID).size());
+        this.service.addDependenciesForCommand(COMMAND_3_ID, newDependencies);
+        final Set<String> finalDependencies = this.service.getDependenciesForCommand(COMMAND_3_ID);
+        Assert.assertEquals(5, finalDependencies.size());
+        Assert.assertTrue(finalDependencies.contains(newDependency1));
+        Assert.assertTrue(finalDependencies.contains(newDependency2));
+        Assert.assertTrue(finalDependencies.contains(newDependency3));
+    }
+
+    /**
+     * Test add dependencies to command.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test(expected = ConstraintViolationException.class)
+    public void testAddDependenciesToCommandNoId() throws GenieException {
+        this.service.addDependenciesForCommand(null, Sets.newHashSet());
+    }
+
+    /**
+     * Test add dependencies to command.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test(expected = ConstraintViolationException.class)
+    public void testAddDependenciesToCommandNoDependencies() throws GenieException {
+        this.service.addDependenciesForCommand(COMMAND_1_ID, null);
+    }
+
+    /**
+     * Test update dependencies for command.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test
+    public void testUpdateDependenciesForCommand() throws GenieException {
+        final String newDependency1 = UUID.randomUUID().toString();
+        final String newDependency2 = UUID.randomUUID().toString();
+        final String newDependency3 = UUID.randomUUID().toString();
+
+        final Set<String> newDependencies = Sets.newHashSet(newDependency1, newDependency2, newDependency3);
+
+        Assert.assertEquals(0, this.service.getDependenciesForCommand(COMMAND_1_ID).size());
+        this.service.updateDependenciesForCommand(COMMAND_1_ID, newDependencies);
+        final Set<String> finalDependencies = this.service.getDependenciesForCommand(COMMAND_1_ID);
+        Assert.assertEquals(3, finalDependencies.size());
+        Assert.assertTrue(finalDependencies.contains(newDependency1));
+        Assert.assertTrue(finalDependencies.contains(newDependency2));
+        Assert.assertTrue(finalDependencies.contains(newDependency3));
+    }
+
+    /**
+     * Test update dependencies for command.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test(expected = ConstraintViolationException.class)
+    public void testUpdateDependenciesForCommandNoId() throws GenieException {
+        this.service.updateDependenciesForCommand(null, Sets.newHashSet());
+    }
+
+    /**
+     * Test get dependencies for command.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test
+    public void testGetDependenciesForCommand() throws GenieException {
+        Assert.assertEquals(1,
+            this.service.getDependenciesForCommand(COMMAND_2_ID).size());
+    }
+
+    /**
+     * Test get dependencies to command.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test(expected = ConstraintViolationException.class)
+    public void testGetDependenciesForCommandNoId() throws GenieException {
+        this.service.getDependenciesForCommand(null);
+    }
+
+    /**
+     * Test remove all dependencies for command.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test
+    public void testRemoveAllDependenciesForCommand() throws GenieException {
+        Assert.assertEquals(2, this.service.getDependenciesForCommand(COMMAND_3_ID).size());
+        this.service.removeAllDependenciesForCommand(COMMAND_3_ID);
+        Assert.assertEquals(0, this.service.getDependenciesForCommand(COMMAND_3_ID).size());
+    }
+
+    /**
+     * Test remove all dependencies for command.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test(expected = ConstraintViolationException.class)
+    public void testRemoveAllDependenciesForCommandNoId() throws GenieException {
+        this.service.removeAllDependenciesForCommand(null);
+    }
+
+    /**
+     * Test remove dependencies for command.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test
+    public void testRemoveDependencyForCommand() throws GenieException {
+        final Set<String> dependencies = this.service.getDependenciesForCommand(COMMAND_3_ID);
+        Assert.assertEquals(2, dependencies.size());
+        final String removedDependency = dependencies.iterator().next();
+        this.service.removeDependencyForCommand(COMMAND_3_ID, removedDependency);
+        Assert.assertFalse(this.service.getDependenciesForCommand(COMMAND_3_ID).contains(removedDependency));
+    }
+
+    /**
+     * Test remove dependencies for command.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test(expected = ConstraintViolationException.class)
+    public void testRemoveDependencyForCommandNullDependency() throws GenieException {
+        this.service.removeDependencyForCommand(COMMAND_1_ID, null);
+    }
+
+    /**
+     * Test remove dependencies for command.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test(expected = ConstraintViolationException.class)
+    public void testRemoveDependencyForCommandNoId() throws GenieException {
+        this.service.removeDependencyForCommand(null, "something");
     }
 
     /**

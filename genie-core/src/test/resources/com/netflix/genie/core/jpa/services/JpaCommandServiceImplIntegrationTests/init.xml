@@ -75,6 +75,9 @@
     <command_configs
             command_id="command2"
             config="s3://some/config/file"/>
+    <command_dependencies
+        command_id="command2"
+        dependency="s3://some/dependency/file"/>
 
     <commands
             id="command3"
@@ -107,6 +110,12 @@
     <cluster_configs
             cluster_id="cluster1"
             config="s3://some/config/file"/>
+    <command_dependencies
+        command_id="command3"
+        dependency="s3://some/dependency/file"/>
+    <command_dependencies
+        command_id="command3"
+        dependency="s3://some/other/dependency/file"/>
 
     <commands_applications command_id="command1" application_id="app1" application_order="0"/>
 

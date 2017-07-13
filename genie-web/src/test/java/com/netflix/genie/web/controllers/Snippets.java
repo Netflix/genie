@@ -673,6 +673,11 @@ final class Snippets {
                 .description(
                     "The default amount of memory (in MB) that should be allocated for instances of this command client"
                 )
+                .optional(),
+            PayloadDocumentation
+                .fieldWithPath("dependencies")
+                .attributes(getConstraintsForField(COMMAND_CONSTRAINTS, "dependencies"))
+                .description("The dependencies for the command")
                 .optional()
         );
     }

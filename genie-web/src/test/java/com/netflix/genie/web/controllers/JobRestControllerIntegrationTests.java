@@ -357,6 +357,19 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             BASE_DIR + CMD1_ID + FILE_DELIMITER + "config2"
         ).getFile().getAbsolutePath();
         final Set<String> configs = Sets.newHashSet(configFile1, configFile2);
+        final String depFile1 = this.resourceLoader.getResource(
+            BASE_DIR
+                + CLUSTER1_ID
+                + FILE_DELIMITER
+                + "dep1"
+        ).getFile().getAbsolutePath();
+        final String depFile2 = this.resourceLoader.getResource(
+            BASE_DIR
+                + CLUSTER1_ID
+                + FILE_DELIMITER
+                + "dep2"
+        ).getFile().getAbsolutePath();
+        final Set<String> commandDependencies = Sets.newHashSet(depFile1, depFile2);
 
         final Set<String> tags = Sets.newHashSet(BASH_COMMAND_TAG);
 
@@ -371,6 +384,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .withId(CMD1_ID)
             .withSetupFile(setUpFile)
             .withConfigs(configs)
+            .withDependencies(commandDependencies)
             .withTags(tags)
             .build();
 

@@ -216,7 +216,7 @@ killed depending on that code.
 
 ===== Genie Performs Job Clean-Up
 
-To save disk space Genie will delete application, cluster, dependencies from the job working directory after a job is completed.
+To save disk space Genie will delete application, cluster and command dependencies from the job working directory after a job is completed.
 This can be disabled by an admin. If the job is marked as it should be archived the working directory will be zipped up
 and stored in the default archive location as `{jobId}.tar.gz`.
 

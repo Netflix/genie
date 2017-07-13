@@ -58,6 +58,7 @@ public class CommandUnitTests {
         Assert.assertThat(command.getExecutable(), Matchers.is(EXECUTABLE));
         Assert.assertFalse(command.getSetupFile().isPresent());
         Assert.assertThat(command.getConfigs(), Matchers.empty());
+        Assert.assertThat(command.getDependencies(), Matchers.empty());
         Assert.assertFalse(command.getCreated().isPresent());
         Assert.assertFalse(command.getDescription().isPresent());
         Assert.assertFalse(command.getId().isPresent());
@@ -81,6 +82,9 @@ public class CommandUnitTests {
 
         final Set<String> configs = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
         builder.withConfigs(configs);
+
+        final Set<String> dependencies = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
+        builder.withDependencies(dependencies);
 
         final Date created = new Date();
         builder.withCreated(created);
@@ -108,6 +112,7 @@ public class CommandUnitTests {
         Assert.assertThat(command.getCheckDelay(), Matchers.is(CHECK_DELAY));
         Assert.assertThat(command.getSetupFile().orElseThrow(IllegalArgumentException::new), Matchers.is(setupFile));
         Assert.assertThat(command.getConfigs(), Matchers.is(configs));
+        Assert.assertThat(command.getDependencies(), Matchers.is(dependencies));
         Assert.assertThat(command.getCreated().orElseThrow(IllegalArgumentException::new), Matchers.is(created));
         Assert.assertThat(
             command.getDescription().orElseThrow(IllegalArgumentException::new), Matchers.is(description)
@@ -127,6 +132,7 @@ public class CommandUnitTests {
             = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
         builder.withSetupFile(null);
         builder.withConfigs(null);
+        builder.withDependencies(null);
         builder.withCreated(null);
         builder.withDescription(null);
         builder.withId(null);
@@ -142,6 +148,7 @@ public class CommandUnitTests {
         Assert.assertThat(command.getExecutable(), Matchers.is(EXECUTABLE));
         Assert.assertFalse(command.getSetupFile().isPresent());
         Assert.assertThat(command.getConfigs(), Matchers.empty());
+        Assert.assertThat(command.getDependencies(), Matchers.empty());
         Assert.assertFalse(command.getCreated().isPresent());
         Assert.assertFalse(command.getDescription().isPresent());
         Assert.assertFalse(command.getId().isPresent());
@@ -159,6 +166,7 @@ public class CommandUnitTests {
             = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
         builder.withSetupFile(null);
         builder.withConfigs(null);
+        builder.withDependencies(null);
         builder.withCreated(null);
         builder.withDescription(null);
         builder.withId(UUID.randomUUID().toString());
@@ -182,6 +190,7 @@ public class CommandUnitTests {
         final Command.Builder builder = new Command.Builder(NAME, USER, VERSION, null, EXECUTABLE, CHECK_DELAY);
         builder.withSetupFile(null);
         builder.withConfigs(null);
+        builder.withDependencies(null);
         builder.withCreated(null);
         builder.withDescription(null);
         builder.withId(UUID.randomUUID().toString());

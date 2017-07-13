@@ -317,6 +317,72 @@ public class CommandRestController {
     }
 
     /**
+     * Add new dependency files for a given command.
+     *
+     * @param id           The id of the command to add the dependency file to. Not
+     *                     null/empty/blank.
+     * @param dependencies The dependency files to add. Not null.
+     * @throws GenieException For any error
+     */
+    @PostMapping(value = "/{id}/dependencies", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void addDependenciesForCommand(
+        @PathVariable("id") final String id,
+        @RequestBody final Set<String> dependencies
+    ) throws GenieException {
+        log.debug("Called with id {} and dependencies {}", id, dependencies);
+        this.commandService.addDependenciesForCommand(id, dependencies);
+    }
+
+    /**
+     * Get all the dependency files for a given command.
+     *
+     * @param id The id of the command to get the dependency files for. Not
+     *           NULL/empty/blank.
+     * @return The set of dependency files.
+     * @throws GenieException For any error
+     */
+    @GetMapping(value = "/{id}/dependencies", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public Set<String> getDependenciesForCommand(@PathVariable("id") final String id) throws GenieException {
+        log.debug("Called with id {}", id);
+        return this.commandService.getDependenciesForCommand(id);
+    }
+
+    /**
+     * Update the dependency files for a given command.
+     *
+     * @param id           The id of the command to update the dependency files for. Not
+     *                     null/empty/blank.
+     * @param dependencies The dependency files to replace existing dependency files with. Not
+     *                     null/empty/blank.
+     * @throws GenieException For any error
+     */
+    @PutMapping(value = "/{id}/dependencies", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateDependenciesForCommand(
+        @PathVariable("id") final String id,
+        @RequestBody final Set<String> dependencies
+    ) throws GenieException {
+        log.debug("Called with id {} and dependencies {}", id, dependencies);
+        this.commandService.updateDependenciesForCommand(id, dependencies);
+    }
+
+    /**
+     * Delete the all dependency files from a given command.
+     *
+     * @param id The id of the command to delete the dependency files from. Not
+     *           null/empty/blank.
+     * @throws GenieException For any error
+     */
+    @DeleteMapping(value = "/{id}/dependencies")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeAllDependenciesForCommand(@PathVariable("id") final String id) throws GenieException {
+        log.debug("Called with id {}", id);
+        this.commandService.removeAllDependenciesForCommand(id);
+    }
+
+    /**
      * Add new tags to a given command.
      *
      * @param id   The id of the command to add the tags to. Not

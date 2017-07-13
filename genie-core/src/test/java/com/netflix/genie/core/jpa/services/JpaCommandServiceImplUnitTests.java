@@ -212,6 +212,66 @@ public class JpaCommandServiceImplUnitTests {
     }
 
     /**
+     * Test add dependencies to command.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test(expected = GenieNotFoundException.class)
+    public void testAddDependenciesForCommand() throws GenieException {
+        final String id = UUID.randomUUID().toString();
+        Mockito.when(this.jpaCommandRepository.findOne(id)).thenReturn(null);
+        this.service.addDependenciesForCommand(id, Sets.newHashSet());
+    }
+
+    /**
+     * Test update dependencies for command.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test(expected = GenieNotFoundException.class)
+    public void testUpdateDependenciesForCommand() throws GenieException {
+        final String id = UUID.randomUUID().toString();
+        Mockito.when(this.jpaCommandRepository.findOne(id)).thenReturn(null);
+        this.service.updateDependenciesForCommand(id, Sets.newHashSet());
+    }
+
+    /**
+     * Test get dependencies to command.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test(expected = GenieNotFoundException.class)
+    public void testGetDependenciesForCommand() throws GenieException {
+        final String id = UUID.randomUUID().toString();
+        Mockito.when(this.jpaCommandRepository.findOne(id)).thenReturn(null);
+        this.service.getDependenciesForCommand(id);
+    }
+
+    /**
+     * Test remove all dependencies for command.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test(expected = GenieNotFoundException.class)
+    public void testRemoveAllDependenciesForCommand() throws GenieException {
+        final String id = UUID.randomUUID().toString();
+        Mockito.when(this.jpaCommandRepository.findOne(id)).thenReturn(null);
+        this.service.removeAllDependenciesForCommand(id);
+    }
+
+    /**
+     * Test remove configuration for command.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test(expected = GenieNotFoundException.class)
+    public void testRemoveJarForCommand() throws GenieException {
+        final String id = UUID.randomUUID().toString();
+        Mockito.when(this.jpaCommandRepository.findOne(id)).thenReturn(null);
+        this.service.removeDependencyForCommand(id, "something");
+    }
+
+    /**
      * Make sure we can't add duplicate applications to the cluster.
      *
      * @throws GenieException on error
