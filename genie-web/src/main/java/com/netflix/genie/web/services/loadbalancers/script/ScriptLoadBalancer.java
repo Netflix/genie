@@ -45,10 +45,12 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -237,12 +239,24 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
                     "No script source file found for property " + SCRIPT_FILE_SOURCE_PROPERTY_KEY
                 );
             }
+
             final String scriptDestinationDir = this.environment.getProperty(SCRIPT_FILE_DESTINATION_PROPERTY_KEY);
             if (scriptDestinationDir == null) {
                 throw new IllegalStateException(
                     "No script destination directory found for property " + SCRIPT_FILE_DESTINATION_PROPERTY_KEY
                 );
             }
+
+            // Check the validity of the destination directory
+            final File scriptDestinationDirFile = new File(scriptDestinationDir);
+            if (!scriptDestinationDirFile.exists()) {
+                Files.createDirectories(scriptDestinationDirFile.toPath());
+            } else if (!scriptDestinationDirFile.isDirectory()) {
+                throw new IllegalStateException(
+                    "The script destination directory " + scriptDestinationDir + " exists but is not a directory"
+                );
+            }
+
             final String fileName = StringUtils.substringAfterLast(scriptFileSource, SLASH);
             if (StringUtils.isBlank(fileName)) {
                 throw new IllegalStateException("No file name found from " + scriptFileSource);
@@ -253,9 +267,7 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
                 throw new IllegalStateException("No file extension available in " + fileName);
             }
 
-            final String scriptFileDestination = scriptDestinationDir.endsWith(SLASH)
-                ? scriptDestinationDir + fileName
-                : scriptDestinationDir + SLASH + fileName;
+            final String scriptFileDestination = new File(scriptDestinationDirFile, fileName).getAbsolutePath();
 
             // Download and cache the file (if it's not already there)
             this.fileTransferService.getFile(scriptFileSource, scriptFileDestination);

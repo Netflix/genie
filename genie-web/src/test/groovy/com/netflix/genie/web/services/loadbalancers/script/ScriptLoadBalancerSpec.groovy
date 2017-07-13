@@ -34,7 +34,9 @@ import com.netflix.spectator.api.Id
 import com.netflix.spectator.api.Registry
 import com.netflix.spectator.api.Timer
 import org.apache.commons.lang.StringUtils
+import org.junit.Rule
 import org.junit.experimental.categories.Category
+import org.junit.rules.TemporaryFolder
 import org.springframework.core.env.Environment
 import org.springframework.core.task.AsyncTaskExecutor
 import org.springframework.scheduling.TaskScheduler
@@ -44,7 +46,6 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 import java.util.concurrent.TimeUnit
-
 /**
  * Specifications for the ScriptLoadBalancer class.
  *
@@ -53,6 +54,9 @@ import java.util.concurrent.TimeUnit
  */
 @Category(UnitTest.class)
 class ScriptLoadBalancerSpec extends Specification {
+
+    @Rule
+    TemporaryFolder temporaryFolder
 
     @Shared
     def mapper = new ObjectMapper().registerModule(new Jdk8Module())

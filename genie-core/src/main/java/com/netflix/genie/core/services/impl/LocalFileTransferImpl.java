@@ -53,24 +53,11 @@ public class LocalFileTransferImpl implements FileTransfer {
      */
     @Override
     public void getFile(
-        @NotBlank(message = "Source file path cannot be empty.")
-        final String srcRemotePath,
-        @NotBlank(message = "Destination local path cannot be empty")
-        final String dstLocalPath
+        @NotBlank(message = "Source file path cannot be empty.") final String srcRemotePath,
+        @NotBlank(message = "Destination local path cannot be empty") final String dstLocalPath
     ) throws GenieException {
         log.debug("Called with src path {} and destination path {}", srcRemotePath, dstLocalPath);
-        try {
-            final File src = new File(srcRemotePath);
-            final File dest = new File(dstLocalPath);
-            Files.copy(src.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException ioe) {
-            log.error("Got error while copying remote file {} to local path {}", srcRemotePath, dstLocalPath);
-            throw new GenieServerException(
-                "Got error while copying remote file "
-                    + srcRemotePath
-                    + " to local path "
-                    + dstLocalPath, ioe);
-        }
+        this.copy(srcRemotePath, dstLocalPath);
     }
 
     /**
@@ -78,24 +65,11 @@ public class LocalFileTransferImpl implements FileTransfer {
      */
     @Override
     public void putFile(
-        @NotBlank(message = "Source local path cannot be empty.")
-        final String srcLocalPath,
-        @NotBlank(message = "Destination remote path cannot be empty")
-        final String dstRemotePath
+        @NotBlank(message = "Source local path cannot be empty.") final String srcLocalPath,
+        @NotBlank(message = "Destination remote path cannot be empty") final String dstRemotePath
     ) throws GenieException {
         log.debug("Called with src path {} and destination path {}", srcLocalPath, dstRemotePath);
-        try {
-            final File src = new File(srcLocalPath);
-            final File dest = new File(dstRemotePath);
-            Files.copy(src.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException ioe) {
-            log.error("Got error while copying local file {} to remote path {}", srcLocalPath, dstRemotePath);
-            throw new GenieServerException(
-                "Got error while copying local file "
-                    + srcLocalPath
-                    + " to remote path "
-                    + dstRemotePath, ioe);
-        }
+        this.copy(srcLocalPath, dstRemotePath);
     }
 
     /**
@@ -107,8 +81,28 @@ public class LocalFileTransferImpl implements FileTransfer {
             return new File(path).lastModified();
         } catch (Exception e) {
             final String message = String.format("Failed getting the last modified time for file with path %s", path);
-            log.error(message);
+            log.error(message, e);
             throw new GenieServerException(message, e);
+        }
+    }
+
+    private void copy(final String srcPath, final String dstPath) throws GenieServerException {
+        try {
+            final File src = new File(srcPath);
+            final File dest = new File(dstPath);
+            if (!dest.getParentFile().exists()) {
+                Files.createDirectories(dest.getParentFile().toPath());
+            }
+            Files.copy(src.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        } catch (final IOException ioe) {
+            log.error("Got error while copying file {} to {}", srcPath, dstPath, ioe);
+            throw new GenieServerException(
+                "Got error while copying file "
+                    + srcPath
+                    + " to "
+                    + dstPath,
+                ioe
+            );
         }
     }
 }
