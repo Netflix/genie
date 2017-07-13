@@ -46,10 +46,7 @@ public class GenieFileTransferService {
      * @param fileTransferFactory file transfer implementation factory
      * @throws GenieException If there is any problem
      */
-    public GenieFileTransferService(
-            @NotNull
-            final FileTransferFactory fileTransferFactory
-    ) throws GenieException {
+    public GenieFileTransferService(@NotNull final FileTransferFactory fileTransferFactory) throws GenieException {
         this.fileTransferFactory = fileTransferFactory;
     }
 
@@ -61,14 +58,12 @@ public class GenieFileTransferService {
      * @throws GenieException If there is any problem
      */
     public void getFile(
-            @NotBlank(message = "Source file path cannot be empty.")
-            final String srcRemotePath,
-            @NotBlank(message = "Destination local path cannot be empty")
-            final String dstLocalPath
+        @NotBlank(message = "Source file path cannot be empty.") final String srcRemotePath,
+        @NotBlank(message = "Destination local path cannot be empty") final String dstLocalPath
     ) throws GenieException {
         log.debug("Called with src path {} and destination path {}", srcRemotePath, dstLocalPath);
 
-        getFileTransfer(srcRemotePath).getFile(srcRemotePath, dstLocalPath);
+        this.getFileTransfer(srcRemotePath).getFile(srcRemotePath, dstLocalPath);
     }
 
     /**
@@ -79,14 +74,12 @@ public class GenieFileTransferService {
      * @throws GenieException If there is any problem
      */
     public void putFile(
-            @NotBlank(message = "Source local path cannot be empty.")
-            final String srcLocalPath,
-            @NotBlank(message = "Destination remote path cannot be empty")
-            final String dstRemotePath
+        @NotBlank(message = "Source local path cannot be empty.") final String srcLocalPath,
+        @NotBlank(message = "Destination remote path cannot be empty") final String dstRemotePath
     ) throws GenieException {
         log.debug("Called with src path {} and destination path {}", srcLocalPath, dstRemotePath);
 
-        getFileTransfer(dstRemotePath).putFile(srcLocalPath, dstRemotePath);
+        this.getFileTransfer(dstRemotePath).putFile(srcLocalPath, dstRemotePath);
     }
 
     protected FileTransfer getFileTransfer(final String path) throws GenieNotFoundException {
@@ -99,7 +92,7 @@ public class GenieFileTransferService {
         }
         if (result == null) {
             throw new GenieNotFoundException("Failed getting the appropriate FileTransfer implementation to get file: "
-                    + path);
+                + path);
         }
         return result;
     }

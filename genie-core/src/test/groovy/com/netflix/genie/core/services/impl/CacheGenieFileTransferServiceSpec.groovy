@@ -19,7 +19,6 @@ import com.netflix.genie.core.services.FileTransferFactory
 import com.netflix.spectator.api.Registry
 import spock.lang.Specification
 import spock.lang.Unroll
-
 /**
  * Unit tests for CacheGenieFileTransferService.
  * Created by amajumdar on 7/26/16.

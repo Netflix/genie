@@ -18,18 +18,18 @@
 package com.netflix.genie.core.services.impl;
 
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.test.categories.UnitTest;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.exec.Executor;
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.mockito.Mockito;
+import org.junit.rules.TemporaryFolder;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.UUID;
 
 /**
  * This class contains unit tests for the class LocalFileTransferImpl.
@@ -37,16 +37,17 @@ import java.io.IOException;
  * @author amsharma
  * @since 3.0.0
  */
-@Slf4j
 @Category(UnitTest.class)
 public class LocalFileTransferImplUnitTests {
 
-    private static final String COPY_COMMAND = "cp";
-    private static final String SOURCE_FILE = "source";
-    private static final String DESTINATION_FILE = "dest";
+    /**
+     * Temporary folder for test files.
+     */
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-    private Executor executor;
     private LocalFileTransferImpl localFileTransfer;
+
     /**
      * Setup the tests.
      *
@@ -54,8 +55,7 @@ public class LocalFileTransferImplUnitTests {
      */
     @Before
     public void setup() throws GenieException {
-        executor = Mockito.mock(Executor.class);
-        localFileTransfer = new LocalFileTransferImpl();
+        this.localFileTransfer = new LocalFileTransferImpl();
     }
 
     /**
@@ -64,31 +64,89 @@ public class LocalFileTransferImplUnitTests {
      * @throws GenieException If there is any problem
      */
     @Test
-    public void testisValidWithCorrectFilePrefix() throws GenieException {
-        Assert.assertEquals(localFileTransfer.isValid("file:///filepath"), true);
+    public void isValidWithCorrectFilePrefix() throws GenieException {
+        Assert.assertEquals(this.localFileTransfer.isValid("file:///filepath"), true);
     }
 
     /**
      * Test the getFile method.
      *
      * @throws GenieException If there is any problem
-     * @throws IOException If there is any problem
+     * @throws IOException    If there is any problem
      */
     @Test
-    @Ignore
-    public void testGetFileMethod() throws GenieException, IOException {
+    public void canGetFile() throws GenieException, IOException {
+        final String srcFile = this.temporaryFolder.newFile().getAbsolutePath();
+        final String fileName = UUID.randomUUID().toString();
+        final File dstFile = new File(this.temporaryFolder.getRoot().getAbsolutePath(), fileName);
 
+        Assert.assertFalse(dstFile.exists());
+        this.localFileTransfer.getFile(srcFile, dstFile.getAbsolutePath());
+        Assert.assertTrue(dstFile.exists());
+
+        // If a directory exists it can copy the file
+        final File folder = this.temporaryFolder.newFolder();
+        final File dstFile2 = new File(folder.getAbsolutePath(), fileName);
+        Assert.assertTrue(folder.exists());
+        Assert.assertFalse(dstFile2.exists());
+        this.localFileTransfer.getFile(srcFile, dstFile2.getAbsolutePath());
+        Assert.assertTrue(dstFile2.exists());
+
+        // If a directory doesn't exist it creates it and copies the file
+        final File notExistsFolder = new File(this.temporaryFolder.getRoot(), UUID.randomUUID().toString());
+        Assert.assertFalse(notExistsFolder.exists());
+        final File dstFile3 = new File(notExistsFolder, UUID.randomUUID().toString());
+        Assert.assertFalse(dstFile3.exists());
+        this.localFileTransfer.getFile(srcFile, dstFile3.getAbsolutePath());
+        Assert.assertTrue(dstFile3.exists());
     }
 
     /**
      * Test the putFile method.
      *
      * @throws GenieException If there is any problem
-     * @throws IOException If there is any problem
+     * @throws IOException    If there is any problem
      */
-    @Test(expected = GenieServerException.class)
-    @Ignore
-    public void testPutFileMethod() throws GenieException, IOException {
+    @Test
+    public void testPutFile() throws GenieException, IOException {
+        final String srcFile = this.temporaryFolder.newFile().getAbsolutePath();
+        final String fileName = UUID.randomUUID().toString();
+        final File dstFile = new File(this.temporaryFolder.getRoot().getAbsolutePath(), fileName);
 
+        Assert.assertFalse(dstFile.exists());
+        this.localFileTransfer.putFile(srcFile, dstFile.getAbsolutePath());
+        Assert.assertTrue(dstFile.exists());
+
+        // If a directory exists it can copy the file
+        final File folder = this.temporaryFolder.newFolder();
+        final File dstFile2 = new File(folder.getAbsolutePath(), fileName);
+        Assert.assertTrue(folder.exists());
+        Assert.assertFalse(dstFile2.exists());
+        this.localFileTransfer.putFile(srcFile, dstFile2.getAbsolutePath());
+        Assert.assertTrue(dstFile2.exists());
+
+        // If a directory doesn't exist it creates it and copies the file
+        final File notExistsFolder = new File(this.temporaryFolder.getRoot(), UUID.randomUUID().toString());
+        Assert.assertFalse(notExistsFolder.exists());
+        final File dstFile3 = new File(notExistsFolder, UUID.randomUUID().toString());
+        Assert.assertFalse(dstFile3.exists());
+        this.localFileTransfer.putFile(srcFile, dstFile3.getAbsolutePath());
+        Assert.assertTrue(dstFile3.exists());
+    }
+
+    /**
+     * Make sure the last modified time is accurate.
+     *
+     * @throws GenieException on error
+     * @throws IOException    on error
+     */
+    @Test
+    public void canGetLastModifiedTime() throws GenieException, IOException {
+        final File file = this.temporaryFolder.newFile();
+        final long lastModifiedTime = file.lastModified();
+        Assert.assertThat(
+            this.localFileTransfer.getLastModifiedTime(file.getAbsolutePath()),
+            Matchers.is(lastModifiedTime)
+        );
     }
 }
