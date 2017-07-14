@@ -14,7 +14,6 @@
 package com.netflix.genie.core.services.impl
 
 import com.netflix.genie.common.exceptions.GenieServerException
-import com.netflix.genie.core.services.FileTransfer
 import com.netflix.genie.core.services.FileTransferFactory
 import com.netflix.spectator.api.Registry
 import spock.lang.Specification
@@ -25,7 +24,7 @@ import spock.lang.Unroll
  */
 @Unroll
 class CacheGenieFileTransferServiceSpec extends Specification{
-    FileTransfer localFileTransfer = Mock(FileTransfer)
+    LocalFileTransferImpl localFileTransfer = Mock(LocalFileTransferImpl)
     FileTransferFactory fileTransferFactory = Mock(FileTransferFactory){
         get(_) >> localFileTransfer
     }
