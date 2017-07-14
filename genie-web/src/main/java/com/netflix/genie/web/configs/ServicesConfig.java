@@ -38,7 +38,6 @@ import com.netflix.genie.core.services.AttachmentService;
 import com.netflix.genie.core.services.ClusterLoadBalancer;
 import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;
-import com.netflix.genie.core.services.FileTransfer;
 import com.netflix.genie.core.services.FileTransferFactory;
 import com.netflix.genie.core.services.JobCoordinatorService;
 import com.netflix.genie.core.services.JobKillService;
@@ -52,6 +51,7 @@ import com.netflix.genie.core.services.impl.DefaultMailServiceImpl;
 import com.netflix.genie.core.services.impl.FileSystemAttachmentService;
 import com.netflix.genie.core.services.impl.GenieFileTransferService;
 import com.netflix.genie.core.services.impl.JobCoordinatorServiceImpl;
+import com.netflix.genie.core.services.impl.LocalFileTransferImpl;
 import com.netflix.genie.core.services.impl.LocalJobKillServiceImpl;
 import com.netflix.genie.core.services.impl.LocalJobRunner;
 import com.netflix.genie.core.services.impl.MailServiceImpl;
@@ -286,7 +286,7 @@ public class ServicesConfig {
     public GenieFileTransferService cacheGenieFileTransferService(
         final FileTransferFactory fileTransferFactory,
         @Value("${genie.file.cache.location}") final String baseCacheLocation,
-        @Qualifier("file.system.file") final FileTransfer localFileTransfer,
+        final LocalFileTransferImpl localFileTransfer,
         final Registry registry
     ) throws GenieException {
         return new CacheGenieFileTransferService(fileTransferFactory, baseCacheLocation, localFileTransfer, registry);

@@ -18,7 +18,6 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
-import com.netflix.genie.core.services.FileTransfer;
 import com.netflix.genie.core.services.FileTransferFactory;
 import com.netflix.spectator.api.Registry;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +42,7 @@ public class CacheGenieFileTransferService extends GenieFileTransferService {
     //File cache location
     private final String baseCacheLocation;
     //File transfer service to get/put files on a local system
-    private final FileTransfer localFileTransfer;
+    private final LocalFileTransferImpl localFileTransfer;
     //File cache
     private final LoadingCache<String, File> fileCache = CacheBuilder.newBuilder()
         .recordStats()
@@ -67,7 +66,7 @@ public class CacheGenieFileTransferService extends GenieFileTransferService {
     public CacheGenieFileTransferService(
         @NotNull final FileTransferFactory fileTransferFactory,
         @NotNull final String baseCacheLocation,
-        @NotNull final FileTransfer localFileTransfer, // TODO: I think this should be instance of LocalFileTransferImpl
+        @NotNull final LocalFileTransferImpl localFileTransfer,
         @NotNull final Registry registry
     ) throws GenieException {
         super(fileTransferFactory);

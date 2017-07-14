@@ -28,7 +28,6 @@ import com.netflix.genie.core.jobs.workflow.impl.JobKickoffTask;
 import com.netflix.genie.core.jobs.workflow.impl.JobTask;
 import com.netflix.genie.core.properties.JobsProperties;
 import com.netflix.genie.core.services.AttachmentService;
-import com.netflix.genie.core.services.FileTransfer;
 import com.netflix.genie.core.services.impl.GenieFileTransferService;
 import com.netflix.genie.core.services.impl.LocalFileTransferImpl;
 import com.netflix.genie.web.services.impl.HttpFileTransferImpl;
@@ -56,7 +55,7 @@ public class JobConfig {
      */
     @Bean(name = {"file.system.file", "file.system.null"})
     @Order(value = 2)
-    public FileTransfer localFileTransfer() {
+    public LocalFileTransferImpl localFileTransfer() {
         return new LocalFileTransferImpl();
     }
 
@@ -69,7 +68,7 @@ public class JobConfig {
      */
     @Bean(name = {"file.system.http", "file.system.https"})
     @Order(value = 3)
-    public FileTransfer httpFileTransfer(final RestTemplate restTemplate, final Registry registry) {
+    public HttpFileTransferImpl httpFileTransfer(final RestTemplate restTemplate, final Registry registry) {
         return new HttpFileTransferImpl(restTemplate, registry);
     }
 
