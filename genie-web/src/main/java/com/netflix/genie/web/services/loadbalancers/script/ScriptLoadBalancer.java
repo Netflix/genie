@@ -49,6 +49,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.List;
@@ -237,19 +239,23 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
                 )
             );
 
-            final String scriptFileSource = this.environment.getProperty(SCRIPT_FILE_SOURCE_PROPERTY_KEY);
-            if (scriptFileSource == null) {
+            final String scriptFileSourceValue = this.environment.getProperty(SCRIPT_FILE_SOURCE_PROPERTY_KEY);
+            if (StringUtils.isBlank(scriptFileSourceValue)) {
                 throw new IllegalStateException(
-                    "No script source file found for property " + SCRIPT_FILE_SOURCE_PROPERTY_KEY
+                    "Invalid empty value for script source file property: " + SCRIPT_FILE_SOURCE_PROPERTY_KEY
                 );
             }
+            final String scriptFileSource = new URI(scriptFileSourceValue).getPath();
 
-            final String scriptDestinationDir = this.environment.getProperty(SCRIPT_FILE_DESTINATION_PROPERTY_KEY);
-            if (scriptDestinationDir == null) {
+            final String scriptFileDestinationValue =
+                this.environment.getProperty(SCRIPT_FILE_DESTINATION_PROPERTY_KEY);
+            if (StringUtils.isBlank(scriptFileSourceValue)) {
                 throw new IllegalStateException(
-                    "No script destination directory found for property " + SCRIPT_FILE_DESTINATION_PROPERTY_KEY
+                    "Invalid empty value for script destination directory property: "
+                        + SCRIPT_FILE_DESTINATION_PROPERTY_KEY
                 );
             }
+            final String scriptDestinationDir = new URI(scriptFileDestinationValue).getPath();
 
             // Check the validity of the destination directory
             final File scriptDestinationDirFile = new File(scriptDestinationDir);
@@ -295,7 +301,7 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
             tags.put(STATUS_TAG_KEY, STATUS_TAG_OK);
 
             this.isConfigured.set(true);
-        } catch (final GenieException | IOException | ScriptException | RuntimeException e) {
+        } catch (final GenieException | IOException | ScriptException | RuntimeException | URISyntaxException e) {
             tags.put(STATUS_TAG_KEY, STATUS_TAG_FAILED);
             tags.put(EXCEPTION_TAG_KEY, e.getClass().getName());
             log.error(
