@@ -220,6 +220,22 @@ public class JobRequestEntityUnitTests {
     }
 
     /**
+     * Make sure can set the blank file dependencies.
+     */
+    @Test
+    public void canSetBlankDependencies() {
+        final String[] blankDependencies = {
+            null,
+            "",
+            " ",
+        };
+        for (String blankDependenciesString : blankDependencies) {
+            this.entity.setDependencies(blankDependenciesString);
+            Assert.assertThat(this.entity.getDependencies(), Matchers.is(EMPTY_JSON_ARRAY));
+        }
+    }
+
+    /**
      * Make sure can set whether to disable logs or not.
      */
     @Test

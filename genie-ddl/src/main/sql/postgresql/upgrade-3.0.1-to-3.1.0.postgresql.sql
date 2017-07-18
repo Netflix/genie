@@ -25,7 +25,10 @@ ALTER TABLE job_requests
   ALTER COLUMN cluster_criterias SET NOT NULL,
   ALTER COLUMN command_criteria TYPE TEXT,
   ALTER COLUMN command_criteria SET DEFAULT ''::character varying,
-  ALTER COLUMN command_criteria SET NOT NULL;
+  ALTER COLUMN command_criteria SET NOT NULL,
+  ALTER COLUMN dependencies TYPE TEXT,
+  ALTER COLUMN dependencies SET NOT NULL,
+  ALTER COLUMN dependencies SET DEFAULT ''::character varying;
 
 ALTER TABLE applications
   ALTER COLUMN description TYPE text,

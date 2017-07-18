@@ -82,9 +82,9 @@ public class JobRequestEntity extends SetupFileEntity {
     @Size(min = 1, message = "Command criteria cannot be empty")
     private String commandCriteria = EMPTY_JSON_ARRAY;
 
-    @Basic
-    @Column(name = "dependencies", length = 30000)
-    @Size(max = 30000, message = "Max length in the database is 30000 characters")
+    @Lob
+    @Basic(optional = false)
+    @Column(name = "dependencies", nullable = false)
     private String dependencies = EMPTY_JSON_ARRAY;
 
     @Basic(optional = false)
@@ -201,7 +201,7 @@ public class JobRequestEntity extends SetupFileEntity {
      * @param dependencies Dependent files for the job in csv format
      */
     protected void setDependencies(final String dependencies) {
-        this.dependencies = dependencies;
+        this.dependencies = StringUtils.isBlank(dependencies) ? EMPTY_JSON_ARRAY : dependencies;
     }
 
     /**
