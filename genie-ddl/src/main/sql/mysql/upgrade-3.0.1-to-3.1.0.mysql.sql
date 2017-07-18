@@ -20,7 +20,8 @@ ALTER TABLE `jobs`
 
 ALTER TABLE `job_requests`
   MODIFY COLUMN `cluster_criterias` TEXT NOT NULL,
-  MODIFY COLUMN `command_criteria` TEXT NOT NULL;
+  MODIFY COLUMN `command_criteria` TEXT NOT NULL,
+  MODIFY COLUMN `dependencies` TEXT NOT NULL;
 
 ALTER TABLE `clusters`
   MODIFY COLUMN `description` TEXT;
