@@ -27,7 +27,7 @@ DROP TABLE IF EXISTS `application_configs`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `application_configs` (
   `application_id` varchar(255) NOT NULL,
-  `config` varchar(1024) NOT NULL,
+  `config` varchar(2048) NOT NULL,
   KEY `application_id` (`application_id`),
   CONSTRAINT `application_configs_ibfk_1` FOREIGN KEY (`application_id`) REFERENCES `applications` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -42,7 +42,7 @@ DROP TABLE IF EXISTS `application_dependencies`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `application_dependencies` (
   `application_id` varchar(255) NOT NULL,
-  `dependency` varchar(1024) NOT NULL,
+  `dependency` varchar(2048) NOT NULL,
   KEY `application_id` (`application_id`),
   CONSTRAINT `application_dependencies_ibfk_1` FOREIGN KEY (`application_id`) REFERENCES `applications` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -85,7 +85,7 @@ DROP TABLE IF EXISTS `cluster_configs`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `cluster_configs` (
   `cluster_id` varchar(255) NOT NULL,
-  `config` varchar(1024) NOT NULL,
+  `config` varchar(2048) NOT NULL,
   KEY `cluster_id` (`cluster_id`),
   CONSTRAINT `cluster_configs_ibfk_1` FOREIGN KEY (`cluster_id`) REFERENCES `clusters` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -100,7 +100,7 @@ DROP TABLE IF EXISTS `cluster_dependencies`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `cluster_dependencies` (
   `cluster_id` varchar(255) NOT NULL,
-  `dependency` varchar(1024) NOT NULL,
+  `dependency` varchar(2048) NOT NULL,
   KEY `cluster_id` (`cluster_id`),
   CONSTRAINT `cluster_dependencies_ibfk_1` FOREIGN KEY (`cluster_id`) REFERENCES `clusters` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -159,7 +159,7 @@ DROP TABLE IF EXISTS `command_configs`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `command_configs` (
   `command_id` varchar(255) NOT NULL,
-  `config` varchar(1024) NOT NULL,
+  `config` varchar(2048) NOT NULL,
   KEY `command_id` (`command_id`),
   CONSTRAINT `command_configs_ibfk_1` FOREIGN KEY (`command_id`) REFERENCES `commands` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -174,7 +174,7 @@ DROP TABLE IF EXISTS `command_dependencies`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `command_dependencies` (
   `command_id` varchar(255) NOT NULL,
-  `dependency` varchar(1024) NOT NULL,
+  `dependency` varchar(2048) NOT NULL,
   KEY `command_id` (`command_id`),
   CONSTRAINT `command_dependencies_ibfk_1` FOREIGN KEY (`command_id`) REFERENCES `commands` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

@@ -71,5 +71,29 @@ ALTER TABLE jobs
 ALTER TABLE job_requests
   ALTER COLUMN tags TYPE character varying(10000);
 
+ALTER TABLE application_configs
+  ALTER COLUMN config TYPE character varying(2048),
+  ALTER COLUMN config SET NOT NULL;
+
+ALTER TABLE cluster_configs
+  ALTER COLUMN config TYPE character varying(2048),
+  ALTER COLUMN config SET NOT NULL;
+
+ALTER TABLE command_configs
+  ALTER COLUMN config TYPE character varying(2048),
+  ALTER COLUMN config SET NOT NULL;
+
+ALTER TABLE application_dependencies
+  ALTER COLUMN dependency TYPE character varying(2048),
+  ALTER COLUMN dependency SET NOT NULL;
+
+ALTER TABLE cluster_dependencies
+  ALTER COLUMN dependency TYPE character varying(2048),
+  ALTER COLUMN dependency SET NOT NULL;
+
+ALTER TABLE command_dependencies
+  ALTER COLUMN dependency TYPE character varying(2048),
+  ALTER COLUMN dependency SET NOT NULL;
+
 SELECT CURRENT_TIMESTAMP, 'Finished upgrading from 3.0.1 schema to 3.1.0 schema';
 COMMIT;

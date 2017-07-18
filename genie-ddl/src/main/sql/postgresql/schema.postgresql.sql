@@ -42,7 +42,7 @@ SET default_with_oids = false;
 
 CREATE TABLE application_configs (
     application_id character varying(255) NOT NULL,
-    config character varying(1024) NOT NULL
+    config character varying(2048) NOT NULL
 );
 
 
@@ -52,7 +52,7 @@ CREATE TABLE application_configs (
 
 CREATE TABLE application_dependencies (
     application_id character varying(255) NOT NULL,
-    dependency character varying(1024) NOT NULL
+    dependency character varying(2048) NOT NULL
 );
 
 
@@ -82,7 +82,7 @@ CREATE TABLE applications (
 
 CREATE TABLE cluster_configs (
     cluster_id character varying(255) NOT NULL,
-    config character varying(1024) NOT NULL
+    config character varying(2048) NOT NULL
 );
 
 
@@ -92,7 +92,7 @@ CREATE TABLE cluster_configs (
 
 CREATE TABLE cluster_dependencies (
     cluster_id character varying(255) NOT NULL,
-    dependency character varying(1024) NOT NULL
+    dependency character varying(2048) NOT NULL
 );
 
 
@@ -132,7 +132,7 @@ CREATE TABLE clusters_commands (
 
 CREATE TABLE command_configs (
     command_id character varying(255) NOT NULL,
-    config character varying(1024) NOT NULL
+    config character varying(2048) NOT NULL
 );
 
 
@@ -142,7 +142,7 @@ CREATE TABLE command_configs (
 
 CREATE TABLE command_dependencies (
     command_id character varying(255) NOT NULL,
-    dependency character varying(1024) NOT NULL
+    dependency character varying(2048) NOT NULL
 );
 
 
