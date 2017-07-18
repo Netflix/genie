@@ -72,7 +72,7 @@ public class ClusterEntity extends SetupFileEntity {
         name = "cluster_configs",
         joinColumns = @JoinColumn(name = "cluster_id", referencedColumnName = "id")
     )
-    @Column(name = "config", nullable = false, length = 1024)
+    @Column(name = "config", nullable = false, length = 2048)
     private Set<String> configs = new HashSet<>();
 
     @ElementCollection(fetch = FetchType.EAGER)
@@ -80,7 +80,7 @@ public class ClusterEntity extends SetupFileEntity {
         name = "cluster_dependencies",
         joinColumns = @JoinColumn(name = "cluster_id", referencedColumnName = "id")
     )
-    @Column(name = "dependency", nullable = false, length = 1024)
+    @Column(name = "dependency", nullable = false, length = 2048)
     private Set<String> dependencies = new HashSet<>();
 
     // TODO: Make lazy?

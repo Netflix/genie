@@ -54,5 +54,23 @@ ALTER TABLE `jobs`
 ALTER TABLE `job_requests`
   MODIFY COLUMN `tags` VARCHAR(10000) DEFAULT NULL;
 
+ALTER TABLE `application_configs`
+  MODIFY COLUMN `config` VARCHAR(2048) NOT NULL;
+
+ALTER TABLE `cluster_configs`
+  MODIFY COLUMN `config` VARCHAR(2048) NOT NULL;
+
+ALTER TABLE `command_configs`
+  MODIFY COLUMN `config` VARCHAR(2048) NOT NULL;
+
+ALTER TABLE `application_dependencies`
+  MODIFY COLUMN `dependency` VARCHAR(2048) NOT NULL;
+
+ALTER TABLE `cluster_dependencies`
+  MODIFY COLUMN `dependency` VARCHAR(2048) NOT NULL;
+
+ALTER TABLE `command_dependencies`
+  MODIFY COLUMN `dependency` VARCHAR(2048) NOT NULL;
+
 SELECT CURRENT_TIMESTAMP AS '', 'Finished upgrading from 3.0.1 schema to 3.1.0 schema' AS '';
 COMMIT;

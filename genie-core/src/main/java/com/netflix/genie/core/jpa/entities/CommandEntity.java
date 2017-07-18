@@ -90,7 +90,7 @@ public class CommandEntity extends SetupFileEntity {
         name = "command_configs",
         joinColumns = @JoinColumn(name = "command_id", referencedColumnName = "id")
     )
-    @Column(name = "config", nullable = false, length = 1024)
+    @Column(name = "config", nullable = false, length = 2048)
     private Set<String> configs = new HashSet<>();
 
     // TODO: Make lazy?
@@ -115,7 +115,7 @@ public class CommandEntity extends SetupFileEntity {
         name = "command_dependencies",
         joinColumns = @JoinColumn(name = "command_id", referencedColumnName = "id")
     )
-    @Column(name = "dependency", nullable = false, length = 1024)
+    @Column(name = "dependency", nullable = false, length = 2048)
     private Set<String> dependencies = new HashSet<>();
 
     /**
