@@ -291,6 +291,7 @@ public class JobRestController {
                 .withId(jobId)
                 .withDisableLogArchival(jobRequest.isDisableLogArchival())
                 .withTags(jobRequest.getTags())
+                .withConfigs(jobRequest.getConfigs())
                 .withDependencies(jobRequest.getDependencies())
                 .withApplications(jobRequest.getApplications());
 

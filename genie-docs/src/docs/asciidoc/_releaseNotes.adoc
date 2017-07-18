@@ -12,6 +12,7 @@ property
 ** Turn off by setting `management.security.enabled` to `false`
 * Optional cluster load balancer via Admin supplied script
 * Add dependencies to the Cluster and Command entities
+* Add configurations to the JobRequest entity
 
 === Library Upgrades
 
@@ -165,3 +166,4 @@ for more information. Currently on classpath only none, hash_map, redis and jdbc
 * Switch Applications' table 'cluster_criterias' and 'command_criteria' columns to text
 * Increase the size of 'tags' column for applications, clusters, commands, jobs, job_requests
 * Switch JobRequest table 'dependencies' column to text
+* Add job request table configs column

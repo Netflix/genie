@@ -75,6 +75,7 @@ public class JobRequestUnitTests {
         Assert.assertFalse(request.getCpu().isPresent());
         Assert.assertThat(request.isDisableLogArchival(), Matchers.is(false));
         Assert.assertFalse(request.getEmail().isPresent());
+        Assert.assertThat(request.getConfigs(), Matchers.empty());
         Assert.assertThat(request.getDependencies(), Matchers.empty());
         Assert.assertFalse(request.getGroup().isPresent());
         Assert.assertFalse(request.getMemory().isPresent());
@@ -106,6 +107,13 @@ public class JobRequestUnitTests {
 
         final String email = UUID.randomUUID().toString() + "@netflix.com";
         builder.withEmail(email);
+
+        final Set<String> configs = Sets.newHashSet(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
+        );
+        builder.withConfigs(configs);
 
         final Set<String> dependencies = Sets.newHashSet(
             UUID.randomUUID().toString(),
@@ -163,6 +171,7 @@ public class JobRequestUnitTests {
         Assert.assertThat(request.getCpu().orElseThrow(IllegalArgumentException::new), Matchers.is(cpu));
         Assert.assertThat(request.isDisableLogArchival(), Matchers.is(disableLogArchival));
         Assert.assertThat(request.getEmail().orElseThrow(IllegalArgumentException::new), Matchers.is(email));
+        Assert.assertThat(request.getConfigs(), Matchers.is(configs));
         Assert.assertThat(request.getDependencies(), Matchers.is(dependencies));
         Assert.assertThat(request.getGroup().orElseThrow(IllegalArgumentException::new), Matchers.is(group));
         Assert.assertThat(request.getMemory().orElseThrow(IllegalArgumentException::new), Matchers.is(memory));
@@ -185,6 +194,7 @@ public class JobRequestUnitTests {
     public void canBuildJobRequestWithNulls() {
         final JobRequest.Builder builder = new JobRequest.Builder(NAME, USER, VERSION, COMMAND_ARGS, null, null);
         builder.withEmail(null);
+        builder.withConfigs(null);
         builder.withDependencies(null);
         builder.withGroup(null);
         builder.withSetupFile(null);
@@ -206,6 +216,7 @@ public class JobRequestUnitTests {
         Assert.assertThat(request.isDisableLogArchival(), Matchers.is(false));
         Assert.assertFalse(request.getEmail().isPresent());
         Assert.assertThat(request.getDependencies(), Matchers.empty());
+        Assert.assertThat(request.getDependencies(), Matchers.empty());
         Assert.assertFalse(request.getGroup().isPresent());
         Assert.assertFalse(request.getMemory().isPresent());
         Assert.assertFalse(request.getSetupFile().isPresent());
@@ -225,6 +236,7 @@ public class JobRequestUnitTests {
     public void canFindEquality() {
         final JobRequest.Builder builder = new JobRequest.Builder(NAME, USER, VERSION, COMMAND_ARGS, null, null);
         builder.withEmail(null);
+        builder.withConfigs(null);
         builder.withDependencies(null);
         builder.withGroup(null);
         builder.withSetupFile(null);
@@ -252,6 +264,7 @@ public class JobRequestUnitTests {
     public void canUseHashCode() {
         final JobRequest.Builder builder = new JobRequest.Builder(NAME, USER, VERSION, COMMAND_ARGS, null, null);
         builder.withEmail(null);
+        builder.withConfigs(null);
         builder.withDependencies(null);
         builder.withGroup(null);
         builder.withSetupFile(null);

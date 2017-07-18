@@ -32,7 +32,7 @@ import java.util.Optional;
  */
 @Getter
 @JsonDeserialize(builder = Application.Builder.class)
-public class Application extends ConfigDTO {
+public class Application extends ExecutionEnvironmentDTO {
 
     private static final long serialVersionUID = 212266105066344180L;
 
@@ -66,7 +66,7 @@ public class Application extends ConfigDTO {
      * @author tgianos
      * @since 3.0.0
      */
-    public static class Builder extends ConfigDTO.Builder<Builder> {
+    public static class Builder extends ExecutionEnvironmentDTO.Builder<Builder> {
 
         private final ApplicationStatus bStatus;
         private String bType;

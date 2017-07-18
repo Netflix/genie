@@ -31,7 +31,7 @@ import javax.validation.constraints.NotNull;
  */
 @Getter
 @JsonDeserialize(builder = Cluster.Builder.class)
-public class Cluster extends ConfigDTO {
+public class Cluster extends ExecutionEnvironmentDTO {
 
     private static final long serialVersionUID = 8562447832504925029L;
 
@@ -54,7 +54,7 @@ public class Cluster extends ConfigDTO {
      * @author tgianos
      * @since 3.0.0
      */
-    public static class Builder extends ConfigDTO.Builder<Builder> {
+    public static class Builder extends ExecutionEnvironmentDTO.Builder<Builder> {
 
         private final ClusterStatus bStatus;
 

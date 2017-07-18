@@ -81,6 +81,8 @@ public class JobRequestEntityUnitTests {
         Assert.assertThat(this.entity.getCommandCriteriaAsSet(), Matchers.empty());
         Assert.assertFalse(this.entity.getCpu().isPresent());
         Assert.assertFalse(this.entity.getEmail().isPresent());
+        Assert.assertThat(this.entity.getConfigs(), Matchers.is(EMPTY_JSON_ARRAY));
+        Assert.assertThat(this.entity.getConfigsAsSet(), Matchers.empty());
         Assert.assertThat(this.entity.getDependencies(), Matchers.is(EMPTY_JSON_ARRAY));
         Assert.assertThat(this.entity.getDependenciesAsSet(), Matchers.empty());
         Assert.assertFalse(this.entity.getGroup().isPresent());
@@ -177,6 +179,62 @@ public class JobRequestEntityUnitTests {
         final String commandArgs = UUID.randomUUID().toString();
         this.entity.setCommandArgs(commandArgs);
         Assert.assertThat(this.entity.getCommandArgs(), Matchers.is(commandArgs));
+    }
+
+    /**
+     * Make sure can set the file configs for the job.
+     *
+     * @throws GenieException on error
+     */
+    @Test
+    public void canSetFileConfigsFromSet() throws GenieException {
+        final Set<String> fileConfigs = Sets.newHashSet(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
+        );
+
+        this.entity.setConfigsFromSet(fileConfigs);
+        Assert.assertThat(this.entity.getConfigsAsSet(), Matchers.is(fileConfigs));
+        Assert.assertThat(this.entity.getConfigs(), Matchers.notNullValue());
+
+        try {
+            final ObjectMapper mapper = new ObjectMapper();
+            mapper.readTree(this.entity.getConfigs());
+        } catch (final IOException ioe) {
+            Assert.fail();
+        }
+
+        this.entity.setConfigsFromSet(null);
+        Assert.assertThat(this.entity.getConfigsAsSet(), Matchers.empty());
+        Assert.assertThat(this.entity.getConfigs(), Matchers.is("[]"));
+    }
+
+    /**
+     * Make sure can set the file configs.
+     */
+    @Test
+    public void canSetFileConfigs() {
+        final String fileConfigs = UUID.randomUUID().toString();
+        this.entity.setConfigs(fileConfigs);
+        Assert.assertThat(this.entity.getConfigs(), Matchers.is(fileConfigs));
+    }
+
+    /**
+     * Make sure can set the blank file configs.
+     */
+    @Test
+    public void canSetBlankConfigs() {
+        final String[] blankConfigs = {
+            null,
+            "",
+            " ",
+        };
+        for (String blankConfigsString : blankConfigs) {
+            this.entity.setConfigs(blankConfigsString);
+            Assert.assertThat(this.entity.getConfigs(), Matchers.is(EMPTY_JSON_ARRAY));
+        }
     }
 
     /**
@@ -476,6 +534,13 @@ public class JobRequestEntityUnitTests {
         );
         requestEntity.setCommandCriteriaFromSet(commandCriteria);
 
+        final Set<String> configs = Sets.newHashSet(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
+        );
+        requestEntity.setConfigsFromSet(configs);
+
         final Set<String> fileDependencies = Sets.newHashSet(
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
@@ -529,6 +594,7 @@ public class JobRequestEntityUnitTests {
         Assert.assertThat(criterias.get(2).getTags(), Matchers.containsInAnyOrder("seven", "eight", "nine"));
 
         Assert.assertThat(request.getCommandCriteria(), Matchers.is(commandCriteria));
+        Assert.assertThat(request.getConfigs(), Matchers.is(configs));
         Assert.assertThat(request.getDependencies(), Matchers.is(fileDependencies));
         Assert.assertTrue(request.isDisableLogArchival());
         Assert.assertThat(request.getEmail().orElseGet(RandomSuppliers.STRING), Matchers.is(email));

@@ -737,6 +737,13 @@ final class Snippets {
                 )
                 .optional(),
             PayloadDocumentation
+                .fieldWithPath("configs")
+                .attributes(getConstraintsForField(JOB_REQUEST_CONSTRAINTS, "configs"))
+                .description(
+                    "URI's of configuration files which will be downloaded into job working directory at runtime"
+                )
+                .optional(),
+            PayloadDocumentation
                 .fieldWithPath("dependencies")
                 .attributes(getConstraintsForField(JOB_REQUEST_CONSTRAINTS, "dependencies"))
                 .description("URI's of dependency files which will be downloaded into job working directory at runtime")

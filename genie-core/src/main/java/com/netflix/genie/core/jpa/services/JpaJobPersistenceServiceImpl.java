@@ -332,6 +332,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         jobRequest.getSetupFile().ifPresent(jobRequestEntity::setSetupFile);
         jobRequestEntity.setClusterCriteriasFromList(jobRequest.getClusterCriterias());
         jobRequestEntity.setCommandCriteriaFromSet(jobRequest.getCommandCriteria());
+        jobRequestEntity.setConfigsFromSet(jobRequest.getConfigs());
         jobRequestEntity.setDependenciesFromSet(jobRequest.getDependencies());
         jobRequestEntity.setDisableLogArchival(jobRequest.isDisableLogArchival());
         jobRequest.getEmail().ifPresent(jobRequestEntity::setEmail);

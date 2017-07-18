@@ -194,7 +194,7 @@ needed
 . Cluster configuration and dependency files are downloaded and stored in the job directory
 . Command configuration and dependency files are downloaded and stored in the job directory
 . Command related variables are written into the run script
-. All job dependency files (including attachments) are downloaded into the job working directory
+. All job dependency files (including configurations, dependencies, attachments) are downloaded into the job working directory
 . Job related variables are written into the run script
 
 ===== Genie Launches and Monitors the Job Execution

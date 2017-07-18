@@ -296,6 +296,7 @@ CREATE TABLE `job_requests` (
   `setup_file` varchar(1024) DEFAULT NULL,
   `cluster_criterias` TEXT NOT NULL,
   `command_criteria` TEXT NOT NULL,
+  `configs` TEXT NOT NULL,
   `dependencies` TEXT NOT NULL,
   `disable_log_archival` bit(1) NOT NULL DEFAULT b'0',
   `email` varchar(255) DEFAULT NULL,
