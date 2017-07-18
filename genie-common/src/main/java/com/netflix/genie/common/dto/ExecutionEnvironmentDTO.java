@@ -32,9 +32,10 @@ import java.util.Set;
  * @since 3.0.0
  */
 @Getter
-public abstract class SetupFileAndDependenciesDTO extends CommonDTO {
+public abstract class ExecutionEnvironmentDTO extends CommonDTO {
 
     private static final long serialVersionUID = 2116254045303538065L;
+    protected final Set<String> configs = new HashSet<>();
     protected final Set<String> dependencies = new HashSet<>();
     @Size(max = 1024, message = "Max length of the setup file is 1024 characters")
     private final String setupFile;
@@ -45,9 +46,10 @@ public abstract class SetupFileAndDependenciesDTO extends CommonDTO {
      * @param builder The builder to use
      */
     @SuppressWarnings("unchecked")
-    protected SetupFileAndDependenciesDTO(final Builder builder) {
+    protected ExecutionEnvironmentDTO(final Builder builder) {
         super(builder);
         this.setupFile = builder.bSetupFile;
+        this.configs.addAll(builder.bConfigs);
         this.dependencies.addAll(builder.bDependencies);
     }
 
@@ -58,6 +60,15 @@ public abstract class SetupFileAndDependenciesDTO extends CommonDTO {
      */
     public Optional<String> getSetupFile() {
         return Optional.ofNullable(this.setupFile);
+    }
+
+    /**
+     * Get the set of configs for the entity.
+     *
+     * @return The configs for the entity as a read-only set.
+     */
+    public Set<String> getConfigs() {
+        return Collections.unmodifiableSet(this.configs);
     }
 
     /**
@@ -79,6 +90,7 @@ public abstract class SetupFileAndDependenciesDTO extends CommonDTO {
     @SuppressWarnings("unchecked")
     protected abstract static class Builder<T extends Builder> extends CommonDTO.Builder<T> {
 
+        private final Set<String> bConfigs = new HashSet<>();
         private final Set<String> bDependencies = new HashSet<>();
         private String bSetupFile;
 
@@ -101,6 +113,19 @@ public abstract class SetupFileAndDependenciesDTO extends CommonDTO {
          */
         public T withSetupFile(final String setupFile) {
             this.bSetupFile = setupFile;
+            return (T) this;
+        }
+
+        /**
+         * The configs to use with the resource if desired.
+         *
+         * @param configs The configuration file locations
+         * @return The builder
+         */
+        public T withConfigs(final Set<String> configs) {
+            if (configs != null) {
+                this.bConfigs.addAll(configs);
+            }
             return (T) this;
         }
 

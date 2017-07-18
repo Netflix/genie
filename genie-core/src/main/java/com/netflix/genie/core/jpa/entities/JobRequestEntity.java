@@ -87,6 +87,11 @@ public class JobRequestEntity extends SetupFileEntity {
     @Column(name = "dependencies", nullable = false)
     private String dependencies = EMPTY_JSON_ARRAY;
 
+    @Lob
+    @Basic
+    @Column(name = "configs")
+    private String configs = EMPTY_JSON_ARRAY;
+
     @Basic(optional = false)
     @Column(name = "disable_log_archival", nullable = false)
     private boolean disableLogArchival;
@@ -164,6 +169,44 @@ public class JobRequestEntity extends SetupFileEntity {
      */
     protected void setClusterCriterias(final String clusterCriterias) {
         this.clusterCriterias = StringUtils.isBlank(clusterCriterias) ? EMPTY_JSON_ARRAY : clusterCriterias;
+    }
+
+    /**
+     * Get the file configs as a set of strings.
+     *
+     * @return The file configs for the job
+     * @throws GenieException On any exception
+     */
+    public Set<String> getConfigsAsSet() throws GenieException {
+        return JsonUtils.unmarshall(this.configs, SET_STRING_TYPE_REFERENCE);
+    }
+
+    /**
+     * Sets the configs for the job request from a set of strings.
+     *
+     * @param configsSet Configuration files for the job
+     * @throws GenieException for any processing error
+     */
+    public void setConfigsFromSet(final Set<String> configsSet) throws GenieException {
+        this.configs = configsSet == null ? EMPTY_JSON_ARRAY : JsonUtils.marshall(configsSet);
+    }
+
+    /**
+     * Gets the configs for the job as JSON array.
+     *
+     * @return configs
+     */
+    protected String getConfigs() {
+        return this.configs;
+    }
+
+    /**
+     * Sets the configs for the job.
+     *
+     * @param configs Dependent files for the job in csv format
+     */
+    protected void setConfigs(final String configs) {
+        this.configs = StringUtils.isBlank(configs) ? EMPTY_JSON_ARRAY : configs;
     }
 
     /**
@@ -336,6 +379,7 @@ public class JobRequestEntity extends SetupFileEntity {
             .withId(this.getId())
             .withDisableLogArchival(this.disableLogArchival)
             .withEmail(this.email)
+            .withConfigs(this.getConfigsAsSet())
             .withDependencies(this.getDependenciesAsSet())
             .withGroup(this.group)
             .withTags(this.getTags())

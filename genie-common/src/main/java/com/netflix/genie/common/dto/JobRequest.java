@@ -43,7 +43,7 @@ import java.util.Set;
  */
 @Getter
 @JsonDeserialize(builder = JobRequest.Builder.class)
-public class JobRequest extends SetupFileAndDependenciesDTO {
+public class JobRequest extends ExecutionEnvironmentDTO {
 
     /**
      * The default number of seconds from start before a job times out.
@@ -172,7 +172,7 @@ public class JobRequest extends SetupFileAndDependenciesDTO {
      * @author tgianos
      * @since 3.0.0
      */
-    public static class Builder extends SetupFileAndDependenciesDTO.Builder<Builder> {
+    public static class Builder extends ExecutionEnvironmentDTO.Builder<Builder> {
 
         private final String bCommandArgs;
         private final List<ClusterCriteria> bClusterCriterias = new ArrayList<>();

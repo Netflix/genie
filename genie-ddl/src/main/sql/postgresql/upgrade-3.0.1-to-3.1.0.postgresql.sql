@@ -28,7 +28,10 @@ ALTER TABLE job_requests
   ALTER COLUMN command_criteria SET NOT NULL,
   ALTER COLUMN dependencies TYPE TEXT,
   ALTER COLUMN dependencies SET NOT NULL,
-  ALTER COLUMN dependencies SET DEFAULT ''::character varying;
+  ALTER COLUMN dependencies SET DEFAULT ''::character varying,
+  ADD COLUMN configs TYPE TEXT,
+  ALTER COLUMN configs SET NOT NULL,
+  ALTER COLUMN configs SET DEFAULT ''::character varying;
 
 ALTER TABLE applications
   ALTER COLUMN description TYPE text,

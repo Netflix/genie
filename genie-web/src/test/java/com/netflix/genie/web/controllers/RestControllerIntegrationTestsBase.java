@@ -25,7 +25,7 @@ import com.netflix.genie.GenieWeb;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
-import com.netflix.genie.common.dto.ConfigDTO;
+import com.netflix.genie.common.dto.ExecutionEnvironmentDTO;
 import com.netflix.genie.common.util.GenieDateFormat;
 import com.netflix.genie.test.categories.IntegrationTest;
 import org.apache.commons.lang3.StringUtils;
@@ -359,7 +359,7 @@ public abstract class RestControllerIntegrationTestsBase {
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem(tag2)));
     }
 
-    <R extends ConfigDTO> String createConfigResource(
+    <R extends ExecutionEnvironmentDTO> String createConfigResource(
         @NotNull final R resource,
         final RestDocumentationResultHandler documentationResultHandler
     ) throws Exception {

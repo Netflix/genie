@@ -138,6 +138,17 @@ request parameters, a cluster and command combination is selected for execution.
 files to Genie either as attachments or using the file dependencies field if they already exist in an accessible file
 system. As a job executes, its details are recorded in the job record within the Genie database.
 
+====== Resource configuration vs. dependencies
+
+Genie allows associating files with the resources above so that these files are retrieved and placed in the job execution
+directory as part of the setup.
+When creating an Application, a Cluster, a Command or a Job, it is possible to associate *configs* and/or *dependencies*.
+*Configs* are expected to be small configuration files (XML, JSON, YAML, ...), whereas *dependencies* are expected to be
+larger and possibly binary (Jars, executables, libraries, etc).
+Application, Cluster, and Command dependencies are deleted after job completion (unless Genie is configured to preserve
+them), to avoid storing and archiving them over and over. Configurations are preserved. Job configurations and
+dependencies are also preserved.
+
 ==== Wrap-up
 
 This section was intended to provide insight into how the Genie data model is thought out and works together. It is

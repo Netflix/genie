@@ -36,7 +36,7 @@ import java.util.Optional;
  */
 @Getter
 @JsonDeserialize(builder = Command.Builder.class)
-public class Command extends ConfigDTO {
+public class Command extends ExecutionEnvironmentDTO {
 
     /**
      * The default amount of time to wait between job process checks.
@@ -89,7 +89,7 @@ public class Command extends ConfigDTO {
      * @author tgianos
      * @since 3.0.0
      */
-    public static class Builder extends ConfigDTO.Builder<Builder> {
+    public static class Builder extends ExecutionEnvironmentDTO.Builder<Builder> {
 
         private final CommandStatus bStatus;
         private final String bExecutable;

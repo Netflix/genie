@@ -234,6 +234,7 @@ CREATE TABLE job_requests (
     cluster_criterias text DEFAULT ''::character varying NOT NULL,
     command_criteria text DEFAULT ''::character varying NOT NULL,
     dependencies text DEFAULT ''::character varying NOT NULL,
+    configs text DEFAULT ''::character varying NOT NULL,
     disable_log_archival boolean DEFAULT false NOT NULL,
     email character varying(255) DEFAULT NULL::character varying,
     tags character varying(10000) DEFAULT NULL::character varying,

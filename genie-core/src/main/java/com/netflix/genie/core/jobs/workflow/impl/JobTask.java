@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.core.jobs.workflow.impl;
 
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.jobs.JobConstants;
@@ -31,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -108,14 +110,17 @@ public class JobTask extends GenieBaseTask {
                 }
             }
 
-            // Iterate over and get all dependencies
-            for (final String dependencyFile : jobExecEnv.getJobRequest().getDependencies()) {
-                if (StringUtils.isNotBlank(dependencyFile)) {
+            // Iterate over and get all configs and dependencies
+            final Collection<String> configsAndDependencies = Sets.newHashSet();
+            configsAndDependencies.addAll(jobExecEnv.getJobRequest().getDependencies());
+            configsAndDependencies.addAll(jobExecEnv.getJobRequest().getConfigs());
+            for (final String dependentFile : configsAndDependencies) {
+                if (StringUtils.isNotBlank(dependentFile)) {
                     final String localPath = jobWorkingDirectory
                         + JobConstants.FILE_PATH_DELIMITER
-                        + dependencyFile.substring(dependencyFile.lastIndexOf(JobConstants.FILE_PATH_DELIMITER) + 1);
+                        + dependentFile.substring(dependentFile.lastIndexOf(JobConstants.FILE_PATH_DELIMITER) + 1);
 
-                    fts.getFile(dependencyFile, localPath);
+                    fts.getFile(dependentFile, localPath);
                 }
             }
 

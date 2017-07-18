@@ -821,6 +821,7 @@ Below is an actual job request (with a few obfuscations) made by a production jo
   "cpu": null,
   "memory": null,
   "timeout": null,
+  "configs": [],
   "dependencies": [ // <6>
     "s3://bucket/DSE/etl_code/cs/ticket/fct_ticket.py",
     "s3://bucket/dea/pyspark_core/dea_pyspark_core-latest.egg"

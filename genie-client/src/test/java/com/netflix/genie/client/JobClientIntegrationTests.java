@@ -113,6 +113,10 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
 
         final Set<String> commandCriteria = Sets.newHashSet("bash");
 
+        final String configFile1
+            = this.resourceLoader.getResource("/config1").getFile().getAbsolutePath();
+        final Set<String> configs = Sets.newHashSet(configFile1);
+
         final String depFile1
             = this.resourceLoader.getResource("/dep1").getFile().getAbsolutePath();
         final Set<String> dependencies = Sets.newHashSet(depFile1);
@@ -130,6 +134,7 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
             .withId(jobId)
             .withDisableLogArchival(true)
             .withSetupFile(setUpFile)
+            .withConfigs(configs)
             .withDependencies(dependencies)
             .withDescription(JOB_DESCRIPTION)
             .build();

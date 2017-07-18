@@ -439,6 +439,12 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .getFile()
             .getAbsolutePath();
 
+        final String configFile1 = this.resourceLoader
+            .getResource(BASE_DIR + "job" + FILE_DELIMITER + "config1")
+            .getFile()
+            .getAbsolutePath();
+        final Set<String> configs = Sets.newHashSet(configFile1);
+
         final String depFile1 = this.resourceLoader
             .getResource(BASE_DIR + "job" + FILE_DELIMITER + "dep1")
             .getFile()
@@ -457,6 +463,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         )
             .withDisableLogArchival(true)
             .withSetupFile(setUpFile)
+            .withConfigs(configs)
             .withDependencies(dependencies)
             .withDescription(JOB_DESCRIPTION)
             .build();
@@ -467,7 +474,9 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         this.checkJobStatus(documentationId, id);
         this.checkJob(documentationId, id, commandArgs);
         this.checkJobOutput(documentationId, id);
-        this.checkJobRequest(documentationId, id, commandArgs, setUpFile, clusterTag, commandTag, depFile1);
+        this.checkJobRequest(
+            documentationId, id, commandArgs, setUpFile, clusterTag, commandTag, configFile1, depFile1
+        );
         this.checkJobExecution(documentationId, id);
         this.checkJobCluster(documentationId, id);
         this.checkJobCommand(documentationId, id);
@@ -674,11 +683,12 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("parent", Matchers.isEmptyOrNullString()))
             .andExpect(MockMvcResultMatchers.jsonPath("$.directories[0].name", Matchers.is("genie/")))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.files[0].name", Matchers.is("dep1")))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.files[1].name", Matchers.is("jobsetupfile")))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.files[2].name", Matchers.is("run")))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.files[3].name", Matchers.is("stderr")))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.files[4].name", Matchers.is("stdout")))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.files[0].name", Matchers.is("config1")))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.files[1].name", Matchers.is("dep1")))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.files[2].name", Matchers.is("jobsetupfile")))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.files[3].name", Matchers.is("run")))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.files[4].name", Matchers.is("stderr")))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.files[5].name", Matchers.is("stdout")))
             .andDo(jsonResultHandler);
 
         // Check getting a directory as HTML
@@ -767,6 +777,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         final String setupFile,
         final String clusterTag,
         final String commandTag,
+        final String configFile1,
         final String depFile1
     ) throws Exception {
         final RestDocumentationResultHandler getResultHandler = MockMvcRestDocumentation.document(
@@ -797,6 +808,8 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andExpect(MockMvcResultMatchers.jsonPath(COMMAND_CRITERIA_PATH + "[0]", Matchers.is(commandTag)))
             .andExpect(MockMvcResultMatchers.jsonPath(GROUP_PATH, Matchers.nullValue()))
             .andExpect(MockMvcResultMatchers.jsonPath(DISABLE_LOG_ARCHIVAL_PATH, Matchers.is(true)))
+            .andExpect(MockMvcResultMatchers.jsonPath(CONFIGS_PATH, Matchers.hasSize(1)))
+            .andExpect(MockMvcResultMatchers.jsonPath(CONFIGS_PATH + "[0]", Matchers.is(configFile1)))
             .andExpect(MockMvcResultMatchers.jsonPath(DEPENDENCIES_PATH, Matchers.hasSize(1)))
             .andExpect(MockMvcResultMatchers.jsonPath(DEPENDENCIES_PATH + "[0]", Matchers.is(depFile1)))
             .andExpect(MockMvcResultMatchers.jsonPath(EMAIL_PATH, Matchers.nullValue()))
