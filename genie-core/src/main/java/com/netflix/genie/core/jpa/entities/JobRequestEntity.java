@@ -88,8 +88,8 @@ public class JobRequestEntity extends SetupFileEntity {
     private String dependencies = EMPTY_JSON_ARRAY;
 
     @Lob
-    @Basic
-    @Column(name = "configs")
+    @Basic(optional = false)
+    @Column(name = "configs", nullable = false)
     private String configs = EMPTY_JSON_ARRAY;
 
     @Basic(optional = false)

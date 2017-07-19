@@ -35,8 +35,8 @@ import java.util.Set;
 public abstract class ExecutionEnvironmentDTO extends CommonDTO {
 
     private static final long serialVersionUID = 2116254045303538065L;
-    protected final Set<String> configs = new HashSet<>();
-    protected final Set<String> dependencies = new HashSet<>();
+    private final Set<String> configs = new HashSet<>();
+    private final Set<String> dependencies = new HashSet<>();
     @Size(max = 1024, message = "Max length of the setup file is 1024 characters")
     private final String setupFile;
 
