@@ -38,6 +38,8 @@ import org.junit.Rule
 import org.junit.experimental.categories.Category
 import org.junit.rules.TemporaryFolder
 import org.springframework.core.env.Environment
+import org.springframework.core.io.DefaultResourceLoader
+import org.springframework.core.io.ResourceLoader
 import org.springframework.core.task.AsyncTaskExecutor
 import org.springframework.scheduling.TaskScheduler
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
@@ -45,6 +47,7 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import java.nio.file.Paths
 import java.util.concurrent.TimeUnit
 
 /**
@@ -281,7 +284,7 @@ class ScriptLoadBalancerSpec extends Specification {
 
         where:
         type         | file
-        "JavaScript" | this.class.getResource("loadBalance.js").file
-        "Groovy"     | this.class.getResource("loadBalance.groovy").file
+        "JavaScript" | Paths.get(this.class.getResource("loadBalance.js").file).toUri().toString()
+        "Groovy"     | Paths.get(this.class.getResource("loadBalance.groovy").file).toUri().toString()
     }
 }

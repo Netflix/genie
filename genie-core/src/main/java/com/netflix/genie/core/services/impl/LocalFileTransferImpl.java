@@ -26,6 +26,8 @@ import org.hibernate.validator.constraints.NotBlank;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 /**
@@ -88,13 +90,13 @@ public class LocalFileTransferImpl implements FileTransfer {
 
     private void copy(final String srcPath, final String dstPath) throws GenieServerException {
         try {
-            final File src = new File(srcPath);
-            final File dest = new File(dstPath);
-            final File parent = dest.getParentFile();
-            if (!parent.exists() && !parent.mkdirs()) {
-                throw new IOException("Unable to create parent directory " + parent.getAbsolutePath());
+            final Path src = Paths.get(srcPath);
+            final Path dest = Paths.get(dstPath);
+            final Path parent = dest.getParent();
+            if (parent != null && !Files.exists(parent)) {
+                Files.createDirectories(parent);
             }
-            Files.copy(src.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(src, dest, StandardCopyOption.REPLACE_EXISTING);
         } catch (final IOException ioe) {
             log.error("Got error while copying file {} to {}", srcPath, dstPath, ioe);
             throw new GenieServerException(

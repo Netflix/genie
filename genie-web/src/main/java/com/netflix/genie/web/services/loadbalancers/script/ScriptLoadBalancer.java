@@ -45,13 +45,15 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -254,15 +256,14 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
                         + SCRIPT_FILE_DESTINATION_PROPERTY_KEY
                 );
             }
-            final String scriptDestinationDir = new URI(scriptFileDestinationValue).toString();
+            final Path scriptDestinationDirectory = Paths.get(new URI(scriptFileDestinationValue));
 
             // Check the validity of the destination directory
-            final File scriptDestinationDirFile = new File(scriptDestinationDir);
-            if (!scriptDestinationDirFile.exists() && !scriptDestinationDirFile.mkdirs()) {
-                throw new IllegalStateException("Unable to create directory " + scriptDestinationDir);
-            } else if (!scriptDestinationDirFile.isDirectory()) {
+            if (!Files.exists(scriptDestinationDirectory)) {
+                Files.createDirectories(scriptDestinationDirectory);
+            } else if (!Files.isDirectory(scriptDestinationDirectory)) {
                 throw new IllegalStateException(
-                    "The script destination directory " + scriptDestinationDir + " exists but is not a directory"
+                    "The script destination directory " + scriptDestinationDirectory + " exists but is not a directory"
                 );
             }
 
@@ -276,10 +277,10 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
                 throw new IllegalStateException("No file extension available in " + fileName);
             }
 
-            final String scriptFileDestination = new File(scriptDestinationDirFile, fileName).getAbsolutePath();
+            final Path scriptDestinationPath = scriptDestinationDirectory.resolve(fileName);
 
             // Download and cache the file (if it's not already there)
-            this.fileTransferService.getFile(scriptFileSource, scriptFileDestination);
+            this.fileTransferService.getFile(scriptFileSource, scriptDestinationPath.toUri().toString());
 
             final ScriptEngine engine = this.scriptEngineManager.getEngineByExtension(scriptExtension);
             // We want a compilable engine so we can cache the script
@@ -290,7 +291,7 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
             }
             final Compilable compilable = (Compilable) engine;
             try (
-                final FileInputStream fis = new FileInputStream(scriptFileDestination);
+                final InputStream fis = Files.newInputStream(scriptDestinationPath);
                 final InputStreamReader reader = new InputStreamReader(fis, UTF_8)
             ) {
                 log.debug("Compiling " + scriptFileSource);
