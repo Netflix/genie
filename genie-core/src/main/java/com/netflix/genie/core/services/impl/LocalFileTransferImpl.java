@@ -90,8 +90,9 @@ public class LocalFileTransferImpl implements FileTransfer {
         try {
             final File src = new File(srcPath);
             final File dest = new File(dstPath);
-            if (!dest.getParentFile().exists()) {
-                Files.createDirectories(dest.getParentFile().toPath());
+            final File parent = dest.getParentFile();
+            if (!parent.exists() && !parent.mkdirs()) {
+                throw new IOException("Unable to create parent directory " + parent.getAbsolutePath());
             }
             Files.copy(src.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (final IOException ioe) {

@@ -52,7 +52,6 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -245,22 +244,22 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
                     "Invalid empty value for script source file property: " + SCRIPT_FILE_SOURCE_PROPERTY_KEY
                 );
             }
-            final String scriptFileSource = new URI(scriptFileSourceValue).getPath();
+            final String scriptFileSource = new URI(scriptFileSourceValue).toString();
 
             final String scriptFileDestinationValue =
                 this.environment.getProperty(SCRIPT_FILE_DESTINATION_PROPERTY_KEY);
-            if (StringUtils.isBlank(scriptFileSourceValue)) {
+            if (StringUtils.isBlank(scriptFileDestinationValue)) {
                 throw new IllegalStateException(
                     "Invalid empty value for script destination directory property: "
                         + SCRIPT_FILE_DESTINATION_PROPERTY_KEY
                 );
             }
-            final String scriptDestinationDir = new URI(scriptFileDestinationValue).getPath();
+            final String scriptDestinationDir = new URI(scriptFileDestinationValue).toString();
 
             // Check the validity of the destination directory
             final File scriptDestinationDirFile = new File(scriptDestinationDir);
-            if (!scriptDestinationDirFile.exists()) {
-                Files.createDirectories(scriptDestinationDirFile.toPath());
+            if (!scriptDestinationDirFile.exists() && !scriptDestinationDirFile.mkdirs()) {
+                throw new IllegalStateException("Unable to create directory " + scriptDestinationDir);
             } else if (!scriptDestinationDirFile.isDirectory()) {
                 throw new IllegalStateException(
                     "The script destination directory " + scriptDestinationDir + " exists but is not a directory"
