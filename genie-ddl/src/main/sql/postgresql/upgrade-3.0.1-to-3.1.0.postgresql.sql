@@ -1,23 +1,42 @@
 BEGIN;
 SELECT CURRENT_TIMESTAMP, 'Upgrading from 3.0.1 schema to 3.1.0 schema';
 
-CREATE TABLE cluster_dependencies (
-    cluster_id character varying(255) NOT NULL,
-    dependency character varying(1024) NOT NULL
-);
+SELECT CURRENT_TIMESTAMP, 'Upgrading applications table';
 
-ALTER TABLE cluster_dependencies
-  ADD CONSTRAINT cluster_dependencies_cluster_id_fkey FOREIGN KEY (cluster_id) REFERENCES clusters(id) ON DELETE CASCADE;
+ALTER TABLE applications
+  ALTER COLUMN description TYPE text,
+  ALTER COLUMN description SET DEFAULT NULL,
+  ALTER COLUMN tags TYPE character varying(10000),
+  ALTER COLUMN tags SET DEFAULT NULL;
 
-CREATE TABLE command_dependencies (
-    command_id character varying(255) NOT NULL,
-    dependency character varying(1024) NOT NULL
-);
+SELECT CURRENT_TIMESTAMP, 'Upgrading clusters table';
 
-ALTER TABLE command_dependencies
-  ADD CONSTRAINT command_dependencies_command_id_fkey FOREIGN KEY (command_id) REFERENCES commands(id) ON DELETE CASCADE;
+ALTER TABLE clusters
+  ALTER COLUMN description TYPE text,
+  ALTER COLUMN description SET DEFAULT NULL,
+  ALTER COLUMN tags TYPE character varying(10000),
+  ALTER COLUMN tags SET DEFAULT NULL;
+
+SELECT CURRENT_TIMESTAMP, 'Upgrading commands table';
+
+ALTER TABLE commands
+  ALTER COLUMN description TYPE text,
+  ALTER COLUMN description SET DEFAULT NULL,
+  ALTER COLUMN tags TYPE character varying(10000),
+  ALTER COLUMN tags SET DEFAULT NULL;
+
+SELECT CURRENT_TIMESTAMP, 'Upgrading jobs table';
+
+ALTER TABLE jobs
+  ALTER COLUMN description TYPE text,
+  ALTER COLUMN description SET DEFAULT NULL,
+  ALTER COLUMN tags TYPE character varying(10000);
+
+SELECT CURRENT_TIMESTAMP, 'Creating index for name in jobs table';
 
 CREATE INDEX JOBS_NAME_INDEX ON jobs (name);
+
+SELECT CURRENT_TIMESTAMP, 'Upgrading job_requests table';
 
 ALTER TABLE job_requests
   ALTER COLUMN cluster_criterias TYPE TEXT,
@@ -29,71 +48,54 @@ ALTER TABLE job_requests
   ALTER COLUMN dependencies TYPE TEXT,
   ALTER COLUMN dependencies SET NOT NULL,
   ALTER COLUMN dependencies SET DEFAULT ''::character varying,
-  ADD COLUMN configs TYPE TEXT,
-  ALTER COLUMN configs SET NOT NULL,
-  ALTER COLUMN configs SET DEFAULT ''::character varying;
-
-ALTER TABLE applications
+  ADD COLUMN configs text DEFAULT ''::character varying NOT NULL,
   ALTER COLUMN description TYPE text,
-  ALTER COLUMN description SET DEFAULT NULL;
-
-ALTER TABLE clusters
-  ALTER COLUMN description TYPE text,
-  ALTER COLUMN description SET DEFAULT NULL;
-
-ALTER TABLE commands
-  ALTER COLUMN description TYPE text,
-  ALTER COLUMN description SET DEFAULT NULL;
-
-ALTER TABLE jobs
-  ALTER COLUMN description TYPE text,
-  ALTER COLUMN description SET DEFAULT NULL;
-
-ALTER TABLE job_requests
-  ALTER COLUMN description TYPE text,
-  ALTER COLUMN description SET DEFAULT NULL;
-
-ALTER TABLE applications
-  ALTER COLUMN tags TYPE character varying(10000),
-  ALTER COLUMN tags SET DEFAULT NULL;
-
-ALTER TABLE clusters
-  ALTER COLUMN tags TYPE character varying(10000),
-  ALTER COLUMN tags SET DEFAULT NULL;
-
-ALTER TABLE commands
-  ALTER COLUMN tags TYPE character varying(10000),
-  ALTER COLUMN tags SET DEFAULT NULL;
-
-ALTER TABLE jobs
+  ALTER COLUMN description SET DEFAULT NULL,
   ALTER COLUMN tags TYPE character varying(10000);
 
-ALTER TABLE job_requests
-  ALTER COLUMN tags TYPE character varying(10000);
+SELECT CURRENT_TIMESTAMP, 'Creating cluster_dependencies table';
 
-ALTER TABLE application_configs
-  ALTER COLUMN config TYPE character varying(2048),
-  ALTER COLUMN config SET NOT NULL;
+CREATE TABLE cluster_dependencies (
+    cluster_id character varying(255) NOT NULL,
+    dependency character varying(2048) NOT NULL
+);
 
-ALTER TABLE cluster_configs
-  ALTER COLUMN config TYPE character varying(2048),
-  ALTER COLUMN config SET NOT NULL;
+ALTER TABLE cluster_dependencies
+  ADD CONSTRAINT cluster_dependencies_cluster_id_fkey FOREIGN KEY (cluster_id) REFERENCES clusters(id) ON DELETE CASCADE;
 
-ALTER TABLE command_configs
-  ALTER COLUMN config TYPE character varying(2048),
-  ALTER COLUMN config SET NOT NULL;
+SELECT CURRENT_TIMESTAMP, 'Creating command_dependencies table';
+
+CREATE TABLE command_dependencies (
+    command_id character varying(255) NOT NULL,
+    dependency character varying(2048) NOT NULL
+);
+
+ALTER TABLE command_dependencies
+  ADD CONSTRAINT command_dependencies_command_id_fkey FOREIGN KEY (command_id) REFERENCES commands(id) ON DELETE CASCADE;
+
+SELECT CURRENT_TIMESTAMP, 'Upgrading application_dependencies table';
 
 ALTER TABLE application_dependencies
   ALTER COLUMN dependency TYPE character varying(2048),
   ALTER COLUMN dependency SET NOT NULL;
 
-ALTER TABLE cluster_dependencies
-  ALTER COLUMN dependency TYPE character varying(2048),
-  ALTER COLUMN dependency SET NOT NULL;
+SELECT CURRENT_TIMESTAMP, 'Upgrading application_configs table';
 
-ALTER TABLE command_dependencies
-  ALTER COLUMN dependency TYPE character varying(2048),
-  ALTER COLUMN dependency SET NOT NULL;
+ALTER TABLE application_configs
+  ALTER COLUMN config TYPE character varying(2048),
+  ALTER COLUMN config SET NOT NULL;
+
+SELECT CURRENT_TIMESTAMP, 'Upgrading cluster_configs table';
+
+ALTER TABLE cluster_configs
+  ALTER COLUMN config TYPE character varying(2048),
+  ALTER COLUMN config SET NOT NULL;
+
+SELECT CURRENT_TIMESTAMP, 'Upgrading command_configs table';
+
+ALTER TABLE command_configs
+  ALTER COLUMN config TYPE character varying(2048),
+  ALTER COLUMN config SET NOT NULL;
 
 SELECT CURRENT_TIMESTAMP, 'Finished upgrading from 3.0.1 schema to 3.1.0 schema';
 COMMIT;
