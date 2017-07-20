@@ -17,27 +17,33 @@
  */
 package com.netflix.genie.core.services.impl;
 
+import com.amazonaws.util.StringUtils;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.services.FileTransfer;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.NotBlank;
 
-import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 /**
- * An implementation of the FileTransferService interface in which the remote locations are on local unix filesystem.
+ * An implementation of the FileTransferService interface in which the remote locations are on local filesystem.
  *
  * @author amsharma
+ * @author tgianos
  * @since 3.0.0
  */
 @Slf4j
 public class LocalFileTransferImpl implements FileTransfer {
+
+    private static final String FILE_SCHEME = "file:";
+    private static final String ENTIRE_FILE_SCHEME = FILE_SCHEME + "//";
 
     /**
      * {@inheritDoc}
@@ -58,7 +64,7 @@ public class LocalFileTransferImpl implements FileTransfer {
         @NotBlank(message = "Source file path cannot be empty.") final String srcRemotePath,
         @NotBlank(message = "Destination local path cannot be empty") final String dstLocalPath
     ) throws GenieException {
-        log.debug("Called with src path {} and destination path {}", srcRemotePath, dstLocalPath);
+        log.debug("Called to get {} and put it to {}", srcRemotePath, dstLocalPath);
         this.copy(srcRemotePath, dstLocalPath);
     }
 
@@ -70,7 +76,7 @@ public class LocalFileTransferImpl implements FileTransfer {
         @NotBlank(message = "Source local path cannot be empty.") final String srcLocalPath,
         @NotBlank(message = "Destination remote path cannot be empty") final String dstRemotePath
     ) throws GenieException {
-        log.debug("Called with src path {} and destination path {}", srcLocalPath, dstRemotePath);
+        log.debug("Called to take {} and put it to {}", srcLocalPath, dstRemotePath);
         this.copy(srcLocalPath, dstRemotePath);
     }
 
@@ -80,8 +86,8 @@ public class LocalFileTransferImpl implements FileTransfer {
     @Override
     public long getLastModifiedTime(final String path) throws GenieException {
         try {
-            return new File(path).lastModified();
-        } catch (Exception e) {
+            return Files.getLastModifiedTime(this.createFilePath(path)).toMillis();
+        } catch (final Exception e) {
             final String message = String.format("Failed getting the last modified time for file with path %s", path);
             log.error(message, e);
             throw new GenieServerException(message, e);
@@ -90,8 +96,8 @@ public class LocalFileTransferImpl implements FileTransfer {
 
     private void copy(final String srcPath, final String dstPath) throws GenieServerException {
         try {
-            final Path src = Paths.get(srcPath);
-            final Path dest = Paths.get(dstPath);
+            final Path src = this.createFilePath(srcPath);
+            final Path dest = this.createFilePath(dstPath);
             final Path parent = dest.getParent();
             if (parent != null && !Files.exists(parent)) {
                 Files.createDirectories(parent);
@@ -106,6 +112,26 @@ public class LocalFileTransferImpl implements FileTransfer {
                     + dstPath,
                 ioe
             );
+        }
+    }
+
+    private Path createFilePath(final String path) throws GenieServerException {
+        log.debug("Normalizing path from {}", path);
+        final String finalPath;
+        if (StringUtils.beginsWithIgnoreCase(path, ENTIRE_FILE_SCHEME)) {
+            finalPath = path;
+        } else if (StringUtils.beginsWithIgnoreCase(path, FILE_SCHEME)) {
+            finalPath = path.replace(FILE_SCHEME, ENTIRE_FILE_SCHEME);
+        } else {
+            finalPath = ENTIRE_FILE_SCHEME + path;
+        }
+        log.debug("Final path of {} after normalization is {}", path, finalPath);
+
+        try {
+            return Paths.get(new URI(finalPath));
+        } catch (final IllegalArgumentException | URISyntaxException e) {
+            log.error("Unable to convert {} to java.nio.file.Path due to {}", finalPath, e.getMessage(), e);
+            throw new GenieServerException(e);
         }
     }
 }

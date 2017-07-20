@@ -99,6 +99,18 @@ public class LocalFileTransferImplUnitTests {
         Assert.assertFalse(dstFile3.exists());
         this.localFileTransfer.getFile(srcFile, dstFile3.getAbsolutePath());
         Assert.assertTrue(dstFile3.exists());
+
+        // Normalize for case where input is file:
+        final File dstFile4 = new File(folder.getAbsolutePath(), UUID.randomUUID().toString());
+        Assert.assertFalse(dstFile4.exists());
+        this.localFileTransfer.getFile("file:" + srcFile, dstFile4.getAbsolutePath());
+        Assert.assertTrue(dstFile4.exists());
+
+        // Normalize for case where input is file://
+        final File dstFile5 = new File(folder.getAbsolutePath(), UUID.randomUUID().toString());
+        Assert.assertFalse(dstFile5.exists());
+        this.localFileTransfer.getFile("file://" + srcFile, dstFile5.getAbsolutePath());
+        Assert.assertTrue(dstFile5.exists());
     }
 
     /**
