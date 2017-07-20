@@ -95,72 +95,6 @@ ClusterRestController {
     }
 
     /**
-     * Add new dependency files for a given cluster.
-     *
-     * @param id           The id of the cluster to add the dependency file to. Not
-     *                     null/empty/blank.
-     * @param dependencies The dependency files to add. Not null.
-     * @throws GenieException For any error
-     */
-    @PostMapping(value = "/{id}/dependencies", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void addDependenciesForCluster(
-        @PathVariable("id") final String id,
-        @RequestBody final Set<String> dependencies
-    ) throws GenieException {
-        log.debug("Called with id {} and dependencies {}", id, dependencies);
-        this.clusterService.addDependenciesForCluster(id, dependencies);
-    }
-
-    /**
-     * Get all the dependency files for a given cluster.
-     *
-     * @param id The id of the cluster to get the dependency files for. Not
-     *           NULL/empty/blank.
-     * @return The set of dependency files.
-     * @throws GenieException For any error
-     */
-    @GetMapping(value = "/{id}/dependencies", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    public Set<String> getDependenciesForCluster(@PathVariable("id") final String id) throws GenieException {
-        log.debug("Called with id {}", id);
-        return this.clusterService.getDependenciesForCluster(id);
-    }
-
-    /**
-     * Update the dependency files for a given cluster.
-     *
-     * @param id           The id of the cluster to update the dependency files for. Not
-     *                     null/empty/blank.
-     * @param dependencies The dependency files to replace existing dependency files with. Not
-     *                     null/empty/blank.
-     * @throws GenieException For any error
-     */
-    @PutMapping(value = "/{id}/dependencies", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateDependenciesForCluster(
-        @PathVariable("id") final String id,
-        @RequestBody final Set<String> dependencies
-    ) throws GenieException {
-        log.debug("Called with id {} and dependencies {}", id, dependencies);
-        this.clusterService.updateDependenciesForCluster(id, dependencies);
-    }
-
-    /**
-     * Delete the all dependency files from a given cluster.
-     *
-     * @param id The id of the cluster to delete the dependency files from. Not
-     *           null/empty/blank.
-     * @throws GenieException For any error
-     */
-    @DeleteMapping(value = "/{id}/dependencies")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeAllDependenciesForCluster(@PathVariable("id") final String id) throws GenieException {
-        log.debug("Called with id {}", id);
-        this.clusterService.removeAllDependenciesForCluster(id);
-    }
-
-    /**
      * Create cluster configuration.
      *
      * @param cluster contains the cluster information to create
@@ -388,6 +322,72 @@ ClusterRestController {
         this.clusterService.removeAllConfigsForCluster(id);
     }
 
+    /**
+     * Add new dependency files for a given cluster.
+     *
+     * @param id           The id of the cluster to add the dependency file to. Not
+     *                     null/empty/blank.
+     * @param dependencies The dependency files to add. Not null.
+     * @throws GenieException For any error
+     */
+    @PostMapping(value = "/{id}/dependencies", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void addDependenciesForCluster(
+        @PathVariable("id") final String id,
+        @RequestBody final Set<String> dependencies
+    ) throws GenieException {
+        log.debug("Called with id {} and dependencies {}", id, dependencies);
+        this.clusterService.addDependenciesForCluster(id, dependencies);
+    }
+
+    /**
+     * Get all the dependency files for a given cluster.
+     *
+     * @param id The id of the cluster to get the dependency files for. Not
+     *           NULL/empty/blank.
+     * @return The set of dependency files.
+     * @throws GenieException For any error
+     */
+    @GetMapping(value = "/{id}/dependencies", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public Set<String> getDependenciesForCluster(@PathVariable("id") final String id) throws GenieException {
+        log.debug("Called with id {}", id);
+        return this.clusterService.getDependenciesForCluster(id);
+    }
+
+    /**
+     * Update the dependency files for a given cluster.
+     *
+     * @param id           The id of the cluster to update the dependency files for. Not
+     *                     null/empty/blank.
+     * @param dependencies The dependency files to replace existing dependency files with. Not
+     *                     null/empty/blank.
+     * @throws GenieException For any error
+     */
+    @PutMapping(value = "/{id}/dependencies", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateDependenciesForCluster(
+        @PathVariable("id") final String id,
+        @RequestBody final Set<String> dependencies
+    ) throws GenieException {
+        log.debug("Called with id {} and dependencies {}", id, dependencies);
+        this.clusterService.updateDependenciesForCluster(id, dependencies);
+    }
+
+    /**
+     * Delete the all dependency files from a given cluster.
+     *
+     * @param id The id of the cluster to delete the dependency files from. Not
+     *           null/empty/blank.
+     * @throws GenieException For any error
+     */
+    @DeleteMapping(value = "/{id}/dependencies")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeAllDependenciesForCluster(@PathVariable("id") final String id) throws GenieException {
+        log.debug("Called with id {}", id);
+        this.clusterService.removeAllDependenciesForCluster(id);
+    }
+    
     /**
      * Add new tags to a given cluster.
      *
