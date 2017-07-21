@@ -224,7 +224,7 @@ public class JpaCommandServiceImpl implements CommandService {
         @NotBlank(message = "No id entered. Unable to delete.")
         final String id
     ) throws GenieException {
-        log.debug("Called to delete command config with id {}");
+        log.debug("Called to delete command config with id {}", id);
         final CommandEntity commandEntity = this.findCommand(id);
 
         //Remove the command from the associated Application references
