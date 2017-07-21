@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 3.1.0-SNAPSHOT,</span>
-<span id="revdate">2017-07-20</span>
+<span id="revdate">2017-07-21</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -736,6 +736,7 @@ b.conum * { color: inherit !important; }
 <li><a href="#_renamed">2.3.4. Renamed</a></li>
 </ul>
 </li>
+<li><a href="#_database_upgrades">2.4. Database Upgrades</a></li>
 </ul>
 </li>
 <li><a href="#_concepts">3. Concepts</a>
@@ -907,6 +908,12 @@ property</p>
 </li>
 <li>
 <p>Optional cluster load balancer via Admin supplied script</p>
+</li>
+<li>
+<p>Add dependencies to the Cluster and Command entities</p>
+</li>
+<li>
+<p>Add configurations to the JobRequest entity</p>
 </li>
 </ul>
 </div>
@@ -1159,6 +1166,40 @@ for more information. Currently on classpath only none, hash_map, redis and jdbc
 </table>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_database_upgrades"><a class="anchor" href="#_database_upgrades"></a>2.4. Database Upgrades</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Add cluster and command dependencies table</p>
+</li>
+<li>
+<p>Rename MySQL and PostgreSQL schema files</p>
+</li>
+<li>
+<p>Index 'name' column of Jobs table</p>
+</li>
+<li>
+<p>Switch Job and JobRequest tables 'description' column to text</p>
+</li>
+<li>
+<p>Switch Applications' table 'cluster_criterias' and 'command_criteria' columns to text</p>
+</li>
+<li>
+<p>Increase the size of 'tags' column for applications, clusters, commands, jobs, job_requests</p>
+</li>
+<li>
+<p>Switch JobRequest table 'dependencies' column to text</p>
+</li>
+<li>
+<p>Add job request table configs column</p>
+</li>
+<li>
+<p>Double the size of 'config' and 'dependencies' column for Application, Cluster, Command</p>
+</li>
+</ul>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -1268,8 +1309,8 @@ and setup files that can be used to install and configure (surprise!) an applica
 used when an application isn&#8217;t already installed and on the <code>PATH</code> on a Genie node.</p>
 </div>
 <div class="paragraph">
-<p>When a job is run and applications are involved in running the job Genie will download all the dependencies,
-configuration files and setup files of each application and store it all in the job working directory. It will then
+<p>When a job is run the job Genie will download all the dependencies, configuration files and
+setup files of each application and cluster and store it all in the job working directory. It will then
 execute the setup script in order to install that application for that job. Genie is "dumb" as to the contents or
 purpose of any of these files so the onus is on the administrators to create and test these packages.</p>
 </div>
@@ -1297,10 +1338,10 @@ flexibility in the trade-off.</p>
 <h6 id="_command_resource"><a class="anchor" href="#_command_resource"></a>3.1.2.2.2. Command Resource</h6>
 <div class="paragraph">
 <p>Commands resources primarily represent what a user would enter at the command line if you wanted to run a process on a
-cluster and what dependencies (applications) you would need on your PATH to make that possible.</p>
+cluster and what binaries (i.e., applications) you would need on your PATH to make that possible.</p>
 </div>
 <div class="paragraph">
-<p>Commands can have configuration and setup files just like applications but primarily they should have an ordered list
+<p>Commands can have configuration, setup and dependencies files just like applications but primarily they should have an ordered list
 of applications associated with them if necessary. For example lets take a typical scenario involving running Hive. To
 run Hive you generally need a few things:</p>
 </div>
@@ -1322,9 +1363,10 @@ run Hive you generally need a few things:</p>
 </div>
 <div class="paragraph">
 <p>So a typical setup for Hive in Genie would be to have one, or many, Hive commands configured. Each command would have
-its own hive-site.xml pointing to a specific metastore (prod, test, etc). The command would depend on Hadoop and Hive
-applications already configured which would have all the default Hadoop and Hive binaries and configurations. All this
-would be combined in the job working directory in order to run Hive.</p>
+its own hive-site.xml pointing to a specific metastore (prod, test, etc). Alternatively, site-specific configuration
+can be associated to clusters and will be available to all commands executing against it.
+The command would depend on Hadoop and Hive applications already configured which would have all the default
+Hadoop and Hive binaries and configurations. All this would be combined in the job working directory in order to run Hive.</p>
 </div>
 <div class="paragraph">
 <p>You can have any number of commands configured in the system. They should then be linked to the clusters they can
@@ -1390,6 +1432,19 @@ interesting to a system admin than a regular user. Frequently useful in debuggin
 request parameters, a cluster and command combination is selected for execution. Job requests can also supply necessary
 files to Genie either as attachments or using the file dependencies field if they already exist in an accessible file
 system. As a job executes, its details are recorded in the job record within the Genie database.</p>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_resource_configuration_vs_dependencies"><a class="anchor" href="#_resource_configuration_vs_dependencies"></a>3.1.2.3.4. Resource configuration vs. dependencies</h6>
+<div class="paragraph">
+<p>Genie allows associating files with the resources above so that these files are retrieved and placed in the job execution
+directory as part of the setup.
+When creating an Application, a Cluster, a Command or a Job, it is possible to associate <strong>configs</strong> and/or <strong>dependencies</strong>.
+<strong>Configs</strong> are expected to be small configuration files (XML, JSON, YAML, &#8230;&#8203;), whereas <strong>dependencies</strong> are expected to be
+larger and possibly binary (Jars, executables, libraries, etc).
+Application, Cluster, and Command dependencies are deleted after job completion (unless Genie is configured to preserve
+them), to avoid storing and archiving them over and over. Configurations are preserved. Job configurations and
+dependencies are also preserved.</p>
 </div>
 </div>
 </div>
@@ -1712,13 +1767,16 @@ needed</p>
 <p>Application related variables are written into the run script</p>
 </li>
 <li>
-<p>Command configuration and dependency files are downloaded and store in the job directory</p>
+<p>Cluster configuration and dependency files are downloaded and stored in the job directory</p>
+</li>
+<li>
+<p>Command configuration and dependency files are downloaded and stored in the job directory</p>
 </li>
 <li>
 <p>Command related variables are written into the run script</p>
 </li>
 <li>
-<p>All job dependency files (including attachments) are downloaded into the job working directory</p>
+<p>All job dependency files (including configurations, dependencies, attachments) are downloaded into the job working directory</p>
 </li>
 <li>
 <p>Job related variables are written into the run script</p>
@@ -1769,7 +1827,7 @@ killed depending on that code.</p>
 <div class="sect4">
 <h5 id="_genie_performs_job_clean_up"><a class="anchor" href="#_genie_performs_job_clean_up"></a>3.2.2.6. Genie Performs Job Clean-Up</h5>
 <div class="paragraph">
-<p>To save disk space Genie will delete application dependencies from the job working directory after a job is completed.
+<p>To save disk space Genie will delete application, cluster and command dependencies from the job working directory after a job is completed.
 This can be disabled by an admin. If the job is marked as it should be archived the working directory will be zipped up
 and stored in the default archive location as <code>{jobId}.tar.gz</code>.</p>
 </div>
@@ -1875,6 +1933,7 @@ downloaded into the job working directory at runtime.</p>
     "s3://bucket/users/bdp/h2prod/20161217/205111/genie/hdfs-site.xml",
     "s3://bucket/users/bdp/h2prod/20161217/205111/genie/core-site.xml"
   ],
+  "dependencies": [],
   "status": "UP",
   "_links": {
     "self": {
@@ -1916,6 +1975,7 @@ downloaded into the job working directory at runtime.</p>
     "s3://bucket/users/bdp/h2query/20161108/204556/genie/mapred-site.xml",
     "s3://bucket/users/bdp/h2query/20161108/204556/genie/yarn-site.xml"
   ],
+  "dependencies": [],
   "status": "UP",
   "_links": {
     "self": {
@@ -1952,6 +2012,7 @@ downloaded into the job working directory at runtime.</p>
   "description": null,
   "setupFile": null,
   "configs": [],
+  "dependencies": [],
   "status": "UP",
   "_links": {
     "self": {
@@ -2002,6 +2063,7 @@ The presto command includes a setup file which allows additional configuration w
   "description": "Presto Command",
   "setupFile": "s3://bucket/builds/bdp-cluster-configs/genie3/commands/presto/0.149/setup.sh",
   "configs": [],
+  "dependencies": [],
   "status": "ACTIVE",
   "executable": "${PRESTO_CMD} --server ${PRESTO_SERVER} --catalog hive --schema default --debug",
   "checkDelay": 5000,
@@ -2063,6 +2125,7 @@ chmod 755 ${PRESTO_CMD}</code></pre>
   "configs": [
     "s3://bucket/builds/bdp-cluster-configs/genie3/commands/spark/1.6.1/prod/configs/hive-site.xml"
   ],
+  "dependencies": [],
   "status": "ACTIVE",
   "executable": "${SPARK_HOME}/bin/dsespark-submit",
   "checkDelay": 5000,
@@ -2123,6 +2186,7 @@ cp ${GENIE_COMMAND_DIR}/config/* ${HADOOP_CONF_DIR}/</code></pre>
   "configs": [
     "s3://bucket/builds/bdp-cluster-configs/genie3/commands/spark/2.0.0/prod/configs/hive-site.xml"
   ],
+  "dependencies": [],
   "status": "ACTIVE",
   "executable": "${SPARK_HOME}/bin/dsespark-submit.py",
   "checkDelay": 5000,
@@ -2677,6 +2741,7 @@ and command to be used based on what was configured above.</p>
   "cpu": null,
   "memory": null,
   "timeout": null,
+  "configs": [],
   "dependencies": [ <i class="conum" data-value="6"></i><b>(6)</b>
     "s3://bucket/DSE/etl_code/cs/ticket/fct_ticket.py",
     "s3://bucket/dea/pyspark_core/dea_pyspark_core-latest.egg"
@@ -3948,13 +4013,13 @@ This assumes the MySQL client binaries are installed
 </div>
 <div class="paragraph">
 <p>Download the
-<a href="https://github.com/Netflix/genie/blob/master/genie-ddl/src/main/sql/mysql/3.0.0-schema.mysql.sql">MySQL Schema</a>.
+<a href="https://github.com/Netflix/genie/blob/master/genie-ddl/src/main/sql/mysql/schema.mysql.sql">MySQL Schema</a>.
 Then run:</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">mysql -u {username} -p{password} -h {host} -e 'create database genie;'
-mysql -u {username} -p{password} -h {host} genie &lt; 3.0.0-schema.mysql.sql</code></pre>
+mysql -u {username} -p{password} -h {host} genie &lt; schema.mysql.sql</code></pre>
 </div>
 </div>
 </div>
@@ -3974,13 +4039,13 @@ This assumes the PSQL binaries are installed
 </div>
 <div class="paragraph">
 <p>Download the
-<a href="https://github.com/Netflix/genie/blob/master/genie-ddl/src/main/sql/postgresql/3.0.0-schema.postgresql.sql">PostgreSQL Schema</a>
+<a href="https://github.com/Netflix/genie/blob/master/genie-ddl/src/main/sql/postgresql/schema.postgresql.sql">PostgreSQL Schema</a>
 Then run:</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">createdb genie
-psql -U {user} -h {host} -d genie -f 3.0.0-schema.postgresql.sql</code></pre>
+psql -U {user} -h {host} -d genie -f schema.postgresql.sql</code></pre>
 </div>
 </div>
 </div>
@@ -4114,7 +4179,7 @@ Health of the system is marked unhealthy if the CPU load of a system goes beyond
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.cleanup.deleteDependencies</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Whether or not to delete the dependencies directories for applications to save disk space after job completion</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether or not to delete the dependencies directories for applications, cluster, command to save disk space after job completion</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
 </tr>
 <tr>
@@ -4798,7 +4863,7 @@ an embedded database, "none" otherwise.</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 3.1.0-SNAPSHOT<br>
-Last updated 2017-07-20 16:50:04 +00:00
+Last updated 2017-07-20 23:54:45 +00:00
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
