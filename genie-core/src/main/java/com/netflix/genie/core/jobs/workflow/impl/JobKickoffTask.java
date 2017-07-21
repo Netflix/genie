@@ -241,7 +241,7 @@ public class JobKickoffTask extends GenieBaseTask {
                     log.debug("Running command to create group:  [" + groupCreateCommandLine.toString() + "]");
                     this.executor.execute(groupCreateCommandLine);
                 } catch (IOException ioexception) {
-                    log.debug("Group creation threw an error as it might already exist");
+                    log.debug("Group creation threw an error as it might already exist", ioexception);
                 }
             }
 
