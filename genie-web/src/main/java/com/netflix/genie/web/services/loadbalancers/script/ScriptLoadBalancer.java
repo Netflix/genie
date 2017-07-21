@@ -204,7 +204,7 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
         } catch (final Exception e) {
             tags.put(STATUS_TAG_KEY, STATUS_TAG_FAILED);
             tags.put(EXCEPTION_TAG_KEY, e.getClass().getName());
-            log.error("Unable to execute script due to", e.getMessage(), e);
+            log.error("Unable to execute script due to {}", e.getMessage(), e);
             return null;
         } finally {
             this.registry
