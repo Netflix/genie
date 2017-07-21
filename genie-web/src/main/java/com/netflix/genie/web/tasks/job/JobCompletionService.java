@@ -287,7 +287,7 @@ public class JobCompletionService {
                 });
             }
         } catch (final GenieException ge) {
-            log.error("Unable to cleanup process for job due to exception. " + jobId, ge);
+            log.error("Unable to cleanup process for job due to exception. {}", jobId, ge);
             this.processGroupCleanupFailureRate.increment();
         }
     }
@@ -463,7 +463,7 @@ public class JobCompletionService {
                 deleteCommand.addArgument("rm");
                 deleteCommand.addArgument("-rf");
                 deleteCommand.addArgument(dependencyDirectory.getCanonicalPath());
-                log.debug("Delete command is {}", deleteCommand.toString());
+                log.debug("Delete command is {}", deleteCommand);
                 this.executor.execute(deleteCommand);
             } else {
                 FileUtils.deleteDirectory(dependencyDirectory);
@@ -514,7 +514,7 @@ public class JobCompletionService {
 
                     this.executor.setWorkingDirectory(jobDir);
 
-                    log.debug("Archive command : {}", commandLine.toString());
+                    log.debug("Archive command : {}", commandLine);
                     this.executor.execute(commandLine);
 
                     // Upload the tar file to remote location
@@ -532,7 +532,7 @@ public class JobCompletionService {
                                 deleteCommand.addArgument(localArchiveFile.getCanonicalPath());
 
                                 this.executor.setWorkingDirectory(jobDir);
-                                log.debug("Delete command: {}", deleteCommand.toString());
+                                log.debug("Delete command: {}", deleteCommand);
                                 this.executor.execute(deleteCommand);
                             } else if (!localArchiveFile.delete()) {
                                 log.error("Failed to delete archive file for job: {}", jobId);
