@@ -172,7 +172,7 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
         final Map<String, String> tags = Maps.newHashMap();
         try {
             if (this.isConfigured.get() && this.script != null && this.script.get() != null) {
-                log.debug("Evaluating script for job " + jobRequest.getId().orElse("without id"));
+                log.debug("Evaluating script for job {}", jobRequest.getId().orElse("without id"));
                 final Bindings bindings = new SimpleBindings();
                 bindings.put(CLUSTERS_BINDING, this.mapper.writeValueAsString(clusters));
                 bindings.put(JOB_REQUEST_BINDING, this.mapper.writeValueAsString(jobRequest));
@@ -191,7 +191,7 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
                         }
                     }
                 }
-                log.warn("Script returned a cluster not in the input list: " + clusterId);
+                log.warn("Script returned a cluster not in the input list: {}", clusterId);
             } else {
                 log.debug("Script returned null");
                 tags.put(STATUS_TAG_KEY, STATUS_TAG_NOT_CONFIGURED);
@@ -294,7 +294,7 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
                 final InputStream fis = Files.newInputStream(scriptDestinationPath);
                 final InputStreamReader reader = new InputStreamReader(fis, UTF_8)
             ) {
-                log.debug("Compiling " + scriptFileSource);
+                log.debug("Compiling {}", scriptFileSource);
                 this.script.set(compilable.compile(reader));
             }
 

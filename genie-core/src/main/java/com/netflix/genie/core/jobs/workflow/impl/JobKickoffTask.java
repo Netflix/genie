@@ -197,7 +197,7 @@ public class JobKickoffTask extends GenieBaseTask {
 
     // Helper method to add write permissions to a directory for the group owner
     private void makeDirGroupWritable(final String dir) throws GenieServerException {
-        log.debug("Adding write permissions for the directory " + dir + " for the group.");
+        log.debug("Adding write permissions for the directory {} for the group.", dir);
         final CommandLine commandLIne = new CommandLine("sudo").addArgument("chmod").addArgument("g+w")
             .addArgument(dir);
 
@@ -238,7 +238,7 @@ public class JobKickoffTask extends GenieBaseTask {
                 // We create the group and ignore the error as it will fail if group already exists.
                 // If the failure is due to some other reason, then user creation will fail and we catch that.
                 try {
-                    log.debug("Running command to create group:  [" + groupCreateCommandLine.toString() + "]");
+                    log.debug("Running command to create group:  [{}]", groupCreateCommandLine);
                     this.executor.execute(groupCreateCommandLine);
                 } catch (IOException ioexception) {
                     log.debug("Group creation threw an error as it might already exist");
@@ -252,7 +252,7 @@ public class JobKickoffTask extends GenieBaseTask {
             userCreateCommandLine.addArgument("-M");
 
             try {
-                log.debug("Running command to create user: [" + userCreateCommandLine.toString() + "]");
+                log.debug("Running command to create user: [{}]", userCreateCommandLine);
                 this.executor.execute(userCreateCommandLine);
             } catch (IOException ioexception) {
                 throw new GenieServerException("Could not create user " + user + " with exception " + ioexception);

@@ -66,7 +66,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configureGlobal(final AuthenticationManagerBuilder auth) throws Exception {
         if (this.providers != null) {
             for (final AuthenticationProvider provider : this.providers) {
-                log.debug("Adding authentication provider {} to authentication provider.", provider.toString());
+                log.debug("Adding authentication provider {} to authentication provider.", provider);
                 auth.authenticationProvider(provider);
             }
         } else {
