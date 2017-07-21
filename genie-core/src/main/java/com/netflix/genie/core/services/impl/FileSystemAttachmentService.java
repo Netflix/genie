@@ -63,7 +63,7 @@ public class FileSystemAttachmentService implements AttachmentService {
         final File attachment = new File(attachmentDirectory, jobId + "/" + filename);
         try {
             FileUtils.copyInputStreamToFile(content, attachment);
-            log.info("Saved " + filename + " to " + attachment.getAbsolutePath());
+            log.info("Saved {} to {}", filename, attachment.getAbsolutePath());
         } catch (final IOException ioe) {
             throw new GenieServerException(ioe);
         }

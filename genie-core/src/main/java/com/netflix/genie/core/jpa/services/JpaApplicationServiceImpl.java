@@ -99,7 +99,7 @@ public class JpaApplicationServiceImpl implements ApplicationService {
         @Valid
         final Application app
     ) throws GenieException {
-        log.debug("Called with application: {}", app.toString());
+        log.debug("Called with application: {}", app);
         final Optional<String> appId = app.getId();
         if (appId.isPresent() && this.applicationRepo.exists(appId.get())) {
             throw new GenieConflictException("An application with id " + appId.get() + " already exists");
@@ -165,7 +165,7 @@ public class JpaApplicationServiceImpl implements ApplicationService {
             throw new GenieBadRequestException("Application id inconsistent with id passed in.");
         }
 
-        log.debug("Called with app {}", updateApp.toString());
+        log.debug("Called with app {}", updateApp);
         this.updateAndSaveApplicationEntity(this.findApplication(id), updateApp);
     }
 

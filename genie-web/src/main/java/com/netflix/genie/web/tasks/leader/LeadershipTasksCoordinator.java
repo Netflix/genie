@@ -136,7 +136,7 @@ public class LeadershipTasksCoordinator {
 
     private void cancelTasks() {
         for (final ScheduledFuture<?> future : this.futures) {
-            log.info("Attempting to cancel thread {}", future.toString());
+            log.info("Attempting to cancel thread {}", future);
             if (future.cancel(true)) {
                 log.info("Successfully cancelled.");
             } else {
