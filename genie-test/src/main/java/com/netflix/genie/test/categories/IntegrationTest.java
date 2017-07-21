@@ -18,7 +18,7 @@
 package com.netflix.genie.test.categories;
 
 /**
- * Interface intented to be used as a JUnit category to flag tests as integration tests.
+ * Interface intended to be used as a JUnit category to flag tests as integration tests.
  *
  * @author tgianos
  * @since 3.0.0
