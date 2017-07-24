@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.controllers;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,6 +29,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 /**
  * Controller for forwarding UI requests.
@@ -36,6 +39,7 @@ import javax.validation.constraints.NotNull;
  * @since 3.0.0
  */
 @Controller
+@Slf4j
 public class UIController {
 
     /**
@@ -71,9 +75,19 @@ public class UIController {
      * @param id The id of the job
      * @param request the servlet request to get path information from
      * @return The forward address to go to at the API endpoint
+     * @throws UnsupportedEncodingException if URL-encoding of the job id fails
      */
     @RequestMapping(value = "/file/{id}/**", method = RequestMethod.GET)
-    public String getFile(@PathVariable("id") final String id, final HttpServletRequest request) {
-        return "forward:/api/v3/jobs/" + id + "/" + ControllerUtils.getRemainingPath(request);
+    public String getFile(
+        @PathVariable("id") final String id,
+        final HttpServletRequest request
+    ) throws UnsupportedEncodingException {
+        // When forwarding, the downstream ApplicationContext will perform URL decoding.
+        // If the job ID contains special characters (such as '+'), they will be interpreted as url-encoded and
+        // decoded, resulting in an invalid job ID that cannot be found.
+        // To prevent this, always perform URL encoding on the ID before forwarding.
+        final String encodedId = URLEncoder.encode(id, "UTF-8");
+        final String path = "/api/v3/jobs/" + encodedId + "/" + ControllerUtils.getRemainingPath(request);
+        return "forward:" + path;
     }
 }

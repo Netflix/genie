@@ -31,6 +31,7 @@ import org.springframework.web.servlet.HandlerMapping;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.net.URLEncoder;
 import java.util.UUID;
 
 /**
@@ -75,9 +76,10 @@ public class UIControllerUnitTests {
 
     /**
      * Make sure the getFile method returns the right forward command.
+     * @throws Exception if an error occurs
      */
     @Test
-    public void canGetFile() {
+    public void canGetFile() throws Exception {
         final String id = UUID.randomUUID().toString();
         final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
 
@@ -88,9 +90,12 @@ public class UIControllerUnitTests {
             .when(request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE))
             .thenReturn("/file/{id}/**");
 
+        final String encodedId = URLEncoder.encode(id, "UTF-8");
+        final String expectedPath = "/api/v3/jobs/" + encodedId + "/output/genie/log.out";
+
         Assert.assertThat(
             this.controller.getFile(id, request),
-            Matchers.is("forward:/api/v3/jobs/" + id + "/output/genie/log.out")
+            Matchers.is("forward:" + expectedPath)
         );
     }
 }
