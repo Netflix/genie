@@ -29,8 +29,11 @@ import com.netflix.genie.common.exceptions.GenieTimeoutException;
 import com.netflix.genie.core.util.MetricsConstants;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.spectator.api.Counter;
+import com.netflix.spectator.api.DefaultRegistry;
+import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Registry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -44,6 +47,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Tests for the exception mapper.
@@ -54,17 +59,7 @@ import java.lang.reflect.Method;
 @Category(UnitTest.class)
 public class GenieExceptionMapperUnitTests {
 
-    private Counter badRequestRate;
-    private Counter conflictRate;
-    private Counter notFoundRate;
-    private Counter preconditionRate;
-    private Counter serverRate;
-    private Counter serverUnavailableRate;
-    private Counter timeoutRate;
-    private Counter genieRate;
-    private Counter constraintViolationRate;
-    private Counter methodArgumentNotValidRate;
-
+    private Registry registry;
     private HttpServletResponse response;
     private GenieExceptionMapper mapper;
 
@@ -73,50 +68,8 @@ public class GenieExceptionMapperUnitTests {
      */
     @Before
     public void setup() {
-        this.badRequestRate = Mockito.mock(Counter.class);
-        this.conflictRate = Mockito.mock(Counter.class);
-        this.notFoundRate = Mockito.mock(Counter.class);
-        this.preconditionRate = Mockito.mock(Counter.class);
-        this.serverRate = Mockito.mock(Counter.class);
-        this.serverUnavailableRate = Mockito.mock(Counter.class);
-        this.timeoutRate = Mockito.mock(Counter.class);
-        this.genieRate = Mockito.mock(Counter.class);
-        this.constraintViolationRate = Mockito.mock(Counter.class);
-        this.methodArgumentNotValidRate = Mockito.mock(Counter.class);
-
-        final Registry registry = Mockito.mock(Registry.class);
-        Mockito
-            .when(registry.counter(MetricsConstants.GENIE_EXCEPTIONS_BAD_REQUEST_RATE))
-            .thenReturn(this.badRequestRate);
-        Mockito
-            .when(registry.counter(MetricsConstants.GENIE_EXCEPTIONS_CONFLICT_RATE))
-            .thenReturn(this.conflictRate);
-        Mockito
-            .when(registry.counter(MetricsConstants.GENIE_EXCEPTIONS_NOT_FOUND_RATE))
-            .thenReturn(this.notFoundRate);
-        Mockito
-            .when(registry.counter(MetricsConstants.GENIE_EXCEPTIONS_PRECONDITION_RATE))
-            .thenReturn(this.preconditionRate);
-        Mockito
-            .when(registry.counter(MetricsConstants.GENIE_EXCEPTIONS_SERVER_RATE))
-            .thenReturn(this.serverRate);
-        Mockito
-            .when(registry.counter(MetricsConstants.GENIE_EXCEPTIONS_SERVER_UNAVAILABLE_RATE))
-            .thenReturn(this.serverUnavailableRate);
-        Mockito
-            .when(registry.counter(MetricsConstants.GENIE_EXCEPTIONS_TIMEOUT_RATE))
-            .thenReturn(this.timeoutRate);
-        Mockito
-            .when(registry.counter(MetricsConstants.GENIE_EXCEPTIONS_OTHER_RATE))
-            .thenReturn(this.genieRate);
-        Mockito
-            .when(registry.counter(MetricsConstants.GENIE_EXCEPTIONS_CONSTRAINT_VIOLATION_RATE))
-            .thenReturn(this.constraintViolationRate);
-        Mockito
-            .when(registry.counter(MetricsConstants.GENIE_EXCEPTIONS_METHOD_ARGUMENT_NOT_VALID_RATE))
-            .thenReturn(this.methodArgumentNotValidRate);
-
         this.response = Mockito.mock(HttpServletResponse.class);
+        this.registry = new DefaultRegistry();
         this.mapper = new GenieExceptionMapper(registry);
     }
 
@@ -127,24 +80,23 @@ public class GenieExceptionMapperUnitTests {
      */
     @Test
     public void canHandleGenieExceptions() throws IOException {
-        this.mapper.handleGenieException(this.response, new GenieBadRequestException("bad"));
-        this.mapper.handleGenieException(this.response, new GenieConflictException("conflict"));
-        this.mapper.handleGenieException(this.response, new GenieNotFoundException("Not Found"));
-        this.mapper.handleGenieException(this.response, new GeniePreconditionException("Precondition"));
-        this.mapper.handleGenieException(this.response, new GenieServerException("server"));
-        this.mapper.handleGenieException(this.response, new GenieServerUnavailableException("Server Unavailable"));
-        this.mapper.handleGenieException(this.response, new GenieTimeoutException("Timeout"));
-        this.mapper.handleGenieException(this.response, new GenieException(568, "Other"));
 
-        Mockito.verify(this.badRequestRate, Mockito.times(1)).increment();
-        Mockito.verify(this.conflictRate, Mockito.times(1)).increment();
-        Mockito.verify(this.notFoundRate, Mockito.times(1)).increment();
-        Mockito.verify(this.preconditionRate, Mockito.times(1)).increment();
-        Mockito.verify(this.serverRate, Mockito.times(1)).increment();
-        Mockito.verify(this.serverUnavailableRate, Mockito.times(1)).increment();
-        Mockito.verify(this.timeoutRate, Mockito.times(1)).increment();
-        Mockito.verify(this.genieRate, Mockito.times(1)).increment();
-        Mockito.verify(this.response, Mockito.times(8)).sendError(Mockito.anyInt(), Mockito.anyString());
+        final List<GenieException> exceptions = Arrays.asList(
+            new GenieBadRequestException("bad"),
+            new GenieConflictException("conflict"),
+            new GenieNotFoundException("Not Found"),
+            new GeniePreconditionException("Precondition"),
+            new GenieServerException("server"),
+            new GenieServerUnavailableException("Server Unavailable"),
+            new GenieTimeoutException("Timeout"),
+            new GenieException(568, "Other")
+        );
+
+        for (GenieException exception : exceptions) {
+            this.verifyExceptionCounter(exception, 0);
+            this.mapper.handleGenieException(this.response, exception);
+            this.verifyExceptionCounter(exception, 1);
+        }
     }
 
     /**
@@ -154,10 +106,11 @@ public class GenieExceptionMapperUnitTests {
      */
     @Test
     public void canHandleConstraintViolationExceptions() throws IOException {
-        this.mapper.handleConstraintViolation(this.response, new ConstraintViolationException("cve", null));
-        Mockito.verify(this.constraintViolationRate, Mockito.times(1)).increment();
+        final ConstraintViolationException exception = new ConstraintViolationException("cve", null);
+        this.mapper.handleConstraintViolation(this.response, exception);
         Mockito.verify(this.response, Mockito.times(1))
             .sendError(Mockito.eq(HttpStatus.PRECONDITION_FAILED.value()), Mockito.anyString());
+        verifyExceptionCounter(exception, 1);
     }
 
     /**
@@ -177,18 +130,25 @@ public class GenieExceptionMapperUnitTests {
         final BindingResult bindingResult = Mockito.mock(BindingResult.class);
         Mockito.when(bindingResult.getAllErrors()).thenReturn(Lists.newArrayList());
 
+        final MethodArgumentNotValidException exception = new MethodArgumentNotValidException(
+            parameter,
+            bindingResult
+        );
+
         this.mapper.handleMethodArgumentNotValidException(
             this.response,
-            new MethodArgumentNotValidException(
-                parameter,
-                bindingResult
-            )
+            exception
         );
-        Mockito
-            .verify(this.methodArgumentNotValidRate, Mockito.times(1))
-            .increment();
         Mockito
             .verify(this.response, Mockito.times(1))
             .sendError(Mockito.eq(HttpStatus.PRECONDITION_FAILED.value()), Mockito.anyString());
+        verifyExceptionCounter(exception, 1);
+    }
+
+    private void verifyExceptionCounter(final Exception exception, final int expectedCount) {
+        final Id counterTaggedId = this.registry.createId("genie.web.controllers.exception")
+            .withTag(MetricsConstants.TagKeys.EXCEPTION_CLASS, exception.getClass().getCanonicalName());
+        final Counter counter = (Counter) this.registry.counter(counterTaggedId);
+        Assert.assertEquals(expectedCount, counter.count());
     }
 }

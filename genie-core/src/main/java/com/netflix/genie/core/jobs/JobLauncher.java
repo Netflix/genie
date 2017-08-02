@@ -21,16 +21,10 @@ import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.JobRequest;
-import com.netflix.genie.common.exceptions.GenieBadRequestException;
-import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.exceptions.GenieNotFoundException;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.netflix.genie.common.exceptions.GenieServerException;
-import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
-import com.netflix.genie.common.exceptions.GenieTimeoutException;
 import com.netflix.genie.core.services.JobSubmitterService;
 import com.netflix.genie.core.util.MetricsConstants;
+import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Registry;
 import com.netflix.spectator.api.Timer;
 import lombok.extern.slf4j.Slf4j;
@@ -57,6 +51,7 @@ public class JobLauncher implements Runnable {
     private final int memory;
     private final Registry registry;
     private final Timer submitTimer;
+    private final Id submitExceptionCounterId;
 
     /**
      * Constructor.
@@ -86,6 +81,7 @@ public class JobLauncher implements Runnable {
         this.memory = memory;
         this.registry = registry;
         this.submitTimer = this.registry.timer("genie.jobs.submit.timer");
+        this.submitExceptionCounterId = registry.createId("genie.jobs.submit.exception");
     }
 
     /**
@@ -105,23 +101,9 @@ public class JobLauncher implements Runnable {
                     );
                 } catch (final GenieException e) {
                     log.error("Unable to submit job due to exception: {}", e.getMessage(), e);
-                    if (e instanceof GenieBadRequestException) {
-                        this.registry.counter(MetricsConstants.GENIE_EXCEPTIONS_BAD_REQUEST_RATE).increment();
-                    } else if (e instanceof GenieConflictException) {
-                        this.registry.counter(MetricsConstants.GENIE_EXCEPTIONS_CONFLICT_RATE).increment();
-                    } else if (e instanceof GenieNotFoundException) {
-                        this.registry.counter(MetricsConstants.GENIE_EXCEPTIONS_NOT_FOUND_RATE).increment();
-                    } else if (e instanceof GeniePreconditionException) {
-                        this.registry.counter(MetricsConstants.GENIE_EXCEPTIONS_PRECONDITION_RATE).increment();
-                    } else if (e instanceof GenieServerException) {
-                        this.registry.counter(MetricsConstants.GENIE_EXCEPTIONS_SERVER_RATE).increment();
-                    } else if (e instanceof GenieServerUnavailableException) {
-                        this.registry.counter(MetricsConstants.GENIE_EXCEPTIONS_SERVER_UNAVAILABLE_RATE).increment();
-                    } else if (e instanceof GenieTimeoutException) {
-                        this.registry.counter(MetricsConstants.GENIE_EXCEPTIONS_TIMEOUT_RATE).increment();
-                    } else {
-                        this.registry.counter(MetricsConstants.GENIE_EXCEPTIONS_OTHER_RATE).increment();
-                    }
+                    final Id taggedId = this.submitExceptionCounterId
+                        .withTag(MetricsConstants.TagKeys.EXCEPTION_CLASS, e.getClass().getCanonicalName());
+                    this.registry.counter(taggedId).increment();
                 }
             }
         );
