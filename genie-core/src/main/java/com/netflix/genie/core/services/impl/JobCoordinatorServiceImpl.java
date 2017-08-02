@@ -471,7 +471,11 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                 final Command command : this.clusterService.getCommandsForCluster(clusterId, this.commandStatuses)
                 ) {
                 if (command.getTags().containsAll(jobRequest.getCommandCriteria())) {
-                    log.info("Selected command {} for job {} ", command.getId(), jobRequest.getId());
+                    log.info(
+                        "Selected command {} for job {} ",
+                        command.getId().orElse(NO_ID_FOUND),
+                        jobRequest.getId().orElse(NO_ID_FOUND)
+                    );
                     return command;
                 }
             }
@@ -512,7 +516,8 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                     .map(Application::getId)
                     .filter(Optional::isPresent)
                     .map(Optional::get)
-                    .reduce((one, two) -> one + "," + two),
+                    .reduce((one, two) -> one + "," + two)
+                .orElse(NO_ID_FOUND),
                 jobRequest.getId().orElse(NO_ID_FOUND)
             );
             return applications;
