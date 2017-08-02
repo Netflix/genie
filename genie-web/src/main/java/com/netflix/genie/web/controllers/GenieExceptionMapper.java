@@ -17,17 +17,9 @@
  */
 package com.netflix.genie.web.controllers;
 
-import com.netflix.genie.common.exceptions.GenieBadRequestException;
-import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.exceptions.GenieNotFoundException;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.netflix.genie.common.exceptions.GenieServerException;
-import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
-import com.netflix.genie.common.exceptions.GenieTimeoutException;
 import com.netflix.genie.common.exceptions.GenieUserLimitExceededException;
 import com.netflix.genie.core.util.MetricsConstants;
-import com.netflix.spectator.api.Counter;
 import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Registry;
 import lombok.extern.slf4j.Slf4j;
@@ -55,17 +47,7 @@ public class GenieExceptionMapper {
     private static final String NEW_LINE = "\n";
 
     private final Registry registry;
-    private final Counter badRequestRate;
-    private final Counter conflictRate;
-    private final Counter notFoundRate;
-    private final Counter preconditionRate;
-    private final Counter serverRate;
-    private final Counter serverUnavailableRate;
-    private final Counter timeoutRate;
-    private final Counter genieRate;
-    private final Counter constraintViolationRate;
-    private final Id userLimitExceededRateId;
-    private final Counter methodArgumentNotValidRate;
+    private final Id exceptionCounterId;
 
     /**
      * Constructor.
@@ -75,18 +57,7 @@ public class GenieExceptionMapper {
     @Autowired
     public GenieExceptionMapper(final Registry registry) {
         this.registry = registry;
-        this.badRequestRate = registry.counter(MetricsConstants.GENIE_EXCEPTIONS_BAD_REQUEST_RATE);
-        this.conflictRate = registry.counter(MetricsConstants.GENIE_EXCEPTIONS_CONFLICT_RATE);
-        this.notFoundRate = registry.counter(MetricsConstants.GENIE_EXCEPTIONS_NOT_FOUND_RATE);
-        this.preconditionRate = registry.counter(MetricsConstants.GENIE_EXCEPTIONS_PRECONDITION_RATE);
-        this.serverRate = registry.counter(MetricsConstants.GENIE_EXCEPTIONS_SERVER_RATE);
-        this.serverUnavailableRate = registry.counter(MetricsConstants.GENIE_EXCEPTIONS_SERVER_UNAVAILABLE_RATE);
-        this.timeoutRate = registry.counter(MetricsConstants.GENIE_EXCEPTIONS_TIMEOUT_RATE);
-        this.genieRate = registry.counter(MetricsConstants.GENIE_EXCEPTIONS_OTHER_RATE);
-        this.constraintViolationRate = registry.counter(MetricsConstants.GENIE_EXCEPTIONS_CONSTRAINT_VIOLATION_RATE);
-        this.userLimitExceededRateId = registry.createId(MetricsConstants.GENIE_EXCEPTIONS_USER_LIMIT_EXCEEDED_RATE);
-        this.methodArgumentNotValidRate
-            = registry.counter(MetricsConstants.GENIE_EXCEPTIONS_METHOD_ARGUMENT_NOT_VALID_RATE);
+        this.exceptionCounterId = registry.createId("genie.web.controllers.exception");
     }
 
     /**
@@ -101,29 +72,7 @@ public class GenieExceptionMapper {
         final HttpServletResponse response,
         final GenieException e
     ) throws IOException {
-        if (e instanceof GenieBadRequestException) {
-            this.badRequestRate.increment();
-        } else if (e instanceof GenieConflictException) {
-            this.conflictRate.increment();
-        } else if (e instanceof GenieNotFoundException) {
-            this.notFoundRate.increment();
-        } else if (e instanceof GeniePreconditionException) {
-            this.preconditionRate.increment();
-        } else if (e instanceof GenieServerException) {
-            this.serverRate.increment();
-        } else if (e instanceof GenieServerUnavailableException) {
-            this.serverUnavailableRate.increment();
-        } else if (e instanceof GenieTimeoutException) {
-            this.timeoutRate.increment();
-        } else if (e instanceof GenieUserLimitExceededException) {
-            final GenieUserLimitExceededException userLimitExceededException = (GenieUserLimitExceededException) e;
-            final Id taggedId = this.userLimitExceededRateId
-                .withTag("user", userLimitExceededException.getUser())
-                .withTag("limit", userLimitExceededException.getExceededLimitName());
-            this.registry.counter(taggedId).increment();
-        } else {
-            this.genieRate.increment();
-        }
+        this.countException(e);
         log.error(e.getLocalizedMessage(), e);
         response.sendError(e.getErrorCode(), e.getLocalizedMessage());
     }
@@ -149,7 +98,7 @@ public class GenieExceptionMapper {
                 builder.append(cv.getMessage());
             }
         }
-        this.constraintViolationRate.increment();
+        this.countException(cve);
         log.error(cve.getLocalizedMessage(), cve);
         response.sendError(HttpStatus.PRECONDITION_FAILED.value(), builder.toString());
     }
@@ -166,8 +115,22 @@ public class GenieExceptionMapper {
         final HttpServletResponse response,
         final MethodArgumentNotValidException e
     ) throws IOException {
-        this.methodArgumentNotValidRate.increment();
+        this.countException(e);
         log.error(e.getMessage(), e);
         response.sendError(HttpStatus.PRECONDITION_FAILED.value(), e.getMessage());
+    }
+
+    private void countException(final Exception e) {
+        Id taggedId = this.exceptionCounterId
+            .withTag(MetricsConstants.TagKeys.EXCEPTION_CLASS, e.getClass().getCanonicalName());
+
+        if (e instanceof GenieUserLimitExceededException) {
+            final GenieUserLimitExceededException userLimitExceededException = (GenieUserLimitExceededException) e;
+            taggedId = taggedId
+                .withTag("user", userLimitExceededException.getUser())
+                .withTag("limit", userLimitExceededException.getExceededLimitName());
+        }
+
+        this.registry.counter(taggedId).increment();
     }
 }

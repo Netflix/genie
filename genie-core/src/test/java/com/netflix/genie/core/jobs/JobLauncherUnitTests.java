@@ -27,14 +27,15 @@ import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.services.JobSubmitterService;
 import com.netflix.genie.core.util.MetricsConstants;
 import com.netflix.genie.test.categories.UnitTest;
-import com.netflix.spectator.api.Counter;
+import com.netflix.spectator.api.DefaultRegistry;
+import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Registry;
 import com.netflix.spectator.api.Timer;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
 
 import java.util.List;
 
@@ -50,7 +51,6 @@ public class JobLauncherUnitTests {
     private JobLauncher jobLauncher;
     private JobSubmitterService jobSubmitterService;
     private Registry registry;
-    private Counter counter;
     private JobRequest jobRequest;
     private Cluster cluster;
     private Command command;
@@ -68,19 +68,9 @@ public class JobLauncherUnitTests {
         this.command = Mockito.mock(Command.class);
         this.applications = Lists.newArrayList(Mockito.mock(Application.class));
         this.jobSubmitterService = Mockito.mock(JobSubmitterService.class);
-        this.registry = Mockito.mock(Registry.class);
-        this.counter = Mockito.mock(Counter.class);
-        this.timer = Mockito.mock(Timer.class);
+        this.registry = new DefaultRegistry();
+        this.timer = this.registry.timer("genie.jobs.submit.timer");
         this.memory = 1_024;
-        // Force the runnable to be invoked within the timer
-        Mockito.doAnswer(
-            (final InvocationOnMock invocationOnMock) -> {
-                final Runnable runnable = (Runnable) invocationOnMock.getArguments()[0];
-                runnable.run();
-                return null;
-            }
-        ).when(this.timer).record(Mockito.any(Runnable.class));
-        Mockito.when(this.registry.timer("genie.jobs.submit.timer")).thenReturn(this.timer);
         this.jobLauncher = new JobLauncher(
             this.jobSubmitterService,
             this.jobRequest,
@@ -102,7 +92,7 @@ public class JobLauncherUnitTests {
         this.jobLauncher.run();
         Mockito.verify(this.jobSubmitterService, Mockito.times(1))
             .submitJob(this.jobRequest, this.cluster, this.command, this.applications, this.memory);
-        Mockito.verify(this.timer, Mockito.times(1)).record(Mockito.any(Runnable.class));
+        Assert.assertEquals(1, this.timer.count());
     }
 
     /**
@@ -112,12 +102,13 @@ public class JobLauncherUnitTests {
      */
     @Test
     public void cantRun() throws GenieException {
-        Mockito.when(this.registry.counter(MetricsConstants.GENIE_EXCEPTIONS_SERVER_RATE)).thenReturn(this.counter);
-        Mockito.doThrow(new GenieServerException("test")).when(this.jobSubmitterService)
+        final GenieServerException exception = new GenieServerException("test");
+        Mockito.doThrow(exception).when(this.jobSubmitterService)
             .submitJob(this.jobRequest, this.cluster, this.command, this.applications, this.memory);
         this.jobLauncher.run();
-        Mockito.verify(this.registry, Mockito.times(1)).counter(MetricsConstants.GENIE_EXCEPTIONS_SERVER_RATE);
-        Mockito.verify(this.counter, Mockito.times(1)).increment();
-        Mockito.verify(this.timer, Mockito.times(1)).record(Mockito.any(Runnable.class));
+        Assert.assertEquals(1, this.timer.count());
+        final Id counterId = registry.createId("genie.jobs.submit.exception")
+            .withTag(MetricsConstants.TagKeys.EXCEPTION_CLASS, exception.getClass().getCanonicalName());
+        Assert.assertEquals(1, registry.counter(counterId).count());
     }
 }

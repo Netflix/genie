@@ -26,64 +26,55 @@ package com.netflix.genie.core.util;
 public final class MetricsConstants {
 
     /**
-     * For counting how often bad requests happen in the system.
+     * Inner class for constants used as key to tag metrics.
      */
-    public static final String GENIE_EXCEPTIONS_BAD_REQUEST_RATE = "genie.exceptions.badRequest.rate";
+    public static final class TagKeys {
+
+        /**
+         * Key to tag metrics with exception class.
+         */
+        public static final String EXCEPTION_CLASS = "exceptionClass";
+
+        /**
+         * Key to tag metrics with application ID.
+         */
+        public static final String APPLICATION_ID = "applicationId";
+
+        /**
+         * Key to tag metrics with application name.
+         */
+        public static final String APPLICATION_NAME = "applicationName";
+
+        /**
+         * Key to tag metrics with cluster ID.
+         */
+        public static final String CLUSTER_ID = "clusterId";
+
+        /**
+         * Key to tag metrics with cluster name.
+         */
+        public static final String CLUSTER_NAME = "clusterName";
+
+        /**
+         * Key to tag metrics with command ID.
+         */
+        public static final String COMMAND_ID = "commandId";
+
+        /**
+         * Key to tag metrics with command name.
+         */
+        public static final String COMMAND_NAME = "commandName";
+
+        /**
+         * Utility class private constructor.
+         */
+        private TagKeys() {
+        }
+    }
 
     /**
-     * For counting how often conflicts happen in the system.
+     * Utility class private constructor.
      */
-    public static final String GENIE_EXCEPTIONS_CONFLICT_RATE = "genie.exceptions.conflict.rate";
-
-    /**
-     * For counting how often not found exceptions happen in the system.
-     */
-    public static final String GENIE_EXCEPTIONS_NOT_FOUND_RATE = "genie.exceptions.notFound.rate";
-
-    /**
-     * For counting how often precondition exceptions happen in the system.
-     */
-    public static final String GENIE_EXCEPTIONS_PRECONDITION_RATE = "genie.exceptions.precondition.rate";
-
-    /**
-     * For counting how often server exceptions happen in the system.
-     */
-    public static final String GENIE_EXCEPTIONS_SERVER_RATE = "genie.exceptions.server.rate";
-
-    /**
-     * For counting how often server unavailable exceptions in the system.
-     */
-    public static final String GENIE_EXCEPTIONS_SERVER_UNAVAILABLE_RATE = "genie.exceptions.serverUnavailable.rate";
-
-    /**
-     * For counting how often timeout exceptions happen in the system.
-     */
-    public static final String GENIE_EXCEPTIONS_TIMEOUT_RATE = "genie.exceptions.timeout.rate";
-
-    /**
-     * For counting how often bad requests happen in the system.
-     */
-    public static final String GENIE_EXCEPTIONS_OTHER_RATE = "genie.exceptions.other.rate";
-
-    /**
-     * For counting how often constraint violations happen in the system.
-     */
-    public static final String GENIE_EXCEPTIONS_CONSTRAINT_VIOLATION_RATE = "genie.exceptions.constraintViolation.rate";
-
-    /**
-     * For counting how often requests are rejected due to user exceeding limits.
-     */
-    public static final String GENIE_EXCEPTIONS_USER_LIMIT_EXCEEDED_RATE = "genie.exceptions.userLimitExceeded.rate";
-
-    /**
-     * For counting how often method argument not valid exceptions happen in the system.
-     */
-    public static final String GENIE_EXCEPTIONS_METHOD_ARGUMENT_NOT_VALID_RATE
-        = "genie.exceptions.methodArgumentNotValid.rate";
-
-    /**
-     * Utility class protected constructor.
-     */
-    protected MetricsConstants() {
+    private MetricsConstants() {
     }
 }
