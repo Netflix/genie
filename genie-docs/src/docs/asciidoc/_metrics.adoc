@@ -1,0 +1,409 @@
+== Metrics
+
+The following is an extensive list of metrics (counters, timers, gauges, ...)
+published organically by Genie, in addition to metrics published by Spring, JVM
+and system metrics and statistics.
+
+[cols=">1m,<10,^1,^1m,^1m",options="header"]
+|===
+|Name |Description |Unit |Source |Tags
+
+|genie.jobs.submit.timer
+|Time taken initialize the job environment (working directory, script) and fork the children
+|nanoseconds
+|JobLauncher
+|status, exceptionClass
+
+|genie.jobs.tasks.applicationTask.timer
+|Time taken to stage all applications that a job depends on
+|nanoseconds
+|ApplicationTask
+|status, applicationId, exceptionClass
+
+|genie.jobs.tasks.applicationTask.applicationSetup.timer
+|Time taken to set up individual applications (creating folders, staging dependencies and configurations)
+|nanoseconds
+|ApplicationTask
+|applicationId, applicationName
+
+|genie.jobs.tasks.clusterTask.timer
+|Time taken to set up cluster a job runs on (creating folders, staging dependencies and configurations)
+|nanoseconds
+|ClusterTask
+|clusterId, clusterName, status, exceptionClass
+
+|genie.jobs.tasks.commmandTask.timer
+|Time taken to set up commmand a job runs (creating folders, staging dependencies and configurations)
+|nanoseconds
+|CommmandTask
+|commmandId, commmandName, status, exceptionClass
+
+|genie.jobs.tasks.initialSetupTask.timer
+|Time taken to set up job environment (creating folder structure, shell environment script)
+|nanoseconds
+|InitialSetupTask
+|status, exceptionClass
+
+|genie.jobs.tasks.jobFailureAndKillHandlerLogicTask.timer
+|Time taken to set up run script section that deals with child process termination
+|nanoseconds
+|JobFailureAndKillHandlerLogicTask
+|status, exceptionClass
+
+|genie.jobs.tasks.jobKickoffTask.timer
+|Time taken to complete job launch
+|nanoseconds
+|JobKickoffTask
+|status, exceptionClass
+
+|genie.jobs.tasks.jobTask.timer
+|Time taken to set up job-specific environment (creating folders, staging attachments, dependencies)
+|nanoseconds
+|JobTask
+|status, exceptionClass
+
+|genie.jobs.file.cache.hitRate
+|File cache hit ratio
+|ratio
+|CacheGenieFileTransferService
+|-
+
+|genie.jobs.file.cache.missRate
+|File cache miss ratio
+|ratio
+|CacheGenieFileTransferService
+|-
+
+|genie.jobs.file.cache.loadExceptionRate
+|File cache loading exception ratio
+|ratio
+|CacheGenieFileTransferService
+|-
+
+|genie.jobs.coordination.timer
+|Time taken to initialize the job database record and resolve applications, command, cluster, based on criteria and load balancing strategy.
+|nanoseconds
+|JobCoordinatorServiceImpl
+|status, exceptionClass
+
+|genie.jobs.submit.localRunner.selectCluster.timer
+|Time taken to select a cluster based on criteria and load balancing strategy
+|nanoseconds
+|JobCoordinatorServiceImpl
+|status, exceptionClass
+
+|genie.jobs.submit.localRunner.selectCommand.timer
+|Time taken to resolve a command based on criteria and cluster
+|nanoseconds
+|JobCoordinatorServiceImpl
+|status, exceptionClass
+
+|genie.jobs.submit.localRunner.selectApplications.timer
+|Time taken to retrieve applications information for this task
+|nanoseconds
+|JobCoordinatorServiceImpl
+|status, exceptionClass
+
+|genie.jobs.submit.localRunner.setJobEnvironment.timer
+|Time taken to persist the job runtime information in the database
+|nanoseconds
+|JobCoordinatorServiceImpl
+|status, exceptionClass
+
+|genie.jobs.submit.selectCluster.loadBalancer.counter
+|Counter for cluster load balancer algorithms invocations
+|count
+|JobCoordinatorServiceImpl
+|class, status
+
+|genie.jobs.submit.selectCluster.noneSelected.counter
+|Number of times the cluster load balancing terminated without selecting a cluster
+|count
+|JobCoordinatorServiceImpl
+|-
+
+|genie.jobs.submit.selectCluster.noneFound.counter
+|Number of times the criteria for cluster selection does not match any cluster
+|count
+|JobCoordinatorServiceImpl
+|-
+
+|genie.jobs.running.gauge
+|Number of jobs currently running locally
+|amount
+|JobStateServiceImpl
+|-
+
+|genie.jobs.active.gauge
+|Number of jobs currently active locally
+|amount
+|JobStateServiceImpl
+|-
+
+|genie.jobs.memory.used.gauge
+|Total amount of memory allocated to local jobs (according to job request)
+|Megabytes
+|JobStateServiceImpl
+|-
+
+|genie.jobs.unableToCancel.rate
+|Count number of times a job asynchronous task cancelling was requested and failed (failure to cancel may be due to the task no longer being running)
+|count
+|JobStateServiceImpl
+|-
+
+|genie.jobs.submit.localRunner.overall.timer
+|Time takend to submit a new job (create workspace and scripts, register in database and kick off)
+|nanoseconds
+|LocalJobRunner
+|-
+
+|genie.jobs.submit.localRunner.createJobDir.timer
+|Time taken to create a job working directory (includes failures to create)
+|nanoseconds
+|LocalJobRunner
+|-
+
+|genie.jobs.submit.localRunner.createRunScript.timer
+|Time taken to create the job run script
+|nanoseconds
+|LocalJobRunner
+|-
+
+|genie.jobs.submit.localRunner.executeJob.timer
+|Time taken to execute the job workflow tasks
+|nanoseconds
+|LocalJobRunner
+|-
+
+|genie.jobs.submit.localRunner.saveJobExecution.timer
+|Time taken to persist information about job execution
+|nanoseconds
+|LocalJobRunner
+|-
+
+|genie.jobs.submit.localRunner.publishJobStartedEvent.timer
+|Time taken to publish the event that announces a job has started
+|nanoseconds
+|LocalJobRunner
+|-
+
+|genie.jobs.submit.localRunner.createInitFailureDetailsFile.timer
+|Time taken to write a file with details about failure to launch a job
+|nanoseconds
+|LocalJobRunner
+|-
+
+|genie.files.s3.download.timer
+|Time taken to download a file from S3
+|nanoseconds
+|S3FileTransferImpl
+|status, exceptionClass
+
+|genie.files.s3.upload.timer
+|Time taken to upload a local file to S3
+|nanoseconds
+|S3FileTransferImpl
+|status, exceptionClass
+
+|genie.files.s3.getObjectMetadata.timer
+|Time taken to obtain S3 file metadata (modification time)
+|nanoseconds
+|S3FileTransferImpl
+|status, exceptionClass
+
+|genie.web.controllers.exception
+|Counts exceptions returned to the user
+|count
+|GenieExceptionMapper
+|exceptionClass (*)
+
+|genie.api.v3.jobs.submitJobWithoutAttachments.rate
+|Counts the number of jobs submitted without an attachment
+|count
+|JobRestController
+|-
+
+|genie.api.v3.jobs.submitJobWithAttachments.rate
+|Counts the number of jobs submitted with one or more attachments
+|count
+|JobRestController
+|-
+
+|genie.security.oauth2.pingFederate.authentication.timer
+|Time taken to process JWT token and obtain OAuth2 authentication
+|nanoseconds
+|PingFederateJWTTokenServices
+|-
+
+|genie.security.oauth2.pingFederate.tokenValidation.error.rate
+|Counts the number of token validation errors from the backend
+|nanoseconds
+|PingFederateRemoteTokenServices
+|status
+
+|genie.security.oauth2.pingFederate.authentication.timer
+|Time taken to process authentication token and obtain OAuth2 for an API request
+|nanoseconds
+|PingFederateRemoteTokenServices
+|-
+
+|genie.security.oauth2.pingFederate.api.timer
+|?
+|nanoseconds
+|PingFederateRemoteTokenServices
+|-
+
+|genie.security.oauth2.pingFederate.jwt.validation.timer
+|Time taken to validate a JWT token claim
+|nanoseconds
+|PingFederateValidator
+|-
+
+|genie.security.saml.parse.timer
+|Time taken to load or create user details based on SAML parameters
+|nanoseconds
+|SAMLUserDetailsServiceImpl
+|-
+
+|genie.files.http.download.timer
+|Time taken to download a file from via HTTP
+|nanoseconds
+|HttpFileTransferImpl
+|status, exceptionClass
+
+|genie.files.http.upload.timer
+|Time taken to upload a file via HTTP
+|nanoseconds
+|HttpFileTransferImpl
+|status, exceptionClass
+
+|genie.files.http.getLastModified.timer
+|Time taken to retrieve last modification time for a HTTP document
+|nanoseconds
+|HttpFileTransferImpl
+|status, exceptionClass
+
+|genie.jobs.clusters.loadBalancers.script.select.timer
+|Time taken by the loaded script to select a cluster among the one passed as input
+|nanoseconds
+|ScriptLoadBalancer
+|status, exceptionClass
+
+|genie.jobs.clusters.loadBalancers.script.update.timer
+|Time taken to reload the script
+|nanoseconds
+|ScriptLoadBalancer
+|status, exceptionClass
+
+|genie.jobs.completion.timer
+|Time taken to perform post-job-completion finalization such as folder cleanup, archival and email notification.
+|nanoseconds
+|JobCompletionService
+|error, status, exceptionClass
+
+|genie.jobs.errors.count
+|Counts various kinds of nonfatal errors encountered (email, archival, cleanup, ...). A single request may increment for multiple errors.
+|count
+|JobCompletionService
+|error
+
+|genie.jobs.successfulStatusCheck.rate
+|Counts the successful checks made on locally running jobs
+|count
+|JobMonitor
+|-
+
+|genie.jobs.timeout.rate
+|Counts the number of jobs killed for exceeding the maximum allowed run time
+|count
+|JobMonitor
+|-
+
+|genie.jobs.finished.rate
+|Counts the number of jobs that completed (successfully or not)
+|count
+|JobMonitor
+|-
+
+|genie.jobs.unsuccessfulStatusCheck.rate
+|Counts the number of time an exception was raised while trying to check on a locally running job
+|count
+|JobMonitor
+|-
+
+|genie.jobs.stdOutTooLarge.rate
+|Counts the number of jobs killed for exceeding the maximum allowed standard output limit
+|count
+|JobMonitor
+|-
+
+|genie.jobs.stdErrTooLarge.rate
+|Counts the number of jobs killed for exceeding the maximum allowed standard error limit
+|count
+|JobMonitor
+|-
+
+|genie.jobs.unableToReAttach.rate
+|Counts the number of times a genie node failed to resume monitoring a local job process after server restart
+|count
+|JobMonitoringCoordinator
+|-
+
+|genie.tasks.clusterChecker.errorCounts.gauge
+|Number of Genie nodes that the current leader failed is presently failing to contact
+|Current amount
+|ClusterCheckerTask
+|-
+
+|genie.tasks.clusterChecker.lostJobs.rate
+|Number of jobs marked as "lost" due to a consistent failure to contact the Genie node hosting them
+|count
+|ClusterCheckerTask
+|-
+
+|genie.tasks.clusterChecker.unableToUpdateJob.rate
+|Counts the number of time an exception was raised while trying to update the database status of a lost job
+|count
+|ClusterCheckerTask
+|-
+
+|genie.tasks.databaseCleanup.numDeletedJobs.gauge
+|Number of database records purged during the last database cleanup pass
+|amount
+|DatabaseCleanupTask
+|-
+
+|genie.tasks.databaseCleanup.duration.timer
+|Time taken to cleanup database records for jobs that executed over a given amount of time in the past
+|nanoseconds
+|DatabaseCleanupTask
+|status, exceptionClass
+
+|genie.tasks.diskCleanup.numberDeletedJobDirs.gauge
+|Number of job folders deleted during the last cleanup pass
+|amount
+|DiskCleanupTask
+|-
+
+|genie.tasks.diskCleanup.numberDirsUnableToDelete.gauge
+|Number of failures deleting job folders during the last cleanup pass
+|amount
+|DiskCleanupTask
+|-
+
+|genie.tasks.diskCleanup.unableToGetJobs.rate
+|Counts the number of times a local job folder is encountered during cleanup and the corresponding job record in the database cannot be found
+|count
+|DiskCleanupTask
+|-
+
+|genie.tasks.diskCleanup.unableToDeleteJobsDir.rate
+|Counts the number of times a local job folder could not be deleted
+|count
+|DiskCleanupTask
+|-
+
+|===
+
+(*) Source may add additional tags on a case-by-case basis

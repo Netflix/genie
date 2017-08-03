@@ -39,3 +39,5 @@ include::features/_features.adoc[]
 include::_installation.adoc[]
 
 include::_properties.adoc[]
+
+include::_metrics.adoc[]
