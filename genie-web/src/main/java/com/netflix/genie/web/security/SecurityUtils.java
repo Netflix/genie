@@ -79,7 +79,7 @@ public final class SecurityUtils {
             .and()
                 .x509().authenticationUserDetailsService(x509UserDetailsService)
             .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.NEVER)
 //            .and()
 //                .requiresChannel().anyRequest().requiresSecure()
             .and()
