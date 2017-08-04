@@ -1,6 +1,6 @@
-import T from 'prop-types';
-import React from 'react';
-import $ from 'jquery';
+import T from "prop-types";
+import React from "react";
+import $ from "jquery";
 
 import SearchForm from "./components/SearchForm";
 import NoSearchResult from "./components/NoSearchResult";
@@ -95,27 +95,28 @@ export default class Page extends React.Component {
     if (this.state.error != null) {
       resultPanel = <Error error={this.state.error} />;
     } else {
-      resultPanel = this.state.data.length > 0
-        ? <div
-            className={this.state.showSearchForm ? "col-md-10" : "col-md-12"}
-          >
-            <Table>
-              <TableHeader headers={this.tableHeader} />
-              <TableBody
-                rows={this.state.data}
-                rowId={this.state.rowId}
-                rowType={this.rowType}
-                detailsTable={this.detailsTable}
-                toggleRowDetails={this.toggleRowDetails}
+      resultPanel =
+        this.state.data.length > 0
+          ? <div
+              className={this.state.showSearchForm ? "col-md-10" : "col-md-12"}
+            >
+              <Table>
+                <TableHeader headers={this.tableHeader} />
+                <TableBody
+                  rows={this.state.data}
+                  rowId={this.state.rowId}
+                  rowType={this.rowType}
+                  detailsTable={this.detailsTable}
+                  toggleRowDetails={this.toggleRowDetails}
+                />
+              </Table>
+              <Pagination
+                page={this.state.page}
+                pageType={this.searchPath}
+                links={this.state.links}
               />
-            </Table>
-            <Pagination
-              page={this.state.page}
-              pageType={this.searchPath}
-              links={this.state.links}
-            />
-          </div>
-        : this.state.noSearchResult ? <NoSearchResult /> : <Loading />; // Default to loading...
+            </div>
+          : this.state.noSearchResult ? <NoSearchResult /> : <Loading />; // Default to loading...
     }
 
     return (

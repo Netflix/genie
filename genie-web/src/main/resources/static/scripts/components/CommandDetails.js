@@ -96,10 +96,11 @@ export default class CommandDetails extends React.Component {
                   <td className="col-xs-2 align-right">Dependencies:</td>
                   <td>
                     <ul>
-                      {this.state.command.dependencies.map((dependency, index) =>
-                        <li key={index}>
-                          {dependency}
-                        </li>
+                      {this.state.command.dependencies.map(
+                        (dependency, index) =>
+                          <li key={index}>
+                            {dependency}
+                          </li>
                       )}
                     </ul>
                   </td>

@@ -1,7 +1,7 @@
-import T from 'prop-types';
-import React from 'react';
-import { momentFormat, momentDurationFormat } from '../utils';
-import CopyToClipboard from 'react-copy-to-clipboard';
+import T from "prop-types";
+import React from "react";
+import { momentFormat, momentDurationFormat } from "../utils";
+import CopyToClipboard from "react-copy-to-clipboard";
 
 export default class TableRow extends React.Component {
   static propTypes = {
@@ -55,9 +55,8 @@ export default class TableRow extends React.Component {
         >
           <CopyToClipboard
             onCopy={() => this.setState({ copied: true })}
-            text={
-              `${this.jobsUrl}?id=${this.props.row.id}&rowId=${this.props.row.id}`
-            }
+            text={`${this.jobsUrl}?id=${this.props.row.id}&rowId=${this.props
+              .row.id}`}
           >
             <button className="btn btn-default btn-xs">
               <i className="fa fa-share-alt" aria-hidden="true" />

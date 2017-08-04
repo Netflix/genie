@@ -21,7 +21,8 @@ export default class ClusterDetails extends React.Component {
         id: "",
         configs: [],
         dependencies: [],
-        _links: { self: "", commands: "" } },
+        _links: { self: "", commands: "" }
+      },
       commands: []
     };
   }
@@ -80,7 +81,7 @@ export default class ClusterDetails extends React.Component {
                   <td className="col-xs-2 align-right">Dependencies:</td>
                   <td>
                     <ul>
-                      {this.state.cluster.dependencies.map((data,index) =>
+                      {this.state.cluster.dependencies.map((data, index) =>
                         <li key={index}>
                           {data}
                         </li>

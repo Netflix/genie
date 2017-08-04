@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 import Select from "react-select";
 
@@ -9,10 +9,10 @@ import Panel from "rc-time-picker/lib/Panel";
 
 import { momentFormat, milliSeconds, nowUtc } from "./../utils";
 
-import T from 'prop-types';
+import T from "prop-types";
 
-import 'rc-calendar/assets/index.css';
-import 'rc-time-picker/assets/index.css';
+import "rc-calendar/assets/index.css";
+import "rc-time-picker/assets/index.css";
 
 export default class SearchForm extends React.Component {
   static contextTypes = { router: T.object.isRequired };
@@ -203,9 +203,11 @@ export default class SearchForm extends React.Component {
                       value={this.state.formFields[field.name].value}
                       onChange={this.handleFormFieldChange(field.name)}
                     >
-                      {field.optionValues.map((value, idx) => (
-                        <option key={idx} value={value}>{value}</option>
-                      ))}
+                      {field.optionValues.map((value, idx) =>
+                        <option key={idx} value={value}>
+                          {value}
+                        </option>
+                      )}
                     </select>
                   </div>
                 );
@@ -236,8 +238,10 @@ export default class SearchForm extends React.Component {
                             className="form-control ant-calendar-picker-input ant-input"
                             value={
                               (this.isValidRange(value) &&
-                                `${momentFormat(value[0])} - ${momentFormat(value[1])}`) ||
-                                ""
+                                `${momentFormat(value[0])} - ${momentFormat(
+                                  value[1]
+                                )}`) ||
+                              ""
                             }
                           />
                         );
@@ -262,11 +266,11 @@ export default class SearchForm extends React.Component {
                         value={this.state.formFields.sortOrder.value}
                         onChange={this.handleSortOrderChange}
                       >
-                        {field.optionValues.map((value, idx) => (
+                        {field.optionValues.map((value, idx) =>
                           <option key={`${idx}-option`} value={value}>
                             {value}
                           </option>
-                        ))}
+                        )}
                       </select>
                     </div>
                   </div>
@@ -276,7 +280,7 @@ export default class SearchForm extends React.Component {
             }
           })}
           <div className={this.state.showAllFormFields ? "" : "hidden"}>
-            {this.props.hiddenFormFields.map((field, index) => (
+            {this.props.hiddenFormFields.map((field, index) =>
               <div key={`${index}-div`} className="form-group">
                 <label key={`${index}-label`} className="form-label">
                   {field.label}:
@@ -289,7 +293,7 @@ export default class SearchForm extends React.Component {
                   className="form-control"
                 />
               </div>
-            ))}
+            )}
           </div>
           {this.state.hasHiddenFormFields
             ? <div className="form-group">

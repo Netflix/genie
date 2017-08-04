@@ -1,6 +1,6 @@
-import T from 'prop-types';
-import React from 'react';
-import { Link } from 'react-router';
+import T from "prop-types";
+import React from "react";
+import { Link } from "react-router";
 
 import { momentFormat, fetch } from "../utils";
 import Modal from "react-modal";
@@ -101,39 +101,57 @@ export default class JobDetails extends React.Component {
               <tbody>
                 <tr>
                   <td className="col-xs-2 align-right">Job Id:</td>
-                  <td>{this.state.job.id}</td>
+                  <td>
+                    {this.state.job.id}
+                  </td>
                 </tr>
                 <tr>
                   <td className="col-xs-2 align-right">Version:</td>
-                  <td>{this.state.job.version}</td>
+                  <td>
+                    {this.state.job.version}
+                  </td>
                 </tr>
                 <tr>
                   <td className="col-xs-2 align-right">Description:</td>
-                  <td>{this.state.job.description}</td>
+                  <td>
+                    {this.state.job.description}
+                  </td>
                 </tr>
                 <tr>
                   <td className="col-xs-2 align-right">Tags:</td>
-                  <td>{this.state.job.tags.join(",")}</td>
+                  <td>
+                    {this.state.job.tags.join(",")}
+                  </td>
                 </tr>
                 <tr>
                   <td className="col-xs-2 align-right">Status:</td>
-                  <td>{this.state.job.status}</td>
+                  <td>
+                    {this.state.job.status}
+                  </td>
                 </tr>
                 <tr>
                   <td className="col-xs-2 align-right">Status Msg:</td>
-                  <td>{this.state.job.statusMsg}</td>
+                  <td>
+                    {this.state.job.statusMsg}
+                  </td>
                 </tr>
                 <tr>
                   <td className="col-xs-2 align-right">Created:</td>
-                  <td>{momentFormat(this.state.job.created)}</td>
+                  <td>
+                    {momentFormat(this.state.job.created)}
+                  </td>
                 </tr>
                 <tr>
                   <td className="col-xs-2 align-right">Updated:</td>
-                  <td>{momentFormat(this.state.job.updated)}</td>
+                  <td>
+                    {momentFormat(this.state.job.updated)}
+                  </td>
                 </tr>
                 <tr>
                   <td className="col-xs-2 align-right">Archive Location:</td>
-                  <td>{this.state.job.archiveLocation}</td>
+                  <td>
+                    {this.state.job.archiveLocation}
+                  </td>
                 </tr>
                 <tr>
                   <td className="col-xs-2 align-right">Command Name:</td>
@@ -147,9 +165,8 @@ export default class JobDetails extends React.Component {
                   <td className="col-xs-2 align-right">Command Id:</td>
                   <td>
                     <Link
-                      to={
-                        `commands?name=${this.state.job.commandName}&rowId=${this.state.command.id}`
-                      }
+                      to={`commands?name=${this.state.job
+                        .commandName}&rowId=${this.state.command.id}`}
                     >
                       {this.state.command.id}
                     </Link>
@@ -157,23 +174,33 @@ export default class JobDetails extends React.Component {
                 </tr>
                 <tr>
                   <td className="col-xs-2 align-right">Command Version:</td>
-                  <td>{this.state.command.version}</td>
+                  <td>
+                    {this.state.command.version}
+                  </td>
                 </tr>
                 <tr>
                   <td className="col-xs-2 align-right">Command Created:</td>
-                  <td>{momentFormat(this.state.command.created)}</td>
+                  <td>
+                    {momentFormat(this.state.command.created)}
+                  </td>
                 </tr>
                 <tr>
                   <td className="col-xs-2 align-right">Command Updated:</td>
-                  <td>{momentFormat(this.state.command.updated)}</td>
+                  <td>
+                    {momentFormat(this.state.command.updated)}
+                  </td>
                 </tr>
                 <tr>
                   <td className="col-xs-2 align-right">Command Status:</td>
-                  <td>{this.state.command.status}</td>
+                  <td>
+                    {this.state.command.status}
+                  </td>
                 </tr>
                 <tr>
                   <td className="col-xs-2 align-right">Command Args:</td>
-                  <td>{this.state.job.commandArgs}</td>
+                  <td>
+                    {this.state.job.commandArgs}
+                  </td>
                 </tr>
                 <tr>
                   <td className="col-xs-2 align-right">Details:</td>
@@ -216,7 +243,7 @@ export default class JobDetails extends React.Component {
                 </tr>
                 {(this.state.job.status === "RUNNING" ||
                   this.state.job.status === "INIT") &&
-                  !this.state.killJobRequestSent
+                !this.state.killJobRequestSent
                   ? <tr>
                       <td>
                         <button
@@ -268,7 +295,8 @@ export default class JobDetails extends React.Component {
             </table>
             {this.state.killJobRequestSent && !this.state.killRequestError
               ? <small>
-                  *Request accepted. Please refresh the page in a few seconds to see the status change.
+                  *Request accepted. Please refresh the page in a few seconds to
+                  see the status change.
                 </small>
               : null}
             {this.state.killRequestError
@@ -280,7 +308,9 @@ export default class JobDetails extends React.Component {
                   </div>
                   <div>
                     <small>
-                      <code>{this.state.killRequestError.message}.</code>
+                      <code>
+                        {this.state.killRequestError.message}.
+                      </code>
                     </small>
                   </div>
                 </div>

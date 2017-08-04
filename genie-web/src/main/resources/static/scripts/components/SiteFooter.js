@@ -1,16 +1,17 @@
-import PropTypes from 'prop-types';
-import React from 'react';
+import PropTypes from "prop-types";
+import React from "react";
 
-const SiteFooter = props => (
+const SiteFooter = props =>
   <div className="site-footer">
     <footer>
-      <p>{props.version}</p>
+      <p>
+        {props.version}
+      </p>
     </footer>
-  </div>
-);
+  </div>;
 
 SiteFooter.propTypes = {
-  version: PropTypes.string,
+  version: PropTypes.string
 };
 
 export default SiteFooter;
