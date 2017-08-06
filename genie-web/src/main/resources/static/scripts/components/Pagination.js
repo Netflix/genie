@@ -1,5 +1,5 @@
-import T from 'prop-types';
-import React from 'react';
+import T from "prop-types";
+import React from "react";
 
 import { Link } from "react-router";
 
@@ -59,13 +59,8 @@ const Pagination = props => {
   return (
     <div>
       <span>
-        Showing{" "}
-        {start}
-        {" "}to{" "}
-        {end}
-        {" "}of{" "}
-        {props.page.totalElements.toLocaleString()}
-        {" "}entries
+        Showing {start} to {end} of {props.page.totalElements.toLocaleString()}{" "}
+        entries
       </span>
       <nav>
         <ul className="pager">

@@ -1,8 +1,8 @@
-import T from 'prop-types';
-import React from 'react';
-import { Link } from 'react-router';
+import T from "prop-types";
+import React from "react";
+import { Link } from "react-router";
 
-const InfoTable = props => (
+const InfoTable = props =>
   <table className="table" style={{ width: "50%" }}>
     <thead>
       <tr>
@@ -11,19 +11,20 @@ const InfoTable = props => (
       </tr>
     </thead>
     <tbody>
-      {props.data.map((info, index) => (
+      {props.data.map((info, index) =>
         <tr key={index}>
           <td>
             <Link to={`${props.type}?name=${info.name}&rowId=${info.id}`}>
               {info.id}
             </Link>
           </td>
-          <td>{info.name}</td>
+          <td>
+            {info.name}
+          </td>
         </tr>
-      ))}
+      )}
     </tbody>
-  </table>
-);
+  </table>;
 
 InfoTable.propTypes = {
   type: T.string,

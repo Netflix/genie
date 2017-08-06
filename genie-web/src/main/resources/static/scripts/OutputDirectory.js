@@ -1,6 +1,6 @@
-import T from 'prop-types';
-import React from 'react';
-import { Link } from 'react-router';
+import T from "prop-types";
+import React from "react";
+import { Link } from "react-router";
 
 import TableHeader from "./components/TableHeader";
 import SiteHeader from "./components/SiteHeader";
@@ -53,8 +53,7 @@ export default class OutputDirectory extends React.Component {
               url: `/jobs?id=${jobId}&rowId=${jobId}`,
               name: (
                 <div>
-                  <i className="fa fa-search" aria-hidden="true" />
-                  {" "}Job Id:{" "}
+                  <i className="fa fa-search" aria-hidden="true" /> Job Id:{" "}
                   {jobId}
                 </div>
               ),
@@ -85,7 +84,7 @@ export default class OutputDirectory extends React.Component {
                 : <div>
                     <Navigation url={this.state.url} />
                     {this.state.output.files.length === 0 &&
-                      this.state.output.directories.length === 0
+                    this.state.output.directories.length === 0
                       ? <div>Empty directory</div>
                       : <div>
                           <Table>
@@ -104,18 +103,23 @@ export default class OutputDirectory extends React.Component {
   }
 }
 
-const FileRow = props => (
+const FileRow = props =>
   <tr>
     <td>
       <i className="fa fa-file-o" aria-hidden="true" />
       <span className="output-listing">
-        <a href={fileUrl(props.file.url)}>{props.file.name}</a>
+        <a href={fileUrl(props.file.url)}>
+          {props.file.name}
+        </a>
       </span>
     </td>
-    <td>{filesize(props.file.size)}</td>
-    <td className="col-xs-3">{momentFormat(props.file.lastModified)}</td>
-  </tr>
-);
+    <td>
+      {filesize(props.file.size)}
+    </td>
+    <td className="col-xs-3">
+      {momentFormat(props.file.lastModified)}
+    </td>
+  </tr>;
 
 FileRow.propTypes = {
   file: T.shape({
@@ -126,7 +130,7 @@ FileRow.propTypes = {
   })
 };
 
-const DirectoryRow = props => (
+const DirectoryRow = props =>
   <tr>
     <td>
       <i className="fa fa-folder-o" aria-hidden="true" />
@@ -137,9 +141,10 @@ const DirectoryRow = props => (
       </span>
     </td>
     <td>--</td>
-    <td className="col-xs-3">{momentFormat(props.directory.lastModified)}</td>
-  </tr>
-);
+    <td className="col-xs-3">
+      {momentFormat(props.directory.lastModified)}
+    </td>
+  </tr>;
 
 DirectoryRow.propTypes = {
   directory: T.shape({
@@ -150,11 +155,10 @@ DirectoryRow.propTypes = {
   })
 };
 
-const Table = props => (
+const Table = props =>
   <table className="table">
     {props.children}
-  </table>
-);
+  </table>;
 
 Table.propTypes = {
   children: T.array,
@@ -162,28 +166,25 @@ Table.propTypes = {
   output: T.shape({ files: T.array, directories: T.array })
 };
 
-const TableBody = props => (
+const TableBody = props =>
   <tbody>
-    {props.output.directories.map((directory, index) => (
+    {props.output.directories.map((directory, index) =>
       <DirectoryRow key={index} directory={directory} />
-    ))}
-    {props.output.files.map((file, index) => (
+    )}
+    {props.output.files.map((file, index) =>
       <FileRow key={index} file={file} />
-    ))}
-  </tbody>
-);
+    )}
+  </tbody>;
 
 TableBody.propTypes = {
   output: T.shape({ files: T.array, directories: T.array })
 };
 
-const DirectoryInfo = props => (
+const DirectoryInfo = props =>
   <div className="pull-right directory-info">
-    {
-      `${props.output.files.length} File(s), ${props.output.directories.length} Folder(s)`
-    }
-  </div>
-);
+    {`${props.output.files.length} File(s), ${props.output.directories
+      .length} Folder(s)`}
+  </div>;
 
 DirectoryInfo.propTypes = {
   output: T.shape({ files: T.array, directories: T.array })
@@ -212,7 +213,9 @@ const Navigation = props => {
       const fullPath = path.slice(0, index + 1).join("/");
       breadCrumbs.push(
         <li key={index}>
-          <Link to={`/output/${jobId}/${output}/${fullPath}`}>{name}</Link>
+          <Link to={`/output/${jobId}/${output}/${fullPath}`}>
+            {name}
+          </Link>
         </li>
       );
     }

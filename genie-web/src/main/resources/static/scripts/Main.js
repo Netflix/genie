@@ -1,6 +1,6 @@
-import T from 'prop-types';
-import React from 'react';
-import { fetch } from './utils';
+import T from "prop-types";
+import React from "react";
+import { fetch } from "./utils";
 
 import cookie from "react-cookie";
 

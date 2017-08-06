@@ -1,13 +1,12 @@
-import T from 'prop-types';
-import React from 'react';
+import T from "prop-types";
+import React from "react";
 
-const Table = props => (
+const Table = props =>
   <div className="table-responsive">
     <table className="table">
       {props.children}
     </table>
-  </div>
-);
+  </div>;
 
 Table.propTypes = { children: T.array.isRequired };
 

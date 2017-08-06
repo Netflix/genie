@@ -1,14 +1,14 @@
-import T from 'prop-types';
-import React from 'react';
+import T from "prop-types";
+import React from "react";
 
 const TableBody = props => {
-  const tableRows = props.rows.map((row, index) => (
+  const tableRows = props.rows.map((row, index) =>
     <props.rowType
       key={index}
       row={row}
       toggleRowDetails={props.toggleRowDetails}
     />
-  ));
+  );
 
   if (props.rowId) {
     const filteredRow = props.rows.find(row => row.id === props.rowId);

@@ -1,6 +1,6 @@
-import T from 'prop-types';
-import React from 'react';
-import { momentFormat } from '../utils';
+import T from "prop-types";
+import React from "react";
+import { momentFormat } from "../utils";
 
 import CopyToClipboard from "react-copy-to-clipboard";
 
@@ -48,9 +48,8 @@ export default class TableRow extends React.Component {
         >
           <CopyToClipboard
             onCopy={() => this.setState({ copied: true })}
-            text={
-              `${this.url}?name=${this.props.row.name}&rowId=${this.props.row.id}`
-            }
+            text={`${this.url}?name=${this.props.row.name}&rowId=${this.props
+              .row.id}`}
           >
             <button className="btn btn-default btn-xs">
               <i className="fa fa-share-alt" aria-hidden="true" />
@@ -71,9 +70,11 @@ export default class TableRow extends React.Component {
         </td>
         <td onClick={() => this.props.toggleRowDetails(this.props.row.id)}>
           <ul>
-            {this.props.row.tags.map((tag, index) => (
-              <li key={index}>{tag}</li>
-            ))}
+            {this.props.row.tags.map((tag, index) =>
+              <li key={index}>
+                {tag}
+              </li>
+            )}
           </ul>
         </td>
         <td
