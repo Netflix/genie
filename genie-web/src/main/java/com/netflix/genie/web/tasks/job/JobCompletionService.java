@@ -73,7 +73,7 @@ import java.util.stream.Collectors;
 @Service
 public class JobCompletionService {
 
-    private static final String STATUS_TAG = "status";
+    private static final String JOB_STATUS_TAG = "jobStatus";
     private static final String ERROR_TAG = "error";
 
     private final JobPersistenceService jobPersistenceService;
@@ -242,7 +242,7 @@ public class JobCompletionService {
                 try {
                     final String finalStatus =
                         this.retryTemplate.execute(context -> updateFinalStatusForJob(jobId).toString());
-                    tags.put(STATUS_TAG, finalStatus);
+                    tags.put(JOB_STATUS_TAG, finalStatus);
                     cleanupProcesses(jobId);
                 } catch (Exception e) {
                     tags.put(ERROR_TAG, "JOB_UPDATE_FINAL_STATUS_FAILURE");
@@ -256,7 +256,7 @@ public class JobCompletionService {
 
         if (eventStatus != null) {
             this.jobPersistenceService.updateJobStatus(jobId, eventStatus, event.getMessage());
-            tags.put(STATUS_TAG, eventStatus.toString());
+            tags.put(JOB_STATUS_TAG, eventStatus.toString());
         }
         return null;
     }

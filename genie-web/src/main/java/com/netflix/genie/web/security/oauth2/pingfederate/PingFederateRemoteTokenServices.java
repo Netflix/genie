@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.security.oauth2.pingfederate;
 
+import com.netflix.genie.core.util.MetricsConstants;
 import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Registry;
 import com.netflix.spectator.api.Timer;
@@ -121,7 +122,10 @@ public class PingFederateRemoteTokenServices extends RemoteTokenServices {
                 @Override
                 public void handleError(final ClientHttpResponse response) throws IOException {
                     final int errorCode = response.getRawStatusCode();
-                    registry.counter(tokenValidationError.withTag("status", Integer.toString(errorCode))).increment();
+                    registry.counter(
+                        tokenValidationError
+                        .withTag(MetricsConstants.TagKeys.STATUS, Integer.toString(errorCode))
+                    ).increment();
                     if (response.getRawStatusCode() != HttpStatus.BAD_REQUEST.value()) {
                         super.handleError(response);
                     }

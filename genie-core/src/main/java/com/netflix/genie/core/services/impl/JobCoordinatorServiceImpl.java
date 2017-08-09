@@ -45,6 +45,7 @@ import com.netflix.genie.core.services.JobKillService;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobStateService;
+import com.netflix.genie.core.util.MetricsConstants;
 import com.netflix.spectator.api.Counter;
 import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Registry;
@@ -76,8 +77,6 @@ import java.util.stream.Collectors;
 public class JobCoordinatorServiceImpl implements JobCoordinatorService {
 
     private static final String NO_ID_FOUND = "No id found";
-    private static final String LOAD_BALANCER_CLASS_TAG = "class";
-    private static final String LOAD_BALANCER_STATUS_TAG = "status";
     private static final String LOAD_BALANCER_STATUS_SUCCESS = "success";
     private static final String LOAD_BALANCER_STATUS_NO_PREFERENCE = "no preference";
     private static final String LOAD_BALANCER_STATUS_EXCEPTION = "exception";
@@ -380,11 +379,11 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                                 this.registry.counter(
                                     this.loadBalancerId
                                         .withTag(
-                                            LOAD_BALANCER_CLASS_TAG,
+                                            MetricsConstants.TagKeys.CLASS_NAME,
                                             loadBalancerClass
                                         )
                                         .withTag(
-                                            LOAD_BALANCER_STATUS_TAG,
+                                            MetricsConstants.TagKeys.STATUS,
                                             LOAD_BALANCER_STATUS_SUCCESS
                                         )
                                 ).increment();
@@ -401,11 +400,11 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                                 this.registry.counter(
                                     this.loadBalancerId
                                         .withTag(
-                                            LOAD_BALANCER_CLASS_TAG,
+                                            MetricsConstants.TagKeys.CLASS_NAME,
                                             loadBalancerClass
                                         )
                                         .withTag(
-                                            LOAD_BALANCER_STATUS_TAG,
+                                            MetricsConstants.TagKeys.STATUS,
                                             LOAD_BALANCER_STATUS_INVALID
                                         )
                                 ).increment();
@@ -414,11 +413,11 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                             this.registry.counter(
                                 this.loadBalancerId
                                     .withTag(
-                                        LOAD_BALANCER_CLASS_TAG,
+                                        MetricsConstants.TagKeys.CLASS_NAME,
                                         loadBalancerClass
                                     )
                                     .withTag(
-                                        LOAD_BALANCER_STATUS_TAG,
+                                        MetricsConstants.TagKeys.STATUS,
                                         LOAD_BALANCER_STATUS_NO_PREFERENCE
                                     )
                             ).increment();
@@ -428,11 +427,11 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                         this.registry.counter(
                             this.loadBalancerId
                                 .withTag(
-                                    LOAD_BALANCER_CLASS_TAG,
+                                    MetricsConstants.TagKeys.CLASS_NAME,
                                     loadBalancerClass
                                 )
                                 .withTag(
-                                    LOAD_BALANCER_STATUS_TAG,
+                                    MetricsConstants.TagKeys.STATUS,
                                     LOAD_BALANCER_STATUS_EXCEPTION
                                 )
                         ).increment();

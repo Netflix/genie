@@ -29,6 +29,7 @@ import com.netflix.genie.common.dto.JobRequest
 import com.netflix.genie.common.util.GenieDateFormat
 import com.netflix.genie.core.services.ClusterLoadBalancer
 import com.netflix.genie.core.services.impl.GenieFileTransferService
+import com.netflix.genie.core.util.MetricsConstants
 import com.netflix.genie.test.categories.UnitTest
 import com.netflix.spectator.api.Id
 import com.netflix.spectator.api.Registry
@@ -193,7 +194,7 @@ class ScriptLoadBalancerSpec extends Specification {
         1 * registry.createId(
                 ScriptLoadBalancer.SELECT_TIMER_NAME,
                 ImmutableMap.of(
-                        ScriptLoadBalancer.STATUS_TAG_KEY,
+                        MetricsConstants.TagKeys.STATUS,
                         ScriptLoadBalancer.STATUS_TAG_NOT_CONFIGURED
                 )
         ) >> selectId
@@ -209,9 +210,9 @@ class ScriptLoadBalancerSpec extends Specification {
         1 * registry.createId(
                 ScriptLoadBalancer.UPDATE_TIMER_NAME,
                 ImmutableMap.of(
-                        ScriptLoadBalancer.STATUS_TAG_KEY,
+                        MetricsConstants.TagKeys.STATUS,
                         ScriptLoadBalancer.STATUS_TAG_FAILED,
-                        ScriptLoadBalancer.EXCEPTION_TAG_KEY,
+                        MetricsConstants.TagKeys.EXCEPTION_CLASS,
                         IllegalStateException.class.getName()
                 )
         ) >> updateId
@@ -226,7 +227,7 @@ class ScriptLoadBalancerSpec extends Specification {
         1 * registry.createId(
                 ScriptLoadBalancer.SELECT_TIMER_NAME,
                 ImmutableMap.of(
-                        ScriptLoadBalancer.STATUS_TAG_KEY,
+                        MetricsConstants.TagKeys.STATUS,
                         ScriptLoadBalancer.STATUS_TAG_NOT_CONFIGURED
                 )
         ) >> selectId
@@ -244,7 +245,7 @@ class ScriptLoadBalancerSpec extends Specification {
         1 * registry.createId(
                 ScriptLoadBalancer.UPDATE_TIMER_NAME,
                 ImmutableMap.of(
-                        ScriptLoadBalancer.STATUS_TAG_KEY,
+                        MetricsConstants.TagKeys.STATUS,
                         ScriptLoadBalancer.STATUS_TAG_OK
                 )
         ) >> updateId
@@ -260,7 +261,7 @@ class ScriptLoadBalancerSpec extends Specification {
         1 * registry.createId(
                 ScriptLoadBalancer.SELECT_TIMER_NAME,
                 ImmutableMap.of(
-                        ScriptLoadBalancer.STATUS_TAG_KEY,
+                        MetricsConstants.TagKeys.STATUS,
                         ScriptLoadBalancer.STATUS_TAG_FOUND
                 )
         ) >> selectId
@@ -275,7 +276,7 @@ class ScriptLoadBalancerSpec extends Specification {
         1 * registry.createId(
                 ScriptLoadBalancer.SELECT_TIMER_NAME,
                 ImmutableMap.of(
-                        ScriptLoadBalancer.STATUS_TAG_KEY,
+                        MetricsConstants.TagKeys.STATUS,
                         ScriptLoadBalancer.STATUS_TAG_NOT_FOUND
                 )
         ) >> selectId
