@@ -24,6 +24,7 @@ import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.services.ClusterLoadBalancer;
 import com.netflix.genie.core.services.impl.GenieFileTransferService;
+import com.netflix.genie.core.util.MetricsConstants;
 import com.netflix.spectator.api.Registry;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -89,13 +90,11 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
         = "genie.jobs.clusters.loadBalancers.script.order";
     static final String SELECT_TIMER_NAME = "genie.jobs.clusters.loadBalancers.script.select.timer";
     static final String UPDATE_TIMER_NAME = "genie.jobs.clusters.loadBalancers.script.update.timer";
-    static final String STATUS_TAG_KEY = "status";
     static final String STATUS_TAG_OK = "ok";
     static final String STATUS_TAG_NOT_FOUND = "not found";
     static final String STATUS_TAG_NOT_CONFIGURED = "not configured";
     static final String STATUS_TAG_FOUND = "found";
     static final String STATUS_TAG_FAILED = "failed";
-    static final String EXCEPTION_TAG_KEY = "exception";
 
     private static final long DEFAULT_TIMEOUT_LENGTH = 5_000L;
     private static final Charset UTF_8 = Charset.forName("UTF-8");
@@ -186,7 +185,7 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
                 if (clusterId != null) {
                     for (final Cluster cluster : clusters) {
                         if (cluster.getId().isPresent() && clusterId.equals(cluster.getId().get())) {
-                            tags.put(STATUS_TAG_KEY, STATUS_TAG_FOUND);
+                            tags.put(MetricsConstants.TagKeys.STATUS, STATUS_TAG_FOUND);
                             return cluster;
                         }
                     }
@@ -194,16 +193,16 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
                 log.warn("Script returned a cluster not in the input list: {}", clusterId);
             } else {
                 log.debug("Script returned null");
-                tags.put(STATUS_TAG_KEY, STATUS_TAG_NOT_CONFIGURED);
+                tags.put(MetricsConstants.TagKeys.STATUS, STATUS_TAG_NOT_CONFIGURED);
                 return null;
             }
 
-            tags.put(STATUS_TAG_KEY, STATUS_TAG_NOT_FOUND);
+            tags.put(MetricsConstants.TagKeys.STATUS, STATUS_TAG_NOT_FOUND);
             // Defer to any subsequent load balancer in the chain
             return null;
         } catch (final Exception e) {
-            tags.put(STATUS_TAG_KEY, STATUS_TAG_FAILED);
-            tags.put(EXCEPTION_TAG_KEY, e.getClass().getName());
+            tags.put(MetricsConstants.TagKeys.STATUS, STATUS_TAG_FAILED);
+            tags.put(MetricsConstants.TagKeys.EXCEPTION_CLASS, e.getClass().getCanonicalName());
             log.error("Unable to execute script due to {}", e.getMessage(), e);
             return null;
         } finally {
@@ -298,12 +297,12 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
                 this.script.set(compilable.compile(reader));
             }
 
-            tags.put(STATUS_TAG_KEY, STATUS_TAG_OK);
+            tags.put(MetricsConstants.TagKeys.STATUS, STATUS_TAG_OK);
 
             this.isConfigured.set(true);
         } catch (final GenieException | IOException | ScriptException | RuntimeException | URISyntaxException e) {
-            tags.put(STATUS_TAG_KEY, STATUS_TAG_FAILED);
-            tags.put(EXCEPTION_TAG_KEY, e.getClass().getName());
+            tags.put(MetricsConstants.TagKeys.STATUS, STATUS_TAG_FAILED);
+            tags.put(MetricsConstants.TagKeys.EXCEPTION_CLASS, e.getClass().getName());
             log.error(
                 "Refreshing the load balancing script for ScriptLoadBalancer failed due to {}",
                 e.getMessage(),

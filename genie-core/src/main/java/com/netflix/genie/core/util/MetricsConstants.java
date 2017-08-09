@@ -66,6 +66,16 @@ public final class MetricsConstants {
         public static final String COMMAND_NAME = "commandName";
 
         /**
+         * Key to tag a class name.
+         */
+        public static final String CLASS_NAME = "class";
+
+        /**
+         * Key to tag the status of a request or operation.
+         */
+        public static final String STATUS = "status";
+
+        /**
          * Utility class private constructor.
          */
         private TagKeys() {
