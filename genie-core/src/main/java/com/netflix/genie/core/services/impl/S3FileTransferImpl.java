@@ -18,22 +18,23 @@
 package com.netflix.genie.core.services.impl;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3URI;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.google.common.annotations.VisibleForTesting;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.services.FileTransfer;
 import com.netflix.spectator.api.Registry;
 import com.netflix.spectator.api.Timer;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -45,8 +46,9 @@ import java.util.regex.Pattern;
 @Slf4j
 public class S3FileTransferImpl implements FileTransfer {
 
-    private final Pattern s3FilePattern = Pattern.compile("^(s3[n]?://)(.*?)/(.*/.*)");
     private final Pattern s3PrefixPattern = Pattern.compile("^s3[n]?://.*$");
+    private final Pattern s3BucketPattern = Pattern.compile("^[a-z0-9][a-z0-9.\\-]{1,61}[a-z0-9]$");
+    private final Pattern s3KeyPattern = Pattern.compile("^[0-9a-zA-Z!\\-_.*'()]+(?:/[0-9a-zA-Z!\\-_.*'()]+)*$");
     private AmazonS3 s3Client;
     private Timer downloadTimer;
     private Timer uploadTimer;
@@ -71,8 +73,13 @@ public class S3FileTransferImpl implements FileTransfer {
     @Override
     public boolean isValid(final String fileName) throws GenieException {
         log.debug("Called with file name {}", fileName);
-        final Matcher matcher = this.s3PrefixPattern.matcher(fileName);
-        return matcher.matches();
+        try {
+            getS3Uri(fileName);
+            return true;
+        } catch (GenieServerException e) {
+            log.error("Invalid S3 path {} ({})", fileName, e.getMessage());
+        }
+        return false;
     }
 
     /**
@@ -89,10 +96,10 @@ public class S3FileTransferImpl implements FileTransfer {
         try {
             log.debug("Called with src path {} and destination path {}", srcRemotePath, dstLocalPath);
 
-            final S3Key s3Key = new S3Key(srcRemotePath);
+            final AmazonS3URI s3Uri = getS3Uri(srcRemotePath);
             try {
                 this.s3Client.getObject(
-                    new GetObjectRequest(s3Key.getBucket(), s3Key.getKey()),
+                    new GetObjectRequest(s3Uri.getBucket(), s3Uri.getKey()),
                     new File(dstLocalPath)
                 );
             } catch (AmazonS3Exception ase) {
@@ -118,9 +125,9 @@ public class S3FileTransferImpl implements FileTransfer {
         try {
             log.debug("Called with src path {} and destination path {}", srcLocalPath, dstRemotePath);
 
-            final S3Key s3Key = new S3Key(dstRemotePath);
+            final AmazonS3URI s3Uri = getS3Uri(dstRemotePath);
             try {
-                this.s3Client.putObject(s3Key.getBucket(), s3Key.getKey(), new File(srcLocalPath));
+                this.s3Client.putObject(s3Uri.getBucket(), s3Uri.getKey(), new File(srcLocalPath));
             } catch (AmazonS3Exception ase) {
                 log.error("Error posting file {} to s3 due to exception {}", dstRemotePath, ase);
                 throw new GenieServerException("Error uploading file to s3. Filename: " + dstRemotePath);
@@ -137,9 +144,9 @@ public class S3FileTransferImpl implements FileTransfer {
     public long getLastModifiedTime(final String path) throws GenieException {
         final long start = System.nanoTime();
         try {
-            final S3Key s3Key = new S3Key(path);
+            final AmazonS3URI s3Uri = getS3Uri(path);
             try {
-                final ObjectMetadata o = s3Client.getObjectMetadata(s3Key.getBucket(), s3Key.getKey());
+                final ObjectMetadata o = s3Client.getObjectMetadata(s3Uri.getBucket(), s3Uri.getKey());
                 return o.getLastModified().getTime();
             } catch (final Exception ase) {
                 final String message = String.format("Failed getting the metadata of the s3 file %s", path);
@@ -151,19 +158,33 @@ public class S3FileTransferImpl implements FileTransfer {
         }
     }
 
-    @Getter
-    private class S3Key {
-        private final String bucket;
-        private final String key;
-
-        S3Key(final String path) throws GenieServerException {
-            final Matcher matcher = s3FilePattern.matcher(path);
-            if (matcher.matches()) {
-                bucket = matcher.group(2);
-                key = matcher.group(3);
-            } else {
-                throw new GenieServerException(String.format("Invalid path for s3 file %s", path));
-            }
+    @VisibleForTesting
+    AmazonS3URI getS3Uri(final String path) throws GenieServerException {
+        if (!s3PrefixPattern.matcher(path).matches()) {
+            throw new GenieServerException(String.format("Invalid prefix in path for s3 file %s", path));
         }
+        // Delegate validation and parsing to AmazonS3URI.
+        // However it cannot handle "s3n://", so strip the 'n'
+        final String adjustedPath = path.replaceFirst("^s3n://", "s3://");
+        final AmazonS3URI uri;
+        try {
+            uri = new AmazonS3URI(adjustedPath, false);
+        } catch (IllegalArgumentException e) {
+            throw new GenieServerException(String.format("Invalid path for s3 file %s", path), e);
+        }
+        if (StringUtils.isBlank(uri.getBucket()) || StringUtils.isBlank(uri.getKey())) {
+            throw new GenieServerException(String.format("Invalid blank components in path for s3 file %s", path));
+        }
+        // Perform further validation on bucket name as per:
+        // http://docs.aws.amazon.com/AmazonS3/latest/dev/BucketRestrictions.html#bucketnamingrules
+        if (!s3BucketPattern.matcher(uri.getBucket()).matches()) {
+            throw new GenieServerException(String.format("Invalid bucket in path for s3 file %s", path));
+        }
+        // Perform further validation on key as per:
+        // http://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html#object-keys
+        if (!s3KeyPattern.matcher(uri.getKey()).matches()) {
+            throw new GenieServerException(String.format("Invalid bucket in path for s3 file %s", path));
+        }
+        return uri;
     }
 }

@@ -18,6 +18,7 @@
 package com.netflix.genie.core.services.impl;
 
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.AmazonS3URI;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -27,6 +28,7 @@ import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.spectator.api.Registry;
 import com.netflix.spectator.api.Timer;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -74,33 +76,144 @@ public class S3FileTransferImplUnitTests {
     }
 
     /**
-     * Test the isValid method for valid file prefix s3n:// or s3://.
-     *
-     * @throws GenieException If there is any problem
+     * Given a set of valid S3 {prefix,bucket,key}, try all combinations.
+     * Ensure they are accepted as valid and the path components are parsed correctly.
+     * @throws GenieException in case of error building the URI
      */
     @Test
-    public void testisValidWithValidFilePrefixS3() throws GenieException {
-        Assert.assertEquals(s3FileTransfer.isValid("s3://filepath"), true);
+    public void testValidS3Paths() throws GenieException {
+        final String[] prefixes = {
+            "s3://",
+            "s3n://",
+        };
+
+        final String[] buckets = {
+            "bucket",
+            "bucket1",
+            "1bucket",
+            "bucket-bucket",
+            "bucket.bucket",
+        };
+
+        final String[] keys = {
+            "Development/Projects1.xls",
+            "Finance/statement1.pdf",
+            "Private/taxdocument.pdf",
+            "s3-dg.pdf",
+            "weird/but/valid/key!-_*'().pdf",
+        };
+
+        for (final String prefix : prefixes) {
+            for (final String bucket : buckets) {
+                for (final String key : keys) {
+                    final String path = prefix + bucket + "/" + key;
+                    Assert.assertTrue(this.s3FileTransfer.isValid(path));
+                    final AmazonS3URI s3Uri = this.s3FileTransfer.getS3Uri(path);
+                    Assert.assertEquals(bucket, s3Uri.getBucket());
+                    Assert.assertEquals(key, s3Uri.getKey());
+                }
+            }
+        }
     }
 
     /**
-     * Test the isValid method for valid file prefix s3n:// or s3://.
-     *
-     * @throws GenieException If there is any problem
+     * Verify invalid S3 prefixes are rejected.
+     * @throws GenieException in case of unexpected validation error
      */
     @Test
-    public void testisValidWithValidFilePrefixS3n() throws GenieException {
-        Assert.assertEquals(s3FileTransfer.isValid("s3n://filepath"), true);
+    public void testInvalidS3Prefixes() throws GenieException {
+        final String[] invalidPrefixes = {
+            "",
+            " ",
+            "s3/",
+            "s3//",
+            "s3:/",
+            "s3x:/",
+            "foo://",
+            "file://",
+            "http://",
+        };
+
+        for (final String invalidPrefix : invalidPrefixes) {
+            final String path = invalidPrefix + "bucket/key";
+            Assert.assertFalse(this.s3FileTransfer.isValid(path));
+            boolean genieException = false;
+            try {
+                this.s3FileTransfer.getS3Uri(path);
+            } catch (GenieServerException e) {
+                genieException = true;
+            } finally {
+                Assert.assertTrue(genieException);
+            }
+        }
     }
 
     /**
-     * Test the isValid method for invalid file prefix not starting with s3n:// or s3://.
-     *
-     * @throws GenieException If there is any problem
+     * Verify invalid S3 bucket names are rejected.
+     * @throws GenieException in case of unexpected validation error
      */
     @Test
-    public void testisValidWithInvalidFilePrefix() throws GenieException {
-        Assert.assertEquals(s3FileTransfer.isValid("filepath"), false);
+    public void testInvalidS3Buckets() throws GenieException {
+        final String[] invalidBuckets = {
+            "",
+            " ",
+            "a",
+            "aa",
+            "Bucket",
+            ".bucket",
+            "bucket.",
+            "buc:ket",
+            "buc!ket",
+            "buc[ket",
+            "buc(ket",
+            "buc'ket",
+            "buc ket",
+            StringUtils.leftPad("", 64, "b"),
+            ".",
+            "/",
+            // "buc..ket", // Invalid, but current logic does not catch this
+        };
+
+        for (final String invalidBucket : invalidBuckets) {
+            final String path = "s3://" + invalidBucket + "/key";
+            Assert.assertFalse(this.s3FileTransfer.isValid(path));
+            boolean genieException = false;
+            try {
+                this.s3FileTransfer.getS3Uri(path);
+            } catch (GenieServerException e) {
+                genieException = true;
+            } finally {
+                Assert.assertTrue(genieException);
+            }
+        }
+    }
+
+    /**
+     * Verify invalid S3 key names are rejected.
+     * @throws GenieException in case of unexpected validation error
+     */
+    @Test
+    public void testInvalidS3Keys() throws GenieException {
+        final String[] invalidKeys = {
+            "",
+            " ",
+            "/",
+            "//",
+            "[key]",
+        };
+
+        for (final String invalidKey : invalidKeys) {
+            final String path = "s3://bucket/" + invalidKey;
+            Assert.assertFalse(this.s3FileTransfer.isValid(path));
+            boolean genieException = false;
+            try {
+                this.s3FileTransfer.getS3Uri(path);
+            } catch (GenieServerException e) {
+                genieException = true;
+            } finally {
+                Assert.assertTrue(genieException);
+            }
+        }
     }
 
     /**
@@ -111,10 +224,13 @@ public class S3FileTransferImplUnitTests {
     @Test(expected = GenieServerException.class)
     public void testGetFileMethodInvalidS3Path() throws GenieException {
         final String invalidS3Path = "filepath";
-        s3FileTransfer.getFile(invalidS3Path, LOCAL_PATH);
-        Mockito
-            .verify(this.downloadTimer, Mockito.times(1))
-            .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+        try {
+            s3FileTransfer.getFile(invalidS3Path, LOCAL_PATH);
+        } finally {
+            Mockito
+                .verify(this.downloadTimer, Mockito.times(1))
+                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+        }
     }
 
     /**
@@ -122,7 +238,7 @@ public class S3FileTransferImplUnitTests {
      *
      * @throws GenieException If there is any problem
      */
-    @Test(expected = GenieServerException.class)
+    @Test
     public void testGetFileMethodValidS3Path() throws GenieException {
 
         final ObjectMetadata objectMetadata = Mockito.mock(ObjectMetadata.class);
@@ -148,10 +264,18 @@ public class S3FileTransferImplUnitTests {
     public void testGetFileMethodFailureToFetch() throws GenieException {
         Mockito.when(this.s3Client.getObject(Mockito.any(GetObjectRequest.class), Mockito.any(File.class)))
             .thenThrow(new AmazonS3Exception("something"));
-        s3FileTransfer.getFile(S3_PATH, LOCAL_PATH);
-        Mockito
-            .verify(this.downloadTimer, Mockito.times(1))
-            .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+        final ArgumentCaptor<GetObjectRequest> argument = ArgumentCaptor.forClass(GetObjectRequest.class);
+
+        try {
+            s3FileTransfer.getFile(S3_PATH, LOCAL_PATH);
+        } finally {
+            Mockito.verify(this.s3Client).getObject(argument.capture(), Mockito.any());
+            Assert.assertEquals(S3_BUCKET, argument.getValue().getBucketName());
+            Assert.assertEquals(S3_KEY, argument.getValue().getKey());
+            Mockito
+                .verify(this.downloadTimer, Mockito.times(1))
+                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+        }
     }
 
     /**
@@ -162,8 +286,13 @@ public class S3FileTransferImplUnitTests {
     @Test(expected = GenieServerException.class)
     public void testPutFileMethodInvalidS3Path() throws GenieException {
         final String invalidS3Path = "filepath";
-        s3FileTransfer.putFile(LOCAL_PATH, invalidS3Path);
-        Mockito.verify(this.uploadTimer, Mockito.times(1)).record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+        try {
+            s3FileTransfer.putFile(LOCAL_PATH, invalidS3Path);
+        } finally {
+            Mockito
+                .verify(this.uploadTimer, Mockito.times(1))
+                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+        }
     }
 
     /**
@@ -171,7 +300,7 @@ public class S3FileTransferImplUnitTests {
      *
      * @throws GenieException If there is any problem
      */
-    @Test(expected = GenieServerException.class)
+    @Test
     public void testPutFileMethodValidS3Path() throws GenieException {
 
         final PutObjectResult putObjectResult = Mockito.mock(PutObjectResult.class);
@@ -185,8 +314,10 @@ public class S3FileTransferImplUnitTests {
             .verify(this.s3Client)
             .putObject(bucketArgument.capture(), keyArgument.capture(), Mockito.any(File.class));
         Assert.assertEquals(S3_BUCKET, bucketArgument.getValue());
-        Assert.assertEquals(S3_KEY, bucketArgument.getValue());
-        Mockito.verify(this.uploadTimer, Mockito.times(1)).record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+        Assert.assertEquals(S3_KEY, keyArgument.getValue());
+        Mockito
+            .verify(this.uploadTimer, Mockito.times(1))
+            .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
     }
 
     /**
@@ -199,7 +330,20 @@ public class S3FileTransferImplUnitTests {
         Mockito
             .when(this.s3Client.putObject(Mockito.any(), Mockito.any(), Mockito.any(File.class)))
             .thenThrow(new AmazonS3Exception("something"));
-        s3FileTransfer.getFile(LOCAL_PATH, S3_PATH);
-        Mockito.verify(this.uploadTimer, Mockito.times(1)).record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+        final ArgumentCaptor<String> bucketArgument = ArgumentCaptor.forClass(String.class);
+        final ArgumentCaptor<String> keyArgument = ArgumentCaptor.forClass(String.class);
+
+        try {
+            s3FileTransfer.putFile(LOCAL_PATH, S3_PATH);
+        } finally {
+            Mockito
+                .verify(this.s3Client)
+                .putObject(bucketArgument.capture(), keyArgument.capture(), Mockito.any(File.class));
+            Assert.assertEquals(S3_BUCKET, bucketArgument.getValue());
+            Assert.assertEquals(S3_KEY, keyArgument.getValue());
+            Mockito
+                .verify(this.uploadTimer, Mockito.times(1))
+                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+        }
     }
 }
