@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.core.jobs.workflow.impl;
 
+import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.jobs.AdminResources;
@@ -24,8 +25,10 @@ import com.netflix.genie.core.jobs.FileType;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
 import com.netflix.genie.core.services.impl.GenieFileTransferService;
+import com.netflix.genie.core.util.MetricsConstants;
+import com.netflix.genie.core.util.MetricsUtils;
+import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Registry;
-import com.netflix.spectator.api.Timer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -46,7 +49,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class CommandTask extends GenieBaseTask {
 
-    private final Timer timer;
+    private final Id timerId;
     private final GenieFileTransferService fts;
 
     /**
@@ -56,7 +59,8 @@ public class CommandTask extends GenieBaseTask {
      * @param fts      File transfer service
      */
     public CommandTask(@NotNull final Registry registry, @NotNull final GenieFileTransferService fts) {
-        this.timer = registry.timer("genie.jobs.tasks.commandTask.timer");
+        super(registry);
+        this.timerId = registry.createId("genie.jobs.tasks.commandTask.timer");
         this.fts = fts;
     }
 
@@ -66,16 +70,20 @@ public class CommandTask extends GenieBaseTask {
     @Override
     public void executeTask(@NotNull final Map<String, Object> context) throws GenieException, IOException {
         final long start = System.nanoTime();
+        final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
         try {
             final JobExecutionEnvironment jobExecEnv =
                 (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
+            final Command command = jobExecEnv.getCommand();
+            tags.put(MetricsConstants.TagKeys.COMMAND_NAME, command.getName());
+            tags.put(MetricsConstants.TagKeys.COMMAND_ID, command.getId().orElse(NO_ID_FOUND));
             final String jobWorkingDirectory = jobExecEnv.getJobWorkingDir().getCanonicalPath();
             final String genieDir = jobWorkingDirectory
                 + JobConstants.FILE_PATH_DELIMITER
                 + JobConstants.GENIE_PATH_VAR;
             final Writer writer = (Writer) context.get(JobConstants.WRITER_KEY);
 
-            log.info("Starting Command Task for job {}", jobExecEnv.getJobRequest().getId());
+            log.info("Starting Command Task for job {}", jobExecEnv.getJobRequest().getId().orElse(NO_ID_FOUND));
 
             final String commandId = jobExecEnv
                 .getCommand()
@@ -150,10 +158,15 @@ public class CommandTask extends GenieBaseTask {
                 );
                 fts.getFile(dependencyFile, localPath);
             }
-            log.info("Finished Command Task for job {}", jobExecEnv.getJobRequest().getId());
+            log.info("Finished Command Task for job {}", jobExecEnv.getJobRequest().getId().orElse(NO_ID_FOUND));
+        } catch (Throwable t) {
+            MetricsUtils.addFailureTagsWithException(tags, t);
+            throw t;
         } finally {
             final long finish = System.nanoTime();
-            this.timer.record(finish - start, TimeUnit.NANOSECONDS);
+            this.getRegistry().timer(
+                timerId.withTags(tags)
+            ).record(finish - start, TimeUnit.NANOSECONDS);
         }
     }
 }

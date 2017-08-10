@@ -20,8 +20,9 @@ package com.netflix.genie.core.jobs.workflow.impl;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
+import com.netflix.genie.core.util.MetricsUtils;
+import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Registry;
-import com.netflix.spectator.api.Timer;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotNull;
@@ -39,7 +40,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class JobFailureAndKillHandlerLogicTask extends GenieBaseTask {
 
-    private final Timer timer;
+    private final Id timerId;
 
     /**
      * Constructor.
@@ -47,7 +48,8 @@ public class JobFailureAndKillHandlerLogicTask extends GenieBaseTask {
      * @param registry The metrics registry to use
      */
     public JobFailureAndKillHandlerLogicTask(@NotNull final Registry registry) {
-        this.timer = registry.timer("genie.jobs.tasks.jobFailureAndKillHandlerLogicTask.timer");
+        super(registry);
+        this.timerId = getRegistry().createId("genie.jobs.tasks.jobFailureAndKillHandlerLogicTask.timer");
     }
 
     /**
@@ -56,19 +58,26 @@ public class JobFailureAndKillHandlerLogicTask extends GenieBaseTask {
     @Override
     public void executeTask(@NotNull final Map<String, Object> context) throws GenieException, IOException {
         final long start = System.nanoTime();
+        final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
         try {
             final JobExecutionEnvironment jobExecEnv
                 = (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
-            log.info("Starting Job Failure and Kill Handler Task for job {}", jobExecEnv.getJobRequest().getId());
+            final String jobId = jobExecEnv.getJobRequest().getId().orElse(NO_ID_FOUND);
+                log.info("Starting Job Failure and Kill Handler Task for job {}", jobId);
 
             final Writer writer = (Writer) context.get(JobConstants.WRITER_KEY);
 
             // Append logic for handling job kill signal
             writer.write(JobConstants.JOB_FAILURE_AND_KILL_HANDLER_LOGIC + System.lineSeparator());
-            log.info("Finished Job Failure and Kill Handler Task for job {}", jobExecEnv.getJobRequest().getId());
+            log.info("Finished Job Failure and Kill Handler Task for job {}", jobId);
+        } catch (Throwable t) {
+            MetricsUtils.addFailureTagsWithException(tags, t);
+            throw t;
         } finally {
             final long finish = System.nanoTime();
-            this.timer.record(finish - start, TimeUnit.NANOSECONDS);
+            this.getRegistry().timer(
+                timerId.withTags(tags)
+            ).record(finish - start, TimeUnit.NANOSECONDS);
         }
     }
 }

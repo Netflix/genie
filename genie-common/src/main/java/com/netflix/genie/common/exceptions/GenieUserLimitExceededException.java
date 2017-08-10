@@ -32,7 +32,13 @@ public final class GenieUserLimitExceededException extends GenieException {
     private final String user;
     private final String exceededLimitName;
 
-    private GenieUserLimitExceededException(
+    /**
+     * Constructor.
+     * @param user user name
+     * @param limitName limit name
+     * @param message message
+     */
+    public GenieUserLimitExceededException(
         final String user,
         final String limitName,
         final String message

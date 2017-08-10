@@ -18,6 +18,7 @@
 package com.netflix.genie.core.services.impl;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
@@ -46,10 +47,10 @@ import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobStateService;
 import com.netflix.genie.core.util.MetricsConstants;
+import com.netflix.genie.core.util.MetricsUtils;
 import com.netflix.spectator.api.Counter;
 import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Registry;
-import com.netflix.spectator.api.Timer;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -60,6 +61,7 @@ import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -98,13 +100,14 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
 
     // Metrics
     private final Registry registry;
-    private final Timer coordinationTimer;
-    private final Timer selectClusterTimer;
-    private final Timer selectCommandTimer;
-    private final Timer selectApplicationsTimer;
-    private final Timer setJobEnvironmentTimer;
+    private final Id coordinationTimerId;
+    private final Id selectClusterTimerId;
+    private final Id selectCommandTimerId;
+    private final Id selectApplicationsTimerId;
+    private final Id setJobEnvironmentTimerId;
+    private final Counter noClusterSelectedCounter;
+    private final Id loadBalancerCounterId;
     private final Counter noClusterFoundCounter;
-    private final Id loadBalancerId;
 
     /**
      * Constructor.
@@ -152,13 +155,14 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
 
         // Metrics
         this.registry = registry;
-        this.coordinationTimer = registry.timer("genie.jobs.coordination.timer");
-        this.selectClusterTimer = registry.timer("genie.jobs.submit.localRunner.selectCluster.timer");
-        this.selectCommandTimer = registry.timer("genie.jobs.submit.localRunner.selectCommand.timer");
-        this.selectApplicationsTimer = registry.timer("genie.jobs.submit.localRunner.selectApplications.timer");
-        this.setJobEnvironmentTimer = registry.timer("genie.jobs.submit.localRunner.setJobEnvironment.timer");
-        this.loadBalancerId = registry.createId("genie.jobs.submit.selectCluster.loadBalancer.counter");
-        this.noClusterFoundCounter = registry.counter("genie.jobs.submit.selectCluster.notFound.counter");
+        this.coordinationTimerId = registry.createId("genie.jobs.coordination.timer");
+        this.selectClusterTimerId = registry.createId("genie.jobs.submit.localRunner.selectCluster.timer");
+        this.selectCommandTimerId = registry.createId("genie.jobs.submit.localRunner.selectCommand.timer");
+        this.selectApplicationsTimerId = registry.createId("genie.jobs.submit.localRunner.selectApplications.timer");
+        this.setJobEnvironmentTimerId = registry.createId("genie.jobs.submit.localRunner.setJobEnvironment.timer");
+        this.loadBalancerCounterId = registry.createId("genie.jobs.submit.selectCluster.loadBalancer.counter");
+        this.noClusterSelectedCounter = registry.counter("genie.jobs.submit.selectCluster.noneSelected.counter");
+        this.noClusterFoundCounter = registry.counter("genie.jobs.submit.selectCluster.noneFound.counter");
     }
 
     /**
@@ -172,6 +176,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
         @NotNull(message = "No job metadata provided. Unable to execute.") final JobMetadata jobMetadata
     ) throws GenieException {
         final long coordinationStart = System.nanoTime();
+        final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
         final String jobId = jobRequest
             .getId()
             .orElseThrow(() -> new GenieServerException("Id of the jobRequest cannot be null"));
@@ -277,9 +282,11 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                 }
             }
         } catch (GenieConflictException e) {
+            MetricsUtils.addFailureTagsWithException(tags, e);
             // Job has not been initiated so we don't have to call JobStateService.done()
             throw e;
         } catch (GenieException e) {
+            MetricsUtils.addFailureTagsWithException(tags, e);
             //
             // Need to check if the job exists in the JobStateService
             // because this error can happen before the job is initiated.
@@ -290,6 +297,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
             }
             throw e;
         } catch (Exception e) {
+            MetricsUtils.addFailureTagsWithException(tags, e);
             //
             // Need to check if the job exists in the JobStateService
             // because this error can happen before the job is initiated.
@@ -299,8 +307,13 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                 jobPersistenceService.updateJobStatus(jobId, jobStatus, e.getMessage());
             }
             throw new GenieServerException(e);
+        } catch (Throwable t) {
+            MetricsUtils.addFailureTagsWithException(tags, t);
+            throw t;
         } finally {
-            this.coordinationTimer.record(System.nanoTime() - coordinationStart, TimeUnit.NANOSECONDS);
+            this.registry.timer(
+                this.coordinationTimerId.withTags(tags)
+            ).record(System.nanoTime() - coordinationStart, TimeUnit.NANOSECONDS);
         }
     }
 
@@ -320,13 +333,14 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
         final int memory
     ) throws GenieException {
         final long jobEnvironmentStart = System.nanoTime();
-        final String clusterId = cluster
-            .getId()
-            .orElseThrow(() -> new GenieServerException("Cluster has no id"));
-        final String commandId = command
-            .getId()
-            .orElseThrow(() -> new GenieServerException("Command has no id"));
+        final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
         try {
+            final String clusterId = cluster
+                .getId()
+                .orElseThrow(() -> new GenieServerException("Cluster has no id"));
+            final String commandId = command
+                .getId()
+                .orElseThrow(() -> new GenieServerException("Command has no id"));
             this.jobPersistenceService.updateJobWithRuntimeEnvironment(
                 jobId,
                 clusterId,
@@ -339,13 +353,20 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                     .collect(Collectors.toList()),
                 memory
             );
+        } catch (Throwable t) {
+            MetricsUtils.addFailureTagsWithException(tags, t);
+            throw t;
         } finally {
-            this.setJobEnvironmentTimer.record(System.nanoTime() - jobEnvironmentStart, TimeUnit.NANOSECONDS);
+            this.registry.timer(
+                setJobEnvironmentTimerId.withTags(tags)
+            ).record(System.nanoTime() - jobEnvironmentStart, TimeUnit.NANOSECONDS);
         }
     }
 
     private Cluster getCluster(final JobRequest jobRequest) throws GenieException {
         final long start = System.nanoTime();
+        final Map<String, String> timerTags = MetricsUtils.newSuccessTagsMap();
+        final Map<String, String> counterTags = Maps.newHashMap();
         try {
             log.info("Selecting cluster for job {}", jobRequest.getId().orElse(NO_ID_FOUND));
             final List<Cluster> clusters = ImmutableList.copyOf(
@@ -353,6 +374,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
             );
             Cluster cluster = null;
             if (clusters.isEmpty()) {
+                this.noClusterFoundCounter.increment();
                 throw new GeniePreconditionException(
                     "No cluster/command combination found for the given criteria. Unable to continue"
                 );
@@ -366,6 +388,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                                 ? ((TargetClassAware) loadBalancer).getTargetClass()
                                 : loadBalancer.getClass()
                         ).getCanonicalName();
+                    counterTags.put(MetricsConstants.TagKeys.CLASS_NAME, loadBalancerClass);
                     try {
                         final Cluster selectedCluster = loadBalancer.selectCluster(clusters, jobRequest);
                         if (selectedCluster != null) {
@@ -376,16 +399,9 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                                     selectedCluster.getId().orElse(NO_ID_FOUND),
                                     loadBalancerClass
                                 );
+                                counterTags.put(MetricsConstants.TagKeys.STATUS, LOAD_BALANCER_STATUS_SUCCESS);
                                 this.registry.counter(
-                                    this.loadBalancerId
-                                        .withTag(
-                                            MetricsConstants.TagKeys.CLASS_NAME,
-                                            loadBalancerClass
-                                        )
-                                        .withTag(
-                                            MetricsConstants.TagKeys.STATUS,
-                                            LOAD_BALANCER_STATUS_SUCCESS
-                                        )
+                                    this.loadBalancerCounterId.withTags(counterTags)
                                 ).increment();
                                 cluster = selectedCluster;
                                 break;
@@ -397,50 +413,30 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                                     loadBalancerClass,
                                     clusters
                                 );
+                                counterTags.put(MetricsConstants.TagKeys.STATUS, LOAD_BALANCER_STATUS_INVALID);
+
                                 this.registry.counter(
-                                    this.loadBalancerId
-                                        .withTag(
-                                            MetricsConstants.TagKeys.CLASS_NAME,
-                                            loadBalancerClass
-                                        )
-                                        .withTag(
-                                            MetricsConstants.TagKeys.STATUS,
-                                            LOAD_BALANCER_STATUS_INVALID
-                                        )
+                                    this.loadBalancerCounterId.withTags(counterTags)
                                 ).increment();
                             }
                         } else {
+                            counterTags.put(MetricsConstants.TagKeys.STATUS, LOAD_BALANCER_STATUS_NO_PREFERENCE);
                             this.registry.counter(
-                                this.loadBalancerId
-                                    .withTag(
-                                        MetricsConstants.TagKeys.CLASS_NAME,
-                                        loadBalancerClass
-                                    )
-                                    .withTag(
-                                        MetricsConstants.TagKeys.STATUS,
-                                        LOAD_BALANCER_STATUS_NO_PREFERENCE
-                                    )
+                                this.loadBalancerCounterId.withTags(counterTags)
                             ).increment();
                         }
                     } catch (final Exception e) {
                         log.error("Cluster load balancer {} threw exception:", loadBalancer, e);
+                        counterTags.put(MetricsConstants.TagKeys.STATUS, LOAD_BALANCER_STATUS_EXCEPTION);
                         this.registry.counter(
-                            this.loadBalancerId
-                                .withTag(
-                                    MetricsConstants.TagKeys.CLASS_NAME,
-                                    loadBalancerClass
-                                )
-                                .withTag(
-                                    MetricsConstants.TagKeys.STATUS,
-                                    LOAD_BALANCER_STATUS_EXCEPTION
-                                )
+                            this.loadBalancerCounterId.withTags(counterTags)
                         ).increment();
                     }
                 }
 
-                // Make sure we found a cluster
+                // Make sure we selected a cluster
                 if (cluster == null) {
-                    this.noClusterFoundCounter.increment();
+                    this.noClusterSelectedCounter.increment();
                     throw new GeniePreconditionException(
                         "Unable to select a cluster from using any of the available load balancers."
                     );
@@ -453,13 +449,19 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                 jobRequest.getId().orElse(NO_ID_FOUND)
             );
             return cluster;
+        } catch (Throwable t) {
+            MetricsUtils.addFailureTagsWithException(timerTags, t);
+            throw t;
         } finally {
-            this.selectClusterTimer.record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+            this.registry.timer(
+                selectClusterTimerId.withTags(timerTags)
+            ).record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
     }
 
     private Command getCommand(final JobRequest jobRequest, final Cluster cluster) throws GenieException {
         final long start = System.nanoTime();
+        final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
         try {
             final String clusterId = cluster.getId().orElseThrow(() -> new GenieServerException("No cluster id."));
             final String jobId = jobRequest.getId().orElseThrow(() -> new GenieServerException("No job id"));
@@ -485,8 +487,14 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                     + "] attached to cluster with id: "
                     + cluster.getId().orElse(NO_ID_FOUND)
             );
+
+        } catch (Throwable t) {
+            MetricsUtils.addFailureTagsWithException(tags, t);
+            throw t;
         } finally {
-            this.selectCommandTimer.record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+            this.registry.timer(
+                selectCommandTimerId.withTags(tags)
+            ).record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
     }
 
@@ -495,6 +503,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
         final Command command
     ) throws GenieException {
         final long start = System.nanoTime();
+        final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
         try {
             final String jobId = jobRequest.getId().orElseThrow(() -> new GenieServerException("No job Id"));
             final String commandId = command.getId().orElseThrow(() -> new GenieServerException("No command Id"));
@@ -516,12 +525,18 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .reduce((one, two) -> one + "," + two)
-                .orElse(NO_ID_FOUND),
+                    .orElse(NO_ID_FOUND),
                 jobRequest.getId().orElse(NO_ID_FOUND)
             );
             return applications;
+
+        } catch (Throwable t) {
+            MetricsUtils.addFailureTagsWithException(tags, t);
+            throw t;
         } finally {
-            this.selectApplicationsTimer.record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+            this.registry.timer(
+                selectApplicationsTimerId.withTags(tags)
+            ).record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
     }
 }

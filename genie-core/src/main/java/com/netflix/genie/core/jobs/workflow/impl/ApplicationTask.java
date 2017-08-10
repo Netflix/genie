@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.core.jobs.workflow.impl;
 
+import com.google.common.collect.Maps;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
@@ -25,8 +26,10 @@ import com.netflix.genie.core.jobs.FileType;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
 import com.netflix.genie.core.services.impl.GenieFileTransferService;
+import com.netflix.genie.core.util.MetricsConstants;
+import com.netflix.genie.core.util.MetricsUtils;
+import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Registry;
-import com.netflix.spectator.api.Timer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -47,7 +50,8 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class ApplicationTask extends GenieBaseTask {
 
-    private final Timer timer;
+    private final Id timerId;
+    private final Id applicationTimerId;
     private final GenieFileTransferService fts;
 
     /**
@@ -58,7 +62,9 @@ public class ApplicationTask extends GenieBaseTask {
      */
     public ApplicationTask(@NotNull final Registry registry,
                            @NotNull final GenieFileTransferService fts) {
-        this.timer = registry.timer("genie.jobs.tasks.applicationTask.timer");
+        super(registry);
+        this.timerId = registry.createId("genie.jobs.tasks.applicationTask.timer");
+        this.applicationTimerId = registry.createId("genie.jobs.tasks.applicationTask.applicationSetup.timer");
         this.fts = fts;
     }
 
@@ -70,6 +76,7 @@ public class ApplicationTask extends GenieBaseTask {
         @NotNull
         final Map<String, Object> context
     ) throws GenieException, IOException {
+        final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
         final long start = System.nanoTime();
         try {
             final JobExecutionEnvironment jobExecEnv =
@@ -79,88 +86,112 @@ public class ApplicationTask extends GenieBaseTask {
                 + JobConstants.FILE_PATH_DELIMITER
                 + JobConstants.GENIE_PATH_VAR;
             final Writer writer = (Writer) context.get(JobConstants.WRITER_KEY);
-            log.info("Starting Application Task for job {}", jobExecEnv.getJobRequest().getId());
+            log.info("Starting Application Task for job {}", jobExecEnv.getJobRequest().getId().orElse(NO_ID_FOUND));
 
 
             if (jobExecEnv.getApplications() != null) {
                 for (Application application : jobExecEnv.getApplications()) {
-                    final String applicationId = application
-                        .getId()
-                        .orElseThrow(() -> new GeniePreconditionException("Application without id"));
-
-                    // Create the directory for this application under applications in the cwd
-                    createEntityInstanceDirectory(
-                        genieDir,
-                        applicationId,
-                        AdminResources.APPLICATION
+                    final long applicationStart = System.nanoTime();
+                    final Map<String, String> applicationTags = Maps.newHashMap();
+                    applicationTags.put(
+                        MetricsConstants.TagKeys.APPLICATION_ID,
+                        application.getId().orElse(NO_ID_FOUND)
                     );
+                    applicationTags.put(MetricsConstants.TagKeys.APPLICATION_NAME, application.getName());
 
-                    // Create the config directory for this id
-                    createEntityInstanceConfigDirectory(
-                        genieDir,
-                        applicationId,
-                        AdminResources.APPLICATION
-                    );
+                    try {
+                        final String applicationId = application
+                            .getId()
+                            .orElseThrow(() -> new GeniePreconditionException("Application without id"));
 
-                    // Create the dependencies directory for this id
-                    createEntityInstanceDependenciesDirectory(
-                        genieDir,
-                        applicationId,
-                        AdminResources.APPLICATION
-                    );
+                        // Create the directory for this application under applications in the cwd
+                        createEntityInstanceDirectory(
+                            genieDir,
+                            applicationId,
+                            AdminResources.APPLICATION
+                        );
 
-                    // Get the setup file if specified and add it as source command in launcher script
-                    final Optional<String> setupFile = application.getSetupFile();
-                    if (setupFile.isPresent()) {
-                        final String applicationSetupFile = setupFile.get();
-                        if (StringUtils.isNotBlank(applicationSetupFile)) {
+                        // Create the config directory for this id
+                        createEntityInstanceConfigDirectory(
+                            genieDir,
+                            applicationId,
+                            AdminResources.APPLICATION
+                        );
+
+                        // Create the dependencies directory for this id
+                        createEntityInstanceDependenciesDirectory(
+                            genieDir,
+                            applicationId,
+                            AdminResources.APPLICATION
+                        );
+
+                        // Get the setup file if specified and add it as source command in launcher script
+                        final Optional<String> setupFile = application.getSetupFile();
+                        if (setupFile.isPresent()) {
+                            final String applicationSetupFile = setupFile.get();
+                            if (StringUtils.isNotBlank(applicationSetupFile)) {
+                                final String localPath = super.buildLocalFilePath(
+                                    jobWorkingDirectory,
+                                    applicationId,
+                                    applicationSetupFile,
+                                    FileType.SETUP,
+                                    AdminResources.APPLICATION
+                                );
+                                this.fts.getFile(applicationSetupFile, localPath);
+
+                                super.generateSetupFileSourceSnippet(
+                                    applicationId,
+                                    "Application:",
+                                    localPath,
+                                    writer,
+                                    jobWorkingDirectory);
+                            }
+                        }
+
+                        // Iterate over and get all dependencies
+                        for (final String dependencyFile : application.getDependencies()) {
                             final String localPath = super.buildLocalFilePath(
                                 jobWorkingDirectory,
                                 applicationId,
-                                applicationSetupFile,
-                                FileType.SETUP,
+                                dependencyFile,
+                                FileType.DEPENDENCIES,
                                 AdminResources.APPLICATION
                             );
-                            this.fts.getFile(applicationSetupFile, localPath);
-
-                            super.generateSetupFileSourceSnippet(
-                                applicationId,
-                                "Application:",
-                                localPath,
-                                writer,
-                                jobWorkingDirectory);
+                            fts.getFile(dependencyFile, localPath);
                         }
-                    }
 
-                    // Iterate over and get all dependencies
-                    for (final String dependencyFile : application.getDependencies()) {
-                        final String localPath = super.buildLocalFilePath(
-                            jobWorkingDirectory,
-                            applicationId,
-                            dependencyFile,
-                            FileType.DEPENDENCIES,
-                            AdminResources.APPLICATION
-                        );
-                        fts.getFile(dependencyFile, localPath);
-                    }
-
-                    // Iterate over and get all configuration files
-                    for (final String configFile : application.getConfigs()) {
-                        final String localPath = super.buildLocalFilePath(
-                            jobWorkingDirectory,
-                            applicationId,
-                            configFile,
-                            FileType.CONFIG,
-                            AdminResources.APPLICATION
-                        );
-                        fts.getFile(configFile, localPath);
+                        // Iterate over and get all configuration files
+                        for (final String configFile : application.getConfigs()) {
+                            final String localPath = super.buildLocalFilePath(
+                                jobWorkingDirectory,
+                                applicationId,
+                                configFile,
+                                FileType.CONFIG,
+                                AdminResources.APPLICATION
+                            );
+                            fts.getFile(configFile, localPath);
+                        }
+                        MetricsUtils.addSuccessTags(applicationTags);
+                    } catch (Throwable t) {
+                        MetricsUtils.addFailureTagsWithException(applicationTags, t);
+                        throw t;
+                    } finally {
+                        final long applicationFinish = System.nanoTime();
+                        this.getRegistry().timer(
+                            applicationTimerId.withTags(applicationTags)
+                        ).record(applicationFinish - applicationStart, TimeUnit.NANOSECONDS);
                     }
                 }
             }
-            log.info("Finished Application Task for job {}", jobExecEnv.getJobRequest().getId());
+            log.info("Finished Application Task for job {}", jobExecEnv.getJobRequest().getId().orElse(NO_ID_FOUND));
+        } catch (Throwable t) {
+            MetricsUtils.addFailureTagsWithException(tags, t);
+            throw t;
         } finally {
             final long finish = System.nanoTime();
-            this.timer.record(finish - start, TimeUnit.NANOSECONDS);
+            this.getRegistry().timer(
+                timerId.withTags(tags)
+            ).record(finish - start, TimeUnit.NANOSECONDS);
         }
     }
 }

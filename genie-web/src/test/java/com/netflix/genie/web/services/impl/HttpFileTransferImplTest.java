@@ -19,7 +19,9 @@ package com.netflix.genie.web.services.impl;
 
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.core.util.MetricsUtils;
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Registry;
 import com.netflix.spectator.api.Timer;
 import org.hamcrest.Matchers;
@@ -67,6 +69,9 @@ public class HttpFileTransferImplTest {
     private MockRestServiceServer server;
     private HttpFileTransferImpl httpFileTransfer;
 
+    private Id downloadTimerId;
+    private Id uploadTimerId;
+    private Id metadataTimerId;
     private Timer downloadTimer;
     private Timer uploadTimer;
     private Timer metadataTimer;
@@ -81,10 +86,19 @@ public class HttpFileTransferImplTest {
         this.downloadTimer = Mockito.mock(Timer.class);
         this.uploadTimer = Mockito.mock(Timer.class);
         this.metadataTimer = Mockito.mock(Timer.class);
+        this.downloadTimerId = Mockito.mock(Id.class);
+        this.uploadTimerId = Mockito.mock(Id.class);
+        this.metadataTimerId = Mockito.mock(Id.class);
         final Registry registry = Mockito.mock(Registry.class);
-        Mockito.when(registry.timer("genie.files.http.download.timer")).thenReturn(this.downloadTimer);
-        Mockito.when(registry.timer("genie.files.http.upload.timer")).thenReturn(this.uploadTimer);
-        Mockito.when(registry.timer("genie.files.http.getLastModified.timer")).thenReturn(this.metadataTimer);
+        Mockito.when(registry.createId("genie.files.http.download.timer")).thenReturn(this.downloadTimerId);
+        Mockito.when(registry.createId("genie.files.http.upload.timer")).thenReturn(this.uploadTimerId);
+        Mockito.when(registry.createId("genie.files.http.getLastModified.timer")).thenReturn(this.metadataTimerId);
+        Mockito.when(downloadTimerId.withTags(Mockito.anyMap())).thenReturn(downloadTimerId);
+        Mockito.when(uploadTimerId.withTags(Mockito.anyMap())).thenReturn(uploadTimerId);
+        Mockito.when(metadataTimerId.withTags(Mockito.anyMap())).thenReturn(metadataTimerId);
+        Mockito.when(registry.timer(downloadTimerId)).thenReturn(downloadTimer);
+        Mockito.when(registry.timer(uploadTimerId)).thenReturn(uploadTimer);
+        Mockito.when(registry.timer(metadataTimerId)).thenReturn(metadataTimer);
         this.httpFileTransfer = new HttpFileTransferImpl(restTemplate, registry);
     }
 
@@ -126,6 +140,9 @@ public class HttpFileTransferImplTest {
 
         this.server.verify();
         Mockito
+            .verify(this.downloadTimerId, Mockito.times(1))
+            .withTags(MetricsUtils.newSuccessTagsMap());
+        Mockito
             .verify(this.downloadTimer, Mockito.times(1))
             .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
     }
@@ -138,7 +155,19 @@ public class HttpFileTransferImplTest {
      */
     @Test(expected = GenieServerException.class)
     public void cantGetWithInvalidUrl() throws GenieException, IOException {
-        this.httpFileTransfer.getFile(UUID.randomUUID().toString(), this.temporaryFolder.getRoot().getCanonicalPath());
+        try {
+            this.httpFileTransfer.getFile(
+                UUID.randomUUID().toString(),
+                this.temporaryFolder.getRoot().getCanonicalPath()
+            );
+        } finally {
+            Mockito
+                .verify(this.downloadTimerId, Mockito.times(1))
+                .withTags(MetricsUtils.newFailureTagsMapForException(new GenieServerException("test")));
+            Mockito
+                .verify(this.downloadTimer, Mockito.times(1))
+                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+        }
     }
 
     /**
@@ -156,7 +185,16 @@ public class HttpFileTransferImplTest {
                 MockRestResponseCreators
                     .withSuccess("junk".getBytes(Charset.forName("UTF-8")), MediaType.APPLICATION_OCTET_STREAM)
             );
-        this.httpFileTransfer.getFile(TEST_URL, this.temporaryFolder.getRoot().getCanonicalPath());
+        try {
+            this.httpFileTransfer.getFile(TEST_URL, this.temporaryFolder.getRoot().getCanonicalPath());
+        } finally {
+            Mockito
+                .verify(this.downloadTimerId, Mockito.times(1))
+                .withTags(MetricsUtils.newFailureTagsMapForException(new ResourceAccessException("test")));
+            Mockito
+                .verify(this.downloadTimer, Mockito.times(1))
+                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+        }
     }
 
     /**
@@ -164,13 +202,15 @@ public class HttpFileTransferImplTest {
      *
      * @throws GenieException on error
      */
-    @Test
+    @Test(expected = UnsupportedOperationException.class)
     public void cantPutFile() throws GenieException {
         try {
             final String file = UUID.randomUUID().toString();
             this.httpFileTransfer.putFile(file, file);
-            Assert.fail();
-        } catch (final UnsupportedOperationException e) {
+        } finally {
+            Mockito
+                .verify(this.uploadTimerId, Mockito.times(1))
+                .withTags(MetricsUtils.newFailureTagsMapForException(new UnsupportedOperationException("test")));
             Mockito
                 .verify(this.uploadTimer, Mockito.times(1))
                 .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
@@ -195,6 +235,9 @@ public class HttpFileTransferImplTest {
         Assert.assertThat(this.httpFileTransfer.getLastModifiedTime(TEST_URL), Matchers.is(lastModified));
         this.server.verify();
         Mockito
+            .verify(this.metadataTimerId, Mockito.times(1))
+            .withTags(MetricsUtils.newSuccessTagsMap());
+        Mockito
             .verify(this.metadataTimer, Mockito.times(1))
             .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
     }
@@ -213,6 +256,9 @@ public class HttpFileTransferImplTest {
             .andRespond(MockRestResponseCreators.withSuccess());
         Assert.assertTrue(this.httpFileTransfer.getLastModifiedTime(TEST_URL) > time);
         Mockito
+            .verify(this.metadataTimerId, Mockito.times(1))
+            .withTags(MetricsUtils.newSuccessTagsMap());
+        Mockito
             .verify(this.metadataTimer, Mockito.times(1))
             .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
     }
@@ -222,13 +268,17 @@ public class HttpFileTransferImplTest {
      *
      * @throws GenieException On error
      */
-    @Test
+    @Test(expected = GenieServerException.class)
     public void cantGetLastModifiedTimeIfNotURL() throws GenieException {
         try {
             this.httpFileTransfer.getLastModifiedTime(UUID.randomUUID().toString());
-            Assert.fail();
         } catch (final GenieServerException e) {
             Assert.assertTrue(e.getCause() instanceof MalformedURLException);
+            throw e;
+        } finally {
+            Mockito
+                .verify(this.metadataTimerId, Mockito.times(1))
+                .withTags(MetricsUtils.newFailureTagsMapForException(new MalformedURLException("test")));
             Mockito
                 .verify(this.metadataTimer, Mockito.times(1))
                 .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));

@@ -19,9 +19,11 @@ package com.netflix.genie.web.tasks.leader;
 
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.services.JobPersistenceService;
+import com.netflix.genie.core.util.MetricsUtils;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.properties.DatabaseCleanupProperties;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
+import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Registry;
 import com.netflix.spectator.api.Timer;
 import org.hamcrest.Matchers;
@@ -52,6 +54,7 @@ public class DatabaseCleanupTaskUnitTests {
     private DatabaseCleanupTask task;
     private AtomicLong numDeletedJobs;
     private Timer deletionTimer;
+    private Id deletionTimerId;
 
     /**
      * Setup for the tests.
@@ -62,7 +65,17 @@ public class DatabaseCleanupTaskUnitTests {
         this.jobPersistenceService = Mockito.mock(JobPersistenceService.class);
         this.numDeletedJobs = new AtomicLong();
         this.deletionTimer = Mockito.mock(Timer.class);
+        this.deletionTimerId = Mockito.mock(Id.class);
         final Registry registry = Mockito.mock(Registry.class);
+        Mockito
+            .when(registry.createId("genie.tasks.databaseCleanup.duration.timer"))
+            .thenReturn(deletionTimerId);
+        Mockito
+            .when(deletionTimerId.withTags(Mockito.anyMap()))
+            .thenReturn(deletionTimerId);
+        Mockito
+            .when(registry.timer(deletionTimerId))
+            .thenReturn(deletionTimer);
         Mockito
             .when(
                 registry.gauge(
@@ -115,10 +128,15 @@ public class DatabaseCleanupTaskUnitTests {
         final Calendar before = Calendar.getInstance(JobConstants.UTC);
         this.task.run();
         Assert.assertThat(this.numDeletedJobs.get(), Matchers.is(deletedCount1));
+        Mockito
+            .verify(this.deletionTimerId, Mockito.times(1))
+            .withTags(MetricsUtils.newSuccessTagsMap());
         this.task.run();
         final Calendar after = Calendar.getInstance(JobConstants.UTC);
         Assert.assertThat(this.numDeletedJobs.get(), Matchers.is(deletedCount2));
-
+        Mockito
+            .verify(this.deletionTimerId, Mockito.times(2))
+            .withTags(MetricsUtils.newSuccessTagsMap());
         Mockito
             .verify(this.deletionTimer, Mockito.times(2))
             .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
@@ -135,6 +153,34 @@ public class DatabaseCleanupTaskUnitTests {
             date.add(Calendar.DAY_OF_YEAR, negativeDays);
             Assert.assertThat(argument.getAllValues().get(0), Matchers.is(date.getTime()));
             Assert.assertThat(argument.getAllValues().get(1), Matchers.is(date.getTime()));
+        }
+    }
+
+    /**
+     * Make sure the run method throws when an error is encountered.
+     */
+    @Test(expected = RuntimeException.class)
+    public void cantRun() {
+        final int days = 5;
+        final int negativeDays = -1 * days;
+        final int batchSize = 10;
+
+        Mockito.when(this.cleanupProperties.getRetention()).thenReturn(days).thenReturn(negativeDays);
+        Mockito.when(this.cleanupProperties.getBatchSize()).thenReturn(batchSize);
+
+        Mockito
+            .when(this.jobPersistenceService.deleteAllJobsCreatedBeforeDate(Mockito.any(Date.class), Mockito.anyInt()))
+            .thenThrow(new RuntimeException("test"));
+
+        try {
+            this.task.run();
+        } finally {
+            Mockito
+                .verify(this.deletionTimerId, Mockito.times(1))
+                .withTags(MetricsUtils.newFailureTagsMapForException(new RuntimeException()));
+            Mockito
+                .verify(this.deletionTimer, Mockito.times(1))
+                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
         }
     }
 }

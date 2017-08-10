@@ -25,8 +25,9 @@ import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
+import com.netflix.genie.core.util.MetricsUtils;
+import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Registry;
-import com.netflix.spectator.api.Timer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -53,7 +54,7 @@ public class InitialSetupTask extends GenieBaseTask {
     private static final String GENIE_VERSION_EXPORT = "export GENIE_VERSION=3";
     private static final String LINE_SEPARATOR = System.lineSeparator();
 
-    private final Timer timer;
+    private final Id timerId;
 
     /**
      * Constructor.
@@ -61,7 +62,8 @@ public class InitialSetupTask extends GenieBaseTask {
      * @param registry The metrics registry to use
      */
     public InitialSetupTask(@NotNull final Registry registry) {
-        this.timer = registry.timer("genie.jobs.tasks.initialSetupTask.timer");
+        super(registry);
+        this.timerId = getRegistry().createId("genie.jobs.tasks.initialSetupTask.timer");
     }
 
     /**
@@ -70,6 +72,7 @@ public class InitialSetupTask extends GenieBaseTask {
     @Override
     public void executeTask(@NotNull final Map<String, Object> context) throws GenieException, IOException {
         final long start = System.nanoTime();
+        final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
         try {
             final JobExecutionEnvironment jobExecEnv
                 = (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
@@ -109,8 +112,13 @@ public class InitialSetupTask extends GenieBaseTask {
             writer.write(LINE_SEPARATOR);
 
             log.info("Finished Initial Setup Task for job {}", jobId);
+        } catch (Throwable t) {
+            MetricsUtils.addFailureTagsWithException(tags, t);
+            throw t;
         } finally {
-            this.timer.record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+            this.getRegistry().timer(
+                timerId.withTags(tags)
+            ).record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
     }
 

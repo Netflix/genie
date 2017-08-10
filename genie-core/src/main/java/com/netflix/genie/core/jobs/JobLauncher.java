@@ -23,15 +23,16 @@ import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.services.JobSubmitterService;
-import com.netflix.genie.core.util.MetricsConstants;
+import com.netflix.genie.core.util.MetricsUtils;
 import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Registry;
-import com.netflix.spectator.api.Timer;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Class to wrap launching a job in an asynchronous thread from the HTTP request thread to free up the system to
@@ -50,8 +51,7 @@ public class JobLauncher implements Runnable {
     private final List<Application> applications;
     private final int memory;
     private final Registry registry;
-    private final Timer submitTimer;
-    private final Id submitExceptionCounterId;
+    private final Id submitTimerId;
 
     /**
      * Constructor.
@@ -80,8 +80,7 @@ public class JobLauncher implements Runnable {
         this.applications = applications;
         this.memory = memory;
         this.registry = registry;
-        this.submitTimer = this.registry.timer("genie.jobs.submit.timer");
-        this.submitExceptionCounterId = registry.createId("genie.jobs.submit.exception");
+        this.submitTimerId = this.registry.createId("genie.jobs.submit.timer");
     }
 
     /**
@@ -89,23 +88,27 @@ public class JobLauncher implements Runnable {
      */
     @Override
     public void run() {
-        this.submitTimer.record(() -> {
-                // TODO: Compress the timer into a single ID tagged by exceptions
-                try {
-                    this.jobSubmitterService.submitJob(
-                        this.jobRequest,
-                        this.cluster,
-                        this.command,
-                        this.applications,
-                        this.memory
-                    );
-                } catch (final GenieException e) {
-                    log.error("Unable to submit job due to exception: {}", e.getMessage(), e);
-                    final Id taggedId = this.submitExceptionCounterId
-                        .withTag(MetricsConstants.TagKeys.EXCEPTION_CLASS, e.getClass().getCanonicalName());
-                    this.registry.counter(taggedId).increment();
-                }
-            }
-        );
+        final long start = System.nanoTime();
+        final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
+        try {
+            this.jobSubmitterService.submitJob(
+                this.jobRequest,
+                this.cluster,
+                this.command,
+                this.applications,
+                this.memory
+            );
+        } catch (final GenieException e) {
+            log.error("Unable to submit job due to exception: {}", e.getMessage(), e);
+            MetricsUtils.addFailureTagsWithException(tags, e);
+        } catch (Throwable t) {
+            MetricsUtils.addFailureTagsWithException(tags, t);
+            throw t;
+        } finally {
+            final long finish = System.nanoTime();
+            this.registry.timer(
+                submitTimerId.withTags(tags)
+            ).record(finish - start, TimeUnit.NANOSECONDS);
+        }
     }
 }

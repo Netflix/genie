@@ -43,20 +43,26 @@ import com.netflix.genie.core.services.JobKillService;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobStateService;
+import com.netflix.genie.core.util.MetricsConstants;
+import com.netflix.genie.core.util.MetricsUtils;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.spectator.api.Counter;
 import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Registry;
 import com.netflix.spectator.api.Timer;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Unit tests for JobCoordinatorServiceImpl.
@@ -76,6 +82,7 @@ public class JobCoordinatorServiceImplUnitTests {
     private static final int MEMORY = 1_512;
     private static final String KILL_REASON = "Killed by test";
     private static final boolean ACTIVE_JOBS_LIMIT_ENABLED = false;
+    private static final Map SUCCESS_TIMER_TAGS = MetricsUtils.newSuccessTagsMap();
 
     private JobCoordinatorServiceImpl jobCoordinatorService;
     private JobPersistenceService jobPersistenceService;
@@ -89,7 +96,23 @@ public class JobCoordinatorServiceImplUnitTests {
     private ClusterLoadBalancer clusterLoadBalancer2;
     private ClusterLoadBalancer clusterLoadBalancer3;
     private ClusterLoadBalancer clusterLoadBalancer4;
+    private Registry registry;
     private JobsProperties jobsProperties;
+    private ArgumentCaptor<Map> tagsCaptor;
+    private Id coordinationTimerId;
+    private Timer coordinationTimer;
+    private Id selectClusterTimerId;
+    private Timer selectClusterTimer;
+    private Counter noClusterSelectedCounter;
+    private Counter noMatchingClusterCounter;
+    private Id loadBalancerCounterId;
+    private Counter loadBalancerCounter;
+    private Id selectCommandTimerId;
+    private Timer selectCommandTimer;
+    private Id selectApplicationTimerId;
+    private Timer selectApplicationTimer;
+    private Id setJobEnvironmentTimerId;
+    private Timer setJobEnvironmentTimer;
 
     /**
      * Setup for the tests.
@@ -112,12 +135,82 @@ public class JobCoordinatorServiceImplUnitTests {
         this.clusterLoadBalancer3 = Mockito.mock(ClusterLoadBalancer.class);
         this.clusterLoadBalancer4 = Mockito.mock(ClusterLoadBalancer.class);
 
-        final Registry registry = Mockito.mock(Registry.class);
-        final Id loadBalancerId = Mockito.mock(Id.class);
-        Mockito.when(registry.timer(Mockito.anyString())).thenReturn(Mockito.mock(Timer.class));
-        Mockito.when(registry.createId(Mockito.anyString())).thenReturn(loadBalancerId);
-        Mockito.when(loadBalancerId.withTag(Mockito.anyString(), Mockito.anyString())).thenReturn(loadBalancerId);
-        Mockito.when(registry.counter(loadBalancerId)).thenReturn(Mockito.mock(Counter.class));
+        this.registry = Mockito.mock(Registry.class);
+        this.tagsCaptor = ArgumentCaptor.forClass(Map.class);
+        this.coordinationTimerId = Mockito.mock(Id.class);
+        this.coordinationTimer = Mockito.mock(Timer.class);
+        Mockito
+            .when(this.registry.createId("genie.jobs.coordination.timer"))
+            .thenReturn(coordinationTimerId);
+        Mockito
+            .when(coordinationTimerId.withTags(Mockito.any(Map.class)))
+            .thenReturn(coordinationTimerId);
+        Mockito
+            .when(this.registry.timer(Mockito.eq(coordinationTimerId)))
+            .thenReturn(coordinationTimer);
+        this.selectClusterTimerId = Mockito.mock(Id.class);
+        this.selectClusterTimer = Mockito.mock(Timer.class);
+        Mockito
+            .when(this.registry.createId("genie.jobs.submit.localRunner.selectCluster.timer"))
+            .thenReturn(selectClusterTimerId);
+        Mockito
+            .when(selectClusterTimerId.withTags(Mockito.any(Map.class)))
+            .thenReturn(selectClusterTimerId);
+        Mockito
+            .when(this.registry.timer(Mockito.eq(selectClusterTimerId)))
+            .thenReturn(selectClusterTimer);
+        this.selectCommandTimerId = Mockito.mock(Id.class);
+        this.selectCommandTimer = Mockito.mock(Timer.class);
+        Mockito
+            .when(this.registry.createId("genie.jobs.submit.localRunner.selectCommand.timer"))
+            .thenReturn(selectCommandTimerId);
+        Mockito
+            .when(selectCommandTimerId.withTags(Mockito.any(Map.class)))
+            .thenReturn(selectCommandTimerId);
+        Mockito
+            .when(this.registry.timer(Mockito.eq(selectCommandTimerId)))
+            .thenReturn(selectCommandTimer);
+        this.selectApplicationTimerId = Mockito.mock(Id.class);
+        this.selectApplicationTimer = Mockito.mock(Timer.class);
+        Mockito
+            .when(this.registry.createId("genie.jobs.submit.localRunner.selectApplications.timer"))
+            .thenReturn(selectApplicationTimerId);
+        Mockito
+            .when(selectApplicationTimerId.withTags(Mockito.any(Map.class)))
+            .thenReturn(selectApplicationTimerId);
+        Mockito
+            .when(this.registry.timer(Mockito.eq(selectApplicationTimerId)))
+            .thenReturn(selectApplicationTimer);
+        this.setJobEnvironmentTimerId = Mockito.mock(Id.class);
+        this.setJobEnvironmentTimer = Mockito.mock(Timer.class);
+        Mockito
+            .when(this.registry.createId("genie.jobs.submit.localRunner.setJobEnvironment.timer"))
+            .thenReturn(setJobEnvironmentTimerId);
+        Mockito
+            .when(setJobEnvironmentTimerId.withTags(Mockito.any(Map.class)))
+            .thenReturn(setJobEnvironmentTimerId);
+        Mockito
+            .when(this.registry.timer(Mockito.eq(setJobEnvironmentTimerId)))
+            .thenReturn(setJobEnvironmentTimer);
+        this.noClusterSelectedCounter = Mockito.mock(Counter.class);
+        Mockito
+            .when(this.registry.counter("genie.jobs.submit.selectCluster.noneSelected.counter"))
+            .thenReturn(noClusterSelectedCounter);
+        this.noMatchingClusterCounter = Mockito.mock(Counter.class);
+        Mockito
+            .when(registry.counter("genie.jobs.submit.selectCluster.noneFound.counter"))
+            .thenReturn(noMatchingClusterCounter);
+        this.loadBalancerCounterId = Mockito.mock(Id.class);
+        this.loadBalancerCounter = Mockito.mock(Counter.class);
+        Mockito
+            .when(this.registry.createId("genie.jobs.submit.selectCluster.loadBalancer.counter"))
+            .thenReturn(loadBalancerCounterId);
+        Mockito
+            .when(loadBalancerCounterId.withTags(Mockito.any(Map.class)))
+            .thenReturn(loadBalancerCounterId);
+        Mockito
+            .when(this.registry.counter(Mockito.eq(loadBalancerCounterId)))
+            .thenReturn(loadBalancerCounter);
 
         this.jobCoordinatorService = new JobCoordinatorServiceImpl(
             this.jobPersistenceService,
@@ -134,7 +227,7 @@ public class JobCoordinatorServiceImplUnitTests {
                 this.clusterLoadBalancer3,
                 this.clusterLoadBalancer4
             ),
-            registry,
+            this.registry,
             HOST_NAME
         );
     }
@@ -146,6 +239,7 @@ public class JobCoordinatorServiceImplUnitTests {
      */
     @Test(expected = GeniePreconditionException.class)
     public void cantCoordinateJobIfNoClustersFound() throws GenieException {
+
         final Set<String> commandCriteria = Sets.newHashSet(
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
@@ -159,7 +253,95 @@ public class JobCoordinatorServiceImplUnitTests {
             .when(this.clusterService.chooseClusterForJobRequest(jobRequest))
             .thenReturn(Lists.newArrayList());
 
-        this.jobCoordinatorService.coordinateJob(jobRequest, jobMetadata);
+        Mockito.verifyNoMoreInteractions(
+            selectApplicationTimer,
+            selectApplicationTimerId,
+            selectClusterTimer,
+            selectClusterTimerId,
+            setJobEnvironmentTimer,
+            setJobEnvironmentTimerId
+        );
+
+        try {
+            this.jobCoordinatorService.coordinateJob(jobRequest, jobMetadata);
+        } finally {
+            Mockito
+                .verify(this.coordinationTimer, Mockito.times(1))
+                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+            Mockito
+                .verify(this.coordinationTimerId, Mockito.times(1))
+                .withTags(MetricsUtils.newFailureTagsMapForException(new GeniePreconditionException("test")));
+            Mockito
+                .verify(this.noMatchingClusterCounter, Mockito.times(1))
+                .increment();
+            Mockito
+                .verify(this.selectClusterTimer, Mockito.times(1))
+                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+            Mockito
+                .verify(this.selectClusterTimerId, Mockito.times(1))
+                .withTags(MetricsUtils.newFailureTagsMapForException(new GeniePreconditionException("test")));
+        }
+    }
+
+    /**
+     * Test the coordinate job method.
+     *
+     * @throws GenieException If there is any problem
+     */
+    @Test(expected = GeniePreconditionException.class)
+    public void cantCoordinateJobIfNoClustersSelected() throws GenieException {
+
+        final Set<String> commandCriteria = Sets.newHashSet(
+        );
+
+        final JobRequest jobRequest = this.getJobRequest(true, commandCriteria, null, null);
+        final JobMetadata jobMetadata = this.getJobMetadata();
+
+        Mockito
+            .when(this.clusterService.chooseClusterForJobRequest(jobRequest))
+            .thenReturn(Lists.newArrayList(
+                Mockito.mock(Cluster.class),
+                Mockito.mock(Cluster.class)
+            ));
+
+        Mockito.verifyNoMoreInteractions(
+            selectApplicationTimer,
+            selectApplicationTimerId,
+            selectClusterTimer,
+            selectClusterTimerId,
+            setJobEnvironmentTimer,
+            setJobEnvironmentTimerId
+        );
+
+        try {
+            this.jobCoordinatorService.coordinateJob(jobRequest, jobMetadata);
+        } finally {
+            Mockito
+                .verify(this.coordinationTimer, Mockito.times(1))
+                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+            Mockito
+                .verify(this.coordinationTimerId, Mockito.times(1))
+                .withTags(MetricsUtils.newFailureTagsMapForException(new GeniePreconditionException("test")));
+            Mockito
+                .verify(this.noClusterSelectedCounter, Mockito.times(1)).increment();
+            Mockito
+                .verify(this.loadBalancerCounterId, Mockito.times(4))
+                .withTags(tagsCaptor.capture());
+            final String className = (String) tagsCaptor.getValue().get(MetricsConstants.TagKeys.CLASS_NAME);
+            Assert.assertNotNull(className);
+            Assert.assertTrue(className.startsWith("com.netflix.genie.core.services.ClusterLoadBalancer"));
+            final String status = (String) tagsCaptor.getValue().get(MetricsConstants.TagKeys.STATUS);
+            Assert.assertEquals("no preference", status);
+            Mockito
+                .verify(this.loadBalancerCounter, Mockito.times(4))
+                .increment();
+            Mockito
+                .verify(this.selectClusterTimer, Mockito.times(1))
+                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+            Mockito
+                .verify(this.selectClusterTimerId, Mockito.times(1))
+                .withTags(MetricsUtils.newFailureTagsMapForException(new GeniePreconditionException("test")));
+        }
     }
 
     /**
@@ -234,6 +416,42 @@ public class JobCoordinatorServiceImplUnitTests {
         Mockito.verify(this.clusterLoadBalancer2, Mockito.never()).selectCluster(Mockito.any(), Mockito.any());
         Mockito.verify(this.clusterLoadBalancer3, Mockito.never()).selectCluster(Mockito.any(), Mockito.any());
         Mockito.verify(this.clusterLoadBalancer4, Mockito.never()).selectCluster(Mockito.any(), Mockito.any());
+
+        Mockito
+            .verify(this.coordinationTimer, Mockito.times(1))
+            .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+        Mockito
+            .verify(this.coordinationTimerId, Mockito.times(1))
+            .withTags(SUCCESS_TIMER_TAGS);
+        Mockito
+            .verify(this.noClusterSelectedCounter, Mockito.times(0)).increment();
+        Mockito
+            .verify(this.loadBalancerCounter, Mockito.times(0))
+            .increment();
+        Mockito
+            .verify(this.selectClusterTimer, Mockito.times(1))
+            .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+        Mockito
+            .verify(this.selectClusterTimerId, Mockito.times(1))
+            .withTags(SUCCESS_TIMER_TAGS);
+        Mockito
+            .verify(this.selectCommandTimer, Mockito.times(1))
+            .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+        Mockito
+            .verify(this.selectCommandTimerId, Mockito.times(1))
+            .withTags(SUCCESS_TIMER_TAGS);
+        Mockito
+            .verify(this.selectApplicationTimer, Mockito.times(1))
+            .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+        Mockito
+            .verify(this.selectApplicationTimerId, Mockito.times(1))
+            .withTags(SUCCESS_TIMER_TAGS);
+        Mockito
+            .verify(this.setJobEnvironmentTimer, Mockito.times(1))
+            .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+        Mockito
+            .verify(this.setJobEnvironmentTimerId, Mockito.times(1))
+            .withTags(SUCCESS_TIMER_TAGS);
     }
 
     /**
@@ -309,6 +527,42 @@ public class JobCoordinatorServiceImplUnitTests {
         Mockito.verify(this.clusterLoadBalancer2, Mockito.times(1)).selectCluster(Mockito.any(), Mockito.any());
         Mockito.verify(this.clusterLoadBalancer3, Mockito.times(1)).selectCluster(Mockito.any(), Mockito.any());
         Mockito.verify(this.clusterLoadBalancer4, Mockito.never()).selectCluster(Mockito.any(), Mockito.any());
+
+        Mockito
+            .verify(this.coordinationTimer, Mockito.times(1))
+            .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+        Mockito
+            .verify(this.coordinationTimerId, Mockito.times(1))
+            .withTags(SUCCESS_TIMER_TAGS);
+        Mockito
+            .verify(this.noClusterSelectedCounter, Mockito.times(0)).increment();
+        Mockito
+            .verify(this.loadBalancerCounter, Mockito.times(3))
+            .increment();
+        Mockito
+            .verify(this.selectClusterTimer, Mockito.times(1))
+            .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+        Mockito
+            .verify(this.selectClusterTimerId, Mockito.times(1))
+            .withTags(SUCCESS_TIMER_TAGS);
+        Mockito
+            .verify(this.selectCommandTimer, Mockito.times(1))
+            .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+        Mockito
+            .verify(this.selectCommandTimerId, Mockito.times(1))
+            .withTags(SUCCESS_TIMER_TAGS);
+        Mockito
+            .verify(this.selectApplicationTimer, Mockito.times(1))
+            .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+        Mockito
+            .verify(this.selectApplicationTimerId, Mockito.times(1))
+            .withTags(SUCCESS_TIMER_TAGS);
+        Mockito
+            .verify(this.setJobEnvironmentTimer, Mockito.times(1))
+            .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+        Mockito
+            .verify(this.setJobEnvironmentTimerId, Mockito.times(1))
+            .withTags(SUCCESS_TIMER_TAGS);
     }
 
     /**
@@ -376,6 +630,42 @@ public class JobCoordinatorServiceImplUnitTests {
 
         Mockito.verify(jobStateService, Mockito.times(1)).schedule(JOB_1_ID, jobRequest, cluster,
             command, Lists.newArrayList(application), MEMORY);
+
+        Mockito
+            .verify(this.coordinationTimer, Mockito.times(1))
+            .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+        Mockito
+            .verify(this.coordinationTimerId, Mockito.times(1))
+            .withTags(SUCCESS_TIMER_TAGS);
+        Mockito
+            .verify(this.noClusterSelectedCounter, Mockito.times(0)).increment();
+        Mockito
+            .verify(this.loadBalancerCounter, Mockito.times(0))
+            .increment();
+        Mockito
+            .verify(this.selectClusterTimer, Mockito.times(1))
+            .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+        Mockito
+            .verify(this.selectClusterTimerId, Mockito.times(1))
+            .withTags(SUCCESS_TIMER_TAGS);
+        Mockito
+            .verify(this.selectCommandTimer, Mockito.times(1))
+            .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+        Mockito
+            .verify(this.selectCommandTimerId, Mockito.times(1))
+            .withTags(SUCCESS_TIMER_TAGS);
+        Mockito
+            .verify(this.selectApplicationTimer, Mockito.times(1))
+            .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+        Mockito
+            .verify(this.selectApplicationTimerId, Mockito.times(1))
+            .withTags(SUCCESS_TIMER_TAGS);
+        Mockito
+            .verify(this.setJobEnvironmentTimer, Mockito.times(1))
+            .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+        Mockito
+            .verify(this.setJobEnvironmentTimerId, Mockito.times(1))
+            .withTags(SUCCESS_TIMER_TAGS);
     }
 
     /**
@@ -427,9 +717,48 @@ public class JobCoordinatorServiceImplUnitTests {
 
         Mockito.when(this.commandService.getApplicationsForCommand(commandId)).thenReturn(applications);
 
-        this.jobCoordinatorService.coordinateJob(jobRequest, jobMetadata);
+        try {
+            this.jobCoordinatorService.coordinateJob(jobRequest, jobMetadata);
+        } finally {
+            Mockito.verify(this.jobStateService, Mockito.never()).getUsedMemory();
 
-        Mockito.verify(this.jobStateService, Mockito.never()).getUsedMemory();
+            Mockito
+                .verify(this.coordinationTimer, Mockito.times(1))
+                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+
+            Mockito
+                .verify(this.coordinationTimerId, Mockito.times(1))
+                .withTags(MetricsUtils.newFailureTagsMapForException(new GeniePreconditionException("test")));
+            Mockito
+                .verify(this.noClusterSelectedCounter, Mockito.times(0)).increment();
+            Mockito
+                .verify(this.loadBalancerCounter, Mockito.times(0))
+                .increment();
+            Mockito
+                .verify(this.selectClusterTimer, Mockito.times(1))
+                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+            Mockito
+                .verify(this.selectClusterTimerId, Mockito.times(1))
+                .withTags(SUCCESS_TIMER_TAGS);
+            Mockito
+                .verify(this.selectCommandTimer, Mockito.times(1))
+                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+            Mockito
+                .verify(this.selectCommandTimerId, Mockito.times(1))
+                .withTags(SUCCESS_TIMER_TAGS);
+            Mockito
+                .verify(this.selectApplicationTimer, Mockito.times(1))
+                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+            Mockito
+                .verify(this.selectApplicationTimerId, Mockito.times(1))
+                .withTags(SUCCESS_TIMER_TAGS);
+            Mockito
+                .verify(this.setJobEnvironmentTimer, Mockito.times(1))
+                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+            Mockito
+                .verify(this.setJobEnvironmentTimerId, Mockito.times(1))
+                .withTags(SUCCESS_TIMER_TAGS);
+        }
     }
 
     /**
@@ -484,12 +813,58 @@ public class JobCoordinatorServiceImplUnitTests {
             .when(this.jobStateService.getUsedMemory())
             .thenReturn(this.jobsProperties.getMemory().getMaxSystemMemory());
 
-        this.jobCoordinatorService.coordinateJob(jobRequest, jobMetadata);
-
-        Mockito.verify(this.jobStateService, Mockito.times(1)).getUsedMemory();
         Mockito
-            .verify(this.jobPersistenceService, Mockito.times(1))
-            .updateJobStatus(Mockito.eq(JOB_1_ID), Mockito.eq(JobStatus.FAILED), Mockito.anyString());
+            .when(this.jobStateService.jobExists(Mockito.any()))
+            .thenReturn(true);
+
+        try {
+            this.jobCoordinatorService.coordinateJob(jobRequest, jobMetadata);
+        } finally {
+            Mockito.
+                verify(this.jobStateService, Mockito.times(1))
+                .getUsedMemory();
+
+            Mockito
+                .verify(this.jobPersistenceService, Mockito.times(1))
+                .updateJobStatus(Mockito.eq(JOB_1_ID), Mockito.eq(JobStatus.FAILED), Mockito.anyString());
+
+            Mockito
+                .verify(this.coordinationTimer, Mockito.times(1))
+                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+
+            Mockito
+                .verify(this.coordinationTimerId, Mockito.times(1))
+                .withTags(MetricsUtils.newFailureTagsMapForException(new GenieServerUnavailableException("test")));
+            Mockito
+                .verify(this.noClusterSelectedCounter, Mockito.times(0)).increment();
+            Mockito
+                .verify(this.loadBalancerCounter, Mockito.times(0))
+                .increment();
+            Mockito
+                .verify(this.selectClusterTimer, Mockito.times(1))
+                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+            Mockito
+                .verify(this.selectClusterTimerId, Mockito.times(1))
+                .withTags(SUCCESS_TIMER_TAGS);
+            Mockito
+                .verify(this.selectCommandTimer, Mockito.times(1))
+                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+            Mockito
+                .verify(this.selectCommandTimerId, Mockito.times(1))
+                .withTags(SUCCESS_TIMER_TAGS);
+            Mockito
+                .verify(this.selectApplicationTimer, Mockito.times(1))
+                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+            Mockito
+                .verify(this.selectApplicationTimerId, Mockito.times(1))
+                .withTags(SUCCESS_TIMER_TAGS);
+            Mockito
+                .verify(this.setJobEnvironmentTimer, Mockito.times(1))
+                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+            Mockito
+                .verify(this.setJobEnvironmentTimerId, Mockito.times(1))
+                .withTags(SUCCESS_TIMER_TAGS);
+        }
     }
 
     /**
@@ -550,6 +925,42 @@ public class JobCoordinatorServiceImplUnitTests {
             .thenReturn(Long.valueOf(userActiveJobsLimit));
 
         this.jobCoordinatorService.coordinateJob(jobRequest, jobMetadata);
+
+        Mockito
+            .verify(this.coordinationTimer, Mockito.times(1))
+            .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+        Mockito
+            .verify(this.coordinationTimerId, Mockito.times(1))
+            .withTags(SUCCESS_TIMER_TAGS);
+        Mockito
+            .verify(this.noClusterSelectedCounter, Mockito.times(0)).increment();
+        Mockito
+            .verify(this.loadBalancerCounter, Mockito.times(0))
+            .increment();
+        Mockito
+            .verify(this.selectClusterTimer, Mockito.times(1))
+            .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+        Mockito
+            .verify(this.selectClusterTimerId, Mockito.times(1))
+            .withTags(SUCCESS_TIMER_TAGS);
+        Mockito
+            .verify(this.selectCommandTimer, Mockito.times(1))
+            .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+        Mockito
+            .verify(this.selectCommandTimerId, Mockito.times(1))
+            .withTags(SUCCESS_TIMER_TAGS);
+        Mockito
+            .verify(this.selectApplicationTimer, Mockito.times(1))
+            .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+        Mockito
+            .verify(this.selectApplicationTimerId, Mockito.times(1))
+            .withTags(SUCCESS_TIMER_TAGS);
+        Mockito
+            .verify(this.setJobEnvironmentTimer, Mockito.times(1))
+            .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+        Mockito
+            .verify(this.setJobEnvironmentTimerId, Mockito.times(1))
+            .withTags(SUCCESS_TIMER_TAGS);
     }
 
     /**
@@ -608,7 +1019,47 @@ public class JobCoordinatorServiceImplUnitTests {
             .when(this.jobSearchService.getActiveJobCountForUser(Mockito.any(String.class)))
             .thenReturn(Long.valueOf(userActiveJobsLimit));
 
-        this.jobCoordinatorService.coordinateJob(jobRequest, jobMetadata);
+        try {
+            this.jobCoordinatorService.coordinateJob(jobRequest, jobMetadata);
+        } finally {
+            Mockito
+                .verify(this.coordinationTimer, Mockito.times(1))
+                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+            Mockito
+                .verify(this.coordinationTimerId, Mockito.times(1))
+                .withTags(MetricsUtils.newFailureTagsMapForException(
+                    new GenieUserLimitExceededException("test", "test", "test"))
+                );
+            Mockito
+                .verify(this.noClusterSelectedCounter, Mockito.times(0)).increment();
+            Mockito
+                .verify(this.loadBalancerCounter, Mockito.times(0))
+                .increment();
+            Mockito
+                .verify(this.selectClusterTimer, Mockito.times(1))
+                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+            Mockito
+                .verify(this.selectClusterTimerId, Mockito.times(1))
+                .withTags(SUCCESS_TIMER_TAGS);
+            Mockito
+                .verify(this.selectCommandTimer, Mockito.times(1))
+                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+            Mockito
+                .verify(this.selectCommandTimerId, Mockito.times(1))
+                .withTags(SUCCESS_TIMER_TAGS);
+            Mockito
+                .verify(this.selectApplicationTimer, Mockito.times(1))
+                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+            Mockito
+                .verify(this.selectApplicationTimerId, Mockito.times(1))
+                .withTags(SUCCESS_TIMER_TAGS);
+            Mockito
+                .verify(this.setJobEnvironmentTimer, Mockito.times(1))
+                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+            Mockito
+                .verify(this.setJobEnvironmentTimerId, Mockito.times(1))
+                .withTags(SUCCESS_TIMER_TAGS);
+        }
     }
 
     /**
@@ -663,13 +1114,56 @@ public class JobCoordinatorServiceImplUnitTests {
         Mockito
             .when(this.jobStateService.getUsedMemory())
             .thenReturn(0);
-
-        this.jobCoordinatorService.coordinateJob(jobRequest, jobMetadata);
-
-        Mockito.verify(this.jobStateService, Mockito.times(1)).getUsedMemory();
         Mockito
-            .verify(this.jobPersistenceService, Mockito.times(1))
-            .updateJobStatus(Mockito.eq(JOB_1_ID), Mockito.eq(JobStatus.FAILED), Mockito.anyString());
+            .when(this.jobStateService.jobExists(Mockito.any()))
+            .thenReturn(true);
+
+        try {
+            this.jobCoordinatorService.coordinateJob(jobRequest, jobMetadata);
+        } finally {
+            Mockito
+                .verify(this.jobStateService, Mockito.times(1))
+                .getUsedMemory();
+            Mockito
+                .verify(this.jobPersistenceService, Mockito.times(1))
+                .updateJobStatus(Mockito.eq(JOB_1_ID), Mockito.eq(JobStatus.FAILED), Mockito.anyString());
+
+            Mockito
+                .verify(this.coordinationTimer, Mockito.times(1))
+                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+            Mockito
+                .verify(this.coordinationTimerId, Mockito.times(1))
+                .withTags(MetricsUtils.newFailureTagsMapForException(new RuntimeException("test")));
+            Mockito
+                .verify(this.noClusterSelectedCounter, Mockito.times(0)).increment();
+            Mockito
+                .verify(this.loadBalancerCounter, Mockito.times(0))
+                .increment();
+            Mockito
+                .verify(this.selectClusterTimer, Mockito.times(1))
+                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+            Mockito
+                .verify(this.selectClusterTimerId, Mockito.times(1))
+                .withTags(SUCCESS_TIMER_TAGS);
+            Mockito
+                .verify(this.selectCommandTimer, Mockito.times(1))
+                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+            Mockito
+                .verify(this.selectCommandTimerId, Mockito.times(1))
+                .withTags(SUCCESS_TIMER_TAGS);
+            Mockito
+                .verify(this.selectApplicationTimer, Mockito.times(1))
+                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+            Mockito
+                .verify(this.selectApplicationTimerId, Mockito.times(1))
+                .withTags(SUCCESS_TIMER_TAGS);
+            Mockito
+                .verify(this.setJobEnvironmentTimer, Mockito.times(1))
+                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+            Mockito
+                .verify(this.setJobEnvironmentTimerId, Mockito.times(1))
+                .withTags(SUCCESS_TIMER_TAGS);
+        }
     }
 
     /**
@@ -712,7 +1206,40 @@ public class JobCoordinatorServiceImplUnitTests {
             )
             .thenReturn(Lists.newArrayList(command));
 
-        this.jobCoordinatorService.coordinateJob(jobRequest, jobMetadata);
+        Mockito.verifyNoMoreInteractions(
+            selectApplicationTimer,
+            selectApplicationTimerId,
+            setJobEnvironmentTimer,
+            setJobEnvironmentTimerId
+        );
+
+        try {
+            this.jobCoordinatorService.coordinateJob(jobRequest, jobMetadata);
+        } finally {
+            Mockito
+                .verify(this.coordinationTimer, Mockito.times(1))
+                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+            Mockito
+                .verify(this.coordinationTimerId, Mockito.times(1))
+                .withTags(MetricsUtils.newFailureTagsMapForException(new GeniePreconditionException("test")));
+            Mockito
+                .verify(this.noClusterSelectedCounter, Mockito.times(0)).increment();
+            Mockito
+                .verify(this.loadBalancerCounter, Mockito.times(0))
+                .increment();
+            Mockito
+                .verify(this.selectClusterTimer, Mockito.times(1))
+                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+            Mockito
+                .verify(this.selectClusterTimerId, Mockito.times(1))
+                .withTags(SUCCESS_TIMER_TAGS);
+            Mockito
+                .verify(this.selectCommandTimer, Mockito.times(1))
+                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+            Mockito
+                .verify(this.selectCommandTimerId, Mockito.times(1))
+                .withTags(MetricsUtils.newFailureTagsMapForException(new GeniePreconditionException("test")));
+        }
     }
 
     /**
@@ -724,6 +1251,14 @@ public class JobCoordinatorServiceImplUnitTests {
     public void cantCoordinateIfNoId() throws GenieException {
         final JobRequest request = Mockito.mock(JobRequest.class);
         Mockito.when(request.getId()).thenReturn(Optional.empty());
+        Mockito.verifyNoMoreInteractions(
+            coordinationTimer,
+            selectApplicationTimer,
+            setJobEnvironmentTimer,
+            selectClusterTimer,
+            selectCommandTimer,
+            loadBalancerCounter
+        );
         this.jobCoordinatorService.coordinateJob(request, Mockito.mock(JobMetadata.class));
     }
 
@@ -740,7 +1275,25 @@ public class JobCoordinatorServiceImplUnitTests {
             .createJob(Mockito.eq(request), Mockito.eq(metadata),
                 Mockito.any(Job.class),
                 Mockito.any(JobExecution.class));
-        this.jobCoordinatorService.coordinateJob(request, metadata);
+
+        Mockito.verifyNoMoreInteractions(
+            selectApplicationTimer,
+            setJobEnvironmentTimer,
+            selectClusterTimer,
+            selectCommandTimer,
+            loadBalancerCounter
+        );
+
+        try {
+            this.jobCoordinatorService.coordinateJob(request, metadata);
+        } finally {
+            Mockito
+                .verify(this.coordinationTimer, Mockito.times(1))
+                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+            Mockito
+                .verify(this.coordinationTimerId, Mockito.times(1))
+                .withTags(MetricsUtils.newFailureTagsMapForException(new GenieConflictException("test")));
+        }
     }
 
     /**

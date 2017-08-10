@@ -23,6 +23,7 @@ import com.netflix.genie.core.jobs.AdminResources;
 import com.netflix.genie.core.jobs.FileType;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
+import com.netflix.spectator.api.Registry;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -40,6 +41,13 @@ import java.io.Writer;
  */
 @Slf4j
 public abstract class GenieBaseTask implements WorkflowTask {
+
+    protected static final String NO_ID_FOUND = "<no id>";
+    private final Registry registry;
+
+    protected GenieBaseTask(final Registry registry) {
+        this.registry = registry;
+    }
 
     /**
      * Helper Function to fetch file to local dir.
@@ -280,5 +288,9 @@ public abstract class GenieBaseTask implements WorkflowTask {
 
         // Append new line
         writer.write(System.lineSeparator());
+    }
+
+    protected Registry getRegistry() {
+        return registry;
     }
 }

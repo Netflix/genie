@@ -25,9 +25,8 @@ import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.services.JobSubmitterService;
-import com.netflix.genie.core.util.MetricsConstants;
+import com.netflix.genie.core.util.MetricsUtils;
 import com.netflix.genie.test.categories.UnitTest;
-import com.netflix.spectator.api.DefaultRegistry;
 import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Registry;
 import com.netflix.spectator.api.Timer;
@@ -35,9 +34,12 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Unit tests for the JobLauncher class.
@@ -57,6 +59,8 @@ public class JobLauncherUnitTests {
     private List<Application> applications;
     private Timer timer;
     private int memory;
+    private Id timerId;
+    private ArgumentCaptor<Map> tagsCaptor;
 
     /**
      * Setup for the tests.
@@ -68,9 +72,15 @@ public class JobLauncherUnitTests {
         this.command = Mockito.mock(Command.class);
         this.applications = Lists.newArrayList(Mockito.mock(Application.class));
         this.jobSubmitterService = Mockito.mock(JobSubmitterService.class);
-        this.registry = new DefaultRegistry();
-        this.timer = this.registry.timer("genie.jobs.submit.timer");
         this.memory = 1_024;
+        this.registry = Mockito.mock(Registry.class);
+        this.timerId = Mockito.mock(Id.class);
+        this.timer = Mockito.mock(Timer.class);
+        Mockito.when(registry.createId("genie.jobs.submit.timer")).thenReturn(timerId);
+        Mockito.when(timerId.withTags(Mockito.any(Map.class))).thenReturn(timerId);
+        Mockito.when(registry.timer(Mockito.eq(timerId))).thenReturn(timer);
+        this.tagsCaptor = ArgumentCaptor.forClass(Map.class);
+
         this.jobLauncher = new JobLauncher(
             this.jobSubmitterService,
             this.jobRequest,
@@ -92,7 +102,13 @@ public class JobLauncherUnitTests {
         this.jobLauncher.run();
         Mockito.verify(this.jobSubmitterService, Mockito.times(1))
             .submitJob(this.jobRequest, this.cluster, this.command, this.applications, this.memory);
-        Assert.assertEquals(1, this.timer.count());
+        Mockito
+            .verify(this.timer, Mockito.times(1))
+            .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+        Mockito
+            .verify(this.timerId, Mockito.times(1))
+            .withTags(tagsCaptor.capture());
+        Assert.assertEquals(MetricsUtils.newSuccessTagsMap(), tagsCaptor.getValue());
     }
 
     /**
@@ -106,9 +122,41 @@ public class JobLauncherUnitTests {
         Mockito.doThrow(exception).when(this.jobSubmitterService)
             .submitJob(this.jobRequest, this.cluster, this.command, this.applications, this.memory);
         this.jobLauncher.run();
-        Assert.assertEquals(1, this.timer.count());
-        final Id counterId = registry.createId("genie.jobs.submit.exception")
-            .withTag(MetricsConstants.TagKeys.EXCEPTION_CLASS, exception.getClass().getCanonicalName());
-        Assert.assertEquals(1, registry.counter(counterId).count());
+        Mockito
+            .verify(this.timer, Mockito.times(1))
+            .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+        Mockito
+            .verify(this.timerId, Mockito.times(1))
+            .withTags(tagsCaptor.capture());
+        Assert.assertEquals(
+            MetricsUtils.newFailureTagsMapForException(new GenieServerException("test")),
+            tagsCaptor.getValue()
+        );
+    }
+
+    /**
+     * When a runtime exception is thrown the it gets propagated.
+     *
+     * @throws GenieException on error
+     */
+    @Test(expected = RuntimeException.class)
+    public void runtimeException() throws GenieException {
+        final RuntimeException exception = new RuntimeException("test");
+        Mockito.doThrow(exception).when(this.jobSubmitterService)
+            .submitJob(this.jobRequest, this.cluster, this.command, this.applications, this.memory);
+        try {
+            this.jobLauncher.run();
+        } finally {
+            Mockito
+                .verify(this.timer, Mockito.times(1))
+                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+            Mockito
+                .verify(this.timerId, Mockito.times(1))
+                .withTags(tagsCaptor.capture());
+            Assert.assertEquals(
+                MetricsUtils.newFailureTagsMapForException(new RuntimeException("test")),
+                tagsCaptor.getValue()
+            );
+        }
     }
 }

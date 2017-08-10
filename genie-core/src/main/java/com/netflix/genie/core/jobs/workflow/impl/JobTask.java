@@ -24,8 +24,9 @@ import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
 import com.netflix.genie.core.services.AttachmentService;
 import com.netflix.genie.core.services.impl.GenieFileTransferService;
+import com.netflix.genie.core.util.MetricsUtils;
+import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Registry;
-import com.netflix.spectator.api.Timer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -47,7 +48,7 @@ import java.util.concurrent.TimeUnit;
 public class JobTask extends GenieBaseTask {
 
     private final AttachmentService attachmentService;
-    private final Timer timer;
+    private final Id timerId;
     private final GenieFileTransferService fts;
 
     /**
@@ -66,8 +67,9 @@ public class JobTask extends GenieBaseTask {
         @NotNull
         final GenieFileTransferService fts
     ) throws GenieException {
+        super(registry);
         this.attachmentService = attachmentService;
-        this.timer = registry.timer("genie.jobs.tasks.jobTask.timer");
+        this.timerId = registry.createId("genie.jobs.tasks.jobTask.timer");
         this.fts = fts;
     }
 
@@ -77,6 +79,7 @@ public class JobTask extends GenieBaseTask {
     @Override
     public void executeTask(@NotNull final Map<String, Object> context) throws GenieException, IOException {
         final long start = System.nanoTime();
+        final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
         try {
             final JobExecutionEnvironment jobExecEnv
                 = (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
@@ -185,10 +188,15 @@ public class JobTask extends GenieBaseTask {
             // Print the timestamp once its done running.
             writer.write("echo End: `date '+%Y-%m-%d %H:%M:%S'`\n");
 
-            log.info("Finished Job Task for job {}", jobExecEnv.getJobRequest().getId());
+            log.info("Finished Job Task for job {}", jobId);
+        } catch (Throwable t) {
+            MetricsUtils.addFailureTagsWithException(tags, t);
+            throw t;
         } finally {
             final long finish = System.nanoTime();
-            this.timer.record(finish - start, TimeUnit.NANOSECONDS);
+            this.getRegistry().timer(
+                timerId.withTags(tags)
+            ).record(finish - start, TimeUnit.NANOSECONDS);
         }
     }
 }
