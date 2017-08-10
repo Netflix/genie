@@ -82,7 +82,14 @@ configure(javaProjects) {
                 entry "retrofit"
                 entry "converter-jackson"
             }
-            dependency("com.netflix.spectator:spectator-api:0.55.0")
+            dependencySet(group: "com.netflix.servo", version: "0.12.17") {
+                entry "servo-core"
+                entry "servo-internal"
+            }
+            dependencySet(group: "com.netflix.spectator", version: "0.56.0") {
+                entry "spectator-api"
+                entry "spectator-reg-servo"
+            }
             dependencySet(group: "io.springfox", version: "2.7.0") {
                 entry "springfox-swagger2"
                 entry "springfox-swagger-ui"
