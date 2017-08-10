@@ -15,6 +15,7 @@ com.netflix.genie.core.jobs
 com.netflix.genie.core.jobs.workflow
 com.netflix.genie.core.jobs.workflow.impl
 com.netflix.genie.core.jpa.entities
+com.netflix.genie.core.jpa.entities.projections
 com.netflix.genie.core.jpa.repositories
 com.netflix.genie.core.jpa.services
 com.netflix.genie.core.jpa.specifications

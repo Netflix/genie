@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 3.1.0-SNAPSHOT,</span>
-<span id="revdate">2017-08-08</span>
+<span id="revdate">2017-08-10</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -1025,6 +1025,12 @@ no value set will be given Integer.MAX_VALUE - 1 (default).</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The amount of time (in milliseconds) that the system will attempt to run the cluster load balancer script before it
 forces a timeout</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">5000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.databaseCleanup.batchSize</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The number of jobs to delete from the database at a time. Genie will loop until all jobs older than the retention
+time are deleted.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10000</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">management.security.roles</p></td>
@@ -4486,6 +4492,12 @@ lost and failed by the Genie leader</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.databaseCleanup.batchSize</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The number of jobs to delete from the database at a time. Genie will loop until all jobs older than the retention
+time are deleted.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">10000</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.databaseCleanup.expression</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The cron expression for how often to run the database cleanup task</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0 0 0 * * *</p></td>
@@ -4863,7 +4875,7 @@ an embedded database, "none" otherwise.</p></td>
 <div id="footer">
 <div id="footer-text">
 Version 3.1.0-SNAPSHOT<br>
-Last updated 2017-08-08 18:08:18 +00:00
+Last updated 2017-08-10 19:17:15 +00:00
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
