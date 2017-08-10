@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2016 Netflix, Inc.
+ *  Copyright 2017 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,26 +15,20 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.properties;
-
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+package com.netflix.genie.core.jpa.entities.projections;
 
 /**
- * Properties controlling the behavior of the database cleanup leadership task.
+ * A projection just for returning the id field of a given entity.
  *
  * @author tgianos
- * @since 3.0.0
+ * @since 3.1.0
  */
-@ConfigurationProperties(prefix = "genie.tasks.databaseCleanup")
-@Component
-@Getter
-@Setter
-public class DatabaseCleanupProperties {
-    private boolean enabled;
-    private String expression = "0 0 0 * * *";
-    private int retention = 90;
-    private int batchSize = 10_000;
+public interface IdProjection {
+
+    /**
+     * Get the id from the projection.
+     *
+     * @return The id
+     */
+    String getId();
 }

@@ -128,8 +128,9 @@ public interface JobPersistenceService {
     /**
      * This method will delete all jobs whose created time is less than date.
      *
-     * @param date The date before which all jobs should be deleted
+     * @param date      The date before which all jobs should be deleted
+     * @param batchSize The maximum number of jobs that should be deleted per iteration
      * @return the number of deleted jobs
      */
-    long deleteAllJobsCreatedBeforeDate(@NotNull final Date date);
+    long deleteAllJobsCreatedBeforeDate(@NotNull final Date date, @Min(1) final int batchSize);
 }
