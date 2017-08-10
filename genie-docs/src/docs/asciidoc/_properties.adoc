@@ -290,6 +290,11 @@ lost and failed by the Genie leader
 |Whether or not to delete old job records from the database
 |true
 
+|genie.tasks.databaseCleanup.batchSize
+|The number of jobs to delete from the database at a time. Genie will loop until all jobs older than the retention
+time are deleted.
+|10000
+
 |genie.tasks.databaseCleanup.expression
 |The cron expression for how often to run the database cleanup task
 |0 0 0 * * *

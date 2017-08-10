@@ -16,10 +16,11 @@
 package com.netflix.genie.core.jpa.repositories;
 
 import com.netflix.genie.core.jpa.entities.JobRequestEntity;
+import com.netflix.genie.core.jpa.entities.projections.IdProjection;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
@@ -34,13 +35,13 @@ import java.util.List;
 public interface JpaJobRequestRepository extends JpaRepository<JobRequestEntity, String>, JpaSpecificationExecutor {
 
     /**
-     * Returns all job requests created before the given date.
+     * Returns the slice of ids for job requests created before the given date.
      *
-     * @param date The date before which all job requests were created.
-     * @return List of job requests
+     * @param date     The date before which the job requests were created
+     * @param pageable The page of data to get
+     * @return List of job request ids
      */
-    @Query("SELECT e.id FROM JobRequestEntity e WHERE e.created < :date")
-    List<String> findByCreatedBefore(@NotNull @Param("date") final Date date);
+    Slice<IdProjection> findByCreatedBefore(@NotNull final Date date, @NotNull Pageable pageable);
 
     /**
      * Deletes all job requests for the given ids.

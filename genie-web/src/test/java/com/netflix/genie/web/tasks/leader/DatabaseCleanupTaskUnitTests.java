@@ -23,6 +23,7 @@ import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.properties.DatabaseCleanupProperties;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import com.netflix.spectator.api.Registry;
+import com.netflix.spectator.api.Timer;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -34,6 +35,7 @@ import org.springframework.scheduling.support.CronTrigger;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -49,6 +51,7 @@ public class DatabaseCleanupTaskUnitTests {
     private JobPersistenceService jobPersistenceService;
     private DatabaseCleanupTask task;
     private AtomicLong numDeletedJobs;
+    private Timer deletionTimer;
 
     /**
      * Setup for the tests.
@@ -58,6 +61,7 @@ public class DatabaseCleanupTaskUnitTests {
         this.cleanupProperties = Mockito.mock(DatabaseCleanupProperties.class);
         this.jobPersistenceService = Mockito.mock(JobPersistenceService.class);
         this.numDeletedJobs = new AtomicLong();
+        this.deletionTimer = Mockito.mock(Timer.class);
         final Registry registry = Mockito.mock(Registry.class);
         Mockito
             .when(
@@ -66,6 +70,7 @@ public class DatabaseCleanupTaskUnitTests {
                     Mockito.any(AtomicLong.class)
                 )
             ).thenReturn(this.numDeletedJobs);
+        Mockito.when(registry.timer("genie.tasks.databaseCleanup.duration.timer")).thenReturn(this.deletionTimer);
         this.task = new DatabaseCleanupTask(this.cleanupProperties, this.jobPersistenceService, registry);
     }
 
@@ -93,14 +98,16 @@ public class DatabaseCleanupTaskUnitTests {
     public void canRun() {
         final int days = 5;
         final int negativeDays = -1 * days;
+        final int batchSize = 10;
 
         Mockito.when(this.cleanupProperties.getRetention()).thenReturn(days).thenReturn(negativeDays);
+        Mockito.when(this.cleanupProperties.getBatchSize()).thenReturn(batchSize);
         final ArgumentCaptor<Date> argument = ArgumentCaptor.forClass(Date.class);
 
         final long deletedCount1 = 6L;
         final long deletedCount2 = 18L;
         Mockito
-            .when(this.jobPersistenceService.deleteAllJobsCreatedBeforeDate(Mockito.any(Date.class)))
+            .when(this.jobPersistenceService.deleteAllJobsCreatedBeforeDate(Mockito.any(Date.class), Mockito.anyInt()))
             .thenReturn(deletedCount1)
             .thenReturn(deletedCount2);
 
@@ -112,10 +119,14 @@ public class DatabaseCleanupTaskUnitTests {
         final Calendar after = Calendar.getInstance(JobConstants.UTC);
         Assert.assertThat(this.numDeletedJobs.get(), Matchers.is(deletedCount2));
 
+        Mockito
+            .verify(this.deletionTimer, Mockito.times(2))
+            .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+
         if (before.get(Calendar.DAY_OF_YEAR) == after.get(Calendar.DAY_OF_YEAR)) {
             Mockito
                 .verify(this.jobPersistenceService, Mockito.times(2))
-                .deleteAllJobsCreatedBeforeDate(argument.capture());
+                .deleteAllJobsCreatedBeforeDate(argument.capture(), Mockito.eq(batchSize));
             final Calendar date = Calendar.getInstance(JobConstants.UTC);
             date.set(Calendar.HOUR_OF_DAY, 0);
             date.set(Calendar.MINUTE, 0);

@@ -34,6 +34,7 @@ import com.netflix.genie.core.jpa.entities.JobEntity;
 import com.netflix.genie.core.jpa.entities.JobExecutionEntity;
 import com.netflix.genie.core.jpa.entities.JobMetadataEntity;
 import com.netflix.genie.core.jpa.entities.JobRequestEntity;
+import com.netflix.genie.core.jpa.entities.projections.IdProjection;
 import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
@@ -44,6 +45,9 @@ import com.netflix.genie.core.jpa.repositories.JpaJobRequestRepository;
 import com.netflix.genie.core.services.JobPersistenceService;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.NotBlank;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nullable;
@@ -52,6 +56,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * JPA implementation of the job persistence service.
@@ -294,12 +299,86 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
      * {@inheritDoc}
      */
     @Override
-    public long deleteAllJobsCreatedBeforeDate(@NotNull final Date date) {
-        final List<String> ids = this.jobRequestRepo.findByCreatedBefore(date);
-        this.jobExecutionRepo.deleteByIdIn(ids);
-        this.jobMetadataRepository.deleteByIdIn(ids);
-        this.jobRepo.deleteByIdIn(ids);
-        return jobRequestRepo.deleteByIdIn(ids);
+    public long deleteAllJobsCreatedBeforeDate(@NotNull final Date date, @Min(1) final int batchSize) {
+        log.info("Attempting to delete all jobs created before {} ms from epoch", date.getTime());
+        long jobExecutionsDeleted = 0;
+        long jobMetadatasDeleted = 0;
+        long jobsDeleted = 0;
+        long jobRequestsDeleted = 0;
+        // Grab the first 10,000 jobs
+        final Pageable page = new PageRequest(0, batchSize);
+        Slice<IdProjection> idProjections;
+        do {
+            idProjections = this.jobRequestRepo.findByCreatedBefore(date, page);
+            if (idProjections.hasContent()) {
+                final List<String> ids = idProjections
+                    .getContent()
+                    .stream()
+                    .map(IdProjection::getId)
+                    .collect(Collectors.toList());
+
+                final long toBeDeleted = ids.size();
+                // Due to optimizations for queries these entity mappings aren't reversed so cascade delete
+                // isn't available and runtime exception thrown if you try to delete from the top.
+
+                log.debug("Attempting to delete {} rows from job_executions...", toBeDeleted);
+                final long deletedExecutions = this.jobExecutionRepo.deleteByIdIn(ids);
+                log.debug("Successfully deleted {} rows from job_executions...", deletedExecutions);
+                if (deletedExecutions != toBeDeleted) {
+                    log.error(
+                        "Deleted {} job execution records but expected to delete {}",
+                        deletedExecutions,
+                        toBeDeleted
+                    );
+                }
+                jobExecutionsDeleted += deletedExecutions;
+
+                log.debug("Attempting to delete {} rows from job_metadata...", toBeDeleted);
+                final long deletedMetadata = this.jobMetadataRepository.deleteByIdIn(ids);
+                log.debug("Successfully deleted {} rows from job_metadata...", deletedMetadata);
+                if (deletedMetadata != toBeDeleted) {
+                    log.error(
+                        "Deleted {} job metadata records but expected to delete {}",
+                        deletedMetadata,
+                        toBeDeleted
+                    );
+                }
+                jobMetadatasDeleted += deletedMetadata;
+
+                log.debug("Attempting to delete {} rows from jobs...", toBeDeleted);
+                final long deletedJobs = this.jobRepo.deleteByIdIn(ids);
+                log.debug("Successfully deleted {} rows from jobs...", deletedJobs);
+                if (deletedMetadata != toBeDeleted) {
+                    log.error(
+                        "Deleted {} job records but expected to delete {}",
+                        deletedJobs,
+                        toBeDeleted
+                    );
+                }
+                jobsDeleted += deletedJobs;
+
+                log.debug("Attempting to delete {} rows from job_requests...", toBeDeleted);
+                final long deletedJobRequests = this.jobRequestRepo.deleteByIdIn(ids);
+                log.debug("Successfully deleted {} rows from job_requests...", deletedJobRequests);
+                if (deletedJobRequests != toBeDeleted) {
+                    log.error(
+                        "Deleted {} job request records but expected to delete {}",
+                        deletedJobRequests,
+                        toBeDeleted
+                    );
+                }
+                jobRequestsDeleted += deletedJobRequests;
+            }
+        } while (idProjections.hasNext());
+
+        log.info(
+            "Finished deleting job records. Deleted {} execution, {} metadata, {} job and {} job request records",
+            jobExecutionsDeleted,
+            jobMetadatasDeleted,
+            jobsDeleted,
+            jobRequestsDeleted
+        );
+        return jobRequestsDeleted;
     }
 
     private void updateJobStatus(final JobEntity jobEntity, final JobStatus jobStatus, final String statusMsg) {

@@ -65,6 +65,11 @@ no value set will be given Integer.MAX_VALUE - 1 (default).
 forces a timeout
 |5000
 
+|genie.tasks.databaseCleanup.batchSize
+|The number of jobs to delete from the database at a time. Genie will loop until all jobs older than the retention
+time are deleted.
+|10000
+
 |management.security.roles
 |The roles a user needs to have in order to access the Actuator endpoints
 |ADMIN

@@ -23,6 +23,7 @@ import com.netflix.genie.web.properties.DatabaseCleanupProperties;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import com.netflix.genie.web.tasks.TaskUtils;
 import com.netflix.spectator.api.Registry;
+import com.netflix.spectator.api.Timer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -35,6 +36,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -53,6 +55,7 @@ public class DatabaseCleanupTask extends LeadershipTask {
     private final JobPersistenceService jobPersistenceService;
 
     private final AtomicLong numDeletedJobs;
+    private final Timer deletionTimer;
 
     /**
      * Constructor.
@@ -71,6 +74,7 @@ public class DatabaseCleanupTask extends LeadershipTask {
         this.jobPersistenceService = jobPersistenceService;
 
         this.numDeletedJobs = registry.gauge("genie.tasks.databaseCleanup.numDeletedJobs.gauge", new AtomicLong());
+        this.deletionTimer = registry.timer("genie.tasks.databaseCleanup.duration.timer");
     }
 
     /**
@@ -94,14 +98,27 @@ public class DatabaseCleanupTask extends LeadershipTask {
      */
     @Override
     public void run() {
-        final Calendar cal = TaskUtils.getMidnightUTC();
-        // Move the date back the number of days retention is set for
-        TaskUtils.subtractDaysFromDate(cal, this.cleanupProperties.getRetention());
-        final Date retentionLimit = cal.getTime();
+        final long start = System.nanoTime();
+        try {
+            final Calendar cal = TaskUtils.getMidnightUTC();
+            // Move the date back the number of days retention is set for
+            TaskUtils.subtractDaysFromDate(cal, this.cleanupProperties.getRetention());
+            final Date retentionLimit = cal.getTime();
+            final String retentionLimitString = this.dateFormat.format(retentionLimit);
+            final int batchSize = this.cleanupProperties.getBatchSize();
 
-        final long numberDeletedJobs = this.jobPersistenceService.deleteAllJobsCreatedBeforeDate(retentionLimit);
-        log.info("Deleted {} jobs from before {}", numberDeletedJobs, this.dateFormat.format(retentionLimit));
-        this.numDeletedJobs.set(numberDeletedJobs);
+            log.info(
+                "Attempting to delete jobs from before {} in batches of {} jobs per iteration",
+                retentionLimitString,
+                batchSize
+            );
+            final long numberDeletedJobs
+                = this.jobPersistenceService.deleteAllJobsCreatedBeforeDate(retentionLimit, batchSize);
+            log.info("Deleted {} jobs from before {}", numberDeletedJobs, retentionLimitString);
+            this.numDeletedJobs.set(numberDeletedJobs);
+        } finally {
+            this.deletionTimer.record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+        }
     }
 
     /**

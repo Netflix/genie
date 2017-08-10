@@ -62,7 +62,7 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
      * Make sure we can delete jobs that were created before a given date.
      */
     @Test
-    public void canDeleteJobsCreatedBeforeDate() {
+    public void canDeleteJobsCreatedBeforeDateWithMinimumBatchSize() {
         Assert.assertThat(this.jobExecutionRepository.count(), Matchers.is(3L));
         Assert.assertThat(this.jobRequestRepository.count(), Matchers.is(3L));
         Assert.assertThat(this.jobRequestMetadataRepository.count(), Matchers.is(3L));
@@ -73,7 +73,35 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
         cal.set(2016, Calendar.JANUARY, 1, 0, 0, 0);
         cal.set(Calendar.MILLISECOND, 0);
 
-        final long deleted = this.jobPersistenceService.deleteAllJobsCreatedBeforeDate(cal.getTime());
+        final long deleted = this.jobPersistenceService.deleteAllJobsCreatedBeforeDate(cal.getTime(), 1);
+
+        Assert.assertThat(deleted, Matchers.is(2L));
+        Assert.assertThat(this.jobExecutionRepository.count(), Matchers.is(1L));
+        Assert.assertThat(this.jobRequestRepository.count(), Matchers.is(1L));
+        Assert.assertThat(this.jobRequestMetadataRepository.count(), Matchers.is(1L));
+        Assert.assertThat(this.jobRepository.count(), Matchers.is(1L));
+        Assert.assertNotNull(this.jobExecutionRepository.getOne(JOB_3_ID));
+        Assert.assertNotNull(this.jobRequestRepository.getOne(JOB_3_ID));
+        Assert.assertNotNull(this.jobRequestMetadataRepository.getOne(JOB_3_ID));
+        Assert.assertNotNull(this.jobRepository.getOne(JOB_3_ID));
+    }
+
+    /**
+     * Make sure we can delete jobs that were created before a given date.
+     */
+    @Test
+    public void canDeleteJobsCreatedBeforeDateWithLargeBatchSize() {
+        Assert.assertThat(this.jobExecutionRepository.count(), Matchers.is(3L));
+        Assert.assertThat(this.jobRequestRepository.count(), Matchers.is(3L));
+        Assert.assertThat(this.jobRequestMetadataRepository.count(), Matchers.is(3L));
+        Assert.assertThat(this.jobRepository.count(), Matchers.is(3L));
+
+        // Try to delete all jobs before Jan 1, 2016
+        final Calendar cal = Calendar.getInstance(JobConstants.UTC);
+        cal.set(2016, Calendar.JANUARY, 1, 0, 0, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+
+        final long deleted = this.jobPersistenceService.deleteAllJobsCreatedBeforeDate(cal.getTime(), 10_000);
 
         Assert.assertThat(deleted, Matchers.is(2L));
         Assert.assertThat(this.jobExecutionRepository.count(), Matchers.is(1L));
