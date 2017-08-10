@@ -387,7 +387,7 @@ ClusterRestController {
         log.debug("Called with id {}", id);
         this.clusterService.removeAllDependenciesForCluster(id);
     }
-    
+
     /**
      * Add new tags to a given cluster.
      *
