@@ -25,7 +25,9 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectResult;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.core.util.MetricsUtils;
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Registry;
 import com.netflix.spectator.api.Timer;
 import org.apache.commons.lang3.StringUtils;
@@ -37,6 +39,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import java.io.File;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -53,11 +56,18 @@ public class S3FileTransferImplUnitTests {
     private static final String S3_KEY = "key";
     private static final String S3_PATH = S3_PREFIX + S3_BUCKET + "/" + S3_KEY;
     private static final String LOCAL_PATH = "local";
+    private static final Map SUCCESS_TAGS = MetricsUtils.newSuccessTagsMap();
+    private static final Map FAILURE_TAGS =
+        MetricsUtils.newFailureTagsMapForException(new GenieServerException("test"));
 
     private S3FileTransferImpl s3FileTransfer;
     private AmazonS3Client s3Client;
+    private Id downloadTimerId;
     private Timer downloadTimer;
+    private Id uploadTimerId;
     private Timer uploadTimer;
+    private Registry registry;
+    private ArgumentCaptor<Map> tagsCaptor;
 
     /**
      * Setup the tests.
@@ -66,13 +76,20 @@ public class S3FileTransferImplUnitTests {
      */
     @Before
     public void setup() throws GenieException {
-        final Registry registry = Mockito.mock(Registry.class);
+        this.registry = Mockito.mock(Registry.class);
         this.downloadTimer = Mockito.mock(Timer.class);
-        Mockito.when(registry.timer("genie.files.s3.download.timer")).thenReturn(this.downloadTimer);
+        this.downloadTimerId = Mockito.mock(Id.class);
         this.uploadTimer = Mockito.mock(Timer.class);
-        Mockito.when(registry.timer("genie.files.s3.upload.timer")).thenReturn(this.uploadTimer);
+        this.uploadTimerId = Mockito.mock(Id.class);
+        Mockito.when(registry.createId("genie.files.s3.download.timer")).thenReturn(this.downloadTimerId);
+        Mockito.when(downloadTimerId.withTags(Mockito.anyMap())).thenReturn(downloadTimerId);
+        Mockito.when(registry.timer(Mockito.eq(downloadTimerId))).thenReturn(downloadTimer);
+        Mockito.when(registry.createId("genie.files.s3.upload.timer")).thenReturn(this.uploadTimerId);
+        Mockito.when(uploadTimerId.withTags(Mockito.anyMap())).thenReturn(uploadTimerId);
+        Mockito.when(registry.timer(Mockito.eq(uploadTimerId))).thenReturn(uploadTimer);
         this.s3Client = Mockito.mock(AmazonS3Client.class);
         this.s3FileTransfer = new S3FileTransferImpl(this.s3Client, registry);
+        this.tagsCaptor = ArgumentCaptor.forClass(Map.class);
     }
 
     /**
@@ -230,6 +247,10 @@ public class S3FileTransferImplUnitTests {
             Mockito
                 .verify(this.downloadTimer, Mockito.times(1))
                 .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+            Mockito
+                .verify(this.downloadTimerId, Mockito.times(1))
+                .withTags(tagsCaptor.capture());
+            Assert.assertEquals(FAILURE_TAGS, tagsCaptor.getValue());
         }
     }
 
@@ -253,6 +274,11 @@ public class S3FileTransferImplUnitTests {
         Mockito
             .verify(this.downloadTimer, Mockito.times(1))
             .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+        Mockito
+            .verify(this.downloadTimerId, Mockito.times(1))
+            .withTags(tagsCaptor.capture());
+        Assert.assertEquals(SUCCESS_TAGS, tagsCaptor.getValue());
+
     }
 
     /**
@@ -275,6 +301,10 @@ public class S3FileTransferImplUnitTests {
             Mockito
                 .verify(this.downloadTimer, Mockito.times(1))
                 .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+            Mockito
+                .verify(this.downloadTimerId, Mockito.times(1))
+                .withTags(tagsCaptor.capture());
+            Assert.assertEquals(FAILURE_TAGS, tagsCaptor.getValue());
         }
     }
 
@@ -292,6 +322,10 @@ public class S3FileTransferImplUnitTests {
             Mockito
                 .verify(this.uploadTimer, Mockito.times(1))
                 .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+            Mockito
+                .verify(this.uploadTimerId, Mockito.times(1))
+                .withTags(tagsCaptor.capture());
+            Assert.assertEquals(FAILURE_TAGS, tagsCaptor.getValue());
         }
     }
 
@@ -318,6 +352,10 @@ public class S3FileTransferImplUnitTests {
         Mockito
             .verify(this.uploadTimer, Mockito.times(1))
             .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+        Mockito
+            .verify(this.uploadTimerId, Mockito.times(1))
+            .withTags(tagsCaptor.capture());
+        Assert.assertEquals(SUCCESS_TAGS, tagsCaptor.getValue());
     }
 
     /**
@@ -344,6 +382,10 @@ public class S3FileTransferImplUnitTests {
             Mockito
                 .verify(this.uploadTimer, Mockito.times(1))
                 .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
+            Mockito
+                .verify(this.uploadTimerId, Mockito.times(1))
+                .withTags(tagsCaptor.capture());
+            Assert.assertEquals(FAILURE_TAGS, tagsCaptor.getValue());
         }
     }
 }

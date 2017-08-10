@@ -19,11 +19,12 @@ package com.netflix.genie.web.tasks.leader;
 
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.services.JobPersistenceService;
+import com.netflix.genie.core.util.MetricsUtils;
 import com.netflix.genie.web.properties.DatabaseCleanupProperties;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import com.netflix.genie.web.tasks.TaskUtils;
+import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Registry;
-import com.netflix.spectator.api.Timer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -36,6 +37,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -54,8 +56,9 @@ public class DatabaseCleanupTask extends LeadershipTask {
     private final DatabaseCleanupProperties cleanupProperties;
     private final JobPersistenceService jobPersistenceService;
 
+    private final Registry registry;
     private final AtomicLong numDeletedJobs;
-    private final Timer deletionTimer;
+    private final Id deletionTimerId;
 
     /**
      * Constructor.
@@ -70,11 +73,12 @@ public class DatabaseCleanupTask extends LeadershipTask {
         @NotNull final JobPersistenceService jobPersistenceService,
         @NotNull final Registry registry
     ) {
+        this.registry = registry;
         this.cleanupProperties = cleanupProperties;
         this.jobPersistenceService = jobPersistenceService;
 
         this.numDeletedJobs = registry.gauge("genie.tasks.databaseCleanup.numDeletedJobs.gauge", new AtomicLong());
-        this.deletionTimer = registry.timer("genie.tasks.databaseCleanup.duration.timer");
+        this.deletionTimerId = registry.createId("genie.tasks.databaseCleanup.duration.timer");
     }
 
     /**
@@ -99,6 +103,7 @@ public class DatabaseCleanupTask extends LeadershipTask {
     @Override
     public void run() {
         final long start = System.nanoTime();
+        final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
         try {
             final Calendar cal = TaskUtils.getMidnightUTC();
             // Move the date back the number of days retention is set for
@@ -116,8 +121,14 @@ public class DatabaseCleanupTask extends LeadershipTask {
                 = this.jobPersistenceService.deleteAllJobsCreatedBeforeDate(retentionLimit, batchSize);
             log.info("Deleted {} jobs from before {}", numberDeletedJobs, retentionLimitString);
             this.numDeletedJobs.set(numberDeletedJobs);
+        } catch (Throwable t) {
+            MetricsUtils.addFailureTagsWithException(tags, t);
+            throw t;
         } finally {
-            this.deletionTimer.record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+            final long finish = System.nanoTime();
+            this.registry.timer(
+                deletionTimerId.withTags(tags)
+            ).record(finish - start, TimeUnit.NANOSECONDS);
         }
     }
 

@@ -82,7 +82,7 @@ public class InitialSetupTaskUnitTest {
             JobConstants.CLUSTER_PATH_VAR,
         };
 
-        for (String subDirectoryName : subDirectoryNames) {
+        for (final String subDirectoryName : subDirectoryNames) {
             final File genieSubDirectory = new File(genieDirectory, subDirectoryName);
             Assert.assertTrue(genieSubDirectory.exists());
             Assert.assertTrue(genieSubDirectory.isDirectory());
@@ -93,7 +93,7 @@ public class InitialSetupTaskUnitTest {
             JobConstants.STDERR_LOG_FILE_NAME,
         };
 
-        for (String emptyFileName : emptyFileNames) {
+        for (final String emptyFileName : emptyFileNames) {
             final File emptyFile = new File(this.tempDir.getRoot(), emptyFileName);
             Assert.assertTrue(emptyFile.exists());
             Assert.assertTrue(emptyFile.isFile());

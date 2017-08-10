@@ -26,14 +26,16 @@ import com.google.common.annotations.VisibleForTesting;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.services.FileTransfer;
+import com.netflix.genie.core.util.MetricsUtils;
+import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Registry;
-import com.netflix.spectator.api.Timer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
 import java.io.File;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
@@ -49,10 +51,11 @@ public class S3FileTransferImpl implements FileTransfer {
     private final Pattern s3PrefixPattern = Pattern.compile("^s3[n]?://.*$");
     private final Pattern s3BucketPattern = Pattern.compile("^[a-z0-9][a-z0-9.\\-]{1,61}[a-z0-9]$");
     private final Pattern s3KeyPattern = Pattern.compile("^[0-9a-zA-Z!\\-_.*'()]+(?:/[0-9a-zA-Z!\\-_.*'()]+)*$");
-    private AmazonS3 s3Client;
-    private Timer downloadTimer;
-    private Timer uploadTimer;
-    private Timer getTimer;
+    private final Registry registry;
+    private final AmazonS3 s3Client;
+    private final Id downloadTimerId;
+    private final Id uploadTimerId;
+    private final Id getTimerId;
 
     /**
      * Constructor.
@@ -62,9 +65,10 @@ public class S3FileTransferImpl implements FileTransfer {
      */
     public S3FileTransferImpl(@NotNull final AmazonS3 amazonS3Client, @NotNull final Registry registry) {
         this.s3Client = amazonS3Client;
-        this.downloadTimer = registry.timer("genie.files.s3.download.timer");
-        this.uploadTimer = registry.timer("genie.files.s3.upload.timer");
-        this.getTimer = registry.timer("genie.files.s3.getObjectMetadata.timer");
+        this.registry = registry;
+        this.downloadTimerId = registry.createId("genie.files.s3.download.timer");
+        this.uploadTimerId = registry.createId("genie.files.s3.upload.timer");
+        this.getTimerId = registry.createId("genie.files.s3.getObjectMetadata.timer");
     }
 
     /**
@@ -93,6 +97,7 @@ public class S3FileTransferImpl implements FileTransfer {
         final String dstLocalPath
     ) throws GenieException {
         final long start = System.nanoTime();
+        final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
         try {
             log.debug("Called with src path {} and destination path {}", srcRemotePath, dstLocalPath);
 
@@ -106,8 +111,13 @@ public class S3FileTransferImpl implements FileTransfer {
                 log.error("Error fetching file {} from s3 due to exception {}", srcRemotePath, ase);
                 throw new GenieServerException("Error downloading file from s3. Filename: " + srcRemotePath);
             }
+        } catch (Throwable t) {
+            MetricsUtils.addFailureTagsWithException(tags, t);
+            throw t;
         } finally {
-            this.downloadTimer.record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+            this.registry.timer(
+                downloadTimerId.withTags(tags)
+            ).record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
     }
 
@@ -122,6 +132,7 @@ public class S3FileTransferImpl implements FileTransfer {
         final String dstRemotePath
     ) throws GenieException {
         final long start = System.nanoTime();
+        final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
         try {
             log.debug("Called with src path {} and destination path {}", srcLocalPath, dstRemotePath);
 
@@ -132,8 +143,14 @@ public class S3FileTransferImpl implements FileTransfer {
                 log.error("Error posting file {} to s3 due to exception {}", dstRemotePath, ase);
                 throw new GenieServerException("Error uploading file to s3. Filename: " + dstRemotePath);
             }
+        } catch (Throwable t) {
+            MetricsUtils.addFailureTagsWithException(tags, t);
+            throw t;
         } finally {
-            this.uploadTimer.record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+            this.registry.timer(
+                uploadTimerId.withTags(tags)
+            ).record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+
         }
     }
 
@@ -143,19 +160,27 @@ public class S3FileTransferImpl implements FileTransfer {
     @Override
     public long getLastModifiedTime(final String path) throws GenieException {
         final long start = System.nanoTime();
+        final long lastModTime;
+        final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
         try {
             final AmazonS3URI s3Uri = getS3Uri(path);
             try {
                 final ObjectMetadata o = s3Client.getObjectMetadata(s3Uri.getBucket(), s3Uri.getKey());
-                return o.getLastModified().getTime();
+                lastModTime = o.getLastModified().getTime();
             } catch (final Exception ase) {
                 final String message = String.format("Failed getting the metadata of the s3 file %s", path);
                 log.error(message);
                 throw new GenieServerException(message, ase);
             }
+        } catch (Throwable t) {
+            MetricsUtils.addFailureTagsWithException(tags, t);
+            throw t;
         } finally {
-            this.getTimer.record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+            this.registry.timer(
+                getTimerId.withTags(tags)
+            ).record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
+        return lastModTime;
     }
 
     @VisibleForTesting

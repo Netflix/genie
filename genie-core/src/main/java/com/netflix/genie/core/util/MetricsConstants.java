@@ -26,6 +26,12 @@ package com.netflix.genie.core.util;
 public final class MetricsConstants {
 
     /**
+     * Utility class private constructor.
+     */
+    private MetricsConstants() {
+    }
+
+    /**
      * Inner class for constants used as key to tag metrics.
      */
     public static final class TagKeys {
@@ -83,8 +89,23 @@ public final class MetricsConstants {
     }
 
     /**
-     * Utility class private constructor.
+     * Constants used as metrics tags values by various classes.
      */
-    private MetricsConstants() {
+    public static final class TagValues {
+        /**
+         * Tag value to denote success (used with TagKeys.STATUS).
+         */
+        public static final String SUCCESS = "success";
+
+        /**
+         * Tag value to denote failure (used with TagKeys.STATUS).
+         */
+        public static final String FAILURE = "failure";
+
+        /**
+         * Utility class private constructor.
+         */
+        private TagValues() {
+        }
     }
 }

@@ -21,8 +21,9 @@ import com.google.common.collect.Lists;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.services.FileTransfer;
+import com.netflix.genie.core.util.MetricsUtils;
+import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Registry;
-import com.netflix.spectator.api.Timer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.validator.routines.UrlValidator;
@@ -40,6 +41,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.Instant;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -54,9 +56,10 @@ public class HttpFileTransferImpl implements FileTransfer {
     private final UrlValidator validator
         = new UrlValidator(new String[]{"http", "https"}, UrlValidator.ALLOW_LOCAL_URLS);
     private final RestTemplate restTemplate;
-    private final Timer downloadTimer;
-    private final Timer uploadTimer;
-    private final Timer getLastModifiedTimer;
+    private final Registry registry;
+    private final Id downloadTimerId;
+    private final Id uploadTimerId;
+    private final Id getLastModifiedTimerId;
 
     /**
      * Constructor.
@@ -66,9 +69,10 @@ public class HttpFileTransferImpl implements FileTransfer {
      */
     public HttpFileTransferImpl(@NotNull final RestTemplate restTemplate, @NotNull final Registry registry) {
         this.restTemplate = restTemplate;
-        this.downloadTimer = registry.timer("genie.files.http.download.timer");
-        this.uploadTimer = registry.timer("genie.files.http.upload.timer");
-        this.getLastModifiedTimer = registry.timer("genie.files.http.getLastModified.timer");
+        this.registry = registry;
+        this.downloadTimerId = registry.createId("genie.files.http.download.timer");
+        this.uploadTimerId = registry.createId("genie.files.http.upload.timer");
+        this.getLastModifiedTimerId = registry.createId("genie.files.http.getLastModified.timer");
     }
 
     /**
@@ -91,6 +95,7 @@ public class HttpFileTransferImpl implements FileTransfer {
         final String dstLocalPath
     ) throws GenieException {
         final long start = System.nanoTime();
+        final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
         log.debug("Called with src path {} and destination path {}", srcRemotePath, dstLocalPath);
 
         try {
@@ -113,8 +118,13 @@ public class HttpFileTransferImpl implements FileTransfer {
                     }
                 }
             );
+        } catch (GenieException | RuntimeException e) {
+            MetricsUtils.addFailureTagsWithException(tags, e);
+            throw e;
         } finally {
-            this.downloadTimer.record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+            this.registry.timer(
+                downloadTimerId.withTags(tags)
+            ).record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
     }
 
@@ -129,12 +139,18 @@ public class HttpFileTransferImpl implements FileTransfer {
         final String dstRemotePath
     ) throws GenieException {
         final long start = System.nanoTime();
+        final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
         try {
             throw new UnsupportedOperationException(
                 "Saving a file to an HttpEndpoint isn't implemented in this version"
             );
+        } catch (Throwable t) {
+            MetricsUtils.addFailureTagsWithException(tags, t);
+            throw t;
         } finally {
-            this.uploadTimer.record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+            this.registry.timer(
+                uploadTimerId.withTags(tags)
+            ).record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
     }
 
@@ -144,16 +160,25 @@ public class HttpFileTransferImpl implements FileTransfer {
     @Override
     public long getLastModifiedTime(final String path) throws GenieException {
         final long start = System.nanoTime();
+        final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
+        final long lastModtime;
         try {
             final URL url = new URL(path);
             final long time = this.restTemplate.headForHeaders(url.toURI()).getLastModified();
             // Returns now if there was no last modified header as best we can do is assume file is brand new
-            return time != -1 ? time : Instant.now().toEpochMilli();
+            lastModtime = time != -1 ? time : Instant.now().toEpochMilli();
         } catch (final MalformedURLException | URISyntaxException e) {
             log.error(e.getLocalizedMessage(), e);
+            MetricsUtils.addFailureTagsWithException(tags, e);
             throw new GenieServerException(e);
+        } catch (Throwable t) {
+            MetricsUtils.addFailureTagsWithException(tags, t);
+            throw t;
         } finally {
-            this.getLastModifiedTimer.record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+            this.registry.timer(
+                getLastModifiedTimerId.withTags(tags)
+            ).record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
+        return lastModtime;
     }
 }

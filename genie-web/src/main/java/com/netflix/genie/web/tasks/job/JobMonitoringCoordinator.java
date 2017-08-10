@@ -175,7 +175,7 @@ public class JobMonitoringCoordinator extends JobStateServiceImpl {
                     setMemoryAndTask(id, jobExecution.getMemory().orElse(0), scheduleMonitor(jobExecution));
                     log.info("Re-attached a job monitor to job {}", id);
                 } catch (final GenieException ge) {
-                    log.error("Unable to re-attach to job {}.", id);
+                    log.error("Unable to re-attach to job {}.", id, ge);
                     this.eventMulticaster.multicastEvent(
                         new JobFinishedEvent(
                             id, JobFinishedReason.SYSTEM_CRASH, JobStatusMessages.UNABLE_TO_RE_ATTACH_ON_STARTUP, this

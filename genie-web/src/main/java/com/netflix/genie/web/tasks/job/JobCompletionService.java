@@ -19,7 +19,7 @@ package com.netflix.genie.web.tasks.job;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
-import com.google.common.collect.Maps;
+import com.google.common.collect.ImmutableMap;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
@@ -38,7 +38,8 @@ import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.MailService;
 import com.netflix.genie.core.services.impl.GenieFileTransferService;
-import com.netflix.spectator.api.Counter;
+import com.netflix.genie.core.util.MetricsConstants;
+import com.netflix.genie.core.util.MetricsUtils;
 import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Registry;
 import lombok.extern.slf4j.Slf4j;
@@ -73,9 +74,7 @@ import java.util.stream.Collectors;
 @Service
 public class JobCompletionService {
 
-    private static final String JOB_STATUS_TAG = "jobStatus";
-    private static final String ERROR_TAG = "error";
-
+    private static final String ERROR_SOURCE_TAG = "error";
     private final JobPersistenceService jobPersistenceService;
     private final JobSearchService jobSearchService;
     private final GenieFileTransferService genieFileTransferService;
@@ -88,15 +87,8 @@ public class JobCompletionService {
 
     // Metrics
     private final Registry registry;
-    private final Id jobCompletionId;
-    private final Counter emailSuccessRate;
-    private final Counter emailFailureRate;
-    private final Counter archivalFailureRate;
-    private final Counter doneFileProcessingFailureRate;
-    private final Counter finalStatusUpdateFailureRate;
-    private final Counter processGroupCleanupFailureRate;
-    private final Counter archiveFileDeletionFailure;
-    private final Counter deleteDependenciesFailure;
+    private final Id jobCompletionTimerId;
+    private final Id errorCounterId;
     private final RetryTemplate retryTemplate;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -143,15 +135,16 @@ public class JobCompletionService {
 
         // Set up the metrics
         this.registry = registry;
-        this.jobCompletionId = registry.createId("genie.jobs.completion.timer");
-        this.emailSuccessRate = registry.counter("genie.jobs.email.success.rate");
-        this.emailFailureRate = registry.counter("genie.jobs.email.failure.rate");
-        this.archivalFailureRate = registry.counter("genie.jobs.archivalFailure.rate");
-        this.doneFileProcessingFailureRate = registry.counter("genie.jobs.doneFileProcessingFailure.rate");
-        this.finalStatusUpdateFailureRate = registry.counter("genie.jobs.finalStatusUpdateFailure.rate");
-        this.processGroupCleanupFailureRate = registry.counter("genie.jobs.processGroupCleanupFailure.rate");
-        this.archiveFileDeletionFailure = registry.counter("genie.jobs.archiveFileDeletionFailure.rate");
-        this.deleteDependenciesFailure = registry.counter("genie.jobs.deleteDependenciesFailure.rate");
+        this.jobCompletionTimerId = registry.createId("genie.jobs.completion.timer");
+        this.errorCounterId = registry.createId("genie.jobs.errors.count");
+//        this.emailSuccessRate = registry.counter("genie.jobs.email.success.rate");
+//        this.emailFailureRate = registry.counter("genie.jobs.email.failure.rate");
+//        this.archivalFailureRate = registry.counter("genie.jobs.archivalFailure.rate");
+//        this.doneFileProcessingFailureRate = registry.counter("genie.jobs.doneFileProcessingFailure.rate");
+//        this.finalStatusUpdateFailureRate = registry.counter("genie.jobs.finalStatusUpdateFailure.rate");
+//        this.processGroupCleanupFailureRate = registry.counter("genie.jobs.processGroupCleanupFailure.rate");
+//        this.archiveFileDeletionFailure = registry.counter("genie.jobs.archiveFileDeletionFailure.rate");
+//        this.deleteDependenciesFailure = registry.counter("genie.jobs.deleteDependenciesFailure.rate");
         // Retry template
         this.retryTemplate = retryTemplate;
     }
@@ -165,7 +158,7 @@ public class JobCompletionService {
     void handleJobCompletion(final JobFinishedEvent event) throws GenieException {
         final long start = System.nanoTime();
         final String jobId = event.getId();
-        final Map<String, String> tags = Maps.newHashMap();
+        final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
 
         try {
             final Job job = retryTemplate.execute(context -> getJob(jobId));
@@ -175,34 +168,31 @@ public class JobCompletionService {
             // Make sure the job isn't already done before doing something
             if (status.isActive()) {
                 try {
-                    this.retryTemplate.execute(context -> updateJob(job, event, tags));
+                    this.retryTemplate.execute(context -> updateJob(job, event));
                 } catch (Exception e) {
                     log.error("Failed updating for job: {}", jobId, e);
-                    tags.put(ERROR_TAG, "JOB_UPDATE_FAILURE");
-                    this.finalStatusUpdateFailureRate.increment();
                 }
                 // Things that should be done either way
                 try {
                     this.retryTemplate.execute(context -> processJobDir(job));
                 } catch (Exception e) {
                     log.error("Failed archiving directory for job: {}", jobId, e);
-                    tags.put(ERROR_TAG, "JOB_DIRECTORY_FAILURE");
-                    this.archivalFailureRate.increment();
+                    incrementErrorCounter("JOB_DIRECTORY_FAILURE", e);
                 }
                 try {
                     this.retryTemplate.execute(context -> sendEmail(jobId));
                 } catch (Exception e) {
                     log.error("Failed sending email for job: {}", jobId, e);
-                    tags.put(ERROR_TAG, "SEND_EMAIL_FAILURE");
-                    this.emailFailureRate.increment();
+                    incrementErrorCounter("JOB_UPDATE_FAILURE", e);
                 }
             }
         } catch (Exception e) {
             log.error("Failed getting job with id: {}", jobId, e);
-            tags.put(ERROR_TAG, "GET_JOB_FAILURE");
+            MetricsUtils.addFailureTagsWithException(tags, e);
         } finally {
-            final Id timerId = this.jobCompletionId.withTags(tags);
-            this.registry.timer(timerId).record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+            this.registry.timer(
+                this.jobCompletionTimerId.withTags(tags)
+            ).record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
     }
 
@@ -210,53 +200,55 @@ public class JobCompletionService {
         return this.jobSearchService.getJob(jobId);
     }
 
-    private Void updateJob(final Job job, final JobFinishedEvent event, final Map<String, String> tags)
+    private Void updateJob(final Job job, final JobFinishedEvent event)
         throws GenieException {
-        final String jobId = event.getId();
-        final JobStatus status = job.getStatus();
-        // Now we know this job should be marked in one of the finished states
-        JobStatus eventStatus = null;
-        if (status == JobStatus.INIT) {
-            switch (event.getReason()) {
-                case KILLED:
-                    eventStatus = JobStatus.KILLED;
-                    break;
-                case INVALID:
-                    eventStatus = JobStatus.INVALID;
-                    break;
-                case FAILED_TO_INIT:
-                    eventStatus = JobStatus.FAILED;
-                    break;
-                case PROCESS_COMPLETED:
-                    eventStatus = JobStatus.SUCCEEDED;
-                    break;
-                case SYSTEM_CRASH:
-                    eventStatus = JobStatus.FAILED;
-                    break;
-                default:
-                    eventStatus = JobStatus.INVALID;
-                    log.warn("Unknown event status for job: {}", jobId);
-            }
-        } else {
-            if (event.getReason() != JobFinishedReason.SYSTEM_CRASH) {
-                try {
-                    final String finalStatus =
-                        this.retryTemplate.execute(context -> updateFinalStatusForJob(jobId).toString());
-                    tags.put(JOB_STATUS_TAG, finalStatus);
-                    cleanupProcesses(jobId);
-                } catch (Exception e) {
-                    tags.put(ERROR_TAG, "JOB_UPDATE_FINAL_STATUS_FAILURE");
-                    log.error("Failed updating the exit code and status for job: {}", jobId, e);
-                    this.finalStatusUpdateFailureRate.increment();
+        try {
+
+            final String jobId = event.getId();
+            final JobStatus status = job.getStatus();
+            // Now we know this job should be marked in one of the finished states
+            JobStatus eventStatus = null;
+            if (status == JobStatus.INIT) {
+                switch (event.getReason()) {
+                    case KILLED:
+                        eventStatus = JobStatus.KILLED;
+                        break;
+                    case INVALID:
+                        eventStatus = JobStatus.INVALID;
+                        break;
+                    case FAILED_TO_INIT:
+                        eventStatus = JobStatus.FAILED;
+                        break;
+                    case PROCESS_COMPLETED:
+                        eventStatus = JobStatus.SUCCEEDED;
+                        break;
+                    case SYSTEM_CRASH:
+                        eventStatus = JobStatus.FAILED;
+                        break;
+                    default:
+                        eventStatus = JobStatus.INVALID;
+                        log.warn("Unknown event status for job: {}", jobId);
                 }
             } else {
-                eventStatus = JobStatus.FAILED;
+                if (event.getReason() != JobFinishedReason.SYSTEM_CRASH) {
+                    try {
+                        final String finalStatus =
+                            this.retryTemplate.execute(context -> updateFinalStatusForJob(jobId).toString());
+                        cleanupProcesses(jobId);
+                    } catch (Exception e) {
+                        log.error("Failed updating the exit code and status for job: {}", jobId, e);
+                    }
+                } else {
+                    eventStatus = JobStatus.FAILED;
+                }
             }
-        }
 
-        if (eventStatus != null) {
-            this.jobPersistenceService.updateJobStatus(jobId, eventStatus, event.getMessage());
-            tags.put(JOB_STATUS_TAG, eventStatus.toString());
+            if (eventStatus != null) {
+                this.jobPersistenceService.updateJobStatus(jobId, eventStatus, event.getMessage());
+            }
+        } catch (Throwable t) {
+            incrementErrorCounter("JOB_UPDATE_FAILURE", t);
+            throw t;
         }
         return null;
     }
@@ -280,7 +272,7 @@ public class JobCompletionService {
                         // The process group should not exist and the above code should always throw and exception.
                         // If it does not then the bash script is not cleaning up stuff well during kills
                         // or the script is done but child processes are still remaining. This metric tracks all that.
-                        this.processGroupCleanupFailureRate.increment();
+                        incrementErrorCounter("JOB_PROCESS_CLEANUP_NOT_THROWING_FAILURE", new RuntimeException());
                     } catch (final Exception e) {
                         log.debug("Received expected exception. Ignoring.");
                     }
@@ -288,7 +280,10 @@ public class JobCompletionService {
             }
         } catch (final GenieException ge) {
             log.error("Unable to cleanup process for job due to exception. {}", jobId, ge);
-            this.processGroupCleanupFailureRate.increment();
+            incrementErrorCounter("JOB_CLEANUP_FAILURE", ge);
+        } catch (Throwable t) {
+            incrementErrorCounter("JOB_PROCESS_CLEANUP_FAILURE", t);
+            throw t;
         }
     }
 
@@ -366,7 +361,7 @@ public class JobCompletionService {
             }
             return finalStatus;
         } catch (final IOException ioe) {
-            this.doneFileProcessingFailureRate.increment();
+            incrementErrorCounter("JOB_FINAL_UPDATE_FAILURE", ioe);
             // The run.sh should theoretically ALWAYS generate a done file so we should never hit this code.
             // But if we do handle it generate a metric for it which we can track
             log.error("Could not load the done file for job {}. Marking it as failed.", id, ioe);
@@ -376,6 +371,9 @@ public class JobCompletionService {
                 JobStatusMessages.COULD_NOT_LOAD_DONE_FILE
             );
             return JobStatus.FAILED;
+        } catch (Throwable t) {
+            incrementErrorCounter("JOB_FINAL_UPDATE_FAILURE", t);
+            throw t;
         }
     }
 
@@ -415,7 +413,7 @@ public class JobCompletionService {
             } catch (Exception e) {
                 log.error("Could not delete job dependencies after completion for job: {} due to error {}",
                     jobId, e);
-                this.deleteDependenciesFailure.increment();
+                incrementErrorCounter("DELETE_APPLICATION_DEPENDENCIES_FAILURE", e);
             }
         }
     }
@@ -451,22 +449,27 @@ public class JobCompletionService {
             } catch (Exception e) {
                 log.error("Could not delete job dependencies after completion for job: {} due to error {}",
                     jobId, e);
-                this.deleteDependenciesFailure.increment();
+                incrementErrorCounter("DELETE_CLUSTER_DEPENDENCIES_FAILURE", e);
             }
         }
     }
 
     private void deleteDependenciesDirectory(final File dependencyDirectory) throws IOException {
         if (dependencyDirectory.exists()) {
-            if (this.runAsUserEnabled) {
-                final CommandLine deleteCommand = new CommandLine("sudo");
-                deleteCommand.addArgument("rm");
-                deleteCommand.addArgument("-rf");
-                deleteCommand.addArgument(dependencyDirectory.getCanonicalPath());
-                log.debug("Delete command is {}", deleteCommand);
-                this.executor.execute(deleteCommand);
-            } else {
-                FileUtils.deleteDirectory(dependencyDirectory);
+            try {
+                if (this.runAsUserEnabled) {
+                    final CommandLine deleteCommand = new CommandLine("sudo");
+                    deleteCommand.addArgument("rm");
+                    deleteCommand.addArgument("-rf");
+                    deleteCommand.addArgument(dependencyDirectory.getCanonicalPath());
+                    log.debug("Delete command is {}", deleteCommand);
+                    this.executor.execute(deleteCommand);
+                } else {
+                    FileUtils.deleteDirectory(dependencyDirectory);
+                }
+            } catch (Throwable t) {
+                incrementErrorCounter("DELETE_DEPENDENCIES_FAILURE");
+                throw t;
             }
         }
     }
@@ -515,7 +518,12 @@ public class JobCompletionService {
                     this.executor.setWorkingDirectory(jobDir);
 
                     log.debug("Archive command : {}", commandLine);
-                    this.executor.execute(commandLine);
+                    try {
+                        this.executor.execute(commandLine);
+                    } catch (Throwable t) {
+                        incrementErrorCounter("JOB_ARCHIVAL_FAILURE", t);
+                        throw t;
+                    }
 
                     // Upload the tar file to remote location
                     this.genieFileTransferService.putFile(localArchiveFile.getCanonicalPath(), archiveLocation.get());
@@ -536,11 +544,11 @@ public class JobCompletionService {
                                 this.executor.execute(deleteCommand);
                             } else if (!localArchiveFile.delete()) {
                                 log.error("Failed to delete archive file for job: {}", jobId);
-                                this.archiveFileDeletionFailure.increment();
+                                incrementErrorCounter("JOB_ARCHIVE_DELETION_FAILURE");
                             }
                         } catch (final Exception e) {
                             log.error("Failed to delete archive file for job: {}", jobId, e);
-                            this.archiveFileDeletionFailure.increment();
+                            incrementErrorCounter("JOB_ARCHIVE_DELETION_FAILURE", e);
                         }
                     }
                     result = true;
@@ -582,14 +590,35 @@ public class JobCompletionService {
                 .append("Tags: " + jobRequest.getTags() + "\n");
             jobRequest.getDescription().ifPresent(description -> body.append("[" + description + "]"));
 
-            this.mailServiceImpl.sendEmail(
-                email.get(),
-                subject.toString(),
-                body.toString()
-            );
+            try {
+                this.mailServiceImpl.sendEmail(
+                    email.get(),
+                    subject.toString(),
+                    body.toString()
+                );
+            } catch (Throwable t) {
+                incrementErrorCounter("JOB_EMAIL_FAILURE", t);
+                throw t;
+            }
             result = true;
-            this.emailSuccessRate.increment();
         }
         return result;
+    }
+
+    private void incrementErrorCounter(final String errorTagValue, final Throwable throwable) {
+        this.incrementErrorCounter(
+           ImmutableMap.of(
+               ERROR_SOURCE_TAG, errorTagValue,
+               MetricsConstants.TagKeys.EXCEPTION_CLASS, throwable.getClass().getCanonicalName()
+           )
+       );
+    }
+
+    private void incrementErrorCounter(final String errorTagValue) {
+        this.incrementErrorCounter(ImmutableMap.of(ERROR_SOURCE_TAG, errorTagValue));
+    }
+
+    private void incrementErrorCounter(final Map<String, String> tags) {
+        this.registry.counter(this.errorCounterId.withTags(tags)).increment();
     }
 }

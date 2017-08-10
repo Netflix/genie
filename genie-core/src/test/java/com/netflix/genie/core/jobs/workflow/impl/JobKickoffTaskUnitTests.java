@@ -21,7 +21,6 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.spectator.api.Registry;
-import com.netflix.spectator.api.Timer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.Executor;
@@ -56,8 +55,7 @@ public class JobKickoffTaskUnitTests {
     @Before
     public void setUp() {
         final Registry registry = Mockito.mock(Registry.class);
-        final Timer timer = Mockito.mock(Timer.class);
-        Mockito.when(registry.timer("genie.jobs.tasks.jobKickoffTask.timer")).thenReturn(timer);
+
         this.executor = Mockito.mock(Executor.class);
         jobKickoffTask = new JobKickoffTask(
             false,

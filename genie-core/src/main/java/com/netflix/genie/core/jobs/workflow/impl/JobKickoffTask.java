@@ -24,8 +24,9 @@ import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
+import com.netflix.genie.core.util.MetricsUtils;
+import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Registry;
-import com.netflix.spectator.api.Timer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.Executor;
@@ -62,8 +63,7 @@ public class JobKickoffTask extends GenieBaseTask {
     private final boolean isUserCreationEnabled;
     private final Executor executor;
     private final String hostname;
-    private final Timer timer;
-    private final Registry registry;
+    private final Id timerId;
     private final RetryTemplate retryTemplate;
 
     /**
@@ -82,12 +82,12 @@ public class JobKickoffTask extends GenieBaseTask {
         @NotNull final String hostname,
         @NotNull final Registry registry
     ) {
+        super(registry);
         this.isRunAsUserEnabled = runAsUserEnabled;
         this.isUserCreationEnabled = userCreationEnabled;
         this.executor = executor;
         this.hostname = hostname;
-        this.registry = registry;
-        this.timer = registry.timer("genie.jobs.tasks.jobKickoffTask.timer");
+        this.timerId = registry.createId("genie.jobs.tasks.jobKickoffTask.timer");
         retryTemplate = new RetryTemplate();
         retryTemplate.setBackOffPolicy(new ExponentialBackOffPolicy());
     }
@@ -98,6 +98,7 @@ public class JobKickoffTask extends GenieBaseTask {
     @Override
     public void executeTask(@NotNull final Map<String, Object> context) throws GenieException, IOException {
         final long start = System.nanoTime();
+        final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
         try {
             final JobExecutionEnvironment jobExecEnv =
                 (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
@@ -176,9 +177,14 @@ public class JobKickoffTask extends GenieBaseTask {
                 throw new GenieServerException("Unable to start command " + String.valueOf(command), ie);
             }
             log.info("Finished Job Kickoff Task for job {}", jobId);
+        } catch (Throwable t) {
+            MetricsUtils.addFailureTagsWithException(tags, t);
+            throw t;
         } finally {
             final long finish = System.nanoTime();
-            this.timer.record(finish - start, TimeUnit.NANOSECONDS);
+            this.getRegistry().timer(
+                timerId.withTags(tags)
+            ).record(finish - start, TimeUnit.NANOSECONDS);
         }
     }
 
@@ -189,7 +195,6 @@ public class JobKickoffTask extends GenieBaseTask {
                 return true;
             });
         } catch (Exception e) {
-            registry.counter("genie.jobs.tasks.jobKickoffTask.run.failure").increment();
             log.warn("Failed touching the run script file", e);
         }
         return false;
