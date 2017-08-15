@@ -22,6 +22,7 @@ import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.savedrequest.NullRequestCache;
 
 import javax.validation.constraints.NotNull;
 
@@ -82,6 +83,8 @@ public final class SecurityUtils {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.NEVER)
 //            .and()
 //                .requiresChannel().anyRequest().requiresSecure()
+            .and()
+                .requestCache().requestCache(new NullRequestCache())
             .and()
                 .csrf().disable();
         // @formatter:on

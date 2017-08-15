@@ -764,11 +764,11 @@ public class SAMLConfig extends WebSecurityConfigurerAdapter {
         // @formatter:on
     }
 
-    protected void setSamlProperties(final SAMLProperties samlProperties) {
+    void setSamlProperties(final SAMLProperties samlProperties) {
         this.samlProperties = samlProperties;
     }
 
-    protected void setResourceLoader(final ResourceLoader resourceLoader) {
+    void setResourceLoader(final ResourceLoader resourceLoader) {
         this.resourceLoader = resourceLoader;
     }
 }
