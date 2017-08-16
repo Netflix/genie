@@ -39,15 +39,6 @@ public class GenieServerException extends GenieException {
     /**
      * Constructor.
      *
-     * @param cause reason for this exception
-     */
-    public GenieServerException(final Throwable cause) {
-        super(HttpURLConnection.HTTP_INTERNAL_ERROR, cause);
-    }
-
-    /**
-     * Constructor.
-     *
      * @param msg human readable message
      */
     public GenieServerException(final String msg) {

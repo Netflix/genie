@@ -131,7 +131,7 @@ public class LocalFileTransferImpl implements FileTransfer {
             return Paths.get(new URI(finalPath));
         } catch (final IllegalArgumentException | URISyntaxException e) {
             log.error("Unable to convert {} to java.nio.file.Path due to {}", finalPath, e.getMessage(), e);
-            throw new GenieServerException(e);
+            throw new GenieServerException("Failed to get file path", e);
         }
     }
 }

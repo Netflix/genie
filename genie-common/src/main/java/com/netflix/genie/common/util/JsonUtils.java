@@ -52,7 +52,7 @@ public final class JsonUtils {
             final ObjectMapper mapper = new ObjectMapper();
             return mapper.writeValueAsString(value);
         } catch (final JsonProcessingException jpe) {
-            throw new GenieServerException(jpe);
+            throw new GenieServerException("Failed to marshall object", jpe);
         }
     }
 
@@ -77,7 +77,7 @@ public final class JsonUtils {
                 return mapper.readValue("[]", typeReference);
             }
         } catch (final IOException ioe) {
-            throw new GenieServerException(ioe);
+            throw new GenieServerException("Failed to read JSON value", ioe);
         }
     }
 }

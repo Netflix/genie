@@ -39,15 +39,6 @@ public class GenieNotFoundException extends GenieException {
     /**
      * Constructor.
      *
-     * @param cause reason for this exception
-     */
-    public GenieNotFoundException(final Throwable cause) {
-        super(HttpURLConnection.HTTP_NOT_FOUND, cause);
-    }
-
-    /**
-     * Constructor.
-     *
      * @param msg human readable message
      */
     public GenieNotFoundException(final String msg) {

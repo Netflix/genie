@@ -64,17 +64,4 @@ public class GenieNotFoundExceptionUnitTests extends Exception {
         Assert.assertNull(ge.getCause());
         throw ge;
     }
-
-    /**
-     * Test the constructor.
-     *
-     * @throws GenieNotFoundException When not found
-     */
-    @Test(expected = GenieNotFoundException.class)
-    public void testThrowableArgConstructor() throws GenieNotFoundException {
-        final GenieNotFoundException ge = new GenieNotFoundException(IOE);
-        Assert.assertEquals(HttpURLConnection.HTTP_NOT_FOUND, ge.getErrorCode());
-        Assert.assertEquals(IOE, ge.getCause());
-        throw ge;
-    }
 }

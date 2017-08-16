@@ -170,7 +170,7 @@ public class HttpFileTransferImpl implements FileTransfer {
         } catch (final MalformedURLException | URISyntaxException e) {
             log.error(e.getLocalizedMessage(), e);
             MetricsUtils.addFailureTagsWithException(tags, e);
-            throw new GenieServerException(e);
+            throw new GenieServerException("Failed to get metadata for invalid URL", e);
         } catch (Throwable t) {
             MetricsUtils.addFailureTagsWithException(tags, t);
             throw t;

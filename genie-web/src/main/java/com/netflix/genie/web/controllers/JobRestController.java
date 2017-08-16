@@ -318,7 +318,7 @@ public class JobRestController {
                 try {
                     this.attachmentService.save(jobId, attachment.getOriginalFilename(), attachment.getInputStream());
                 } catch (final IOException ioe) {
-                    throw new GenieServerException(ioe);
+                    throw new GenieServerException("Failed to save job attachment", ioe);
                 }
             }
         }

@@ -64,17 +64,4 @@ public class GenieConflictExceptionUnitTests extends Exception {
         Assert.assertNull(ge.getCause());
         throw ge;
     }
-
-    /**
-     * Test the constructor.
-     *
-     * @throws GenieConflictException On conflict
-     */
-    @Test(expected = GenieConflictException.class)
-    public void testThrowableArgConstructor() throws GenieConflictException {
-        final GenieConflictException ge = new GenieConflictException(IOE);
-        Assert.assertEquals(HttpURLConnection.HTTP_CONFLICT, ge.getErrorCode());
-        Assert.assertEquals(IOE, ge.getCause());
-        throw ge;
-    }
 }

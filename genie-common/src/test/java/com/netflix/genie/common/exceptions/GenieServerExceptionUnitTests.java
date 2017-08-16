@@ -64,17 +64,4 @@ public class GenieServerExceptionUnitTests extends Exception {
         Assert.assertNull(ge.getCause());
         throw ge;
     }
-
-    /**
-     * Test the constructor.
-     *
-     * @throws GenieServerException On a server issue
-     */
-    @Test(expected = GenieServerException.class)
-    public void testThrowableArgConstructor() throws GenieServerException {
-        final GenieServerException ge = new GenieServerException(IOE);
-        Assert.assertEquals(HttpURLConnection.HTTP_INTERNAL_ERROR, ge.getErrorCode());
-        Assert.assertEquals(IOE, ge.getCause());
-        throw ge;
-    }
 }

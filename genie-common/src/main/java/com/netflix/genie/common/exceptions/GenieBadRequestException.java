@@ -39,15 +39,6 @@ public class GenieBadRequestException extends GenieException {
     /**
      * Constructor.
      *
-     * @param cause reason for this exception
-     */
-    public GenieBadRequestException(final Throwable cause) {
-        super(HttpURLConnection.HTTP_BAD_REQUEST, cause);
-    }
-
-    /**
-     * Constructor.
-     *
      * @param msg human readable message
      */
     public GenieBadRequestException(final String msg) {
