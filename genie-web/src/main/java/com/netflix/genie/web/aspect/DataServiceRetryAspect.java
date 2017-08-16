@@ -102,7 +102,10 @@ public class DataServiceRetryAspect implements Ordered {
         } catch (GenieException | ConstraintViolationException e) {
             throw e;
         } catch (Throwable e) {
-            throw new GenieServerException(e);
+            throw new GenieServerException(
+                "Failed to execute data service method",
+                e
+            );
         }
     }
 

@@ -64,17 +64,4 @@ public class GenieTimeoutExceptionUnitTests extends Exception {
         Assert.assertNull(ge.getCause());
         throw ge;
     }
-
-    /**
-     * Test the constructor.
-     *
-     * @throws GenieTimeoutException On an issue
-     */
-    @Test(expected = GenieTimeoutException.class)
-    public void testThrowableArgConstructor() throws GenieTimeoutException {
-        final GenieTimeoutException ge = new GenieTimeoutException(IOE);
-        Assert.assertEquals(HttpURLConnection.HTTP_CLIENT_TIMEOUT, ge.getErrorCode());
-        Assert.assertEquals(IOE, ge.getCause());
-        throw ge;
-    }
 }

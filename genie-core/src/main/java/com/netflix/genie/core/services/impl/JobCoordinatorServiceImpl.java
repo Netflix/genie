@@ -306,7 +306,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                 jobStateService.done(jobId);
                 jobPersistenceService.updateJobStatus(jobId, jobStatus, e.getMessage());
             }
-            throw new GenieServerException(e);
+            throw new GenieServerException("Failed to coordinate job launch", e);
         } catch (Throwable t) {
             MetricsUtils.addFailureTagsWithException(tags, t);
             throw t;

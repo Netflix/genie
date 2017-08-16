@@ -40,15 +40,6 @@ public class GenieTimeoutException extends GenieException {
     /**
      * Constructor.
      *
-     * @param cause reason for this exception
-     */
-    public GenieTimeoutException(final Throwable cause) {
-        super(HttpURLConnection.HTTP_CLIENT_TIMEOUT, cause);
-    }
-
-    /**
-     * Constructor.
-     *
      * @param msg human readable message
      */
     public GenieTimeoutException(final String msg) {

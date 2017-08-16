@@ -64,17 +64,4 @@ public class GenieBadRequestExceptionUnitTests extends Exception {
         Assert.assertNull(ge.getCause());
         throw ge;
     }
-
-    /**
-     * Test the constructor.
-     *
-     * @throws GenieBadRequestException For a bad request
-     */
-    @Test(expected = GenieBadRequestException.class)
-    public void testThrowableArgConstructor() throws GenieBadRequestException {
-        final GenieBadRequestException ge = new GenieBadRequestException(IOE);
-        Assert.assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, ge.getErrorCode());
-        Assert.assertEquals(IOE, ge.getCause());
-        throw ge;
-    }
 }

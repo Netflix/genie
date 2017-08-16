@@ -64,17 +64,4 @@ public class GenieServerUnavailableExceptionUnitTests extends Exception {
         Assert.assertNull(ge.getCause());
         throw ge;
     }
-
-    /**
-     * Test the constructor.
-     *
-     * @throws GenieServerUnavailableException When the server is unavailable
-     */
-    @Test(expected = GenieServerUnavailableException.class)
-    public void testThrowableArgConstructor() throws GenieServerUnavailableException {
-        final GenieServerUnavailableException ge = new GenieServerUnavailableException(IOE);
-        Assert.assertEquals(HttpURLConnection.HTTP_UNAVAILABLE, ge.getErrorCode());
-        Assert.assertEquals(IOE, ge.getCause());
-        throw ge;
-    }
 }

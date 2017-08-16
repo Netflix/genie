@@ -65,7 +65,7 @@ public class FileSystemAttachmentService implements AttachmentService {
             FileUtils.copyInputStreamToFile(content, attachment);
             log.info("Saved {} to {}", filename, attachment.getAbsolutePath());
         } catch (final IOException ioe) {
-            throw new GenieServerException(ioe);
+            throw new GenieServerException("Failed to save attachment", ioe);
         }
     }
 
@@ -82,7 +82,7 @@ public class FileSystemAttachmentService implements AttachmentService {
             try {
                 FileUtils.copyDirectory(source, destination);
             } catch (final IOException ioe) {
-                throw new GenieServerException(ioe);
+                throw new GenieServerException("Failed to copy attachment directory", ioe);
             }
         }
     }
@@ -97,7 +97,7 @@ public class FileSystemAttachmentService implements AttachmentService {
             try {
                 FileUtils.deleteDirectory(jobDir);
             } catch (final IOException ioe) {
-                throw new GenieServerException(ioe);
+                throw new GenieServerException("Failed to delete directory " + jobId, ioe);
             }
         }
     }

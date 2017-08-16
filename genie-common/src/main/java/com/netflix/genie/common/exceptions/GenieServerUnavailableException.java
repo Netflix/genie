@@ -39,15 +39,6 @@ public class GenieServerUnavailableException extends GenieException {
     /**
      * Constructor.
      *
-     * @param cause reason for this exception
-     */
-    public GenieServerUnavailableException(final Throwable cause) {
-        super(HttpURLConnection.HTTP_UNAVAILABLE, cause);
-    }
-
-    /**
-     * Constructor.
-     *
      * @param msg human readable message
      */
     public GenieServerUnavailableException(final String msg) {

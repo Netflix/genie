@@ -64,17 +64,4 @@ public class GeniePreconditionExceptionUnitTests extends Exception {
         Assert.assertNull(ge.getCause());
         throw ge;
     }
-
-    /**
-     * Test the constructor.
-     *
-     * @throws GeniePreconditionException On a precondition issue
-     */
-    @Test(expected = GeniePreconditionException.class)
-    public void testThrowableArgConstructor() throws GeniePreconditionException {
-        final GeniePreconditionException ge = new GeniePreconditionException(IOE);
-        Assert.assertEquals(HttpURLConnection.HTTP_PRECON_FAILED, ge.getErrorCode());
-        Assert.assertEquals(IOE, ge.getCause());
-        throw ge;
-    }
 }

@@ -39,15 +39,6 @@ public class GenieConflictException extends GenieException {
     /**
      * Constructor.
      *
-     * @param cause reason for this exception
-     */
-    public GenieConflictException(final Throwable cause) {
-        super(HttpURLConnection.HTTP_CONFLICT, cause);
-    }
-
-    /**
-     * Constructor.
-     *
      * @param msg human readable message
      */
     public GenieConflictException(final String msg) {

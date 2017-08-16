@@ -39,15 +39,6 @@ public class GeniePreconditionException extends GenieException {
     /**
      * Constructor.
      *
-     * @param cause reason for this exception
-     */
-    public GeniePreconditionException(final Throwable cause) {
-        super(HttpURLConnection.HTTP_PRECON_FAILED, cause);
-    }
-
-    /**
-     * Constructor.
-     *
      * @param msg human readable message
      */
     public GeniePreconditionException(final String msg) {
