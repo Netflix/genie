@@ -337,6 +337,10 @@ to the number of CPU cores x 2 + 1
 |The namespace to use for Genie leadership election of a given cluster
 |/genie/leader/
 
+|genie.s3filetransfer.strictUrlCheckEnabled
+|Wether to strictly check an S3 URL for illegal characters before attempting to use it
+|false
+
 |===
 
 ==== Spring Properties

@@ -212,6 +212,12 @@ and system metrics and statistics.
 |S3FileTransferImpl
 |status, exceptionClass
 
+|genie.files.s3.failStrictValidation.counter
+|Count the number of times a S3 URL fails strict validation, but is allowed through anyway
+|count
+|S3FileTransferImpl
+|-
+
 |genie.web.controllers.exception
 |Counts exceptions returned to the user
 |count

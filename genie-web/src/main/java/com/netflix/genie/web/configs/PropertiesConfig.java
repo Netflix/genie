@@ -20,6 +20,7 @@ package com.netflix.genie.web.configs;
 import com.netflix.genie.core.properties.DataServiceRetryProperties;
 import com.netflix.genie.core.properties.HealthProperties;
 import com.netflix.genie.core.properties.JobsProperties;
+import com.netflix.genie.core.properties.S3FileTransferProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -64,5 +65,16 @@ public class PropertiesConfig {
     @ConfigurationProperties("genie.health")
     public HealthProperties healthProperties() {
         return new HealthProperties();
+    }
+
+    /**
+     * All the properties related to configuring S3 file transfer.
+     *
+     * @return The S3FileTransfer properties structure
+     */
+    @Bean
+    @ConfigurationProperties("genie.s3filetransfer")
+    public S3FileTransferProperties s3FileTransferProperties() {
+        return new S3FileTransferProperties();
     }
 }

@@ -25,6 +25,7 @@ import com.amazonaws.retry.PredefinedRetryPolicies;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.core.properties.S3FileTransferProperties;
 import com.netflix.genie.core.services.impl.S3FileTransferImpl;
 import com.netflix.spectator.api.Registry;
 import lombok.extern.slf4j.Slf4j;
@@ -105,6 +106,7 @@ public class AwsS3Config {
      *
      * @param s3Client S3 client to initialize the service
      * @param registry The metrics registry to use
+     * @param s3FileTransferProperties Configuration properties
      * @return An s3 implementation of the FileTransfer interface
      * @throws GenieException if there is any problem
      */
@@ -113,8 +115,9 @@ public class AwsS3Config {
     @ConditionalOnBean(AmazonS3.class)
     public S3FileTransferImpl s3FileTransferImpl(
         final AmazonS3 s3Client,
-        final Registry registry
+        final Registry registry,
+        final S3FileTransferProperties s3FileTransferProperties
     ) throws GenieException {
-        return new S3FileTransferImpl(s3Client, registry);
+        return new S3FileTransferImpl(s3Client, registry, s3FileTransferProperties);
     }
 }

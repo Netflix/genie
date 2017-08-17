@@ -23,10 +23,13 @@ import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectResult;
+import com.google.common.collect.ImmutableMap;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.core.properties.S3FileTransferProperties;
 import com.netflix.genie.core.util.MetricsUtils;
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.spectator.api.Counter;
 import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Registry;
 import com.netflix.spectator.api.Timer;
@@ -62,10 +65,12 @@ public class S3FileTransferImplUnitTests {
 
     private S3FileTransferImpl s3FileTransfer;
     private AmazonS3Client s3Client;
+    private S3FileTransferProperties s3FileTransferProperties;
     private Id downloadTimerId;
     private Timer downloadTimer;
     private Id uploadTimerId;
     private Timer uploadTimer;
+    private Counter urlFailingStrictValidationCounter;
     private Registry registry;
     private ArgumentCaptor<Map> tagsCaptor;
 
@@ -81,56 +86,110 @@ public class S3FileTransferImplUnitTests {
         this.downloadTimerId = Mockito.mock(Id.class);
         this.uploadTimer = Mockito.mock(Timer.class);
         this.uploadTimerId = Mockito.mock(Id.class);
+        this.urlFailingStrictValidationCounter = Mockito.mock(Counter.class);
         Mockito.when(registry.createId("genie.files.s3.download.timer")).thenReturn(this.downloadTimerId);
         Mockito.when(downloadTimerId.withTags(Mockito.anyMap())).thenReturn(downloadTimerId);
         Mockito.when(registry.timer(Mockito.eq(downloadTimerId))).thenReturn(downloadTimer);
         Mockito.when(registry.createId("genie.files.s3.upload.timer")).thenReturn(this.uploadTimerId);
         Mockito.when(uploadTimerId.withTags(Mockito.anyMap())).thenReturn(uploadTimerId);
         Mockito.when(registry.timer(Mockito.eq(uploadTimerId))).thenReturn(uploadTimer);
+        Mockito
+            .when(registry.counter("genie.files.s3.failStrictValidation.counter"))
+            .thenReturn(urlFailingStrictValidationCounter);
         this.s3Client = Mockito.mock(AmazonS3Client.class);
-        this.s3FileTransfer = new S3FileTransferImpl(this.s3Client, registry);
+        this.s3FileTransferProperties = Mockito.mock(S3FileTransferProperties.class);
+        this.s3FileTransfer = new S3FileTransferImpl(this.s3Client, registry, s3FileTransferProperties);
         this.tagsCaptor = ArgumentCaptor.forClass(Map.class);
     }
 
     /**
      * Given a set of valid S3 {prefix,bucket,key}, try all combinations.
      * Ensure they are accepted as valid and the path components are parsed correctly.
+     * Each component is tagged as being valid for strict validation.
      * @throws GenieException in case of error building the URI
      */
     @Test
     public void testValidS3Paths() throws GenieException {
-        final String[] prefixes = {
-            "s3://",
-            "s3n://",
-        };
+        final Map<String, Boolean> prefixes = ImmutableMap.<String, Boolean>builder()
+            .put("s3://", true)
+            .put("s3n://", true)
+            .build();
 
-        final String[] buckets = {
-            "bucket",
-            "bucket1",
-            "1bucket",
-            "bucket-bucket",
-            "bucket.bucket",
-        };
+        final Map<String, Boolean> buckets = ImmutableMap.<String, Boolean>builder()
+            .put(".", false)
+            .put("b", false)
+            .put("bucket", true)
+            .put("Bucket", false)
+            .put("bucket1", true)
+            .put("1bucket", true)
+            .put("bucket-bucket", true)
+            .put("bucket.bucket", true)
+            .put("bucket+bucket", false)
+            .put(".bucket", false)
+            .put("bucket.", false)
+            .put("buc:ket", false)
+            .put("buc!ket", false)
+            .put("buc(ket", false)
+            .put("buc'ket", false)
+            .put(StringUtils.leftPad("", 64, "b"), false)
+            .build();
 
-        final String[] keys = {
-            "Development/Projects1.xls",
-            "Finance/statement1.pdf",
-            "Private/taxdocument.pdf",
-            "s3-dg.pdf",
-            "weird/but/valid/key!-_*'().pdf",
-        };
+        final Map<String, Boolean> keys = ImmutableMap.<String, Boolean>builder()
+            .put("Development/Projects1.xls", true)
+            .put("Finance/statement1.pdf", true)
+            .put("Private/taxdocument.pdf", true)
+            .put("s3-dg.pdf", true)
+            .put("weird/but/valid/key!-_*'().pdf", true)
+            .put("1+1=3.pdf", false)
+            .put("/", false)
+            .put("//", false)
+            .build();
 
-        for (final String prefix : prefixes) {
-            for (final String bucket : buckets) {
-                for (final String key : keys) {
-                    final String path = prefix + bucket + "/" + key;
-                    Assert.assertTrue(this.s3FileTransfer.isValid(path));
+        int notStrictlyValidExpectedCount = 0;
+
+        // Re-run all combinations with stricter check
+        for (final Map.Entry<String, Boolean> prefixEntry : prefixes.entrySet()) {
+            for (final Map.Entry<String, Boolean> bucketEntry : buckets.entrySet()) {
+                for (final Map.Entry<String, Boolean> keyEntry : keys.entrySet()) {
+
+                    final String path = prefixEntry.getKey() + bucketEntry.getKey() + "/" + keyEntry.getKey();
+                    final boolean expectedStrictlyValid =
+                        prefixEntry.getValue() && bucketEntry.getValue() && keyEntry.getValue();
+
+                    // Turn off strict validation
+                    Mockito.when(s3FileTransferProperties.isStrictUrlCheckEnabled()).thenReturn(false);
+                    Assert.assertFalse(s3FileTransferProperties.isStrictUrlCheckEnabled());
+                    // Should pass non-strict validation
+                    Assert.assertTrue(
+                        "Failed validation: " + path,
+                        this.s3FileTransfer.isValid(path)
+                    );
+                    // Should correctly split bucket from key
                     final AmazonS3URI s3Uri = this.s3FileTransfer.getS3Uri(path);
-                    Assert.assertEquals(bucket, s3Uri.getBucket());
-                    Assert.assertEquals(key, s3Uri.getKey());
+                    Assert.assertEquals(bucketEntry.getKey(), s3Uri.getBucket());
+                    Assert.assertEquals(keyEntry.getKey(), s3Uri.getKey());
+
+                    if (!expectedStrictlyValid) {
+                        // Count twice, for isValid() and getS3Uri()
+                        notStrictlyValidExpectedCount += 2;
+                    }
+
+                    //Turn on strict validation
+                    Mockito.when(s3FileTransferProperties.isStrictUrlCheckEnabled()).thenReturn(true);
+                    Assert.assertTrue(s3FileTransferProperties.isStrictUrlCheckEnabled());
+
+                    Assert.assertEquals(
+                        "Failed strict validation: " + path,
+                        expectedStrictlyValid,
+                        this.s3FileTransfer.isValid(path)
+                    );
                 }
             }
         }
+
+        Mockito
+            .verify(urlFailingStrictValidationCounter, Mockito.times(notStrictlyValidExpectedCount))
+            .increment();
     }
 
     /**
@@ -153,14 +212,20 @@ public class S3FileTransferImplUnitTests {
 
         for (final String invalidPrefix : invalidPrefixes) {
             final String path = invalidPrefix + "bucket/key";
-            Assert.assertFalse(this.s3FileTransfer.isValid(path));
+            Assert.assertFalse(
+                "Passed validation: " + path,
+                this.s3FileTransfer.isValid(path)
+            );
             boolean genieException = false;
             try {
                 this.s3FileTransfer.getS3Uri(path);
             } catch (GenieServerException e) {
                 genieException = true;
             } finally {
-                Assert.assertTrue(genieException);
+                Assert.assertTrue(
+                    "Parsed without error: " + path,
+                    genieException
+                );
             }
         }
     }
@@ -174,33 +239,28 @@ public class S3FileTransferImplUnitTests {
         final String[] invalidBuckets = {
             "",
             " ",
-            "a",
-            "aa",
-            "Bucket",
-            ".bucket",
-            "bucket.",
-            "buc:ket",
-            "buc!ket",
-            "buc[ket",
-            "buc(ket",
-            "buc'ket",
             "buc ket",
-            StringUtils.leftPad("", 64, "b"),
-            ".",
+            "buc[ket",
             "/",
             // "buc..ket", // Invalid, but current logic does not catch this
         };
 
         for (final String invalidBucket : invalidBuckets) {
             final String path = "s3://" + invalidBucket + "/key";
-            Assert.assertFalse(this.s3FileTransfer.isValid(path));
+            Assert.assertFalse(
+                "Passed validation: " + path,
+                this.s3FileTransfer.isValid(path)
+            );
             boolean genieException = false;
             try {
                 this.s3FileTransfer.getS3Uri(path);
             } catch (GenieServerException e) {
                 genieException = true;
             } finally {
-                Assert.assertTrue(genieException);
+                Assert.assertTrue(
+                    "Parsed without error: " + path,
+                    genieException
+                );
             }
         }
     }
@@ -214,21 +274,25 @@ public class S3FileTransferImplUnitTests {
         final String[] invalidKeys = {
             "",
             " ",
-            "/",
-            "//",
-            "[key]",
+            "k[ey",
         };
 
         for (final String invalidKey : invalidKeys) {
             final String path = "s3://bucket/" + invalidKey;
-            Assert.assertFalse(this.s3FileTransfer.isValid(path));
+            Assert.assertFalse(
+                "Passed validation: " + path,
+                this.s3FileTransfer.isValid(path)
+            );
             boolean genieException = false;
             try {
                 this.s3FileTransfer.getS3Uri(path);
             } catch (GenieServerException e) {
                 genieException = true;
             } finally {
-                Assert.assertTrue(genieException);
+                Assert.assertTrue(
+                    "Parsed without error: " + path,
+                    genieException
+                );
             }
         }
     }
