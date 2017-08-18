@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 3.1.0-SNAPSHOT,</span>
-<span id="revdate">2017-08-17</span>
+<span id="revdate">2017-08-18</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -4550,6 +4550,11 @@ to the number of CPU cores x 2 + 1</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The namespace to use for Genie leadership election of a given cluster</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">/genie/leader/</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.s3filetransfer.strictUrlCheckEnabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Wether to strictly check an S3 URL for illegal characters before attempting to use it</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -5137,6 +5142,13 @@ and system metrics and statistics.</p>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
 </tr>
 <tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.files.s3.failStrictValidation.counter</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Count the number of times a S3 URL fails strict validation, but is allowed through anyway</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>S3FileTransferImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
+</tr>
+<tr>
 <td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.web.controllers.exception</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Counts exceptions returned to the user</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
@@ -5371,7 +5383,7 @@ and system metrics and statistics.</p>
 <div id="footer">
 <div id="footer-text">
 Version 3.1.0-SNAPSHOT<br>
-Last updated 2017-08-17 20:49:30 +00:00
+Last updated 2017-08-18 00:21:16 +00:00
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
