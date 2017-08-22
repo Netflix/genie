@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 3.1.0-SNAPSHOT,</span>
-<span id="revdate">2017-08-18</span>
+<span id="revdate">2017-08-22</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -4493,10 +4493,17 @@ lost and failed by the Genie leader</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.databaseCleanup.batchSize</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The number of jobs to delete from the database at a time. Genie will loop until all jobs older than the retention
-time are deleted.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">10000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.databaseCleanup.maxDeletedPerTransaction</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The number of job records (across multiple tables) to delete from the database
+ in a single transaction. Genie will loop and perform multiple transactions until
+ all jobs older than the retention time are deleted.
+ This is a soft limit, it could be rounded up to the next multiple of page size.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.databaseCleanup.pageSize</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The page size used within each cleanup transaction to iterate through the job records</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1000</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.databaseCleanup.expression</p></td>
@@ -5383,7 +5390,7 @@ and system metrics and statistics.</p>
 <div id="footer">
 <div id="footer-text">
 Version 3.1.0-SNAPSHOT<br>
-Last updated 2017-08-18 00:21:16 +00:00
+Last updated 2017-08-22 17:01:25 +00:00
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
