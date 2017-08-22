@@ -126,11 +126,15 @@ public interface JobPersistenceService {
     ) throws GenieException;
 
     /**
-     * This method will delete all jobs whose created time is less than date.
+     * This method will delete a chunk of jobs whose creation time is earlier than the given date.
      *
-     * @param date      The date before which all jobs should be deleted
-     * @param batchSize The maximum number of jobs that should be deleted per iteration
+     * @param date       The date before which all jobs should be deleted
+     * @param maxDeleted The maximum number of jobs that should be deleted
+     *                   (soft limit, can be rounded up to multiple of page size)
+     * @param pageSize   Page size used to iterate through jobs
      * @return the number of deleted jobs
      */
-    long deleteAllJobsCreatedBeforeDate(@NotNull final Date date, @Min(1) final int batchSize);
+    long deleteBatchOfJobsCreatedBeforeDate(@NotNull final Date date,
+                                            @Min(1) final int maxDeleted,
+                                            @Min(1) final int pageSize);
 }

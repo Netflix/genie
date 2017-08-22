@@ -53,6 +53,8 @@ public class DatabaseCleanupPropertiesUnitTests {
         Assert.assertFalse(this.properties.isEnabled());
         Assert.assertThat(this.properties.getExpression(), Matchers.is("0 0 0 * * *"));
         Assert.assertThat(this.properties.getRetention(), Matchers.is(90));
+        Assert.assertThat(this.properties.getMaxDeletedPerTransaction(), Matchers.is(1000));
+        Assert.assertThat(this.properties.getPageSize(), Matchers.is(1000));
     }
 
     /**
@@ -82,5 +84,25 @@ public class DatabaseCleanupPropertiesUnitTests {
         final int retention = 2318;
         this.properties.setRetention(retention);
         Assert.assertThat(this.properties.getRetention(), Matchers.is(retention));
+    }
+
+    /**
+     * Make sure can set a max deletion batch size.
+     */
+    @Test
+    public void canSetMaxDeletedPerTransaction() {
+        final int max = 2318;
+        this.properties.setMaxDeletedPerTransaction(max);
+        Assert.assertThat(this.properties.getMaxDeletedPerTransaction(), Matchers.is(max));
+    }
+
+    /**
+     * Make sure can set a new page size.
+     */
+    @Test
+    public void canPageSize() {
+        final int size = 2318;
+        this.properties.setPageSize(size);
+        Assert.assertThat(this.properties.getPageSize(), Matchers.is(size));
     }
 }

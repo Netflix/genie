@@ -111,18 +111,30 @@ public class DatabaseCleanupTaskUnitTests {
     public void canRun() {
         final int days = 5;
         final int negativeDays = -1 * days;
-        final int batchSize = 10;
+        final int pageSize = 10;
+        final int maxDeleted = 10_000;
 
         Mockito.when(this.cleanupProperties.getRetention()).thenReturn(days).thenReturn(negativeDays);
-        Mockito.when(this.cleanupProperties.getBatchSize()).thenReturn(batchSize);
+        Mockito.when(this.cleanupProperties.getPageSize()).thenReturn(pageSize);
+        Mockito.when(this.cleanupProperties.getMaxDeletedPerTransaction()).thenReturn(maxDeleted);
         final ArgumentCaptor<Date> argument = ArgumentCaptor.forClass(Date.class);
 
         final long deletedCount1 = 6L;
         final long deletedCount2 = 18L;
+        final long deletedCount3 = 2L;
         Mockito
-            .when(this.jobPersistenceService.deleteAllJobsCreatedBeforeDate(Mockito.any(Date.class), Mockito.anyInt()))
+            .when(
+                this.jobPersistenceService.deleteBatchOfJobsCreatedBeforeDate(
+                    Mockito.any(Date.class),
+                    Mockito.anyInt(),
+                    Mockito.anyInt()
+                )
+            )
             .thenReturn(deletedCount1)
-            .thenReturn(deletedCount2);
+            .thenReturn(0L)
+            .thenReturn(deletedCount2)
+            .thenReturn(deletedCount3)
+            .thenReturn(0L);
 
         // The multiple calendar instances are to protect against running this test when the day flips
         final Calendar before = Calendar.getInstance(JobConstants.UTC);
@@ -133,7 +145,7 @@ public class DatabaseCleanupTaskUnitTests {
             .withTags(MetricsUtils.newSuccessTagsMap());
         this.task.run();
         final Calendar after = Calendar.getInstance(JobConstants.UTC);
-        Assert.assertThat(this.numDeletedJobs.get(), Matchers.is(deletedCount2));
+        Assert.assertThat(this.numDeletedJobs.get(), Matchers.is(deletedCount2 + deletedCount3));
         Mockito
             .verify(this.deletionTimerId, Mockito.times(2))
             .withTags(MetricsUtils.newSuccessTagsMap());
@@ -143,8 +155,8 @@ public class DatabaseCleanupTaskUnitTests {
 
         if (before.get(Calendar.DAY_OF_YEAR) == after.get(Calendar.DAY_OF_YEAR)) {
             Mockito
-                .verify(this.jobPersistenceService, Mockito.times(2))
-                .deleteAllJobsCreatedBeforeDate(argument.capture(), Mockito.eq(batchSize));
+                .verify(this.jobPersistenceService, Mockito.times(5))
+                .deleteBatchOfJobsCreatedBeforeDate(argument.capture(), Mockito.eq(maxDeleted), Mockito.eq(pageSize));
             final Calendar date = Calendar.getInstance(JobConstants.UTC);
             date.set(Calendar.HOUR_OF_DAY, 0);
             date.set(Calendar.MINUTE, 0);
@@ -163,13 +175,21 @@ public class DatabaseCleanupTaskUnitTests {
     public void cantRun() {
         final int days = 5;
         final int negativeDays = -1 * days;
-        final int batchSize = 10;
+        final int pageSize = 10;
+        final int maxDeleted = 10_000;
 
         Mockito.when(this.cleanupProperties.getRetention()).thenReturn(days).thenReturn(negativeDays);
-        Mockito.when(this.cleanupProperties.getBatchSize()).thenReturn(batchSize);
+        Mockito.when(this.cleanupProperties.getPageSize()).thenReturn(pageSize);
+        Mockito.when(this.cleanupProperties.getMaxDeletedPerTransaction()).thenReturn(maxDeleted);
 
         Mockito
-            .when(this.jobPersistenceService.deleteAllJobsCreatedBeforeDate(Mockito.any(Date.class), Mockito.anyInt()))
+            .when(
+                this.jobPersistenceService.deleteBatchOfJobsCreatedBeforeDate(
+                    Mockito.any(Date.class),
+                    Mockito.anyInt(),
+                    Mockito.anyInt()
+                )
+            )
             .thenThrow(new RuntimeException("test"));
 
         try {

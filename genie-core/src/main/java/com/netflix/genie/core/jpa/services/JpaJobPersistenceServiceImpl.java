@@ -299,14 +299,22 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
      * {@inheritDoc}
      */
     @Override
-    public long deleteAllJobsCreatedBeforeDate(@NotNull final Date date, @Min(1) final int batchSize) {
-        log.info("Attempting to delete all jobs created before {} ms from epoch", date.getTime());
+    public long deleteBatchOfJobsCreatedBeforeDate(
+        @NotNull final Date date,
+        @Min(1) final int maxDeleted,
+        @Min(1) final int pageSize
+    ) {
+        log.info(
+            "Attempting to delete batch of jobs (at most {}) created before {} ms from epoch",
+            maxDeleted,
+            date.getTime()
+        );
         long jobExecutionsDeleted = 0;
         long jobMetadatasDeleted = 0;
         long jobsDeleted = 0;
         long jobRequestsDeleted = 0;
-        // Grab the first 10,000 jobs
-        final Pageable page = new PageRequest(0, batchSize);
+        long totalAttemptedDeletions = 0;
+        final Pageable page = new PageRequest(0, pageSize);
         Slice<IdProjection> idProjections;
         do {
             idProjections = this.jobRequestRepo.findByCreatedBefore(date, page);
@@ -318,6 +326,7 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
                     .collect(Collectors.toList());
 
                 final long toBeDeleted = ids.size();
+                totalAttemptedDeletions += toBeDeleted;
                 // Due to optimizations for queries these entity mappings aren't reversed so cascade delete
                 // isn't available and runtime exception thrown if you try to delete from the top.
 
@@ -369,16 +378,17 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
                 }
                 jobRequestsDeleted += deletedJobRequests;
             }
-        } while (idProjections.hasNext());
+        } while (idProjections.hasNext() && totalAttemptedDeletions < maxDeleted);
 
         log.info(
-            "Finished deleting job records. Deleted {} execution, {} metadata, {} job and {} job request records",
+            "Deleted a chunk of {} job records: {} execution, {} metadata, {} job and {} job request records",
+            totalAttemptedDeletions,
             jobExecutionsDeleted,
             jobMetadatasDeleted,
             jobsDeleted,
             jobRequestsDeleted
         );
-        return jobRequestsDeleted;
+        return totalAttemptedDeletions;
     }
 
     private void updateJobStatus(final JobEntity jobEntity, final JobStatus jobStatus, final String statusMsg) {

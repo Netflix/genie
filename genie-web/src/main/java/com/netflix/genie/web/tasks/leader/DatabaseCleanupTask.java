@@ -110,17 +110,28 @@ public class DatabaseCleanupTask extends LeadershipTask {
             TaskUtils.subtractDaysFromDate(cal, this.cleanupProperties.getRetention());
             final Date retentionLimit = cal.getTime();
             final String retentionLimitString = this.dateFormat.format(retentionLimit);
-            final int batchSize = this.cleanupProperties.getBatchSize();
+            final int batchSize = this.cleanupProperties.getMaxDeletedPerTransaction();
+            final int pageSize = this.cleanupProperties.getPageSize();
 
             log.info(
                 "Attempting to delete jobs from before {} in batches of {} jobs per iteration",
                 retentionLimitString,
                 batchSize
             );
-            final long numberDeletedJobs
-                = this.jobPersistenceService.deleteAllJobsCreatedBeforeDate(retentionLimit, batchSize);
-            log.info("Deleted {} jobs from before {}", numberDeletedJobs, retentionLimitString);
-            this.numDeletedJobs.set(numberDeletedJobs);
+            long totalDeletedJobs = 0;
+            while (true) {
+                final long numberDeletedJobs = this.jobPersistenceService.deleteBatchOfJobsCreatedBeforeDate(
+                    retentionLimit,
+                    batchSize,
+                    pageSize
+                );
+                totalDeletedJobs += numberDeletedJobs;
+                if (numberDeletedJobs == 0) {
+                    break;
+                }
+            }
+            log.info("Deleted {} jobs from before {}", totalDeletedJobs, retentionLimitString);
+            this.numDeletedJobs.set(totalDeletedJobs);
         } catch (Throwable t) {
             MetricsUtils.addFailureTagsWithException(tags, t);
             throw t;

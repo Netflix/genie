@@ -36,5 +36,6 @@ public class DatabaseCleanupProperties {
     private boolean enabled;
     private String expression = "0 0 0 * * *";
     private int retention = 90;
-    private int batchSize = 10_000;
+    private int maxDeletedPerTransaction = 1_000;
+    private int pageSize = 1_000;
 }
