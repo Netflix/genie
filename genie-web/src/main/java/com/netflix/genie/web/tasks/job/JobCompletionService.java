@@ -75,6 +75,7 @@ import java.util.stream.Collectors;
 public class JobCompletionService {
 
     private static final String ERROR_SOURCE_TAG = "error";
+    private static final String JOB_FINAL_STATE = "jobFinalState";
     private final JobPersistenceService jobPersistenceService;
     private final JobSearchService jobSearchService;
     private final GenieFileTransferService genieFileTransferService;
@@ -137,14 +138,6 @@ public class JobCompletionService {
         this.registry = registry;
         this.jobCompletionTimerId = registry.createId("genie.jobs.completion.timer");
         this.errorCounterId = registry.createId("genie.jobs.errors.count");
-//        this.emailSuccessRate = registry.counter("genie.jobs.email.success.rate");
-//        this.emailFailureRate = registry.counter("genie.jobs.email.failure.rate");
-//        this.archivalFailureRate = registry.counter("genie.jobs.archivalFailure.rate");
-//        this.doneFileProcessingFailureRate = registry.counter("genie.jobs.doneFileProcessingFailure.rate");
-//        this.finalStatusUpdateFailureRate = registry.counter("genie.jobs.finalStatusUpdateFailure.rate");
-//        this.processGroupCleanupFailureRate = registry.counter("genie.jobs.processGroupCleanupFailure.rate");
-//        this.archiveFileDeletionFailure = registry.counter("genie.jobs.archiveFileDeletionFailure.rate");
-//        this.deleteDependenciesFailure = registry.counter("genie.jobs.deleteDependenciesFailure.rate");
         // Retry template
         this.retryTemplate = retryTemplate;
     }
@@ -168,7 +161,7 @@ public class JobCompletionService {
             // Make sure the job isn't already done before doing something
             if (status.isActive()) {
                 try {
-                    this.retryTemplate.execute(context -> updateJob(job, event));
+                    this.retryTemplate.execute(context -> updateJob(job, event, tags));
                 } catch (Exception e) {
                     log.error("Failed updating for job: {}", jobId, e);
                 }
@@ -200,7 +193,7 @@ public class JobCompletionService {
         return this.jobSearchService.getJob(jobId);
     }
 
-    private Void updateJob(final Job job, final JobFinishedEvent event)
+    private Void updateJob(final Job job, final JobFinishedEvent event, Map<String, String> tags)
         throws GenieException {
         try {
 
@@ -234,16 +227,19 @@ public class JobCompletionService {
                     try {
                         final String finalStatus =
                             this.retryTemplate.execute(context -> updateFinalStatusForJob(jobId).toString());
+                        tags.put(JOB_FINAL_STATE, finalStatus);
                         cleanupProcesses(jobId);
                     } catch (Exception e) {
                         log.error("Failed updating the exit code and status for job: {}", jobId, e);
                     }
                 } else {
+                    tags.put(JOB_FINAL_STATE, JobStatus.FAILED.toString());
                     eventStatus = JobStatus.FAILED;
                 }
             }
 
             if (eventStatus != null) {
+                tags.put(JOB_FINAL_STATE, status.toString());
                 this.jobPersistenceService.updateJobStatus(jobId, eventStatus, event.getMessage());
             }
         } catch (Throwable t) {
