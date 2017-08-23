@@ -144,6 +144,7 @@ class JobCompletionServiceSpec extends Specification{
         1 * completionTimer.record(_, TimeUnit.NANOSECONDS)
         timerTagsCapture == ImmutableMap.of(
                 MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.SUCCESS,
+                JobCompletionService.JOB_FINAL_STATE, JobStatus.FAILED.toString()
         )
         4 * errorCounter.increment()
         counterTagsCaptures.containsAll(ImmutableList.of(
@@ -179,6 +180,7 @@ class JobCompletionServiceSpec extends Specification{
         1 * completionTimer.record(_, TimeUnit.NANOSECONDS)
         timerTagsCapture == ImmutableMap.of(
                 MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.SUCCESS,
+                JobCompletionService.JOB_FINAL_STATE, JobStatus.FAILED.toString()
         )
         3 * errorCounter.increment()
     }
