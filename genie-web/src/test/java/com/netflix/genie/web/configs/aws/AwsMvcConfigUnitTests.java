@@ -60,8 +60,12 @@ public class AwsMvcConfigUnitTests {
         Mockito.when(restTemplate.getForObject(this.awsMvcConfig.publicHostNameGet, String.class)).thenReturn(hostname);
 
         Assert.assertThat(this.awsMvcConfig.hostName(restTemplate), Matchers.is(hostname));
-        Mockito.verify(restTemplate, Mockito.times(1)).getForObject(awsMvcConfig.publicHostNameGet, String.class);
-        Mockito.verify(restTemplate, Mockito.never()).getForObject(awsMvcConfig.localIPV4HostNameGet, String.class);
+        Mockito
+            .verify(restTemplate, Mockito.times(1))
+            .getForObject(this.awsMvcConfig.publicHostNameGet, String.class);
+        Mockito
+            .verify(restTemplate, Mockito.never())
+            .getForObject(this.awsMvcConfig.localIPV4HostNameGet, String.class);
     }
 
     /**
@@ -70,14 +74,16 @@ public class AwsMvcConfigUnitTests {
      * @throws IOException on any problem
      */
     @Test
+    @SuppressWarnings("unchecked")
     public void canGetIPv4Hostname() throws IOException {
         final RestTemplate restTemplate = Mockito.mock(RestTemplate.class);
         final String hostname = UUID.randomUUID().toString();
-        Mockito.when(restTemplate.getForObject(this.awsMvcConfig.publicHostNameGet, String.class))
-                .thenThrow(Exception.class);
+        Mockito
+            .when(restTemplate.getForObject(this.awsMvcConfig.publicHostNameGet, String.class))
+            .thenThrow(Exception.class);
 
         Mockito.when(restTemplate.getForObject(this.awsMvcConfig.localIPV4HostNameGet, String.class))
-                .thenReturn(hostname);
+            .thenReturn(hostname);
 
         Assert.assertThat(this.awsMvcConfig.hostName(restTemplate), Matchers.is(hostname));
         Mockito.verify(restTemplate, Mockito.times(1)).getForObject(awsMvcConfig.publicHostNameGet, String.class);
@@ -90,12 +96,15 @@ public class AwsMvcConfigUnitTests {
      * @throws Exception on any problem
      */
     @Test(expected = Exception.class)
+    @SuppressWarnings("unchecked")
     public void cantGetHostname() throws Exception {
         final RestTemplate restTemplate = Mockito.mock(RestTemplate.class);
-        Mockito.when(restTemplate.getForObject(this.awsMvcConfig.publicHostNameGet, String.class))
-                .thenThrow(Exception.class);
-        Mockito.when(restTemplate.getForObject(this.awsMvcConfig.localIPV4HostNameGet, String.class))
-                .thenThrow(Exception.class);
+        Mockito
+            .when(restTemplate.getForObject(this.awsMvcConfig.publicHostNameGet, String.class))
+            .thenThrow(Exception.class);
+        Mockito
+            .when(restTemplate.getForObject(this.awsMvcConfig.localIPV4HostNameGet, String.class))
+            .thenThrow(Exception.class);
 
         this.awsMvcConfig.hostName(restTemplate);
     }

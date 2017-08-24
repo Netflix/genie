@@ -93,12 +93,18 @@ public class HttpFileTransferImplTest {
         Mockito.when(registry.createId("genie.files.http.download.timer")).thenReturn(this.downloadTimerId);
         Mockito.when(registry.createId("genie.files.http.upload.timer")).thenReturn(this.uploadTimerId);
         Mockito.when(registry.createId("genie.files.http.getLastModified.timer")).thenReturn(this.metadataTimerId);
-        Mockito.when(downloadTimerId.withTags(Mockito.anyMap())).thenReturn(downloadTimerId);
-        Mockito.when(uploadTimerId.withTags(Mockito.anyMap())).thenReturn(uploadTimerId);
-        Mockito.when(metadataTimerId.withTags(Mockito.anyMap())).thenReturn(metadataTimerId);
-        Mockito.when(registry.timer(downloadTimerId)).thenReturn(downloadTimer);
-        Mockito.when(registry.timer(uploadTimerId)).thenReturn(uploadTimer);
-        Mockito.when(registry.timer(metadataTimerId)).thenReturn(metadataTimer);
+        Mockito
+            .when(this.downloadTimerId.withTags(Mockito.anyMapOf(String.class, String.class)))
+            .thenReturn(this.downloadTimerId);
+        Mockito
+            .when(this.uploadTimerId.withTags(Mockito.anyMapOf(String.class, String.class)))
+            .thenReturn(this.uploadTimerId);
+        Mockito
+            .when(this.metadataTimerId.withTags(Mockito.anyMapOf(String.class, String.class)))
+            .thenReturn(this.metadataTimerId);
+        Mockito.when(registry.timer(this.downloadTimerId)).thenReturn(this.downloadTimer);
+        Mockito.when(registry.timer(this.uploadTimerId)).thenReturn(this.uploadTimer);
+        Mockito.when(registry.timer(this.metadataTimerId)).thenReturn(this.metadataTimer);
         this.httpFileTransfer = new HttpFileTransferImpl(restTemplate, registry);
     }
 
@@ -121,7 +127,7 @@ public class HttpFileTransferImplTest {
      * Make sure we can actually get a file.
      *
      * @throws GenieException On error
-     * @throws IOException On error
+     * @throws IOException    On error
      */
     @Test
     public void canGet() throws GenieException, IOException {
@@ -151,7 +157,7 @@ public class HttpFileTransferImplTest {
      * Make sure can't get a file if the intput isn't a valid url.
      *
      * @throws GenieException On Error
-     * @throws IOException On Error
+     * @throws IOException    On Error
      */
     @Test(expected = GenieServerException.class)
     public void cantGetWithInvalidUrl() throws GenieException, IOException {
@@ -174,7 +180,7 @@ public class HttpFileTransferImplTest {
      * Make sure can't get a file if the output location is a directory.
      *
      * @throws GenieException On Error
-     * @throws IOException On Error
+     * @throws IOException    On Error
      */
     @Test(expected = ResourceAccessException.class)
     public void cantGetWithDirectoryAsOutput() throws GenieException, IOException {

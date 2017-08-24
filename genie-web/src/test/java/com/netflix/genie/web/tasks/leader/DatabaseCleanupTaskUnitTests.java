@@ -71,7 +71,7 @@ public class DatabaseCleanupTaskUnitTests {
             .when(registry.createId("genie.tasks.databaseCleanup.duration.timer"))
             .thenReturn(deletionTimerId);
         Mockito
-            .when(deletionTimerId.withTags(Mockito.anyMap()))
+            .when(deletionTimerId.withTags(Mockito.anyMapOf(String.class, String.class)))
             .thenReturn(deletionTimerId);
         Mockito
             .when(registry.timer(deletionTimerId))

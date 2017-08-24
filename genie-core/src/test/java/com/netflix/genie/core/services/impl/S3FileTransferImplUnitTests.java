@@ -39,7 +39,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import java.io.File;
 import java.util.Map;
@@ -71,8 +73,8 @@ public class S3FileTransferImplUnitTests {
     private Id uploadTimerId;
     private Timer uploadTimer;
     private Counter urlFailingStrictValidationCounter;
-    private Registry registry;
-    private ArgumentCaptor<Map> tagsCaptor;
+    @Captor
+    private ArgumentCaptor<Map<String, String>> tagsCaptor;
 
     /**
      * Setup the tests.
@@ -81,31 +83,36 @@ public class S3FileTransferImplUnitTests {
      */
     @Before
     public void setup() throws GenieException {
-        this.registry = Mockito.mock(Registry.class);
+        MockitoAnnotations.initMocks(this);
+        final Registry registry = Mockito.mock(Registry.class);
         this.downloadTimer = Mockito.mock(Timer.class);
         this.downloadTimerId = Mockito.mock(Id.class);
         this.uploadTimer = Mockito.mock(Timer.class);
         this.uploadTimerId = Mockito.mock(Id.class);
         this.urlFailingStrictValidationCounter = Mockito.mock(Counter.class);
         Mockito.when(registry.createId("genie.files.s3.download.timer")).thenReturn(this.downloadTimerId);
-        Mockito.when(downloadTimerId.withTags(Mockito.anyMap())).thenReturn(downloadTimerId);
-        Mockito.when(registry.timer(Mockito.eq(downloadTimerId))).thenReturn(downloadTimer);
+        Mockito
+            .when(this.downloadTimerId.withTags(Mockito.anyMapOf(String.class, String.class)))
+            .thenReturn(this.downloadTimerId);
+        Mockito.when(registry.timer(Mockito.eq(this.downloadTimerId))).thenReturn(this.downloadTimer);
         Mockito.when(registry.createId("genie.files.s3.upload.timer")).thenReturn(this.uploadTimerId);
-        Mockito.when(uploadTimerId.withTags(Mockito.anyMap())).thenReturn(uploadTimerId);
-        Mockito.when(registry.timer(Mockito.eq(uploadTimerId))).thenReturn(uploadTimer);
+        Mockito
+            .when(this.uploadTimerId.withTags(Mockito.anyMapOf(String.class, String.class)))
+            .thenReturn(this.uploadTimerId);
+        Mockito.when(registry.timer(Mockito.eq(this.uploadTimerId))).thenReturn(this.uploadTimer);
         Mockito
             .when(registry.counter("genie.files.s3.failStrictValidation.counter"))
-            .thenReturn(urlFailingStrictValidationCounter);
+            .thenReturn(this.urlFailingStrictValidationCounter);
         this.s3Client = Mockito.mock(AmazonS3Client.class);
         this.s3FileTransferProperties = Mockito.mock(S3FileTransferProperties.class);
-        this.s3FileTransfer = new S3FileTransferImpl(this.s3Client, registry, s3FileTransferProperties);
-        this.tagsCaptor = ArgumentCaptor.forClass(Map.class);
+        this.s3FileTransfer = new S3FileTransferImpl(this.s3Client, registry, this.s3FileTransferProperties);
     }
 
     /**
      * Given a set of valid S3 {prefix,bucket,key}, try all combinations.
      * Ensure they are accepted as valid and the path components are parsed correctly.
      * Each component is tagged as being valid for strict validation.
+     *
      * @throws GenieException in case of error building the URI
      */
     @Test
@@ -194,6 +201,7 @@ public class S3FileTransferImplUnitTests {
 
     /**
      * Verify invalid S3 prefixes are rejected.
+     *
      * @throws GenieException in case of unexpected validation error
      */
     @Test
@@ -232,6 +240,7 @@ public class S3FileTransferImplUnitTests {
 
     /**
      * Verify invalid S3 bucket names are rejected.
+     *
      * @throws GenieException in case of unexpected validation error
      */
     @Test
@@ -267,6 +276,7 @@ public class S3FileTransferImplUnitTests {
 
     /**
      * Verify invalid S3 key names are rejected.
+     *
      * @throws GenieException in case of unexpected validation error
      */
     @Test
