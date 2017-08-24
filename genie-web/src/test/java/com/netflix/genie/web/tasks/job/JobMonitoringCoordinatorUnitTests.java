@@ -77,7 +77,6 @@ public class JobMonitoringCoordinatorUnitTests {
 
     private TaskScheduler scheduler;
     private JobMonitoringCoordinator coordinator;
-    private JobSubmitterService jobSubmitterService;
     private JobSearchService jobSearchService;
     private ApplicationEventMulticaster eventMulticaster;
     private Date tomorrow;
@@ -94,7 +93,7 @@ public class JobMonitoringCoordinatorUnitTests {
         cal.add(Calendar.DAY_OF_YEAR, 1);
         this.tomorrow = cal.getTime();
         this.jobSearchService = Mockito.mock(JobSearchService.class);
-        this.jobSubmitterService = Mockito.mock(JobSubmitterService.class);
+        final JobSubmitterService jobSubmitterService = Mockito.mock(JobSubmitterService.class);
         final Executor executor = Mockito.mock(Executor.class);
         this.scheduler = Mockito.mock(TaskScheduler.class);
         this.eventMulticaster = Mockito.mock(ApplicationEventMulticaster.class);
@@ -356,6 +355,7 @@ public class JobMonitoringCoordinatorUnitTests {
      * @throws GenieException on error
      */
     @Test
+    @SuppressWarnings("unchecked")
     public void canStopJobTask() throws GenieException {
         final String jobId = UUID.randomUUID().toString();
         final ScheduledFuture task = Mockito.mock(ScheduledFuture.class);

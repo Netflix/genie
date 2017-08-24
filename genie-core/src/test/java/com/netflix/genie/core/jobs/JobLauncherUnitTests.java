@@ -35,7 +35,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import java.util.List;
 import java.util.Map;
@@ -52,7 +54,6 @@ public class JobLauncherUnitTests {
 
     private JobLauncher jobLauncher;
     private JobSubmitterService jobSubmitterService;
-    private Registry registry;
     private JobRequest jobRequest;
     private Cluster cluster;
     private Command command;
@@ -60,26 +61,27 @@ public class JobLauncherUnitTests {
     private Timer timer;
     private int memory;
     private Id timerId;
-    private ArgumentCaptor<Map> tagsCaptor;
+    @Captor
+    private ArgumentCaptor<Map<String, String>> tagsCaptor;
 
     /**
      * Setup for the tests.
      */
     @Before
     public void setup() {
+        MockitoAnnotations.initMocks(this);
         this.jobRequest = Mockito.mock(JobRequest.class);
         this.cluster = Mockito.mock(Cluster.class);
         this.command = Mockito.mock(Command.class);
         this.applications = Lists.newArrayList(Mockito.mock(Application.class));
         this.jobSubmitterService = Mockito.mock(JobSubmitterService.class);
         this.memory = 1_024;
-        this.registry = Mockito.mock(Registry.class);
+        final Registry registry = Mockito.mock(Registry.class);
         this.timerId = Mockito.mock(Id.class);
         this.timer = Mockito.mock(Timer.class);
         Mockito.when(registry.createId("genie.jobs.submit.timer")).thenReturn(timerId);
-        Mockito.when(timerId.withTags(Mockito.any(Map.class))).thenReturn(timerId);
+        Mockito.when(timerId.withTags(Mockito.anyMapOf(String.class, String.class))).thenReturn(timerId);
         Mockito.when(registry.timer(Mockito.eq(timerId))).thenReturn(timer);
-        this.tagsCaptor = ArgumentCaptor.forClass(Map.class);
 
         this.jobLauncher = new JobLauncher(
             this.jobSubmitterService,
@@ -88,7 +90,7 @@ public class JobLauncherUnitTests {
             this.command,
             this.applications,
             this.memory,
-            this.registry
+            registry
         );
     }
 

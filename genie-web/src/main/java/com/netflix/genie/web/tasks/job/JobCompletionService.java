@@ -193,8 +193,11 @@ public class JobCompletionService {
         return this.jobSearchService.getJob(jobId);
     }
 
-    private Void updateJob(final Job job, final JobFinishedEvent event, Map<String, String> tags)
-        throws GenieException {
+    private Void updateJob(
+        final Job job,
+        final JobFinishedEvent event,
+        final Map<String, String> tags
+    ) throws GenieException {
         try {
 
             final String jobId = event.getId();
@@ -310,7 +313,7 @@ public class JobCompletionService {
                     JobKillReasonFile.class
                 ).getKillReason();
             } else {
-                 killedStatusMessages = JobStatusMessages.JOB_KILLED_BY_USER;
+                killedStatusMessages = JobStatusMessages.JOB_KILLED_BY_USER;
             }
             final int exitCode = jobDoneFile.getExitCode();
             // Read the size of STD OUT and STD ERR files
@@ -603,11 +606,11 @@ public class JobCompletionService {
 
     private void incrementErrorCounter(final String errorTagValue, final Throwable throwable) {
         this.incrementErrorCounter(
-           ImmutableMap.of(
-               ERROR_SOURCE_TAG, errorTagValue,
-               MetricsConstants.TagKeys.EXCEPTION_CLASS, throwable.getClass().getCanonicalName()
-           )
-       );
+            ImmutableMap.of(
+                ERROR_SOURCE_TAG, errorTagValue,
+                MetricsConstants.TagKeys.EXCEPTION_CLASS, throwable.getClass().getCanonicalName()
+            )
+        );
     }
 
     private void incrementErrorCounter(final String errorTagValue) {

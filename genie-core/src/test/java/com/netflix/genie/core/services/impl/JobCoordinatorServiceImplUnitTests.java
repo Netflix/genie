@@ -55,7 +55,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import java.util.List;
 import java.util.Map;
@@ -82,7 +84,7 @@ public class JobCoordinatorServiceImplUnitTests {
     private static final int MEMORY = 1_512;
     private static final String KILL_REASON = "Killed by test";
     private static final boolean ACTIVE_JOBS_LIMIT_ENABLED = false;
-    private static final Map SUCCESS_TIMER_TAGS = MetricsUtils.newSuccessTagsMap();
+    private static final Map<String, String> SUCCESS_TIMER_TAGS = MetricsUtils.newSuccessTagsMap();
 
     private JobCoordinatorServiceImpl jobCoordinatorService;
     private JobPersistenceService jobPersistenceService;
@@ -96,9 +98,9 @@ public class JobCoordinatorServiceImplUnitTests {
     private ClusterLoadBalancer clusterLoadBalancer2;
     private ClusterLoadBalancer clusterLoadBalancer3;
     private ClusterLoadBalancer clusterLoadBalancer4;
-    private Registry registry;
     private JobsProperties jobsProperties;
-    private ArgumentCaptor<Map> tagsCaptor;
+    @Captor
+    private ArgumentCaptor<Map<String, String>> tagsCaptor;
     private Id coordinationTimerId;
     private Timer coordinationTimer;
     private Id selectClusterTimerId;
@@ -119,6 +121,7 @@ public class JobCoordinatorServiceImplUnitTests {
      */
     @Before
     public void setup() {
+        MockitoAnnotations.initMocks(this);
         this.jobPersistenceService = Mockito.mock(JobPersistenceService.class);
         this.jobKillService = Mockito.mock(JobKillService.class);
         this.jobStateService = Mockito.mock(JobStateService.class);
@@ -135,82 +138,81 @@ public class JobCoordinatorServiceImplUnitTests {
         this.clusterLoadBalancer3 = Mockito.mock(ClusterLoadBalancer.class);
         this.clusterLoadBalancer4 = Mockito.mock(ClusterLoadBalancer.class);
 
-        this.registry = Mockito.mock(Registry.class);
-        this.tagsCaptor = ArgumentCaptor.forClass(Map.class);
+        final Registry registry = Mockito.mock(Registry.class);
         this.coordinationTimerId = Mockito.mock(Id.class);
         this.coordinationTimer = Mockito.mock(Timer.class);
         Mockito
-            .when(this.registry.createId("genie.jobs.coordination.timer"))
-            .thenReturn(coordinationTimerId);
+            .when(registry.createId("genie.jobs.coordination.timer"))
+            .thenReturn(this.coordinationTimerId);
         Mockito
-            .when(coordinationTimerId.withTags(Mockito.any(Map.class)))
-            .thenReturn(coordinationTimerId);
+            .when(this.coordinationTimerId.withTags(Mockito.anyMapOf(String.class, String.class)))
+            .thenReturn(this.coordinationTimerId);
         Mockito
-            .when(this.registry.timer(Mockito.eq(coordinationTimerId)))
-            .thenReturn(coordinationTimer);
+            .when(registry.timer(Mockito.eq(this.coordinationTimerId)))
+            .thenReturn(this.coordinationTimer);
         this.selectClusterTimerId = Mockito.mock(Id.class);
         this.selectClusterTimer = Mockito.mock(Timer.class);
         Mockito
-            .when(this.registry.createId("genie.jobs.submit.localRunner.selectCluster.timer"))
-            .thenReturn(selectClusterTimerId);
+            .when(registry.createId("genie.jobs.submit.localRunner.selectCluster.timer"))
+            .thenReturn(this.selectClusterTimerId);
         Mockito
-            .when(selectClusterTimerId.withTags(Mockito.any(Map.class)))
-            .thenReturn(selectClusterTimerId);
+            .when(this.selectClusterTimerId.withTags(Mockito.anyMapOf(String.class, String.class)))
+            .thenReturn(this.selectClusterTimerId);
         Mockito
-            .when(this.registry.timer(Mockito.eq(selectClusterTimerId)))
-            .thenReturn(selectClusterTimer);
+            .when(registry.timer(Mockito.eq(this.selectClusterTimerId)))
+            .thenReturn(this.selectClusterTimer);
         this.selectCommandTimerId = Mockito.mock(Id.class);
         this.selectCommandTimer = Mockito.mock(Timer.class);
         Mockito
-            .when(this.registry.createId("genie.jobs.submit.localRunner.selectCommand.timer"))
-            .thenReturn(selectCommandTimerId);
+            .when(registry.createId("genie.jobs.submit.localRunner.selectCommand.timer"))
+            .thenReturn(this.selectCommandTimerId);
         Mockito
-            .when(selectCommandTimerId.withTags(Mockito.any(Map.class)))
-            .thenReturn(selectCommandTimerId);
+            .when(this.selectCommandTimerId.withTags(Mockito.anyMapOf(String.class, String.class)))
+            .thenReturn(this.selectCommandTimerId);
         Mockito
-            .when(this.registry.timer(Mockito.eq(selectCommandTimerId)))
-            .thenReturn(selectCommandTimer);
+            .when(registry.timer(Mockito.eq(this.selectCommandTimerId)))
+            .thenReturn(this.selectCommandTimer);
         this.selectApplicationTimerId = Mockito.mock(Id.class);
         this.selectApplicationTimer = Mockito.mock(Timer.class);
         Mockito
-            .when(this.registry.createId("genie.jobs.submit.localRunner.selectApplications.timer"))
-            .thenReturn(selectApplicationTimerId);
+            .when(registry.createId("genie.jobs.submit.localRunner.selectApplications.timer"))
+            .thenReturn(this.selectApplicationTimerId);
         Mockito
-            .when(selectApplicationTimerId.withTags(Mockito.any(Map.class)))
-            .thenReturn(selectApplicationTimerId);
+            .when(this.selectApplicationTimerId.withTags(Mockito.anyMapOf(String.class, String.class)))
+            .thenReturn(this.selectApplicationTimerId);
         Mockito
-            .when(this.registry.timer(Mockito.eq(selectApplicationTimerId)))
+            .when(registry.timer(Mockito.eq(selectApplicationTimerId)))
             .thenReturn(selectApplicationTimer);
         this.setJobEnvironmentTimerId = Mockito.mock(Id.class);
         this.setJobEnvironmentTimer = Mockito.mock(Timer.class);
         Mockito
-            .when(this.registry.createId("genie.jobs.submit.localRunner.setJobEnvironment.timer"))
-            .thenReturn(setJobEnvironmentTimerId);
+            .when(registry.createId("genie.jobs.submit.localRunner.setJobEnvironment.timer"))
+            .thenReturn(this.setJobEnvironmentTimerId);
         Mockito
-            .when(setJobEnvironmentTimerId.withTags(Mockito.any(Map.class)))
-            .thenReturn(setJobEnvironmentTimerId);
+            .when(this.setJobEnvironmentTimerId.withTags(Mockito.anyMapOf(String.class, String.class)))
+            .thenReturn(this.setJobEnvironmentTimerId);
         Mockito
-            .when(this.registry.timer(Mockito.eq(setJobEnvironmentTimerId)))
-            .thenReturn(setJobEnvironmentTimer);
+            .when(registry.timer(Mockito.eq(this.setJobEnvironmentTimerId)))
+            .thenReturn(this.setJobEnvironmentTimer);
         this.noClusterSelectedCounter = Mockito.mock(Counter.class);
         Mockito
-            .when(this.registry.counter("genie.jobs.submit.selectCluster.noneSelected.counter"))
-            .thenReturn(noClusterSelectedCounter);
+            .when(registry.counter("genie.jobs.submit.selectCluster.noneSelected.counter"))
+            .thenReturn(this.noClusterSelectedCounter);
         this.noMatchingClusterCounter = Mockito.mock(Counter.class);
         Mockito
             .when(registry.counter("genie.jobs.submit.selectCluster.noneFound.counter"))
-            .thenReturn(noMatchingClusterCounter);
+            .thenReturn(this.noMatchingClusterCounter);
         this.loadBalancerCounterId = Mockito.mock(Id.class);
         this.loadBalancerCounter = Mockito.mock(Counter.class);
         Mockito
-            .when(this.registry.createId("genie.jobs.submit.selectCluster.loadBalancer.counter"))
-            .thenReturn(loadBalancerCounterId);
+            .when(registry.createId("genie.jobs.submit.selectCluster.loadBalancer.counter"))
+            .thenReturn(this.loadBalancerCounterId);
         Mockito
-            .when(loadBalancerCounterId.withTags(Mockito.any(Map.class)))
-            .thenReturn(loadBalancerCounterId);
+            .when(this.loadBalancerCounterId.withTags(Mockito.anyMapOf(String.class, String.class)))
+            .thenReturn(this.loadBalancerCounterId);
         Mockito
-            .when(this.registry.counter(Mockito.eq(loadBalancerCounterId)))
-            .thenReturn(loadBalancerCounter);
+            .when(registry.counter(Mockito.eq(this.loadBalancerCounterId)))
+            .thenReturn(this.loadBalancerCounter);
 
         this.jobCoordinatorService = new JobCoordinatorServiceImpl(
             this.jobPersistenceService,
@@ -227,7 +229,7 @@ public class JobCoordinatorServiceImplUnitTests {
                 this.clusterLoadBalancer3,
                 this.clusterLoadBalancer4
             ),
-            this.registry,
+            registry,
             HOST_NAME
         );
     }
@@ -327,10 +329,10 @@ public class JobCoordinatorServiceImplUnitTests {
             Mockito
                 .verify(this.loadBalancerCounterId, Mockito.times(4))
                 .withTags(tagsCaptor.capture());
-            final String className = (String) tagsCaptor.getValue().get(MetricsConstants.TagKeys.CLASS_NAME);
+            final String className = this.tagsCaptor.getValue().get(MetricsConstants.TagKeys.CLASS_NAME);
             Assert.assertNotNull(className);
             Assert.assertTrue(className.startsWith("com.netflix.genie.core.services.ClusterLoadBalancer"));
-            final String status = (String) tagsCaptor.getValue().get(MetricsConstants.TagKeys.STATUS);
+            final String status = this.tagsCaptor.getValue().get(MetricsConstants.TagKeys.STATUS);
             Assert.assertEquals("no preference", status);
             Mockito
                 .verify(this.loadBalancerCounter, Mockito.times(4))
