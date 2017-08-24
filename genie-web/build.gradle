@@ -1,5 +1,5 @@
 plugins {
-    id "com.moowork.node" version "0.12"
+    id "com.moowork.node" version "1.2.0"
 }
 
 apply plugin: "org.asciidoctor.convert"
@@ -150,12 +150,21 @@ clean {
 }
 
 task bundle(type: NpmTask) {
+    inputs.files(fileTree("node_modules"))
+    inputs.file("npm-shrinkwrap.json")
+    inputs.file("package.json")
+    inputs.file("server.js")
+    inputs.file("webpack.config.js")
     inputs.dir static_project_dir
+
     outputs.dir static_build_dir
+
+    dependsOn npm_install
     args = ["run", "build"]
 }
 
-bundle.dependsOn(npm_install)
+npm_install.args = ["--loglevel", "error"]
+npmInstall.args = ["--loglevel", "error"]
 
 jar {
     dependsOn bundle
