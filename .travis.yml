@@ -27,6 +27,7 @@ cache:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
     - genie-web/node_modules/
+  timeout: 1000
 env:
   global:
     - secure: fDTw7flEHvAMikDBMr9g5itVC9pHxW1To2tnZKQnP+FO0CDkFBYctSHxRzhahPYryWiKtSSsFVslpCaKXs2Q6vFuTJE7GW1ZhGMtP7oxtOMWLUWL/yK8YHsG7M+ReEn/oBF4jtrkBFJPF3FXzjLa5MiK1+eSnEe6u5V2xiLrbHY=
