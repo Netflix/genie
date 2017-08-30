@@ -19,13 +19,13 @@ package com.netflix.genie.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.collect.ImmutableSet;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -35,13 +35,14 @@ import java.util.Set;
  * @author tgianos
  * @since 2.0.0
  */
+@Getter
 @EqualsAndHashCode(doNotUseGetters = true)
 public class ClusterCriteria implements Serializable {
 
     private static final long serialVersionUID = 1782794735938665541L;
 
     @NotEmpty(message = "No valid (e.g. non-blank) tags present")
-    private Set<String> tags = new HashSet<>();
+    private Set<String> tags;
 
     /**
      * Create a cluster criteria object with the included tags.
@@ -53,23 +54,16 @@ public class ClusterCriteria implements Serializable {
         @JsonProperty("tags")
         final Set<String> tags
     ) {
+        final ImmutableSet.Builder<String> builder = ImmutableSet.builder();
         if (tags != null) {
             tags.forEach(
                 tag -> {
                     if (StringUtils.isNotBlank(tag)) {
-                        this.tags.add(tag);
+                        builder.add(tag);
                     }
                 }
             );
         }
-    }
-
-    /**
-     * Get the tags for this cluster criteria.
-     *
-     * @return The tags for this criteria as a read-only set. Any attempt to modify will throw exception.
-     */
-    public Set<String> getTags() {
-        return Collections.unmodifiableSet(this.tags);
+        this.tags = builder.build();
     }
 }

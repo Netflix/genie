@@ -60,7 +60,7 @@ public abstract class BaseDTO implements Serializable {
      *
      * @param builder The builder to use
      */
-    protected BaseDTO(final Builder builder) {
+    BaseDTO(final Builder builder) {
         this.id = builder.bId;
         this.created = builder.bCreated == null ? null : new Date(builder.bCreated.getTime());
         this.updated = builder.bUpdated == null ? null : new Date(builder.bUpdated.getTime());
@@ -122,8 +122,12 @@ public abstract class BaseDTO implements Serializable {
      * @author tgianos
      * @since 3.0.0
      */
+    // NOTE: These abstract class builders are marked public not protected due to a JDK bug from 1999 which caused
+    //       issues with Clojure clients which use reflection to make the Java API calls.
+    //       http://bugs.java.com/bugdatabase/view_bug.do?bug_id=4283544
+    //       Setting them to public seems to have solved the issue at the expense of "proper" code design
     @SuppressWarnings("unchecked")
-    protected abstract static class Builder<T extends Builder> {
+    public abstract static class Builder<T extends Builder> {
 
         private String bId;
         private Date bCreated;

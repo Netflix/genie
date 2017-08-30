@@ -17,11 +17,11 @@
  */
 package com.netflix.genie.common.dto;
 
+import com.google.common.collect.ImmutableSet;
 import lombok.Getter;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.Size;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -37,8 +37,6 @@ public abstract class CommonDTO extends BaseDTO {
 
     private static final long serialVersionUID = -2082573569004634251L;
 
-    private final Set<String> tags = new HashSet<>();
-
     @NotEmpty(message = "A version is required and must be at most 255 characters.")
     @Size(max = 255, message = "The version can be no longer than 255 characters")
     private final String version;
@@ -49,6 +47,7 @@ public abstract class CommonDTO extends BaseDTO {
     @Size(max = 255, message = "The name can be no longer than 255 characters")
     private final String name;
     private final String description;
+    private final Set<String> tags;
 
     /**
      * Constructor.
@@ -56,13 +55,13 @@ public abstract class CommonDTO extends BaseDTO {
      * @param builder The builder to use
      */
     @SuppressWarnings("unchecked")
-    protected CommonDTO(final Builder builder) {
+    CommonDTO(final Builder builder) {
         super(builder);
         this.name = builder.bName;
         this.user = builder.bUser;
         this.version = builder.bVersion;
         this.description = builder.bDescription;
-        this.tags.addAll(builder.bTags);
+        this.tags = ImmutableSet.copyOf(builder.bTags);
     }
 
     /**
@@ -75,23 +74,18 @@ public abstract class CommonDTO extends BaseDTO {
     }
 
     /**
-     * Get a readonly copy of the tags.
-     *
-     * @return The tags. Read only. Will throw exception if try to modify.
-     */
-    public Set<String> getTags() {
-        return Collections.unmodifiableSet(this.tags);
-    }
-
-    /**
      * Builder pattern to save constructor arguments.
      *
      * @param <T> Type of builder that extends this
      * @author tgianos
      * @since 3.0.0
      */
+    // NOTE: These abstract class builders are marked public not protected due to a JDK bug from 1999 which caused
+    //       issues with Clojure clients which use reflection to make the Java API calls.
+    //       http://bugs.java.com/bugdatabase/view_bug.do?bug_id=4283544
+    //       Setting them to public seems to have solved the issue at the expense of "proper" code design
     @SuppressWarnings("unchecked")
-    protected abstract static class Builder<T extends Builder> extends BaseDTO.Builder<T> {
+    public abstract static class Builder<T extends Builder> extends BaseDTO.Builder<T> {
 
         private final String bName;
         private final String bUser;
@@ -123,6 +117,7 @@ public abstract class CommonDTO extends BaseDTO {
          * @return The builder
          */
         public T withTags(final Set<String> tags) {
+            this.bTags.clear();
             if (tags != null) {
                 this.bTags.addAll(tags);
             }

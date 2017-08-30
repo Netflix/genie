@@ -17,10 +17,10 @@
  */
 package com.netflix.genie.common.dto;
 
+import com.google.common.collect.ImmutableSet;
 import lombok.Getter;
 
 import javax.validation.constraints.Size;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -35,8 +35,8 @@ import java.util.Set;
 public abstract class ExecutionEnvironmentDTO extends CommonDTO {
 
     private static final long serialVersionUID = 2116254045303538065L;
-    private final Set<String> configs = new HashSet<>();
-    private final Set<String> dependencies = new HashSet<>();
+    private final Set<String> configs;
+    private final Set<String> dependencies;
     @Size(max = 1024, message = "Max length of the setup file is 1024 characters")
     private final String setupFile;
 
@@ -46,11 +46,11 @@ public abstract class ExecutionEnvironmentDTO extends CommonDTO {
      * @param builder The builder to use
      */
     @SuppressWarnings("unchecked")
-    protected ExecutionEnvironmentDTO(final Builder builder) {
+    ExecutionEnvironmentDTO(final Builder builder) {
         super(builder);
         this.setupFile = builder.bSetupFile;
-        this.configs.addAll(builder.bConfigs);
-        this.dependencies.addAll(builder.bDependencies);
+        this.configs = ImmutableSet.copyOf(builder.bConfigs);
+        this.dependencies = ImmutableSet.copyOf(builder.bDependencies);
     }
 
     /**
@@ -63,32 +63,18 @@ public abstract class ExecutionEnvironmentDTO extends CommonDTO {
     }
 
     /**
-     * Get the set of configs for the entity.
-     *
-     * @return The configs for the entity as a read-only set.
-     */
-    public Set<String> getConfigs() {
-        return Collections.unmodifiableSet(this.configs);
-    }
-
-    /**
-     * Get the set of dependencies for the entity.
-     *
-     * @return The dependencies for the entity as a read-only set.
-     */
-    public Set<String> getDependencies() {
-        return Collections.unmodifiableSet(this.dependencies);
-    }
-
-    /**
      * A builder for helping to create instances.
      *
      * @param <T> The type of builder that extends this builder for final implementation
      * @author tgianos
      * @since 3.0.0
      */
+    // NOTE: These abstract class builders are marked public not protected due to a JDK bug from 1999 which caused
+    //       issues with Clojure clients which use reflection to make the Java API calls.
+    //       http://bugs.java.com/bugdatabase/view_bug.do?bug_id=4283544
+    //       Setting them to public seems to have solved the issue at the expense of "proper" code design
     @SuppressWarnings("unchecked")
-    protected abstract static class Builder<T extends Builder> extends CommonDTO.Builder<T> {
+    public abstract static class Builder<T extends Builder> extends CommonDTO.Builder<T> {
 
         private final Set<String> bConfigs = new HashSet<>();
         private final Set<String> bDependencies = new HashSet<>();
@@ -123,6 +109,7 @@ public abstract class ExecutionEnvironmentDTO extends CommonDTO {
          * @return The builder
          */
         public T withConfigs(final Set<String> configs) {
+            this.bConfigs.clear();
             if (configs != null) {
                 this.bConfigs.addAll(configs);
             }
@@ -136,6 +123,7 @@ public abstract class ExecutionEnvironmentDTO extends CommonDTO {
          * @return The builder
          */
         public T withDependencies(final Set<String> dependencies) {
+            this.bDependencies.clear();
             if (dependencies != null) {
                 this.bDependencies.addAll(dependencies);
             }
