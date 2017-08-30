@@ -19,6 +19,8 @@ package com.netflix.genie.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.Email;
@@ -29,7 +31,6 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -57,9 +58,9 @@ public class JobRequest extends ExecutionEnvironmentDTO {
     private final String commandArgs;
     @Valid
     @NotEmpty(message = "At least one cluster criteria is required")
-    private final List<ClusterCriteria> clusterCriterias = new ArrayList<>();
+    private final List<ClusterCriteria> clusterCriterias;
     @NotEmpty(message = "At least one valid (e.g. non-blank) command criteria is required")
-    private final Set<String> commandCriteria = new HashSet<>();
+    private final Set<String> commandCriteria;
     @Size(max = 255, message = "Max length of the group is 255 characters")
     private final String group;
     private final boolean disableLogArchival;
@@ -72,7 +73,7 @@ public class JobRequest extends ExecutionEnvironmentDTO {
     private final Integer memory;
     @Min(value = 1, message = "The timeout must be at least 1 second, preferably much more.")
     private final Integer timeout;
-    private final List<String> applications = new ArrayList<>();
+    private final List<String> applications;
 
     /**
      * Constructor used by the builder build() method.
@@ -80,18 +81,18 @@ public class JobRequest extends ExecutionEnvironmentDTO {
      * @param builder The builder to use
      */
     @SuppressWarnings("unchecked")
-    protected JobRequest(@Valid final Builder builder) {
+    JobRequest(@Valid final Builder builder) {
         super(builder);
         this.commandArgs = builder.bCommandArgs;
-        this.clusterCriterias.addAll(builder.bClusterCriterias);
-        this.commandCriteria.addAll(builder.bCommandCriteria);
+        this.clusterCriterias = ImmutableList.copyOf(builder.bClusterCriterias);
+        this.commandCriteria = ImmutableSet.copyOf(builder.bCommandCriteria);
         this.group = builder.bGroup;
         this.disableLogArchival = builder.bDisableLogArchival;
         this.email = builder.bEmail;
         this.cpu = builder.bCpu;
         this.memory = builder.bMemory;
         this.timeout = builder.bTimeout;
-        this.applications.addAll(builder.bApplications);
+        this.applications = ImmutableList.copyOf(builder.bApplications);
     }
 
     /**
@@ -137,33 +138,6 @@ public class JobRequest extends ExecutionEnvironmentDTO {
      */
     public Optional<Integer> getTimeout() {
         return Optional.ofNullable(this.timeout);
-    }
-
-    /**
-     * Get the list of cluster criterias.
-     *
-     * @return Read-only version of the cluster criterias. Attempts to modify will throw exception
-     */
-    public List<ClusterCriteria> getClusterCriterias() {
-        return Collections.unmodifiableList(this.clusterCriterias);
-    }
-
-    /**
-     * Get the set of command criteria.
-     *
-     * @return Read-only version of the command criteria. Attempts to modify will throw exception
-     */
-    public Set<String> getCommandCriteria() {
-        return Collections.unmodifiableSet(this.commandCriteria);
-    }
-
-    /**
-     * Get the list of application id's this job is requesting to override the default applications with.
-     *
-     * @return The application ids as an read-only list. Attempts to modify with throw runtime exception.
-     */
-    public List<String> getApplications() {
-        return Collections.unmodifiableList(this.applications);
     }
 
     /**
