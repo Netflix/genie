@@ -37,13 +37,15 @@ public final class MetricsUtils {
 
     /**
      * Convenience method to add failure status and exception cause to an existing map of tags.
-     * @param tagsMap the map of tags
+     *
+     * @param tagsMap   the map of tags
      * @param throwable the exception to be tagged
      * @return the updated map of tags
      */
     public static Map<String, String> addFailureTagsWithException(
         final Map<String, String> tagsMap,
-        final Throwable throwable) {
+        final Throwable throwable
+    ) {
         tagsMap.put(MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.FAILURE);
         tagsMap.put(MetricsConstants.TagKeys.EXCEPTION_CLASS, throwable.getClass().getCanonicalName());
         return tagsMap;
@@ -51,6 +53,7 @@ public final class MetricsUtils {
 
     /**
      * Convenience method to add success tag to an existing map of tags.
+     *
      * @param tagsMap the map of tags
      * @return the updated map of tags
      */
@@ -61,6 +64,7 @@ public final class MetricsUtils {
 
     /**
      * Convenience method that creates a tag map pre-populated with success status.
+     *
      * @return a new map containing success tags
      */
     public static Map<String, String> newSuccessTagsMap() {
@@ -69,6 +73,7 @@ public final class MetricsUtils {
 
     /**
      * Convenience method that creates a tag map pre-populated with failure status and exception details.
+     *
      * @param t the exception
      * @return a new map containing failure tags
      */
