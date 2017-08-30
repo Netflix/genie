@@ -154,38 +154,38 @@ public class JobCompletionService {
         final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
 
         try {
-            final Job job = retryTemplate.execute(context -> getJob(jobId));
+            final Job job = this.retryTemplate.execute(context -> this.getJob(jobId));
 
             final JobStatus status = job.getStatus();
 
             // Make sure the job isn't already done before doing something
             if (status.isActive()) {
                 try {
-                    this.retryTemplate.execute(context -> updateJob(job, event, tags));
-                } catch (Exception e) {
+                    this.retryTemplate.execute(context -> this.updateJob(job, event, tags));
+                } catch (final Exception e) {
                     log.error("Failed updating for job: {}", jobId, e);
                 }
                 // Things that should be done either way
                 try {
-                    this.retryTemplate.execute(context -> processJobDir(job));
-                } catch (Exception e) {
+                    this.retryTemplate.execute(context -> this.processJobDir(job));
+                } catch (final Exception e) {
                     log.error("Failed archiving directory for job: {}", jobId, e);
-                    incrementErrorCounter("JOB_DIRECTORY_FAILURE", e);
+                    this.incrementErrorCounter("JOB_DIRECTORY_FAILURE", e);
                 }
                 try {
                     this.retryTemplate.execute(context -> sendEmail(jobId));
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     log.error("Failed sending email for job: {}", jobId, e);
-                    incrementErrorCounter("JOB_UPDATE_FAILURE", e);
+                    this.incrementErrorCounter("JOB_UPDATE_FAILURE", e);
                 }
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             log.error("Failed getting job with id: {}", jobId, e);
             MetricsUtils.addFailureTagsWithException(tags, e);
         } finally {
-            this.registry.timer(
-                this.jobCompletionTimerId.withTags(tags)
-            ).record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+            this.registry
+                .timer(this.jobCompletionTimerId.withTags(tags))
+                .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
     }
 
@@ -485,7 +485,7 @@ public class JobCompletionService {
         final Optional<String> oJobId = job.getId();
 
         // The deletion of dependencies and archiving only happens for job requests which are not Invalid.
-        if (oJobId.isPresent() && !(this.jobSearchService.getJobStatus(job.getId().get()).equals(JobStatus.INVALID))) {
+        if (oJobId.isPresent() && !(this.jobSearchService.getJobStatus(oJobId.get()).equals(JobStatus.INVALID))) {
             final String jobId = oJobId.get();
             final File jobDir = new File(this.baseWorkingDir, jobId);
 
@@ -582,12 +582,29 @@ public class JobCompletionService {
                 .append("].");
 
             final StringBuilder body = new StringBuilder()
-                .append("Id: [" + jobId + "]\n")
-                .append("Name: [" + jobRequest.getName() + "]\n")
-                .append("Status: [" + status + "]\n")
-                .append("User: [" + jobRequest.getUser() + "]\n")
-                .append("Tags: " + jobRequest.getTags() + "\n");
-            jobRequest.getDescription().ifPresent(description -> body.append("[" + description + "]"));
+                .append("Id: [")
+                .append(jobId)
+                .append("]\n")
+                .append("Name: [")
+                .append(jobRequest.getName())
+                .append("]\n")
+                .append("Status: [")
+                .append(status)
+                .append("]\n")
+                .append("User: [")
+                .append(jobRequest.getUser())
+                .append("]\n")
+                .append("Tags: ")
+                .append(jobRequest.getTags())
+                .append("\n");
+            jobRequest
+                .getDescription()
+                .ifPresent(
+                    description ->
+                        body.append("[")
+                            .append(description)
+                            .append("]")
+                );
 
             try {
                 this.mailServiceImpl.sendEmail(
