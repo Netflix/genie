@@ -30,13 +30,11 @@ import org.apache.commons.validator.routines.UrlValidator;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestTemplate;
 
 import javax.validation.constraints.NotNull;
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -106,16 +104,12 @@ public class HttpFileTransferImpl implements FileTransfer {
             this.restTemplate.execute(
                 srcRemotePath,
                 HttpMethod.GET,
-                requestEntity ->
-                    requestEntity.getHeaders().setAccept(Lists.newArrayList(MediaType.ALL)),
-                new ResponseExtractor<Void>() {
-                    @Override
-                    public Void extractData(final ClientHttpResponse response) throws IOException {
-                        // Documentation I could find pointed to the HttpEntity reading the bytes off
-                        // the stream so this should resolve memory problems if the file returned is large
-                        FileUtils.copyInputStreamToFile(response.getBody(), outputFile);
-                        return null;
-                    }
+                requestEntity -> requestEntity.getHeaders().setAccept(Lists.newArrayList(MediaType.ALL)),
+                (ResponseExtractor<Void>) response -> {
+                    // Documentation I could find pointed to the HttpEntity reading the bytes off
+                    // the stream so this should resolve memory problems if the file returned is large
+                    FileUtils.copyInputStreamToFile(response.getBody(), outputFile);
+                    return null;
                 }
             );
         } catch (GenieException | RuntimeException e) {

@@ -37,14 +37,6 @@ import javax.servlet.http.HttpServletRequest;
 public class ControllerUtilsUnitTests {
 
     /**
-     * Dumb test.
-     */
-    @Test
-    public void canConstruct() {
-        Assert.assertNotNull(new ControllerUtils());
-    }
-
-    /**
      * Test the getRemainingPath method.
      */
     @Test
@@ -68,5 +60,21 @@ public class ControllerUtilsUnitTests {
             .when(request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE))
             .thenReturn("/api/v3/jobs/{id}/output");
         Assert.assertThat(ControllerUtils.getRemainingPath(request), Matchers.is(""));
+
+        Mockito
+            .when(request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE))
+            .thenReturn("/api/v3/jobs/1234/output/");
+        Mockito
+            .when(request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE))
+            .thenReturn("/api/v3/jobs/{id}/output/");
+        Assert.assertThat(ControllerUtils.getRemainingPath(request), Matchers.is(""));
+
+        Mockito
+            .when(request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE))
+            .thenReturn("/api/v3/jobs/1234/output/stdout");
+        Mockito
+            .when(request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE))
+            .thenReturn("/api/v3/jobs/{id}/output/**");
+        Assert.assertThat(ControllerUtils.getRemainingPath(request), Matchers.is("stdout"));
     }
 }
