@@ -30,12 +30,12 @@ import javax.servlet.http.HttpServletRequest;
  * @since 3.0.0
  */
 @Slf4j
-public final class ControllerUtils {
+final class ControllerUtils {
 
     /**
      * Constructor.
      */
-    protected ControllerUtils() {
+    private ControllerUtils() {
     }
 
     /**
@@ -46,7 +46,7 @@ public final class ControllerUtils {
      * @param request The http servlet request.
      * @return The remaining path
      */
-    public static String getRemainingPath(final HttpServletRequest request) {
+    static String getRemainingPath(final HttpServletRequest request) {
         String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
         if (path != null) {
             final String bestMatchPattern
