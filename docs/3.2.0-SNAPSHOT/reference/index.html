@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 3.2.0-SNAPSHOT,</span>
-<span id="revdate">2017-09-06</span>
+<span id="revdate">2017-11-14</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -924,7 +924,7 @@ property</p>
 <div class="ulist">
 <ul>
 <li>
-<p>Upgrade Spring Boot from 1.3.8.RELEASE to 1.5.6.RELEASE</p>
+<p>Upgrade Spring Boot from 1.3.8.RELEASE to 1.5.4.RELEASE</p>
 <div class="ulist">
 <ul>
 <li>
@@ -937,21 +937,21 @@ property</p>
 </div>
 </li>
 <li>
-<p>Upgrade to Spring Platform IO Brussels-SR4 for library dependency management</p>
+<p>Upgrade to Spring Platform IO Brussels-SR3 for library dependency management</p>
 <div class="ulist">
 <ul>
 <li>
-<p><a href="http://docs.spring.io/platform/docs/Brussels-SR4/reference/htmlsingle/">Reference Docs</a></p>
+<p><a href="http://docs.spring.io/platform/docs/Brussels-SR3/reference/htmlsingle/">Reference Docs</a></p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p>Upgrade to Spring Cloud Dalston.SR3 for cloud dependency management</p>
+<p>Upgrade to Spring Cloud Dalston.SR2 for cloud dependency management</p>
 <div class="ulist">
 <ul>
 <li>
-<p><a href="http://cloud.spring.io/spring-cloud-static/Dalston.SR3/">Reference Docs</a></p>
+<p><a href="http://cloud.spring.io/spring-cloud-static/Dalston.SR2/">Reference Docs</a></p>
 </li>
 </ul>
 </div>
@@ -1051,7 +1051,7 @@ time are deleted.</p></td>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">spring.session.store-type</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The back end storage system for Spring to store HTTP session information. See
-<a href="http://docs.spring.io/spring-boot/docs/1.5.6.RELEASE/reference/htmlsingle/#boot-features-session">Spring Boot Session</a>
+<a href="http://docs.spring.io/spring-boot/docs/1.5.4.RELEASE/reference/htmlsingle/#boot-features-session">Spring Boot Session</a>
 for more information. Currently on classpath only none, hash_map, redis and jdbc will work.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">hash_map</p></td>
 </tr>
@@ -3922,7 +3922,7 @@ from a <code>.genie/</code> directory stored in the users home directory (e.g. <
 </div>
 <div class="paragraph">
 <p>For more details see the
-<a href="http://docs.spring.io/spring-boot/docs/1.5.6.RELEASE/reference/htmlsingle/#boot-features-external-config">Spring Boot</a>
+<a href="http://docs.spring.io/spring-boot/docs/1.5.4.RELEASE/reference/htmlsingle/#boot-features-external-config">Spring Boot</a>
 documentation on external configuration.</p>
 </div>
 </div>
@@ -3950,7 +3950,7 @@ Genie and it may be more overhead than you&#8217;re comfortable with.</p>
 <div class="paragraph">
 <p>Genie has a lot of available configuration options. For descriptions of specific properties you can see the
 <a href="#_properties">Properties</a> section below. Additionally if you want to know how to configure more parts of the application you
-should have a look at the <a href="http://docs.spring.io/spring-boot/docs/1.5.6.RELEASE/reference/htmlsingle/">Spring Boot</a> docs
+should have a look at the <a href="http://docs.spring.io/spring-boot/docs/1.5.4.RELEASE/reference/htmlsingle/">Spring Boot</a> docs
 as they will go in depth on how to configure the various Spring components used in Genie.</p>
 </div>
 <div class="sect3">
@@ -3958,7 +3958,7 @@ as they will go in depth on how to configure the various Spring components used 
 <div class="paragraph">
 <p>Spring provides a mechanism of segregating parts of application configuration and activating them in certain
 conditions. This mechanism is known as
-<a href="http://docs.spring.io/spring-boot/docs/1.5.6.RELEASE/reference/htmlsingle/#boot-features-profiles">profiles</a>. By default
+<a href="http://docs.spring.io/spring-boot/docs/1.5.4.RELEASE/reference/htmlsingle/#boot-features-profiles">profiles</a>. By default
 Genie will run with the <code>dev</code> profile activated. This means that all the properties in <code>application-dev.yml</code> will be
 appended to, or overwrite, the properties in <code>application.yml</code> which are the defaults. Changing the active profiles is
 easy you just need to change the property <code>spring.profiles.active</code> and pass in a comma separated list of active
@@ -3998,8 +3998,8 @@ reasons. Follow the below sections to load the schemas into your table.</p>
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-There exist Genie 2.x to Genie 3.x migration scripts for MySQL and PostgreSQL but it is recommended to start from
-scratch if you can. See the source code for the migration scripts if you want to try to use them.
+Genie 3.1.x software is not compatible with 3.0.x database schema. Before upgrading Genie servers to 3.1.x, follow the
+steps below to perform database upgrade, or create a new database with 3.1.x schema.
 </td>
 </tr>
 </table>
@@ -4029,6 +4029,21 @@ Then run:</p>
 mysql -u {username} -p{password} -h {host} genie &lt; schema.mysql.sql</code></pre>
 </div>
 </div>
+<div class="sect5">
+<h6 id="_3_0_1_to_3_1_0_database_upgrade"><a class="anchor" href="#_3_0_1_to_3_1_0_database_upgrade"></a>5.3.2.1.1. 3.0.1 to 3.1.0 database upgrade</h6>
+<div class="paragraph">
+<p>Download the:
+<a href="https://github.com/Netflix/genie/blob/master/genie-ddl/src/main/sql/mysql/upgrade-3.0.1-to-3.1.0.mysql.sql">3.0.1 to 3.1.0 Schema Upgrade</a>.</p>
+</div>
+<div class="paragraph">
+<p>Then run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">mysql -u {username} -p{password} -h {host} genie &lt; upgrade-3.0.1-to-3.1.0.mysql.sql</code></pre>
+</div>
+</div>
+</div>
 </div>
 <div class="sect4">
 <h5 id="_postgresql"><a class="anchor" href="#_postgresql"></a>5.3.2.2. PostgreSQL</h5>
@@ -4053,6 +4068,22 @@ Then run:</p>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">createdb genie
 psql -U {user} -h {host} -d genie -f schema.postgresql.sql</code></pre>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_3_0_1_to_3_1_0_database_upgrade_2"><a class="anchor" href="#_3_0_1_to_3_1_0_database_upgrade_2"></a>5.3.2.2.1. 3.0.1 to 3.1.0 database upgrade</h6>
+<div class="paragraph">
+<p>Download the
+<a href="https://github.com/Netflix/genie/blob/master/genie-ddl/src/main/sql/postgresql/upgrade-3.0.1-to-3.1.0.postgresql.sql">3.0.1 to 3.1.0 Schema Upgrade</a>.</p>
+</div>
+<div class="paragraph">
+<p>Then run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">createdb genie
+psql -U {user} -h {host} -d genie -f upgrade-3.0.1-to-3.1.0.postgresql.sql</code></pre>
+</div>
 </div>
 </div>
 </div>
@@ -4128,8 +4159,8 @@ the <a href="#_properties">Properties</a> section below for the properties you&#
 <div class="paragraph">
 <p>This section describes the various properties that can be set to control the behavior of your Genie node and cluster.
 For more information on Spring properties you should see the
-<a href="http://docs.spring.io/spring-boot/docs/1.5.6.RELEASE/reference/htmlsingle/">Spring Boot</a> reference documentation
-and the <a href="http://cloud.spring.io/spring-cloud-static/Dalston.SR3/">Spring Cloud</a> documentation.
+<a href="http://docs.spring.io/spring-boot/docs/1.5.4.RELEASE/reference/htmlsingle/">Spring Boot</a> reference documentation
+and the <a href="http://cloud.spring.io/spring-cloud-static/Dalston.SR2/">Spring Cloud</a> documentation.
 The Spring properties described here are ones that we have overridden from Spring defaults.</p>
 </div>
 <div class="sect2">
@@ -4568,7 +4599,7 @@ to the number of CPU cores x 2 + 1</p></td>
 <div class="sect3">
 <h4 id="_spring_properties"><a class="anchor" href="#_spring_properties"></a>6.1.2. Spring Properties</h4>
 <div class="paragraph">
-<p><a href="http://docs.spring.io/spring-boot/docs/1.5.6.RELEASE/reference/htmlsingle/#common-application-properties">Spring Properties</a></p>
+<p><a href="http://docs.spring.io/spring-boot/docs/1.5.4.RELEASE/reference/htmlsingle/#common-application-properties">Spring Properties</a></p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
@@ -4708,7 +4739,7 @@ property is true</p></td>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">spring.session.store-type</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The back end storage system for Spring to store HTTP session information. See
-<a href="http://docs.spring.io/spring-boot/docs/1.5.6.RELEASE/reference/htmlsingle/#boot-features-session">Spring Boot Session</a>
+<a href="http://docs.spring.io/spring-boot/docs/1.5.4.RELEASE/reference/htmlsingle/#boot-features-session">Spring Boot Session</a>
 for more information. Currently on classpath only none, hash_map, redis and jdbc will work.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">hash_map</p></td>
 </tr>
@@ -5390,7 +5421,7 @@ and system metrics and statistics.</p>
 <div id="footer">
 <div id="footer-text">
 Version 3.2.0-SNAPSHOT<br>
-Last updated 2017-09-06 04:03:02 +00:00
+Last updated 2017-11-14 00:45:49 +00:00
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
