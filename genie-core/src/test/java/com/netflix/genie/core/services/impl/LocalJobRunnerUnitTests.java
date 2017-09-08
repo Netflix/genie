@@ -27,6 +27,7 @@ import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.core.events.GenieEventBus;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import com.netflix.genie.core.services.JobPersistenceService;
@@ -41,8 +42,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.core.io.Resource;
 
 import java.io.File;
@@ -90,8 +89,7 @@ public class LocalJobRunnerUnitTests {
      */
     @Before
     public void setup() throws IOException {
-        final ApplicationEventPublisher eventPublisher = Mockito.mock(ApplicationEventPublisher.class);
-        final ApplicationEventMulticaster eventMulticaster = Mockito.mock(ApplicationEventMulticaster.class);
+        final GenieEventBus genieEventBus = Mockito.mock(GenieEventBus.class);
         final WorkflowTask task1 = Mockito.mock(WorkflowTask.class);
         this.task2 = Mockito.mock(WorkflowTask.class);
 
@@ -108,8 +106,7 @@ public class LocalJobRunnerUnitTests {
 
         this.jobSubmitterService = new LocalJobRunner(
             Mockito.mock(JobPersistenceService.class),
-            eventPublisher,
-            eventMulticaster,
+            genieEventBus,
             jobWorkflowTasks,
             baseWorkingDirResource,
             registry

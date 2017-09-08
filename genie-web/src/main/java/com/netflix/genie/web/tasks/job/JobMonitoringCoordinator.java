@@ -23,6 +23,7 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.core.events.GenieEventBus;
 import com.netflix.genie.core.events.JobFinishedEvent;
 import com.netflix.genie.core.events.JobFinishedReason;
 import com.netflix.genie.core.events.JobStartedEvent;
@@ -36,10 +37,9 @@ import com.netflix.spectator.api.Registry;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.Executor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEvent;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Primary;
-import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
@@ -64,7 +64,6 @@ import java.util.concurrent.ScheduledFuture;
 public class JobMonitoringCoordinator extends JobStateServiceImpl {
     private final String hostName;
     private final JobSearchService jobSearchService;
-    private final ApplicationEventMulticaster eventMulticaster;
     private final Executor executor;
     private final File jobsDir;
     private final JobsProperties jobsProperties;
@@ -74,35 +73,32 @@ public class JobMonitoringCoordinator extends JobStateServiceImpl {
     /**
      * Constructor.
      *
-     * @param hostName         The name of the host this Genie process is running on
-     * @param jobSearchService The search service to use to find jobs
-     * @param publisher        The application event publisher to use to publish synchronous events
-     * @param eventMulticaster The event eventMulticaster to use to publish asynchronous events
-     * @param scheduler        The task scheduler to use to register scheduling of job checkers
-     * @param executor         The executor to use to launch processes
-     * @param registry         The metrics registry
-     * @param jobsDir          The directory where job output is stored
-     * @param jobsProperties   The properties pertaining to jobs
-     * @param jobSubmitterService   implementation of the job submitter service
+     * @param hostName            The name of the host this Genie process is running on
+     * @param jobSearchService    The search service to use to find jobs
+     * @param genieEventBus       The Genie event bus to use for publishing events
+     * @param scheduler           The task scheduler to use to register scheduling of job checkers
+     * @param executor            The executor to use to launch processes
+     * @param registry            The metrics registry
+     * @param jobsDir             The directory where job output is stored
+     * @param jobsProperties      The properties pertaining to jobs
+     * @param jobSubmitterService implementation of the job submitter service
      * @throws IOException on error with the filesystem
      */
     @Autowired
     public JobMonitoringCoordinator(
         final String hostName,
         final JobSearchService jobSearchService,
-        final ApplicationEventPublisher publisher,
-        final ApplicationEventMulticaster eventMulticaster,
-        final TaskScheduler scheduler,
+        final GenieEventBus genieEventBus,
+        @Qualifier("genieTaskScheduler") final TaskScheduler scheduler,
         final Executor executor,
         final Registry registry,
         final Resource jobsDir,
         final JobsProperties jobsProperties,
         final JobSubmitterService jobSubmitterService
     ) throws IOException {
-        super(jobSubmitterService, scheduler, publisher, registry);
+        super(jobSubmitterService, scheduler, genieEventBus, registry);
         this.hostName = hostName;
         this.jobSearchService = jobSearchService;
-        this.eventMulticaster = eventMulticaster;
         this.executor = executor;
         this.jobsDir = jobsDir.getFile();
         this.jobsProperties = jobsProperties;
@@ -163,7 +159,7 @@ public class JobMonitoringCoordinator extends JobStateServiceImpl {
             if (jobExists(id)) {
                 log.info("Job {} is already being tracked. Ignoring.", id);
             } else if (job.getStatus() != JobStatus.RUNNING) {
-                this.eventMulticaster.multicastEvent(
+                this.genieEventBus.publishAsynchronousEvent(
                     new JobFinishedEvent(
                         id, JobFinishedReason.SYSTEM_CRASH, JobStatusMessages.SYSTEM_CRASHED_WHILE_JOB_STARTING, this
                     )
@@ -176,7 +172,7 @@ public class JobMonitoringCoordinator extends JobStateServiceImpl {
                     log.info("Re-attached a job monitor to job {}", id);
                 } catch (final GenieException ge) {
                     log.error("Unable to re-attach to job {}.", id, ge);
-                    this.eventMulticaster.multicastEvent(
+                    this.genieEventBus.publishAsynchronousEvent(
                         new JobFinishedEvent(
                             id, JobFinishedReason.SYSTEM_CRASH, JobStatusMessages.UNABLE_TO_RE_ATTACH_ON_STARTUP, this
                         )
@@ -197,8 +193,7 @@ public class JobMonitoringCoordinator extends JobStateServiceImpl {
             stdOut,
             stdErr,
             this.executor,
-            this.publisher,
-            this.eventMulticaster,
+            this.genieEventBus,
             this.registry,
             this.jobsProperties
         );

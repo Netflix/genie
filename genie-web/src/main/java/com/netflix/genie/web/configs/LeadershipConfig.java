@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.configs;
 
+import com.netflix.genie.core.events.GenieEventBus;
 import com.netflix.genie.web.properties.ZookeeperProperties;
 import com.netflix.genie.web.tasks.leader.LeadershipTask;
 import com.netflix.genie.web.tasks.leader.LeadershipTasksCoordinator;
@@ -25,7 +26,6 @@ import org.apache.curator.framework.CuratorFramework;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.zookeeper.config.LeaderInitiatorFactoryBean;
@@ -84,16 +84,16 @@ public class LeadershipConfig {
      * If Spring Cloud Leadership is disabled and this node is forced to be the leader create the local leader
      * bean which will fire appropriate events.
      *
-     * @param publisher The application event publisher to use
-     * @param isLeader  Whether this node is the leader of the cluster or not
+     * @param genieEventBus The genie event bus implementation to use
+     * @param isLeader      Whether this node is the leader of the cluster or not
      * @return The local leader bean
      */
     @Bean
     @ConditionalOnProperty(value = "genie.zookeeper.enabled", havingValue = "false", matchIfMissing = true)
     public LocalLeader localLeader(
-        final ApplicationEventPublisher publisher,
+        final GenieEventBus genieEventBus,
         @Value("${genie.leader.enabled}") final boolean isLeader
     ) {
-        return new LocalLeader(publisher, isLeader);
+        return new LocalLeader(genieEventBus, isLeader);
     }
 }

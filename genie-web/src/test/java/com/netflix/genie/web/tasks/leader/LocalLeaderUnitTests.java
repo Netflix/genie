@@ -17,13 +17,13 @@
  */
 package com.netflix.genie.web.tasks.leader;
 
+import com.netflix.genie.core.events.GenieEventBus;
 import com.netflix.genie.test.categories.UnitTest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.integration.leader.event.OnGrantedEvent;
@@ -39,7 +39,7 @@ import org.springframework.integration.leader.event.OnRevokedEvent;
 public class LocalLeaderUnitTests {
 
     private LocalLeader localLeader;
-    private ApplicationEventPublisher publisher;
+    private GenieEventBus genieEventBus;
     private ContextRefreshedEvent contextRefreshedEvent;
     private ContextClosedEvent contextClosedEvent;
 
@@ -48,7 +48,7 @@ public class LocalLeaderUnitTests {
      */
     @Before
     public void setup() {
-        this.publisher = Mockito.mock(ApplicationEventPublisher.class);
+        this.genieEventBus = Mockito.mock(GenieEventBus.class);
         this.contextRefreshedEvent = Mockito.mock(ContextRefreshedEvent.class);
         this.contextClosedEvent = Mockito.mock(ContextClosedEvent.class);
     }
@@ -66,9 +66,9 @@ public class LocalLeaderUnitTests {
      */
     @Test
     public void canStartLeadershipIfLeader() {
-        this.localLeader = new LocalLeader(this.publisher, true);
+        this.localLeader = new LocalLeader(this.genieEventBus, true);
         this.localLeader.startLeadership(this.contextRefreshedEvent);
-        Mockito.verify(this.publisher, Mockito.times(1)).publishEvent(Mockito.any(OnGrantedEvent.class));
+        Mockito.verify(this.genieEventBus, Mockito.times(1)).publishSynchronousEvent(Mockito.any(OnGrantedEvent.class));
     }
 
     /**
@@ -76,9 +76,9 @@ public class LocalLeaderUnitTests {
      */
     @Test
     public void wontStartLeadershipIfNotLeader() {
-        this.localLeader = new LocalLeader(this.publisher, false);
+        this.localLeader = new LocalLeader(this.genieEventBus, false);
         this.localLeader.startLeadership(this.contextRefreshedEvent);
-        Mockito.verify(this.publisher, Mockito.never()).publishEvent(Mockito.any(OnGrantedEvent.class));
+        Mockito.verify(this.genieEventBus, Mockito.never()).publishSynchronousEvent(Mockito.any(OnGrantedEvent.class));
     }
 
     /**
@@ -86,9 +86,9 @@ public class LocalLeaderUnitTests {
      */
     @Test
     public void canStopLeadershipIfLeader() {
-        this.localLeader = new LocalLeader(this.publisher, true);
+        this.localLeader = new LocalLeader(this.genieEventBus, true);
         this.localLeader.stopLeadership(this.contextClosedEvent);
-        Mockito.verify(this.publisher, Mockito.times(1)).publishEvent(Mockito.any(OnRevokedEvent.class));
+        Mockito.verify(this.genieEventBus, Mockito.times(1)).publishSynchronousEvent(Mockito.any(OnRevokedEvent.class));
     }
 
     /**
@@ -96,8 +96,8 @@ public class LocalLeaderUnitTests {
      */
     @Test
     public void wontStopLeadershipIfNotLeader() {
-        this.localLeader = new LocalLeader(this.publisher, false);
+        this.localLeader = new LocalLeader(this.genieEventBus, false);
         this.localLeader.stopLeadership(this.contextClosedEvent);
-        Mockito.verify(this.publisher, Mockito.never()).publishEvent(Mockito.any(OnRevokedEvent.class));
+        Mockito.verify(this.genieEventBus, Mockito.never()).publishSynchronousEvent(Mockito.any(OnRevokedEvent.class));
     }
 }

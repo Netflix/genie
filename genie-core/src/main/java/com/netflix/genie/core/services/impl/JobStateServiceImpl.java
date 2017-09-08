@@ -22,6 +22,7 @@ import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.core.events.GenieEventBus;
 import com.netflix.genie.core.events.JobScheduledEvent;
 import com.netflix.genie.core.jobs.JobLauncher;
 import com.netflix.genie.core.services.JobStateService;
@@ -32,7 +33,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.Instant;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.TaskScheduler;
 
 import java.util.Collections;
@@ -52,26 +52,29 @@ import java.util.function.Supplier;
 public class JobStateServiceImpl implements JobStateService {
     protected final TaskScheduler scheduler;
     protected final Registry registry;
-    protected final ApplicationEventPublisher publisher;
+    protected final GenieEventBus genieEventBus;
     private final Map<String, JobInfo> jobs = Collections.synchronizedMap(new HashMap<>());
     private final JobSubmitterService jobSubmitterService;
     private final Counter unableToCancel;
 
     /**
      * Constructor.
+     *
      * @param jobSubmitterService implementation of the job submitter service
      * @param scheduler           The task scheduler to use to register scheduling of job checkers
-     * @param publisher           The application event publisher to use to publish synchronous events
+     * @param genieEventBus       The event bus to use to publish events
      * @param registry            The metrics registry
      */
-    public JobStateServiceImpl(final JobSubmitterService jobSubmitterService,
-                               final TaskScheduler scheduler,
-                               final ApplicationEventPublisher publisher,
-                               final Registry registry) {
+    public JobStateServiceImpl(
+        final JobSubmitterService jobSubmitterService,
+        final TaskScheduler scheduler,
+        final GenieEventBus genieEventBus,
+        final Registry registry
+    ) {
         this.jobSubmitterService = jobSubmitterService;
         this.scheduler = scheduler;
         this.registry = registry;
-        this.publisher = publisher;
+        this.genieEventBus = genieEventBus;
 
         this.registry.mapSize("genie.jobs.running.gauge", this.jobs);
         this.registry.methodValue("genie.jobs.active.gauge", this, "getNumActiveJobs");
@@ -84,36 +87,46 @@ public class JobStateServiceImpl implements JobStateService {
      */
     @Override
     public void init(final String jobId) {
-        jobs.putIfAbsent(jobId, new JobInfo());
+        this.jobs.putIfAbsent(jobId, new JobInfo());
     }
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public void schedule(final String jobId, final JobRequest jobRequest, final Cluster cluster,
-                         final Command command, final List<Application> applications, final int memory) {
-        handle(jobId, () -> {
-            final JobInfo jobInfo = jobs.get(jobId);
-            jobInfo.setMemory(memory);
-            final JobLauncher jobLauncher = new JobLauncher(this.jobSubmitterService,
-                jobRequest,
-                cluster,
-                command,
-                applications,
-                memory,
-                registry
-            );
-            final Future<?> task = scheduler.schedule(jobLauncher, Instant.now().toDate());
-            jobInfo.setRunningTask(task);
-            jobInfo.setActive(true);
-            //
-            // This event is fired when a job is scheduled to run on this Genie node. We'll track the future here in
-            // case it needs to be killed while still in INIT state. Once it's running the onJobStarted event will
-            // clear it out.
-            //
-            publisher.publishEvent(new JobScheduledEvent(jobId, task, memory, this));
-            return null;
-        });
+    public void schedule(
+        final String jobId,
+        final JobRequest jobRequest,
+        final Cluster cluster,
+        final Command command,
+        final List<Application> applications,
+        final int memory
+    ) {
+        this.handle(
+            jobId,
+            () -> {
+                final JobInfo jobInfo = jobs.get(jobId);
+                jobInfo.setMemory(memory);
+                final JobLauncher jobLauncher = new JobLauncher(this.jobSubmitterService,
+                    jobRequest,
+                    cluster,
+                    command,
+                    applications,
+                    memory,
+                    registry
+                );
+                final Future<?> task = this.scheduler.schedule(jobLauncher, Instant.now().toDate());
+                jobInfo.setRunningTask(task);
+                jobInfo.setActive(true);
+                //
+                // This event is fired when a job is scheduled to run on this Genie node. We'll track the future here in
+                // case it needs to be killed while still in INIT state. Once it's running the onJobStarted event will
+                // clear it out.
+                //
+                this.genieEventBus.publishSynchronousEvent(new JobScheduledEvent(jobId, task, memory, this));
+                return null;
+            }
+        );
     }
 
     /**
@@ -121,20 +134,23 @@ public class JobStateServiceImpl implements JobStateService {
      */
     @Override
     public void done(final String jobId) throws GenieException {
-        handle(jobId, () -> {
-            final JobInfo jobInfo = jobs.get(jobId);
-            final Future<?> task = jobInfo.getRunningTask();
-            if (task != null && !task.isDone()) {
-                if (task.cancel(true)) {
-                    log.debug("Successfully cancelled job task for job {}", jobId);
-                } else {
-                    log.error("Unable to cancel job task for job {}", jobId);
-                    this.unableToCancel.increment();
+        this.handle(
+            jobId,
+            () -> {
+                final JobInfo jobInfo = jobs.get(jobId);
+                final Future<?> task = jobInfo.getRunningTask();
+                if (task != null && !task.isDone()) {
+                    if (task.cancel(true)) {
+                        log.debug("Successfully cancelled job task for job {}", jobId);
+                    } else {
+                        log.error("Unable to cancel job task for job {}", jobId);
+                        this.unableToCancel.increment();
+                    }
                 }
+                jobs.remove(jobId);
+                return null;
             }
-            jobs.remove(jobId);
-            return null;
-        });
+        );
     }
 
     private void handle(final String jobId, final Supplier<Void> supplier) {
@@ -177,6 +193,7 @@ public class JobStateServiceImpl implements JobStateService {
             return (int) this.jobs.values().stream().filter(JobInfo::isActive).count();
         }
     }
+
     /**
      * {@inheritDoc}
      */

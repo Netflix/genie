@@ -5,10 +5,10 @@ import com.netflix.genie.common.dto.Application
 import com.netflix.genie.common.dto.Cluster
 import com.netflix.genie.common.dto.Command
 import com.netflix.genie.common.dto.JobRequest
+import com.netflix.genie.core.events.GenieEventBus
 import com.netflix.genie.core.services.JobStateService
 import com.netflix.genie.core.services.JobSubmitterService
 import com.netflix.spectator.api.Registry
-import org.springframework.context.ApplicationEventPublisher
 import org.springframework.scheduling.TaskScheduler
 import spock.lang.Specification
 
@@ -18,20 +18,21 @@ import spock.lang.Specification
  * @author amajumdar
  * @since 3.0.0
  */
-class JobStateServiceImplSpec extends Specification{
+class JobStateServiceImplSpec extends Specification {
     JobSubmitterService jobSubmitterService = Mock(JobSubmitterService)
     TaskScheduler scheduler = Mock(TaskScheduler)
-    ApplicationEventPublisher publisher = Mock(ApplicationEventPublisher)
+    GenieEventBus genieEventBus = Mock(GenieEventBus)
     Registry registry = Mock(Registry)
     JobRequest jobRequest = Mock(JobRequest)
     Cluster cluster = Mock(Cluster)
     Command command = Mock(Command)
     List<Application> applications = Lists.newArrayList(Mock(Application))
-    JobStateService jobStateService = new JobStateServiceImpl(jobSubmitterService, scheduler, publisher, registry)
+    JobStateService jobStateService = new JobStateServiceImpl(jobSubmitterService, scheduler, genieEventBus, registry)
     String job1Id = "1"
     String job2Id = "2"
-    int memory = 1024;
-    def testInit(){
+    int memory = 1024
+
+    def testInit() {
         when:
         jobStateService.init(job1Id)
         then:
@@ -44,7 +45,8 @@ class JobStateServiceImplSpec extends Specification{
         jobStateService.jobExists(job1Id)
         jobStateService.getNumActiveJobs() == 0
     }
-    def testSchedule(){
+
+    def testSchedule() {
         when:
         jobStateService.init(job1Id)
         jobStateService.schedule(job1Id, jobRequest, cluster, command, applications, memory)
@@ -69,7 +71,8 @@ class JobStateServiceImplSpec extends Specification{
         jobStateService.getNumActiveJobs() == 1
         jobStateService.getUsedMemory() == 1024
     }
-    def testDone(){
+
+    def testDone() {
         when:
         jobStateService.init(job1Id)
         jobStateService.done(job1Id)

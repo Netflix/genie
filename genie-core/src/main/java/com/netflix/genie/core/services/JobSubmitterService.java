@@ -51,18 +51,13 @@ public interface JobSubmitterService {
      * @throws GenieException if there is an error
      */
     void submitJob(
-        @Valid
         @NotNull(message = "No job provided. Unable to submit job for execution.")
-        final JobRequest jobRequest,
-        @Valid
+        @Valid final JobRequest jobRequest,
         @NotNull(message = "No cluster provided. Unable to submit job for execution")
-        final Cluster cluster,
-        @Valid
+        @Valid final Cluster cluster,
         @NotNull(message = "No command provided. Unable to submit job for execution")
-        final Command command,
-        @NotNull(message = "No applications provided. Unable to submit job for execution")
-        final List<Application> applications,
-        @Min(value = 1, message = "Memory can't be less than 1 MB")
-        final int memory
+        @Valid final Command command,
+        @NotNull(message = "No applications provided. Unable to execute") final List<Application> applications,
+        @Min(value = 1, message = "Memory can't be less than 1 MB") final int memory
     ) throws GenieException;
 }

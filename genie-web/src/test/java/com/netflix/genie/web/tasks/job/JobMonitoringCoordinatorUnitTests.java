@@ -23,6 +23,7 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
+import com.netflix.genie.core.events.GenieEventBus;
 import com.netflix.genie.core.events.JobFinishedEvent;
 import com.netflix.genie.core.events.JobFinishedReason;
 import com.netflix.genie.core.events.JobStartedEvent;
@@ -42,8 +43,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.io.Resource;
 import org.springframework.scheduling.TaskScheduler;
@@ -78,7 +77,7 @@ public class JobMonitoringCoordinatorUnitTests {
     private TaskScheduler scheduler;
     private JobMonitoringCoordinator coordinator;
     private JobSearchService jobSearchService;
-    private ApplicationEventMulticaster eventMulticaster;
+    private GenieEventBus genieEventBus;
     private Date tomorrow;
     private Counter unableToCancel;
 
@@ -96,7 +95,7 @@ public class JobMonitoringCoordinatorUnitTests {
         final JobSubmitterService jobSubmitterService = Mockito.mock(JobSubmitterService.class);
         final Executor executor = Mockito.mock(Executor.class);
         this.scheduler = Mockito.mock(TaskScheduler.class);
-        this.eventMulticaster = Mockito.mock(ApplicationEventMulticaster.class);
+        this.genieEventBus = Mockito.mock(GenieEventBus.class);
         final Registry registry = Mockito.mock(Registry.class);
         this.unableToCancel = Mockito.mock(Counter.class);
         Mockito.when(registry.counter(Mockito.anyString())).thenReturn(this.unableToCancel);
@@ -108,8 +107,7 @@ public class JobMonitoringCoordinatorUnitTests {
         this.coordinator = new JobMonitoringCoordinator(
             HOSTNAME,
             this.jobSearchService,
-            Mockito.mock(ApplicationEventPublisher.class),
-            this.eventMulticaster,
+            this.genieEventBus,
             this.scheduler,
             executor,
             registry,
@@ -188,7 +186,9 @@ public class JobMonitoringCoordinatorUnitTests {
         Mockito.when(this.jobSearchService.getJobExecution(job4Id)).thenThrow(new GenieNotFoundException("blah"));
         this.coordinator.onStartup(event);
 
-        Mockito.verify(this.eventMulticaster, Mockito.times(2)).multicastEvent(Mockito.any(JobFinishedEvent.class));
+        Mockito
+            .verify(this.genieEventBus, Mockito.times(2))
+            .publishAsynchronousEvent(Mockito.any(JobFinishedEvent.class));
         Mockito
             .verify(this.scheduler, Mockito.times(3))
             .scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(DELAY));
