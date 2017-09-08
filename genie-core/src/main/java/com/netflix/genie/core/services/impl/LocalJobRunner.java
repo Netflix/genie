@@ -26,6 +26,7 @@ import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.core.events.GenieEventBus;
 import com.netflix.genie.core.events.JobFinishedEvent;
 import com.netflix.genie.core.events.JobFinishedReason;
 import com.netflix.genie.core.events.JobStartedEvent;
@@ -37,9 +38,8 @@ import com.netflix.genie.core.services.JobSubmitterService;
 import com.netflix.spectator.api.Registry;
 import com.netflix.spectator.api.Timer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.core.io.Resource;
 
 import javax.validation.Valid;
@@ -70,8 +70,7 @@ public class LocalJobRunner implements JobSubmitterService {
     private final JobPersistenceService jobPersistenceService;
     private final List<WorkflowTask> jobWorkflowTasks;
     private final Resource baseWorkingDirPath;
-    private final ApplicationEventPublisher eventPublisher;
-    private final ApplicationEventMulticaster eventMulticaster;
+    private final GenieEventBus genieEventBus;
 
     private final Timer overallSubmitTimer;
     private final Timer createJobDirTimer;
@@ -85,25 +84,22 @@ public class LocalJobRunner implements JobSubmitterService {
      * Constructor create the object.
      *
      * @param jobPersistenceService Implementation of the job persistence service
-     * @param eventPublisher        The synchronous event publisher to use
-     * @param eventMulticaster      Instance of the asynchronous event publisher to use
+     * @param genieEventBus         The event bus implementation to use
      * @param workflowTasks         List of all the workflow tasks to be executed
      * @param genieWorkingDir       Working directory for genie where it creates jobs directories
      * @param registry              The metrics registry to use
      */
     public LocalJobRunner(
         @NotNull final JobPersistenceService jobPersistenceService,
-        @NotNull final ApplicationEventPublisher eventPublisher,
-        @NotNull final ApplicationEventMulticaster eventMulticaster,
+        @NonNull final GenieEventBus genieEventBus,
         @NotNull final List<WorkflowTask> workflowTasks,
         @NotNull final Resource genieWorkingDir,
         @NotNull final Registry registry
     ) {
         this.jobPersistenceService = jobPersistenceService;
+        this.genieEventBus = genieEventBus;
         this.jobWorkflowTasks = workflowTasks;
         this.baseWorkingDirPath = genieWorkingDir;
-        this.eventPublisher = eventPublisher;
-        this.eventMulticaster = eventMulticaster;
 
         // Metrics
         this.overallSubmitTimer = registry.timer("genie.jobs.submit.localRunner.overall.timer");
@@ -126,19 +122,14 @@ public class LocalJobRunner implements JobSubmitterService {
     )
     @Override
     public void submitJob(
-        @Valid
         @NotNull(message = "No job provided. Unable to submit job for execution.")
-        final JobRequest jobRequest,
-        @Valid
+        @Valid final JobRequest jobRequest,
         @NotNull(message = "No cluster provided. Unable to submit job for execution")
-        final Cluster cluster,
-        @Valid
+        @Valid final Cluster cluster,
         @NotNull(message = "No command provided. Unable to submit job for execution")
-        final Command command,
-        @NotNull(message = "No applications provided. Unable to submit job for execution")
-        final List<Application> applications,
-        @Min(value = 1, message = "Memory can't be less than 1 MB")
-        final int memory
+        @Valid final Command command,
+        @NotNull(message = "No applications provided. Unable to execute") final List<Application> applications,
+        @Min(value = 1, message = "Memory can't be less than 1 MB") final int memory
     ) throws GenieException {
         final long start = System.nanoTime();
 
@@ -186,7 +177,7 @@ public class LocalJobRunner implements JobSubmitterService {
                     final long publishEventStart = System.nanoTime();
                     try {
                         log.info("Publishing job started event for job {}", id);
-                        this.eventPublisher.publishEvent(new JobStartedEvent(jobExecution, this));
+                        this.genieEventBus.publishSynchronousEvent(new JobStartedEvent(jobExecution, this));
                     } finally {
                         this.publishJobStartedEventTimer
                             .record(System.nanoTime() - publishEventStart, TimeUnit.NANOSECONDS);
@@ -195,7 +186,7 @@ public class LocalJobRunner implements JobSubmitterService {
             } catch (final GeniePreconditionException gpe) {
                 log.error(gpe.getMessage(), gpe);
                 this.createInitFailureDetailsFile(id, gpe);
-                this.eventMulticaster.multicastEvent(
+                this.genieEventBus.publishAsynchronousEvent(
                     new JobFinishedEvent(
                         id, JobFinishedReason.INVALID, JobStatusMessages.SUBMIT_PRECONDITION_FAILURE, this
                     )
@@ -204,7 +195,7 @@ public class LocalJobRunner implements JobSubmitterService {
             } catch (final Exception e) {
                 log.error(e.getMessage(), e);
                 this.createInitFailureDetailsFile(id, e);
-                this.eventMulticaster.multicastEvent(
+                this.genieEventBus.publishAsynchronousEvent(
                     new JobFinishedEvent(
                         id, JobFinishedReason.FAILED_TO_INIT, JobStatusMessages.SUBMIT_INIT_FAILURE, this
                     )

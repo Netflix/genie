@@ -19,6 +19,7 @@ package com.netflix.genie.web.configs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.core.events.GenieEventBus;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
@@ -64,10 +65,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ServiceLocatorFactoryBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.core.io.Resource;
 import org.springframework.mail.javamail.JavaMailSender;
 
@@ -223,7 +222,7 @@ public class ServicesConfig {
      * @param jobSearchService The job search service to use to locate job information.
      * @param executor         The executor to use to run system processes.
      * @param jobsProperties   The jobs properties to use
-     * @param eventPublisher   The application event publisher to use to publish system wide events
+     * @param genieEventBus    The application event bus to use to publish system wide events
      * @param genieWorkingDir  Working directory for genie where it creates jobs directories.
      * @param objectMapper     The Jackson ObjectMapper used to serialize from/to JSON
      * @return A job kill service instance.
@@ -234,7 +233,7 @@ public class ServicesConfig {
         final JobSearchService jobSearchService,
         final Executor executor,
         final JobsProperties jobsProperties,
-        final ApplicationEventPublisher eventPublisher,
+        final GenieEventBus genieEventBus,
         @Qualifier("jobsDir") final Resource genieWorkingDir,
         final ObjectMapper objectMapper
     ) {
@@ -243,9 +242,10 @@ public class ServicesConfig {
             jobSearchService,
             executor,
             jobsProperties.getUsers().isRunAsUserEnabled(),
-            eventPublisher,
+            genieEventBus,
             genieWorkingDir,
-            objectMapper);
+            objectMapper
+        );
     }
 
     /**
@@ -296,8 +296,7 @@ public class ServicesConfig {
      * Get a implementation of the JobSubmitterService that runs jobs locally.
      *
      * @param jobPersistenceService Implementation of the job persistence service.
-     * @param eventPublisher        Instance of the synchronous event publisher.
-     * @param eventMulticaster      Instance of the asynchronous event publisher.
+     * @param genieEventBus         The genie event bus implementation to use
      * @param workflowTasks         List of all the workflow tasks to be executed.
      * @param genieWorkingDir       Working directory for genie where it creates jobs directories.
      * @param registry              The metrics registry to use
@@ -306,16 +305,14 @@ public class ServicesConfig {
     @Bean
     public JobSubmitterService jobSubmitterService(
         final JobPersistenceService jobPersistenceService,
-        final ApplicationEventPublisher eventPublisher,
-        final ApplicationEventMulticaster eventMulticaster,
+        final GenieEventBus genieEventBus,
         final List<WorkflowTask> workflowTasks,
         @Qualifier("jobsDir") final Resource genieWorkingDir,
         final Registry registry
     ) {
         return new LocalJobRunner(
             jobPersistenceService,
-            eventPublisher,
-            eventMulticaster,
+            genieEventBus,
             workflowTasks,
             genieWorkingDir,
             registry

@@ -17,8 +17,8 @@
  */
 package com.netflix.genie.web.tasks.leader;
 
+import com.netflix.genie.core.events.GenieEventBus;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
@@ -35,17 +35,18 @@ import org.springframework.integration.leader.event.OnRevokedEvent;
 @Slf4j
 public class LocalLeader {
 
-    private final ApplicationEventPublisher publisher;
+    private final GenieEventBus genieEventBus;
     private final boolean isLeader;
 
     /**
      * Constructor.
      *
-     * @param publisher The spring application event publisher to use to invoke that this node is a leader
-     * @param isLeader  Whether this node should be the leader or not. Should only be on in a cluster but not enforced
+     * @param genieEventBus The spring application event publisher to use to invoke that this node is a leader
+     * @param isLeader      Whether this node should be the leader or not. Should only be one in a cluster but not
+     *                      enforced by Genie at this time
      */
-    public LocalLeader(final ApplicationEventPublisher publisher, final boolean isLeader) {
-        this.publisher = publisher;
+    public LocalLeader(final GenieEventBus genieEventBus, final boolean isLeader) {
+        this.genieEventBus = genieEventBus;
         this.isLeader = isLeader;
         if (this.isLeader) {
             log.info("Constructing LocalLeader. This node IS the leader.");
@@ -63,7 +64,7 @@ public class LocalLeader {
     public void startLeadership(final ContextRefreshedEvent event) {
         if (this.isLeader) {
             log.debug("Starting Leadership due to {}", event);
-            this.publisher.publishEvent(new OnGrantedEvent(this, null, "leader"));
+            this.genieEventBus.publishSynchronousEvent(new OnGrantedEvent(this, null, "leader"));
         }
     }
 
@@ -76,7 +77,7 @@ public class LocalLeader {
     public void stopLeadership(final ContextClosedEvent event) {
         if (this.isLeader) {
             log.debug("Stopping Leadership due to {}", event);
-            this.publisher.publishEvent(new OnRevokedEvent(this, null, "leader"));
+            this.genieEventBus.publishSynchronousEvent(new OnRevokedEvent(this, null, "leader"));
         }
     }
 }

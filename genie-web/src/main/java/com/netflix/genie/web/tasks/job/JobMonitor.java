@@ -20,6 +20,7 @@ package com.netflix.genie.web.tasks.job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.exceptions.GenieTimeoutException;
+import com.netflix.genie.core.events.GenieEventBus;
 import com.netflix.genie.core.events.JobFinishedEvent;
 import com.netflix.genie.core.events.JobFinishedReason;
 import com.netflix.genie.core.events.KillJobEvent;
@@ -30,12 +31,11 @@ import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import com.netflix.genie.web.tasks.node.NodeTask;
 import com.netflix.spectator.api.Counter;
 import com.netflix.spectator.api.Registry;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.lang3.SystemUtils;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.event.ApplicationEventMulticaster;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -58,8 +58,7 @@ public class JobMonitor extends NodeTask {
     private final String id;
     private final JobExecution execution;
     private final ProcessChecker processChecker;
-    private final ApplicationEventPublisher publisher;
-    private final ApplicationEventMulticaster eventMulticaster;
+    private final GenieEventBus genieEventBus;
     private final File stdOut;
     private final File stdErr;
     private final long maxStdOutLength;
@@ -77,22 +76,20 @@ public class JobMonitor extends NodeTask {
     /**
      * Constructor.
      *
-     * @param execution        The job execution object including the pid
-     * @param stdOut           The std out output file
-     * @param stdErr           The std err output file
-     * @param executor         The process executor to use
-     * @param publisher        The event publisher to use when a job isn't running anymore
-     * @param eventMulticaster The multicaster to send async events
-     * @param registry         The metrics event registry
-     * @param jobsProperties   The properties for jobs
+     * @param execution      The job execution object including the pid
+     * @param stdOut         The std out output file
+     * @param stdErr         The std err output file
+     * @param executor       The process executor to use
+     * @param genieEventBus  The event bus implementation to use
+     * @param registry       The metrics event registry
+     * @param jobsProperties The properties for jobs
      */
-    public JobMonitor(
+    JobMonitor(
         @Valid final JobExecution execution,
         @NotNull final File stdOut,
         @NotNull final File stdErr,
         @NotNull final Executor executor,
-        @NotNull final ApplicationEventPublisher publisher,
-        @NotNull final ApplicationEventMulticaster eventMulticaster,
+        @NonNull final GenieEventBus genieEventBus,
         @NotNull final Registry registry,
         @NotNull final JobsProperties jobsProperties
     ) {
@@ -103,8 +100,7 @@ public class JobMonitor extends NodeTask {
         this.errorCount = 0;
         this.id = execution.getId().orElseThrow(IllegalArgumentException::new);
         this.execution = execution;
-        this.publisher = publisher;
-        this.eventMulticaster = eventMulticaster;
+        this.genieEventBus = genieEventBus;
 
         final int processId = execution.getProcessId().orElseThrow(IllegalArgumentException::new);
         final Date timeout = execution.getTimeout().orElseThrow(IllegalArgumentException::new);
@@ -139,7 +135,7 @@ public class JobMonitor extends NodeTask {
             }
 
             if (this.stdOut.exists() && this.stdOut.length() > this.maxStdOutLength) {
-                this.publisher.publishEvent(
+                this.genieEventBus.publishSynchronousEvent(
                     new KillJobEvent(this.id, JobStatusMessages.JOB_EXCEEDED_STDOUT_LENGTH, this)
                 );
                 this.stdOutTooLarge.increment();
@@ -147,7 +143,7 @@ public class JobMonitor extends NodeTask {
             }
 
             if (this.stdErr.exists() && this.stdErr.length() > this.maxStdErrLength) {
-                this.publisher.publishEvent(
+                this.genieEventBus.publishSynchronousEvent(
                     new KillJobEvent(this.id, JobStatusMessages.JOB_EXCEEDED_STDERR_LENGTH, this)
                 );
                 this.stdErrTooLarge.increment();
@@ -158,11 +154,13 @@ public class JobMonitor extends NodeTask {
         } catch (final GenieTimeoutException gte) {
             log.info("Job {} has timed out", this.execution.getId(), gte);
             this.timeoutRate.increment();
-            this.publisher.publishEvent(new KillJobEvent(this.id, JobStatusMessages.JOB_EXCEEDED_TIMEOUT, this));
+            this.genieEventBus.publishSynchronousEvent(
+                new KillJobEvent(this.id, JobStatusMessages.JOB_EXCEEDED_TIMEOUT, this)
+            );
         } catch (final ExecuteException ee) {
             log.info("Job {} has finished", this.id);
             this.finishedRate.increment();
-            this.eventMulticaster.multicastEvent(
+            this.genieEventBus.publishAsynchronousEvent(
                 new JobFinishedEvent(
                     this.id,
                     JobFinishedReason.PROCESS_COMPLETED,
@@ -182,7 +180,7 @@ public class JobMonitor extends NodeTask {
             // If this keeps throwing errors out we should kill the job
             if (this.errorCount > MAX_ERRORS) {
                 // TODO: What if they throw an exception?
-                this.publisher.publishEvent(
+                this.genieEventBus.publishSynchronousEvent(
                     new KillJobEvent(
                         this.id,
                         JobStatusMessages.JOB_PROCESS_NOT_FOUND,
@@ -190,7 +188,7 @@ public class JobMonitor extends NodeTask {
                     )
                 );
                 // Also send a job finished event
-                this.eventMulticaster.multicastEvent(
+                this.genieEventBus.publishAsynchronousEvent(
                     new JobFinishedEvent(
                         this.id,
                         JobFinishedReason.KILLED,

@@ -18,6 +18,7 @@
 package com.netflix.genie.web.configs;
 
 import com.google.common.collect.Sets;
+import com.netflix.genie.core.events.GenieEventBus;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.properties.ZookeeperProperties;
 import com.netflix.genie.web.tasks.leader.LeadershipTask;
@@ -26,7 +27,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.TaskScheduler;
 
 import java.util.Collection;
@@ -65,7 +65,7 @@ public class LeadershipConfigTest {
      */
     @Test
     public void canGetLocalLeader() {
-        final ApplicationEventPublisher publisher = Mockito.mock(ApplicationEventPublisher.class);
-        Assert.assertNotNull(new LeadershipConfig().localLeader(publisher, true));
+        final GenieEventBus genieEventBus = Mockito.mock(GenieEventBus.class);
+        Assert.assertNotNull(new LeadershipConfig().localLeader(genieEventBus, true));
     }
 }

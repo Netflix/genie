@@ -19,6 +19,7 @@ package com.netflix.genie.web.tasks;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -44,7 +45,7 @@ public class TasksCleanup {
      * @param scheduler The task scheduler for the system.
      */
     @Autowired
-    public TasksCleanup(@NotNull final ThreadPoolTaskScheduler scheduler) {
+    public TasksCleanup(@Qualifier("genieTaskScheduler") @NotNull final ThreadPoolTaskScheduler scheduler) {
         this.scheduler = scheduler;
     }
 

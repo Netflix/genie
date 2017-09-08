@@ -23,4 +23,7 @@
  * @author tgianos
  * @since 3.0.0
  */
+@ParametersAreNonnullByDefault
 package com.netflix.genie.core.events;
+
+import javax.annotation.ParametersAreNonnullByDefault;

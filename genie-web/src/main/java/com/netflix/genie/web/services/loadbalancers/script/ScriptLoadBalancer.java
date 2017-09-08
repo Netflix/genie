@@ -107,7 +107,7 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
     private final AtomicBoolean isConfigured = new AtomicBoolean();
     private final ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
 
-    private final AsyncTaskExecutor taskExecutor;
+    private final AsyncTaskExecutor asyncTaskExecutor;
     private final GenieFileTransferService fileTransferService;
     private final Environment environment;
     private final ObjectMapper mapper;
@@ -120,7 +120,7 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
     /**
      * Constructor.
      *
-     * @param taskExecutor        The asynchronous task executor to use to run the load balancer script in
+     * @param asyncTaskExecutor   The asynchronous task executor to use to run the load balancer script in
      * @param taskScheduler       The task scheduler to schedule the script refresh task with
      * @param fileTransferService The file transfer service to use to download the script
      * @param environment         The program environment to get properties from
@@ -129,14 +129,14 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
      */
     @Autowired
     public ScriptLoadBalancer(
-        final AsyncTaskExecutor taskExecutor,
-        final TaskScheduler taskScheduler,
+        @Qualifier("genieAsyncTaskExecutor") final AsyncTaskExecutor asyncTaskExecutor,
+        @Qualifier("genieTaskScheduler") final TaskScheduler taskScheduler,
         @Qualifier("cacheGenieFileTransferService") final GenieFileTransferService fileTransferService,
         final Environment environment,
         final ObjectMapper mapper,
         final Registry registry
     ) {
-        this.taskExecutor = taskExecutor;
+        this.asyncTaskExecutor = asyncTaskExecutor;
         this.fileTransferService = fileTransferService;
         this.environment = environment;
         this.mapper = mapper;
@@ -177,7 +177,7 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
                 bindings.put(JOB_REQUEST_BINDING, this.mapper.writeValueAsString(jobRequest));
 
                 // Run as callable and timeout after the configured timeout length
-                final String clusterId = this.taskExecutor
+                final String clusterId = this.asyncTaskExecutor
                     .submit(() -> (String) this.script.get().eval(bindings))
                     .get(this.timeoutLength.get(), TimeUnit.MILLISECONDS);
 

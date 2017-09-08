@@ -23,11 +23,8 @@ import org.apache.commons.exec.PumpStreamHandler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.event.ApplicationEventMulticaster;
-import org.springframework.context.event.SimpleApplicationEventMulticaster;
 import org.springframework.core.task.AsyncTaskExecutor;
-import org.springframework.core.task.TaskExecutor;
-import org.springframework.scheduling.TaskScheduler;
+import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -55,26 +52,15 @@ public class TaskConfig {
     }
 
     /**
-     * A multicast (async) event publisher to replace the synchronous one used by Spring via the ApplicationContext.
-     *
-     * @param taskExecutor The task executor to use
-     * @return The application event multicaster to use
-     */
-    @Bean
-    public ApplicationEventMulticaster applicationEventMulticaster(final TaskExecutor taskExecutor) {
-        final SimpleApplicationEventMulticaster applicationEventMulticaster = new SimpleApplicationEventMulticaster();
-        applicationEventMulticaster.setTaskExecutor(taskExecutor);
-        return applicationEventMulticaster;
-    }
-
-    /**
      * Get a task scheduler.
      *
      * @param poolSize The initial size of the thread pool that should be allocated
      * @return The task scheduler
      */
     @Bean
-    public TaskScheduler taskScheduler(@Value("${genie.tasks.scheduler.pool.size:1}") final int poolSize) {
+    public ThreadPoolTaskScheduler genieTaskScheduler(
+        @Value("${genie.tasks.scheduler.pool.size:1}") final int poolSize
+    ) {
         final ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
         scheduler.setPoolSize(poolSize);
         return scheduler;
@@ -87,9 +73,19 @@ public class TaskConfig {
      * @return The task executor the system to use
      */
     @Bean
-    public AsyncTaskExecutor taskExecutor(@Value("${genie.tasks.executor.pool.size:1}") final int poolSize) {
+    public AsyncTaskExecutor genieAsyncTaskExecutor(@Value("${genie.tasks.executor.pool.size:1}") final int poolSize) {
         final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(poolSize);
         return executor;
+    }
+
+    /**
+     * Synchronous task executor.
+     *
+     * @return The synchronous task executor to use
+     */
+    @Bean
+    public SyncTaskExecutor genieSyncTaskExecutor() {
+        return new SyncTaskExecutor();
     }
 }

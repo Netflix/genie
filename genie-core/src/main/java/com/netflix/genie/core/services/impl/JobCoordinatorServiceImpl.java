@@ -211,7 +211,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
 
             // Log all the job initial job information
             this.jobPersistenceService.createJob(jobRequest, jobMetadata, jobBuilder.build(), jobExecution);
-            jobStateService.init(jobId);
+            this.jobStateService.init(jobId);
             //TODO: Combine the cluster and command selection into a single method/database query for efficiency
             // Resolve the cluster for the job request based on the tags specified
             final Cluster cluster = this.getCluster(jobRequest);
@@ -265,7 +265,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                     );
                     // Tell the system a new job has been scheduled so any actions can be taken
                     log.info("Publishing job scheduled event for job {}", jobId);
-                    jobStateService.schedule(jobId, jobRequest, cluster, command, applications, memory);
+                    this.jobStateService.schedule(jobId, jobRequest, cluster, command, applications, memory);
                     return jobId;
                 } else {
                     throw new GenieServerUnavailableException(
@@ -281,39 +281,39 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                     );
                 }
             }
-        } catch (GenieConflictException e) {
+        } catch (final GenieConflictException e) {
             MetricsUtils.addFailureTagsWithException(tags, e);
             // Job has not been initiated so we don't have to call JobStateService.done()
             throw e;
-        } catch (GenieException e) {
+        } catch (final GenieException e) {
             MetricsUtils.addFailureTagsWithException(tags, e);
             //
             // Need to check if the job exists in the JobStateService
             // because this error can happen before the job is initiated.
             //
-            if (jobStateService.jobExists(jobId)) {
-                jobStateService.done(jobId);
-                jobPersistenceService.updateJobStatus(jobId, jobStatus, e.getMessage());
+            if (this.jobStateService.jobExists(jobId)) {
+                this.jobStateService.done(jobId);
+                this.jobPersistenceService.updateJobStatus(jobId, jobStatus, e.getMessage());
             }
             throw e;
-        } catch (Exception e) {
+        } catch (final Exception e) {
             MetricsUtils.addFailureTagsWithException(tags, e);
             //
             // Need to check if the job exists in the JobStateService
             // because this error can happen before the job is initiated.
             //
-            if (jobStateService.jobExists(jobId)) {
-                jobStateService.done(jobId);
-                jobPersistenceService.updateJobStatus(jobId, jobStatus, e.getMessage());
+            if (this.jobStateService.jobExists(jobId)) {
+                this.jobStateService.done(jobId);
+                this.jobPersistenceService.updateJobStatus(jobId, jobStatus, e.getMessage());
             }
             throw new GenieServerException("Failed to coordinate job launch", e);
-        } catch (Throwable t) {
+        } catch (final Throwable t) {
             MetricsUtils.addFailureTagsWithException(tags, t);
             throw t;
         } finally {
-            this.registry.timer(
-                this.coordinationTimerId.withTags(tags)
-            ).record(System.nanoTime() - coordinationStart, TimeUnit.NANOSECONDS);
+            this.registry
+                .timer(this.coordinationTimerId.withTags(tags))
+                .record(System.nanoTime() - coordinationStart, TimeUnit.NANOSECONDS);
         }
     }
 

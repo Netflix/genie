@@ -44,6 +44,6 @@ public class TaskConfigUnitTests {
      */
     @Test
     public void canGetTaskScheduler() {
-        Assert.assertNotNull(new TaskConfig().taskScheduler(7));
+        Assert.assertNotNull(new TaskConfig().genieTaskScheduler(7));
     }
 }
