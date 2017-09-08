@@ -19,6 +19,10 @@ package com.netflix.genie.web.tasks.job
 
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableMap
+import com.google.common.io.Files
+import com.netflix.genie.common.dto.Application
+import com.netflix.genie.common.dto.Cluster
+import com.netflix.genie.common.dto.Command
 import com.netflix.genie.common.dto.Job
 import com.netflix.genie.common.dto.JobRequest
 import com.netflix.genie.common.dto.JobStatus
@@ -37,7 +41,9 @@ import com.netflix.spectator.api.Counter
 import com.netflix.spectator.api.Id
 import com.netflix.spectator.api.Registry
 import com.netflix.spectator.api.Timer
+import org.junit.Rule
 import org.junit.experimental.categories.Category
+import org.junit.rules.TemporaryFolder
 import org.springframework.core.io.FileSystemResource
 import org.springframework.retry.support.RetryTemplate
 import spock.lang.Specification
@@ -70,6 +76,12 @@ class JobCompletionServiceSpec extends Specification{
     Id errorCounterId;
     Counter errorCounter;
     List<Map<String, String>> counterTagsCaptures;
+
+    /**
+     * Temporary folder used for storing fake job files. Deleted after tests are done.
+     */
+    @Rule
+    public TemporaryFolder tmpJobDir = new TemporaryFolder();
 
     def setup(){
         jobPersistenceService = Mock(JobPersistenceService.class)
@@ -183,5 +195,38 @@ class JobCompletionServiceSpec extends Specification{
                 JobCompletionService.JOB_FINAL_STATE, JobStatus.FAILED.toString()
         )
         3 * errorCounter.increment()
+    }
+
+    def deleteDependenciesDirectories() {
+        given:
+        def tempDirPath = tmpJobDir.getRoot().getAbsolutePath()
+        def dependencyDirs = Arrays.asList(
+                new File(tempDirPath + "/genie/applications/app1/dependencies"),
+                new File(tempDirPath + "/genie/applications/app2/dependencies"),
+                new File(tempDirPath + "/genie/cluster/cluster-x/dependencies"),
+                new File(tempDirPath + "/genie/command/command-y/dependencies"),
+        )
+        dependencyDirs.forEach({d -> Files.createParentDirs(new File(d, "a_dependency"))})
+        def jobId = "1"
+        def app1 = Mock(Application)
+        app1.getId() >> new Optional<String>("app1")
+        def app2 = Mock(Application)
+        app2.getId() >> new Optional<String>("app2")
+        jobSearchService.getJobApplications(jobId) >> Arrays.asList(app1, app2)
+        def cluster = Mock(Cluster)
+        cluster.getId() >> new Optional<String>("cluster-x")
+        jobSearchService.getJobCluster(jobId) >> cluster
+        def command = Mock(Command)
+        command.getId() >> new Optional<String>("command-y")
+        jobSearchService.getJobCommand(jobId) >> command
+
+        when:
+        jobCompletionService.deleteDependenciesDirectories(jobId, tmpJobDir.root)
+
+        then:
+        noExceptionThrown()
+        dependencyDirs.forEach({ d ->
+            assert ! d.exists()
+        })
     }
 }
