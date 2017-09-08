@@ -19,6 +19,7 @@ package com.netflix.genie.web.configs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.core.events.GenieEventBus;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
@@ -45,8 +46,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -206,16 +205,14 @@ public class ServicesConfigUnitTests {
     @Test
     public void canGetJobSubmitterServiceBean() {
         final JobPersistenceService jobPersistenceService = Mockito.mock(JobPersistenceService.class);
-        final ApplicationEventPublisher eventPublisher = Mockito.mock(ApplicationEventPublisher.class);
-        final ApplicationEventMulticaster eventMulticaster = Mockito.mock(ApplicationEventMulticaster.class);
+        final GenieEventBus genieEventBus = Mockito.mock(GenieEventBus.class);
         final Resource resource = Mockito.mock(Resource.class);
         final List<WorkflowTask> workflowTasks = new ArrayList<>();
 
         Assert.assertNotNull(
             this.servicesConfig.jobSubmitterService(
                 jobPersistenceService,
-                eventPublisher,
-                eventMulticaster,
+                genieEventBus,
                 workflowTasks,
                 resource,
                 Mockito.mock(Registry.class)
@@ -278,7 +275,7 @@ public class ServicesConfigUnitTests {
                 this.jobSearchService,
                 Mockito.mock(Executor.class),
                 new JobsProperties(),
-                Mockito.mock(ApplicationEventPublisher.class),
+                Mockito.mock(GenieEventBus.class),
                 Mockito.mock(FileSystemResource.class),
                 new ObjectMapper()
             )

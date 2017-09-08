@@ -32,6 +32,7 @@ import org.apache.commons.exec.Executor;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.Resource;
 import org.springframework.scheduling.TaskScheduler;
@@ -81,7 +82,7 @@ public class DiskCleanupTask implements Runnable {
     @Autowired
     public DiskCleanupTask(
         @NotNull final DiskCleanupProperties properties,
-        @NotNull final TaskScheduler scheduler,
+        @Qualifier("genieTaskScheduler") @NotNull final TaskScheduler scheduler,
         @NotNull final Resource jobsDir,
         @NotNull final JobSearchService jobSearchService,
         @NotNull final JobsProperties jobsProperties,
