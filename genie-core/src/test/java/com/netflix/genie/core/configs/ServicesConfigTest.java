@@ -19,6 +19,8 @@ package com.netflix.genie.core.configs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.core.events.GenieEventBus;
+import com.netflix.genie.core.events.GenieEventBusImpl;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
@@ -61,14 +63,12 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.ServiceLocatorFactoryBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.context.event.SimpleApplicationEventMulticaster;
 import org.springframework.core.io.Resource;
 import org.springframework.core.task.AsyncTaskExecutor;
-import org.springframework.core.task.TaskExecutor;
+import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -197,7 +197,7 @@ public class ServicesConfigTest {
      * @param hostname         The name of the host this Genie node is running on.
      * @param jobSearchService The job search service to use to locate job information.
      * @param executor         The executor to use to run system processes.
-     * @param eventPublisher   The event publisher to use
+     * @param genieEventBus    The Genie event bus to use
      * @param genieWorkingDir  Working directory for genie where it creates jobs directories.
      * @param objectMapper     The Jackson ObjectMapper used to serialize from/to JSON
      * @return A job kill service instance.
@@ -207,7 +207,7 @@ public class ServicesConfigTest {
         final String hostname,
         final JobSearchService jobSearchService,
         final Executor executor,
-        final ApplicationEventPublisher eventPublisher,
+        final GenieEventBus genieEventBus,
         @Qualifier("jobsDir") final Resource genieWorkingDir,
         final ObjectMapper objectMapper
     ) {
@@ -216,7 +216,7 @@ public class ServicesConfigTest {
             jobSearchService,
             executor,
             false,
-            eventPublisher,
+            genieEventBus,
             genieWorkingDir,
             objectMapper
         );
@@ -250,8 +250,7 @@ public class ServicesConfigTest {
      * Get a implementation of the JobSubmitterService that runs jobs locally.
      *
      * @param jobPersistenceService Implementation of the job persistence service.
-     * @param eventPublisher        Instance of the synchronous event publisher.
-     * @param eventMulticaster      Instance of the asynchronous event publisher.
+     * @param genieEventBus         The Genie event bus implementation to use
      * @param workflowTasks         List of all the workflow tasks to be executed.
      * @param genieWorkingDir       Working directory for genie where it creates jobs directories.
      * @param registry              The metrics registry to use
@@ -260,16 +259,14 @@ public class ServicesConfigTest {
     @Bean
     public JobSubmitterService jobSubmitterService(
         final JobPersistenceService jobPersistenceService,
-        final ApplicationEventPublisher eventPublisher,
-        final ApplicationEventMulticaster eventMulticaster,
+        final GenieEventBus genieEventBus,
         final List<WorkflowTask> workflowTasks,
         @Qualifier("jobsDir") final Resource genieWorkingDir,
         final Registry registry
     ) {
         return new LocalJobRunner(
             jobPersistenceService,
-            eventPublisher,
-            eventMulticaster,
+            genieEventBus,
             workflowTasks,
             genieWorkingDir,
             registry
@@ -303,39 +300,58 @@ public class ServicesConfigTest {
      *
      * @param jobSubmitterService The job submitter implementation to use
      * @param taskScheduler       The task scheduler to use to register scheduling of job checkers
-     * @param eventPublisher      The application event publisher to use to publish synchronous events
+     * @param genieEventBus       The genie event bus
      * @param registry            The metrics registry
      * @return The job state service bean
      */
     @Bean
-    public JobStateService jobStateService(final JobSubmitterService jobSubmitterService,
-                                           final TaskScheduler taskScheduler,
-                                           final ApplicationEventPublisher eventPublisher,
-                                           final Registry registry) {
-        return new JobStateServiceImpl(jobSubmitterService, taskScheduler, eventPublisher, registry);
+    public JobStateService jobStateService(
+        final JobSubmitterService jobSubmitterService,
+        final TaskScheduler taskScheduler,
+        final GenieEventBus genieEventBus,
+        final Registry registry
+    ) {
+        return new JobStateServiceImpl(jobSubmitterService, taskScheduler, genieEventBus, registry);
     }
 
     /**
-     * The task executor to use.
+     * The async task executor to use.
      *
      * @return The task executor to for launching jobs
      */
     @Bean
-    public AsyncTaskExecutor taskExecutor() {
+    public AsyncTaskExecutor genieAsyncTaskExecutor() {
         return new ThreadPoolTaskExecutor();
     }
 
     /**
-     * A multicast (async) event publisher to replace the synchronous one used by Spring via the ApplicationContext.
+     * The sync task executor to use.
      *
-     * @param taskExecutor The task executor to use
+     * @return The task executor to for launching jobs
+     */
+    @Bean
+    public SyncTaskExecutor genieSyncTaskExecutor() {
+        return new SyncTaskExecutor();
+    }
+
+    /**
+     * Genie Event Bus.
+     *
+     * @param syncTaskExecutor  The synchronous task executor to use
+     * @param asyncTaskExecutor The asynchronous task executor to use
      * @return The application event multicaster to use
      */
     @Bean
-    public ApplicationEventMulticaster applicationEventMulticaster(final TaskExecutor taskExecutor) {
-        final SimpleApplicationEventMulticaster applicationEventMulticaster = new SimpleApplicationEventMulticaster();
-        applicationEventMulticaster.setTaskExecutor(taskExecutor);
-        return applicationEventMulticaster;
+    public GenieEventBusImpl applicationEventMulticaster(
+        final SyncTaskExecutor syncTaskExecutor,
+        final AsyncTaskExecutor asyncTaskExecutor
+    ) {
+        final SimpleApplicationEventMulticaster testSyncMulticaster = new SimpleApplicationEventMulticaster();
+        testSyncMulticaster.setTaskExecutor(syncTaskExecutor);
+
+        final SimpleApplicationEventMulticaster testAsyncMulticaster = new SimpleApplicationEventMulticaster();
+        testAsyncMulticaster.setTaskExecutor(asyncTaskExecutor);
+        return new GenieEventBusImpl(testSyncMulticaster, testAsyncMulticaster);
     }
 
     /**

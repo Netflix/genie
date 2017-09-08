@@ -24,6 +24,7 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.core.events.GenieEventBus;
 import com.netflix.genie.core.events.JobFinishedEvent;
 import com.netflix.genie.core.events.JobFinishedReason;
 import com.netflix.genie.core.services.JobSearchService;
@@ -40,7 +41,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.FileSystemResource;
 
 import java.io.File;
@@ -65,11 +65,12 @@ public class LocalJobKillServiceImplUnitTests {
     private JobSearchService jobSearchService;
     private Executor executor;
     private LocalJobKillServiceImpl service;
-    private ApplicationEventPublisher eventPublisher;
+    private GenieEventBus genieEventBus;
     private FileSystemResource genieWorkingDir;
 
     /**
      * Setup for the tests.
+     *
      * @throws IOException if the job directory cannot be created
      */
     @Before
@@ -80,9 +81,16 @@ public class LocalJobKillServiceImplUnitTests {
         Files.createParentDirs(new File(tempDirectory.getPath() + "/" + ID + "/genie/x"));
         this.jobSearchService = Mockito.mock(JobSearchService.class);
         this.executor = Mockito.mock(Executor.class);
-        this.eventPublisher = Mockito.mock(ApplicationEventPublisher.class);
-        this.service = new LocalJobKillServiceImpl(HOSTNAME, this.jobSearchService, this.executor, false,
-            this.eventPublisher, genieWorkingDir, new ObjectMapper());
+        this.genieEventBus = Mockito.mock(GenieEventBus.class);
+        this.service = new LocalJobKillServiceImpl(
+            HOSTNAME,
+            this.jobSearchService,
+            this.executor,
+            false,
+            this.genieEventBus,
+            this.genieWorkingDir,
+            new ObjectMapper()
+        );
 
         this.killCommand = new CommandLine("kill");
         this.killCommand.addArguments(Integer.toString(PID));
@@ -210,9 +218,15 @@ public class LocalJobKillServiceImplUnitTests {
      */
     @Test
     public void canKillJobRunningAsUser() throws GenieException, IOException {
-        this.service
-            = new LocalJobKillServiceImpl(HOSTNAME, this.jobSearchService, this.executor, true,
-            this.eventPublisher, genieWorkingDir, new ObjectMapper());
+        this.service = new LocalJobKillServiceImpl(
+            HOSTNAME,
+            this.jobSearchService,
+            this.executor,
+            true,
+            this.genieEventBus,
+            this.genieWorkingDir,
+            new ObjectMapper()
+        );
 
         final JobExecution jobExecution = Mockito.mock(JobExecution.class);
         Mockito.when(jobExecution.getExitCode()).thenReturn(Optional.empty());
@@ -266,7 +280,7 @@ public class LocalJobKillServiceImplUnitTests {
         Mockito.when(this.jobSearchService.getJobStatus(ID)).thenReturn(JobStatus.INIT);
         this.service.killJob(ID, KILL_REASON);
 
-        Mockito.verify(this.eventPublisher, Mockito.times(1)).publishEvent(captor.capture());
+        Mockito.verify(this.genieEventBus, Mockito.times(1)).publishSynchronousEvent(captor.capture());
         Assert.assertThat(captor.getValue().getId(), Matchers.is(ID));
         Assert.assertThat(captor.getValue().getReason(), Matchers.is(JobFinishedReason.KILLED));
         Mockito.verify(this.jobSearchService, Mockito.never()).getJobExecution(ID);

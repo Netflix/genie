@@ -24,6 +24,7 @@ import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.core.events.GenieEventBus;
 import com.netflix.genie.core.events.JobFinishedEvent;
 import com.netflix.genie.core.events.JobFinishedReason;
 import com.netflix.genie.core.events.KillJobEvent;
@@ -39,7 +40,6 @@ import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.lang3.SystemUtils;
 import org.hibernate.validator.constraints.NotBlank;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
 
@@ -61,7 +61,7 @@ public class LocalJobKillServiceImpl implements JobKillService {
     private final JobSearchService jobSearchService;
     private final Executor executor;
     private final boolean runAsUser;
-    private final ApplicationEventPublisher eventPublisher;
+    private final GenieEventBus genieEventBus;
     private final File baseWorkingDir;
     private final ObjectMapper objectMapper;
 
@@ -72,7 +72,7 @@ public class LocalJobKillServiceImpl implements JobKillService {
      * @param jobSearchService The job search service to use to locate job information
      * @param executor         The executor to use to run system processes
      * @param runAsUser        True if jobs are run as the user who submitted the job
-     * @param eventPublisher   The system event publisher to use
+     * @param genieEventBus    The system event bus to use
      * @param genieWorkingDir  The working directory where all job directories are created.
      * @param objectMapper     The Jackson ObjectMapper used to serialize from/to JSON
      */
@@ -81,7 +81,7 @@ public class LocalJobKillServiceImpl implements JobKillService {
         @NotNull final JobSearchService jobSearchService,
         @NotNull final Executor executor,
         final boolean runAsUser,
-        @NotNull final ApplicationEventPublisher eventPublisher,
+        @NotNull final GenieEventBus genieEventBus,
         @NotNull final Resource genieWorkingDir,
         @NotNull final ObjectMapper objectMapper
     ) {
@@ -89,7 +89,7 @@ public class LocalJobKillServiceImpl implements JobKillService {
         this.jobSearchService = jobSearchService;
         this.executor = executor;
         this.runAsUser = runAsUser;
-        this.eventPublisher = eventPublisher;
+        this.genieEventBus = genieEventBus;
         this.objectMapper = objectMapper;
 
         try {
@@ -112,7 +112,7 @@ public class LocalJobKillServiceImpl implements JobKillService {
         final JobStatus jobStatus = this.jobSearchService.getJobStatus(id);
         if (jobStatus == JobStatus.INIT) {
             // Send a job finished event to force system to update the job to killed
-            this.eventPublisher.publishEvent(
+            this.genieEventBus.publishSynchronousEvent(
                 new JobFinishedEvent(
                     id,
                     JobFinishedReason.KILLED,
