@@ -3998,8 +3998,8 @@ reasons. Follow the below sections to load the schemas into your table.</p>
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-There exist Genie 2.x to Genie 3.x migration scripts for MySQL and PostgreSQL but it is recommended to start from
-scratch if you can. See the source code for the migration scripts if you want to try to use them.
+Genie 3.1.x software is not compatible with 3.0.x database schema. Before upgrading Genie servers to 3.1.x, follow the
+steps below to perform database upgrade, or create a new database with 3.1.x schema.
 </td>
 </tr>
 </table>
@@ -4029,6 +4029,21 @@ Then run:</p>
 mysql -u {username} -p{password} -h {host} genie &lt; schema.mysql.sql</code></pre>
 </div>
 </div>
+<div class="sect5">
+<h6 id="_3_0_1_to_3_1_0_database_upgrade"><a class="anchor" href="#_3_0_1_to_3_1_0_database_upgrade"></a>5.3.2.1.1. 3.0.1 to 3.1.0 database upgrade</h6>
+<div class="paragraph">
+<p>Download the:
+<a href="https://github.com/Netflix/genie/blob/master/genie-ddl/src/main/sql/mysql/upgrade-3.0.1-to-3.1.0.mysql.sql">3.0.1 to 3.1.0 Schema Upgrade</a>.</p>
+</div>
+<div class="paragraph">
+<p>Then run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">mysql -u {username} -p{password} -h {host} genie &lt; upgrade-3.0.1-to-3.1.0.mysql.sql</code></pre>
+</div>
+</div>
+</div>
 </div>
 <div class="sect4">
 <h5 id="_postgresql"><a class="anchor" href="#_postgresql"></a>5.3.2.2. PostgreSQL</h5>
@@ -4053,6 +4068,22 @@ Then run:</p>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">createdb genie
 psql -U {user} -h {host} -d genie -f schema.postgresql.sql</code></pre>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_3_0_1_to_3_1_0_database_upgrade_2"><a class="anchor" href="#_3_0_1_to_3_1_0_database_upgrade_2"></a>5.3.2.2.1. 3.0.1 to 3.1.0 database upgrade</h6>
+<div class="paragraph">
+<p>Download the
+<a href="https://github.com/Netflix/genie/blob/master/genie-ddl/src/main/sql/postgresql/upgrade-3.0.1-to-3.1.0.postgresql.sql">3.0.1 to 3.1.0 Schema Upgrade</a>.</p>
+</div>
+<div class="paragraph">
+<p>Then run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">createdb genie
+psql -U {user} -h {host} -d genie -f upgrade-3.0.1-to-3.1.0.postgresql.sql</code></pre>
+</div>
 </div>
 </div>
 </div>
@@ -5390,7 +5421,7 @@ and system metrics and statistics.</p>
 <div id="footer">
 <div id="footer-text">
 Version 3.2.0-SNAPSHOT<br>
-Last updated 2017-09-11 17:51:45 +00:00
+Last updated 2017-09-11 18:56:03 +00:00
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
