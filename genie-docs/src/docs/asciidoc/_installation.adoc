@@ -97,8 +97,8 @@ Genie also ships with database schema scripts for MySQL and PostgreSQL. You will
 before you run Genie if you use one of these databases. Genie no longer creates the schema dynamically for performance
 reasons. Follow the below sections to load the schemas into your table.
 
-NOTE: There exist Genie 2.x to Genie 3.x migration scripts for MySQL and PostgreSQL but it is recommended to start from
-scratch if you can. See the source code for the migration scripts if you want to try to use them.
+NOTE: Genie 3.1.x software is not compatible with 3.0.x database schema. Before upgrading Genie servers to 3.1.x, follow the
+steps below to perform database upgrade, or create a new database with 3.1.x schema.
 
 ===== MySQL
 
@@ -119,6 +119,23 @@ mysql -u {username} -p{password} -h {host} -e 'create database genie;'
 mysql -u {username} -p{password} -h {host} genie < schema.mysql.sql
 ----
 
+====== 3.0.1 to 3.1.0 database upgrade
+
+Download the:
+ifeval::[{isSnapshot} == true]
+https://github.com/Netflix/genie/blob/master/genie-ddl/src/main/sql/mysql/upgrade-3.0.1-to-3.1.0.mysql.sql[3.0.1 to 3.1.0 Schema Upgrade].
+endif::[]
+ifeval::[{isSnapshot} == false]
+https://github.com/Netflix/genie/blob/v{revnumber}/genie-ddl/src/main/sql/mysql/upgrade-3.0.1-to-3.1.0.mysql.sql[3.0.1 to 3.1.0 Schema Upgrade].
+endif::[]
+
+Then run:
+
+[source,bash]
+----
+mysql -u {username} -p{password} -h {host} genie < upgrade-3.0.1-to-3.1.0.mysql.sql
+----
+
 ===== PostgreSQL
 
 NOTE: This assumes the PSQL binaries are installed
@@ -136,6 +153,24 @@ Then run:
 ----
 createdb genie
 psql -U {user} -h {host} -d genie -f schema.postgresql.sql
+----
+
+====== 3.0.1 to 3.1.0 database upgrade
+
+Download the
+ifeval::[{isSnapshot} == true]
+https://github.com/Netflix/genie/blob/master/genie-ddl/src/main/sql/postgresql/upgrade-3.0.1-to-3.1.0.postgresql.sql[3.0.1 to 3.1.0 Schema Upgrade].
+endif::[]
+ifeval::[{isSnapshot} == false]
+https://github.com/Netflix/genie/blob/v{revnumber}/genie-ddl/src/main/sql/postgresql/upgrade-3.0.1-to-3.1.0.postgresql.sql[3.0.1 to 3.1.0 Schema Upgrade].
+endif::[]
+
+Then run:
+
+[source,bash]
+----
+createdb genie
+psql -U {user} -h {host} -d genie -f upgrade-3.0.1-to-3.1.0.postgresql.sql
 ----
 
 ==== Local Directories
