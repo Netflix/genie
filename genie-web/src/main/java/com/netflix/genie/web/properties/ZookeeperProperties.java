@@ -21,6 +21,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * Properties related to Zookeeper.
@@ -32,6 +33,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Getter
 @Setter
+@Validated
 public class ZookeeperProperties {
     /**
      * Whether Zookeeper connectivity should be enabled or not for this node.

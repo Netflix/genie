@@ -20,6 +20,7 @@ package com.netflix.genie.core.properties;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * Properties for S3FileTransfer.
@@ -29,6 +30,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@Validated
 public class S3FileTransferProperties {
     private boolean strictUrlCheckEnabled;
 }

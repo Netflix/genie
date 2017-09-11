@@ -19,6 +19,7 @@ package com.netflix.genie.core.properties;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * Properties related to users running jobs.
@@ -28,6 +29,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@Validated
 public class JobsUsersProperties {
     private boolean creationEnabled;
     private boolean runAsUserEnabled;

@@ -19,6 +19,7 @@ package com.netflix.genie.core.properties;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * All properties related to data service retry template in Genie.
@@ -28,6 +29,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@Validated
 public class DataServiceRetryProperties {
     /**
      * Default to 5 retries.
