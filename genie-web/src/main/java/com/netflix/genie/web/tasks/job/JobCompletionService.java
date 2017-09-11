@@ -20,6 +20,7 @@ package com.netflix.genie.web.tasks.job;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
@@ -57,11 +58,10 @@ import org.springframework.stereotype.Service;
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 /**
  * A class that has the methods to perform various tasks when a job completes.
@@ -376,99 +376,123 @@ public class JobCompletionService {
         }
     }
 
+
     /**
-     * Delete the application dependencies off disk to save space.
+     * Delete application, cluster, command dependencies from the job working directory to save space.
      *
      * @param jobId  The ID of the job to delete dependencies for
      * @param jobDir The job working directory
      */
-    private void deleteApplicationDependencies(final String jobId, final File jobDir) {
-        log.debug("Deleting dependencies as its enabled.");
+    private void deleteDependenciesDirectories(final String jobId, final File jobDir) {
+        log.debug("Deleting dependencies.");
+
         if (jobDir.exists()) {
+
+            final Collection<File> dependencyDirectories = Sets.newHashSet();
+
+            // Collect application dependencies
             try {
-                final List<String> appIds = this.jobSearchService
-                    .getJobApplications(jobId)
-                    .stream()
-                    .map(Application::getId)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .collect(Collectors.toList());
-
-                for (final String appId : appIds) {
-                    final File appDependencyDir = new File(
-                        jobDir,
-                        JobConstants.GENIE_PATH_VAR
-                            + JobConstants.FILE_PATH_DELIMITER
-                            + JobConstants.APPLICATION_PATH_VAR
-                            + JobConstants.FILE_PATH_DELIMITER
-                            + appId
-                            + JobConstants.FILE_PATH_DELIMITER
-                            + JobConstants.DEPENDENCY_FILE_PATH_PREFIX
+                for (Application application : this.jobSearchService.getJobApplications(jobId)) {
+                    application.getId().ifPresent(
+                        appId ->
+                            dependencyDirectories.add(
+                                new File(
+                                    jobDir,
+                                    JobConstants.GENIE_PATH_VAR
+                                        + JobConstants.FILE_PATH_DELIMITER
+                                        + JobConstants.APPLICATION_PATH_VAR
+                                        + JobConstants.FILE_PATH_DELIMITER
+                                        + appId
+                                        + JobConstants.FILE_PATH_DELIMITER
+                                        + JobConstants.DEPENDENCY_FILE_PATH_PREFIX
+                                )
+                            )
                     );
-
-                    deleteDependenciesDirectory(appDependencyDir);
                 }
-
-            } catch (Exception e) {
-                log.error("Could not delete job dependencies after completion for job: {} due to error {}",
-                    jobId, e);
+            } catch (GenieException e) {
+                log.error(
+                    "Error collecting application dependencies for job: {} due to error {}",
+                    jobId,
+                    e);
                 incrementErrorCounter("DELETE_APPLICATION_DEPENDENCIES_FAILURE", e);
             }
-        }
-    }
 
-    /**
-     * Delete the cluster dependencies off disk to save space.
-     *
-     * @param jobId  The ID of the job to delete dependencies for
-     * @param jobDir The job working directory
-     */
-    private void deleteClusterDependencies(final String jobId, final File jobDir) {
-        log.debug("Deleting dependencies as its enabled.");
-        if (jobDir.exists()) {
+            // Collect cluster dependencies
             try {
-                final String clusterId = this.jobSearchService
-                    .getJobCluster(jobId)
-                    .getId()
-                    .orElseThrow(IllegalStateException::new);
-
-                final File clusterDependencyDir = new File(
-                    jobDir,
-                    JobConstants.GENIE_PATH_VAR
-                        + JobConstants.FILE_PATH_DELIMITER
-                        + JobConstants.CLUSTER_PATH_VAR
-                        + JobConstants.FILE_PATH_DELIMITER
-                        + clusterId
-                        + JobConstants.FILE_PATH_DELIMITER
-                        + JobConstants.DEPENDENCY_FILE_PATH_PREFIX
+                this.jobSearchService.getJobCluster(jobId).getId().ifPresent(
+                    clusterId ->
+                        dependencyDirectories.add(
+                            new File(
+                                jobDir,
+                                JobConstants.GENIE_PATH_VAR
+                                    + JobConstants.FILE_PATH_DELIMITER
+                                    + JobConstants.CLUSTER_PATH_VAR
+                                    + JobConstants.FILE_PATH_DELIMITER
+                                    + clusterId
+                                    + JobConstants.FILE_PATH_DELIMITER
+                                    + JobConstants.DEPENDENCY_FILE_PATH_PREFIX
+                            )
+                        )
                 );
-
-                deleteDependenciesDirectory(clusterDependencyDir);
-
-            } catch (Exception e) {
-                log.error("Could not delete job dependencies after completion for job: {} due to error {}",
-                    jobId, e);
+            } catch (GenieException e) {
+                log.error(
+                    "Error collecting cluster dependency for job: {} due to error {}",
+                    jobId,
+                    e);
                 incrementErrorCounter("DELETE_CLUSTER_DEPENDENCIES_FAILURE", e);
             }
-        }
-    }
 
-    private void deleteDependenciesDirectory(final File dependencyDirectory) throws IOException {
-        if (dependencyDirectory.exists()) {
+            // Collect command dependencies
             try {
-                if (this.runAsUserEnabled) {
-                    final CommandLine deleteCommand = new CommandLine("sudo");
-                    deleteCommand.addArgument("rm");
-                    deleteCommand.addArgument("-rf");
-                    deleteCommand.addArgument(dependencyDirectory.getCanonicalPath());
-                    log.debug("Delete command is {}", deleteCommand);
-                    this.executor.execute(deleteCommand);
-                } else {
-                    FileUtils.deleteDirectory(dependencyDirectory);
+                this.jobSearchService.getJobCommand(jobId).getId().ifPresent(
+                    commandId ->
+                        dependencyDirectories.add(
+                            new File(
+                                jobDir,
+                                JobConstants.GENIE_PATH_VAR
+                                    + JobConstants.FILE_PATH_DELIMITER
+                                    + JobConstants.COMMAND_PATH_VAR
+                                    + JobConstants.FILE_PATH_DELIMITER
+                                    + commandId
+                                    + JobConstants.FILE_PATH_DELIMITER
+                                    + JobConstants.DEPENDENCY_FILE_PATH_PREFIX
+                            )
+                        )
+                );
+            } catch (GenieException e) {
+                log.error(
+                    "Error collecting command dependency for job: {} due to error {}",
+                    jobId,
+                    e);
+                incrementErrorCounter("DELETE_COMMAND_DEPENDENCIES_FAILURE", e);
+            }
+
+            // Delete all dependencies
+            for (File dependencyDirectory : dependencyDirectories) {
+                if (dependencyDirectory.exists()) {
+                    try {
+                        if (this.runAsUserEnabled) {
+                            final CommandLine deleteCommand = new CommandLine("sudo");
+                            deleteCommand.addArgument("rm");
+                            deleteCommand.addArgument("-rf");
+                            deleteCommand.addArgument(dependencyDirectory.getCanonicalPath());
+                            log.debug("Delete command is {}", deleteCommand);
+                            this.executor.execute(deleteCommand);
+                        } else {
+                            FileUtils.deleteDirectory(dependencyDirectory);
+                        }
+                    } catch (IOException e) {
+                        incrementErrorCounter("DELETE_DEPENDENCIES_FAILURE");
+                        log.error(
+                            "Error deleting dependency directory: {}: {}",
+                            dependencyDirectory.getAbsolutePath(),
+                            e
+                        );
+                    } catch (Throwable t) {
+                        incrementErrorCounter("DELETE_DEPENDENCIES_FAILURE");
+                        throw t;
+                    }
                 }
-            } catch (Throwable t) {
-                incrementErrorCounter("DELETE_DEPENDENCIES_FAILURE");
-                throw t;
             }
         }
     }
@@ -491,8 +515,7 @@ public class JobCompletionService {
 
             if (jobDir.exists()) {
                 if (this.deleteDependencies) {
-                    this.deleteApplicationDependencies(jobId, jobDir);
-                    this.deleteClusterDependencies(jobId, jobDir);
+                    this.deleteDependenciesDirectories(jobId, jobDir);
                 }
 
                 final Optional<String> archiveLocation = job.getArchiveLocation();
