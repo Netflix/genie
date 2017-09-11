@@ -21,6 +21,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * Properties controlling the behavior of the database cleanup leadership task.
@@ -32,6 +33,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Getter
 @Setter
+@Validated
 public class DiskCleanupProperties {
     private boolean enabled;
     private String expression = "0 0 0 * * *";

@@ -19,6 +19,7 @@ package com.netflix.genie.core.properties;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.Min;
 
@@ -30,6 +31,7 @@ import javax.validation.constraints.Min;
  */
 @Getter
 @Setter
+@Validated
 public class JobsMaxProperties {
 
     @Min(value = 1L, message = "Max standard output file size has to be at least 1 byte and preferably much larger")

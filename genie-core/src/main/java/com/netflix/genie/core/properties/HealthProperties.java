@@ -19,6 +19,7 @@ package com.netflix.genie.core.properties;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * All properties related to health thresholds in Genie.
@@ -28,6 +29,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@Validated
 public class HealthProperties {
     /**
      * Defines the threshold for the maximum CPU load percentage. Health of the system is marked OUT_OF_SERVICE if

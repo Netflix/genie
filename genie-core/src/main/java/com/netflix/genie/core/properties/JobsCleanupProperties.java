@@ -19,6 +19,7 @@ package com.netflix.genie.core.properties;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * Properties related to cleanup for jobs.
@@ -28,6 +29,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@Validated
 public class JobsCleanupProperties {
     private boolean deleteArchiveFile = true;
     private boolean deleteDependencies = true;

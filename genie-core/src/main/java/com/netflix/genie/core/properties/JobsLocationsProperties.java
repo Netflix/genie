@@ -20,6 +20,7 @@ package com.netflix.genie.core.properties;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * Properties for various job related locations.
@@ -29,6 +30,7 @@ import org.hibernate.validator.constraints.NotEmpty;
  */
 @Getter
 @Setter
+@Validated
 public class JobsLocationsProperties {
     @NotEmpty(message = "Archives location is required")
     private String archives = "file:///tmp/genie/archives/";

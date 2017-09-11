@@ -21,6 +21,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * Properties associated with the cluster checking task.
@@ -32,6 +33,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Getter
 @Setter
+@Validated
 public class ClusterCheckerProperties {
     private String scheme = "http";
     private int port = 8080;

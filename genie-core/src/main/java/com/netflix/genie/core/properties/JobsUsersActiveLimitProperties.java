@@ -19,6 +19,7 @@ package com.netflix.genie.core.properties;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.Min;
 
@@ -30,6 +31,7 @@ import javax.validation.constraints.Min;
  */
 @Getter
 @Setter
+@Validated
 public class JobsUsersActiveLimitProperties {
     /**
      * Default value for active user job limit enabled.
