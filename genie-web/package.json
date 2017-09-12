@@ -1,7 +1,7 @@
 {
   "name": "genie-web",
-  "version": "3.1.0",
-  "description": "UI for Genie3 [A federated Job Execution Engine]",
+  "version": "3.2.0",
+  "description": "UI for Genie",
   "main": "index.js",
   "scripts": {
     "build": "webpack -p --config ./webpack.config.js",
@@ -19,7 +19,6 @@
     "url": "https://github.com/Netflix/genie/issues"
   },
   "dependencies": {
-    "create-react-class": "^15.5.3",
     "filesize": "^3.3.0",
     "install": "^0.6.2",
     "jquery": "^2.2.3",
@@ -34,7 +33,6 @@
     "react-modal": "^1.4.0",
     "react-router": "^2.3.0",
     "react-select": "^1.0.0-beta13",
-    "prop-types": "^15.5.9",
     "create-react-class": "^15.5.3"
   },
   "devDependencies": {

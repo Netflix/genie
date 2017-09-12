@@ -60,7 +60,7 @@ public class UIControllerUnitTests {
     public void canGetIndex() {
         final HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
         final ArgumentCaptor<Cookie> cookieArgumentCaptor = ArgumentCaptor.forClass(Cookie.class);
-        Assert.assertThat(this.controller.getIndex(response, null), Matchers.is("index"));
+        Assert.assertThat(this.controller.getIndex(response, null), Matchers.is("index.html"));
         Mockito.verify(response, Mockito.times(1)).addCookie(cookieArgumentCaptor.capture());
         Assert.assertThat(cookieArgumentCaptor.getValue().getName(), Matchers.is("genie.user"));
         Assert.assertThat(cookieArgumentCaptor.getValue().getValue(), Matchers.is("user@genie"));
@@ -68,7 +68,7 @@ public class UIControllerUnitTests {
         final Authentication authentication = Mockito.mock(Authentication.class);
         final String name = UUID.randomUUID().toString();
         Mockito.when(authentication.getName()).thenReturn(name);
-        Assert.assertThat(this.controller.getIndex(response, authentication), Matchers.is("index"));
+        Assert.assertThat(this.controller.getIndex(response, authentication), Matchers.is("index.html"));
         Mockito.verify(response, Mockito.times(2)).addCookie(cookieArgumentCaptor.capture());
         Assert.assertThat(cookieArgumentCaptor.getValue().getName(), Matchers.is("genie.user"));
         Assert.assertThat(cookieArgumentCaptor.getValue().getValue(), Matchers.is(name));
