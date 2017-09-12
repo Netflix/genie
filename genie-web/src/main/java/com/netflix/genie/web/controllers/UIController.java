@@ -40,7 +40,7 @@ import java.net.URLEncoder;
 public class UIController {
 
     /**
-     * Return the getIndex.html template for requests to root.
+     * Return the index.html file for requests to root.
      *
      * @param response       The servlet response to add cookies to
      * @param authentication The Spring Security authentication if present
@@ -62,7 +62,7 @@ public class UIController {
         } else {
             response.addCookie(new Cookie("genie.user", "user@genie"));
         }
-        return "index";
+        return "index.html";
     }
 
     /**
