@@ -105,3 +105,7 @@ jacocoTestReport {
         classDirectories = fileTree(dir: "${buildDir}/classes/main/").exclude(["com/netflix/genie/core/jpa/entities/*_*"])
     }
 }
+
+license {
+  exclude "**/com/netflix/genie/core/jpa/entities/*_.java"
+}
