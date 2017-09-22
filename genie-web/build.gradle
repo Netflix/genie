@@ -86,7 +86,7 @@ dependencies {
 }
 
 license {
-    excludes(["static/*", "*.yml", "genie-banner.txt"])
+    excludes(["static/*", "templates/*", "*.yml", "genie-banner.txt", "db/**/*.sql"])
 }
 
 test {
