@@ -177,7 +177,7 @@ public class BaseEntityUnitTests {
     public void testEntityVersion() {
         final BaseEntity a = new BaseEntity();
         Assert.assertNull(a.getEntityVersion());
-        final Long version = 4L;
+        final Integer version = 4;
         a.setEntityVersion(version);
         Assert.assertEquals(version, a.getEntityVersion());
     }

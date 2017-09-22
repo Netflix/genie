@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.7.17, for macos10.12 (x86_64)
+-- MySQL dump 10.13  Distrib 5.7.19, for osx10.12 (x86_64)
 --
--- Host: localhost    Database: genie
+-- Host: localhost    Database: genieoss
 -- ------------------------------------------------------
--- Server version	5.6.35
+-- Server version	5.7.19
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -15,9 +15,6 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-CREATE DATABASE  IF NOT EXISTS `genie`;
-USE `genie`;
-
 --
 -- Table structure for table `application_configs`
 --
@@ -28,9 +25,10 @@ DROP TABLE IF EXISTS `application_configs`;
 CREATE TABLE `application_configs` (
   `application_id` varchar(255) NOT NULL,
   `config` varchar(2048) NOT NULL,
-  KEY `application_id` (`application_id`),
-  CONSTRAINT `application_configs_ibfk_1` FOREIGN KEY (`application_id`) REFERENCES `applications` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  PRIMARY KEY (`application_id`,`config`),
+  KEY `APPLICATION_CONFIGS_APPLICATION_ID_INDEX` (`application_id`),
+  CONSTRAINT `APPLICATION_CONFIGS_APPLICATION_ID_FK` FOREIGN KEY (`application_id`) REFERENCES `applications` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -43,9 +41,10 @@ DROP TABLE IF EXISTS `application_dependencies`;
 CREATE TABLE `application_dependencies` (
   `application_id` varchar(255) NOT NULL,
   `dependency` varchar(2048) NOT NULL,
-  KEY `application_id` (`application_id`),
-  CONSTRAINT `application_dependencies_ibfk_1` FOREIGN KEY (`application_id`) REFERENCES `applications` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  PRIMARY KEY (`application_id`,`dependency`),
+  KEY `APPLICATION_DEPENDENCIES_APPLICATION_ID_INDEX` (`application_id`),
+  CONSTRAINT `APPLICATION_DEPENDENCIES_APPLICATION_ID_FK` FOREIGN KEY (`application_id`) REFERENCES `applications` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -62,7 +61,7 @@ CREATE TABLE `applications` (
   `name` varchar(255) NOT NULL,
   `genie_user` varchar(255) NOT NULL,
   `version` varchar(255) NOT NULL,
-  `description` TEXT,
+  `description` text,
   `tags` varchar(10000) DEFAULT NULL,
   `setup_file` varchar(1024) DEFAULT NULL,
   `status` varchar(20) NOT NULL DEFAULT 'INACTIVE',
@@ -70,10 +69,10 @@ CREATE TABLE `applications` (
   `entity_version` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `APPLICATIONS_NAME_INDEX` (`name`),
-  KEY `APPLICATIONS_TAGS_INDEX` (`tags`),
   KEY `APPLICATIONS_STATUS_INDEX` (`status`),
+  KEY `APPLICATIONS_TAGS_INDEX` (`tags`(3072)),
   KEY `APPLICATIONS_TYPE_INDEX` (`type`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -86,9 +85,10 @@ DROP TABLE IF EXISTS `cluster_configs`;
 CREATE TABLE `cluster_configs` (
   `cluster_id` varchar(255) NOT NULL,
   `config` varchar(2048) NOT NULL,
-  KEY `cluster_id` (`cluster_id`),
-  CONSTRAINT `cluster_configs_ibfk_1` FOREIGN KEY (`cluster_id`) REFERENCES `clusters` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  PRIMARY KEY (`cluster_id`,`config`),
+  KEY `CLUSTER_CONFIGS_CLUSTER_ID_INDEX` (`cluster_id`),
+  CONSTRAINT `CLUSTER_CONFIGS_CLUSTER_ID_FK` FOREIGN KEY (`cluster_id`) REFERENCES `clusters` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -101,9 +101,10 @@ DROP TABLE IF EXISTS `cluster_dependencies`;
 CREATE TABLE `cluster_dependencies` (
   `cluster_id` varchar(255) NOT NULL,
   `dependency` varchar(2048) NOT NULL,
-  KEY `cluster_id` (`cluster_id`),
-  CONSTRAINT `cluster_dependencies_ibfk_1` FOREIGN KEY (`cluster_id`) REFERENCES `clusters` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  PRIMARY KEY (`cluster_id`,`dependency`),
+  KEY `CLUSTER_DEPENDENCIES_CLUSTER_ID_INDEX` (`cluster_id`),
+  CONSTRAINT `CLUSTER_DEPENDENCIES_CLUSTER_ID_FK` FOREIGN KEY (`cluster_id`) REFERENCES `clusters` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -120,16 +121,16 @@ CREATE TABLE `clusters` (
   `name` varchar(255) NOT NULL,
   `genie_user` varchar(255) NOT NULL,
   `version` varchar(255) NOT NULL,
-  `description` TEXT,
+  `description` text,
   `tags` varchar(10000) DEFAULT NULL,
   `setup_file` varchar(1024) DEFAULT NULL,
   `status` varchar(20) NOT NULL DEFAULT 'OUT_OF_SERVICE',
   `entity_version` int(11) DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `CLUSTERS_NAME_INDEX` (`name`),
-  KEY `CLUSTERS_TAG_INDEX` (`tags`),
-  KEY `CLUSTERS_STATUS_INDEX` (`status`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `CLUSTERS_STATUS_INDEX` (`status`),
+  KEY `CLUSTERS_TAGS_INDEX` (`tags`(3072))
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -143,11 +144,12 @@ CREATE TABLE `clusters_commands` (
   `cluster_id` varchar(255) NOT NULL,
   `command_id` varchar(255) NOT NULL,
   `command_order` int(11) NOT NULL,
-  KEY `cluster_id` (`cluster_id`),
-  KEY `command_id` (`command_id`),
-  CONSTRAINT `clusters_commands_ibfk_1` FOREIGN KEY (`cluster_id`) REFERENCES `clusters` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `clusters_commands_ibfk_2` FOREIGN KEY (`command_id`) REFERENCES `commands` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  PRIMARY KEY (`cluster_id`,`command_id`,`command_order`),
+  KEY `CLUSTERS_COMMANDS_CLUSTER_ID_INDEX` (`cluster_id`),
+  KEY `CLUSTERS_COMMANDS_COMMAND_ID_INDEX` (`command_id`),
+  CONSTRAINT `CLUSTERS_COMMANDS_CLUSTER_ID_FK` FOREIGN KEY (`cluster_id`) REFERENCES `clusters` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `CLUSTERS_COMMANDS_COMMAND_ID_FK` FOREIGN KEY (`command_id`) REFERENCES `commands` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -160,9 +162,10 @@ DROP TABLE IF EXISTS `command_configs`;
 CREATE TABLE `command_configs` (
   `command_id` varchar(255) NOT NULL,
   `config` varchar(2048) NOT NULL,
-  KEY `command_id` (`command_id`),
-  CONSTRAINT `command_configs_ibfk_1` FOREIGN KEY (`command_id`) REFERENCES `commands` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  PRIMARY KEY (`command_id`,`config`),
+  KEY `COMMAND_CONFIGS_COMMAND_ID_INDEX` (`command_id`),
+  CONSTRAINT `COMMAND_CONFIGS_COMMAND_ID_FK` FOREIGN KEY (`command_id`) REFERENCES `commands` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -175,9 +178,10 @@ DROP TABLE IF EXISTS `command_dependencies`;
 CREATE TABLE `command_dependencies` (
   `command_id` varchar(255) NOT NULL,
   `dependency` varchar(2048) NOT NULL,
-  KEY `command_id` (`command_id`),
-  CONSTRAINT `command_dependencies_ibfk_1` FOREIGN KEY (`command_id`) REFERENCES `commands` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  PRIMARY KEY (`command_id`,`dependency`),
+  KEY `COMMAND_DEPENDENCIES_COMMAND_ID_INDEX` (`command_id`),
+  CONSTRAINT `COMMAND_DEPENDENCIES_COMMAND_ID_FK` FOREIGN KEY (`command_id`) REFERENCES `commands` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -194,7 +198,7 @@ CREATE TABLE `commands` (
   `name` varchar(255) NOT NULL,
   `genie_user` varchar(255) NOT NULL,
   `version` varchar(255) NOT NULL,
-  `description` TEXT,
+  `description` text,
   `tags` varchar(10000) DEFAULT NULL,
   `setup_file` varchar(1024) DEFAULT NULL,
   `executable` varchar(255) NOT NULL,
@@ -204,9 +208,9 @@ CREATE TABLE `commands` (
   `entity_version` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `COMMANDS_NAME_INDEX` (`name`),
-  KEY `COMMANDS_TAGS_INDEX` (`tags`),
-  KEY `COMMANDS_STATUS_INDEX` (`status`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  KEY `COMMANDS_STATUS_INDEX` (`status`),
+  KEY `COMMANDS_TAGS_INDEX` (`tags`(3072))
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -220,11 +224,12 @@ CREATE TABLE `commands_applications` (
   `command_id` varchar(255) NOT NULL,
   `application_id` varchar(255) NOT NULL,
   `application_order` int(11) NOT NULL,
-  KEY `command_id` (`command_id`),
-  KEY `application_id` (`application_id`),
-  CONSTRAINT `commands_applications_ibfk_1` FOREIGN KEY (`command_id`) REFERENCES `commands` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `commands_applications_ibfk_2` FOREIGN KEY (`application_id`) REFERENCES `applications` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  PRIMARY KEY (`command_id`,`application_id`,`application_order`),
+  KEY `COMMANDS_APPLICATIONS_APPLICATION_ID_INDEX` (`application_id`),
+  KEY `COMMANDS_APPLICATIONS_COMMAND_ID_INDEX` (`command_id`),
+  CONSTRAINT `COMMANDS_APPLICATIONS_APPLICATION_ID_FK` FOREIGN KEY (`application_id`) REFERENCES `applications` (`id`),
+  CONSTRAINT `COMMANDS_APPLICATIONS_COMMAND_ID_FK` FOREIGN KEY (`command_id`) REFERENCES `commands` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -245,11 +250,10 @@ CREATE TABLE `job_executions` (
   `check_delay` bigint(20) DEFAULT NULL,
   `timeout` datetime(3) DEFAULT NULL,
   `memory` int(11) DEFAULT NULL,
-  KEY `id` (`id`),
+  PRIMARY KEY (`id`),
   KEY `JOB_EXECUTIONS_HOSTNAME_INDEX` (`host_name`),
-  KEY `JOB_EXECUTIONS_EXIT_CODE_INDEX` (`exit_code`),
-  CONSTRAINT `job_executions_ibfk_1` FOREIGN KEY (`id`) REFERENCES `jobs` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  CONSTRAINT `JOB_EXECUTIONS_ID_FK` FOREIGN KEY (`id`) REFERENCES `jobs` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -270,9 +274,9 @@ CREATE TABLE `job_metadata` (
   `total_size_of_attachments` bigint(20) DEFAULT NULL,
   `std_out_size` bigint(20) DEFAULT NULL,
   `std_err_size` bigint(20) DEFAULT NULL,
-  KEY `id` (`id`),
-  CONSTRAINT `job_metadata_ibfk_1` FOREIGN KEY (`id`) REFERENCES `job_requests` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  PRIMARY KEY (`id`),
+  CONSTRAINT `JOB_METADATA_ID_FK` FOREIGN KEY (`id`) REFERENCES `jobs` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -289,15 +293,14 @@ CREATE TABLE `job_requests` (
   `name` varchar(255) NOT NULL,
   `genie_user` varchar(255) NOT NULL,
   `version` varchar(255) NOT NULL,
-  `description` TEXT,
+  `description` text,
   `entity_version` int(11) NOT NULL DEFAULT '0',
   `command_args` varchar(10000) NOT NULL,
   `group_name` varchar(255) DEFAULT NULL,
   `setup_file` varchar(1024) DEFAULT NULL,
-  `cluster_criterias` TEXT NOT NULL,
-  `command_criteria` TEXT NOT NULL,
-  `configs` TEXT NOT NULL,
-  `dependencies` TEXT NOT NULL,
+  `cluster_criterias` text NOT NULL,
+  `command_criteria` text NOT NULL,
+  `dependencies` text NOT NULL,
   `disable_log_archival` bit(1) NOT NULL DEFAULT b'0',
   `email` varchar(255) DEFAULT NULL,
   `tags` varchar(10000) DEFAULT NULL,
@@ -305,9 +308,10 @@ CREATE TABLE `job_requests` (
   `memory` int(11) DEFAULT NULL,
   `applications` varchar(2048) NOT NULL DEFAULT '[]',
   `timeout` int(11) DEFAULT NULL,
+  `configs` text NOT NULL,
   PRIMARY KEY (`id`),
   KEY `JOB_REQUESTS_CREATED_INDEX` (`created`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -328,7 +332,7 @@ CREATE TABLE `jobs` (
   `command_args` varchar(10000) NOT NULL,
   `command_id` varchar(255) DEFAULT NULL,
   `command_name` varchar(255) DEFAULT NULL,
-  `description` TEXT,
+  `description` text,
   `cluster_id` varchar(255) DEFAULT NULL,
   `cluster_name` varchar(255) DEFAULT NULL,
   `finished` datetime(3) DEFAULT NULL,
@@ -337,22 +341,22 @@ CREATE TABLE `jobs` (
   `status_msg` varchar(255) DEFAULT NULL,
   `entity_version` int(11) NOT NULL DEFAULT '0',
   `tags` varchar(10000) DEFAULT NULL,
-  KEY `id` (`id`),
-  KEY `cluster_id` (`cluster_id`),
-  KEY `command_id` (`command_id`),
+  PRIMARY KEY (`id`),
+  KEY `JOBS_CLUSTER_ID_INDEX` (`cluster_id`),
+  KEY `JOBS_CLUSTER_NAME_INDEX` (`cluster_name`),
+  KEY `JOBS_COMMAND_ID_INDEX` (`command_id`),
+  KEY `JOBS_COMMAND_NAME_INDEX` (`command_name`),
+  KEY `JOBS_CREATED_INDEX` (`created`),
+  KEY `JOBS_FINISHED_INDEX` (`finished`),
   KEY `JOBS_NAME_INDEX` (`name`),
   KEY `JOBS_STARTED_INDEX` (`started`),
-  KEY `JOBS_FINISHED_INDEX` (`finished`),
   KEY `JOBS_STATUS_INDEX` (`status`),
+  KEY `JOBS_TAGS_INDEX` (`tags`(3072)),
   KEY `JOBS_USER_INDEX` (`genie_user`),
-  KEY `JOBS_CREATED_INDEX` (`created`),
-  KEY `JOBS_CLUSTER_NAME_INDEX` (`cluster_name`),
-  KEY `JOBS_COMMAND_NAME_INDEX` (`command_name`),
-  KEY `JOBS_TAGS_INDEX` (`tags`),
-  CONSTRAINT `jobs_ibfk_1` FOREIGN KEY (`id`) REFERENCES `job_requests` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `jobs_ibfk_2` FOREIGN KEY (`cluster_id`) REFERENCES `clusters` (`id`),
-  CONSTRAINT `jobs_ibfk_3` FOREIGN KEY (`command_id`) REFERENCES `commands` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  CONSTRAINT `JOBS_CLUSTER_ID_FK` FOREIGN KEY (`cluster_id`) REFERENCES `clusters` (`id`),
+  CONSTRAINT `JOBS_COMMAND_ID_FK` FOREIGN KEY (`command_id`) REFERENCES `commands` (`id`),
+  CONSTRAINT `JOBS_ID_FK` FOREIGN KEY (`id`) REFERENCES `job_requests` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -366,11 +370,12 @@ CREATE TABLE `jobs_applications` (
   `job_id` varchar(255) NOT NULL,
   `application_id` varchar(255) NOT NULL,
   `application_order` int(11) NOT NULL,
-  KEY `job_id` (`job_id`),
-  KEY `application_id` (`application_id`),
-  CONSTRAINT `jobs_applications_ibfk_1` FOREIGN KEY (`job_id`) REFERENCES `jobs` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `jobs_applications_ibfk_2` FOREIGN KEY (`application_id`) REFERENCES `applications` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  PRIMARY KEY (`job_id`,`application_id`,`application_order`),
+  KEY `JOBS_APPLICATIONS_APPLICATION_ID_INDEX` (`application_id`),
+  KEY `JOBS_APPLICATIONS_JOB_ID_INDEX` (`job_id`),
+  CONSTRAINT `JOBS_APPLICATIONS_APPLICATION_ID_FK` FOREIGN KEY (`application_id`) REFERENCES `applications` (`id`),
+  CONSTRAINT `JOBS_APPLICATIONS_JOB_ID_FK` FOREIGN KEY (`job_id`) REFERENCES `jobs` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -382,4 +387,4 @@ CREATE TABLE `jobs_applications` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-06-30 10:15:56
+-- Dump completed

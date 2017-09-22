@@ -2,10 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.6.3
--- Dumped by pg_dump version 9.6.3
-
--- Started on 2017-07-06 10:33:35 PDT
+-- Dumped from database version 9.6.5
+-- Dumped by pg_dump version 9.6.5
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -31,8 +29,6 @@ COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 
 
 SET search_path = public, pg_catalog;
-
-SET default_tablespace = '';
 
 SET default_with_oids = false;
 
@@ -70,7 +66,7 @@ CREATE TABLE applications (
     setup_file character varying(1024) DEFAULT NULL::character varying,
     status character varying(20) DEFAULT 'INACTIVE'::character varying NOT NULL,
     entity_version integer DEFAULT 0 NOT NULL,
-    description text DEFAULT NULL,
+    description text,
     tags character varying(10000) DEFAULT NULL::character varying,
     type character varying(255) DEFAULT NULL::character varying
 );
@@ -109,7 +105,7 @@ CREATE TABLE clusters (
     version character varying(255) NOT NULL,
     status character varying(20) DEFAULT 'OUT_OF_SERVICE'::character varying NOT NULL,
     entity_version integer DEFAULT 0 NOT NULL,
-    description text DEFAULT NULL,
+    description text,
     tags character varying(10000) DEFAULT NULL::character varying,
     setup_file character varying(1024) DEFAULT NULL::character varying
 );
@@ -161,7 +157,7 @@ CREATE TABLE commands (
     executable character varying(255) NOT NULL,
     status character varying(20) DEFAULT 'INACTIVE'::character varying NOT NULL,
     entity_version integer DEFAULT 0 NOT NULL,
-    description text DEFAULT NULL,
+    description text,
     tags character varying(10000) DEFAULT NULL::character varying,
     check_delay bigint DEFAULT 10000 NOT NULL,
     memory integer
@@ -226,7 +222,7 @@ CREATE TABLE job_requests (
     name character varying(255) NOT NULL,
     genie_user character varying(255) NOT NULL,
     version character varying(255) NOT NULL,
-    description text DEFAULT NULL,
+    description text,
     entity_version integer DEFAULT 0 NOT NULL,
     command_args character varying(10000) NOT NULL,
     group_name character varying(255) DEFAULT NULL::character varying,
@@ -260,7 +256,7 @@ CREATE TABLE jobs (
     command_args character varying(10000) NOT NULL,
     command_id character varying(255) DEFAULT NULL::character varying,
     command_name character varying(255) DEFAULT NULL::character varying,
-    description text DEFAULT NULL,
+    description text,
     cluster_id character varying(255) DEFAULT NULL::character varying,
     cluster_name character varying(255) DEFAULT NULL::character varying,
     finished timestamp(3) without time zone DEFAULT NULL::timestamp without time zone,
@@ -284,11 +280,51 @@ CREATE TABLE jobs_applications (
 
 
 --
+-- Name: application_configs application_config_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY application_configs
+    ADD CONSTRAINT application_config_pkey PRIMARY KEY (application_id, config);
+
+
+--
+-- Name: application_dependencies application_dependency_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY application_dependencies
+    ADD CONSTRAINT application_dependency_pkey PRIMARY KEY (application_id, dependency);
+
+
+--
 -- Name: applications application_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY applications
     ADD CONSTRAINT application_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: clusters_commands cluster_command_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY clusters_commands
+    ADD CONSTRAINT cluster_command_pkey PRIMARY KEY (cluster_id, command_id, command_order);
+
+
+--
+-- Name: cluster_configs cluster_config_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY cluster_configs
+    ADD CONSTRAINT cluster_config_pkey PRIMARY KEY (cluster_id, config);
+
+
+--
+-- Name: cluster_dependencies cluster_dependency_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY cluster_dependencies
+    ADD CONSTRAINT cluster_dependency_pkey PRIMARY KEY (cluster_id, dependency);
 
 
 --
@@ -300,11 +336,59 @@ ALTER TABLE ONLY clusters
 
 
 --
+-- Name: commands_applications command_application_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY commands_applications
+    ADD CONSTRAINT command_application_pkey PRIMARY KEY (command_id, application_id, application_order);
+
+
+--
+-- Name: command_configs command_config_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY command_configs
+    ADD CONSTRAINT command_config_pkey PRIMARY KEY (command_id, config);
+
+
+--
+-- Name: command_dependencies command_dependency_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY command_dependencies
+    ADD CONSTRAINT command_dependency_pkey PRIMARY KEY (command_id, dependency);
+
+
+--
 -- Name: commands command_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY commands
     ADD CONSTRAINT command_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: jobs_applications job_application_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY jobs_applications
+    ADD CONSTRAINT job_application_pkey PRIMARY KEY (job_id, application_id, application_order);
+
+
+--
+-- Name: job_executions job_execution_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY job_executions
+    ADD CONSTRAINT job_execution_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: job_metadata job_metadata_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY job_metadata
+    ADD CONSTRAINT job_metadata_pkey PRIMARY KEY (id);
 
 
 --
@@ -321,6 +405,20 @@ ALTER TABLE ONLY jobs
 
 ALTER TABLE ONLY job_requests
     ADD CONSTRAINT job_requests_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: application_configs_application_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX application_configs_application_id_index ON application_configs USING btree (application_id);
+
+
+--
+-- Name: application_dependencies_application_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX application_dependencies_application_id_index ON application_dependencies USING btree (application_id);
 
 
 --
@@ -352,6 +450,34 @@ CREATE INDEX applications_type_index ON applications USING btree (type);
 
 
 --
+-- Name: cluster_configs_cluster_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX cluster_configs_cluster_id_index ON cluster_configs USING btree (cluster_id);
+
+
+--
+-- Name: cluster_dependencies_cluster_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX cluster_dependencies_cluster_id_index ON cluster_dependencies USING btree (cluster_id);
+
+
+--
+-- Name: clusters_commands_cluster_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX clusters_commands_cluster_id_index ON clusters_commands USING btree (cluster_id);
+
+
+--
+-- Name: clusters_commands_command_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX clusters_commands_command_id_index ON clusters_commands USING btree (command_id);
+
+
+--
 -- Name: clusters_name_index; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -370,6 +496,34 @@ CREATE INDEX clusters_status_index ON clusters USING btree (status);
 --
 
 CREATE INDEX clusters_tag_index ON clusters USING btree (tags);
+
+
+--
+-- Name: command_configs_command_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX command_configs_command_id_index ON command_configs USING btree (command_id);
+
+
+--
+-- Name: command_dependencies_command_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX command_dependencies_command_id_index ON command_dependencies USING btree (command_id);
+
+
+--
+-- Name: commands_applications_application_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX commands_applications_application_id_index ON commands_applications USING btree (application_id);
+
+
+--
+-- Name: commands_applications_command_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX commands_applications_command_id_index ON commands_applications USING btree (command_id);
 
 
 --
@@ -394,13 +548,6 @@ CREATE INDEX commands_tags_index ON commands USING btree (tags);
 
 
 --
--- Name: job_executions_exit_code_index; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX job_executions_exit_code_index ON job_executions USING btree (exit_code);
-
-
---
 -- Name: job_executions_hostname_index; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -415,10 +562,38 @@ CREATE INDEX job_requests_created_index ON job_requests USING btree (created);
 
 
 --
+-- Name: jobs_applications_application_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX jobs_applications_application_id_index ON jobs_applications USING btree (application_id);
+
+
+--
+-- Name: jobs_applications_job_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX jobs_applications_job_id_index ON jobs_applications USING btree (job_id);
+
+
+--
+-- Name: jobs_cluster_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX jobs_cluster_id_index ON jobs USING btree (cluster_id);
+
+
+--
 -- Name: jobs_cluster_name_index; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX jobs_cluster_name_index ON jobs USING btree (cluster_name);
+
+
+--
+-- Name: jobs_command_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX jobs_command_id_index ON jobs USING btree (command_id);
 
 
 --
@@ -440,6 +615,13 @@ CREATE INDEX jobs_created_index ON jobs USING btree (created);
 --
 
 CREATE INDEX jobs_finished_index ON jobs USING btree (finished);
+
+
+--
+-- Name: jobs_name_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX jobs_name_index ON jobs USING btree (name);
 
 
 --
@@ -470,14 +652,6 @@ CREATE INDEX jobs_tags_index ON jobs USING btree (tags);
 CREATE INDEX jobs_user_index ON jobs USING btree (genie_user);
 
 
---
--- Name: jobs_name_index; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX jobs_name_index ON jobs USING btree (name);
-
-
---
 --
 -- Name: application_configs application_configs_application_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
@@ -614,8 +788,7 @@ ALTER TABLE ONLY jobs
     ADD CONSTRAINT jobs_id_fkey FOREIGN KEY (id) REFERENCES job_requests(id) ON DELETE CASCADE;
 
 
--- Completed on 2017-07-06 10:33:36 PDT
-
 --
 -- PostgreSQL database dump complete
 --
+
