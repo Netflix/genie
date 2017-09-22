@@ -231,7 +231,7 @@ configure(javaProjects) {
     }
 
     license {
-        excludes(["${projectDir}/src/generated/*"])
+        ignoreFailures false
     }
 
     checkstyle {
