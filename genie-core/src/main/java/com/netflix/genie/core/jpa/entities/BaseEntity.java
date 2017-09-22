@@ -63,7 +63,7 @@ public class BaseEntity implements Serializable {
 
     @Version
     @Column(name = "entity_version", nullable = false)
-    private Long entityVersion;
+    private Integer entityVersion;
 
     /**
      * Updates the created and updated timestamps to be creation time.
@@ -155,7 +155,7 @@ public class BaseEntity implements Serializable {
      *
      * @return The entityVersion of this entity as handled by JPA
      */
-    public Long getEntityVersion() {
+    public Integer getEntityVersion() {
         return this.entityVersion;
     }
 
@@ -164,7 +164,7 @@ public class BaseEntity implements Serializable {
      *
      * @param entityVersion The new entityVersion
      */
-    protected void setEntityVersion(final Long entityVersion) {
+    protected void setEntityVersion(final Integer entityVersion) {
         this.entityVersion = entityVersion;
     }
 }
