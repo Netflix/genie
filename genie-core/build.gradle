@@ -60,12 +60,6 @@ tasks.withType(Checkstyle) {
     exclude metaModelIgnorePattern
 }
 
-tasks.withType(FindBugs) {
-    classes = classes.filter {
-        !it.path.contains("_")
-    }
-}
-
 tasks.withType(Pmd) {
     exclude metaModelIgnorePattern
 }
