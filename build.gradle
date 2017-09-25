@@ -11,6 +11,7 @@ buildscript {
         classpath("org.asciidoctor:asciidoctor-gradle-plugin:1.5.3")
         classpath("gradle.plugin.com.gorylenko.gradle-git-properties:gradle-git-properties:1.4.17")
         classpath("com.netflix.nebula:gradle-aggregate-javadocs-plugin:3.0.1")
+        classpath("com.google.protobuf:protobuf-gradle-plugin:0.8.3")
     }
 }
 
@@ -105,18 +106,33 @@ configure(javaProjects) {
             dependency("org.opensaml:opensaml:2.6.4")
             dependency("org.python:jython-standalone:2.7.1")
             dependency("org.springframework.security.extensions:spring-security-saml2-core:1.0.2.RELEASE")
+            dependencySet(group: "com.google.protobuf", version: "3.4.0") {
+              entry "protobuf-java"
+              entry "protoc"
+            }
+            dependencySet(group: "io.grpc", version: "1.6.1") {
+              entry "grpc-core"
+              entry "grpc-netty"
+              entry "grpc-stub"
+              entry "grpc-protobuf"
+              entry "protoc-gen-grpc-java"
+              entry "grpc-testing"
+            }
         }
     }
 
     ext {
         generatedSourcesDir = new File("${projectDir}/src/generated")
         generatedSourcesJavaDir = new File(generatedSourcesDir, "/java")
+        // Necessary due to limitations of proto plugin (${source-set-name}/${variant} is always appended)
+        generatedSourcesJavaProtobufDir = new File(generatedSourcesDir, "/main/java")
     }
 
     sourceSets {
         main {
             java {
                 srcDir generatedSourcesJavaDir
+                srcDir generatedSourcesJavaProtobufDir
             }
         }
     }
