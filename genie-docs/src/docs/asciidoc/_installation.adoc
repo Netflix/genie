@@ -62,18 +62,18 @@ Genie and it may be more overhead than you're comfortable with.
 
 Genie has a lot of available configuration options. For descriptions of specific properties you can see the
 <<Properties>> section below. Additionally if you want to know how to configure more parts of the application you
-should have a look at the http://docs.spring.io/spring-boot/docs/{springBootVersion}/reference/htmlsingle/[Spring Boot] docs
-as they will go in depth on how to configure the various Spring components used in Genie.
+should have a look at the http://docs.spring.io/spring-boot/docs/{springBootVersion}/reference/htmlsingle/[Spring Boot]
+docs as they will go in depth on how to configure the various Spring components used in Genie.
 
 ==== Profiles
 
 Spring provides a mechanism of segregating parts of application configuration and activating them in certain
 conditions. This mechanism is known as
-http://docs.spring.io/spring-boot/docs/{springBootVersion}/reference/htmlsingle/#boot-features-profiles[profiles]. By default
-Genie will run with the `dev` profile activated. This means that all the properties in `application-dev.yml` will be
-appended to, or overwrite, the properties in `application.yml` which are the defaults. Changing the active profiles is
-easy you just need to change the property `spring.profiles.active` and pass in a comma separated list of active
-profiles. For example `--spring.profiles.active=prod,cloud` would activate the prod and cloud profiles.
+http://docs.spring.io/spring-boot/docs/{springBootVersion}/reference/htmlsingle/#boot-features-profiles[profiles]. By
+default Genie will run with the `dev` profile activated. This means that all the properties in `application-dev.yml`
+will be appended to, or overwrite, the properties in `application.yml` which are the defaults. Changing the active
+profiles is easy you just need to change the property `spring.profiles.active` and pass in a comma separated list of
+active profiles. For example `--spring.profiles.active=prod,cloud` would activate the prod and cloud profiles.
 
 Properties for specific profiles should be stored in files named `application-{profileName}.yml`. You can make as many
 as you want but Genie ships with `dev`, `s3` and `prod` profiles properties already included. Their properties can be
@@ -97,80 +97,98 @@ Genie also ships with database schema scripts for MySQL and PostgreSQL. You will
 before you run Genie if you use one of these databases. Genie no longer creates the schema dynamically for performance
 reasons. Follow the below sections to load the schemas into your table.
 
-NOTE: Genie 3.1.x software is not compatible with 3.0.x database schema. Before upgrading Genie servers to 3.1.x, follow the
-steps below to perform database upgrade, or create a new database with 3.1.x schema.
+NOTE: Genie 3.2.0+ software is not compatible with previous database schema. Before upgrading existing Genie servers to
+3.2.0, follow the steps below to perform database upgrade, or create a new database with 3.1.x schema. Database upgrades
+beyond 3.2.0 are handled automatically by the Genie binary via https://flywaydb.org/[Flyway].
 
 ===== MySQL
 
 NOTE: This assumes the MySQL client binaries are installed
 
-Download the
-ifeval::[{isSnapshot} == true]
-https://github.com/Netflix/genie/blob/master/genie-ddl/src/main/sql/mysql/schema.mysql.sql[MySQL Schema].
-endif::[]
-ifeval::[{isSnapshot} == false]
-https://github.com/Netflix/genie/blob/v{revnumber}/genie-ddl/src/main/sql/mysql/schema.mysql.sql[MySQL Schema].
-endif::[]
-Then run:
+WARNING: Genie requires MySQL 5.6.3+ due to certain properties not existing before that version
+
+Ensure the following properties are set in your `my.cnf`:
+
+[source,text]
+----
+[mysqld]
+innodb_file_per_table=ON
+innodb_large_prefix=ON
+innodb_file_format=barracuda
+----
+
+NOTE: Restart MySQL if you've changed these properties
+
+Run:
 
 [source,bash]
 ----
 mysql -u {username} -p{password} -h {host} -e 'create database genie;'
-mysql -u {username} -p{password} -h {host} genie < schema.mysql.sql
 ----
 
-====== 3.0.1 to 3.1.0 database upgrade
+====== 3.1.x to 3.2.0 database upgrade
+
+WARNING: Genie requires MySQL 5.6.3+ due to certain properties not existing before that version
+
+If you have an existing Genie installation on a database version < 3.2.0 you'll need to upgrade your schema to
+3.2.0 before continuing.
 
 Download the:
 ifeval::[{isSnapshot} == true]
-https://github.com/Netflix/genie/blob/master/genie-ddl/src/main/sql/mysql/upgrade-3.0.1-to-3.1.0.mysql.sql[3.0.1 to 3.1.0 Schema Upgrade].
+https://github.com/Netflix/genie/blob/master/genie-ddl/src/main/sql/mysql/upgrade-3.1.x-to-3.2.0.mysql.sql[3.1.x to 3.2.0 Schema Upgrade].
 endif::[]
 ifeval::[{isSnapshot} == false]
-https://github.com/Netflix/genie/blob/v{revnumber}/genie-ddl/src/main/sql/mysql/upgrade-3.0.1-to-3.1.0.mysql.sql[3.0.1 to 3.1.0 Schema Upgrade].
+https://github.com/Netflix/genie/blob/v{revnumber}/genie-ddl/src/main/sql/mysql/upgrade-3.1.x-to-3.2.0.mysql.sql[3.1.x to 3.2.0 Schema Upgrade].
 endif::[]
+
+Ensure the following properties are set in your `my.cnf`:
+
+[source,text]
+----
+[mysqld]
+innodb_file_per_table=ON
+innodb_large_prefix=ON
+innodb_file_format=barracuda
+----
+
+NOTE: Restart MySQL if you've changed these properties
 
 Then run:
 
 [source,bash]
 ----
-mysql -u {username} -p{password} -h {host} genie < upgrade-3.0.1-to-3.1.0.mysql.sql
+mysql -u {username} -p{password} -h {host} genie < upgrade-3.1.x-to-3.2.0.mysql.sql
 ----
 
 ===== PostgreSQL
 
 NOTE: This assumes the PSQL binaries are installed
 
-Download the
-ifeval::[{isSnapshot} == true]
-https://github.com/Netflix/genie/blob/master/genie-ddl/src/main/sql/postgresql/schema.postgresql.sql[PostgreSQL Schema]
-endif::[]
-ifeval::[{isSnapshot} == false]
-https://github.com/Netflix/genie/blob/v{revnumber}/genie-ddl/src/main/sql/postgresql/schema.postgresql.sql[PostgreSQL Schema]
-endif::[]
-Then run:
+Run:
 
 [source,bash]
 ----
 createdb genie
-psql -U {user} -h {host} -d genie -f schema.postgresql.sql
 ----
 
-====== 3.0.1 to 3.1.0 database upgrade
+====== 3.1.x to 3.2.0 database upgrade
+
+If you have an existing Genie installation on a database version < 3.2.0 you'll need to upgrade your schema to
+3.2.0 before continuing.
 
 Download the
 ifeval::[{isSnapshot} == true]
-https://github.com/Netflix/genie/blob/master/genie-ddl/src/main/sql/postgresql/upgrade-3.0.1-to-3.1.0.postgresql.sql[3.0.1 to 3.1.0 Schema Upgrade].
+https://github.com/Netflix/genie/blob/master/genie-ddl/src/main/sql/postgresql/upgrade-3.1.x-to-3.2.0.postgresql.sql[3.1.x to 3.2.0 Schema Upgrade].
 endif::[]
 ifeval::[{isSnapshot} == false]
-https://github.com/Netflix/genie/blob/v{revnumber}/genie-ddl/src/main/sql/postgresql/upgrade-3.0.1-to-3.1.0.postgresql.sql[3.0.1 to 3.1.0 Schema Upgrade].
+https://github.com/Netflix/genie/blob/v{revnumber}/genie-ddl/src/main/sql/postgresql/upgrade-3.1.x-to-3.2.0.postgresql.sql[3.1.x to 3.2.0 Schema Upgrade].
 endif::[]
 
 Then run:
 
 [source,bash]
 ----
-createdb genie
-psql -U {user} -h {host} -d genie -f upgrade-3.0.1-to-3.1.0.postgresql.sql
+psql -U {user} -h {host} -d genie -f upgrade-3.1.x-to-3.2.0.postgresql.sql
 ----
 
 ==== Local Directories
@@ -181,14 +199,19 @@ the `genie.jobs.locations.*` properties described below in the <<Properties>> se
 
 ===== S3
 
-If your commands, applications, or jobs depend on artifacts referenced via S3 URI, you will need to configure the S3 subsystem.
+If your commands, applications, or jobs depend on artifacts referenced via S3 URI, you will need to configure the S3
+subsystem.
 
-1. Make sure `application-s3.yml` exists in `~/.genie` (or at a custom location, referenced by `--spring.config.location=`)
+1. Make sure `application-s3.yml` exists in `~/.genie` (or at a custom location, referenced by
+`--spring.config.location=`)
 2. An example of `application-s3.yml` is available below. Set either `credentials.file` or `credentials.role`
-  * For `credentials.file`, provide a filename of a file **in classpath** that contains the AWS access key and secret. A convenient location to place this file is `~/.genie/lib`.
+  * For `credentials.file`, provide a filename of a file **in classpath** that contains the AWS access key and secret.
+  A convenient location to place this file is `~/.genie/lib`.
   * For `credentials.role`, provide an inline role value.
-3. Enable the Spring Boot `s3` profile during Genie launch, for example via command-line: `--spring.profiles.active=prod,s3`
-4. To confirm things are properly configured, head to `/actuator/beans` and verify that the `file.system.s3` bean was created
+3. Enable the Spring Boot `s3` profile during Genie launch, for example via command-line:
+`--spring.profiles.active=prod,s3`
+4. To confirm things are properly configured, head to `/actuator/beans` and verify that the `file.system.s3` bean was
+created
 
 Example `application-s3.yml`
 ```
