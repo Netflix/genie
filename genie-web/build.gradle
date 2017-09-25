@@ -83,6 +83,7 @@ dependencies {
     testCompile("org.springframework.restdocs:spring-restdocs-core")
     testCompile("org.springframework.restdocs:spring-restdocs-mockmvc")
     testCompile("org.springframework.security:spring-security-test")
+    testCompile("io.grpc:grpc-testing")
 }
 
 license {
