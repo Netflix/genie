@@ -23,6 +23,12 @@ eureka:
   client:
     enabled: false
 
+flyway:
+  locations: db/migration/{vendor}
+  baselineDescription: Base Version
+  baselineOnMigrate: true
+  baselineVersion: 3.2.0
+
 genie:
   file:
     cache:
@@ -133,9 +139,10 @@ spring:
   jackson:
     date-format: com.netflix.genie.common.util.GenieDateFormat
     time-zone: UTC
+  jpa:
+    hibernate:
+      ddl-auto: none # TODO: Switch to validate
   profiles:
     active: dev
   session:
     store-type: hash_map
-  velocity:
-    enabled: false

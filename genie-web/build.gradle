@@ -30,6 +30,9 @@ dependencies {
     // JWT JOSE implementation lib
     compile("org.bitbucket.b_c:jose4j")
 
+    // Flyway for database migrations
+    compile("org.flywaydb:flyway-core")
+
     // Spring Libs
     compile("org.springframework.boot:spring-boot-starter-actuator")
     compile("org.springframework.boot:spring-boot-starter-data-redis")

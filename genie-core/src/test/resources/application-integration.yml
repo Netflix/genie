@@ -26,10 +26,12 @@ genie:
       attachments: file:///tmp/genie/attachments/
       jobs: file:///tmp/
 
+
+# TODO: This still uses Hibernate to generate DDL in HSQL DB. Not desirable but leaving till DB code no longer in core
 spring:
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
       naming:
         strategy: org.hibernate.cfg.ImprovedNamingStrategy
   datasource:

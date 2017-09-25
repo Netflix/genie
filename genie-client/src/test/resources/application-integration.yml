@@ -26,9 +26,7 @@ genie:
 spring:
   jpa:
     hibernate:
-      ddl-auto: update
-      naming:
-        strategy: org.hibernate.cfg.ImprovedNamingStrategy
+      ddl-auto: none
     properties:
       hibernate:
         show_sql: true
