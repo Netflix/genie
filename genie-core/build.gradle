@@ -30,6 +30,7 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-mail")
     compile("org.springframework.retry:spring-retry")
     compile("org.springframework.cloud:spring-cloud-aws-context")
+    compile("net.devh:grpc-server-spring-boot-autoconfigure")
 
     // AWS Libs
     compile("com.amazonaws:aws-java-sdk-sts")

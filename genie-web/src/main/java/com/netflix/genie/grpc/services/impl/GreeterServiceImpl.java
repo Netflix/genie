@@ -22,10 +22,12 @@ import com.netflix.genie.protogen.GreeterServiceGrpc;
 import com.netflix.genie.protogen.HelloReply;
 import com.netflix.genie.protogen.HelloRequest;
 import io.grpc.stub.StreamObserver;
+import net.devh.springboot.autoconfigure.grpc.server.GrpcService;
 
 /**
  * Example implementation of the Greeter service definition.
  */
+@GrpcService(GreeterServiceGrpc.class)
 public class GreeterServiceImpl extends GreeterServiceGrpc.GreeterServiceImplBase {
 
     /**

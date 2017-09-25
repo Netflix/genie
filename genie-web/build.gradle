@@ -52,6 +52,7 @@ dependencies {
     }
     compile("org.springframework.security.oauth:spring-security-oauth2")
     compile("org.springframework.session:spring-session")
+    compile("net.devh:grpc-server-spring-boot-starter")
 
     /*******************************
      * Provided Dependencies
