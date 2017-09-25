@@ -12,6 +12,7 @@ dependencies {
      *******************************/
 
     compile project(":genie-common")
+    compile project(":genie-proto")
 
     // JSON Patch Support
     compile("com.github.fge:json-patch")
@@ -30,6 +31,7 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-mail")
     compile("org.springframework.retry:spring-retry")
     compile("org.springframework.cloud:spring-cloud-aws-context")
+    compile("net.devh:grpc-server-spring-boot-autoconfigure")
 
     // AWS Libs
     compile("com.amazonaws:aws-java-sdk-sts")
@@ -54,6 +56,7 @@ dependencies {
     testCompile(project(":genie-test"))
     testCompile("org.dbunit:dbunit")
     testCompile("com.github.springtestdbunit:spring-test-dbunit")
+    testCompile("io.grpc:grpc-testing")
 
     /*******************************
      * JPA Model Gen Dependencies
@@ -84,12 +87,6 @@ tasks.withType(Checkstyle) {
     exclude metaModelIgnorePattern
 }
 
-tasks.withType(FindBugs) {
-    classes = classes.filter {
-        !it.path.contains("_")
-    }
-}
-
 tasks.withType(Pmd) {
     exclude metaModelIgnorePattern
 }
@@ -104,4 +101,8 @@ jacocoTestReport {
     doFirst {
         classDirectories = fileTree(dir: "${buildDir}/classes/main/").exclude(["com/netflix/genie/core/jpa/entities/*_*"])
     }
+}
+
+license {
+  exclude "**/com/netflix/genie/core/jpa/entities/*_.java"
 }

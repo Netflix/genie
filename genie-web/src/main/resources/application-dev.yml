@@ -26,3 +26,12 @@ spring:
     url: jdbc:hsqldb:mem:genie-db;shutdown=true
     username: SA
     password:
+
+genie:
+  grpc:
+    server:
+      enabled: true
+
+grpc:
+  server:
+    port: 8081

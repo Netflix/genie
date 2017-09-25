@@ -1,0 +1,81 @@
+apply plugin: 'com.google.protobuf'
+
+ext {
+    protogenIgnorePattern = "**/com/netflix/genie/protogen/*"
+}
+
+dependencies {
+
+    /*******************************
+     * Compile Dependencies
+     *******************************/
+
+     compile ("com.google.protobuf:protobuf-java")
+     compile("io.grpc:grpc-stub")
+     compile("io.grpc:grpc-protobuf")
+
+    /*******************************
+     * Provided Dependencies
+     *******************************/
+
+    /*******************************
+     * Runtime Dependencies
+     *******************************/
+
+    /*******************************
+     * Test Dependencies
+     *******************************/
+
+}
+
+// Configure protobuf classes and grpc stubs generation
+protobuf {
+    protoc {
+        // Download the protoc compiler
+        artifact = 'com.google.protobuf:protoc'
+        // Use project convention for generated files
+        generatedFilesBaseDir = "${projectDir}/src/generated"
+    }
+
+    plugins {
+        grpc {
+            // Download the grpc compiler
+            artifact = 'io.grpc:protoc-gen-grpc-java'
+        }
+    }
+
+    generateProtoTasks {
+        ofSourceSet('main')*.plugins {
+            // Activate the gRPC plugin
+            grpc {
+                outputSubDir = 'java'
+            }
+        }
+    }
+}
+
+//Ignore the generated classes from all our style/coverage/bug/license finding tools
+
+tasks.withType(Checkstyle) {
+    exclude protogenIgnorePattern
+}
+
+tasks.withType(Pmd) {
+    exclude protogenIgnorePattern
+}
+
+test {
+    jacoco {
+        excludes = [protogenIgnorePattern]
+    }
+}
+
+jacocoTestReport {
+    doFirst {
+        classDirectories = fileTree(dir: "${buildDir}/classes/main/").exclude([protogenIgnorePattern])
+    }
+}
+
+license {
+  exclude protogenIgnorePattern
+}
