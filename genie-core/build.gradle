@@ -8,6 +8,7 @@ dependencies {
      *******************************/
 
     compile project(":genie-common")
+    compile project(":genie-proto")
 
     // JSON Patch Support
     compile("com.github.fge:json-patch")
@@ -53,7 +54,7 @@ dependencies {
     testCompile(project(":genie-test"))
     testCompile("org.dbunit:dbunit")
     testCompile("com.github.springtestdbunit:spring-test-dbunit")
-}
+    testCompile("io.grpc:grpc-testing")
 
 //Ignore the generated classes from all our style/coverage/bug finding tools
 tasks.withType(Checkstyle) {
