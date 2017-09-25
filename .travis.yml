@@ -19,7 +19,6 @@ before_script:
   - cat "$TRAVIS_BUILD_DIR/travis/config/mysql/my.cnf" | sudo tee -a /etc/mysql/my.cnf
   - sudo service mysql restart
   - mysql -u root -e 'create database genie;'
-  - mysql -u root genie < genie-ddl/src/main/sql/mysql/schema.mysql.sql
 script: ./travis/buildViaTravis.sh
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
