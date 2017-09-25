@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 3.2.0-SNAPSHOT,</span>
-<span id="revdate">2017-09-22</span>
+<span id="revdate">2017-09-25</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -726,102 +726,111 @@ b.conum * { color: inherit !important; }
 <li><a href="#_introduction">1. Introduction</a></li>
 <li><a href="#_3_2_0_snapshot_release_notes">2. 3.2.0-SNAPSHOT Release Notes</a>
 <ul class="sectlevel2">
-<li><a href="#_features">2.1. Features</a></li>
-<li><a href="#_library_upgrades">2.2. Library Upgrades</a></li>
-<li><a href="#_property_changes">2.3. Property Changes</a>
-<ul class="sectlevel3">
-<li><a href="#_added">2.3.1. Added</a></li>
-<li><a href="#_changed_default_value">2.3.2. Changed Default Value</a></li>
-<li><a href="#_removed">2.3.3. Removed</a></li>
-<li><a href="#_renamed">2.3.4. Renamed</a></li>
+<li><a href="#_upgrade_instructions">2.1. Upgrade Instructions</a></li>
+<li><a href="#_features">2.2. Features</a></li>
+<li><a href="#_library_upgrades">2.3. Library Upgrades</a></li>
+<li><a href="#_property_changes">2.4. Property Changes</a></li>
+<li><a href="#_database_upgrades">2.5. Database Upgrades</a></li>
 </ul>
 </li>
-<li><a href="#_database_upgrades">2.4. Database Upgrades</a></li>
-</ul>
-</li>
-<li><a href="#_concepts">3. Concepts</a>
+<li><a href="#_3_1_0_release_notes">3. 3.1.0 Release Notes</a>
 <ul class="sectlevel2">
-<li><a href="#_data_model">3.1. Data Model</a>
+<li><a href="#_features_2">3.1. Features</a></li>
+<li><a href="#_library_upgrades_2">3.2. Library Upgrades</a></li>
+<li><a href="#_property_changes_2">3.3. Property Changes</a>
 <ul class="sectlevel3">
-<li><a href="#_caveats">3.1.1. Caveats</a></li>
-<li><a href="#_resources">3.1.2. Resources</a></li>
-<li><a href="#_wrap_up">3.1.3. Wrap-up</a></li>
+<li><a href="#_added">3.3.1. Added</a></li>
+<li><a href="#_changed_default_value">3.3.2. Changed Default Value</a></li>
+<li><a href="#_removed">3.3.3. Removed</a></li>
+<li><a href="#_renamed">3.3.4. Renamed</a></li>
 </ul>
 </li>
-<li><a href="#_how_it_works">3.2. How it Works</a>
-<ul class="sectlevel3">
-<li><a href="#_resource_configuration">3.2.1. Resource Configuration</a></li>
-<li><a href="#_job_submission">3.2.2. Job Submission</a></li>
-<li><a href="#_user_behavior">3.2.3. User Behavior</a></li>
-<li><a href="#_wrap_up_2">3.2.4. Wrap Up</a></li>
+<li><a href="#_database_upgrades_2">3.4. Database Upgrades</a></li>
 </ul>
 </li>
-<li><a href="#_netflix_example">3.3. Netflix Example</a>
-<ul class="sectlevel3">
-<li><a href="#_configuration">3.3.1. Configuration</a></li>
-<li><a href="#_job_submission_2">3.3.2. Job Submission</a></li>
-<li><a href="#_wrap_up_3">3.3.3. Wrap Up</a></li>
-</ul>
-</li>
-<li><a href="#_netflix_deployment">3.4. Netflix Deployment</a>
-<ul class="sectlevel3">
-<li><a href="#_components">3.4.1. Components</a></li>
-<li><a href="#_wrap_up_4">3.4.2. Wrap Up</a></li>
-</ul>
-</li>
-<li><a href="#_security">3.5. Security</a>
-<ul class="sectlevel3">
-<li><a href="#_architecture">3.5.1. Architecture</a></li>
-<li><a href="#_rest_api_security">3.5.2. REST API Security</a></li>
-<li><a href="#_ui_security">3.5.3. UI Security</a></li>
-<li><a href="#_wrap_up_5">3.5.4. Wrap Up</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#_features_2">4. Features</a>
+<li><a href="#_concepts">4. Concepts</a>
 <ul class="sectlevel2">
-<li><a href="#_cluster_load_balancing">4.1. Cluster Load Balancing</a>
+<li><a href="#_data_model">4.1. Data Model</a>
 <ul class="sectlevel3">
-<li><a href="#_randomizedclusterloadbalancerimpl">4.1.1. RandomizedClusterLoadBalancerImpl</a></li>
-<li><a href="#_scriptloadbalancer">4.1.2. ScriptLoadBalancer</a></li>
-<li><a href="#_wrap_up_6">4.1.3. Wrap Up</a></li>
+<li><a href="#_caveats">4.1.1. Caveats</a></li>
+<li><a href="#_resources">4.1.2. Resources</a></li>
+<li><a href="#_wrap_up">4.1.3. Wrap-up</a></li>
+</ul>
+</li>
+<li><a href="#_how_it_works">4.2. How it Works</a>
+<ul class="sectlevel3">
+<li><a href="#_resource_configuration">4.2.1. Resource Configuration</a></li>
+<li><a href="#_job_submission">4.2.2. Job Submission</a></li>
+<li><a href="#_user_behavior">4.2.3. User Behavior</a></li>
+<li><a href="#_wrap_up_2">4.2.4. Wrap Up</a></li>
+</ul>
+</li>
+<li><a href="#_netflix_example">4.3. Netflix Example</a>
+<ul class="sectlevel3">
+<li><a href="#_configuration">4.3.1. Configuration</a></li>
+<li><a href="#_job_submission_2">4.3.2. Job Submission</a></li>
+<li><a href="#_wrap_up_3">4.3.3. Wrap Up</a></li>
+</ul>
+</li>
+<li><a href="#_netflix_deployment">4.4. Netflix Deployment</a>
+<ul class="sectlevel3">
+<li><a href="#_components">4.4.1. Components</a></li>
+<li><a href="#_wrap_up_4">4.4.2. Wrap Up</a></li>
+</ul>
+</li>
+<li><a href="#_security">4.5. Security</a>
+<ul class="sectlevel3">
+<li><a href="#_architecture">4.5.1. Architecture</a></li>
+<li><a href="#_rest_api_security">4.5.2. REST API Security</a></li>
+<li><a href="#_ui_security">4.5.3. UI Security</a></li>
+<li><a href="#_wrap_up_5">4.5.4. Wrap Up</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#_installation">5. Installation</a>
+<li><a href="#_features_3">5. Features</a>
 <ul class="sectlevel2">
-<li><a href="#_standalone_jar">5.1. Standalone Jar</a></li>
-<li><a href="#_tomcat_deployment">5.2. Tomcat Deployment</a></li>
-<li><a href="#_configuration_3">5.3. Configuration</a>
+<li><a href="#_cluster_load_balancing">5.1. Cluster Load Balancing</a>
 <ul class="sectlevel3">
-<li><a href="#_profiles">5.3.1. Profiles</a></li>
-<li><a href="#_database">5.3.2. Database</a></li>
-<li><a href="#_local_directories">5.3.3. Local Directories</a></li>
+<li><a href="#_randomizedclusterloadbalancerimpl">5.1.1. RandomizedClusterLoadBalancerImpl</a></li>
+<li><a href="#_scriptloadbalancer">5.1.2. ScriptLoadBalancer</a></li>
+<li><a href="#_wrap_up_6">5.1.3. Wrap Up</a></li>
 </ul>
 </li>
-<li><a href="#_wrap_up_7">5.4. Wrap Up</a></li>
 </ul>
 </li>
-<li><a href="#_properties">6. Properties</a>
+<li><a href="#_installation">6. Installation</a>
 <ul class="sectlevel2">
-<li><a href="#_default_properties">6.1. Default Properties</a>
+<li><a href="#_standalone_jar">6.1. Standalone Jar</a></li>
+<li><a href="#_tomcat_deployment">6.2. Tomcat Deployment</a></li>
+<li><a href="#_configuration_3">6.3. Configuration</a>
 <ul class="sectlevel3">
-<li><a href="#_genie_properties">6.1.1. Genie Properties</a></li>
-<li><a href="#_spring_properties">6.1.2. Spring Properties</a></li>
+<li><a href="#_profiles">6.3.1. Profiles</a></li>
+<li><a href="#_database">6.3.2. Database</a></li>
+<li><a href="#_local_directories">6.3.3. Local Directories</a></li>
 </ul>
 </li>
-<li><a href="#_profile_specific_properties">6.2. Profile Specific Properties</a>
+<li><a href="#_wrap_up_7">6.4. Wrap Up</a></li>
+</ul>
+</li>
+<li><a href="#_properties">7. Properties</a>
+<ul class="sectlevel2">
+<li><a href="#_default_properties">7.1. Default Properties</a>
 <ul class="sectlevel3">
-<li><a href="#_dev_profile">6.2.1. Dev Profile</a></li>
-<li><a href="#_prod_profile">6.2.2. Prod Profile</a></li>
-<li><a href="#_s3_profile">6.2.3. S3 Profile</a></li>
+<li><a href="#_genie_properties">7.1.1. Genie Properties</a></li>
+<li><a href="#_spring_properties">7.1.2. Spring Properties</a></li>
+</ul>
+</li>
+<li><a href="#_profile_specific_properties">7.2. Profile Specific Properties</a>
+<ul class="sectlevel3">
+<li><a href="#_dev_profile">7.2.1. Dev Profile</a></li>
+<li><a href="#_prod_profile">7.2.2. Prod Profile</a></li>
+<li><a href="#_s3_profile">7.2.3. S3 Profile</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#_metrics">7. Metrics</a></li>
+<li><a href="#_metrics">8. Metrics</a></li>
 </ul>
 </div>
 </div>
@@ -880,7 +889,112 @@ For a demo of this version of Genie please see the
 <p>The following are the release notes for Genie 3.2.0-SNAPSHOT.</p>
 </div>
 <div class="sect2">
-<h3 id="_features"><a class="anchor" href="#_features"></a>2.1. Features</h3>
+<h3 id="_upgrade_instructions"><a class="anchor" href="#_upgrade_instructions"></a>2.1. Upgrade Instructions</h3>
+<div class="paragraph">
+<p>If upgrading from existing 3.1.x installation run appropriate database upgrade script:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://raw.githubusercontent.com/Netflix/genie/v3.2.0/genie-ddl/src/main/sql/mysql/upgrade-3.1.x-to-3.2.0.mysql.sql">mysql</a></p>
+</li>
+<li>
+<p><a href="https://raw.githubusercontent.com/Netflix/genie/v3.2.0/genie-ddl/src/main/sql/postgresql/upgrade-3.1.x-to-3.2.0.postgresql.sql">postgresql</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This <strong>must</strong> be done before deploying the 3.2.0 binary or Flyway will break. Going forward this will no longer be
+necessary and Genie binary will package upgrade scripts and Flyway will apply them automatically.</p>
+</div>
+<div class="paragraph">
+<p>Once the script is run you can deploy the 3.2.0 binary. Once successfully deployed in your db schema you should see a
+new table <code>schema_version</code>. Do not delete or modify this table it is used by Flyway to manage upgrades.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_features"><a class="anchor" href="#_features"></a>2.2. Features</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Database improvements</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Switch to <a href="https://flywaydb.org/">Flyway</a> for database upgrade management</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Abstract internal eventing behind common interface</p>
+</li>
+<li>
+<p>Bug fixes</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_library_upgrades"><a class="anchor" href="#_library_upgrades"></a>2.3. Library Upgrades</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Upgrade Spring Boot to 1.5.7.RELEASE</p>
+</li>
+<li>
+<p>Upgrade to Spring Platform IO Brussels-SR5 for library dependency management</p>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="http://docs.spring.io/platform/docs/Brussels-SR5/reference/htmlsingle/">Reference Docs</a></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Upgrade to Spring Cloud Dalston.SR3 for cloud dependency management</p>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="http://cloud.spring.io/spring-cloud-static/Dalston.SR3/">Reference Docs</a></p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_property_changes"><a class="anchor" href="#_property_changes"></a>2.4. Property Changes</h3>
+
+</div>
+<div class="sect2">
+<h3 id="_database_upgrades"><a class="anchor" href="#_database_upgrades"></a>2.5. Database Upgrades</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>Standardize database schemas for consistency</p>
+</li>
+<li>
+<p>Switch to <a href="https://flywaydb.org/">Flyway</a> for database upgrade management</p>
+</li>
+<li>
+<p>If using MySQL now require 5.6.3+ due to properties needed. See <a href="#_installation">Installation</a> for details</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_3_1_0_release_notes"><a class="anchor" href="#_3_1_0_release_notes"></a>3. 3.1.0 Release Notes</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The following are the release notes for Genie 3.1.0.</p>
+</div>
+<div class="sect2">
+<h3 id="_features_2"><a class="anchor" href="#_features_2"></a>3.1. Features</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -920,11 +1034,11 @@ property</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_library_upgrades"><a class="anchor" href="#_library_upgrades"></a>2.2. Library Upgrades</h3>
+<h3 id="_library_upgrades_2"><a class="anchor" href="#_library_upgrades_2"></a>3.2. Library Upgrades</h3>
 <div class="ulist">
 <ul>
 <li>
-<p>Upgrade Spring Boot from 1.3.8.RELEASE to 1.5.6.RELEASE</p>
+<p>Upgrade Spring Boot from 1.3.8.RELEASE to 1.5.4.RELEASE</p>
 <div class="ulist">
 <ul>
 <li>
@@ -937,21 +1051,21 @@ property</p>
 </div>
 </li>
 <li>
-<p>Upgrade to Spring Platform IO Brussels-SR4 for library dependency management</p>
+<p>Upgrade to Spring Platform IO Brussels-SR3 for library dependency management</p>
 <div class="ulist">
 <ul>
 <li>
-<p><a href="http://docs.spring.io/platform/docs/Brussels-SR4/reference/htmlsingle/">Reference Docs</a></p>
+<p><a href="http://docs.spring.io/platform/docs/Brussels-SR3/reference/htmlsingle/">Reference Docs</a></p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p>Upgrade to Spring Cloud Dalston.SR3 for cloud dependency management</p>
+<p>Upgrade to Spring Cloud Dalston.SR2 for cloud dependency management</p>
 <div class="ulist">
 <ul>
 <li>
-<p><a href="http://cloud.spring.io/spring-cloud-static/Dalston.SR3/">Reference Docs</a></p>
+<p><a href="http://cloud.spring.io/spring-cloud-static/Dalston.SR2/">Reference Docs</a></p>
 </li>
 </ul>
 </div>
@@ -974,9 +1088,9 @@ to Spring Integration Zookeeper. That library is now used.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_property_changes"><a class="anchor" href="#_property_changes"></a>2.3. Property Changes</h3>
+<h3 id="_property_changes_2"><a class="anchor" href="#_property_changes_2"></a>3.3. Property Changes</h3>
 <div class="sect3">
-<h4 id="_added"><a class="anchor" href="#_added"></a>2.3.1. Added</h4>
+<h4 id="_added"><a class="anchor" href="#_added"></a>3.3.1. Added</h4>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 33%;">
@@ -1051,7 +1165,7 @@ time are deleted.</p></td>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">spring.session.store-type</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The back end storage system for Spring to store HTTP session information. See
-<a href="http://docs.spring.io/spring-boot/docs/1.5.6.RELEASE/reference/htmlsingle/#boot-features-session">Spring Boot Session</a>
+<a href="http://docs.spring.io/spring-boot/docs/1.5.7.RELEASE/reference/htmlsingle/#boot-features-session">Spring Boot Session</a>
 for more information. Currently on classpath only none, hash_map, redis and jdbc will work.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">hash_map</p></td>
 </tr>
@@ -1059,7 +1173,7 @@ for more information. Currently on classpath only none, hash_map, redis and jdbc
 </table>
 </div>
 <div class="sect3">
-<h4 id="_changed_default_value"><a class="anchor" href="#_changed_default_value"></a>2.3.2. Changed Default Value</h4>
+<h4 id="_changed_default_value"><a class="anchor" href="#_changed_default_value"></a>3.3.2. Changed Default Value</h4>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 33%;">
@@ -1088,11 +1202,11 @@ for more information. Currently on classpath only none, hash_map, redis and jdbc
 </table>
 </div>
 <div class="sect3">
-<h4 id="_removed"><a class="anchor" href="#_removed"></a>2.3.3. Removed</h4>
+<h4 id="_removed"><a class="anchor" href="#_removed"></a>3.3.3. Removed</h4>
 
 </div>
 <div class="sect3">
-<h4 id="_renamed"><a class="anchor" href="#_renamed"></a>2.3.4. Renamed</h4>
+<h4 id="_renamed"><a class="anchor" href="#_renamed"></a>3.3.4. Renamed</h4>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 50%;">
@@ -1174,7 +1288,7 @@ for more information. Currently on classpath only none, hash_map, redis and jdbc
 </div>
 </div>
 <div class="sect2">
-<h3 id="_database_upgrades"><a class="anchor" href="#_database_upgrades"></a>2.4. Database Upgrades</h3>
+<h3 id="_database_upgrades_2"><a class="anchor" href="#_database_upgrades_2"></a>3.4. Database Upgrades</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1210,10 +1324,10 @@ for more information. Currently on classpath only none, hash_map, redis and jdbc
 </div>
 </div>
 <div class="sect1">
-<h2 id="_concepts"><a class="anchor" href="#_concepts"></a>3. Concepts</h2>
+<h2 id="_concepts"><a class="anchor" href="#_concepts"></a>4. Concepts</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_data_model"><a class="anchor" href="#_data_model"></a>3.1. Data Model</h3>
+<h3 id="_data_model"><a class="anchor" href="#_data_model"></a>4.1. Data Model</h3>
 <div class="paragraph">
 <p>The Genie 3 data model contains several modifications and additions to the
 <a href="https://netflix.github.io/genie/concepts/2/DataModel.html">Genie 2 data model</a> to enable even more flexibility,
@@ -1221,7 +1335,7 @@ modularity and meta data retention. This section will go over the purpose of the
 Genie API and how they interact together.</p>
 </div>
 <div class="sect3">
-<h4 id="_caveats"><a class="anchor" href="#_caveats"></a>3.1.1. Caveats</h4>
+<h4 id="_caveats"><a class="anchor" href="#_caveats"></a>4.1.1. Caveats</h4>
 <div class="ulist">
 <ul>
 <li>
@@ -1232,7 +1346,7 @@ Genie API and how they interact together.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_resources"><a class="anchor" href="#_resources"></a>3.1.2. Resources</h4>
+<h4 id="_resources"><a class="anchor" href="#_resources"></a>4.1.2. Resources</h4>
 <div class="paragraph">
 <p>The following sections describe the various resources available from the Genie REST APIs. You should reference the
 <a href="https://netflix.github.io/genie/docs/3.2.0-SNAPSHOT/rest/">API Docs</a> for how to manipulate these resources. These sections
@@ -1240,7 +1354,7 @@ will focus on the high level purposes for each resource and how they rely and/or
 the system.</p>
 </div>
 <div class="sect4">
-<h5 id="_tagging"><a class="anchor" href="#_tagging"></a>3.1.2.1. Tagging</h5>
+<h5 id="_tagging"><a class="anchor" href="#_tagging"></a>4.1.2.1. Tagging</h5>
 <div class="paragraph">
 <p>An important concept is the tagging of resources. Genie relies heavily on tags for how the system discovers
 resources like clusters and commands for a job. Each of the core resources has a set of tags that can be associated
@@ -1303,13 +1417,13 @@ some of the following standards for our tags:</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_configuration_resources"><a class="anchor" href="#_configuration_resources"></a>3.1.2.2. Configuration Resources</h5>
+<h5 id="_configuration_resources"><a class="anchor" href="#_configuration_resources"></a>4.1.2.2. Configuration Resources</h5>
 <div class="paragraph">
 <p>The following resources (applications, commands and clusters) are considered configuration, or admin, resources.
 They&#8217;re generally set up by the Genie administrator and available to all users for user with their jobs.</p>
 </div>
 <div class="sect5">
-<h6 id="_application_resource"><a class="anchor" href="#_application_resource"></a>3.1.2.2.1. Application Resource</h6>
+<h6 id="_application_resource"><a class="anchor" href="#_application_resource"></a>4.1.2.2.1. Application Resource</h6>
 <div class="paragraph">
 <p>An application resource represents pretty much what you&#8217;d expect. It is a reusable set of binaries, configuration files
 and setup files that can be used to install and configure (surprise!) an application. Generally these resources are
@@ -1342,7 +1456,7 @@ flexibility in the trade-off.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="_command_resource"><a class="anchor" href="#_command_resource"></a>3.1.2.2.2. Command Resource</h6>
+<h6 id="_command_resource"><a class="anchor" href="#_command_resource"></a>4.1.2.2.2. Command Resource</h6>
 <div class="paragraph">
 <p>Commands resources primarily represent what a user would enter at the command line if you wanted to run a process on a
 cluster and what binaries (i.e., applications) you would need on your PATH to make that possible.</p>
@@ -1381,7 +1495,7 @@ execute on. Clusters are explained next.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="_cluster"><a class="anchor" href="#_cluster"></a>3.1.2.2.3. Cluster</h6>
+<h6 id="_cluster"><a class="anchor" href="#_cluster"></a>4.1.2.2.3. Cluster</h6>
 <div class="paragraph">
 <p>A cluster stores all the details of an execution cluster including connection information, properties, etc. Some
 cluster examples are Hadoop, Spark, Presto, etc. Every cluster can be linked to a set of commands that it can run.</p>
@@ -1399,7 +1513,7 @@ first one found in the list will be chosen provided all tags match. See <a href=
 </div>
 </div>
 <div class="sect4">
-<h5 id="_job_resources"><a class="anchor" href="#_job_resources"></a>3.1.2.3. Job Resources</h5>
+<h5 id="_job_resources"><a class="anchor" href="#_job_resources"></a>4.1.2.3. Job Resources</h5>
 <div class="paragraph">
 <p>The following resources all relate to a user submitting and monitoring a given job. They are split up from the Genie 2
 Job idea to provide better separation of concerns as usually a user doesn&#8217;t care about certain things. What node a
@@ -1410,7 +1524,7 @@ job ran on or its Linux process exit code for example.</p>
 only get their current state back from Genie.</p>
 </div>
 <div class="sect5">
-<h6 id="_job_request"><a class="anchor" href="#_job_request"></a>3.1.2.3.1. Job Request</h6>
+<h6 id="_job_request"><a class="anchor" href="#_job_request"></a>4.1.2.3.1. Job Request</h6>
 <div class="paragraph">
 <p>This is the resource you use to kick off a job. It contains all the information the system needs to run a job.
 Optionally the REST APIs can take attachments. All attachments and file dependencies are downloaded into the root of
@@ -1420,7 +1534,7 @@ command criteria. These dictate the which cluster, command and arguments will be
 </div>
 </div>
 <div class="sect5">
-<h6 id="_job"><a class="anchor" href="#_job"></a>3.1.2.3.2. Job</h6>
+<h6 id="_job"><a class="anchor" href="#_job"></a>4.1.2.3.2. Job</h6>
 <div class="paragraph">
 <p>The job resource is created in the system after a Job Request is received. All the information a typical user would be
 interested in should be contained within this resource. It has links to the command, cluster and applications used to
@@ -1429,7 +1543,7 @@ run the job as well as the meta information like status, start time, end time an
 </div>
 </div>
 <div class="sect5">
-<h6 id="_job_execution"><a class="anchor" href="#_job_execution"></a>3.1.2.3.3. Job Execution</h6>
+<h6 id="_job_execution"><a class="anchor" href="#_job_execution"></a>4.1.2.3.3. Job Execution</h6>
 <div class="paragraph">
 <p>The job execution resource contains information about where a job was run and other information that may be more
 interesting to a system admin than a regular user. Frequently useful in debugging.</p>
@@ -1442,7 +1556,7 @@ system. As a job executes, its details are recorded in the job record within the
 </div>
 </div>
 <div class="sect5">
-<h6 id="_resource_configuration_vs_dependencies"><a class="anchor" href="#_resource_configuration_vs_dependencies"></a>3.1.2.3.4. Resource configuration vs. dependencies</h6>
+<h6 id="_resource_configuration_vs_dependencies"><a class="anchor" href="#_resource_configuration_vs_dependencies"></a>4.1.2.3.4. Resource configuration vs. dependencies</h6>
 <div class="paragraph">
 <p>Genie allows associating files with the resources above so that these files are retrieved and placed in the job execution
 directory as part of the setup.
@@ -1457,7 +1571,7 @@ dependencies are also preserved.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_wrap_up"><a class="anchor" href="#_wrap_up"></a>3.1.3. Wrap-up</h4>
+<h4 id="_wrap_up"><a class="anchor" href="#_wrap_up"></a>4.1.3. Wrap-up</h4>
 <div class="paragraph">
 <p>This section was intended to provide insight into how the Genie data model is thought out and works together. It is
 meant to be very generic and support as many use cases as possible without modifications to the Genie codebase.</p>
@@ -1465,20 +1579,20 @@ meant to be very generic and support as many use cases as possible without modif
 </div>
 </div>
 <div class="sect2">
-<h3 id="_how_it_works"><a class="anchor" href="#_how_it_works"></a>3.2. How it Works</h3>
+<h3 id="_how_it_works"><a class="anchor" href="#_how_it_works"></a>4.2. How it Works</h3>
 <div class="paragraph">
 <p>This section is meant to provide context for how Genie can be configured with Clusters, Commands and Applications (see
 <a href="#_data_model">Data Model</a> for details) and then how these work together in order to run a job on a Genie node.</p>
 </div>
 <div class="sect3">
-<h4 id="_resource_configuration"><a class="anchor" href="#_resource_configuration"></a>3.2.1. Resource Configuration</h4>
+<h4 id="_resource_configuration"><a class="anchor" href="#_resource_configuration"></a>4.2.1. Resource Configuration</h4>
 <div class="paragraph">
 <p>This section describes how configuration of Genie works from an administrator point of view. This isn&#8217;t how to
 install and configure the Genie application itself. Rather it is how to configure the various resources involved in
 running a job.</p>
 </div>
 <div class="sect4">
-<h5 id="_register_resources"><a class="anchor" href="#_register_resources"></a>3.2.1.1. Register Resources</h5>
+<h5 id="_register_resources"><a class="anchor" href="#_register_resources"></a>4.2.1.1. Register Resources</h5>
 <div class="paragraph">
 <p>All resources (clusters, commands, applications) should be registered with Genie before attempting to link them
 together. Any files these resources depend on should be uploaded somewhere Genie can access them (S3, web server,
@@ -1493,13 +1607,13 @@ are available they can find what to submit their jobs with so it is routed to th
 </div>
 </div>
 <div class="sect4">
-<h5 id="_linking_resources"><a class="anchor" href="#_linking_resources"></a>3.2.1.2. Linking Resources</h5>
+<h5 id="_linking_resources"><a class="anchor" href="#_linking_resources"></a>4.2.1.2. Linking Resources</h5>
 <div class="paragraph">
 <p>Once resources are registered they should be linked together. By linking we mean to represent relationships between the
 resources.</p>
 </div>
 <div class="sect5">
-<h6 id="_commands_for_a_cluster"><a class="anchor" href="#_commands_for_a_cluster"></a>3.2.1.2.1. Commands for a Cluster</h6>
+<h6 id="_commands_for_a_cluster"><a class="anchor" href="#_commands_for_a_cluster"></a>4.2.1.2.1. Commands for a Cluster</h6>
 <div class="paragraph">
 <p>Adding commands to a cluster means that the administrator acknowledges that this cluster can run a given set of
 commands. If a command is not linked to a cluster it cannot be used to run a job.</p>
@@ -1533,7 +1647,7 @@ would get Spark 1.6.0. However if we later deemed 2.0.0 to be ready to be the de
 </div>
 </div>
 <div class="sect5">
-<h6 id="_applications_for_a_command"><a class="anchor" href="#_applications_for_a_command"></a>3.2.1.2.2. Applications for a Command</h6>
+<h6 id="_applications_for_a_command"><a class="anchor" href="#_applications_for_a_command"></a>4.2.1.2.2. Applications for a Command</h6>
 <div class="paragraph">
 <p>Linking application(s) to commands means that a command has a dependency on said application(s). The order of the
 applications added is important because Genie will setup the applications in that order. Meaning if one application
@@ -1544,14 +1658,14 @@ applications must successfully be installed before Genie will start running the 
 </div>
 </div>
 <div class="sect3">
-<h4 id="_job_submission"><a class="anchor" href="#_job_submission"></a>3.2.2. Job Submission</h4>
+<h4 id="_job_submission"><a class="anchor" href="#_job_submission"></a>4.2.2. Job Submission</h4>
 <div class="paragraph">
 <p>The system admin has everything registered and linked together. Things could change but that&#8217;s mostly
 transparent to end users, who just want to run jobs. How does that work? This section walks through what
 happens at a high level when a job is submitted.</p>
 </div>
 <div class="sect4">
-<h5 id="_cluster_and_command_matching"><a class="anchor" href="#_cluster_and_command_matching"></a>3.2.2.1. Cluster and command matching</h5>
+<h5 id="_cluster_and_command_matching"><a class="anchor" href="#_cluster_and_command_matching"></a>4.2.2.1. Cluster and command matching</h5>
 <div class="paragraph">
 <p>In order to submit a job request there is some work a user will have to do up front. What kind of job are they running?
 What cluster do they want to run on? What command do they want to use? Do they care about certain details like version
@@ -1586,7 +1700,7 @@ all others are ignored.
 </table>
 </div>
 <div class="sect5">
-<h6 id="_cluster_matching_example"><a class="anchor" href="#_cluster_matching_example"></a>3.2.2.1.1. Cluster matching example</h6>
+<h6 id="_cluster_matching_example"><a class="anchor" href="#_cluster_matching_example"></a>4.2.2.1.1. Cluster matching example</h6>
 <div class="paragraph">
 <p>Say the following 3 clusters exists tagged as follows:</p>
 </div>
@@ -1655,7 +1769,7 @@ all others are ignored.
 </div>
 </div>
 <div class="sect4">
-<h5 id="_user_submits_a_job_request"><a class="anchor" href="#_user_submits_a_job_request"></a>3.2.2.2. User Submits a Job Request</h5>
+<h5 id="_user_submits_a_job_request"><a class="anchor" href="#_user_submits_a_job_request"></a>4.2.2.2. User Submits a Job Request</h5>
 <div class="paragraph">
 <p>There are other things a user needs to consider when submitting a job. All dependencies which aren&#8217;t sent as attachments
 must already be uploaded somewhere Genie can access them. Somewhere like S3, web server, shared disk, etc.</p>
@@ -1668,7 +1782,7 @@ the setup process of all the cluster, command and application setup processes.</
 </div>
 </div>
 <div class="sect4">
-<h5 id="_genie_receives_the_job_request"><a class="anchor" href="#_genie_receives_the_job_request"></a>3.2.2.3. Genie Receives the Job Request</h5>
+<h5 id="_genie_receives_the_job_request"><a class="anchor" href="#_genie_receives_the_job_request"></a>4.2.2.3. Genie Receives the Job Request</h5>
 <div class="paragraph">
 <p>When Genie receives the job request it does a few things immediately:</p>
 </div>
@@ -1727,7 +1841,7 @@ asynchronously by the system.</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_genie_performs_job_setup"><a class="anchor" href="#_genie_performs_job_setup"></a>3.2.2.4. Genie Performs Job Setup</h5>
+<h5 id="_genie_performs_job_setup"><a class="anchor" href="#_genie_performs_job_setup"></a>4.2.2.4. Genie Performs Job Setup</h5>
 <div class="paragraph">
 <p>Once a job has been accepted to run on a Genie node, a workflow is executed in order to setup the job working directory
 and launch the job. Some minor steps left out for brevity.</p>
@@ -1792,7 +1906,7 @@ needed</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_genie_launches_and_monitors_the_job_execution"><a class="anchor" href="#_genie_launches_and_monitors_the_job_execution"></a>3.2.2.5. Genie Launches and Monitors the Job Execution</h5>
+<h5 id="_genie_launches_and_monitors_the_job_execution"><a class="anchor" href="#_genie_launches_and_monitors_the_job_execution"></a>4.2.2.5. Genie Launches and Monitors the Job Execution</h5>
 <div class="paragraph">
 <p>Assuming no errors occurred during the setup, the job is launched.</p>
 </div>
@@ -1832,7 +1946,7 @@ killed depending on that code.</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_genie_performs_job_clean_up"><a class="anchor" href="#_genie_performs_job_clean_up"></a>3.2.2.6. Genie Performs Job Clean-Up</h5>
+<h5 id="_genie_performs_job_clean_up"><a class="anchor" href="#_genie_performs_job_clean_up"></a>4.2.2.6. Genie Performs Job Clean-Up</h5>
 <div class="paragraph">
 <p>To save disk space Genie will delete application, cluster and command dependencies from the job working directory after a job is completed.
 This can be disabled by an admin. If the job is marked as it should be archived the working directory will be zipped up
@@ -1841,14 +1955,14 @@ and stored in the default archive location as <code>{jobId}.tar.gz</code>.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_user_behavior"><a class="anchor" href="#_user_behavior"></a>3.2.3. User Behavior</h4>
+<h4 id="_user_behavior"><a class="anchor" href="#_user_behavior"></a>4.2.3. User Behavior</h4>
 <div class="paragraph">
 <p>Users can check on the status of their job using the <code>status</code> API and get the output using the output APIs. See the
 <a href="https://netflix.github.io/genie/docs/3.2.0-SNAPSHOT/rest/">REST Documentation</a> for specifics on how to do that.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_wrap_up_2"><a class="anchor" href="#_wrap_up_2"></a>3.2.4. Wrap Up</h4>
+<h4 id="_wrap_up_2"><a class="anchor" href="#_wrap_up_2"></a>4.2.4. Wrap Up</h4>
 <div class="paragraph">
 <p>This section should have helped you understand how Genie works at a high level from configuration all the way to user
 job submission and monitoring. The design of Genie is intended to make this process repeatable and reliable for all
@@ -1857,7 +1971,7 @@ users while not hiding any of the details of what is executed at job runtime.</p
 </div>
 </div>
 <div class="sect2">
-<h3 id="_netflix_example"><a class="anchor" href="#_netflix_example"></a>3.3. Netflix Example</h3>
+<h3 id="_netflix_example"><a class="anchor" href="#_netflix_example"></a>4.3. Netflix Example</h3>
 <div class="paragraph">
 <p>Understanding Genie without a concrete example is hard. This section attempts to walk through an end to end
 configuration and job execution example of a job at Netflix. To see more examples or try your own please see the
@@ -1878,13 +1992,13 @@ This example contains JSON representations of resources.
 </table>
 </div>
 <div class="sect3">
-<h4 id="_configuration"><a class="anchor" href="#_configuration"></a>3.3.1. Configuration</h4>
+<h4 id="_configuration"><a class="anchor" href="#_configuration"></a>4.3.1. Configuration</h4>
 <div class="paragraph">
 <p>For the purpose of brevity we will only cover a subset of the total Netflix
 configuration.</p>
 </div>
 <div class="sect4">
-<h5 id="_clusters"><a class="anchor" href="#_clusters"></a>3.3.1.1. Clusters</h5>
+<h5 id="_clusters"><a class="anchor" href="#_clusters"></a>4.3.1.1. Clusters</h5>
 <div class="paragraph">
 <p>At Netflix there are tens of active clusters available at any given time. For this example we&#8217;ll focus on the
 production (SLA) and adhoc <a href="http://hadoop.apache.org/">Hadoop</a> YARN clusters and the production
@@ -1912,7 +2026,7 @@ pipeline the metadata is registered with Genie using the aforementioned Python t
 downloaded into the job working directory at runtime.</p>
 </div>
 <div class="sect5">
-<h6 id="_hadoop_prod_cluster"><a class="anchor" href="#_hadoop_prod_cluster"></a>3.3.1.1.1. Hadoop Prod Cluster</h6>
+<h6 id="_hadoop_prod_cluster"><a class="anchor" href="#_hadoop_prod_cluster"></a>4.3.1.1.1. Hadoop Prod Cluster</h6>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
@@ -1955,7 +2069,7 @@ downloaded into the job working directory at runtime.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="_hadoop_adhoc_cluster"><a class="anchor" href="#_hadoop_adhoc_cluster"></a>3.3.1.1.2. Hadoop Adhoc Cluster</h6>
+<h6 id="_hadoop_adhoc_cluster"><a class="anchor" href="#_hadoop_adhoc_cluster"></a>4.3.1.1.2. Hadoop Adhoc Cluster</h6>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
@@ -1997,7 +2111,7 @@ downloaded into the job working directory at runtime.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="_presto_prod_cluster"><a class="anchor" href="#_presto_prod_cluster"></a>3.3.1.1.3. Presto Prod Cluster</h6>
+<h6 id="_presto_prod_cluster"><a class="anchor" href="#_presto_prod_cluster"></a>4.3.1.1.3. Presto Prod Cluster</h6>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
@@ -2035,7 +2149,7 @@ downloaded into the job working directory at runtime.</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_commands"><a class="anchor" href="#_commands"></a>3.3.1.2. Commands</h5>
+<h5 id="_commands"><a class="anchor" href="#_commands"></a>4.3.1.2. Commands</h5>
 <div class="paragraph">
 <p>Commands and applications at Netflix are handled a bit differently than clusters. The source data for these command and
 application resources are not generated dynamically like the cluster configuration files. Instead they are stored in a
@@ -2049,7 +2163,7 @@ commands and applications with Genie via the same python tool set and Genie pyth
 The presto command includes a setup file which allows additional configuration when it is used.</p>
 </div>
 <div class="sect5">
-<h6 id="_presto_0_149"><a class="anchor" href="#_presto_0_149"></a>3.3.1.2.1. Presto 0.149</h6>
+<h6 id="_presto_0_149"><a class="anchor" href="#_presto_0_149"></a>4.3.1.2.1. Presto 0.149</h6>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
@@ -2109,7 +2223,7 @@ chmod 755 ${PRESTO_CMD}</code></pre>
 </div>
 </div>
 <div class="sect5">
-<h6 id="_spark_submit_prod_1_6_1"><a class="anchor" href="#_spark_submit_prod_1_6_1"></a>3.3.1.2.2. Spark Submit Prod 1.6.1</h6>
+<h6 id="_spark_submit_prod_1_6_1"><a class="anchor" href="#_spark_submit_prod_1_6_1"></a>4.3.1.2.2. Spark Submit Prod 1.6.1</h6>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
@@ -2169,7 +2283,7 @@ cp ${GENIE_COMMAND_DIR}/config/* ${HADOOP_CONF_DIR}/</code></pre>
 </div>
 </div>
 <div class="sect5">
-<h6 id="_spark_submit_prod_2_0_0"><a class="anchor" href="#_spark_submit_prod_2_0_0"></a>3.3.1.2.3. Spark Submit Prod 2.0.0</h6>
+<h6 id="_spark_submit_prod_2_0_0"><a class="anchor" href="#_spark_submit_prod_2_0_0"></a>4.3.1.2.3. Spark Submit Prod 2.0.0</h6>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
@@ -2228,7 +2342,7 @@ cp ${GENIE_COMMAND_DIR}/config/* ${SPARK_CONF_DIR}</code></pre>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_applications"><a class="anchor" href="#_applications"></a>3.3.1.3. Applications</h5>
+<h5 id="_applications"><a class="anchor" href="#_applications"></a>4.3.1.3. Applications</h5>
 <div class="paragraph">
 <p>Below are the applications needed by the above commands. The most important part of these applications are the
 dependencies and the setup file.</p>
@@ -2245,7 +2359,7 @@ pattern allows us to avoid upgrade of Genie clusters every time an application c
 the expectation is that after it is run the application is successfully configured in the job working directory.</p>
 </div>
 <div class="sect5">
-<h6 id="_hadoop_2_7_2"><a class="anchor" href="#_hadoop_2_7_2"></a>3.3.1.3.1. Hadoop 2.7.2</h6>
+<h6 id="_hadoop_2_7_2"><a class="anchor" href="#_hadoop_2_7_2"></a>4.3.1.3.1. Hadoop 2.7.2</h6>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
@@ -2317,7 +2431,7 @@ rm "${HADOOP_DEPENDENCIES_DIR}/hadoop-2.7.2.tgz"</code></pre>
 </div>
 </div>
 <div class="sect5">
-<h6 id="_presto_0_149_2"><a class="anchor" href="#_presto_0_149_2"></a>3.3.1.3.2. Presto 0.149</h6>
+<h6 id="_presto_0_149_2"><a class="anchor" href="#_presto_0_149_2"></a>4.3.1.3.2. Presto 0.149</h6>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
@@ -2373,7 +2487,7 @@ export PRESTO_CLI_PATH="${GENIE_APPLICATION_DIR}/presto0149/dependencies/presto-
 </div>
 </div>
 <div class="sect5">
-<h6 id="_spark_1_6_1"><a class="anchor" href="#_spark_1_6_1"></a>3.3.1.3.3. Spark 1.6.1</h6>
+<h6 id="_spark_1_6_1"><a class="anchor" href="#_spark_1_6_1"></a>4.3.1.3.3. Spark 1.6.1</h6>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
@@ -2459,7 +2573,7 @@ export SPARK_DAEMON_JAVA_OPTS="-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCTimeS
 </div>
 </div>
 <div class="sect5">
-<h6 id="_spark_2_0_0"><a class="anchor" href="#_spark_2_0_0"></a>3.3.1.3.4. Spark 2.0.0</h6>
+<h6 id="_spark_2_0_0"><a class="anchor" href="#_spark_2_0_0"></a>4.3.1.3.4. Spark 2.0.0</h6>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-json" data-lang="json">{
@@ -2539,13 +2653,13 @@ chmod a+x ${SPARK_HOME}/bin/dsespark-submit.py</code></pre>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_relationships"><a class="anchor" href="#_relationships"></a>3.3.1.4. Relationships</h5>
+<h5 id="_relationships"><a class="anchor" href="#_relationships"></a>4.3.1.4. Relationships</h5>
 <div class="paragraph">
 <p>Now that all the resources are available they need to be linked together. Commands need to be added to the clusters
 they can be run on and applications need to be added as dependencies for commands.</p>
 </div>
 <div class="sect5">
-<h6 id="_commands_for_a_cluster_2"><a class="anchor" href="#_commands_for_a_cluster_2"></a>3.3.1.4.1. Commands for a Cluster</h6>
+<h6 id="_commands_for_a_cluster_2"><a class="anchor" href="#_commands_for_a_cluster_2"></a>4.3.1.4.1. Commands for a Cluster</h6>
 <div class="paragraph">
 <p>When commands are added to a cluster they should be in priority order. Meaning if two commands both match a users tags
 for a job the one higher in the list will be used. This allows us to switch defaults quickly and transparently.</p>
@@ -2626,7 +2740,7 @@ could have multiple backwards compatible versions of the client available.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="_applications_for_a_command_2"><a class="anchor" href="#_applications_for_a_command_2"></a>3.3.1.4.2. Applications for a Command</h6>
+<h6 id="_applications_for_a_command_2"><a class="anchor" href="#_applications_for_a_command_2"></a>4.3.1.4.2. Applications for a Command</h6>
 <div class="paragraph">
 <p>Linking applications to a command tells Genie that these applications need to be downloaded and setup in order to
 successfully run the command. The order of the applications will be the order the download and setup is performed so
@@ -2701,14 +2815,14 @@ the configurations can be copied to Spark.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_job_submission_2"><a class="anchor" href="#_job_submission_2"></a>3.3.2. Job Submission</h4>
+<h4 id="_job_submission_2"><a class="anchor" href="#_job_submission_2"></a>4.3.2. Job Submission</h4>
 <div class="paragraph">
 <p>Everything is now in place for users to submit their jobs. This section will walk through the components and outputs of
 that process. For clarity we&#8217;re going to show a PySpark job being submitted to show how Genie figures out the cluster
 and command to be used based on what was configured above.</p>
 </div>
 <div class="sect4">
-<h5 id="_the_request"><a class="anchor" href="#_the_request"></a>3.3.2.1. The Request</h5>
+<h5 id="_the_request"><a class="anchor" href="#_the_request"></a>4.3.2.1. The Request</h5>
 <div class="paragraph">
 <p>Below is an actual job request (with a few obfuscations) made by a production job here at Netflix to Genie.</p>
 </div>
@@ -2810,7 +2924,7 @@ downloaded in the root job directory parallel to the run script so they are acce
 </div>
 </div>
 <div class="sect4">
-<h5 id="__strong_the_job_strong"><a class="anchor" href="#__strong_the_job_strong"></a>3.3.2.2. <strong>The Job</strong></h5>
+<h5 id="__strong_the_job_strong"><a class="anchor" href="#__strong_the_job_strong"></a>4.3.2.2. <strong>The Job</strong></h5>
 <div class="paragraph">
 <p>In this case the job was accepted by Genie for processing. Below is the actual job object containing fields the user
 might care about. Some are copied from the initial request (like tags) and some are added by Genie.</p>
@@ -2911,7 +3025,7 @@ SUCCESSFUL</td>
 </table>
 </div>
 <div class="sect5">
-<h6 id="_cluster_selection"><a class="anchor" href="#_cluster_selection"></a>3.3.2.2.1. Cluster Selection</h6>
+<h6 id="_cluster_selection"><a class="anchor" href="#_cluster_selection"></a>4.3.2.2.1. Cluster Selection</h6>
 <div class="paragraph">
 <p>Because the user submitted with <code>sched:sla</code> this limits the clusters it can run on to any with that tag applied. In our
 example case only the cluster with ID <code>bdp_h2prod_20161217_205111</code> has this tag. This isn&#8217;t enough to make sure this
@@ -2920,7 +3034,7 @@ them all equal and randomly select one.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="_command_selection"><a class="anchor" href="#_command_selection"></a>3.3.2.2.2. Command Selection</h6>
+<h6 id="_command_selection"><a class="anchor" href="#_command_selection"></a>4.3.2.2.2. Command Selection</h6>
 <div class="paragraph">
 <p>The command criteria states that this job needs to run on a SLA cluster that supports a command of type
 <code>prodsparksubmit</code> that can access <code>prod</code> data. Two commands (<code>prodsparksubmit161</code> and <code>prodsparksubmit200</code>) match this
@@ -2930,7 +3044,7 @@ which is the first on in the list. In this case it was <code>prodsparksubmit161<
 </div>
 </div>
 <div class="sect4">
-<h5 id="_the_job_execution"><a class="anchor" href="#_the_job_execution"></a>3.3.2.3. The Job Execution</h5>
+<h5 id="_the_job_execution"><a class="anchor" href="#_the_job_execution"></a>4.3.2.3. The Job Execution</h5>
 <div class="paragraph">
 <p>Below is the job execution resource. This is mainly for system and admin use but it can have some useful information
 for users as well. Mainly it shows which Genie node it actually ran on, how much memory it was allocated, how
@@ -2970,7 +3084,7 @@ frequently the system polled it for status and when it would have timed out had 
 </div>
 </div>
 <div class="sect4">
-<h5 id="_job_output"><a class="anchor" href="#_job_output"></a>3.3.2.4. Job Output</h5>
+<h5 id="_job_output"><a class="anchor" href="#_job_output"></a>4.3.2.4. Job Output</h5>
 <div class="paragraph">
 <p>Below is an image of the root of the job output directory (displayed via Genie UI) for the above job. Note that the
 dependency files are all downloaded there and some standard files are available (run, stdout, stderr).</p>
@@ -3019,7 +3133,7 @@ Click image for full size
 </div>
 </div>
 <div class="sect5">
-<h6 id="_the_run_script"><a class="anchor" href="#_the_run_script"></a>3.3.2.4.1. The Run Script</h6>
+<h6 id="_the_run_script"><a class="anchor" href="#_the_run_script"></a>4.3.2.4.1. The Run Script</h6>
 <div class="paragraph">
 <p>Clicking into the run script shows the below contents. This run script is generated specifically for each individual
 job by Genie. It has some standard bits (error checking, exit process) but also specific information like environment
@@ -3156,7 +3270,7 @@ echo End: `date '+%Y-%m-%d %H:%M:%S'`</code></pre>
 </div>
 </div>
 <div class="sect5">
-<h6 id="_genie_dir"><a class="anchor" href="#_genie_dir"></a>3.3.2.4.2. Genie Dir</h6>
+<h6 id="_genie_dir"><a class="anchor" href="#_genie_dir"></a>4.3.2.4.2. Genie Dir</h6>
 <div class="paragraph">
 <p>Inside the output directory there is a <code>genie</code> directory. This directory is where Genie stores all the downloaded
 dependencies and any logs. Everything outside this directory is intended to be user generated other than the run
@@ -3370,7 +3484,7 @@ Click image for full size
 </div>
 </div>
 <div class="sect3">
-<h4 id="_wrap_up_3"><a class="anchor" href="#_wrap_up_3"></a>3.3.3. Wrap Up</h4>
+<h4 id="_wrap_up_3"><a class="anchor" href="#_wrap_up_3"></a>4.3.3. Wrap Up</h4>
 <div class="paragraph">
 <p>This section went over how Genie is configured by admins at Netflix and how how users submit
 jobs and retrieve their logs and output. Anyone is free to configure Genie however suits their needs in terms of
@@ -3380,7 +3494,7 @@ Netflix.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_netflix_deployment"><a class="anchor" href="#_netflix_deployment"></a>3.4. Netflix Deployment</h3>
+<h3 id="_netflix_deployment"><a class="anchor" href="#_netflix_deployment"></a>4.4. Netflix Deployment</h3>
 <div class="paragraph">
 <p>Many people ask how Genie is deployed at Netflix on AWS. This section tries to explain at a high level the components
 used and how Genie integrates into the environment. Below is a diagram of how deployment looks at Netflix.</p>
@@ -3392,12 +3506,12 @@ used and how Genie integrates into the environment. Below is a diagram of how de
 <div class="title">Figure 1. Genie Netflix Deployment</div>
 </div>
 <div class="sect3">
-<h4 id="_components"><a class="anchor" href="#_components"></a>3.4.1. Components</h4>
+<h4 id="_components"><a class="anchor" href="#_components"></a>4.4.1. Components</h4>
 <div class="paragraph">
 <p>Brief descriptions of all the components.</p>
 </div>
 <div class="sect4">
-<h5 id="_elastic_load_balancer"><a class="anchor" href="#_elastic_load_balancer"></a>3.4.1.1. Elastic Load Balancer</h5>
+<h5 id="_elastic_load_balancer"><a class="anchor" href="#_elastic_load_balancer"></a>4.4.1.1. Elastic Load Balancer</h5>
 <div class="paragraph">
 <p>The <a href="https://aws.amazon.com/elasticloadbalancing/">Elastic Load Balancer</a> (ELB) is used for a few purposes.</p>
 </div>
@@ -3419,7 +3533,7 @@ used and how Genie integrates into the environment. Below is a diagram of how de
 </div>
 </div>
 <div class="sect4">
-<h5 id="_auto_scaling_group_asg"><a class="anchor" href="#_auto_scaling_group_asg"></a>3.4.1.2. Auto Scaling Group (ASG)</h5>
+<h5 id="_auto_scaling_group_asg"><a class="anchor" href="#_auto_scaling_group_asg"></a>4.4.1.2. Auto Scaling Group (ASG)</h5>
 <div class="paragraph">
 <p>A cluster of Genie nodes. Each <a href="http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html">AMI</a> contains an Apache
 HTTP server fronting Tomcat 8 via <a href="http://tomcat.apache.org/connectors-doc/index.html">AJP</a>.</p>
@@ -3445,7 +3559,7 @@ smaller size.</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_relational_database_rds"><a class="anchor" href="#_relational_database_rds"></a>3.4.1.3. Relational Database (RDS)</h5>
+<h5 id="_relational_database_rds"><a class="anchor" href="#_relational_database_rds"></a>4.4.1.3. Relational Database (RDS)</h5>
 <div class="paragraph">
 <p>We currently use an <a href="https://aws.amazon.com/rds/aurora/">Amazon Aurora</a> cluster on db.r3.4xl instances. Aurora is MySQL
 compatible so we use the standard MySQL JDBC driver that is packaged with Genie to talk to the database. We deploy to
@@ -3453,7 +3567,7 @@ a Multi-AZ cluster and we have a reader endpoint that we use for reporting and b
 </div>
 </div>
 <div class="sect4">
-<h5 id="_zookeeper"><a class="anchor" href="#_zookeeper"></a>3.4.1.4. Zookeeper</h5>
+<h5 id="_zookeeper"><a class="anchor" href="#_zookeeper"></a>4.4.1.4. Zookeeper</h5>
 <div class="paragraph">
 <p>We use an <a href="https://zookeeper.apache.org/">Apache Zookeeper</a> cluster which is deployed and managed by another team within
 Netflix for leadership election within our Genie ASG. When the Genie ASG comes up it (using Spring Cloud Cluster) looks
@@ -3465,7 +3579,7 @@ one.</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_elasticache"><a class="anchor" href="#_elasticache"></a>3.4.1.5. ElastiCache</h5>
+<h5 id="_elasticache"><a class="anchor" href="#_elasticache"></a>4.4.1.5. ElastiCache</h5>
 <div class="paragraph">
 <p>We use <a href="https://aws.amazon.com/elasticache/">AWS ElastiCache</a> to provide a Redis cluster to store our HTTP sessions (via
 <a href="http://projects.spring.io/spring-session/">Spring Session</a>). This allows us to have the users only sign in via SAML one
@@ -3473,7 +3587,7 @@ time and not have to do it every time the ELB routes them to a new host for the 
 </div>
 </div>
 <div class="sect4">
-<h5 id="_security_configuration"><a class="anchor" href="#_security_configuration"></a>3.4.1.6. Security Configuration</h5>
+<h5 id="_security_configuration"><a class="anchor" href="#_security_configuration"></a>4.4.1.6. Security Configuration</h5>
 <div class="paragraph">
 <p>Internally Genie is secured via OAuth2 (for APIs) and SAML (for UI). We integrate with a Ping Federate IDP service to
 provide authentication and authorization information.</p>
@@ -3486,7 +3600,7 @@ provide authentication and authorization information.</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_spinnaker"><a class="anchor" href="#_spinnaker"></a>3.4.1.7. Spinnaker</h5>
+<h5 id="_spinnaker"><a class="anchor" href="#_spinnaker"></a>4.4.1.7. Spinnaker</h5>
 <div class="paragraph">
 <p>Genie is deployed using <a href="http://www.spinnaker.io/">Spinnaker</a>. We currently have a few stacks (prod, test, dev, load,
 stage, etc) that we use for different purposes. Spinnaker handles all this for us after we configure the pipelines.
@@ -3495,7 +3609,7 @@ See the Spinnaker site for more information.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_wrap_up_4"><a class="anchor" href="#_wrap_up_4"></a>3.4.2. Wrap Up</h4>
+<h4 id="_wrap_up_4"><a class="anchor" href="#_wrap_up_4"></a>4.4.2. Wrap Up</h4>
 <div class="paragraph">
 <p>This section focused on how Genie is deployed within Netflix. Hopefully it helps bring clarity to a way that Genie can
 be deployed. Genie certainly is not limited to this deployment model and you are free to come up with your own this
@@ -3504,7 +3618,7 @@ should only serve as a template or example.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_security"><a class="anchor" href="#_security"></a>3.5. Security</h3>
+<h3 id="_security"><a class="anchor" href="#_security"></a>4.5. Security</h3>
 <div class="paragraph">
 <p>A long requested feature for Genie has been adding authentication and authorization support for the UI and particularly
 the REST APIs. Genie 3 development allowed the time and resources to finally implement a solution. Genie security is
@@ -3512,7 +3626,7 @@ built on top of <a href="https://projects.spring.io/spring-security/">Spring Sec
 solution to be plugged in based on user requirements.</p>
 </div>
 <div class="sect3">
-<h4 id="_architecture"><a class="anchor" href="#_architecture"></a>3.5.1. Architecture</h4>
+<h4 id="_architecture"><a class="anchor" href="#_architecture"></a>4.5.1. Architecture</h4>
 <div class="paragraph">
 <p>Out of the box Genie supports securing the REST APIs via OAuth2 and/or x509 certificates and the UI via SAML. Below is
 an image of how this security architecture works within Netflix.</p>
@@ -3536,7 +3650,7 @@ and disabling is done via the <code>genie.security</code> properties.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_rest_api_security"><a class="anchor" href="#_rest_api_security"></a>3.5.2. REST API Security</h4>
+<h4 id="_rest_api_security"><a class="anchor" href="#_rest_api_security"></a>4.5.2. REST API Security</h4>
 <div class="paragraph">
 <p>The REST APIs described in the <a href="https://netflix.github.io/genie/releases/3.2.0-SNAPSHOT/rest/">REST documentation</a> can be
 secured via OAuth2 and/or x509 out of the box. Both these mechanisms secure everything under <code>/api/*</code> to require a user
@@ -3546,7 +3660,7 @@ configuration APIs for <code>applications</code>, <code>commands</code> and <cod
 modify the state of these resources like the POST, PUT, PATCH, DELETE APIs.</p>
 </div>
 <div class="sect4">
-<h5 id="_x509"><a class="anchor" href="#_x509"></a>3.5.2.1. x509</h5>
+<h5 id="_x509"><a class="anchor" href="#_x509"></a>4.5.2.1. x509</h5>
 <div class="paragraph">
 <p>If x509 is enabled it will be checked first (before the OAuth2 filter chain if that is enabled) and if a valid
 certificate is present in the request the user will be authenticated and granted the pertinent role.</p>
@@ -3558,7 +3672,7 @@ will be granted within the system.</p>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_oauth2"><a class="anchor" href="#_oauth2"></a>3.5.2.2. OAuth2</h5>
+<h5 id="_oauth2"><a class="anchor" href="#_oauth2"></a>4.5.2.2. OAuth2</h5>
 <div class="paragraph">
 <p><a href="https://oauth.net/2/">OAuth2</a> security is implemented via the
 <a href="https://projects.spring.io/spring-security-oauth/">Spring Security OAuth</a> project. You can read documentation there but
@@ -3571,7 +3685,7 @@ option as you save processing time and unnecessary IO.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_ui_security"><a class="anchor" href="#_ui_security"></a>3.5.3. UI Security</h4>
+<h4 id="_ui_security"><a class="anchor" href="#_ui_security"></a>4.5.3. UI Security</h4>
 <div class="paragraph">
 <p>The UI and other endpoints can be secured using SAML via <a href="https://projects.spring.io/spring-security-saml/">Spring SAML</a>.
 You can configure Genie where to look in the SAML assertion to parse out user and role information. If only SAML
@@ -3581,7 +3695,7 @@ the REST APIs within the same HTTP session without aquiring a token or passing a
 </div>
 </div>
 <div class="sect3">
-<h4 id="_wrap_up_5"><a class="anchor" href="#_wrap_up_5"></a>3.5.4. Wrap Up</h4>
+<h4 id="_wrap_up_5"><a class="anchor" href="#_wrap_up_5"></a>4.5.4. Wrap Up</h4>
 <div class="paragraph">
 <p>This section is meant to provide a high level overview of how Genie supports authentication and authorization out of
 the box if configured properly. Security is a very large topic and to truly understand how this works reading into
@@ -3592,13 +3706,13 @@ the various libraries and technologies mentioned in this section is recommended.
 </div>
 </div>
 <div class="sect1">
-<h2 id="_features_2"><a class="anchor" href="#_features_2"></a>4. Features</h2>
+<h2 id="_features_3"><a class="anchor" href="#_features_3"></a>5. Features</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>This section has documentation pertaining to specific features of Genie that may need specific examples.</p>
 </div>
 <div class="sect2">
-<h3 id="_cluster_load_balancing"><a class="anchor" href="#_cluster_load_balancing"></a>4.1. Cluster Load Balancing</h3>
+<h3 id="_cluster_load_balancing"><a class="anchor" href="#_cluster_load_balancing"></a>5.1. Cluster Load Balancing</h3>
 <div class="paragraph">
 <p>Genie allows administrators to tag clusters with multiple tags that could reflect any type of domain modeling the
 admins wish to accomplish. Purpose of the cluster, types of data the cluster can access, workload expected are just
@@ -3656,7 +3770,7 @@ use.</p>
 <p>Genie currently ships with two implementations of this interface which are described below.</p>
 </div>
 <div class="sect3">
-<h4 id="_randomizedclusterloadbalancerimpl"><a class="anchor" href="#_randomizedclusterloadbalancerimpl"></a>4.1.1. RandomizedClusterLoadBalancerImpl</h4>
+<h4 id="_randomizedclusterloadbalancerimpl"><a class="anchor" href="#_randomizedclusterloadbalancerimpl"></a>5.1.1. RandomizedClusterLoadBalancerImpl</h4>
 <div class="paragraph">
 <p>As the name indicates this load balancer simply uses a random number generator to select a cluster from the list by
 index. There is no intelligence to this load balancer algorithm but it does provide very close to an equal distribution
@@ -3668,7 +3782,7 @@ implementations fail to select a cluster this implementation will be invoked and
 </div>
 </div>
 <div class="sect3">
-<h4 id="_scriptloadbalancer"><a class="anchor" href="#_scriptloadbalancer"></a>4.1.2. ScriptLoadBalancer</h4>
+<h4 id="_scriptloadbalancer"><a class="anchor" href="#_scriptloadbalancer"></a>5.1.2. ScriptLoadBalancer</h4>
 <div class="paragraph">
 <p>This implementation, first introduced in 3.1.0, allows administrators to provide a script to be invoked at runtime to
 decide which cluster to select. Currently <code>JavaScript</code> and <code>Groovy</code> are supported out of the box but others (like
@@ -3676,7 +3790,7 @@ decide which cluster to select. Currently <code>JavaScript</code> and <code>Groo
 <a href="https://docs.oracle.com/javase/8/docs/api/javax/script/ScriptEngine.html">ScriptEngine</a> interface to the Genie classpath.</p>
 </div>
 <div class="sect4">
-<h5 id="_configuration_2"><a class="anchor" href="#_configuration_2"></a>4.1.2.1. Configuration</h5>
+<h5 id="_configuration_2"><a class="anchor" href="#_configuration_2"></a>5.1.2.1. Configuration</h5>
 <div class="paragraph">
 <p>The script load balancer is disabled by default. To enable it an admin must set the property
 <code>genie.jobs.clusters.loadBalancers.script.enabled</code> to true.</p>
@@ -3738,7 +3852,7 @@ forces a timeout</p></td>
 </table>
 </div>
 <div class="sect4">
-<h5 id="_script_contract"><a class="anchor" href="#_script_contract"></a>4.1.2.2. Script Contract</h5>
+<h5 id="_script_contract"><a class="anchor" href="#_script_contract"></a>5.1.2.2. Script Contract</h5>
 <div class="paragraph">
 <p>The contract between the script and the Java code is as follows:</p>
 </div>
@@ -3793,12 +3907,12 @@ forces a timeout</p></td>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_script_examples"><a class="anchor" href="#_script_examples"></a>4.1.2.3. Script Examples</h5>
+<h5 id="_script_examples"><a class="anchor" href="#_script_examples"></a>5.1.2.3. Script Examples</h5>
 <div class="paragraph">
 <p>Some simple script examples</p>
 </div>
 <div class="sect5">
-<h6 id="_javascript"><a class="anchor" href="#_javascript"></a>4.1.2.3.1. Javascript</h6>
+<h6 id="_javascript"><a class="anchor" href="#_javascript"></a>5.1.2.3.1. Javascript</h6>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-javascript" data-lang="javascript">var cJson = JSON.parse(clusters);
@@ -3817,7 +3931,7 @@ index &lt; cJson.length ? cJson[index].id : null;</code></pre>
 </div>
 </div>
 <div class="sect5">
-<h6 id="_groovy"><a class="anchor" href="#_groovy"></a>4.1.2.3.2. Groovy</h6>
+<h6 id="_groovy"><a class="anchor" href="#_groovy"></a>5.1.2.3.2. Groovy</h6>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-groovy" data-lang="groovy">import groovy.json.JsonSlurper
@@ -3836,7 +3950,7 @@ index == -1 ? null : cJson[index].id</code></pre>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_caveats_2"><a class="anchor" href="#_caveats_2"></a>4.1.2.4. Caveats</h5>
+<h5 id="_caveats_2"><a class="anchor" href="#_caveats_2"></a>5.1.2.4. Caveats</h5>
 <div class="paragraph">
 <p>The script load balancer provides great flexibility for system administrators to test algorithms for cluster load
 balancing at runtime. Since the script is refreshed periodically it can even be changed after Genie is running. With
@@ -3854,7 +3968,7 @@ this situation.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_wrap_up_6"><a class="anchor" href="#_wrap_up_6"></a>4.1.3. Wrap Up</h4>
+<h4 id="_wrap_up_6"><a class="anchor" href="#_wrap_up_6"></a>5.1.3. Wrap Up</h4>
 <div class="paragraph">
 <p>This section went over the cluster load balancing feature of Genie. This interface provides an extension point for
 administrators of Genie to tweak Genie&#8217;s runtime behavior to suit their needs.</p>
@@ -3864,7 +3978,7 @@ administrators of Genie to tweak Genie&#8217;s runtime behavior to suit their ne
 </div>
 </div>
 <div class="sect1">
-<h2 id="_installation"><a class="anchor" href="#_installation"></a>5. Installation</h2>
+<h2 id="_installation"><a class="anchor" href="#_installation"></a>6. Installation</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Installing Genie is easy. You can run Genie either as a standalone application with an embedded Tomcat or by deploying
@@ -3872,7 +3986,7 @@ the WAR file to an existing Tomcat or other servlet container. There are trade-o
 discussed below.</p>
 </div>
 <div class="sect2">
-<h3 id="_standalone_jar"><a class="anchor" href="#_standalone_jar"></a>5.1. Standalone Jar</h3>
+<h3 id="_standalone_jar"><a class="anchor" href="#_standalone_jar"></a>6.1. Standalone Jar</h3>
 <div class="paragraph">
 <p>The
 <a href="http://oss.jfrog.org/libs-snapshot/com/netflix/genie/genie-app/3.2.0-SNAPSHOT/">standalone jar</a>
@@ -3922,12 +4036,12 @@ from a <code>.genie/</code> directory stored in the users home directory (e.g. <
 </div>
 <div class="paragraph">
 <p>For more details see the
-<a href="http://docs.spring.io/spring-boot/docs/1.5.6.RELEASE/reference/htmlsingle/#boot-features-external-config">Spring Boot</a>
+<a href="http://docs.spring.io/spring-boot/docs/1.5.7.RELEASE/reference/htmlsingle/#boot-features-external-config">Spring Boot</a>
 documentation on external configuration.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_tomcat_deployment"><a class="anchor" href="#_tomcat_deployment"></a>5.2. Tomcat Deployment</h3>
+<h3 id="_tomcat_deployment"><a class="anchor" href="#_tomcat_deployment"></a>6.2. Tomcat Deployment</h3>
 <div class="paragraph">
 <p>The WAR deployment requires the
 <a href="http://oss.jfrog.org/libs-snapshot/com/netflix/genie/genie-war/3.2.0-SNAPSHOT/">WAR file</a>
@@ -3946,23 +4060,23 @@ Genie and it may be more overhead than you&#8217;re comfortable with.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_configuration_3"><a class="anchor" href="#_configuration_3"></a>5.3. Configuration</h3>
+<h3 id="_configuration_3"><a class="anchor" href="#_configuration_3"></a>6.3. Configuration</h3>
 <div class="paragraph">
 <p>Genie has a lot of available configuration options. For descriptions of specific properties you can see the
 <a href="#_properties">Properties</a> section below. Additionally if you want to know how to configure more parts of the application you
-should have a look at the <a href="http://docs.spring.io/spring-boot/docs/1.5.6.RELEASE/reference/htmlsingle/">Spring Boot</a> docs
-as they will go in depth on how to configure the various Spring components used in Genie.</p>
+should have a look at the <a href="http://docs.spring.io/spring-boot/docs/1.5.7.RELEASE/reference/htmlsingle/">Spring Boot</a>
+docs as they will go in depth on how to configure the various Spring components used in Genie.</p>
 </div>
 <div class="sect3">
-<h4 id="_profiles"><a class="anchor" href="#_profiles"></a>5.3.1. Profiles</h4>
+<h4 id="_profiles"><a class="anchor" href="#_profiles"></a>6.3.1. Profiles</h4>
 <div class="paragraph">
 <p>Spring provides a mechanism of segregating parts of application configuration and activating them in certain
 conditions. This mechanism is known as
-<a href="http://docs.spring.io/spring-boot/docs/1.5.6.RELEASE/reference/htmlsingle/#boot-features-profiles">profiles</a>. By default
-Genie will run with the <code>dev</code> profile activated. This means that all the properties in <code>application-dev.yml</code> will be
-appended to, or overwrite, the properties in <code>application.yml</code> which are the defaults. Changing the active profiles is
-easy you just need to change the property <code>spring.profiles.active</code> and pass in a comma separated list of active
-profiles. For example <code>--spring.profiles.active=prod,cloud</code> would activate the prod and cloud profiles.</p>
+<a href="http://docs.spring.io/spring-boot/docs/1.5.7.RELEASE/reference/htmlsingle/#boot-features-profiles">profiles</a>. By
+default Genie will run with the <code>dev</code> profile activated. This means that all the properties in <code>application-dev.yml</code>
+will be appended to, or overwrite, the properties in <code>application.yml</code> which are the defaults. Changing the active
+profiles is easy you just need to change the property <code>spring.profiles.active</code> and pass in a comma separated list of
+active profiles. For example <code>--spring.profiles.active=prod,cloud</code> would activate the prod and cloud profiles.</p>
 </div>
 <div class="paragraph">
 <p>Properties for specific profiles should be stored in files named <code>application-{profileName}.yml</code>. You can make as many
@@ -3971,7 +4085,7 @@ seen in the <a href="#_properties">Properties</a> section below.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_database"><a class="anchor" href="#_database"></a>5.3.2. Database</h4>
+<h4 id="_database"><a class="anchor" href="#_database"></a>6.3.2. Database</h4>
 <div class="paragraph">
 <p>By default since Genie will launch with the <code>dev</code> profile active it will launch with an in memory database running as
 part of its process. This means when you shut Genie down all data will be lost. It is meant for development only. Genie
@@ -3998,14 +4112,15 @@ reasons. Follow the below sections to load the schemas into your table.</p>
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-Genie 3.1.x software is not compatible with 3.0.x database schema. Before upgrading Genie servers to 3.1.x, follow the
-steps below to perform database upgrade, or create a new database with 3.1.x schema.
+Genie 3.2.0+ software is not compatible with previous database schema. Before upgrading existing Genie servers to
+3.2.0, follow the steps below to perform database upgrade, or create a new database with 3.1.x schema. Database upgrades
+beyond 3.2.0 are handled automatically by the Genie binary via <a href="https://flywaydb.org/">Flyway</a>.
 </td>
 </tr>
 </table>
 </div>
 <div class="sect4">
-<h5 id="_mysql"><a class="anchor" href="#_mysql"></a>5.3.2.1. MySQL</h5>
+<h5 id="_mysql"><a class="anchor" href="#_mysql"></a>6.3.2.1. MySQL</h5>
 <div class="admonitionblock note">
 <table>
 <tr>
@@ -4018,35 +4133,106 @@ This assumes the MySQL client binaries are installed
 </tr>
 </table>
 </div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+Genie requires MySQL 5.6.3+ due to certain properties not existing before that version
+</td>
+</tr>
+</table>
+</div>
 <div class="paragraph">
-<p>Download the
-<a href="https://github.com/Netflix/genie/blob/master/genie-ddl/src/main/sql/mysql/schema.mysql.sql">MySQL Schema</a>.
-Then run:</p>
+<p>Ensure the following properties are set in your <code>my.cnf</code>:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">mysql -u {username} -p{password} -h {host} -e 'create database genie;'
-mysql -u {username} -p{password} -h {host} genie &lt; schema.mysql.sql</code></pre>
+<pre class="highlightjs highlight"><code class="language-text" data-lang="text">[mysqld]
+innodb_file_per_table=ON
+innodb_large_prefix=ON
+innodb_file_format=barracuda</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Restart MySQL if you&#8217;ve changed these properties
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">mysql -u {username} -p{password} -h {host} -e 'create database genie;'</code></pre>
 </div>
 </div>
 <div class="sect5">
-<h6 id="_3_0_1_to_3_1_0_database_upgrade"><a class="anchor" href="#_3_0_1_to_3_1_0_database_upgrade"></a>5.3.2.1.1. 3.0.1 to 3.1.0 database upgrade</h6>
+<h6 id="_3_1_x_to_3_2_0_database_upgrade"><a class="anchor" href="#_3_1_x_to_3_2_0_database_upgrade"></a>6.3.2.1.1. 3.1.x to 3.2.0 database upgrade</h6>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+Genie requires MySQL 5.6.3+ due to certain properties not existing before that version
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>If you have an existing Genie installation on a database version &lt; 3.2.0 you&#8217;ll need to upgrade your schema to
+3.2.0 before continuing.</p>
+</div>
 <div class="paragraph">
 <p>Download the:
-<a href="https://github.com/Netflix/genie/blob/master/genie-ddl/src/main/sql/mysql/upgrade-3.0.1-to-3.1.0.mysql.sql">3.0.1 to 3.1.0 Schema Upgrade</a>.</p>
+<a href="https://github.com/Netflix/genie/blob/master/genie-ddl/src/main/sql/mysql/upgrade-3.1.x-to-3.2.0.mysql.sql">3.1.x to 3.2.0 Schema Upgrade</a>.</p>
+</div>
+<div class="paragraph">
+<p>Ensure the following properties are set in your <code>my.cnf</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-text" data-lang="text">[mysqld]
+innodb_file_per_table=ON
+innodb_large_prefix=ON
+innodb_file_format=barracuda</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Restart MySQL if you&#8217;ve changed these properties
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
 <p>Then run:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">mysql -u {username} -p{password} -h {host} genie &lt; upgrade-3.0.1-to-3.1.0.mysql.sql</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">mysql -u {username} -p{password} -h {host} genie &lt; upgrade-3.1.x-to-3.2.0.mysql.sql</code></pre>
 </div>
 </div>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_postgresql"><a class="anchor" href="#_postgresql"></a>5.3.2.2. PostgreSQL</h5>
+<h5 id="_postgresql"><a class="anchor" href="#_postgresql"></a>6.3.2.2. PostgreSQL</h5>
 <div class="admonitionblock note">
 <table>
 <tr>
@@ -4060,57 +4246,60 @@ This assumes the PSQL binaries are installed
 </table>
 </div>
 <div class="paragraph">
-<p>Download the
-<a href="https://github.com/Netflix/genie/blob/master/genie-ddl/src/main/sql/postgresql/schema.postgresql.sql">PostgreSQL Schema</a>
-Then run:</p>
+<p>Run:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">createdb genie
-psql -U {user} -h {host} -d genie -f schema.postgresql.sql</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">createdb genie</code></pre>
 </div>
 </div>
 <div class="sect5">
-<h6 id="_3_0_1_to_3_1_0_database_upgrade_2"><a class="anchor" href="#_3_0_1_to_3_1_0_database_upgrade_2"></a>5.3.2.2.1. 3.0.1 to 3.1.0 database upgrade</h6>
+<h6 id="_3_1_x_to_3_2_0_database_upgrade_2"><a class="anchor" href="#_3_1_x_to_3_2_0_database_upgrade_2"></a>6.3.2.2.1. 3.1.x to 3.2.0 database upgrade</h6>
+<div class="paragraph">
+<p>If you have an existing Genie installation on a database version &lt; 3.2.0 you&#8217;ll need to upgrade your schema to
+3.2.0 before continuing.</p>
+</div>
 <div class="paragraph">
 <p>Download the
-<a href="https://github.com/Netflix/genie/blob/master/genie-ddl/src/main/sql/postgresql/upgrade-3.0.1-to-3.1.0.postgresql.sql">3.0.1 to 3.1.0 Schema Upgrade</a>.</p>
+<a href="https://github.com/Netflix/genie/blob/master/genie-ddl/src/main/sql/postgresql/upgrade-3.1.x-to-3.2.0.postgresql.sql">3.1.x to 3.2.0 Schema Upgrade</a>.</p>
 </div>
 <div class="paragraph">
 <p>Then run:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">createdb genie
-psql -U {user} -h {host} -d genie -f upgrade-3.0.1-to-3.1.0.postgresql.sql</code></pre>
+<pre class="highlightjs highlight"><code class="language-bash" data-lang="bash">psql -U {user} -h {host} -d genie -f upgrade-3.1.x-to-3.2.0.postgresql.sql</code></pre>
 </div>
 </div>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_local_directories"><a class="anchor" href="#_local_directories"></a>5.3.3. Local Directories</h4>
+<h4 id="_local_directories"><a class="anchor" href="#_local_directories"></a>6.3.3. Local Directories</h4>
 <div class="paragraph">
 <p>Genie requires a few directories to run. By default Genie will place them under <code>/tmp</code> however in production you should
 probably create a larger directory you can store the job working directories and other places in. These correspond to
 the <code>genie.jobs.locations.*</code> properties described below in the <a href="#_properties">Properties</a> section.</p>
 </div>
 <div class="sect4">
-<h5 id="_s3"><a class="anchor" href="#_s3"></a>5.3.3.1. S3</h5>
+<h5 id="_s3"><a class="anchor" href="#_s3"></a>6.3.3.1. S3</h5>
 <div class="paragraph">
-<p>If your commands, applications, or jobs depend on artifacts referenced via S3 URI, you will need to configure the S3 subsystem.</p>
+<p>If your commands, applications, or jobs depend on artifacts referenced via S3 URI, you will need to configure the S3
+subsystem.</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Make sure <code>application-s3.yml</code> exists in <code>~/.genie</code> (or at a custom location, referenced by <code>--spring.config.location=</code>)</p>
+<p>Make sure <code>application-s3.yml</code> exists in <code>~/.genie</code> (or at a custom location, referenced by
+<code>--spring.config.location=</code>)</p>
 </li>
 <li>
 <p>An example of <code>application-s3.yml</code> is available below. Set either <code>credentials.file</code> or <code>credentials.role</code></p>
 <div class="ulist">
 <ul>
 <li>
-<p>For <code>credentials.file</code>, provide a filename of a file <strong>in classpath</strong> that contains the AWS access key and secret. A convenient location to place this file is <code>~/.genie/lib</code>.</p>
+<p>For <code>credentials.file</code>, provide a filename of a file <strong>in classpath</strong> that contains the AWS access key and secret.
+A convenient location to place this file is <code>~/.genie/lib</code>.</p>
 </li>
 <li>
 <p>For <code>credentials.role</code>, provide an inline role value.</p>
@@ -4119,10 +4308,12 @@ the <code>genie.jobs.locations.*</code> properties described below in the <a hre
 </div>
 </li>
 <li>
-<p>Enable the Spring Boot <code>s3</code> profile during Genie launch, for example via command-line: <code>--spring.profiles.active=prod,s3</code></p>
+<p>Enable the Spring Boot <code>s3</code> profile during Genie launch, for example via command-line:
+<code>--spring.profiles.active=prod,s3</code></p>
 </li>
 <li>
-<p>To confirm things are properly configured, head to <code>/actuator/beans</code> and verify that the <code>file.system.s3</code> bean was created</p>
+<p>To confirm things are properly configured, head to <code>/actuator/beans</code> and verify that the <code>file.system.s3</code> bean was
+created</p>
 </li>
 </ol>
 </div>
@@ -4144,7 +4335,7 @@ the <code>genie.jobs.locations.*</code> properties described below in the <a hre
 </div>
 </div>
 <div class="sect2">
-<h3 id="_wrap_up_7"><a class="anchor" href="#_wrap_up_7"></a>5.4. Wrap Up</h3>
+<h3 id="_wrap_up_7"><a class="anchor" href="#_wrap_up_7"></a>6.4. Wrap Up</h3>
 <div class="paragraph">
 <p>This section contains the basic setup instructions for Genie. There are other components that can be added to the
 system like Redis, Zookeeper and Security systems that are somewhat outside the scope of an initial setup. You can see
@@ -4154,19 +4345,19 @@ the <a href="#_properties">Properties</a> section below for the properties you&#
 </div>
 </div>
 <div class="sect1">
-<h2 id="_properties"><a class="anchor" href="#_properties"></a>6. Properties</h2>
+<h2 id="_properties"><a class="anchor" href="#_properties"></a>7. Properties</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>This section describes the various properties that can be set to control the behavior of your Genie node and cluster.
 For more information on Spring properties you should see the
-<a href="http://docs.spring.io/spring-boot/docs/1.5.6.RELEASE/reference/htmlsingle/">Spring Boot</a> reference documentation
+<a href="http://docs.spring.io/spring-boot/docs/1.5.7.RELEASE/reference/htmlsingle/">Spring Boot</a> reference documentation
 and the <a href="http://cloud.spring.io/spring-cloud-static/Dalston.SR3/">Spring Cloud</a> documentation.
 The Spring properties described here are ones that we have overridden from Spring defaults.</p>
 </div>
 <div class="sect2">
-<h3 id="_default_properties"><a class="anchor" href="#_default_properties"></a>6.1. Default Properties</h3>
+<h3 id="_default_properties"><a class="anchor" href="#_default_properties"></a>7.1. Default Properties</h3>
 <div class="sect3">
-<h4 id="_genie_properties"><a class="anchor" href="#_genie_properties"></a>6.1.1. Genie Properties</h4>
+<h4 id="_genie_properties"><a class="anchor" href="#_genie_properties"></a>7.1.1. Genie Properties</h4>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 33%;">
@@ -4597,9 +4788,9 @@ to the number of CPU cores x 2 + 1</p></td>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_spring_properties"><a class="anchor" href="#_spring_properties"></a>6.1.2. Spring Properties</h4>
+<h4 id="_spring_properties"><a class="anchor" href="#_spring_properties"></a>7.1.2. Spring Properties</h4>
 <div class="paragraph">
-<p><a href="http://docs.spring.io/spring-boot/docs/1.5.6.RELEASE/reference/htmlsingle/#common-application-properties">Spring Properties</a></p>
+<p><a href="http://docs.spring.io/spring-boot/docs/1.5.7.RELEASE/reference/htmlsingle/#common-application-properties">Spring Properties</a></p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
@@ -4739,7 +4930,7 @@ property is true</p></td>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">spring.session.store-type</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The back end storage system for Spring to store HTTP session information. See
-<a href="http://docs.spring.io/spring-boot/docs/1.5.6.RELEASE/reference/htmlsingle/#boot-features-session">Spring Boot Session</a>
+<a href="http://docs.spring.io/spring-boot/docs/1.5.7.RELEASE/reference/htmlsingle/#boot-features-session">Spring Boot Session</a>
 for more information. Currently on classpath only none, hash_map, redis and jdbc will work.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">hash_map</p></td>
 </tr>
@@ -4753,9 +4944,9 @@ for more information. Currently on classpath only none, hash_map, redis and jdbc
 </div>
 </div>
 <div class="sect2">
-<h3 id="_profile_specific_properties"><a class="anchor" href="#_profile_specific_properties"></a>6.2. Profile Specific Properties</h3>
+<h3 id="_profile_specific_properties"><a class="anchor" href="#_profile_specific_properties"></a>7.2. Profile Specific Properties</h3>
 <div class="sect3">
-<h4 id="_dev_profile"><a class="anchor" href="#_dev_profile"></a>6.2.1. Dev Profile</h4>
+<h4 id="_dev_profile"><a class="anchor" href="#_dev_profile"></a>7.2.1. Dev Profile</h4>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 33%;">
@@ -4800,7 +4991,7 @@ an embedded database, "none" otherwise.</p></td>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_prod_profile"><a class="anchor" href="#_prod_profile"></a>6.2.2. Prod Profile</h4>
+<h4 id="_prod_profile"><a class="anchor" href="#_prod_profile"></a>7.2.2. Prod Profile</h4>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 33%;">
@@ -4884,7 +5075,7 @@ an embedded database, "none" otherwise.</p></td>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_s3_profile"><a class="anchor" href="#_s3_profile"></a>6.2.3. S3 Profile</h4>
+<h4 id="_s3_profile"><a class="anchor" href="#_s3_profile"></a>7.2.3. S3 Profile</h4>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 33%;">
@@ -4916,7 +5107,7 @@ an embedded database, "none" otherwise.</p></td>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_metrics"><a class="anchor" href="#_metrics"></a>7. Metrics</h2>
+<h2 id="_metrics"><a class="anchor" href="#_metrics"></a>8. Metrics</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>The following is an extensive list of metrics (counters, timers, gauges, &#8230;&#8203;)
@@ -5421,7 +5612,7 @@ and system metrics and statistics.</p>
 <div id="footer">
 <div id="footer-text">
 Version 3.2.0-SNAPSHOT<br>
-Last updated 2017-09-22 20:00:55 +00:00
+Last updated 2017-09-25 23:27:40 +00:00
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
