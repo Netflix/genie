@@ -18,6 +18,7 @@
 package com.netflix.genie;
 
 import com.google.common.collect.Maps;
+import net.devh.springboot.autoconfigure.grpc.server.GrpcServerAutoConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
@@ -35,7 +36,8 @@ import java.util.Map;
 @SpringBootApplication(
     exclude = {
         RedisAutoConfiguration.class,
-        RedisRepositoriesAutoConfiguration.class
+        RedisRepositoriesAutoConfiguration.class,
+        GrpcServerAutoConfiguration.class,
     }
 )
 @EnableAspectJAutoProxy
