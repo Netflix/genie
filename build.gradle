@@ -116,6 +116,10 @@ configure(javaProjects) {
               entry "protoc-gen-grpc-java"
               entry "grpc-testing"
             }
+            dependencySet(group: "net.devh", version: "1.3.0-RELEASE") {
+              entry "grpc-server-spring-boot-autoconfigure"
+              entry "grpc-server-spring-boot-starter"
+            }
         }
     }
 
