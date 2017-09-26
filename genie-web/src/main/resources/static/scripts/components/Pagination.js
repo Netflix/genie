@@ -17,7 +17,7 @@ const Pagination = props => {
         <PageLink
           pageType={props.pageType}
           url={props.links.first.href}
-          text="«"
+          text="&laquo;"
         />
       </li>
     );
@@ -28,7 +28,7 @@ const Pagination = props => {
         <PageLink
           pageType={props.pageType}
           url={props.links.prev.href}
-          text="← Previous"
+          text="&larr; Previous"
         />
       </li>
     );
@@ -39,7 +39,7 @@ const Pagination = props => {
         <PageLink
           pageType={props.pageType}
           url={props.links.next.href}
-          text="Next →"
+          text="Next &rarr;"
         />
       </li>
     );
@@ -50,7 +50,7 @@ const Pagination = props => {
         <PageLink
           pageType={props.pageType}
           url={props.links.last.href}
-          text="»"
+          text="&raquo;"
         />
       </li>
     );
