@@ -35,6 +35,7 @@ import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
@@ -42,6 +43,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
 /**
@@ -203,5 +205,19 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
         handler.setLocations(Lists.newArrayList(jobsDir));
 
         return handler;
+    }
+
+    /**
+     * Character encoding filter that forces content-type in response to be UTF-8.
+     * @return The encoding filter
+     */
+    @Bean
+    public CharacterEncodingFilter characterEncodingFilter() {
+        final CharacterEncodingFilter characterEncodingFilter = new CharacterEncodingFilter();
+        characterEncodingFilter.setEncoding(StandardCharsets.UTF_8.name());
+        // This effectively obliterates any upstream default and/or encoding detectors
+        // As a result, everything is served as UTF-8
+        characterEncodingFilter.setForceEncoding(true);
+        return characterEncodingFilter;
     }
 }
