@@ -44,6 +44,7 @@ import org.springframework.restdocs.snippet.Attributes;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -131,6 +132,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             .perform(RestDocumentationRequestBuilders.get(APPLICATIONS_API + "/{id}", id))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
             .andExpect(MockMvcResultMatchers.jsonPath(ID_PATH, Matchers.is(id)))
             .andExpect(MockMvcResultMatchers.jsonPath(UPDATED_PATH, Matchers.notNullValue()))
             .andExpect(MockMvcResultMatchers.jsonPath(CREATED_PATH, Matchers.notNullValue()))
@@ -201,6 +203,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             .perform(MockMvcRequestBuilders.get(APPLICATIONS_API + "/" + ID))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
             .andExpect(MockMvcResultMatchers.jsonPath(ID_PATH, Matchers.is(ID)))
             .andExpect(MockMvcResultMatchers.jsonPath(UPDATED_PATH, Matchers.notNullValue()))
             .andExpect(MockMvcResultMatchers.jsonPath(CREATED_PATH, Matchers.notNullValue()))
@@ -362,6 +365,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             .perform(MockMvcRequestBuilders.get(APPLICATIONS_API))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
             .andExpect(MockMvcResultMatchers.jsonPath(APPLICATIONS_LIST_PATH, Matchers.hasSize(7)))
             .andExpect(MockMvcResultMatchers.jsonPath(APPLICATIONS_ID_LIST_PATH, Matchers.hasSize(7)))
             .andExpect(MockMvcResultMatchers.jsonPath(APPLICATIONS_ID_LIST_PATH, Matchers.containsInAnyOrder(
@@ -376,6 +380,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             .perform(MockMvcRequestBuilders.get(APPLICATIONS_API).param("size", "2"))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
             .andExpect(MockMvcResultMatchers.jsonPath(APPLICATIONS_LIST_PATH, Matchers.hasSize(2)))
             .andDo(documentationResultHandler);
 
@@ -384,6 +389,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             .perform(MockMvcRequestBuilders.get(APPLICATIONS_API).param("name", "hive"))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
             .andExpect(MockMvcResultMatchers.jsonPath(APPLICATIONS_LIST_PATH, Matchers.hasSize(1)))
             .andExpect(MockMvcResultMatchers.jsonPath(APPLICATIONS_LIST_PATH + "[0].id", Matchers.is(hiveId)))
             .andDo(documentationResultHandler);
@@ -393,6 +399,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             .perform(MockMvcRequestBuilders.get(APPLICATIONS_API).param("user", "genieUser3"))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
             .andExpect(MockMvcResultMatchers.jsonPath(APPLICATIONS_LIST_PATH, Matchers.hasSize(1)))
             .andExpect(MockMvcResultMatchers.jsonPath(APPLICATIONS_LIST_PATH + "[0].id", Matchers.is(spark141Id)))
             .andDo(documentationResultHandler);
@@ -406,6 +413,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             )
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
             .andExpect(MockMvcResultMatchers.jsonPath(APPLICATIONS_LIST_PATH, Matchers.hasSize(6)))
             .andExpect(MockMvcResultMatchers.jsonPath(APPLICATIONS_LIST_PATH + "[0].id", Matchers.is(hiveId)))
             .andExpect(MockMvcResultMatchers.jsonPath(APPLICATIONS_LIST_PATH + "[1].id", Matchers.is(pigId)))
@@ -420,6 +428,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             .perform(MockMvcRequestBuilders.get(APPLICATIONS_API).param("tag", "genie.id:" + spark131Id))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
             .andExpect(MockMvcResultMatchers.jsonPath(APPLICATIONS_LIST_PATH, Matchers.hasSize(1)))
             .andExpect(MockMvcResultMatchers.jsonPath(APPLICATIONS_LIST_PATH + "[0].id", Matchers.is(spark131Id)))
             .andDo(documentationResultHandler);
@@ -429,6 +438,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             .perform(MockMvcRequestBuilders.get(APPLICATIONS_API).param("type", "spark"))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
             .andExpect(MockMvcResultMatchers.jsonPath(APPLICATIONS_LIST_PATH, Matchers.hasSize(5)))
             .andExpect(MockMvcResultMatchers.jsonPath(APPLICATIONS_LIST_PATH + "[0].id", Matchers.is(spark131Id)))
             .andExpect(MockMvcResultMatchers.jsonPath(APPLICATIONS_LIST_PATH + "[1].id", Matchers.is(spark140Id)))
@@ -505,6 +515,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             .perform(MockMvcRequestBuilders.get(applicationResource, id))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
             .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(ApplicationStatus.INACTIVE.toString())));
         Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(1L));
     }
@@ -554,6 +565,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             .perform(MockMvcRequestBuilders.get(applicationResource, id))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
             .andExpect(MockMvcResultMatchers.jsonPath(USER_PATH, Matchers.is(newUser)));
         Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(1L));
     }
@@ -996,6 +1008,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
                     .perform(MockMvcRequestBuilders.get(applicationCommandsAPI, ID))
                     .andExpect(MockMvcResultMatchers.status().isOk())
                     .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
+                    .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
                     .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
                     .andReturn()
                     .getResponse()
@@ -1042,6 +1055,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             )
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(1)))
             .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(command1Id)))
             .andDo(getResultHandler);

@@ -72,6 +72,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -159,6 +160,9 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         = "genie.id:" + CLUSTER1_ID + ","
         + "genie.name:" + CLUSTER1_NAME + ","
         + LOCALHOST_CLUSTER_TAG;
+    // This file is not UTF-8 encoded. It is uploaded to test server behavior
+    // related to charset headers
+    private static final String GB18030_TXT = "GB18030.txt";
 
 
     private ResourceLoader resourceLoader;
@@ -356,7 +360,10 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         final String configFile2 = this.resourceLoader.getResource(
             BASE_DIR + CMD1_ID + FILE_DELIMITER + "config2"
         ).getFile().getAbsolutePath();
-        final Set<String> configs = Sets.newHashSet(configFile1, configFile2);
+        final String configFile3 = this.resourceLoader.getResource(
+            BASE_DIR + CMD1_ID + FILE_DELIMITER + GB18030_TXT
+        ).getFile().getAbsolutePath();
+        final Set<String> configs = Sets.newHashSet(configFile1, configFile2, configFile3);
         final String depFile1 = this.resourceLoader.getResource(
             BASE_DIR
                 + CLUSTER1_ID
@@ -1265,6 +1272,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .perform(MockMvcRequestBuilders.get(JOBS_API + "/" + jobId))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
             .andExpect(MockMvcResultMatchers.jsonPath(ID_PATH, Matchers.is(jobId)))
             .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(JobStatus.KILLED.toString())))
             .andExpect(MockMvcResultMatchers.jsonPath(
@@ -1331,6 +1339,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .perform(MockMvcRequestBuilders.get(JOBS_API + "/{id}", id))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
             .andExpect(MockMvcResultMatchers.jsonPath(ID_PATH, Matchers.is(id)))
             .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(JobStatus.KILLED.toString())))
             .andExpect(MockMvcResultMatchers.jsonPath(STATUS_MESSAGE_PATH, Matchers.is("Job exceeded timeout.")));
@@ -1382,6 +1391,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .perform(MockMvcRequestBuilders.get(JOBS_API + "/{id}", id))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
             .andExpect(MockMvcResultMatchers.jsonPath(ID_PATH, Matchers.is(id)))
             .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(JobStatus.FAILED.toString())))
             .andExpect(MockMvcResultMatchers.jsonPath(STATUS_MESSAGE_PATH, Matchers.is(JobStatusMessages.JOB_FAILED)));
@@ -1425,27 +1435,42 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         this.mvc
             .perform(MockMvcRequestBuilders.get(JOBS_API + "/" + jobId + "/output/genie/logs/env.log"))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE));
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
+            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()));
 
         this.mvc
             .perform(MockMvcRequestBuilders.get(JOBS_API + "/" + jobId + "/output/genie/logs/genie.log"))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE));
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
+            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()));
 
         this.mvc
             .perform(MockMvcRequestBuilders.get(JOBS_API + "/" + jobId + "/output/genie/genie.done"))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE));
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
+            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()));
 
         this.mvc
             .perform(MockMvcRequestBuilders.get(JOBS_API + "/" + jobId + "/output/stdout").accept(MediaType.ALL))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE));
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
+            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()));
 
         this.mvc
             .perform(MockMvcRequestBuilders.get(JOBS_API + "/" + jobId + "/output/stderr").accept(MediaType.ALL))
             .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE));
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
+            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()));
+
+
+        // Verify the file is served as UTF-8 even if it's not
+        this.mvc
+            .perform(MockMvcRequestBuilders.get(
+                JOBS_API + "/" + jobId + "/output/genie/command/" + CMD1_ID + "/config/" + GB18030_TXT
+            ).accept(MediaType.ALL))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
+            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()));
     }
 
     private String getIdFromLocation(final String location) {
