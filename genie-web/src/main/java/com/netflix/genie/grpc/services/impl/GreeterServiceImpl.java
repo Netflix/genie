@@ -17,7 +17,7 @@
  */
  package com.netflix.genie.grpc.services.impl;
 
-import com.netflix.genie.grpc.SimpleLoggingInterceptor;
+import com.netflix.genie.core.grpc.poc.SimpleLoggingInterceptor;
 import com.netflix.genie.protogen.GreeterServiceGrpc;
 import com.netflix.genie.protogen.HelloReply;
 import com.netflix.genie.protogen.HelloRequest;
@@ -27,7 +27,12 @@ import net.devh.springboot.autoconfigure.grpc.server.GrpcService;
 /**
  * Example implementation of the Greeter service definition.
  */
-@GrpcService(GreeterServiceGrpc.class)
+@GrpcService(
+    value = GreeterServiceGrpc.class,
+    interceptors = {
+        SimpleLoggingInterceptor.class,
+    }
+)
 public class GreeterServiceImpl extends GreeterServiceGrpc.GreeterServiceImplBase {
 
     /**
