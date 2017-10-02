@@ -43,7 +43,7 @@ public class UIControllerIntegrationTest extends RestControllerIntegrationTestsB
             this.mvc
                 .perform(MockMvcRequestBuilders.get(validPath))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.forwardedUrl("index.html"))
+                .andExpect(MockMvcResultMatchers.view().name("index"))
                 .andReturn();
         }
     }
@@ -55,27 +55,38 @@ public class UIControllerIntegrationTest extends RestControllerIntegrationTestsB
     @Test
     public void testGetIndex() throws Exception {
 
-        final byte[] indexResourceBytes;
+        final String indexContent;
         InputStream is = null;
 
         try {
-            is = UIController.class.getResourceAsStream("/static/index.html");
+            is = UIController.class.getResourceAsStream("/templates/index.html");
             Assert.assertNotNull(is);
             Assert.assertTrue(is.available() > 0);
-            indexResourceBytes = IOUtils.toByteArray(is);
+            indexContent = IOUtils.toString(is, StandardCharsets.UTF_8);
         } finally {
             if (is != null) {
                 is.close();
             }
         }
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.get("/index.html"))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.content().bytes(indexResourceBytes))
-            .andReturn();
+        final List<String> validPaths = Arrays.asList(
+            "/",
+            "/applications",
+            "/clusters",
+            "/commands",
+            "/jobs",
+            "/output/12345"
+        );
+
+        for (String validPath : validPaths) {
+            this.mvc
+                .perform(MockMvcRequestBuilders.get(validPath))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
+                .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
+                .andExpect(MockMvcResultMatchers.content().string(indexContent))
+                .andReturn();
+        }
     }
 
     /**
