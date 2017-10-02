@@ -30,6 +30,7 @@ import com.netflix.genie.web.hateoas.resources.ClusterResource;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,6 +83,15 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
 
     @Autowired
     private DataServiceRetryAspect dataServiceRetryAspect;
+
+    /**
+     * Common setup for all tests.
+     */
+    @Before
+    public void setup() {
+        this.jpaClusterRepository.deleteAll();
+        this.jpaCommandRepository.deleteAll();
+    }
 
     /**
      * Cleanup after tests.

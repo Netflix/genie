@@ -204,206 +204,21 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
      */
     @Before
     public void setup() throws Exception {
+        // Ensure database is empty and doesn't bleed from other test classes
+        this.jobRequestMetadataRepository.deleteAll();
+        this.jobExecutionRepository.deleteAll();
+        this.jobRepository.deleteAll();
+        this.jobRequestRepository.deleteAll();
+        this.clusterRepository.deleteAll();
+        this.commandRepository.deleteAll();
+        this.applicationRepository.deleteAll();
+
         this.resourceLoader = new DefaultResourceLoader();
-        //this.jobsBaseUrl = "http://localhost:" + this.port + "/api/v3/jobs";
-        createAnApplication(APP1_ID, APP1_NAME);
-        createAnApplication(APP2_ID, APP2_NAME);
-        createAllClusters();
-        createAllCommands();
-        linkAllEntities();
-    }
-
-    private void linkAllEntities() throws Exception {
-        final List<String> apps = new ArrayList<>();
-        apps.add(APP1_ID);
-        apps.add(APP2_ID);
-
-        this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .post(COMMANDS_API + FILE_DELIMITER + CMD1_ID + FILE_DELIMITER + APPLICATIONS_LINK_KEY)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsBytes(apps))
-            )
-            .andExpect(MockMvcResultMatchers.status().isNoContent());
-
-        final List<String> cmds = Lists.newArrayList(CMD1_ID);
-
-        this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .post(CLUSTERS_API + FILE_DELIMITER + CLUSTER1_ID + FILE_DELIMITER + COMMANDS_LINK_KEY)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(this.objectMapper.writeValueAsBytes(cmds))
-            )
-            .andExpect(MockMvcResultMatchers.status().isNoContent());
-    }
-
-    private void createAnApplication(final String id, final String appName) throws Exception {
-        final String setUpFile = this.resourceLoader.getResource(
-            BASE_DIR
-                + id
-                + FILE_DELIMITER
-                + "setupfile"
-        ).getFile().getAbsolutePath();
-
-        final String depFile1 = this.resourceLoader.getResource(
-            BASE_DIR
-                + id
-                + FILE_DELIMITER
-                + "dep1"
-        ).getFile().getAbsolutePath();
-        final String depFile2 = this.resourceLoader.getResource(
-            BASE_DIR
-                + id
-                + FILE_DELIMITER
-                + "dep2"
-        ).getFile().getAbsolutePath();
-        final Set<String> app1Dependencies = Sets.newHashSet(depFile1, depFile2);
-
-        final String configFile1 = this.resourceLoader.getResource(
-            BASE_DIR
-                + id
-                + FILE_DELIMITER
-                + "config1"
-        ).getFile().getAbsolutePath();
-        final String configFile2 = this.resourceLoader.getResource(
-            BASE_DIR
-                + id
-                + FILE_DELIMITER
-                + "config2"
-        ).getFile().getAbsolutePath();
-        final Set<String> app1Configs = Sets.newHashSet(configFile1, configFile2);
-
-        final Application app = new Application.Builder(
-            appName,
-            APP1_USER,
-            APP1_VERSION,
-            ApplicationStatus.ACTIVE)
-            .withId(id)
-            .withSetupFile(setUpFile)
-            .withConfigs(app1Configs)
-            .withDependencies(app1Dependencies)
-            .build();
-
-        this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .post(APPLICATIONS_API)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(this.objectMapper.writeValueAsBytes(app))
-            )
-            .andExpect(MockMvcResultMatchers.status().isCreated())
-            .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()));
-    }
-
-    private void createAllClusters() throws Exception {
-        final String setUpFile = this.resourceLoader.getResource(
-            BASE_DIR + CLUSTER1_ID + FILE_DELIMITER + "setupfile"
-        ).getFile().getAbsolutePath();
-
-        final String configFile1 = this.resourceLoader.getResource(
-            BASE_DIR + CLUSTER1_ID + FILE_DELIMITER + "config1"
-        ).getFile().getAbsolutePath();
-        final String configFile2 = this.resourceLoader.getResource(
-            BASE_DIR + CLUSTER1_ID + FILE_DELIMITER + "config2"
-        ).getFile().getAbsolutePath();
-        final Set<String> configs = Sets.newHashSet(configFile1, configFile2);
-
-        final String depFile1 = this.resourceLoader.getResource(
-            BASE_DIR
-                + CLUSTER1_ID
-                + FILE_DELIMITER
-                + "dep1"
-        ).getFile().getAbsolutePath();
-        final String depFile2 = this.resourceLoader.getResource(
-            BASE_DIR
-                + CLUSTER1_ID
-                + FILE_DELIMITER
-                + "dep2"
-        ).getFile().getAbsolutePath();
-        final Set<String> clusterDependencies = Sets.newHashSet(depFile1, depFile2);
-        final Set<String> tags = Sets.newHashSet(LOCALHOST_CLUSTER_TAG);
-
-        final Cluster cluster = new Cluster.Builder(
-            CLUSTER1_NAME,
-            CLUSTER1_USER,
-            CLUSTER1_VERSION,
-            ClusterStatus.UP
-        )
-            .withId(CLUSTER1_ID)
-            .withSetupFile(setUpFile)
-            .withConfigs(configs)
-            .withDependencies(clusterDependencies)
-            .withTags(tags)
-            .build();
-
-        this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .post(CLUSTERS_API)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsBytes(cluster))
-            )
-            .andExpect(MockMvcResultMatchers.status().isCreated())
-            .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()));
-    }
-
-    private void createAllCommands() throws Exception {
-        final String setUpFile = this.resourceLoader.getResource(
-            BASE_DIR + CMD1_ID + FILE_DELIMITER + "setupfile"
-        ).getFile().getAbsolutePath();
-
-        final String configFile1 = this.resourceLoader.getResource(
-            BASE_DIR + CMD1_ID + FILE_DELIMITER + "config1"
-        ).getFile().getAbsolutePath();
-        final String configFile2 = this.resourceLoader.getResource(
-            BASE_DIR + CMD1_ID + FILE_DELIMITER + "config2"
-        ).getFile().getAbsolutePath();
-        final String configFile3 = this.resourceLoader.getResource(
-            BASE_DIR + CMD1_ID + FILE_DELIMITER + GB18030_TXT
-        ).getFile().getAbsolutePath();
-        final Set<String> configs = Sets.newHashSet(configFile1, configFile2, configFile3);
-        final String depFile1 = this.resourceLoader.getResource(
-            BASE_DIR
-                + CLUSTER1_ID
-                + FILE_DELIMITER
-                + "dep1"
-        ).getFile().getAbsolutePath();
-        final String depFile2 = this.resourceLoader.getResource(
-            BASE_DIR
-                + CLUSTER1_ID
-                + FILE_DELIMITER
-                + "dep2"
-        ).getFile().getAbsolutePath();
-        final Set<String> commandDependencies = Sets.newHashSet(depFile1, depFile2);
-
-        final Set<String> tags = Sets.newHashSet(BASH_COMMAND_TAG);
-
-        final Command cmd = new Command.Builder(
-            CMD1_NAME,
-            CMD1_USER,
-            CMD1_VERSION,
-            CommandStatus.ACTIVE,
-            CMD1_EXECUTABLE,
-            CHECK_DELAY
-        )
-            .withId(CMD1_ID)
-            .withSetupFile(setUpFile)
-            .withConfigs(configs)
-            .withDependencies(commandDependencies)
-            .withTags(tags)
-            .build();
-
-        this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .post(COMMANDS_API)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsBytes(cmd))
-            )
-            .andExpect(MockMvcResultMatchers.status().isCreated())
-            .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()));
+        this.createAnApplication(APP1_ID, APP1_NAME);
+        this.createAnApplication(APP2_ID, APP2_NAME);
+        this.createAllClusters();
+        this.createAllCommands();
+        this.linkAllEntities();
     }
 
     /**
@@ -1528,5 +1343,198 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                 break;
             }
         }
+    }
+
+    private void linkAllEntities() throws Exception {
+        final List<String> apps = new ArrayList<>();
+        apps.add(APP1_ID);
+        apps.add(APP2_ID);
+
+        this.mvc
+            .perform(
+                MockMvcRequestBuilders
+                    .post(COMMANDS_API + FILE_DELIMITER + CMD1_ID + FILE_DELIMITER + APPLICATIONS_LINK_KEY)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsBytes(apps))
+            )
+            .andExpect(MockMvcResultMatchers.status().isNoContent());
+
+        final List<String> cmds = Lists.newArrayList(CMD1_ID);
+
+        this.mvc
+            .perform(
+                MockMvcRequestBuilders
+                    .post(CLUSTERS_API + FILE_DELIMITER + CLUSTER1_ID + FILE_DELIMITER + COMMANDS_LINK_KEY)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(this.objectMapper.writeValueAsBytes(cmds))
+            )
+            .andExpect(MockMvcResultMatchers.status().isNoContent());
+    }
+
+    private void createAnApplication(final String id, final String appName) throws Exception {
+        final String setUpFile = this.resourceLoader.getResource(
+            BASE_DIR
+                + id
+                + FILE_DELIMITER
+                + "setupfile"
+        ).getFile().getAbsolutePath();
+
+        final String depFile1 = this.resourceLoader.getResource(
+            BASE_DIR
+                + id
+                + FILE_DELIMITER
+                + "dep1"
+        ).getFile().getAbsolutePath();
+        final String depFile2 = this.resourceLoader.getResource(
+            BASE_DIR
+                + id
+                + FILE_DELIMITER
+                + "dep2"
+        ).getFile().getAbsolutePath();
+        final Set<String> app1Dependencies = Sets.newHashSet(depFile1, depFile2);
+
+        final String configFile1 = this.resourceLoader.getResource(
+            BASE_DIR
+                + id
+                + FILE_DELIMITER
+                + "config1"
+        ).getFile().getAbsolutePath();
+        final String configFile2 = this.resourceLoader.getResource(
+            BASE_DIR
+                + id
+                + FILE_DELIMITER
+                + "config2"
+        ).getFile().getAbsolutePath();
+        final Set<String> app1Configs = Sets.newHashSet(configFile1, configFile2);
+
+        final Application app = new Application.Builder(
+            appName,
+            APP1_USER,
+            APP1_VERSION,
+            ApplicationStatus.ACTIVE)
+            .withId(id)
+            .withSetupFile(setUpFile)
+            .withConfigs(app1Configs)
+            .withDependencies(app1Dependencies)
+            .build();
+
+        this.mvc
+            .perform(
+                MockMvcRequestBuilders
+                    .post(APPLICATIONS_API)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(this.objectMapper.writeValueAsBytes(app))
+            )
+            .andExpect(MockMvcResultMatchers.status().isCreated())
+            .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()));
+    }
+
+    private void createAllClusters() throws Exception {
+        final String setUpFile = this.resourceLoader.getResource(
+            BASE_DIR + CLUSTER1_ID + FILE_DELIMITER + "setupfile"
+        ).getFile().getAbsolutePath();
+
+        final String configFile1 = this.resourceLoader.getResource(
+            BASE_DIR + CLUSTER1_ID + FILE_DELIMITER + "config1"
+        ).getFile().getAbsolutePath();
+        final String configFile2 = this.resourceLoader.getResource(
+            BASE_DIR + CLUSTER1_ID + FILE_DELIMITER + "config2"
+        ).getFile().getAbsolutePath();
+        final Set<String> configs = Sets.newHashSet(configFile1, configFile2);
+
+        final String depFile1 = this.resourceLoader.getResource(
+            BASE_DIR
+                + CLUSTER1_ID
+                + FILE_DELIMITER
+                + "dep1"
+        ).getFile().getAbsolutePath();
+        final String depFile2 = this.resourceLoader.getResource(
+            BASE_DIR
+                + CLUSTER1_ID
+                + FILE_DELIMITER
+                + "dep2"
+        ).getFile().getAbsolutePath();
+        final Set<String> clusterDependencies = Sets.newHashSet(depFile1, depFile2);
+        final Set<String> tags = Sets.newHashSet(LOCALHOST_CLUSTER_TAG);
+
+        final Cluster cluster = new Cluster.Builder(
+            CLUSTER1_NAME,
+            CLUSTER1_USER,
+            CLUSTER1_VERSION,
+            ClusterStatus.UP
+        )
+            .withId(CLUSTER1_ID)
+            .withSetupFile(setUpFile)
+            .withConfigs(configs)
+            .withDependencies(clusterDependencies)
+            .withTags(tags)
+            .build();
+
+        this.mvc
+            .perform(
+                MockMvcRequestBuilders
+                    .post(CLUSTERS_API)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsBytes(cluster))
+            )
+            .andExpect(MockMvcResultMatchers.status().isCreated())
+            .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()));
+    }
+
+    private void createAllCommands() throws Exception {
+        final String setUpFile = this.resourceLoader.getResource(
+            BASE_DIR + CMD1_ID + FILE_DELIMITER + "setupfile"
+        ).getFile().getAbsolutePath();
+
+        final String configFile1 = this.resourceLoader.getResource(
+            BASE_DIR + CMD1_ID + FILE_DELIMITER + "config1"
+        ).getFile().getAbsolutePath();
+        final String configFile2 = this.resourceLoader.getResource(
+            BASE_DIR + CMD1_ID + FILE_DELIMITER + "config2"
+        ).getFile().getAbsolutePath();
+        final String configFile3 = this.resourceLoader.getResource(
+            BASE_DIR + CMD1_ID + FILE_DELIMITER + GB18030_TXT
+        ).getFile().getAbsolutePath();
+        final Set<String> configs = Sets.newHashSet(configFile1, configFile2, configFile3);
+        final String depFile1 = this.resourceLoader.getResource(
+            BASE_DIR
+                + CLUSTER1_ID
+                + FILE_DELIMITER
+                + "dep1"
+        ).getFile().getAbsolutePath();
+        final String depFile2 = this.resourceLoader.getResource(
+            BASE_DIR
+                + CLUSTER1_ID
+                + FILE_DELIMITER
+                + "dep2"
+        ).getFile().getAbsolutePath();
+        final Set<String> commandDependencies = Sets.newHashSet(depFile1, depFile2);
+
+        final Set<String> tags = Sets.newHashSet(BASH_COMMAND_TAG);
+
+        final Command cmd = new Command.Builder(
+            CMD1_NAME,
+            CMD1_USER,
+            CMD1_VERSION,
+            CommandStatus.ACTIVE,
+            CMD1_EXECUTABLE,
+            CHECK_DELAY
+        )
+            .withId(CMD1_ID)
+            .withSetupFile(setUpFile)
+            .withConfigs(configs)
+            .withDependencies(commandDependencies)
+            .withTags(tags)
+            .build();
+
+        this.mvc
+            .perform(
+                MockMvcRequestBuilders
+                    .post(COMMANDS_API)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsBytes(cmd))
+            )
+            .andExpect(MockMvcResultMatchers.status().isCreated())
+            .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()));
     }
 }
