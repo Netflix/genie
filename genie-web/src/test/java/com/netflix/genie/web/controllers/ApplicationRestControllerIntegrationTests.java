@@ -30,6 +30,7 @@ import com.netflix.genie.web.hateoas.resources.ApplicationResource;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.MediaTypes;
@@ -77,6 +78,15 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
 
     @Autowired
     private JpaCommandRepository jpaCommandRepository;
+
+    /**
+     * Common setup for all tests.
+     */
+    @Before
+    public void setup() {
+        this.jpaCommandRepository.deleteAll();
+        this.jpaApplicationRepository.deleteAll();
+    }
 
     /**
      * Cleanup after tests.
