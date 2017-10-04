@@ -19,7 +19,9 @@ package com.netflix.genie.core.jobs.workflow.impl;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.netflix.genie.common.dto.Cluster;
+import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.Command;
+import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
@@ -38,6 +40,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -105,6 +108,9 @@ public class InitialSetupTask extends GenieBaseTask {
                 jobExecEnv.getJobRequest().getName(),
                 jobExecEnv.getMemory()
             );
+
+            // create environment variables for the job request
+            this.createJobRequestEnvironmentVariables(writer, jobExecEnv.getJobRequest());
 
             //Export the Genie Version
             writer.write(GENIE_VERSION_EXPORT);
@@ -371,6 +377,60 @@ public class InitialSetupTask extends GenieBaseTask {
                 + memory
                 + LINE_SEPARATOR
         );
+
+        // Append new line
+        writer.write(LINE_SEPARATOR);
+    }
+
+    @VisibleForTesting
+    void createJobRequestEnvironmentVariables(
+        final Writer writer,
+        final JobRequest jobRequest
+    ) throws IOException {
+
+        // create environment variable for the command tags/criteria in the job request
+        writer.write(JobConstants.EXPORT
+            + JobConstants.GENIE_REQUESTED_COMMAND_TAGS_ENV_VAR
+            + JobConstants.EQUALS_SYMBOL
+            + JobConstants.DOUBLE_QUOTE_SYMBOL
+            + tagsToString(jobRequest.getCommandCriteria())
+            + JobConstants.DOUBLE_QUOTE_SYMBOL
+            + LINE_SEPARATOR);
+
+        final List<ClusterCriteria> clusterCriterias = jobRequest.getClusterCriterias();
+
+        final List<String> clusterCriteriasStrings = new ArrayList<>(clusterCriterias.size());
+
+        for (ClusterCriteria clusterCriteria : clusterCriterias) {
+            clusterCriteriasStrings.add("[" + tagsToString(clusterCriteria.getTags()) + "]");
+        }
+
+        // Append new line
+        writer.write(System.lineSeparator());
+
+        // create environment variable for the list of cluster tags/criteria in the job request as a single
+        // value in the form "[[x,y,z],[a,b,c]]"
+        writer.write(JobConstants.EXPORT
+            + JobConstants.GENIE_REQUESTED_CLUSTER_TAGS_ENV_VAR
+            + JobConstants.EQUALS_SYMBOL
+            + JobConstants.DOUBLE_QUOTE_SYMBOL
+            + "[" + StringUtils.join(clusterCriteriasStrings, ',') + "]"
+            + JobConstants.DOUBLE_QUOTE_SYMBOL
+            + LINE_SEPARATOR);
+
+        // create environment variables for individual tags/criteria in the job request
+        for (int i = 0; i < clusterCriterias.size(); i++) {
+            final ClusterCriteria clusterCriteria = clusterCriterias.get(i);
+
+            // create environment variable for the job name
+            writer.write(JobConstants.EXPORT
+                + JobConstants.GENIE_REQUESTED_CLUSTER_TAGS_ENV_VAR + "_" + i
+                + JobConstants.EQUALS_SYMBOL
+                + JobConstants.DOUBLE_QUOTE_SYMBOL
+                + tagsToString(clusterCriteria.getTags())
+                + JobConstants.DOUBLE_QUOTE_SYMBOL
+                + LINE_SEPARATOR);
+        }
 
         // Append new line
         writer.write(LINE_SEPARATOR);

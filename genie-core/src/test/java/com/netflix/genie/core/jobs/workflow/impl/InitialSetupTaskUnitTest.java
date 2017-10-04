@@ -17,8 +17,11 @@
  */
 package com.netflix.genie.core.jobs.workflow.impl;
 
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Cluster;
+import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.Command;
+import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.spectator.api.Registry;
@@ -117,6 +120,12 @@ public class InitialSetupTaskUnitTest {
         final String commandTag2 = "cmd-foo";
         final String jobName = "The Job";
         final int memory = 1000;
+        final String cmdCritTag1 = "tagX";
+        final String cmdCritTag2 = "tagY";
+        final String cmdCritTag3 = "tagZ";
+        final String cltCritTag1 = "bar";
+        final String cltCritTag2 = "baz";
+        final String cltCritTag3 = "foo";
 
         final Cluster mockCluster = Mockito.mock(Cluster.class);
         Mockito.when(mockCluster.getId()).thenReturn(java.util.Optional.of(clusterId));
@@ -129,12 +138,29 @@ public class InitialSetupTaskUnitTest {
         Mockito.when(mockCommand.getId()).thenReturn(java.util.Optional.of(commandName));
         Mockito.when(mockCommand.getTags()).thenReturn(new HashSet<>(Arrays.asList(commandTag2, commandTag1)));
 
+        final JobRequest mockJobRequest = Mockito.mock(JobRequest.class);
+        Mockito
+            .when(mockJobRequest.getCommandCriteria())
+            .thenReturn(
+                Sets.newHashSet(Arrays.asList(cmdCritTag3, cmdCritTag2, cmdCritTag1))
+            );
+        Mockito
+            .when(mockJobRequest.getClusterCriterias())
+            .thenReturn(
+                Arrays.asList(
+                    new ClusterCriteria(Sets.newHashSet(cltCritTag3, cltCritTag1, cltCritTag2)),
+                    new ClusterCriteria(Sets.newHashSet(cltCritTag3, cltCritTag1)),
+                    new ClusterCriteria(Sets.newHashSet(cltCritTag3))
+                )
+            );
+
         final StringWriter mockWriter = new StringWriter();
         this.initialSetupTask.createJobDirEnvironmentVariables(mockWriter, tempDir.getRoot().getAbsolutePath());
         this.initialSetupTask.createApplicationEnvironmentVariables(mockWriter);
         this.initialSetupTask.createCommandEnvironmentVariables(mockWriter, mockCommand);
         this.initialSetupTask.createClusterEnvironmentVariables(mockWriter, mockCluster);
         this.initialSetupTask.createJobEnvironmentVariables(mockWriter, jobId, jobName, memory);
+        this.initialSetupTask.createJobRequestEnvironmentVariables(mockWriter, mockJobRequest);
 
         final String expextedOutput = ""
             + "export GENIE_JOB_DIR=\"" + tempDir.getRoot().getAbsolutePath() + "\"\n"
@@ -162,6 +188,17 @@ public class InitialSetupTaskUnitTest {
             + "export GENIE_JOB_NAME=\"" + jobName + "\"\n"
             + "\n"
             + "export GENIE_JOB_MEMORY=" + memory + "\n"
+            + "\n"
+            + "export GENIE_REQUESTED_COMMAND_TAGS=\"" + cmdCritTag1 + "," + cmdCritTag2 + "," + cmdCritTag3 + "\"\n"
+            + "\n"
+            + "export GENIE_REQUESTED_CLUSTER_TAGS=\"["
+                + "[" + cltCritTag1 + "," + cltCritTag2 + "," + cltCritTag3 + "],"
+                + "[" + cltCritTag1 + "," + cltCritTag3 + "],"
+                + "[" + cltCritTag3 + "]"
+            + "]\"" + "\n"
+            + "export GENIE_REQUESTED_CLUSTER_TAGS_0=\"" + cltCritTag1 + "," + cltCritTag2 + "," + cltCritTag3 + "\"\n"
+            + "export GENIE_REQUESTED_CLUSTER_TAGS_1=\"" + cltCritTag1 + "," + cltCritTag3 + "\"\n"
+            + "export GENIE_REQUESTED_CLUSTER_TAGS_2=\"" + cltCritTag3 + "\"\n"
             + "\n";
 
         Assert.assertEquals(expextedOutput, mockWriter.getString());

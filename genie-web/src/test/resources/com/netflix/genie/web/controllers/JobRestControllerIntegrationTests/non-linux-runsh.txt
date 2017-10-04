@@ -89,6 +89,11 @@ export GENIE_JOB_NAME="List * ... Directories bash job"
 
 export GENIE_JOB_MEMORY=1024
 
+export GENIE_REQUESTED_COMMAND_TAGS="bash"
+
+export GENIE_REQUESTED_CLUSTER_TAGS="[[localhost]]"
+export GENIE_REQUESTED_CLUSTER_TAGS_0="localhost"
+
 export GENIE_VERSION=3
 
 # Sourcing setup file from Cluster: cluster1
