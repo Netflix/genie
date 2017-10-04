@@ -246,6 +246,16 @@ public final class JobConstants {
     public static final String GENIE_JOB_MEMORY_ENV_VAR = "GENIE_JOB_MEMORY";
 
     /**
+     * Environment variable for the Genie command tags in the job request.
+     */
+    public static final String GENIE_REQUESTED_COMMAND_TAGS_ENV_VAR = "GENIE_REQUESTED_COMMAND_TAGS";
+
+    /**
+     * Environment variable for the Genie cluster criteria tags in the job request.
+     */
+    public static final String GENIE_REQUESTED_CLUSTER_TAGS_ENV_VAR = "GENIE_REQUESTED_CLUSTER_TAGS";
+
+    /**
      * Process ID.
      **/
     public static final String PID = "pid";
