@@ -72,7 +72,7 @@ public class OAuth2SecurityInterceptor implements SecurityInterceptor {
                 .addHeader(HttpHeaders.AUTHORIZATION, accessToken.getTokenType() + " " + accessToken.getAccessToken())
                 .build();
 
-            log.debug("Sending request {} on {} {} {}", newRequest.url(), chain.connection(), newRequest.headers());
+            log.debug("Sending request {} on {} {}", newRequest.url(), chain.connection(), newRequest.headers());
 
             return chain.proceed(newRequest);
     }
