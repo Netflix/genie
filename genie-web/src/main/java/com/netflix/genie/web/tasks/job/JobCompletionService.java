@@ -413,7 +413,7 @@ public class JobCompletionService {
                 log.error(
                     "Error collecting application dependencies for job: {} due to error {}",
                     jobId,
-                    e);
+                    e.toString());
                 incrementErrorCounter("DELETE_APPLICATION_DEPENDENCIES_FAILURE", e);
             }
 
@@ -438,7 +438,7 @@ public class JobCompletionService {
                 log.error(
                     "Error collecting cluster dependency for job: {} due to error {}",
                     jobId,
-                    e);
+                    e.toString());
                 incrementErrorCounter("DELETE_CLUSTER_DEPENDENCIES_FAILURE", e);
             }
 
@@ -463,7 +463,7 @@ public class JobCompletionService {
                 log.error(
                     "Error collecting command dependency for job: {} due to error {}",
                     jobId,
-                    e);
+                    e.toString());
                 incrementErrorCounter("DELETE_COMMAND_DEPENDENCIES_FAILURE", e);
             }
 
@@ -486,7 +486,7 @@ public class JobCompletionService {
                         log.error(
                             "Error deleting dependency directory: {}: {}",
                             dependencyDirectory.getAbsolutePath(),
-                            e
+                            e.toString()
                         );
                     } catch (Throwable t) {
                         incrementErrorCounter("DELETE_DEPENDENCIES_FAILURE");
