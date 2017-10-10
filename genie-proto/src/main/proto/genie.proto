@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package com.netflix.genie.proto;
 
+import "google/protobuf/timestamp.proto";
+
 option java_multiple_files = true;
 option java_package = "com.netflix.genie.protogen";
 option java_outer_classname = "GenieProto";
@@ -23,4 +25,23 @@ message HelloRequest {
 // The response message containing the greetings
 message HelloReply {
   string message = 1;
+}
+
+// Heartbeat service (POC for handling disconnections).
+service HeartbeatService {
+  // Client heartbeat and server echoes to confirm receipt
+  rpc Heartbeat (HeartbeatRequest) returns (HeartbeatResponse) {}
+}
+
+// Heartbeat from client to server
+message HeartbeatRequest {
+  string heartbeat_uuid = 1;
+  google.protobuf.Timestamp request_timestamp = 2;
+}
+
+// Server Heartbeat acknowledgement
+message HeartbeatResponse {
+  string heartbeat_uuid = 1;
+  google.protobuf.Timestamp request_timestamp = 2;
+  google.protobuf.Timestamp response_timestamp = 3;
 }
