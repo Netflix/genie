@@ -45,3 +45,19 @@ message HeartbeatResponse {
   google.protobuf.Timestamp request_timestamp = 2;
   google.protobuf.Timestamp response_timestamp = 3;
 }
+
+// Kill service (POC for handling long-polling).
+service KillService {
+  // Client long-polls for a kill signal from server
+  rpc WaitKill (KillRequest) returns (KillResponse) {}
+}
+
+// Kill request from client to server
+message KillRequest {
+  string client_id = 1;
+}
+
+// Server Kill command
+message KillResponse {
+  string client_id = 1;
+}
