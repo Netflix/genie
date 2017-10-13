@@ -23,17 +23,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.genie.client.exceptions.GenieClientException;
 import okhttp3.Interceptor;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 import java.io.IOException;
+import java.io.Reader;
 
 /**
- * Class that evaluates the retrofit response code and maps it to an gitappropriate Genie Exception.
+ * Class that evaluates the retrofit response code and maps it to an appropriate Genie Exception.
  *
  * @author amsharma
  * @since 3.0.0
  */
 public class ResponseMappingInterceptor implements Interceptor {
 
+    private static final String ERROR_MESSAGE_KEY = "message";
     private final ObjectMapper mapper;
 
     /**
@@ -53,17 +56,24 @@ public class ResponseMappingInterceptor implements Interceptor {
         if (response.isSuccessful()) {
             return response;
         } else {
-            final String bodyContent = response.body().string();
+            final ResponseBody body = response.body();
+            if (body != null) {
+                final Reader bodyReader = body.charStream();
 
-            try {
-                final JsonNode responseBody = this.mapper.readTree(bodyContent);
-                throw new GenieClientException(
-                    response.code(),
-                    response.message() + " : " + responseBody.get("message")
-                );
-            } catch (final JsonProcessingException jpe) {
-                throw new GenieClientException(response.code(), response.message() + bodyContent);
+                if (bodyReader != null) {
+                    try {
+                        final JsonNode responseBody = this.mapper.readTree(bodyReader);
+                        throw new GenieClientException(
+                            response.code(),
+                            response.message() + " : " + responseBody.get(ERROR_MESSAGE_KEY).asText()
+                        );
+                    } catch (final JsonProcessingException jpe) {
+                        throw new GenieClientException(response.code(), response.message() + " " + jpe.getMessage());
+                    }
+                }
             }
+
+            throw new GenieClientException(response.code(), "Unable to find response body to parse error message from");
         }
     }
 }
