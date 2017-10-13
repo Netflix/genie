@@ -36,6 +36,7 @@ import java.io.Reader;
  */
 public class ResponseMappingInterceptor implements Interceptor {
 
+    private static final String EMPTY_STRING = "";
     private static final String ERROR_MESSAGE_KEY = "message";
     private final ObjectMapper mapper;
 
@@ -63,9 +64,13 @@ public class ResponseMappingInterceptor implements Interceptor {
                 if (bodyReader != null) {
                     try {
                         final JsonNode responseBody = this.mapper.readTree(bodyReader);
+                        final String errorMessage =
+                            responseBody == null || !responseBody.has(ERROR_MESSAGE_KEY)
+                                ? EMPTY_STRING
+                                : responseBody.get(ERROR_MESSAGE_KEY).asText();
                         throw new GenieClientException(
                             response.code(),
-                            response.message() + " : " + responseBody.get(ERROR_MESSAGE_KEY).asText()
+                            response.message() + " : " + errorMessage
                         );
                     } catch (final JsonProcessingException jpe) {
                         throw new GenieClientException(response.code(), response.message() + " " + jpe.getMessage());
