@@ -17,19 +17,22 @@
  */
 package com.netflix.genie.client.interceptors;
 
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.core.Options;
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.netflix.genie.client.exceptions.GenieClientException;
 import com.netflix.genie.test.categories.UnitTest;
-import okhttp3.Interceptor;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import okhttp3.ResponseBody;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.mockito.Mockito;
+import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -40,14 +43,18 @@ import java.util.UUID;
  * @author tgianos
  * @since 3.0.0
  */
-// OkHTTP has final classes for Request and Response making it darn near impossible to mock...thanks
-@Ignore
 @Category(UnitTest.class)
 public class ResponseMappingInterceptorUnitTests {
 
-    private ResponseMappingInterceptor interceptor;
-    private Interceptor.Chain chain;
-    private Request request;
+    /**
+     * Create a mock server.
+     */
+    @Rule
+    @SuppressFBWarnings("URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD")
+    public WireMockRule wireMock = new WireMockRule(Options.DYNAMIC_PORT);
+
+    private OkHttpClient client;
+    private String uri;
 
     /**
      * Setup for the tests.
@@ -56,9 +63,12 @@ public class ResponseMappingInterceptorUnitTests {
      */
     @Before
     public void setup() throws IOException {
-        this.request = new Request.Builder().url("http://localhost:8080/api/v3/jobs").build();
-        this.interceptor = new ResponseMappingInterceptor();
-        this.chain = Mockito.mock(Interceptor.Chain.class);
+        final int port = this.wireMock.port();
+        this.uri = "http://localhost:" + port + "/api/v3/jobs";
+
+        final OkHttpClient.Builder builder = new OkHttpClient.Builder();
+        builder.addInterceptor(new ResponseMappingInterceptor());
+        this.client = builder.build();
     }
 
     /**
@@ -68,9 +78,19 @@ public class ResponseMappingInterceptorUnitTests {
      */
     @Test
     public void canInterceptSuccess() throws IOException {
-        final Response response = new Response.Builder().code(200).build();
-        Mockito.when(this.chain.proceed(this.request)).thenReturn(response);
-        Assert.assertThat(this.interceptor.intercept(this.chain), Matchers.is(response));
+        WireMock
+            .stubFor(
+                WireMock
+                    .get(WireMock.urlMatching("/api/.*"))
+                    .willReturn(
+                        WireMock
+                            .aResponse()
+                            .withStatus(HttpStatus.OK.value())
+                    )
+            );
+        final Request request = new Request.Builder().url(this.uri).get().build();
+        final Response response = this.client.newCall(request).execute();
+        Assert.assertThat(response.code(), Matchers.is(HttpStatus.OK.value()));
     }
 
     /**
@@ -80,21 +100,52 @@ public class ResponseMappingInterceptorUnitTests {
      */
     @Test
     public void canInterceptFailure() throws IOException {
-        final String message = UUID.randomUUID().toString();
-        final String bodyString = "{\"message\":\"" + message + "\"}";
-        final ResponseBody body = Mockito.mock(ResponseBody.class);
-        Mockito.when(body.string()).thenReturn(bodyString);
-        final int errorCode = 503;
-        final String errorMessage = UUID.randomUUID().toString();
-        final Response response = new Response.Builder().code(errorCode).message(errorMessage).body(body).build();
+        WireMock
+            .stubFor(
+                WireMock
+                    .get(WireMock.urlMatching("/api/.*"))
+                    .willReturn(
+                        WireMock
+                            .aResponse()
+                            .withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .withBody((String) null)
+                    )
+            );
 
-        Mockito.when(this.chain.proceed(this.request)).thenReturn(response);
         try {
-            this.interceptor.intercept(this.chain);
+            final Request request = new Request.Builder().url(this.uri).get().build();
+            this.client.newCall(request).execute();
             Assert.fail();
         } catch (final GenieClientException gce) {
-            Assert.assertThat(gce.getErrorCode(), Matchers.is(errorCode));
-            Assert.assertThat(gce.getMessage(), Matchers.is(errorMessage + " : " + message));
+            Assert.assertThat(gce.getErrorCode(), Matchers.is(HttpStatus.INTERNAL_SERVER_ERROR.value()));
+        }
+
+        final String message = UUID.randomUUID().toString();
+        final String bodyString = "{\"message\":\"" + message + "\"}";
+        final String errorMessage = UUID.randomUUID().toString();
+        WireMock
+            .stubFor(
+                WireMock
+                    .get(WireMock.urlMatching("/api/.*"))
+                    .willReturn(
+                        WireMock
+                            .aResponse()
+                            .withStatusMessage(errorMessage)
+                            .withStatus(HttpStatus.SERVICE_UNAVAILABLE.value())
+                            .withBody(bodyString)
+                    )
+            );
+
+        try {
+            final Request request = new Request.Builder().url(this.uri).get().build();
+            this.client.newCall(request).execute();
+            Assert.fail();
+        } catch (final GenieClientException gce) {
+            Assert.assertThat(gce.getErrorCode(), Matchers.is(HttpStatus.SERVICE_UNAVAILABLE.value()));
+            Assert.assertThat(
+                gce.getMessage(),
+                Matchers.is(HttpStatus.SERVICE_UNAVAILABLE.value() + ": " + errorMessage + " : " + message)
+            );
         }
     }
 }
