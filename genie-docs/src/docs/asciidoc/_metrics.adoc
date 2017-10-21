@@ -410,6 +410,30 @@ and system metrics and statistics.
 |DiskCleanupTask
 |-
 
+|genie.health.endpoint.timer
+|Time taken for the Health endpoint to collect and aggregate state from health indicators
+|nanoseconds
+|HealthCheckMetricsAspect
+|status, exceptionClass
+
+|genie.health.indicator.timer
+|Time taken for each health indicator to report its status
+|nanoseconds
+|HealthCheckMetricsAspect
+|status, exceptionClass, healthIndicatorClass
+
+|genie.health.indicator.counter
+|Counter for of calls each health indicator tagged by reported status
+|count
+|HealthCheckMetricsAspect
+|status, exceptionClass, healthIndicatorName
+
+|genie.health.failure.counter
+|Counter for calls each health indicator that reports status other than UP
+|count
+|HealthCheckMetricsAspect
+|status, exceptionClass, healthIndicatorName
+
 |===
 
 (*) Source may add additional tags on a case-by-case basis
