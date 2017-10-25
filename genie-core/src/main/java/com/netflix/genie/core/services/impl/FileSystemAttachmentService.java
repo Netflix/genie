@@ -115,7 +115,8 @@ public class FileSystemAttachmentService implements AttachmentService {
             this.attachmentDirectory = dir;
         } catch (IOException | URISyntaxException e) {
             throw new IllegalArgumentException(
-                    "Failed to create attachments directory " + attachmentsDirectoryPath
+                "Failed to create attachments directory " + attachmentsDirectoryPath,
+                e
             );
         }
     }
