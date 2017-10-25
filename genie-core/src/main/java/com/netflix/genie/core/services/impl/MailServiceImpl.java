@@ -71,7 +71,7 @@ public class MailServiceImpl implements MailService {
         try {
             this.javaMailSender.send(simpleMailMessage);
         } catch (final MailException me) {
-            throw new GenieServerException("Failure to send email: " + me);
+            throw new GenieServerException("Failure to send email", me);
         }
     }
 }

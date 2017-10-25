@@ -131,7 +131,7 @@ public class JobCompletionService {
         try {
             this.baseWorkingDir = genieWorkingDir.getFile();
         } catch (IOException gse) {
-            throw new GenieServerException("Could not load the base path from resource");
+            throw new GenieServerException("Could not load the base path from resource", gse);
         }
 
         // Set up the metrics
