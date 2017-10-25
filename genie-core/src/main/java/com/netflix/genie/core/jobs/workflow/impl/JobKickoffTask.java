@@ -117,7 +117,7 @@ public class JobKickoffTask extends GenieBaseTask {
                 writer.flush();
                 writer.close();
             } catch (IOException e) {
-                throw new GenieServerException("Failed to execute job with exception." + e);
+                throw new GenieServerException("Failed to execute job", e);
             }
             // Create user, if enabled
             if (isUserCreationEnabled) {
@@ -209,7 +209,7 @@ public class JobKickoffTask extends GenieBaseTask {
         try {
             this.executor.execute(commandLIne);
         } catch (IOException ioe) {
-            throw new GenieServerException("Could not make the job working logs directory group writable.");
+            throw new GenieServerException("Could not make the job working logs directory group writable.", ioe);
         }
     }
 
@@ -260,7 +260,7 @@ public class JobKickoffTask extends GenieBaseTask {
                 log.debug("Running command to create user: [{}]", userCreateCommandLine);
                 this.executor.execute(userCreateCommandLine);
             } catch (IOException ioexception) {
-                throw new GenieServerException("Could not create user " + user + " with exception " + ioexception);
+                throw new GenieServerException("Could not create user " + user, ioexception);
             }
         }
     }
@@ -282,7 +282,7 @@ public class JobKickoffTask extends GenieBaseTask {
         try {
             this.executor.execute(commandLine);
         } catch (IOException ioexception) {
-            throw new GenieServerException("Could not change ownership with exception " + ioexception);
+            throw new GenieServerException("Could not change ownership", ioexception);
         }
     }
 

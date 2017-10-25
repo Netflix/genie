@@ -88,7 +88,7 @@ public class GenieFileTransferService {
             final URI uri = new URI(path);
             result = fileTransferFactory.get(BEAN_NAME_FILE_SYSTEM_PREFIX + uri.getScheme());
         } catch (URISyntaxException ignored) {
-            throw new GenieNotFoundException("Invalid file path: " + path);
+            throw new GenieNotFoundException("Invalid file path: " + path, ignored);
         }
         if (result == null) {
             throw new GenieNotFoundException("Failed getting the appropriate FileTransfer implementation to get file: "
