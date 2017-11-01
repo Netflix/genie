@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 3.3.0-SNAPSHOT,</span>
-<span id="revdate">2017-10-31</span>
+<span id="revdate">2017-11-01</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -5601,6 +5601,34 @@ and system metrics and statistics.</p>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>DiskCleanupTask</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
 </tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.health.endpoint.timer</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken for the Health endpoint to collect and aggregate state from health indicators</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>HealthCheckMetricsAspect</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.health.indicator.timer</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken for each health indicator to report its status</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>HealthCheckMetricsAspect</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass, healthIndicatorClass</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.health.indicator.counter</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Counter for of calls each health indicator tagged by reported status</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>HealthCheckMetricsAspect</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass, healthIndicatorName</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.health.failure.counter</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Counter for calls each health indicator that reports status other than UP</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>HealthCheckMetricsAspect</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass, healthIndicatorName</code></p></td>
+</tr>
 </tbody>
 </table>
 <div class="paragraph">
@@ -5612,7 +5640,7 @@ and system metrics and statistics.</p>
 <div id="footer">
 <div id="footer-text">
 Version 3.3.0-SNAPSHOT<br>
-Last updated 2017-10-31 16:38:29 +00:00
+Last updated 2017-11-01 18:05:54 +00:00
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
