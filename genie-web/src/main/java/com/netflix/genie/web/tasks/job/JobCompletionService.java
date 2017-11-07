@@ -543,6 +543,7 @@ public class JobCompletionService {
                     try {
                         this.executor.execute(commandLine);
                     } catch (Throwable t) {
+                        log.warn("Failed to created archive of job files", t);
                         incrementErrorCounter("JOB_ARCHIVAL_FAILURE", t);
                         throw t;
                     }
