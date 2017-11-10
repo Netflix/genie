@@ -1,6 +1,6 @@
 ##
 #
-#  Copyright 2015 Netflix, Inc.
+#  Copyright 2017 Netflix, Inc.
 #
 #     Licensed under the Apache License, Version 2.0 (the "License");
 #     you may not use this file except in compliance with the License.
@@ -16,21 +16,8 @@
 #
 ##
 
-genie:
-  data:
-    service:
-      retry:
-        noOfRetries: 2
-        initialInterval: 10
-        maxInterval: 10
-  health:
-    maxCpuLoadPercent: 100
-  jobs:
-    clusters:
-      loadBalancers:
-        script:
-          enabled: true
-    dir:
-      location: "file:///tmp/"
-    archive:
-      location: /archive/location
+spring:
+  datasource:
+    url: jdbc:hsqldb:mem:genie-int-db;shutdown=true
+    username: SA
+    password:

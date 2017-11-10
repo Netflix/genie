@@ -1,9 +1,14 @@
 #!/bin/bash
 # This script will build the project.
 
+# Stop at the first error
+set -e
+
 if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
   echo -e "Build Pull Request #$TRAVIS_PULL_REQUEST => Branch [$TRAVIS_BRANCH]"
   ./gradlew build asciidoc coveralls dockerBuildAllImages
+  # Re-run genie-web integration tests with MySQL...
+  INTEGRATION_TEST_DB=mysql ./gradlew genie-web:integrationTests
 elif [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "develop" ]; then
   echo -e 'Build Develop without publishing artifacts'
   ./gradlew build
