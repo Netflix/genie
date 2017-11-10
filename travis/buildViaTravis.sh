@@ -9,6 +9,8 @@ if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
   ./gradlew build asciidoc coveralls dockerBuildAllImages
   # Re-run genie-web integration tests with MySQL...
   INTEGRATION_TEST_DB=mysql ./gradlew genie-web:integrationTests
+  # ... and PostgreSQL
+  INTEGRATION_TEST_DB=postgresql ./gradlew genie-web:integrationTests
 elif [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "develop" ]; then
   echo -e 'Build Develop without publishing artifacts'
   ./gradlew build
