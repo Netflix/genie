@@ -211,9 +211,14 @@ configure(javaProjects) {
             minHeapSize = "256m"
             maxHeapSize = "2g"
 
-            // If the project is running on a CI server
-            if (System.getenv("CI") != null) {
-                systemProperty "CI", System.getenv("CI")
+            // Environment properties to be forwarded to the test runtime
+            [
+                "CI",
+                "INTEGRATION_TEST_DB",
+            ].each { envVariableName ->
+                if (System.getenv(envVariableName) != null) {
+                    systemProperty envVariableName, System.getenv(envVariableName)
+                }
             }
 
             reports.html.destination = file("${reporting.baseDir}/test/${task.name}")
