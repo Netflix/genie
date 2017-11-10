@@ -169,6 +169,9 @@ configure(javaProjects) {
             excludeCategories "com.netflix.genie.test.categories.IntegrationTest"
             excludeCategories "com.netflix.genie.test.categories.DocumentationTest"
         }
+        outputs.upToDateWhen {
+            return false
+        }
     }
 
     task integrationTests(type: Test, group: "verification") {
@@ -177,6 +180,9 @@ configure(javaProjects) {
             excludeCategories "com.netflix.genie.test.categories.UnitTest"
             excludeCategories "com.netflix.genie.test.categories.DocumentationTest"
         }
+        outputs.upToDateWhen {
+            return false
+        }
     }
 
     task documentationTests(type: Test, group: "verification") {
@@ -184,6 +190,9 @@ configure(javaProjects) {
             includeCategories "com.netflix.genie.test.categories.DocumentationTest"
             excludeCategories "com.netflix.genie.test.categories.UnitTest"
             excludeCategories "com.netflix.genie.test.categories.IntegrationTest"
+        }
+        outputs.upToDateWhen {
+            return false
         }
     }
 
