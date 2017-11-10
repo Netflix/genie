@@ -1,6 +1,6 @@
 ##
 #
-#  Copyright 2015 Netflix, Inc.
+#  Copyright 2017 Netflix, Inc.
 #
 #     Licensed under the Apache License, Version 2.0 (the "License");
 #     you may not use this file except in compliance with the License.
@@ -16,21 +16,16 @@
 #
 ##
 
-genie:
-  data:
-    service:
-      retry:
-        noOfRetries: 2
-        initialInterval: 10
-        maxInterval: 10
-  health:
-    maxCpuLoadPercent: 100
-  jobs:
-    clusters:
-      loadBalancers:
-        script:
-          enabled: true
-    dir:
-      location: "file:///tmp/"
-    archive:
-      location: /archive/location
+spring:
+  datasource:
+    tomcat:
+      min-idle: 5
+      max-idle: 20
+      max-active: 40
+      test-on-borrow: true
+      test-on-connect: true
+      test-on-return: true
+      test-while-idle: true
+      min-evictable-idle-time-millis: 60000
+      time-between-eviction-runs-millis: 10000
+      jdbc-interceptors: org.apache.tomcat.jdbc.pool.interceptor.QueryTimeoutInterceptor
