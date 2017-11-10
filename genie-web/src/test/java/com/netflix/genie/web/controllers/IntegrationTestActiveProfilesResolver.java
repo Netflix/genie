@@ -32,9 +32,11 @@ public class IntegrationTestActiveProfilesResolver implements ActiveProfilesReso
 
     private static final String DB_SELECTOR_ENV_VARIABLE_NAME = "INTEGRATION_TEST_DB";
     private static final String MYSQL = "mysql";
+    private static final String POSTGRESQL = "postgresql";
     private static final String HSQL_MEM = "hsql-mem";
     private final Set<String> knownDatabaseProfiles = Sets.newHashSet(
         MYSQL,
+        POSTGRESQL,
         HSQL_MEM
     );
 

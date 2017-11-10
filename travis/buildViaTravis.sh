@@ -9,6 +9,8 @@ if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
   ./gradlew build asciidoc coveralls dockerBuildAllImages
   # Re-run genie-web integration tests with MySQL...
   INTEGRATION_TEST_DB=mysql ./gradlew genie-web:integrationTests
+  # ... and PostgreSQL
+  INTEGRATION_TEST_DB=postgresql ./gradlew genie-web:integrationTests
 elif [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_TAG" == "" ]; then
   echo -e 'Build Branch with Snapshot => Branch ['$TRAVIS_BRANCH']'
   ./gradlew -Prelease.travisci=true -PbintrayUser="${bintrayUser}" -PbintrayKey="${bintrayKey}" -PsonatypeUsername="${sonatypeUsername}" -PsonatypePassword="${sonatypePassword}" snapshot coveralls publishGhPages dockerPush
