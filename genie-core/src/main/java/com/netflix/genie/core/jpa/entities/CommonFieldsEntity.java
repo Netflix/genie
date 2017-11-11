@@ -21,6 +21,7 @@ import com.google.common.collect.Sets;
 import com.netflix.genie.common.exceptions.GenieException;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.Basic;
@@ -77,6 +78,7 @@ public class CommonFieldsEntity extends BaseEntity {
 
     @Lob
     @Basic(fetch = FetchType.LAZY)
+    @Type(type = "org.hibernate.type.TextType")
     @Column(name = "description")
     private String description;
 
