@@ -25,6 +25,7 @@ import com.netflix.genie.common.util.JsonUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.Basic;
@@ -72,22 +73,26 @@ public class JobRequestEntity extends SetupFileEntity {
 
     @Lob
     @Basic(optional = false)
+    @Type(type = "org.hibernate.type.TextType")
     @Column(name = "cluster_criterias", nullable = false)
     @Size(min = 1, message = "Cluster criterias cannot be empty")
     private String clusterCriterias = EMPTY_JSON_ARRAY;
 
     @Lob
     @Basic(optional = false)
+    @Type(type = "org.hibernate.type.TextType")
     @Column(name = "command_criteria", nullable = false)
     @Size(min = 1, message = "Command criteria cannot be empty")
     private String commandCriteria = EMPTY_JSON_ARRAY;
 
     @Lob
+    @Type(type = "org.hibernate.type.TextType")
     @Basic(optional = false)
     @Column(name = "dependencies", nullable = false)
     private String dependencies = EMPTY_JSON_ARRAY;
 
     @Lob
+    @Type(type = "org.hibernate.type.TextType")
     @Basic(optional = false)
     @Column(name = "configs", nullable = false)
     private String configs = EMPTY_JSON_ARRAY;
