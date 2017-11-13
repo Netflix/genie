@@ -70,7 +70,7 @@ CREATE TABLE applications (
     setup_file character varying(1024) DEFAULT NULL::character varying,
     status character varying(20) DEFAULT 'INACTIVE'::character varying NOT NULL,
     entity_version integer DEFAULT 0 NOT NULL,
-    description text DEFAULT NULL,
+    description text,
     tags character varying(10000) DEFAULT NULL::character varying,
     type character varying(255) DEFAULT NULL::character varying
 );
@@ -109,7 +109,7 @@ CREATE TABLE clusters (
     version character varying(255) NOT NULL,
     status character varying(20) DEFAULT 'OUT_OF_SERVICE'::character varying NOT NULL,
     entity_version integer DEFAULT 0 NOT NULL,
-    description text DEFAULT NULL,
+    description text,
     tags character varying(10000) DEFAULT NULL::character varying,
     setup_file character varying(1024) DEFAULT NULL::character varying
 );
@@ -161,7 +161,7 @@ CREATE TABLE commands (
     executable character varying(255) NOT NULL,
     status character varying(20) DEFAULT 'INACTIVE'::character varying NOT NULL,
     entity_version integer DEFAULT 0 NOT NULL,
-    description text DEFAULT NULL,
+    description text,
     tags character varying(10000) DEFAULT NULL::character varying,
     check_delay bigint DEFAULT 10000 NOT NULL,
     memory integer
@@ -226,7 +226,7 @@ CREATE TABLE job_requests (
     name character varying(255) NOT NULL,
     genie_user character varying(255) NOT NULL,
     version character varying(255) NOT NULL,
-    description text DEFAULT NULL,
+    description text,
     entity_version integer DEFAULT 0 NOT NULL,
     command_args character varying(10000) NOT NULL,
     group_name character varying(255) DEFAULT NULL::character varying,
@@ -234,14 +234,14 @@ CREATE TABLE job_requests (
     cluster_criterias text DEFAULT ''::character varying NOT NULL,
     command_criteria text DEFAULT ''::character varying NOT NULL,
     dependencies text DEFAULT ''::character varying NOT NULL,
-    configs text DEFAULT ''::character varying NOT NULL,
     disable_log_archival boolean DEFAULT false NOT NULL,
     email character varying(255) DEFAULT NULL::character varying,
     tags character varying(10000) DEFAULT NULL::character varying,
     cpu integer,
     memory integer,
     applications character varying(2048) DEFAULT '[]'::character varying NOT NULL,
-    timeout integer
+    timeout integer,
+    configs text DEFAULT ''::character varying NOT NULL
 );
 
 
@@ -260,7 +260,7 @@ CREATE TABLE jobs (
     command_args character varying(10000) NOT NULL,
     command_id character varying(255) DEFAULT NULL::character varying,
     command_name character varying(255) DEFAULT NULL::character varying,
-    description text DEFAULT NULL,
+    description text,
     cluster_id character varying(255) DEFAULT NULL::character varying,
     cluster_name character varying(255) DEFAULT NULL::character varying,
     finished timestamp(3) without time zone DEFAULT NULL::timestamp without time zone,
