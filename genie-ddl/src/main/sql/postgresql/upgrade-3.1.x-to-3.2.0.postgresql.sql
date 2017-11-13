@@ -7,7 +7,8 @@ SELECT
   'Altering application_configs';
 
 ALTER TABLE application_configs
-  ADD CONSTRAINT application_config_pkey PRIMARY KEY (application_id, config);
+  DROP CONSTRAINT IF EXISTS application_configs_pkey,
+  ADD CONSTRAINT application_configs_pkey PRIMARY KEY (application_id, config);
 
 CREATE INDEX application_configs_application_id_index
   ON application_configs USING BTREE (application_id);
@@ -21,7 +22,8 @@ SELECT
   'Altering application_dependencies';
 
 ALTER TABLE application_dependencies
-  ADD CONSTRAINT application_dependency_pkey PRIMARY KEY (application_id, dependency);
+  DROP CONSTRAINT IF EXISTS application_dependencies_pkey,
+  ADD CONSTRAINT application_dependencies_pkey PRIMARY KEY (application_id, dependency);
 
 CREATE INDEX application_dependencies_application_id_index
   ON application_dependencies USING BTREE (application_id);
@@ -35,7 +37,8 @@ SELECT
   'Altering cluster_configs';
 
 ALTER TABLE cluster_configs
-  ADD CONSTRAINT cluster_config_pkey PRIMARY KEY (cluster_id, config);
+  DROP CONSTRAINT IF EXISTS cluster_configs_pkey,
+  ADD CONSTRAINT cluster_configs_pkey PRIMARY KEY (cluster_id, config);
 
 CREATE INDEX cluster_configs_cluster_id_index
   ON cluster_configs USING BTREE (cluster_id);
@@ -63,7 +66,8 @@ SELECT
   'Altering clusters_commands';
 
 ALTER TABLE clusters_commands
-  ADD CONSTRAINT cluster_command_pkey PRIMARY KEY (cluster_id, command_id, command_order);
+  DROP CONSTRAINT IF EXISTS clusters_commands_pkey,
+  ADD CONSTRAINT clusters_commands_pkey PRIMARY KEY (cluster_id, command_id, command_order);
 
 CREATE INDEX clusters_commands_cluster_id_index
   ON clusters_commands USING BTREE (cluster_id);
@@ -80,7 +84,8 @@ SELECT
   'Altering command_configs';
 
 ALTER TABLE command_configs
-  ADD CONSTRAINT command_config_pkey PRIMARY KEY (command_id, config);
+  DROP CONSTRAINT IF EXISTS command_configs_pkey,
+  ADD CONSTRAINT command_configs_pkey PRIMARY KEY (command_id, config);
 
 CREATE INDEX command_configs_command_id_index
   ON command_configs USING BTREE (command_id);
@@ -108,7 +113,8 @@ SELECT
   'Altering commands_applications';
 
 ALTER TABLE commands_applications
-  ADD CONSTRAINT command_application_pkey PRIMARY KEY (command_id, application_id, application_order);
+  DROP CONSTRAINT IF EXISTS commands_applications_pkey,
+  ADD CONSTRAINT commands_applications_pkey PRIMARY KEY (command_id, application_id, application_order);
 
 CREATE INDEX commands_applications_command_id_index
   ON commands_applications USING BTREE (command_id);
@@ -125,9 +131,10 @@ SELECT
   'Altering job_executions';
 
 ALTER TABLE job_executions
-  ADD CONSTRAINT job_execution_pkey PRIMARY KEY (id);
+  DROP CONSTRAINT IF EXISTS job_executions_pkey,
+  ADD CONSTRAINT job_executions_pkey PRIMARY KEY (id);
 
-DROP INDEX job_executions_exit_code_index;
+DROP INDEX IF EXISTS job_executions_exit_code_index;
 
 SELECT
   CURRENT_TIMESTAMP,
@@ -138,6 +145,7 @@ SELECT
   'Altering job_metadata';
 
 ALTER TABLE job_metadata
+  DROP CONSTRAINT IF EXISTS job_metadata_pkey,
   ADD CONSTRAINT job_metadata_pkey PRIMARY KEY (id);
 
 SELECT
@@ -163,7 +171,8 @@ SELECT
   'Altering jobs_applications';
 
 ALTER TABLE jobs_applications
-  ADD CONSTRAINT job_application_pkey PRIMARY KEY (job_id, application_id, application_order);
+  DROP CONSTRAINT IF EXISTS jobs_applications_pkey,
+  ADD CONSTRAINT jobs_applications_pkey PRIMARY KEY (job_id, application_id, application_order);
 
 CREATE INDEX jobs_applications_job_id_index
   ON jobs_applications USING BTREE (job_id);
