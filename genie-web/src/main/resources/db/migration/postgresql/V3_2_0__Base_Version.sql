@@ -248,14 +248,14 @@ CREATE TABLE job_requests (
     cluster_criterias text DEFAULT ''::character varying NOT NULL,
     command_criteria text DEFAULT ''::character varying NOT NULL,
     dependencies text DEFAULT ''::character varying NOT NULL,
-    configs text DEFAULT ''::character varying NOT NULL,
     disable_log_archival boolean DEFAULT false NOT NULL,
     email character varying(255) DEFAULT NULL::character varying,
     tags character varying(10000) DEFAULT NULL::character varying,
     cpu integer,
     memory integer,
     applications character varying(2048) DEFAULT '[]'::character varying NOT NULL,
-    timeout integer
+    timeout integer,
+    configs text DEFAULT ''::character varying NOT NULL
 );
 
 
@@ -298,19 +298,19 @@ CREATE TABLE jobs_applications (
 
 
 --
--- Name: application_configs application_config_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: application_configs application_configs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY application_configs
-    ADD CONSTRAINT application_config_pkey PRIMARY KEY (application_id, config);
+    ADD CONSTRAINT application_configs_pkey PRIMARY KEY (application_id, config);
 
 
 --
--- Name: application_dependencies application_dependency_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: application_dependencies application_dependencies_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY application_dependencies
-    ADD CONSTRAINT application_dependency_pkey PRIMARY KEY (application_id, dependency);
+    ADD CONSTRAINT application_dependencies_pkey PRIMARY KEY (application_id, dependency);
 
 
 --
@@ -322,19 +322,11 @@ ALTER TABLE ONLY applications
 
 
 --
--- Name: clusters_commands cluster_command_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY clusters_commands
-    ADD CONSTRAINT cluster_command_pkey PRIMARY KEY (cluster_id, command_id, command_order);
-
-
---
--- Name: cluster_configs cluster_config_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: cluster_configs cluster_configs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY cluster_configs
-    ADD CONSTRAINT cluster_config_pkey PRIMARY KEY (cluster_id, config);
+    ADD CONSTRAINT cluster_configs_pkey PRIMARY KEY (cluster_id, config);
 
 
 --
@@ -354,19 +346,19 @@ ALTER TABLE ONLY clusters
 
 
 --
--- Name: commands_applications command_application_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: clusters_commands clusters_commands_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY commands_applications
-    ADD CONSTRAINT command_application_pkey PRIMARY KEY (command_id, application_id, application_order);
+ALTER TABLE ONLY clusters_commands
+    ADD CONSTRAINT clusters_commands_pkey PRIMARY KEY (cluster_id, command_id, command_order);
 
 
 --
--- Name: command_configs command_config_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: command_configs command_configs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY command_configs
-    ADD CONSTRAINT command_config_pkey PRIMARY KEY (command_id, config);
+    ADD CONSTRAINT command_configs_pkey PRIMARY KEY (command_id, config);
 
 
 --
@@ -386,19 +378,19 @@ ALTER TABLE ONLY commands
 
 
 --
--- Name: jobs_applications job_application_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: commands_applications commands_applications_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY jobs_applications
-    ADD CONSTRAINT job_application_pkey PRIMARY KEY (job_id, application_id, application_order);
+ALTER TABLE ONLY commands_applications
+    ADD CONSTRAINT commands_applications_pkey PRIMARY KEY (command_id, application_id, application_order);
 
 
 --
--- Name: job_executions job_execution_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: job_executions job_executions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY job_executions
-    ADD CONSTRAINT job_execution_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT job_executions_pkey PRIMARY KEY (id);
 
 
 --
@@ -423,6 +415,14 @@ ALTER TABLE ONLY jobs
 
 ALTER TABLE ONLY job_requests
     ADD CONSTRAINT job_requests_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: jobs_applications jobs_applications_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY jobs_applications
+    ADD CONSTRAINT jobs_applications_pkey PRIMARY KEY (job_id, application_id, application_order);
 
 
 --
