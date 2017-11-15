@@ -16,19 +16,28 @@
 -->
 <dataset>
     <clusters/>
-    <cluster_configs/>
-    <cluster_dependencies/>
     <commands/>
-    <command_configs/>
-    <command_dependencies/>
-    <clusters_commands/>
     <applications/>
-    <application_configs/>
-    <application_dependencies/>
-    <commands_applications/>
-    <job_requests/>
-    <job_metadata/>
     <jobs/>
-    <job_executions/>
+    <cluster_criterias/>
+    <files/>
+    <tags/>
+    <clusters_configs/>
+    <clusters_dependencies/>
+    <clusters_tags/>
+    <commands_configs/>
+    <commands_dependencies/>
+    <commands_tags/>
+    <clusters_commands/>
+    <applications_configs/>
+    <applications_dependencies/>
+    <applications_tags/>
+    <commands_applications/>
     <jobs_applications/>
+    <job_applications_requested/>
+    <jobs_configs/>
+    <job_command_criteria_tags/>
+    <jobs_dependencies/>
+    <jobs_tags/>
+    <cluster_criterias_tags/>
 </dataset>

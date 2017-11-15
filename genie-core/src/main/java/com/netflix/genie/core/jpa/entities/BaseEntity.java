@@ -17,13 +17,15 @@
  */
 package com.netflix.genie.core.jpa.entities;
 
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.hibernate.validator.constraints.Length;
+import com.netflix.genie.core.jpa.entities.projections.BaseProjection;
+import com.netflix.genie.core.jpa.entities.projections.IdProjection;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.ToString;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.PrePersist;
@@ -33,36 +35,41 @@ import javax.persistence.TemporalType;
 import javax.persistence.Version;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.UUID;
 
 /**
  * Abstract class to support basic columns for all entities for genie.
  *
  * @author tgianos
  */
+@Getter
+@ToString
 @MappedSuperclass
-@Slf4j
-public class BaseEntity implements Serializable {
+public class BaseEntity implements Serializable, IdProjection, BaseProjection {
 
     private static final long serialVersionUID = 7526472297322776147L;
 
     @Id
-    @Column(name = "id", updatable = false)
-    @Length(max = 255, message = "Max length of id in database is 255 characters")
-    private String id;
+    @GeneratedValue
+    @Column(name = "id", nullable = false, updatable = false)
+    private long id;
 
     @Basic(optional = false)
     @Column(name = "created", nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
+    // TODO: Test out this instead of all the pre-persist stuff
+//    @CreatedDate
     private Date created = new Date();
 
     @Basic(optional = false)
     @Column(name = "updated", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
+    // TODO: Test out this instead of all the pre-persist stuff
+//    @LastModifiedDate
     private Date updated = new Date();
 
     @Version
     @Column(name = "entity_version", nullable = false)
+    @Getter(AccessLevel.NONE)
     private Integer entityVersion;
 
     /**
@@ -73,11 +80,6 @@ public class BaseEntity implements Serializable {
         final Date date = new Date();
         this.updated = date;
         this.created = date;
-
-        //Make sure we have an id if one wasn't entered beforehand
-        if (this.id == null) {
-            this.id = UUID.randomUUID().toString();
-        }
     }
 
     /**
@@ -86,29 +88,6 @@ public class BaseEntity implements Serializable {
     @PreUpdate
     protected void onUpdateBaseEntity() {
         this.updated = new Date();
-    }
-
-    /**
-     * Get the id.
-     *
-     * @return The id
-     */
-    public String getId() {
-        return this.id;
-    }
-
-    /**
-     * Set the id.
-     *
-     * @param id The id to set. Not null/empty/blank.
-     * @throws GeniePreconditionException When precondition isn't met.
-     */
-    public void setId(final String id) throws GeniePreconditionException {
-        if (StringUtils.isBlank(this.id)) {
-            this.id = id;
-        } else {
-            throw new GeniePreconditionException("Id already set for this entity.");
-        }
     }
 
     /**
@@ -121,50 +100,11 @@ public class BaseEntity implements Serializable {
     }
 
     /**
-     * Set the created timestamp. This is a No-Op. Set once by system.
-     *
-     * @param created The created timestamp
-     */
-    public void setCreated(final Date created) {
-        log.debug("Tried to set created to {} for entity {}. Will not be persisted.", created, this.id);
-        if (created.before(this.created)) {
-            this.created = new Date(created.getTime());
-        }
-    }
-
-    /**
      * Get the time this entity was updated.
      *
      * @return The updated timestamp
      */
     public Date getUpdated() {
         return new Date(this.updated.getTime());
-    }
-
-    /**
-     * Set the time this entity was updated. This is a No-Op. Updated automatically by system.
-     *
-     * @param updated The updated timestamp
-     */
-    public void setUpdated(final Date updated) {
-        this.updated = new Date(updated.getTime());
-    }
-
-    /**
-     * Get the version of this entity.
-     *
-     * @return The entityVersion of this entity as handled by JPA
-     */
-    public Integer getEntityVersion() {
-        return this.entityVersion;
-    }
-
-    /**
-     * Set the version of this entity. Shouldn't be called. Handled by JPA.
-     *
-     * @param entityVersion The new entityVersion
-     */
-    protected void setEntityVersion(final Integer entityVersion) {
-        this.entityVersion = entityVersion;
     }
 }

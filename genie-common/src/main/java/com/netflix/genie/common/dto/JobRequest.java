@@ -28,7 +28,6 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -53,8 +52,6 @@ public class JobRequest extends ExecutionEnvironmentDTO {
 
     private static final long serialVersionUID = 3163971970144435277L;
 
-    @NotNull
-    @Size(min = 1, max = 10000, message = "Command arguments are required and max at 10000 characters")
     private final String commandArgs;
     @Valid
     @NotEmpty(message = "At least one cluster criteria is required")
@@ -93,6 +90,15 @@ public class JobRequest extends ExecutionEnvironmentDTO {
         this.memory = builder.bMemory;
         this.timeout = builder.bTimeout;
         this.applications = ImmutableList.copyOf(builder.bApplications);
+    }
+
+    /**
+     * Get the arguments to be put on the command line along with the command executable.
+     *
+     * @return The command arguments
+     */
+    public Optional<String> getCommandArgs() {
+        return Optional.of(this.commandArgs);
     }
 
     /**
@@ -170,18 +176,12 @@ public class JobRequest extends ExecutionEnvironmentDTO {
          * @param commandCriteria  The list of command criteria for the Job
          */
         public Builder(
-            @JsonProperty("name")
-            final String name,
-            @JsonProperty("user")
-            final String user,
-            @JsonProperty("version")
-            final String version,
-            @JsonProperty("commandArgs")
-            final String commandArgs,
-            @JsonProperty("clusterCriterias")
-            final List<ClusterCriteria> clusterCriterias,
-            @JsonProperty("commandCriteria")
-            final Set<String> commandCriteria
+            @JsonProperty("name") final String name,
+            @JsonProperty("user") final String user,
+            @JsonProperty("version") final String version,
+            @JsonProperty("commandArgs") final String commandArgs,
+            @JsonProperty("clusterCriterias") final List<ClusterCriteria> clusterCriterias,
+            @JsonProperty("commandCriteria") final Set<String> commandCriteria
         ) {
             super(name, user, version);
             this.bCommandArgs = commandArgs;

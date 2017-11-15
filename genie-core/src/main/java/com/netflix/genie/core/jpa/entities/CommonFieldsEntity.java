@@ -17,24 +17,25 @@
  */
 package com.netflix.genie.core.jpa.entities;
 
-import com.google.common.collect.Sets;
-import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.core.jpa.entities.projections.CommonFieldsProjection;
+import com.netflix.genie.core.jpa.entities.projections.SetupFileProjection;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * The common entity fields for all Genie entities.
@@ -45,18 +46,18 @@ import java.util.stream.Collectors;
  */
 @Getter
 @Setter
+@EqualsAndHashCode(of = "uniqueId", callSuper = false)
+@ToString(callSuper = true)
 @MappedSuperclass
-public class CommonFieldsEntity extends BaseEntity {
-    /**
-     * The delimiter used to separate tags in the database.
-     */
-    public static final String TAG_DELIMITER = "|";
-    protected static final String GENIE_TAG_NAMESPACE = "genie.";
-    protected static final String GENIE_ID_TAG_NAMESPACE = GENIE_TAG_NAMESPACE + "id:";
-    protected static final String GENIE_NAME_TAG_NAMESPACE = GENIE_TAG_NAMESPACE + "name:";
-    protected static final String TAG_DELIMITER_REGEX = "\\" + TAG_DELIMITER + "\\" + TAG_DELIMITER;
+public class CommonFieldsEntity extends BaseEntity implements CommonFieldsProjection, SetupFileProjection {
 
     private static final long serialVersionUID = -5040659007494311180L;
+
+    @Basic(optional = false)
+    @Column(name = "unique_id", nullable = false, unique = true, updatable = false)
+    @NotBlank(message = "A unique identifier is missing and is required.")
+    @Size(max = 255, message = "Max length in database is 255 characters")
+    private String uniqueId = UUID.randomUUID().toString();
 
     @Basic(optional = false)
     @Column(name = "version", nullable = false)
@@ -78,19 +79,18 @@ public class CommonFieldsEntity extends BaseEntity {
 
     @Lob
     @Basic(fetch = FetchType.LAZY)
-    @Type(type = "org.hibernate.type.TextType")
     @Column(name = "description")
+    @Type(type = "org.hibernate.type.TextType")
     private String description;
 
-    @Basic
-    @Column(name = "tags", length = 10000)
-    @Size(max = 10000, message = "Max length in database is 10000 characters")
-    private String tags;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "setup_file")
+    private FileEntity setupFile;
 
     /**
      * Default constructor.
      */
-    public CommonFieldsEntity() {
+    CommonFieldsEntity() {
         super();
     }
 
@@ -104,62 +104,11 @@ public class CommonFieldsEntity extends BaseEntity {
     }
 
     /**
-     * Get the tags attached to this entity.
+     * Get the setup file for this entity.
      *
-     * @return The tags attached to this entity
+     * @return The setup file as an Optional in case it's null
      */
-    public Set<String> getTags() {
-        if (this.tags != null) {
-            return Sets.newHashSet(this.splitTags(this.tags));
-        } else {
-            return Sets.newHashSet();
-        }
-    }
-
-    /**
-     * Set the tags.
-     *
-     * @param tags The tags to set
-     */
-    public void setTags(final Set<String> tags) {
-        this.tags = null;
-        if (tags != null && !tags.isEmpty()) {
-            this.tags = TAG_DELIMITER
-                + tags
-                .stream()
-                .sorted(String.CASE_INSENSITIVE_ORDER)
-                .reduce((one, two) -> one + TAG_DELIMITER + TAG_DELIMITER + two)
-                .orElse("")
-                + TAG_DELIMITER;
-        }
-    }
-
-    /**
-     * Get the tags with the current genie.id and genie.name tags added into the set.
-     *
-     * @return The final set of tags for storing in the database
-     * @throws GenieException On any exception
-     */
-    protected Set<String> getFinalTags() throws GenieException {
-        final Set<String> finalTags;
-        if (this.tags == null) {
-            finalTags = Sets.newHashSet();
-        } else {
-            finalTags = Sets.newHashSet(this.splitTags(this.tags))
-                .stream()
-                .filter(tag -> !tag.contains(GENIE_TAG_NAMESPACE))
-                .collect(Collectors.toSet());
-        }
-        if (this.getId() == null) {
-            this.setId(UUID.randomUUID().toString());
-        }
-        finalTags.add(GENIE_ID_TAG_NAMESPACE + this.getId());
-        finalTags.add(GENIE_NAME_TAG_NAMESPACE + this.getName());
-        return finalTags;
-    }
-
-    @NotNull
-    private String[] splitTags(@NotNull final String tagsToSplit) {
-        return tagsToSplit.substring(1, tagsToSplit.length() - 1).split(TAG_DELIMITER_REGEX);
+    public Optional<FileEntity> getSetupFile() {
+        return Optional.ofNullable(this.setupFile);
     }
 }

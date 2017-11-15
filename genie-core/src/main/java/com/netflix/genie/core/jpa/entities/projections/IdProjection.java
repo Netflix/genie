@@ -30,5 +30,5 @@ public interface IdProjection {
      *
      * @return The id
      */
-    String getId();
+    long getId();
 }

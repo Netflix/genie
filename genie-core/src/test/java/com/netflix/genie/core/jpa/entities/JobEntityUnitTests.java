@@ -19,7 +19,6 @@ package com.netflix.genie.core.jpa.entities;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
@@ -36,6 +35,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Test case for Job Status utility methods.
@@ -69,7 +69,7 @@ public class JobEntityUnitTests extends EntityTestsBase {
     @Test
     public void testDefaultConstructor() {
         final JobEntity localJobEntity = new JobEntity();
-        Assert.assertNull(localJobEntity.getId());
+        Assert.assertNotNull(localJobEntity.getUniqueId());
         Assert.assertEquals(JobEntity.DEFAULT_VERSION, localJobEntity.getVersion());
     }
 
@@ -78,7 +78,7 @@ public class JobEntityUnitTests extends EntityTestsBase {
      */
     @Test
     public void testConstructor() {
-        Assert.assertNull(this.jobEntity.getId());
+        Assert.assertNotNull(this.jobEntity.getUniqueId());
         Assert.assertEquals(NAME, this.jobEntity.getName());
         Assert.assertEquals(USER, this.jobEntity.getUser());
         Assert.assertEquals(VERSION, this.jobEntity.getVersion());
@@ -91,17 +91,19 @@ public class JobEntityUnitTests extends EntityTestsBase {
      * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testOnCreateOrUpdateJob() throws GeniePreconditionException {
-        Assert.assertNull(this.jobEntity.getId());
-        //Simulate the call stack JPA will make on persist
-        this.jobEntity.onCreateBaseEntity();
-        Assert.assertNotNull(this.jobEntity.getId());
-        Assert.assertFalse(this.jobEntity.getTags().contains(
-            CommonFieldsEntity.GENIE_ID_TAG_NAMESPACE + this.jobEntity.getId())
-        );
-        Assert.assertFalse(this.jobEntity.getTags().contains(
-            CommonFieldsEntity.GENIE_NAME_TAG_NAMESPACE + this.jobEntity.getName())
-        );
+    public void testOnCreateJob() throws GeniePreconditionException {
+        Assert.assertNull(this.jobEntity.getTagSearchString());
+        this.jobEntity.onCreateJob();
+        Assert.assertNull(this.jobEntity.getTagSearchString());
+        final TagEntity one = new TagEntity();
+        one.setTag("abc");
+        final TagEntity two = new TagEntity();
+        two.setTag("def");
+        final TagEntity three = new TagEntity();
+        three.setTag("ghi");
+        this.jobEntity.setTags(Sets.newHashSet(three, two, one));
+        this.jobEntity.onCreateJob();
+        Assert.assertEquals("|abc||def||ghi|", this.jobEntity.getTagSearchString());
     }
 
     /**
@@ -133,10 +135,13 @@ public class JobEntityUnitTests extends EntityTestsBase {
      */
     @Test
     public void testSetGetCommandArgs() {
-        Assert.assertNull(this.jobEntity.getCommandArgs());
+        Assert.assertFalse(this.jobEntity.getCommandArgs().isPresent());
         final String commandArgs = UUID.randomUUID().toString();
         this.jobEntity.setCommandArgs(commandArgs);
-        Assert.assertThat(this.jobEntity.getCommandArgs(), Matchers.is(commandArgs));
+        Assert.assertThat(
+            this.jobEntity.getCommandArgs().orElseThrow(IllegalArgumentException::new),
+            Matchers.is(commandArgs)
+        );
     }
 
     /**
@@ -257,7 +262,11 @@ public class JobEntityUnitTests extends EntityTestsBase {
     public void testSetGetTags() {
         Assert.assertNotNull(this.jobEntity.getTags());
         Assert.assertTrue(this.jobEntity.getTags().isEmpty());
-        final Set<String> tags = Sets.newHashSet("someTag", "someOtherTag");
+        final TagEntity one = new TagEntity();
+        one.setTag("someTag");
+        final TagEntity two = new TagEntity();
+        two.setTag("someOtherTag");
+        final Set<TagEntity> tags = Sets.newHashSet(one, two);
         this.jobEntity.setTags(tags);
         Assert.assertEquals(tags, this.jobEntity.getTags());
 
@@ -284,39 +293,6 @@ public class JobEntityUnitTests extends EntityTestsBase {
     }
 
     /**
-     * Test to make sure can successfully set the job tags.
-     */
-    @Test
-    public void canSetJobTags() {
-        final Set<String> tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
-        this.jobEntity.setTags(tags);
-        Assert.assertThat(this.jobEntity.getTags(), Matchers.is(tags));
-
-        this.jobEntity.setTags(null);
-        Assert.assertThat(this.jobEntity.getTags(), Matchers.empty());
-    }
-
-    /**
-     * Test to make sure can successfully set the Job request that launched this job.
-     */
-    @Test
-    public void canSetJobRequest() {
-        final JobRequestEntity entity = new JobRequestEntity();
-        this.jobEntity.setRequest(entity);
-        Assert.assertThat(this.jobEntity.getRequest(), Matchers.is(entity));
-    }
-
-    /**
-     * Test to make sure can successfully set the Job Execution for this job.
-     */
-    @Test
-    public void canSetJobExecution() {
-        final JobExecutionEntity entity = new JobExecutionEntity();
-        entity.setJob(this.jobEntity);
-        Assert.assertThat(this.jobEntity, Matchers.is(entity.getJob()));
-    }
-
-    /**
      * Test to make sure can successfully set the Cluster this job ran on.
      */
     @Test
@@ -326,12 +302,12 @@ public class JobEntityUnitTests extends EntityTestsBase {
         cluster.setName(clusterName);
         Assert.assertFalse(this.jobEntity.getClusterName().isPresent());
         this.jobEntity.setCluster(cluster);
-        Assert.assertThat(this.jobEntity.getCluster(), Matchers.is(cluster));
+        Assert.assertThat(this.jobEntity.getCluster().orElseThrow(IllegalArgumentException::new), Matchers.is(cluster));
         final String actualClusterName = this.jobEntity.getClusterName().orElseThrow(IllegalArgumentException::new);
         Assert.assertThat(actualClusterName, Matchers.is(clusterName));
 
         this.jobEntity.setCluster(null);
-        Assert.assertThat(this.jobEntity.getCluster(), Matchers.nullValue());
+        Assert.assertFalse(this.jobEntity.getCluster().isPresent());
         Assert.assertFalse(this.jobEntity.getClusterName().isPresent());
     }
 
@@ -345,12 +321,12 @@ public class JobEntityUnitTests extends EntityTestsBase {
         command.setName(commandName);
         Assert.assertFalse(this.jobEntity.getCommandName().isPresent());
         this.jobEntity.setCommand(command);
-        Assert.assertThat(this.jobEntity.getCommand(), Matchers.is(command));
+        Assert.assertThat(this.jobEntity.getCommand().orElseThrow(IllegalArgumentException::new), Matchers.is(command));
         final String actualCommandName = this.jobEntity.getCommandName().orElseThrow(IllegalArgumentException::new);
         Assert.assertThat(actualCommandName, Matchers.is(commandName));
 
         this.jobEntity.setCommand(null);
-        Assert.assertThat(this.jobEntity.getCommand(), Matchers.nullValue());
+        Assert.assertFalse(this.jobEntity.getCommand().isPresent());
         Assert.assertFalse(this.jobEntity.getCommandName().isPresent());
     }
 
@@ -362,11 +338,11 @@ public class JobEntityUnitTests extends EntityTestsBase {
     @Test
     public void canSetApplications() throws GenieException {
         final ApplicationEntity application1 = new ApplicationEntity();
-        application1.setId(UUID.randomUUID().toString());
+        application1.setUniqueId(UUID.randomUUID().toString());
         final ApplicationEntity application2 = new ApplicationEntity();
-        application2.setId(UUID.randomUUID().toString());
+        application2.setUniqueId(UUID.randomUUID().toString());
         final ApplicationEntity application3 = new ApplicationEntity();
-        application3.setId(UUID.randomUUID().toString());
+        application3.setUniqueId(UUID.randomUUID().toString());
         final List<ApplicationEntity> applications = Lists.newArrayList(application1, application2, application3);
 
         Assert.assertThat(this.jobEntity.getApplications(), Matchers.empty());
@@ -375,56 +351,384 @@ public class JobEntityUnitTests extends EntityTestsBase {
     }
 
     /**
-     * Test to make sure can get a valid DTO from the job entity.
-     *
-     * @throws GenieException on error
+     * Test to make sure can successfully set the host name the job is running on.
      */
     @Test
-    public void canGetDTO() throws GenieException {
-        final JobEntity entity = new JobEntity();
-        final String id = UUID.randomUUID().toString();
-        entity.setId(id);
-        final String name = UUID.randomUUID().toString();
-        entity.setName(name);
-        final String user = UUID.randomUUID().toString();
-        entity.setUser(user);
-        final String version = UUID.randomUUID().toString();
-        entity.setVersion(version);
-        final String clusterName = UUID.randomUUID().toString();
-        entity.setClusterName(clusterName);
-        final String commandName = UUID.randomUUID().toString();
-        entity.setCommandName(commandName);
-        final Date created = entity.getCreated();
-        final Date updated = entity.getUpdated();
-        final String description = UUID.randomUUID().toString();
-        entity.setDescription(description);
-        final Set<String> tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
-        entity.setTags(tags);
-        final String archiveLocation = UUID.randomUUID().toString();
-        entity.setArchiveLocation(archiveLocation);
-        final Date started = new Date();
-        entity.setStarted(started);
-        final Date finished = new Date();
-        entity.setFinished(finished);
-        entity.setStatus(JobStatus.SUCCEEDED);
-        final String statusMessage = UUID.randomUUID().toString();
-        entity.setStatusMsg(statusMessage);
+    public void canSetHostName() {
+        final String hostName = UUID.randomUUID().toString();
+        this.jobEntity.setHostName(hostName);
+        Assert.assertThat(this.jobEntity.getHostName(), Matchers.is(hostName));
+    }
 
-        final Job job = entity.getDTO();
-        Assert.assertThat(job.getId().orElseGet(RandomSuppliers.STRING), Matchers.is(id));
-        Assert.assertThat(job.getName(), Matchers.is(name));
-        Assert.assertThat(job.getUser(), Matchers.is(user));
-        Assert.assertThat(job.getVersion(), Matchers.is(version));
-        Assert.assertThat(job.getDescription().orElseGet(RandomSuppliers.STRING), Matchers.is(description));
-        Assert.assertThat(job.getCreated().orElseGet(RandomSuppliers.DATE), Matchers.is(created));
-        Assert.assertThat(job.getUpdated().orElseGet(RandomSuppliers.DATE), Matchers.is(updated));
-        Assert.assertThat(job.getClusterName().orElseGet(RandomSuppliers.STRING), Matchers.is(clusterName));
-        Assert.assertThat(job.getCommandName().orElseGet(RandomSuppliers.STRING), Matchers.is(commandName));
-        Assert.assertThat(job.getTags(), Matchers.is(tags));
-        Assert.assertThat(job.getArchiveLocation().orElseGet(RandomSuppliers.STRING), Matchers.is(archiveLocation));
-        Assert.assertThat(job.getStarted().orElseGet(RandomSuppliers.DATE), Matchers.is(started));
-        Assert.assertThat(job.getFinished().orElseGet(RandomSuppliers.DATE), Matchers.is(finished));
-        Assert.assertThat(job.getStatus(), Matchers.is(JobStatus.SUCCEEDED));
-        Assert.assertThat(job.getStatusMsg().orElseGet(RandomSuppliers.STRING), Matchers.is(statusMessage));
+    /**
+     * Test to make sure can successfully set the process id of the job.
+     */
+    @Test
+    public void canSetProcessId() {
+        final int processId = 12309834;
+        this.jobEntity.setProcessId(processId);
+        Assert.assertThat(this.jobEntity.getProcessId().orElseGet(RandomSuppliers.INT), Matchers.is(processId));
+    }
+
+    /**
+     * Make sure setting the check delay time period works properly.
+     */
+    @Test
+    public void canSetCheckDelay() {
+        Assert.assertFalse(this.jobEntity.getCheckDelay().isPresent());
+        final long newDelay = 1803234L;
+        this.jobEntity.setCheckDelay(newDelay);
+        Assert.assertThat(
+            this.jobEntity.getCheckDelay().orElseThrow(IllegalArgumentException::new),
+            Matchers.is(newDelay)
+        );
+    }
+
+    /**
+     * Test to make sure can successfully set the process id of the job.
+     */
+    @Test
+    public void canSetExitCode() {
+        final int exitCode = 80072043;
+        this.jobEntity.setExitCode(exitCode);
+        Assert.assertThat(this.jobEntity.getExitCode().orElseGet(RandomSuppliers.INT), Matchers.is(exitCode));
+    }
+
+    /**
+     * Make sure setting timeout works.
+     */
+    @Test
+    public void canSetTimeout() {
+        Assert.assertFalse(this.jobEntity.getTimeout().isPresent());
+        final Date timeout = new Date();
+        this.jobEntity.setTimeout(timeout);
+        Assert.assertThat(this.jobEntity.getTimeout().orElseGet(RandomSuppliers.DATE), Matchers.is(timeout));
+    }
+
+    /**
+     * Make sure setting memory used works.
+     */
+    @Test
+    public void canSetMemoryUsed() {
+        Assert.assertFalse(this.jobEntity.getMemoryUsed().isPresent());
+        final int memory = 10_240;
+        this.jobEntity.setMemoryUsed(memory);
+        Assert.assertThat(this.jobEntity.getMemoryUsed().orElseGet(RandomSuppliers.INT), Matchers.is(memory));
+    }
+
+    /**
+     * Make sure can set the client host name the request came from.
+     */
+    @Test
+    public void canSetClientHost() {
+        final String clientHost = UUID.randomUUID().toString();
+        this.jobEntity.setClientHost(clientHost);
+        Assert.assertThat(this.jobEntity.getClientHost().orElseGet(RandomSuppliers.STRING), Matchers.is(clientHost));
+    }
+
+    /**
+     * Make sure we can set and get the user agent string.
+     */
+    @Test
+    public void canSetUserAgent() {
+        Assert.assertFalse(this.jobEntity.getUserAgent().isPresent());
+        final String userAgent = UUID.randomUUID().toString();
+        this.jobEntity.setUserAgent(userAgent);
+        Assert.assertThat(
+            this.jobEntity.getUserAgent().orElseGet(RandomSuppliers.STRING),
+            Matchers.is(userAgent)
+        );
+    }
+
+    /**
+     * Make sure we can set and get the number of attachments.
+     */
+    @Test
+    public void canSetNumAttachments() {
+        Assert.assertFalse(this.jobEntity.getNumAttachments().isPresent());
+        final int numAttachments = 380208;
+        this.jobEntity.setNumAttachments(numAttachments);
+        Assert.assertThat(
+            this.jobEntity.getNumAttachments().orElseGet(RandomSuppliers.INT), Matchers.is(numAttachments)
+        );
+    }
+
+    /**
+     * Make sure we can set and get the total size of the attachments.
+     */
+    @Test
+    public void canSetTotalSizeOfAttachments() {
+        Assert.assertFalse(this.jobEntity.getTotalSizeOfAttachments().isPresent());
+        final long totalSizeOfAttachments = 90832432L;
+        this.jobEntity.setTotalSizeOfAttachments(totalSizeOfAttachments);
+        Assert.assertThat(
+            this.jobEntity.getTotalSizeOfAttachments().orElseGet(RandomSuppliers.LONG),
+            Matchers.is(totalSizeOfAttachments)
+        );
+    }
+
+    /**
+     * Make sure we can set and get the size of the std out file.
+     */
+    @Test
+    public void canSetStdOutSize() {
+        Assert.assertFalse(this.jobEntity.getStdOutSize().isPresent());
+        final long stdOutSize = 90334432L;
+        this.jobEntity.setStdOutSize(stdOutSize);
+        Assert.assertThat(
+            this.jobEntity.getStdOutSize().orElseGet(RandomSuppliers.LONG),
+            Matchers.is(stdOutSize)
+        );
+    }
+
+    /**
+     * Make sure we can set and get the size of the std err file.
+     */
+    @Test
+    public void canSetStdErrSize() {
+        Assert.assertFalse(this.jobEntity.getStdErrSize().isPresent());
+        final long stdErrSize = 9089932L;
+        this.jobEntity.setStdErrSize(stdErrSize);
+        Assert.assertThat(
+            this.jobEntity.getStdErrSize().orElseGet(RandomSuppliers.LONG),
+            Matchers.is(stdErrSize)
+        );
+    }
+
+    /**
+     * Make sure can set the group for the job.
+     */
+    @Test
+    public void canSetGroup() {
+        final String group = UUID.randomUUID().toString();
+        this.jobEntity.setGenieUserGroup(group);
+        Assert.assertThat(this.jobEntity.getGenieUserGroup().orElseGet(RandomSuppliers.STRING), Matchers.is(group));
+    }
+
+    /**
+     * Make sure can set the cluster criteria.
+     */
+    @Test
+    public void canSetClusterCriterias() {
+        final Set<TagEntity> one = Sets.newHashSet("one", "two", "three")
+            .stream()
+            .map(
+                tag -> {
+                    final TagEntity tagEntity = new TagEntity();
+                    tagEntity.setTag(tag);
+                    return tagEntity;
+                }
+            ).collect(Collectors.toSet());
+        final Set<TagEntity> two = Sets.newHashSet("four", "five", "six")
+            .stream()
+            .map(
+                tag -> {
+                    final TagEntity tagEntity = new TagEntity();
+                    tagEntity.setTag(tag);
+                    return tagEntity;
+                }
+            ).collect(Collectors.toSet());
+        final Set<TagEntity> three = Sets.newHashSet("seven", "eight", "nine")
+            .stream()
+            .map(
+                tag -> {
+                    final TagEntity tagEntity = new TagEntity();
+                    tagEntity.setTag(tag);
+                    return tagEntity;
+                }
+            ).collect(Collectors.toSet());
+
+        final ClusterCriteriaEntity entity1 = new ClusterCriteriaEntity();
+        entity1.setTags(one);
+        final ClusterCriteriaEntity entity2 = new ClusterCriteriaEntity();
+        entity2.setTags(two);
+        final ClusterCriteriaEntity entity3 = new ClusterCriteriaEntity();
+        entity3.setTags(three);
+
+        final List<ClusterCriteriaEntity> clusterCriterias = Lists.newArrayList(entity1, entity2, entity3);
+
+        this.jobEntity.setClusterCriterias(clusterCriterias);
+        Assert.assertThat(this.jobEntity.getClusterCriterias(), Matchers.is(clusterCriterias));
+    }
+
+    /**
+     * Make sure the setter for the jobEntity class works for JPA for null cluster criterias.
+     */
+    @Test
+    public void canSetNullClusterCriterias() {
+        this.jobEntity.setClusterCriterias(null);
+        Assert.assertThat(this.jobEntity.getClusterCriterias(), Matchers.empty());
+    }
+
+    /**
+     * Make sure can set the command args for the job.
+     */
+    @Test
+    public void canSetCommandArgs() {
+        final String commandArgs = UUID.randomUUID().toString();
+        this.jobEntity.setCommandArgs(commandArgs);
+        Assert.assertThat(this.jobEntity.getCommandArgs().orElseGet(RandomSuppliers.STRING), Matchers.is(commandArgs));
+    }
+
+    /**
+     * Make sure can set the file configs.
+     */
+    @Test
+    public void canSetConfigs() {
+        final String fileConfigs = UUID.randomUUID().toString();
+        final FileEntity config = new FileEntity();
+        config.setFile(fileConfigs);
+        final Set<FileEntity> configs = Sets.newHashSet(config);
+        this.jobEntity.setConfigs(configs);
+        Assert.assertThat(this.jobEntity.getConfigs(), Matchers.is(configs));
+    }
+
+    /**
+     * Make sure can set the blank file configs.
+     */
+    @Test
+    public void canSetNullConfigs() {
+        this.jobEntity.setConfigs(null);
+        Assert.assertThat(this.jobEntity.getConfigs(), Matchers.empty());
+    }
+
+    /**
+     * Make sure can set the file dependencies.
+     */
+    @Test
+    public void canSetDependencies() {
+        final String fileConfigs = UUID.randomUUID().toString();
+        final FileEntity dependency = new FileEntity();
+        dependency.setFile(fileConfigs);
+        final Set<FileEntity> dependencies = Sets.newHashSet(dependency);
+        this.jobEntity.setDependencies(dependencies);
+        Assert.assertThat(this.jobEntity.getDependencies(), Matchers.is(dependencies));
+    }
+
+    /**
+     * Make sure can set the blank file dependencies.
+     */
+    @Test
+    public void canSetNullDependencies() {
+        this.jobEntity.setDependencies(null);
+        Assert.assertThat(this.jobEntity.getDependencies(), Matchers.empty());
+    }
+
+    /**
+     * Make sure can set whether to disable logs or not.
+     */
+    @Test
+    public void canSetDisableLogArchival() {
+        this.jobEntity.setDisableLogArchival(true);
+        Assert.assertTrue(this.jobEntity.isDisableLogArchival());
+    }
+
+    /**
+     * Make sure can set the email address of the user.
+     */
+    @Test
+    public void canSetEmail() {
+        final String email = UUID.randomUUID().toString();
+        this.jobEntity.setEmail(email);
+        Assert.assertThat(this.jobEntity.getEmail().orElseGet(RandomSuppliers.STRING), Matchers.is(email));
+    }
+
+    /**
+     * Make sure can set the command criteria.
+     */
+    @Test
+    public void canSetCommandCriteria() {
+        final TagEntity one = new TagEntity();
+        one.setTag(UUID.randomUUID().toString());
+        final TagEntity two = new TagEntity();
+        two.setTag(UUID.randomUUID().toString());
+        final Set<TagEntity> commandCriteria = Sets.newHashSet(one, two);
+
+        this.jobEntity.setCommandCriteria(commandCriteria);
+        Assert.assertThat(this.jobEntity.getCommandCriteria(), Matchers.notNullValue());
+        Assert.assertThat(this.jobEntity.getCommandCriteria(), Matchers.is(commandCriteria));
+    }
+
+    /**
+     * Make sure the setter for the jobEntity class works for JPA for null command criteria.
+     */
+    @Test
+    public void canSetNullCommandCriteria() {
+        this.jobEntity.setCommandCriteria(null);
+        Assert.assertThat(this.jobEntity.getCommandCriteria(), Matchers.empty());
+    }
+
+    /**
+     * Make sure can set the setup file.
+     */
+    @Test
+    public void canSetSetupFile() {
+        final String setupFile = UUID.randomUUID().toString();
+        final FileEntity setupFileEntity = new FileEntity();
+        setupFileEntity.setFile(setupFile);
+        this.jobEntity.setSetupFile(setupFileEntity);
+        Assert.assertThat(
+            this.jobEntity.getSetupFile().orElseThrow(IllegalArgumentException::new), Matchers.is(setupFileEntity)
+        );
+    }
+
+    /**
+     * Make sure can set the tags for the job.
+     */
+    @Test
+    public void canSetTags() {
+        final TagEntity one = new TagEntity();
+        one.setTag(UUID.randomUUID().toString());
+        final TagEntity two = new TagEntity();
+        two.setTag(UUID.randomUUID().toString());
+        final Set<TagEntity> tags = Sets.newHashSet(one, two);
+
+        this.jobEntity.setTags(tags);
+        Assert.assertThat(this.jobEntity.getTags(), Matchers.is(tags));
+
+        this.jobEntity.setTags(null);
+        Assert.assertThat(this.jobEntity.getTags(), Matchers.empty());
+    }
+
+    /**
+     * Make sure can set the number of cpu's to use for the job.
+     */
+    @Test
+    public void canSetCpu() {
+        final int cpu = 16;
+        this.jobEntity.setCpuRequested(cpu);
+        Assert.assertThat(this.jobEntity.getCpuRequested().orElseGet(RandomSuppliers.INT), Matchers.is(cpu));
+    }
+
+    /**
+     * Make sure can set the amount of memory to use for the job.
+     */
+    @Test
+    public void canSetMemory() {
+        final int memory = 2048;
+        this.jobEntity.setMemoryRequested(memory);
+        Assert.assertThat(this.jobEntity.getMemoryRequested().orElseGet(RandomSuppliers.INT), Matchers.is(memory));
+    }
+
+    /**
+     * Make sure the jobEntity class sets the applications requested right.
+     */
+    @Test
+    public void canSetApplicationsRequested() {
+        final String application = UUID.randomUUID().toString();
+        final List<String> applications = Lists.newArrayList(application);
+        this.jobEntity.setApplicationsRequested(applications);
+        Assert.assertThat(this.jobEntity.getApplicationsRequested(), Matchers.is(applications));
+    }
+
+    /**
+     * Make sure can set the timeout date for the job.
+     */
+    @Test
+    public void canSetTimeoutRequested() {
+        Assert.assertFalse(this.jobEntity.getTimeoutRequested().isPresent());
+        final int timeout = 28023423;
+        this.jobEntity.setTimeoutRequested(timeout);
+        Assert.assertThat(this.jobEntity.getTimeoutRequested().orElseGet(RandomSuppliers.INT), Matchers.is(timeout));
     }
 }

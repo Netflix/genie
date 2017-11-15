@@ -20,9 +20,11 @@ import com.netflix.genie.core.jpa.entities.ApplicationEntity;
 import com.netflix.genie.core.jpa.entities.ApplicationEntity_;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity_;
+import com.netflix.genie.core.jpa.entities.TagEntity;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 
+import javax.annotation.Nullable;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
@@ -44,7 +46,7 @@ public final class JpaCommandSpecs {
     /**
      * Private constructor for utility class.
      */
-    protected JpaCommandSpecs() {
+    JpaCommandSpecs() {
     }
 
     /**
@@ -57,10 +59,10 @@ public final class JpaCommandSpecs {
      * @return A specification object used for querying
      */
     public static Specification<CommandEntity> find(
-        final String name,
-        final String user,
-        final Set<CommandStatus> statuses,
-        final Set<String> tags
+        @Nullable final String name,
+        @Nullable final String user,
+        @Nullable final Set<CommandStatus> statuses,
+        @Nullable final Set<TagEntity> tags
     ) {
         return (final Root<CommandEntity> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
             final List<Predicate> predicates = new ArrayList<>();
@@ -83,12 +85,10 @@ public final class JpaCommandSpecs {
                 predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
             }
             if (tags != null && !tags.isEmpty()) {
-                predicates.add(
-                    cb.like(
-                        root.get(CommandEntity_.tags),
-                        JpaSpecificationUtils.getTagLikeString(tags)
-                    )
-                );
+                final Join<CommandEntity, TagEntity> tagEntityJoin = root.join(CommandEntity_.tags);
+                predicates.add(tagEntityJoin.in(tags));
+                cq.groupBy(root.get(CommandEntity_.id));
+                cq.having(cb.equal(cb.count(root.get(CommandEntity_.id)), tags.size()));
             }
             return cb.and(predicates.toArray(new Predicate[predicates.size()]));
         };
@@ -103,13 +103,13 @@ public final class JpaCommandSpecs {
      */
     public static Specification<CommandEntity> findCommandsForApplication(
         final String applicationId,
-        final Set<CommandStatus> statuses
+        @Nullable final Set<CommandStatus> statuses
     ) {
         return (final Root<CommandEntity> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
             final List<Predicate> predicates = new ArrayList<>();
             final Join<CommandEntity, ApplicationEntity> application = root.join(CommandEntity_.applications);
 
-            predicates.add(cb.equal(application.get(ApplicationEntity_.id), applicationId));
+            predicates.add(cb.equal(application.get(ApplicationEntity_.uniqueId), applicationId));
 
             if (statuses != null && !statuses.isEmpty()) {
                 final List<Predicate> orPredicates =

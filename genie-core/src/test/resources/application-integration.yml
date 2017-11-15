@@ -34,6 +34,7 @@ spring:
       ddl-auto: create-drop
       naming:
         strategy: org.hibernate.cfg.ImprovedNamingStrategy
+    show-sql: true
   datasource:
     url: jdbc:hsqldb:mem:genie-int-db;shutdown=true
     username: SA

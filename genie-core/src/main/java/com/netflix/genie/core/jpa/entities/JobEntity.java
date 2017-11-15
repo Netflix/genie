@@ -17,70 +17,166 @@
  */
 package com.netflix.genie.core.jpa.entities;
 
-import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.core.jpa.entities.projections.JobApplicationsProjection;
+import com.netflix.genie.core.jpa.entities.projections.JobClusterProjection;
+import com.netflix.genie.core.jpa.entities.projections.JobCommandProjection;
+import com.netflix.genie.core.jpa.entities.projections.JobExecutionProjection;
+import com.netflix.genie.core.jpa.entities.projections.JobMetadataProjection;
+import com.netflix.genie.core.jpa.entities.projections.JobProjection;
+import com.netflix.genie.core.jpa.entities.projections.JobRequestProjection;
+import com.netflix.genie.core.jpa.specifications.JpaSpecificationUtils;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
+import org.hibernate.annotations.Type;
+import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
 
 import javax.annotation.Nullable;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.MapsId;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
- * Representation of the state of a Genie 3.0 job.
+ * Representation of the state of a Genie job.
  *
  * @author amsharma
  * @author tgianos
  */
 @Getter
 @Setter
+@ToString(callSuper = true)
 @Entity
 @Table(name = "jobs")
-@NamedQueries({
-    @NamedQuery(
-        name = JobEntity.QUERY_GET_STATUS_BY_ID,
-        query = "select j.status from JobEntity j where j.id = :id"
-    )
-})
-public class JobEntity extends CommonFieldsEntity {
-    /**
-     * Query name to get job status.
-     */
-    public static final String QUERY_GET_STATUS_BY_ID = "getStatusById";
-    /**
-     * Used as default version when one not entered.
-     */
-    protected static final String DEFAULT_VERSION = "NA";
+public class JobEntity extends CommonFieldsEntity
+    implements JobProjection, JobRequestProjection, JobMetadataProjection, JobExecutionProjection,
+    JobApplicationsProjection, JobClusterProjection, JobCommandProjection {
+
+    static final String DEFAULT_VERSION = "NA";
+    static final String EMPTY_STRING = "";
 
     private static final long serialVersionUID = 2849367731657512224L;
 
-    @Basic(optional = false)
-    @Column(name = "command_args", nullable = false, length = 10000)
-    @Size(min = 1, max = 10000, message = "Must have command line arguments and be no longer than 10000 characters")
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "command_args", updatable = false)
+    @Type(type = "org.hibernate.type.TextType")
     private String commandArgs;
+
+    @Basic
+    @Column(name = "tags", length = 1024, updatable = false)
+    @Size(max = 1024, message = "Max length in database is 1024 characters")
+    @Getter(AccessLevel.PACKAGE)
+    @Setter(AccessLevel.NONE)
+    private String tagSearchString;
+
+    @Basic
+    @Column(name = "genie_user_group", updatable = false)
+    @Size(max = 255, message = "Max length in database is 255 characters")
+    private String genieUserGroup;
+
+    @Basic(optional = false)
+    @Column(name = "disable_log_archival", nullable = false, updatable = false)
+    private boolean disableLogArchival;
+
+    @Basic
+    @Column(name = "email", updatable = false)
+    @Email
+    @Size(max = 255, message = "Max length in database is 255 characters")
+    private String email;
+
+    @Basic
+    @Column(name = "cpu_requested", updatable = false)
+    @Min(value = 1, message = "Can't have less than 1 CPU")
+    private Integer cpuRequested;
+
+    @Basic
+    @Column(name = "memory_requested", updatable = false)
+    @Min(value = 1, message = "Can't have less than 1 MB of memory allocated")
+    private Integer memoryRequested;
+
+    @Basic
+    @Column(name = "timeout_requested", updatable = false)
+    @Min(value = 1)
+    private Integer timeoutRequested;
+
+    @Basic
+    @Column(name = "grouping", updatable = false)
+    @Size(max = 255, message = "Max length in database is 255 characters")
+    private String grouping;
+
+    @Basic
+    @Column(name = "groupingInstance", updatable = false)
+    @Size(max = 255, message = "Max length in database is 255 characters")
+    private String groupingInstance;
+
+    @Basic
+    @Column(name = "client_host", updatable = false)
+    @Size(max = 255, message = "Max length in database is 255 characters")
+    private String clientHost;
+
+    @Basic
+    @Column(name = "user_agent", length = 1024, updatable = false)
+    @Size(max = 1024, message = "Max length in database is 1024 characters")
+    private String userAgent;
+
+    @Basic
+    @Column(name = "num_attachments", updatable = false)
+    @Min(value = 0, message = "Can't have less than zero attachments")
+    private Integer numAttachments;
+
+    @Basic
+    @Column(name = "total_size_of_attachments", updatable = false)
+    @Min(value = 0, message = "Can't have less than zero bytes total attachment size")
+    private Long totalSizeOfAttachments;
+
+    @Basic
+    @Column(name = "std_out_size")
+    @Min(value = 0, message = "Can't have less than zero bytes for std out size")
+    private Long stdOutSize;
+
+    @Basic
+    @Column(name = "std_err_size")
+    @Min(value = 0, message = "Can't have less than zero bytes for std err size")
+    private Long stdErrSize;
+
+    @Basic
+    @Column(name = "cluster_name")
+    @Size(max = 255, message = "Max length in database is 255 characters")
+    private String clusterName;
+
+    @Basic
+    @Column(name = "command_name")
+    @Size(max = 255, message = "Max length in database is 255 characters")
+    private String commandName;
 
     @Basic(optional = false)
     @Column(name = "status", nullable = false, length = 20)
@@ -102,25 +198,37 @@ public class JobEntity extends CommonFieldsEntity {
     @Temporal(TemporalType.TIMESTAMP)
     private Date finished;
 
+    @Basic(optional = false)
+    @Column(name = "host_name", nullable = false, updatable = false)
+    @Size(min = 1, max = 255, message = "Must have a host name no longer than 255 characters")
+    private String hostName;
+
+    @Basic
+    @Column(name = "process_id")
+    private Integer processId;
+
+    @Basic
+    @Column(name = "check_delay")
+    @Min(1)
+    private Long checkDelay;
+
+    @Basic
+    @Column(name = "exit_code")
+    private Integer exitCode;
+
+    @Basic
+    @Column(name = "memory_used")
+    private Integer memoryUsed;
+
+    @Basic
+    @Column(name = "timeout")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date timeout;
+
     @Basic
     @Column(name = "archive_location", length = 1024)
     @Size(max = 1024, message = "Max length in database is 1024 characters")
     private String archiveLocation;
-
-    @Basic
-    @Column(name = "cluster_name")
-    @Size(max = 255, message = "Max length in database is 255 characters")
-    private String clusterName;
-
-    @Basic
-    @Column(name = "command_name")
-    @Size(max = 255, message = "Max length in database is 255 characters")
-    private String commandName;
-
-    @OneToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "id")
-    @MapsId
-    private JobRequestEntity request;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cluster_id")
@@ -140,8 +248,71 @@ public class JobEntity extends CommonFieldsEntity {
             @JoinColumn(name = "application_id", referencedColumnName = "id", nullable = false)
         }
     )
-    @OrderColumn(name = "application_order", nullable = false)
+    @OrderColumn(name = "application_order", nullable = false, updatable = false)
     private List<ApplicationEntity> applications = new ArrayList<>();
+
+    @OneToMany(mappedBy = "job", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderColumn(name = "priority_order", nullable = false, updatable = false)
+    private List<ClusterCriteriaEntity> clusterCriterias = new ArrayList<>();
+
+    @ElementCollection
+    @CollectionTable(
+        name = "job_applications_requested",
+        joinColumns = {
+            @JoinColumn(name = "job_id", nullable = false, updatable = false)
+        }
+    )
+    @Column(name = "application_id", nullable = false, updatable = false)
+    @OrderColumn(name = "application_order", nullable = false, updatable = false)
+    private List<String> applicationsRequested = new ArrayList<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "jobs_configs",
+        joinColumns = {
+            @JoinColumn(name = "job_id", referencedColumnName = "id", nullable = false, updatable = false)
+        },
+        inverseJoinColumns = {
+            @JoinColumn(name = "file_id", referencedColumnName = "id", nullable = false, updatable = false)
+        }
+    )
+    private Set<FileEntity> configs = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "jobs_dependencies",
+        joinColumns = {
+            @JoinColumn(name = "job_id", referencedColumnName = "id", nullable = false, updatable = false)
+        },
+        inverseJoinColumns = {
+            @JoinColumn(name = "file_id", referencedColumnName = "id", nullable = false, updatable = false)
+        }
+    )
+    private Set<FileEntity> dependencies = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "jobs_tags",
+        joinColumns = {
+            @JoinColumn(name = "job_id", referencedColumnName = "id", nullable = false, updatable = false)
+        },
+        inverseJoinColumns = {
+            @JoinColumn(name = "tag_id", referencedColumnName = "id", nullable = false, updatable = false)
+        }
+    )
+    private Set<TagEntity> tags = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "job_command_criteria_tags",
+        joinColumns = {
+            @JoinColumn(name = "job_id", referencedColumnName = "id", nullable = false, updatable = false)
+        },
+        inverseJoinColumns = {
+            @JoinColumn(name = "tag_id", referencedColumnName = "id", nullable = false, updatable = false)
+        }
+    )
+    private Set<TagEntity> commandCriteria = new HashSet<>();
 
     /**
      * Default Constructor.
@@ -152,39 +323,168 @@ public class JobEntity extends CommonFieldsEntity {
     }
 
     /**
-     * Gets the name of the cluster on which this job was run.
-     *
-     * @return the cluster name
+     * Before a job is created create the job search string.
      */
-    public Optional<String> getClusterName() {
-        return Optional.ofNullable(this.clusterName);
+    @PrePersist
+    void onCreateJob() {
+        if (!this.tags.isEmpty()) {
+            // Tag search string length max is currently 1024 which will be caught by hibernate validator if this
+            // exceeds that length
+            this.tagSearchString = JpaSpecificationUtils.createTagSearchString(this.tags);
+        }
     }
 
     /**
-     * Sets the name of the cluster on which this job is run.
+     * Get the command arguments for this job.
      *
-     * @param clusterName Name of the cluster on which job was executed.
+     * @return The command arguments or Optional of null
      */
-    protected void setClusterName(final String clusterName) {
-        this.clusterName = clusterName;
+    public Optional<String> getCommandArgs() {
+        return Optional.ofNullable(this.commandArgs);
     }
 
     /**
-     * Gets the command name for this job.
+     * Get the user group for this job.
      *
-     * @return The command name
+     * @return the user group
      */
-    public Optional<String> getCommandName() {
-        return Optional.ofNullable(this.commandName);
+    public Optional<String> getGenieUserGroup() {
+        return Optional.of(this.genieUserGroup);
     }
 
     /**
-     * Set command Name with which this job is run.
+     * Get the email of the user associated with this job if they desire an email notification at completion
+     * of the job.
      *
-     * @param commandName Name of the command used to run the job
+     * @return The email
      */
-    protected void setCommandName(final String commandName) {
-        this.commandName = commandName;
+    public Optional<String> getEmail() {
+        return Optional.of(this.email);
+    }
+
+    /**
+     * Get the number of CPU's requested to run this job.
+     *
+     * @return The number of CPU's as an Optional
+     */
+    public Optional<Integer> getCpuRequested() {
+        return Optional.ofNullable(this.cpuRequested);
+    }
+
+    /**
+     * Get the memory requested to run this job with.
+     *
+     * @return The amount of memory the user requested for this job in MB as an Optional
+     */
+    public Optional<Integer> getMemoryRequested() {
+        return Optional.ofNullable(this.memoryRequested);
+    }
+
+    /**
+     * Get the timeout (in seconds) requested by the user for this job.
+     *
+     * @return The number of seconds before a timeout as an Optional
+     */
+    public Optional<Integer> getTimeoutRequested() {
+        return Optional.ofNullable(this.timeoutRequested);
+    }
+
+    /**
+     * Get the grouping this job is a part of. e.g. scheduler job name for job run many times
+     *
+     * @return The grouping
+     */
+    public Optional<String> getGrouping() {
+        return Optional.of(this.grouping);
+    }
+
+    /**
+     * Get the instance identifier of a grouping. e.g. the run id of a given scheduled job
+     *
+     * @return The grouping instance
+     */
+    public Optional<String> getGroupingInstance() {
+        return Optional.of(this.groupingInstance);
+    }
+
+    /**
+     * Get the client host.
+     *
+     * @return Optional of the client host
+     */
+    public Optional<String> getClientHost() {
+        return Optional.ofNullable(this.clientHost);
+    }
+
+    /**
+     * Get the user agent.
+     *
+     * @return Optional of the user agent
+     */
+    public Optional<String> getUserAgent() {
+        return Optional.ofNullable(this.userAgent);
+    }
+
+    /**
+     * Get the number of attachments.
+     *
+     * @return The number of attachments as an optional
+     */
+    public Optional<Integer> getNumAttachments() {
+        return Optional.ofNullable(this.numAttachments);
+    }
+
+    /**
+     * Get the total size of the attachments.
+     *
+     * @return The total size of attachments as an optional
+     */
+    public Optional<Long> getTotalSizeOfAttachments() {
+        return Optional.ofNullable(this.totalSizeOfAttachments);
+    }
+
+    /**
+     * Get the size of standard out for this job.
+     *
+     * @return The size (in bytes) of this jobs standard out file as Optional
+     */
+    public Optional<Long> getStdOutSize() {
+        return Optional.ofNullable(this.stdOutSize);
+    }
+
+    /**
+     * Get the size of standard error for this job.
+     *
+     * @return The size (in bytes) of this jobs standard error file as Optional
+     */
+    public Optional<Long> getStdErrSize() {
+        return Optional.ofNullable(this.stdErrSize);
+    }
+
+    /**
+     * Set job status, and update start/update/finish times, if needed.
+     *
+     * @param jobStatus status for job
+     */
+    void setJobStatus(@NotNull final JobStatus jobStatus) {
+        this.status = jobStatus;
+
+        if (jobStatus == JobStatus.INIT) {
+            this.setStarted(new Date());
+        } else if (jobStatus.isFinished()) {
+            this.setFinished(new Date());
+        }
+    }
+
+    /**
+     * Sets job status and human-readable message.
+     *
+     * @param newStatus predefined status
+     * @param msg       human-readable message
+     */
+    void setJobStatus(@NotNull final JobStatus newStatus, final String msg) {
+        this.setJobStatus(newStatus);
+        this.setStatusMsg(msg);
     }
 
     /**
@@ -235,54 +535,127 @@ public class JobEntity extends CommonFieldsEntity {
     /**
      * Get location where logs are archived.
      *
-     * @return s3/hdfs location where logs are archived
+     * @return Location where logs are archived
      */
     public Optional<String> getArchiveLocation() {
         return Optional.ofNullable(this.archiveLocation);
     }
 
     /**
-     * Set job status, and update start/update/finish times, if needed.
+     * Gets the name of the cluster on which this job was run.
      *
-     * @param jobStatus status for job
+     * @return the cluster name
      */
-    public void setJobStatus(@NotNull final JobStatus jobStatus) {
-        this.status = jobStatus;
+    public Optional<String> getClusterName() {
+        return Optional.ofNullable(this.clusterName);
+    }
 
-        if (jobStatus == JobStatus.INIT) {
-            this.setStarted(new Date());
-        } else if (jobStatus != JobStatus.RUNNING) {
-            setFinished(new Date());
+    /**
+     * Gets the command name for this job.
+     *
+     * @return The command name
+     */
+    public Optional<String> getCommandName() {
+        return Optional.ofNullable(this.commandName);
+    }
+
+    /**
+     * Get the process id of the job.
+     *
+     * @return the process id
+     */
+    public Optional<Integer> getProcessId() {
+        return Optional.ofNullable(this.processId);
+    }
+
+    /**
+     * Get the amount of time (in milliseconds) to delay the check for the job status.
+     *
+     * @return Could be null so return optional of the Long
+     */
+    public Optional<Long> getCheckDelay() {
+        return Optional.ofNullable(this.checkDelay);
+    }
+
+    /**
+     * Get the exit code from the process that ran the job.
+     *
+     * @return The exit code or -1 if the job hasn't finished yet
+     */
+    public Optional<Integer> getExitCode() {
+        return Optional.ofNullable(this.exitCode);
+    }
+
+    /**
+     * Get the amount of memory (in MB) that this job is/was run with.
+     *
+     * @return The memory as an optional as it could be null
+     */
+    public Optional<Integer> getMemoryUsed() {
+        return Optional.ofNullable(this.memoryUsed);
+    }
+
+    /**
+     * Get the date this job will be killed due to exceeding its set timeout duration.
+     *
+     * @return The timeout date
+     */
+    public Optional<Date> getTimeout() {
+        return this.timeout == null ? Optional.empty() : Optional.of(new Date(this.timeout.getTime()));
+    }
+
+    /**
+     * Set the date this job will be killed due to exceeding its set timeout duration.
+     *
+     * @param timeout The new timeout
+     */
+    public void setTimeout(@Nullable final Date timeout) {
+        this.timeout = timeout == null ? null : new Date(timeout.getTime());
+    }
+
+    /**
+     * Set all the files associated as configuration files for this job.
+     *
+     * @param configs The configuration files to set
+     */
+    public void setConfigs(@Nullable final Set<FileEntity> configs) {
+        this.configs.clear();
+        if (configs != null) {
+            this.configs.addAll(configs);
         }
     }
 
     /**
-     * Sets job status and human-readable message.
+     * Set all the files associated as dependency files for this job.
      *
-     * @param newStatus predefined status
-     * @param msg       human-readable message
+     * @param dependencies The dependency files to set
      */
-    public void setJobStatus(final JobStatus newStatus, final String msg) {
-        setJobStatus(newStatus);
-        setStatusMsg(msg);
+    public void setDependencies(@Nullable final Set<FileEntity> dependencies) {
+        this.dependencies.clear();
+        if (dependencies != null) {
+            this.dependencies.addAll(dependencies);
+        }
     }
 
     /**
-     * Get the job request for this job.
+     * Set all the tags associated to this job.
      *
-     * @return The original job request
+     * @param tags The dependency tags to set
      */
-    protected JobRequestEntity getRequest() {
-        return this.request;
+    public void setTags(@Nullable final Set<TagEntity> tags) {
+        this.tags.clear();
+        if (tags != null) {
+            this.tags.addAll(tags);
+        }
     }
 
     /**
-     * Set the job request for this job.
+     * Get the cluster that is running or did run this job.
      *
-     * @param request The job request. Not null.
+     * @return The cluster or empty Optional if it hasn't been set
      */
-    public void setRequest(final JobRequestEntity request) {
-        this.request = request;
+    public Optional<ClusterEntity> getCluster() {
+        return Optional.ofNullable(this.cluster);
     }
 
     /**
@@ -290,17 +663,25 @@ public class JobEntity extends CommonFieldsEntity {
      *
      * @param cluster The cluster this job ran on
      */
-    public void setCluster(final ClusterEntity cluster) {
+    public void setCluster(@Nullable final ClusterEntity cluster) {
         if (this.cluster != null) {
             this.clusterName = null;
         }
 
         this.cluster = cluster;
 
-        // Reverse side of the relationship
         if (this.cluster != null) {
             this.clusterName = cluster.getName();
         }
+    }
+
+    /**
+     * Get the command that is executing this job.
+     *
+     * @return The command or empty Optional if one wasn't set yet
+     */
+    public Optional<CommandEntity> getCommand() {
+        return Optional.ofNullable(this.command);
     }
 
     /**
@@ -308,14 +689,13 @@ public class JobEntity extends CommonFieldsEntity {
      *
      * @param command The command
      */
-    public void setCommand(final CommandEntity command) {
+    public void setCommand(@Nullable final CommandEntity command) {
         if (this.command != null) {
             this.commandName = null;
         }
 
         this.command = command;
 
-        // Reverse side of the relationship
         if (this.command != null) {
             this.commandName = command.getName();
         }
@@ -326,7 +706,7 @@ public class JobEntity extends CommonFieldsEntity {
      *
      * @param applications The applications
      */
-    public void setApplications(final List<ApplicationEntity> applications) {
+    public void setApplications(@Nullable final List<ApplicationEntity> applications) {
         this.applications.clear();
         if (applications != null) {
             this.applications.addAll(applications);
@@ -334,31 +714,26 @@ public class JobEntity extends CommonFieldsEntity {
     }
 
     /**
-     * Get a DTO representing this job.
+     * Set the command criteria requested for this job.
      *
-     * @return The read-only DTO.
+     * @param commandCriteria The command criteria to use
      */
-    public Job getDTO() {
-        final Job.Builder builder = new Job.Builder(
-            this.getName(),
-            this.getUser(),
-            this.getVersion(),
-            this.commandArgs
-        )
-            .withId(this.getId())
-            .withClusterName(this.clusterName)
-            .withCommandName(this.commandName)
-            .withCreated(this.getCreated())
-            .withTags(this.getTags())
-            .withUpdated(this.getUpdated())
-            .withArchiveLocation(this.archiveLocation)
-            .withFinished(this.finished)
-            .withStarted(this.started)
-            .withStatus(this.status)
-            .withStatusMsg(this.statusMsg);
+    public void setCommandCriteria(@Nullable final Set<TagEntity> commandCriteria) {
+        this.commandCriteria.clear();
+        if (commandCriteria != null) {
+            this.commandCriteria.addAll(commandCriteria);
+        }
+    }
 
-        this.getDescription().ifPresent(builder::withDescription);
-
-        return builder.build();
+    /**
+     * Set the cluster criterias requested for this job.
+     *
+     * @param clusterCriterias The cluster criterias in priority order
+     */
+    public void setClusterCriterias(@Nullable final List<ClusterCriteriaEntity> clusterCriterias) {
+        this.clusterCriterias.clear();
+        if (clusterCriterias != null) {
+            this.clusterCriterias.addAll(clusterCriterias);
+        }
     }
 }

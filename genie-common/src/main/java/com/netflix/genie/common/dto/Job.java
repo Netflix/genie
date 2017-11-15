@@ -56,7 +56,6 @@ public class Job extends CommonDTO {
     @NotNull
     @JsonSerialize(using = ToStringSerializer.class)
     private final Duration runtime;
-    @Size(min = 1, max = 10000, message = "Command arguments are required and max at 10000 characters")
     private String commandArgs;
 
     /**
@@ -76,6 +75,15 @@ public class Job extends CommonDTO {
         this.commandName = builder.bCommandName;
 
         this.runtime = TimeUtils.getDuration(this.started, this.finished);
+    }
+
+    /**
+     * Get the arguments to be put on the command line along with the command executable.
+     *
+     * @return The command arguments
+     */
+    public Optional<String> getCommandArgs() {
+        return Optional.of(this.commandArgs);
     }
 
     /**

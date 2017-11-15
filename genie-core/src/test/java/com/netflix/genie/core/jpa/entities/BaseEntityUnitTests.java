@@ -17,15 +17,13 @@
  */
 package com.netflix.genie.core.jpa.entities;
 
-import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import org.hamcrest.Matchers;
+import com.netflix.genie.test.categories.UnitTest;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import java.util.Date;
-import java.util.UUID;
 
 /**
  * Tests for the base entity.
@@ -41,39 +39,8 @@ public class BaseEntityUnitTests {
     @Test
     public void testConstructor() {
         final BaseEntity a = new BaseEntity();
-        Assert.assertNull(a.getId());
         Assert.assertNotNull(a.getCreated());
         Assert.assertNotNull(a.getUpdated());
-    }
-
-    /**
-     * Test the setter for id.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
-     */
-    @Test
-    public void testSetId() throws GeniePreconditionException {
-        final BaseEntity a = new BaseEntity();
-        Assert.assertNull(a.getId());
-        final String id = UUID.randomUUID().toString();
-        a.setId(id);
-        Assert.assertEquals(id, a.getId());
-    }
-
-    /**
-     * Test the setter for id.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
-     */
-    @Test(expected = GeniePreconditionException.class)
-    public void testSetIdTwice() throws GeniePreconditionException {
-        final BaseEntity a = new BaseEntity();
-        Assert.assertNull(a.getId());
-        final String id = UUID.randomUUID().toString();
-        a.setId(id);
-        Assert.assertEquals(id, a.getId());
-        //Should throw exception here
-        a.setId(UUID.randomUUID().toString());
     }
 
     /**
@@ -85,26 +52,17 @@ public class BaseEntityUnitTests {
     @Test
     public void testOnCreateBaseEntity() throws InterruptedException, GeniePreconditionException {
         final BaseEntity a = new BaseEntity();
-        Assert.assertNull(a.getId());
         Assert.assertNotNull(a.getCreated());
         Assert.assertNotNull(a.getUpdated());
         final Date originalCreated = a.getCreated();
         final Date originalUpdated = a.getUpdated();
         Thread.sleep(1);
         a.onCreateBaseEntity();
-        Assert.assertNotNull(a.getId());
         Assert.assertNotNull(a.getCreated());
         Assert.assertNotNull(a.getUpdated());
         Assert.assertNotEquals(originalCreated, a.getCreated());
         Assert.assertNotEquals(originalUpdated, a.getUpdated());
         Assert.assertEquals(a.getCreated(), a.getUpdated());
-
-        //Test to make sure if an ID already was set we don't change it
-        final BaseEntity baseEntity = new BaseEntity();
-        final String id = UUID.randomUUID().toString();
-        baseEntity.setId(id);
-        baseEntity.onCreateBaseEntity();
-        Assert.assertEquals(id, baseEntity.getId());
     }
 
     /**
@@ -115,7 +73,6 @@ public class BaseEntityUnitTests {
     @Test
     public void testOnUpdateBaseEntity() throws InterruptedException {
         final BaseEntity a = new BaseEntity();
-        Assert.assertNull(a.getId());
         Assert.assertNotNull(a.getCreated());
         Assert.assertNotNull(a.getUpdated());
         a.onCreateBaseEntity();
@@ -125,60 +82,5 @@ public class BaseEntityUnitTests {
         a.onUpdateBaseEntity();
         Assert.assertEquals(originalCreate, a.getCreated());
         Assert.assertNotEquals(originalUpdate, a.getUpdated());
-    }
-
-    /**
-     * Test to make sure the setter of created does nothing relative to persistence.
-     */
-    @Test
-    public void testSetCreated() {
-        final BaseEntity a = new BaseEntity();
-        Assert.assertNotNull(a.getCreated());
-        final Date date = new Date(0);
-        a.setCreated(date);
-        Assert.assertNotNull(a.getCreated());
-        Assert.assertEquals(date, a.getCreated());
-        a.onCreateBaseEntity();
-        Assert.assertNotNull(a.getCreated());
-        Assert.assertNotEquals(date, a.getCreated());
-
-        final BaseEntity b = new BaseEntity();
-        final Date created = b.getCreated();
-        final Date newCreated = new Date(created.getTime() + 1);
-        b.setCreated(newCreated);
-        Assert.assertThat(b.getCreated(), Matchers.is(created));
-    }
-
-    /**
-     * Test to make sure updated is set but really is overwritten by onUpdate.
-     *
-     * @throws InterruptedException If processing is interrupted
-     */
-    @Test
-    public void testSetUpdated() throws InterruptedException {
-        final BaseEntity a = new BaseEntity();
-        Assert.assertNotNull(a.getUpdated());
-        final Date date = new Date(0);
-        a.setUpdated(date);
-        Assert.assertNotNull(a.getUpdated());
-        Assert.assertEquals(date, a.getUpdated());
-        a.onCreateBaseEntity();
-        Assert.assertNotEquals(date, a.getUpdated());
-        final Date oldUpdated = a.getUpdated();
-        Thread.sleep(1);
-        a.onUpdateBaseEntity();
-        Assert.assertNotEquals(oldUpdated, a.getUpdated());
-    }
-
-    /**
-     * Test the entity version code.
-     */
-    @Test
-    public void testEntityVersion() {
-        final BaseEntity a = new BaseEntity();
-        Assert.assertNull(a.getEntityVersion());
-        final Integer version = 4;
-        a.setEntityVersion(version);
-        Assert.assertEquals(version, a.getEntityVersion());
     }
 }

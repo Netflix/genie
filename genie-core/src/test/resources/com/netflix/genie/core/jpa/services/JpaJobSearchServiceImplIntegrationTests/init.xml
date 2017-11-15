@@ -15,263 +15,573 @@
     limitations under the License.
 -->
 <dataset>
+    <files
+        id="1"
+        created="2016-03-21 01:35:00"
+        updated="2016-03-21 01:35:00"
+        entity_version="0"
+        file="s3://some/hadoop/config/file"
+    />
+    <files
+        id="2"
+        created="2016-03-21 01:35:00"
+        updated="2016-03-21 01:35:00"
+        entity_version="0"
+        file="s3://some/other/hadoop/config/file"
+    />
+    <files
+        id="3"
+        created="2016-03-21 01:35:00"
+        updated="2016-03-21 01:35:00"
+        entity_version="0"
+        file="hadoop.jar"
+    />
+    <files
+        id="4"
+        created="2016-03-21 01:35:00"
+        updated="2016-03-21 01:35:00"
+        entity_version="0"
+        file="s3://some/spark/config/file"
+    />
+    <files
+        id="5"
+        created="2016-03-21 01:35:00"
+        updated="2016-03-21 01:35:00"
+        entity_version="0"
+        file="s3://some/other/spark/config/file"
+    />
+    <files
+        id="6"
+        created="2016-03-21 01:35:00"
+        updated="2016-03-21 01:35:00"
+        entity_version="0"
+        file="spark.jar"
+    />
+    <files
+        id="7"
+        created="2016-03-21 01:35:00"
+        updated="2016-03-21 01:35:00"
+        entity_version="0"
+        file="s3://some/spark2/config/file"
+    />
+    <files
+        id="8"
+        created="2016-03-21 01:35:00"
+        updated="2016-03-21 01:35:00"
+        entity_version="0"
+        file="s3://some/other/spark2/config/file"
+    />
+    <files
+        id="9"
+        created="2016-03-21 01:35:00"
+        updated="2016-03-21 01:35:00"
+        entity_version="0"
+        file="spark2.jar"
+    />
+    <files
+        id="10"
+        created="2016-03-21 01:35:00"
+        updated="2016-03-21 01:35:00"
+        entity_version="0"
+        file="s3://some/config/file"
+    />
+    <files
+        id="11"
+        created="2016-03-21 01:35:00"
+        updated="2016-03-21 01:35:00"
+        entity_version="0"
+        file="s3://some/other/config/file"
+    />
+
+    <tags
+        id="1"
+        created="2016-03-21 01:35:00"
+        updated="2016-03-21 01:35:00"
+        entity_version="0"
+        tag="genie.id:app1"
+    />
+    <tags
+        id="2"
+        created="2016-03-21 01:35:00"
+        updated="2016-03-21 01:35:00"
+        entity_version="0"
+        tag="genie.name:hadoop"
+    />
+    <tags
+        id="3"
+        created="2016-03-21 01:35:00"
+        updated="2016-03-21 01:35:00"
+        entity_version="0"
+        tag="type:hadoop"
+    />
+    <tags
+        id="4"
+        created="2016-03-21 01:35:00"
+        updated="2016-03-21 01:35:00"
+        entity_version="0"
+        tag="genie.id:app2"
+    />
+    <tags
+        id="5"
+        created="2016-03-21 01:35:00"
+        updated="2016-03-21 01:35:00"
+        entity_version="0"
+        tag="genie.name:spark"
+    />
+    <tags
+        id="6"
+        created="2016-03-21 01:35:00"
+        updated="2016-03-21 01:35:00"
+        entity_version="0"
+        tag="type:spark"
+    />
+    <tags
+        id="7"
+        created="2016-03-21 01:35:00"
+        updated="2016-03-21 01:35:00"
+        entity_version="0"
+        tag="genie.id:app3"
+    />
+    <tags
+        id="8"
+        created="2016-03-21 01:35:00"
+        updated="2016-03-21 01:35:00"
+        entity_version="0"
+        tag="genie.id:command1"
+    />
+    <tags
+        id="9"
+        created="2016-03-21 01:35:00"
+        updated="2016-03-21 01:35:00"
+        entity_version="0"
+        tag="genie.id:cluster1"
+    />
+    <tags
+        id="10"
+        created="2016-03-21 01:35:00"
+        updated="2016-03-21 01:35:00"
+        entity_version="0"
+        tag="genie.name:h2query"
+    />
+    <tags
+        id="11"
+        created="2016-03-21 01:35:00"
+        updated="2016-03-21 01:35:00"
+        entity_version="0"
+        tag="sched:adhoc"
+    />
+    <tags
+        id="12"
+        created="2016-03-21 01:35:00"
+        updated="2016-03-21 01:35:00"
+        entity_version="0"
+        tag="type:yarn"
+    />
+    <tags
+        id="13"
+        created="2016-03-21 01:35:00"
+        updated="2016-03-21 01:35:00"
+        entity_version="0"
+        tag="sla"
+    />
+    <tags
+        id="14"
+        created="2016-03-21 01:35:00"
+        updated="2016-03-21 01:35:00"
+        entity_version="0"
+        tag="yarn"
+    />
+    <tags
+        id="15"
+        created="2016-03-21 01:35:00"
+        updated="2016-03-21 01:35:00"
+        entity_version="0"
+        tag="adhoc"
+    />
+    <tags
+        id="16"
+        created="2016-03-21 01:35:00"
+        updated="2016-03-21 01:35:00"
+        entity_version="0"
+        tag="ver:1.6.0"
+    />
+    <tags
+        id="17"
+        created="2016-03-21 01:35:00"
+        updated="2016-03-21 01:35:00"
+        entity_version="0"
+        tag="sched:sla"
+    />
 
     <applications
-        id="app1"
+        id="1"
         created="2016-03-21 01:35:00"
         updated="2016-03-21 01:40:00"
+        entity_version="0"
+        unique_id="app1"
         genie_user="tgianos"
         name="hadoop"
         version="4.5.6"
         status="ACTIVE"
-        entity_version="0"
         type="hadoop"
-        tags="|genie.id:app1||genie.name:hadoop||type:hadoop|"
     />
-    <application_configs
-        application_id="app1"
-        config="s3://some/hadoop/config/file"/>
-    <application_configs
-        application_id="app1"
-        config="s3://some/other/hadoop/config/file"/>
-    <application_dependencies
-        application_id="app1"
-        dependency="hadoop.jar"/>
+    <applications_configs
+        application_id="1"
+        file_id="1"
+    />
+    <applications_configs
+        application_id="1"
+        file_id="2"
+    />
+    <applications_dependencies
+        application_id="1"
+        file_id="2"
+    />
+    <applications_tags
+        application_id="1"
+        tag_id="1"
+    />
+    <applications_tags
+        application_id="1"
+        tag_id="2"
+    />
+    <applications_tags
+        application_id="1"
+        tag_id="3"
+    />
 
     <applications
-        id="app2"
+        id="2"
         created="2016-03-21 01:45:00"
         updated="2016-03-21 01:50:00"
+        entity_version="0"
+        unique_id="app2"
         genie_user="tgianos"
         name="spark"
         version="1.6.0"
         status="ACTIVE"
-        entity_version="0"
         type="spark"
-        tags="|genie.id:app2||genie.name:spark||type:spark|"
     />
-    <application_configs
-        application_id="app2"
-        config="s3://some/spark/config/file"/>
-    <application_configs
-        application_id="app2"
-        config="s3://some/other/spark/config/file"/>
-    <application_dependencies
-        application_id="app2"
-        dependency="spark.jar"/>
+    <applications_configs
+        application_id="2"
+        file_id="4"
+    />
+    <applications_configs
+        application_id="2"
+        file_id="5"
+    />
+    <applications_dependencies
+        application_id="2"
+        file_id="6"
+    />
+    <applications_tags
+        application_id="2"
+        tag_id="4"
+    />
+    <applications_tags
+        application_id="2"
+        tag_id="5"
+    />
+    <applications_tags
+        application_id="2"
+        tag_id="6"
+    />
 
     <applications
-        id="app3"
+        id="3"
         created="2016-03-21 01:55:00"
         updated="2016-03-21 02:00:00"
+        entity_version="0"
+        unique_id="app3"
         genie_user="tgianos"
         name="spark"
         version="2.0.0"
         status="ACTIVE"
-        entity_version="0"
         type="spark"
-        tags="|genie.id:app3||genie.name:spark||type:spark|"
     />
-    <application_configs
-        application_id="app3"
-        config="s3://some/spark2/config/file"/>
-    <application_configs
-        application_id="app3"
-        config="s3://some/other/spark2/config/file"/>
-    <application_dependencies
-        application_id="app3"
-        dependency="spark2.jar"/>
+    <applications_configs
+        application_id="3"
+        file_id="7"
+    />
+    <applications_configs
+        application_id="3"
+        file_id="8"
+    />
+    <applications_dependencies
+        application_id="3"
+        file_id="9"
+    />
+    <applications_tags
+        application_id="3"
+        tag_id="7"
+    />
+    <applications_tags
+        application_id="3"
+        tag_id="5"
+    />
+    <applications_tags
+        application_id="3"
+        tag_id="6"
+    />
 
     <commands
-        id="command1"
+        id="1"
         created="2016-03-21 01:47:00"
         updated="2016-03-21 01:59:00"
+        entity_version="0"
+        unique_id="command1"
         genie_user="tgianos"
         name="spark"
         version="1.6.0"
         executable="spark"
         check_delay="10000"
         status="ACTIVE"
-        entity_version="0"
-        tags="|genie.id:command1||genie.name:spark|"
     />
 
-    <commands_applications command_id="command1" application_id="app1" application_order="0"/>
-    <commands_applications command_id="command1" application_id="app2" application_order="1"/>
+    <commands_tags
+        command_id="1"
+        tag_id="8"
+    />
+    <commands_tags
+        command_id="1"
+        tag_id="5"
+    />
+
+    <commands_applications command_id="1" application_id="1" application_order="0"/>
+    <commands_applications command_id="1" application_id="2" application_order="1"/>
 
     <clusters
-        id="cluster1"
+        id="1"
         created="2016-03-21 01:49:00"
         updated="2016-03-21 02:59:00"
+        entity_version="0"
+        unique_id="cluster1"
         genie_user="tgianos"
         name="h2query"
         version="2.4.0"
         status="UP"
-        entity_version="0"
-        tags="|genie.id:cluster1||genie.name:h2query||sched:adhoc||type:yarn|"
     />
-    <cluster_configs
-        cluster_id="cluster1"
-        config="s3://some/config/file"/>
-    <cluster_configs
-        cluster_id="cluster1"
-        config="s3://some/other/config/file"/>
+    <clusters_configs
+        cluster_id="1"
+        file_id="10"
+    />
+    <clusters_configs
+        cluster_id="1"
+        file_id="11"
+    />
 
     <clusters_commands
-        cluster_id="cluster1"
-        command_id="command1"
-        command_order="0"/>
-
-    <job_requests
-        id="job1"
-        created="2015-08-11 01:48:00"
-        updated="2014-08-11 02:59:00"
-        genie_user="tgianos"
-        name="testSparkJob"
-        version="2.4"
-        command_args="-f query.q"
-        cluster_criterias="[
-            {&quot;tags&quot;:[&quot;sla&quot;,&quot;yarn&quot;]},
-            {&quot;tags&quot;:[&quot;adhoc&quot;,&quot;yarn&quot;]}
-        ]"
-        command_criteria="[&quot;type:spark&quot;,&quot;ver:1.6.0&quot;]"
-        applications="[&quot;app1&quot;,&quot;app3&quot;]"
-        configs="[]"
-        dependencies="[]"
-        cpu="1"
-        memory="1560"
-        disable_log_archival="true"
-        timeout="608400"
-        entity_version="1"
+        cluster_id="1"
+        command_id="1"
+        command_order="0"
     />
+
     <jobs
-        id="job1"
-        created="2015-08-11 01:49:00"
-        updated="2014-08-11 02:59:00"
+        id="1"
+        created="2015-08-11 01:48:00"
+        updated="2015-08-11 02:59:00"
+        entity_version="1"
+        unique_id="job1"
         genie_user="tgianos"
         name="testSparkJob"
-        command_args="-f query.q"
-        status="SUCCEEDED"
         version="2.4"
-        entity_version="0"
-        cluster_id="cluster1"
-        command_id="command1"
-    />
-
-    <jobs_applications job_id="job1" application_id="app1" application_order="0"/>
-    <jobs_applications job_id="job1" application_id="app3" application_order="1"/>
-
-    <job_executions
-        id="job1"
-        created="2015-08-11 01:49:00"
-        updated="2014-08-11 02:59:00"
+        command_args="-f query.q"
+        cpu_requested="1"
+        memory_requested="1560"
+        disable_log_archival="true"
+        timeout_requested="608400"
+        num_attachments="2"
+        total_size_of_attachments="38083"
+        status="SUCCEEDED"
+        cluster_id="1"
+        command_id="1"
         host_name="a.netflix.com"
         exit_code="0"
         process_id="317"
         check_delay="10000"
         timeout="2015-08-18 01:49:00"
-        entity_version="2"
+    />
+    <job_applications_requested
+        job_id="1"
+        application_id="app1"
+        application_order="0"
+    />
+    <job_applications_requested
+        job_id="1"
+        application_id="app3"
+        application_order="1"
+    />
+    <cluster_criterias
+        id="1"
+        created="2015-08-11 01:48:00"
+        updated="2015-08-11 02:59:00"
+        entity_version="0"
+        job_id="1"
+        priority_order="0"
+    />
+    <cluster_criterias_tags
+        cluster_criteria_id="1"
+        tag_id="13"
+    />
+    <cluster_criterias_tags
+        cluster_criteria_id="1"
+        tag_id="14"
+    />
+    <cluster_criterias
+        id="2"
+        created="2015-08-11 01:48:00"
+        updated="2015-08-11 02:59:00"
+        entity_version="0"
+        job_id="1"
+        priority_order="1"
+    />
+    <cluster_criterias_tags
+        cluster_criteria_id="2"
+        tag_id="13"
+    />
+    <cluster_criterias_tags
+        cluster_criteria_id="2"
+        tag_id="15"
+    />
+    <job_command_criteria_tags
+        job_id="1"
+        tag_id="6"
+    />
+    <job_command_criteria_tags
+        job_id="1"
+        tag_id="16"
     />
 
-    <job_requests
-        id="job2"
+    <jobs_applications job_id="1" application_id="1" application_order="0"/>
+    <jobs_applications job_id="1" application_id="3" application_order="1"/>
+
+    <jobs
+        id="2"
         created="2015-08-12 01:48:00"
         updated="2015-08-12 02:59:00"
-        genie_user="tgianos"
-        name="testSparkJob1"
-        version="2.4"
-        command_args="-f spark.jar"
-        cluster_criterias="[
-            {&quot;tags&quot;:[&quot;sched:sla&quot;,&quot;type:yarn&quot;]},
-            {&quot;tags&quot;:[&quot;sched:adhoc&quot;,&quot;type:yarn&quot;]}
-        ]"
-        command_criteria="[&quot;type:spark&quot;]"
-        applications="[]"
-        configs="[]"
-        dependencies="[]"
-        cpu="2"
-        memory="2048"
-        disable_log_archival="false"
-        timeout="608400"
         entity_version="1"
-    />
-    <jobs
-        id="job2"
-        created="2015-08-12 01:49:00"
-        updated="2015-08-12 02:59:00"
+        unique_id="job2"
         genie_user="tgianos"
         name="testSparkJob1"
-        command_args="-f spark.jar"
-        status="INIT"
         version="2.4"
-        entity_version="0"
-        cluster_id="cluster1"
-        command_id="command1"
-    />
-
-    <jobs_applications job_id="job2" application_id="app1" application_order="0"/>
-    <jobs_applications job_id="job2" application_id="app2" application_order="1"/>
-
-    <job_executions
-        id="job2"
-        created="2015-08-12 01:49:00"
-        updated="2015-08-12 02:59:00"
+        command_args="-f spark.jar"
+        cpu_requested="2"
+        memory_requested="2048"
+        disable_log_archival="false"
+        timeout_requested="608400"
+        num_attachments="3"
+        total_size_of_attachments="38082233"
+        status="INIT"
+        cluster_id="1"
+        command_id="1"
         host_name="a.netflix.com"
         exit_code="-1"
         process_id="318"
         check_delay="11000"
         timeout="2015-08-19 01:49:00"
+    />
+    <cluster_criterias
+        id="3"
+        created="2015-08-12 01:48:00"
+        updated="2015-08-12 02:59:00"
         entity_version="0"
+        job_id="2"
+        priority_order="0"
+    />
+    <cluster_criterias_tags
+        cluster_criteria_id="3"
+        tag_id="17"
+    />
+    <cluster_criterias_tags
+        cluster_criteria_id="3"
+        tag_id="12"
+    />
+    <cluster_criterias
+        id="4"
+        created="2015-08-12 01:48:00"
+        updated="2015-08-12 02:59:00"
+        entity_version="0"
+        job_id="2"
+        priority_order="1"
+    />
+    <cluster_criterias_tags
+        cluster_criteria_id="4"
+        tag_id="11"
+    />
+    <cluster_criterias_tags
+        cluster_criteria_id="4"
+        tag_id="12"
+    />
+    <job_command_criteria_tags
+        job_id="2"
+        tag_id="6"
     />
 
-    <job_requests
-        id="job3"
+    <jobs_applications job_id="2" application_id="1" application_order="0"/>
+    <jobs_applications job_id="2" application_id="2" application_order="1"/>
+
+    <jobs
+        id="3"
         created="2016-02-24 01:48:00"
         updated="2016-02-24 02:59:00"
-        genie_user="tgianos"
-        name="testSparkJob2"
-        version="2.4"
-        command_args="-f spark.jar"
-        cluster_criterias="[
-            {&quot;tags&quot;:[&quot;sched:sla&quot;,&quot;type:yarn&quot;]},
-            {&quot;tags&quot;:[&quot;sched:adhoc&quot;,&quot;type:yarn&quot;]}
-        ]"
-        command_criteria="[&quot;type:spark&quot;]"
-        applications="[]"
-        configs="[]"
-        dependencies="[]"
-        cpu="2"
-        memory="2048"
-        disable_log_archival="true"
-        timeout="608400"
         entity_version="1"
-    />
-    <jobs
-        id="job3"
-        created="2016-02-24 01:49:00"
-        updated="2016-02-24 02:59:00"
+        unique_id="job3"
         genie_user="tgianos"
         name="testSparkJob2"
-        command_args="-f spark.jar"
-        status="RUNNING"
         version="2.4"
-        entity_version="0"
-        cluster_id="cluster1"
-        command_id="command1"
-    />
-
-    <jobs_applications job_id="job3" application_id="app1" application_order="0"/>
-    <jobs_applications job_id="job3" application_id="app2" application_order="1"/>
-
-    <job_executions
-        id="job3"
-        created="2016-02-24 01:49:00"
-        updated="2016-02-24 02:59:00"
+        command_args="-f spark.jar"
+        cpu_requested="2"
+        memory_requested="2048"
+        disable_log_archival="true"
+        timeout_requested="608400"
+        num_attachments="1"
+        total_size_of_attachments="382"
+        status="RUNNING"
+        cluster_id="1"
+        command_id="1"
         host_name="b.netflix.com"
         exit_code="-1"
         process_id="319"
         check_delay="12000"
         timeout="2016-03-03 01:49:00"
-        entity_version="0"
     />
+    <cluster_criterias
+        id="5"
+        created="2015-08-12 01:48:00"
+        updated="2015-08-12 02:59:00"
+        entity_version="0"
+        job_id="3"
+        priority_order="0"
+    />
+    <cluster_criterias_tags
+        cluster_criteria_id="5"
+        tag_id="17"
+    />
+    <cluster_criterias_tags
+        cluster_criteria_id="5"
+        tag_id="12"
+    />
+    <cluster_criterias
+        id="6"
+        created="2015-08-12 01:48:00"
+        updated="2015-08-12 02:59:00"
+        entity_version="0"
+        job_id="3"
+        priority_order="1"
+    />
+    <cluster_criterias_tags
+        cluster_criteria_id="6"
+        tag_id="11"
+    />
+    <cluster_criterias_tags
+        cluster_criteria_id="6"
+        tag_id="12"
+    />
+    <job_command_criteria_tags
+        job_id="3"
+        tag_id="6"
+    />
+
+    <jobs_applications job_id="3" application_id="1" application_order="0"/>
+    <jobs_applications job_id="3" application_id="2" application_order="1"/>
 </dataset>

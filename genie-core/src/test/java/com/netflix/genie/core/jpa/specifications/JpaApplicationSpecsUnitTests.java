@@ -19,6 +19,7 @@ import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.core.jpa.entities.ApplicationEntity;
 import com.netflix.genie.core.jpa.entities.ApplicationEntity_;
+import com.netflix.genie.core.jpa.entities.TagEntity;
 import com.netflix.genie.test.categories.UnitTest;
 import org.junit.Assert;
 import org.junit.Before;
@@ -29,9 +30,11 @@ import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.criteria.SetJoin;
 import java.util.Set;
 import java.util.UUID;
 
@@ -45,17 +48,18 @@ public class JpaApplicationSpecsUnitTests {
 
     private static final String NAME = "tez";
     private static final String USER_NAME = "tgianos";
-    private static final String TAG_1 = "tez";
-    private static final String TAG_2 = "yarn";
-    private static final String TAG_3 = "hadoop";
-    private static final Set<String> TAGS = Sets.newHashSet();
-    private static final Set<ApplicationStatus> STATUSES = Sets.newHashSet();
+    private static final TagEntity TAG_1 = new TagEntity("tez");
+    private static final TagEntity TAG_2 = new TagEntity("yarn");
+    private static final TagEntity TAG_3 = new TagEntity("hadoop");
+    private static final Set<TagEntity> TAGS = Sets.newHashSet(TAG_1, TAG_2, TAG_3);
+    private static final Set<ApplicationStatus> STATUSES
+        = Sets.newHashSet(ApplicationStatus.ACTIVE, ApplicationStatus.DEPRECATED);
     private static final String TYPE = UUID.randomUUID().toString();
 
     private Root<ApplicationEntity> root;
     private CriteriaQuery<?> cq;
     private CriteriaBuilder cb;
-    private String tagLikeStatement;
+    private SetJoin<ApplicationEntity, TagEntity> tagEntityJoin;
 
     /**
      * Setup some variables.
@@ -63,18 +67,12 @@ public class JpaApplicationSpecsUnitTests {
     @Before
     @SuppressWarnings("unchecked")
     public void setup() {
-        TAGS.clear();
-        TAGS.add(TAG_1);
-        TAGS.add(TAG_2);
-        TAGS.add(TAG_3);
-
-        STATUSES.clear();
-        STATUSES.add(ApplicationStatus.ACTIVE);
-        STATUSES.add(ApplicationStatus.DEPRECATED);
-
         this.root = (Root<ApplicationEntity>) Mockito.mock(Root.class);
         this.cq = Mockito.mock(CriteriaQuery.class);
         this.cb = Mockito.mock(CriteriaBuilder.class);
+
+        final Path<Long> idPath = (Path<Long>) Mockito.mock(Path.class);
+        Mockito.when(this.root.get(ApplicationEntity_.id)).thenReturn(idPath);
 
         final Path<String> namePath = (Path<String>) Mockito.mock(Path.class);
         final Predicate equalNamePredicate = Mockito.mock(Predicate.class);
@@ -96,13 +94,15 @@ public class JpaApplicationSpecsUnitTests {
         Mockito.when(this.cb.equal(Mockito.eq(statusPath), Mockito.any(ApplicationStatus.class)))
             .thenReturn(equalStatusPredicate);
 
-        final Path<String> tagPath = (Path<String>) Mockito.mock(Path.class);
-        final Predicate likeTagPredicate = Mockito.mock(Predicate.class);
-        Mockito.when(this.root.get(ApplicationEntity_.tags)).thenReturn(tagPath);
-        Mockito.when(this.cb.like(Mockito.eq(tagPath), Mockito.any(String.class)))
-            .thenReturn(likeTagPredicate);
+        this.tagEntityJoin = (SetJoin<ApplicationEntity, TagEntity>) Mockito.mock(SetJoin.class);
+        Mockito.when(this.root.join(ApplicationEntity_.tags)).thenReturn(this.tagEntityJoin);
+        final Predicate tagInPredicate = Mockito.mock(Predicate.class);
+        Mockito.when(this.tagEntityJoin.in(TAGS)).thenReturn(tagInPredicate);
 
-        this.tagLikeStatement = JpaSpecificationUtils.getTagLikeString(TAGS);
+        final Expression<Long> idCountExpression = (Expression<Long>) Mockito.mock(Expression.class);
+        Mockito.when(this.cb.count(idPath)).thenReturn(idCountExpression);
+        final Predicate havingPredicate = Mockito.mock(Predicate.class);
+        Mockito.when(this.cb.equal(idCountExpression, TAGS.size())).thenReturn(havingPredicate);
 
         final Path<String> typePath = (Path<String>) Mockito.mock(Path.class);
         final Predicate equalTypePredicate = Mockito.mock(Predicate.class);
@@ -125,7 +125,13 @@ public class JpaApplicationSpecsUnitTests {
         for (final ApplicationStatus status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.status), status);
         }
-        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(ApplicationEntity_.tags), this.tagLikeStatement);
+
+        // Tags
+        Mockito.verify(this.root, Mockito.times(1)).join(ApplicationEntity_.tags);
+        Mockito.verify(this.tagEntityJoin, Mockito.times(1)).in(TAGS);
+        Mockito.verify(this.cq, Mockito.times(1)).groupBy(Mockito.any(Path.class));
+        Mockito.verify(this.cq, Mockito.times(1)).having(Mockito.any(Predicate.class));
+
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.type), TYPE);
     }
 
@@ -146,7 +152,10 @@ public class JpaApplicationSpecsUnitTests {
         for (final ApplicationStatus status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.status), status);
         }
-        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(ApplicationEntity_.tags), this.tagLikeStatement);
+        Mockito.verify(this.root, Mockito.times(1)).join(ApplicationEntity_.tags);
+        Mockito.verify(this.tagEntityJoin, Mockito.times(1)).in(TAGS);
+        Mockito.verify(this.cq, Mockito.times(1)).groupBy(Mockito.any(Path.class));
+        Mockito.verify(this.cq, Mockito.times(1)).having(Mockito.any(Predicate.class));
         Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(ApplicationEntity_.type), newType);
     }
 
@@ -163,7 +172,10 @@ public class JpaApplicationSpecsUnitTests {
         for (final ApplicationStatus status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.status), status);
         }
-        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(ApplicationEntity_.tags), this.tagLikeStatement);
+        Mockito.verify(this.root, Mockito.times(1)).join(ApplicationEntity_.tags);
+        Mockito.verify(this.tagEntityJoin, Mockito.times(1)).in(TAGS);
+        Mockito.verify(this.cq, Mockito.times(1)).groupBy(Mockito.any(Path.class));
+        Mockito.verify(this.cq, Mockito.times(1)).having(Mockito.any(Predicate.class));
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.type), TYPE);
     }
 
@@ -180,7 +192,10 @@ public class JpaApplicationSpecsUnitTests {
         for (final ApplicationStatus status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.status), status);
         }
-        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(ApplicationEntity_.tags), this.tagLikeStatement);
+        Mockito.verify(this.root, Mockito.times(1)).join(ApplicationEntity_.tags);
+        Mockito.verify(this.tagEntityJoin, Mockito.times(1)).in(TAGS);
+        Mockito.verify(this.cq, Mockito.times(1)).groupBy(Mockito.any(Path.class));
+        Mockito.verify(this.cq, Mockito.times(1)).having(Mockito.any(Predicate.class));
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.type), TYPE);
     }
 
@@ -197,7 +212,10 @@ public class JpaApplicationSpecsUnitTests {
         for (final ApplicationStatus status : STATUSES) {
             Mockito.verify(this.cb, Mockito.never()).equal(this.root.get(ApplicationEntity_.status), status);
         }
-        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(ApplicationEntity_.tags), this.tagLikeStatement);
+        Mockito.verify(this.root, Mockito.times(1)).join(ApplicationEntity_.tags);
+        Mockito.verify(this.tagEntityJoin, Mockito.times(1)).in(TAGS);
+        Mockito.verify(this.cq, Mockito.times(1)).groupBy(Mockito.any(Path.class));
+        Mockito.verify(this.cq, Mockito.times(1)).having(Mockito.any(Predicate.class));
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.type), TYPE);
     }
 
@@ -215,7 +233,10 @@ public class JpaApplicationSpecsUnitTests {
         for (final ApplicationStatus status : STATUSES) {
             Mockito.verify(this.cb, Mockito.never()).equal(this.root.get(ApplicationEntity_.status), status);
         }
-        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(ApplicationEntity_.tags), this.tagLikeStatement);
+        Mockito.verify(this.root, Mockito.times(1)).join(ApplicationEntity_.tags);
+        Mockito.verify(this.tagEntityJoin, Mockito.times(1)).in(TAGS);
+        Mockito.verify(this.cq, Mockito.times(1)).groupBy(Mockito.any(Path.class));
+        Mockito.verify(this.cq, Mockito.times(1)).having(Mockito.any(Predicate.class));
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.type), TYPE);
     }
 
@@ -232,25 +253,7 @@ public class JpaApplicationSpecsUnitTests {
         for (final ApplicationStatus status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.status), status);
         }
-        Mockito.verify(this.cb, Mockito.never()).like(this.root.get(ApplicationEntity_.tags), this.tagLikeStatement);
-        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.type), TYPE);
-    }
-
-    /**
-     * Test the find specification.
-     */
-    @Test
-    public void testFindEmptyTag() {
-        TAGS.add("");
-        final Specification<ApplicationEntity> spec = JpaApplicationSpecs.find(NAME, USER_NAME, STATUSES, TAGS, TYPE);
-
-        spec.toPredicate(this.root, this.cq, this.cb);
-        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.name), NAME);
-        Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.user), USER_NAME);
-        for (final ApplicationStatus status : STATUSES) {
-            Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.status), status);
-        }
-        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(ApplicationEntity_.tags), this.tagLikeStatement);
+        Mockito.verify(this.root, Mockito.never()).join(ApplicationEntity_.tags);
         Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.type), TYPE);
     }
 
@@ -267,7 +270,10 @@ public class JpaApplicationSpecsUnitTests {
         for (final ApplicationStatus status : STATUSES) {
             Mockito.verify(this.cb, Mockito.times(1)).equal(this.root.get(ApplicationEntity_.status), status);
         }
-        Mockito.verify(this.cb, Mockito.times(1)).like(this.root.get(ApplicationEntity_.tags), this.tagLikeStatement);
+        Mockito.verify(this.root, Mockito.times(1)).join(ApplicationEntity_.tags);
+        Mockito.verify(this.tagEntityJoin, Mockito.times(1)).in(TAGS);
+        Mockito.verify(this.cq, Mockito.times(1)).groupBy(Mockito.any(Path.class));
+        Mockito.verify(this.cq, Mockito.times(1)).having(Mockito.any(Predicate.class));
         Mockito.verify(this.cb, Mockito.never()).equal(this.root.get(ApplicationEntity_.type), TYPE);
     }
 

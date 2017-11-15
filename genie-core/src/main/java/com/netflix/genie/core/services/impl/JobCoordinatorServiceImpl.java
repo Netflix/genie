@@ -188,7 +188,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                 jobRequest.getName(),
                 jobRequest.getUser(),
                 jobRequest.getVersion(),
-                jobRequest.getCommandArgs()
+                jobRequest.getCommandArgs().orElse(null)
             )
                 .withId(jobId)
                 .withTags(jobRequest.getTags())

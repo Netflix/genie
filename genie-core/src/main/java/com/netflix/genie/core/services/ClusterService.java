@@ -30,6 +30,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
@@ -84,11 +85,11 @@ public interface ClusterService {
      * @return All the clusters matching the criteria
      */
     Page<Cluster> getClusters(
-        final String name,
-        final Set<ClusterStatus> statuses,
-        final Set<String> tags,
-        final Date minUpdateTime,
-        final Date maxUpdateTime,
+        @Nullable final String name,
+        @Nullable final Set<ClusterStatus> statuses,
+        @Nullable final Set<String> tags,
+        @Nullable final Date minUpdateTime,
+        @Nullable final Date maxUpdateTime,
         final Pageable page
     );
 
@@ -375,7 +376,7 @@ public interface ClusterService {
     List<Command> getCommandsForCluster(
         @NotBlank(message = "No cluster id entered. Unable to get commands.")
         final String id,
-        final Set<CommandStatus> statuses
+        @Nullable final Set<CommandStatus> statuses
     ) throws GenieException;
 
     /**

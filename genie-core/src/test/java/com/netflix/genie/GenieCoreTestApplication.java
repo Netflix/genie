@@ -55,9 +55,9 @@ public class GenieCoreTestApplication {
     @PreDestroy
     @SuppressWarnings("PMD.CollapsibleIfStatements") // Collapsing inner `if` statement is not equivalent to this.
     public void cleanUp() {
-        if (temporaryFolder != null && temporaryFolder.exists()) {
-            if (!temporaryFolder.delete()) {
-                throw new RuntimeException("Temporary folder not deleted: " + temporaryFolder.toString());
+        if (this.temporaryFolder.exists()) {
+            if (!this.temporaryFolder.delete()) {
+                throw new RuntimeException("Temporary folder not deleted: " + this.temporaryFolder.toString());
             }
         }
     }

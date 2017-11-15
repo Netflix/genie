@@ -33,7 +33,6 @@ import com.netflix.genie.test.categories.IntegrationTest;
 import com.netflix.genie.test.suppliers.RandomSuppliers;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -138,16 +137,6 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
      * @throws GenieException For any problem
      */
     @Test(expected = ConstraintViolationException.class)
-    public void testGetApplicationNull() throws GenieException {
-        this.appService.getApplication(null);
-    }
-
-    /**
-     * Test the get application method.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
     public void testGetApplicationEmpty() throws GenieException {
         this.appService.getApplication("");
     }
@@ -224,6 +213,16 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
+     * Test the get applications method when a tag doesn't exist in the database.
+     */
+    @Test
+    public void testGetApplicationsByTagsWhenOneDoesntExist() {
+        final Set<String> tags = Sets.newHashSet("prod", UUID.randomUUID().toString());
+        Page<Application> apps = this.appService.getApplications(null, null, null, tags, null, PAGEABLE);
+        Assert.assertEquals(0, apps.getNumberOfElements());
+    }
+
+    /**
      * Test the get applications method.
      */
     @Test
@@ -237,7 +236,7 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
      * Test the get applications method with descending sort.
      */
     @Test
-    public void testGetClustersDescending() {
+    public void testGetApplicationsDescending() {
         //Default to order by Updated
         final Page<Application> applications = this.appService.getApplications(null, null, null, null, null, PAGEABLE);
         Assert.assertEquals(3, applications.getNumberOfElements());
@@ -322,28 +321,6 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
-     * Test the get applications method order by a collection field should return the order by default value (updated).
-     */
-    @Test
-    @Ignore
-    public void testGetClustersOrderBysCollectionField() {
-        final Pageable orderByTagsPage = new PageRequest(0, 10, Sort.Direction.DESC, "tags");
-        final Page<Application> applications
-            = this.appService.getApplications(null, null, null, null, null, orderByTagsPage);
-        Assert.assertThat(applications.getContent().toString(), Matchers.is("blahs"));
-        Assert.assertEquals(3, applications.getNumberOfElements());
-        Assert.assertEquals(
-            APP_3_ID, applications.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new)
-        );
-        Assert.assertEquals(
-            APP_2_ID, applications.getContent().get(1).getId().orElseThrow(IllegalArgumentException::new)
-        );
-        Assert.assertEquals(
-            APP_1_ID, applications.getContent().get(2).getId().orElseThrow(IllegalArgumentException::new)
-        );
-    }
-
-    /**
      * Test the create method.
      *
      * @throws GenieException For any problem
@@ -401,16 +378,6 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
                 ge.getErrorCode()
             );
         }
-    }
-
-    /**
-     * Test to make sure an exception is thrown when null is entered.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testCreateApplicationNull() throws GenieException {
-        this.appService.createApplication(null);
     }
 
     /**
@@ -507,26 +474,6 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
-     * Test to update an application.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testUpdateApplicationNullId() throws GenieException {
-        this.appService.updateApplication(null, this.appService.getApplication(APP_1_ID));
-    }
-
-    /**
-     * Test to update an application.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testUpdateApplicationNullUpdateApp() throws GenieException {
-        this.appService.updateApplication(APP_1_ID, null);
-    }
-
-    /**
      * Test delete all.
      *
      * @throws GenieException For any problem
@@ -562,16 +509,6 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
-     * Test delete.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testDeleteNoId() throws GenieException {
-        this.appService.deleteApplication(null);
-    }
-
-    /**
      * Test add configurations to application.
      *
      * @throws GenieException For any problem
@@ -591,26 +528,6 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertTrue(finalConfigs.contains(newConfig1));
         Assert.assertTrue(finalConfigs.contains(newConfig2));
         Assert.assertTrue(finalConfigs.contains(newConfig3));
-    }
-
-    /**
-     * Test add configurations to application.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testAddConfigsToApplicationNoId() throws GenieException {
-        this.appService.addConfigsToApplication(null, Sets.newHashSet());
-    }
-
-    /**
-     * Test add configurations to application.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testAddConfigsToApplicationNoConfigs() throws GenieException {
-        this.appService.addConfigsToApplication(APP_1_ID, null);
     }
 
     /**
@@ -636,16 +553,6 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
-     * Test update configurations for application.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testUpdateConfigsForApplicationNoId() throws GenieException {
-        this.appService.updateConfigsForApplication(null, Sets.newHashSet());
-    }
-
-    /**
      * Test get configurations for application.
      *
      * @throws GenieException For any problem
@@ -653,16 +560,6 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
     @Test
     public void testGetConfigsForApplication() throws GenieException {
         Assert.assertEquals(2, this.appService.getConfigsForApplication(APP_1_ID).size());
-    }
-
-    /**
-     * Test get configurations to application.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testGetConfigsForApplicationNoId() throws GenieException {
-        this.appService.getConfigsForApplication(null);
     }
 
     /**
@@ -678,16 +575,6 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
-     * Test remove all configurations for application.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testRemoveAllConfigsForApplicationNoId() throws GenieException {
-        this.appService.removeAllConfigsForApplication(null);
-    }
-
-    /**
      * Test remove configuration for application.
      *
      * @throws GenieException For any problem
@@ -699,26 +586,6 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
         final String removedConfig = configs.iterator().next();
         this.appService.removeConfigForApplication(APP_1_ID, removedConfig);
         Assert.assertFalse(this.appService.getConfigsForApplication(APP_1_ID).contains(removedConfig));
-    }
-
-    /**
-     * Test remove configuration for application.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testRemoveConfigForApplicationNullConfig() throws GenieException {
-        this.appService.removeConfigForApplication(APP_1_ID, null);
-    }
-
-    /**
-     * Test remove configuration for application.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testRemoveConfigForApplicationNoId() throws GenieException {
-        this.appService.removeConfigForApplication(null, "something");
     }
 
     /**
@@ -744,26 +611,6 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
-     * Test add dependencies to application.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testAddDependenciesToApplicationNoId() throws GenieException {
-        this.appService.addDependenciesForApplication(null, Sets.newHashSet());
-    }
-
-    /**
-     * Test add dependencies to application.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testAddDependenciesToApplicationNoDependencies() throws GenieException {
-        this.appService.addDependenciesForApplication(APP_1_ID, null);
-    }
-
-    /**
      * Test update dependencies for application.
      *
      * @throws GenieException For any problem
@@ -786,16 +633,6 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
-     * Test update dependencies for application.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testUpdateDependenciesForApplicationNoId() throws GenieException {
-        this.appService.updateDependenciesForApplication(null, Sets.newHashSet());
-    }
-
-    /**
      * Test get dependencies for application.
      *
      * @throws GenieException For any problem
@@ -804,16 +641,6 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
     public void testGetDependenciesForApplication() throws GenieException {
         Assert.assertEquals(2,
             this.appService.getDependenciesForApplication(APP_1_ID).size());
-    }
-
-    /**
-     * Test get dependencies to application.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testGetDependenciesForApplicationNoId() throws GenieException {
-        this.appService.getDependenciesForApplication(null);
     }
 
     /**
@@ -829,16 +656,6 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
-     * Test remove all dependencies for application.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testRemoveAllDependenciesForApplicationNoId() throws GenieException {
-        this.appService.removeAllDependenciesForApplication(null);
-    }
-
-    /**
      * Test remove configuration for application.
      *
      * @throws GenieException For any problem
@@ -850,26 +667,6 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
         final String removedDependency = dependencies.iterator().next();
         this.appService.removeDependencyForApplication(APP_1_ID, removedDependency);
         Assert.assertFalse(this.appService.getDependenciesForApplication(APP_1_ID).contains(removedDependency));
-    }
-
-    /**
-     * Test remove configuration for application.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testRemoveDependencyForApplicationNullDependency() throws GenieException {
-        this.appService.removeDependencyForApplication(APP_1_ID, null);
-    }
-
-    /**
-     * Test remove configuration for application.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testRemoveDependencyForApplicationNoId() throws GenieException {
-        this.appService.removeDependencyForApplication(null, "something");
     }
 
     /**
@@ -895,26 +692,6 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
-     * Test add tags to application.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testAddTagsToApplicationNoId() throws GenieException {
-        this.appService.addTagsForApplication(null, Sets.newHashSet());
-    }
-
-    /**
-     * Test add tags to application.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testAddTagsToApplicationNoTags() throws GenieException {
-        this.appService.addTagsForApplication(APP_1_ID, null);
-    }
-
-    /**
      * Test update tags for application.
      *
      * @throws GenieException For any problem
@@ -937,16 +714,6 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
-     * Test update tags for application.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testUpdateTagsForApplicationNoId() throws GenieException {
-        this.appService.updateTagsForApplication(null, Sets.newHashSet());
-    }
-
-    /**
      * Test get tags for application.
      *
      * @throws GenieException For any problem
@@ -955,16 +722,6 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
     public void testGetTagsForApplication() throws GenieException {
         Assert.assertEquals(3,
             this.appService.getTagsForApplication(APP_1_ID).size());
-    }
-
-    /**
-     * Test get tags to application.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testGetTagsForApplicationNoId() throws GenieException {
-        this.appService.getTagsForApplication(null);
     }
 
     /**
@@ -980,16 +737,6 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
-     * Test remove all tags for application.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testRemoveAllTagsForApplicationNoId() throws GenieException {
-        this.appService.removeAllTagsForApplication(null);
-    }
-
-    /**
      * Test remove tag for application.
      *
      * @throws GenieException For any problem
@@ -1000,26 +747,6 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(3, tags.size());
         this.appService.removeTagForApplication(APP_1_ID, "prod");
         Assert.assertFalse(this.appService.getTagsForApplication(APP_1_ID).contains("prod"));
-    }
-
-    /**
-     * Test remove tag for application.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testRemoveTagForApplicationNullTag() throws GenieException {
-        this.appService.removeTagForApplication(APP_1_ID, null);
-    }
-
-    /**
-     * Test remove configuration for application.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testRemoveTagForApplicationNoId() throws GenieException {
-        this.appService.removeTagForApplication(null, "something");
     }
 
     /**

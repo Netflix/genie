@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.core.jpa.entities;
 
-import com.google.common.collect.Sets;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.test.categories.UnitTest;
 import org.hamcrest.Matchers;
@@ -27,7 +26,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import javax.validation.ConstraintViolationException;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -37,6 +35,7 @@ import java.util.UUID;
  */
 @Category(UnitTest.class)
 public class CommonFieldsEntityUnitTests extends EntityTestsBase {
+    private static final String UNIQUE_ID = UUID.randomUUID().toString();
     private static final String NAME = "pig13";
     private static final String USER = "tgianos";
     private static final String VERSION = "1.0";
@@ -49,6 +48,7 @@ public class CommonFieldsEntityUnitTests extends EntityTestsBase {
     @Before
     public void setup() {
         this.c = new CommonFieldsEntity();
+        this.c.setUniqueId(UNIQUE_ID);
         this.c.setName(NAME);
         this.c.setUser(USER);
         this.c.setVersion(VERSION);
@@ -60,9 +60,12 @@ public class CommonFieldsEntityUnitTests extends EntityTestsBase {
     @Test
     public void testDefaultConstructor() {
         final CommonFieldsEntity local = new CommonFieldsEntity();
+        Assert.assertNotNull(local.getUniqueId());
         Assert.assertNull(local.getName());
         Assert.assertNull(local.getUser());
         Assert.assertNull(local.getVersion());
+        Assert.assertFalse(local.getDescription().isPresent());
+        Assert.assertFalse(local.getSetupFile().isPresent());
     }
 
     /**
@@ -111,6 +114,18 @@ public class CommonFieldsEntityUnitTests extends EntityTestsBase {
     }
 
     /**
+     * Test the getting and setting of the unique id.
+     */
+    @Test
+    public void testSetUniqueId() {
+        final CommonFieldsEntity local = new CommonFieldsEntity();
+        Assert.assertNotNull(local.getUniqueId());
+        Assert.assertNotEquals(local.getUniqueId(), UNIQUE_ID);
+        local.setUniqueId(UNIQUE_ID);
+        Assert.assertEquals(UNIQUE_ID, local.getUniqueId());
+    }
+
+    /**
      * Test to make sure the name is being set properly.
      */
     @Test
@@ -155,44 +170,42 @@ public class CommonFieldsEntityUnitTests extends EntityTestsBase {
     }
 
     /**
-     * Make sure can set the sorted tags from an unsorted set.
+     * Test the setup file get/set.
      */
     @Test
-    public void canSetTags() {
-        final Set<String> tags = Sets.newHashSet("second", "Third", "Fourth", "first");
-        this.c.setTags(tags);
-        Assert.assertThat(this.c.getTags(), Matchers.is(tags));
-
-        this.c.setTags(null);
-        Assert.assertThat(this.c.getTags(), Matchers.empty());
-
-        this.c.setTags(Sets.newHashSet());
-        Assert.assertThat(this.c.getTags(), Matchers.empty());
+    public void testSetSetupFile() {
+        Assert.assertFalse(this.c.getSetupFile().isPresent());
+        final FileEntity setupFile = new FileEntity();
+        setupFile.setFile(UUID.randomUUID().toString());
+        this.c.setSetupFile(setupFile);
+        Assert.assertThat(this.c.getSetupFile().orElseThrow(IllegalArgumentException::new), Matchers.is(setupFile));
+        this.c.setSetupFile(null);
+        Assert.assertFalse(this.c.getSetupFile().isPresent());
     }
 
     /**
-     * Make sure we generate the proper final tags.
-     *
-     * @throws GenieException on error
+     * Test to make sure equals and hash code only care about the unique id.
      */
     @Test
-    public void canGetFinalTags() throws GenieException {
+    public void testEqualsAndHashCode() {
         final String id = UUID.randomUUID().toString();
-        this.c.setId(id);
+        final String name = UUID.randomUUID().toString();
+        final CommonFieldsEntity one = new CommonFieldsEntity();
+        one.setUniqueId(id);
+        one.setName(UUID.randomUUID().toString());
+        final CommonFieldsEntity two = new CommonFieldsEntity();
+        two.setUniqueId(id);
+        two.setName(name);
+        final CommonFieldsEntity three = new CommonFieldsEntity();
+        three.setUniqueId(UUID.randomUUID().toString());
+        three.setName(name);
 
-        Assert.assertThat(this.c.getFinalTags(), Matchers.is(Sets.newHashSet("genie.id:" + id, "genie.name:" + NAME)));
+        Assert.assertTrue(one.equals(two));
+        Assert.assertFalse(one.equals(three));
+        Assert.assertFalse(two.equals(three));
 
-        final String sortedTags = "big,genie.id:id,genie.name:name,tom";
-        this.c.setTags(Sets.newHashSet(sortedTags.split(",")));
-        final Set<String> finalTags = this.c.getFinalTags();
-        Assert.assertThat(
-            finalTags,
-            Matchers.is(Sets.newHashSet("genie.id:" + id, "genie.name:" + NAME, "big", "tom"))
-        );
-        Assert.assertThat(finalTags.size(), Matchers.is(4));
-
-        this.c = new CommonFieldsEntity();
-        this.c.setName(NAME);
-        Assert.assertThat(this.c.getFinalTags().size(), Matchers.is(2));
+        Assert.assertEquals(one.hashCode(), two.hashCode());
+        Assert.assertNotEquals(one.hashCode(), three.hashCode());
+        Assert.assertNotEquals(two.hashCode(), three.hashCode());
     }
 }

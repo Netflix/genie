@@ -17,14 +17,15 @@ package com.netflix.genie.core.jpa.specifications;
 
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.ClusterStatus;
-import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.core.jpa.entities.ClusterEntity;
 import com.netflix.genie.core.jpa.entities.ClusterEntity_;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity_;
+import com.netflix.genie.core.jpa.entities.TagEntity;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 
+import javax.annotation.Nullable;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
@@ -47,7 +48,7 @@ public final class JpaClusterSpecs {
     /**
      * Private constructor for utility class.
      */
-    protected JpaClusterSpecs() {
+    JpaClusterSpecs() {
     }
 
     /**
@@ -61,11 +62,11 @@ public final class JpaClusterSpecs {
      * @return The specification
      */
     public static Specification<ClusterEntity> find(
-        final String name,
-        final Set<ClusterStatus> statuses,
-        final Set<String> tags,
-        final Date minUpdateTime,
-        final Date maxUpdateTime
+        @Nullable final String name,
+        @Nullable final Set<ClusterStatus> statuses,
+        @Nullable final Set<TagEntity> tags,
+        @Nullable final Date minUpdateTime,
+        @Nullable final Date maxUpdateTime
     ) {
         return (final Root<ClusterEntity> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
             final List<Predicate> predicates = new ArrayList<>();
@@ -81,12 +82,10 @@ public final class JpaClusterSpecs {
                 predicates.add(cb.lessThan(root.get(ClusterEntity_.updated), maxUpdateTime));
             }
             if (tags != null && !tags.isEmpty()) {
-                predicates.add(
-                    cb.like(
-                        root.get(ClusterEntity_.tags),
-                        JpaSpecificationUtils.getTagLikeString(tags)
-                    )
-                );
+                final Join<ClusterEntity, TagEntity> tagEntityJoin = root.join(ClusterEntity_.tags);
+                predicates.add(tagEntityJoin.in(tags));
+                cq.groupBy(root.get(ClusterEntity_.id));
+                cq.having(cb.equal(cb.count(root.get(ClusterEntity_.id)), tags.size()));
             }
             if (statuses != null && !statuses.isEmpty()) {
                 //Could optimize this as we know size could use native array
@@ -109,6 +108,7 @@ public final class JpaClusterSpecs {
      * @param commandCriteria The command Criteria
      * @return The specification
      */
+    //TODO
     public static Specification<ClusterEntity> findByClusterAndCommandCriteria(
         final ClusterCriteria clusterCriteria,
         final Set<String> commandCriteria
@@ -121,25 +121,25 @@ public final class JpaClusterSpecs {
 
             predicates.add(cb.equal(root.get(ClusterEntity_.status), ClusterStatus.UP));
 
-            if (clusterCriteria != null && clusterCriteria.getTags() != null && !clusterCriteria.getTags().isEmpty()) {
-                predicates.add(
-                    cb.like(
-                        root.get(ClusterEntity_.tags),
-                        JpaSpecificationUtils.getTagLikeString(clusterCriteria.getTags())
-                    )
-                );
-            }
-
-            predicates.add(cb.equal(commands.get(CommandEntity_.status), CommandStatus.ACTIVE));
-
-            if (commandCriteria != null && !commandCriteria.isEmpty()) {
-                predicates.add(
-                    cb.like(
-                        commands.get(CommandEntity_.tags),
-                        JpaSpecificationUtils.getTagLikeString(commandCriteria)
-                    )
-                );
-            }
+//            if (clusterCriteria.getTags() != null && !clusterCriteria.getTags().isEmpty()) {
+//                predicates.add(
+//                    cb.like(
+//                        root.get(ClusterEntity_.tags),
+//                        JpaSpecificationUtils.getTagLikeString(clusterCriteria.getTags())
+//                    )
+//                );
+//            }
+//
+//            predicates.add(cb.equal(commands.get(CommandEntity_.status), CommandStatus.ACTIVE));
+//
+//            if (!commandCriteria.isEmpty()) {
+//                predicates.add(
+//                    cb.like(
+//                        commands.get(CommandEntity_.tags),
+//                        JpaSpecificationUtils.getTagLikeString(commandCriteria)
+//                    )
+//                );
+//            }
 
             return cb.and(predicates.toArray(new Predicate[predicates.size()]));
         };
@@ -154,12 +154,13 @@ public final class JpaClusterSpecs {
      */
     public static Specification<ClusterEntity> findClustersForCommand(
         final String commandId,
-        final Set<ClusterStatus> statuses) {
+        @Nullable final Set<ClusterStatus> statuses
+    ) {
         return (final Root<ClusterEntity> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
             final List<Predicate> predicates = new ArrayList<>();
             final Join<ClusterEntity, CommandEntity> commands = root.join(ClusterEntity_.commands);
 
-            predicates.add(cb.equal(commands.get(CommandEntity_.id), commandId));
+            predicates.add(cb.equal(commands.get(CommandEntity_.uniqueId), commandId));
 
             if (statuses != null && !statuses.isEmpty()) {
                 //Could optimize this as we know size could use native array

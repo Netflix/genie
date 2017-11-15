@@ -17,24 +17,21 @@
  */
 package com.netflix.genie.core.jpa.entities;
 
-import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
-import com.netflix.genie.common.exceptions.GenieException;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
+import javax.annotation.Nullable;
 import javax.persistence.Basic;
-import javax.persistence.CollectionTable;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;
@@ -50,9 +47,10 @@ import java.util.Set;
  */
 @Getter
 @Setter
+@ToString(callSuper = true)
 @Entity
 @Table(name = "applications")
-public class ApplicationEntity extends SetupFileEntity {
+public class ApplicationEntity extends CommonFieldsEntity {
 
     private static final long serialVersionUID = -8780722054561507963L;
 
@@ -66,21 +64,41 @@ public class ApplicationEntity extends SetupFileEntity {
     @Column(name = "type")
     private String type;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(
-        name = "application_configs",
-        joinColumns = @JoinColumn(name = "application_id", referencedColumnName = "id")
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "applications_configs",
+        joinColumns = {
+            @JoinColumn(name = "application_id", referencedColumnName = "id", nullable = false, updatable = false)
+        },
+        inverseJoinColumns = {
+            @JoinColumn(name = "file_id", referencedColumnName = "id", nullable = false, updatable = false)
+        }
     )
-    @Column(name = "config", nullable = false, length = 2048)
-    private Set<String> configs = new HashSet<>();
+    private Set<FileEntity> configs = new HashSet<>();
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(
-        name = "application_dependencies",
-        joinColumns = @JoinColumn(name = "application_id", referencedColumnName = "id")
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "applications_dependencies",
+        joinColumns = {
+            @JoinColumn(name = "application_id", referencedColumnName = "id", nullable = false, updatable = false)
+        },
+        inverseJoinColumns = {
+            @JoinColumn(name = "file_id", referencedColumnName = "id", nullable = false, updatable = false)
+        }
     )
-    @Column(name = "dependency", nullable = false, length = 2048)
-    private Set<String> dependencies = new HashSet<>();
+    private Set<FileEntity> dependencies = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "applications_tags",
+        joinColumns = {
+            @JoinColumn(name = "application_id", referencedColumnName = "id", nullable = false, updatable = false)
+        },
+        inverseJoinColumns = {
+            @JoinColumn(name = "tag_id", referencedColumnName = "id", nullable = false, updatable = false)
+        }
+    )
+    private Set<TagEntity> tags = new HashSet<>();
 
     @ManyToMany(mappedBy = "applications", fetch = FetchType.LAZY)
     private Set<CommandEntity> commands = new HashSet<>();
@@ -93,17 +111,6 @@ public class ApplicationEntity extends SetupFileEntity {
     }
 
     /**
-     * Check to make sure everything is OK before persisting.
-     *
-     * @throws GenieException If any preconditions aren't met.
-     */
-    @PrePersist
-    @PreUpdate
-    protected void onCreateOrUpdateApplication() throws GenieException {
-        this.setTags(this.getFinalTags());
-    }
-
-    /**
      * Get the type of this application.
      *
      * @return The type as an Optional in case it's null
@@ -113,11 +120,11 @@ public class ApplicationEntity extends SetupFileEntity {
     }
 
     /**
-     * Sets the configurations for this application.
+     * Set all the files associated as configuration files for this application.
      *
-     * @param configs The configuration files that this application needs
+     * @param configs The configuration files to set
      */
-    public void setConfigs(final Set<String> configs) {
+    public void setConfigs(@Nullable final Set<FileEntity> configs) {
         this.configs.clear();
         if (configs != null) {
             this.configs.addAll(configs);
@@ -125,14 +132,26 @@ public class ApplicationEntity extends SetupFileEntity {
     }
 
     /**
-     * Sets the dependencies needed for this application.
+     * Set all the files associated as dependency files for this application.
      *
-     * @param dependencies All dependencies needed for execution of this application
+     * @param dependencies The dependency files to set
      */
-    public void setDependencies(final Set<String> dependencies) {
+    public void setDependencies(@Nullable final Set<FileEntity> dependencies) {
         this.dependencies.clear();
         if (dependencies != null) {
             this.dependencies.addAll(dependencies);
+        }
+    }
+
+    /**
+     * Set all the tags associated to this application.
+     *
+     * @param tags The dependency tags to set
+     */
+    public void setTags(@Nullable final Set<TagEntity> tags) {
+        this.tags.clear();
+        if (tags != null) {
+            this.tags.addAll(tags);
         }
     }
 
@@ -141,32 +160,10 @@ public class ApplicationEntity extends SetupFileEntity {
      *
      * @param commands The commands to set.
      */
-    protected void setCommands(final Set<CommandEntity> commands) {
+    void setCommands(@Nullable final Set<CommandEntity> commands) {
         this.commands.clear();
         if (commands != null) {
             this.commands.addAll(commands);
         }
-    }
-
-    /**
-     * Get a DTO from this entity.
-     *
-     * @return DTO of this entity.
-     */
-    public Application getDTO() {
-        final Application.Builder builder = new Application
-            .Builder(this.getName(), this.getUser(), this.getVersion(), this.status)
-            .withId(this.getId())
-            .withCreated(this.getCreated())
-            .withUpdated(this.getUpdated())
-            .withTags(this.getTags())
-            .withConfigs(this.configs)
-            .withDependencies(this.dependencies)
-            .withType(this.type);
-
-        this.getDescription().ifPresent(builder::withDescription);
-        this.getSetupFile().ifPresent(builder::withSetupFile);
-
-        return builder.build();
     }
 }

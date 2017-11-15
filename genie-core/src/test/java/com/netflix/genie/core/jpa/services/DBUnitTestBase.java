@@ -34,8 +34,14 @@ import org.springframework.test.context.transaction.TransactionalTestExecutionLi
  * @author tgianos
  */
 @RunWith(SpringRunner.class)
+//@DataJpaTest
 @SpringBootTest(classes = GenieCoreTestApplication.class, webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @TestExecutionListeners(
+//    {
+//        DependencyInjectionTestExecutionListener.class,
+//        DbUnitTestExecutionListener.class,
+//        DirtiesContextTestExecutionListener.class
+//    }
     {
         DependencyInjectionTestExecutionListener.class,
         DirtiesContextTestExecutionListener.class,

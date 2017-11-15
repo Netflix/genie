@@ -30,12 +30,17 @@ import com.netflix.genie.core.jpa.entities.ApplicationEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
+import com.netflix.genie.core.jpa.repositories.JpaFileRepository;
+import com.netflix.genie.core.jpa.repositories.JpaTagRepository;
+import com.netflix.genie.core.services.FileService;
+import com.netflix.genie.core.services.TagService;
 import com.netflix.genie.test.categories.UnitTest;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
 
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -60,8 +65,14 @@ public class JpaApplicationServiceImplUnitTests {
     @Before
     public void setup() {
         this.jpaApplicationRepository = Mockito.mock(JpaApplicationRepository.class);
-        final JpaCommandRepository jpaCommandRepository = Mockito.mock(JpaCommandRepository.class);
-        this.appService = new JpaApplicationServiceImpl(this.jpaApplicationRepository, jpaCommandRepository);
+        this.appService = new JpaApplicationServiceImpl(
+            Mockito.mock(TagService.class),
+            Mockito.mock(JpaTagRepository.class),
+            Mockito.mock(FileService.class),
+            Mockito.mock(JpaFileRepository.class),
+            this.jpaApplicationRepository,
+            Mockito.mock(JpaCommandRepository.class)
+        );
     }
 
     /**
@@ -72,8 +83,8 @@ public class JpaApplicationServiceImplUnitTests {
     @Test(expected = GenieNotFoundException.class)
     public void testGetApplicationNotExists() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jpaApplicationRepository.findOne(Mockito.eq(id))).thenReturn(null);
-        this.appService.getApplication(UUID.randomUUID().toString());
+        Mockito.when(this.jpaApplicationRepository.findByUniqueId(id)).thenReturn(Optional.empty());
+        this.appService.getApplication(id);
     }
 
     /**
@@ -88,7 +99,7 @@ public class JpaApplicationServiceImplUnitTests {
         )
             .withId(APP_1_ID)
             .build();
-        Mockito.when(this.jpaApplicationRepository.exists(Mockito.eq(APP_1_ID))).thenReturn(true);
+        Mockito.when(this.jpaApplicationRepository.existsByUniqueId(Mockito.eq(APP_1_ID))).thenReturn(true);
         this.appService.createApplication(app);
     }
 
@@ -105,7 +116,7 @@ public class JpaApplicationServiceImplUnitTests {
             .withId(APP_1_ID)
             .build();
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jpaApplicationRepository.findOne(Mockito.eq(id))).thenReturn(null);
+        Mockito.when(this.jpaApplicationRepository.findByUniqueId(Mockito.eq(id))).thenReturn(Optional.empty());
         this.appService.updateApplication(id, app);
     }
 
@@ -122,7 +133,7 @@ public class JpaApplicationServiceImplUnitTests {
         )
             .withId(UUID.randomUUID().toString())
             .build();
-        Mockito.when(this.jpaApplicationRepository.exists(id)).thenReturn(true);
+        Mockito.when(this.jpaApplicationRepository.existsByUniqueId(id)).thenReturn(true);
         this.appService.updateApplication(id, app);
     }
 
@@ -163,7 +174,7 @@ public class JpaApplicationServiceImplUnitTests {
     @Test(expected = GenieException.class)
     public void testDeleteNoAppToDelete() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jpaApplicationRepository.findOne(Mockito.eq(id))).thenReturn(null);
+        Mockito.when(this.jpaApplicationRepository.findByUniqueId(Mockito.eq(id))).thenReturn(Optional.empty());
         this.appService.deleteApplication(id);
     }
 
@@ -175,7 +186,7 @@ public class JpaApplicationServiceImplUnitTests {
     @Test(expected = GenieNotFoundException.class)
     public void testAddConfigsToApplicationNoApp() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jpaApplicationRepository.getOne(Mockito.eq(id))).thenReturn(null);
+        Mockito.when(this.jpaApplicationRepository.findByUniqueId(Mockito.eq(id))).thenReturn(Optional.empty());
         this.appService.addConfigsToApplication(id, Sets.newHashSet());
     }
 
@@ -187,7 +198,7 @@ public class JpaApplicationServiceImplUnitTests {
     @Test(expected = GenieNotFoundException.class)
     public void testUpdateConfigsForApplicationNoApp() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jpaApplicationRepository.findOne(Mockito.eq(id))).thenReturn(null);
+        Mockito.when(this.jpaApplicationRepository.findByUniqueId(Mockito.eq(id))).thenReturn(Optional.empty());
         this.appService.updateConfigsForApplication(id, Sets.newHashSet());
     }
 
@@ -199,7 +210,7 @@ public class JpaApplicationServiceImplUnitTests {
     @Test(expected = GenieNotFoundException.class)
     public void testGetConfigsForApplicationNoApp() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jpaApplicationRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaApplicationRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         this.appService.getConfigsForApplication(id);
     }
 
@@ -211,7 +222,7 @@ public class JpaApplicationServiceImplUnitTests {
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveAllConfigsForApplicationNoApp() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jpaApplicationRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaApplicationRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         this.appService.removeAllConfigsForApplication(id);
     }
 
@@ -223,7 +234,7 @@ public class JpaApplicationServiceImplUnitTests {
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveConfigForApplicationNoApp() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jpaApplicationRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaApplicationRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         this.appService.removeConfigForApplication(id, "something");
     }
 
@@ -235,7 +246,7 @@ public class JpaApplicationServiceImplUnitTests {
     @Test(expected = GenieNotFoundException.class)
     public void testAddJarsForApplicationNoApp() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jpaApplicationRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaApplicationRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         this.appService.addDependenciesForApplication(id, Sets.newHashSet());
     }
 
@@ -247,7 +258,7 @@ public class JpaApplicationServiceImplUnitTests {
     @Test(expected = GenieNotFoundException.class)
     public void testUpdateJarsForApplicationNoApp() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jpaApplicationRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaApplicationRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         this.appService.updateDependenciesForApplication(id, Sets.newHashSet());
     }
 
@@ -259,7 +270,7 @@ public class JpaApplicationServiceImplUnitTests {
     @Test(expected = GenieNotFoundException.class)
     public void testGetJarsForApplicationNoApp() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jpaApplicationRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaApplicationRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         this.appService.getDependenciesForApplication(id);
     }
 
@@ -271,7 +282,7 @@ public class JpaApplicationServiceImplUnitTests {
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveAllJarsForApplicationNoApp() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jpaApplicationRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaApplicationRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         this.appService.removeAllDependenciesForApplication(id);
     }
 
@@ -283,7 +294,7 @@ public class JpaApplicationServiceImplUnitTests {
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveJarForApplicationNoApp() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jpaApplicationRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaApplicationRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         this.appService.removeDependencyForApplication(id, "something");
     }
 
@@ -295,7 +306,7 @@ public class JpaApplicationServiceImplUnitTests {
     @Test(expected = GenieNotFoundException.class)
     public void testAddTagsForApplicationNoApp() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jpaApplicationRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaApplicationRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         this.appService.addTagsForApplication(id, Sets.newHashSet());
     }
 
@@ -307,7 +318,7 @@ public class JpaApplicationServiceImplUnitTests {
     @Test(expected = GenieNotFoundException.class)
     public void testUpdateTagsForApplicationNoApp() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jpaApplicationRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaApplicationRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         this.appService.updateTagsForApplication(id, Sets.newHashSet());
     }
 
@@ -319,7 +330,7 @@ public class JpaApplicationServiceImplUnitTests {
     @Test(expected = GenieNotFoundException.class)
     public void testGetTagsForApplicationNoApp() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jpaApplicationRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaApplicationRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         this.appService.getTagsForApplication(id);
     }
 
@@ -331,7 +342,7 @@ public class JpaApplicationServiceImplUnitTests {
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveAllTagsForApplicationNoApp() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jpaApplicationRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaApplicationRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         this.appService.removeAllTagsForApplication(id);
     }
 
@@ -343,7 +354,7 @@ public class JpaApplicationServiceImplUnitTests {
     @Test(expected = GenieNotFoundException.class)
     public void testRemoveTagForApplicationNoApp() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jpaApplicationRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaApplicationRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         this.appService.removeTagForApplication(id, "something");
     }
 
@@ -355,7 +366,7 @@ public class JpaApplicationServiceImplUnitTests {
     @Test(expected = GenieNotFoundException.class)
     public void testGetCommandsForApplicationNoApp() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jpaApplicationRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jpaApplicationRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         this.appService.getCommandsForApplication(id, null);
     }
 }

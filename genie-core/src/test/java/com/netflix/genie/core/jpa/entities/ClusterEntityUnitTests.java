@@ -19,12 +19,9 @@ package com.netflix.genie.core.jpa.entities;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
-import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.test.categories.UnitTest;
-import com.netflix.genie.test.suppliers.RandomSuppliers;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -33,7 +30,6 @@ import org.junit.experimental.categories.Category;
 
 import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -52,7 +48,7 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
     private static final String VERSION = "1.2.3";
 
     private ClusterEntity c;
-    private Set<String> configs;
+    private Set<FileEntity> configs;
 
     /**
      * Setup the tests.
@@ -60,7 +56,9 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
     @Before
     public void setup() {
         this.c = new ClusterEntity();
-        this.configs = Sets.newHashSet(CONFIG);
+        final FileEntity config = new FileEntity();
+        config.setFile(CONFIG);
+        this.configs = Sets.newHashSet(config);
         this.c.setName(NAME);
         this.c.setUser(USER);
         this.c.setVersion(VERSION);
@@ -85,19 +83,6 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
         Assert.assertTrue(entity.getTags().isEmpty());
         Assert.assertNotNull(entity.getCommands());
         Assert.assertTrue(entity.getCommands().isEmpty());
-    }
-
-    /**
-     * Test to make sure validation works.
-     *
-     * @throws GenieException If any precondition isn't met.
-     */
-    @Test
-    public void testOnCreateOrUpdateCluster() throws GenieException {
-        Assert.assertNotNull(this.c.getTags());
-        Assert.assertTrue(this.c.getTags().isEmpty());
-        this.c.onCreateOrUpdateCluster();
-        Assert.assertEquals(2, this.c.getTags().size());
     }
 
     /**
@@ -161,7 +146,11 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
     @Test
     public void testSetTags() throws GeniePreconditionException {
         Assert.assertNotNull(this.c.getTags());
-        final Set<String> tags = Sets.newHashSet("prod", "sla");
+        final TagEntity prodTag = new TagEntity();
+        prodTag.setTag("prod");
+        final TagEntity slaTag = new TagEntity();
+        slaTag.setTag("sla");
+        final Set<TagEntity> tags = Sets.newHashSet(prodTag, slaTag);
         this.c.setTags(tags);
         Assert.assertEquals(tags, this.c.getTags());
 
@@ -188,7 +177,9 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
     @Test
     public void testSetDependencies() {
         Assert.assertNotNull(this.c.getDependencies());
-        final Set<String> dependencies = Sets.newHashSet("s3://netflix/jars/myJar.jar");
+        final FileEntity dependency = new FileEntity();
+        dependency.setFile("s3://netflix/jars/myJar.jar");
+        final Set<FileEntity> dependencies = Sets.newHashSet(dependency);
         this.c.setDependencies(dependencies);
         Assert.assertEquals(dependencies, this.c.getDependencies());
 
@@ -206,9 +197,9 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
         Assert.assertNotNull(this.c.getCommands());
         Assert.assertTrue(this.c.getCommands().isEmpty());
         final CommandEntity one = new CommandEntity();
-        one.setId("one");
+        one.setUniqueId("one");
         final CommandEntity two = new CommandEntity();
-        two.setId("two");
+        two.setUniqueId("two");
         final List<CommandEntity> commands = new ArrayList<>();
         commands.add(one);
         commands.add(two);
@@ -230,9 +221,9 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
     @Test(expected = GeniePreconditionException.class)
     public void cantSetCommandsWithDuplicates() throws GeniePreconditionException {
         final CommandEntity one = new CommandEntity();
-        one.setId(UUID.randomUUID().toString());
+        one.setUniqueId(UUID.randomUUID().toString());
         final CommandEntity two = new CommandEntity();
-        two.setId(UUID.randomUUID().toString());
+        two.setUniqueId(UUID.randomUUID().toString());
 
         this.c.setCommands(Lists.newArrayList(one, two, one));
     }
@@ -245,7 +236,7 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
     @Test
     public void testAddCommand() throws GeniePreconditionException {
         final CommandEntity commandEntity = new CommandEntity();
-        commandEntity.setId("commandId");
+        commandEntity.setUniqueId("commandId");
         Assert.assertNotNull(this.c.getCommands());
         Assert.assertTrue(this.c.getCommands().isEmpty());
         this.c.addCommand(commandEntity);
@@ -261,7 +252,7 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
     @Test(expected = GeniePreconditionException.class)
     public void cantAddDuplicateCommand() throws GeniePreconditionException {
         final CommandEntity entity = new CommandEntity();
-        entity.setId(UUID.randomUUID().toString());
+        entity.setUniqueId(UUID.randomUUID().toString());
         this.c.addCommand(entity);
 
         // Should throw exception here
@@ -276,9 +267,9 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
     @Test
     public void testRemoveCommand() throws GeniePreconditionException {
         final CommandEntity one = new CommandEntity();
-        one.setId("one");
+        one.setUniqueId("one");
         final CommandEntity two = new CommandEntity();
-        two.setId("two");
+        two.setUniqueId("two");
         Assert.assertNotNull(this.c.getCommands());
         Assert.assertTrue(this.c.getCommands().isEmpty());
         this.c.addCommand(one);
@@ -310,9 +301,9 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
         Assert.assertNotNull(this.c.getCommands());
         Assert.assertTrue(this.c.getCommands().isEmpty());
         final CommandEntity one = new CommandEntity();
-        one.setId("one");
+        one.setUniqueId("one");
         final CommandEntity two = new CommandEntity();
-        two.setId("two");
+        two.setUniqueId("two");
         final List<CommandEntity> commands = new ArrayList<>();
         commands.add(one);
         commands.add(two);
@@ -333,7 +324,13 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
      */
     @Test
     public void canSetClusterTags() {
-        final Set<String> tags = Sets.newHashSet("one", "two", "Pre");
+        final TagEntity oneTag = new TagEntity();
+        oneTag.setTag("one");
+        final TagEntity twoTag = new TagEntity();
+        twoTag.setTag("tow");
+        final TagEntity preTag = new TagEntity();
+        preTag.setTag("Pre");
+        final Set<TagEntity> tags = Sets.newHashSet(oneTag, twoTag, preTag);
         this.c.setTags(tags);
         Assert.assertThat(this.c.getTags(), Matchers.is(tags));
         Assert.assertThat(this.c.getTags().size(), Matchers.is(tags.size()));
@@ -344,47 +341,5 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
 
         this.c.setTags(null);
         Assert.assertThat(this.c.getTags(), Matchers.empty());
-    }
-
-    /**
-     * Test to make sure the entity can return a valid DTO.
-     *
-     * @throws GenieException on error
-     */
-    @Test
-    public void canGetDTO() throws GenieException {
-        final ClusterEntity entity = new ClusterEntity();
-        final String name = UUID.randomUUID().toString();
-        entity.setName(name);
-        final String user = UUID.randomUUID().toString();
-        entity.setUser(user);
-        final String version = UUID.randomUUID().toString();
-        entity.setVersion(version);
-        entity.setStatus(ClusterStatus.TERMINATED);
-        final String id = UUID.randomUUID().toString();
-        entity.setId(id);
-        final Date created = entity.getCreated();
-        final Date updated = entity.getUpdated();
-        final String description = UUID.randomUUID().toString();
-        entity.setDescription(description);
-        final Set<String> tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
-        entity.setTags(tags);
-        final Set<String> confs = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
-        entity.setConfigs(confs);
-        final Set<String> dependencies = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
-        entity.setDependencies(dependencies);
-
-        final Cluster cluster = entity.getDTO();
-        Assert.assertThat(cluster.getId().orElseGet(RandomSuppliers.STRING), Matchers.is(id));
-        Assert.assertThat(cluster.getName(), Matchers.is(name));
-        Assert.assertThat(cluster.getUser(), Matchers.is(user));
-        Assert.assertThat(cluster.getVersion(), Matchers.is(version));
-        Assert.assertThat(cluster.getDescription().orElseGet(RandomSuppliers.STRING), Matchers.is(description));
-        Assert.assertThat(cluster.getStatus(), Matchers.is(ClusterStatus.TERMINATED));
-        Assert.assertThat(cluster.getCreated().orElseGet(RandomSuppliers.DATE), Matchers.is(created));
-        Assert.assertThat(cluster.getUpdated().orElseGet(RandomSuppliers.DATE), Matchers.is(updated));
-        Assert.assertThat(cluster.getTags(), Matchers.is(tags));
-        Assert.assertThat(cluster.getConfigs(), Matchers.is(confs));
-        Assert.assertThat(cluster.getDependencies(), Matchers.is(dependencies));
     }
 }

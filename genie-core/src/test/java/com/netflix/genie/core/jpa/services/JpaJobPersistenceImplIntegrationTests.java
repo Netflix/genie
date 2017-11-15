@@ -20,10 +20,7 @@ package com.netflix.genie.core.jpa.services;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseTearDown;
 import com.netflix.genie.core.jobs.JobConstants;
-import com.netflix.genie.core.jpa.repositories.JpaJobExecutionRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
-import com.netflix.genie.core.jpa.repositories.JpaJobMetadataRepository;
-import com.netflix.genie.core.jpa.repositories.JpaJobRequestRepository;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.test.categories.IntegrationTest;
 import org.hamcrest.Matchers;
@@ -49,12 +46,6 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
     private static final String JOB_3_ID = "job3";
 
     @Autowired
-    private JpaJobExecutionRepository jobExecutionRepository;
-    @Autowired
-    private JpaJobRequestRepository jobRequestRepository;
-    @Autowired
-    private JpaJobMetadataRepository jobRequestMetadataRepository;
-    @Autowired
     private JpaJobRepository jobRepository;
     @Autowired
     private JobPersistenceService jobPersistenceService;
@@ -64,9 +55,6 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
      */
     @Before
     public void setup() {
-        Assert.assertThat(this.jobExecutionRepository.count(), Matchers.is(3L));
-        Assert.assertThat(this.jobRequestRepository.count(), Matchers.is(3L));
-        Assert.assertThat(this.jobRequestMetadataRepository.count(), Matchers.is(3L));
         Assert.assertThat(this.jobRepository.count(), Matchers.is(3L));
     }
 
@@ -75,7 +63,6 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void canDeleteJobsCreatedBeforeDateWithMinTransactionAndPageSize() {
-
         // Try to delete a single job from before Jan 1, 2016
         final Calendar cal = Calendar.getInstance(JobConstants.UTC);
         cal.set(2016, Calendar.JANUARY, 1, 0, 0, 0);
@@ -84,14 +71,8 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
         final long deleted = this.jobPersistenceService.deleteBatchOfJobsCreatedBeforeDate(cal.getTime(), 1, 1);
 
         Assert.assertThat(deleted, Matchers.is(1L));
-        Assert.assertThat(this.jobExecutionRepository.count(), Matchers.is(2L));
-        Assert.assertThat(this.jobRequestRepository.count(), Matchers.is(2L));
-        Assert.assertThat(this.jobRequestMetadataRepository.count(), Matchers.is(2L));
         Assert.assertThat(this.jobRepository.count(), Matchers.is(2L));
-        Assert.assertNotNull(this.jobExecutionRepository.getOne(JOB_3_ID));
-        Assert.assertNotNull(this.jobRequestRepository.getOne(JOB_3_ID));
-        Assert.assertNotNull(this.jobRequestMetadataRepository.getOne(JOB_3_ID));
-        Assert.assertNotNull(this.jobRepository.getOne(JOB_3_ID));
+        Assert.assertTrue(this.jobRepository.findByUniqueId(JOB_3_ID).isPresent());
     }
 
     /**
@@ -99,7 +80,6 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void canDeleteJobsCreatedBeforeDateWithPageLargerThanMax() {
-
         // Try to delete a all jobs from before Jan 1, 2016
         final Calendar cal = Calendar.getInstance(JobConstants.UTC);
         cal.set(2016, Calendar.JANUARY, 1, 0, 0, 0);
@@ -108,14 +88,8 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
         final long deleted = this.jobPersistenceService.deleteBatchOfJobsCreatedBeforeDate(cal.getTime(), 1, 10);
 
         Assert.assertThat(deleted, Matchers.is(2L));
-        Assert.assertThat(this.jobExecutionRepository.count(), Matchers.is(1L));
-        Assert.assertThat(this.jobRequestRepository.count(), Matchers.is(1L));
-        Assert.assertThat(this.jobRequestMetadataRepository.count(), Matchers.is(1L));
         Assert.assertThat(this.jobRepository.count(), Matchers.is(1L));
-        Assert.assertNotNull(this.jobExecutionRepository.getOne(JOB_3_ID));
-        Assert.assertNotNull(this.jobRequestRepository.getOne(JOB_3_ID));
-        Assert.assertNotNull(this.jobRequestMetadataRepository.getOne(JOB_3_ID));
-        Assert.assertNotNull(this.jobRepository.getOne(JOB_3_ID));
+        Assert.assertTrue(this.jobRepository.findByUniqueId(JOB_3_ID).isPresent());
     }
 
     /**
@@ -123,7 +97,6 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void canDeleteJobsCreatedBeforeDateWithMaxLargerThanPage() {
-
         // Try to delete a all jobs from before Jan 1, 2016
         final Calendar cal = Calendar.getInstance(JobConstants.UTC);
         cal.set(2016, Calendar.JANUARY, 1, 0, 0, 0);
@@ -132,14 +105,8 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
         final long deleted = this.jobPersistenceService.deleteBatchOfJobsCreatedBeforeDate(cal.getTime(), 10, 1);
 
         Assert.assertThat(deleted, Matchers.is(2L));
-        Assert.assertThat(this.jobExecutionRepository.count(), Matchers.is(1L));
-        Assert.assertThat(this.jobRequestRepository.count(), Matchers.is(1L));
-        Assert.assertThat(this.jobRequestMetadataRepository.count(), Matchers.is(1L));
         Assert.assertThat(this.jobRepository.count(), Matchers.is(1L));
-        Assert.assertNotNull(this.jobExecutionRepository.getOne(JOB_3_ID));
-        Assert.assertNotNull(this.jobRequestRepository.getOne(JOB_3_ID));
-        Assert.assertNotNull(this.jobRequestMetadataRepository.getOne(JOB_3_ID));
-        Assert.assertNotNull(this.jobRepository.getOne(JOB_3_ID));
+        Assert.assertTrue(this.jobRepository.findByUniqueId(JOB_3_ID).isPresent());
     }
 
     /**
@@ -155,13 +122,7 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
         final long deleted = this.jobPersistenceService.deleteBatchOfJobsCreatedBeforeDate(cal.getTime(), 10_000, 1);
 
         Assert.assertThat(deleted, Matchers.is(2L));
-        Assert.assertThat(this.jobExecutionRepository.count(), Matchers.is(1L));
-        Assert.assertThat(this.jobRequestRepository.count(), Matchers.is(1L));
-        Assert.assertThat(this.jobRequestMetadataRepository.count(), Matchers.is(1L));
         Assert.assertThat(this.jobRepository.count(), Matchers.is(1L));
-        Assert.assertNotNull(this.jobExecutionRepository.getOne(JOB_3_ID));
-        Assert.assertNotNull(this.jobRequestRepository.getOne(JOB_3_ID));
-        Assert.assertNotNull(this.jobRequestMetadataRepository.getOne(JOB_3_ID));
-        Assert.assertNotNull(this.jobRepository.getOne(JOB_3_ID));
+        Assert.assertTrue(this.jobRepository.findByUniqueId(JOB_3_ID).isPresent());
     }
 }

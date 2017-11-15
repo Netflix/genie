@@ -19,6 +19,7 @@ import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity_;
+import com.netflix.genie.core.jpa.entities.TagEntity;
 import com.netflix.genie.test.categories.UnitTest;
 import org.junit.Assert;
 import org.junit.Before;
@@ -29,9 +30,11 @@ import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.criteria.SetJoin;
 import java.util.Set;
 
 /**
@@ -44,16 +47,16 @@ public class JpaCommandSpecsUnitTests {
 
     private static final String NAME = "hive";
     private static final String USER_NAME = "tgianos";
-    private static final String TAG_1 = "prod";
-    private static final String TAG_2 = "hive";
-    private static final String TAG_3 = "11";
-    private static final Set<String> TAGS = Sets.newHashSet();
-    private static final Set<CommandStatus> STATUSES = Sets.newHashSet();
+    private static final TagEntity TAG_1 = new TagEntity("prod");
+    private static final TagEntity TAG_2 = new TagEntity("hive");
+    private static final TagEntity TAG_3 = new TagEntity("11");
+    private static final Set<TagEntity> TAGS = Sets.newHashSet(TAG_1, TAG_2, TAG_3);
+    private static final Set<CommandStatus> STATUSES = Sets.newHashSet(CommandStatus.ACTIVE, CommandStatus.INACTIVE);
 
     private Root<CommandEntity> root;
     private CriteriaQuery<?> cq;
     private CriteriaBuilder cb;
-    private String tagLikeStatement;
+    private SetJoin<CommandEntity, TagEntity> tagEntityJoin;
 
     /**
      * Setup some variables.
@@ -61,18 +64,12 @@ public class JpaCommandSpecsUnitTests {
     @Before
     @SuppressWarnings("unchecked")
     public void setup() {
-        TAGS.clear();
-        TAGS.add(TAG_1);
-        TAGS.add(TAG_2);
-        TAGS.add(TAG_3);
-
-        STATUSES.clear();
-        STATUSES.add(CommandStatus.ACTIVE);
-        STATUSES.add(CommandStatus.INACTIVE);
-
         this.root = (Root<CommandEntity>) Mockito.mock(Root.class);
         this.cq = Mockito.mock(CriteriaQuery.class);
         this.cb = Mockito.mock(CriteriaBuilder.class);
+
+        final Path<Long> idPath = (Path<Long>) Mockito.mock(Path.class);
+        Mockito.when(this.root.get(CommandEntity_.id)).thenReturn(idPath);
 
         final Path<String> commandNamePath = (Path<String>) Mockito.mock(Path.class);
         final Predicate equalNamePredicate = Mockito.mock(Predicate.class);
@@ -94,12 +91,15 @@ public class JpaCommandSpecsUnitTests {
         Mockito.when(this.cb.equal(Mockito.eq(statusPath), Mockito.any(CommandStatus.class)))
             .thenReturn(equalStatusPredicate);
 
-        final Path<String> tagPath = (Path<String>) Mockito.mock(Path.class);
-        final Predicate likeTagPredicate = Mockito.mock(Predicate.class);
-        Mockito.when(this.root.get(CommandEntity_.tags)).thenReturn(tagPath);
-        Mockito.when(this.cb.like(Mockito.eq(tagPath), Mockito.any(String.class))).thenReturn(likeTagPredicate);
+        this.tagEntityJoin = (SetJoin<CommandEntity, TagEntity>) Mockito.mock(SetJoin.class);
+        Mockito.when(this.root.join(CommandEntity_.tags)).thenReturn(this.tagEntityJoin);
+        final Predicate tagInPredicate = Mockito.mock(Predicate.class);
+        Mockito.when(this.tagEntityJoin.in(TAGS)).thenReturn(tagInPredicate);
 
-        this.tagLikeStatement = JpaSpecificationUtils.getTagLikeString(TAGS);
+        final Expression<Long> idCountExpression = (Expression<Long>) Mockito.mock(Expression.class);
+        Mockito.when(this.cb.count(idPath)).thenReturn(idCountExpression);
+        final Predicate havingPredicate = Mockito.mock(Predicate.class);
+        Mockito.when(this.cb.equal(idCountExpression, TAGS.size())).thenReturn(havingPredicate);
     }
 
     /**
@@ -120,8 +120,10 @@ public class JpaCommandSpecsUnitTests {
             Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(CommandEntity_.status), status);
         }
-        Mockito.verify(this.cb, Mockito.times(1))
-            .like(this.root.get(CommandEntity_.tags), this.tagLikeStatement);
+        Mockito.verify(this.root, Mockito.times(1)).join(CommandEntity_.tags);
+        Mockito.verify(this.tagEntityJoin, Mockito.times(1)).in(TAGS);
+        Mockito.verify(this.cq, Mockito.times(1)).groupBy(Mockito.any(Path.class));
+        Mockito.verify(this.cq, Mockito.times(1)).having(Mockito.any(Predicate.class));
     }
 
     /**
@@ -144,8 +146,10 @@ public class JpaCommandSpecsUnitTests {
             Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(CommandEntity_.status), status);
         }
-        Mockito.verify(this.cb, Mockito.times(1))
-            .like(this.root.get(CommandEntity_.tags), this.tagLikeStatement);
+        Mockito.verify(this.root, Mockito.times(1)).join(CommandEntity_.tags);
+        Mockito.verify(this.tagEntityJoin, Mockito.times(1)).in(TAGS);
+        Mockito.verify(this.cq, Mockito.times(1)).groupBy(Mockito.any(Path.class));
+        Mockito.verify(this.cq, Mockito.times(1)).having(Mockito.any(Predicate.class));
     }
 
     /**
@@ -166,8 +170,10 @@ public class JpaCommandSpecsUnitTests {
             Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(CommandEntity_.status), status);
         }
-        Mockito.verify(this.cb, Mockito.times(1))
-            .like(this.root.get(CommandEntity_.tags), this.tagLikeStatement);
+        Mockito.verify(this.root, Mockito.times(1)).join(CommandEntity_.tags);
+        Mockito.verify(this.tagEntityJoin, Mockito.times(1)).in(TAGS);
+        Mockito.verify(this.cq, Mockito.times(1)).groupBy(Mockito.any(Path.class));
+        Mockito.verify(this.cq, Mockito.times(1)).having(Mockito.any(Predicate.class));
     }
 
     /**
@@ -188,8 +194,10 @@ public class JpaCommandSpecsUnitTests {
             Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(CommandEntity_.status), status);
         }
-        Mockito.verify(this.cb, Mockito.times(1))
-            .like(this.root.get(CommandEntity_.tags), this.tagLikeStatement);
+        Mockito.verify(this.root, Mockito.times(1)).join(CommandEntity_.tags);
+        Mockito.verify(this.tagEntityJoin, Mockito.times(1)).in(TAGS);
+        Mockito.verify(this.cq, Mockito.times(1)).groupBy(Mockito.any(Path.class));
+        Mockito.verify(this.cq, Mockito.times(1)).having(Mockito.any(Predicate.class));
     }
 
     /**
@@ -210,31 +218,7 @@ public class JpaCommandSpecsUnitTests {
             Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(CommandEntity_.status), status);
         }
-        Mockito.verify(this.cb, Mockito.never())
-            .like(this.root.get(CommandEntity_.tags), this.tagLikeStatement);
-    }
-
-    /**
-     * Test the find specification.
-     */
-    @Test
-    public void testFindEmptyTag() {
-        TAGS.add("");
-        final Specification<CommandEntity> spec = JpaCommandSpecs.find(
-            NAME, USER_NAME, STATUSES, TAGS
-        );
-
-        spec.toPredicate(this.root, this.cq, this.cb);
-        Mockito.verify(this.cb, Mockito.times(1))
-            .equal(this.root.get(CommandEntity_.name), NAME);
-        Mockito.verify(this.cb, Mockito.times(1))
-            .equal(this.root.get(CommandEntity_.user), USER_NAME);
-        for (final CommandStatus status : STATUSES) {
-            Mockito.verify(this.cb, Mockito.times(1))
-                .equal(this.root.get(CommandEntity_.status), status);
-        }
-        Mockito.verify(this.cb, Mockito.times(1))
-            .like(this.root.get(CommandEntity_.tags), this.tagLikeStatement);
+        Mockito.verify(this.root, Mockito.never()).join(CommandEntity_.tags);
     }
 
     /**
@@ -254,8 +238,10 @@ public class JpaCommandSpecsUnitTests {
             Mockito.verify(this.cb, Mockito.never())
                 .equal(this.root.get(CommandEntity_.status), status);
         }
-        Mockito.verify(this.cb, Mockito.times(1))
-            .like(this.root.get(CommandEntity_.tags), this.tagLikeStatement);
+        Mockito.verify(this.root, Mockito.times(1)).join(CommandEntity_.tags);
+        Mockito.verify(this.tagEntityJoin, Mockito.times(1)).in(TAGS);
+        Mockito.verify(this.cq, Mockito.times(1)).groupBy(Mockito.any(Path.class));
+        Mockito.verify(this.cq, Mockito.times(1)).having(Mockito.any(Predicate.class));
     }
 
     /**
@@ -275,8 +261,10 @@ public class JpaCommandSpecsUnitTests {
             Mockito.verify(this.cb, Mockito.never())
                 .equal(this.root.get(CommandEntity_.status), status);
         }
-        Mockito.verify(this.cb, Mockito.times(1))
-            .like(this.root.get(CommandEntity_.tags), this.tagLikeStatement);
+        Mockito.verify(this.root, Mockito.times(1)).join(CommandEntity_.tags);
+        Mockito.verify(this.tagEntityJoin, Mockito.times(1)).in(TAGS);
+        Mockito.verify(this.cq, Mockito.times(1)).groupBy(Mockito.any(Path.class));
+        Mockito.verify(this.cq, Mockito.times(1)).having(Mockito.any(Predicate.class));
     }
 
     /**

@@ -31,6 +31,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
@@ -65,19 +66,19 @@ public interface JobSearchService {
      * @return Metadata information on jobs which match the criteria
      */
     Page<JobSearchResult> findJobs(
-        final String id,
-        final String name,
-        final String user,
-        final Set<JobStatus> statuses,
-        final Set<String> tags,
-        final String clusterName,
-        final String clusterId,
-        final String commandName,
-        final String commandId,
-        final Date minStarted,
-        final Date maxStarted,
-        final Date minFinished,
-        final Date maxFinished,
+        @Nullable final String id,
+        @Nullable final String name,
+        @Nullable final String user,
+        @Nullable final Set<JobStatus> statuses,
+        @Nullable final Set<String> tags,
+        @Nullable final String clusterName,
+        @Nullable final String clusterId,
+        @Nullable final String commandName,
+        @Nullable final String commandId,
+        @Nullable final Date minStarted,
+        @Nullable final Date maxStarted,
+        @Nullable final Date minFinished,
+        @Nullable final Date maxFinished,
         @NotNull final Pageable page
     );
 
@@ -90,11 +91,11 @@ public interface JobSearchService {
     Set<Job> getAllActiveJobsOnHost(@NotBlank final String hostName);
 
     /**
-     * Get a list of host names which are currently have active jobs in the Genie cluster.
+     * Get a set of host names which are currently have active jobs in the Genie cluster.
      *
-     * @return The list of hosts with jobs currently in an active state
+     * @return The set of hosts with jobs currently in an active state
      */
-    List<String> getAllHostsWithActiveJobs();
+    Set<String> getAllHostsWithActiveJobs();
 
     /**
      * Get job information for given job id.

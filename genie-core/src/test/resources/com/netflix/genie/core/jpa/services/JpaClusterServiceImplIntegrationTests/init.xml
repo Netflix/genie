@@ -15,189 +15,524 @@
     limitations under the License.
 -->
 <dataset>
-    <commands
-        id="command1"
+    <files
+        id="1"
         created="2014-08-08 01:47:00"
         updated="2014-08-08 01:59:00"
+        entity_version="0"
+        file="s3://some/config/file"
+    />
+    <files
+        id="2"
+        created="2014-08-08 01:47:00"
+        updated="2014-08-08 01:59:00"
+        entity_version="0"
+        file="s3://some/other/config/file"
+    />
+    <files
+        id="3"
+        created="2014-08-08 01:47:00"
+        updated="2014-08-08 01:59:00"
+        entity_version="0"
+        file="s3://some/config/cluster1/foo.json"
+    />
+    <files
+        id="4"
+        created="2014-08-08 01:47:00"
+        updated="2014-08-08 01:59:00"
+        entity_version="0"
+        file="s3://some/config/cluster1/bar.json"
+    />
+
+    <tags
+        id="1"
+        created="2014-08-08 01:47:00"
+        updated="2014-08-08 01:59:00"
+        entity_version="0"
+        tag="genie.id:command1"
+    />
+    <tags
+        id="2"
+        created="2014-08-08 01:47:00"
+        updated="2014-08-08 01:59:00"
+        entity_version="0"
+        tag="genie:name:pig_13_prod"
+    />
+    <tags
+        id="3"
+        created="2014-08-08 01:47:00"
+        updated="2014-08-08 01:59:00"
+        entity_version="0"
+        tag="pig"
+    />
+    <tags
+        id="4"
+        created="2014-08-08 01:47:00"
+        updated="2014-08-08 01:59:00"
+        entity_version="0"
+        tag="prod"
+    />
+    <tags
+        id="5"
+        created="2014-08-08 01:47:00"
+        updated="2014-08-08 01:59:00"
+        entity_version="0"
+        tag="tez"
+    />
+    <tags
+        id="6"
+        created="2014-08-08 01:47:00"
+        updated="2014-08-08 01:59:00"
+        entity_version="0"
+        tag="genie.id:command2"
+    />
+    <tags
+        id="7"
+        created="2014-08-08 01:47:00"
+        updated="2014-08-08 01:59:00"
+        entity_version="0"
+        tag="genie:name:hive_11_prod"
+    />
+    <tags
+        id="8"
+        created="2014-08-08 01:47:00"
+        updated="2014-08-08 01:59:00"
+        entity_version="0"
+        tag="hive"
+    />
+    <tags
+        id="9"
+        created="2014-08-08 01:47:00"
+        updated="2014-08-08 01:59:00"
+        entity_version="0"
+        tag="genie.id:cluster1"
+    />
+    <tags
+        id="10"
+        created="2014-08-08 01:47:00"
+        updated="2014-08-08 01:59:00"
+        entity_version="0"
+        tag="genie.name:h2prod"
+    />
+    <tags
+        id="11"
+        created="2014-08-08 01:47:00"
+        updated="2014-08-08 01:59:00"
+        entity_version="0"
+        tag="genie.id:cluster2"
+    />
+    <tags
+        id="12"
+        created="2014-08-08 01:47:00"
+        updated="2014-08-08 01:59:00"
+        entity_version="0"
+        tag="genie:name:h2query"
+    />
+    <tags
+        id="13"
+        created="2014-08-08 01:47:00"
+        updated="2014-08-08 01:59:00"
+        entity_version="0"
+        tag="query"
+    />
+    <tags
+        id="14"
+        created="2014-08-08 01:47:00"
+        updated="2014-08-08 01:59:00"
+        entity_version="0"
+        tag="sla"
+    />
+    <tags
+        id="15"
+        created="2014-08-08 01:47:00"
+        updated="2014-08-08 01:59:00"
+        entity_version="0"
+        tag="adhoc"
+    />
+    <tags
+        id="16"
+        created="2014-08-08 01:47:00"
+        updated="2014-08-08 01:59:00"
+        entity_version="0"
+        tag="yarn"
+    />
+    <tags
+        id="17"
+        created="2014-08-08 01:47:00"
+        updated="2014-08-08 01:59:00"
+        entity_version="0"
+        tag="0.15.0"
+    />
+    <tags
+        id="18"
+        created="2014-08-08 01:47:00"
+        updated="2014-08-08 01:59:00"
+        entity_version="0"
+        tag="spark"
+    />
+    <tags
+        id="19"
+        created="2014-08-08 01:47:00"
+        updated="2014-08-08 01:59:00"
+        entity_version="0"
+        tag="deprecated"
+    />
+    <tags
+        id="20"
+        created="2014-08-08 01:47:00"
+        updated="2014-08-08 01:59:00"
+        entity_version="0"
+        tag="genie.id:command3"
+    />
+    <tags
+        id="21"
+        created="2014-08-08 01:47:00"
+        updated="2014-08-08 01:59:00"
+        entity_version="0"
+        tag="genie:name:pig_11_prod"
+    />
+
+    <commands
+        id="1"
+        created="2014-08-08 01:47:00"
+        updated="2014-08-08 01:59:00"
+        entity_version="0"
+        unique_id="command1"
         genie_user="tgianos"
         name="pig_13_prod"
         version="1.2.3"
         executable="pig"
         check_delay="15000"
         status="ACTIVE"
-        entity_version="0"
-        tags="|genie.id:command1||genie:name:pig_13_prod||pig||prod||tez|"
     />
-    <command_configs
-        command_id="command1"
-        config="s3://some/config/file"/>
-    <command_configs
-        command_id="command1"
-        config="s3://some/other/config/file"/>
+    <commands_configs
+        command_id="1"
+        file_id="1"
+    />
+    <commands_configs
+        command_id="1"
+        file_id="2"
+    />
+    <commands_tags
+        command_id="1"
+        tag_id="1"
+    />
+    <commands_tags
+        command_id="1"
+        tag_id="2"
+    />
+    <commands_tags
+        command_id="1"
+        tag_id="3"
+    />
+    <commands_tags
+        command_id="1"
+        tag_id="4"
+    />
+    <commands_tags
+        command_id="1"
+        tag_id="5"
+    />
 
     <commands
-        id="command2"
+        id="2"
         created="2014-08-08 01:46:00"
         updated="2014-08-08 03:12:00"
+        entity_version="0"
+        unique_id="command2"
         genie_user="amsharma"
         name="hive_11_prod"
         version="4.5.6"
         executable="hive"
         check_delay="16000"
         status="INACTIVE"
-        entity_version="0"
-        tags="|genie.id:command2||genie:name:hive_11_prod||hive||prod|"
     />
-    <command_configs
-        command_id="command2"
-        config="s3://some/config/file"/>
+    <commands_configs
+        command_id="2"
+        file_id="1"
+    />
+    <commands_tags
+        command_id="2"
+        tag_id="6"
+    />
+    <commands_tags
+        command_id="2"
+        tag_id="7"
+    />
+    <commands_tags
+        command_id="2"
+        tag_id="8"
+    />
+    <commands_tags
+        command_id="2"
+        tag_id="4"
+    />
 
     <commands
-        id="command3"
+        id="3"
         created="2014-08-08 01:49:00"
         updated="2014-08-08 02:59:00"
+        entity_version="0"
+        unique_id="command3"
         genie_user="tgianos"
         name="pig_11_prod"
         version="7.8.9"
         executable="pig"
         check_delay="17000"
         status="DEPRECATED"
-        entity_version="0"
-        tags="|deprecated||genie.id:command3||genie:name:pig_11_prod||pig||prod|"
     />
-    <command_configs
-        command_id="command3"
-        config="s3://some/config/file"/>
+    <commands_configs
+        command_id="3"
+        file_id="1"
+    />
+    <commands_tags
+        command_id="3"
+        tag_id="19"
+    />
+    <commands_tags
+        command_id="3"
+        tag_id="20"
+    />
+    <commands_tags
+        command_id="3"
+        tag_id="21"
+    />
+    <commands_tags
+        command_id="3"
+        tag_id="3"
+    />
+    <commands_tags
+        command_id="3"
+        tag_id="4"
+    />
 
     <clusters
-        id="cluster1"
+        id="1"
         created="2014-07-08 01:49:00"
         updated="2014-07-08 02:59:00"
+        entity_version="0"
+        unique_id="cluster1"
         genie_user="tgianos"
         name="h2prod"
         version="2.4.0"
         status="UP"
-        entity_version="0"
-        tags="|genie.id:cluster1||genie.name:h2prod||hive||pig||prod|"
     />
-    <cluster_configs
-        cluster_id="cluster1"
-        config="s3://some/config/file"/>
+    <clusters_configs
+        cluster_id="1"
+        file_id="1"
+    />
+    <clusters_dependencies
+        cluster_id="1"
+        file_id="3"
+    />
+    <clusters_dependencies
+        cluster_id="1"
+        file_id="4"
+    />
+    <clusters_tags
+        cluster_id="1"
+        tag_id="9"
+    />
+    <clusters_tags
+        cluster_id="1"
+        tag_id="10"
+    />
+    <clusters_tags
+        cluster_id="1"
+        tag_id="8"
+    />
+    <clusters_tags
+        cluster_id="1"
+        tag_id="3"
+    />
+    <clusters_tags
+        cluster_id="1"
+        tag_id="4"
+    />
 
     <clusters_commands
-        cluster_id="cluster1"
-        command_id="command1"
-        command_order="0"/>
+        cluster_id="1"
+        command_id="1"
+        command_order="0"
+    />
     <clusters_commands
-        cluster_id="cluster1"
-        command_id="command2"
-        command_order="2"/>
+        cluster_id="1"
+        command_id="2"
+        command_order="2"
+    />
     <clusters_commands
-        cluster_id="cluster1"
-        command_id="command3"
-        command_order="1"/>
-
-    <cluster_dependencies
-        cluster_id="cluster1"
-        dependency="s3://some/config/cluster1/foo.json"/>
-    <cluster_dependencies
-        cluster_id="cluster1"
-        dependency="s3://some/config/cluster1/bar.json"/>
+        cluster_id="1"
+        command_id="3"
+        command_order="1"
+    />
 
     <clusters
-        id="cluster2"
+        id="2"
         created="2014-07-09 01:49:00"
         updated="2014-07-09 02:59:00"
+        entity_version="0"
+        unique_id="cluster2"
         genie_user="amsharma"
         name="h2query"
         version="2.4.0"
         status="UP"
-        entity_version="0"
-        tags="|genie.id:cluster2||genie.name:h2query||hive||pig||query|"
     />
-    <cluster_configs
-        cluster_id="cluster2"
-        config="s3://some/config/file"/>
-    <cluster_configs
-        cluster_id="cluster2"
-        config="s3://some/other/config/file"/>
+    <clusters_configs
+        cluster_id="2"
+        file_id="1"
+    />
+    <clusters_configs
+        cluster_id="2"
+        file_id="2"
+    />
+    <clusters_tags
+        cluster_id="2"
+        tag_id="11"
+    />
+    <clusters_tags
+        cluster_id="2"
+        tag_id="12"
+    />
+    <clusters_tags
+        cluster_id="2"
+        tag_id="8"
+    />
+    <clusters_tags
+        cluster_id="2"
+        tag_id="3"
+    />
+    <clusters_tags
+        cluster_id="2"
+        tag_id="13"
+    />
 
     <clusters_commands
-        cluster_id="cluster2"
-        command_id="command1"
-        command_order="0"/>
+        cluster_id="2"
+        command_id="1"
+        command_order="0"
+    />
     <clusters_commands
-        cluster_id="cluster2"
-        command_id="command2"
-        command_order="1"/>
+        cluster_id="2"
+        command_id="2"
+        command_order="1"
+    />
     <clusters_commands
-        cluster_id="cluster2"
-        command_id="command3"
-        command_order="2"/>
+        cluster_id="2"
+        command_id="3"
+        command_order="2"
+    />
 
-    <job_requests
-        id="job1"
+    <jobs
+        id="1"
         created="2015-08-11 01:48:00"
         updated="2014-08-11 02:59:00"
-        genie_user="tgianos"
-        name="testPigJob"
-        version="2.4"
-        command_args="-f query.pig"
-        cluster_criterias="[
-            {&quot;tags&quot;:[&quot;sla&quot;,&quot;yarn&quot;]},
-            {&quot;tags&quot;:[&quot;adhoc&quot;,&quot;yarn&quot;]}
-        ]"
-        command_criteria="[&quot;pig&quot;,&quot;0.15.0&quot;]"
-        applications="[]"
-        configs="[]"
-        dependencies="[]"
-        disable_log_archival="true"
-        cpu="1"
-        memory="1560"
-        timeout="608400"
         entity_version="1"
-    />
-    <jobs
-        id="job1"
-        created="2015-08-11 01:49:00"
-        updated="2014-08-11 02:59:00"
+        unique_id="job1"
         genie_user="tgianos"
         name="testPigJob"
-        command_args="-f query.pig"
-        status="SUCCEEDED"
         version="2.4"
-        entity_version="0"/>
+        command_args="-f query.pig"
+        disable_log_archival="true"
+        cpu_requested="1"
+        memory_requested="1560"
+        timeout_requested="608400"
+        status="SUCCEEDED"
+        host_name="b.netflix.com"
+    />
 
-    <job_requests
-        id="job2"
+    <cluster_criterias
+        id="1"
+        created="2015-08-11 01:48:00"
+        updated="2014-08-11 02:59:00"
+        entity_version="0"
+        job_id="1"
+        priority_order="0"
+    />
+    <cluster_criterias_tags
+        cluster_criteria_id="1"
+        tag_id="14"
+    />
+    <cluster_criterias_tags
+        cluster_criteria_id="1"
+        tag_id="16"
+    />
+    <cluster_criterias
+        id="2"
+        created="2015-08-11 01:48:00"
+        updated="2014-08-11 02:59:00"
+        entity_version="0"
+        job_id="1"
+        priority_order="1"
+    />
+    <cluster_criterias_tags
+        cluster_criteria_id="2"
+        tag_id="15"
+    />
+    <cluster_criterias_tags
+        cluster_criteria_id="2"
+        tag_id="16"
+    />
+    <job_command_criteria_tags
+        job_id="1"
+        tag_id="3"
+    />
+    <job_command_criteria_tags
+        job_id="1"
+        tag_id="17"
+    />
+
+    <jobs
+        id="2"
         created="2015-08-12 01:48:00"
         updated="2014-08-12 02:59:00"
-        genie_user="tgianos"
-        name="testSparkJob"
-        version="2.4"
-        command_args="-f spark.jar"
-        cluster_criterias="[
-            {&quot;tags&quot;:[&quot;sla&quot;,&quot;yarn&quot;]},
-            {&quot;tags&quot;:[&quot;adhoc&quot;,&quot;yarn&quot;]}
-        ]"
-        command_criteria="[&quot;spark&quot;]"
-        applications="[]"
-        configs="[]"
-        dependencies="[]"
-        disable_log_archival="true"
-        cpu="2"
-        memory="2048"
-        timeout="608401"
         entity_version="1"
-    />
-    <jobs
-        id="job2"
-        created="2015-08-12 01:49:00"
-        updated="2014-08-12 02:59:00"
+        unique_id="job2"
         genie_user="tgianos"
         name="testSparkJob"
-        command_args="-f spark.jar"
-        status="RUNNING"
         version="2.4"
-        entity_version="0"/>
+        command_args="-f spark.jar"
+        disable_log_archival="true"
+        cpu_requested="2"
+        memory_requested="2048"
+        timeout_requested="608401"
+        status="RUNNING"
+        host_name="a.netflix.com"
+    />
+
+    <cluster_criterias
+        id="3"
+        created="2015-08-11 01:48:00"
+        updated="2014-08-11 02:59:00"
+        entity_version="0"
+        job_id="2"
+        priority_order="0"
+    />
+    <cluster_criterias_tags
+        cluster_criteria_id="3"
+        tag_id="14"
+    />
+    <cluster_criterias_tags
+        cluster_criteria_id="3"
+        tag_id="16"
+    />
+    <cluster_criterias
+        id="4"
+        created="2015-08-11 01:48:00"
+        updated="2014-08-11 02:59:00"
+        entity_version="0"
+        job_id="2"
+        priority_order="1"
+    />
+    <cluster_criterias_tags
+        cluster_criteria_id="4"
+        tag_id="15"
+    />
+    <cluster_criterias_tags
+        cluster_criteria_id="4"
+        tag_id="16"
+    />
+    <job_command_criteria_tags
+        job_id="2"
+        tag_id="18"
+    />
 </dataset>
