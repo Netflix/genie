@@ -3,6 +3,7 @@ syntax = "proto3";
 package com.netflix.genie.proto;
 
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
 
 option java_multiple_files = true;
 option java_package = "com.netflix.genie.protogen";
@@ -60,4 +61,21 @@ message KillRequest {
 // Server Kill command
 message KillResponse {
   string client_id = 1;
+}
+
+// A chunk of a file
+message FileChunkRequest {
+    string path = 1;
+    uint64 offset = 2;
+    bytes data = 3;
+}
+
+// Acknowledgement from the servers that a given number of chunks were received
+message FileChunkResponse {
+    uint32 watermark = 1;
+}
+
+// Client streaming service definition
+service FileStreamService {
+    rpc streamFileChunks(stream FileChunkRequest) returns (stream FileChunkResponse) {}
 }
