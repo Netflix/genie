@@ -17,9 +17,8 @@
  */
 package com.netflix.genie.core.jpa.entities.projections;
 
-import com.netflix.genie.core.jpa.entities.ClusterCriteriaEntity;
+import com.netflix.genie.core.jpa.entities.CriterionEntity;
 import com.netflix.genie.core.jpa.entities.FileEntity;
-import com.netflix.genie.core.jpa.entities.TagEntity;
 
 import java.util.List;
 import java.util.Optional;
@@ -41,18 +40,18 @@ public interface JobRequestProjection extends JobCommonFieldsProjection, SetupFi
     Optional<String> getGenieUserGroup();
 
     /**
-     * Get all the cluster criterias.
+     * Get all the cluster criteria.
      *
      * @return The criteria in priority order
      */
-    List<ClusterCriteriaEntity> getClusterCriterias();
+    List<CriterionEntity> getClusterCriteria();
 
     /**
-     * Get all the command criteria for this job.
+     * Get the command criterion for this job.
      *
-     * @return The command criteria tags for this job
+     * @return The command criterion for this job if one exists
      */
-    Set<TagEntity> getCommandCriteria();
+    Optional<CriterionEntity> getCommandCriterion();
 
     /**
      * Get all the dependency files for this job.

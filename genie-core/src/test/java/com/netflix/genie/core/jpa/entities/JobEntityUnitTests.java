@@ -509,46 +509,28 @@ public class JobEntityUnitTests extends EntityTestsBase {
      * Make sure can set the cluster criteria.
      */
     @Test
-    public void canSetClusterCriterias() {
+    public void canSetClusterCriteria() {
         final Set<TagEntity> one = Sets.newHashSet("one", "two", "three")
             .stream()
-            .map(
-                tag -> {
-                    final TagEntity tagEntity = new TagEntity();
-                    tagEntity.setTag(tag);
-                    return tagEntity;
-                }
-            ).collect(Collectors.toSet());
+            .map(TagEntity::new)
+            .collect(Collectors.toSet());
         final Set<TagEntity> two = Sets.newHashSet("four", "five", "six")
             .stream()
-            .map(
-                tag -> {
-                    final TagEntity tagEntity = new TagEntity();
-                    tagEntity.setTag(tag);
-                    return tagEntity;
-                }
-            ).collect(Collectors.toSet());
+            .map(TagEntity::new)
+            .collect(Collectors.toSet());
         final Set<TagEntity> three = Sets.newHashSet("seven", "eight", "nine")
             .stream()
-            .map(
-                tag -> {
-                    final TagEntity tagEntity = new TagEntity();
-                    tagEntity.setTag(tag);
-                    return tagEntity;
-                }
-            ).collect(Collectors.toSet());
+            .map(TagEntity::new)
+            .collect(Collectors.toSet());
 
-        final ClusterCriteriaEntity entity1 = new ClusterCriteriaEntity();
-        entity1.setTags(one);
-        final ClusterCriteriaEntity entity2 = new ClusterCriteriaEntity();
-        entity2.setTags(two);
-        final ClusterCriteriaEntity entity3 = new ClusterCriteriaEntity();
-        entity3.setTags(three);
+        final CriterionEntity entity1 = new CriterionEntity(one);
+        final CriterionEntity entity2 = new CriterionEntity(two);
+        final CriterionEntity entity3 = new CriterionEntity(three);
 
-        final List<ClusterCriteriaEntity> clusterCriterias = Lists.newArrayList(entity1, entity2, entity3);
+        final List<CriterionEntity> clusterCriteria = Lists.newArrayList(entity1, entity2, entity3);
 
-        this.jobEntity.setClusterCriterias(clusterCriterias);
-        Assert.assertThat(this.jobEntity.getClusterCriterias(), Matchers.is(clusterCriterias));
+        this.jobEntity.setClusterCriteria(clusterCriteria);
+        Assert.assertThat(this.jobEntity.getClusterCriteria(), Matchers.is(clusterCriteria));
     }
 
     /**
@@ -556,8 +538,8 @@ public class JobEntityUnitTests extends EntityTestsBase {
      */
     @Test
     public void canSetNullClusterCriterias() {
-        this.jobEntity.setClusterCriterias(null);
-        Assert.assertThat(this.jobEntity.getClusterCriterias(), Matchers.empty());
+        this.jobEntity.setClusterCriteria(null);
+        Assert.assertThat(this.jobEntity.getClusterCriteria(), Matchers.empty());
     }
 
     /**
@@ -638,15 +620,19 @@ public class JobEntityUnitTests extends EntityTestsBase {
      */
     @Test
     public void canSetCommandCriteria() {
-        final TagEntity one = new TagEntity();
-        one.setTag(UUID.randomUUID().toString());
-        final TagEntity two = new TagEntity();
-        two.setTag(UUID.randomUUID().toString());
-        final Set<TagEntity> commandCriteria = Sets.newHashSet(one, two);
+        final Set<TagEntity> tags = Sets.newHashSet(
+            new TagEntity(UUID.randomUUID().toString()),
+            new TagEntity(UUID.randomUUID().toString())
+        );
 
-        this.jobEntity.setCommandCriteria(commandCriteria);
-        Assert.assertThat(this.jobEntity.getCommandCriteria(), Matchers.notNullValue());
-        Assert.assertThat(this.jobEntity.getCommandCriteria(), Matchers.is(commandCriteria));
+        final CriterionEntity commandCriterion = new CriterionEntity(tags);
+
+        this.jobEntity.setCommandCriterion(commandCriterion);
+        Assert.assertTrue(this.jobEntity.getCommandCriterion().isPresent());
+        Assert.assertThat(
+            this.jobEntity.getCommandCriterion().orElseThrow(IllegalArgumentException::new),
+            Matchers.is(commandCriterion)
+        );
     }
 
     /**
@@ -654,8 +640,8 @@ public class JobEntityUnitTests extends EntityTestsBase {
      */
     @Test
     public void canSetNullCommandCriteria() {
-        this.jobEntity.setCommandCriteria(null);
-        Assert.assertThat(this.jobEntity.getCommandCriteria(), Matchers.empty());
+        this.jobEntity.setCommandCriterion(null);
+        Assert.assertFalse(this.jobEntity.getCommandCriterion().isPresent());
     }
 
     /**

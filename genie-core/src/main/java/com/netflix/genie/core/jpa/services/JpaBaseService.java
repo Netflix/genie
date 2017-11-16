@@ -58,10 +58,10 @@ class JpaBaseService {
     /**
      * Constructor.
      *
-     * @param tagService     The tag service to use
-     * @param tagRepository  The tag repository to use
-     * @param fileService    The file service to use
-     * @param fileRepository The file repository to use
+     * @param tagService          The tag service to use
+     * @param tagRepository       The tag repository to use
+     * @param fileService         The file service to use
+     * @param fileRepository      The file repository to use
      */
     JpaBaseService(
         final TagService tagService,

@@ -158,13 +158,12 @@ DECLARE
   applications_requested_local VARCHAR(2048);
   application_order_local      INT;
   application_requested        VARCHAR(255);
-  cluster_criterias_local      TEXT;
-  cluster_criteria_order_local INT;
   cluster_criteria             TEXT;
-  cluster_tag                  VARCHAR(255);
-  cluster_criteria_id_local    BIGINT;
-  command_criteria_local       TEXT;
-  command_tag                  VARCHAR(255);
+  cluster_criteria_order_local INT;
+  cluster_criterion            TEXT;
+  criterion_tag                VARCHAR(255);
+  criterion_id_local           BIGINT;
+  command_criterion            TEXT;
   configs_local                TEXT;
   config                       VARCHAR(1024);
   dependencies_local           TEXT;
@@ -241,80 +240,99 @@ BEGIN
      */
 
     -- Rip off array brackets []
-    cluster_criterias_local = job_request_record.cluster_criterias;
-    cluster_criterias_local = TRIM(LEADING '[' FROM cluster_criterias_local);
-    cluster_criterias_local = TRIM(TRAILING ']' FROM cluster_criterias_local);
-    -- Loop through array (keep variable for order starting at 0)
-    cluster_criteria_order_local = 0;
-    << CLUSTER_CRITERIAS_LOOP >> WHILE LENGTH(cluster_criterias_local) > 0 LOOP
-      -- Create cluster_criterias entry (save ID)
-      INSERT INTO cluster_criterias (job_id, priority_order)
-      VALUES (new_job_id, cluster_criteria_order_local)
-      RETURNING id
-        INTO cluster_criteria_id_local;
-      -- Rip off JSON Object tags
-      cluster_criterias_local = TRIM(LEADING '{' FROM cluster_criterias_local);
-      cluster_criteria = SPLIT_PART(cluster_criterias_local, '}', 1);
-      cluster_criterias_local = TRIM(LEADING cluster_criteria FROM cluster_criterias_local);
-      cluster_criterias_local = TRIM(LEADING '}' FROM cluster_criterias_local);
-      cluster_criterias_local = TRIM(LEADING ',' FROM cluster_criterias_local);
-      cluster_criteria = TRIM(cluster_criteria);
-      -- Rip off "{tags:["
-      cluster_criteria = TRIM(LEADING '"tags":[' FROM cluster_criteria);
-      -- Rip off bracket ]
-      cluster_criteria = TRIM(TRAILING ']' FROM cluster_criteria);
-      -- Loop through array
-      << CLUSTER_CRITERIA_LOOP >> WHILE LENGTH(cluster_criteria) > 0 LOOP
-        -- Create entry in cluster_criteria_tags using saved id
-        cluster_tag = SPLIT_PART(cluster_criteria, '",', 1);
-        cluster_criteria = TRIM(LEADING cluster_tag FROM cluster_criteria);
-        cluster_criteria = TRIM(LEADING '"' FROM cluster_criteria);
+    cluster_criteria = job_request_record.cluster_criterias;
+    cluster_criteria = TRIM(LEADING '[' FROM cluster_criteria);
+    cluster_criteria = TRIM(TRAILING ']' FROM cluster_criteria);
+    IF LENGTH(cluster_criteria) > 0
+    THEN
+      -- Loop through array (keep variable for order starting at 0)
+      cluster_criteria_order_local = 0;
+      << CLUSTER_CRITERIAS_LOOP >> WHILE LENGTH(cluster_criteria) > 0 LOOP
+        -- Create criteria entry (save ID)
+        INSERT INTO criteria (created) VALUES (now())
+        RETURNING id
+          INTO criterion_id_local;
+
+        INSERT INTO jobs_cluster_criteria (job_id, criterion_id, priority_order)
+        VALUES (new_job_id, criterion_id_local, cluster_criteria_order_local);
+
+        -- Rip off JSON Object tags
+        cluster_criteria = TRIM(LEADING '{' FROM cluster_criteria);
+        cluster_criterion = SPLIT_PART(cluster_criteria, '}', 1);
+        cluster_criteria = TRIM(LEADING cluster_criterion FROM cluster_criteria);
+        cluster_criteria = TRIM(LEADING '}' FROM cluster_criteria);
         cluster_criteria = TRIM(LEADING ',' FROM cluster_criteria);
-        cluster_tag = TRIM(cluster_tag);
-        cluster_tag = TRIM(BOTH '"' FROM cluster_tag);
+        cluster_criterion = TRIM(cluster_criterion);
+        -- Rip off "{tags:["
+        cluster_criterion = TRIM(LEADING '"tags":[' FROM cluster_criterion);
+        -- Rip off bracket ]
+        cluster_criterion = TRIM(TRAILING ']' FROM cluster_criterion);
+        -- Loop through array
+        << CLUSTER_CRITERIA_LOOP >> WHILE LENGTH(cluster_criterion) > 0 LOOP
+          -- Create entry in cluster_criteria_tags using saved id
+          criterion_tag = SPLIT_PART(cluster_criterion, '",', 1);
+          cluster_criterion = TRIM(LEADING criterion_tag FROM cluster_criterion);
+          cluster_criterion = TRIM(LEADING '"' FROM cluster_criterion);
+          cluster_criterion = TRIM(LEADING ',' FROM cluster_criterion);
+          criterion_tag = TRIM(criterion_tag);
+          criterion_tag = TRIM(BOTH '"' FROM criterion_tag);
 
-        INSERT INTO tags (tag) VALUES (cluster_tag)
-        ON CONFLICT DO NOTHING;
+          INSERT INTO tags (tag) VALUES (criterion_tag)
+          ON CONFLICT DO NOTHING;
 
-        SELECT t.id
-        INTO found_tag_id
-        FROM tags t
-        WHERE t.tag = cluster_tag;
+          SELECT t.id
+          INTO found_tag_id
+          FROM tags t
+          WHERE t.tag = criterion_tag;
 
-        INSERT INTO cluster_criterias_tags VALUES (cluster_criteria_id_local, found_tag_id);
-      END LOOP CLUSTER_CRITERIA_LOOP;
-      -- Increment order
-      cluster_criteria_order_local = cluster_criteria_order_local + 1;
-    END LOOP CLUSTER_CRITERIAS_LOOP;
+          INSERT INTO criteria_tags (criterion_id, tag_id) VALUES (criterion_id_local, found_tag_id);
+        END LOOP CLUSTER_CRITERIA_LOOP;
+
+        -- Increment order
+        cluster_criteria_order_local = cluster_criteria_order_local + 1;
+      END LOOP CLUSTER_CRITERIAS_LOOP;
+    END IF;
 
     /*
      * COMMAND CRITERIA (desired command tags) FOR A GIVEN JOB
      */
 
-    command_criteria_local = job_request_record.command_criteria;
+    command_criterion = job_request_record.command_criteria;
     -- Pull off the brackets
-    command_criteria_local = TRIM(LEADING '[' FROM command_criteria_local);
-    command_criteria_local = TRIM(TRAILING ']' FROM command_criteria_local);
+    command_criterion = TRIM(LEADING '[' FROM command_criterion);
+    command_criterion = TRIM(TRAILING ']' FROM command_criterion);
 
-    -- LOOP while nothing left
-    << COMMAND_CRITERIA_LOOP >> WHILE LENGTH(command_criteria_local) > 0 LOOP
-      command_tag = SPLIT_PART(command_criteria_local, '",', 1);
-      command_criteria_local = TRIM(LEADING command_tag FROM command_criteria_local);
-      command_criteria_local = TRIM(LEADING '"' FROM command_criteria_local);
-      command_criteria_local = TRIM(LEADING ',' FROM command_criteria_local);
-      command_tag = TRIM(command_tag);
-      command_tag = TRIM(BOTH '"' FROM command_tag);
+    IF LENGTH(command_criterion) > 0
+    THEN
+      -- Create criteria entry (save ID)
+      INSERT INTO criteria (created) VALUES (now())
+      RETURNING id
+        INTO criterion_id_local;
 
-      INSERT INTO tags (tag) VALUES (command_tag)
-      ON CONFLICT DO NOTHING;
+      UPDATE jobs j
+      SET j.command_criterion = criterion_id_local
+      WHERE j.id = new_job_id;
 
-      SELECT t.id
-      INTO found_tag_id
-      FROM tags t
-      WHERE t.tag = command_tag;
+      -- LOOP while nothing left
+      << COMMAND_CRITERIA_LOOP >> WHILE LENGTH(command_criterion) > 0 LOOP
+        criterion_tag = SPLIT_PART(command_criterion, '",', 1);
+        command_criterion = TRIM(LEADING criterion_tag FROM command_criterion);
+        command_criterion = TRIM(LEADING '"' FROM command_criterion);
+        command_criterion = TRIM(LEADING ',' FROM command_criterion);
+        criterion_tag = TRIM(criterion_tag);
+        criterion_tag = TRIM(BOTH '"' FROM criterion_tag);
 
-      INSERT INTO job_command_criteria_tags VALUES (new_job_id, found_tag_id);
-    END LOOP COMMAND_CRITERIA_LOOP;
+        INSERT INTO tags (tag) VALUES (criterion_tag)
+        ON CONFLICT DO NOTHING;
+
+        SELECT t.id
+        INTO found_tag_id
+        FROM tags t
+        WHERE t.tag = criterion_tag;
+
+        INSERT INTO criteria_tags (criterion_id, tag_id) VALUES (criterion_id_local, found_tag_id);
+      END LOOP COMMAND_CRITERIA_LOOP;
+    END IF;
 
     /*
      * CONFIG FILES FOR A GIVEN JOB

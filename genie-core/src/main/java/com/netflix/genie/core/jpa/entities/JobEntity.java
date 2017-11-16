@@ -49,7 +49,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
@@ -251,9 +250,22 @@ public class JobEntity extends CommonFieldsEntity
     @OrderColumn(name = "application_order", nullable = false, updatable = false)
     private List<ApplicationEntity> applications = new ArrayList<>();
 
-    @OneToMany(mappedBy = "job", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(
+        name = "jobs_cluster_criteria",
+        joinColumns = {
+            @JoinColumn(name = "job_id", referencedColumnName = "id", nullable = false)
+        },
+        inverseJoinColumns = {
+            @JoinColumn(name = "criterion_id", referencedColumnName = "id", nullable = false)
+        }
+    )
     @OrderColumn(name = "priority_order", nullable = false, updatable = false)
-    private List<ClusterCriteriaEntity> clusterCriterias = new ArrayList<>();
+    private List<CriterionEntity> clusterCriteria = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "command_criterion", updatable = false)
+    private CriterionEntity commandCriterion;
 
     @ElementCollection
     @CollectionTable(
@@ -302,18 +314,6 @@ public class JobEntity extends CommonFieldsEntity
     )
     private Set<TagEntity> tags = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "job_command_criteria_tags",
-        joinColumns = {
-            @JoinColumn(name = "job_id", referencedColumnName = "id", nullable = false, updatable = false)
-        },
-        inverseJoinColumns = {
-            @JoinColumn(name = "tag_id", referencedColumnName = "id", nullable = false, updatable = false)
-        }
-    )
-    private Set<TagEntity> commandCriteria = new HashSet<>();
-
     /**
      * Default Constructor.
      */
@@ -350,6 +350,15 @@ public class JobEntity extends CommonFieldsEntity
      */
     public Optional<String> getGenieUserGroup() {
         return Optional.of(this.genieUserGroup);
+    }
+
+    /**
+     * Get the command criterion if one exists.
+     *
+     * @return The command criterion if one exists
+     */
+    public Optional<CriterionEntity> getCommandCriterion() {
+        return Optional.ofNullable(this.commandCriterion);
     }
 
     /**
@@ -640,7 +649,7 @@ public class JobEntity extends CommonFieldsEntity
     /**
      * Set all the tags associated to this job.
      *
-     * @param tags The dependency tags to set
+     * @param tags The tags to set
      */
     public void setTags(@Nullable final Set<TagEntity> tags) {
         this.tags.clear();
@@ -714,26 +723,14 @@ public class JobEntity extends CommonFieldsEntity
     }
 
     /**
-     * Set the command criteria requested for this job.
+     * Set the cluster criteria set for this job.
      *
-     * @param commandCriteria The command criteria to use
+     * @param clusterCriteria The cluster criteria in priority order
      */
-    public void setCommandCriteria(@Nullable final Set<TagEntity> commandCriteria) {
-        this.commandCriteria.clear();
-        if (commandCriteria != null) {
-            this.commandCriteria.addAll(commandCriteria);
-        }
-    }
-
-    /**
-     * Set the cluster criterias requested for this job.
-     *
-     * @param clusterCriterias The cluster criterias in priority order
-     */
-    public void setClusterCriterias(@Nullable final List<ClusterCriteriaEntity> clusterCriterias) {
-        this.clusterCriterias.clear();
-        if (clusterCriterias != null) {
-            this.clusterCriterias.addAll(clusterCriterias);
+    public void setClusterCriteria(@Nullable final List<CriterionEntity> clusterCriteria) {
+        this.clusterCriteria.clear();
+        if (clusterCriteria != null) {
+            this.clusterCriteria.addAll(clusterCriteria);
         }
     }
 }

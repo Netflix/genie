@@ -270,77 +270,96 @@ CREATE PROCEDURE GENIE_SPLIT_JOB_REQUESTS_320()
        */
 
       -- Rip off array brackets []
-      SET @cluster_criterias_local = `cluster_criterias_json`;
-      SET @cluster_criterias_local = TRIM(LEADING '[' FROM @cluster_criterias_local);
-      SET @cluster_criterias_local = TRIM(TRAILING ']' FROM @cluster_criterias_local);
-      -- Loop through array (keep variable for order starting at 0)
-      SET @cluster_criteria_order = 0;
-      CLUSTER_CRITERIAS_LOOP: WHILE LENGTH(@cluster_criterias_local) > 0 DO
-        -- Create cluster_criterias entry (save ID)
-        INSERT INTO `cluster_criterias` (`job_id`, `priority_order`)
-        VALUES (`new_job_id`, @cluster_criteria_order);
-        SET @cluster_criteria_id = LAST_INSERT_ID();
-        -- Rip off JSON Object tags
-        SET @cluster_criterias_local = TRIM(LEADING '{' FROM @cluster_criterias_local);
-        SET @cluster_criteria = SUBSTRING_INDEX(@cluster_criterias_local, '}', 1);
-        SET @cluster_criterias_local = TRIM(LEADING @cluster_criteria FROM @cluster_criterias_local);
-        SET @cluster_criterias_local = TRIM(LEADING '}' FROM @cluster_criterias_local);
-        SET @cluster_criterias_local = TRIM(LEADING ',' FROM @cluster_criterias_local);
-        SET @cluster_criteria = TRIM(@cluster_criteria);
-        -- Rip off "{tags:["
-        SET @cluster_criteria = TRIM(LEADING '"tags":[' FROM @cluster_criteria);
-        -- Rip off bracket ]
-        SET @cluster_criteria = TRIM(TRAILING ']' FROM @cluster_criteria);
-        -- Loop through array
+      SET @cluster_criteria = `cluster_criterias_json`;
+      SET @cluster_criteria = TRIM(LEADING '[' FROM @cluster_criteria);
+      SET @cluster_criteria = TRIM(TRAILING ']' FROM @cluster_criteria);
+      IF LENGTH(@cluster_criteria > 0)
+      THEN
+        -- Loop through array (keep variable for order starting at 0)
+        SET @cluster_criteria_order = 0;
         CLUSTER_CRITERIA_LOOP: WHILE LENGTH(@cluster_criteria) > 0 DO
-          -- Create entry in cluster_criteria_tags using saved id
-          SET @cluster_tag = SUBSTRING_INDEX(@cluster_criteria, '",', 1);
-          SET @cluster_criteria = TRIM(LEADING @cluster_tag FROM @cluster_criteria);
-          SET @cluster_criteria = TRIM(LEADING '"' FROM @cluster_criteria);
+          -- Create cluster_criterias entry (save ID)
+          INSERT INTO `criteria` (`created`) VALUES (CURRENT_TIMESTAMP(3));
+          SET @criteria_id = LAST_INSERT_ID();
+
+          INSERT INTO `jobs_cluster_criteria` (`job_id`, `criterion_id`, `priority_order`)
+          VALUES (`new_job_id`, @criteria_id, @cluster_criteria_order);
+
+          -- Rip off JSON Object tags
+          SET @cluster_criteria = TRIM( LEADING '{' FROM @cluster_criteria);
+          SET @cluster_criterion = SUBSTRING_INDEX(@cluster_criteria, '}', 1);
+          SET @cluster_criteria = TRIM(LEADING @cluster_criterion FROM @cluster_criteria);
+          SET @cluster_criteria = TRIM(LEADING '}' FROM @cluster_criteria);
           SET @cluster_criteria = TRIM(LEADING ',' FROM @cluster_criteria);
-          SET @cluster_tag = TRIM(@cluster_tag);
-          SET @cluster_tag = TRIM(BOTH '"' FROM @cluster_tag);
+          SET @cluster_criterion = TRIM(@cluster_criterion);
+          -- Rip off "{tags:["
+          SET @cluster_criterion = TRIM(LEADING '"tags":[' FROM @cluster_criterion);
+          -- Rip off bracket ]
+          SET @cluster_criterion = TRIM(TRAILING ']' FROM @cluster_criterion);
+          -- Loop through array
+          CLUSTER_CRITERION_LOOP: WHILE LENGTH(@cluster_criterion) > 0 DO
+            -- Create entry in cluster_criteria_tags using saved id
+            SET @criterion_tag = SUBSTRING_INDEX(@cluster_criterion, '",', 1);
+            SET @cluster_criterion = TRIM(LEADING @criterion_tag FROM @cluster_criterion);
+            SET @cluster_criterion = TRIM(LEADING '"' FROM @cluster_criterion);
+            SET @cluster_criterion = TRIM(LEADING ',' FROM @cluster_criterion);
+            SET @criterion_tag = TRIM(@criterion_tag);
+            SET @criterion_tag = TRIM(BOTH '"' FROM @criterion_tag);
 
-          INSERT IGNORE INTO `tags` (`tag`) VALUES (@cluster_tag);
+            INSERT IGNORE INTO `tags` (`tag`) VALUES (@criterion_tag);
 
-          SELECT `t`.`id`
-          INTO `found_tag_id`
-          FROM `tags` `t`
-          WHERE `t`.`tag` = @cluster_tag COLLATE utf8_bin;
+            SELECT `t`.`id`
+            INTO `found_tag_id`
+            FROM `tags` `t`
+            WHERE `t`.`tag` = @criterion_tag COLLATE utf8_bin;
 
-          INSERT INTO `cluster_criterias_tags` VALUES (@cluster_criteria_id, `found_tag_id`);
+            INSERT INTO `criteria_tags` (`criterion_id`, `tag_id`) VALUES (@criteria_id, `found_tag_id`);
+          END WHILE CLUSTER_CRITERION_LOOP;
+
+          -- Increment order
+          SET @cluster_criteria_order = @cluster_criteria_order + 1;
         END WHILE CLUSTER_CRITERIA_LOOP;
-        -- Increment order
-        SET @cluster_criteria_order = @cluster_criteria_order + 1;
-      END WHILE CLUSTER_CRITERIAS_LOOP;
+      END IF;
 
       /*
        * COMMAND CRITERIA (desired command tags) FOR A GIVEN JOB
        */
 
-      SET @command_criteria_local = `command_criteria_json`;
+      SET @command_criterion = `command_criteria_json`;
       -- Pull off the brackets
-      SET @command_criteria_local = TRIM(LEADING '[' FROM @command_criteria_local);
-      SET @command_criteria_local = TRIM(TRAILING ']' FROM @command_criteria_local);
+      SET @command_criterion = TRIM(LEADING '[' FROM @command_criterion);
+      SET @command_criterion = TRIM(TRAILING ']' FROM @command_criterion);
 
-      -- LOOP while nothing left
-      COMMAND_CRITERIA_LOOP: WHILE LENGTH(@command_criteria_local) > 0 DO
-        SET @command_tag = SUBSTRING_INDEX(@command_criteria_local, '",', 1);
-        SET @command_criteria_local = TRIM(LEADING @command_tag FROM @command_criteria_local);
-        SET @command_criteria_local = TRIM(LEADING '"' FROM @command_criteria_local);
-        SET @command_criteria_local = TRIM(LEADING ',' FROM @command_criteria_local);
-        SET @command_tag = TRIM(@command_tag);
-        SET @command_tag = TRIM(BOTH '"' FROM @command_tag);
+      IF LENGTH(@command_criterion) > 0
+      THEN
+        -- Create cluster_criterias entry (save ID)
+        INSERT INTO `criteria` (`created`) VALUES (CURRENT_TIMESTAMP(3));
+        SET @criteria_id = LAST_INSERT_ID();
 
-        INSERT IGNORE INTO `tags` (`tag`) VALUES (@command_tag);
+        UPDATE `jobs` `j`
+        SET `j`.`command_criterion` = @criteria_id
+        WHERE `j`.`id` = `new_job_id`;
 
-        SELECT `t`.`id`
-        INTO `found_tag_id`
-        FROM `tags` `t`
-        WHERE `t`.`tag` = @command_tag COLLATE utf8_bin;
+        -- LOOP while nothing left
+        COMMAND_CRITERION_LOOP: WHILE LENGTH(@command_criterion) > 0 DO
+          SET @criterion_tag = SUBSTRING_INDEX(@command_criterion, '",', 1);
+          SET @command_criterion = TRIM(LEADING @criterion_tag FROM @command_criterion);
+          SET @command_criterion = TRIM(LEADING '"' FROM @command_criterion);
+          SET @command_criterion = TRIM(LEADING ',' FROM @command_criterion);
+          SET @criterion_tag = TRIM(@criterion_tag);
+          SET @criterion_tag = TRIM(BOTH '"' FROM @criterion_tag);
 
-        INSERT INTO `job_command_criteria_tags` VALUES (`new_job_id`, `found_tag_id`);
-      END WHILE COMMAND_CRITERIA_LOOP;
+          INSERT IGNORE INTO `tags` (`tag`) VALUES (@criterion_tag);
+
+          SELECT `t`.`id`
+          INTO `found_tag_id`
+          FROM `tags` `t`
+          WHERE `t`.`tag` = @criterion_tag COLLATE utf8_bin;
+
+          -- Save tag data for later
+          INSERT INTO `criteria_tags` (`criterion_id`, `tag_id`) VALUES (@criteria_id, `found_tag_id`);
+        END WHILE COMMAND_CRITERION_LOOP;
+      END IF;
 
       /*
        * CONFIG FILES FOR A GIVEN JOB
@@ -558,6 +577,8 @@ DROP TABLE IF EXISTS
 SELECT
   CURRENT_TIMESTAMP              AS '',
   'Finished dropping old tables' AS '';
+
+DROP TABLE IF EXISTS `criteria_tags_tmp`;
 
 SELECT
   CURRENT_TIMESTAMP                                                     AS '',

@@ -18,8 +18,8 @@
     <clusters/>
     <commands/>
     <applications/>
+    <criteria/>
     <jobs/>
-    <cluster_criterias/>
     <files/>
     <tags/>
     <clusters_configs/>
@@ -36,8 +36,8 @@
     <jobs_applications/>
     <job_applications_requested/>
     <jobs_configs/>
-    <job_command_criteria_tags/>
     <jobs_dependencies/>
     <jobs_tags/>
-    <cluster_criterias_tags/>
+    <jobs_cluster_criteria/>
+    <criteria_tags/>
 </dataset>

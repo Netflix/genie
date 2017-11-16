@@ -376,6 +376,20 @@
         command_order="0"
     />
 
+    <criteria
+        id="0"
+        created="2015-08-11 01:48:00"
+        updated="2015-08-11 02:59:00"
+        entity_version="0"
+    />
+    <criteria_tags
+        criterion_id="1"
+        tag_id="6"
+    />
+    <criteria_tags
+        criterion_id="1"
+        tag_id="16"
+    />
     <jobs
         id="1"
         created="2015-08-11 01:48:00"
@@ -385,6 +399,7 @@
         genie_user="tgianos"
         name="testSparkJob"
         version="2.4"
+        command_criterion="0"
         command_args="-f query.q"
         cpu_requested="1"
         memory_requested="1560"
@@ -411,50 +426,58 @@
         application_id="app3"
         application_order="1"
     />
-    <cluster_criterias
+    <criteria
         id="1"
         created="2015-08-11 01:48:00"
         updated="2015-08-11 02:59:00"
         entity_version="0"
-        job_id="1"
-        priority_order="0"
     />
-    <cluster_criterias_tags
-        cluster_criteria_id="1"
+    <criteria_tags
+        criterion_id="1"
         tag_id="13"
     />
-    <cluster_criterias_tags
-        cluster_criteria_id="1"
+    <criteria_tags
+        criterion_id="1"
         tag_id="14"
     />
-    <cluster_criterias
+    <jobs_cluster_criteria
+        job_id="1"
+        criterion_id="1"
+        priority_order="0"
+    />
+    <criteria
         id="2"
         created="2015-08-11 01:48:00"
         updated="2015-08-11 02:59:00"
         entity_version="0"
-        job_id="1"
-        priority_order="1"
     />
-    <cluster_criterias_tags
-        cluster_criteria_id="2"
+    <criteria_tags
+        criterion_id="2"
         tag_id="13"
     />
-    <cluster_criterias_tags
-        cluster_criteria_id="2"
+    <criteria_tags
+        criterion_id="2"
         tag_id="15"
     />
-    <job_command_criteria_tags
+    <jobs_cluster_criteria
         job_id="1"
-        tag_id="6"
-    />
-    <job_command_criteria_tags
-        job_id="1"
-        tag_id="16"
+        criterion_id="2"
+        priority_order="1"
     />
 
     <jobs_applications job_id="1" application_id="1" application_order="0"/>
     <jobs_applications job_id="1" application_id="3" application_order="1"/>
 
+    <criteria
+        id="3"
+        created="2015-08-11 01:48:00"
+        updated="2015-08-11 02:59:00"
+        entity_version="0"
+    />
+    <criteria_tags
+        criterion_id="3"
+        tag_id="6"
+    />
     <jobs
         id="2"
         created="2015-08-12 01:48:00"
@@ -464,6 +487,7 @@
         genie_user="tgianos"
         name="testSparkJob1"
         version="2.4"
+        command_criterion="3"
         command_args="-f spark.jar"
         cpu_requested="2"
         memory_requested="2048"
@@ -480,46 +504,58 @@
         check_delay="11000"
         timeout="2015-08-19 01:49:00"
     />
-    <cluster_criterias
-        id="3"
-        created="2015-08-12 01:48:00"
-        updated="2015-08-12 02:59:00"
-        entity_version="0"
-        job_id="2"
-        priority_order="0"
-    />
-    <cluster_criterias_tags
-        cluster_criteria_id="3"
-        tag_id="17"
-    />
-    <cluster_criterias_tags
-        cluster_criteria_id="3"
-        tag_id="12"
-    />
-    <cluster_criterias
+    <criteria
         id="4"
         created="2015-08-12 01:48:00"
         updated="2015-08-12 02:59:00"
         entity_version="0"
-        job_id="2"
-        priority_order="1"
     />
-    <cluster_criterias_tags
-        cluster_criteria_id="4"
-        tag_id="11"
+    <criteria_tags
+        criterion_id="4"
+        tag_id="17"
     />
-    <cluster_criterias_tags
-        cluster_criteria_id="4"
+    <criteria_tags
+        criterion_id="4"
         tag_id="12"
     />
-    <job_command_criteria_tags
+    <jobs_cluster_criteria
         job_id="2"
-        tag_id="6"
+        criterion_id="4"
+        priority_order="0"
+    />
+    <criteria
+        id="5"
+        created="2015-08-12 01:48:00"
+        updated="2015-08-12 02:59:00"
+        entity_version="0"
+    />
+    <criteria_tags
+        criterion_id="5"
+        tag_id="11"
+    />
+    <criteria_tags
+        criterion_id="5"
+        tag_id="12"
+    />
+    <jobs_cluster_criteria
+        job_id="2"
+        criterion_id="5"
+        priority_order="1"
     />
 
     <jobs_applications job_id="2" application_id="1" application_order="0"/>
     <jobs_applications job_id="2" application_id="2" application_order="1"/>
 
+    <criteria
+        id="6"
+        created="2015-08-11 01:48:00"
+        updated="2015-08-11 02:59:00"
+        entity_version="0"
+    />
+    <criteria_tags
+        criterion_id="6"
+        tag_id="6"
+    />
     <jobs
         id="3"
         created="2016-02-24 01:48:00"
@@ -529,6 +565,7 @@
         genie_user="tgianos"
         name="testSparkJob2"
         version="2.4"
+        command_criterion="6"
         command_args="-f spark.jar"
         cpu_requested="2"
         memory_requested="2048"
@@ -545,41 +582,43 @@
         check_delay="12000"
         timeout="2016-03-03 01:49:00"
     />
-    <cluster_criterias
-        id="5"
+    <criteria
+        id="7"
         created="2015-08-12 01:48:00"
         updated="2015-08-12 02:59:00"
         entity_version="0"
-        job_id="3"
-        priority_order="0"
     />
-    <cluster_criterias_tags
-        cluster_criteria_id="5"
+    <criteria_tags
+        criterion_id="7"
         tag_id="17"
     />
-    <cluster_criterias_tags
-        cluster_criteria_id="5"
+    <criteria_tags
+        criterion_id="7"
         tag_id="12"
     />
-    <cluster_criterias
-        id="6"
+    <jobs_cluster_criteria
+        job_id="3"
+        criterion_id="7"
+        priority_order="0"
+    />
+    <criteria
+        id="8"
         created="2015-08-12 01:48:00"
         updated="2015-08-12 02:59:00"
         entity_version="0"
-        job_id="3"
-        priority_order="1"
     />
-    <cluster_criterias_tags
-        cluster_criteria_id="6"
+    <criteria_tags
+        criterion_id="8"
         tag_id="11"
     />
-    <cluster_criterias_tags
-        cluster_criteria_id="6"
+    <criteria_tags
+        criterion_id="8"
         tag_id="12"
     />
-    <job_command_criteria_tags
+    <jobs_cluster_criteria
         job_id="3"
-        tag_id="6"
+        criterion_id="8"
+        priority_order="1"
     />
 
     <jobs_applications job_id="3" application_id="1" application_order="0"/>

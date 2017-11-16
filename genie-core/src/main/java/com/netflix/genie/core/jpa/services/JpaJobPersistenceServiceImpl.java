@@ -29,9 +29,9 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.jpa.entities.ApplicationEntity;
-import com.netflix.genie.core.jpa.entities.ClusterCriteriaEntity;
 import com.netflix.genie.core.jpa.entities.ClusterEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
+import com.netflix.genie.core.jpa.entities.CriterionEntity;
 import com.netflix.genie.core.jpa.entities.FileEntity;
 import com.netflix.genie.core.jpa.entities.JobEntity;
 import com.netflix.genie.core.jpa.entities.projections.IdProjection;
@@ -130,7 +130,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
             throw new GenieConflictException("A job with id " + jobId + " already exists");
         }
 
-        final JobEntity jobEntity = this.dtosToEntity(jobId, jobRequest, jobMetadata, job, jobExecution);
+        final JobEntity jobEntity = this.toEntity(jobId, jobRequest, jobMetadata, job, jobExecution);
         this.jobRepository.save(jobEntity);
     }
 
@@ -322,7 +322,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         }
     }
 
-    private JobEntity dtosToEntity(
+    private JobEntity toEntity(
         final String id,
         final JobRequest jobRequest,
         final JobMetadata jobMetadata,
@@ -346,18 +346,17 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         if (setupFile != null) {
             jobEntity.setSetupFile(setupFile);
         }
-        final List<ClusterCriteriaEntity> clusterCriteriaEntities
+        final List<CriterionEntity> clusterCriteria
             = Lists.newArrayListWithExpectedSize(jobRequest.getClusterCriterias().size());
 
-        for (final ClusterCriteria clusterCriteria : jobRequest.getClusterCriterias()) {
-            final ClusterCriteriaEntity clusterCriteriaEntity = new ClusterCriteriaEntity();
-            clusterCriteriaEntity.setTags(this.createAndGetTagEntities(clusterCriteria.getTags()));
-            clusterCriteriaEntity.setJob(jobEntity);
-            clusterCriteriaEntities.add(clusterCriteriaEntity);
+        for (final ClusterCriteria clusterCriterion : jobRequest.getClusterCriterias()) {
+            clusterCriteria.add(new CriterionEntity(this.createAndGetTagEntities(clusterCriterion.getTags())));
         }
-        jobEntity.setClusterCriterias(clusterCriteriaEntities);
+        jobEntity.setClusterCriteria(clusterCriteria);
 
-        jobEntity.setCommandCriteria(this.createAndGetTagEntities(jobRequest.getCommandCriteria()));
+        jobEntity.setCommandCriterion(
+            new CriterionEntity(this.createAndGetTagEntities(jobRequest.getCommandCriteria()))
+        );
         jobEntity.setConfigs(this.createAndGetFileEntities(jobRequest.getConfigs()));
         jobEntity.setDependencies(this.createAndGetFileEntities(jobRequest.getDependencies()));
         jobEntity.setDisableLogArchival(jobRequest.isDisableLogArchival());

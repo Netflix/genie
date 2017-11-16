@@ -87,6 +87,45 @@ SELECT
 
 SELECT
   CURRENT_TIMESTAMP,
+  'Creating criteria table';
+
+CREATE TABLE criteria (
+  id             BIGINT IDENTITY                           NOT NULL,
+  created        DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3)  NOT NULL,
+  updated        DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3)  NOT NULL,
+  entity_version INT DEFAULT '0'                           NOT NULL,
+  PRIMARY KEY (id)
+);
+
+SELECT
+  CURRENT_TIMESTAMP,
+  'Finished creating criteria table';
+
+SELECT
+  CURRENT_TIMESTAMP,
+  'Creating criteria_tags table';
+
+CREATE TABLE criteria_tags (
+  crterion_id BIGINT NOT NULL,
+  tag_id      BIGINT NOT NULL,
+  PRIMARY KEY (crterion_id, tag_id),
+  CONSTRAINT CRITERIA_TAGS_CRITERION_ID_FK FOREIGN KEY (crterion_id) REFERENCES criteria (id)
+    ON DELETE CASCADE,
+  CONSTRAINT CRITERIA_TAGS_TAG_ID_FK FOREIGN KEY (tag_id) REFERENCES tags (id)
+    ON DELETE RESTRICT
+);
+
+CREATE INDEX CRITERIA_TAGS_CRITERION_ID_INDEX
+  ON criteria_tags (crterion_id);
+CREATE INDEX CRITERIA_TAGS_TAG_ID_INDEX
+  ON criteria_tags (tag_id);
+
+SELECT
+  CURRENT_TIMESTAMP,
+  'Created criteria_tags table';
+
+SELECT
+  CURRENT_TIMESTAMP,
   'Creating new applications table';
 
 CREATE TABLE applications (
@@ -395,6 +434,7 @@ CREATE TABLE jobs (
   name                      VARCHAR(255)                                          NOT NULL,
   genie_user                VARCHAR(255)                                          NOT NULL,
   version                   VARCHAR(255)                                          NOT NULL,
+  command_criterion         BIGINT        DEFAULT NULL,
   command_args              LONGVARCHAR   DEFAULT NULL,
   description               LONGVARCHAR   DEFAULT NULL,
   setup_file                BIGINT        DEFAULT NULL,
@@ -437,6 +477,8 @@ CREATE TABLE jobs (
   -- Post Job Info
   archive_location          VARCHAR(1024) DEFAULT NULL,
   PRIMARY KEY (id),
+  CONSTRAINT JOBS_COMMAND_CRITERION_FK FOREIGN KEY (command_criterion) REFERENCES criteria (id)
+    ON DELETE RESTRICT,
   CONSTRAINT JOBS_CLUSTER_ID_FK FOREIGN KEY (cluster_id) REFERENCES clusters (id)
     ON DELETE RESTRICT,
   CONSTRAINT JOBS_COMMAND_ID_FK FOREIGN KEY (command_id) REFERENCES commands (id)
@@ -446,11 +488,13 @@ CREATE TABLE jobs (
 );
 
 CREATE UNIQUE INDEX JOBS_UNIQUE_ID_UNIQUE_INDEX
-  ON jobs (job_id);
+  ON jobs (unique_id);
 CREATE INDEX JOBS_CLUSTER_ID_INDEX
   ON jobs (cluster_id);
 CREATE INDEX JOBS_CLUSTER_NAME_INDEX
   ON jobs (cluster_name);
+CREATE INDEX JOBS_COMMAND_CRITERION_INDEX
+  ON jobs (command_criterion);
 CREATE INDEX JOBS_COMMAND_ID_INDEX
   ON jobs (command_id);
 CREATE INDEX JOBS_COMMAND_NAME_INDEX
@@ -598,49 +642,27 @@ SELECT
 
 SELECT
   CURRENT_TIMESTAMP,
-  'Creating cluster_criterias table';
+  'Creating jobs_cluster_criteria table';
 
-CREATE TABLE cluster_criterias (
-  id             BIGINT IDENTITY                           NOT NULL,
-  created        DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3)  NOT NULL,
-  updated        DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3)  NOT NULL,
-  entity_version INT DEFAULT '0'                           NOT NULL,
-  job_id         INT                                       NOT NULL,
-  priority_order INT                                       NOT NULL,
-  PRIMARY KEY (id),
-  CONSTRAINT CLUSTER_CRITERIAS_JOB_ID_FK FOREIGN KEY (job_id) REFERENCES jobs (id)
-    ON DELETE CASCADE
-);
-
-CREATE INDEX CLUSTER_CRITERIAS_JOB_ID_INDEX
-  ON cluster_criterias (job_id);
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Created cluster_criterias table';
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Creating cluster_criterias_tags table';
-
-CREATE TABLE cluster_criterias_tags (
-  cluster_criteria_id BIGINT NOT NULL,
-  tag_id              BIGINT NOT NULL,
-  PRIMARY KEY (cluster_criteria_id, tag_id),
-  CONSTRAINT CLUSTER_CRITERIAS_CLUSTER_CRITERIA_ID_FK FOREIGN KEY (cluster_criteria_id) REFERENCES cluster_criterias (id)
+CREATE TABLE jobs_cluster_criteria (
+  job_id         BIGINT NOT NULL,
+  criterion_id   BIGINT NOT NULL,
+  priority_order INT    NOT NULL,
+  PRIMARY KEY (job_id, criterion_id, priority_order),
+  CONSTRAINT JOBS_CLUSTER_CRITERIA_JOB_ID FOREIGN KEY (job_id) REFERENCES jobs (id)
     ON DELETE CASCADE,
-  CONSTRAINT CLUSTER_CRITERIAS_TAG_ID_FK FOREIGN KEY (tag_id) REFERENCES tags (id)
+  CONSTRAINT JOBS_CLUSTER_CRITERIA_CRITERION_ID_FK FOREIGN KEY (criterion_id) REFERENCES criteria (id)
     ON DELETE RESTRICT
 );
 
-CREATE INDEX CLUSTER_CRITERIAS_TAGS_CLUSTER_CRITERIA_ID_INDEX
-  ON cluster_criterias_tags (cluster_criteria_id);
-CREATE INDEX CLUSTER_CRITERIAS_TAGS_ID_INDEX
-  ON cluster_criterias_tags (tag_id);
+CREATE INDEX JOBS_CLUSTER_CRITERIA_JOB_ID_INDEX
+  ON jobs_cluster_criteria (job_id);
+CREATE INDEX JOBS_CLUSTER_CRITERIA_CRITERION_ID_INDEX
+  ON jobs_cluster_criteria (criterion_id);
 
 SELECT
   CURRENT_TIMESTAMP,
-  'Created cluster_criterias_tags table';
+  'Created jobs_cluster_criteria table';
 
 SELECT
   CURRENT_TIMESTAMP,
@@ -664,29 +686,6 @@ CREATE INDEX JOB_APPLICATIONS_REQUESTED_JOB_ID_INDEX
 SELECT
   CURRENT_TIMESTAMP,
   'Created job_applications_requested table';
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Creating job_command_criteria_tags table';
-
-CREATE TABLE job_command_criteria_tags (
-  job_id BIGINT NOT NULL,
-  tag_id BIGINT NOT NULL,
-  PRIMARY KEY (job_id, tag_id),
-  CONSTRAINT JOB_COMMAND_CRITERIA_TAGS_JOB_ID_FK FOREIGN KEY (job_id) REFERENCES jobs (id)
-    ON DELETE CASCADE,
-  CONSTRAINT JOB_COMMAND_CRITERIA_TAGS_TAG_ID_FK FOREIGN KEY (tag_id) REFERENCES tags (id)
-    ON DELETE RESTRICT
-);
-
-CREATE INDEX JOB_COMMAND_CRITERIA_TAGS_JOB_ID_INDEX
-  ON job_command_criteria_tags (job_id);
-CREATE INDEX JOB_COMMAND_CRITERIA_TAGS_TAG_ID_INDEX
-  ON job_command_criteria_tags (tag_id);
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Created job_command_criteria_tags table';
 
 SELECT
   CURRENT_TIMESTAMP,

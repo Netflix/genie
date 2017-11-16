@@ -422,6 +422,20 @@
         command_order="2"
     />
 
+    <criteria
+        id="0"
+        created="2015-08-11 01:48:00"
+        updated="2014-08-11 02:59:00"
+        entity_version="0"
+    />
+    <criteria_tags
+        criterion_id="0"
+        tag_id="3"
+    />
+    <criteria_tags
+        criterion_id="0"
+        tag_id="17"
+    />
     <jobs
         id="1"
         created="2015-08-11 01:48:00"
@@ -431,6 +445,7 @@
         genie_user="tgianos"
         name="testPigJob"
         version="2.4"
+        command_criterion="0"
         command_args="-f query.pig"
         disable_log_archival="true"
         cpu_requested="1"
@@ -440,47 +455,56 @@
         host_name="b.netflix.com"
     />
 
-    <cluster_criterias
+    <criteria
         id="1"
         created="2015-08-11 01:48:00"
         updated="2014-08-11 02:59:00"
         entity_version="0"
-        job_id="1"
-        priority_order="0"
     />
-    <cluster_criterias_tags
-        cluster_criteria_id="1"
+    <criteria_tags
+        criterion_id="1"
         tag_id="14"
     />
-    <cluster_criterias_tags
-        cluster_criteria_id="1"
+    <criteria_tags
+        criterion_id="1"
         tag_id="16"
     />
-    <cluster_criterias
+    <jobs_cluster_criteria
+        job_id="1"
+        criterion_id="1"
+        priority_order="0"
+    />
+
+    <criteria
         id="2"
         created="2015-08-11 01:48:00"
         updated="2014-08-11 02:59:00"
         entity_version="0"
-        job_id="1"
-        priority_order="1"
     />
-    <cluster_criterias_tags
-        cluster_criteria_id="2"
+    <criteria_tags
+        criterion_id="2"
         tag_id="15"
     />
-    <cluster_criterias_tags
-        cluster_criteria_id="2"
+    <criteria_tags
+        criterion_id="2"
         tag_id="16"
     />
-    <job_command_criteria_tags
+    <jobs_cluster_criteria
         job_id="1"
-        tag_id="3"
-    />
-    <job_command_criteria_tags
-        job_id="1"
-        tag_id="17"
+        criterion_id="2"
+        priority_order="1"
     />
 
+    <criteria
+        id="3"
+        created="2015-08-11 01:48:00"
+        updated="2014-08-11 02:59:00"
+        entity_version="0"
+    />
+    <criteria_tags
+        criterion_id="3"
+        tag_id="18"
+    />
     <jobs
         id="2"
         created="2015-08-12 01:48:00"
@@ -490,6 +514,7 @@
         genie_user="tgianos"
         name="testSparkJob"
         version="2.4"
+        command_criterion="3"
         command_args="-f spark.jar"
         disable_log_archival="true"
         cpu_requested="2"
@@ -499,40 +524,42 @@
         host_name="a.netflix.com"
     />
 
-    <cluster_criterias
-        id="3"
-        created="2015-08-11 01:48:00"
-        updated="2014-08-11 02:59:00"
-        entity_version="0"
-        job_id="2"
-        priority_order="0"
-    />
-    <cluster_criterias_tags
-        cluster_criteria_id="3"
-        tag_id="14"
-    />
-    <cluster_criterias_tags
-        cluster_criteria_id="3"
-        tag_id="16"
-    />
-    <cluster_criterias
+    <criteria
         id="4"
         created="2015-08-11 01:48:00"
         updated="2014-08-11 02:59:00"
         entity_version="0"
-        job_id="2"
-        priority_order="1"
     />
-    <cluster_criterias_tags
-        cluster_criteria_id="4"
-        tag_id="15"
+    <criteria_tags
+        criterion_id="4"
+        tag_id="14"
     />
-    <cluster_criterias_tags
-        cluster_criteria_id="4"
+    <criteria_tags
+        criterion_id="4"
         tag_id="16"
     />
-    <job_command_criteria_tags
+    <jobs_cluster_criteria
         job_id="2"
-        tag_id="18"
+        criterion_id="4"
+        priority_order="0"
+    />
+    <criteria
+        id="5"
+        created="2015-08-11 01:48:00"
+        updated="2014-08-11 02:59:00"
+        entity_version="0"
+    />
+    <criteria_tags
+        criterion_id="5"
+        tag_id="15"
+    />
+    <criteria_tags
+        criterion_id="5"
+        tag_id="16"
+    />
+    <jobs_cluster_criteria
+        job_id="2"
+        criterion_id="5"
+        priority_order="1"
     />
 </dataset>

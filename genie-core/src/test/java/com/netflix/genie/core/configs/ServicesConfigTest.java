@@ -204,14 +204,14 @@ public class ServicesConfigTest {
     /**
      * Get JPA based implementation of the JobPersistenceService.
      *
-     * @param tagService      The tag service to use
-     * @param tagRepository   The tag repository to use
-     * @param fileService     The file service to use
-     * @param fileRepository  The file repository to use
-     * @param jobRepository   The job repository to use
-     * @param applicationRepo The application repository to use
-     * @param clusterRepo     The cluster repository to use
-     * @param commandRepo     The command repository to use
+     * @param tagService            The tag service to use
+     * @param tagRepository         The tag repository to use
+     * @param fileService           The file service to use
+     * @param fileRepository        The file repository to use
+     * @param jobRepository         The job repository to use
+     * @param applicationRepository The application repository to use
+     * @param clusterRepository     The cluster repository to use
+     * @param commandRepository     The command repository to use
      * @return A job search service instance.
      */
     @Bean
@@ -221,9 +221,9 @@ public class ServicesConfigTest {
         final FileService fileService,
         final JpaFileRepository fileRepository,
         final JpaJobRepository jobRepository,
-        final JpaApplicationRepository applicationRepo,
-        final JpaClusterRepository clusterRepo,
-        final JpaCommandRepository commandRepo
+        final JpaApplicationRepository applicationRepository,
+        final JpaClusterRepository clusterRepository,
+        final JpaCommandRepository commandRepository
     ) {
         return new JpaJobPersistenceServiceImpl(
             tagService,
@@ -231,9 +231,9 @@ public class ServicesConfigTest {
             fileService,
             fileRepository,
             jobRepository,
-            applicationRepo,
-            clusterRepo,
-            commandRepo
+            applicationRepository,
+            clusterRepository,
+            commandRepository
         );
     }
 

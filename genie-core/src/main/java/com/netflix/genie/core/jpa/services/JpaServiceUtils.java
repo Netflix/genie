@@ -26,9 +26,9 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.core.jpa.entities.ApplicationEntity;
-import com.netflix.genie.core.jpa.entities.ClusterCriteriaEntity;
 import com.netflix.genie.core.jpa.entities.ClusterEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
+import com.netflix.genie.core.jpa.entities.CriterionEntity;
 import com.netflix.genie.core.jpa.entities.FileEntity;
 import com.netflix.genie.core.jpa.entities.TagEntity;
 import com.netflix.genie.core.jpa.entities.projections.JobExecutionProjection;
@@ -173,11 +173,17 @@ public class JpaServiceUtils {
             jobRequestProjection.getVersion(),
             jobRequestProjection.getCommandArgs().orElse(null),
             jobRequestProjection
-                .getClusterCriterias()
+                .getClusterCriteria()
                 .stream()
                 .map(JpaServiceUtils::toClusterCriteriaDto)
                 .collect(Collectors.toList()),
-            jobRequestProjection.getCommandCriteria().stream().map(TagEntity::getTag).collect(Collectors.toSet())
+            jobRequestProjection
+                .getCommandCriterion()
+                .orElse(new CriterionEntity())
+                .getTags()
+                .stream()
+                .map(TagEntity::getTag)
+                .collect(Collectors.toSet())
         )
             .withCreated(jobRequestProjection.getCreated())
             .withId(jobRequestProjection.getUniqueId())
@@ -214,9 +220,9 @@ public class JpaServiceUtils {
         return builder.build();
     }
 
-    private static ClusterCriteria toClusterCriteriaDto(final ClusterCriteriaEntity clusterCriteriaEntity) {
+    private static ClusterCriteria toClusterCriteriaDto(final CriterionEntity clusterCriterionEntity) {
         return new ClusterCriteria(
-            clusterCriteriaEntity
+            clusterCriterionEntity
                 .getTags()
                 .stream()
                 .map(TagEntity::getTag)

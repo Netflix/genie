@@ -324,16 +324,12 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
     @Override
     public List<Application> getJobApplications(@NotBlank final String id) throws GenieException {
         log.debug("Called for job with id {}", id);
-        if (this.jobRepository.existsByUniqueId(id)) {
-            return this.jobRepository.findByUniqueId(id, JobApplicationsProjection.class)
-                .orElseThrow(() -> new GenieNotFoundException("No applications found for job " + id))
-                .getApplications()
-                .stream()
-                .map(JpaServiceUtils::toApplicationDto)
-                .collect(Collectors.toList());
-        } else {
-            throw new GenieNotFoundException("No job with id " + id + " exists. Unable to get cluster");
-        }
+        return this.jobRepository.findByUniqueId(id, JobApplicationsProjection.class)
+            .orElseThrow(() -> new GenieNotFoundException("No job with " + id + " exists. Unable to get applications"))
+            .getApplications()
+            .stream()
+            .map(JpaServiceUtils::toApplicationDto)
+            .collect(Collectors.toList());
     }
 
     /**

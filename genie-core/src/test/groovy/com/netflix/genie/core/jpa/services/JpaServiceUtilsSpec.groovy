@@ -388,35 +388,29 @@ class JpaServiceUtilsSpec extends Specification {
                 new ClusterCriteria(two),
                 new ClusterCriteria(three)
         )
-        List<ClusterCriteriaEntity> clusterCriteriaEntities = clusterCriterias.collect(
+        List<CriterionEntity> clusterCriteriaEntities = clusterCriterias.collect(
                 {
                     final Set<TagEntity> clusterCriteriaTags = it.tags.collect(
                             {
-                                def tagEntity = new TagEntity()
-                                tagEntity.setTag(it)
-                                tagEntity
+                                new TagEntity(it)
                             }
                     )
-                    def clusterCriteriaEntity = new ClusterCriteriaEntity()
-                    clusterCriteriaEntity.setTags(clusterCriteriaTags)
-                    clusterCriteriaEntity
+                    new CriterionEntity(clusterCriteriaTags)
                 }
         )
-        entity.setClusterCriterias(clusterCriteriaEntities)
+        entity.setClusterCriteria(clusterCriteriaEntities)
 
         def commandCriteria = Sets.newHashSet(
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString()
         )
-        final Set<TagEntity> commandCriteriaEntities = commandCriteria.collect(
+        final Set<TagEntity> commandCriterionTags = commandCriteria.collect(
                 {
-                    def tagEntity = new TagEntity()
-                    tagEntity.setTag(it)
-                    tagEntity
+                    new TagEntity(it)
                 }
         )
-        entity.setCommandCriteria(commandCriteriaEntities)
+        entity.setCommandCriterion(new CriterionEntity(commandCriterionTags))
 
         def configs = Sets.newHashSet(
                 UUID.randomUUID().toString(),

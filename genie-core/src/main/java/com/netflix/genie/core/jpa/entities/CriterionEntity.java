@@ -17,45 +17,71 @@
  */
 package com.netflix.genie.core.jpa.entities;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.annotation.Nullable;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Entity for a given cluster criteria.
+ * Entity for criteria records.
  *
  * @author tgianos
  * @since 3.3.0
  */
+@NoArgsConstructor
 @Getter
 @Setter
+@EqualsAndHashCode(of = "tags", callSuper = false)
 @ToString(callSuper = true)
 @Entity
-@Table(name = "cluster_criterias")
-public class ClusterCriteriaEntity extends BaseEntity {
+@Table(name = "criteria")
+public class CriterionEntity extends BaseEntity {
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-        name = "cluster_criterias_tags",
+        name = "criteria_tags",
         joinColumns = {
-            @JoinColumn(name = "cluster_criteria_id", referencedColumnName = "id", nullable = false, updatable = false)
+            @JoinColumn(name = "criterion_id", referencedColumnName = "id", nullable = false, updatable = false)
         },
         inverseJoinColumns = {
             @JoinColumn(name = "tag_id", referencedColumnName = "id", nullable = false, updatable = false)
         }
     )
+    @NotEmpty(message = "Must have at least one tag associated with a criterion")
     private Set<TagEntity> tags = new HashSet<>();
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "job_id", nullable = false, updatable = false)
-    private JobEntity job;
+    /**
+     * Constructor.
+     *
+     * @param tags The tags to associate with this criterion
+     */
+    public CriterionEntity(@Nullable final Set<TagEntity> tags) {
+        super();
+        if (tags != null) {
+            this.tags.addAll(tags);
+        }
+    }
+
+    /**
+     * Set all the tags associated to this criterion.
+     *
+     * @param tags The criterion tags to set
+     */
+    public void setTags(@Nullable final Set<TagEntity> tags) {
+        this.tags.clear();
+        if (tags != null) {
+            this.tags.addAll(tags);
+        }
+    }
 }

@@ -25,7 +25,6 @@ import com.netflix.genie.core.services.TagService;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -53,15 +52,15 @@ public class JpaTagServiceImpl implements TagService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    // TODO: Test whether we need new transaction or not
+//    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void createTagIfNotExists(@NotBlank final String tag) throws GenieException {
         if (this.tagRepository.existsByTag(tag)) {
             return;
         }
 
         // Try to create the tag
-        final TagEntity tagEntity = new TagEntity();
-        tagEntity.setTag(tag);
+        final TagEntity tagEntity = new TagEntity(tag);
 
         try {
             this.tagRepository.saveAndFlush(tagEntity);

@@ -125,8 +125,48 @@ SELECT
   'Finished creating files table' AS '';
 
 SELECT
+  CURRENT_TIMESTAMP         AS '',
+  'Creating criteria table' AS '';
+
+CREATE TABLE `criteria` (
+  `id`             BIGINT(20) AUTO_INCREMENT                               NOT NULL,
+  `created`        DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3)                NOT NULL,
+  `updated`        DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3)                NOT NULL ON UPDATE CURRENT_TIMESTAMP(3),
+  `entity_version` INT(11) DEFAULT '0'                                     NOT NULL,
+  PRIMARY KEY (`id`)
+)
+  ENGINE = InnoDB
+  DEFAULT CHARSET = utf8
+  DEFAULT COLLATE = utf8_bin
+  ROW_FORMAT = DYNAMIC;
+
+SELECT
+  CURRENT_TIMESTAMP                  AS '',
+  'Finished creating criteria table' AS '';
+
+SELECT
+  CURRENT_TIMESTAMP              AS '',
+  'Creating criteria_tags table' AS '';
+
+CREATE TABLE `criteria_tags` (
+  `criterion_id` BIGINT(20) NOT NULL,
+  `tag_id`       BIGINT(20) NOT NULL,
+  PRIMARY KEY (`criterion_id`, `tag_id`),
+  KEY `CRITERIA_TAGS_CRITERION_ID_INDEX` (`criterion_id`),
+  KEY `CRITERIA_TAGS_TAG_ID_INDEX` (`tag_id`),
+  CONSTRAINT `CRITERIA_TAGS_CRITERION_ID_FK` FOREIGN KEY (`criterion_id`) REFERENCES `criteria` (`id`)
+    ON DELETE CASCADE,
+  CONSTRAINT `CRITERIA_TAGS_TAG_ID_FK` FOREIGN KEY (`tag_id`) REFERENCES `tags` (`id`)
+    ON DELETE RESTRICT
+)
+  ENGINE = InnoDB
+  DEFAULT CHARSET = utf8
+  DEFAULT COLLATE = utf8_bin
+  ROW_FORMAT = DYNAMIC;
+
+SELECT
   CURRENT_TIMESTAMP             AS '',
-  'Creating applications table' AS '';
+  'Created criteria_tags table' AS '';
 
 CREATE TABLE `applications` (
   `id`             BIGINT(20) AUTO_INCREMENT                               NOT NULL,
@@ -439,6 +479,7 @@ CREATE TABLE `jobs` (
   `name`                      VARCHAR(255)                                            NOT NULL,
   `genie_user`                VARCHAR(255)                                            NOT NULL,
   `version`                   VARCHAR(255)                                            NOT NULL,
+  `command_criterion`         BIGINT(20)    DEFAULT NULL,
   `command_args`              TEXT          DEFAULT NULL,
   `description`               TEXT          DEFAULT NULL,
   `setup_file`                BIGINT(20)    DEFAULT NULL,
@@ -484,6 +525,7 @@ CREATE TABLE `jobs` (
   UNIQUE KEY `JOBS_UNIQUE_ID_UNIQUE_INDEX` (`unique_id`),
   KEY `JOBS_CLUSTER_ID_INDEX` (`cluster_id`),
   KEY `JOBS_CLUSTER_NAME_INDEX` (`cluster_name`),
+  KEY `JOBS_COMMAND_CRITERION_INDEX` (`command_criterion`),
   KEY `JOBS_COMMAND_ID_INDEX` (`command_id`),
   KEY `JOBS_COMMAND_NAME_INDEX` (`command_name`),
   KEY `JOBS_CREATED_INDEX` (`created`),
@@ -496,6 +538,8 @@ CREATE TABLE `jobs` (
   KEY `JOBS_STATUS_INDEX` (`status`),
   KEY `JOBS_TAGS_INDEX` (`tags`),
   KEY `JOBS_USER_INDEX` (`genie_user`),
+  CONSTRAINT `JOBS_COMMAND_CRITERION_FK` FOREIGN KEY (`command_criterion`) REFERENCES `criteria` (`id`)
+    ON DELETE RESTRICT,
   CONSTRAINT `JOBS_CLUSTER_ID_FK` FOREIGN KEY (`cluster_id`) REFERENCES `clusters` (`id`)
     ON DELETE RESTRICT,
   CONSTRAINT `JOBS_COMMAND_ID_FK` FOREIGN KEY (`command_id`) REFERENCES `commands` (`id`)
@@ -634,44 +678,19 @@ SELECT
   'Finished creating job_tags table' AS '';
 
 SELECT
-  CURRENT_TIMESTAMP                  AS '',
-  'Creating cluster_criterias table' AS '';
+  CURRENT_TIMESTAMP                      AS '',
+  'Creating jobs_cluster_criteria table' AS '';
 
-CREATE TABLE `cluster_criterias` (
-  `id`             BIGINT(20) AUTO_INCREMENT                               NOT NULL,
-  `created`        DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3)                NOT NULL,
-  `updated`        DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3)                NOT NULL ON UPDATE CURRENT_TIMESTAMP(3),
-  `entity_version` INT(11) DEFAULT '0'                                     NOT NULL,
-  `job_id`         BIGINT(20)                                              NOT NULL,
-  `priority_order` INT(11)                                                 NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `CLUSTER_CRITERIAS_JOB_ID_INDEX` (`job_id`),
-  CONSTRAINT `CLUSTER_CRITERIAS_JOB_ID_FK` FOREIGN KEY (`job_id`) REFERENCES `jobs` (`id`)
-    ON DELETE CASCADE
-)
-  ENGINE = InnoDB
-  DEFAULT CHARSET = utf8
-  DEFAULT COLLATE = utf8_bin
-  ROW_FORMAT = DYNAMIC;
-
-SELECT
-  CURRENT_TIMESTAMP                 AS '',
-  'Created cluster_criterias table' AS '';
-
-SELECT
-  CURRENT_TIMESTAMP                       AS '',
-  'Creating cluster_criterias_tags table' AS '';
-
-CREATE TABLE `cluster_criterias_tags` (
-  `cluster_criteria_id` BIGINT(20) NOT NULL,
-  `tag_id`              BIGINT(20) NOT NULL,
-  PRIMARY KEY (`cluster_criteria_id`, `tag_id`),
-  KEY `CLUSTER_CRITERIAS_TAGS_CLUSTER_CRITERIA_ID_INDEX` (`cluster_criteria_id`),
-  KEY `CLUSTER_CRITERIAS_TAGS_TAG_ID_INDEX` (`tag_id`),
-  CONSTRAINT `CLUSTER_CRITERIAS_CRITERIA_TAGS_CLUSTER_CRITERIA_ID_FK` FOREIGN KEY (`cluster_criteria_id`)
-  REFERENCES `cluster_criterias` (`id`)
+CREATE TABLE `jobs_cluster_criteria` (
+  `job_id`         BIGINT(20) NOT NULL,
+  `criterion_id`   BIGINT(20) NOT NULL,
+  `priority_order` INT(11)    NOT NULL,
+  PRIMARY KEY (`job_id`, `criterion_id`, `priority_order`),
+  KEY `JOBS_CLUSTER_CRITERIA_JOB_ID_INDEX` (`job_id`),
+  KEY `JOBS_CLUSTER_CRITERIA_CRITERION_ID_INDEX` (`criterion_id`),
+  CONSTRAINT `JOBS_CLUSTER_CRITERIA_JOB_ID_FK` FOREIGN KEY (`job_id`) REFERENCES `jobs` (`id`)
     ON DELETE CASCADE,
-  CONSTRAINT `CLUSTER_CRITERIAS_TAGS_TAG_ID_FK` FOREIGN KEY (`tag_id`) REFERENCES `tags` (`id`)
+  CONSTRAINT `JOBS_CLUSTER_CRITERIA_CRITERION_ID_FK` FOREIGN KEY (`criterion_id`) REFERENCES `criteria` (`id`)
     ON DELETE RESTRICT
 )
   ENGINE = InnoDB
@@ -680,8 +699,8 @@ CREATE TABLE `cluster_criterias_tags` (
   ROW_FORMAT = DYNAMIC;
 
 SELECT
-  CURRENT_TIMESTAMP                      AS '',
-  'Created cluster_criterias_tags table' AS '';
+  CURRENT_TIMESTAMP                     AS '',
+  'Created jobs_cluster_criteria table' AS '';
 
 SELECT
   CURRENT_TIMESTAMP                           AS '',
@@ -706,30 +725,6 @@ CREATE TABLE `job_applications_requested` (
 SELECT
   CURRENT_TIMESTAMP                          AS '',
   'Created job_applications_requested table' AS '';
-
-SELECT
-  CURRENT_TIMESTAMP                          AS '',
-  'Creating job_command_criteria_tags table' AS '';
-
-CREATE TABLE `job_command_criteria_tags` (
-  `job_id` BIGINT(20) NOT NULL,
-  `tag_id` BIGINT(20) NOT NULL,
-  PRIMARY KEY (`job_id`, `tag_id`),
-  KEY `JOB_COMMAND_CRITERIA_TAGS_JOB_ID_INDEX` (`job_id`),
-  KEY `JOB_COMMAND_CRITERIA_TAGS_TAG_ID_INDEX` (`tag_id`),
-  CONSTRAINT `JOB_COMMAND_CRITERIA_TAGS_JOB_ID_FK` FOREIGN KEY (`job_id`) REFERENCES `jobs` (`id`)
-    ON DELETE CASCADE,
-  CONSTRAINT `JOB_COMMAND_CRITERIA_TAGS_TAG_ID_FK` FOREIGN KEY (`tag_id`) REFERENCES `tags` (`id`)
-    ON DELETE RESTRICT
-)
-  ENGINE = InnoDB
-  DEFAULT CHARSET = utf8
-  DEFAULT COLLATE = utf8_bin
-  ROW_FORMAT = DYNAMIC;
-
-SELECT
-  CURRENT_TIMESTAMP                         AS '',
-  'Created job_command_criteria_tags table' AS '';
 
 SELECT
   CURRENT_TIMESTAMP             AS '',

@@ -25,7 +25,6 @@ import com.netflix.genie.core.services.FileService;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -53,15 +52,15 @@ public class JpaFileServiceImpl implements FileService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    // TODO: Test whether we need new transaction or not
+//    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void createFileIfNotExists(@NotBlank final String file) throws GenieException {
         if (this.fileRepository.existsByFile(file)) {
             return;
         }
 
         // Try to create the file
-        final FileEntity fileEntity = new FileEntity();
-        fileEntity.setFile(file);
+        final FileEntity fileEntity = new FileEntity(file);
 
         try {
             this.fileRepository.saveAndFlush(fileEntity);
