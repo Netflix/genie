@@ -54,7 +54,7 @@ import java.util.Set;
 @ToString(callSuper = true)
 @Entity
 @Table(name = "clusters")
-public class ClusterEntity extends CommonFieldsEntity {
+public class ClusterEntity extends BaseEntity {
 
     private static final long serialVersionUID = -5674870110962005872L;
 

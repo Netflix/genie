@@ -28,7 +28,7 @@ import java.util.Set;
  * @author tgianos
  * @since 3.3.0
  */
-public interface JpaTagRepository extends BaseRepository<TagEntity> {
+public interface JpaTagRepository extends JpaIdRepository<TagEntity> {
 
     /**
      * Find a tag by its unique tag value.

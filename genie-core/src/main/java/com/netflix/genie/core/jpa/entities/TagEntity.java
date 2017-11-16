@@ -43,7 +43,7 @@ import javax.persistence.Table;
 @ToString(callSuper = true)
 @Entity
 @Table(name = "tags")
-public class TagEntity extends BaseEntity {
+public class TagEntity extends AuditEntity {
 
     @Basic(optional = false)
     @Column(name = "tag", nullable = false, unique = true, updatable = false)

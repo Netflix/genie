@@ -22,5 +22,5 @@ import com.netflix.genie.core.jpa.entities.ClusterEntity;
  *
  * @author tgianos
  */
-public interface JpaClusterRepository extends CommonFieldsRepository<ClusterEntity> {
+public interface JpaClusterRepository extends JpaBaseRepository<ClusterEntity> {
 }

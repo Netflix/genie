@@ -36,7 +36,7 @@ import java.util.Set;
  *
  * @author tgianos
  */
-public interface JpaJobRepository extends CommonFieldsRepository<JobEntity> {
+public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
 
     // TODO: Make interfaces generic but be aware of https://jira.spring.io/browse/DATAJPA-1185
 

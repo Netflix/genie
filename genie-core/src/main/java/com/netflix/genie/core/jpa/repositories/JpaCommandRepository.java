@@ -22,5 +22,5 @@ import com.netflix.genie.core.jpa.entities.CommandEntity;
  *
  * @author tgianos
  */
-public interface JpaCommandRepository extends CommonFieldsRepository<CommandEntity> {
+public interface JpaCommandRepository extends JpaBaseRepository<CommandEntity> {
 }

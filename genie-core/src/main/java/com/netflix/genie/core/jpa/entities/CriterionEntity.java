@@ -47,7 +47,7 @@ import java.util.Set;
 @ToString(callSuper = true)
 @Entity
 @Table(name = "criteria")
-public class CriterionEntity extends BaseEntity {
+public class CriterionEntity extends AuditEntity {
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "criteria_tags",

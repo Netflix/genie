@@ -28,7 +28,7 @@ import java.util.Set;
  * @author tgianos
  * @since 3.3.0
  */
-public interface JobCommonFieldsProjection extends CommonFieldsProjection {
+public interface JobCommonFieldsProjection extends BaseProjection {
     /**
      * Get the command arguments for this job.
      *

@@ -15,33 +15,29 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.core.jpa.repositories;
+package com.netflix.genie.core.jpa.entities.projections;
 
-import com.netflix.genie.core.jpa.entities.FileEntity;
-
-import java.util.Optional;
+import java.util.Date;
 
 /**
- * Repository for file references.
+ * Returns all the base entity attributes.
  *
  * @author tgianos
  * @since 3.3.0
  */
-public interface JpaFileRepository extends JpaIdRepository<FileEntity> {
+public interface AuditProjection extends IdProjection {
 
     /**
-     * Find a file by its unique file value.
+     * Get when this entity was created.
      *
-     * @param file The file value to search for
-     * @return An Optional of a FileEntity
+     * @return The created timestamp
      */
-    Optional<FileEntity> findByFile(final String file);
+    Date getCreated();
 
     /**
-     * Find out whether a file entity with the given file value exists.
+     * Get when this entity was updated.
      *
-     * @param file The file value to check for
-     * @return True if the file exists
+     * @return The updated timestamp
      */
-    boolean existsByFile(final String file);
+    Date getUpdated();
 }

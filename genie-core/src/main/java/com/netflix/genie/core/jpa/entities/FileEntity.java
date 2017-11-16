@@ -43,7 +43,7 @@ import javax.persistence.Table;
 @ToString(callSuper = true)
 @Entity
 @Table(name = "files")
-public class FileEntity extends BaseEntity {
+public class FileEntity extends AuditEntity {
 
     @Basic(optional = false)
     @Column(name = "file", nullable = false, unique = true, updatable = false)

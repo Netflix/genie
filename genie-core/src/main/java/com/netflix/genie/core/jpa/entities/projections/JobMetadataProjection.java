@@ -26,7 +26,7 @@ import java.util.Optional;
  * @author tgianos
  * @since 3.3.0
  */
-public interface JobMetadataProjection extends BaseProjection {
+public interface JobMetadataProjection extends AuditProjection {
 
     /**
      * Get the unique identifier of this job execution.

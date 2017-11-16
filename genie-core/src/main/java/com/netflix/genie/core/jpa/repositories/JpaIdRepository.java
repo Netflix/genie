@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.core.jpa.repositories;
 
-import com.netflix.genie.core.jpa.entities.BaseEntity;
+import com.netflix.genie.core.jpa.entities.IdEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.NoRepositoryBean;
@@ -25,10 +25,10 @@ import org.springframework.data.repository.NoRepositoryBean;
 /**
  * A base repository for all Genie JPA repositories to inherit from to save boilerplate.
  *
- * @param <E> The entity type which must extend BaseEntity
+ * @param <E> The entity type which must extend IdEntity
  * @author tgianos
  * @since 3.3.0
  */
 @NoRepositoryBean
-interface BaseRepository<E extends BaseEntity> extends JpaRepository<E, Long>, JpaSpecificationExecutor {
+interface JpaIdRepository<E extends IdEntity> extends JpaRepository<E, Long>, JpaSpecificationExecutor {
 }

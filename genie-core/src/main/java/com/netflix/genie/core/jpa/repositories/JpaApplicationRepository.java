@@ -22,5 +22,5 @@ import com.netflix.genie.core.jpa.entities.ApplicationEntity;
  *
  * @author tgianos
  */
-public interface JpaApplicationRepository extends CommonFieldsRepository<ApplicationEntity> {
+public interface JpaApplicationRepository extends JpaBaseRepository<ApplicationEntity> {
 }

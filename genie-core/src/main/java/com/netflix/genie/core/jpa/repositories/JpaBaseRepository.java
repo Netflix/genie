@@ -17,20 +17,20 @@
  */
 package com.netflix.genie.core.jpa.repositories;
 
-import com.netflix.genie.core.jpa.entities.CommonFieldsEntity;
+import com.netflix.genie.core.jpa.entities.BaseEntity;
 import org.springframework.data.repository.NoRepositoryBean;
 
 import java.util.Optional;
 
 /**
- * A common repository for inheritance of common methods for Entities extending CommonFieldsEntity.
+ * A common repository for inheritance of common methods for Entities extending BaseEntity.
  *
- * @param <E> The entity class to act on which must extend CommonFieldsEntity
+ * @param <E> The entity class to act on which must extend BaseEntity
  * @author tgianos
  * @since 3.3.0
  */
 @NoRepositoryBean
-public interface CommonFieldsRepository<E extends CommonFieldsEntity> extends BaseRepository<E> {
+public interface JpaBaseRepository<E extends BaseEntity> extends JpaIdRepository<E> {
     /**
      * Find an entity by its unique id.
      *

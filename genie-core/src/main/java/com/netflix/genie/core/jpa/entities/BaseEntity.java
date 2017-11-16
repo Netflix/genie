@@ -18,93 +18,97 @@
 package com.netflix.genie.core.jpa.entities;
 
 import com.netflix.genie.core.jpa.entities.projections.BaseProjection;
-import com.netflix.genie.core.jpa.entities.projections.IdProjection;
-import lombok.AccessLevel;
+import com.netflix.genie.core.jpa.entities.projections.SetupFileProjection;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.Type;
+import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Version;
-import java.io.Serializable;
-import java.util.Date;
+import javax.validation.constraints.Size;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
- * Abstract class to support basic columns for all entities for genie.
+ * The base for all Genie top level entities. e.g. Applications, Jobs, etc.
  *
+ * @author amsharma
  * @author tgianos
+ * @since 2.0.0
  */
 @Getter
-@ToString
+@Setter
+@EqualsAndHashCode(of = "uniqueId", callSuper = false)
+@ToString(callSuper = true)
 @MappedSuperclass
-public class BaseEntity implements Serializable, IdProjection, BaseProjection {
+public class BaseEntity extends AuditEntity implements BaseProjection, SetupFileProjection {
 
-    private static final long serialVersionUID = 7526472297322776147L;
-
-    @Id
-    @GeneratedValue
-    @Column(name = "id", nullable = false, updatable = false)
-    private long id;
+    private static final long serialVersionUID = -5040659007494311180L;
 
     @Basic(optional = false)
-    @Column(name = "created", nullable = false, updatable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    // TODO: Test out this instead of all the pre-persist stuff
-//    @CreatedDate
-    private Date created = new Date();
+    @Column(name = "unique_id", nullable = false, unique = true, updatable = false)
+    @NotBlank(message = "A unique identifier is missing and is required.")
+    @Size(max = 255, message = "Max length in database is 255 characters")
+    private String uniqueId = UUID.randomUUID().toString();
 
     @Basic(optional = false)
-    @Column(name = "updated", nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    // TODO: Test out this instead of all the pre-persist stuff
-//    @LastModifiedDate
-    private Date updated = new Date();
+    @Column(name = "version", nullable = false)
+    @NotBlank(message = "Version is missing and is required.")
+    @Size(max = 255, message = "Max length in database is 255 characters")
+    private String version;
 
-    @Version
-    @Column(name = "entity_version", nullable = false)
-    @Getter(AccessLevel.NONE)
-    private Integer entityVersion;
+    @Basic(optional = false)
+    @Column(name = "genie_user", nullable = false)
+    @NotBlank(message = "User name is missing and is required.")
+    @Size(max = 255, message = "Max length in database is 255 characters")
+    private String user;
+
+    @Basic(optional = false)
+    @Column(name = "name", nullable = false)
+    @NotBlank(message = "Name is missing and is required.")
+    @Size(max = 255, message = "Max length in database is 255 characters")
+    private String name;
+
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "description")
+    @Type(type = "org.hibernate.type.TextType")
+    private String description;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "setup_file")
+    private FileEntity setupFile;
 
     /**
-     * Updates the created and updated timestamps to be creation time.
+     * Default constructor.
      */
-    @PrePersist
-    protected void onCreateBaseEntity() {
-        final Date date = new Date();
-        this.updated = date;
-        this.created = date;
+    BaseEntity() {
+        super();
     }
 
     /**
-     * On any update to the entity will update the update time.
-     */
-    @PreUpdate
-    protected void onUpdateBaseEntity() {
-        this.updated = new Date();
-    }
-
-    /**
-     * Get when this entity was created.
+     * Gets the description of this entity.
      *
-     * @return The created timestamps
+     * @return description
      */
-    public Date getCreated() {
-        return new Date(this.created.getTime());
+    public Optional<String> getDescription() {
+        return Optional.ofNullable(this.description);
     }
 
     /**
-     * Get the time this entity was updated.
+     * Get the setup file for this entity.
      *
-     * @return The updated timestamp
+     * @return The setup file as an Optional in case it's null
      */
-    public Date getUpdated() {
-        return new Date(this.updated.getTime());
+    public Optional<FileEntity> getSetupFile() {
+        return Optional.ofNullable(this.setupFile);
     }
 }

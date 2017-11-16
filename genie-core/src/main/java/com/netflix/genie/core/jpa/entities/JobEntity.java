@@ -75,7 +75,7 @@ import java.util.Set;
 @ToString(callSuper = true)
 @Entity
 @Table(name = "jobs")
-public class JobEntity extends CommonFieldsEntity
+public class JobEntity extends BaseEntity
     implements JobProjection, JobRequestProjection, JobMetadataProjection, JobExecutionProjection,
     JobApplicationsProjection, JobClusterProjection, JobCommandProjection {
 

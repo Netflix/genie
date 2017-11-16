@@ -57,7 +57,7 @@ import java.util.Set;
 @ToString(callSuper = true)
 @Entity
 @Table(name = "commands")
-public class CommandEntity extends CommonFieldsEntity {
+public class CommandEntity extends BaseEntity {
 
     private static final long serialVersionUID = -8058995173025433517L;
 

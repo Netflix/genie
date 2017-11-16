@@ -17,70 +17,195 @@
  */
 package com.netflix.genie.core.jpa.entities;
 
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.test.categories.UnitTest;
+import org.hamcrest.Matchers;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import java.util.Date;
+import javax.validation.ConstraintViolationException;
+import java.util.UUID;
 
 /**
- * Tests for the base entity.
+ * Test the BaseEntity class and methods.
  *
  * @author tgianos
  */
 @Category(UnitTest.class)
-public class BaseEntityUnitTests {
+public class BaseEntityUnitTests extends EntityTestsBase {
+    private static final String UNIQUE_ID = UUID.randomUUID().toString();
+    private static final String NAME = "pig13";
+    private static final String USER = "tgianos";
+    private static final String VERSION = "1.0";
+
+    private BaseEntity c;
 
     /**
-     * Test to make sure objects are constructed properly.
+     * Setup the tests.
      */
-    @Test
-    public void testConstructor() {
-        final BaseEntity a = new BaseEntity();
-        Assert.assertNotNull(a.getCreated());
-        Assert.assertNotNull(a.getUpdated());
+    @Before
+    public void setup() {
+        this.c = new BaseEntity();
+        this.c.setUniqueId(UNIQUE_ID);
+        this.c.setName(NAME);
+        this.c.setUser(USER);
+        this.c.setVersion(VERSION);
     }
 
     /**
-     * Test to make sure @PrePersist annotation will do what we want before persistence.
-     *
-     * @throws InterruptedException       If the process is interrupted
-     * @throws GeniePreconditionException If any precondition isn't met.
+     * Test the default Constructor.
      */
     @Test
-    public void testOnCreateBaseEntity() throws InterruptedException, GeniePreconditionException {
-        final BaseEntity a = new BaseEntity();
-        Assert.assertNotNull(a.getCreated());
-        Assert.assertNotNull(a.getUpdated());
-        final Date originalCreated = a.getCreated();
-        final Date originalUpdated = a.getUpdated();
-        Thread.sleep(1);
-        a.onCreateBaseEntity();
-        Assert.assertNotNull(a.getCreated());
-        Assert.assertNotNull(a.getUpdated());
-        Assert.assertNotEquals(originalCreated, a.getCreated());
-        Assert.assertNotEquals(originalUpdated, a.getUpdated());
-        Assert.assertEquals(a.getCreated(), a.getUpdated());
+    public void testDefaultConstructor() {
+        final BaseEntity local = new BaseEntity();
+        Assert.assertNotNull(local.getUniqueId());
+        Assert.assertNull(local.getName());
+        Assert.assertNull(local.getUser());
+        Assert.assertNull(local.getVersion());
+        Assert.assertFalse(local.getDescription().isPresent());
+        Assert.assertFalse(local.getSetupFile().isPresent());
     }
 
     /**
-     * Test to make sure the update timestamp is updated by this method.
-     *
-     * @throws InterruptedException If the process is interrupted
+     * Test to make sure validation works.
      */
     @Test
-    public void testOnUpdateBaseEntity() throws InterruptedException {
-        final BaseEntity a = new BaseEntity();
-        Assert.assertNotNull(a.getCreated());
-        Assert.assertNotNull(a.getUpdated());
-        a.onCreateBaseEntity();
-        final Date originalCreate = a.getCreated();
-        final Date originalUpdate = a.getUpdated();
-        Thread.sleep(1);
-        a.onUpdateBaseEntity();
-        Assert.assertEquals(originalCreate, a.getCreated());
-        Assert.assertNotEquals(originalUpdate, a.getUpdated());
+    public void testValidate() {
+        this.validate(this.c);
+    }
+
+    /**
+     * Test to make sure validation works.
+     *
+     * @throws GenieException For any issue
+     */
+    @Test(expected = ConstraintViolationException.class)
+    public void testValidateWithNothing() throws GenieException {
+        this.validate(new BaseEntity());
+    }
+
+    /**
+     * Test to make sure validation works and throws exception when no name entered.
+     */
+    @Test(expected = ConstraintViolationException.class)
+    public void testValidateNoName() {
+        this.c.setName(null);
+        this.validate(this.c);
+    }
+
+    /**
+     * Test to make sure validation works and throws exception when no name entered.
+     */
+    @Test(expected = ConstraintViolationException.class)
+    public void testValidateNoUser() {
+        this.c.setUser("     ");
+        this.validate(this.c);
+    }
+
+    /**
+     * Test to make sure validation works and throws exception when no name entered.
+     */
+    @Test(expected = ConstraintViolationException.class)
+    public void testValidateNoVersion() {
+        this.c.setVersion("");
+        this.validate(this.c);
+    }
+
+    /**
+     * Test the getting and setting of the unique id.
+     */
+    @Test
+    public void testSetUniqueId() {
+        final BaseEntity local = new BaseEntity();
+        Assert.assertNotNull(local.getUniqueId());
+        Assert.assertNotEquals(local.getUniqueId(), UNIQUE_ID);
+        local.setUniqueId(UNIQUE_ID);
+        Assert.assertEquals(UNIQUE_ID, local.getUniqueId());
+    }
+
+    /**
+     * Test to make sure the name is being set properly.
+     */
+    @Test
+    public void testSetName() {
+        final BaseEntity local = new BaseEntity();
+        Assert.assertNull(local.getName());
+        local.setName(NAME);
+        Assert.assertEquals(NAME, local.getName());
+    }
+
+    /**
+     * Test to make sure the user is being set properly.
+     */
+    @Test
+    public void testSetUser() {
+        final BaseEntity local = new BaseEntity();
+        Assert.assertNull(local.getUser());
+        local.setUser(USER);
+        Assert.assertEquals(USER, local.getUser());
+    }
+
+    /**
+     * Test to make sure the version is being set properly.
+     */
+    @Test
+    public void testSetVersion() {
+        final BaseEntity local = new BaseEntity();
+        Assert.assertNull(local.getVersion());
+        local.setVersion(VERSION);
+        Assert.assertEquals(VERSION, local.getVersion());
+    }
+
+    /**
+     * Test the description get/set.
+     */
+    @Test
+    public void testSetDescription() {
+        Assert.assertFalse(this.c.getDescription().isPresent());
+        final String description = "Test description";
+        this.c.setDescription(description);
+        Assert.assertEquals(description, this.c.getDescription().orElseThrow(IllegalArgumentException::new));
+    }
+
+    /**
+     * Test the setup file get/set.
+     */
+    @Test
+    public void testSetSetupFile() {
+        Assert.assertFalse(this.c.getSetupFile().isPresent());
+        final FileEntity setupFile = new FileEntity();
+        setupFile.setFile(UUID.randomUUID().toString());
+        this.c.setSetupFile(setupFile);
+        Assert.assertThat(this.c.getSetupFile().orElseThrow(IllegalArgumentException::new), Matchers.is(setupFile));
+        this.c.setSetupFile(null);
+        Assert.assertFalse(this.c.getSetupFile().isPresent());
+    }
+
+    /**
+     * Test to make sure equals and hash code only care about the unique id.
+     */
+    @Test
+    public void testEqualsAndHashCode() {
+        final String id = UUID.randomUUID().toString();
+        final String name = UUID.randomUUID().toString();
+        final BaseEntity one = new BaseEntity();
+        one.setUniqueId(id);
+        one.setName(UUID.randomUUID().toString());
+        final BaseEntity two = new BaseEntity();
+        two.setUniqueId(id);
+        two.setName(name);
+        final BaseEntity three = new BaseEntity();
+        three.setUniqueId(UUID.randomUUID().toString());
+        three.setName(name);
+
+        Assert.assertTrue(one.equals(two));
+        Assert.assertFalse(one.equals(three));
+        Assert.assertFalse(two.equals(three));
+
+        Assert.assertEquals(one.hashCode(), two.hashCode());
+        Assert.assertNotEquals(one.hashCode(), three.hashCode());
+        Assert.assertNotEquals(two.hashCode(), three.hashCode());
     }
 }

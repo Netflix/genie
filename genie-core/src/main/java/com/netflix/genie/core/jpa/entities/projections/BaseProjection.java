@@ -17,27 +17,47 @@
  */
 package com.netflix.genie.core.jpa.entities.projections;
 
-import java.util.Date;
+import java.util.Optional;
 
 /**
- * Returns all the base entity attributes.
+ * Projection for the common fields.
  *
  * @author tgianos
  * @since 3.3.0
  */
-public interface BaseProjection extends IdProjection {
+public interface BaseProjection extends AuditProjection {
+    /**
+     * Get the unique identifier for this entity.
+     *
+     * @return The globally unique identifier of this entity
+     */
+    String getUniqueId();
 
     /**
-     * Get when this entity was created.
+     * Get the version.
      *
-     * @return The created timestamp
+     * @return The version of the resource (job, app, etc)
      */
-    Date getCreated();
+    String getVersion();
 
     /**
-     * Get when this entity was updated.
+     * Get the user who created the resource
      *
-     * @return The updated timestamp
+     * @return The user who created the resource
      */
-    Date getUpdated();
+    String getUser();
+
+    /**
+     * Get the name of the resource.
+     *
+     * @return The name of the resource
+     */
+    String getName();
+
+    /**
+     * Get the description of this resource.
+     *
+     * @return The description which could be null so it's wrapped in Optional
+     */
+    Optional<String> getDescription();
 }
