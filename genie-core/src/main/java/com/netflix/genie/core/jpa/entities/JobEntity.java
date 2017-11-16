@@ -349,7 +349,7 @@ public class JobEntity extends CommonFieldsEntity
      * @return the user group
      */
     public Optional<String> getGenieUserGroup() {
-        return Optional.of(this.genieUserGroup);
+        return Optional.ofNullable(this.genieUserGroup);
     }
 
     /**
@@ -368,7 +368,7 @@ public class JobEntity extends CommonFieldsEntity
      * @return The email
      */
     public Optional<String> getEmail() {
-        return Optional.of(this.email);
+        return Optional.ofNullable(this.email);
     }
 
     /**
@@ -404,7 +404,7 @@ public class JobEntity extends CommonFieldsEntity
      * @return The grouping
      */
     public Optional<String> getGrouping() {
-        return Optional.of(this.grouping);
+        return Optional.ofNullable(this.grouping);
     }
 
     /**
@@ -413,7 +413,7 @@ public class JobEntity extends CommonFieldsEntity
      * @return The grouping instance
      */
     public Optional<String> getGroupingInstance() {
-        return Optional.of(this.groupingInstance);
+        return Optional.ofNullable(this.groupingInstance);
     }
 
     /**

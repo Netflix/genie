@@ -242,9 +242,18 @@ public class JpaJobSearchServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void canGetJobRequest() throws GenieException {
-        Assert.assertThat(this.service.getJobRequest(JOB_1_ID).getCommandArgs(), Matchers.is("-f query.q"));
-        Assert.assertThat(this.service.getJobRequest(JOB_2_ID).getCommandArgs(), Matchers.is("-f spark.jar"));
-        Assert.assertThat(this.service.getJobRequest(JOB_3_ID).getCommandArgs(), Matchers.is("-f spark.jar"));
+        Assert.assertThat(
+            this.service.getJobRequest(JOB_1_ID).getCommandArgs().orElseThrow(IllegalArgumentException::new),
+            Matchers.is("-f query.q")
+        );
+        Assert.assertThat(
+            this.service.getJobRequest(JOB_2_ID).getCommandArgs().orElseThrow(IllegalArgumentException::new),
+            Matchers.is("-f spark.jar")
+        );
+        Assert.assertThat(
+            this.service.getJobRequest(JOB_3_ID).getCommandArgs().orElseThrow(IllegalArgumentException::new),
+            Matchers.is("-f spark.jar")
+        );
 
         try {
             this.service.getJobRequest(UUID.randomUUID().toString());
