@@ -39,6 +39,9 @@ allprojects {
         maven {
             url "http://repo.spring.io/milestone"
         }
+        maven {
+            url "http://repo.spring.io/libs-snapshot"
+        }
     }
 }
 
@@ -105,6 +108,10 @@ configure(javaProjects) {
             dependency("org.opensaml:opensaml:2.6.4")
             dependency("org.python:jython-standalone:2.7.1")
             dependency("org.springframework.security.extensions:spring-security-saml2-core:1.0.2.RELEASE")
+
+            // TODO: These are here as part of waiting for bug fix release https://jira.spring.io/browse/DATAJPA-1185
+            dependency("org.springframework.data:spring-data-commons:1.13.8.RELEASE")
+            dependency("org.springframework.data:spring-data-jpa:1.11.9.BUILD-SNAPSHOT")
         }
     }
 

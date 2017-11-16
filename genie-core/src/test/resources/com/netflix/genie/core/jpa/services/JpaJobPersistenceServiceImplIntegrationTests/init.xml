@@ -378,9 +378,6 @@
 
     <criteria
         id="0"
-        created="2015-08-11 01:48:00"
-        updated="2015-08-11 02:59:00"
-        entity_version="0"
     />
     <criteria_tags
         criterion_id="1"
@@ -428,9 +425,6 @@
     />
     <criteria
         id="1"
-        created="2015-08-11 01:48:00"
-        updated="2015-08-11 02:59:00"
-        entity_version="0"
     />
     <criteria_tags
         criterion_id="1"
@@ -447,9 +441,6 @@
     />
     <criteria
         id="2"
-        created="2015-08-11 01:48:00"
-        updated="2015-08-11 02:59:00"
-        entity_version="0"
     />
     <criteria_tags
         criterion_id="2"
@@ -470,9 +461,6 @@
 
     <criteria
         id="3"
-        created="2015-08-11 01:48:00"
-        updated="2015-08-11 02:59:00"
-        entity_version="0"
     />
     <criteria_tags
         criterion_id="3"
@@ -506,9 +494,6 @@
     />
     <criteria
         id="4"
-        created="2015-08-12 01:48:00"
-        updated="2015-08-12 02:59:00"
-        entity_version="0"
     />
     <criteria_tags
         criterion_id="4"
@@ -525,9 +510,6 @@
     />
     <criteria
         id="5"
-        created="2015-08-12 01:48:00"
-        updated="2015-08-12 02:59:00"
-        entity_version="0"
     />
     <criteria_tags
         criterion_id="5"
@@ -548,9 +530,6 @@
 
     <criteria
         id="6"
-        created="2015-08-11 01:48:00"
-        updated="2015-08-11 02:59:00"
-        entity_version="0"
     />
     <criteria_tags
         criterion_id="6"
@@ -584,9 +563,6 @@
     />
     <criteria
         id="7"
-        created="2015-08-12 01:48:00"
-        updated="2015-08-12 02:59:00"
-        entity_version="0"
     />
     <criteria_tags
         criterion_id="7"
@@ -603,9 +579,6 @@
     />
     <criteria
         id="8"
-        created="2015-08-12 01:48:00"
-        updated="2015-08-12 02:59:00"
-        entity_version="0"
     />
     <criteria_tags
         criterion_id="8"

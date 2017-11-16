@@ -279,14 +279,14 @@ CREATE PROCEDURE GENIE_SPLIT_JOB_REQUESTS_320()
         SET @cluster_criteria_order = 0;
         CLUSTER_CRITERIA_LOOP: WHILE LENGTH(@cluster_criteria) > 0 DO
           -- Create cluster_criterias entry (save ID)
-          INSERT INTO `criteria` (`created`) VALUES (CURRENT_TIMESTAMP(3));
+          INSERT INTO `criteria` (`id`) VALUES (DEFAULT);
           SET @criteria_id = LAST_INSERT_ID();
 
           INSERT INTO `jobs_cluster_criteria` (`job_id`, `criterion_id`, `priority_order`)
           VALUES (`new_job_id`, @criteria_id, @cluster_criteria_order);
 
           -- Rip off JSON Object tags
-          SET @cluster_criteria = TRIM( LEADING '{' FROM @cluster_criteria);
+          SET @cluster_criteria = TRIM(LEADING '{' FROM @cluster_criteria);
           SET @cluster_criterion = SUBSTRING_INDEX(@cluster_criteria, '}', 1);
           SET @cluster_criteria = TRIM(LEADING @cluster_criterion FROM @cluster_criteria);
           SET @cluster_criteria = TRIM(LEADING '}' FROM @cluster_criteria);
@@ -333,7 +333,7 @@ CREATE PROCEDURE GENIE_SPLIT_JOB_REQUESTS_320()
       IF LENGTH(@command_criterion) > 0
       THEN
         -- Create cluster_criterias entry (save ID)
-        INSERT INTO `criteria` (`created`) VALUES (CURRENT_TIMESTAMP(3));
+        INSERT INTO `criteria` (`id`) VALUES (DEFAULT);
         SET @criteria_id = LAST_INSERT_ID();
 
         UPDATE `jobs` `j`

@@ -717,4 +717,12 @@ public class JobEntityUnitTests extends EntityTestsBase {
         this.jobEntity.setTimeoutRequested(timeout);
         Assert.assertThat(this.jobEntity.getTimeoutRequested().orElseGet(RandomSuppliers.INT), Matchers.is(timeout));
     }
+
+    /**
+     * Test the toString method.
+     */
+    @Test
+    public void testToString() {
+        Assert.assertNotNull(this.jobEntity.toString());
+    }
 }

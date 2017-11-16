@@ -342,4 +342,12 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
         this.c.setTags(null);
         Assert.assertThat(this.c.getTags(), Matchers.empty());
     }
+
+    /**
+     * Test the toString method.
+     */
+    @Test
+    public void testToString() {
+        Assert.assertNotNull(this.c.toString());
+    }
 }

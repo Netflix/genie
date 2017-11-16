@@ -83,4 +83,12 @@ public class AuditEntityUnitTests {
         Assert.assertEquals(originalCreate, a.getCreated());
         Assert.assertNotEquals(originalUpdate, a.getUpdated());
     }
+
+    /**
+     * Test the toString method.
+     */
+    @Test
+    public void testToString() {
+        Assert.assertNotNull(new AuditEntity().toString());
+    }
 }

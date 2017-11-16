@@ -209,4 +209,12 @@ public class ApplicationEntityUnitTests extends EntityTestsBase {
         this.a.setCommands(null);
         Assert.assertThat(this.a.getCommands(), Matchers.empty());
     }
+
+    /**
+     * Test the toString method.
+     */
+    @Test
+    public void testToString() {
+        Assert.assertNotNull(this.a.toString());
+    }
 }

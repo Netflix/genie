@@ -98,7 +98,7 @@ public class JobRequest extends ExecutionEnvironmentDTO {
      * @return The command arguments
      */
     public Optional<String> getCommandArgs() {
-        return Optional.of(this.commandArgs);
+        return Optional.ofNullable(this.commandArgs);
     }
 
     /**

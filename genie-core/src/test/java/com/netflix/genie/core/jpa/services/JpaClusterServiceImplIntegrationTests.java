@@ -328,8 +328,6 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertThat(this.service.chooseClusterForJobRequest(five).size(), Matchers.is(2));
     }
 
-    // TODO Add tests where jobRequest object is
-
     /**
      * Test the create method.
      *

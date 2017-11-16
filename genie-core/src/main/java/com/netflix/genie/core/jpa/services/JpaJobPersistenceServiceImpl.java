@@ -369,7 +369,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         if (!jobRequest.getApplications().isEmpty()) {
             jobEntity.setApplicationsRequested(jobRequest.getApplications());
         }
-        jobRequest.getTimeout().ifPresent(jobEntity::setMemoryRequested);
+        jobRequest.getTimeout().ifPresent(jobEntity::setTimeoutRequested);
 
         // TODO: Add grouping and grouping instance
 

@@ -38,7 +38,7 @@ import java.util.Date;
  * @author tgianos
  */
 @Getter
-@ToString
+@ToString(callSuper = true)
 @MappedSuperclass
 public class AuditEntity extends IdEntity implements AuditProjection {
 

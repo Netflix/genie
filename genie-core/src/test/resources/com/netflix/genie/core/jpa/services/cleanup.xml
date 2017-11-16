@@ -19,9 +19,9 @@
     <commands/>
     <applications/>
     <criteria/>
-    <jobs/>
     <files/>
     <tags/>
+    <jobs/>
     <clusters_configs/>
     <clusters_dependencies/>
     <clusters_tags/>

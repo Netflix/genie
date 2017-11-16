@@ -100,4 +100,12 @@ public class TagEntityUnitTest extends EntityTestsBase {
         Assert.assertNotEquals(one.hashCode(), three.hashCode());
         Assert.assertNotEquals(two.hashCode(), three.hashCode());
     }
+
+    /**
+     * Test the toString method.
+     */
+    @Test
+    public void testToString() {
+        Assert.assertNotNull(new TagEntity().toString());
+    }
 }

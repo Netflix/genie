@@ -40,18 +40,18 @@ public class BaseEntityUnitTests extends EntityTestsBase {
     private static final String USER = "tgianos";
     private static final String VERSION = "1.0";
 
-    private BaseEntity c;
+    private BaseEntity b;
 
     /**
      * Setup the tests.
      */
     @Before
     public void setup() {
-        this.c = new BaseEntity();
-        this.c.setUniqueId(UNIQUE_ID);
-        this.c.setName(NAME);
-        this.c.setUser(USER);
-        this.c.setVersion(VERSION);
+        this.b = new BaseEntity();
+        this.b.setUniqueId(UNIQUE_ID);
+        this.b.setName(NAME);
+        this.b.setUser(USER);
+        this.b.setVersion(VERSION);
     }
 
     /**
@@ -73,7 +73,7 @@ public class BaseEntityUnitTests extends EntityTestsBase {
      */
     @Test
     public void testValidate() {
-        this.validate(this.c);
+        this.validate(this.b);
     }
 
     /**
@@ -91,8 +91,8 @@ public class BaseEntityUnitTests extends EntityTestsBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testValidateNoName() {
-        this.c.setName(null);
-        this.validate(this.c);
+        this.b.setName(null);
+        this.validate(this.b);
     }
 
     /**
@@ -100,8 +100,8 @@ public class BaseEntityUnitTests extends EntityTestsBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testValidateNoUser() {
-        this.c.setUser("     ");
-        this.validate(this.c);
+        this.b.setUser("     ");
+        this.validate(this.b);
     }
 
     /**
@@ -109,8 +109,8 @@ public class BaseEntityUnitTests extends EntityTestsBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testValidateNoVersion() {
-        this.c.setVersion("");
-        this.validate(this.c);
+        this.b.setVersion("");
+        this.validate(this.b);
     }
 
     /**
@@ -163,10 +163,10 @@ public class BaseEntityUnitTests extends EntityTestsBase {
      */
     @Test
     public void testSetDescription() {
-        Assert.assertFalse(this.c.getDescription().isPresent());
+        Assert.assertFalse(this.b.getDescription().isPresent());
         final String description = "Test description";
-        this.c.setDescription(description);
-        Assert.assertEquals(description, this.c.getDescription().orElseThrow(IllegalArgumentException::new));
+        this.b.setDescription(description);
+        Assert.assertEquals(description, this.b.getDescription().orElseThrow(IllegalArgumentException::new));
     }
 
     /**
@@ -174,13 +174,13 @@ public class BaseEntityUnitTests extends EntityTestsBase {
      */
     @Test
     public void testSetSetupFile() {
-        Assert.assertFalse(this.c.getSetupFile().isPresent());
+        Assert.assertFalse(this.b.getSetupFile().isPresent());
         final FileEntity setupFile = new FileEntity();
         setupFile.setFile(UUID.randomUUID().toString());
-        this.c.setSetupFile(setupFile);
-        Assert.assertThat(this.c.getSetupFile().orElseThrow(IllegalArgumentException::new), Matchers.is(setupFile));
-        this.c.setSetupFile(null);
-        Assert.assertFalse(this.c.getSetupFile().isPresent());
+        this.b.setSetupFile(setupFile);
+        Assert.assertThat(this.b.getSetupFile().orElseThrow(IllegalArgumentException::new), Matchers.is(setupFile));
+        this.b.setSetupFile(null);
+        Assert.assertFalse(this.b.getSetupFile().isPresent());
     }
 
     /**
@@ -207,5 +207,13 @@ public class BaseEntityUnitTests extends EntityTestsBase {
         Assert.assertEquals(one.hashCode(), two.hashCode());
         Assert.assertNotEquals(one.hashCode(), three.hashCode());
         Assert.assertNotEquals(two.hashCode(), three.hashCode());
+    }
+
+    /**
+     * Test the toString method.
+     */
+    @Test
+    public void testToString() {
+        Assert.assertNotNull(this.b.toString());
     }
 }

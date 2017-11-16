@@ -52,7 +52,7 @@ public class JobUnitTests {
         Assert.assertThat(job.getName(), Matchers.is(NAME));
         Assert.assertThat(job.getUser(), Matchers.is(USER));
         Assert.assertThat(job.getVersion(), Matchers.is(VERSION));
-        Assert.assertThat(job.getCommandArgs(), Matchers.is(COMMAND_ARGS));
+        Assert.assertThat(job.getCommandArgs().orElseThrow(IllegalArgumentException::new), Matchers.is(COMMAND_ARGS));
         Assert.assertFalse(job.getArchiveLocation().isPresent());
         Assert.assertFalse(job.getClusterName().isPresent());
         Assert.assertFalse(job.getCommandName().isPresent());
@@ -120,7 +120,7 @@ public class JobUnitTests {
         Assert.assertThat(job.getName(), Matchers.is(NAME));
         Assert.assertThat(job.getUser(), Matchers.is(USER));
         Assert.assertThat(job.getVersion(), Matchers.is(VERSION));
-        Assert.assertThat(job.getCommandArgs(), Matchers.is(COMMAND_ARGS));
+        Assert.assertThat(job.getCommandArgs().orElseThrow(IllegalArgumentException::new), Matchers.is(COMMAND_ARGS));
         Assert.assertThat(
             job.getArchiveLocation().orElseThrow(IllegalArgumentException::new), Matchers.is(archiveLocation)
         );
@@ -161,7 +161,7 @@ public class JobUnitTests {
         Assert.assertThat(job.getName(), Matchers.is(NAME));
         Assert.assertThat(job.getUser(), Matchers.is(USER));
         Assert.assertThat(job.getVersion(), Matchers.is(VERSION));
-        Assert.assertThat(job.getCommandArgs(), Matchers.is(COMMAND_ARGS));
+        Assert.assertThat(job.getCommandArgs().orElseThrow(IllegalArgumentException::new), Matchers.is(COMMAND_ARGS));
         Assert.assertFalse(job.getArchiveLocation().isPresent());
         Assert.assertFalse(job.getClusterName().isPresent());
         Assert.assertFalse(job.getCommandName().isPresent());

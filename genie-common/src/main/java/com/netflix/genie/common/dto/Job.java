@@ -83,7 +83,7 @@ public class Job extends CommonDTO {
      * @return The command arguments
      */
     public Optional<String> getCommandArgs() {
-        return Optional.of(this.commandArgs);
+        return Optional.ofNullable(this.commandArgs);
     }
 
     /**

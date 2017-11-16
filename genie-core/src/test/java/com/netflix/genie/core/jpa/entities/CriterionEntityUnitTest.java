@@ -72,6 +72,23 @@ public class CriterionEntityUnitTest extends EntityTestsBase {
     }
 
     /**
+     * Make sure setting the tags works.
+     */
+    @Test
+    public void canSetTags() {
+        final CriterionEntity entity = new CriterionEntity();
+        Assert.assertTrue(entity.getTags().isEmpty());
+        entity.setTags(null);
+        Assert.assertTrue(entity.getTags().isEmpty());
+        final Set<TagEntity> tags = Sets.newHashSet();
+        entity.setTags(tags);
+        Assert.assertTrue(entity.getTags().isEmpty());
+        tags.add(new TagEntity(UUID.randomUUID().toString()));
+        entity.setTags(tags);
+        Assert.assertEquals(entity.getTags(), tags);
+    }
+
+    /**
      * Test to make sure equals and hash code only care about the unique file.
      */
     @Test
@@ -91,5 +108,13 @@ public class CriterionEntityUnitTest extends EntityTestsBase {
         Assert.assertEquals(one.hashCode(), two.hashCode());
         Assert.assertNotEquals(one.hashCode(), three.hashCode());
         Assert.assertNotEquals(two.hashCode(), three.hashCode());
+    }
+
+    /**
+     * Test the toString method.
+     */
+    @Test
+    public void testToString() {
+        Assert.assertNotNull(new CriterionEntity().toString());
     }
 }

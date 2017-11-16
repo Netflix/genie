@@ -249,7 +249,7 @@ BEGIN
       cluster_criteria_order_local = 0;
       << CLUSTER_CRITERIAS_LOOP >> WHILE LENGTH(cluster_criteria) > 0 LOOP
         -- Create criteria entry (save ID)
-        INSERT INTO criteria (created) VALUES (now())
+        INSERT INTO criteria (id) VALUES (DEFAULT)
         RETURNING id
           INTO criterion_id_local;
 
@@ -305,7 +305,7 @@ BEGIN
     IF LENGTH(command_criterion) > 0
     THEN
       -- Create criteria entry (save ID)
-      INSERT INTO criteria (created) VALUES (now())
+      INSERT INTO criteria (id) VALUES (DEFAULT)
       RETURNING id
         INTO criterion_id_local;
 

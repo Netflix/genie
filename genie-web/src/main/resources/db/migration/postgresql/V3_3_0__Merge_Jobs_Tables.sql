@@ -184,10 +184,7 @@ SELECT
   'Creating criteria table';
 
 CREATE TABLE criteria (
-  id             BIGSERIAL                                    NOT NULL,
-  created        TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT now() NOT NULL,
-  updated        TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT now() NOT NULL,
-  entity_version INT DEFAULT '0'                              NOT NULL,
+  id BIGSERIAL NOT NULL,
   PRIMARY KEY (id)
 );
 

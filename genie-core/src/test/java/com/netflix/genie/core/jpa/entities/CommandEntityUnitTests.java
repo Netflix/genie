@@ -390,4 +390,12 @@ public class CommandEntityUnitTests extends EntityTestsBase {
         this.c.setClusters(null);
         Assert.assertThat(this.c.getClusters(), Matchers.empty());
     }
+
+    /**
+     * Test the toString method.
+     */
+    @Test
+    public void testToString() {
+        Assert.assertNotNull(this.c.toString());
+    }
 }

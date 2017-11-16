@@ -129,10 +129,7 @@ SELECT
   'Creating criteria table' AS '';
 
 CREATE TABLE `criteria` (
-  `id`             BIGINT(20) AUTO_INCREMENT                               NOT NULL,
-  `created`        DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3)                NOT NULL,
-  `updated`        DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3)                NOT NULL ON UPDATE CURRENT_TIMESTAMP(3),
-  `entity_version` INT(11) DEFAULT '0'                                     NOT NULL,
+  `id` BIGINT(20) AUTO_INCREMENT NOT NULL,
   PRIMARY KEY (`id`)
 )
   ENGINE = InnoDB

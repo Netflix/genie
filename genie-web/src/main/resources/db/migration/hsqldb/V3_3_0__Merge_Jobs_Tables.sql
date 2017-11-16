@@ -90,10 +90,7 @@ SELECT
   'Creating criteria table';
 
 CREATE TABLE criteria (
-  id             BIGINT IDENTITY                           NOT NULL,
-  created        DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3)  NOT NULL,
-  updated        DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3)  NOT NULL,
-  entity_version INT DEFAULT '0'                           NOT NULL,
+  id BIGINT IDENTITY NOT NULL,
   PRIMARY KEY (id)
 );
 
