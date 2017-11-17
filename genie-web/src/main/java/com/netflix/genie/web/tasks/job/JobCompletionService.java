@@ -278,7 +278,7 @@ public class JobCompletionService {
                 });
             }
         } catch (final GenieException ge) {
-            log.error("Unable to cleanup process for job due to exception. {}", jobId, ge);
+            log.error("Unable to cleanup process for job {} due to exception.", jobId, ge);
             incrementErrorCounter("JOB_CLEANUP_FAILURE", ge);
         } catch (Throwable t) {
             incrementErrorCounter("JOB_PROCESS_CLEANUP_FAILURE", t);
@@ -546,7 +546,7 @@ public class JobCompletionService {
                     try {
                         this.executor.execute(commandLine);
                     } catch (Throwable t) {
-                        log.warn("Failed to created archive of job files", t);
+                        log.warn("Failed to created archive of job files for job: {}", jobId, t);
                         incrementErrorCounter("JOB_ARCHIVAL_FAILURE", t);
                         throw t;
                     }
