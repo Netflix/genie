@@ -531,11 +531,12 @@ public class JobCompletionService {
                     } else {
                         commandLine = new CommandLine("tar");
                     }
-                    commandLine.addArgument("-c");
-                    commandLine.addArgument("-z");
-                    commandLine.addArgument("-f");
-                    commandLine.addArgument(localArchiveFile.getCanonicalPath());
-                    commandLine.addArgument("./");
+                    commandLine
+                        .addArgument("-c")
+                        .addArgument("-z")
+                        .addArgument("-f")
+                        .addArgument(localArchiveFile.getCanonicalPath())
+                        .addArgument("./");
 
                     this.executor.setWorkingDirectory(jobDir);
 
@@ -557,10 +558,10 @@ public class JobCompletionService {
                         log.debug("Deleting archive file");
                         try {
                             if (this.runAsUserEnabled) {
-                                final CommandLine deleteCommand = new CommandLine("sudo");
-                                deleteCommand.addArgument("rm");
-                                deleteCommand.addArgument("-f");
-                                deleteCommand.addArgument(localArchiveFile.getCanonicalPath());
+                                final CommandLine deleteCommand = new CommandLine("sudo")
+                                    .addArgument("rm")
+                                    .addArgument("-f")
+                                    .addArgument(localArchiveFile.getCanonicalPath());
 
                                 this.executor.setWorkingDirectory(jobDir);
                                 log.debug("Delete command: {}", deleteCommand);
