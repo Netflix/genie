@@ -536,6 +536,8 @@ public class JobCompletionService {
                         .addArgument("-z")
                         .addArgument("-f")
                         .addArgument(localArchiveFile.getCanonicalPath())
+                        .addArgument("--exclude")
+                        .addArgument(localArchiveFile.getName())
                         .addArgument("./");
 
                     this.executor.setWorkingDirectory(jobDir);
