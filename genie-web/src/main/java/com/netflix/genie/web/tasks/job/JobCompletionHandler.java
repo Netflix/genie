@@ -42,9 +42,7 @@ public class JobCompletionHandler {
      * @param jobCompletionService An implementation of the job completion service.
      */
     @Autowired
-    public JobCompletionHandler(
-        final JobCompletionService jobCompletionService
-    ) {
+    public JobCompletionHandler(final JobCompletionService jobCompletionService) {
         this.jobCompletionService = jobCompletionService;
     }
 
@@ -56,6 +54,6 @@ public class JobCompletionHandler {
      */
     @EventListener
     public void handleJobCompletion(final JobFinishedEvent event) throws GenieException {
-        jobCompletionService.handleJobCompletion(event);
+        this.jobCompletionService.handleJobCompletion(event);
     }
 }
