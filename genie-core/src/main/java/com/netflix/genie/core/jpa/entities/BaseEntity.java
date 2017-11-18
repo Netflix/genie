@@ -26,6 +26,7 @@ import lombok.ToString;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.NotBlank;
 
+import javax.annotation.Nullable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.FetchType;
@@ -104,11 +105,29 @@ public class BaseEntity extends AuditEntity implements BaseProjection, SetupFile
     }
 
     /**
+     * Set the description.
+     *
+     * @param description The description. Null wipes database field
+     */
+    public void setDescription(@Nullable final String description) {
+        this.description = description;
+    }
+
+    /**
      * Get the setup file for this entity.
      *
      * @return The setup file as an Optional in case it's null
      */
     public Optional<FileEntity> getSetupFile() {
         return Optional.ofNullable(this.setupFile);
+    }
+
+    /**
+     * Set the setup file for this entity.
+     *
+     * @param setupFile The setup file. Null clears reference in the database
+     */
+    public void setSetupFile(@Nullable final FileEntity setupFile) {
+        this.setupFile = setupFile;
     }
 }

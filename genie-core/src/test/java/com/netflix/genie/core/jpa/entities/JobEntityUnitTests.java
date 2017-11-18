@@ -537,7 +537,7 @@ public class JobEntityUnitTests extends EntityTestsBase {
      * Make sure the setter for the jobEntity class works for JPA for null cluster criterias.
      */
     @Test
-    public void canSetNullClusterCriterias() {
+    public void canSetNullClusterCriteria() {
         this.jobEntity.setClusterCriteria(null);
         Assert.assertThat(this.jobEntity.getClusterCriteria(), Matchers.empty());
     }
@@ -639,7 +639,7 @@ public class JobEntityUnitTests extends EntityTestsBase {
      * Make sure the setter for the jobEntity class works for JPA for null command criteria.
      */
     @Test
-    public void canSetNullCommandCriteria() {
+    public void canSetNullCommandCriterion() {
         this.jobEntity.setCommandCriterion(null);
         Assert.assertFalse(this.jobEntity.getCommandCriterion().isPresent());
     }

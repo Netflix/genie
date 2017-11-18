@@ -278,7 +278,7 @@ public class JobRestController {
                 jobRequest.getName(),
                 jobRequest.getUser(),
                 jobRequest.getVersion(),
-                jobRequest.getCommandArgs(),
+                jobRequest.getCommandArgs().orElse(null),
                 jobRequest.getClusterCriterias(),
                 jobRequest.getCommandCriteria()
             )

@@ -21,7 +21,6 @@ import com.netflix.genie.core.jpa.entities.ApplicationEntity;
 import com.netflix.genie.core.jpa.entities.ApplicationEntity_;
 import com.netflix.genie.core.jpa.entities.TagEntity;
 import com.netflix.genie.test.categories.UnitTest;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -275,13 +274,5 @@ public class JpaApplicationSpecsUnitTests {
         Mockito.verify(this.cq, Mockito.times(1)).groupBy(Mockito.any(Path.class));
         Mockito.verify(this.cq, Mockito.times(1)).having(Mockito.any(Predicate.class));
         Mockito.verify(this.cb, Mockito.never()).equal(this.root.get(ApplicationEntity_.type), TYPE);
-    }
-
-    /**
-     * Here for completeness.
-     */
-    @Test
-    public void testProtectedConstructor() {
-        Assert.assertNotNull(new JpaApplicationSpecs());
     }
 }

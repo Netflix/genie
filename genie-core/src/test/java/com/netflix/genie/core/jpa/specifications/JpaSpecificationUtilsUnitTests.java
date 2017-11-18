@@ -41,15 +41,6 @@ import java.util.Set;
 public class JpaSpecificationUtilsUnitTests {
 
     /**
-     * Utility class should have protected constructor.
-     */
-    @Test
-    public void canAccessProtectedConstructor() {
-        final JpaSpecificationUtils utils = new JpaSpecificationUtils();
-        Assert.assertThat(utils, Matchers.notNullValue());
-    }
-
-    /**
      * Make sure the method to create the tag search string for jobs is working as expected.
      */
     @Test

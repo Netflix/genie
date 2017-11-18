@@ -46,7 +46,7 @@ public final class JpaCommandSpecs {
     /**
      * Private constructor for utility class.
      */
-    JpaCommandSpecs() {
+    private JpaCommandSpecs() {
     }
 
     /**

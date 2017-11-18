@@ -35,6 +35,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -94,13 +95,13 @@ public interface ClusterService {
     );
 
     /**
-     * Get the clusters on which the job can be run.
+     * Find the clusters and commands that can run a job given the criteria the user asked for in the job.
      *
      * @param jobRequest The request to runt he job. Not null.
-     * @return successful response, or one with HTTP error code
+     * @return a map of cluster to the unique id of the command to use if that cluster is used
      * @throws GenieException if there is an error
      */
-    List<Cluster> chooseClusterForJobRequest(
+    Map<Cluster, String> findClustersAndCommandsForJob(
         @NotNull(message = "JobRequest object is null. Unable to continue.")
         final JobRequest jobRequest
     ) throws GenieException;

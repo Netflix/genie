@@ -315,7 +315,8 @@ public class JpaClusterServiceImplUnitTests {
         Mockito.when(this.jpaClusterRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         this.service.getCommandsForCluster(id, null);
     }
-//TODO: Missing tests for statuses
+
+    // TODO: Missing tests for statuses
 
     /**
      * Test updating commands for the cluster.

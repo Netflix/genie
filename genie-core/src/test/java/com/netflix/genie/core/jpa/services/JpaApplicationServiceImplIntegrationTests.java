@@ -218,7 +218,7 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
     @Test
     public void testGetApplicationsByTagsWhenOneDoesntExist() {
         final Set<String> tags = Sets.newHashSet("prod", UUID.randomUUID().toString());
-        Page<Application> apps = this.appService.getApplications(null, null, null, tags, null, PAGEABLE);
+        final Page<Application> apps = this.appService.getApplications(null, null, null, tags, null, PAGEABLE);
         Assert.assertEquals(0, apps.getNumberOfElements());
     }
 

@@ -37,7 +37,7 @@ public final class JpaSpecificationUtils {
     static final String PERCENT = "%";
     static final String TAG_DELIMITER = "|";
 
-    JpaSpecificationUtils() {
+    private JpaSpecificationUtils() {
     }
 
     /**

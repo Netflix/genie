@@ -96,4 +96,20 @@ public class AuditEntity extends IdEntity implements AuditProjection {
     public Date getUpdated() {
         return new Date(this.updated.getTime());
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object o) {
+        return super.equals(o);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }

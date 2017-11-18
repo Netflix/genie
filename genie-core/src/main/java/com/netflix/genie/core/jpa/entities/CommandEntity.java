@@ -119,8 +119,7 @@ public class CommandEntity extends BaseEntity {
     )
     private Set<TagEntity> tags = new HashSet<>();
 
-    // TODO: Make lazy?
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "commands_applications",
         joinColumns = {
@@ -255,5 +254,21 @@ public class CommandEntity extends BaseEntity {
         if (clusters != null) {
             this.clusters.addAll(clusters);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object o) {
+        return super.equals(o);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 }

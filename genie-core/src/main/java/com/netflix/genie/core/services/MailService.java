@@ -21,6 +21,9 @@ import com.netflix.genie.common.exceptions.GenieException;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 /**
  * An interface for sending emails.
  *
@@ -35,15 +38,14 @@ public interface MailService {
      *
      * @param toEmail The email address to send the email to.
      * @param subject The subject of the email.
-     * @param body The body of the email
-     *
+     * @param body    The body of the email
      * @throws GenieException If there is any problem
      */
     void sendEmail(
         @NotBlank(message = "Cannot send email to blank address.")
-        final String toEmail,
+        @Nonnull final String toEmail,
         @NotBlank(message = "Subject cannot be empty")
-        final String subject,
-        final String body
+        @Nonnull final String subject,
+        @Nullable final String body
     ) throws GenieException;
 }

@@ -107,7 +107,7 @@ public class CommandEntityUnitTests extends EntityTestsBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testValidateNoName() {
-        this.c.setName(null);
+        this.c.setName("");
         this.validate(this.c);
     }
 
@@ -126,15 +126,6 @@ public class CommandEntityUnitTests extends EntityTestsBase {
     @Test(expected = ConstraintViolationException.class)
     public void testValidateNoVersion() {
         this.c.setVersion("");
-        this.validate(this.c);
-    }
-
-    /**
-     * Make sure validation works on with failure from command.
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testValidateNoStatus() {
-        this.c.setStatus(null);
         this.validate(this.c);
     }
 

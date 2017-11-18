@@ -15,7 +15,6 @@
  */
 package com.netflix.genie.core.jpa.specifications;
 
-import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.core.jpa.entities.ClusterEntity;
 import com.netflix.genie.core.jpa.entities.ClusterEntity_;
@@ -48,7 +47,7 @@ public final class JpaClusterSpecs {
     /**
      * Private constructor for utility class.
      */
-    JpaClusterSpecs() {
+    private JpaClusterSpecs() {
     }
 
     /**
@@ -96,50 +95,6 @@ public final class JpaClusterSpecs {
                         .collect(Collectors.toList());
                 predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
             }
-
-            return cb.and(predicates.toArray(new Predicate[predicates.size()]));
-        };
-    }
-
-    /**
-     * Get all the clusters given the specified parameters.
-     *
-     * @param clusterCriteria The cluster criteria
-     * @param commandCriteria The command Criteria
-     * @return The specification
-     */
-    //TODO
-    public static Specification<ClusterEntity> findByClusterAndCommandCriteria(
-        final ClusterCriteria clusterCriteria,
-        final Set<String> commandCriteria
-    ) {
-        return (final Root<ClusterEntity> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
-            final List<Predicate> predicates = new ArrayList<>();
-            final Join<ClusterEntity, CommandEntity> commands = root.join(ClusterEntity_.commands);
-
-            cq.distinct(true);
-
-            predicates.add(cb.equal(root.get(ClusterEntity_.status), ClusterStatus.UP));
-
-//            if (clusterCriteria.getTags() != null && !clusterCriteria.getTags().isEmpty()) {
-//                predicates.add(
-//                    cb.like(
-//                        root.get(ClusterEntity_.tags),
-//                        JpaSpecificationUtils.getTagLikeString(clusterCriteria.getTags())
-//                    )
-//                );
-//            }
-//
-//            predicates.add(cb.equal(commands.get(CommandEntity_.status), CommandStatus.ACTIVE));
-//
-//            if (!commandCriteria.isEmpty()) {
-//                predicates.add(
-//                    cb.like(
-//                        commands.get(CommandEntity_.tags),
-//                        JpaSpecificationUtils.getTagLikeString(commandCriteria)
-//                    )
-//                );
-//            }
 
             return cb.and(predicates.toArray(new Predicate[predicates.size()]));
         };

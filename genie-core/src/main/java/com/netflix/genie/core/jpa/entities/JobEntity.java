@@ -417,6 +417,15 @@ public class JobEntity extends BaseEntity
     }
 
     /**
+     * Set the command criterion.
+     *
+     * @param commandCriterion The criterion. Null clears reference.
+     */
+    public void setCommandCriterion(@Nullable final CriterionEntity commandCriterion) {
+        this.commandCriterion = commandCriterion;
+    }
+
+    /**
      * Get the client host.
      *
      * @return Optional of the client host
@@ -468,6 +477,24 @@ public class JobEntity extends BaseEntity
      */
     public Optional<Long> getStdErrSize() {
         return Optional.ofNullable(this.stdErrSize);
+    }
+
+    /**
+     * Set the total size in bytes of the std err file for this job.
+     *
+     * @param stdErrSize The size. Null empties database field
+     */
+    public void setStdErrSize(@Nullable final Long stdErrSize) {
+        this.stdErrSize = stdErrSize;
+    }
+
+    /**
+     * Set the total size in bytes of the std out file for this job.
+     *
+     * @param stdOutSize The size. Null empties database field
+     */
+    public void setStdOutSize(@Nullable final Long stdOutSize) {
+        this.stdOutSize = stdOutSize;
     }
 
     /**
@@ -732,5 +759,21 @@ public class JobEntity extends BaseEntity
         if (clusterCriteria != null) {
             this.clusterCriteria.addAll(clusterCriteria);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object o) {
+        return super.equals(o);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 }

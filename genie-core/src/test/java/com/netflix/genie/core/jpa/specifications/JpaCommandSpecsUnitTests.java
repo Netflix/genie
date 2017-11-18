@@ -21,7 +21,6 @@ import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity_;
 import com.netflix.genie.core.jpa.entities.TagEntity;
 import com.netflix.genie.test.categories.UnitTest;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -265,13 +264,5 @@ public class JpaCommandSpecsUnitTests {
         Mockito.verify(this.tagEntityJoin, Mockito.times(1)).in(TAGS);
         Mockito.verify(this.cq, Mockito.times(1)).groupBy(Mockito.any(Path.class));
         Mockito.verify(this.cq, Mockito.times(1)).having(Mockito.any(Predicate.class));
-    }
-
-    /**
-     * Here for completeness.
-     */
-    @Test
-    public void testProtectedConstructor() {
-        Assert.assertNotNull(new JpaCommandSpecs());
     }
 }

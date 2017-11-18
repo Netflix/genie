@@ -246,6 +246,30 @@ SELECT
   'Finished creating new application_dependencies table' AS '';
 
 SELECT
+  CURRENT_TIMESTAMP                  AS '',
+  'Creating applications_tags table' AS '';
+
+CREATE TABLE `applications_tags` (
+  `application_id` BIGINT(20) NOT NULL,
+  `tag_id`         BIGINT(20) NOT NULL,
+  PRIMARY KEY (`application_id`, `tag_id`),
+  KEY `APPLICATIONS_TAGS_APPLICATION_ID_INDEX` (`application_id`),
+  KEY `APPLICATIONS_TAGS_TAG_ID_INDEX` (tag_id),
+  CONSTRAINT `APPLICATIONS_TAGS_APPLICATION_ID_FK` FOREIGN KEY (`application_id`) REFERENCES `applications` (`id`)
+    ON DELETE CASCADE,
+  CONSTRAINT `APPLICATIONS_TAGS_TAG_ID_FK` FOREIGN KEY (`tag_id`) REFERENCES `tags` (`id`)
+    ON DELETE RESTRICT
+)
+  ENGINE = InnoDB
+  DEFAULT CHARSET = utf8
+  DEFAULT COLLATE = utf8_bin
+  ROW_FORMAT DYNAMIC;
+
+SELECT
+  CURRENT_TIMESTAMP                           AS '',
+  'Finished creating applications_tags table' AS '';
+
+SELECT
   CURRENT_TIMESTAMP             AS '',
   'Creating new clusters table' AS '';
 
@@ -325,6 +349,30 @@ CREATE TABLE `clusters_dependencies` (
 SELECT
   CURRENT_TIMESTAMP                                   AS '',
   'Finished creating new clusters_dependencies table' AS '';
+
+SELECT
+  CURRENT_TIMESTAMP              AS '',
+  'Creating clusters_tags table' AS '';
+
+CREATE TABLE `clusters_tags` (
+  `cluster_id` BIGINT(20) NOT NULL,
+  `tag_id`     BIGINT(20) NOT NULL,
+  PRIMARY KEY (`cluster_id`, `tag_id`),
+  KEY `CLUSTERS_TAGS_CLUSTER_ID_INDEX` (`cluster_id`),
+  KEY `CLUSTERS_TAGS_TAG_ID_INDEX` (tag_id),
+  CONSTRAINT `CLUSTERS_TAGS_CLUSTER_ID_FK` FOREIGN KEY (`cluster_id`) REFERENCES `clusters` (`id`)
+    ON DELETE CASCADE,
+  CONSTRAINT `CLUSTERS_TAGS_TAG_ID_FK` FOREIGN KEY (`tag_id`) REFERENCES `tags` (`id`)
+    ON DELETE RESTRICT
+)
+  ENGINE = InnoDB
+  DEFAULT CHARSET = utf8
+  DEFAULT COLLATE = utf8_bin
+  ROW_FORMAT DYNAMIC;
+
+SELECT
+  CURRENT_TIMESTAMP                       AS '',
+  'Finished creating clusters_tags table' AS '';
 
 SELECT
   CURRENT_TIMESTAMP             AS '',
@@ -408,6 +456,30 @@ CREATE TABLE `commands_dependencies` (
 SELECT
   CURRENT_TIMESTAMP                                   AS '',
   'Finished creating new commands_dependencies table' AS '';
+
+SELECT
+  CURRENT_TIMESTAMP              AS '',
+  'Creating commands_tags table' AS '';
+
+CREATE TABLE `commands_tags` (
+  `command_id` BIGINT(20) NOT NULL,
+  `tag_id`     BIGINT(20) NOT NULL,
+  PRIMARY KEY (`command_id`, `tag_id`),
+  KEY `COMMANDS_TAGS_COMMAND_ID_INDEX` (`command_id`),
+  KEY `COMMANDS_TAGS_TAG_ID_INDEX` (tag_id),
+  CONSTRAINT `COMMANDS_TAGS_COMMAND_ID_FK` FOREIGN KEY (`command_id`) REFERENCES `commands` (`id`)
+    ON DELETE CASCADE,
+  CONSTRAINT `COMMANDS_TAGS_TAG_ID_FK` FOREIGN KEY (`tag_id`) REFERENCES `tags` (`id`)
+    ON DELETE RESTRICT
+)
+  ENGINE = InnoDB
+  DEFAULT CHARSET = utf8
+  DEFAULT COLLATE = utf8_bin
+  ROW_FORMAT DYNAMIC;
+
+SELECT
+  CURRENT_TIMESTAMP                       AS '',
+  'Finished creating commands_tags table' AS '';
 
 SELECT
   CURRENT_TIMESTAMP                      AS '',
@@ -577,78 +649,6 @@ CREATE TABLE `jobs_applications` (
 SELECT
   CURRENT_TIMESTAMP                               AS '',
   'Finished creating new jobs_applications table' AS '';
-
-SELECT
-  CURRENT_TIMESTAMP                  AS '',
-  'Creating applications_tags table' AS '';
-
-CREATE TABLE `applications_tags` (
-  `application_id` BIGINT(20) NOT NULL,
-  `tag_id`         BIGINT(20) NOT NULL,
-  PRIMARY KEY (`application_id`, `tag_id`),
-  KEY `APPLICATIONS_TAGS_APPLICATION_ID_INDEX` (`application_id`),
-  KEY `APPLICATIONS_TAGS_TAG_ID_INDEX` (tag_id),
-  CONSTRAINT `APPLICATIONS_TAGS_APPLICATION_ID_FK` FOREIGN KEY (`application_id`) REFERENCES `applications` (`id`)
-    ON DELETE CASCADE,
-  CONSTRAINT `APPLICATIONS_TAGS_TAG_ID_FK` FOREIGN KEY (`tag_id`) REFERENCES `tags` (`id`)
-    ON DELETE RESTRICT
-)
-  ENGINE = InnoDB
-  DEFAULT CHARSET = utf8
-  DEFAULT COLLATE = utf8_bin
-  ROW_FORMAT DYNAMIC;
-
-SELECT
-  CURRENT_TIMESTAMP                           AS '',
-  'Finished creating applications_tags table' AS '';
-
-SELECT
-  CURRENT_TIMESTAMP              AS '',
-  'Creating clusters_tags table' AS '';
-
-CREATE TABLE `clusters_tags` (
-  `cluster_id` BIGINT(20) NOT NULL,
-  `tag_id`     BIGINT(20) NOT NULL,
-  PRIMARY KEY (`cluster_id`, `tag_id`),
-  KEY `CLUSTERS_TAGS_CLUSTER_ID_INDEX` (`cluster_id`),
-  KEY `CLUSTERS_TAGS_TAG_ID_INDEX` (tag_id),
-  CONSTRAINT `CLUSTERS_TAGS_CLUSTER_ID_FK` FOREIGN KEY (`cluster_id`) REFERENCES `clusters` (`id`)
-    ON DELETE CASCADE,
-  CONSTRAINT `CLUSTERS_TAGS_TAG_ID_FK` FOREIGN KEY (`tag_id`) REFERENCES `tags` (`id`)
-    ON DELETE RESTRICT
-)
-  ENGINE = InnoDB
-  DEFAULT CHARSET = utf8
-  DEFAULT COLLATE = utf8_bin
-  ROW_FORMAT DYNAMIC;
-
-SELECT
-  CURRENT_TIMESTAMP                       AS '',
-  'Finished creating clusters_tags table' AS '';
-
-SELECT
-  CURRENT_TIMESTAMP              AS '',
-  'Creating commands_tags table' AS '';
-
-CREATE TABLE `commands_tags` (
-  `command_id` BIGINT(20) NOT NULL,
-  `tag_id`     BIGINT(20) NOT NULL,
-  PRIMARY KEY (`command_id`, `tag_id`),
-  KEY `COMMANDS_TAGS_COMMAND_ID_INDEX` (`command_id`),
-  KEY `COMMANDS_TAGS_TAG_ID_INDEX` (tag_id),
-  CONSTRAINT `COMMANDS_TAGS_COMMAND_ID_FK` FOREIGN KEY (`command_id`) REFERENCES `commands` (`id`)
-    ON DELETE CASCADE,
-  CONSTRAINT `COMMANDS_TAGS_TAG_ID_FK` FOREIGN KEY (`tag_id`) REFERENCES `tags` (`id`)
-    ON DELETE RESTRICT
-)
-  ENGINE = InnoDB
-  DEFAULT CHARSET = utf8
-  DEFAULT COLLATE = utf8_bin
-  ROW_FORMAT DYNAMIC;
-
-SELECT
-  CURRENT_TIMESTAMP                       AS '',
-  'Finished creating commands_tags table' AS '';
 
 SELECT
   CURRENT_TIMESTAMP          AS '',

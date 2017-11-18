@@ -92,7 +92,7 @@ public class ApplicationEntityUnitTests extends EntityTestsBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testValidateNoName() {
-        this.a.setName(null);
+        this.a.setName("");
         this.validate(this.a);
     }
 
@@ -111,15 +111,6 @@ public class ApplicationEntityUnitTests extends EntityTestsBase {
     @Test(expected = ConstraintViolationException.class)
     public void testValidateNoVersion() {
         this.a.setVersion(" ");
-        this.validate(this.a);
-    }
-
-    /**
-     * Make sure validation works on with failure from application.
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testValidateNoStatus() {
-        this.a.setStatus(null);
         this.validate(this.a);
     }
 

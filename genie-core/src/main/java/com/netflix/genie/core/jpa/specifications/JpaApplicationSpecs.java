@@ -44,7 +44,7 @@ public final class JpaApplicationSpecs {
     /**
      * Private constructor for utility class.
      */
-    JpaApplicationSpecs() {
+    private JpaApplicationSpecs() {
     }
 
     /**

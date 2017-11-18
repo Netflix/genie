@@ -27,12 +27,12 @@ public final class JobStatusMessages {
     //TODO this class could go away and we could fold this into JobStatus
 
     /**
-     * Job killed because maximum stdout lenght was exceeded.
+     * Job killed because maximum stdout length was exceeded.
      */
     public static final String JOB_EXCEEDED_STDOUT_LENGTH = "Std out length exceeded.";
 
     /**
-     * Job killed because maximum stderr lenght was exceeded.
+     * Job killed because maximum stderr length was exceeded.
      */
     public static final String JOB_EXCEEDED_STDERR_LENGTH = "Std err length exceeded.";
 

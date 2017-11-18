@@ -41,7 +41,7 @@ public interface BaseProjection extends AuditProjection {
     String getVersion();
 
     /**
-     * Get the user who created the resource
+     * Get the user who created the resource.
      *
      * @return The user who created the resource
      */

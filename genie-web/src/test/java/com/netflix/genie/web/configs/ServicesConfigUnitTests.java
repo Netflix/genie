@@ -24,19 +24,20 @@ import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
-import com.netflix.genie.core.jpa.repositories.JpaJobExecutionRepository;
-import com.netflix.genie.core.jpa.repositories.JpaJobMetadataRepository;
+import com.netflix.genie.core.jpa.repositories.JpaFileRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
-import com.netflix.genie.core.jpa.repositories.JpaJobRequestRepository;
+import com.netflix.genie.core.jpa.repositories.JpaTagRepository;
 import com.netflix.genie.core.properties.JobsProperties;
 import com.netflix.genie.core.services.ApplicationService;
 import com.netflix.genie.core.services.ClusterLoadBalancer;
 import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;
+import com.netflix.genie.core.services.FileService;
 import com.netflix.genie.core.services.JobKillService;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobStateService;
+import com.netflix.genie.core.services.TagService;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.spectator.api.Registry;
 import org.apache.commons.exec.Executor;
@@ -63,12 +64,14 @@ import java.util.UUID;
 @Category(UnitTest.class)
 public class ServicesConfigUnitTests {
 
+    private TagService tagService;
+    private JpaTagRepository tagRepository;
+    private FileService fileService;
+    private JpaFileRepository fileRepository;
     private JpaApplicationRepository applicationRepository;
     private JpaClusterRepository clusterRepository;
     private JpaCommandRepository commandRepository;
-    private JpaJobExecutionRepository jobExecutionRepository;
     private JpaJobRepository jobRepository;
-    private JpaJobRequestRepository jobRequestRepository;
     private JobSearchService jobSearchService;
     private ServicesConfig servicesConfig;
 
@@ -77,12 +80,14 @@ public class ServicesConfigUnitTests {
      */
     @Before
     public void setUp() {
+        this.tagService = Mockito.mock(TagService.class);
+        this.tagRepository = Mockito.mock(JpaTagRepository.class);
+        this.fileService = Mockito.mock(FileService.class);
+        this.fileRepository = Mockito.mock(JpaFileRepository.class);
         this.applicationRepository = Mockito.mock(JpaApplicationRepository.class);
         this.clusterRepository = Mockito.mock(JpaClusterRepository.class);
         this.commandRepository = Mockito.mock(JpaCommandRepository.class);
         this.jobRepository = Mockito.mock(JpaJobRepository.class);
-        this.jobRequestRepository = Mockito.mock(JpaJobRequestRepository.class);
-        this.jobExecutionRepository = Mockito.mock(JpaJobExecutionRepository.class);
         this.jobSearchService = Mockito.mock(JobSearchService.class);
 
         this.servicesConfig = new ServicesConfig();
@@ -128,9 +133,12 @@ public class ServicesConfigUnitTests {
      */
     @Test
     public void canGetApplicationServiceBean() {
-
         Assert.assertNotNull(
             this.servicesConfig.applicationService(
+                this.tagService,
+                this.tagRepository,
+                this.fileService,
+                this.fileRepository,
                 this.applicationRepository,
                 this.commandRepository
             )
@@ -145,6 +153,10 @@ public class ServicesConfigUnitTests {
 
         Assert.assertNotNull(
             this.servicesConfig.commandService(
+                this.tagService,
+                this.tagRepository,
+                this.fileService,
+                this.fileRepository,
                 this.commandRepository,
                 this.applicationRepository,
                 this.clusterRepository
@@ -159,6 +171,10 @@ public class ServicesConfigUnitTests {
     public void canGetClusterServiceBean() {
         Assert.assertNotNull(
             this.servicesConfig.clusterService(
+                this.tagService,
+                this.tagRepository,
+                this.fileService,
+                this.fileRepository,
                 this.clusterRepository,
                 this.commandRepository
             )
@@ -173,8 +189,6 @@ public class ServicesConfigUnitTests {
         Assert.assertNotNull(
             this.servicesConfig.jobSearchService(
                 this.jobRepository,
-                this.jobRequestRepository,
-                this.jobExecutionRepository,
                 Mockito.mock(JpaClusterRepository.class),
                 Mockito.mock(JpaCommandRepository.class)
             )
@@ -188,10 +202,11 @@ public class ServicesConfigUnitTests {
     public void canGetJobPersistenceServiceBean() {
         Assert.assertNotNull(
             this.servicesConfig.jobPersistenceService(
+                this.tagService,
+                this.tagRepository,
+                this.fileService,
+                this.fileRepository,
                 this.jobRepository,
-                this.jobRequestRepository,
-                Mockito.mock(JpaJobMetadataRepository.class),
-                jobExecutionRepository,
                 this.applicationRepository,
                 this.clusterRepository,
                 this.commandRepository
@@ -280,5 +295,21 @@ public class ServicesConfigUnitTests {
                 new ObjectMapper()
             )
         );
+    }
+
+    /**
+     * Make sure a tag service bean can be created.
+     */
+    @Test
+    public void canGetTagServiceBean() {
+        Assert.assertNotNull(this.servicesConfig.tagService(this.tagRepository));
+    }
+
+    /**
+     * Make sure a tag service bean can be created.
+     */
+    @Test
+    public void canGetFileServiceBean() {
+        Assert.assertNotNull(this.servicesConfig.fileService(this.fileRepository));
     }
 }

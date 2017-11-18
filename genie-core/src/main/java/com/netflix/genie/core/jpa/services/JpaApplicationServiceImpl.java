@@ -167,10 +167,11 @@ public class JpaApplicationServiceImpl extends JpaBaseService implements Applica
             tagEntities = null;
         }
 
-        @SuppressWarnings("unchecked") final Page<ApplicationEntity> applicationEntities = this.applicationRepository.findAll(
-            JpaApplicationSpecs.find(name, user, statuses, tagEntities, type),
-            page
-        );
+        @SuppressWarnings("unchecked") final Page<ApplicationEntity> applicationEntities = this.applicationRepository
+            .findAll(
+                JpaApplicationSpecs.find(name, user, statuses, tagEntities, type),
+                page
+            );
 
         return applicationEntities.map(JpaServiceUtils::toApplicationDto);
     }

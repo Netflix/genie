@@ -91,7 +91,7 @@ public class BaseEntityUnitTests extends EntityTestsBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testValidateNoName() {
-        this.b.setName(null);
+        this.b.setName("");
         this.validate(this.b);
     }
 

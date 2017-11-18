@@ -95,7 +95,8 @@ public interface JobSearchService {
      *
      * @return The set of hosts with jobs currently in an active state
      */
-    Set<String> getAllHostsWithActiveJobs();
+    // TODO: Change to set
+    List<String> getAllHostsWithActiveJobs();
 
     /**
      * Get job information for given job id.

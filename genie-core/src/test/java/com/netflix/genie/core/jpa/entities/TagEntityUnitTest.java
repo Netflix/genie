@@ -74,7 +74,7 @@ public class TagEntityUnitTest extends EntityTestsBase {
     @Test(expected = ConstraintViolationException.class)
     public void cantCreateTagEntityDueToNoTag() {
         final TagEntity tagEntity = new TagEntity();
-        final String tag = null;
+        final String tag = "";
         tagEntity.setTag(tag);
         this.validate(tagEntity);
     }

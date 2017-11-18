@@ -89,7 +89,7 @@ public class CriterionEntityUnitTest extends EntityTestsBase {
     }
 
     /**
-     * Test to make sure equals and hash code only care about the unique file.
+     * Test to make sure equals and hash code only care about the id of the base class not the tags.
      */
     @Test
     public void testEqualsAndHashCode() {
@@ -102,12 +102,12 @@ public class CriterionEntityUnitTest extends EntityTestsBase {
         final CriterionEntity three = new CriterionEntity();
 
         Assert.assertTrue(one.equals(two));
-        Assert.assertFalse(one.equals(three));
-        Assert.assertFalse(two.equals(three));
+        Assert.assertTrue(one.equals(three));
+        Assert.assertTrue(two.equals(three));
 
         Assert.assertEquals(one.hashCode(), two.hashCode());
-        Assert.assertNotEquals(one.hashCode(), three.hashCode());
-        Assert.assertNotEquals(two.hashCode(), three.hashCode());
+        Assert.assertEquals(one.hashCode(), three.hashCode());
+        Assert.assertEquals(two.hashCode(), three.hashCode());
     }
 
     /**

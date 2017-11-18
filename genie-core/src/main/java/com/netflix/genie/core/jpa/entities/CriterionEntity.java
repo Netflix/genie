@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.core.jpa.entities;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -43,7 +42,6 @@ import java.util.Set;
 @NoArgsConstructor
 @Getter
 @Setter
-@EqualsAndHashCode(of = "tags", callSuper = false)
 @ToString(callSuper = true)
 @Entity
 @Table(name = "criteria")
@@ -83,5 +81,21 @@ public class CriterionEntity extends IdEntity {
         if (tags != null) {
             this.tags.addAll(tags);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object o) {
+        return super.equals(o);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 }

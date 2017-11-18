@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
+import com.google.common.collect.Maps;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.ClusterStatus;
@@ -61,6 +62,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -181,32 +183,53 @@ public class JpaClusterServiceImpl extends JpaBaseService implements ClusterServ
      */
     @Override
     @Transactional(readOnly = true)
-    public List<Cluster> chooseClusterForJobRequest(
+    public Map<Cluster, String> findClustersAndCommandsForJob(
         @NotNull(message = "JobRequest object is null. Unable to continue.") final JobRequest jobRequest
     ) throws GenieException {
         log.debug("Called");
 
-        final List<ClusterCriteria> clusterCriterias = jobRequest.getClusterCriterias();
-        final Set<String> commandCriteria = jobRequest.getCommandCriteria();
+        final List<ClusterCriteria> clusterCriteria = jobRequest.getClusterCriterias();
+        final Set<String> commandCriterion = jobRequest.getCommandCriteria();
+        final Map<Cluster, String> foundClusters = Maps.newHashMap();
 
-        for (final ClusterCriteria clusterCriteria : clusterCriterias) {
-            @SuppressWarnings("unchecked") final List<ClusterEntity> clusterEntities = this.clusterRepository.findAll(
-                JpaClusterSpecs.findByClusterAndCommandCriteria(
-                    clusterCriteria,
-                    commandCriteria
-                )
+        for (final ClusterCriteria clusterCriterion : clusterCriteria) {
+            final List<Object[]> clusterCommands = this.clusterRepository.findClustersAndCommandsForCriterion(
+                clusterCriterion.getTags(),
+                clusterCriterion.getTags().size(),
+                commandCriterion,
+                commandCriterion.size()
             );
 
-            if (!clusterEntities.isEmpty()) {
-                return clusterEntities
-                    .stream()
-                    .map(JpaServiceUtils::toClusterDto)
-                    .collect(Collectors.toList());
+            if (!clusterCommands.isEmpty()) {
+                for (final Object[] ids : clusterCommands) {
+                    if (ids.length != 2) {
+                        throw new GenieServerException("Expected result length 2 but got " + ids.length);
+                    }
+                    final long clusterId;
+                    if (ids[0] instanceof Number) {
+                        clusterId = ((Number) ids[0]).longValue();
+                    } else {
+                        throw new GenieServerException("Expected number type but got " + ids[0].getClass().getName());
+                    }
+                    final String commandUniqueId;
+                    if (ids[1] instanceof String) {
+                        commandUniqueId = (String) ids[1];
+                    } else {
+                        throw new GenieServerException("Expected String type but got " + ids[1].getClass().getName());
+                    }
+
+                    final ClusterEntity clusterEntity = this.clusterRepository.getOne(clusterId);
+                    if (clusterEntity == null) {
+                        throw new GenieNotFoundException("No cluster with id " + clusterId + " exists");
+                    }
+                    foundClusters.put(JpaServiceUtils.toClusterDto(clusterEntity), commandUniqueId);
+                }
+                return foundClusters;
             }
         }
 
-        //if we've gotten to here no clusters were found so return empty list
-        return new ArrayList<>();
+        //if we've gotten to here no clusters were found so return empty map
+        return foundClusters;
     }
 
     /**

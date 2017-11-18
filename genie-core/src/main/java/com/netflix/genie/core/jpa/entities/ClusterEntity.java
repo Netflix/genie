@@ -100,8 +100,7 @@ public class ClusterEntity extends BaseEntity {
     )
     private Set<TagEntity> tags = new HashSet<>();
 
-    // TODO: Make lazy?
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "clusters_commands",
         joinColumns = {
@@ -215,5 +214,21 @@ public class ClusterEntity extends BaseEntity {
      */
     public void removeAllCommands() {
         Lists.newArrayList(this.commands).forEach(this::removeCommand);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object o) {
+        return super.equals(o);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 }

@@ -33,10 +33,9 @@ import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
-import com.netflix.genie.core.jpa.repositories.JpaJobExecutionRepository;
-import com.netflix.genie.core.jpa.repositories.JpaJobMetadataRepository;
+import com.netflix.genie.core.jpa.repositories.JpaFileRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
-import com.netflix.genie.core.jpa.repositories.JpaJobRequestRepository;
+import com.netflix.genie.core.jpa.repositories.JpaTagRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SystemUtils;
 import org.hamcrest.Matchers;
@@ -171,15 +170,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     private JpaJobRepository jobRepository;
 
     @Autowired
-    private JpaJobRequestRepository jobRequestRepository;
-
-    @Autowired
-    private JpaJobMetadataRepository jobRequestMetadataRepository;
-
-    @Autowired
-    private JpaJobExecutionRepository jobExecutionRepository;
-
-    @Autowired
     private JpaApplicationRepository applicationRepository;
 
     @Autowired
@@ -187,6 +177,12 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
 
     @Autowired
     private JpaClusterRepository clusterRepository;
+
+    @Autowired
+    private JpaFileRepository fileRepository;
+
+    @Autowired
+    private JpaTagRepository tagRepository;
 
     @Autowired
     private String hostname;
@@ -205,13 +201,12 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     @Before
     public void setup() throws Exception {
         // Ensure database is empty and doesn't bleed from other test classes
-        this.jobRequestMetadataRepository.deleteAll();
-        this.jobExecutionRepository.deleteAll();
         this.jobRepository.deleteAll();
-        this.jobRequestRepository.deleteAll();
         this.clusterRepository.deleteAll();
         this.commandRepository.deleteAll();
         this.applicationRepository.deleteAll();
+        this.fileRepository.deleteAll();
+        this.tagRepository.deleteAll();
 
         this.resourceLoader = new DefaultResourceLoader();
         this.createAnApplication(APP1_ID, APP1_NAME);
@@ -228,13 +223,12 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
      */
     @After
     public void cleanup() throws Exception {
-        this.jobRequestMetadataRepository.deleteAll();
-        this.jobExecutionRepository.deleteAll();
         this.jobRepository.deleteAll();
-        this.jobRequestRepository.deleteAll();
         this.clusterRepository.deleteAll();
         this.commandRepository.deleteAll();
         this.applicationRepository.deleteAll();
+        this.fileRepository.deleteAll();
+        this.tagRepository.deleteAll();
     }
 
     /**
@@ -306,9 +300,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         this.checkFindJobs(documentationId, id, JOB_USER);
 
         Assert.assertThat(this.jobRepository.count(), Matchers.is(1L));
-        Assert.assertThat(this.jobRequestRepository.count(), Matchers.is(1L));
-        Assert.assertThat(this.jobRequestMetadataRepository.count(), Matchers.is(1L));
-        Assert.assertThat(this.jobExecutionRepository.count(), Matchers.is(1L));
 
         // Check if the cluster setup file is cached
         final String clusterSetUpFilePath = this.resourceLoader

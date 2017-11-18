@@ -28,6 +28,8 @@ import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
+import com.netflix.genie.core.jpa.repositories.JpaFileRepository;
+import com.netflix.genie.core.jpa.repositories.JpaTagRepository;
 import com.netflix.genie.web.aspect.DataServiceRetryAspect;
 import com.netflix.genie.web.hateoas.resources.ClusterResource;
 import org.apache.catalina.util.URLEncoder;
@@ -88,6 +90,12 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
     private JpaCommandRepository jpaCommandRepository;
 
     @Autowired
+    private JpaFileRepository fileRepository;
+
+    @Autowired
+    private JpaTagRepository tagRepository;
+
+    @Autowired
     private DataSource dataSource;
 
     @Autowired
@@ -100,6 +108,8 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
     public void setup() {
         this.jpaClusterRepository.deleteAll();
         this.jpaCommandRepository.deleteAll();
+        this.fileRepository.deleteAll();
+        this.tagRepository.deleteAll();
     }
 
     /**
@@ -109,6 +119,8 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
     public void cleanup() {
         this.jpaClusterRepository.deleteAll();
         this.jpaCommandRepository.deleteAll();
+        this.fileRepository.deleteAll();
+        this.tagRepository.deleteAll();
     }
 
     /**

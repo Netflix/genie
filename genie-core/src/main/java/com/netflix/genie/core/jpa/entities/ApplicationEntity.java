@@ -166,4 +166,20 @@ public class ApplicationEntity extends BaseEntity {
             this.commands.addAll(commands);
         }
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object o) {
+        return super.equals(o);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }

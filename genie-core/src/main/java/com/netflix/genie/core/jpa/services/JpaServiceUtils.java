@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
  * @author tgianos
  * @since 3.3.0
  */
-public class JpaServiceUtils {
+public final class JpaServiceUtils {
 
     private JpaServiceUtils() {
     }
@@ -138,7 +138,7 @@ public class JpaServiceUtils {
     }
 
     /**
-     * Convert the data in this job projection into a job DTO
+     * Convert the data in this job projection into a job DTO for external exposure.
      *
      * @return The job DTO representation
      */

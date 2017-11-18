@@ -74,7 +74,7 @@ public class FileEntityUnitTest extends EntityTestsBase {
     @Test(expected = ConstraintViolationException.class)
     public void cantCreateFileEntityDueToNoFile() {
         final FileEntity fileEntity = new FileEntity();
-        final String file = null;
+        final String file = "";
         fileEntity.setFile(file);
         this.validate(fileEntity);
     }

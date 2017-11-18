@@ -16,13 +16,40 @@
  *
  */
 
-SELECT
-  CURRENT_TIMESTAMP,
-  'Upgrading database schema to 3.3.0';
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Dropping old tables';
+ALTER TABLE jobs
+    DROP CONSTRAINT JOBS_CLUSTER_ID_FK;
+ALTER TABLE jobs
+    DROP CONSTRAINT JOBS_COMMAND_ID_FK;
+ALTER TABLE jobs
+    DROP CONSTRAINT JOBS_ID_FK;
+ALTER TABLE job_executions
+    DROP CONSTRAINT JOB_EXECUTIONS_ID_FK;
+ALTER TABLE job_metadata
+    DROP CONSTRAINT JOB_METADATA_ID_FK;
+ALTER TABLE application_configs
+    DROP CONSTRAINT APPLICATION_CONFIGS_APPLICATION_ID_FK;
+ALTER TABLE application_dependencies
+    DROP CONSTRAINT APPLICATION_DEPENDENCIES_APPLICATION_ID_FK;
+ALTER TABLE cluster_configs
+    DROP CONSTRAINT CLUSTER_CONFIGS_CLUSTER_ID_FK;
+ALTER TABLE cluster_dependencies
+    DROP CONSTRAINT CLUSTER_DEPENDENCIES_CLUSTER_ID_FK;
+ALTER TABLE clusters_commands
+    DROP CONSTRAINT CLUSTERS_COMMANDS_CLUSTER_ID_FK;
+ALTER TABLE clusters_commands
+    DROP CONSTRAINT CLUSTERS_COMMANDS_COMMAND_ID_FK;
+ALTER TABLE command_configs
+    DROP CONSTRAINT COMMAND_CONFIGS_COMMAND_ID_FK;
+ALTER TABLE command_dependencies
+    DROP CONSTRAINT COMMAND_DEPENDENCIES_COMMAND_ID_FK;
+ALTER TABLE commands_applications
+    DROP CONSTRAINT COMMANDS_APPLICATIONS_APPLICATION_ID_FK;
+ALTER TABLE commands_applications
+    DROP CONSTRAINT COMMANDS_APPLICATIONS_COMMAND_ID_FK;
+ALTER TABLE jobs_applications
+    DROP CONSTRAINT JOBS_APPLICATIONS_APPLICATION_ID_FK;
+ALTER TABLE jobs_applications
+    DROP CONSTRAINT JOBS_APPLICATIONS_JOB_ID_FK;
 
 DROP TABLE job_metadata;
 DROP TABLE job_executions;
@@ -41,110 +68,61 @@ DROP TABLE applications;
 DROP TABLE clusters;
 DROP TABLE commands;
 
-SELECT
-  CURRENT_TIMESTAMP,
-  'Finished dropping old tables';
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Creating tags table';
-
 CREATE TABLE tags (
-  id             BIGINT IDENTITY                           NOT NULL,
-  created        DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3)  NOT NULL,
-  updated        DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3)  NOT NULL,
-  entity_version INT DEFAULT '0'                           NOT NULL,
-  tag            VARCHAR(255)                              NOT NULL,
-  PRIMARY KEY (id)
+  id             BIGINT IDENTITY                            NOT NULL,
+  created        TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3)  NOT NULL,
+  updated        TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3)  NOT NULL,
+  entity_version INT DEFAULT '0'                            NOT NULL,
+  tag            VARCHAR(255)                               NOT NULL,
+  CONSTRAINT TAGS_TAG_UNIQUE_INDEX UNIQUE (tag)
 );
-
-CREATE UNIQUE INDEX TAGS_TAG_UNIQUE_INDEX
-  ON tags (tag);
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Finished creating tags table';
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Creating files table';
 
 CREATE TABLE files (
-  id             BIGINT IDENTITY                           NOT NULL,
-  created        DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3)  NOT NULL,
-  updated        DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3)  NOT NULL,
-  entity_version INT DEFAULT '0'                           NOT NULL,
-  file           VARCHAR(1024)                             NOT NULL,
-  PRIMARY KEY (id)
+  id             BIGINT IDENTITY                            NOT NULL,
+  created        TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3)  NOT NULL,
+  updated        TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3)  NOT NULL,
+  entity_version INT DEFAULT '0'                            NOT NULL,
+  file           VARCHAR(1024)                              NOT NULL,
+  CONSTRAINT FILES_FILE_UNIQUE_INDEX UNIQUE (file)
 );
-
-CREATE UNIQUE INDEX FILES_FILE_UNIQUE_INDEX
-  ON files (file);
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Finished creating files table';
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Creating criteria table';
 
 CREATE TABLE criteria (
-  id BIGINT IDENTITY NOT NULL,
-  PRIMARY KEY (id)
+  id BIGINT IDENTITY NOT NULL
 );
 
-SELECT
-  CURRENT_TIMESTAMP,
-  'Finished creating criteria table';
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Creating criteria_tags table';
-
 CREATE TABLE criteria_tags (
-  crterion_id BIGINT NOT NULL,
-  tag_id      BIGINT NOT NULL,
-  PRIMARY KEY (crterion_id, tag_id),
-  CONSTRAINT CRITERIA_TAGS_CRITERION_ID_FK FOREIGN KEY (crterion_id) REFERENCES criteria (id)
+  criterion_id BIGINT NOT NULL,
+  tag_id       BIGINT NOT NULL,
+  PRIMARY KEY (criterion_id, tag_id),
+  CONSTRAINT CRITERIA_TAGS_CRITERION_ID_FK FOREIGN KEY (criterion_id) REFERENCES criteria (id)
     ON DELETE CASCADE,
   CONSTRAINT CRITERIA_TAGS_TAG_ID_FK FOREIGN KEY (tag_id) REFERENCES tags (id)
     ON DELETE RESTRICT
 );
 
 CREATE INDEX CRITERIA_TAGS_CRITERION_ID_INDEX
-  ON criteria_tags (crterion_id);
+  ON criteria_tags (criterion_id);
 CREATE INDEX CRITERIA_TAGS_TAG_ID_INDEX
   ON criteria_tags (tag_id);
 
-SELECT
-  CURRENT_TIMESTAMP,
-  'Created criteria_tags table';
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Creating new applications table';
-
 CREATE TABLE applications (
-  id             BIGINT IDENTITY                                        NOT NULL,
-  created        DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3)               NOT NULL,
-  updated        DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3)               NOT NULL,
-  entity_version INT DEFAULT '0'                                        NOT NULL,
-  unique_id      VARCHAR(255) DEFAULT UUID()                            NOT NULL,
-  name           VARCHAR(255)                                           NOT NULL,
-  genie_user     VARCHAR(255)                                           NOT NULL,
-  version        VARCHAR(255)                                           NOT NULL,
+  id             BIGINT IDENTITY                                         NOT NULL,
+  created        TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3)               NOT NULL,
+  updated        TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3)               NOT NULL,
+  entity_version INT DEFAULT '0'                                         NOT NULL,
+  unique_id      VARCHAR(255)                                            NOT NULL,
+  name           VARCHAR(255)                                            NOT NULL,
+  genie_user     VARCHAR(255)                                            NOT NULL,
+  version        VARCHAR(255)                                            NOT NULL,
   description    LONGVARCHAR  DEFAULT NULL,
   setup_file     BIGINT       DEFAULT NULL,
-  status         VARCHAR(20) DEFAULT 'INACTIVE'                         NOT NULL,
+  status         VARCHAR(20) DEFAULT 'INACTIVE'                          NOT NULL,
   type           VARCHAR(255) DEFAULT NULL,
-  PRIMARY KEY (id),
+  CONSTRAINT APPLICATIONS_UNIQUE_ID_UNIQUE_INDEX UNIQUE (unique_id),
   CONSTRAINT APPLICATIONS_SETUP_FILE_FK FOREIGN KEY (setup_file) REFERENCES files (id)
     ON DELETE RESTRICT
 );
 
-CREATE UNIQUE INDEX APPLICATIONS_UNIQUE_ID_UNIQUE_INDEX
-  ON applications (unique_id);
 CREATE INDEX APPLICATIONS_NAME_INDEX
   ON applications (name);
 CREATE INDEX APPLICATIONS_SETUP_FILE_INDEX
@@ -154,79 +132,68 @@ CREATE INDEX APPLICATIONS_STATUS_INDEX
 CREATE INDEX APPLICATIONS_TYPE_INDEX
   ON applications (type);
 
-SELECT
-  CURRENT_TIMESTAMP,
-  'Created new applications table';
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Creating new application_configs table';
-
-CREATE TABLE application_configs (
+CREATE TABLE applications_configs (
   application_id BIGINT NOT NULL,
   file_id        BIGINT NOT NULL,
   PRIMARY KEY (application_id, file_id),
-  CONSTRAINT APPLICATION_CONFIGS_APPLICATION_ID_FK FOREIGN KEY (application_id) REFERENCES applications (id)
+  CONSTRAINT APPLICATIONS_CONFIGS_APPLICATION_ID_FK FOREIGN KEY (application_id) REFERENCES applications (id)
     ON DELETE CASCADE,
-  CONSTRAINT APPLICATION_CONFIGS_FILE_ID_FK FOREIGN KEY (file_id) REFERENCES files (id)
+  CONSTRAINT APPLICATIONS_CONFIGS_FILE_ID_FK FOREIGN KEY (file_id) REFERENCES files (id)
     ON DELETE RESTRICT
 );
 
-CREATE INDEX APPLICATION_CONFIGS_APPLICATION_ID_INDEX
-  ON application_configs (application_id);
-CREATE INDEX APPLICATION_CONFIGS_FILE_ID_INDEX
-  ON application_configs (file_id);
+CREATE INDEX APPLICATIONS_CONFIGS_APPLICATION_ID_INDEX
+  ON applications_configs (application_id);
+CREATE INDEX APPLICATIONS_CONFIGS_FILE_ID_INDEX
+  ON applications_configs (file_id);
 
-SELECT
-  CURRENT_TIMESTAMP,
-  'Created new application_configs table';
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Creating new application_dependencies table';
-
-CREATE TABLE application_dependencies (
+CREATE TABLE applications_dependencies (
   application_id BIGINT NOT NULL,
   file_id        BIGINT NOT NULL,
   PRIMARY KEY (application_id, file_id),
-  CONSTRAINT APPLICATION_DEPENDENCIES_APPLICATION_ID_FK FOREIGN KEY (application_id) REFERENCES applications (id)
+  CONSTRAINT APPLICATIONS_DEPENDENCIES_APPLICATION_ID_FK FOREIGN KEY (application_id) REFERENCES applications (id)
     ON DELETE CASCADE,
-  CONSTRAINT APPLICATION_DEPENDENCIES_FILE_ID_FK FOREIGN KEY (file_id) REFERENCES files (id)
+  CONSTRAINT APPLICATIONS_DEPENDENCIES_FILE_ID_FK FOREIGN KEY (file_id) REFERENCES files (id)
     ON DELETE RESTRICT
 );
 
-CREATE INDEX APPLICATION_DEPENDENCIES_APPLICATION_ID_INDEX
-  ON application_dependencies (application_id);
-CREATE INDEX APPLICATION_DEPENDENCIES_FILE_ID_INDEX
-  ON application_dependencies (file_id);
+CREATE INDEX APPLICATIONS_DEPENDENCIES_APPLICATION_ID_INDEX
+  ON applications_dependencies (application_id);
+CREATE INDEX APPLICATIONS_DEPENDENCIES_FILE_ID_INDEX
+  ON applications_dependencies (file_id);
 
-SELECT
-  CURRENT_TIMESTAMP,
-  'Finished creating new application_dependencies table';
+CREATE TABLE applications_tags (
+  application_id BIGINT NOT NULL,
+  tag_id         BIGINT NOT NULL,
+  PRIMARY KEY (application_id, tag_id),
+  CONSTRAINT APPLICATIONS_TAGS_APPLICATION_ID_FK FOREIGN KEY (application_id) REFERENCES applications (id)
+    ON DELETE CASCADE,
+  CONSTRAINT APPLICATIONS_TAGS_TAG_ID_FK FOREIGN KEY (tag_id) REFERENCES tags (id)
+    ON DELETE RESTRICT
+);
 
-SELECT
-  CURRENT_TIMESTAMP,
-  'Creating new clusters table';
+CREATE INDEX APPLICATIONS_TAGS_APPLICATION_ID_INDEX
+  ON applications_tags (application_id);
+CREATE INDEX APPLICATIONS_TAGS_TAG_ID_INDEX
+  ON applications_tags (tag_id);
 
 CREATE TABLE clusters (
-  id             BIGINT IDENTITY                                     NOT NULL,
-  created        DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3)            NOT NULL,
-  updated        DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3)            NOT NULL,
-  entity_version INT DEFAULT '0'                                     NOT NULL,
-  unique_id      VARCHAR(255) DEFAULT UUID()                         NOT NULL,
-  name           VARCHAR(255)                                        NOT NULL,
-  genie_user     VARCHAR(255)                                        NOT NULL,
-  version        VARCHAR(255)                                        NOT NULL,
+  id             BIGINT IDENTITY                                      NOT NULL,
+  created        TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3)            NOT NULL,
+  updated        TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3)            NOT NULL,
+  entity_version INT DEFAULT '0'                                      NOT NULL,
+  unique_id      VARCHAR(255)                                         NOT NULL,
+  name           VARCHAR(255)                                         NOT NULL,
+  genie_user     VARCHAR(255)                                         NOT NULL,
+  version        VARCHAR(255)                                         NOT NULL,
   description    LONGVARCHAR DEFAULT NULL,
   setup_file     BIGINT      DEFAULT NULL,
-  status         VARCHAR(20) DEFAULT 'OUT_OF_SERVICE'                NOT NULL,
-  PRIMARY KEY (id),
+  status         VARCHAR(20) DEFAULT 'OUT_OF_SERVICE'                 NOT NULL,
+  CONSTRAINT CLUSTERS_UNIQUE_ID_UNIQUE_INDEX UNIQUE (unique_id),
   CONSTRAINT CLUSTERS_SETUP_FILE_FK FOREIGN KEY (setup_file) REFERENCES files (id)
     ON DELETE RESTRICT
 );
 
-CREATE UNIQUE INDEX CLUSTERS_UNIQUE_ID_UNIQUE_INDEX
-  ON clusters (unique_id);
 CREATE INDEX CLUSTERS_NAME_INDEX
   ON clusters (name);
 CREATE INDEX CLUSTERS_SETUP_FILE_INDEX
@@ -234,82 +201,71 @@ CREATE INDEX CLUSTERS_SETUP_FILE_INDEX
 CREATE INDEX CLUSTERS_STATUS_INDEX
   ON clusters (status);
 
-SELECT
-  CURRENT_TIMESTAMP,
-  'Finished creating new clusters table';
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Creating new cluster_configs table';
-
-CREATE TABLE cluster_configs (
+CREATE TABLE clusters_configs (
   cluster_id BIGINT NOT NULL,
   file_id    BIGINT NOT NULL,
   PRIMARY KEY (cluster_id, file_id),
-  CONSTRAINT CLUSTER_CONFIGS_CLUSTER_ID_FK FOREIGN KEY (cluster_id) REFERENCES clusters (id)
+  CONSTRAINT CLUSTERS_CONFIGS_CLUSTER_ID_FK FOREIGN KEY (cluster_id) REFERENCES clusters (id)
     ON DELETE CASCADE,
-  CONSTRAINT CLUSTER_CONFIGS_FILE_ID_FK FOREIGN KEY (file_id) REFERENCES files (id)
+  CONSTRAINT CLUSTERS_CONFIGS_FILE_ID_FK FOREIGN KEY (file_id) REFERENCES files (id)
     ON DELETE RESTRICT
 );
 
-CREATE INDEX CLUSTER_CONFIGS_CLUSTER_ID_INDEX
-  ON cluster_configs (cluster_id);
-CREATE INDEX CLUSTER_CONFIGS_FILE_ID_INDEX
-  ON cluster_configs (file_id);
+CREATE INDEX CLUSTERS_CONFIGS_CLUSTER_ID_INDEX
+  ON clusters_configs (cluster_id);
+CREATE INDEX CLUSTERS_CONFIGS_FILE_ID_INDEX
+  ON clusters_configs (file_id);
 
-SELECT
-  CURRENT_TIMESTAMP,
-  'Created new cluster_configs table';
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Creating new cluster_dependencies table';
-
-CREATE TABLE cluster_dependencies (
+CREATE TABLE clusters_dependencies (
   cluster_id BIGINT NOT NULL,
   file_id    BIGINT NOT NULL,
   PRIMARY KEY (cluster_id, file_id),
-  CONSTRAINT CLUSTER_DEPENDENCIES_CLUSTER_ID_FK FOREIGN KEY (cluster_id) REFERENCES clusters (id)
+  CONSTRAINT CLUSTERS_DEPENDENCIES_CLUSTER_ID_FK FOREIGN KEY (cluster_id) REFERENCES clusters (id)
     ON DELETE CASCADE,
-  CONSTRAINT CLUSTER_DEPENDENCIES_FILE_ID_FK FOREIGN KEY (file_id) REFERENCES files (id)
+  CONSTRAINT CLUSTERS_DEPENDENCIES_FILE_ID_FK FOREIGN KEY (file_id) REFERENCES files (id)
     ON DELETE RESTRICT
 );
 
-CREATE INDEX CLUSTER_DEPENDENCIES_CLUSTER_ID_INDEX
-  ON cluster_dependencies (cluster_id);
-CREATE INDEX CLUSTER_DEPENDENCIES_FILE_ID_INDEX
-  ON cluster_dependencies (file_id);
+CREATE INDEX CLUSTERS_DEPENDENCIES_CLUSTER_ID_INDEX
+  ON clusters_dependencies (cluster_id);
+CREATE INDEX CLUSTERS_DEPENDENCIES_FILE_ID_INDEX
+  ON clusters_dependencies (file_id);
 
-SELECT
-  CURRENT_TIMESTAMP,
-  'Finished creating new cluster_dependencies table';
+CREATE TABLE clusters_tags (
+  cluster_id BIGINT NOT NULL,
+  tag_id     BIGINT NOT NULL,
+  PRIMARY KEY (cluster_id, tag_id),
+  CONSTRAINT CLUSTERS_TAGS_CLUSTER_ID_FK FOREIGN KEY (cluster_id) REFERENCES clusters (id)
+    ON DELETE CASCADE,
+  CONSTRAINT CLUSTERS_TAGS_TAG_ID_FK FOREIGN KEY (tag_id) REFERENCES tags (id)
+    ON DELETE RESTRICT
+);
 
-SELECT
-  CURRENT_TIMESTAMP,
-  'Creating new commands table';
+CREATE INDEX CLUSTERS_TAGS_CLUSTER_ID_INDEX
+  ON clusters_tags (cluster_id);
+CREATE INDEX CLUSTERS_TAGS_TAG_ID_INDEX
+  ON clusters_tags (tag_id);
 
 CREATE TABLE commands (
-  id             BIGINT IDENTITY                                      NOT NULL,
-  created        DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3)             NOT NULL,
-  updated        DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3)             NOT NULL,
-  entity_version INT DEFAULT '0'                                      NOT NULL,
-  unique_id      VARCHAR(255) DEFAULT UUID()                          NOT NULL,
-  name           VARCHAR(255)                                         NOT NULL,
-  genie_user     VARCHAR(255)                                         NOT NULL,
-  version        VARCHAR(255)                                         NOT NULL,
+  id             BIGINT IDENTITY                                       NOT NULL,
+  created        TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3)             NOT NULL,
+  updated        TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3)             NOT NULL,
+  entity_version INT DEFAULT '0'                                       NOT NULL,
+  unique_id      VARCHAR(255)                                          NOT NULL,
+  name           VARCHAR(255)                                          NOT NULL,
+  genie_user     VARCHAR(255)                                          NOT NULL,
+  version        VARCHAR(255)                                          NOT NULL,
   description    LONGVARCHAR DEFAULT NULL,
   setup_file     BIGINT      DEFAULT NULL,
-  executable     VARCHAR(255)                                         NOT NULL,
-  check_delay    BIGINT DEFAULT '10000'                               NOT NULL,
+  executable     VARCHAR(255)                                          NOT NULL,
+  check_delay    BIGINT DEFAULT '10000'                                NOT NULL,
   memory         INT         DEFAULT NULL,
-  status         VARCHAR(20) DEFAULT 'INACTIVE'                       NOT NULL,
-  PRIMARY KEY (id),
+  status         VARCHAR(20) DEFAULT 'INACTIVE'                        NOT NULL,
+  CONSTRAINT COMMANDS_UNIQUE_ID_UNIQUE_INDEX UNIQUE (unique_id),
   CONSTRAINT COMMANDS_SETUP_FILE_FK FOREIGN KEY (setup_file) REFERENCES files (id)
     ON DELETE RESTRICT
 );
 
-CREATE UNIQUE INDEX COMMANDS_UNIQUE_ID_UNIQUE_INDEX
-  ON commands (unique_id);
 CREATE INDEX COMMANDS_NAME_INDEX
   ON commands (name);
 CREATE INDEX COMMANDS_SETUP_FILE_INDEX
@@ -317,59 +273,50 @@ CREATE INDEX COMMANDS_SETUP_FILE_INDEX
 CREATE INDEX COMMANDS_STATUS_INDEX
   ON commands (status);
 
-SELECT
-  CURRENT_TIMESTAMP,
-  'Finished creating new commands table';
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Creating new command_configs table';
-
-CREATE TABLE command_configs (
+CREATE TABLE commands_configs (
   command_id BIGINT NOT NULL,
   file_id    BIGINT NOT NULL,
   PRIMARY KEY (command_id, file_id),
-  CONSTRAINT COMMAND_CONFIGS_COMMAND_ID_FK FOREIGN KEY (command_id) REFERENCES commands (id)
+  CONSTRAINT COMMANDS_CONFIGS_COMMAND_ID_FK FOREIGN KEY (command_id) REFERENCES commands (id)
     ON DELETE CASCADE,
-  CONSTRAINT COMMAND_CONFIGS_FILE_ID_FK FOREIGN KEY (file_id) REFERENCES files (id)
+  CONSTRAINT COMMANDS_CONFIGS_FILE_ID_FK FOREIGN KEY (file_id) REFERENCES files (id)
     ON DELETE RESTRICT
 );
 
-CREATE INDEX COMMAND_CONFIGS_COMMAND_ID_INDEX
-  ON command_configs (command_id);
-CREATE INDEX COMMAND_CONFIGS_FILE_ID_INDEX
-  ON command_configs (file_id);
+CREATE INDEX COMMANDS_CONFIGS_COMMAND_ID_INDEX
+  ON commands_configs (command_id);
+CREATE INDEX COMMANDS_CONFIGS_FILE_ID_INDEX
+  ON commands_configs (file_id);
 
-SELECT
-  CURRENT_TIMESTAMP,
-  'Created new command_configs table';
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Creating new command_dependencies table';
-
-CREATE TABLE command_dependencies (
+CREATE TABLE commands_dependencies (
   command_id BIGINT NOT NULL,
   file_id    BIGINT NOT NULL,
   PRIMARY KEY (command_id, file_id),
-  CONSTRAINT COMMAND_DEPENDENCIES_COMMAND_ID_FK FOREIGN KEY (command_id) REFERENCES commands (id)
+  CONSTRAINT COMMANDS_DEPENDENCIES_COMMAND_ID_FK FOREIGN KEY (command_id) REFERENCES commands (id)
     ON DELETE CASCADE,
-  CONSTRAINT COMMAND_DEPENDENCIES_FILE_ID_FK FOREIGN KEY (file_id) REFERENCES files (id)
+  CONSTRAINT COMMANDS_DEPENDENCIES_FILE_ID_FK FOREIGN KEY (file_id) REFERENCES files (id)
     ON DELETE RESTRICT
 );
 
-CREATE INDEX COMMAND_DEPENDENCIES_COMMAND_ID_INDEX
-  ON command_dependencies (command_id);
-CREATE INDEX COMMAND_DEPENDENCIES_FILE_ID_INDEX
-  ON command_dependencies (file_id);
+CREATE INDEX COMMANDS_DEPENDENCIES_COMMAND_ID_INDEX
+  ON commands_dependencies (command_id);
+CREATE INDEX COMMANDS_DEPENDENCIES_FILE_ID_INDEX
+  ON commands_dependencies (file_id);
 
-SELECT
-  CURRENT_TIMESTAMP,
-  'Finished creating new command_dependencies table';
+CREATE TABLE commands_tags (
+  command_id BIGINT NOT NULL,
+  tag_id     BIGINT NOT NULL,
+  PRIMARY KEY (command_id, tag_id),
+  CONSTRAINT COMMANDS_TAGS_COMMAND_ID_FK FOREIGN KEY (command_id) REFERENCES commands (id)
+    ON DELETE CASCADE,
+  CONSTRAINT COMMANDS_TAGS_TAG_ID_FK FOREIGN KEY (tag_id) REFERENCES tags (id)
+    ON DELETE RESTRICT
+);
 
-SELECT
-  CURRENT_TIMESTAMP,
-  'Creating new clusters_commands table';
+CREATE INDEX COMMANDS_TAGS_COMMAND_ID_INDEX
+  ON commands_tags (command_id);
+CREATE INDEX COMMANDS_TAGS_TAG_ID_INDEX
+  ON commands_tags (tag_id);
 
 CREATE TABLE clusters_commands (
   cluster_id    BIGINT NOT NULL,
@@ -387,14 +334,6 @@ CREATE INDEX CLUSTERS_COMMANDS_CLUSTER_ID_INDEX
 CREATE INDEX CLUSTERS_COMMANDS_COMMAND_ID_INDEX
   ON clusters_commands (command_id);
 
-SELECT
-  CURRENT_TIMESTAMP,
-  'Finished creating new clusters_commands table';
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Creating into new commands_applications table';
-
 CREATE TABLE commands_applications (
   command_id        BIGINT NOT NULL,
   application_id    BIGINT NOT NULL,
@@ -411,33 +350,25 @@ CREATE INDEX COMMANDS_APPLICATIONS_APPLICATION_ID_INDEX
 CREATE INDEX COMMANDS_APPLICATIONS_COMMAND_ID_INDEX
   ON commands_applications (command_id);
 
-SELECT
-  CURRENT_TIMESTAMP,
-  'Finished creating into new commands_applications table';
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Creating new jobs table';
-
 CREATE TABLE jobs (
   -- common
-  id                        BIGINT IDENTITY                                       NOT NULL,
-  created                   DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3)              NOT NULL,
-  updated                   DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3)              NOT NULL,
-  entity_version            INT DEFAULT '0'                                       NOT NULL,
+  id                        BIGINT IDENTITY                                         NOT NULL,
+  created                   TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3)               NOT NULL,
+  updated                   TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3)               NOT NULL,
+  entity_version            INT DEFAULT '0'                                         NOT NULL,
 
   -- Job Request
-  unique_id                 VARCHAR(255) DEFAULT UUID()                           NOT NULL,
-  name                      VARCHAR(255)                                          NOT NULL,
-  genie_user                VARCHAR(255)                                          NOT NULL,
-  version                   VARCHAR(255)                                          NOT NULL,
+  unique_id                 VARCHAR(255)                                            NOT NULL,
+  name                      VARCHAR(255)                                            NOT NULL,
+  genie_user                VARCHAR(255)                                            NOT NULL,
+  version                   VARCHAR(255)                                            NOT NULL,
   command_criterion         BIGINT        DEFAULT NULL,
   command_args              LONGVARCHAR   DEFAULT NULL,
   description               LONGVARCHAR   DEFAULT NULL,
   setup_file                BIGINT        DEFAULT NULL,
   tags                      VARCHAR(1024) DEFAULT NULL,
   genie_user_group          VARCHAR(255)  DEFAULT NULL,
-  disable_log_archival      BIT(1) DEFAULT b'0'                                   NOT NULL,
+  disable_log_archival      BOOLEAN DEFAULT FALSE                                   NOT NULL,
   email                     VARCHAR(255)  DEFAULT NULL,
   cpu_requested             INT           DEFAULT NULL,
   memory_requested          INT           DEFAULT NULL,
@@ -458,22 +389,20 @@ CREATE TABLE jobs (
   command_name              VARCHAR(255)  DEFAULT NULL,
   cluster_id                INT           DEFAULT NULL,
   cluster_name              VARCHAR(255)  DEFAULT NULL,
-  started                   DATETIME(3)   DEFAULT NULL,
   finished                  DATETIME(3)   DEFAULT NULL,
-  status                    VARCHAR(20) DEFAULT 'INIT'                            NOT NULL,
+  started                   DATETIME(3)   DEFAULT NULL,
+  status                    VARCHAR(20) DEFAULT 'INIT'                              NOT NULL,
   status_msg                VARCHAR(255)  DEFAULT NULL,
 
   -- Job Execution
-  host_name                 VARCHAR(255)                                          NOT NULL,
+  host_name                 VARCHAR(255)                                            NOT NULL,
   process_id                INT           DEFAULT NULL,
   exit_code                 INT           DEFAULT NULL,
   check_delay               BIGINT        DEFAULT NULL,
-  timeout                   DATETIME(3)   DEFAULT NULL,
+  timeout                   TIMESTAMP(3)  DEFAULT NULL,
   memory_used               INT           DEFAULT NULL,
-
-  -- Post Job Info
   archive_location          VARCHAR(1024) DEFAULT NULL,
-  PRIMARY KEY (id),
+  CONSTRAINT JOBS_UNIQUE_ID_UNIQUE_INDEX UNIQUE (unique_id),
   CONSTRAINT JOBS_COMMAND_CRITERION_FK FOREIGN KEY (command_criterion) REFERENCES criteria (id)
     ON DELETE RESTRICT,
   CONSTRAINT JOBS_CLUSTER_ID_FK FOREIGN KEY (cluster_id) REFERENCES clusters (id)
@@ -481,11 +410,8 @@ CREATE TABLE jobs (
   CONSTRAINT JOBS_COMMAND_ID_FK FOREIGN KEY (command_id) REFERENCES commands (id)
     ON DELETE RESTRICT,
   CONSTRAINT JOBS_SETUP_FILE_FK FOREIGN KEY (setup_file) REFERENCES files (id)
-    ON DELETE RESTRICT
 );
 
-CREATE UNIQUE INDEX JOBS_UNIQUE_ID_UNIQUE_INDEX
-  ON jobs (unique_id);
 CREATE INDEX JOBS_CLUSTER_ID_INDEX
   ON jobs (cluster_id);
 CREATE INDEX JOBS_CLUSTER_NAME_INDEX
@@ -517,14 +443,6 @@ CREATE INDEX JOBS_TAGS_INDEX
 CREATE INDEX JOBS_USER_INDEX
   ON jobs (genie_user);
 
-SELECT
-  CURRENT_TIMESTAMP,
-  'Finished creating new jobs table';
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Creating new jobs_applications table';
-
 CREATE TABLE jobs_applications (
   job_id            BIGINT NOT NULL,
   application_id    BIGINT NOT NULL,
@@ -541,83 +459,6 @@ CREATE INDEX JOBS_APPLICATIONS_APPLICATION_ID_INDEX
 CREATE INDEX JOBS_APPLICATIONS_JOB_ID_INDEX
   ON jobs_applications (job_id);
 
-SELECT
-  CURRENT_TIMESTAMP,
-  'Finished creating new jobs_applications table';
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Creating applications_tags table';
-
-CREATE TABLE applications_tags (
-  application_id BIGINT NOT NULL,
-  tag_id         BIGINT NOT NULL,
-  PRIMARY KEY (application_id, tag_id),
-  CONSTRAINT APPLICATIONS_TAGS_APPLICATION_ID_FK FOREIGN KEY (application_id) REFERENCES applications (id)
-    ON DELETE CASCADE,
-  CONSTRAINT APPLICATIONS_TAGS_TAG_ID_FK FOREIGN KEY (tag_id) REFERENCES tags (id)
-    ON DELETE RESTRICT
-);
-
-CREATE INDEX APPLICATIONS_TAGS_APPLICATION_ID_INDEX
-  ON applications_tags (application_id);
-CREATE INDEX APPLICATIONS_TAGS_TAG_ID_INDEX
-  ON applications_tags (tag_id);
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Finished creating applications_tags table';
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Creating clusters_tags table';
-
-CREATE TABLE clusters_tags (
-  cluster_id BIGINT NOT NULL,
-  tag_id     BIGINT NOT NULL,
-  PRIMARY KEY (cluster_id, tag_id),
-  CONSTRAINT CLUSTERS_TAGS_CLUSTER_ID_FK FOREIGN KEY (cluster_id) REFERENCES clusters (id)
-    ON DELETE CASCADE,
-  CONSTRAINT CLUSTERS_TAGS_TAG_ID_FK FOREIGN KEY (tag_id) REFERENCES tags (id)
-    ON DELETE RESTRICT
-);
-
-CREATE INDEX CLUSTERS_TAGS_CLUSTER_ID_INDEX
-  ON clusters_tags (cluster_id);
-CREATE INDEX CLUSTERS_TAGS_TAG_ID_INDEX
-  ON clusters_tags (tag_id);
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Finished creating clusters_tags table';
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Creating commands_tags table';
-
-CREATE TABLE commands_tags (
-  command_id BIGINT NOT NULL,
-  tag_id     BIGINT NOT NULL,
-  PRIMARY KEY (command_id, tag_id),
-  CONSTRAINT COMMANDS_TAGS_COMMAND_ID_FK FOREIGN KEY (command_id) REFERENCES commands (id)
-    ON DELETE CASCADE,
-  CONSTRAINT COMMANDS_TAGS_TAG_ID_FK FOREIGN KEY (tag_id) REFERENCES tags (id)
-    ON DELETE RESTRICT
-);
-
-CREATE INDEX COMMANDS_TAGS_COMMAND_ID_INDEX
-  ON commands_tags (command_id);
-CREATE INDEX COMMANDS_TAGS_TAG_ID_INDEX
-  ON commands_tags (tag_id);
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Finished creating commands_tags table';
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Creating jobs_tags table';
-
 CREATE TABLE jobs_tags (
   job_id BIGINT NOT NULL,
   tag_id BIGINT NOT NULL,
@@ -632,14 +473,6 @@ CREATE INDEX JOBS_TAGS_COMMAND_ID_INDEX
   ON jobs_tags (job_id);
 CREATE INDEX JOBS_TAGS_TAG_ID_INDEX
   ON jobs_tags (tag_id);
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Finished creating jobs_tags table';
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Creating jobs_cluster_criteria table';
 
 CREATE TABLE jobs_cluster_criteria (
   job_id         BIGINT NOT NULL,
@@ -657,14 +490,6 @@ CREATE INDEX JOBS_CLUSTER_CRITERIA_JOB_ID_INDEX
 CREATE INDEX JOBS_CLUSTER_CRITERIA_CRITERION_ID_INDEX
   ON jobs_cluster_criteria (criterion_id);
 
-SELECT
-  CURRENT_TIMESTAMP,
-  'Created jobs_cluster_criteria table';
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Creating job_applications_requested table';
-
 -- NOTE: Don't think we need to applications foreign key here cause user could request some bad apps
 CREATE TABLE job_applications_requested (
   job_id            BIGINT       NOT NULL,
@@ -680,56 +505,32 @@ CREATE INDEX JOB_APPLICATIONS_REQUESTED_APPLICATION_ID_INDEX
 CREATE INDEX JOB_APPLICATIONS_REQUESTED_JOB_ID_INDEX
   ON job_applications_requested (job_id);
 
-SELECT
-  CURRENT_TIMESTAMP,
-  'Created job_applications_requested table';
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Creating job_configs table';
-
-CREATE TABLE job_configs (
+CREATE TABLE jobs_configs (
   job_id  BIGINT NOT NULL,
   file_id BIGINT NOT NULL,
   PRIMARY KEY (job_id, file_id),
-  CONSTRAINT JOB_CONFIGS_JOB_ID_FK FOREIGN KEY (job_id) REFERENCES jobs (id)
+  CONSTRAINT JOBS_CONFIGS_JOB_ID_FK FOREIGN KEY (job_id) REFERENCES jobs (id)
     ON DELETE CASCADE,
-  CONSTRAINT JOB_CONFIGS_FILE_ID_FK FOREIGN KEY (file_id) REFERENCES files (id)
+  CONSTRAINT JOBS_CONFIGS_FILE_ID_FK FOREIGN KEY (file_id) REFERENCES files (id)
     ON DELETE RESTRICT
 );
 
-CREATE INDEX JOB_CONFIGS_JOB_ID_INDEX
-  ON job_configs (job_id);
-CREATE INDEX JOB_CONFIGS_FILE_ID_INDEX
-  ON job_configs (file_id);
+CREATE INDEX JOBS_CONFIGS_JOB_ID_INDEX
+  ON jobs_configs (job_id);
+CREATE INDEX JOBS_CONFIGS_FILE_ID_INDEX
+  ON jobs_configs (file_id);
 
-SELECT
-  CURRENT_TIMESTAMP,
-  'Created job_configs table';
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Creating job_dependencies table';
-
-CREATE TABLE job_dependencies (
+CREATE TABLE jobs_dependencies (
   job_id  BIGINT NOT NULL,
-  fild_id BIGINT NOT NULL,
-  PRIMARY KEY (job_id, fild_id),
-  CONSTRAINT JOB_DEPENDENCIES_JOB_ID_FK FOREIGN KEY (job_id) REFERENCES jobs (id)
+  file_id BIGINT NOT NULL,
+  PRIMARY KEY (job_id, file_id),
+  CONSTRAINT JOBS_DEPENDENCIES_JOB_ID_FK FOREIGN KEY (job_id) REFERENCES jobs (id)
     ON DELETE CASCADE,
-  CONSTRAINT JOB_DEPENDENCIES_FILE_ID_FK FOREIGN KEY (fild_id) REFERENCES files (id)
+  CONSTRAINT JOBS_DEPENDENCIES_FILE_ID_FK FOREIGN KEY (file_id) REFERENCES files (id)
     ON DELETE RESTRICT
 );
 
-CREATE INDEX JOB_DEPENDENCIES_JOB_ID_INDEX
-  ON job_dependencies (job_id);
-CREATE INDEX JOB_DEPENDENCIES_FILE_ID_INDEX
-  ON job_dependencies (fild_id);
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Created job_dependencies table';
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Finished upgrading database schema to 3.3.0';
+CREATE INDEX JOBS_DEPENDENCIES_JOB_ID_INDEX
+  ON jobs_dependencies (job_id);
+CREATE INDEX JOBS_DEPENDENCIES_FILE_ID_INDEX
+  ON jobs_dependencies (file_id);

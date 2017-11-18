@@ -43,7 +43,7 @@ public final class JpaJobSpecs {
     /**
      * Protected constructor for utility class.
      */
-    JpaJobSpecs() {
+    private JpaJobSpecs() {
     }
 
     /**

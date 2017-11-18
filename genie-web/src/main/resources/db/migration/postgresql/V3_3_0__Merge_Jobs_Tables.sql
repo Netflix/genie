@@ -297,6 +297,28 @@ SELECT
 
 SELECT
   CURRENT_TIMESTAMP,
+  'Creating applications_tags table';
+
+CREATE TABLE applications_tags (
+  application_id BIGINT NOT NULL,
+  tag_id         BIGINT NOT NULL,
+  PRIMARY KEY (application_id, tag_id),
+  CONSTRAINT applications_tags_application_id_fkey FOREIGN KEY (application_id) REFERENCES applications (id)
+  ON DELETE CASCADE,
+  CONSTRAINT applications_tags_tag_id_fkey FOREIGN KEY (tag_id) REFERENCES tags (id) ON DELETE RESTRICT
+);
+
+CREATE INDEX applications_tags_application_id_index
+  ON applications_tags (application_id);
+CREATE INDEX applications_tags_tags_id_index
+  ON applications_tags (tag_id);
+
+SELECT
+  CURRENT_TIMESTAMP,
+  'Finished creating applications_tags table';
+
+SELECT
+  CURRENT_TIMESTAMP,
   'Creating new clusters table';
 
 CREATE TABLE clusters (
@@ -371,6 +393,27 @@ CREATE INDEX clusters_dependencies_file_id_index
 SELECT
   CURRENT_TIMESTAMP,
   'Finished creating new cluster_dependencies table';
+
+SELECT
+  CURRENT_TIMESTAMP,
+  'Creating clusters_tags table';
+
+CREATE TABLE clusters_tags (
+  cluster_id BIGINT NOT NULL,
+  tag_id     BIGINT NOT NULL,
+  PRIMARY KEY (cluster_id, tag_id),
+  CONSTRAINT clusters_tags_cluster_id_fkey FOREIGN KEY (cluster_id) REFERENCES clusters (id) ON DELETE CASCADE,
+  CONSTRAINT clusters_tags_tag_id_fkey FOREIGN KEY (tag_id) REFERENCES tags (id) ON DELETE RESTRICT
+);
+
+CREATE INDEX clusters_tags_cluster_id_index
+  ON clusters_tags (cluster_id);
+CREATE INDEX clusters_tags_tags_id_index
+  ON clusters_tags (tag_id);
+
+SELECT
+  CURRENT_TIMESTAMP,
+  'Finished creating clusters_tags table';
 
 SELECT
   CURRENT_TIMESTAMP,
@@ -451,6 +494,26 @@ CREATE INDEX commands_dependencies_file_id_index
 SELECT
   CURRENT_TIMESTAMP,
   'Finished creating new command_dependencies table';
+SELECT
+  CURRENT_TIMESTAMP,
+  'Creating commands_tags table';
+
+CREATE TABLE commands_tags (
+  command_id BIGINT NOT NULL,
+  tag_id     BIGINT NOT NULL,
+  PRIMARY KEY (command_id, tag_id),
+  CONSTRAINT commands_tags_command_id_fkey FOREIGN KEY (command_id) REFERENCES commands (id) ON DELETE CASCADE,
+  CONSTRAINT commands_tags_tag_id_fkey FOREIGN KEY (tag_id) REFERENCES tags (id) ON DELETE RESTRICT
+);
+
+CREATE INDEX commands_tags_command_id_index
+  ON commands_tags (command_id);
+CREATE INDEX commands_tags_tags_id_index
+  ON commands_tags (tag_id);
+
+SELECT
+  CURRENT_TIMESTAMP,
+  'Finished creating commands_tags table';
 
 SELECT
   CURRENT_TIMESTAMP,
@@ -623,70 +686,6 @@ CREATE INDEX jobs_applications_job_id_index
 SELECT
   CURRENT_TIMESTAMP,
   'Finished creating new jobs_applications table';
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Creating applications_tags table';
-
-CREATE TABLE applications_tags (
-  application_id BIGINT NOT NULL,
-  tag_id         BIGINT NOT NULL,
-  PRIMARY KEY (application_id, tag_id),
-  CONSTRAINT applications_tags_application_id_fkey FOREIGN KEY (application_id) REFERENCES applications (id)
-  ON DELETE CASCADE,
-  CONSTRAINT applications_tags_tag_id_fkey FOREIGN KEY (tag_id) REFERENCES tags (id) ON DELETE RESTRICT
-);
-
-CREATE INDEX applications_tags_application_id_index
-  ON applications_tags (application_id);
-CREATE INDEX applications_tags_tags_id_index
-  ON applications_tags (tag_id);
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Finished creating applications_tags table';
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Creating clusters_tags table';
-
-CREATE TABLE clusters_tags (
-  cluster_id BIGINT NOT NULL,
-  tag_id     BIGINT NOT NULL,
-  PRIMARY KEY (cluster_id, tag_id),
-  CONSTRAINT clusters_tags_cluster_id_fkey FOREIGN KEY (cluster_id) REFERENCES clusters (id) ON DELETE CASCADE,
-  CONSTRAINT clusters_tags_tag_id_fkey FOREIGN KEY (tag_id) REFERENCES tags (id) ON DELETE RESTRICT
-);
-
-CREATE INDEX clusters_tags_cluster_id_index
-  ON clusters_tags (cluster_id);
-CREATE INDEX clusters_tags_tags_id_index
-  ON clusters_tags (tag_id);
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Finished creating clusters_tags table';
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Creating commands_tags table';
-
-CREATE TABLE commands_tags (
-  command_id BIGINT NOT NULL,
-  tag_id     BIGINT NOT NULL,
-  PRIMARY KEY (command_id, tag_id),
-  CONSTRAINT commands_tags_command_id_fkey FOREIGN KEY (command_id) REFERENCES commands (id) ON DELETE CASCADE,
-  CONSTRAINT commands_tags_tag_id_fkey FOREIGN KEY (tag_id) REFERENCES tags (id) ON DELETE RESTRICT
-);
-
-CREATE INDEX commands_tags_command_id_index
-  ON commands_tags (command_id);
-CREATE INDEX commands_tags_tags_id_index
-  ON commands_tags (tag_id);
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Finished creating commands_tags table';
 
 SELECT
   CURRENT_TIMESTAMP,

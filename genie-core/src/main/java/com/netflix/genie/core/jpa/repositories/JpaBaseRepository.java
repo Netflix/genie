@@ -44,6 +44,7 @@ public interface JpaBaseRepository<E extends BaseEntity> extends JpaIdRepository
     /**
      * Find an entity by its unique id.
      *
+     * @param <T>      The class type which is a projection of E
      * @param uniqueId The unique id to find an entity for
      * @param type     The entity or projection type to return
      * @return The entity found or empty Optional

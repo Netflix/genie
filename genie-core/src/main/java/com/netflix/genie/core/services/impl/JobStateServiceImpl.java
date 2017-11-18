@@ -107,7 +107,8 @@ public class JobStateServiceImpl implements JobStateService {
             () -> {
                 final JobInfo jobInfo = jobs.get(jobId);
                 jobInfo.setMemory(memory);
-                final JobLauncher jobLauncher = new JobLauncher(this.jobSubmitterService,
+                final JobLauncher jobLauncher = new JobLauncher(
+                    this.jobSubmitterService,
                     jobRequest,
                     cluster,
                     command,
@@ -153,6 +154,14 @@ public class JobStateServiceImpl implements JobStateService {
         );
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean jobExists(final String jobId) {
+        return jobs.containsKey(jobId);
+    }
+
     private void handle(final String jobId, final Supplier<Void> supplier) {
         JobInfo jobInfo = jobs.get(jobId);
         if (jobInfo != null) {
@@ -163,14 +172,6 @@ public class JobStateServiceImpl implements JobStateService {
                 }
             }
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean jobExists(final String jobId) {
-        return jobs.containsKey(jobId);
     }
 
     protected void setMemoryAndTask(final String jobId, final int memory, final Future<?> task) {

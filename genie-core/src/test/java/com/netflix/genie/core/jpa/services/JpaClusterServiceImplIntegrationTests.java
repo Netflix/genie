@@ -321,11 +321,11 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
             Sets.newHashSet("pig")
         ).build();
 
-        Assert.assertThat(this.service.chooseClusterForJobRequest(one).size(), Matchers.is(1));
-        Assert.assertThat(this.service.chooseClusterForJobRequest(two).size(), Matchers.is(0));
-        Assert.assertThat(this.service.chooseClusterForJobRequest(three).size(), Matchers.is(0));
-        Assert.assertThat(this.service.chooseClusterForJobRequest(four).size(), Matchers.is(2));
-        Assert.assertThat(this.service.chooseClusterForJobRequest(five).size(), Matchers.is(2));
+        Assert.assertThat(this.service.findClustersAndCommandsForJob(one).size(), Matchers.is(1));
+        Assert.assertThat(this.service.findClustersAndCommandsForJob(two).size(), Matchers.is(0));
+        Assert.assertThat(this.service.findClustersAndCommandsForJob(three).size(), Matchers.is(0));
+        Assert.assertThat(this.service.findClustersAndCommandsForJob(four).size(), Matchers.is(2));
+        Assert.assertThat(this.service.findClustersAndCommandsForJob(five).size(), Matchers.is(2));
     }
 
     /**

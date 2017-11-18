@@ -19,10 +19,8 @@ import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.core.jpa.entities.ClusterEntity;
 import com.netflix.genie.core.jpa.entities.ClusterEntity_;
-import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.entities.TagEntity;
 import com.netflix.genie.test.categories.UnitTest;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -33,7 +31,6 @@ import org.springframework.data.jpa.domain.Specification;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.ListJoin;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -54,24 +51,16 @@ public class JpaClusterSpecsUnitTests {
     private static final TagEntity TAG_1 = new TagEntity("prod");
     private static final TagEntity TAG_2 = new TagEntity("yarn");
     private static final TagEntity TAG_3 = new TagEntity("hadoop");
-    private static final TagEntity COMMAND_CRITERIA_TAG_1 = new TagEntity("hive");
-    private static final TagEntity COMMAND_CRITERIA_TAG_2 = new TagEntity("prod");
     private static final ClusterStatus STATUS_1 = ClusterStatus.UP;
     private static final ClusterStatus STATUS_2 = ClusterStatus.OUT_OF_SERVICE;
     private static final Set<TagEntity> TAGS = Sets.newHashSet(TAG_1, TAG_2, TAG_3);
     private static final Set<ClusterStatus> STATUSES = EnumSet.noneOf(ClusterStatus.class);
     private static final Date MIN_UPDATE_TIME = new Date(123467L);
     private static final Date MAX_UPDATE_TIME = new Date(1234643L);
-    private static final Set<TagEntity> CLUSTER_CRITERIA_TAGS = Sets.newHashSet(TAG_1, TAG_2, TAG_3);
-    private static final Set<TagEntity> COMMAND_CRITERIA = Sets.newHashSet(
-        COMMAND_CRITERIA_TAG_1,
-        COMMAND_CRITERIA_TAG_2
-    );
 
     private Root<ClusterEntity> root;
     private CriteriaQuery<?> cq;
     private CriteriaBuilder cb;
-    private ListJoin<ClusterEntity, CommandEntity> commands;
     private SetJoin<ClusterEntity, TagEntity> tagEntityJoin;
 
     /**
@@ -92,7 +81,6 @@ public class JpaClusterSpecsUnitTests {
         this.root = (Root<ClusterEntity>) Mockito.mock(Root.class);
         this.cq = Mockito.mock(CriteriaQuery.class);
         this.cb = Mockito.mock(CriteriaBuilder.class);
-        this.commands = (ListJoin<ClusterEntity, CommandEntity>) Mockito.mock(ListJoin.class);
 
         final Path<Long> idPath = (Path<Long>) Mockito.mock(Path.class);
         Mockito.when(this.root.get(ClusterEntity_.id)).thenReturn(idPath);
@@ -130,9 +118,6 @@ public class JpaClusterSpecsUnitTests {
         Mockito.when(this.cb.count(idPath)).thenReturn(idCountExpression);
         final Predicate havingPredicate = Mockito.mock(Predicate.class);
         Mockito.when(this.cb.equal(idCountExpression, TAGS.size())).thenReturn(havingPredicate);
-
-        // Setup for findByClusterAndCommandCriteria
-        Mockito.when(this.root.join(ClusterEntity_.commands)).thenReturn(this.commands);
     }
 
     /**
@@ -378,37 +363,5 @@ public class JpaClusterSpecsUnitTests {
             Mockito.verify(this.cb, Mockito.times(1))
                 .equal(this.root.get(ClusterEntity_.status), status);
         }
-    }
-
-//    /**
-//     * Test to all predicates are added.
-//     *
-//     * @throws GenieException For any problem
-//     */
-//    @Test
-//    //TODO
-//    public void testFindByClusterAndCommandCriteria() throws GenieException {
-//        final ClusterCriteria criteria = new ClusterCriteria(CLUSTER_CRITERIA_TAGS);
-//        final Specification<ClusterEntity> spec
-//            = JpaClusterSpecs.findByClusterAndCommandCriteria(criteria, COMMAND_CRITERIA);
-//
-//        spec.toPredicate(this.root, this.cq, this.cb);
-//        Mockito.verify(this.cq, Mockito.times(1)).distinct(true);
-//        Mockito.verify(this.cb, Mockito.times(1))
-//            .equal(Mockito.eq(this.commands.get(CommandEntity_.status)), Mockito.eq(CommandStatus.ACTIVE));
-//        Mockito.verify(this.cb, Mockito.times(1))
-//            .equal(Mockito.eq(this.root.get(ClusterEntity_.status)), Mockito.eq(ClusterStatus.UP));
-//        Mockito.verify(this.cb, Mockito.times(1))
-//            .like(Mockito.eq(this.root.get(ClusterEntity_.tags)), Mockito.eq(this.tagLikeStatement));
-//        Mockito.verify(this.cb, Mockito.times(1))
-//            .like(Mockito.eq(this.commands.get(CommandEntity_.tags)), Mockito.eq(this.commandLikeStatement));
-//    }
-
-    /**
-     * Here for completeness.
-     */
-    @Test
-    public void testProtectedConstructor() {
-        Assert.assertNotNull(new JpaClusterSpecs());
     }
 }

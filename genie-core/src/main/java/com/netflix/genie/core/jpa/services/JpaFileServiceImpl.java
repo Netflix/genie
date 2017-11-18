@@ -52,7 +52,6 @@ public class JpaFileServiceImpl implements FileService {
      * {@inheritDoc}
      */
     @Override
-    // TODO: Test whether we need new transaction or not
 //    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void createFileIfNotExists(@NotBlank final String file) throws GenieException {
         if (this.fileRepository.existsByFile(file)) {
