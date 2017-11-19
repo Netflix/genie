@@ -160,7 +160,7 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
         final String user = UUID.randomUUID().toString();
         final String version = UUID.randomUUID().toString();
         final String description = UUID.randomUUID().toString();
-        final String commandArgs = UUID.randomUUID().toString();
+        final List<String> commandArgs = Lists.newArrayList(UUID.randomUUID().toString());
         final String group = UUID.randomUUID().toString();
         final String setupFile = UUID.randomUUID().toString();
         final String clusterTag1 = UUID.randomUUID().toString();
@@ -195,10 +195,11 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
         // TODO: grouping and grouping instance
 
         final JobRequest jobRequest = new JobRequest.Builder(
-            name, user, version, commandArgs, clusterCriteria, commandCriterion
+            name, user, version, clusterCriteria, commandCriterion
         )
             .withId(uniqueId)
             .withDescription(description)
+            .withCommandArgs(commandArgs)
             .withGroup(group)
             .withSetupFile(setupFile)
             .withConfigs(configs)
@@ -236,8 +237,8 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
         final JobStatus status = JobStatus.RUNNING;
         final String statusMsg = UUID.randomUUID().toString();
 
-        final Job job = new Job.Builder(
-            name, user, version, commandArgs
+        final Job.Builder jobBuilder = new Job.Builder(
+            name, user, version
         )
             .withId(uniqueId)
             .withDescription(description)
@@ -246,8 +247,10 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
             .withStarted(started)
             .withFinished(finished)
             .withStatus(status)
-            .withStatusMsg(statusMsg)
-            .build();
+            .withStatusMsg(statusMsg);
+
+        jobBuilder.withCommandArgs(commandArgs);
+        final Job job = jobBuilder.build();
 
         // Job Execution fields
         final String hostName = UUID.randomUUID().toString();

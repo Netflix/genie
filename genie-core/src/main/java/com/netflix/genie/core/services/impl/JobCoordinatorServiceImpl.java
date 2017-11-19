@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.core.services.impl;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Cluster;
@@ -50,6 +51,7 @@ import com.netflix.spectator.api.Counter;
 import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Registry;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.aop.TargetClassAware;
@@ -179,14 +181,20 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
             final Job.Builder jobBuilder = new Job.Builder(
                 jobRequest.getName(),
                 jobRequest.getUser(),
-                jobRequest.getVersion(),
-                jobRequest.getCommandArgs().orElse(null)
+                jobRequest.getVersion()
             )
                 .withId(jobId)
                 .withTags(jobRequest.getTags())
                 .withStatus(JobStatus.INIT)
                 .withStatusMsg("Job Accepted and in initialization phase.");
 
+            jobRequest.getCommandArgs().ifPresent(
+                commandArgs ->
+                    jobBuilder
+                        .withCommandArgs(
+                            Lists.newArrayList(StringUtils.splitByWholeSeparator(commandArgs, StringUtils.SPACE))
+                        )
+            );
             jobRequest.getDescription().ifPresent(jobBuilder::withDescription);
             if (!jobRequest.isDisableLogArchival()) {
                 jobBuilder.withArchiveLocation(

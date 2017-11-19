@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.core.jpa.services;
 
+import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterCriteria;
@@ -35,6 +36,7 @@ import com.netflix.genie.core.jpa.entities.projections.JobExecutionProjection;
 import com.netflix.genie.core.jpa.entities.projections.JobMetadataProjection;
 import com.netflix.genie.core.jpa.entities.projections.JobProjection;
 import com.netflix.genie.core.jpa.entities.projections.JobRequestProjection;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.stream.Collectors;
 
@@ -146,8 +148,7 @@ public final class JpaServiceUtils {
         final Job.Builder builder = new Job.Builder(
             jobProjection.getName(),
             jobProjection.getUser(),
-            jobProjection.getVersion(),
-            jobProjection.getCommandArgs().orElse(null)
+            jobProjection.getVersion()
         )
             .withId(jobProjection.getUniqueId())
             .withCreated(jobProjection.getCreated())
@@ -155,6 +156,13 @@ public final class JpaServiceUtils {
             .withTags(jobProjection.getTags().stream().map(TagEntity::getTag).collect(Collectors.toSet()))
             .withStatus(jobProjection.getStatus());
 
+        jobProjection.getCommandArgs().ifPresent(
+            commandArgs ->
+                builder
+                    .withCommandArgs(
+                        Lists.newArrayList(StringUtils.splitByWholeSeparator(commandArgs, StringUtils.SPACE))
+                    )
+        );
         jobProjection.getDescription().ifPresent(builder::withDescription);
         jobProjection.getStatusMsg().ifPresent(builder::withStatusMsg);
         jobProjection.getStarted().ifPresent(builder::withStarted);
@@ -171,7 +179,6 @@ public final class JpaServiceUtils {
             jobRequestProjection.getName(),
             jobRequestProjection.getUser(),
             jobRequestProjection.getVersion(),
-            jobRequestProjection.getCommandArgs().orElse(null),
             jobRequestProjection
                 .getClusterCriteria()
                 .stream()
@@ -207,6 +214,13 @@ public final class JpaServiceUtils {
             .withApplications(jobRequestProjection.getApplicationsRequested())
             .withTimeout(jobRequestProjection.getTimeoutRequested().orElse(null));
 
+        jobRequestProjection.getCommandArgs().ifPresent(
+            commandArgs ->
+                builder
+                    .withCommandArgs(
+                        Lists.newArrayList(StringUtils.splitByWholeSeparator(commandArgs, StringUtils.SPACE))
+                    )
+        );
         jobRequestProjection.getEmail().ifPresent(builder::withEmail);
         jobRequestProjection.getGenieUserGroup().ifPresent(builder::withGroup);
         jobRequestProjection.getDescription().ifPresent(builder::withDescription);

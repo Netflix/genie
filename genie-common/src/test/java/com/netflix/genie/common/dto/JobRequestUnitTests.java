@@ -20,6 +20,7 @@ package com.netflix.genie.common.dto;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.netflix.genie.test.categories.UnitTest;
+import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
@@ -42,7 +43,7 @@ public class JobRequestUnitTests {
     private static final String NAME = UUID.randomUUID().toString();
     private static final String USER = UUID.randomUUID().toString();
     private static final String VERSION = UUID.randomUUID().toString();
-    private static final String COMMAND_ARGS = UUID.randomUUID().toString();
+    private static final List<String> COMMAND_ARGS = Lists.newArrayList(UUID.randomUUID().toString());
     private static final List<ClusterCriteria> CLUSTER_CRITERIAS = Lists.newArrayList(
         new ClusterCriteria(
             Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
@@ -63,15 +64,22 @@ public class JobRequestUnitTests {
      * Test to make sure can build a valid JobRequest using the builder.
      */
     @Test
-    public void canBuildJobRequest() {
-        final JobRequest request
-            = new JobRequest.Builder(NAME, USER, VERSION, COMMAND_ARGS, CLUSTER_CRITERIAS, COMMAND_CRITERIA).build();
+    @SuppressWarnings("deprecation")
+    public void canBuildJobRequestDeprecated() {
+        final JobRequest request = new JobRequest.Builder(
+            NAME,
+            USER,
+            VERSION,
+            StringUtils.join(COMMAND_ARGS, StringUtils.SPACE),
+            CLUSTER_CRITERIAS,
+            COMMAND_CRITERIA
+        ).build();
         Assert.assertThat(request.getName(), Matchers.is(NAME));
         Assert.assertThat(request.getUser(), Matchers.is(USER));
         Assert.assertThat(request.getVersion(), Matchers.is(VERSION));
         Assert.assertThat(
             request.getCommandArgs().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(COMMAND_ARGS)
+            Matchers.is(StringUtils.join(COMMAND_ARGS, StringUtils.SPACE))
         );
         Assert.assertThat(request.getClusterCriterias(), Matchers.is(CLUSTER_CRITERIAS));
         Assert.assertThat(request.getCommandCriteria(), Matchers.is(COMMAND_CRITERIA));
@@ -90,6 +98,40 @@ public class JobRequestUnitTests {
         Assert.assertFalse(request.getUpdated().isPresent());
         Assert.assertThat(request.getApplications(), Matchers.empty());
         Assert.assertFalse(request.getTimeout().isPresent());
+        Assert.assertFalse(request.getGrouping().isPresent());
+        Assert.assertFalse(request.getGroupingInstance().isPresent());
+    }
+
+    /**
+     * Test to make sure can build a valid JobRequest using the builder.
+     */
+    @Test
+    public void canBuildJobRequest() {
+        final JobRequest request
+            = new JobRequest.Builder(NAME, USER, VERSION, CLUSTER_CRITERIAS, COMMAND_CRITERIA).build();
+        Assert.assertThat(request.getName(), Matchers.is(NAME));
+        Assert.assertThat(request.getUser(), Matchers.is(USER));
+        Assert.assertThat(request.getVersion(), Matchers.is(VERSION));
+        Assert.assertFalse(request.getCommandArgs().isPresent());
+        Assert.assertThat(request.getClusterCriterias(), Matchers.is(CLUSTER_CRITERIAS));
+        Assert.assertThat(request.getCommandCriteria(), Matchers.is(COMMAND_CRITERIA));
+        Assert.assertFalse(request.getCpu().isPresent());
+        Assert.assertThat(request.isDisableLogArchival(), Matchers.is(false));
+        Assert.assertFalse(request.getEmail().isPresent());
+        Assert.assertThat(request.getConfigs(), Matchers.empty());
+        Assert.assertThat(request.getDependencies(), Matchers.empty());
+        Assert.assertFalse(request.getGroup().isPresent());
+        Assert.assertFalse(request.getMemory().isPresent());
+        Assert.assertFalse(request.getSetupFile().isPresent());
+        Assert.assertFalse(request.getCreated().isPresent());
+        Assert.assertFalse(request.getDescription().isPresent());
+        Assert.assertFalse(request.getId().isPresent());
+        Assert.assertThat(request.getTags(), Matchers.empty());
+        Assert.assertFalse(request.getUpdated().isPresent());
+        Assert.assertThat(request.getApplications(), Matchers.empty());
+        Assert.assertFalse(request.getTimeout().isPresent());
+        Assert.assertFalse(request.getGrouping().isPresent());
+        Assert.assertFalse(request.getGroupingInstance().isPresent());
     }
 
     /**
@@ -98,9 +140,12 @@ public class JobRequestUnitTests {
      * @throws Exception on error
      */
     @Test
-    public void canBuildJobRequestWithOptionals() throws Exception {
+    @SuppressWarnings("deprecation")
+    public void canBuildJobRequestWithOptionalsDeprecated() throws Exception {
         final JobRequest.Builder builder
-            = new JobRequest.Builder(NAME, USER, VERSION, COMMAND_ARGS, CLUSTER_CRITERIAS, COMMAND_CRITERIA);
+            = new JobRequest.Builder(NAME, USER, VERSION, CLUSTER_CRITERIAS, COMMAND_CRITERIA);
+
+        builder.withCommandArgs(StringUtils.join(COMMAND_ARGS, StringUtils.SPACE));
 
         final int cpu = 5;
         builder.withCpu(cpu);
@@ -164,13 +209,19 @@ public class JobRequestUnitTests {
         final int timeout = 8970243;
         builder.withTimeout(timeout);
 
+        final String grouping = UUID.randomUUID().toString();
+        builder.withGrouping(grouping);
+
+        final String groupingInstance = UUID.randomUUID().toString();
+        builder.withGroupingInstance(groupingInstance);
+
         final JobRequest request = builder.build();
         Assert.assertThat(request.getName(), Matchers.is(NAME));
         Assert.assertThat(request.getUser(), Matchers.is(USER));
         Assert.assertThat(request.getVersion(), Matchers.is(VERSION));
         Assert.assertThat(
             request.getCommandArgs().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(COMMAND_ARGS)
+            Matchers.is(StringUtils.join(COMMAND_ARGS, StringUtils.SPACE))
         );
         Assert.assertThat(request.getClusterCriterias(), Matchers.is(CLUSTER_CRITERIAS));
         Assert.assertThat(request.getCommandCriteria(), Matchers.is(COMMAND_CRITERIA));
@@ -191,6 +242,125 @@ public class JobRequestUnitTests {
         Assert.assertThat(request.getUpdated().orElseThrow(IllegalArgumentException::new), Matchers.is(updated));
         Assert.assertThat(request.getApplications(), Matchers.is(applications));
         Assert.assertThat(request.getTimeout().orElseThrow(IllegalArgumentException::new), Matchers.is(timeout));
+        Assert.assertThat(request.getGrouping().orElseThrow(IllegalArgumentException::new), Matchers.is(grouping));
+        Assert.assertThat(
+            request.getGroupingInstance().orElseThrow(IllegalArgumentException::new),
+            Matchers.is(groupingInstance)
+        );
+    }
+
+    /**
+     * Test to make sure can build a valid JobRequest with optional parameters.
+     *
+     * @throws Exception on error
+     */
+    @Test
+    public void canBuildJobRequestWithOptionals() throws Exception {
+        final JobRequest.Builder builder
+            = new JobRequest.Builder(NAME, USER, VERSION, CLUSTER_CRITERIAS, COMMAND_CRITERIA);
+
+        builder.withCommandArgs(COMMAND_ARGS);
+
+        final int cpu = 5;
+        builder.withCpu(cpu);
+
+        final boolean disableLogArchival = true;
+        builder.withDisableLogArchival(disableLogArchival);
+
+        final String email = UUID.randomUUID().toString() + "@netflix.com";
+        builder.withEmail(email);
+
+        final Set<String> configs = Sets.newHashSet(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
+        );
+        builder.withConfigs(configs);
+
+        final Set<String> dependencies = Sets.newHashSet(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
+        );
+        builder.withDependencies(dependencies);
+
+        final String group = UUID.randomUUID().toString();
+        builder.withGroup(group);
+
+        final int memory = 2048;
+        builder.withMemory(memory);
+
+        final String setupFile = UUID.randomUUID().toString();
+        builder.withSetupFile(setupFile);
+
+        final Date created = new Date();
+        builder.withCreated(created);
+
+        final String description = UUID.randomUUID().toString();
+        builder.withDescription(description);
+
+        final String id = UUID.randomUUID().toString();
+        builder.withId(id);
+
+        final Set<String> tags = Sets.newHashSet(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
+        );
+        builder.withTags(tags);
+
+        final Date updated = new Date();
+        builder.withUpdated(updated);
+
+        final List<String> applications = Lists.newArrayList(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
+        );
+        builder.withApplications(applications);
+
+        final int timeout = 8970243;
+        builder.withTimeout(timeout);
+
+        final String grouping = UUID.randomUUID().toString();
+        builder.withGrouping(grouping);
+
+        final String groupingInstance = UUID.randomUUID().toString();
+        builder.withGroupingInstance(groupingInstance);
+
+        final JobRequest request = builder.build();
+        Assert.assertThat(request.getName(), Matchers.is(NAME));
+        Assert.assertThat(request.getUser(), Matchers.is(USER));
+        Assert.assertThat(request.getVersion(), Matchers.is(VERSION));
+        Assert.assertThat(
+            request.getCommandArgs().orElseThrow(IllegalArgumentException::new),
+            Matchers.is(StringUtils.join(COMMAND_ARGS, StringUtils.SPACE))
+        );
+        Assert.assertThat(request.getClusterCriterias(), Matchers.is(CLUSTER_CRITERIAS));
+        Assert.assertThat(request.getCommandCriteria(), Matchers.is(COMMAND_CRITERIA));
+        Assert.assertThat(request.getCpu().orElseThrow(IllegalArgumentException::new), Matchers.is(cpu));
+        Assert.assertThat(request.isDisableLogArchival(), Matchers.is(disableLogArchival));
+        Assert.assertThat(request.getEmail().orElseThrow(IllegalArgumentException::new), Matchers.is(email));
+        Assert.assertThat(request.getConfigs(), Matchers.is(configs));
+        Assert.assertThat(request.getDependencies(), Matchers.is(dependencies));
+        Assert.assertThat(request.getGroup().orElseThrow(IllegalArgumentException::new), Matchers.is(group));
+        Assert.assertThat(request.getMemory().orElseThrow(IllegalArgumentException::new), Matchers.is(memory));
+        Assert.assertThat(request.getSetupFile().orElseThrow(IllegalArgumentException::new), Matchers.is(setupFile));
+        Assert.assertThat(request.getCreated().orElseThrow(IllegalArgumentException::new), Matchers.is(created));
+        Assert.assertThat(
+            request.getDescription().orElseThrow(IllegalArgumentException::new), Matchers.is(description)
+        );
+        Assert.assertThat(request.getId().orElseThrow(IllegalArgumentException::new), Matchers.is(id));
+        Assert.assertThat(request.getTags(), Matchers.is(tags));
+        Assert.assertThat(request.getUpdated().orElseThrow(IllegalArgumentException::new), Matchers.is(updated));
+        Assert.assertThat(request.getApplications(), Matchers.is(applications));
+        Assert.assertThat(request.getTimeout().orElseThrow(IllegalArgumentException::new), Matchers.is(timeout));
+        Assert.assertThat(request.getGrouping().orElseThrow(IllegalArgumentException::new), Matchers.is(grouping));
+        Assert.assertThat(
+            request.getGroupingInstance().orElseThrow(IllegalArgumentException::new),
+            Matchers.is(groupingInstance)
+        );
     }
 
     /**
@@ -198,7 +368,8 @@ public class JobRequestUnitTests {
      */
     @Test
     public void canBuildJobRequestWithNulls() {
-        final JobRequest.Builder builder = new JobRequest.Builder(NAME, USER, VERSION, COMMAND_ARGS, null, null);
+        final JobRequest.Builder builder = new JobRequest.Builder(NAME, USER, VERSION, null, null);
+        builder.withCommandArgs((List<String>) null);
         builder.withEmail(null);
         builder.withConfigs(null);
         builder.withDependencies(null);
@@ -215,10 +386,7 @@ public class JobRequestUnitTests {
         Assert.assertThat(request.getName(), Matchers.is(NAME));
         Assert.assertThat(request.getUser(), Matchers.is(USER));
         Assert.assertThat(request.getVersion(), Matchers.is(VERSION));
-        Assert.assertThat(
-            request.getCommandArgs().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(COMMAND_ARGS)
-        );
+        Assert.assertFalse(request.getCommandArgs().isPresent());
         Assert.assertThat(request.getClusterCriterias(), Matchers.empty());
         Assert.assertThat(request.getCommandCriteria(), Matchers.empty());
         Assert.assertFalse(request.getCpu().isPresent());
@@ -243,7 +411,7 @@ public class JobRequestUnitTests {
      */
     @Test
     public void canFindEquality() {
-        final JobRequest.Builder builder = new JobRequest.Builder(NAME, USER, VERSION, COMMAND_ARGS, null, null);
+        final JobRequest.Builder builder = new JobRequest.Builder(NAME, USER, VERSION, null, null);
         builder.withEmail(null);
         builder.withConfigs(null);
         builder.withDependencies(null);
@@ -271,7 +439,7 @@ public class JobRequestUnitTests {
      */
     @Test
     public void canUseHashCode() {
-        final JobRequest.Builder builder = new JobRequest.Builder(NAME, USER, VERSION, COMMAND_ARGS, null, null);
+        final JobRequest.Builder builder = new JobRequest.Builder(NAME, USER, VERSION, null, null);
         builder.withEmail(null);
         builder.withConfigs(null);
         builder.withDependencies(null);

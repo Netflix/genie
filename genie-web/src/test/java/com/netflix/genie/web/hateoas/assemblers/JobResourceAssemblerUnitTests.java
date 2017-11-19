@@ -42,7 +42,6 @@ public class JobResourceAssemblerUnitTests {
     private static final String NAME = UUID.randomUUID().toString();
     private static final String USER = UUID.randomUUID().toString();
     private static final String VERSION = UUID.randomUUID().toString();
-    private static final String COMMAND_ARGS = UUID.randomUUID().toString();
 
     private Job job;
     private JobResourceAssembler assembler;
@@ -52,7 +51,7 @@ public class JobResourceAssemblerUnitTests {
      */
     @Before
     public void setup() {
-        this.job = new Job.Builder(NAME, USER, VERSION, COMMAND_ARGS).withId(ID).build();
+        this.job = new Job.Builder(NAME, USER, VERSION).withId(ID).build();
         this.assembler = new JobResourceAssembler();
     }
 

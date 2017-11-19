@@ -284,12 +284,10 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
             Lists.newArrayList(new ClusterCriteria(Sets.newHashSet("genie.id:cluster1"))),
             Sets.newHashSet("pig")
         ).build();
         final JobRequest two = new JobRequest.Builder(
-            UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
@@ -300,7 +298,6 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
             Lists.newArrayList(new ClusterCriteria(Sets.newHashSet("genie.id:cluster1"))),
             Sets.newHashSet("pi")
         ).build();
@@ -308,12 +305,10 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
             Lists.newArrayList(new ClusterCriteria(Sets.newHashSet("pig"))),
             Sets.newHashSet("pig")
         ).build();
         final JobRequest five = new JobRequest.Builder(
-            UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),

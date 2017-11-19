@@ -82,7 +82,6 @@ class ScriptLoadBalancerSpec extends Specification {
             "jobName",
             "jobUser",
             "jobVersion",
-            "jobCommandAgs",
             Lists.newArrayList(
                     new ClusterCriteria(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
             ),

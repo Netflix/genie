@@ -2,7 +2,7 @@
  *
  *  Copyright 2016 Netflix, Inc.
  *
- *     Licensed under the Apache License, Version 2.0 (the "License");
+ *     Licensed under the Apache License, Version 2.0 (the "License")
  *     you may not use this file except in compliance with the License.
  *     You may obtain a copy of the License at
  *
@@ -20,12 +20,7 @@ package com.netflix.genie.web.tasks.job
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableMap
 import com.google.common.io.Files
-import com.netflix.genie.common.dto.Application
-import com.netflix.genie.common.dto.Cluster
-import com.netflix.genie.common.dto.Command
-import com.netflix.genie.common.dto.Job
-import com.netflix.genie.common.dto.JobRequest
-import com.netflix.genie.common.dto.JobStatus
+import com.netflix.genie.common.dto.*
 import com.netflix.genie.common.exceptions.GenieServerException
 import com.netflix.genie.core.events.JobFinishedEvent
 import com.netflix.genie.core.events.JobFinishedReason
@@ -41,6 +36,7 @@ import com.netflix.spectator.api.Counter
 import com.netflix.spectator.api.Id
 import com.netflix.spectator.api.Registry
 import com.netflix.spectator.api.Timer
+import org.assertj.core.util.Lists
 import org.junit.Rule
 import org.junit.experimental.categories.Category
 import org.junit.rules.TemporaryFolder
@@ -50,7 +46,6 @@ import spock.lang.Specification
 
 import java.util.concurrent.TimeUnit
 
-
 /**
  * Unit tests for JobCompletionHandler
  *
@@ -58,32 +53,32 @@ import java.util.concurrent.TimeUnit
  * @since 3.0.0
  */
 @Category(UnitTest.class)
-class JobCompletionServiceSpec extends Specification{
-    private static final String NAME = UUID.randomUUID().toString();
-    private static final String USER = UUID.randomUUID().toString();
-    private static final String VERSION = UUID.randomUUID().toString();
-    private static final String COMMAND_ARGS = UUID.randomUUID().toString();
-    JobPersistenceService jobPersistenceService;
-    JobSearchService jobSearchService;
-    JobCompletionService jobCompletionService;
-    MailService mailService;
-    GenieFileTransferService genieFileTransferService;
-    JobsProperties jobsProperties;
-    Registry registry;
-    Id completionTimerId;
-    Timer completionTimer;
-    Map<String, String> timerTagsCapture;
-    Id errorCounterId;
-    Counter errorCounter;
-    List<Map<String, String>> counterTagsCaptures;
+class JobCompletionServiceSpec extends Specification {
+    private static final String NAME = UUID.randomUUID().toString()
+    private static final String USER = UUID.randomUUID().toString()
+    private static final String VERSION = UUID.randomUUID().toString()
+    private static final List<String> COMMAND_ARGS = Lists.newArrayList(UUID.randomUUID().toString())
+    JobPersistenceService jobPersistenceService
+    JobSearchService jobSearchService
+    JobCompletionService jobCompletionService
+    MailService mailService
+    GenieFileTransferService genieFileTransferService
+    JobsProperties jobsProperties
+    Registry registry
+    Id completionTimerId
+    Timer completionTimer
+    Map<String, String> timerTagsCapture
+    Id errorCounterId
+    Counter errorCounter
+    List<Map<String, String>> counterTagsCaptures
 
     /**
      * Temporary folder used for storing fake job files. Deleted after tests are done.
      */
     @Rule
-    public TemporaryFolder tmpJobDir = new TemporaryFolder();
+    public TemporaryFolder tmpJobDir = new TemporaryFolder()
 
-    def setup(){
+    def setup() {
         jobPersistenceService = Mock(JobPersistenceService.class)
         jobSearchService = Mock(JobSearchService.class)
         mailService = Mock(MailService.class)
@@ -96,11 +91,11 @@ class JobCompletionServiceSpec extends Specification{
         completionTimerId = Mock(Id.class)
         completionTimerId.withTags(_) >> { args ->
             timerTagsCapture = args[0]
-            return completionTimerId;
+            return completionTimerId
         }
         errorCounterId.withTags(_) >> { args ->
             counterTagsCaptures.add(args[0])
-            return errorCounterId;
+            return errorCounterId
         }
         completionTimer = Mock(Timer.class)
         registry.createId("genie.jobs.completion.timer") >> completionTimerId
@@ -110,12 +105,12 @@ class JobCompletionServiceSpec extends Specification{
         jobsProperties.cleanup.deleteArchiveFile = false
         jobsProperties.cleanup.deleteDependencies = false
         jobsProperties.users.runAsUserEnabled = false
-        jobCompletionService = new JobCompletionService( jobPersistenceService, jobSearchService,
+        jobCompletionService = new JobCompletionService(jobPersistenceService, jobSearchService,
                 genieFileTransferService, new FileSystemResource("/tmp"), mailService, registry,
                 jobsProperties, new RetryTemplate())
     }
 
-    def handleJobCompletion() throws Exception{
+    def handleJobCompletion() throws Exception {
         given:
         def jobId = "1"
         when:
@@ -123,9 +118,9 @@ class JobCompletionServiceSpec extends Specification{
         then:
         noExceptionThrown()
         3 * jobSearchService.getJob(jobId) >>
-                { throw new GenieServerException("null")} >>
-                { throw new GenieServerException("null")} >>
-                { throw new GenieServerException("null")}
+                { throw new GenieServerException("null") } >>
+                { throw new GenieServerException("null") } >>
+                { throw new GenieServerException("null") }
         completionTimerId.withTags(MetricsUtils.newFailureTagsMapForException(new GenieServerException("null")))
         1 * completionTimer.record(_, TimeUnit.NANOSECONDS)
         timerTagsCapture == ImmutableMap.of(
@@ -138,9 +133,9 @@ class JobCompletionServiceSpec extends Specification{
         jobCompletionService.handleJobCompletion(new JobFinishedEvent(jobId, JobFinishedReason.KILLED, "null", this))
         then:
         noExceptionThrown()
-        1 * jobSearchService.getJob(jobId) >> new Job.Builder(NAME, USER, VERSION, COMMAND_ARGS)
-                .withId(jobId).withStatus(JobStatus.SUCCEEDED).build();
-        0 * jobPersistenceService.updateJobStatus(jobId,_,_)
+        1 * jobSearchService.getJob(jobId) >> new Job.Builder(NAME, USER, VERSION)
+                .withId(jobId).withStatus(JobStatus.SUCCEEDED).withCommandArgs(COMMAND_ARGS).build()
+        0 * jobPersistenceService.updateJobStatus(jobId, _, _)
         timerTagsCapture == ImmutableMap.of(
                 MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.SUCCESS,
         )
@@ -150,9 +145,9 @@ class JobCompletionServiceSpec extends Specification{
         jobCompletionService.handleJobCompletion(new JobFinishedEvent(jobId, JobFinishedReason.KILLED, "null", this))
         then:
         noExceptionThrown()
-        1 * jobSearchService.getJob(jobId) >> new Job.Builder(NAME, USER, VERSION, COMMAND_ARGS)
-                .withId(jobId).withStatus(JobStatus.RUNNING).build();
-        1 * jobPersistenceService.updateJobStatus(jobId,_,_)
+        1 * jobSearchService.getJob(jobId) >> new Job.Builder(NAME, USER, VERSION)
+                .withId(jobId).withStatus(JobStatus.RUNNING).withCommandArgs(COMMAND_ARGS).build()
+        1 * jobPersistenceService.updateJobStatus(jobId, _, _)
         1 * completionTimer.record(_, TimeUnit.NANOSECONDS)
         timerTagsCapture == ImmutableMap.of(
                 MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.SUCCESS,
@@ -183,12 +178,12 @@ class JobCompletionServiceSpec extends Specification{
         jobCompletionService.handleJobCompletion(new JobFinishedEvent(jobId, JobFinishedReason.KILLED, "null", this))
         then:
         noExceptionThrown()
-        1 * jobSearchService.getJob(jobId) >> new Job.Builder(NAME, USER, VERSION, COMMAND_ARGS)
-                .withId(jobId).withStatus(JobStatus.RUNNING).build();
-        1 * jobSearchService.getJobRequest(jobId) >> new JobRequest.Builder(NAME, USER, VERSION, COMMAND_ARGS, null, null)
-                .withId(jobId).withEmail('admin@netflix.com').build();
-        1 * jobPersistenceService.updateJobStatus(jobId,_,_)
-        1 * mailService.sendEmail('admin@netflix.com',_,_)
+        1 * jobSearchService.getJob(jobId) >> new Job.Builder(NAME, USER, VERSION)
+                .withId(jobId).withStatus(JobStatus.RUNNING).withCommandArgs(COMMAND_ARGS).build()
+        1 * jobSearchService.getJobRequest(jobId) >> new JobRequest.Builder(NAME, USER, VERSION, null, null)
+                .withId(jobId).withCommandArgs(COMMAND_ARGS).withEmail('admin@netflix.com').build()
+        1 * jobPersistenceService.updateJobStatus(jobId, _, _)
+        1 * mailService.sendEmail('admin@netflix.com', _, _)
         1 * completionTimer.record(_, TimeUnit.NANOSECONDS)
         timerTagsCapture == ImmutableMap.of(
                 MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.SUCCESS,
@@ -206,7 +201,7 @@ class JobCompletionServiceSpec extends Specification{
                 new File(tempDirPath + "/genie/cluster/cluster-x/dependencies"),
                 new File(tempDirPath + "/genie/command/command-y/dependencies"),
         )
-        dependencyDirs.forEach({d -> Files.createParentDirs(new File(d, "a_dependency"))})
+        dependencyDirs.forEach({ d -> Files.createParentDirs(new File(d, "a_dependency")) })
         def jobId = "1"
         def app1 = Mock(Application)
         app1.getId() >> new Optional<String>("app1")
@@ -226,7 +221,7 @@ class JobCompletionServiceSpec extends Specification{
         then:
         noExceptionThrown()
         dependencyDirs.forEach({ d ->
-            assert ! d.exists()
+            assert !d.exists()
         })
     }
 }

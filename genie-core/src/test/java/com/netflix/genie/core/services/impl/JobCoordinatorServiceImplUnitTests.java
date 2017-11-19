@@ -1318,7 +1318,6 @@ public class JobCoordinatorServiceImplUnitTests {
             JOB_1_USER,
             JOB_1_VERSION,
             null,
-            null,
             commandCriteria
         ).withId(JOB_1_ID)
             .withDescription(description)

@@ -52,6 +52,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -70,7 +71,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
     private static final String JOB_1_NAME = "relativity";
     private static final String JOB_1_USER = "einstien";
     private static final String JOB_1_VERSION = "1.0";
-    private static final String JOB_1_COMMAND_ARGS = "-f hive.q";
+    private static final List<String> JOB_1_COMMAND_ARGS = Lists.newArrayList("-f", "hive.q");
     private static final String JOB_1_STATUS_MSG = "Default message";
 
     private JpaJobRepository jobRepository;
@@ -125,11 +126,11 @@ public class JpaJobPersistenceServiceImplUnitTests {
             JOB_1_NAME,
             JOB_1_USER,
             JOB_1_VERSION,
-            JOB_1_COMMAND_ARGS,
             Lists.newArrayList(),
             Sets.newHashSet()
         ).withId(JOB_1_ID)
             .withDescription(description)
+            .withCommandArgs(JOB_1_COMMAND_ARGS)
             .withCpu(cpu)
             .withMemory(mem)
             .withEmail(email)
@@ -150,10 +151,12 @@ public class JpaJobPersistenceServiceImplUnitTests {
             .withTotalSizeOfAttachments(totalSizeOfAttachments)
             .build();
 
-        final Job job = new Job.Builder(JOB_1_NAME, JOB_1_USER, JOB_1_VERSION, JOB_1_COMMAND_ARGS)
+        final Job.Builder jobBuilder = new Job.Builder(JOB_1_NAME, JOB_1_USER, JOB_1_VERSION)
             .withStatus(JobStatus.INIT)
-            .withStatusMsg("Job is initializing")
-            .build();
+            .withStatusMsg("Job is initializing");
+
+        jobBuilder.withCommandArgs(JOB_1_COMMAND_ARGS);
+        final Job job = jobBuilder.build();
 
         final JobExecution execution = new JobExecution.Builder(UUID.randomUUID().toString()).build();
 
@@ -207,10 +210,10 @@ public class JpaJobPersistenceServiceImplUnitTests {
             JOB_1_NAME,
             JOB_1_USER,
             JOB_1_VERSION,
-            JOB_1_COMMAND_ARGS,
             Lists.newArrayList(),
             Sets.newHashSet()
         )
+            .withCommandArgs(JOB_1_COMMAND_ARGS)
             .build();
         this.jobPersistenceService.createJob(
             jobRequest, Mockito.mock(JobMetadata.class), Mockito.mock(Job.class), Mockito.mock(JobExecution.class)
@@ -228,11 +231,11 @@ public class JpaJobPersistenceServiceImplUnitTests {
             JOB_1_NAME,
             JOB_1_USER,
             JOB_1_VERSION,
-            JOB_1_COMMAND_ARGS,
             Lists.newArrayList(),
             Sets.newHashSet()
         )
             .withId(JOB_1_ID)
+            .withCommandArgs(JOB_1_COMMAND_ARGS)
             .build();
         Mockito.when(this.jobRepository.existsByUniqueId(Mockito.eq(JOB_1_ID))).thenReturn(true);
         this.jobPersistenceService.createJob(
