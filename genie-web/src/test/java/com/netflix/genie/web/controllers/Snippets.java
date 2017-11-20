@@ -377,6 +377,14 @@ final class Snippets {
             RequestDocumentation
                 .parameterWithName("maxFinished")
                 .description("The maximum finished time of the job in milliseconds since epoch. (exclusive)")
+                .optional(),
+            RequestDocumentation
+                .parameterWithName("grouping")
+                .description("The grouping the job should be a member of. Use % symbol for regex like search.")
+                .optional(),
+            RequestDocumentation
+                .parameterWithName("groupingInstance")
+                .description("The grouping instance the job should be a member of. Use % symbol for regex like search.")
                 .optional()
         )
     );

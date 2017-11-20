@@ -25,12 +25,12 @@ import com.netflix.genie.core.jpa.entities.projections.JobExecutionProjection;
 import com.netflix.genie.core.jpa.entities.projections.JobMetadataProjection;
 import com.netflix.genie.core.jpa.entities.projections.JobProjection;
 import com.netflix.genie.core.jpa.entities.projections.JobRequestProjection;
+import com.netflix.genie.core.jpa.entities.projections.JobSearchProjection;
 import com.netflix.genie.core.jpa.specifications.JpaSpecificationUtils;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
 
@@ -46,7 +46,6 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
-import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OrderColumn;
@@ -75,20 +74,19 @@ import java.util.Set;
 @ToString(callSuper = true)
 @Entity
 @Table(name = "jobs")
-public class JobEntity extends BaseEntity
-    implements JobProjection, JobRequestProjection, JobMetadataProjection, JobExecutionProjection,
-    JobApplicationsProjection, JobClusterProjection, JobCommandProjection {
+public class JobEntity extends BaseEntity implements
+    JobProjection,
+    JobRequestProjection,
+    JobMetadataProjection,
+    JobExecutionProjection,
+    JobApplicationsProjection,
+    JobClusterProjection,
+    JobCommandProjection,
+    JobSearchProjection {
 
     static final String DEFAULT_VERSION = "NA";
-    static final String EMPTY_STRING = "";
 
     private static final long serialVersionUID = 2849367731657512224L;
-
-    @Lob
-    @Basic(fetch = FetchType.LAZY)
-    @Column(name = "command_args", updatable = false)
-    @Type(type = "org.hibernate.type.TextType")
-    private String commandArgs;
 
     @Basic
     @Column(name = "tags", length = 1024, updatable = false)
@@ -237,6 +235,17 @@ public class JobEntity extends BaseEntity
     @JoinColumn(name = "command_id")
     private CommandEntity command;
 
+    @ElementCollection
+    @CollectionTable(
+        name = "job_command_arguments",
+        joinColumns = {
+            @JoinColumn(name = "job_id", nullable = false, updatable = false)
+        }
+    )
+    @Column(name = "argument", length = 2048, nullable = false, updatable = false)
+    @OrderColumn(name = "argument_order", nullable = false, updatable = false)
+    private List<String> commandArgs = new ArrayList<>();
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "jobs_applications",
@@ -335,15 +344,6 @@ public class JobEntity extends BaseEntity
     }
 
     /**
-     * Get the command arguments for this job.
-     *
-     * @return The command arguments or Optional of null
-     */
-    public Optional<String> getCommandArgs() {
-        return Optional.ofNullable(this.commandArgs);
-    }
-
-    /**
      * Get the user group for this job.
      *
      * @return the user group
@@ -399,6 +399,15 @@ public class JobEntity extends BaseEntity
     }
 
     /**
+     * Set the command criterion.
+     *
+     * @param commandCriterion The criterion. Null clears reference.
+     */
+    public void setCommandCriterion(@Nullable final CriterionEntity commandCriterion) {
+        this.commandCriterion = commandCriterion;
+    }
+
+    /**
      * Get the grouping this job is a part of. e.g. scheduler job name for job run many times
      *
      * @return The grouping
@@ -414,15 +423,6 @@ public class JobEntity extends BaseEntity
      */
     public Optional<String> getGroupingInstance() {
         return Optional.ofNullable(this.groupingInstance);
-    }
-
-    /**
-     * Set the command criterion.
-     *
-     * @param commandCriterion The criterion. Null clears reference.
-     */
-    public void setCommandCriterion(@Nullable final CriterionEntity commandCriterion) {
-        this.commandCriterion = commandCriterion;
     }
 
     /**
@@ -647,6 +647,18 @@ public class JobEntity extends BaseEntity
      */
     public void setTimeout(@Nullable final Date timeout) {
         this.timeout = timeout == null ? null : new Date(timeout.getTime());
+    }
+
+    /**
+     * Set the command arguments to use with this job.
+     *
+     * @param commandArgs The command arguments to use
+     */
+    public void setCommandArgs(@Nullable final List<String> commandArgs) {
+        this.commandArgs.clear();
+        if (commandArgs != null) {
+            this.commandArgs.addAll(commandArgs);
+        }
     }
 
     /**

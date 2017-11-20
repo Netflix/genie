@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.core.jpa.services;
 
-import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterCriteria;
@@ -36,7 +35,6 @@ import com.netflix.genie.core.jpa.entities.projections.JobExecutionProjection;
 import com.netflix.genie.core.jpa.entities.projections.JobMetadataProjection;
 import com.netflix.genie.core.jpa.entities.projections.JobProjection;
 import com.netflix.genie.core.jpa.entities.projections.JobRequestProjection;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.stream.Collectors;
 
@@ -154,15 +152,9 @@ public final class JpaServiceUtils {
             .withCreated(jobProjection.getCreated())
             .withUpdated(jobProjection.getUpdated())
             .withTags(jobProjection.getTags().stream().map(TagEntity::getTag).collect(Collectors.toSet()))
-            .withStatus(jobProjection.getStatus());
+            .withStatus(jobProjection.getStatus())
+            .withCommandArgs(jobProjection.getCommandArgs());
 
-        jobProjection.getCommandArgs().ifPresent(
-            commandArgs ->
-                builder
-                    .withCommandArgs(
-                        Lists.newArrayList(StringUtils.splitByWholeSeparator(commandArgs, StringUtils.SPACE))
-                    )
-        );
         jobProjection.getDescription().ifPresent(builder::withDescription);
         jobProjection.getStatusMsg().ifPresent(builder::withStatusMsg);
         jobProjection.getStarted().ifPresent(builder::withStarted);
@@ -213,16 +205,9 @@ public final class JpaServiceUtils {
             )
             .withTags(jobRequestProjection.getTags().stream().map(TagEntity::getTag).collect(Collectors.toSet()))
             .withUpdated(jobRequestProjection.getUpdated())
-            .withApplications(jobRequestProjection.getApplicationsRequested());
+            .withApplications(jobRequestProjection.getApplicationsRequested())
+            .withCommandArgs(jobRequestProjection.getCommandArgs());
 
-        jobRequestProjection.getTimeoutRequested().ifPresent(builder::withTimeout);
-        jobRequestProjection.getCommandArgs().ifPresent(
-            commandArgs ->
-                builder
-                    .withCommandArgs(
-                        Lists.newArrayList(StringUtils.splitByWholeSeparator(commandArgs, StringUtils.SPACE))
-                    )
-        );
         jobRequestProjection.getEmail().ifPresent(builder::withEmail);
         jobRequestProjection.getGenieUserGroup().ifPresent(builder::withGroup);
         jobRequestProjection.getDescription().ifPresent(builder::withDescription);

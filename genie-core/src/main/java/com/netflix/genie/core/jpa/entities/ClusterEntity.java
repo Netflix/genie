@@ -20,6 +20,7 @@ package com.netflix.genie.core.jpa.entities;
 import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.core.jpa.entities.projections.ClusterCommandsProjection;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -54,7 +55,7 @@ import java.util.Set;
 @ToString(callSuper = true)
 @Entity
 @Table(name = "clusters")
-public class ClusterEntity extends BaseEntity {
+public class ClusterEntity extends BaseEntity implements ClusterCommandsProjection {
 
     private static final long serialVersionUID = -5674870110962005872L;
 

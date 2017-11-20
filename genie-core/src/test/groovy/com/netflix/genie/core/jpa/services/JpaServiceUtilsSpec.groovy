@@ -23,6 +23,7 @@ import com.netflix.genie.common.dto.*
 import com.netflix.genie.core.jpa.entities.*
 import com.netflix.genie.test.categories.UnitTest
 import com.netflix.genie.test.suppliers.RandomSuppliers
+import org.apache.commons.lang3.StringUtils
 import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
@@ -377,7 +378,7 @@ class JpaServiceUtilsSpec extends Specification {
                 }
         )
         entity.setTags(tagEntities)
-        def commandArgs = UUID.randomUUID().toString()
+        def commandArgs = Lists.newArrayList(UUID.randomUUID().toString())
         entity.setCommandArgs(commandArgs)
 
         def one = Sets.newHashSet("one", "two", "three")
@@ -482,7 +483,7 @@ class JpaServiceUtilsSpec extends Specification {
         request.getCreated().orElseGet(RandomSuppliers.DATE) == created
         request.getUpdated().orElseGet(RandomSuppliers.DATE) == updated
         request.getTags() == tags
-        request.getCommandArgs().orElseGet(RandomSuppliers.STRING) == commandArgs
+        request.getCommandArgs().orElseGet(RandomSuppliers.STRING) == StringUtils.join(commandArgs, StringUtils.SPACE)
 
         def criterias = request.getClusterCriterias()
         criterias.size() == 3

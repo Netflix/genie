@@ -107,6 +107,7 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
      * {@inheritDoc}
      */
     @Override
+    @SuppressWarnings("checkstyle:parameternumber")
     public Page<JobSearchResult> findJobs(
         @Nullable final String id,
         @Nullable final String jobName,
@@ -121,11 +122,13 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
         @Nullable final Date maxStarted,
         @Nullable final Date minFinished,
         @Nullable final Date maxFinished,
+        @Nullable final String grouping,
+        @Nullable final String groupingInstance,
         @NotNull final Pageable page
     ) {
         log.debug("called");
 
-        // TODO: Re-write with projections
+        // TODO: Re-write with projections however not currently supported: https://jira.spring.io/browse/DATAJPA-1033
         final CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
         final CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
         final Root<JobEntity> root = countQuery.from(JobEntity.class);
@@ -146,7 +149,9 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
                 minStarted,
                 maxStarted,
                 minFinished,
-                maxFinished
+                maxFinished,
+                grouping,
+                groupingInstance
             );
 
         countQuery.select(cb.count(root)).where(whereClause);

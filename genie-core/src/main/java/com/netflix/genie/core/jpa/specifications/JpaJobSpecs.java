@@ -49,23 +49,26 @@ public final class JpaJobSpecs {
     /**
      * Generate a criteria query predicate for a where clause based on the given parameters.
      *
-     * @param root        The root to use
-     * @param cb          The criteria builder to use
-     * @param id          The job id
-     * @param name        The job name
-     * @param user        The user who created the job
-     * @param statuses    The job statuses
-     * @param tags        The tags for the jobs to find
-     * @param clusterName The cluster name
-     * @param cluster     The cluster the job should have been run on
-     * @param commandName The command name
-     * @param command     The command the job should have been run with
-     * @param minStarted  The time which the job had to start after in order to be return (inclusive)
-     * @param maxStarted  The time which the job had to start before in order to be returned (exclusive)
-     * @param minFinished The time which the job had to finish after in order to be return (inclusive)
-     * @param maxFinished The time which the job had to finish before in order to be returned (exclusive)
+     * @param root             The root to use
+     * @param cb               The criteria builder to use
+     * @param id               The job id
+     * @param name             The job name
+     * @param user             The user who created the job
+     * @param statuses         The job statuses
+     * @param tags             The tags for the jobs to find
+     * @param clusterName      The cluster name
+     * @param cluster          The cluster the job should have been run on
+     * @param commandName      The command name
+     * @param command          The command the job should have been run with
+     * @param minStarted       The time which the job had to start after in order to be return (inclusive)
+     * @param maxStarted       The time which the job had to start before in order to be returned (exclusive)
+     * @param minFinished      The time which the job had to finish after in order to be return (inclusive)
+     * @param maxFinished      The time which the job had to finish before in order to be returned (exclusive)
+     * @param grouping         The job grouping to search for
+     * @param groupingInstance The job grouping instance to search for
      * @return The specification
      */
+    @SuppressWarnings("checkstyle:parameternumber")
     public static Predicate getFindPredicate(
         final Root<JobEntity> root,
         final CriteriaBuilder cb,
@@ -81,7 +84,9 @@ public final class JpaJobSpecs {
         @Nullable final Date minStarted,
         @Nullable final Date maxStarted,
         @Nullable final Date minFinished,
-        @Nullable final Date maxFinished
+        @Nullable final Date maxFinished,
+        @Nullable final String grouping,
+        @Nullable final String groupingInstance
     ) {
         final List<Predicate> predicates = new ArrayList<>();
         if (StringUtils.isNotBlank(id)) {
@@ -131,6 +136,20 @@ public final class JpaJobSpecs {
         }
         if (maxFinished != null) {
             predicates.add(cb.lessThan(root.get(JobEntity_.finished), maxFinished));
+        }
+        if (grouping != null) {
+            predicates.add(
+                JpaSpecificationUtils.getStringLikeOrEqualPredicate(cb, root.get(JobEntity_.grouping), grouping)
+            );
+        }
+        if (groupingInstance != null) {
+            predicates.add(
+                JpaSpecificationUtils.getStringLikeOrEqualPredicate(
+                    cb,
+                    root.get(JobEntity_.groupingInstance),
+                    groupingInstance
+                )
+            );
         }
         return cb.and(predicates.toArray(new Predicate[predicates.size()]));
     }

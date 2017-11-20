@@ -528,8 +528,8 @@ CREATE TABLE `commands_applications` (
   ROW_FORMAT = DYNAMIC;
 
 SELECT
-  CURRENT_TIMESTAMP                                        AS '',
-  'Finished creating into new commands_applications table' AS '';
+  CURRENT_TIMESTAMP                                   AS '',
+  'Finished creating new commands_applications table' AS '';
 
 SELECT
   CURRENT_TIMESTAMP         AS '',
@@ -549,7 +549,6 @@ CREATE TABLE `jobs` (
   `genie_user`                VARCHAR(255)                                            NOT NULL,
   `version`                   VARCHAR(255)                                            NOT NULL,
   `command_criterion`         BIGINT(20)    DEFAULT NULL,
-  `command_args`              TEXT          DEFAULT NULL,
   `description`               TEXT          DEFAULT NULL,
   `setup_file`                BIGINT(20)    DEFAULT NULL,
   `tags`                      VARCHAR(1024) DEFAULT NULL,
@@ -647,8 +646,30 @@ CREATE TABLE `jobs_applications` (
   ROW_FORMAT = DYNAMIC;
 
 SELECT
-  CURRENT_TIMESTAMP                               AS '',
-  'Finished creating new jobs_applications table' AS '';
+  CURRENT_TIMESTAMP                           AS '',
+  'Finished creating jobs_applications table' AS '';
+
+SELECT
+  CURRENT_TIMESTAMP                      AS '',
+  'Creating job_command_arguments table' AS '';
+
+CREATE TABLE `job_command_arguments` (
+  `job_id`         BIGINT(20)     NOT NULL,
+  `argument`       VARCHAR(10000) NOT NULL,
+  `argument_order` INT(11)        NOT NULL,
+  PRIMARY KEY (`job_id`, `argument_order`),
+  KEY `JOB_COMMAND_ARGUMENTS_JOB_ID_INDEX` (`job_id`),
+  CONSTRAINT `JOB_COMMAND_ARGUMENTS_JOB_ID_FK` FOREIGN KEY (`job_id`) REFERENCES `jobs` (`id`)
+    ON DELETE CASCADE
+)
+  ENGINE = InnoDB
+  DEFAULT CHARSET = utf8
+  DEFAULT COLLATE = utf8_bin
+  ROW_FORMAT = DYNAMIC;
+
+SELECT
+  CURRENT_TIMESTAMP                     AS '',
+  'Created job_command_arguments table' AS '';
 
 SELECT
   CURRENT_TIMESTAMP          AS '',

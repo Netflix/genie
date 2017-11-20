@@ -49,22 +49,25 @@ public interface JobSearchService {
     /**
      * Search for jobs which match the given filter criteria.
      *
-     * @param id          id for job
-     * @param name        name of job (can be a SQL-style pattern such as HIVE%)
-     * @param user        user who submitted job
-     * @param statuses    statuses of job
-     * @param tags        tags for the job
-     * @param clusterName name of cluster for job
-     * @param clusterId   id of cluster for job
-     * @param commandName name of the command run in the job
-     * @param commandId   id of the command run in the job
-     * @param minStarted  The time which the job had to start after in order to be return (inclusive)
-     * @param maxStarted  The time which the job had to start before in order to be returned (exclusive)
-     * @param minFinished The time which the job had to finish after in order to be return (inclusive)
-     * @param maxFinished The time which the job had to finish before in order to be returned (exclusive)
-     * @param page        Page information of job to get
+     * @param id               id for job
+     * @param name             name of job (can be a SQL-style pattern such as HIVE%)
+     * @param user             user who submitted job
+     * @param statuses         statuses of job
+     * @param tags             tags for the job
+     * @param clusterName      name of cluster for job
+     * @param clusterId        id of cluster for job
+     * @param commandName      name of the command run in the job
+     * @param commandId        id of the command run in the job
+     * @param minStarted       The time which the job had to start after in order to be return (inclusive)
+     * @param maxStarted       The time which the job had to start before in order to be returned (exclusive)
+     * @param minFinished      The time which the job had to finish after in order to be return (inclusive)
+     * @param maxFinished      The time which the job had to finish before in order to be returned (exclusive)
+     * @param grouping         The job grouping to search for
+     * @param groupingInstance The job grouping instance to search for
+     * @param page             Page information of job to get
      * @return Metadata information on jobs which match the criteria
      */
+    @SuppressWarnings("checkstyle:parameternumber")
     Page<JobSearchResult> findJobs(
         @Nullable final String id,
         @Nullable final String name,
@@ -79,6 +82,8 @@ public interface JobSearchService {
         @Nullable final Date maxStarted,
         @Nullable final Date minFinished,
         @Nullable final Date maxFinished,
+        @Nullable final String grouping,
+        @Nullable final String groupingInstance,
         @NotNull final Pageable page
     );
 

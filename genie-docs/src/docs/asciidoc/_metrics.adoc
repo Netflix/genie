@@ -86,8 +86,14 @@ and system metrics and statistics.
 |JobCoordinatorServiceImpl
 |status, exceptionClass
 
+|genie.jobs.coordination.clusterCommandQuery.timer
+|Time taken to query the database and find clusters and commands matching the supplied criteria.
+|nanoseconds
+|JobCoordinatorServiceImpl
+|status, exceptionClass
+
 |genie.jobs.submit.localRunner.selectCluster.timer
-|Time taken to select a cluster based on criteria and load balancing strategy
+|Time taken to select a cluster using the load balancing strategy
 |nanoseconds
 |JobCoordinatorServiceImpl
 |status, exceptionClass

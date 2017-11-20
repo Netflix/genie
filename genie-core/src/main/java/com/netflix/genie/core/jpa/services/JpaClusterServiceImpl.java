@@ -38,6 +38,7 @@ import com.netflix.genie.core.jpa.entities.ClusterEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.entities.FileEntity;
 import com.netflix.genie.core.jpa.entities.TagEntity;
+import com.netflix.genie.core.jpa.entities.projections.ClusterCommandsProjection;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.core.jpa.repositories.JpaFileRepository;
@@ -507,9 +508,12 @@ public class JpaClusterServiceImpl extends JpaBaseService implements ClusterServ
         @NotBlank(message = "No cluster id entered. Unable to get commands.") final String id,
         @Nullable final Set<CommandStatus> statuses
     ) throws GenieException {
-        // TODO: Switch to query
-        final ClusterEntity clusterEntity = this.findCluster(id);
-        final List<CommandEntity> commandEntities = clusterEntity.getCommands();
+        final Optional<ClusterCommandsProjection> commandsProjection
+            = this.clusterRepository.findByUniqueId(id, ClusterCommandsProjection.class);
+
+        final List<CommandEntity> commandEntities = commandsProjection
+            .orElseThrow(() -> new GenieNotFoundException("No cluster with id " + id + " exists"))
+            .getCommands();
         if (statuses != null) {
             return commandEntities.stream()
                 .filter(command -> statuses.contains(command.getStatus()))

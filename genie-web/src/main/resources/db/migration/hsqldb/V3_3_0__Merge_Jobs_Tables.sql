@@ -363,7 +363,6 @@ CREATE TABLE jobs (
   genie_user                VARCHAR(255)                                            NOT NULL,
   version                   VARCHAR(255)                                            NOT NULL,
   command_criterion         BIGINT        DEFAULT NULL,
-  command_args              LONGVARCHAR   DEFAULT NULL,
   description               LONGVARCHAR   DEFAULT NULL,
   setup_file                BIGINT        DEFAULT NULL,
   tags                      VARCHAR(1024) DEFAULT NULL,
@@ -458,6 +457,18 @@ CREATE INDEX JOBS_APPLICATIONS_APPLICATION_ID_INDEX
   ON jobs_applications (application_id);
 CREATE INDEX JOBS_APPLICATIONS_JOB_ID_INDEX
   ON jobs_applications (job_id);
+
+CREATE TABLE job_command_arguments (
+  job_id         BIGINT         NOT NULL,
+  argument       VARCHAR(10000) NOT NULL,
+  argument_order INT            NOT NULL,
+  PRIMARY KEY (job_id, argument_order),
+  CONSTRAINT JOB_COMMAND_ARGUMENTS_JOB_ID FOREIGN KEY (job_id) REFERENCES jobs (id)
+    ON DELETE CASCADE
+);
+
+CREATE INDEX JOB_COMMAND_ARGUMENTS_JOB_ID_INDEX
+  ON job_command_arguments (job_id);
 
 CREATE TABLE jobs_tags (
   job_id BIGINT NOT NULL,

@@ -52,7 +52,6 @@ public class JpaTagServiceImpl implements TagService {
      * {@inheritDoc}
      */
     @Override
-    // TODO: Test whether we need new transaction or not
 //    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void createTagIfNotExists(@NotBlank final String tag) throws GenieException {
         if (this.tagRepository.existsByTag(tag)) {

@@ -28,7 +28,6 @@ INSERT INTO jobs (
   name,
   genie_user,
   version,
-  command_args,
   description,
   genie_user_group,
   disable_log_archival,
@@ -63,7 +62,6 @@ INSERT INTO jobs (
     j.name,
     j.genie_user,
     j.version,
-    j.command_args,
     j.description,
     r.group_name,
     r.disable_log_archival,
@@ -174,6 +172,9 @@ DECLARE
   new_job_id                   BIGINT;
   found_tag_id                 BIGINT;
   found_file_id                BIGINT;
+  command_args_local           VARCHAR(10000);
+  argument                     VARCHAR(10000);
+  argument_order               INT;
 BEGIN
 
   << JOB_REQUESTS_LOOP >>
@@ -186,7 +187,8 @@ BEGIN
     configs,
     dependencies,
     tags,
-    setup_file
+    setup_file,
+    command_args
   FROM job_requests_320
   LOOP
 
@@ -211,6 +213,24 @@ BEGIN
       SET j.setup_file = found_file_id
       WHERE j.id = new_job_id;
     END IF;
+
+    /*
+     * COMMAND ARGUMENTS FOR A GIVEN JOB
+     */
+
+    argument_order = 0;
+    command_args_local = job_request_record.command_args;
+    << COMMAND_ARGS_LOOP >> WHILE LENGTH(command_args_local) > 0 LOOP
+      argument = SPLIT_PART(command_args_local, ' ', 1);
+      command_args_local = TRIM(LEADING argument FROM command_args_local);
+      command_args_local = TRIM(LEADING ' ' FROM command_args_local);
+      IF LENGTH(argument) > 0
+      THEN
+        INSERT INTO job_command_arguments
+        VALUES (new_job_id, argument, argument_order);
+        argument_order = argument_order + 1;
+      END IF;
+    END LOOP COMMAND_ARGS_LOOP;
 
     /*
      * APPLICATIONS REQUESTED FOR A GIVEN JOB

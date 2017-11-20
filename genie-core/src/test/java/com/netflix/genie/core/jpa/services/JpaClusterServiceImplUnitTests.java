@@ -28,6 +28,7 @@ import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.jpa.entities.ClusterEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
+import com.netflix.genie.core.jpa.entities.projections.ClusterCommandsProjection;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.core.jpa.repositories.JpaFileRepository;
@@ -312,7 +313,9 @@ public class JpaClusterServiceImplUnitTests {
     @Test(expected = GenieNotFoundException.class)
     public void testGetCommandsForClusterNoCluster() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jpaClusterRepository.findByUniqueId(id)).thenReturn(Optional.empty());
+        Mockito
+            .when(this.jpaClusterRepository.findByUniqueId(id, ClusterCommandsProjection.class))
+            .thenReturn(Optional.empty());
         this.service.getCommandsForCluster(id, null);
     }
 

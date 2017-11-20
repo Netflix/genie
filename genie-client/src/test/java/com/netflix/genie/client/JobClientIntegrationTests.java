@@ -545,6 +545,8 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
                 null,
                 null,
                 null,
+                null,
+                null,
                 null
             ).get(0).getId()
         );
@@ -555,6 +557,8 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
             jobClient.getJobs(
                 null,
                 "job1",
+                null,
+                null,
                 null,
                 null,
                 null,
@@ -585,6 +589,8 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
                 null,
                 null,
                 null,
+                null,
+                null,
                 null
             ).get(0).getId());
 
@@ -596,6 +602,8 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
                 null,
                 null,
                 Arrays.stream(new String[]{"SUCCEEDED"}).collect(Collectors.toSet()),
+                null,
+                null,
                 null,
                 null,
                 null,
@@ -623,6 +631,8 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
                 null,
                 null,
                 null,
+                null,
+                null,
                 null
             ).get(0).getId());
 
@@ -633,6 +643,8 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
             null,
             null,
             Arrays.stream(new String[]{"foo"}).collect(Collectors.toSet()),
+            null,
+            null,
             null,
             null,
             null,

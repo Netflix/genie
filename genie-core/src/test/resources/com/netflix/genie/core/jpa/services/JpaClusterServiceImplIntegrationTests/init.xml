@@ -443,13 +443,22 @@
         name="testPigJob"
         version="2.4"
         command_criterion="0"
-        command_args="-f query.pig"
         disable_log_archival="true"
         cpu_requested="1"
         memory_requested="1560"
         timeout_requested="608400"
         status="SUCCEEDED"
         host_name="b.netflix.com"
+    />
+    <job_command_arguments
+        job_id="1"
+        argument="-f"
+        argument_order="0"
+    />
+    <job_command_arguments
+        job_id="1"
+        argument="query.pig"
+        argument_order="1"
     />
 
     <criteria
@@ -503,13 +512,22 @@
         name="testSparkJob"
         version="2.4"
         command_criterion="3"
-        command_args="-f spark.jar"
         disable_log_archival="true"
         cpu_requested="2"
         memory_requested="2048"
         timeout_requested="608401"
         status="RUNNING"
         host_name="a.netflix.com"
+    />
+    <job_command_arguments
+        job_id="2"
+        argument="-f"
+        argument_order="0"
+    />
+    <job_command_arguments
+        job_id="2"
+        argument="spark.jar"
+        argument_order="1"
     />
 
     <criteria

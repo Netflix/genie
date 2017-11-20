@@ -579,7 +579,6 @@ CREATE TABLE jobs (
   genie_user                VARCHAR(255)                                                                            NOT NULL,
   version                   VARCHAR(255)                                                                            NOT NULL,
   command_criterion         BIGINT                         DEFAULT NULL,
-  command_args              TEXT                           DEFAULT NULL,
   description               TEXT                           DEFAULT NULL,
   setup_file                BIGINT                         DEFAULT NULL,
   tags                      VARCHAR(1024)                  DEFAULT NULL,
@@ -686,6 +685,26 @@ CREATE INDEX jobs_applications_job_id_index
 SELECT
   CURRENT_TIMESTAMP,
   'Finished creating new jobs_applications table';
+
+SELECT
+  CURRENT_TIMESTAMP,
+  'Creating job_command_arguments table';
+
+CREATE TABLE job_command_arguments (
+  job_id         BIGINT         NOT NULL,
+  argument       VARCHAR(10000) NOT NULL,
+  argument_order INT            NOT NULL,
+  PRIMARY KEY (job_id, argument_order),
+  CONSTRAINT job_command_arguments_job_id_fkey FOREIGN KEY (job_id) REFERENCES jobs (id)
+  ON DELETE CASCADE
+);
+
+CREATE INDEX job_command_arguments_job_id_index
+  ON job_command_arguments (job_id);
+
+SELECT
+  CURRENT_TIMESTAMP,
+  'Created job_command_arguments table';
 
 SELECT
   CURRENT_TIMESTAMP,

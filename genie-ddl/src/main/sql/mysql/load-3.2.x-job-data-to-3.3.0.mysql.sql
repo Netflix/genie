@@ -28,7 +28,6 @@ INSERT INTO `jobs` (
   `name`,
   `genie_user`,
   `version`,
-  `command_args`,
   `description`,
   `genie_user_group`,
   `disable_log_archival`,
@@ -63,7 +62,6 @@ INSERT INTO `jobs` (
     `j`.`name`,
     `j`.`genie_user`,
     `j`.`version`,
-    `j`.`command_args`,
     `j`.`description`,
     `r`.`group_name`,
     `r`.`disable_log_archival`,
@@ -187,6 +185,7 @@ CREATE PROCEDURE GENIE_SPLIT_JOB_REQUESTS_320()
     CHARSET utf8;
     DECLARE `new_job_id` BIGINT(20);
     DECLARE `found_tag_id` BIGINT(20);
+    DECLARE `old_command_args` VARCHAR(10000);
 
     DECLARE `job_request_cursor` CURSOR FOR
       SELECT
@@ -197,7 +196,8 @@ CREATE PROCEDURE GENIE_SPLIT_JOB_REQUESTS_320()
         `configs`,
         `dependencies`,
         `tags`,
-        `setup_file`
+        `setup_file`,
+        `command_args`
       FROM `job_requests_320`;
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
@@ -214,7 +214,8 @@ CREATE PROCEDURE GENIE_SPLIT_JOB_REQUESTS_320()
         `configs_json`,
         `dependencies_json`,
         `old_job_tags`,
-        `old_setup_file`;
+        `old_setup_file`,
+        `old_command_args`;
 
       IF `done`
       THEN
@@ -241,6 +242,24 @@ CREATE PROCEDURE GENIE_SPLIT_JOB_REQUESTS_320()
         SET `setup_file` = @file_id
         WHERE `id` = `new_job_id`;
       END IF;
+
+      /*
+       * COMMAND ARGUMENTS FOR A GIVEN JOB
+       */
+
+      SET @argument_order = 0;
+      SET @command_args_local = `old_command_args`;
+      COMMAND_ARGS_LOOP: WHILE LENGTH(@command_args_local) > 0 DO
+        SET @argument = SUBSTRING_INDEX(@command_args_local, ' ', 1);
+        SET @command_args_local = TRIM(LEADING @argument FROM @command_args_local);
+        SET @command_args_local = TRIM(LEADING ' ' FROM @command_args_local);
+        IF LENGTH(@argument) > 0
+        THEN
+          INSERT INTO `job_command_arguments`
+          VALUES (`new_job_id`, @argument, @argument_order);
+          SET @argument_order = @argument_order + 1;
+        END IF;
+      END WHILE COMMAND_ARGS_LOOP;
 
       /*
        * APPLICATIONS REQUESTED FOR A GIVEN JOB

@@ -397,7 +397,6 @@
         name="testSparkJob"
         version="2.4"
         command_criterion="0"
-        command_args="-f query.q"
         cpu_requested="1"
         memory_requested="1560"
         disable_log_archival="true"
@@ -422,6 +421,16 @@
         job_id="1"
         application_id="app3"
         application_order="1"
+    />
+    <job_command_arguments
+        job_id="1"
+        argument="-f"
+        argument_order="0"
+    />
+    <job_command_arguments
+        job_id="1"
+        argument="query.q"
+        argument_order="1"
     />
     <criteria
         id="1"
@@ -476,7 +485,6 @@
         name="testSparkJob1"
         version="2.4"
         command_criterion="3"
-        command_args="-f spark.jar"
         cpu_requested="2"
         memory_requested="2048"
         disable_log_archival="false"
@@ -491,6 +499,16 @@
         process_id="318"
         check_delay="11000"
         timeout="2015-08-19 01:49:00"
+    />
+    <job_command_arguments
+        job_id="2"
+        argument="-f"
+        argument_order="0"
+    />
+    <job_command_arguments
+        job_id="2"
+        argument="spark.jar"
+        argument_order="1"
     />
     <criteria
         id="4"
@@ -545,7 +563,6 @@
         name="testSparkJob2"
         version="2.4"
         command_criterion="6"
-        command_args="-f spark.jar"
         cpu_requested="2"
         memory_requested="2048"
         disable_log_archival="true"
@@ -560,6 +577,16 @@
         process_id="319"
         check_delay="12000"
         timeout="2016-03-03 01:49:00"
+    />
+    <job_command_arguments
+        job_id="3"
+        argument="-f"
+        argument_order="0"
+    />
+    <job_command_arguments
+        job_id="3"
+        argument="spark.jar"
+        argument_order="1"
     />
     <criteria
         id="7"

@@ -45,6 +45,7 @@ import com.netflix.genie.core.services.FileService;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.TagService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -338,7 +339,14 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         jobEntity.setUser(jobRequest.getUser());
         jobEntity.setVersion(jobRequest.getVersion());
         jobRequest.getDescription().ifPresent(jobEntity::setDescription);
-        jobRequest.getCommandArgs().ifPresent(jobEntity::setCommandArgs);
+        jobRequest.getCommandArgs().ifPresent(
+            commandArgs ->
+                jobEntity.setCommandArgs(
+                    Lists.newArrayList(
+                        StringUtils.splitByWholeSeparator(commandArgs, StringUtils.SPACE)
+                    )
+                )
+        );
         jobRequest.getGroup().ifPresent(jobEntity::setGenieUserGroup);
         final FileEntity setupFile = jobRequest.getSetupFile().isPresent()
             ? this.createAndGetFileEntity(jobRequest.getSetupFile().get())

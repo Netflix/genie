@@ -135,13 +135,15 @@ public class JobEntityUnitTests extends EntityTestsBase {
      */
     @Test
     public void testSetGetCommandArgs() {
-        Assert.assertFalse(this.jobEntity.getCommandArgs().isPresent());
-        final String commandArgs = UUID.randomUUID().toString();
+        Assert.assertTrue(this.jobEntity.getCommandArgs().isEmpty());
+        this.jobEntity.setCommandArgs(null);
+        Assert.assertTrue(this.jobEntity.getCommandArgs().isEmpty());
+        final List<String> commandArgs = Lists.newArrayList();
         this.jobEntity.setCommandArgs(commandArgs);
-        Assert.assertThat(
-            this.jobEntity.getCommandArgs().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(commandArgs)
-        );
+        Assert.assertTrue(this.jobEntity.getCommandArgs().isEmpty());
+        commandArgs.add(UUID.randomUUID().toString());
+        this.jobEntity.setCommandArgs(commandArgs);
+        Assert.assertThat(this.jobEntity.getCommandArgs(), Matchers.is(commandArgs));
     }
 
     /**
@@ -540,16 +542,6 @@ public class JobEntityUnitTests extends EntityTestsBase {
     public void canSetNullClusterCriteria() {
         this.jobEntity.setClusterCriteria(null);
         Assert.assertThat(this.jobEntity.getClusterCriteria(), Matchers.empty());
-    }
-
-    /**
-     * Make sure can set the command args for the job.
-     */
-    @Test
-    public void canSetCommandArgs() {
-        final String commandArgs = UUID.randomUUID().toString();
-        this.jobEntity.setCommandArgs(commandArgs);
-        Assert.assertThat(this.jobEntity.getCommandArgs().orElseGet(RandomSuppliers.STRING), Matchers.is(commandArgs));
     }
 
     /**

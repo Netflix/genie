@@ -19,6 +19,7 @@ package com.netflix.genie.core.jpa.entities.projections;
 
 import com.netflix.genie.core.jpa.entities.TagEntity;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -32,9 +33,9 @@ public interface JobCommonFieldsProjection extends BaseProjection {
     /**
      * Get the command arguments for this job.
      *
-     * @return The command arguments or Optional of null
+     * @return The command arguments
      */
-    Optional<String> getCommandArgs();
+    List<String> getCommandArgs();
 
     /**
      * Get the tags for the job.
