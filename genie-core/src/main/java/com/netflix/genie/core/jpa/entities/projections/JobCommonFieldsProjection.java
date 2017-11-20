@@ -42,4 +42,18 @@ public interface JobCommonFieldsProjection extends BaseProjection {
      * @return Any tags that were sent in when job was originally requested
      */
     Set<TagEntity> getTags();
+
+    /**
+     * Get the grouping this job is a part of. e.g. scheduler job name for job run many times
+     *
+     * @return The grouping
+     */
+    Optional<String> getGrouping();
+
+    /**
+     * Get the instance identifier of a grouping. e.g. the run id of a given scheduled job
+     *
+     * @return The grouping instance
+     */
+    Optional<String> getGroupingInstance();
 }

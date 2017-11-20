@@ -104,20 +104,6 @@ public interface JobRequestProjection extends JobCommonFieldsProjection, SetupFi
     Optional<Integer> getTimeoutRequested();
 
     /**
-     * Get the grouping this job is a part of. e.g. scheduler job name for job run many times
-     *
-     * @return The grouping
-     */
-    Optional<String> getGrouping();
-
-    /**
-     * Get the instance identifier of a grouping. e.g. the run id of a given scheduled job
-     *
-     * @return The grouping instance
-     */
-    Optional<String> getGroupingInstance();
-
-    /**
      * Get any applications requested by their id.
      *
      * @return The applications

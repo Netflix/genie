@@ -170,6 +170,8 @@ public final class JpaServiceUtils {
         jobProjection.getArchiveLocation().ifPresent(builder::withArchiveLocation);
         jobProjection.getClusterName().ifPresent(builder::withClusterName);
         jobProjection.getCommandName().ifPresent(builder::withCommandName);
+        jobProjection.getGrouping().ifPresent(builder::withGrouping);
+        jobProjection.getGroupingInstance().ifPresent(builder::withGroupingInstance);
 
         return builder.build();
     }
@@ -211,9 +213,9 @@ public final class JpaServiceUtils {
             )
             .withTags(jobRequestProjection.getTags().stream().map(TagEntity::getTag).collect(Collectors.toSet()))
             .withUpdated(jobRequestProjection.getUpdated())
-            .withApplications(jobRequestProjection.getApplicationsRequested())
-            .withTimeout(jobRequestProjection.getTimeoutRequested().orElse(null));
+            .withApplications(jobRequestProjection.getApplicationsRequested());
 
+        jobRequestProjection.getTimeoutRequested().ifPresent(builder::withTimeout);
         jobRequestProjection.getCommandArgs().ifPresent(
             commandArgs ->
                 builder
@@ -230,6 +232,8 @@ public final class JpaServiceUtils {
         jobRequestProjection
             .getSetupFile()
             .ifPresent(setupFileEntity -> builder.withSetupFile(setupFileEntity.getFile()));
+        jobRequestProjection.getGrouping().ifPresent(builder::withGrouping);
+        jobRequestProjection.getGroupingInstance().ifPresent(builder::withGroupingInstance);
 
         return builder.build();
     }

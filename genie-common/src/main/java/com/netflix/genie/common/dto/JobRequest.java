@@ -278,8 +278,8 @@ public class JobRequest extends ExecutionEnvironmentDTO {
          *
          * @param commandArgs The command args
          * @return The builder
-         * @since 3.3.0
          * @see #withCommandArgs(List)
+         * @since 3.3.0
          */
         @Deprecated
         public Builder withCommandArgs(@Nullable final String commandArgs) {

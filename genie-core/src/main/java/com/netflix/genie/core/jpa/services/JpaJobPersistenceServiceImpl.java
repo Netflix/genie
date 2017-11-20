@@ -371,7 +371,8 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         }
         jobRequest.getTimeout().ifPresent(jobEntity::setTimeoutRequested);
 
-        // TODO: Add grouping and grouping instance
+        jobRequest.getGrouping().ifPresent(jobEntity::setGrouping);
+        jobRequest.getGroupingInstance().ifPresent(jobEntity::setGroupingInstance);
 
         // Fields collected as metadata
 
