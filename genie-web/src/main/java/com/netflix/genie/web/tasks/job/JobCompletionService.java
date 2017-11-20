@@ -278,7 +278,7 @@ public class JobCompletionService {
                 });
             }
         } catch (final GenieException ge) {
-            log.error("Unable to cleanup process for job due to exception. {}", jobId, ge);
+            log.error("Unable to cleanup process for job {} due to exception.", jobId, ge);
             incrementErrorCounter("JOB_CLEANUP_FAILURE", ge);
         } catch (Throwable t) {
             incrementErrorCounter("JOB_PROCESS_CLEANUP_FAILURE", t);
@@ -531,11 +531,14 @@ public class JobCompletionService {
                     } else {
                         commandLine = new CommandLine("tar");
                     }
-                    commandLine.addArgument("-c");
-                    commandLine.addArgument("-z");
-                    commandLine.addArgument("-f");
-                    commandLine.addArgument(localArchiveFile.getCanonicalPath());
-                    commandLine.addArgument("./");
+                    commandLine
+                        .addArgument("-c")
+                        .addArgument("-z")
+                        .addArgument("-f")
+                        .addArgument(localArchiveFile.getCanonicalPath())
+                        .addArgument("--exclude")
+                        .addArgument(localArchiveFile.getName())
+                        .addArgument("./");
 
                     this.executor.setWorkingDirectory(jobDir);
 
@@ -543,7 +546,7 @@ public class JobCompletionService {
                     try {
                         this.executor.execute(commandLine);
                     } catch (Throwable t) {
-                        log.warn("Failed to created archive of job files", t);
+                        log.warn("Failed to created archive of job files for job: {}", jobId, t);
                         incrementErrorCounter("JOB_ARCHIVAL_FAILURE", t);
                         throw t;
                     }
@@ -557,10 +560,10 @@ public class JobCompletionService {
                         log.debug("Deleting archive file");
                         try {
                             if (this.runAsUserEnabled) {
-                                final CommandLine deleteCommand = new CommandLine("sudo");
-                                deleteCommand.addArgument("rm");
-                                deleteCommand.addArgument("-f");
-                                deleteCommand.addArgument(localArchiveFile.getCanonicalPath());
+                                final CommandLine deleteCommand = new CommandLine("sudo")
+                                    .addArgument("rm")
+                                    .addArgument("-f")
+                                    .addArgument(localArchiveFile.getCanonicalPath());
 
                                 this.executor.setWorkingDirectory(jobDir);
                                 log.debug("Delete command: {}", deleteCommand);
