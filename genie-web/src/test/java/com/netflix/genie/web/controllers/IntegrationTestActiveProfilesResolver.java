@@ -45,7 +45,7 @@ public class IntegrationTestActiveProfilesResolver implements ActiveProfilesReso
      */
     @Override
     public String[] resolve(final Class<?> testClass) {
-        final String integrationTestDatabase = System.getProperty(DB_SELECTOR_ENV_VARIABLE_NAME, MYSQL);
+        final String integrationTestDatabase = System.getProperty(DB_SELECTOR_ENV_VARIABLE_NAME, HSQL_MEM);
 
         if (!knownDatabaseProfiles.contains(integrationTestDatabase)) {
             throw new IllegalStateException("Unknown database profile: " + integrationTestDatabase);
