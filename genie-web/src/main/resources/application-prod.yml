@@ -18,7 +18,7 @@
 
 spring:
   datasource:
-    url: jdbc:mysql://127.0.0.1/genie
+    url: jdbc:mysql://127.0.0.1/genie?useUnicode=yes&characterEncoding=UTF-8
     username: root
     password:
     tomcat:
