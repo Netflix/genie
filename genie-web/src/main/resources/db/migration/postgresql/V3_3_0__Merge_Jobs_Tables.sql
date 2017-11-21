@@ -22,16 +22,6 @@ SELECT
 
 SELECT
   CURRENT_TIMESTAMP,
-  'Installing UUID extension';
-
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
-SELECT
-  CURRENT_TIMESTAMP,
-  'Finished installing UUID extension';
-
-SELECT
-  CURRENT_TIMESTAMP,
   'Dropping existing foreign key constraints';
 
 ALTER TABLE ONLY application_configs
@@ -224,7 +214,7 @@ CREATE TABLE applications (
   created        TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT now()                                     NOT NULL,
   updated        TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT now()                                     NOT NULL,
   entity_version INT DEFAULT 0                                                                    NOT NULL,
-  unique_id      VARCHAR(255) DEFAULT uuid_generate_v1()                                          NOT NULL,
+  unique_id      VARCHAR(255)                                                                     NOT NULL,
   name           VARCHAR(255)                                                                     NOT NULL,
   genie_user     VARCHAR(255)                                                                     NOT NULL,
   version        VARCHAR(255)                                                                     NOT NULL,
@@ -326,7 +316,7 @@ CREATE TABLE clusters (
   created        TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT now()                                    NOT NULL,
   updated        TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT now()                                    NOT NULL,
   entity_version INT DEFAULT '0'                                                                 NOT NULL,
-  unique_id      VARCHAR(255) DEFAULT uuid_generate_v1()                                         NOT NULL,
+  unique_id      VARCHAR(255)                                                                    NOT NULL,
   name           VARCHAR(255)                                                                    NOT NULL,
   genie_user     VARCHAR(255)                                                                    NOT NULL,
   version        VARCHAR(255)                                                                    NOT NULL,
@@ -424,7 +414,7 @@ CREATE TABLE commands (
   created        TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT now()                                     NOT NULL,
   updated        TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT now()                                     NOT NULL,
   entity_version INT DEFAULT '0'                                                                  NOT NULL,
-  unique_id      VARCHAR(255) DEFAULT uuid_generate_v1()                                          NOT NULL,
+  unique_id      VARCHAR(255)                                                                     NOT NULL,
   name           VARCHAR(255)                                                                     NOT NULL,
   genie_user     VARCHAR(255)                                                                     NOT NULL,
   version        VARCHAR(255)                                                                     NOT NULL,
@@ -574,7 +564,7 @@ CREATE TABLE jobs (
   entity_version            INT DEFAULT '0'                                                                         NOT NULL,
 
   -- Job Request
-  unique_id                 VARCHAR(255) DEFAULT uuid_generate_v1()                                                 NOT NULL,
+  unique_id                 VARCHAR(255)                                                                            NOT NULL,
   name                      VARCHAR(255)                                                                            NOT NULL,
   genie_user                VARCHAR(255)                                                                            NOT NULL,
   version                   VARCHAR(255)                                                                            NOT NULL,
