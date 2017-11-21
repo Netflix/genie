@@ -24,6 +24,7 @@ import lombok.ToString;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import java.io.Serializable;
@@ -44,7 +45,7 @@ public class IdEntity implements IdProjection, Serializable {
     private static final long serialVersionUID = 7526472297322776147L;
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, updatable = false)
     private long id;
 }
