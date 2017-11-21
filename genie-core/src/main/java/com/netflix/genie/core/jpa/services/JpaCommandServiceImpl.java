@@ -572,6 +572,14 @@ public class JpaCommandServiceImpl extends JpaBaseService implements CommandServ
         final CommandEntity entity,
         final Command dto
     ) throws GenieException {
+        // Save all the unowned entities first to avoid unintended flushes
+        final Set<FileEntity> configs = this.createAndGetFileEntities(dto.getConfigs());
+        final Set<FileEntity> dependencies = this.createAndGetFileEntities(dto.getDependencies());
+        final FileEntity setupFile = dto.getSetupFile().isPresent()
+            ? this.createAndGetFileEntity(dto.getSetupFile().get())
+            : null;
+        final Set<TagEntity> tags = this.createAndGetTagEntities(dto.getTags());
+
         // NOTE: These are all called in case someone has changed it to set something to null. DO NOT use ifPresent
         entity.setName(dto.getName());
         entity.setUser(dto.getUser());
@@ -579,14 +587,11 @@ public class JpaCommandServiceImpl extends JpaBaseService implements CommandServ
         entity.setDescription(dto.getDescription().orElse(null));
         entity.setExecutable(dto.getExecutable());
         entity.setCheckDelay(dto.getCheckDelay());
-        entity.setConfigs(this.createAndGetFileEntities(dto.getConfigs()));
-        entity.setDependencies(this.createAndGetFileEntities(dto.getDependencies()));
-        final FileEntity setupFile = dto.getSetupFile().isPresent()
-            ? this.createAndGetFileEntity(dto.getSetupFile().get())
-            : null;
+        entity.setConfigs(configs);
+        entity.setDependencies(dependencies);
         entity.setSetupFile(setupFile);
         entity.setStatus(dto.getStatus());
-        entity.setTags(this.createAndGetTagEntities(dto.getTags()));
+        entity.setTags(tags);
         entity.setMemory(dto.getMemory().orElse(null));
 
         this.setFinalTags(entity.getTags(), entity.getUniqueId(), entity.getName());

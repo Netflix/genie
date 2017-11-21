@@ -18,7 +18,6 @@
 package com.netflix.genie.core.jpa.services;
 
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.jpa.entities.FileEntity;
 import com.netflix.genie.core.jpa.repositories.JpaFileRepository;
 import com.netflix.genie.core.services.FileService;
@@ -66,11 +65,6 @@ public class JpaFileServiceImpl implements FileService {
         } catch (final DuplicateKeyException dke) {
             // Must've been created during the time between exists query and now
             log.error("File expected not to be there but seems to be {}", dke.getMessage(), dke);
-        }
-
-        // Make sure it exists
-        if (!this.fileRepository.existsByFile(file)) {
-            throw new GenieServerException("Unable to create file " + file);
         }
     }
 }

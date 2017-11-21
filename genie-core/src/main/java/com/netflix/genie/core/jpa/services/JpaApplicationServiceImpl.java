@@ -459,19 +459,24 @@ public class JpaApplicationServiceImpl extends JpaBaseService implements Applica
         final ApplicationEntity entity,
         final Application dto
     ) throws GenieException {
+        // Save all the unowned entities first to avoid unintended flushes
+        final Set<FileEntity> configs = this.createAndGetFileEntities(dto.getConfigs());
+        final Set<FileEntity> dependencies = this.createAndGetFileEntities(dto.getDependencies());
+        final FileEntity setupFile = dto.getSetupFile().isPresent()
+            ? this.createAndGetFileEntity(dto.getSetupFile().get())
+            : null;
+        final Set<TagEntity> tags = this.createAndGetTagEntities(dto.getTags());
+
         // NOTE: These are all called in case someone has changed it to set something to null. DO NOT use ifPresent
         entity.setName(dto.getName());
         entity.setUser(dto.getUser());
         entity.setVersion(dto.getVersion());
         entity.setDescription(dto.getDescription().orElse(null));
         entity.setStatus(dto.getStatus());
-        final FileEntity setupFile = dto.getSetupFile().isPresent()
-            ? this.createAndGetFileEntity(dto.getSetupFile().get())
-            : null;
         entity.setSetupFile(setupFile);
-        entity.setConfigs(this.createAndGetFileEntities(dto.getConfigs()));
-        entity.setDependencies(this.createAndGetFileEntities(dto.getDependencies()));
-        entity.setTags(this.createAndGetTagEntities(dto.getTags()));
+        entity.setConfigs(configs);
+        entity.setDependencies(dependencies);
+        entity.setTags(tags);
         entity.setType(dto.getType().orElse(null));
 
         this.setFinalTags(entity.getTags(), entity.getUniqueId(), entity.getName());

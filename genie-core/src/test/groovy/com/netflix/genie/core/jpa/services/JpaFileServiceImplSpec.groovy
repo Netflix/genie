@@ -17,14 +17,12 @@
  */
 package com.netflix.genie.core.jpa.services
 
-import com.netflix.genie.common.exceptions.GenieServerException
 import com.netflix.genie.core.jpa.entities.FileEntity
 import com.netflix.genie.core.jpa.repositories.JpaFileRepository
 import com.netflix.genie.test.categories.UnitTest
 import org.junit.experimental.categories.Category
 import org.springframework.dao.DuplicateKeyException
 import spock.lang.Specification
-
 /**
  * Unit tests for JpaFileServiceImpl.
  *
@@ -54,7 +52,7 @@ class JpaFileServiceImplSpec extends Specification {
         this.service.createFileIfNotExists(file)
 
         then:
-        2 * this.fileRepository.existsByFile(file) >>> [false, true]
+        1 * this.fileRepository.existsByFile(file) >> false
         1 * this.fileRepository.saveAndFlush(_ as FileEntity) >> {
             final FileEntity fileEntity ->
                 assert fileEntity.getFile() == file
@@ -69,28 +67,11 @@ class JpaFileServiceImplSpec extends Specification {
         this.service.createFileIfNotExists(file)
 
         then:
-        2 * this.fileRepository.existsByFile(file) >>> [false, true]
+        1 * this.fileRepository.existsByFile(file) >> false
         1 * this.fileRepository.saveAndFlush(_ as FileEntity) >> {
             final FileEntity fileEntity ->
                 assert fileEntity.getFile() == file
                 throw new DuplicateKeyException("Duplicate key")
         }
-    }
-
-    def "If a file was created but we still can't find it an exception is thrown"() {
-        def file = UUID.randomUUID().toString()
-
-        when:
-        this.service.createFileIfNotExists(file)
-
-        then:
-        2 * this.fileRepository.existsByFile(file) >>> [false, false]
-        1 * this.fileRepository.saveAndFlush(_ as FileEntity) >> {
-            final FileEntity fileEntity ->
-                assert fileEntity.getFile() == file
-                fileEntity
-        }
-        def exception = thrown(GenieServerException)
-        exception.message == "Unable to create file " + file
     }
 }

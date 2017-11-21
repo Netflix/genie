@@ -18,7 +18,6 @@
 package com.netflix.genie.core.jpa.services;
 
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.jpa.entities.TagEntity;
 import com.netflix.genie.core.jpa.repositories.JpaTagRepository;
 import com.netflix.genie.core.services.TagService;
@@ -58,19 +57,11 @@ public class JpaTagServiceImpl implements TagService {
             return;
         }
 
-        // Try to create the tag
-        final TagEntity tagEntity = new TagEntity(tag);
-
         try {
-            this.tagRepository.saveAndFlush(tagEntity);
+            this.tagRepository.saveAndFlush(new TagEntity(tag));
         } catch (final DuplicateKeyException dke) {
             // Must've been created during the time between exists query and now
             log.error("Tag expected not to be there but seems to be {}", dke.getMessage(), dke);
-        }
-
-        // Make sure it exists
-        if (!this.tagRepository.existsByTag(tag)) {
-            throw new GenieServerException("Unable to create tag " + tag);
         }
     }
 }

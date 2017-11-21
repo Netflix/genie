@@ -17,14 +17,12 @@
  */
 package com.netflix.genie.core.jpa.services
 
-import com.netflix.genie.common.exceptions.GenieServerException
 import com.netflix.genie.core.jpa.entities.TagEntity
 import com.netflix.genie.core.jpa.repositories.JpaTagRepository
 import com.netflix.genie.test.categories.UnitTest
 import org.junit.experimental.categories.Category
 import org.springframework.dao.DuplicateKeyException
 import spock.lang.Specification
-
 /**
  * Unit tests for JpaTagServiceImpl.
  *
@@ -54,7 +52,7 @@ class JpaTagServiceImplSpec extends Specification {
         this.service.createTagIfNotExists(tag)
 
         then:
-        2 * this.tagRepository.existsByTag(tag) >>> [false, true]
+        1 * this.tagRepository.existsByTag(tag) >> false
         1 * this.tagRepository.saveAndFlush(_ as TagEntity) >> {
             final TagEntity tagEntity ->
                 assert tagEntity.getTag() == tag
@@ -69,28 +67,11 @@ class JpaTagServiceImplSpec extends Specification {
         this.service.createTagIfNotExists(tag)
 
         then:
-        2 * this.tagRepository.existsByTag(tag) >>> [false, true]
+        1 * this.tagRepository.existsByTag(tag) >>> false
         1 * this.tagRepository.saveAndFlush(_ as TagEntity) >> {
             final TagEntity tagEntity ->
                 assert tagEntity.getTag() == tag
                 throw new DuplicateKeyException("Duplicate key")
         }
-    }
-
-    def "If a tag was created but we still can't find it an exception is thrown"() {
-        def tag = UUID.randomUUID().toString()
-
-        when:
-        this.service.createTagIfNotExists(tag)
-
-        then:
-        2 * this.tagRepository.existsByTag(tag) >>> [false, false]
-        1 * this.tagRepository.saveAndFlush(_ as TagEntity) >> {
-            final TagEntity tagEntity ->
-                assert tagEntity.getTag() == tag
-                tagEntity
-        }
-        def exception = thrown(GenieServerException)
-        exception.message == "Unable to create tag " + tag
     }
 }
