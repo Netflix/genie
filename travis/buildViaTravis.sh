@@ -6,14 +6,14 @@ set -e
 
 if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
   echo -e "Build Pull Request #$TRAVIS_PULL_REQUEST => Branch [$TRAVIS_BRANCH]"
-  ./gradlew --no-daemon build javadoc asciidoc coveralls dockerBuildAllImages
+  # Build and run all tests, create coverage report
+  ./gradlew --no-daemon build coveralls
   # Re-run genie-web integration tests with MySQL...
   INTEGRATION_TEST_DB=mysql ./gradlew --no-daemon genie-web:integrationTests
   # ... and PostgreSQL
   INTEGRATION_TEST_DB=postgresql ./gradlew --no-daemon genie-web:integrationTests
-elif [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "develop" ]; then
-  echo -e 'Build Develop without publishing artifacts'
-  ./gradlew build --no-daemon
+  # Build Docker images and compile documentation
+  ./gradlew --no-daemon asciidoc dockerBuildAllImages
 elif [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_TAG" == "" ]; then
   echo -e 'Build Branch with Snapshot => Branch ['$TRAVIS_BRANCH']'
   ./gradlew --no-daemon -Prelease.travisBranch=$TRAVIS_BRANCH -Prelease.travisci=true -PbintrayUser="${bintrayUser}" -PbintrayKey="${bintrayKey}" -PsonatypeUsername="${sonatypeUsername}" -PsonatypePassword="${sonatypePassword}" snapshot coveralls publishGhPages dockerPush
