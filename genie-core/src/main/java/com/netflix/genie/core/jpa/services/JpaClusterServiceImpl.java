@@ -50,6 +50,7 @@ import com.netflix.genie.core.services.TagService;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -120,15 +121,17 @@ public class JpaClusterServiceImpl extends JpaBaseService implements ClusterServ
         @Valid final Cluster cluster
     ) throws GenieException {
         log.debug("Called to create cluster {}", cluster);
-        final Optional<String> clusterId = cluster.getId();
-        if (clusterId.isPresent() && this.clusterRepository.existsByUniqueId(clusterId.get())) {
-            throw new GenieConflictException("A cluster with id " + clusterId.get() + " already exists");
-        }
-
         final ClusterEntity clusterEntity = new ClusterEntity();
         clusterEntity.setUniqueId(cluster.getId().orElse(UUID.randomUUID().toString()));
         this.updateEntityWithDtoContents(clusterEntity, cluster);
-        this.clusterRepository.save(clusterEntity);
+        try {
+            this.clusterRepository.save(clusterEntity);
+        } catch (final DataIntegrityViolationException e) {
+            throw new GenieConflictException(
+                "A cluster with id " + clusterEntity.getUniqueId() + " already exists",
+                e
+            );
+        }
         return clusterEntity.getUniqueId();
     }
 

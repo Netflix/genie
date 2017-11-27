@@ -28,6 +28,7 @@ import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.jpa.entities.ApplicationEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
+import com.netflix.genie.core.jpa.entities.TagEntity;
 import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
@@ -40,6 +41,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
+import org.springframework.dao.DuplicateKeyException;
 
 import java.util.List;
 import java.util.Optional;
@@ -66,6 +68,7 @@ public class JpaCommandServiceImplUnitTests {
     private JpaCommandServiceImpl service;
     private JpaCommandRepository jpaCommandRepository;
     private JpaApplicationRepository jpaApplicationRepository;
+    private JpaTagRepository jpaTagRepository;
 
     /**
      * Setup the tests.
@@ -74,9 +77,10 @@ public class JpaCommandServiceImplUnitTests {
     public void setup() {
         this.jpaCommandRepository = Mockito.mock(JpaCommandRepository.class);
         this.jpaApplicationRepository = Mockito.mock(JpaApplicationRepository.class);
+        this.jpaTagRepository = Mockito.mock(JpaTagRepository.class);
         this.service = new JpaCommandServiceImpl(
             Mockito.mock(TagService.class),
-            Mockito.mock(JpaTagRepository.class),
+            this.jpaTagRepository,
             Mockito.mock(FileService.class),
             Mockito.mock(JpaFileRepository.class),
             this.jpaCommandRepository,
@@ -114,7 +118,13 @@ public class JpaCommandServiceImplUnitTests {
         )
             .withId(COMMAND_1_ID)
             .build();
-        Mockito.when(this.jpaCommandRepository.existsByUniqueId(COMMAND_1_ID)).thenReturn(true);
+
+        Mockito
+            .when(this.jpaTagRepository.findByTag(Mockito.anyString()))
+            .thenReturn(Optional.of(new TagEntity(UUID.randomUUID().toString())));
+        Mockito
+            .when(this.jpaCommandRepository.save(Mockito.any(CommandEntity.class)))
+            .thenThrow(new DuplicateKeyException("Duplicate Key"));
         this.service.createCommand(command);
     }
 

@@ -48,7 +48,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @EqualsAndHashCode(of = "uniqueId", callSuper = false)
-@ToString(callSuper = true)
+@ToString(callSuper = true, exclude = {"description", "setupFile"})
 @MappedSuperclass
 public class BaseEntity extends AuditEntity implements BaseProjection, SetupFileProjection {
 

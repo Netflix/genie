@@ -23,7 +23,7 @@ import com.netflix.genie.core.jpa.repositories.JpaTagRepository;
 import com.netflix.genie.core.services.TagService;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.NotBlank;
-import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -59,9 +59,9 @@ public class JpaTagServiceImpl implements TagService {
 
         try {
             this.tagRepository.saveAndFlush(new TagEntity(tag));
-        } catch (final DuplicateKeyException dke) {
+        } catch (final DataIntegrityViolationException e) {
             // Must've been created during the time between exists query and now
-            log.error("Tag expected not to be there but seems to be {}", dke.getMessage(), dke);
+            log.error("Tag expected not to be there but seems to be {}", e.getMessage(), e);
         }
     }
 }

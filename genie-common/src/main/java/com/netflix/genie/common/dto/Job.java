@@ -28,6 +28,7 @@ import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.Duration;
@@ -70,7 +71,7 @@ public class Job extends CommonDTO {
      *
      * @param builder The builder to use
      */
-    protected Job(final Builder builder) {
+    protected Job(@Valid final Builder builder) {
         super(builder);
         this.commandArgs = builder.bCommandArgs.isEmpty()
             ? null

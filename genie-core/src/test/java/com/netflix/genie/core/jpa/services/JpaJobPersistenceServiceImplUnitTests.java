@@ -50,6 +50,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.springframework.dao.DuplicateKeyException;
 
 import java.util.Date;
 import java.util.List;
@@ -151,12 +152,11 @@ public class JpaJobPersistenceServiceImplUnitTests {
             .withTotalSizeOfAttachments(totalSizeOfAttachments)
             .build();
 
-        final Job.Builder jobBuilder = new Job.Builder(JOB_1_NAME, JOB_1_USER, JOB_1_VERSION)
+        final Job job = new Job.Builder(JOB_1_NAME, JOB_1_USER, JOB_1_VERSION)
             .withStatus(JobStatus.INIT)
-            .withStatusMsg("Job is initializing");
-
-        jobBuilder.withCommandArgs(JOB_1_COMMAND_ARGS);
-        final Job job = jobBuilder.build();
+            .withStatusMsg("Job is initializing")
+            .withCommandArgs(JOB_1_COMMAND_ARGS)
+            .build();
 
         final JobExecution execution = new JobExecution.Builder(UUID.randomUUID().toString()).build();
 
@@ -237,10 +237,34 @@ public class JpaJobPersistenceServiceImplUnitTests {
             .withId(JOB_1_ID)
             .withCommandArgs(JOB_1_COMMAND_ARGS)
             .build();
-        Mockito.when(this.jobRepository.existsByUniqueId(Mockito.eq(JOB_1_ID))).thenReturn(true);
-        this.jobPersistenceService.createJob(
-            jobRequest, Mockito.mock(JobMetadata.class), Mockito.mock(Job.class), Mockito.mock(JobExecution.class)
-        );
+
+        final JobMetadata metadata = new JobMetadata
+            .Builder()
+            .withClientHost(UUID.randomUUID().toString())
+            .withUserAgent(UUID.randomUUID().toString())
+            .withNumAttachments(0)
+            .withTotalSizeOfAttachments(0L)
+            .build();
+
+        final Job job = new Job.Builder(JOB_1_NAME, JOB_1_USER, JOB_1_VERSION)
+            .withStatus(JobStatus.INIT)
+            .withStatusMsg("Job is initializing")
+            .withCommandArgs(JOB_1_COMMAND_ARGS)
+            .build();
+
+
+        final JobExecution execution = new JobExecution.Builder(UUID.randomUUID().toString()).build();
+
+        Mockito
+            .when(this.tagRepository.findByTag(Mockito.anyString()))
+            .thenReturn(Optional.of(new TagEntity(UUID.randomUUID().toString())));
+        Mockito
+            .when(this.fileRepository.findByFile(Mockito.anyString()))
+            .thenReturn(Optional.of(new FileEntity(UUID.randomUUID().toString())));
+        Mockito
+            .when(this.jobRepository.save(Mockito.any(JobEntity.class)))
+            .thenThrow(new DuplicateKeyException("Duplicate Key"));
+        this.jobPersistenceService.createJob(jobRequest, metadata, job, execution);
     }
 
     /**

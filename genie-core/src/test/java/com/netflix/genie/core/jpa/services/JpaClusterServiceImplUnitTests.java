@@ -28,6 +28,8 @@ import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.jpa.entities.ClusterEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
+import com.netflix.genie.core.jpa.entities.FileEntity;
+import com.netflix.genie.core.jpa.entities.TagEntity;
 import com.netflix.genie.core.jpa.entities.projections.ClusterCommandsProjection;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
@@ -40,6 +42,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
+import org.springframework.dao.DuplicateKeyException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,6 +67,8 @@ public class JpaClusterServiceImplUnitTests {
     private JpaClusterServiceImpl service;
     private JpaClusterRepository jpaClusterRepository;
     private JpaCommandRepository jpaCommandRepository;
+    private JpaTagRepository jpaTagRepository;
+    private JpaFileRepository jpaFileRepository;
 
     /**
      * Setup for the tests.
@@ -72,11 +77,13 @@ public class JpaClusterServiceImplUnitTests {
     public void setup() {
         this.jpaClusterRepository = Mockito.mock(JpaClusterRepository.class);
         this.jpaCommandRepository = Mockito.mock(JpaCommandRepository.class);
+        this.jpaTagRepository = Mockito.mock(JpaTagRepository.class);
+        this.jpaFileRepository = Mockito.mock(JpaFileRepository.class);
         this.service = new JpaClusterServiceImpl(
             Mockito.mock(TagService.class),
-            Mockito.mock(JpaTagRepository.class),
+            this.jpaTagRepository,
             Mockito.mock(FileService.class),
-            Mockito.mock(JpaFileRepository.class),
+            this.jpaFileRepository,
             this.jpaClusterRepository,
             this.jpaCommandRepository
         );
@@ -112,7 +119,16 @@ public class JpaClusterServiceImplUnitTests {
             .withConfigs(configs)
             .build();
 
-        Mockito.when(this.jpaClusterRepository.existsByUniqueId(CLUSTER_1_ID)).thenReturn(true);
+
+        Mockito
+            .when(this.jpaTagRepository.findByTag(Mockito.anyString()))
+            .thenReturn(Optional.of(new TagEntity(UUID.randomUUID().toString())));
+        Mockito
+            .when(this.jpaFileRepository.findByFile(Mockito.anyString()))
+            .thenReturn(Optional.of(new FileEntity(UUID.randomUUID().toString())));
+        Mockito
+            .when(this.jpaClusterRepository.save(Mockito.any(ClusterEntity.class)))
+            .thenThrow(new DuplicateKeyException("Duplicate Key"));
         this.service.createCluster(cluster);
     }
 

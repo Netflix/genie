@@ -47,6 +47,7 @@ import com.netflix.genie.core.services.TagService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -127,12 +128,12 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         );
 
         final String jobId = jobRequest.getId().orElseThrow(() -> new GeniePreconditionException("No job id entered"));
-        if (this.jobRepository.existsByUniqueId(jobId)) {
-            throw new GenieConflictException("A job with id " + jobId + " already exists");
-        }
-
         final JobEntity jobEntity = this.toEntity(jobId, jobRequest, jobMetadata, job, jobExecution);
-        this.jobRepository.save(jobEntity);
+        try {
+            this.jobRepository.save(jobEntity);
+        } catch (final DataIntegrityViolationException e) {
+            throw new GenieConflictException("A job with id " + jobId + " already exists", e);
+        }
     }
 
     /**

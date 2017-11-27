@@ -20,6 +20,7 @@ package com.netflix.genie.common.dto;
 import com.google.common.collect.ImmutableSet;
 import lombok.Getter;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Size;
 import java.util.HashSet;
 import java.util.Optional;
@@ -46,7 +47,7 @@ public abstract class ExecutionEnvironmentDTO extends CommonDTO {
      * @param builder The builder to use
      */
     @SuppressWarnings("unchecked")
-    ExecutionEnvironmentDTO(final Builder builder) {
+    ExecutionEnvironmentDTO(@Valid final Builder builder) {
         super(builder);
         this.setupFile = builder.bSetupFile;
         this.configs = ImmutableSet.copyOf(builder.bConfigs);

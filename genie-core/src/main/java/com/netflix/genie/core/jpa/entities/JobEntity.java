@@ -71,7 +71,20 @@ import java.util.Set;
  */
 @Getter
 @Setter
-@ToString(callSuper = true)
+@ToString(
+    callSuper = true,
+    exclude = {
+        "configs",
+        "dependencies",
+        "tags",
+        "cluster",
+        "command",
+        "applications",
+        "clusterCriteria",
+        "commandCriterion",
+        "applicationsRequested"
+    }
+)
 @Entity
 @Table(name = "jobs")
 public class JobEntity extends BaseEntity implements

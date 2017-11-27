@@ -54,7 +54,7 @@ import java.util.Set;
  */
 @Getter
 @Setter
-@ToString(callSuper = true)
+@ToString(callSuper = true, exclude = {"configs", "dependencies", "tags", "applications", "clusters"})
 @Entity
 @Table(name = "commands")
 public class CommandEntity extends BaseEntity {

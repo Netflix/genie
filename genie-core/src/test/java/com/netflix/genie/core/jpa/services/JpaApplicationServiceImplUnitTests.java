@@ -28,6 +28,7 @@ import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.jpa.entities.ApplicationEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
+import com.netflix.genie.core.jpa.entities.TagEntity;
 import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.core.jpa.repositories.JpaFileRepository;
@@ -39,6 +40,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
+import org.springframework.dao.DuplicateKeyException;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -58,6 +60,7 @@ public class JpaApplicationServiceImplUnitTests {
 
     private JpaApplicationRepository jpaApplicationRepository;
     private JpaApplicationServiceImpl appService;
+    private JpaTagRepository jpaTagRepository;
 
     /**
      * Setup the tests.
@@ -65,9 +68,10 @@ public class JpaApplicationServiceImplUnitTests {
     @Before
     public void setup() {
         this.jpaApplicationRepository = Mockito.mock(JpaApplicationRepository.class);
+        this.jpaTagRepository = Mockito.mock(JpaTagRepository.class);
         this.appService = new JpaApplicationServiceImpl(
             Mockito.mock(TagService.class),
-            Mockito.mock(JpaTagRepository.class),
+            this.jpaTagRepository,
             Mockito.mock(FileService.class),
             Mockito.mock(JpaFileRepository.class),
             this.jpaApplicationRepository,
@@ -99,7 +103,13 @@ public class JpaApplicationServiceImplUnitTests {
         )
             .withId(APP_1_ID)
             .build();
-        Mockito.when(this.jpaApplicationRepository.existsByUniqueId(Mockito.eq(APP_1_ID))).thenReturn(true);
+
+        Mockito
+            .when(this.jpaTagRepository.findByTag(Mockito.anyString()))
+            .thenReturn(Optional.of(new TagEntity(UUID.randomUUID().toString())));
+        Mockito
+            .when(this.jpaApplicationRepository.save(Mockito.any(ApplicationEntity.class)))
+            .thenThrow(new DuplicateKeyException("Duplicate Key"));
         this.appService.createApplication(app);
     }
 

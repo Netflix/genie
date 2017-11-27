@@ -38,7 +38,7 @@ import java.util.Date;
  * @author tgianos
  */
 @Getter
-@ToString(callSuper = true)
+@ToString(callSuper = true, exclude = "entityVersion")
 @MappedSuperclass
 public class AuditEntity extends IdEntity implements AuditProjection {
 

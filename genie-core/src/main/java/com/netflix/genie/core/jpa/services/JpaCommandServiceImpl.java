@@ -52,6 +52,7 @@ import com.netflix.genie.core.services.TagService;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -125,15 +126,17 @@ public class JpaCommandServiceImpl extends JpaBaseService implements CommandServ
         @Valid final Command command
     ) throws GenieException {
         log.debug("Called to create command {}", command);
-        final Optional<String> commandId = command.getId();
-        if (commandId.isPresent() && this.commandRepository.existsByUniqueId(commandId.get())) {
-            throw new GenieConflictException("A command with id " + commandId.get() + " already exists");
-        }
-
         final CommandEntity commandEntity = new CommandEntity();
         commandEntity.setUniqueId(command.getId().orElse(UUID.randomUUID().toString()));
         this.updateEntityWithDtoContents(commandEntity, command);
-        this.commandRepository.save(commandEntity);
+        try {
+            this.commandRepository.save(commandEntity);
+        } catch (final DataIntegrityViolationException e) {
+            throw new GenieConflictException(
+                "A command with id " + commandEntity.getUniqueId() + " already exists",
+                e
+            );
+        }
         return commandEntity.getUniqueId();
     }
 

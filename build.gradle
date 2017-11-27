@@ -111,7 +111,7 @@ configure(javaProjects) {
 
             // TODO: These are here as part of waiting for bug fix release https://jira.spring.io/browse/DATAJPA-1185
             dependency("org.springframework.data:spring-data-commons:1.13.8.RELEASE")
-            dependency("org.springframework.data:spring-data-jpa:1.11.9.BUILD-SNAPSHOT")
+            dependency("org.springframework.data:spring-data-jpa:1.11.9.RELEASE")
         }
     }
 

@@ -47,6 +47,7 @@ import com.netflix.genie.core.services.TagService;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -116,15 +117,17 @@ public class JpaApplicationServiceImpl extends JpaBaseService implements Applica
         @Valid final Application app
     ) throws GenieException {
         log.debug("Called with application: {}", app);
-        final Optional<String> appId = app.getId();
-        if (appId.isPresent() && this.applicationRepository.existsByUniqueId(appId.get())) {
-            throw new GenieConflictException("An application with id " + appId.get() + " already exists");
-        }
-
         final ApplicationEntity applicationEntity = new ApplicationEntity();
         applicationEntity.setUniqueId(app.getId().orElse(UUID.randomUUID().toString()));
         this.updateEntityWithDtoContents(applicationEntity, app);
-        this.applicationRepository.save(applicationEntity);
+        try {
+            this.applicationRepository.save(applicationEntity);
+        } catch (final DataIntegrityViolationException e) {
+            throw new GenieConflictException(
+                "An application with id " + applicationEntity.getUniqueId() + " already exists",
+                e
+            );
+        }
         return applicationEntity.getUniqueId();
     }
 
