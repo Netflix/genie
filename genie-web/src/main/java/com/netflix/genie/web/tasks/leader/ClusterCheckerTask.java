@@ -30,6 +30,7 @@ import com.netflix.genie.web.properties.ClusterCheckerProperties;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import com.netflix.spectator.api.Counter;
 import com.netflix.spectator.api.Registry;
+import com.netflix.spectator.api.patterns.PolledMeter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -106,7 +107,10 @@ public class ClusterCheckerTask extends LeadershipTask {
         this.healthIndicatorsToIgnore = Splitter.on(",").omitEmptyStrings()
             .trimResults().splitToList(properties.getHealthIndicatorsToIgnore());
         // Keep track of the number of nodes currently unreachable from the the master
-        registry.mapSize("genie.tasks.clusterChecker.errorCounts.gauge", this.errorCounts);
+        PolledMeter
+            .using(registry)
+            .withName("genie.tasks.clusterChecker.errorCounts.gauge")
+            .monitorSize(this.errorCounts);
         this.lostJobsCounter = registry.counter("genie.tasks.clusterChecker.lostJobs.rate");
         this.unableToUpdateJobCounter = registry.counter("genie.tasks.clusterChecker.unableToUpdateJob.rate");
     }

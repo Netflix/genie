@@ -29,6 +29,7 @@ import com.netflix.genie.core.services.JobStateService;
 import com.netflix.genie.core.services.JobSubmitterService;
 import com.netflix.spectator.api.Counter;
 import com.netflix.spectator.api.Registry;
+import com.netflix.spectator.api.patterns.PolledMeter;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -76,9 +77,21 @@ public class JobStateServiceImpl implements JobStateService {
         this.registry = registry;
         this.genieEventBus = genieEventBus;
 
-        this.registry.mapSize("genie.jobs.running.gauge", this.jobs);
-        this.registry.methodValue("genie.jobs.active.gauge", this, "getNumActiveJobs");
-        this.registry.methodValue("genie.jobs.memory.used.gauge", this, "getUsedMemory");
+        PolledMeter
+            .using(registry)
+            .withName("genie.jobs.running.gauge")
+            .monitorSize(this.jobs);
+
+        PolledMeter
+            .using(registry)
+            .withName("genie.jobs.active.gauge")
+            .monitorValue(this, JobStateServiceImpl::getNumActiveJobs);
+
+        PolledMeter
+            .using(registry)
+            .withName("genie.jobs.memory.used.gauge")
+            .monitorValue(this, JobStateServiceImpl::getUsedMemory);
+
         this.unableToCancel = registry.counter("genie.jobs.unableToCancel.rate");
     }
 

@@ -15,6 +15,7 @@ package com.netflix.genie.core.services.impl
 
 import com.netflix.genie.common.exceptions.GenieServerException
 import com.netflix.genie.core.services.FileTransferFactory
+import com.netflix.spectator.api.DefaultRegistry
 import com.netflix.spectator.api.Registry
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -29,7 +30,7 @@ class CacheGenieFileTransferServiceSpec extends Specification{
         get(_) >> localFileTransfer
     }
     File cachedFile = Mock(File)
-    Registry registry = Mock(Registry)
+    Registry registry = new DefaultRegistry()
     CacheGenieFileTransferService s =
             Spy( CacheGenieFileTransferService,
                     constructorArgs: [fileTransferFactory, "/tmp", localFileTransfer, registry]){

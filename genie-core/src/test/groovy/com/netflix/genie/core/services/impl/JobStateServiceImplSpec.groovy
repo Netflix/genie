@@ -8,6 +8,7 @@ import com.netflix.genie.common.dto.JobRequest
 import com.netflix.genie.core.events.GenieEventBus
 import com.netflix.genie.core.services.JobStateService
 import com.netflix.genie.core.services.JobSubmitterService
+import com.netflix.spectator.api.DefaultRegistry
 import com.netflix.spectator.api.Registry
 import org.springframework.scheduling.TaskScheduler
 import spock.lang.Specification
@@ -22,7 +23,7 @@ class JobStateServiceImplSpec extends Specification {
     JobSubmitterService jobSubmitterService = Mock(JobSubmitterService)
     TaskScheduler scheduler = Mock(TaskScheduler)
     GenieEventBus genieEventBus = Mock(GenieEventBus)
-    Registry registry = Mock(Registry)
+    Registry registry = new DefaultRegistry()
     JobRequest jobRequest = Mock(JobRequest)
     Cluster cluster = Mock(Cluster)
     Command command = Mock(Command)

@@ -85,7 +85,7 @@ configure(javaProjects) {
                 entry "servo-core"
                 entry "servo-internal"
             }
-            dependencySet(group: "com.netflix.spectator", version: "0.56.0") {
+            dependencySet(group: "com.netflix.spectator", version: "0.60.0") {
                 entry "spectator-api"
                 entry "spectator-reg-servo"
             }

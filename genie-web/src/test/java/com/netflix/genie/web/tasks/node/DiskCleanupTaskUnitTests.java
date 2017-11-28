@@ -26,11 +26,9 @@ import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.properties.DiskCleanupProperties;
 import com.netflix.genie.web.tasks.TaskUtils;
-import com.netflix.spectator.api.Counter;
-import com.netflix.spectator.api.Registry;
+import com.netflix.spectator.api.DefaultRegistry;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.lang3.SystemUtils;
-import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Rule;
@@ -48,7 +46,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Unit tests for the disk cleanup task.
@@ -84,7 +81,7 @@ public class DiskCleanupTaskUnitTests {
                 Mockito.mock(JobSearchService.class),
                 properties,
                 Mockito.mock(Executor.class),
-                Mockito.mock(Registry.class)
+                new DefaultRegistry()
             )
         );
     }
@@ -108,7 +105,7 @@ public class DiskCleanupTaskUnitTests {
                 Mockito.mock(JobSearchService.class),
                 new JobsProperties(),
                 Mockito.mock(Executor.class),
-                Mockito.mock(Registry.class)
+                new DefaultRegistry()
             )
         );
         Mockito.verify(scheduler, Mockito.never()).schedule(Mockito.any(Runnable.class), Mockito.any(Trigger.class));
@@ -133,7 +130,7 @@ public class DiskCleanupTaskUnitTests {
                 Mockito.mock(JobSearchService.class),
                 new JobsProperties(),
                 Mockito.mock(Executor.class),
-                Mockito.mock(Registry.class)
+                new DefaultRegistry()
             )
         );
         Mockito.verify(scheduler, Mockito.times(1)).schedule(Mockito.any(Runnable.class), Mockito.any(Trigger.class));
@@ -160,7 +157,7 @@ public class DiskCleanupTaskUnitTests {
                 Mockito.mock(JobSearchService.class),
                 properties,
                 Mockito.mock(Executor.class),
-                Mockito.mock(Registry.class)
+                new DefaultRegistry()
             )
         );
         Mockito.verify(scheduler, Mockito.times(1)).schedule(Mockito.any(Runnable.class), Mockito.any(Trigger.class));
@@ -212,29 +209,6 @@ public class DiskCleanupTaskUnitTests {
         Mockito.when(jobDir.exists()).thenReturn(true);
         Mockito.when(jobDir.getFile()).thenReturn(this.tmpJobDir.getRoot());
         final JobSearchService jobSearchService = Mockito.mock(JobSearchService.class);
-        final Registry registry = Mockito.mock(Registry.class);
-        final AtomicLong numberOfDeletedJobDirs = new AtomicLong();
-        Mockito.when(
-            registry.gauge(
-                Mockito.eq("genie.tasks.diskCleanup.numberDeletedJobDirs.gauge"),
-                Mockito.any(AtomicLong.class)
-            )
-        ).thenReturn(numberOfDeletedJobDirs);
-        final AtomicLong numberOfDirsUnableToDelete = new AtomicLong();
-        Mockito.when(
-            registry.gauge(
-                Mockito.eq("genie.tasks.diskCleanup.numberDirsUnableToDelete.gauge"),
-                Mockito.any(AtomicLong.class)
-            )
-        ).thenReturn(numberOfDirsUnableToDelete);
-        final Counter unableToGetJobCounter = Mockito.mock(Counter.class);
-        Mockito
-            .when(registry.counter("genie.tasks.diskCleanup.unableToGetJobs.rate"))
-            .thenReturn(unableToGetJobCounter);
-        final Counter unabledToDeleteJobsDir = Mockito.mock(Counter.class);
-        Mockito
-            .when(registry.counter("genie.tasks.diskCleanup.unableToDeleteJobsDir.rate"))
-            .thenReturn(unabledToDeleteJobsDir);
 
         Mockito.when(jobSearchService.getJob(job1Id)).thenReturn(job1);
         Mockito.when(jobSearchService.getJob(job2Id)).thenReturn(job2);
@@ -249,13 +223,9 @@ public class DiskCleanupTaskUnitTests {
             jobSearchService,
             jobsProperties,
             Mockito.mock(Executor.class),
-            registry
+            new DefaultRegistry()
         );
-        Assert.assertThat(numberOfDeletedJobDirs.get(), Matchers.is(0L));
-        Assert.assertThat(numberOfDirsUnableToDelete.get(), Matchers.is(0L));
         task.run();
-        Assert.assertThat(numberOfDeletedJobDirs.get(), Matchers.is(1L));
-        Assert.assertThat(numberOfDirsUnableToDelete.get(), Matchers.is(1L));
         Assert.assertTrue(new File(jobDir.getFile(), job1Id).exists());
         Assert.assertTrue(new File(jobDir.getFile(), job2Id).exists());
         Assert.assertFalse(new File(jobDir.getFile(), job3Id).exists());

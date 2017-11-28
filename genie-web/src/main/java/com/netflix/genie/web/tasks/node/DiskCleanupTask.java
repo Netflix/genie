@@ -26,6 +26,7 @@ import com.netflix.genie.web.properties.DiskCleanupProperties;
 import com.netflix.genie.web.tasks.TaskUtils;
 import com.netflix.spectator.api.Counter;
 import com.netflix.spectator.api.Registry;
+import com.netflix.spectator.api.patterns.PolledMeter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.Executor;
@@ -100,10 +101,14 @@ public class DiskCleanupTask implements Runnable {
         this.runAsUser = jobsProperties.getUsers().isRunAsUserEnabled();
         this.processExecutor = processExecutor;
 
-        this.numberOfDeletedJobDirs
-            = registry.gauge("genie.tasks.diskCleanup.numberDeletedJobDirs.gauge", new AtomicLong());
-        this.numberOfDirsUnableToDelete
-            = registry.gauge("genie.tasks.diskCleanup.numberDirsUnableToDelete.gauge", new AtomicLong());
+        this.numberOfDeletedJobDirs = PolledMeter
+            .using(registry)
+            .withName("genie.tasks.diskCleanup.numberDeletedJobDirs.gauge")
+            .monitorValue(new AtomicLong());
+        this.numberOfDirsUnableToDelete = PolledMeter
+            .using(registry)
+            .withName("genie.tasks.diskCleanup.numberDirsUnableToDelete.gauge")
+            .monitorValue(new AtomicLong());
         this.unableToGetJobCounter = registry.counter("genie.tasks.diskCleanup.unableToGetJobs.rate");
         this.unableToDeleteJobDirCounter = registry.counter("genie.tasks.diskCleanup.unableToDeleteJobsDir.rate");
 
