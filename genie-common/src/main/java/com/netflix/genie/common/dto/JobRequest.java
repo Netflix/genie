@@ -198,46 +198,6 @@ public class JobRequest extends ExecutionEnvironmentDTO {
 
         /**
          * Constructor which has required fields.
-         * <p>
-         * DEPRECATED: Will be removed in 4.0.0 as command args are optional and should be a List now
-         *
-         * @param name             The name to use for the Job
-         * @param user             The user to use for the Job
-         * @param version          The version to use for the Job
-         * @param commandArgs      The command line arguments for the Job
-         * @param clusterCriterias The list of cluster criteria for the Job
-         * @param commandCriteria  The list of command criteria for the Job
-         * @see Builder(String, String, String, List, List)
-         */
-        @Deprecated
-        public Builder(
-            final String name,
-            final String user,
-            final String version,
-            @Nullable final String commandArgs,
-            final List<ClusterCriteria> clusterCriterias,
-            final Set<String> commandCriteria
-        ) {
-            super(name, user, version);
-            this.bCommandArgs = commandArgs == null
-                ? Lists.newArrayList()
-                : Lists.newArrayList(StringUtils.splitByWholeSeparator(commandArgs, StringUtils.SPACE));
-            if (clusterCriterias != null) {
-                this.bClusterCriterias.addAll(clusterCriterias);
-            }
-            if (commandCriteria != null) {
-                commandCriteria.forEach(
-                    criteria -> {
-                        if (StringUtils.isNotBlank(criteria)) {
-                            this.bCommandCriteria.add(criteria);
-                        }
-                    }
-                );
-            }
-        }
-
-        /**
-         * Constructor which has required fields.
          *
          * @param name             The name to use for the Job
          * @param user             The user to use for the Job
@@ -256,6 +216,46 @@ public class JobRequest extends ExecutionEnvironmentDTO {
         ) {
             super(name, user, version);
             this.bCommandArgs = Lists.newArrayList();
+            if (clusterCriterias != null) {
+                this.bClusterCriterias.addAll(clusterCriterias);
+            }
+            if (commandCriteria != null) {
+                commandCriteria.forEach(
+                    criteria -> {
+                        if (StringUtils.isNotBlank(criteria)) {
+                            this.bCommandCriteria.add(criteria);
+                        }
+                    }
+                );
+            }
+        }
+
+        /**
+         * Constructor which has required fields.
+         * <p>
+         * DEPRECATED: Will be removed in 4.0.0 as command args are optional and should be a List now
+         *
+         * @param name             The name to use for the Job
+         * @param user             The user to use for the Job
+         * @param version          The version to use for the Job
+         * @param commandArgs      The command line arguments for the Job
+         * @param clusterCriterias The list of cluster criteria for the Job
+         * @param commandCriteria  The list of command criteria for the Job
+         * @see #Builder(String, String, String, List, Set)
+         */
+        @Deprecated
+        public Builder(
+            final String name,
+            final String user,
+            final String version,
+            @Nullable final String commandArgs,
+            final List<ClusterCriteria> clusterCriterias,
+            final Set<String> commandCriteria
+        ) {
+            super(name, user, version);
+            this.bCommandArgs = commandArgs == null
+                ? Lists.newArrayList()
+                : Lists.newArrayList(StringUtils.splitByWholeSeparator(commandArgs, StringUtils.SPACE));
             if (clusterCriterias != null) {
                 this.bClusterCriterias.addAll(clusterCriterias);
             }

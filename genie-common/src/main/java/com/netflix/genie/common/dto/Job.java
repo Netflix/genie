@@ -193,6 +193,24 @@ public class Job extends CommonDTO {
 
         /**
          * Constructor which has required fields.
+         *
+         * @param name    The name to use for the Job
+         * @param user    The user to use for the Job
+         * @param version The version to use for the Job
+         * @since 3.3.0
+         */
+        @JsonCreator
+        public Builder(
+            @JsonProperty("name") final String name,
+            @JsonProperty("user") final String user,
+            @JsonProperty("version") final String version
+        ) {
+            super(name, user, version);
+            this.bCommandArgs = Lists.newArrayList();
+        }
+
+        /**
+         * Constructor which has required fields.
          * <p>
          * Deprecated: Command args is optional. Use new constructor. Will be removed in 4.0.0
          *
@@ -213,24 +231,6 @@ public class Job extends CommonDTO {
             this.bCommandArgs = commandArgs == null
                 ? Lists.newArrayList()
                 : Lists.newArrayList(StringUtils.splitByWholeSeparator(commandArgs, StringUtils.SPACE));
-        }
-
-        /**
-         * Constructor which has required fields.
-         *
-         * @param name    The name to use for the Job
-         * @param user    The user to use for the Job
-         * @param version The version to use for the Job
-         * @since 3.3.0
-         */
-        @JsonCreator
-        public Builder(
-            @JsonProperty("name") final String name,
-            @JsonProperty("user") final String user,
-            @JsonProperty("version") final String version
-        ) {
-            super(name, user, version);
-            this.bCommandArgs = Lists.newArrayList();
         }
 
         /**
