@@ -198,32 +198,38 @@ final class Snippets {
         PayloadDocumentation
             .fieldWithPath("[]")
             .description("Array of configuration file locations")
+            .type(JsonFieldType.ARRAY)
             .attributes(EMPTY_CONSTRAINTS),
     };
     static final FieldDescriptor[] DEPENDENCIES_FIELDS = new FieldDescriptor[]{
         PayloadDocumentation
             .fieldWithPath("[]")
             .description("Array of dependency file locations")
+            .type(JsonFieldType.ARRAY)
             .attributes(EMPTY_CONSTRAINTS),
     };
     static final FieldDescriptor[] TAGS_FIELDS = new FieldDescriptor[]{
         PayloadDocumentation
             .fieldWithPath("[]")
             .description("Array of tags")
+            .type(JsonFieldType.ARRAY)
             .attributes(EMPTY_CONSTRAINTS),
     };
     static final RequestFieldsSnippet PATCH_FIELDS = PayloadDocumentation.requestFields(
         PayloadDocumentation
             .fieldWithPath("[]")
             .description("Array of patches to apply")
+            .type(JsonFieldType.ARRAY)
             .attributes(EMPTY_CONSTRAINTS),
         PayloadDocumentation
             .fieldWithPath("[].op")
             .description("Patch operation to perform.")
+            .type(JsonFieldType.STRING)
             .attributes(Attributes.key(CONSTRAINTS).value("add, remove, replace, copy, move, test")),
         PayloadDocumentation
             .fieldWithPath("[].path")
             .description("The json path to operate on. e.g. /user")
+            .type(JsonFieldType.STRING)
             .attributes(EMPTY_CONSTRAINTS),
         PayloadDocumentation
             .fieldWithPath("[].from")
@@ -395,6 +401,7 @@ final class Snippets {
                 PayloadDocumentation
                     .fieldWithPath("_embedded.applicationList")
                     .description("The found applications.")
+                    .type(JsonFieldType.ARRAY)
                     .attributes(EMPTY_CONSTRAINTS)
             )
         );
@@ -405,6 +412,7 @@ final class Snippets {
                 PayloadDocumentation
                     .fieldWithPath("_embedded.clusterList")
                     .description("The found clusters.")
+                    .type(JsonFieldType.ARRAY)
                     .attributes(EMPTY_CONSTRAINTS)
             )
         );
@@ -415,6 +423,7 @@ final class Snippets {
                 PayloadDocumentation
                     .fieldWithPath("_embedded.commandList")
                     .description("The found commands.")
+                    .type(JsonFieldType.ARRAY)
                     .attributes(EMPTY_CONSTRAINTS)
             )
         );
@@ -425,6 +434,7 @@ final class Snippets {
                 PayloadDocumentation
                     .fieldWithPath("_embedded.jobSearchResultList")
                     .description("The found jobs.")
+                    .type(JsonFieldType.ARRAY)
                     .attributes(EMPTY_CONSTRAINTS)
             )
         );
@@ -434,6 +444,7 @@ final class Snippets {
                 .fieldWithPath("parent")
                 .description("Information about the parent of this directory")
                 .attributes(EMPTY_CONSTRAINTS)
+                .type(JsonFieldType.OBJECT)
                 .optional(),
             PayloadDocumentation
                 .fieldWithPath("parent.name")
@@ -462,42 +473,52 @@ final class Snippets {
             PayloadDocumentation
                 .fieldWithPath("directories")
                 .description("All the subdirectories of this directory")
+                .type(JsonFieldType.ARRAY)
                 .attributes(EMPTY_CONSTRAINTS),
             PayloadDocumentation
                 .fieldWithPath("directories[].name")
                 .description("The name of the directory")
+                .type(JsonFieldType.STRING)
                 .attributes(EMPTY_CONSTRAINTS),
             PayloadDocumentation
                 .fieldWithPath("directories[].url")
                 .description("The url to get the directory")
+                .type(JsonFieldType.STRING)
                 .attributes(EMPTY_CONSTRAINTS),
             PayloadDocumentation
                 .fieldWithPath("directories[].size")
                 .description("The size of the directory in bytes")
+                .type(JsonFieldType.NUMBER)
                 .attributes(EMPTY_CONSTRAINTS),
             PayloadDocumentation
                 .fieldWithPath("directories[].lastModified")
                 .description("The last time the directory was modified in ISO8601 UTC with milliseconds included")
+                .type(JsonFieldType.STRING)
                 .attributes(EMPTY_CONSTRAINTS),
             PayloadDocumentation
                 .fieldWithPath("files")
                 .description("All the files in this directory")
+                .type(JsonFieldType.ARRAY)
                 .attributes(EMPTY_CONSTRAINTS),
             PayloadDocumentation
                 .fieldWithPath("files[].name")
                 .description("The name of the file")
+                .type(JsonFieldType.STRING)
                 .attributes(EMPTY_CONSTRAINTS),
             PayloadDocumentation
                 .fieldWithPath("files[].url")
                 .description("The url to get the file")
+                .type(JsonFieldType.STRING)
                 .attributes(EMPTY_CONSTRAINTS),
             PayloadDocumentation
                 .fieldWithPath("files[].size")
                 .description("The size of the file in bytes")
+                .type(JsonFieldType.NUMBER)
                 .attributes(EMPTY_CONSTRAINTS),
             PayloadDocumentation
                 .fieldWithPath("files[].lastModified")
                 .description("The last time the file was modified in ISO8601 UTC with milliseconds included")
+                .type(JsonFieldType.STRING)
                 .attributes(EMPTY_CONSTRAINTS)
         );
     private static final ConstraintDescriptions COMMAND_CONSTRAINTS = new ConstraintDescriptions(Command.class);
@@ -624,17 +645,20 @@ final class Snippets {
                 .fieldWithPath("type")
                 .attributes(getConstraintsForField(APPLICATION_CONSTRAINTS, "type"))
                 .description("The type of application this is (e.g. hadoop, presto, spark). Can be used to group.")
+                .type(JsonFieldType.STRING)
                 .optional(),
             PayloadDocumentation
                 .fieldWithPath("status")
                 .attributes(getConstraintsForField(APPLICATION_CONSTRAINTS, "status"))
                 .description(
                     "The status of the application. Options: " + Arrays.toString(ApplicationStatus.values())
-                ),
+                )
+                .type(JsonFieldType.STRING),
             PayloadDocumentation
                 .fieldWithPath("dependencies")
                 .attributes(getConstraintsForField(APPLICATION_CONSTRAINTS, "dependencies"))
                 .description("The dependencies for the application")
+                .type(JsonFieldType.ARRAY)
                 .optional()
         );
     }
@@ -647,11 +671,13 @@ final class Snippets {
                 .attributes(getConstraintsForField(CLUSTER_CONSTRAINTS, "status"))
                 .description(
                     "The status of the cluster. Options: " + Arrays.toString(ClusterStatus.values())
-                ),
+                )
+                .type(JsonFieldType.STRING),
             PayloadDocumentation
                 .fieldWithPath("dependencies")
                 .attributes(getConstraintsForField(CLUSTER_CONSTRAINTS, "dependencies"))
                 .description("The dependencies for the cluster")
+                .type(JsonFieldType.ARRAY)
                 .optional()
         );
     }
@@ -664,28 +690,33 @@ final class Snippets {
                 .attributes(getConstraintsForField(COMMAND_CONSTRAINTS, "status"))
                 .description(
                     "The status of the command. Options: " + Arrays.toString(CommandStatus.values())
-                ),
+                )
+                .type(JsonFieldType.STRING),
             PayloadDocumentation
                 .fieldWithPath("executable")
                 .attributes(getConstraintsForField(COMMAND_CONSTRAINTS, "executable"))
-                .description("The executable to run on the Genie node when this command is used. e.g. /usr/bin/hadoop"),
+                .description("The executable to run on the Genie node when this command is used. e.g. /usr/bin/hadoop")
+                .type(JsonFieldType.STRING),
             PayloadDocumentation
                 .fieldWithPath("checkDelay")
                 .attributes(getConstraintsForField(COMMAND_CONSTRAINTS, "checkDelay"))
                 .description(
                     "The amount of time (in milliseconds) to delay between checks of the jobs using this command"
-                ),
+                )
+                .type(JsonFieldType.NUMBER),
             PayloadDocumentation
                 .fieldWithPath("memory")
                 .attributes(getConstraintsForField(COMMAND_CONSTRAINTS, "memory"))
                 .description(
                     "The default amount of memory (in MB) that should be allocated for instances of this command client"
                 )
+                .type(JsonFieldType.NUMBER)
                 .optional(),
             PayloadDocumentation
                 .fieldWithPath("dependencies")
                 .attributes(getConstraintsForField(COMMAND_CONSTRAINTS, "dependencies"))
                 .description("The dependencies for the command")
+                .type(JsonFieldType.ARRAY)
                 .optional()
         );
     }
@@ -697,6 +728,7 @@ final class Snippets {
                 .fieldWithPath("commandArgs")
                 .attributes(getConstraintsForField(JOB_REQUEST_CONSTRAINTS, "commandArgs"))
                 .description("Any arguments to append to the command executable when the job is run")
+                .type(JsonFieldType.STRING)
                 .optional(),
             PayloadDocumentation
                 .fieldWithPath("clusterCriterias")
@@ -705,38 +737,45 @@ final class Snippets {
                     "List of cluster criteria's for which a match will be attempted with register cluster tags."
                         + " Each set of tags within a given cluster criteria must have at least one non-blank "
                         + "(e.g. ' ', '    ', null) tag."
-                ),
+                )
+                .type(JsonFieldType.ARRAY),
             PayloadDocumentation
                 .fieldWithPath("commandCriteria")
                 .attributes(getConstraintsForField(JOB_REQUEST_CONSTRAINTS, "commandCriteria"))
                 .description(
                     "Set of tags which will attempt to match against the commands linked to selected cluster."
                         + " There must be at least one non-blank (e.g. ' ', '   ', null) criteria within the set"
-                ),
+                )
+                .type(JsonFieldType.ARRAY),
             PayloadDocumentation
                 .fieldWithPath("group")
                 .attributes(getConstraintsForField(JOB_REQUEST_CONSTRAINTS, "group"))
                 .description("A group that the job should be run under on the linux system")
+                .type(JsonFieldType.STRING)
                 .optional(),
             PayloadDocumentation
                 .fieldWithPath("disableLogArchival")
                 .attributes(getConstraintsForField(JOB_REQUEST_CONSTRAINTS, "disableLogArchival"))
                 .description("If you want to disable backing up job output files set this to true. Default: false")
+                .type(JsonFieldType.BOOLEAN)
                 .optional(),
             PayloadDocumentation
                 .fieldWithPath("email")
                 .attributes(getConstraintsForField(JOB_REQUEST_CONSTRAINTS, "email"))
                 .description("If you want e-mail notification on job completion enter address here")
+                .type(JsonFieldType.STRING)
                 .optional(),
             PayloadDocumentation
                 .fieldWithPath("cpu")
                 .attributes(getConstraintsForField(JOB_REQUEST_CONSTRAINTS, "cpu"))
                 .description("For future use. Currently has no impact.")
+                .type(JsonFieldType.NUMBER)
                 .optional(),
             PayloadDocumentation
                 .fieldWithPath("memory")
                 .attributes(getConstraintsForField(JOB_REQUEST_CONSTRAINTS, "memory"))
                 .description("The amount of memory (in MB) desired for job client. Cannot exceed configured max.")
+                .type(JsonFieldType.NUMBER)
                 .optional(),
             PayloadDocumentation
                 .fieldWithPath("timeout")
@@ -744,6 +783,7 @@ final class Snippets {
                 .description(
                     "The timeout (in seconds) after which job will be killed by system, system setting used if not set"
                 )
+                .type(JsonFieldType.NUMBER)
                 .optional(),
             PayloadDocumentation
                 .fieldWithPath("configs")
@@ -751,11 +791,13 @@ final class Snippets {
                 .description(
                     "URI's of configuration files which will be downloaded into job working directory at runtime"
                 )
+                .type(JsonFieldType.ARRAY)
                 .optional(),
             PayloadDocumentation
                 .fieldWithPath("dependencies")
                 .attributes(getConstraintsForField(JOB_REQUEST_CONSTRAINTS, "dependencies"))
                 .description("URI's of dependency files which will be downloaded into job working directory at runtime")
+                .type(JsonFieldType.ARRAY)
                 .optional(),
             PayloadDocumentation
                 .fieldWithPath("applications")
@@ -763,16 +805,19 @@ final class Snippets {
                 .description(
                     "Complete list of application ids if power user wishes to override selected command defaults"
                 )
+                .type(JsonFieldType.ARRAY)
                 .optional(),
             PayloadDocumentation
                 .fieldWithPath("grouping")
                 .attributes(getConstraintsForField(JOB_CONSTRAINTS, "grouping"))
                 .description("The grouping of the job relative to other jobs. e.g. scheduler job name")
+                .type(JsonFieldType.STRING)
                 .optional(),
             PayloadDocumentation
                 .fieldWithPath("groupingInstance")
                 .attributes(getConstraintsForField(JOB_CONSTRAINTS, "groupingInstance"))
                 .description("The grouping instance of the job relative to other jobs. e.g. scheduler job run")
+                .type(JsonFieldType.STRING)
                 .optional()
         );
     }
@@ -784,55 +829,66 @@ final class Snippets {
                 .fieldWithPath("commandArgs")
                 .attributes(getConstraintsForField(JOB_CONSTRAINTS, "commandArgs"))
                 .description("Any arguments to append to the command executable when the job is run")
+                .type(JsonFieldType.STRING)
                 .optional(),
             PayloadDocumentation
                 .fieldWithPath("status")
                 .attributes(getConstraintsForField(JOB_CONSTRAINTS, "status"))
-                .description("The status of the job. Options: " + Arrays.toString(JobStatus.values())),
+                .description("The status of the job. Options: " + Arrays.toString(JobStatus.values()))
+                .type(JsonFieldType.STRING),
             PayloadDocumentation
                 .fieldWithPath("statusMsg")
                 .attributes(getConstraintsForField(JOB_CONSTRAINTS, "statusMsg"))
                 .description("The status message of the job")
+                .type(JsonFieldType.STRING)
                 .optional(),
             PayloadDocumentation
                 .fieldWithPath("started")
                 .attributes(getConstraintsForField(JOB_CONSTRAINTS, "started"))
                 .description("The time (UTC ISO8601 with millis) the job was started")
+                .type(JsonFieldType.STRING)
                 .optional(),
             PayloadDocumentation
                 .fieldWithPath("finished")
                 .attributes(getConstraintsForField(JOB_CONSTRAINTS, "finished"))
                 .description("The time (UTC ISO8601 with millis) the job finished")
+                .type(JsonFieldType.STRING)
                 .optional(),
             PayloadDocumentation
                 .fieldWithPath("archiveLocation")
                 .attributes(getConstraintsForField(JOB_CONSTRAINTS, "archiveLocation"))
                 .description("The URI where the working directory zip was stored")
+                .type(JsonFieldType.STRING)
                 .optional(),
             PayloadDocumentation
                 .fieldWithPath("clusterName")
                 .attributes(getConstraintsForField(JOB_CONSTRAINTS, "clusterName"))
                 .description("The name of the cluster the job was run on if it's been determined")
+                .type(JsonFieldType.STRING)
                 .optional(),
             PayloadDocumentation
                 .fieldWithPath("commandName")
                 .attributes(getConstraintsForField(JOB_CONSTRAINTS, "commandName"))
                 .description("The name of the command the job was run with if it's been determined")
+                .type(JsonFieldType.STRING)
                 .optional(),
             PayloadDocumentation
                 .fieldWithPath("runtime")
                 .attributes(getConstraintsForField(JOB_CONSTRAINTS, "runtime"))
                 .description("Runtime of the job in ISO8601 duration format")
+                .type(JsonFieldType.STRING)
                 .optional(),
             PayloadDocumentation
                 .fieldWithPath("grouping")
                 .attributes(getConstraintsForField(JOB_CONSTRAINTS, "grouping"))
                 .description("The grouping of the job relative to other jobs. e.g. scheduler job name")
+                .type(JsonFieldType.STRING)
                 .optional(),
             PayloadDocumentation
                 .fieldWithPath("groupingInstance")
                 .attributes(getConstraintsForField(JOB_CONSTRAINTS, "groupingInstance"))
                 .description("The grouping instance of the job relative to other jobs. e.g. scheduler job run")
+                .type(JsonFieldType.STRING)
                 .optional()
         );
     }
@@ -843,31 +899,37 @@ final class Snippets {
             PayloadDocumentation
                 .fieldWithPath("hostName")
                 .attributes(getConstraintsForField(JOB_CONSTRAINTS, "hostName"))
-                .description("The host name of the Genie node responsible for the job"),
+                .description("The host name of the Genie node responsible for the job")
+                .type(JsonFieldType.STRING),
             PayloadDocumentation
                 .fieldWithPath("processId")
                 .attributes(getConstraintsForField(JOB_CONSTRAINTS, "processId"))
                 .description("The id of the job client process on the Genie node")
+                .type(JsonFieldType.NUMBER)
                 .optional(),
             PayloadDocumentation
                 .fieldWithPath("checkDelay")
                 .attributes(getConstraintsForField(JOB_CONSTRAINTS, "checkDelay"))
                 .description("The amount of time in milliseconds between checks of the job status by Genie")
+                .type(JsonFieldType.NUMBER)
                 .optional(),
             PayloadDocumentation
                 .fieldWithPath("timeout")
                 .attributes(getConstraintsForField(JOB_CONSTRAINTS, "timeout"))
                 .description("The date (UTC ISO8601 with millis) when the job will be killed by Genie due to timeout")
+                .type(JsonFieldType.STRING)
                 .optional(),
             PayloadDocumentation
                 .fieldWithPath("exitCode")
                 .attributes(getConstraintsForField(JOB_CONSTRAINTS, "exitCode"))
                 .description("The job client process exit code after the job is done")
+                .type(JsonFieldType.NUMBER)
                 .optional(),
             PayloadDocumentation
                 .fieldWithPath("memory")
                 .attributes(getConstraintsForField(JOB_CONSTRAINTS, "memory"))
                 .description("The amount of memory (in MB) allocated to the job client")
+                .type(JsonFieldType.NUMBER)
                 .optional()
         );
     }
@@ -879,6 +941,7 @@ final class Snippets {
                 .fieldWithPath("configs")
                 .attributes(getConstraintsForField(constraintDescriptions, "configs"))
                 .description("Any configuration files needed for the resource")
+                .type(JsonFieldType.ARRAY)
                 .optional()
         );
     }
@@ -890,6 +953,7 @@ final class Snippets {
                 .fieldWithPath("setupFile")
                 .attributes(getConstraintsForField(constraintDescriptions, "setupFile"))
                 .description("A location for any setup that needs to be done when installing")
+                .type(JsonFieldType.STRING)
                 .optional()
         );
     }
@@ -900,24 +964,29 @@ final class Snippets {
             PayloadDocumentation
                 .fieldWithPath("name")
                 .attributes(getConstraintsForField(constraintDescriptions, "name"))
-                .description("The name"),
+                .description("The name")
+                .type(JsonFieldType.STRING),
             PayloadDocumentation
                 .fieldWithPath("user")
                 .attributes(getConstraintsForField(constraintDescriptions, "user"))
-                .description("The user"),
+                .description("The user")
+                .type(JsonFieldType.STRING),
             PayloadDocumentation
                 .fieldWithPath("version")
                 .attributes(getConstraintsForField(constraintDescriptions, "version"))
-                .description("The version"),
+                .description("The version")
+                .type(JsonFieldType.STRING),
             PayloadDocumentation
                 .fieldWithPath("description")
                 .attributes(getConstraintsForField(constraintDescriptions, "description"))
                 .description("Any description")
+                .type(JsonFieldType.STRING)
                 .optional(),
             PayloadDocumentation
                 .fieldWithPath("tags")
                 .attributes(getConstraintsForField(constraintDescriptions, "tags"))
                 .description("The tags")
+                .type(JsonFieldType.ARRAY)
                 .optional()
         );
     }
@@ -928,16 +997,19 @@ final class Snippets {
                 .fieldWithPath("id")
                 .attributes(getConstraintsForField(constraintDescriptions, "id"))
                 .description("The id. If not set the system will set one.")
+                .type(JsonFieldType.STRING)
                 .optional(),
             PayloadDocumentation
                 .fieldWithPath("created")
                 .attributes(getConstraintsForField(constraintDescriptions, "created"))
                 .description("The UTC time of creation. Set by system. ISO8601 format including milliseconds.")
+                .type(JsonFieldType.STRING)
                 .optional(),
             PayloadDocumentation
                 .fieldWithPath("updated")
                 .attributes(getConstraintsForField(constraintDescriptions, "updated"))
                 .description("The UTC time of last update. Set by system. ISO8601 format including milliseconds.")
+                .type(JsonFieldType.STRING)
                 .optional(),
         };
     }
