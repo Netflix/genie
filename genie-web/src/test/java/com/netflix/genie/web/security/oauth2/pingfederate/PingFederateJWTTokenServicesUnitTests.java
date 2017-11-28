@@ -21,11 +21,13 @@ import com.google.common.collect.Sets;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.spectator.api.Registry;
 import com.netflix.spectator.api.Timer;
+import org.assertj.core.util.Lists;
 import org.hamcrest.Matchers;
 import org.jose4j.jwt.JwtClaims;
 import org.jose4j.jwt.MalformedClaimException;
 import org.jose4j.jwt.consumer.InvalidJwtException;
 import org.jose4j.jwt.consumer.JwtConsumer;
+import org.jose4j.jwt.consumer.JwtContext;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -148,7 +150,7 @@ public class PingFederateJWTTokenServicesUnitTests {
         Mockito.when(claims.getClaimValue("client_id", String.class))
             .thenThrow(new MalformedClaimException("bad claim"));
         Mockito.when(this.jwtConsumer.processToClaims(Mockito.anyString()))
-            .thenThrow(new InvalidJwtException("bad jwt"))
+            .thenThrow(new InvalidJwtException("bad jwt", Lists.newArrayList(), Mockito.mock(JwtContext.class)))
             .thenReturn(claims);
 
         try {

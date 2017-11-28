@@ -377,6 +377,14 @@ final class Snippets {
             RequestDocumentation
                 .parameterWithName("maxFinished")
                 .description("The maximum finished time of the job in milliseconds since epoch. (exclusive)")
+                .optional(),
+            RequestDocumentation
+                .parameterWithName("grouping")
+                .description("The grouping the job should be a member of. Use % symbol for regex like search.")
+                .optional(),
+            RequestDocumentation
+                .parameterWithName("groupingInstance")
+                .description("The grouping instance the job should be a member of. Use % symbol for regex like search.")
                 .optional()
         )
     );
@@ -688,7 +696,8 @@ final class Snippets {
             PayloadDocumentation
                 .fieldWithPath("commandArgs")
                 .attributes(getConstraintsForField(JOB_REQUEST_CONSTRAINTS, "commandArgs"))
-                .description("Any arguments to append to the command executable when the job is run"),
+                .description("Any arguments to append to the command executable when the job is run")
+                .optional(),
             PayloadDocumentation
                 .fieldWithPath("clusterCriterias")
                 .attributes(getConstraintsForField(JOB_REQUEST_CONSTRAINTS, "clusterCriterias"))
@@ -702,7 +711,7 @@ final class Snippets {
                 .attributes(getConstraintsForField(JOB_REQUEST_CONSTRAINTS, "commandCriteria"))
                 .description(
                     "Set of tags which will attempt to match against the commands linked to selected cluster."
-                     + " There must be at least one non-blank (e.g. ' ', '   ', null) criteria within the set"
+                        + " There must be at least one non-blank (e.g. ' ', '   ', null) criteria within the set"
                 ),
             PayloadDocumentation
                 .fieldWithPath("group")
@@ -754,6 +763,16 @@ final class Snippets {
                 .description(
                     "Complete list of application ids if power user wishes to override selected command defaults"
                 )
+                .optional(),
+            PayloadDocumentation
+                .fieldWithPath("grouping")
+                .attributes(getConstraintsForField(JOB_CONSTRAINTS, "grouping"))
+                .description("The grouping of the job relative to other jobs. e.g. scheduler job name")
+                .optional(),
+            PayloadDocumentation
+                .fieldWithPath("groupingInstance")
+                .attributes(getConstraintsForField(JOB_CONSTRAINTS, "groupingInstance"))
+                .description("The grouping instance of the job relative to other jobs. e.g. scheduler job run")
                 .optional()
         );
     }
@@ -764,7 +783,8 @@ final class Snippets {
             PayloadDocumentation
                 .fieldWithPath("commandArgs")
                 .attributes(getConstraintsForField(JOB_CONSTRAINTS, "commandArgs"))
-                .description("Any arguments to append to the command executable when the job is run"),
+                .description("Any arguments to append to the command executable when the job is run")
+                .optional(),
             PayloadDocumentation
                 .fieldWithPath("status")
                 .attributes(getConstraintsForField(JOB_CONSTRAINTS, "status"))
@@ -803,6 +823,16 @@ final class Snippets {
                 .fieldWithPath("runtime")
                 .attributes(getConstraintsForField(JOB_CONSTRAINTS, "runtime"))
                 .description("Runtime of the job in ISO8601 duration format")
+                .optional(),
+            PayloadDocumentation
+                .fieldWithPath("grouping")
+                .attributes(getConstraintsForField(JOB_CONSTRAINTS, "grouping"))
+                .description("The grouping of the job relative to other jobs. e.g. scheduler job name")
+                .optional(),
+            PayloadDocumentation
+                .fieldWithPath("groupingInstance")
+                .attributes(getConstraintsForField(JOB_CONSTRAINTS, "groupingInstance"))
+                .description("The grouping instance of the job relative to other jobs. e.g. scheduler job run")
                 .optional()
         );
     }

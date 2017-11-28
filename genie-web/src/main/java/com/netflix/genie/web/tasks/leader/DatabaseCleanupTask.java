@@ -25,6 +25,7 @@ import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import com.netflix.genie.web.tasks.TaskUtils;
 import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Registry;
+import com.netflix.spectator.api.patterns.PolledMeter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -77,7 +78,10 @@ public class DatabaseCleanupTask extends LeadershipTask {
         this.cleanupProperties = cleanupProperties;
         this.jobPersistenceService = jobPersistenceService;
 
-        this.numDeletedJobs = registry.gauge("genie.tasks.databaseCleanup.numDeletedJobs.gauge", new AtomicLong());
+        this.numDeletedJobs = PolledMeter
+            .using(registry)
+            .withName("genie.tasks.databaseCleanup.numDeletedJobs.gauge")
+            .monitorValue(new AtomicLong());
         this.deletionTimerId = registry.createId("genie.tasks.databaseCleanup.duration.timer");
     }
 

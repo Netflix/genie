@@ -29,6 +29,7 @@ import com.netflix.genie.core.services.JobStateService;
 import com.netflix.genie.core.services.JobSubmitterService;
 import com.netflix.spectator.api.Counter;
 import com.netflix.spectator.api.Registry;
+import com.netflix.spectator.api.patterns.PolledMeter;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -76,9 +77,21 @@ public class JobStateServiceImpl implements JobStateService {
         this.registry = registry;
         this.genieEventBus = genieEventBus;
 
-        this.registry.mapSize("genie.jobs.running.gauge", this.jobs);
-        this.registry.methodValue("genie.jobs.active.gauge", this, "getNumActiveJobs");
-        this.registry.methodValue("genie.jobs.memory.used.gauge", this, "getUsedMemory");
+        PolledMeter
+            .using(registry)
+            .withName("genie.jobs.running.gauge")
+            .monitorSize(this.jobs);
+
+        PolledMeter
+            .using(registry)
+            .withName("genie.jobs.active.gauge")
+            .monitorValue(this, JobStateServiceImpl::getNumActiveJobs);
+
+        PolledMeter
+            .using(registry)
+            .withName("genie.jobs.memory.used.gauge")
+            .monitorValue(this, JobStateServiceImpl::getUsedMemory);
+
         this.unableToCancel = registry.counter("genie.jobs.unableToCancel.rate");
     }
 
@@ -107,7 +120,8 @@ public class JobStateServiceImpl implements JobStateService {
             () -> {
                 final JobInfo jobInfo = jobs.get(jobId);
                 jobInfo.setMemory(memory);
-                final JobLauncher jobLauncher = new JobLauncher(this.jobSubmitterService,
+                final JobLauncher jobLauncher = new JobLauncher(
+                    this.jobSubmitterService,
                     jobRequest,
                     cluster,
                     command,
@@ -153,6 +167,14 @@ public class JobStateServiceImpl implements JobStateService {
         );
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean jobExists(final String jobId) {
+        return jobs.containsKey(jobId);
+    }
+
     private void handle(final String jobId, final Supplier<Void> supplier) {
         JobInfo jobInfo = jobs.get(jobId);
         if (jobInfo != null) {
@@ -163,14 +185,6 @@ public class JobStateServiceImpl implements JobStateService {
                 }
             }
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean jobExists(final String jobId) {
-        return jobs.containsKey(jobId);
     }
 
     protected void setMemoryAndTask(final String jobId, final int memory, final Future<?> task) {

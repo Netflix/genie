@@ -33,11 +33,11 @@ import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
-import com.netflix.genie.core.jpa.repositories.JpaJobExecutionRepository;
-import com.netflix.genie.core.jpa.repositories.JpaJobMetadataRepository;
+import com.netflix.genie.core.jpa.repositories.JpaFileRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
-import com.netflix.genie.core.jpa.repositories.JpaJobRequestRepository;
+import com.netflix.genie.core.jpa.repositories.JpaTagRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.hamcrest.Matchers;
 import org.junit.After;
@@ -171,15 +171,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     private JpaJobRepository jobRepository;
 
     @Autowired
-    private JpaJobRequestRepository jobRequestRepository;
-
-    @Autowired
-    private JpaJobMetadataRepository jobRequestMetadataRepository;
-
-    @Autowired
-    private JpaJobExecutionRepository jobExecutionRepository;
-
-    @Autowired
     private JpaApplicationRepository applicationRepository;
 
     @Autowired
@@ -187,6 +178,12 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
 
     @Autowired
     private JpaClusterRepository clusterRepository;
+
+    @Autowired
+    private JpaFileRepository fileRepository;
+
+    @Autowired
+    private JpaTagRepository tagRepository;
 
     @Autowired
     private String hostname;
@@ -205,13 +202,12 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     @Before
     public void setup() throws Exception {
         // Ensure database is empty and doesn't bleed from other test classes
-        this.jobRequestMetadataRepository.deleteAll();
-        this.jobExecutionRepository.deleteAll();
         this.jobRepository.deleteAll();
-        this.jobRequestRepository.deleteAll();
         this.clusterRepository.deleteAll();
         this.commandRepository.deleteAll();
         this.applicationRepository.deleteAll();
+        this.fileRepository.deleteAll();
+        this.tagRepository.deleteAll();
 
         this.resourceLoader = new DefaultResourceLoader();
         this.createAnApplication(APP1_ID, APP1_NAME);
@@ -228,13 +224,12 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
      */
     @After
     public void cleanup() throws Exception {
-        this.jobRequestMetadataRepository.deleteAll();
-        this.jobExecutionRepository.deleteAll();
         this.jobRepository.deleteAll();
-        this.jobRequestRepository.deleteAll();
         this.clusterRepository.deleteAll();
         this.commandRepository.deleteAll();
         this.applicationRepository.deleteAll();
+        this.fileRepository.deleteAll();
+        this.tagRepository.deleteAll();
     }
 
     /**
@@ -249,7 +244,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
 
     private void submitAndCheckJob(final int documentationId) throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
-        final String commandArgs = "-c 'echo hello world'";
+        final List<String> commandArgs = Lists.newArrayList("-c", "'echo hello world'");
 
         final String clusterTag = LOCALHOST_CLUSTER_TAG;
         final List<ClusterCriteria> clusterCriteriaList = Lists.newArrayList(
@@ -279,10 +274,10 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             JOB_NAME,
             JOB_USER,
             JOB_VERSION,
-            commandArgs,
             clusterCriteriaList,
             commandCriteria
         )
+            .withCommandArgs(commandArgs)
             .withDisableLogArchival(true)
             .withSetupFile(setUpFile)
             .withConfigs(configs)
@@ -306,9 +301,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         this.checkFindJobs(documentationId, id, JOB_USER);
 
         Assert.assertThat(this.jobRepository.count(), Matchers.is(1L));
-        Assert.assertThat(this.jobRequestRepository.count(), Matchers.is(1L));
-        Assert.assertThat(this.jobRequestMetadataRepository.count(), Matchers.is(1L));
-        Assert.assertThat(this.jobExecutionRepository.count(), Matchers.is(1L));
 
         // Check if the cluster setup file is cached
         final String clusterSetUpFilePath = this.resourceLoader
@@ -427,7 +419,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andDo(getResultHandler);
     }
 
-    private void checkJob(final int documentationId, final String id, final String commandArgs) throws Exception {
+    private void checkJob(final int documentationId, final String id, final List<String> commandArgs) throws Exception {
         final RestDocumentationResultHandler getResultHandler = MockMvcRestDocumentation.document(
             "{class-name}/" + documentationId + "/getJob/",
             Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
@@ -448,7 +440,12 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andExpect(MockMvcResultMatchers.jsonPath(USER_PATH, Matchers.is(JOB_USER)))
             .andExpect(MockMvcResultMatchers.jsonPath(NAME_PATH, Matchers.is(JOB_NAME)))
             .andExpect(MockMvcResultMatchers.jsonPath(DESCRIPTION_PATH, Matchers.is(JOB_DESCRIPTION)))
-            .andExpect(MockMvcResultMatchers.jsonPath(COMMAND_ARGS_PATH, Matchers.is(commandArgs)))
+            .andExpect(
+                MockMvcResultMatchers.jsonPath(
+                    COMMAND_ARGS_PATH,
+                    Matchers.is(StringUtils.join(commandArgs, StringUtils.SPACE))
+                )
+            )
             .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(JobStatus.SUCCEEDED.toString())))
             .andExpect(MockMvcResultMatchers.jsonPath(STATUS_MESSAGE_PATH, Matchers.is(JOB_STATUS_MSG)))
             .andExpect(MockMvcResultMatchers.jsonPath(STARTED_PATH, Matchers.not(new Date(0))))
@@ -595,7 +592,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     private void checkJobRequest(
         final int documentationId,
         final String id,
-        final String commandArgs,
+        final List<String> commandArgs,
         final String setupFile,
         final String clusterTag,
         final String commandTag,
@@ -621,7 +618,12 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andExpect(MockMvcResultMatchers.jsonPath(VERSION_PATH, Matchers.is(JOB_VERSION)))
             .andExpect(MockMvcResultMatchers.jsonPath(USER_PATH, Matchers.is(JOB_USER)))
             .andExpect(MockMvcResultMatchers.jsonPath(DESCRIPTION_PATH, Matchers.is(JOB_DESCRIPTION)))
-            .andExpect(MockMvcResultMatchers.jsonPath(COMMAND_ARGS_PATH, Matchers.is(commandArgs)))
+            .andExpect(
+                MockMvcResultMatchers.jsonPath(
+                    COMMAND_ARGS_PATH,
+                    Matchers.is(StringUtils.join(commandArgs, StringUtils.SPACE))
+                )
+            )
             .andExpect(MockMvcResultMatchers.jsonPath(SETUP_FILE_PATH, Matchers.is(setupFile)))
             .andExpect(MockMvcResultMatchers.jsonPath(CLUSTER_CRITERIAS_PATH, Matchers.hasSize(1)))
             .andExpect(MockMvcResultMatchers.jsonPath(CLUSTER_CRITERIAS_PATH + "[0].tags", Matchers.hasSize(1)))
@@ -753,7 +755,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
 
     private void testForConflicts(
         final String id,
-        final String commandArgs,
+        final List<String> commandArgs,
         final List<ClusterCriteria> clusterCriteriaList,
         final Set<String> commandCriteria
     ) throws Exception {
@@ -761,11 +763,11 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             JOB_NAME,
             JOB_USER,
             JOB_VERSION,
-            commandArgs,
             clusterCriteriaList,
             commandCriteria
         )
             .withId(id)
+            .withCommandArgs(commandArgs)
             .withDisableLogArchival(true)
             .build();
 
@@ -799,11 +801,10 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
      */
     @Test
     public void canSubmitJobWithAttachments() throws Exception {
-        final String commandArgs = "-c 'echo hello world'";
+        final List<String> commandArgs = Lists.newArrayList("-c", "'echo hello world'");
 
-        final String clusterTag = LOCALHOST_CLUSTER_TAG;
         final List<ClusterCriteria> clusterCriteriaList = Lists.newArrayList(
-            new ClusterCriteria(Sets.newHashSet(clusterTag))
+            new ClusterCriteria(Sets.newHashSet(LOCALHOST_CLUSTER_TAG))
         );
 
         final String setUpFile = this.resourceLoader
@@ -843,10 +844,10 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             JOB_NAME,
             JOB_USER,
             JOB_VERSION,
-            commandArgs,
             clusterCriteriaList,
             commandCriteria
         )
+            .withCommandArgs(commandArgs)
             .withDisableLogArchival(true)
             .withSetupFile(setUpFile)
             .withDescription(JOB_DESCRIPTION)
@@ -863,7 +864,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     @Test
     public void testSubmitJobMethodMissingCluster() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
-        final String commandArgs = "-c 'echo hello world'";
+        final List<String> commandArgs = Lists.newArrayList("-c", "'echo hello world'");
 
         final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
         final Set<String> clusterTags = Sets.newHashSet("undefined");
@@ -877,11 +878,11 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             JOB_NAME,
             JOB_USER,
             JOB_VERSION,
-            commandArgs,
             clusterCriteriaList,
             commandCriteria
         )
             .withId(jobId)
+            .withCommandArgs(commandArgs)
             .withDisableLogArchival(true)
             .build();
 
@@ -906,7 +907,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     @Test
     public void testSubmitJobMethodInvalidClusterCriteria() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
-        final String commandArgs = "-c 'echo hello world'";
+        final List<String> commandArgs = Lists.newArrayList("-c", "'echo hello world'");
 
         final List<ClusterCriteria> clusterCriteriaList
             = Lists.newArrayList(new ClusterCriteria(Sets.newHashSet(" ", "", null)));
@@ -918,11 +919,11 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             JOB_NAME,
             JOB_USER,
             JOB_VERSION,
-            commandArgs,
             clusterCriteriaList,
             commandCriteria
         )
             .withId(jobId)
+            .withCommandArgs(commandArgs)
             .withDisableLogArchival(true)
             .build();
 
@@ -949,7 +950,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     @Test
     public void testSubmitJobMethodInvalidCommandCriteria() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
-        final String commandArgs = "-c 'echo hello world'";
+        final List<String> commandArgs = Lists.newArrayList("-c", "'echo hello world'");
 
         final List<ClusterCriteria> clusterCriteriaList
             = Lists.newArrayList(new ClusterCriteria(Sets.newHashSet("ok")));
@@ -961,11 +962,11 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             JOB_NAME,
             JOB_USER,
             JOB_VERSION,
-            commandArgs,
             clusterCriteriaList,
             commandCriteria
         )
             .withId(jobId)
+            .withCommandArgs(commandArgs)
             .withDisableLogArchival(true)
             .build();
 
@@ -991,7 +992,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     @Test
     public void testSubmitJobMethodMissingCommand() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
-        final String commandArgs = "-c 'echo hello world'";
+        final List<String> commandArgs = Lists.newArrayList("-c", "'echo hello world'");
 
         final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
         final Set<String> clusterTags = Sets.newHashSet(LOCALHOST_CLUSTER_TAG);
@@ -1005,11 +1006,11 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             JOB_NAME,
             JOB_USER,
             JOB_VERSION,
-            commandArgs,
             clusterCriteriaList,
             commandCriteria
         )
             .withId(jobId)
+            .withCommandArgs(commandArgs)
             .withDisableLogArchival(true)
             .build();
 
@@ -1033,7 +1034,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     @Test
     public void testSubmitJobMethodKill() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
-        final String commandArgs = "-c 'sleep 60'";
+        final List<String> commandArgs = Lists.newArrayList("-c", "'sleep 60'");
 
         final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
         final Set<String> clusterTags = Sets.newHashSet(LOCALHOST_CLUSTER_TAG);
@@ -1045,10 +1046,10 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             JOB_NAME,
             JOB_USER,
             JOB_VERSION,
-            commandArgs,
             clusterCriteriaList,
             commandCriteria
         )
+            .withCommandArgs(commandArgs)
             .withDisableLogArchival(true)
             .build();
 
@@ -1108,7 +1109,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     @Test
     public void testSubmitJobMethodKillOnTimeout() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
-        final String commandArgs = "-c 'sleep 60'";
+        final List<String> commandArgs = Lists.newArrayList("-c", "'sleep 60'");
 
         final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
         final Set<String> clusterTags = Sets.newHashSet(LOCALHOST_CLUSTER_TAG);
@@ -1120,10 +1121,10 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             JOB_NAME,
             JOB_USER,
             JOB_VERSION,
-            commandArgs,
             clusterCriteriaList,
             commandCriteria
         )
+            .withCommandArgs(commandArgs)
             .withTimeout(5)
             .withDisableLogArchival(true)
             .build();
@@ -1168,7 +1169,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     @Test
     public void testSubmitJobMethodFailure() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
-        final String commandArgs = "-c 'exit 1'";
+        final List<String> commandArgs = Lists.newArrayList("-c", "'exit 1'");
 
         final List<ClusterCriteria> clusterCriteriaList = new ArrayList<>();
         final Set<String> clusterTags = Sets.newHashSet(LOCALHOST_CLUSTER_TAG);
@@ -1180,10 +1181,10 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             JOB_NAME,
             JOB_USER,
             JOB_VERSION,
-            commandArgs,
             clusterCriteriaList,
             commandCriteria
         )
+            .withCommandArgs(commandArgs)
             .withDisableLogArchival(true)
             .build();
 
@@ -1220,16 +1221,16 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     @Test
     public void testResponseContentType() throws Exception {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
-        final String commandArgs = "-c 'echo hello'";
+        final List<String> commandArgs = Lists.newArrayList("-c", "'echo hello'");
 
         final JobRequest jobRequest = new JobRequest.Builder(
             JOB_NAME,
             JOB_USER,
             JOB_VERSION,
-            commandArgs,
             Lists.newArrayList(new ClusterCriteria(Sets.newHashSet("localhost"))),
             Sets.newHashSet("bash")
         )
+            .withCommandArgs(commandArgs)
             .withDisableLogArchival(true)
             .build();
 

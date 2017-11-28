@@ -26,6 +26,9 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 /**
  * Implementation of the Mail service interface.
  *
@@ -41,7 +44,7 @@ public class MailServiceImpl implements MailService {
      * Constructor.
      *
      * @param javaMailSender An implementation of the JavaMailSender interface.
-     * @param fromAddress The from email address for the email.
+     * @param fromAddress    The from email address for the email.
      */
     public MailServiceImpl(final JavaMailSender javaMailSender, final String fromAddress) {
         this.javaMailSender = javaMailSender;
@@ -51,10 +54,10 @@ public class MailServiceImpl implements MailService {
     @Override
     public void sendEmail(
         @NotBlank(message = "Cannot send email to blank address.")
-        final String toEmail,
+        @Nonnull final String toEmail,
         @NotBlank(message = "Subject cannot be empty")
-        final String subject,
-        final String body
+        @Nonnull final String subject,
+        @Nullable final String body
     ) throws GenieException {
         final SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
 

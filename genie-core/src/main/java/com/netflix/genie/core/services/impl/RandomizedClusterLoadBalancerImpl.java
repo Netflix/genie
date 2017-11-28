@@ -27,8 +27,9 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.core.Ordered;
 
 import javax.annotation.Nonnull;
-import java.util.List;
+import java.util.ArrayList;
 import java.util.Random;
+import java.util.Set;
 
 /**
  * Basic implementation of a load balancer where a cluster is picked at random.
@@ -44,14 +45,15 @@ public class RandomizedClusterLoadBalancerImpl implements ClusterLoadBalancer {
      */
     @Override
     public Cluster selectCluster(
-        @Nonnull @NonNull @NotEmpty final List<Cluster> clusters,
+        @Nonnull @NonNull @NotEmpty final Set<Cluster> clusters,
         @Nonnull @NonNull final JobRequest jobRequest
     ) throws GenieException {
         log.debug("called");
 
         // return a random one
         final Random rand = new Random();
-        return clusters.get(Math.abs(rand.nextInt(clusters.size())));
+
+        return new ArrayList<>(clusters).get(Math.abs(rand.nextInt(clusters.size())));
     }
 
     /**

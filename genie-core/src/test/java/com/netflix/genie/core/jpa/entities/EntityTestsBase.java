@@ -50,7 +50,7 @@ public class EntityTestsBase {
      * @param <E>    The type of entity to validate
      * @param entity The entity to validate
      */
-    public <E> void validate(final E entity) {
+    <E> void validate(final E entity) {
         final Set<ConstraintViolation<E>> violations = validator.validate(entity);
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException(violations);

@@ -30,6 +30,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -82,10 +83,10 @@ public interface CommandService {
      * @return All the commands matching the specified criteria
      */
     Page<Command> getCommands(
-        final String name,
-        final String user,
-        final Set<CommandStatus> statuses,
-        final Set<String> tags,
+        @Nullable final String name,
+        @Nullable final String user,
+        @Nullable final Set<CommandStatus> statuses,
+        @Nullable final Set<String> tags,
         final Pageable page
     );
 
@@ -429,6 +430,6 @@ public interface CommandService {
     Set<Cluster> getClustersForCommand(
         @NotBlank(message = "No command id entered. Unable to get clusters.")
         final String id,
-        final Set<ClusterStatus> statuses
+        @Nullable final Set<ClusterStatus> statuses
     ) throws GenieException;
 }

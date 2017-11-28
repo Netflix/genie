@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2016 Netflix, Inc.
+ *  Copyright 2017 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -18,44 +18,24 @@
 package com.netflix.genie.core.jpa.entities;
 
 import com.netflix.genie.test.categories.UnitTest;
-import com.netflix.genie.test.suppliers.RandomSuppliers;
-import org.hamcrest.Matchers;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import java.util.UUID;
-
 /**
- * Unit tests for the SetupFileEntity class.
+ * Unit tests for the IdEntity class.
  *
  * @author tgianos
- * @since 3.0.0
+ * @since 3.3.0
  */
 @Category(UnitTest.class)
-public class SetupFileEntityUnitTests extends EntityTestsBase {
-
-    private SetupFileEntity entity;
+public class IdEntityUnitTests {
 
     /**
-     * Setup for the tests.
-     */
-    @Before
-    public void setup() {
-        this.entity = new SetupFileEntity();
-    }
-
-    /**
-     * Make sure getting and setting the setup file field works properly.
+     * Test the toString method.
      */
     @Test
-    public void canSetSetupFile() {
-        Assert.assertFalse(this.entity.getSetupFile().isPresent());
-        final String setupFile = UUID.randomUUID().toString();
-        this.entity.setSetupFile(setupFile);
-        Assert.assertThat(
-            this.entity.getSetupFile().orElseGet(RandomSuppliers.STRING), Matchers.is(setupFile)
-        );
+    public void testToString() {
+        Assert.assertNotNull(new IdEntity().toString());
     }
 }

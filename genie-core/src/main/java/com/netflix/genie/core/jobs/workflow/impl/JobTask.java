@@ -47,6 +47,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class JobTask extends GenieBaseTask {
 
+    private static final String EMPTY_STRING = "";
     private final AttachmentService attachmentService;
     private final Id timerId;
     private final GenieFileTransferService fts;
@@ -150,7 +151,7 @@ public class JobTask extends GenieBaseTask {
             writer.write(
                 jobExecEnv.getCommand().getExecutable()
                     + JobConstants.WHITE_SPACE
-                    + jobExecEnv.getJobRequest().getCommandArgs()
+                    + jobExecEnv.getJobRequest().getCommandArgs().orElse(EMPTY_STRING)
                     + JobConstants.STDOUT_REDIRECT
                     + "${" + JobConstants.GENIE_JOB_DIR_ENV_VAR + "}/" + JobConstants.STDOUT_LOG_FILE_NAME
                     + JobConstants.STDERR_REDIRECT

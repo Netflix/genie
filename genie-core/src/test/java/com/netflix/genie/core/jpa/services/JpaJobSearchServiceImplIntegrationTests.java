@@ -84,6 +84,8 @@ public class JpaJobSearchServiceImplIntegrationTests extends DBUnitTestBase {
                 null,
                 null,
                 null,
+                null,
+                null,
                 page
             );
         Assert.assertThat(jobs.getTotalElements(), Matchers.is(3L));
@@ -94,6 +96,8 @@ public class JpaJobSearchServiceImplIntegrationTests extends DBUnitTestBase {
                 null,
                 null,
                 Sets.newHashSet(JobStatus.RUNNING),
+                null,
+                null,
                 null,
                 null,
                 null,
@@ -130,6 +134,8 @@ public class JpaJobSearchServiceImplIntegrationTests extends DBUnitTestBase {
                 null,
                 null,
                 null,
+                null,
+                null,
                 page
             );
         Assert.assertThat(jobs.getTotalElements(), Matchers.is(1L));
@@ -141,6 +147,86 @@ public class JpaJobSearchServiceImplIntegrationTests extends DBUnitTestBase {
                 .count(),
             Matchers.is(1L)
         );
+
+        jobs = this.service
+            .findJobs(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                "job3Grouping",
+                null,
+                page
+            );
+        Assert.assertThat(jobs.getTotalElements(), Matchers.is(1L));
+        Assert.assertThat(
+            jobs
+                .getContent()
+                .stream()
+                .filter(job -> job.getId().equals(JOB_3_ID))
+                .count(),
+            Matchers.is(1L)
+        );
+
+        jobs = this.service
+            .findJobs(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                "job2%",
+                page
+            );
+        Assert.assertThat(jobs.getTotalElements(), Matchers.is(1L));
+        Assert.assertThat(
+            jobs
+                .getContent()
+                .stream()
+                .filter(job -> job.getId().equals(JOB_2_ID))
+                .count(),
+            Matchers.is(1L)
+        );
+
+        jobs = this.service
+            .findJobs(
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                "job1%",
+                "job2%",
+                page
+            );
+        Assert.assertThat(jobs.getTotalElements(), Matchers.is(0L));
+        Assert.assertTrue(jobs.getContent().isEmpty());
     }
 
     /**
@@ -242,9 +328,18 @@ public class JpaJobSearchServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void canGetJobRequest() throws GenieException {
-        Assert.assertThat(this.service.getJobRequest(JOB_1_ID).getCommandArgs(), Matchers.is("-f query.q"));
-        Assert.assertThat(this.service.getJobRequest(JOB_2_ID).getCommandArgs(), Matchers.is("-f spark.jar"));
-        Assert.assertThat(this.service.getJobRequest(JOB_3_ID).getCommandArgs(), Matchers.is("-f spark.jar"));
+        Assert.assertThat(
+            this.service.getJobRequest(JOB_1_ID).getCommandArgs().orElseThrow(IllegalArgumentException::new),
+            Matchers.is("-f query.q")
+        );
+        Assert.assertThat(
+            this.service.getJobRequest(JOB_2_ID).getCommandArgs().orElseThrow(IllegalArgumentException::new),
+            Matchers.is("-f spark.jar")
+        );
+        Assert.assertThat(
+            this.service.getJobRequest(JOB_3_ID).getCommandArgs().orElseThrow(IllegalArgumentException::new),
+            Matchers.is("-f spark.jar")
+        );
 
         try {
             this.service.getJobRequest(UUID.randomUUID().toString());

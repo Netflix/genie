@@ -22,6 +22,7 @@ import com.netflix.genie.core.jpa.entities.JobEntity;
 import com.netflix.genie.core.jpa.entities.JobEntity_;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.annotation.Nullable;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -42,49 +43,54 @@ public final class JpaJobSpecs {
     /**
      * Protected constructor for utility class.
      */
-    protected JpaJobSpecs() {
+    private JpaJobSpecs() {
     }
 
     /**
      * Generate a criteria query predicate for a where clause based on the given parameters.
      *
-     * @param root        The root to use
-     * @param cb          The criteria builder to use
-     * @param id          The job id
-     * @param name        The job name
-     * @param user        The user who created the job
-     * @param statuses    The job statuses
-     * @param tags        The tags for the jobs to find
-     * @param clusterName The cluster name
-     * @param cluster     The cluster the job should have been run on
-     * @param commandName The command name
-     * @param command     The command the job should have been run with
-     * @param minStarted  The time which the job had to start after in order to be return (inclusive)
-     * @param maxStarted  The time which the job had to start before in order to be returned (exclusive)
-     * @param minFinished The time which the job had to finish after in order to be return (inclusive)
-     * @param maxFinished The time which the job had to finish before in order to be returned (exclusive)
+     * @param root             The root to use
+     * @param cb               The criteria builder to use
+     * @param id               The job id
+     * @param name             The job name
+     * @param user             The user who created the job
+     * @param statuses         The job statuses
+     * @param tags             The tags for the jobs to find
+     * @param clusterName      The cluster name
+     * @param cluster          The cluster the job should have been run on
+     * @param commandName      The command name
+     * @param command          The command the job should have been run with
+     * @param minStarted       The time which the job had to start after in order to be return (inclusive)
+     * @param maxStarted       The time which the job had to start before in order to be returned (exclusive)
+     * @param minFinished      The time which the job had to finish after in order to be return (inclusive)
+     * @param maxFinished      The time which the job had to finish before in order to be returned (exclusive)
+     * @param grouping         The job grouping to search for
+     * @param groupingInstance The job grouping instance to search for
      * @return The specification
      */
+    @SuppressWarnings("checkstyle:parameternumber")
     public static Predicate getFindPredicate(
         final Root<JobEntity> root,
         final CriteriaBuilder cb,
-        final String id,
-        final String name,
-        final String user,
-        final Set<JobStatus> statuses,
-        final Set<String> tags,
-        final String clusterName,
-        final ClusterEntity cluster,
-        final String commandName,
-        final CommandEntity command,
-        final Date minStarted,
-        final Date maxStarted,
-        final Date minFinished,
-        final Date maxFinished
+        @Nullable final String id,
+        @Nullable final String name,
+        @Nullable final String user,
+        @Nullable final Set<JobStatus> statuses,
+        @Nullable final Set<String> tags,
+        @Nullable final String clusterName,
+        @Nullable final ClusterEntity cluster,
+        @Nullable final String commandName,
+        @Nullable final CommandEntity command,
+        @Nullable final Date minStarted,
+        @Nullable final Date maxStarted,
+        @Nullable final Date minFinished,
+        @Nullable final Date maxFinished,
+        @Nullable final String grouping,
+        @Nullable final String groupingInstance
     ) {
         final List<Predicate> predicates = new ArrayList<>();
         if (StringUtils.isNotBlank(id)) {
-            predicates.add(JpaSpecificationUtils.getStringLikeOrEqualPredicate(cb, root.get(JobEntity_.id), id));
+            predicates.add(JpaSpecificationUtils.getStringLikeOrEqualPredicate(cb, root.get(JobEntity_.uniqueId), id));
         }
         if (StringUtils.isNotBlank(name)) {
             predicates.add(JpaSpecificationUtils.getStringLikeOrEqualPredicate(cb, root.get(JobEntity_.name), name));
@@ -101,7 +107,7 @@ public final class JpaJobSpecs {
             predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
         }
         if (tags != null && !tags.isEmpty()) {
-            predicates.add(cb.like(root.get(JobEntity_.tags), JpaSpecificationUtils.getTagLikeString(tags)));
+            predicates.add(cb.like(root.get(JobEntity_.tagSearchString), JpaSpecificationUtils.getTagLikeString(tags)));
         }
         if (cluster != null) {
             predicates.add(cb.equal(root.get(JobEntity_.cluster), cluster));
@@ -130,6 +136,20 @@ public final class JpaJobSpecs {
         }
         if (maxFinished != null) {
             predicates.add(cb.lessThan(root.get(JobEntity_.finished), maxFinished));
+        }
+        if (grouping != null) {
+            predicates.add(
+                JpaSpecificationUtils.getStringLikeOrEqualPredicate(cb, root.get(JobEntity_.grouping), grouping)
+            );
+        }
+        if (groupingInstance != null) {
+            predicates.add(
+                JpaSpecificationUtils.getStringLikeOrEqualPredicate(
+                    cb,
+                    root.get(JobEntity_.groupingInstance),
+                    groupingInstance
+                )
+            );
         }
         return cb.and(predicates.toArray(new Predicate[predicates.size()]));
     }

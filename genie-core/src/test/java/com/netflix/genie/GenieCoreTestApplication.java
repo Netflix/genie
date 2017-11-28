@@ -55,9 +55,9 @@ public class GenieCoreTestApplication {
     @PreDestroy
     @SuppressWarnings("PMD.CollapsibleIfStatements") // Collapsing inner `if` statement is not equivalent to this.
     public void cleanUp() {
-        if (temporaryFolder != null && temporaryFolder.exists()) {
-            if (!temporaryFolder.delete()) {
-                throw new RuntimeException("Temporary folder not deleted: " + temporaryFolder.toString());
+        if (this.temporaryFolder.exists()) {
+            if (!this.temporaryFolder.delete()) {
+                throw new RuntimeException("Temporary folder not deleted: " + this.temporaryFolder.toString());
             }
         }
     }
@@ -68,7 +68,7 @@ public class GenieCoreTestApplication {
      * @return The bean validator
      */
     @Bean
-    @ConditionalOnMissingBean
+    @ConditionalOnMissingBean(Validator.class)
     public Validator localValidatorFactoryBean() {
         return new LocalValidatorFactoryBean();
     }
@@ -79,7 +79,7 @@ public class GenieCoreTestApplication {
      * @return The method validation processor
      */
     @Bean
-    @ConditionalOnMissingBean
+    @ConditionalOnMissingBean(MethodValidationPostProcessor.class)
     public MethodValidationPostProcessor methodValidationPostProcessor() {
         return new MethodValidationPostProcessor();
     }
@@ -113,7 +113,7 @@ public class GenieCoreTestApplication {
      * @throws IOException on error reading or creating the directory
      */
     @Bean
-    @ConditionalOnMissingBean
+    @ConditionalOnMissingBean(value = Resource.class, name = "jobsDir")
     public Resource jobsDir() throws IOException {
         return new FileSystemResource(temporaryFolder.toString());
     }

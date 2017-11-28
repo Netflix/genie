@@ -18,11 +18,14 @@ package com.netflix.genie.core.jpa.specifications;
 import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.core.jpa.entities.ApplicationEntity;
 import com.netflix.genie.core.jpa.entities.ApplicationEntity_;
+import com.netflix.genie.core.jpa.entities.TagEntity;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 
+import javax.annotation.Nullable;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
@@ -41,7 +44,7 @@ public final class JpaApplicationSpecs {
     /**
      * Private constructor for utility class.
      */
-    protected JpaApplicationSpecs() {
+    private JpaApplicationSpecs() {
     }
 
     /**
@@ -50,16 +53,16 @@ public final class JpaApplicationSpecs {
      * @param name     The name of the application
      * @param user     The name of the user who created the application
      * @param statuses The status of the application
-     * @param tags     The set of tags to search the command for
+     * @param tags     The set of tags to search with
      * @param type     The type of applications to fine
      * @return A specification object used for querying
      */
     public static Specification<ApplicationEntity> find(
-        final String name,
-        final String user,
-        final Set<ApplicationStatus> statuses,
-        final Set<String> tags,
-        final String type
+        @Nullable final String name,
+        @Nullable final String user,
+        @Nullable final Set<ApplicationStatus> statuses,
+        @Nullable final Set<TagEntity> tags,
+        @Nullable final String type
     ) {
         return (final Root<ApplicationEntity> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
             final List<Predicate> predicates = new ArrayList<>();
@@ -82,12 +85,10 @@ public final class JpaApplicationSpecs {
                 predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
             }
             if (tags != null && !tags.isEmpty()) {
-                predicates.add(
-                    cb.like(
-                        root.get(ApplicationEntity_.tags),
-                        JpaSpecificationUtils.getTagLikeString(tags)
-                    )
-                );
+                final Join<ApplicationEntity, TagEntity> tagEntityJoin = root.join(ApplicationEntity_.tags);
+                predicates.add(tagEntityJoin.in(tags));
+                cq.groupBy(root.get(ApplicationEntity_.id));
+                cq.having(cb.equal(cb.count(root.get(ApplicationEntity_.id)), tags.size()));
             }
             if (StringUtils.isNotBlank(type)) {
                 predicates.add(

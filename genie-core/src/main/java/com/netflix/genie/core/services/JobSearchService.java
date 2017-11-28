@@ -31,6 +31,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
@@ -48,36 +49,41 @@ public interface JobSearchService {
     /**
      * Search for jobs which match the given filter criteria.
      *
-     * @param id          id for job
-     * @param name        name of job (can be a SQL-style pattern such as HIVE%)
-     * @param user        user who submitted job
-     * @param statuses    statuses of job
-     * @param tags        tags for the job
-     * @param clusterName name of cluster for job
-     * @param clusterId   id of cluster for job
-     * @param commandName name of the command run in the job
-     * @param commandId   id of the command run in the job
-     * @param minStarted  The time which the job had to start after in order to be return (inclusive)
-     * @param maxStarted  The time which the job had to start before in order to be returned (exclusive)
-     * @param minFinished The time which the job had to finish after in order to be return (inclusive)
-     * @param maxFinished The time which the job had to finish before in order to be returned (exclusive)
-     * @param page        Page information of job to get
+     * @param id               id for job
+     * @param name             name of job (can be a SQL-style pattern such as HIVE%)
+     * @param user             user who submitted job
+     * @param statuses         statuses of job
+     * @param tags             tags for the job
+     * @param clusterName      name of cluster for job
+     * @param clusterId        id of cluster for job
+     * @param commandName      name of the command run in the job
+     * @param commandId        id of the command run in the job
+     * @param minStarted       The time which the job had to start after in order to be return (inclusive)
+     * @param maxStarted       The time which the job had to start before in order to be returned (exclusive)
+     * @param minFinished      The time which the job had to finish after in order to be return (inclusive)
+     * @param maxFinished      The time which the job had to finish before in order to be returned (exclusive)
+     * @param grouping         The job grouping to search for
+     * @param groupingInstance The job grouping instance to search for
+     * @param page             Page information of job to get
      * @return Metadata information on jobs which match the criteria
      */
+    @SuppressWarnings("checkstyle:parameternumber")
     Page<JobSearchResult> findJobs(
-        final String id,
-        final String name,
-        final String user,
-        final Set<JobStatus> statuses,
-        final Set<String> tags,
-        final String clusterName,
-        final String clusterId,
-        final String commandName,
-        final String commandId,
-        final Date minStarted,
-        final Date maxStarted,
-        final Date minFinished,
-        final Date maxFinished,
+        @Nullable final String id,
+        @Nullable final String name,
+        @Nullable final String user,
+        @Nullable final Set<JobStatus> statuses,
+        @Nullable final Set<String> tags,
+        @Nullable final String clusterName,
+        @Nullable final String clusterId,
+        @Nullable final String commandName,
+        @Nullable final String commandId,
+        @Nullable final Date minStarted,
+        @Nullable final Date maxStarted,
+        @Nullable final Date minFinished,
+        @Nullable final Date maxFinished,
+        @Nullable final String grouping,
+        @Nullable final String groupingInstance,
         @NotNull final Pageable page
     );
 
@@ -90,10 +96,11 @@ public interface JobSearchService {
     Set<Job> getAllActiveJobsOnHost(@NotBlank final String hostName);
 
     /**
-     * Get a list of host names which are currently have active jobs in the Genie cluster.
+     * Get a set of host names which are currently have active jobs in the Genie cluster.
      *
-     * @return The list of hosts with jobs currently in an active state
+     * @return The set of hosts with jobs currently in an active state
      */
+    // TODO: Change to set
     List<String> getAllHostsWithActiveJobs();
 
     /**

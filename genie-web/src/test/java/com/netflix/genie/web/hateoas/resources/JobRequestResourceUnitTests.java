@@ -62,7 +62,7 @@ public class JobRequestResourceUnitTests {
     @Before
     public void setup() {
         this.jobRequest = new JobRequest
-            .Builder(NAME, USER, VERSION, COMMAND_ARGS, CLUSTER_CRITERIAS, COMMAND_CRITERIA)
+            .Builder(NAME, USER, VERSION, CLUSTER_CRITERIAS, COMMAND_CRITERIA)
             .withId(ID)
             .build();
     }

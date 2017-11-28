@@ -123,15 +123,20 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
 
         final String setUpFile = this.resourceLoader.getResource("/setupfile").getFile().getAbsolutePath();
 
+        final List<String> commandArgs = Lists.newArrayList(
+            "-c",
+            "'echo HELLO WORLD!!!'"
+        );
+
         final JobRequest jobRequest = new JobRequest.Builder(
             JOB_NAME,
             JOB_USER,
             JOB_VERSION,
-            "-c 'echo HELLO WORLD!!!'",
             clusterCriteriaList,
             commandCriteria
         )
             .withId(jobId)
+            .withCommandArgs(commandArgs)
             .withDisableLogArchival(true)
             .withSetupFile(setUpFile)
             .withConfigs(configs)
@@ -182,15 +187,20 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
 
         final String setUpFile = this.resourceLoader.getResource("/setupfile").getFile().getAbsolutePath();
 
+        final List<String> commandArgs = Lists.newArrayList(
+            "-c",
+            "'echo HELLO WORLD!!!'"
+        );
+
         final JobRequest jobRequest = new JobRequest.Builder(
             JOB_NAME,
             JOB_USER,
             JOB_VERSION,
-            "-c 'echo HELLO WORLD!!!'",
             clusterCriteriaList,
             commandCriteria
         )
             .withId(jobId)
+            .withCommandArgs(commandArgs)
             .withDisableLogArchival(true)
             .withSetupFile(setUpFile)
             .withDependencies(dependencies)
@@ -250,11 +260,11 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
                 JOB_NAME,
                 JOB_USER,
                 JOB_VERSION,
-                "-c 'cat data.txt'",
                 clusterCriteriaList,
                 commandCriteria
             )
                 .withId(jobId)
+                .withCommandArgs(Lists.newArrayList("-c", "'cat data.txt'"))
                 .withDisableLogArchival(true)
                 .build();
 
@@ -295,11 +305,11 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
             JOB_NAME,
             JOB_USER,
             JOB_VERSION,
-            "-c 'cat attachmentfile.txt'",
             clusterCriteriaList,
             commandCriteria
         )
             .withId(jobId)
+            .withCommandArgs(Lists.newArrayList("-c", "'cat attachmentfile.txt'"))
             .withDisableLogArchival(true)
             .build();
 
@@ -349,11 +359,11 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
             JOB_NAME,
             JOB_USER,
             JOB_VERSION,
-            "-c 'sleep 60'",
             clusterCriteriaList,
             commandCriteria
         )
             .withId(UUID.randomUUID().toString())
+            .withCommandArgs(Lists.newArrayList("-c", "'sleep 60'"))
             .withDisableLogArchival(true)
             .build();
 
@@ -391,11 +401,11 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
             JOB_NAME,
             JOB_USER,
             JOB_VERSION,
-            "-c 'sleep 60'",
             clusterCriteriaList,
             commandCriteria
         )
             .withId(UUID.randomUUID().toString())
+            .withCommandArgs(Lists.newArrayList("-c", "'sleep 60'"))
             .withDisableLogArchival(true)
             .withTimeout(1)
             .build();
@@ -429,33 +439,38 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
 
         final Set<String> commandCriteria = Sets.newHashSet("bash");
 
+        final List<String> commandArgs = Lists.newArrayList(
+            "-c",
+            "'echo HELLO WORLD!!!'"
+        );
+
         final JobRequest jobRequest1 = new JobRequest.Builder(
             JOB_NAME,
             JOB_USER,
             JOB_VERSION,
-            "-c 'echo HELLO WORLD!!!'",
             clusterCriteriaList,
             commandCriteria
         )
             .withId(UUID.randomUUID().toString())
+            .withCommandArgs(commandArgs)
             .withDisableLogArchival(true)
             .build();
 
-        jobClient.submitJob(jobRequest1);
+        this.jobClient.submitJob(jobRequest1);
 
         final JobRequest jobRequest2 = new JobRequest.Builder(
             JOB_NAME,
             JOB_USER,
             JOB_VERSION,
-            "-c 'echo HELLO WORLD!!!'",
             clusterCriteriaList,
             commandCriteria
         )
             .withId(UUID.randomUUID().toString())
+            .withCommandArgs(commandArgs)
             .withDisableLogArchival(true)
             .build();
 
-        jobClient.submitJob(jobRequest2);
+        this.jobClient.submitJob(jobRequest2);
 
         final List<JobSearchResult> jobs = jobClient.getJobs();
         Assert.assertTrue(jobs.size() >= 2);
@@ -476,16 +491,21 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
 
         final Set<String> commandCriteria = Sets.newHashSet("bash");
 
+        final List<String> commandArgs = Lists.newArrayList(
+            "-c",
+            "'echo HELLO WORLD!!!'"
+        );
+
         final JobRequest jobRequest1 = new JobRequest.Builder(
             "job1",
             "user1",
             JOB_VERSION,
-            "-c 'echo HELLO WORLD!!!'",
             clusterCriteriaList,
             commandCriteria
         )
-            .withTags(Arrays.stream(new String[]{"foo", "bar"}).collect(Collectors.toSet()))
+            .withTags(Sets.newHashSet("foo", "bar"))
             .withId(UUID.randomUUID().toString())
+            .withCommandArgs(commandArgs)
             .withDisableLogArchival(true)
             .build();
 
@@ -495,11 +515,11 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
             "job2",
             "user2",
             JOB_VERSION,
-            "-c 'ls blah'",
             clusterCriteriaList,
             commandCriteria
         )
-            .withTags(Arrays.stream(new String[]{"foo", "pi"}).collect(Collectors.toSet()))
+            .withTags(Sets.newHashSet("foo", "pi"))
+            .withCommandArgs(Lists.newArrayList("-c", "'ls blah'"))
             .withId(UUID.randomUUID().toString())
             .withDisableLogArchival(true)
             .build();
@@ -514,6 +534,8 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
             jobRequest1.getId().orElseThrow(IllegalArgumentException::new),
             jobClient.getJobs(
                 jobRequest1.getId().orElseThrow(IllegalArgumentException::new),
+                null,
+                null,
                 null,
                 null,
                 null,
@@ -545,6 +567,8 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
                 null,
                 null,
                 null,
+                null,
+                null,
                 null
             ).get(0).getId()
         );
@@ -556,6 +580,8 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
                 null,
                 null,
                 "user2",
+                null,
+                null,
                 null,
                 null,
                 null,
@@ -584,6 +610,8 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
                 null,
                 null,
                 null,
+                null,
+                null,
                 null
             ).get(0).getId());
 
@@ -603,6 +631,8 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
                 null,
                 null,
                 null,
+                null,
+                null,
                 null
             ).get(0).getId());
 
@@ -613,6 +643,8 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
             null,
             null,
             Arrays.stream(new String[]{"foo"}).collect(Collectors.toSet()),
+            null,
+            null,
             null,
             null,
             null,
@@ -639,23 +671,28 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
 
         final Set<String> commandCriteria = Sets.newHashSet("bash");
 
+        final List<String> commandArgs = Lists.newArrayList(
+            "-c",
+            "'echo HELLO WORLD!!!'"
+        );
+
         final JobRequest jobRequest1 = new JobRequest.Builder(
             JOB_NAME,
             JOB_USER,
             JOB_VERSION,
-            "-c 'echo HELLO WORLD!!!'",
             clusterCriteriaList,
             commandCriteria
         )
             .withId(UUID.randomUUID().toString())
+            .withCommandArgs(commandArgs)
             .withDisableLogArchival(true)
             .build();
 
-        jobClient.submitJob(jobRequest1);
-        jobClient.waitForCompletion(jobRequest1.getId().orElseThrow(IllegalArgumentException::new), 60000, 5000);
+        this.jobClient.submitJob(jobRequest1);
+        this.jobClient.waitForCompletion(jobRequest1.getId().orElseThrow(IllegalArgumentException::new), 60000, 5000);
 
         final InputStream inputStream1
-            = jobClient.getJobStdout(jobRequest1.getId().orElseThrow(IllegalArgumentException::new));
+            = this.jobClient.getJobStdout(jobRequest1.getId().orElseThrow(IllegalArgumentException::new));
         final BufferedReader reader1 = new BufferedReader(new InputStreamReader(inputStream1, "UTF-8"));
         final StringBuilder sb = new StringBuilder();
         String line;
@@ -684,23 +721,28 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
 
         final Set<String> commandCriteria = Sets.newHashSet("bash");
 
+        final List<String> commandArgs = Lists.newArrayList(
+            "-c",
+            "'ls foo'"
+        );
+
         final JobRequest jobRequest1 = new JobRequest.Builder(
             JOB_NAME,
             JOB_USER,
             JOB_VERSION,
-            "-c 'ls foo'",
             clusterCriteriaList,
             commandCriteria
         )
             .withId(UUID.randomUUID().toString())
+            .withCommandArgs(commandArgs)
             .withDisableLogArchival(true)
             .build();
 
-        jobClient.submitJob(jobRequest1);
-        jobClient.waitForCompletion(jobRequest1.getId().orElseThrow(IllegalArgumentException::new), 60000, 5000);
+        this.jobClient.submitJob(jobRequest1);
+        this.jobClient.waitForCompletion(jobRequest1.getId().orElseThrow(IllegalArgumentException::new), 60000, 5000);
 
         final InputStream inputStream1
-            = jobClient.getJobStderr(jobRequest1.getId().orElseThrow(IllegalArgumentException::new));
+            = this.jobClient.getJobStderr(jobRequest1.getId().orElseThrow(IllegalArgumentException::new));
         final BufferedReader reader1 = new BufferedReader(new InputStreamReader(inputStream1, "UTF-8"));
         final StringBuilder sb = new StringBuilder();
         String line;
@@ -733,10 +775,10 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
             JOB_NAME,
             JOB_USER,
             JOB_VERSION,
-            "-c 'ls foo'",
             clusterCriteriaList,
             commandCriteria
         )
+            .withCommandArgs(Lists.newArrayList("-c", "'ls foo'"))
             .withDisableLogArchival(true)
             .build();
 

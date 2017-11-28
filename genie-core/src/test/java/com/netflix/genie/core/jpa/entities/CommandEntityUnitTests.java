@@ -21,7 +21,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
-import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.test.suppliers.RandomSuppliers;
@@ -34,7 +33,6 @@ import org.mockito.Mockito;
 
 import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -97,19 +95,6 @@ public class CommandEntityUnitTests extends EntityTestsBase {
     }
 
     /**
-     * Test to make sure validation works.
-     *
-     * @throws GenieException If any precondition isn't met.
-     */
-    @Test
-    public void testOnCreateOrUpdateCommand() throws GenieException {
-        Assert.assertNotNull(this.c.getTags());
-        Assert.assertTrue(this.c.getTags().isEmpty());
-        this.c.onCreateOrUpdateCommand();
-        Assert.assertEquals(2, this.c.getTags().size());
-    }
-
-    /**
      * Make sure validation works on valid apps.
      */
     @Test
@@ -122,7 +107,7 @@ public class CommandEntityUnitTests extends EntityTestsBase {
      */
     @Test(expected = ConstraintViolationException.class)
     public void testValidateNoName() {
-        this.c.setName(null);
+        this.c.setName("");
         this.validate(this.c);
     }
 
@@ -141,15 +126,6 @@ public class CommandEntityUnitTests extends EntityTestsBase {
     @Test(expected = ConstraintViolationException.class)
     public void testValidateNoVersion() {
         this.c.setVersion("");
-        this.validate(this.c);
-    }
-
-    /**
-     * Make sure validation works on with failure from command.
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testValidateNoStatus() {
-        this.c.setStatus(null);
         this.validate(this.c);
     }
 
@@ -186,9 +162,11 @@ public class CommandEntityUnitTests extends EntityTestsBase {
     @Test
     public void testSetSetupFile() {
         Assert.assertFalse(this.c.getSetupFile().isPresent());
-        final String propFile = "s3://netflix.propFile";
-        this.c.setSetupFile(propFile);
-        Assert.assertEquals(propFile, this.c.getSetupFile().orElseThrow(IllegalArgumentException::new));
+        final String setupFile = "s3://netflix.propFile";
+        final FileEntity setupFileEntity = new FileEntity();
+        setupFileEntity.setFile(setupFile);
+        this.c.setSetupFile(setupFileEntity);
+        Assert.assertEquals(setupFileEntity, this.c.getSetupFile().orElseThrow(IllegalArgumentException::new));
     }
 
     /**
@@ -229,7 +207,9 @@ public class CommandEntityUnitTests extends EntityTestsBase {
     public void testSetConfigs() {
         Assert.assertNotNull(this.c.getConfigs());
         Assert.assertTrue(this.c.getConfigs().isEmpty());
-        final Set<String> configs = Sets.newHashSet("s3://netflix.configFile");
+        final FileEntity config = new FileEntity();
+        config.setFile("s3://netflix.configFile");
+        final Set<FileEntity> configs = Sets.newHashSet(config);
         this.c.setConfigs(configs);
         Assert.assertEquals(configs, this.c.getConfigs());
 
@@ -244,7 +224,9 @@ public class CommandEntityUnitTests extends EntityTestsBase {
     public void testSetDependencies() {
         Assert.assertNotNull(this.c.getDependencies());
         Assert.assertTrue(this.c.getDependencies().isEmpty());
-        final Set<String> dependencies = Sets.newHashSet("dep1");
+        final FileEntity dependency = new FileEntity();
+        dependency.setFile("dep1");
+        final Set<FileEntity> dependencies = Sets.newHashSet(dependency);
         this.c.setDependencies(dependencies);
         Assert.assertEquals(dependencies, this.c.getDependencies());
 
@@ -259,22 +241,13 @@ public class CommandEntityUnitTests extends EntityTestsBase {
     public void testSetTags() {
         Assert.assertNotNull(this.c.getTags());
         Assert.assertTrue(this.c.getTags().isEmpty());
-        final Set<String> tags = Sets.newHashSet("tag1", "tag2");
+        final TagEntity one = new TagEntity();
+        one.setTag("tag1");
+        final TagEntity two = new TagEntity();
+        two.setTag("tag2");
+        final Set<TagEntity> tags = Sets.newHashSet(one, two);
         this.c.setTags(tags);
         Assert.assertEquals(tags, this.c.getTags());
-
-        this.c.setTags(null);
-        Assert.assertThat(this.c.getTags(), Matchers.empty());
-    }
-
-    /**
-     * Test to make sure we can set the command tags.
-     */
-    @Test
-    public void canSetCommandTags() {
-        final Set<String> tags = Sets.newHashSet("Third", "first", "second");
-        this.c.setTags(tags);
-        Assert.assertThat(this.c.getTags(), Matchers.is(tags));
 
         this.c.setTags(null);
         Assert.assertThat(this.c.getTags(), Matchers.empty());
@@ -291,9 +264,9 @@ public class CommandEntityUnitTests extends EntityTestsBase {
         Assert.assertTrue(this.c.getApplications().isEmpty());
         final List<ApplicationEntity> applicationEntities = new ArrayList<>();
         final ApplicationEntity one = new ApplicationEntity();
-        one.setId("one");
+        one.setUniqueId("one");
         final ApplicationEntity two = new ApplicationEntity();
-        two.setId("two");
+        two.setUniqueId("two");
         applicationEntities.add(one);
         applicationEntities.add(two);
         this.c.setApplications(applicationEntities);
@@ -324,9 +297,9 @@ public class CommandEntityUnitTests extends EntityTestsBase {
     @Test(expected = GeniePreconditionException.class)
     public void cantSetApplicationsIfDuplicates() throws GeniePreconditionException {
         final ApplicationEntity one = Mockito.mock(ApplicationEntity.class);
-        Mockito.when(one.getId()).thenReturn(UUID.randomUUID().toString());
+        Mockito.when(one.getUniqueId()).thenReturn(UUID.randomUUID().toString());
         final ApplicationEntity two = Mockito.mock(ApplicationEntity.class);
-        Mockito.when(two.getId()).thenReturn(UUID.randomUUID().toString());
+        Mockito.when(two.getUniqueId()).thenReturn(UUID.randomUUID().toString());
 
         this.c.setApplications(Lists.newArrayList(one, two, one));
     }
@@ -340,7 +313,7 @@ public class CommandEntityUnitTests extends EntityTestsBase {
     public void canAddApplication() throws GeniePreconditionException {
         final String id = UUID.randomUUID().toString();
         final ApplicationEntity app = new ApplicationEntity();
-        app.setId(id);
+        app.setUniqueId(id);
 
         this.c.addApplication(app);
         Assert.assertThat(this.c.getApplications(), Matchers.hasItem(app));
@@ -356,7 +329,7 @@ public class CommandEntityUnitTests extends EntityTestsBase {
     public void cantAddApplicationThatAlreadyIsInList() throws GeniePreconditionException {
         final String id = UUID.randomUUID().toString();
         final ApplicationEntity app = new ApplicationEntity();
-        app.setId(id);
+        app.setUniqueId(id);
 
         this.c.addApplication(app);
         this.c.addApplication(app);
@@ -370,9 +343,9 @@ public class CommandEntityUnitTests extends EntityTestsBase {
     @Test
     public void canRemoveApplication() throws GeniePreconditionException {
         final ApplicationEntity one = new ApplicationEntity();
-        one.setId("one");
+        one.setUniqueId("one");
         final ApplicationEntity two = new ApplicationEntity();
-        two.setId("two");
+        two.setUniqueId("two");
         Assert.assertNotNull(this.c.getApplications());
         Assert.assertTrue(this.c.getApplications().isEmpty());
         this.c.addApplication(one);
@@ -410,56 +383,10 @@ public class CommandEntityUnitTests extends EntityTestsBase {
     }
 
     /**
-     * Make sure we can get a valid Command DTO.
-     *
-     * @throws GenieException on error
+     * Test the toString method.
      */
     @Test
-    public void canGetDTO() throws GenieException {
-        final CommandEntity entity = new CommandEntity();
-        final String id = UUID.randomUUID().toString();
-        entity.setId(id);
-        final String name = UUID.randomUUID().toString();
-        entity.setName(name);
-        final String user = UUID.randomUUID().toString();
-        entity.setUser(user);
-        final String version = UUID.randomUUID().toString();
-        entity.setVersion(version);
-        final String description = UUID.randomUUID().toString();
-        entity.setDescription(description);
-        final Date created = entity.getCreated();
-        final Date updated = entity.getUpdated();
-        entity.setStatus(CommandStatus.DEPRECATED);
-        final Set<String> tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
-        entity.setTags(tags);
-        final Set<String> configs = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
-        entity.setConfigs(configs);
-        final Set<String> dependencies = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
-        entity.setDependencies(dependencies);
-        final String setupFile = UUID.randomUUID().toString();
-        entity.setSetupFile(setupFile);
-        final String executable = UUID.randomUUID().toString();
-        entity.setExecutable(executable);
-        final long checkDelay = 2180234L;
-        entity.setCheckDelay(checkDelay);
-        final int memory = 10_241;
-        entity.setMemory(memory);
-
-        final Command command = entity.getDTO();
-        Assert.assertThat(command.getId().orElseGet(RandomSuppliers.STRING), Matchers.is(id));
-        Assert.assertThat(command.getName(), Matchers.is(name));
-        Assert.assertThat(command.getUser(), Matchers.is(user));
-        Assert.assertThat(command.getVersion(), Matchers.is(version));
-        Assert.assertThat(command.getStatus(), Matchers.is(CommandStatus.DEPRECATED));
-        Assert.assertThat(command.getDescription().orElseGet(RandomSuppliers.STRING), Matchers.is(description));
-        Assert.assertThat(command.getCreated().orElseGet(RandomSuppliers.DATE), Matchers.is(created));
-        Assert.assertThat(command.getUpdated().orElseGet(RandomSuppliers.DATE), Matchers.is(updated));
-        Assert.assertThat(command.getExecutable(), Matchers.is(executable));
-        Assert.assertThat(command.getCheckDelay(), Matchers.is(checkDelay));
-        Assert.assertThat(command.getTags(), Matchers.is(tags));
-        Assert.assertThat(command.getSetupFile().orElseGet(RandomSuppliers.STRING), Matchers.is(setupFile));
-        Assert.assertThat(command.getConfigs(), Matchers.is(configs));
-        Assert.assertThat(command.getDependencies(), Matchers.is(dependencies));
-        Assert.assertThat(command.getMemory().orElseGet(RandomSuppliers.INT), Matchers.is(memory));
+    public void testToString() {
+        Assert.assertNotNull(this.c.toString());
     }
 }

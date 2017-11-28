@@ -55,8 +55,8 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -163,7 +163,7 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
      */
     @Override
     public Cluster selectCluster(
-        @Nonnull @NonNull @NotEmpty final List<Cluster> clusters,
+        @Nonnull @NonNull @NotEmpty final Set<Cluster> clusters,
         @Nonnull @NonNull final JobRequest jobRequest
     ) throws GenieException {
         final long selectStart = System.nanoTime();

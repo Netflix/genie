@@ -18,17 +18,16 @@
 package com.netflix.genie.core.jpa.entities;
 
 import com.google.common.collect.Lists;
-import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
-import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.core.jpa.entities.projections.ClusterCommandsProjection;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
+import javax.annotation.Nullable;
 import javax.persistence.Basic;
-import javax.persistence.CollectionTable;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -37,8 +36,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OrderColumn;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -55,9 +52,10 @@ import java.util.Set;
  */
 @Getter
 @Setter
+@ToString(callSuper = true, exclude = {"configs", "dependencies", "tags", "commands"})
 @Entity
 @Table(name = "clusters")
-public class ClusterEntity extends SetupFileEntity {
+public class ClusterEntity extends BaseEntity implements ClusterCommandsProjection {
 
     private static final long serialVersionUID = -5674870110962005872L;
 
@@ -67,24 +65,43 @@ public class ClusterEntity extends SetupFileEntity {
     @NotNull(message = "No cluster status entered and is required.")
     private ClusterStatus status;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(
-        name = "cluster_configs",
-        joinColumns = @JoinColumn(name = "cluster_id", referencedColumnName = "id")
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "clusters_configs",
+        joinColumns = {
+            @JoinColumn(name = "cluster_id", referencedColumnName = "id", nullable = false, updatable = false)
+        },
+        inverseJoinColumns = {
+            @JoinColumn(name = "file_id", referencedColumnName = "id", nullable = false, updatable = false)
+        }
     )
-    @Column(name = "config", nullable = false, length = 2048)
-    private Set<String> configs = new HashSet<>();
+    private Set<FileEntity> configs = new HashSet<>();
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(
-        name = "cluster_dependencies",
-        joinColumns = @JoinColumn(name = "cluster_id", referencedColumnName = "id")
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "clusters_dependencies",
+        joinColumns = {
+            @JoinColumn(name = "cluster_id", referencedColumnName = "id", nullable = false, updatable = false)
+        },
+        inverseJoinColumns = {
+            @JoinColumn(name = "file_id", referencedColumnName = "id", nullable = false, updatable = false)
+        }
     )
-    @Column(name = "dependency", nullable = false, length = 2048)
-    private Set<String> dependencies = new HashSet<>();
+    private Set<FileEntity> dependencies = new HashSet<>();
 
-    // TODO: Make lazy?
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "clusters_tags",
+        joinColumns = {
+            @JoinColumn(name = "cluster_id", referencedColumnName = "id", nullable = false, updatable = false)
+        },
+        inverseJoinColumns = {
+            @JoinColumn(name = "tag_id", referencedColumnName = "id", nullable = false, updatable = false)
+        }
+    )
+    private Set<TagEntity> tags = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "clusters_commands",
         joinColumns = {
@@ -105,26 +122,38 @@ public class ClusterEntity extends SetupFileEntity {
     }
 
     /**
-     * Check to make sure everything is OK before persisting.
+     * Set all the files associated as configuration files for this cluster.
      *
-     * @throws GenieException If any precondition isn't met.
+     * @param configs The configuration files to set
      */
-    @PrePersist
-    @PreUpdate
-    protected void onCreateOrUpdateCluster() throws GenieException {
-        this.setTags(this.getFinalTags());
-    }
-
-    /**
-     * Sets the configurations for this cluster.
-     *
-     * @param configs The configuration files that this cluster needs. Not
-     *                null/empty.
-     */
-    public void setConfigs(final Set<String> configs) {
+    public void setConfigs(@Nullable final Set<FileEntity> configs) {
         this.configs.clear();
         if (configs != null) {
             this.configs.addAll(configs);
+        }
+    }
+
+    /**
+     * Set all the files associated as dependency files for this cluster.
+     *
+     * @param dependencies The dependency files to set
+     */
+    public void setDependencies(@Nullable final Set<FileEntity> dependencies) {
+        this.dependencies.clear();
+        if (dependencies != null) {
+            this.dependencies.addAll(dependencies);
+        }
+    }
+
+    /**
+     * Set all the tags associated to this cluster.
+     *
+     * @param tags The dependency tags to set
+     */
+    public void setTags(@Nullable final Set<TagEntity> tags) {
+        this.tags.clear();
+        if (tags != null) {
+            this.tags.addAll(tags);
         }
     }
 
@@ -134,9 +163,9 @@ public class ClusterEntity extends SetupFileEntity {
      * @param commands The commands that this cluster supports
      * @throws GeniePreconditionException If the commands are already added to the list
      */
-    public void setCommands(final List<CommandEntity> commands) throws GeniePreconditionException {
+    public void setCommands(@Nullable final List<CommandEntity> commands) throws GeniePreconditionException {
         if (commands != null
-            && commands.stream().map(CommandEntity::getId).distinct().count() != commands.size()) {
+            && commands.stream().map(CommandEntity::getUniqueId).distinct().count() != commands.size()) {
             throw new GeniePreconditionException("List of commands to set cannot contain duplicates");
         }
 
@@ -164,14 +193,8 @@ public class ClusterEntity extends SetupFileEntity {
      * @throws GeniePreconditionException If the command is a duplicate of an existing command
      */
     public void addCommand(@NotNull final CommandEntity command) throws GeniePreconditionException {
-        if (
-            this.commands
-                .stream()
-                .map(CommandEntity::getId)
-                .filter(id -> id.equals(command.getId()))
-                .count() != 0
-            ) {
-            throw new GeniePreconditionException("A command with id " + command.getId() + " is already added");
+        if (this.commands.contains(command)) {
+            throw new GeniePreconditionException("A command with id " + command.getUniqueId() + " is already added");
         }
         this.commands.add(command);
         command.getClusters().add(this);
@@ -195,40 +218,18 @@ public class ClusterEntity extends SetupFileEntity {
     }
 
     /**
-     * Sets the dependencies needed for this cluster.
-     *
-     * @param dependencies All dependencies needed for execution in this cluster
+     * {@inheritDoc}
      */
-    public void setDependencies(final Set<String> dependencies) {
-        this.dependencies.clear();
-        if (dependencies != null) {
-            this.dependencies.addAll(dependencies);
-        }
+    @Override
+    public boolean equals(final Object o) {
+        return super.equals(o);
     }
 
-
     /**
-     * Get a DTO from the contents of this entity.
-     *
-     * @return The DTO
+     * {@inheritDoc}
      */
-    public Cluster getDTO() {
-        final Cluster.Builder builder = new Cluster.Builder(
-            this.getName(),
-            this.getUser(),
-            this.getVersion(),
-            this.status
-        )
-            .withId(this.getId())
-            .withCreated(this.getCreated())
-            .withUpdated(this.getUpdated())
-            .withTags(this.getTags())
-            .withConfigs(this.configs)
-            .withDependencies(this.dependencies);
-
-        this.getDescription().ifPresent(builder::withDescription);
-        this.getSetupFile().ifPresent(builder::withSetupFile);
-
-        return builder.build();
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 }

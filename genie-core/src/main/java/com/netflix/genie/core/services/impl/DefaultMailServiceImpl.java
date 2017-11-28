@@ -22,6 +22,9 @@ import com.netflix.genie.core.services.MailService;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.NotBlank;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 /**
  * Default No-Op implementation of Mail Service Interface.
  *
@@ -41,10 +44,10 @@ public class DefaultMailServiceImpl implements MailService {
     @Override
     public void sendEmail(
         @NotBlank(message = "Cannot send email to blank address.")
-        final String toEmail,
+        @Nonnull final String toEmail,
         @NotBlank(message = "Subject cannot be empty")
-        final String subject,
-        final String body
+        @Nonnull final String subject,
+        @Nullable final String body
     ) throws GenieException {
         log.debug("Default mail service skips sending email.");
     }

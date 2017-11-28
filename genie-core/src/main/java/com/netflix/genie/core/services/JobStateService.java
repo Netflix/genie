@@ -34,6 +34,7 @@ import java.util.List;
 public interface JobStateService extends JobMetricsService {
     /**
      * Initialize the job.
+     *
      * @param jobId job id
      */
     void init(final String jobId);
@@ -41,19 +42,19 @@ public interface JobStateService extends JobMetricsService {
     /**
      * Schedules the job.
      *
-     * @param jobId         job id
-     * @param jobRequest    job request
-     * @param cluster       cluster for the job request based on the tags specified
-     * @param command       command for the job request based on command tags and cluster chosen
-     * @param applications  applications to use based on the command that was selected
-     * @param memory        job memory
-     *
+     * @param jobId        job id
+     * @param jobRequest   job request
+     * @param cluster      cluster for the job request based on the tags specified
+     * @param command      command for the job request based on command tags and cluster chosen
+     * @param applications applications to use based on the command that was selected
+     * @param memory       job memory
      */
     void schedule(final String jobId, final JobRequest jobRequest, final Cluster cluster, final Command command,
                   final List<Application> applications, final int memory);
 
     /**
      * Called when the job is done.
+     *
      * @param jobId job id
      * @throws GenieException on unrecoverable error
      */
@@ -61,6 +62,7 @@ public interface JobStateService extends JobMetricsService {
 
     /**
      * Returns true if the job exists locally.
+     *
      * @param jobId job id
      * @return true if job exists
      */

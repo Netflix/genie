@@ -17,168 +17,203 @@
  */
 package com.netflix.genie.core.jpa.entities;
 
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.test.categories.UnitTest;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import java.util.Date;
+import javax.validation.ConstraintViolationException;
 import java.util.UUID;
 
 /**
- * Tests for the base entity.
+ * Test the BaseEntity class and methods.
  *
  * @author tgianos
  */
 @Category(UnitTest.class)
-public class BaseEntityUnitTests {
+public class BaseEntityUnitTests extends EntityTestsBase {
+    private static final String UNIQUE_ID = UUID.randomUUID().toString();
+    private static final String NAME = "pig13";
+    private static final String USER = "tgianos";
+    private static final String VERSION = "1.0";
+
+    private BaseEntity b;
 
     /**
-     * Test to make sure objects are constructed properly.
+     * Setup the tests.
      */
-    @Test
-    public void testConstructor() {
-        final BaseEntity a = new BaseEntity();
-        Assert.assertNull(a.getId());
-        Assert.assertNotNull(a.getCreated());
-        Assert.assertNotNull(a.getUpdated());
+    @Before
+    public void setup() {
+        this.b = new BaseEntity();
+        this.b.setUniqueId(UNIQUE_ID);
+        this.b.setName(NAME);
+        this.b.setUser(USER);
+        this.b.setVersion(VERSION);
     }
 
     /**
-     * Test the setter for id.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
+     * Test the default Constructor.
      */
     @Test
-    public void testSetId() throws GeniePreconditionException {
-        final BaseEntity a = new BaseEntity();
-        Assert.assertNull(a.getId());
+    public void testDefaultConstructor() {
+        final BaseEntity local = new BaseEntity();
+        Assert.assertNotNull(local.getUniqueId());
+        Assert.assertNull(local.getName());
+        Assert.assertNull(local.getUser());
+        Assert.assertNull(local.getVersion());
+        Assert.assertFalse(local.getDescription().isPresent());
+        Assert.assertFalse(local.getSetupFile().isPresent());
+    }
+
+    /**
+     * Test to make sure validation works.
+     */
+    @Test
+    public void testValidate() {
+        this.validate(this.b);
+    }
+
+    /**
+     * Test to make sure validation works.
+     *
+     * @throws GenieException For any issue
+     */
+    @Test(expected = ConstraintViolationException.class)
+    public void testValidateWithNothing() throws GenieException {
+        this.validate(new BaseEntity());
+    }
+
+    /**
+     * Test to make sure validation works and throws exception when no name entered.
+     */
+    @Test(expected = ConstraintViolationException.class)
+    public void testValidateNoName() {
+        this.b.setName("");
+        this.validate(this.b);
+    }
+
+    /**
+     * Test to make sure validation works and throws exception when no name entered.
+     */
+    @Test(expected = ConstraintViolationException.class)
+    public void testValidateNoUser() {
+        this.b.setUser("     ");
+        this.validate(this.b);
+    }
+
+    /**
+     * Test to make sure validation works and throws exception when no name entered.
+     */
+    @Test(expected = ConstraintViolationException.class)
+    public void testValidateNoVersion() {
+        this.b.setVersion("");
+        this.validate(this.b);
+    }
+
+    /**
+     * Test the getting and setting of the unique id.
+     */
+    @Test
+    public void testSetUniqueId() {
+        final BaseEntity local = new BaseEntity();
+        Assert.assertNotNull(local.getUniqueId());
+        Assert.assertNotEquals(local.getUniqueId(), UNIQUE_ID);
+        local.setUniqueId(UNIQUE_ID);
+        Assert.assertEquals(UNIQUE_ID, local.getUniqueId());
+    }
+
+    /**
+     * Test to make sure the name is being set properly.
+     */
+    @Test
+    public void testSetName() {
+        final BaseEntity local = new BaseEntity();
+        Assert.assertNull(local.getName());
+        local.setName(NAME);
+        Assert.assertEquals(NAME, local.getName());
+    }
+
+    /**
+     * Test to make sure the user is being set properly.
+     */
+    @Test
+    public void testSetUser() {
+        final BaseEntity local = new BaseEntity();
+        Assert.assertNull(local.getUser());
+        local.setUser(USER);
+        Assert.assertEquals(USER, local.getUser());
+    }
+
+    /**
+     * Test to make sure the version is being set properly.
+     */
+    @Test
+    public void testSetVersion() {
+        final BaseEntity local = new BaseEntity();
+        Assert.assertNull(local.getVersion());
+        local.setVersion(VERSION);
+        Assert.assertEquals(VERSION, local.getVersion());
+    }
+
+    /**
+     * Test the description get/set.
+     */
+    @Test
+    public void testSetDescription() {
+        Assert.assertFalse(this.b.getDescription().isPresent());
+        final String description = "Test description";
+        this.b.setDescription(description);
+        Assert.assertEquals(description, this.b.getDescription().orElseThrow(IllegalArgumentException::new));
+    }
+
+    /**
+     * Test the setup file get/set.
+     */
+    @Test
+    public void testSetSetupFile() {
+        Assert.assertFalse(this.b.getSetupFile().isPresent());
+        final FileEntity setupFile = new FileEntity();
+        setupFile.setFile(UUID.randomUUID().toString());
+        this.b.setSetupFile(setupFile);
+        Assert.assertThat(this.b.getSetupFile().orElseThrow(IllegalArgumentException::new), Matchers.is(setupFile));
+        this.b.setSetupFile(null);
+        Assert.assertFalse(this.b.getSetupFile().isPresent());
+    }
+
+    /**
+     * Test to make sure equals and hash code only care about the unique id.
+     */
+    @Test
+    public void testEqualsAndHashCode() {
         final String id = UUID.randomUUID().toString();
-        a.setId(id);
-        Assert.assertEquals(id, a.getId());
+        final String name = UUID.randomUUID().toString();
+        final BaseEntity one = new BaseEntity();
+        one.setUniqueId(id);
+        one.setName(UUID.randomUUID().toString());
+        final BaseEntity two = new BaseEntity();
+        two.setUniqueId(id);
+        two.setName(name);
+        final BaseEntity three = new BaseEntity();
+        three.setUniqueId(UUID.randomUUID().toString());
+        three.setName(name);
+
+        Assert.assertTrue(one.equals(two));
+        Assert.assertFalse(one.equals(three));
+        Assert.assertFalse(two.equals(three));
+
+        Assert.assertEquals(one.hashCode(), two.hashCode());
+        Assert.assertNotEquals(one.hashCode(), three.hashCode());
+        Assert.assertNotEquals(two.hashCode(), three.hashCode());
     }
 
     /**
-     * Test the setter for id.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
-     */
-    @Test(expected = GeniePreconditionException.class)
-    public void testSetIdTwice() throws GeniePreconditionException {
-        final BaseEntity a = new BaseEntity();
-        Assert.assertNull(a.getId());
-        final String id = UUID.randomUUID().toString();
-        a.setId(id);
-        Assert.assertEquals(id, a.getId());
-        //Should throw exception here
-        a.setId(UUID.randomUUID().toString());
-    }
-
-    /**
-     * Test to make sure @PrePersist annotation will do what we want before persistence.
-     *
-     * @throws InterruptedException       If the process is interrupted
-     * @throws GeniePreconditionException If any precondition isn't met.
+     * Test the toString method.
      */
     @Test
-    public void testOnCreateBaseEntity() throws InterruptedException, GeniePreconditionException {
-        final BaseEntity a = new BaseEntity();
-        Assert.assertNull(a.getId());
-        Assert.assertNotNull(a.getCreated());
-        Assert.assertNotNull(a.getUpdated());
-        final Date originalCreated = a.getCreated();
-        final Date originalUpdated = a.getUpdated();
-        Thread.sleep(1);
-        a.onCreateBaseEntity();
-        Assert.assertNotNull(a.getId());
-        Assert.assertNotNull(a.getCreated());
-        Assert.assertNotNull(a.getUpdated());
-        Assert.assertNotEquals(originalCreated, a.getCreated());
-        Assert.assertNotEquals(originalUpdated, a.getUpdated());
-        Assert.assertEquals(a.getCreated(), a.getUpdated());
-
-        //Test to make sure if an ID already was set we don't change it
-        final BaseEntity baseEntity = new BaseEntity();
-        final String id = UUID.randomUUID().toString();
-        baseEntity.setId(id);
-        baseEntity.onCreateBaseEntity();
-        Assert.assertEquals(id, baseEntity.getId());
-    }
-
-    /**
-     * Test to make sure the update timestamp is updated by this method.
-     *
-     * @throws InterruptedException If the process is interrupted
-     */
-    @Test
-    public void testOnUpdateBaseEntity() throws InterruptedException {
-        final BaseEntity a = new BaseEntity();
-        Assert.assertNull(a.getId());
-        Assert.assertNotNull(a.getCreated());
-        Assert.assertNotNull(a.getUpdated());
-        a.onCreateBaseEntity();
-        final Date originalCreate = a.getCreated();
-        final Date originalUpdate = a.getUpdated();
-        Thread.sleep(1);
-        a.onUpdateBaseEntity();
-        Assert.assertEquals(originalCreate, a.getCreated());
-        Assert.assertNotEquals(originalUpdate, a.getUpdated());
-    }
-
-    /**
-     * Test to make sure the setter of created does nothing relative to persistence.
-     */
-    @Test
-    public void testSetCreated() {
-        final BaseEntity a = new BaseEntity();
-        Assert.assertNotNull(a.getCreated());
-        final Date date = new Date(0);
-        a.setCreated(date);
-        Assert.assertNotNull(a.getCreated());
-        Assert.assertEquals(date, a.getCreated());
-        a.onCreateBaseEntity();
-        Assert.assertNotNull(a.getCreated());
-        Assert.assertNotEquals(date, a.getCreated());
-
-        final BaseEntity b = new BaseEntity();
-        final Date created = b.getCreated();
-        final Date newCreated = new Date(created.getTime() + 1);
-        b.setCreated(newCreated);
-        Assert.assertThat(b.getCreated(), Matchers.is(created));
-    }
-
-    /**
-     * Test to make sure updated is set but really is overwritten by onUpdate.
-     *
-     * @throws InterruptedException If processing is interrupted
-     */
-    @Test
-    public void testSetUpdated() throws InterruptedException {
-        final BaseEntity a = new BaseEntity();
-        Assert.assertNotNull(a.getUpdated());
-        final Date date = new Date(0);
-        a.setUpdated(date);
-        Assert.assertNotNull(a.getUpdated());
-        Assert.assertEquals(date, a.getUpdated());
-        a.onCreateBaseEntity();
-        Assert.assertNotEquals(date, a.getUpdated());
-        final Date oldUpdated = a.getUpdated();
-        Thread.sleep(1);
-        a.onUpdateBaseEntity();
-        Assert.assertNotEquals(oldUpdated, a.getUpdated());
-    }
-
-    /**
-     * Test the entity version code.
-     */
-    @Test
-    public void testEntityVersion() {
-        final BaseEntity a = new BaseEntity();
-        Assert.assertNull(a.getEntityVersion());
-        final Integer version = 4;
-        a.setEntityVersion(version);
-        Assert.assertEquals(version, a.getEntityVersion());
+    public void testToString() {
+        Assert.assertNotNull(this.b.toString());
     }
 }

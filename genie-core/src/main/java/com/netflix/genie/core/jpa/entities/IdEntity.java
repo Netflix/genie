@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2016 Netflix, Inc.
+ *  Copyright 2017 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -17,43 +17,35 @@
  */
 package com.netflix.genie.core.jpa.entities;
 
+import com.netflix.genie.core.jpa.entities.projections.IdProjection;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.ToString;
 
-import javax.persistence.Basic;
 import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
-import java.util.Optional;
+import java.io.Serializable;
 
 /**
- * Abstract entity which provides a setup file field.
+ * Base class which only provides an ID. For use cases when we don't care about audit fields like
+ * created, updated, entity version etc.
  *
  * @author tgianos
- * @since 3.0.0
+ * @since 3.3.0
  */
 @Getter
-@Setter
+@ToString
+@EqualsAndHashCode(of = "id")
 @MappedSuperclass
-public class SetupFileEntity extends CommonFieldsEntity {
-    private static final long serialVersionUID = -2027110660923577721L;
+public class IdEntity implements IdProjection, Serializable {
 
-    @Basic
-    @Column(name = "setup_file", length = 1024)
-    private String setupFile;
+    private static final long serialVersionUID = 7526472297322776147L;
 
-    /**
-     * Default constructor.
-     */
-    public SetupFileEntity() {
-        super();
-    }
-
-    /**
-     * Get the setup file for this entity.
-     *
-     * @return The setup file as an Optional in case it's null
-     */
-    public Optional<String> getSetupFile() {
-        return Optional.ofNullable(this.setupFile);
-    }
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false, updatable = false)
+    private long id;
 }

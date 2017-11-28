@@ -24,21 +24,23 @@ import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
-import com.netflix.genie.core.jpa.repositories.JpaJobExecutionRepository;
-import com.netflix.genie.core.jpa.repositories.JpaJobMetadataRepository;
+import com.netflix.genie.core.jpa.repositories.JpaFileRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
-import com.netflix.genie.core.jpa.repositories.JpaJobRequestRepository;
+import com.netflix.genie.core.jpa.repositories.JpaTagRepository;
 import com.netflix.genie.core.jpa.services.JpaApplicationServiceImpl;
 import com.netflix.genie.core.jpa.services.JpaClusterServiceImpl;
 import com.netflix.genie.core.jpa.services.JpaCommandServiceImpl;
+import com.netflix.genie.core.jpa.services.JpaFileServiceImpl;
 import com.netflix.genie.core.jpa.services.JpaJobPersistenceServiceImpl;
 import com.netflix.genie.core.jpa.services.JpaJobSearchServiceImpl;
+import com.netflix.genie.core.jpa.services.JpaTagServiceImpl;
 import com.netflix.genie.core.properties.JobsProperties;
 import com.netflix.genie.core.services.ApplicationService;
 import com.netflix.genie.core.services.AttachmentService;
 import com.netflix.genie.core.services.ClusterLoadBalancer;
 import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;
+import com.netflix.genie.core.services.FileService;
 import com.netflix.genie.core.services.FileTransferFactory;
 import com.netflix.genie.core.services.JobCoordinatorService;
 import com.netflix.genie.core.services.JobKillService;
@@ -47,6 +49,7 @@ import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobStateService;
 import com.netflix.genie.core.services.JobSubmitterService;
 import com.netflix.genie.core.services.MailService;
+import com.netflix.genie.core.services.TagService;
 import com.netflix.genie.core.services.impl.CacheGenieFileTransferService;
 import com.netflix.genie.core.services.impl.DefaultMailServiceImpl;
 import com.netflix.genie.core.services.impl.FileSystemAttachmentService;
@@ -111,72 +114,112 @@ public class ServicesConfig {
     /**
      * Get JPA based implementation of the ApplicationService.
      *
-     * @param applicationRepo The application repository to use.
-     * @param commandRepo     The command repository to use.
+     * @param tagService            The tag service to use
+     * @param tagRepository         The tag repository to use
+     * @param fileService           The file service to use
+     * @param fileRepository        The file repository to use
+     * @param applicationRepository The application repository to use.
+     * @param commandRepository     The command repository to use.
      * @return An application service instance.
      */
     @Bean
     public ApplicationService applicationService(
-        final JpaApplicationRepository applicationRepo,
-        final JpaCommandRepository commandRepo
+        final TagService tagService,
+        final JpaTagRepository tagRepository,
+        final FileService fileService,
+        final JpaFileRepository fileRepository,
+        final JpaApplicationRepository applicationRepository,
+        final JpaCommandRepository commandRepository
     ) {
-        return new JpaApplicationServiceImpl(applicationRepo, commandRepo);
+        return new JpaApplicationServiceImpl(
+            tagService,
+            tagRepository,
+            fileService,
+            fileRepository,
+            applicationRepository,
+            commandRepository
+        );
     }
 
     /**
      * Get JPA based implementation of the ClusterService.
      *
-     * @param clusterRepo The cluster repository to use.
-     * @param commandRepo The command repository to use.
+     * @param tagService        The tag service to use
+     * @param tagRepository     The tag repository to use
+     * @param fileService       The file service to use
+     * @param fileRepository    The file repository to use
+     * @param clusterRepository The cluster repository to use.
+     * @param commandRepository The command repository to use.
      * @return A cluster service instance.
      */
     @Bean
     public ClusterService clusterService(
-        final JpaClusterRepository clusterRepo,
-        final JpaCommandRepository commandRepo
+        final TagService tagService,
+        final JpaTagRepository tagRepository,
+        final FileService fileService,
+        final JpaFileRepository fileRepository,
+        final JpaClusterRepository clusterRepository,
+        final JpaCommandRepository commandRepository
     ) {
-        return new JpaClusterServiceImpl(clusterRepo, commandRepo);
+        return new JpaClusterServiceImpl(
+            tagService,
+            tagRepository,
+            fileService,
+            fileRepository,
+            clusterRepository,
+            commandRepository
+        );
     }
 
     /**
      * Get JPA based implementation of the CommandService.
      *
-     * @param commandRepo the command repository to use
-     * @param appRepo     the application repository to use
-     * @param clusterRepo the cluster repository to use
+     * @param tagService            The tag service to use
+     * @param tagRepository         The tag repository to use
+     * @param fileService           The file service to use
+     * @param fileRepository        The file repository to use
+     * @param commandRepository     the command repository to use
+     * @param applicationRepository the application repository to use
+     * @param clusterRepository     the cluster repository to use
      * @return A command service instance.
      */
     @Bean
     public CommandService commandService(
-        final JpaCommandRepository commandRepo,
-        final JpaApplicationRepository appRepo,
-        final JpaClusterRepository clusterRepo
+        final TagService tagService,
+        final JpaTagRepository tagRepository,
+        final FileService fileService,
+        final JpaFileRepository fileRepository,
+        final JpaCommandRepository commandRepository,
+        final JpaApplicationRepository applicationRepository,
+        final JpaClusterRepository clusterRepository
     ) {
-        return new JpaCommandServiceImpl(commandRepo, appRepo, clusterRepo);
+        return new JpaCommandServiceImpl(
+            tagService,
+            tagRepository,
+            fileService,
+            fileRepository,
+            commandRepository,
+            applicationRepository,
+            clusterRepository
+        );
     }
 
     /**
      * Get JPA based implementation of the JobSearchService.
      *
-     * @param jobRepository          The repository to use for job entities
-     * @param jobRequestRepository   The repository to use for job request entities
-     * @param jobExecutionRepository The repository to use for job execution entities
-     * @param clusterRepository      The repository to use for cluster entities
-     * @param commandRepository      The repository to use for command entities
+     * @param jobRepository     The repository to use for job entities
+     * @param clusterRepository The repository to use for cluster entities
+     * @param commandRepository The repository to use for command entities
      * @return A job search service instance.
      */
     @Bean
     public JobSearchService jobSearchService(
         final JpaJobRepository jobRepository,
-        final JpaJobRequestRepository jobRequestRepository,
-        final JpaJobExecutionRepository jobExecutionRepository,
         final JpaClusterRepository clusterRepository,
         final JpaCommandRepository commandRepository
     ) {
         return new JpaJobSearchServiceImpl(
             jobRepository,
-            jobRequestRepository,
-            jobExecutionRepository,
             clusterRepository,
             commandRepository
         );
@@ -185,33 +228,36 @@ public class ServicesConfig {
     /**
      * Get JPA based implementation of the JobPersistenceService.
      *
-     * @param jobRepo               The job repository to use
-     * @param jobRequestRepo        The job request repository to use
-     * @param jobMetadataRepository The job metadata repository to use
-     * @param jobExecutionRepo      The job execution repository to use
-     * @param applicationRepo       The application repository to use
-     * @param clusterRepo           The cluster repository to use
-     * @param commandRepo           The command repository to use
+     * @param tagService            The tag service to use
+     * @param tagRepository         The tag repository to use
+     * @param fileService           The file service to use
+     * @param fileRepository        The file repository to use
+     * @param jobRepository         The job repository to use
+     * @param applicationRepository The application repository to use
+     * @param clusterRepository     The cluster repository to use
+     * @param commandRepository     The command repository to use
      * @return A job search service instance.
      */
     @Bean
     public JobPersistenceService jobPersistenceService(
-        final JpaJobRepository jobRepo,
-        final JpaJobRequestRepository jobRequestRepo,
-        final JpaJobMetadataRepository jobMetadataRepository,
-        final JpaJobExecutionRepository jobExecutionRepo,
-        final JpaApplicationRepository applicationRepo,
-        final JpaClusterRepository clusterRepo,
-        final JpaCommandRepository commandRepo
+        final TagService tagService,
+        final JpaTagRepository tagRepository,
+        final FileService fileService,
+        final JpaFileRepository fileRepository,
+        final JpaJobRepository jobRepository,
+        final JpaApplicationRepository applicationRepository,
+        final JpaClusterRepository clusterRepository,
+        final JpaCommandRepository commandRepository
     ) {
         return new JpaJobPersistenceServiceImpl(
-            jobRepo,
-            jobRequestRepo,
-            jobMetadataRepository,
-            jobExecutionRepo,
-            applicationRepo,
-            clusterRepo,
-            commandRepo
+            tagService,
+            tagRepository,
+            fileService,
+            fileRepository,
+            jobRepository,
+            applicationRepository,
+            clusterRepository,
+            commandRepository
         );
     }
 
@@ -388,5 +434,27 @@ public class ServicesConfig {
         final ServiceLocatorFactoryBean factoryBean = new ServiceLocatorFactoryBean();
         factoryBean.setServiceLocatorInterface(FileTransferFactory.class);
         return factoryBean;
+    }
+
+    /**
+     * Create the tag service bean.
+     *
+     * @param tagRepository The tag repository to use
+     * @return The tag service implementation
+     */
+    @Bean
+    public TagService tagService(final JpaTagRepository tagRepository) {
+        return new JpaTagServiceImpl(tagRepository);
+    }
+
+    /**
+     * Create the file service bean.
+     *
+     * @param fileRepository The file repository to use
+     * @return The file service implementation
+     */
+    @Bean
+    public FileService fileService(final JpaFileRepository fileRepository) {
+        return new JpaFileServiceImpl(fileRepository);
     }
 }

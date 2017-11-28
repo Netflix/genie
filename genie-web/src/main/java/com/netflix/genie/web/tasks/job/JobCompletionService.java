@@ -199,7 +199,6 @@ public class JobCompletionService {
         final Map<String, String> tags
     ) throws GenieException {
         try {
-
             final String jobId = event.getId();
             final JobStatus status = job.getStatus();
             // Now we know this job should be marked in one of the finished states

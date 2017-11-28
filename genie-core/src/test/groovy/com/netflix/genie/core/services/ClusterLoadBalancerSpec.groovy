@@ -44,7 +44,7 @@ class ClusterLoadBalancerSpec extends Specification {
         def loadBalancer = new ClusterLoadBalancer() {
             @Override
             Cluster selectCluster(
-                    @Nonnull @NonNull @NotEmpty List<Cluster> clusters,
+                    @Nonnull @NonNull @NotEmpty Set<Cluster> clusters,
                     @Nonnull @NonNull JobRequest jobRequest) throws GenieException {
                 return null
             }

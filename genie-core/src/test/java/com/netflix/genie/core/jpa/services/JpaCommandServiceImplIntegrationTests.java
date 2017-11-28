@@ -34,7 +34,6 @@ import com.netflix.genie.test.categories.IntegrationTest;
 import com.netflix.genie.test.suppliers.RandomSuppliers;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -138,16 +137,6 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(5, command3.getTags().size());
         Assert.assertEquals(1, command3.getConfigs().size());
         Assert.assertEquals(2, command3.getDependencies().size());
-    }
-
-    /**
-     * Test the get command method.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testGetCommandNull() throws GenieException {
-        this.service.getCommand(null);
     }
 
     /**
@@ -325,26 +314,6 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
-     * Test the get commands method order by a collection field should return the order by default value (updated).
-     */
-    @Ignore
-    @Test
-    public void testGetClustersOrderBysCollectionField() {
-        final Pageable tags = new PageRequest(0, 10, Sort.Direction.DESC, "tags");
-        final Page<Command> commands = this.service.getCommands(null, null, null, null, tags);
-        Assert.assertEquals(3, commands.getNumberOfElements());
-        Assert.assertEquals(
-            COMMAND_2_ID, commands.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new)
-        );
-        Assert.assertEquals(
-            COMMAND_3_ID, commands.getContent().get(1).getId().orElseThrow(IllegalArgumentException::new)
-        );
-        Assert.assertEquals(
-            COMMAND_1_ID, commands.getContent().get(2).getId().orElseThrow(IllegalArgumentException::new)
-        );
-    }
-
-    /**
      * Test the create method.
      *
      * @throws GenieException For any problem
@@ -422,16 +391,6 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
                 ge.getErrorCode()
             );
         }
-    }
-
-    /**
-     * Test to make sure an exception is thrown when null is entered.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testCreateCommandNull() throws GenieException {
-        this.service.createCommand(null);
     }
 
     /**
@@ -540,26 +499,6 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
-     * Test to update an command.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testUpdateCommandNullId() throws GenieException {
-        this.service.updateCommand(null, this.service.getCommand(COMMAND_1_ID));
-    }
-
-    /**
-     * Test to update an command.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testUpdateCommandNullUpdateCommand() throws GenieException {
-        this.service.updateCommand(COMMAND_1_ID, null);
-    }
-
-    /**
      * Test to patch a command.
      *
      * @throws GenieException For any problem
@@ -645,16 +584,6 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
-     * Test delete.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testDeleteNoId() throws GenieException {
-        this.service.deleteCommand(null);
-    }
-
-    /**
      * Test add configurations to command.
      *
      * @throws GenieException For any problem
@@ -674,26 +603,6 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertTrue(finalConfigs.contains(newConfig1));
         Assert.assertTrue(finalConfigs.contains(newConfig2));
         Assert.assertTrue(finalConfigs.contains(newConfig3));
-    }
-
-    /**
-     * Test add configurations to command.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testAddConfigsToCommandNoId() throws GenieException {
-        this.service.addConfigsForCommand(null, Sets.newHashSet());
-    }
-
-    /**
-     * Test add configurations to command.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testAddConfigsToCommandNoConfigs() throws GenieException {
-        this.service.addConfigsForCommand(COMMAND_1_ID, null);
     }
 
     /**
@@ -719,16 +628,6 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
-     * Test update configurations for command.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testUpdateConfigsForCommandNoId() throws GenieException {
-        this.service.updateConfigsForCommand(null, Sets.newHashSet());
-    }
-
-    /**
      * Test get configurations for command.
      *
      * @throws GenieException For any problem
@@ -737,16 +636,6 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     public void testGetConfigsForCommand() throws GenieException {
         Assert.assertEquals(2,
             this.service.getConfigsForCommand(COMMAND_1_ID).size());
-    }
-
-    /**
-     * Test get configurations to command.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testGetConfigsForCommandNoId() throws GenieException {
-        this.service.getConfigsForCommand(null);
     }
 
     /**
@@ -762,16 +651,6 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
-     * Test remove all configurations for command.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testRemoveAllConfigsForCommandNoId() throws GenieException {
-        this.service.removeAllConfigsForCommand(null);
-    }
-
-    /**
      * Test remove configuration for command.
      *
      * @throws GenieException For any problem
@@ -783,26 +662,6 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         final String removedConfig = configs.iterator().next();
         this.service.removeConfigForCommand(COMMAND_1_ID, removedConfig);
         Assert.assertFalse(this.service.getConfigsForCommand(COMMAND_1_ID).contains(removedConfig));
-    }
-
-    /**
-     * Test remove configuration for command.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testRemoveConfigForCommandNullConfig() throws GenieException {
-        this.service.removeConfigForCommand(COMMAND_1_ID, null);
-    }
-
-    /**
-     * Test remove configuration for command.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testRemoveConfigForCommandNoId() throws GenieException {
-        this.service.removeConfigForCommand(null, "something");
     }
 
     /**
@@ -828,26 +687,6 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
-     * Test add dependencies to command.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testAddDependenciesToCommandNoId() throws GenieException {
-        this.service.addDependenciesForCommand(null, Sets.newHashSet());
-    }
-
-    /**
-     * Test add dependencies to command.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testAddDependenciesToCommandNoDependencies() throws GenieException {
-        this.service.addDependenciesForCommand(COMMAND_1_ID, null);
-    }
-
-    /**
      * Test update dependencies for command.
      *
      * @throws GenieException For any problem
@@ -870,16 +709,6 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
-     * Test update dependencies for command.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testUpdateDependenciesForCommandNoId() throws GenieException {
-        this.service.updateDependenciesForCommand(null, Sets.newHashSet());
-    }
-
-    /**
      * Test get dependencies for command.
      *
      * @throws GenieException For any problem
@@ -888,16 +717,6 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     public void testGetDependenciesForCommand() throws GenieException {
         Assert.assertEquals(1,
             this.service.getDependenciesForCommand(COMMAND_2_ID).size());
-    }
-
-    /**
-     * Test get dependencies to command.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testGetDependenciesForCommandNoId() throws GenieException {
-        this.service.getDependenciesForCommand(null);
     }
 
     /**
@@ -913,16 +732,6 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
-     * Test remove all dependencies for command.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testRemoveAllDependenciesForCommandNoId() throws GenieException {
-        this.service.removeAllDependenciesForCommand(null);
-    }
-
-    /**
      * Test remove dependencies for command.
      *
      * @throws GenieException For any problem
@@ -934,26 +743,6 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         final String removedDependency = dependencies.iterator().next();
         this.service.removeDependencyForCommand(COMMAND_3_ID, removedDependency);
         Assert.assertFalse(this.service.getDependenciesForCommand(COMMAND_3_ID).contains(removedDependency));
-    }
-
-    /**
-     * Test remove dependencies for command.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testRemoveDependencyForCommandNullDependency() throws GenieException {
-        this.service.removeDependencyForCommand(COMMAND_1_ID, null);
-    }
-
-    /**
-     * Test remove dependencies for command.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testRemoveDependencyForCommandNoId() throws GenieException {
-        this.service.removeDependencyForCommand(null, "something");
     }
 
     /**
@@ -1020,26 +809,6 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
-     * Test setting the applications for a given command.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testSetApplicationsForCommandNoId() throws GenieException {
-        this.service.setApplicationsForCommand(null, new ArrayList<>());
-    }
-
-    /**
-     * Test setting the applications for a given command.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testSetApplicationsForCommandNoCommand() throws GenieException {
-        this.service.setApplicationsForCommand(COMMAND_2_ID, null);
-    }
-
-    /**
      * Test get applications for command.
      *
      * @throws GenieException For any problem
@@ -1054,16 +823,6 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
-     * Test get applications for command.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testGetApplicationsForCommandNoId() throws GenieException {
-        this.service.getApplicationsForCommand(null);
-    }
-
-    /**
      * Test remove applications for command.
      *
      * @throws GenieException For any problem
@@ -1073,16 +832,6 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(1, this.service.getApplicationsForCommand(COMMAND_1_ID).size());
         this.service.removeApplicationsForCommand(COMMAND_1_ID);
         Assert.assertEquals(0, this.service.getApplicationsForCommand(COMMAND_1_ID).size());
-    }
-
-    /**
-     * Test remove applications for command.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testRemoveApplicationsForCommandNoId() throws GenieException {
-        this.service.removeApplicationsForCommand(null);
     }
 
     /**
@@ -1120,26 +869,6 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
-     * Test add tags to command.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testAddTagsToCommandNoId() throws GenieException {
-        this.service.addTagsForCommand(null, Sets.newHashSet());
-    }
-
-    /**
-     * Test add tags to command.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testAddTagsToCommandNoTags() throws GenieException {
-        this.service.addTagsForCommand(COMMAND_1_ID, null);
-    }
-
-    /**
      * Test update tags for command.
      *
      * @throws GenieException For any problem
@@ -1162,16 +891,6 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
-     * Test update tags for command.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testUpdateTagsForCommandNoId() throws GenieException {
-        this.service.updateTagsForCommand(null, Sets.newHashSet());
-    }
-
-    /**
      * Test get tags for command.
      *
      * @throws GenieException For any problem
@@ -1180,16 +899,6 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     public void testGetTagsForCommand() throws GenieException {
         Assert.assertEquals(5,
             this.service.getTagsForCommand(COMMAND_1_ID).size());
-    }
-
-    /**
-     * Test get tags to command.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testGetTagsForCommandNoId() throws GenieException {
-        this.service.getTagsForCommand(null);
     }
 
     /**
@@ -1205,16 +914,6 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
-     * Test remove all tags for command.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testRemoveAllTagsForCommandNoId() throws GenieException {
-        this.service.removeAllTagsForCommand(null);
-    }
-
-    /**
      * Test remove tag for command.
      *
      * @throws GenieException For any problem
@@ -1224,26 +923,6 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertTrue(this.service.getTagsForCommand(COMMAND_1_ID).contains("tez"));
         this.service.removeTagForCommand(COMMAND_1_ID, "tez");
         Assert.assertFalse(this.service.getTagsForCommand(COMMAND_1_ID).contains("tez"));
-    }
-
-    /**
-     * Test remove tag for command.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testRemoveTagForCommandNullTag() throws GenieException {
-        this.service.removeTagForCommand(COMMAND_1_ID, null);
-    }
-
-    /**
-     * Test remove configuration for command.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testRemoveTagForCommandNoId() throws GenieException {
-        this.service.removeTagForCommand(null, "something");
     }
 
     /**

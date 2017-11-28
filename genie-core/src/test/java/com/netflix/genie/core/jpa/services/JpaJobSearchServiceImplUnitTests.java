@@ -22,12 +22,14 @@ import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.core.jpa.entities.JobEntity;
-import com.netflix.genie.core.jpa.entities.JobExecutionEntity;
+import com.netflix.genie.core.jpa.entities.projections.JobApplicationsProjection;
+import com.netflix.genie.core.jpa.entities.projections.JobClusterProjection;
+import com.netflix.genie.core.jpa.entities.projections.JobCommandProjection;
+import com.netflix.genie.core.jpa.entities.projections.JobHostNameProjection;
+import com.netflix.genie.core.jpa.entities.projections.JobProjection;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
-import com.netflix.genie.core.jpa.repositories.JpaJobExecutionRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
-import com.netflix.genie.core.jpa.repositories.JpaJobRequestRepository;
 import com.netflix.genie.test.categories.UnitTest;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
@@ -36,6 +38,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
 
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -48,8 +51,6 @@ import java.util.UUID;
 public class JpaJobSearchServiceImplUnitTests {
 
     private JpaJobRepository jobRepository;
-    private JpaJobRequestRepository jobRequestRepository;
-    private JpaJobExecutionRepository jobExecutionRepository;
     private JpaJobSearchServiceImpl service;
 
     /**
@@ -58,12 +59,8 @@ public class JpaJobSearchServiceImplUnitTests {
     @Before
     public void setup() {
         this.jobRepository = Mockito.mock(JpaJobRepository.class);
-        this.jobRequestRepository = Mockito.mock(JpaJobRequestRepository.class);
-        this.jobExecutionRepository = Mockito.mock(JpaJobExecutionRepository.class);
         this.service = new JpaJobSearchServiceImpl(
             this.jobRepository,
-            this.jobRequestRepository,
-            this.jobExecutionRepository,
             Mockito.mock(JpaClusterRepository.class),
             Mockito.mock(JpaCommandRepository.class)
         );
@@ -77,7 +74,7 @@ public class JpaJobSearchServiceImplUnitTests {
     @Test(expected = GenieNotFoundException.class)
     public void cantGetJobIfDoesNotExist() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jobRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jobRepository.findByUniqueId(id, JobProjection.class)).thenReturn(Optional.empty());
         this.service.getJob(id);
     }
 
@@ -88,38 +85,15 @@ public class JpaJobSearchServiceImplUnitTests {
      */
     @Test
     public void canGetJob() throws GenieException {
-        final JobEntity jobEntity = Mockito.mock(JobEntity.class);
-        final Job job = Mockito.mock(Job.class);
-        Mockito.when(jobEntity.getDTO()).thenReturn(job);
+        final JobEntity jobEntity = new JobEntity();
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jobRepository.findOne(id)).thenReturn(jobEntity);
+        jobEntity.setUniqueId(id);
+        Mockito.when(this.jobRepository.findByUniqueId(id, JobProjection.class)).thenReturn(Optional.of(jobEntity));
         final Job returnedJob = this.service.getJob(id);
-        Mockito.verify(this.jobRepository, Mockito.times(1)).findOne(id);
-        Assert.assertThat(returnedJob, Matchers.is(job));
-    }
-
-    /**
-     * Test the getJobRequest method.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = GenieNotFoundException.class)
-    public void cantGetJobRequestIfDoesNotExist() throws GenieException {
-        final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jobRequestRepository.findOne(id)).thenReturn(null);
-        this.service.getJobRequest(id);
-    }
-
-    /**
-     * Test the getJobExecution method.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = GenieNotFoundException.class)
-    public void cantGetJobExecutionIfDoesNotExist() throws GenieException {
-        final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jobExecutionRepository.findOne(id)).thenReturn(null);
-        this.service.getJobExecution(id);
+        Mockito
+            .verify(this.jobRepository, Mockito.times(1))
+            .findByUniqueId(id, JobProjection.class);
+        Assert.assertThat(returnedJob.getId().orElseThrow(IllegalArgumentException::new), Matchers.is(id));
     }
 
     /**
@@ -130,7 +104,7 @@ public class JpaJobSearchServiceImplUnitTests {
     @Test(expected = GenieNotFoundException.class)
     public void cantGetJobClusterIfJobDoesNotExist() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jobRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jobRepository.findByUniqueId(id, JobClusterProjection.class)).thenReturn(Optional.empty());
         this.service.getJobCluster(id);
     }
 
@@ -143,8 +117,8 @@ public class JpaJobSearchServiceImplUnitTests {
     public void cantGetJobClusterIfClusterDoesNotExist() throws GenieException {
         final String id = UUID.randomUUID().toString();
         final JobEntity entity = Mockito.mock(JobEntity.class);
-        Mockito.when(entity.getCluster()).thenReturn(null);
-        Mockito.when(this.jobRepository.findOne(id)).thenReturn(entity);
+        Mockito.when(entity.getCluster()).thenReturn(Optional.empty());
+        Mockito.when(this.jobRepository.findByUniqueId(id, JobClusterProjection.class)).thenReturn(Optional.of(entity));
         this.service.getJobCluster(id);
     }
 
@@ -156,7 +130,7 @@ public class JpaJobSearchServiceImplUnitTests {
     @Test(expected = GenieNotFoundException.class)
     public void cantGetJobCommandIfJobDoesNotExist() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jobRepository.findOne(id)).thenReturn(null);
+        Mockito.when(this.jobRepository.findByUniqueId(id, JobCommandProjection.class)).thenReturn(Optional.empty());
         this.service.getJobCommand(id);
     }
 
@@ -169,8 +143,8 @@ public class JpaJobSearchServiceImplUnitTests {
     public void cantGetJobCommandIfCommandDoesNotExist() throws GenieException {
         final String id = UUID.randomUUID().toString();
         final JobEntity entity = Mockito.mock(JobEntity.class);
-        Mockito.when(entity.getCommand()).thenReturn(null);
-        Mockito.when(this.jobRepository.findOne(id)).thenReturn(entity);
+        Mockito.when(entity.getCommand()).thenReturn(Optional.empty());
+        Mockito.when(this.jobRepository.findByUniqueId(id, JobCommandProjection.class)).thenReturn(Optional.of(entity));
         this.service.getJobCommand(id);
     }
 
@@ -182,7 +156,9 @@ public class JpaJobSearchServiceImplUnitTests {
     @Test(expected = GenieNotFoundException.class)
     public void cantGetJobApplicationsIfJobDoesNotExist() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        Mockito.when(this.jobRepository.findOne(id)).thenReturn(null);
+        Mockito
+            .when(this.jobRepository.findByUniqueId(id, JobApplicationsProjection.class))
+            .thenReturn(Optional.empty());
         this.service.getJobApplications(id);
     }
 
@@ -191,26 +167,14 @@ public class JpaJobSearchServiceImplUnitTests {
      *
      * @throws GenieException For any problem
      */
-    @Test()
-    public void cantGetJobApplicationsIfApplicationsDoNotExist() throws GenieException {
-        final String id = UUID.randomUUID().toString();
-        final JobEntity entity = Mockito.mock(JobEntity.class);
-        Mockito.when(entity.getApplications()).thenReturn(null);
-        Mockito.when(this.jobRepository.findOne(id)).thenReturn(entity);
-        Assert.assertTrue(this.service.getJobApplications(id).isEmpty());
-    }
-
-    /**
-     * Test the getJobApplications method.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test()
-    public void cantGetJobApplicationsIfApplicationsAreEmpty() throws GenieException {
+    @Test
+    public void canGetJobApplications() throws GenieException {
         final String id = UUID.randomUUID().toString();
         final JobEntity entity = Mockito.mock(JobEntity.class);
         Mockito.when(entity.getApplications()).thenReturn(Lists.newArrayList());
-        Mockito.when(this.jobRepository.findOne(id)).thenReturn(entity);
+        Mockito
+            .when(this.jobRepository.findByUniqueId(id, JobApplicationsProjection.class))
+            .thenReturn(Optional.of(entity));
         Assert.assertTrue(this.service.getJobApplications(id).isEmpty());
     }
 
@@ -222,7 +186,9 @@ public class JpaJobSearchServiceImplUnitTests {
     @Test(expected = GenieNotFoundException.class)
     public void cantGetJobHostIfNoJobExecution() throws GenieException {
         final String jobId = UUID.randomUUID().toString();
-        Mockito.when(this.service.getJobExecution(Mockito.eq(jobId))).thenReturn(null);
+        Mockito
+            .when(this.jobRepository.findByUniqueId(jobId, JobHostNameProjection.class))
+            .thenReturn(Optional.empty());
         this.service.getJobHost(jobId);
     }
 
@@ -235,9 +201,11 @@ public class JpaJobSearchServiceImplUnitTests {
     public void canGetJobHost() throws GenieException {
         final String jobId = UUID.randomUUID().toString();
         final String hostName = UUID.randomUUID().toString();
-        final JobExecutionEntity jobExecution = Mockito.mock(JobExecutionEntity.class);
-        Mockito.when(jobExecution.getHostName()).thenReturn(hostName);
-        Mockito.when(this.jobExecutionRepository.findOne(jobId)).thenReturn(jobExecution);
+        final JobEntity jobEntity = Mockito.mock(JobEntity.class);
+        Mockito.when(jobEntity.getHostName()).thenReturn(hostName);
+        Mockito
+            .when(this.jobRepository.findByUniqueId(jobId, JobHostNameProjection.class))
+            .thenReturn(Optional.of(jobEntity));
 
         Assert.assertThat(this.service.getJobHost(jobId), Matchers.is(hostName));
     }

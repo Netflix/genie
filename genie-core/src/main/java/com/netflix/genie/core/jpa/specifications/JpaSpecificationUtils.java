@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.core.jpa.specifications;
 
-import com.netflix.genie.core.jpa.entities.CommonFieldsEntity;
+import com.netflix.genie.core.jpa.entities.TagEntity;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -34,9 +34,29 @@ import java.util.Set;
  */
 public final class JpaSpecificationUtils {
 
-    private static final char PERCENT = '%';
+    static final String PERCENT = "%";
+    static final String TAG_DELIMITER = "|";
 
-    protected JpaSpecificationUtils() {
+    private JpaSpecificationUtils() {
+    }
+
+    /**
+     * Convert a set of TagEntities to the '|' delimited tag search string.
+     *
+     * @param tags The tags to convert
+     * @return The tag search string in case insensitive order. e.g. |tag1||tag2||tag3|
+     */
+    public static String createTagSearchString(final Set<TagEntity> tags) {
+        // Tag search string length max is currently 1024 which will be caught by hibernate validator if this
+        // exceeds that length
+        return TAG_DELIMITER
+            + tags
+            .stream()
+            .map(TagEntity::getTag)
+            .sorted(String.CASE_INSENSITIVE_ORDER)
+            .reduce((one, two) -> one + TAG_DELIMITER + TAG_DELIMITER + two)
+            .orElse("")
+            + TAG_DELIMITER;
     }
 
     /**
@@ -47,7 +67,7 @@ public final class JpaSpecificationUtils {
      * @param value      The value to compare the field to
      * @return A LIKE predicate if the value contains a '%' otherwise an EQUAL predicate
      */
-    public static Predicate getStringLikeOrEqualPredicate(
+    static Predicate getStringLikeOrEqualPredicate(
         @NotNull final CriteriaBuilder cb,
         @NotNull final Expression<String> expression,
         @NotNull final String value
@@ -65,7 +85,7 @@ public final class JpaSpecificationUtils {
      * @param tags The tags to use. Not null.
      * @return The tags sorted while ignoring case delimited with percent symbol.
      */
-    public static String getTagLikeString(@NotNull final Set<String> tags) {
+    static String getTagLikeString(@NotNull final Set<String> tags) {
         final StringBuilder builder = new StringBuilder();
         tags.stream()
             .filter(StringUtils::isNotBlank)
@@ -73,9 +93,9 @@ public final class JpaSpecificationUtils {
             .forEach(
                 tag -> builder
                     .append(PERCENT)
-                    .append(CommonFieldsEntity.TAG_DELIMITER)
+                    .append(TAG_DELIMITER)
                     .append(tag)
-                    .append(CommonFieldsEntity.TAG_DELIMITER)
+                    .append(TAG_DELIMITER)
             );
         return builder.append(PERCENT).toString();
     }
