@@ -90,7 +90,7 @@ configure(javaProjects) {
             dependency("org.apache.commons:commons-exec:1.3")
             dependency("org.bitbucket.b_c:jose4j:0.6.2")
             dependency("org.dbunit:dbunit:2.5.4")
-            dependencySet(group: "org.jruby", version:"9.1.14.0") {
+            dependencySet(group: "org.jruby", version: "9.1.14.0") {
                 entry "jruby-complete"
                 entry "jruby-core"
                 entry "jruby-stdlib"
@@ -102,8 +102,8 @@ configure(javaProjects) {
     }
 
     ext {
-        generatedSourcesDir = new File("${projectDir}/src/generated")
-        generatedSourcesJavaDir = new File(generatedSourcesDir, "/java")
+        generatedSourcesDir = file("${buildDir}/generated-sources/main")
+        generatedSourcesJavaDir = file(new File(generatedSourcesDir, "/java"))
     }
 
     sourceSets {
@@ -112,12 +112,6 @@ configure(javaProjects) {
                 srcDir generatedSourcesJavaDir
             }
         }
-    }
-
-    clean {
-        delete "${projectDir}/genie-db"
-        delete "${projectDir}/data"
-        delete generatedSourcesDir.toString()
     }
 
     configurations {
@@ -189,9 +183,27 @@ configure(javaProjects) {
         }
     }
 
+    task removeGeneratedSources(type: Delete) {
+        generatedSourcesDir.deleteDir()
+    }
+
+    task removeIdeaOutDirectory(type: Delete) {
+        file("${projectDir}/out").deleteDir()
+    }
+
+    clean {
+        dependsOn(removeIdeaOutDirectory)
+    }
+
     compileJava {
+        doFirst {
+            generatedSourcesDir.mkdirs()
+            generatedSourcesJavaDir.mkdirs()
+        }
+        dependsOn(removeGeneratedSources)
         options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
         options.incremental = true
+        options.compilerArgs += ['-s', generatedSourcesJavaDir]
     }
 
     compileTestJava {
@@ -206,8 +218,8 @@ configure(javaProjects) {
 
             // Environment properties to be forwarded to the test runtime
             [
-                "CI",
-                "INTEGRATION_TEST_DB",
+                    "CI",
+                    "INTEGRATION_TEST_DB",
             ].each { envVariableName ->
                 if (System.getenv(envVariableName) != null) {
                     systemProperty envVariableName, System.getenv(envVariableName)
