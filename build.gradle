@@ -13,7 +13,6 @@ buildscript {
 
 plugins {
     id "com.github.kt3k.coveralls" version "2.8.1"
-    id "io.spring.dependency-management" version "1.0.3.RELEASE"
     id "nebula.netflixoss" version "4.1.0"
     id "org.ajoberstar.github-pages" version "1.7.2"
 }

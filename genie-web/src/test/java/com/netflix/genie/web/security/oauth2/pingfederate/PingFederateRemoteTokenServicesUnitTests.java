@@ -156,8 +156,7 @@ public class PingFederateRemoteTokenServicesUnitTests {
             scope1 + " " + scope2
         );
 
-        @SuppressWarnings("unchecked")
-        final ResponseEntity<Map> response = Mockito.mock(ResponseEntity.class);
+        @SuppressWarnings("unchecked") final ResponseEntity<Map> response = Mockito.mock(ResponseEntity.class);
 
         Mockito.when(
             restTemplate.exchange(
@@ -214,8 +213,7 @@ public class PingFederateRemoteTokenServicesUnitTests {
         final Map<String, Object> map = Maps.newHashMap();
         map.put(PingFederateRemoteTokenServices.ERROR_KEY, UUID.randomUUID().toString());
 
-        @SuppressWarnings("unchecked")
-        final ResponseEntity<Map> response = Mockito.mock(ResponseEntity.class);
+        @SuppressWarnings("unchecked") final ResponseEntity<Map> response = Mockito.mock(ResponseEntity.class);
 
         Mockito.when(
             restTemplate.exchange(
@@ -237,10 +235,12 @@ public class PingFederateRemoteTokenServicesUnitTests {
      */
     @Test
     public void cantLoadAuthenticationOnRestError() {
-        final String path = UUID.randomUUID().toString();
-        final String uri = "http://localhost:" + this.wireMockRule.port() + "/" + path;
+        final String path = "/" + UUID.randomUUID().toString();
+        final String uri = "http://localhost:" + this.wireMockRule.port() + path;
         final int status = HttpStatus.NOT_FOUND.value();
-        WireMock.post(WireMock.urlEqualTo(uri)).willReturn(WireMock.aResponse().withStatus(status));
+        WireMock
+            .stubFor(WireMock.post(WireMock.urlPathEqualTo(path))
+                .willReturn(WireMock.aResponse().withStatus(status)));
         final AccessTokenConverter converter = Mockito.mock(AccessTokenConverter.class);
         this.resourceServerProperties = new ResourceServerProperties(CLIENT_ID, CLIENT_SECRET);
         // Some resource no one should ever have
