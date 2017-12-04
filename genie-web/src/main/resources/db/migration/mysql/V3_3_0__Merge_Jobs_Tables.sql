@@ -1348,7 +1348,7 @@ CREATE PROCEDURE GENIE_SPLIT_COMMANDS_320()
         FROM `files` `f`
         WHERE `f`.`file` = `old_setup_file`;
 
-        UPDATE `clusters`
+        UPDATE `commands`
         SET `setup_file` = @file_id
         WHERE `id` = `new_command_id`;
       END IF;
