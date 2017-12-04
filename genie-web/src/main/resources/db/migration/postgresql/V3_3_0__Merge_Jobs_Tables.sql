@@ -1252,7 +1252,7 @@ BEGIN
       FROM files f
       WHERE f.file = command_record.setup_file;
 
-      UPDATE clusters c
+      UPDATE commands c
       SET c.setup_file = file_id
       WHERE c.id = new_command_id;
     END IF;
