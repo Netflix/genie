@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 3.3.0-SNAPSHOT,</span>
-<span id="revdate">2017-12-04</span>
+<span id="revdate">2017-12-06</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -949,6 +949,28 @@ workflow</p>
 </li>
 <li>
 <p>Added to search API as optional field</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>New field(s) added to Job Request, Job, Cluster, Command, Application</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>metadata</code></p>
+<div class="ulist">
+<ul>
+<li>
+<p>Allows users to insert any additional metadata they wish to these resources. <strong>MUST</strong> be valid JSON.</p>
+</li>
+<li>
+<p>Stored as blob so no search available. Meant for use by higher level systems to take metadata and parse it
+themselves for use in building up business use cases (lineage, relationships, etc) that the Genie data model doesn&#8217;t
+support natively</p>
 </li>
 </ul>
 </div>
@@ -5784,7 +5806,7 @@ and system metrics and statistics.</p>
 <div id="footer">
 <div id="footer-text">
 Version 3.3.0-SNAPSHOT<br>
-Last updated 2017-12-04 18:44:07 +00:00
+Last updated 2017-12-06 19:49:19 +00:00
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
