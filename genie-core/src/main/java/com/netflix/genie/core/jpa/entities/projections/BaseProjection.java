@@ -60,4 +60,11 @@ public interface BaseProjection extends AuditProjection {
      * @return The description which could be null so it's wrapped in Optional
      */
     Optional<String> getDescription();
+
+    /**
+     * Get the metadata of this entity which is unstructured JSON.
+     *
+     * @return Optional of the metadata json node represented as a string
+     */
+    Optional<String> getMetadata();
 }

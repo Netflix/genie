@@ -18,7 +18,6 @@
 package com.netflix.genie.core.jpa.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.google.common.collect.Lists;
@@ -85,8 +84,6 @@ import java.util.stream.Collectors;
 )
 @Slf4j
 public class JpaCommandServiceImpl extends JpaBaseService implements CommandService {
-
-    private final ObjectMapper mapper = new ObjectMapper();
     private final JpaCommandRepository commandRepository;
     private final JpaApplicationRepository applicationRepository;
     private final JpaClusterRepository clusterRepo;
@@ -222,9 +219,9 @@ public class JpaCommandServiceImpl extends JpaBaseService implements CommandServ
         try {
             final Command commandToPatch = JpaServiceUtils.toCommandDto(commandEntity);
             log.debug("Will patch command {}. Original state: {}", id, commandToPatch);
-            final JsonNode commandNode = this.mapper.readTree(commandToPatch.toString());
+            final JsonNode commandNode = MAPPER.readTree(commandToPatch.toString());
             final JsonNode postPatchNode = patch.apply(commandNode);
-            final Command patchedCommand = this.mapper.treeToValue(postPatchNode, Command.class);
+            final Command patchedCommand = MAPPER.treeToValue(postPatchNode, Command.class);
             log.debug("Finished patching command {}. New state: {}", id, patchedCommand);
             this.updateEntityWithDtoContents(commandEntity, patchedCommand);
         } catch (final JsonPatchException | IOException e) {
@@ -596,6 +593,7 @@ public class JpaCommandServiceImpl extends JpaBaseService implements CommandServ
         entity.setStatus(dto.getStatus());
         entity.setTags(tags);
         entity.setMemory(dto.getMemory().orElse(null));
+        JpaServiceUtils.setEntityMetadata(MAPPER, dto, entity);
 
         this.setFinalTags(entity.getTags(), entity.getUniqueId(), entity.getName());
     }

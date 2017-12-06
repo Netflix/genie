@@ -303,6 +303,7 @@ public class JobRestController {
             jobRequest.getDescription().ifPresent(builder::withDescription);
             jobRequest.getEmail().ifPresent(builder::withEmail);
             jobRequest.getTimeout().ifPresent(builder::withTimeout);
+            jobRequest.getMetadata().ifPresent(builder::withMetadata);
 
             jobRequestWithId = builder.build();
         }
@@ -515,9 +516,8 @@ public class JobRestController {
      * @param forwardedFrom The host this request was forwarded from if present
      * @param request       the servlet request
      * @param response      the servlet response
-     * @throws GenieException   For any error
-     * @throws IOException      on redirect error
-     * @throws ServletException when trying to handle the request
+     * @throws GenieException For any error
+     * @throws IOException    on redirect error
      */
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
@@ -526,7 +526,7 @@ public class JobRestController {
         @RequestHeader(name = JobConstants.GENIE_FORWARDED_FROM_HEADER, required = false) final String forwardedFrom,
         final HttpServletRequest request,
         final HttpServletResponse response
-    ) throws GenieException, IOException, ServletException {
+    ) throws GenieException, IOException {
         log.info("[killJob] Called for job id: {}. Forwarded from: {}", id, forwardedFrom);
 
         // If forwarded from is null this request hasn't been forwarded at all. Check we're on the right node

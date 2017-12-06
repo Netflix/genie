@@ -17,6 +17,8 @@
  */
 package com.netflix.genie.web.controllers;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Application;
@@ -93,6 +95,8 @@ import java.util.UUID;
 public class JobRestControllerIntegrationTests extends RestControllerIntegrationTestsBase {
 
     private static final long SLEEP_TIME = 1000L;
+    private static final String SCHEDULER_JOB_NAME_KEY = "schedulerJobName";
+    private static final String SCHEDULER_RUN_ID_KEY = "schedulerRunId";
 
     private static final String COMMAND_ARGS_PATH = "$.commandArgs";
     private static final String STATUS_MESSAGE_PATH = "$.statusMsg";
@@ -117,7 +121,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     private static final String JOB_COMMAND_LINK_PATH = "$._links.command.href";
     private static final String JOB_CLUSTER_LINK_PATH = "$._links.cluster.href";
     private static final String JOB_APPLICATIONS_LINK_PATH = "$._links.applications.href";
-
 
     private static final long CHECK_DELAY = 1L;
 
@@ -164,8 +167,10 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     // related to charset headers
     private static final String GB18030_TXT = "GB18030.txt";
 
-
     private ResourceLoader resourceLoader;
+    private JsonNode metadata;
+    private String schedulerJobName;
+    private String schedulerRunId;
 
     @Autowired
     private JpaJobRepository jobRepository;
@@ -209,6 +214,20 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         this.fileRepository.deleteAll();
         this.tagRepository.deleteAll();
 
+        this.schedulerJobName = UUID.randomUUID().toString();
+        this.schedulerRunId = UUID.randomUUID().toString();
+        this.metadata = new ObjectMapper().readTree(
+            "{\""
+                + SCHEDULER_JOB_NAME_KEY
+                + "\":\""
+                + this.schedulerJobName
+                + "\", \""
+                + SCHEDULER_RUN_ID_KEY
+                + "\":\""
+                + this.schedulerRunId
+                + "\"}"
+        );
+
         this.resourceLoader = new DefaultResourceLoader();
         this.createAnApplication(APP1_ID, APP1_NAME);
         this.createAnApplication(APP2_ID, APP2_NAME);
@@ -219,11 +238,9 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
 
     /**
      * Cleanup after tests.
-     *
-     * @throws Exception who cares
      */
     @After
-    public void cleanup() throws Exception {
+    public void cleanup() {
         this.jobRepository.deleteAll();
         this.clusterRepository.deleteAll();
         this.commandRepository.deleteAll();
@@ -283,6 +300,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .withConfigs(configs)
             .withDependencies(dependencies)
             .withDescription(JOB_DESCRIPTION)
+            .withMetadata(this.metadata)
             .build();
 
         final String id = this.submitJob(documentationId, jobRequest, null);
@@ -440,6 +458,18 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andExpect(MockMvcResultMatchers.jsonPath(USER_PATH, Matchers.is(JOB_USER)))
             .andExpect(MockMvcResultMatchers.jsonPath(NAME_PATH, Matchers.is(JOB_NAME)))
             .andExpect(MockMvcResultMatchers.jsonPath(DESCRIPTION_PATH, Matchers.is(JOB_DESCRIPTION)))
+            .andExpect(
+                MockMvcResultMatchers.jsonPath(
+                    METADATA_PATH + "." + SCHEDULER_JOB_NAME_KEY,
+                    Matchers.is(this.schedulerJobName)
+                )
+            )
+            .andExpect(
+                MockMvcResultMatchers.jsonPath(
+                    METADATA_PATH + "." + SCHEDULER_RUN_ID_KEY,
+                    Matchers.is(this.schedulerRunId)
+                )
+            )
             .andExpect(
                 MockMvcResultMatchers.jsonPath(
                     COMMAND_ARGS_PATH,
@@ -618,6 +648,18 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andExpect(MockMvcResultMatchers.jsonPath(VERSION_PATH, Matchers.is(JOB_VERSION)))
             .andExpect(MockMvcResultMatchers.jsonPath(USER_PATH, Matchers.is(JOB_USER)))
             .andExpect(MockMvcResultMatchers.jsonPath(DESCRIPTION_PATH, Matchers.is(JOB_DESCRIPTION)))
+            .andExpect(
+                MockMvcResultMatchers.jsonPath(
+                    METADATA_PATH + "." + SCHEDULER_JOB_NAME_KEY,
+                    Matchers.is(this.schedulerJobName)
+                )
+            )
+            .andExpect(
+                MockMvcResultMatchers.jsonPath(
+                    METADATA_PATH + "." + SCHEDULER_RUN_ID_KEY,
+                    Matchers.is(this.schedulerRunId)
+                )
+            )
             .andExpect(
                 MockMvcResultMatchers.jsonPath(
                     COMMAND_ARGS_PATH,
