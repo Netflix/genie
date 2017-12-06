@@ -41,8 +41,8 @@ import java.util.TimeZone;
 @EqualsAndHashCode(of = "id", doNotUseGetters = true)
 public abstract class BaseDTO implements Serializable {
 
+    static final ObjectMapper MAPPER;
     private static final long serialVersionUID = 9093424855934127120L;
-    private static final ObjectMapper MAPPER;
 
     static {
         final DateFormat iso8601 = new GenieDateFormat();

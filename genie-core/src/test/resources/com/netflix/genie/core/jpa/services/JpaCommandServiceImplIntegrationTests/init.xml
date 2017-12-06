@@ -313,6 +313,8 @@
         executable="pig"
         check_delay="20000"
         status="DEPRECATED"
+        metadata=
+            "{&quot;key1&quot;: &quot;value1&quot;, &quot;key2&quot;: 65, &quot;key3&quot;: [], &quot;key4&quot;: {}}"
     />
     <commands_configs
         command_id="3"

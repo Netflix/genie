@@ -18,7 +18,6 @@
 package com.netflix.genie.core.jpa.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.google.common.collect.Maps;
@@ -84,8 +83,6 @@ import java.util.stream.Collectors;
 )
 @Slf4j
 public class JpaClusterServiceImpl extends JpaBaseService implements ClusterService {
-
-    private final ObjectMapper mapper = new ObjectMapper();
     private final JpaClusterRepository clusterRepository;
     private final JpaCommandRepository commandRepository;
 
@@ -266,9 +263,9 @@ public class JpaClusterServiceImpl extends JpaBaseService implements ClusterServ
         try {
             final Cluster clusterToPatch = JpaServiceUtils.toClusterDto(clusterEntity);
             log.debug("Will patch cluster {}. Original state: {}", id, clusterToPatch);
-            final JsonNode clusterNode = this.mapper.readTree(clusterToPatch.toString());
+            final JsonNode clusterNode = MAPPER.readTree(clusterToPatch.toString());
             final JsonNode postPatchNode = patch.apply(clusterNode);
-            final Cluster patchedCluster = this.mapper.treeToValue(postPatchNode, Cluster.class);
+            final Cluster patchedCluster = MAPPER.treeToValue(postPatchNode, Cluster.class);
             log.debug("Finished patching cluster {}. New state: {}", id, patchedCluster);
             this.updateEntityWithDtoContents(clusterEntity, patchedCluster);
         } catch (final JsonPatchException | IOException e) {
@@ -616,6 +613,7 @@ public class JpaClusterServiceImpl extends JpaBaseService implements ClusterServ
         entity.setDependencies(dependencies);
         entity.setTags(tags);
         entity.setSetupFile(setupFile);
+        JpaServiceUtils.setEntityMetadata(MAPPER, dto, entity);
 
         this.setFinalTags(entity.getTags(), entity.getUniqueId(), entity.getName());
     }

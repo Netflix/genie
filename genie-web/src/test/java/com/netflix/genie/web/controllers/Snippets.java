@@ -983,6 +983,12 @@ final class Snippets {
                 .type(JsonFieldType.STRING)
                 .optional(),
             PayloadDocumentation
+                .fieldWithPath("metadata")
+                .attributes(getConstraintsForField(constraintDescriptions, "metadata"))
+                .description("Any semi-structured metadata. Must be valid JSON")
+                .type(JsonFieldType.OBJECT)
+                .optional(),
+            PayloadDocumentation
                 .fieldWithPath("tags")
                 .attributes(getConstraintsForField(constraintDescriptions, "tags"))
                 .description("The tags")

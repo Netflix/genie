@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.core.jpa.services
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.collect.Lists
 import com.google.common.collect.Sets
 import com.netflix.genie.common.dto.*
@@ -35,6 +36,7 @@ import spock.lang.Specification
  */
 @Category(UnitTest.class)
 class JpaServiceUtilsSpec extends Specification {
+    def mapper = new ObjectMapper()
 
     def "Can convert application entity to application dto"() {
         def entity = new ApplicationEntity()
@@ -50,6 +52,8 @@ class JpaServiceUtilsSpec extends Specification {
         def updated = entity.getUpdated()
         def description = UUID.randomUUID().toString()
         entity.setDescription(description)
+        def metadata = "[\"" + UUID.randomUUID().toString() + "\"]"
+        entity.setMetadata(metadata)
         def tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         Set<TagEntity> tagEntities = tags.collect(
                 {
@@ -99,6 +103,8 @@ class JpaServiceUtilsSpec extends Specification {
         application.getSetupFile().orElseGet(RandomSuppliers.STRING) == setupFile
         application.getDependencies() == dependencies
         application.getStatus() == ApplicationStatus.ACTIVE
+        application.getMetadata().isPresent()
+        this.mapper.writeValueAsString(application.getMetadata().get()) == metadata
     }
 
     def "Can convert cluster entity to cluster dto"() {
@@ -116,6 +122,8 @@ class JpaServiceUtilsSpec extends Specification {
         def updated = entity.getUpdated()
         def description = UUID.randomUUID().toString()
         entity.setDescription(description)
+        def metadata = "[\"" + UUID.randomUUID().toString() + "\"]"
+        entity.setMetadata(metadata)
         def tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         final Set<TagEntity> tagEntities = tags.collect(
                 {
@@ -159,6 +167,8 @@ class JpaServiceUtilsSpec extends Specification {
         cluster.getTags() == tags
         cluster.getConfigs() == confs
         cluster.getDependencies() == dependencies
+        cluster.getMetadata().isPresent()
+        this.mapper.writeValueAsString(cluster.getMetadata().get()) == metadata
     }
 
     def "Can convert command entity to command DTO"() {
@@ -176,6 +186,8 @@ class JpaServiceUtilsSpec extends Specification {
         def created = entity.getCreated()
         def updated = entity.getUpdated()
         entity.setStatus(CommandStatus.DEPRECATED)
+        def metadata = "[\"" + UUID.randomUUID().toString() + "\"]"
+        entity.setMetadata(metadata)
         def tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         final Set<TagEntity> tagEntities = tags.collect(
                 {
@@ -233,6 +245,8 @@ class JpaServiceUtilsSpec extends Specification {
         command.getConfigs() == configs
         command.getDependencies() == dependencies
         command.getMemory().orElseGet(RandomSuppliers.INT) == memory
+        command.getMetadata().isPresent()
+        this.mapper.writeValueAsString(command.getMetadata().get()) == metadata
     }
 
     def "Can convert Job Projection of Job Entity to Job DTO"() {
@@ -253,6 +267,8 @@ class JpaServiceUtilsSpec extends Specification {
         def updated = entity.getUpdated()
         def description = UUID.randomUUID().toString()
         entity.setDescription(description)
+        def metadata = "[\"" + UUID.randomUUID().toString() + "\"]"
+        entity.setMetadata(metadata)
         def tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         final Set<TagEntity> tagEntities = tags.collect(
                 {
@@ -291,6 +307,8 @@ class JpaServiceUtilsSpec extends Specification {
         job.getFinished().orElseGet(RandomSuppliers.DATE) == finished
         job.getStatus() == JobStatus.SUCCEEDED
         job.getStatusMsg().orElseGet(RandomSuppliers.STRING) == statusMessage
+        job.getMetadata().isPresent()
+        this.mapper.writeValueAsString(job.getMetadata().get()) == metadata
     }
 
     def "Can convert Job Execution Projection to Job Execution DTO"() {
@@ -369,6 +387,8 @@ class JpaServiceUtilsSpec extends Specification {
         final Date updated = entity.getUpdated()
         def description = UUID.randomUUID().toString()
         entity.setDescription(description)
+        def metadata = "[\"" + UUID.randomUUID().toString() + "\"]"
+        entity.setMetadata(metadata)
         def tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         Set<TagEntity> tagEntities = tags.collect(
                 {
@@ -502,5 +522,7 @@ class JpaServiceUtilsSpec extends Specification {
         request.getMemory().orElseGet(RandomSuppliers.INT) == memory
         request.getApplications() == applications
         request.getTimeout().orElseGet(RandomSuppliers.INT) == timeout
+        request.getMetadata().isPresent()
+        this.mapper.writeValueAsString(request.getMetadata().get()) == metadata
     }
 }

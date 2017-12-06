@@ -18,7 +18,6 @@
 package com.netflix.genie.core.jpa.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.netflix.genie.common.dto.Application;
@@ -81,7 +80,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class JpaApplicationServiceImpl extends JpaBaseService implements ApplicationService {
 
-    private final ObjectMapper mapper = new ObjectMapper();
     private final JpaApplicationRepository applicationRepository;
     private final JpaCommandRepository commandRepository;
 
@@ -209,9 +207,9 @@ public class JpaApplicationServiceImpl extends JpaBaseService implements Applica
         try {
             final Application appToPatch = JpaServiceUtils.toApplicationDto(applicationEntity);
             log.debug("Will patch application {}. Original state: {}", id, appToPatch);
-            final JsonNode applicationNode = this.mapper.readTree(appToPatch.toString());
+            final JsonNode applicationNode = MAPPER.readTree(appToPatch.toString());
             final JsonNode postPatchNode = patch.apply(applicationNode);
-            final Application patchedApp = this.mapper.treeToValue(postPatchNode, Application.class);
+            final Application patchedApp = MAPPER.treeToValue(postPatchNode, Application.class);
             log.debug("Finished patching application {}. New state: {}", id, patchedApp);
             this.updateEntityWithDtoContents(applicationEntity, patchedApp);
         } catch (final JsonPatchException | IOException e) {
@@ -481,6 +479,7 @@ public class JpaApplicationServiceImpl extends JpaBaseService implements Applica
         entity.setDependencies(dependencies);
         entity.setTags(tags);
         entity.setType(dto.getType().orElse(null));
+        JpaServiceUtils.setEntityMetadata(MAPPER, dto, entity);
 
         this.setFinalTags(entity.getTags(), entity.getUniqueId(), entity.getName());
     }

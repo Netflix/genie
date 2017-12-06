@@ -17,7 +17,10 @@
  */
 package com.netflix.genie.common.dto;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.test.suppliers.RandomSuppliers;
 import org.hamcrest.Matchers;
@@ -25,6 +28,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
@@ -61,15 +65,14 @@ public class ApplicationUnitTests {
         Assert.assertFalse(application.getId().isPresent());
         Assert.assertThat(application.getTags(), Matchers.empty());
         Assert.assertFalse(application.getUpdated().isPresent());
+        Assert.assertFalse(application.getMetadata().isPresent());
     }
 
     /**
      * Test to make sure we can build an application with all optional parameters.
-     *
-     * @throws Exception on error
      */
     @Test
-    public void canBuildApplicationWithOptionals() throws Exception {
+    public void canBuildApplicationWithOptionals() {
         final Application.Builder builder = new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE);
 
         final Set<String> dependencies = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
@@ -120,6 +123,39 @@ public class ApplicationUnitTests {
         Assert.assertThat(application.getId().orElseThrow(IllegalArgumentException::new), Matchers.is(id));
         Assert.assertThat(application.getTags(), Matchers.is(tags));
         Assert.assertThat(application.getUpdated().orElseThrow(IllegalArgumentException::new), Matchers.is(updated));
+    }
+
+    /**
+     * Make sure we can use both builder methods for metadata and that trying to use invalid JSON throws exception.
+     *
+     * @throws IOException                on JSON error
+     * @throws GeniePreconditionException on Invalid JSON
+     */
+    @Test
+    public void canBuildWithMetadata() throws IOException, GeniePreconditionException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final String metadata = "{\"key1\":\"value1\",\"key2\":3}";
+        final JsonNode metadataNode = objectMapper.readTree(metadata);
+        final Application.Builder builder = new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE);
+        builder.withMetadata(metadata);
+        Assert.assertThat(
+            objectMapper.writeValueAsString(builder.build().getMetadata().orElseThrow(IllegalArgumentException::new)),
+            Matchers.is(metadata)
+        );
+        builder.withMetadata(metadataNode);
+        Assert.assertThat(
+            builder.build().getMetadata().orElseThrow(IllegalArgumentException::new),
+            Matchers.is(metadataNode)
+        );
+        builder.withMetadata((JsonNode) null);
+        Assert.assertFalse(builder.build().getMetadata().isPresent());
+
+        try {
+            builder.withMetadata("{I'm Not valid Json}");
+            Assert.fail();
+        } catch (final GeniePreconditionException gpe) {
+            Assert.assertTrue(true);
+        }
     }
 
     /**

@@ -23,7 +23,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.annotation.Nullable;
@@ -78,11 +77,15 @@ public class BaseEntity extends AuditEntity implements BaseProjection, SetupFile
     @Size(max = 255, message = "Max length in database is 255 characters")
     private String name;
 
+    @Basic
+    @Column(name = "description", length = 1000)
+    @Size(max = 1000, message = "Max length in database is 1000 characters")
+    private String description;
+
     @Lob
     @Basic(fetch = FetchType.LAZY)
-    @Column(name = "description")
-    @Type(type = "org.hibernate.type.TextType")
-    private String description;
+    @Column(name = "metadata")
+    private String metadata;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "setup_file")
@@ -105,12 +108,30 @@ public class BaseEntity extends AuditEntity implements BaseProjection, SetupFile
     }
 
     /**
-     * Set the description.
+     * Set the description of this entity.
      *
-     * @param description The description. Null wipes database field
+     * @param description The description
      */
     public void setDescription(@Nullable final String description) {
         this.description = description;
+    }
+
+    /**
+     * Get the metadata of this entity which is unstructured JSON.
+     *
+     * @return Optional of the metadata json node represented as a string
+     */
+    public Optional<String> getMetadata() {
+        return Optional.ofNullable(this.metadata);
+    }
+
+    /**
+     * Set the JSON metadata of this entity.
+     *
+     * @param metadata The metadata of this
+     */
+    public void setMetadata(@Nullable final String metadata) {
+        this.metadata = metadata;
     }
 
     /**

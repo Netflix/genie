@@ -39,6 +39,7 @@ public class BaseEntityUnitTests extends EntityTestsBase {
     private static final String NAME = "pig13";
     private static final String USER = "tgianos";
     private static final String VERSION = "1.0";
+    private static final String METADATA = "{\"key\": \"value\"}";
 
     private BaseEntity b;
 
@@ -181,6 +182,18 @@ public class BaseEntityUnitTests extends EntityTestsBase {
         Assert.assertThat(this.b.getSetupFile().orElseThrow(IllegalArgumentException::new), Matchers.is(setupFile));
         this.b.setSetupFile(null);
         Assert.assertFalse(this.b.getSetupFile().isPresent());
+    }
+
+    /**
+     * Test the metadata setter and getter.
+     */
+    @Test
+    public void testSetMetadata() {
+        Assert.assertFalse(this.b.getMetadata().isPresent());
+        this.b.setMetadata(METADATA);
+        Assert.assertThat(this.b.getMetadata().orElseThrow(IllegalArgumentException::new), Matchers.is(METADATA));
+        this.b.setMetadata(null);
+        Assert.assertFalse(this.b.getMetadata().isPresent());
     }
 
     /**

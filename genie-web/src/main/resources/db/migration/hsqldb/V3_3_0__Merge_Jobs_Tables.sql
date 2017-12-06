@@ -17,39 +17,39 @@
  */
 
 ALTER TABLE jobs
-    DROP CONSTRAINT JOBS_CLUSTER_ID_FK;
+  DROP CONSTRAINT JOBS_CLUSTER_ID_FK;
 ALTER TABLE jobs
-    DROP CONSTRAINT JOBS_COMMAND_ID_FK;
+  DROP CONSTRAINT JOBS_COMMAND_ID_FK;
 ALTER TABLE jobs
-    DROP CONSTRAINT JOBS_ID_FK;
+  DROP CONSTRAINT JOBS_ID_FK;
 ALTER TABLE job_executions
-    DROP CONSTRAINT JOB_EXECUTIONS_ID_FK;
+  DROP CONSTRAINT JOB_EXECUTIONS_ID_FK;
 ALTER TABLE job_metadata
-    DROP CONSTRAINT JOB_METADATA_ID_FK;
+  DROP CONSTRAINT JOB_METADATA_ID_FK;
 ALTER TABLE application_configs
-    DROP CONSTRAINT APPLICATION_CONFIGS_APPLICATION_ID_FK;
+  DROP CONSTRAINT APPLICATION_CONFIGS_APPLICATION_ID_FK;
 ALTER TABLE application_dependencies
-    DROP CONSTRAINT APPLICATION_DEPENDENCIES_APPLICATION_ID_FK;
+  DROP CONSTRAINT APPLICATION_DEPENDENCIES_APPLICATION_ID_FK;
 ALTER TABLE cluster_configs
-    DROP CONSTRAINT CLUSTER_CONFIGS_CLUSTER_ID_FK;
+  DROP CONSTRAINT CLUSTER_CONFIGS_CLUSTER_ID_FK;
 ALTER TABLE cluster_dependencies
-    DROP CONSTRAINT CLUSTER_DEPENDENCIES_CLUSTER_ID_FK;
+  DROP CONSTRAINT CLUSTER_DEPENDENCIES_CLUSTER_ID_FK;
 ALTER TABLE clusters_commands
-    DROP CONSTRAINT CLUSTERS_COMMANDS_CLUSTER_ID_FK;
+  DROP CONSTRAINT CLUSTERS_COMMANDS_CLUSTER_ID_FK;
 ALTER TABLE clusters_commands
-    DROP CONSTRAINT CLUSTERS_COMMANDS_COMMAND_ID_FK;
+  DROP CONSTRAINT CLUSTERS_COMMANDS_COMMAND_ID_FK;
 ALTER TABLE command_configs
-    DROP CONSTRAINT COMMAND_CONFIGS_COMMAND_ID_FK;
+  DROP CONSTRAINT COMMAND_CONFIGS_COMMAND_ID_FK;
 ALTER TABLE command_dependencies
-    DROP CONSTRAINT COMMAND_DEPENDENCIES_COMMAND_ID_FK;
+  DROP CONSTRAINT COMMAND_DEPENDENCIES_COMMAND_ID_FK;
 ALTER TABLE commands_applications
-    DROP CONSTRAINT COMMANDS_APPLICATIONS_APPLICATION_ID_FK;
+  DROP CONSTRAINT COMMANDS_APPLICATIONS_APPLICATION_ID_FK;
 ALTER TABLE commands_applications
-    DROP CONSTRAINT COMMANDS_APPLICATIONS_COMMAND_ID_FK;
+  DROP CONSTRAINT COMMANDS_APPLICATIONS_COMMAND_ID_FK;
 ALTER TABLE jobs_applications
-    DROP CONSTRAINT JOBS_APPLICATIONS_APPLICATION_ID_FK;
+  DROP CONSTRAINT JOBS_APPLICATIONS_APPLICATION_ID_FK;
 ALTER TABLE jobs_applications
-    DROP CONSTRAINT JOBS_APPLICATIONS_JOB_ID_FK;
+  DROP CONSTRAINT JOBS_APPLICATIONS_JOB_ID_FK;
 
 DROP TABLE job_metadata;
 DROP TABLE job_executions;
@@ -114,10 +114,11 @@ CREATE TABLE applications (
   name           VARCHAR(255)                                            NOT NULL,
   genie_user     VARCHAR(255)                                            NOT NULL,
   version        VARCHAR(255)                                            NOT NULL,
-  description    LONGVARCHAR  DEFAULT NULL,
-  setup_file     BIGINT       DEFAULT NULL,
+  description    VARCHAR(1000) DEFAULT NULL,
+  metadata       LONGVARCHAR   DEFAULT NULL,
+  setup_file     BIGINT        DEFAULT NULL,
   status         VARCHAR(20) DEFAULT 'INACTIVE'                          NOT NULL,
-  type           VARCHAR(255) DEFAULT NULL,
+  type           VARCHAR(255)  DEFAULT NULL,
   CONSTRAINT APPLICATIONS_UNIQUE_ID_UNIQUE_INDEX UNIQUE (unique_id),
   CONSTRAINT APPLICATIONS_SETUP_FILE_FK FOREIGN KEY (setup_file) REFERENCES files (id)
     ON DELETE RESTRICT
@@ -186,8 +187,9 @@ CREATE TABLE clusters (
   name           VARCHAR(255)                                         NOT NULL,
   genie_user     VARCHAR(255)                                         NOT NULL,
   version        VARCHAR(255)                                         NOT NULL,
-  description    LONGVARCHAR DEFAULT NULL,
-  setup_file     BIGINT      DEFAULT NULL,
+  description    VARCHAR(1000) DEFAULT NULL,
+  metadata       LONGVARCHAR   DEFAULT NULL,
+  setup_file     BIGINT        DEFAULT NULL,
   status         VARCHAR(20) DEFAULT 'OUT_OF_SERVICE'                 NOT NULL,
   CONSTRAINT CLUSTERS_UNIQUE_ID_UNIQUE_INDEX UNIQUE (unique_id),
   CONSTRAINT CLUSTERS_SETUP_FILE_FK FOREIGN KEY (setup_file) REFERENCES files (id)
@@ -255,11 +257,12 @@ CREATE TABLE commands (
   name           VARCHAR(255)                                          NOT NULL,
   genie_user     VARCHAR(255)                                          NOT NULL,
   version        VARCHAR(255)                                          NOT NULL,
-  description    LONGVARCHAR DEFAULT NULL,
-  setup_file     BIGINT      DEFAULT NULL,
+  description    VARCHAR(1000) DEFAULT NULL,
+  metadata       LONGVARCHAR   DEFAULT NULL,
+  setup_file     BIGINT        DEFAULT NULL,
   executable     VARCHAR(255)                                          NOT NULL,
   check_delay    BIGINT DEFAULT '10000'                                NOT NULL,
-  memory         INT         DEFAULT NULL,
+  memory         INT           DEFAULT NULL,
   status         VARCHAR(20) DEFAULT 'INACTIVE'                        NOT NULL,
   CONSTRAINT COMMANDS_UNIQUE_ID_UNIQUE_INDEX UNIQUE (unique_id),
   CONSTRAINT COMMANDS_SETUP_FILE_FK FOREIGN KEY (setup_file) REFERENCES files (id)
@@ -363,7 +366,8 @@ CREATE TABLE jobs (
   genie_user                VARCHAR(255)                                            NOT NULL,
   version                   VARCHAR(255)                                            NOT NULL,
   command_criterion         BIGINT        DEFAULT NULL,
-  description               LONGVARCHAR   DEFAULT NULL,
+  description               VARCHAR(1000) DEFAULT NULL,
+  metadata                  LONGVARCHAR   DEFAULT NULL,
   setup_file                BIGINT        DEFAULT NULL,
   tags                      VARCHAR(1024) DEFAULT NULL,
   genie_user_group          VARCHAR(255)  DEFAULT NULL,

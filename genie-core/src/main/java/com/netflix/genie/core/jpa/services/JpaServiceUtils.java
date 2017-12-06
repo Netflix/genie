@@ -17,24 +17,32 @@
  */
 package com.netflix.genie.core.jpa.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.Command;
+import com.netflix.genie.common.dto.CommonDTO;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.jpa.entities.ApplicationEntity;
+import com.netflix.genie.core.jpa.entities.BaseEntity;
 import com.netflix.genie.core.jpa.entities.ClusterEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
 import com.netflix.genie.core.jpa.entities.CriterionEntity;
 import com.netflix.genie.core.jpa.entities.FileEntity;
 import com.netflix.genie.core.jpa.entities.TagEntity;
+import com.netflix.genie.core.jpa.entities.projections.BaseProjection;
 import com.netflix.genie.core.jpa.entities.projections.JobExecutionProjection;
 import com.netflix.genie.core.jpa.entities.projections.JobMetadataProjection;
 import com.netflix.genie.core.jpa.entities.projections.JobProjection;
 import com.netflix.genie.core.jpa.entities.projections.JobRequestProjection;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.stream.Collectors;
 
@@ -44,6 +52,7 @@ import java.util.stream.Collectors;
  * @author tgianos
  * @since 3.3.0
  */
+@Slf4j
 public final class JpaServiceUtils {
 
     private JpaServiceUtils() {
@@ -74,6 +83,7 @@ public final class JpaServiceUtils {
         applicationEntity.getType().ifPresent(builder::withType);
         applicationEntity.getDescription().ifPresent(builder::withDescription);
         applicationEntity.getSetupFile().ifPresent(setupFileEntity -> builder.withSetupFile(setupFileEntity.getFile()));
+        setDtoMetadata(builder, applicationEntity);
 
         return builder.build();
     }
@@ -102,6 +112,7 @@ public final class JpaServiceUtils {
 
         clusterEntity.getDescription().ifPresent(builder::withDescription);
         clusterEntity.getSetupFile().ifPresent(setupFileEntity -> builder.withSetupFile(setupFileEntity.getFile()));
+        setDtoMetadata(builder, clusterEntity);
 
         return builder.build();
     }
@@ -133,6 +144,7 @@ public final class JpaServiceUtils {
         commandEntity.getMemory().ifPresent(builder::withMemory);
         commandEntity.getDescription().ifPresent(builder::withDescription);
         commandEntity.getSetupFile().ifPresent(setupFileEntity -> builder.withSetupFile(setupFileEntity.getFile()));
+        setDtoMetadata(builder, commandEntity);
 
         return builder.build();
     }
@@ -164,6 +176,7 @@ public final class JpaServiceUtils {
         jobProjection.getCommandName().ifPresent(builder::withCommandName);
         jobProjection.getGrouping().ifPresent(builder::withGrouping);
         jobProjection.getGroupingInstance().ifPresent(builder::withGroupingInstance);
+        setDtoMetadata(builder, jobProjection);
 
         return builder.build();
     }
@@ -219,6 +232,7 @@ public final class JpaServiceUtils {
             .ifPresent(setupFileEntity -> builder.withSetupFile(setupFileEntity.getFile()));
         jobRequestProjection.getGrouping().ifPresent(builder::withGrouping);
         jobRequestProjection.getGroupingInstance().ifPresent(builder::withGroupingInstance);
+        setDtoMetadata(builder, jobRequestProjection);
 
         return builder.build();
     }
@@ -262,5 +276,39 @@ public final class JpaServiceUtils {
         jobMetadataProjection.getStdOutSize().ifPresent(builder::withStdOutSize);
 
         return builder.build();
+    }
+
+    private static <B extends CommonDTO.Builder, E extends BaseProjection> void setDtoMetadata(
+        final B builder,
+        final E entity
+    ) {
+        if (entity.getMetadata().isPresent()) {
+            try {
+                final String metadata = entity.getMetadata().get();
+                builder.withMetadata(metadata);
+            } catch (final GeniePreconditionException gpe) {
+                // Since the DTO can't be constructed on input with invalid JSON this should never even happen
+                log.error("Invalid JSON metadata. Should never happen.", gpe);
+                builder.withMetadata((JsonNode) null);
+            }
+        }
+    }
+
+    static <D extends CommonDTO, E extends BaseEntity> void setEntityMetadata(
+        final ObjectMapper mapper,
+        final D dto,
+        final E entity
+    ) {
+        if (dto.getMetadata().isPresent()) {
+            try {
+                entity.setMetadata(mapper.writeValueAsString(dto.getMetadata().get()));
+            } catch (final JsonProcessingException jpe) {
+                // Should never happen. Swallow and set to null as metadata is not Genie critical
+                log.error("Invalid JSON, unable to convert to string", jpe);
+                entity.setMetadata(null);
+            }
+        } else {
+            entity.setMetadata(null);
+        }
     }
 }

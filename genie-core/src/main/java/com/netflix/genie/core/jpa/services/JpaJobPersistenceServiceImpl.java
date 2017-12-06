@@ -340,6 +340,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         jobEntity.setUser(jobRequest.getUser());
         jobEntity.setVersion(jobRequest.getVersion());
         jobRequest.getDescription().ifPresent(jobEntity::setDescription);
+        JpaServiceUtils.setEntityMetadata(MAPPER, jobRequest, jobEntity);
         jobRequest.getCommandArgs().ifPresent(
             commandArgs ->
                 jobEntity.setCommandArgs(

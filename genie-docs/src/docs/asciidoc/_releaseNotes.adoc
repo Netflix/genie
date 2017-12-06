@@ -19,6 +19,12 @@ be set in this field to provide way to find all the jobs related to this workflo
 *** Building on `grouping` this provides a field for the unique instance of the grouping e.g. the run identifier of the
 workflow
 *** Added to search API as optional field
+* New field(s) added to Job Request, Job, Cluster, Command, Application
+** `metadata`
+*** Allows users to insert any additional metadata they wish to these resources. *MUST* be valid JSON.
+*** Stored as blob so no search available. Meant for use by higher level systems to take metadata and parse it
+themselves for use in building up business use cases (lineage, relationships, etc) that the Genie data model doesn't
+support natively
 
 === Upgrade Instructions
 
