@@ -120,10 +120,11 @@ CREATE PROCEDURE GENIE_SPLIT_JOBS_320()
         `cluster_id`,
         `command_id`
       FROM `jobs_320`;
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET `done` = TRUE;
 
     OPEN `jobs_cursor`;
     READ_LOOP: LOOP
+      START TRANSACTION;
       SET `done` = FALSE;
 
       FETCH `jobs_cursor`
@@ -131,10 +132,9 @@ CREATE PROCEDURE GENIE_SPLIT_JOBS_320()
 
       IF `done`
       THEN
+        COMMIT;
         LEAVE READ_LOOP;
       END IF;
-
-      START TRANSACTION;
 
       SELECT `cl`.`id`
       INTO `new_cluster_id`
@@ -199,10 +199,11 @@ CREATE PROCEDURE GENIE_SPLIT_JOB_REQUESTS_320()
         `setup_file`,
         `command_args`
       FROM `job_requests_320`;
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET `done` = TRUE;
 
     OPEN `job_request_cursor`;
     READ_LOOP: LOOP
+      START TRANSACTION;
       SET `done` = FALSE;
 
       FETCH `job_request_cursor`
@@ -219,10 +220,9 @@ CREATE PROCEDURE GENIE_SPLIT_JOB_REQUESTS_320()
 
       IF `done`
       THEN
+        COMMIT;
         LEAVE READ_LOOP;
       END IF;
-
-      START TRANSACTION;
 
       SELECT `j`.`id`
       INTO `new_job_id`
@@ -530,10 +530,11 @@ CREATE PROCEDURE GENIE_LOAD_JOBS_APPLICATIONS_320()
         `application_id`,
         `application_order`
       FROM `jobs_applications_320`;
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET `done` = TRUE;
 
     OPEN `jobs_applications_cursor`;
     READ_LOOP: LOOP
+      START TRANSACTION;
       SET `done` = FALSE;
 
       FETCH `jobs_applications_cursor`
@@ -541,10 +542,9 @@ CREATE PROCEDURE GENIE_LOAD_JOBS_APPLICATIONS_320()
 
       IF `done`
       THEN
+        COMMIT;
         LEAVE READ_LOOP;
       END IF;
-
-      START TRANSACTION;
 
       SELECT `j`.`id`
       INTO `new_job_id`
