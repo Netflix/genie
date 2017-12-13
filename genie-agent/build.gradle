@@ -1,0 +1,49 @@
+apply plugin: "org.springframework.boot"
+
+dependencies {
+    /*******************************
+     * Compile Dependencies
+     *******************************/
+
+     // Spring Libraries
+     compile("org.springframework.statemachine:spring-statemachine-core:1.2.7.RELEASE")
+     compile("org.springframework.boot:spring-boot-autoconfigure")
+     compile("org.springframework.boot:spring-boot-starter")
+     compile("org.yaml:snakeyaml")
+
+     // Logging
+     compile("org.slf4j:slf4j-api")
+     compile("commons-logging:commons-logging")
+     compile(project(":genie-core"))
+
+    /*******************************
+     * Provided Dependencies
+     *******************************/
+
+    /*******************************
+     * Optional Dependencies
+     *******************************/
+
+    /*******************************
+     * Runtime Dependencies
+     *******************************/
+
+    /*******************************
+     * Test Dependencies
+     *******************************/
+}
+
+jar {
+    manifest {
+        attributes("Implementation-Version": version)
+    }
+}
+
+springBoot {
+    layout = "ZIP"
+    mainClass = "com.netflix.genie.GenieAgent"
+}
+
+bootRun {
+  /*args '--debug'*/
+}
