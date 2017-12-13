@@ -28,8 +28,7 @@ import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.properties.ClusterCheckerProperties;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
-import com.netflix.spectator.api.Counter;
-import com.netflix.spectator.api.Registry;
+import com.netflix.spectator.api.DefaultRegistry;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -63,9 +62,6 @@ public class ClusterCheckerTaskUnitTests {
     private JobPersistenceService jobPersistenceService;
     private RestTemplate restTemplate;
 
-    private Counter lostJobCounter;
-    private Counter unableToUpdateJobCounter;
-
     /**
      * Setup for the tests.
      */
@@ -79,13 +75,6 @@ public class ClusterCheckerTaskUnitTests {
         this.restTemplate = Mockito.mock(RestTemplate.class);
         final ManagementServerProperties serverProperties = Mockito.mock(ManagementServerProperties.class);
         Mockito.when(serverProperties.getContextPath()).thenReturn("/actuator");
-        final Registry registry = Mockito.mock(Registry.class);
-        this.lostJobCounter = Mockito.mock(Counter.class);
-        Mockito.when(registry.counter("genie.tasks.clusterChecker.lostJobs.rate")).thenReturn(this.lostJobCounter);
-        this.unableToUpdateJobCounter = Mockito.mock(Counter.class);
-        Mockito
-            .when(registry.counter("genie.tasks.clusterChecker.unableToUpdateJob.rate"))
-            .thenReturn(this.unableToUpdateJobCounter);
         this.task = new ClusterCheckerTask(
             this.hostName,
             properties,
@@ -93,7 +82,7 @@ public class ClusterCheckerTaskUnitTests {
             this.jobPersistenceService,
             this.restTemplate,
             serverProperties,
-            registry
+            new DefaultRegistry()
         );
     }
 
@@ -207,8 +196,6 @@ public class ClusterCheckerTaskUnitTests {
                 Mockito.eq(null),
                 Mockito.eq(null)
             );
-        Mockito.verify(this.lostJobCounter, Mockito.atLeast(2)).increment();
-        Mockito.verify(this.unableToUpdateJobCounter, Mockito.times(1)).increment();
     }
 
     /**

@@ -19,6 +19,7 @@ package com.netflix.genie.web.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.google.common.collect.Lists;
 import com.google.common.io.ByteStreams;
 import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
@@ -278,7 +279,6 @@ public class JobRestController {
                 jobRequest.getName(),
                 jobRequest.getUser(),
                 jobRequest.getVersion(),
-                jobRequest.getCommandArgs(),
                 jobRequest.getClusterCriterias(),
                 jobRequest.getCommandCriteria()
             )
@@ -289,6 +289,13 @@ public class JobRestController {
                 .withDependencies(jobRequest.getDependencies())
                 .withApplications(jobRequest.getApplications());
 
+            jobRequest.getCommandArgs().ifPresent(
+                commandArgs ->
+                    builder
+                        .withCommandArgs(
+                            Lists.newArrayList(StringUtils.splitByWholeSeparator(commandArgs, StringUtils.SPACE))
+                        )
+            );
             jobRequest.getCpu().ifPresent(builder::withCpu);
             jobRequest.getMemory().ifPresent(builder::withMemory);
             jobRequest.getGroup().ifPresent(builder::withGroup);
@@ -296,6 +303,7 @@ public class JobRestController {
             jobRequest.getDescription().ifPresent(builder::withDescription);
             jobRequest.getEmail().ifPresent(builder::withEmail);
             jobRequest.getTimeout().ifPresent(builder::withTimeout);
+            jobRequest.getMetadata().ifPresent(builder::withMetadata);
 
             jobRequestWithId = builder.build();
         }
@@ -373,26 +381,29 @@ public class JobRestController {
     /**
      * Get jobs for given filter criteria.
      *
-     * @param id          id for job
-     * @param name        name of job (can be a SQL-style pattern such as HIVE%)
-     * @param user        user who submitted job
-     * @param statuses    statuses of jobs to find
-     * @param tags        tags for the job
-     * @param clusterName the name of the cluster
-     * @param clusterId   the id of the cluster
-     * @param commandName the name of the command run by the job
-     * @param commandId   the id of the command run by the job
-     * @param minStarted  The time which the job had to start after in order to be return (inclusive)
-     * @param maxStarted  The time which the job had to start before in order to be returned (exclusive)
-     * @param minFinished The time which the job had to finish after in order to be return (inclusive)
-     * @param maxFinished The time which the job had to finish before in order to be returned (exclusive)
-     * @param page        page information for job
-     * @param assembler   The paged resources assembler to use
+     * @param id               id for job
+     * @param name             name of job (can be a SQL-style pattern such as HIVE%)
+     * @param user             user who submitted job
+     * @param statuses         statuses of jobs to find
+     * @param tags             tags for the job
+     * @param clusterName      the name of the cluster
+     * @param clusterId        the id of the cluster
+     * @param commandName      the name of the command run by the job
+     * @param commandId        the id of the command run by the job
+     * @param minStarted       The time which the job had to start after in order to be return (inclusive)
+     * @param maxStarted       The time which the job had to start before in order to be returned (exclusive)
+     * @param minFinished      The time which the job had to finish after in order to be return (inclusive)
+     * @param maxFinished      The time which the job had to finish before in order to be returned (exclusive)
+     * @param grouping         The grouping the job should be a member of
+     * @param groupingInstance The grouping instance the job should be a member of
+     * @param page             page information for job
+     * @param assembler        The paged resources assembler to use
      * @return successful response, or one with HTTP error code
      * @throws GenieException For any error
      */
     @GetMapping(produces = MediaTypes.HAL_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
+    @SuppressWarnings("checkstyle:parameternumber")
     public PagedResources<JobSearchResultResource> findJobs(
         @RequestParam(value = "id", required = false) final String id,
         @RequestParam(value = "name", required = false) final String name,
@@ -407,16 +418,19 @@ public class JobRestController {
         @RequestParam(value = "maxStarted", required = false) final Long maxStarted,
         @RequestParam(value = "minFinished", required = false) final Long minFinished,
         @RequestParam(value = "maxFinished", required = false) final Long maxFinished,
+        @RequestParam(value = "grouping", required = false) final String grouping,
+        @RequestParam(value = "groupingInstance", required = false) final String groupingInstance,
         @PageableDefault(sort = {"created"}, direction = Sort.Direction.DESC) final Pageable page,
         final PagedResourcesAssembler<JobSearchResult> assembler
     ) throws GenieException {
         log.info(
             "[getJobs] Called with "
                 + "[id | jobName | user | statuses | clusterName "
-                + "| clusterId | minStarted | maxStarted | minFinished | maxFinished | page]"
+                + "| clusterId | minStarted | maxStarted | minFinished | maxFinished | grouping | groupingInstance "
+                + "| page]"
         );
         log.info(
-            "{} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {}",
+            "{} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {}",
             id,
             name,
             user,
@@ -430,6 +444,8 @@ public class JobRestController {
             maxStarted,
             minFinished,
             maxFinished,
+            grouping,
+            groupingInstance,
             page
         );
 
@@ -462,6 +478,8 @@ public class JobRestController {
                         maxStarted,
                         minFinished,
                         maxFinished,
+                        grouping,
+                        groupingInstance,
                         page,
                         assembler
                     )
@@ -482,6 +500,8 @@ public class JobRestController {
                 maxStarted == null ? null : new Date(maxStarted),
                 minFinished == null ? null : new Date(minFinished),
                 maxFinished == null ? null : new Date(maxFinished),
+                grouping,
+                groupingInstance,
                 page
             ),
             this.jobSearchResultResourceAssembler,
@@ -496,9 +516,8 @@ public class JobRestController {
      * @param forwardedFrom The host this request was forwarded from if present
      * @param request       the servlet request
      * @param response      the servlet response
-     * @throws GenieException   For any error
-     * @throws IOException      on redirect error
-     * @throws ServletException when trying to handle the request
+     * @throws GenieException For any error
+     * @throws IOException    on redirect error
      */
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
@@ -507,7 +526,7 @@ public class JobRestController {
         @RequestHeader(name = JobConstants.GENIE_FORWARDED_FROM_HEADER, required = false) final String forwardedFrom,
         final HttpServletRequest request,
         final HttpServletResponse response
-    ) throws GenieException, IOException, ServletException {
+    ) throws GenieException, IOException {
         log.info("[killJob] Called for job id: {}. Forwarded from: {}", id, forwardedFrom);
 
         // If forwarded from is null this request hasn't been forwarded at all. Check we're on the right node

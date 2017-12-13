@@ -17,16 +17,23 @@
  */
 package com.netflix.genie.web.controllers;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
+import com.netflix.genie.core.jpa.repositories.JpaFileRepository;
+import com.netflix.genie.core.jpa.repositories.JpaTagRepository;
 import com.netflix.genie.web.aspect.DataServiceRetryAspect;
 import com.netflix.genie.web.hateoas.resources.ClusterResource;
+import org.apache.catalina.util.URLEncoder;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Assert;
@@ -44,13 +51,17 @@ import org.springframework.restdocs.payload.PayloadDocumentation;
 import org.springframework.restdocs.request.RequestDocumentation;
 import org.springframework.restdocs.snippet.Attributes;
 import org.springframework.retry.RetryListener;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import javax.sql.DataSource;
+import java.net.URI;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.Statement;
+import java.util.HashMap;
 import java.util.UUID;
 
 /**
@@ -79,6 +90,12 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
     private JpaCommandRepository jpaCommandRepository;
 
     @Autowired
+    private JpaFileRepository fileRepository;
+
+    @Autowired
+    private JpaTagRepository tagRepository;
+
+    @Autowired
     private DataSource dataSource;
 
     @Autowired
@@ -91,6 +108,8 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
     public void setup() {
         this.jpaClusterRepository.deleteAll();
         this.jpaCommandRepository.deleteAll();
+        this.fileRepository.deleteAll();
+        this.tagRepository.deleteAll();
     }
 
     /**
@@ -100,6 +119,8 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
     public void cleanup() {
         this.jpaClusterRepository.deleteAll();
         this.jpaCommandRepository.deleteAll();
+        this.fileRepository.deleteAll();
+        this.tagRepository.deleteAll();
     }
 
     /**
@@ -1173,5 +1194,98 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
             .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(1)))
             .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(ID)));
+    }
+
+    /**
+     * This test "documents" a known bug in Spring HATEOAS links that results in doubly-encoded pagination links.
+     * https://github.com/spring-projects/spring-hateoas/issues/559
+     * Currently, we work around this bug in the UI by decoding these elements (see Pagination.js).
+     * If this test starts failing, it may be because the behavior has been corrected, and the workaround may be
+     * removed.
+     *
+     * @throws Exception on error
+     */
+    @Test
+    public void testPagingDoubleEncoding() throws Exception {
+        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
+        final String id1 = UUID.randomUUID().toString();
+        final String id2 = UUID.randomUUID().toString();
+        final String id3 = UUID.randomUUID().toString();
+        final String name1 = "Test " + UUID.randomUUID().toString();
+        final String name2 = "Test " + UUID.randomUUID().toString();
+        final String name3 = "Test " + UUID.randomUUID().toString();
+        final String user1 = UUID.randomUUID().toString();
+        final String user2 = UUID.randomUUID().toString();
+        final String user3 = UUID.randomUUID().toString();
+        final String version1 = UUID.randomUUID().toString();
+        final String version2 = UUID.randomUUID().toString();
+        final String version3 = UUID.randomUUID().toString();
+
+        this.createConfigResource(
+            new Cluster.Builder(name1, user1, version1, ClusterStatus.UP).withId(id1).build(),
+            null
+        );
+        Thread.sleep(1000);
+        this.createConfigResource(
+            new Cluster.Builder(name2, user2, version2, ClusterStatus.OUT_OF_SERVICE).withId(id2).build(),
+            null
+        );
+        Thread.sleep(1000);
+        this.createConfigResource(
+            new Cluster.Builder(name3, user3, version3, ClusterStatus.TERMINATED).withId(id3).build(),
+            null
+        );
+
+        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(3L));
+
+        final URLEncoder urlEncoder = new URLEncoder();
+
+        final String unencodedNameQuery = "Test %";
+        final String singleEncodedNameQuery = urlEncoder.encode(unencodedNameQuery, StandardCharsets.UTF_8);
+        final String doubleEncodedNameQuery = urlEncoder.encode(singleEncodedNameQuery, StandardCharsets.UTF_8);
+
+        // Query by name with wildcard and get the second page containing a single result (out of 3)
+        final MvcResult response = this.mvc
+            .perform(MockMvcRequestBuilders.get(CLUSTERS_API)
+                .param("name", unencodedNameQuery)
+                .param("size", "1")
+                .param("page", "1")
+            )
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
+            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
+            .andExpect(MockMvcResultMatchers.jsonPath(CLUSTERS_LIST_PATH, Matchers.hasSize(1)))
+            .andReturn();
+
+        final JsonNode responseJsonNode = new ObjectMapper().readTree(response.getResponse().getContentAsString());
+
+        // Self link is not double-encoded
+        Assert.assertTrue(
+            responseJsonNode
+                .get("_links")
+                .get("self")
+                .get("href")
+                .asText()
+                .contains(singleEncodedNameQuery));
+
+        // Pagination links are double-encoded
+
+        final String[] doubleEncodedHrefs = new String[] {
+            "first", "next", "prev", "last",
+        };
+
+        for (String doubleEncodedHref : doubleEncodedHrefs) {
+            final String linkString = responseJsonNode.get("_links").get(doubleEncodedHref).get("href").asText();
+            Assert.assertNotNull(linkString);
+            final HashMap<String, String> params = Maps.newHashMap();
+            URLEncodedUtils.parse(new URI(linkString), StandardCharsets.UTF_8)
+                .forEach(nameValuePair -> params.put(nameValuePair.getName(), nameValuePair.getValue()));
+
+            Assert.assertTrue(params.containsKey("name"));
+            // Correct: singleEncodedNameQuery, actual: doubleEncodedNameQuery
+            Assert.assertEquals(doubleEncodedNameQuery, params.get("name"));
+            final String decoded = URLDecoder.decode(params.get("name"), StandardCharsets.UTF_8.name());
+            Assert.assertEquals(singleEncodedNameQuery, decoded);
+        }
     }
 }

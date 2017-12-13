@@ -32,8 +32,7 @@ import com.netflix.genie.core.properties.JobsProperties;
 import com.netflix.genie.core.services.JobSearchService;
 import com.netflix.genie.core.services.JobSubmitterService;
 import com.netflix.genie.test.categories.UnitTest;
-import com.netflix.spectator.api.Counter;
-import com.netflix.spectator.api.Registry;
+import com.netflix.spectator.api.DefaultRegistry;
 import org.apache.commons.exec.Executor;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
@@ -79,7 +78,6 @@ public class JobMonitoringCoordinatorUnitTests {
     private JobSearchService jobSearchService;
     private GenieEventBus genieEventBus;
     private Date tomorrow;
-    private Counter unableToCancel;
 
     /**
      * Setup for the tests.
@@ -96,9 +94,6 @@ public class JobMonitoringCoordinatorUnitTests {
         final Executor executor = Mockito.mock(Executor.class);
         this.scheduler = Mockito.mock(TaskScheduler.class);
         this.genieEventBus = Mockito.mock(GenieEventBus.class);
-        final Registry registry = Mockito.mock(Registry.class);
-        this.unableToCancel = Mockito.mock(Counter.class);
-        Mockito.when(registry.counter(Mockito.anyString())).thenReturn(this.unableToCancel);
 
         final File jobsFile = this.folder.newFolder();
         final Resource jobsDir = Mockito.mock(Resource.class);
@@ -110,7 +105,7 @@ public class JobMonitoringCoordinatorUnitTests {
             this.genieEventBus,
             this.scheduler,
             executor,
-            registry,
+            new DefaultRegistry(),
             jobsDir,
             new JobsProperties(),
             jobSubmitterService
@@ -332,7 +327,6 @@ public class JobMonitoringCoordinatorUnitTests {
 
         Mockito.verify(future1, Mockito.times(1)).cancel(true);
         Mockito.verify(future2, Mockito.times(1)).cancel(true);
-        Mockito.verify(this.unableToCancel, Mockito.times(1)).increment();
     }
 
     /**
@@ -387,7 +381,5 @@ public class JobMonitoringCoordinatorUnitTests {
         this.coordinator.onJobFinished(jobFinishedEvent);
         Assert.assertThat(this.coordinator.getNumActiveJobs(), Matchers.is(0));
         Assert.assertThat(this.coordinator.getUsedMemory(), Matchers.is(0));
-
-        Mockito.verify(this.unableToCancel, Mockito.times(1)).increment();
     }
 }

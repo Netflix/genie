@@ -15,87 +15,281 @@
     limitations under the License.
 -->
 <dataset>
+    <files
+        id="0"
+        created="2014-08-08 01:45:00"
+        updated="2014-08-08 01:45:00"
+        entity_version="0"
+        file="s3://some/config/file"
+    />
+    <files
+        id="1"
+        created="2014-08-08 01:45:00"
+        updated="2014-08-08 01:45:00"
+        entity_version="0"
+        file="s3://some/other/config/file"
+    />
+    <files
+        id="2"
+        created="2014-08-08 01:45:00"
+        updated="2014-08-08 01:45:00"
+        entity_version="0"
+        file="tez.jar"
+    />
+    <files
+        id="3"
+        created="2014-08-08 01:45:00"
+        updated="2014-08-08 01:45:00"
+        entity_version="0"
+        file="yarn.jar"
+    />
+    <files
+        id="4"
+        created="2014-08-08 01:45:00"
+        updated="2014-08-08 01:45:00"
+        entity_version="0"
+        file="s3://some/spark/config/file"
+    />
+    <files
+        id="5"
+        created="2014-08-08 01:45:00"
+        updated="2014-08-08 01:45:00"
+        entity_version="0"
+        file="s3://some/other/spark/config/file"
+    />
+    <files
+        id="6"
+        created="2014-08-08 01:45:00"
+        updated="2014-08-08 01:45:00"
+        entity_version="0"
+        file="spark.jar"
+    />
+    <files
+        id="7"
+        created="2014-08-08 01:45:00"
+        updated="2014-08-08 01:45:00"
+        entity_version="0"
+        file="s3://some/storm/config/file"
+    />
+    <files
+        id="8"
+        created="2014-08-08 01:45:00"
+        updated="2014-08-08 01:45:00"
+        entity_version="0"
+        file="storm.jar"
+    />
+
+    <tags
+        id="0"
+        created="2014-08-08 01:45:00"
+        updated="2014-08-08 01:45:00"
+        entity_version="0"
+        tag="genie.id:app1"
+    />
+    <tags
+        id="1"
+        created="2014-08-08 01:45:00"
+        updated="2014-08-08 01:45:00"
+        entity_version="0"
+        tag="genie.name:tez"
+    />
+    <tags
+        id="2"
+        created="2014-08-08 01:45:00"
+        updated="2014-08-08 01:45:00"
+        entity_version="0"
+        tag="prod"
+    />
+    <tags
+        id="3"
+        created="2014-08-08 01:45:00"
+        updated="2014-08-08 01:45:00"
+        entity_version="0"
+        tag="genie.id:app2"
+    />
+    <tags
+        id="4"
+        created="2014-08-08 01:45:00"
+        updated="2014-08-08 01:45:00"
+        entity_version="0"
+        tag="genie.name:spark"
+    />
+    <tags
+        id="5"
+        created="2014-08-08 01:45:00"
+        updated="2014-08-08 01:45:00"
+        entity_version="0"
+        tag="yarn"
+    />
+    <tags
+        id="6"
+        created="2014-08-08 01:45:00"
+        updated="2014-08-08 01:45:00"
+        entity_version="0"
+        tag="genie.id:app3"
+    />
+    <tags
+        id="7"
+        created="2014-08-08 01:45:00"
+        updated="2014-08-08 01:45:00"
+        entity_version="0"
+        tag="genie.name:storm"
+    />
+    <tags
+        id="8"
+        created="2014-08-08 01:45:00"
+        updated="2014-08-08 01:45:00"
+        entity_version="0"
+        tag="genie.id:command1"
+    />
+    <tags
+        id="9"
+        created="2014-08-08 01:45:00"
+        updated="2014-08-08 01:45:00"
+        entity_version="0"
+        tag="genie.name:pig_13_prod"
+    />
+
     <applications
-        id="app1"
+        id="0"
         created="2014-08-08 01:45:00"
         updated="2014-08-08 01:50:00"
+        entity_version="0"
+        unique_id="app1"
         genie_user="tgianos"
         name="tez"
         version="1.2.3"
         status="INACTIVE"
-        entity_version="0"
-        tags="|genie.id:app1||genie.name:tez||prod|"
     />
-    <application_configs
-        application_id="app1"
-        config="s3://some/config/file"/>
-    <application_configs
-        application_id="app1"
-        config="s3://some/other/config/file"/>
-    <application_dependencies
-        application_id="app1"
-        dependency="tez.jar"/>
-    <application_dependencies
-        application_id="app1"
-        dependency="yarn.jar"/>
+    <applications_configs
+        application_id="0"
+        file_id="0"
+    />
+    <applications_configs
+        application_id="0"
+        file_id="1"
+    />
+    <applications_dependencies
+        application_id="0"
+        file_id="2"
+    />
+    <applications_dependencies
+        application_id="0"
+        file_id="3"
+    />
+    <applications_tags
+        application_id="0"
+        tag_id="0"
+    />
+    <applications_tags
+        application_id="0"
+        tag_id="1"
+    />
+    <applications_tags
+        application_id="0"
+        tag_id="2"
+    />
 
     <applications
-        id="app2"
+        id="1"
         created="2014-08-09 01:45:00"
         updated="2014-08-09 01:50:00"
+        entity_version="0"
+        unique_id="app2"
         genie_user="amsharma"
         name="spark"
         version="4.5.6"
         status="ACTIVE"
-        entity_version="0"
-        tags="|genie.id:app2||genie.name:spark||prod||yarn|"
         type="spark"
     />
-    <application_configs
-        application_id="app2"
-        config="s3://some/spark/config/file"/>
-    <application_configs
-        application_id="app2"
-        config="s3://some/other/spark/config/file"/>
-    <application_dependencies
-        application_id="app2"
-        dependency="spark.jar"/>
+    <applications_configs
+        application_id="1"
+        file_id="4"
+    />
+    <applications_configs
+        application_id="1"
+        file_id="5"
+    />
+    <applications_dependencies
+        application_id="1"
+        file_id="6"
+    />
+    <applications_tags
+        application_id="1"
+        tag_id="3"
+    />
+    <applications_tags
+        application_id="1"
+        tag_id="4"
+    />
+    <applications_tags
+        application_id="1"
+        tag_id="2"
+    />
+    <applications_tags
+        application_id="1"
+        tag_id="5"
+    />
 
     <applications
-        id="app3"
+        id="2"
         created="2014-08-10 01:45:00"
         updated="2014-08-10 01:50:00"
+        entity_version="0"
+        unique_id="app3"
         genie_user="tgianos"
         name="storm"
         version="7.8.9"
         status="DEPRECATED"
-        entity_version="0"
-        tags="|genie.id:app3||genie.name:storm||prod|"
         type="storm"
     />
-    <application_configs
-        application_id="app3"
-        config="s3://some/storm/config/file"/>
-    <application_dependencies
-        application_id="app3"
-        dependency="storm.jar"/>
-    <application_dependencies
-        application_id="app3"
-        dependency="yarn.jar"/>
+    <applications_configs
+        application_id="2"
+        file_id="7"
+    />
+    <applications_dependencies
+        application_id="2"
+        file_id="8"
+    />
+    <applications_dependencies
+        application_id="2"
+        file_id="3"
+    />
+    <applications_tags
+        application_id="2"
+        tag_id="6"
+    />
+    <applications_tags
+        application_id="2"
+        tag_id="7"
+    />
+    <applications_tags
+        application_id="2"
+        tag_id="2"
+    />
 
     <commands
-        id="command1"
+        id="0"
         created="2014-08-08 01:47:00"
         updated="2014-08-08 01:59:00"
+        entity_version="0"
+        unique_id="command1"
         genie_user="tgianos"
         name="pig_13_prod"
         version="1.2.3"
         executable="pig"
         check_delay="10000"
         status="INACTIVE"
-        entity_version="0"
-        tags="|genie.id:command1||genie.name:pig_13_prod|"
     />
 
-    <commands_applications command_id="command1" application_id="app1" application_order="0"/>
+    <commands_tags
+        command_id="0"
+        tag_id="8"
+    />
+    <commands_tags
+        command_id="0"
+        tag_id="9"
+    />
+
+    <commands_applications command_id="0" application_id="0" application_order="0"/>
 </dataset>

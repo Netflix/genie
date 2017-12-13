@@ -121,6 +121,11 @@ management:
   context-path: /actuator
   security:
     roles: ADMIN
+  health:
+    redis:
+      enabled: false
+    mail:
+      enabled: false
 
 security:
   basic:

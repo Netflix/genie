@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+package com.netflix.genie.proto;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+option java_multiple_files = true;
+option java_package = "com.netflix.genie.protogen";
+option java_outer_classname = "GenieProto";
+
+
+// The greeting service definition.
+service GreeterService {
+
+  // Sends a greeting
+  rpc SayHello (HelloRequest) returns (HelloReply) {
+  }
+}
+
+// The request message containing the user's name.
+message HelloRequest {
+  string name = 1;
+}
+
+// The response message containing the greetings
+message HelloReply {
+  string message = 1;
+}
+
+// Heartbeat service (POC for handling disconnections).
+service HeartbeatService {
+  // Client heartbeat and server echoes to confirm receipt
+  rpc Heartbeat (HeartbeatRequest) returns (HeartbeatResponse) {}
+}
+
+// Heartbeat from client to server
+message HeartbeatRequest {
+  string heartbeat_uuid = 1;
+  google.protobuf.Timestamp request_timestamp = 2;
+}
+
+// Server Heartbeat acknowledgement
+message HeartbeatResponse {
+  string heartbeat_uuid = 1;
+  google.protobuf.Timestamp request_timestamp = 2;
+  google.protobuf.Timestamp response_timestamp = 3;
+}
+
+// Kill service (POC for handling long-polling).
+service KillService {
+  // Client long-polls for a kill signal from server
+  rpc WaitKill (KillRequest) returns (KillResponse) {}
+}
+
+// Kill request from client to server
+message KillRequest {
+  string client_id = 1;
+}
+
+// Server Kill command
+message KillResponse {
+  string client_id = 1;
+}
+
+// A chunk of a file
+message FileChunkRequest {
+    string path = 1;
+    uint64 offset = 2;
+    bytes data = 3;
+}
+
+// Acknowledgement from the servers that a given number of chunks were received
+message FileChunkResponse {
+    uint32 watermark = 1;
+}
+
+// Client streaming service definition
+service FileStreamService {
+    rpc streamFileChunks(stream FileChunkRequest) returns (stream FileChunkResponse) {}
+}

@@ -19,13 +19,10 @@ package com.netflix.genie.web.tasks.leader;
 
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.services.JobPersistenceService;
-import com.netflix.genie.core.util.MetricsUtils;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.properties.DatabaseCleanupProperties;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
-import com.netflix.spectator.api.Id;
-import com.netflix.spectator.api.Registry;
-import com.netflix.spectator.api.Timer;
+import com.netflix.spectator.api.DefaultRegistry;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -37,8 +34,6 @@ import org.springframework.scheduling.support.CronTrigger;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Unit tests for DatabaseCleanupTask.
@@ -52,9 +47,6 @@ public class DatabaseCleanupTaskUnitTests {
     private DatabaseCleanupProperties cleanupProperties;
     private JobPersistenceService jobPersistenceService;
     private DatabaseCleanupTask task;
-    private AtomicLong numDeletedJobs;
-    private Timer deletionTimer;
-    private Id deletionTimerId;
 
     /**
      * Setup for the tests.
@@ -63,28 +55,7 @@ public class DatabaseCleanupTaskUnitTests {
     public void setup() {
         this.cleanupProperties = Mockito.mock(DatabaseCleanupProperties.class);
         this.jobPersistenceService = Mockito.mock(JobPersistenceService.class);
-        this.numDeletedJobs = new AtomicLong();
-        this.deletionTimer = Mockito.mock(Timer.class);
-        this.deletionTimerId = Mockito.mock(Id.class);
-        final Registry registry = Mockito.mock(Registry.class);
-        Mockito
-            .when(registry.createId("genie.tasks.databaseCleanup.duration.timer"))
-            .thenReturn(deletionTimerId);
-        Mockito
-            .when(deletionTimerId.withTags(Mockito.anyMapOf(String.class, String.class)))
-            .thenReturn(deletionTimerId);
-        Mockito
-            .when(registry.timer(deletionTimerId))
-            .thenReturn(deletionTimer);
-        Mockito
-            .when(
-                registry.gauge(
-                    Mockito.eq("genie.tasks.databaseCleanup.numDeletedJobs.gauge"),
-                    Mockito.any(AtomicLong.class)
-                )
-            ).thenReturn(this.numDeletedJobs);
-        Mockito.when(registry.timer("genie.tasks.databaseCleanup.duration.timer")).thenReturn(this.deletionTimer);
-        this.task = new DatabaseCleanupTask(this.cleanupProperties, this.jobPersistenceService, registry);
+        this.task = new DatabaseCleanupTask(this.cleanupProperties, this.jobPersistenceService, new DefaultRegistry());
     }
 
     /**
@@ -139,19 +110,8 @@ public class DatabaseCleanupTaskUnitTests {
         // The multiple calendar instances are to protect against running this test when the day flips
         final Calendar before = Calendar.getInstance(JobConstants.UTC);
         this.task.run();
-        Assert.assertThat(this.numDeletedJobs.get(), Matchers.is(deletedCount1));
-        Mockito
-            .verify(this.deletionTimerId, Mockito.times(1))
-            .withTags(MetricsUtils.newSuccessTagsMap());
         this.task.run();
         final Calendar after = Calendar.getInstance(JobConstants.UTC);
-        Assert.assertThat(this.numDeletedJobs.get(), Matchers.is(deletedCount2 + deletedCount3));
-        Mockito
-            .verify(this.deletionTimerId, Mockito.times(2))
-            .withTags(MetricsUtils.newSuccessTagsMap());
-        Mockito
-            .verify(this.deletionTimer, Mockito.times(2))
-            .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
 
         if (before.get(Calendar.DAY_OF_YEAR) == after.get(Calendar.DAY_OF_YEAR)) {
             Mockito
@@ -192,15 +152,6 @@ public class DatabaseCleanupTaskUnitTests {
             )
             .thenThrow(new RuntimeException("test"));
 
-        try {
-            this.task.run();
-        } finally {
-            Mockito
-                .verify(this.deletionTimerId, Mockito.times(1))
-                .withTags(MetricsUtils.newFailureTagsMapForException(new RuntimeException()));
-            Mockito
-                .verify(this.deletionTimer, Mockito.times(1))
-                .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
-        }
+        this.task.run();
     }
 }

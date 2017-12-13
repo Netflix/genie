@@ -2,16 +2,13 @@ ext {
     metaModelIgnorePattern = "**/com/netflix/genie/core/jpa/entities/*_.java"
 }
 
-configurations {
-    jpaModelGen
-}
-
 dependencies {
     /*******************************
      * Compile Dependencies
      *******************************/
 
     compile project(":genie-common")
+    compile project(":genie-proto")
 
     // JSON Patch Support
     compile("com.github.fge:json-patch")
@@ -20,6 +17,9 @@ dependencies {
     compile("commons-httpclient:commons-httpclient")
     compile("commons-io:commons-io")
     compile("org.apache.commons:commons-exec")
+
+    // Hibernate Metamodel Generator Libraries
+    compileOnly("org.hibernate:hibernate-jpamodelgen")
 
     // Netflix Libs
     compile("com.netflix.spectator:spectator-api")
@@ -30,6 +30,7 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-mail")
     compile("org.springframework.retry:spring-retry")
     compile("org.springframework.cloud:spring-cloud-aws-context")
+    compile("net.devh:grpc-server-spring-boot-autoconfigure")
 
     // AWS Libs
     compile("com.amazonaws:aws-java-sdk-sts")
@@ -54,40 +55,11 @@ dependencies {
     testCompile(project(":genie-test"))
     testCompile("org.dbunit:dbunit")
     testCompile("com.github.springtestdbunit:spring-test-dbunit")
-
-    /*******************************
-     * JPA Model Gen Dependencies
-     *******************************/
-
-    // Hibernate Metamodel Generator Libraries
-    jpaModelGen("org.hibernate:hibernate-jpamodelgen")
-    jpaModelGen("org.projectlombok:lombok")
-    jpaModelGen("com.google.code.findbugs:annotations")
-}
-
-task generateJPAMetaModel(type: JavaCompile, group: "build", description: "Generate JPA Meta Models") {
-    source = sourceSets.main.java
-    outputs.dir generatedSourcesJavaDir
-    destinationDir = generatedSourcesJavaDir
-    classpath = configurations.compile + configurations.jpaModelGen
-    options.compilerArgs = [
-            "-proc:only"
-    ]
-}
-
-compileJava {
-    dependsOn generateJPAMetaModel
-}
+    testCompile("io.grpc:grpc-testing")
 
 //Ignore the generated classes from all our style/coverage/bug finding tools
 tasks.withType(Checkstyle) {
     exclude metaModelIgnorePattern
-}
-
-tasks.withType(FindBugs) {
-    classes = classes.filter {
-        !it.path.contains("_")
-    }
 }
 
 tasks.withType(Pmd) {
@@ -104,4 +76,8 @@ jacocoTestReport {
     doFirst {
         classDirectories = fileTree(dir: "${buildDir}/classes/main/").exclude(["com/netflix/genie/core/jpa/entities/*_*"])
     }
+}
+
+license {
+  exclude "**/com/netflix/genie/core/jpa/entities/*_.java"
 }

@@ -34,17 +34,3 @@ genie:
       location: "file:///tmp/"
     archive:
       location: /archive/location
-
-spring:
-  jpa:
-    hibernate:
-      ddl-auto: none
-      naming:
-        strategy: org.hibernate.cfg.ImprovedNamingStrategy
-  datasource:
-    url: jdbc:hsqldb:mem:genie-int-db;shutdown=true
-    username: SA
-    password:
-    tomcat:
-      max-active: 5
-      jdbc-interceptors: org.apache.tomcat.jdbc.pool.interceptor.QueryTimeoutInterceptor

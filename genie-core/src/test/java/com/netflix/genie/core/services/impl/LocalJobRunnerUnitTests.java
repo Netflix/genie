@@ -148,7 +148,6 @@ public class LocalJobRunnerUnitTests {
             USER,
             VERSION,
             null,
-            null,
             null
         )
             .withId(JOB_1_ID)

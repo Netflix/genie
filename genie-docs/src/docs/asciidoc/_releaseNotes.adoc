@@ -2,6 +2,58 @@
 
 The following are the release notes for Genie {revnumber}.
 
+=== Features
+
+* Complete database schema and interaction code re-write for more normalization
+** Allows more insights into job and user behavior by breaking apart large JSON blobs and other denormalized fields
+** Improved cluster selection algorithm to speed up selection
+** Projections on tables improve data transfer speeds
+** Merge jobs tables to reduce duplicate data
+** Surrogate primary keys for improved join performance and space usage vs. Sting based external unique ids
+* New fields added to jobs
+** `grouping`
+*** A way to provide search for jobs related to each other. E.g. The name of an entire workflow in a job scheduler can
+be set in this field to provide way to find all the jobs related to this workflow
+*** Added to search API as optional field
+** `groupingInstance`
+*** Building on `grouping` this provides a field for the unique instance of the grouping e.g. the run identifier of the
+workflow
+*** Added to search API as optional field
+* New field(s) added to Job Request, Job, Cluster, Command, Application
+** `metadata`
+*** Allows users to insert any additional metadata they wish to these resources. *MUST* be valid JSON.
+*** Stored as blob so no search available. Meant for use by higher level systems to take metadata and parse it
+themselves for use in building up business use cases (lineage, relationships, etc) that the Genie data model doesn't
+support natively
+
+=== Upgrade Instructions
+
+https://flywaydb.org/[Flyway] will upgrade the database schema for you. Due to performance reasons at large
+scale, the data for jobs are not copied over between versions by default. Data for applications, commands and clusters
+are copied so as not to interrupt operation. If you desire to copy over your old job data the tables were copied over
+into {tableName}_old and for
+https://raw.githubusercontent.com/Netflix/genie/v{revnumber}/genie-ddl/src/main/sql/mysql/load-3.2.x-job-data-to-3.3.0.mysql.sql[MySQL]
+and
+https://raw.githubusercontent.com/Netflix/genie/v{revnumber}/genie-ddl/src/main/sql/postgresql/load-3.2.x-job-data-to-3.3.0.postgresql.sql[PostgreSQL]
+scripts exist to copy over the job data. You can execute these scripts on your database and they should be able to run
+while your application is active and copy over data in the background.
+
+NOTE: If you run the data movement scripts it will remove the old tables. If you don't they will sit in your schema.
+The next major Genie release will remove these tables in their schema upgrade scripts if they still exist. Feel free to
+drop them yourself if they're no longer needed.
+
+=== Library Upgrades
+
+* Upgrade Spring Boot to {springBootVersion}
+* Upgrade to Spring Platform IO {springPlatformVersion} for library dependency management
+** http://docs.spring.io/platform/docs/{springPlatformVersion}/reference/htmlsingle/[Reference Docs]
+* Upgrade to Spring Cloud {springCloudVersion} for cloud dependency management
+** http://cloud.spring.io/spring-cloud-static/{springCloudVersion}/[Reference Docs]
+
+== 3.2.0 Release Notes
+
+The following are the release notes for Genie 3.2.0.
+
 === Upgrade Instructions
 
 If upgrading from existing 3.1.x installation run appropriate database upgrade script:
@@ -24,11 +76,11 @@ new table `schema_version`. Do not delete or modify this table it is used by Fly
 
 === Library Upgrades
 
-* Upgrade Spring Boot to {springBootVersion}
-* Upgrade to Spring Platform IO {springPlatformVersion} for library dependency management
-** http://docs.spring.io/platform/docs/{springPlatformVersion}/reference/htmlsingle/[Reference Docs]
-* Upgrade to Spring Cloud {springCloudVersion} for cloud dependency management
-** http://cloud.spring.io/spring-cloud-static/{springCloudVersion}/[Reference Docs]
+* Upgrade Spring Boot to 1.5.7.RELEASE
+* Upgrade to Spring Platform IO Brussels-SR5 for library dependency management
+** http://docs.spring.io/platform/docs/Brussels-SR5/reference/htmlsingle/[Reference Docs]
+* Upgrade to Spring Cloud Dalston.SR3 for cloud dependency management
+** http://cloud.spring.io/spring-cloud-static/Dalston.SR3/[Reference Docs]
 
 === Property Changes
 

@@ -90,6 +90,7 @@ public abstract class RestControllerIntegrationTestsBase {
     static final String VERSION_PATH = "$.version";
     static final String USER_PATH = "$.user";
     static final String DESCRIPTION_PATH = "$.description";
+    static final String METADATA_PATH = "$.metadata";
     static final String TAGS_PATH = "$.tags";
     static final String SETUP_FILE_PATH = "$.setupFile";
     static final String STATUS_PATH = "$.status";

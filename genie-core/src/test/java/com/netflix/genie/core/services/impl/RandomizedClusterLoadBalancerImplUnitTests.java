@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.core.services.impl;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
@@ -59,7 +59,7 @@ public class RandomizedClusterLoadBalancerImplUnitTests {
         final Cluster cluster3 = Mockito.mock(Cluster.class);
         Assert.assertNotNull(
             this.clb.selectCluster(
-                Lists.newArrayList(cluster1, cluster2, cluster3),
+                Sets.newHashSet(cluster1, cluster2, cluster3),
                 Mockito.mock(JobRequest.class)
             )
         );
@@ -76,7 +76,7 @@ public class RandomizedClusterLoadBalancerImplUnitTests {
         Assert.assertEquals(
             cluster1,
             this.clb.selectCluster(
-                Lists.newArrayList(cluster1),
+                Sets.newHashSet(cluster1),
                 Mockito.mock(JobRequest.class)
             )
         );

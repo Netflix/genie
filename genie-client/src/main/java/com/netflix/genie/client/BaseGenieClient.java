@@ -44,7 +44,7 @@ import java.util.concurrent.TimeUnit;
  * @author amsharma
  * @since 3.0.0
  */
-public abstract class BaseGenieClient {
+abstract class BaseGenieClient {
 
     private Retrofit retrofit;
     private ObjectMapper mapper;
@@ -57,7 +57,7 @@ public abstract class BaseGenieClient {
      * @param genieNetworkConfiguration A configuration object that provides network settings for HTTP calls.
      * @throws GenieClientException If there is any problem creating the constructor.
      */
-    public BaseGenieClient(
+    BaseGenieClient(
         @NotEmpty final String url,
         @Nullable final List<Interceptor> interceptors,
         @Nullable final GenieNetworkConfiguration genieNetworkConfiguration
@@ -120,15 +120,15 @@ public abstract class BaseGenieClient {
      * @param location The location string in the header.
      * @return The id of the entity embedded in the location.
      */
-    protected String getIdFromLocation(final String location) {
+    String getIdFromLocation(final String location) {
         return location.substring(location.lastIndexOf("/") + 1);
     }
 
-    protected <T> T getService(final Class<T> clazz) {
+    <T> T getService(final Class<T> clazz) {
         return this.retrofit.create(clazz);
     }
 
-    protected <T> T treeToValue(final JsonNode node, final Class<T> clazz) throws IOException {
+    <T> T treeToValue(final JsonNode node, final Class<T> clazz) throws IOException {
         return this.mapper.treeToValue(node, clazz);
     }
 }

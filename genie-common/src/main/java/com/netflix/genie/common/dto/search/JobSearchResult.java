@@ -41,7 +41,7 @@ import java.util.Optional;
  * @since 3.0.0
  */
 @Getter
-@EqualsAndHashCode(callSuper = true, of = {})
+@EqualsAndHashCode(callSuper = true)
 public class JobSearchResult extends BaseSearchResult {
 
     private static final long serialVersionUID = -3886685874572773514L;

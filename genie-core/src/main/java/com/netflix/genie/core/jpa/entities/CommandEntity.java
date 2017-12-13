@@ -19,17 +19,16 @@ package com.netflix.genie.core.jpa.entities;
 
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
-import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
 
+import javax.annotation.Nullable;
 import javax.persistence.Basic;
-import javax.persistence.CollectionTable;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -38,8 +37,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OrderColumn;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -57,9 +54,10 @@ import java.util.Set;
  */
 @Getter
 @Setter
+@ToString(callSuper = true, exclude = {"configs", "dependencies", "tags", "applications", "clusters"})
 @Entity
 @Table(name = "commands")
-public class CommandEntity extends SetupFileEntity {
+public class CommandEntity extends BaseEntity {
 
     private static final long serialVersionUID = -8058995173025433517L;
 
@@ -85,16 +83,43 @@ public class CommandEntity extends SetupFileEntity {
     @Min(1)
     private Integer memory;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(
-        name = "command_configs",
-        joinColumns = @JoinColumn(name = "command_id", referencedColumnName = "id")
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "commands_configs",
+        joinColumns = {
+            @JoinColumn(name = "command_id", referencedColumnName = "id", nullable = false, updatable = false)
+        },
+        inverseJoinColumns = {
+            @JoinColumn(name = "file_id", referencedColumnName = "id", nullable = false, updatable = false)
+        }
     )
-    @Column(name = "config", nullable = false, length = 2048)
-    private Set<String> configs = new HashSet<>();
+    private Set<FileEntity> configs = new HashSet<>();
 
-    // TODO: Make lazy?
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "commands_dependencies",
+        joinColumns = {
+            @JoinColumn(name = "command_id", referencedColumnName = "id", nullable = false, updatable = false)
+        },
+        inverseJoinColumns = {
+            @JoinColumn(name = "file_id", referencedColumnName = "id", nullable = false, updatable = false)
+        }
+    )
+    private Set<FileEntity> dependencies = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "commands_tags",
+        joinColumns = {
+            @JoinColumn(name = "command_id", referencedColumnName = "id", nullable = false, updatable = false)
+        },
+        inverseJoinColumns = {
+            @JoinColumn(name = "tag_id", referencedColumnName = "id", nullable = false, updatable = false)
+        }
+    )
+    private Set<TagEntity> tags = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "commands_applications",
         joinColumns = {
@@ -110,14 +135,6 @@ public class CommandEntity extends SetupFileEntity {
     @ManyToMany(mappedBy = "commands", fetch = FetchType.LAZY)
     private Set<ClusterEntity> clusters = new HashSet<>();
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(
-        name = "command_dependencies",
-        joinColumns = @JoinColumn(name = "command_id", referencedColumnName = "id")
-    )
-    @Column(name = "dependency", nullable = false, length = 2048)
-    private Set<String> dependencies = new HashSet<>();
-
     /**
      * Default Constructor.
      */
@@ -126,14 +143,39 @@ public class CommandEntity extends SetupFileEntity {
     }
 
     /**
-     * Check to make sure everything is OK before persisting.
+     * Set all the files associated as configuration files for this cluster.
      *
-     * @throws GenieException If any precondition isn't met.
+     * @param configs The configuration files to set
      */
-    @PrePersist
-    @PreUpdate
-    protected void onCreateOrUpdateCommand() throws GenieException {
-        this.setTags(this.getFinalTags());
+    public void setConfigs(@Nullable final Set<FileEntity> configs) {
+        this.configs.clear();
+        if (configs != null) {
+            this.configs.addAll(configs);
+        }
+    }
+
+    /**
+     * Set all the files associated as dependency files for this cluster.
+     *
+     * @param dependencies The dependency files to set
+     */
+    public void setDependencies(@Nullable final Set<FileEntity> dependencies) {
+        this.dependencies.clear();
+        if (dependencies != null) {
+            this.dependencies.addAll(dependencies);
+        }
+    }
+
+    /**
+     * Set all the tags associated to this cluster.
+     *
+     * @param tags The dependency tags to set
+     */
+    public void setTags(@Nullable final Set<TagEntity> tags) {
+        this.tags.clear();
+        if (tags != null) {
+            this.tags.addAll(tags);
+        }
     }
 
     /**
@@ -146,26 +188,15 @@ public class CommandEntity extends SetupFileEntity {
     }
 
     /**
-     * Sets the configurations for this command.
-     *
-     * @param configs The configuration files that this command needs
-     */
-    public void setConfigs(final Set<String> configs) {
-        this.configs.clear();
-        if (configs != null) {
-            this.configs.addAll(configs);
-        }
-    }
-
-    /**
      * Sets the applications for this command.
      *
      * @param applications The application that this command uses
      * @throws GeniePreconditionException if the list of applications contains duplicates
      */
-    public void setApplications(final List<ApplicationEntity> applications) throws GeniePreconditionException {
+    public void setApplications(@Nullable final List<ApplicationEntity> applications)
+        throws GeniePreconditionException {
         if (applications != null
-            && applications.stream().map(ApplicationEntity::getId).distinct().count() != applications.size()) {
+            && applications.stream().map(ApplicationEntity::getUniqueId).distinct().count() != applications.size()) {
             throw new GeniePreconditionException("List of applications to set cannot contain duplicates");
         }
 
@@ -193,14 +224,10 @@ public class CommandEntity extends SetupFileEntity {
      * @throws GeniePreconditionException If the application is a duplicate of an existing application
      */
     public void addApplication(@NotNull final ApplicationEntity application) throws GeniePreconditionException {
-        if (
-            this.applications
-                .stream()
-                .map(ApplicationEntity::getId)
-                .filter(id -> id.equals(application.getId()))
-                .count() != 0
-            ) {
-            throw new GeniePreconditionException("An application with id " + application.getId() + " is already added");
+        if (this.applications.contains(application)) {
+            throw new GeniePreconditionException(
+                "An application with id " + application.getUniqueId() + " is already added"
+            );
         }
 
         this.applications.add(application);
@@ -222,7 +249,7 @@ public class CommandEntity extends SetupFileEntity {
      *
      * @param clusters the clusters
      */
-    protected void setClusters(final Set<ClusterEntity> clusters) {
+    protected void setClusters(@Nullable final Set<ClusterEntity> clusters) {
         this.clusters.clear();
         if (clusters != null) {
             this.clusters.addAll(clusters);
@@ -230,42 +257,18 @@ public class CommandEntity extends SetupFileEntity {
     }
 
     /**
-     * Sets the dependencies needed for this command.
-     *
-     * @param dependencies All dependencies needed for execution of this command
+     * {@inheritDoc}
      */
-    public void setDependencies(final Set<String> dependencies) {
-        this.dependencies.clear();
-        if (dependencies != null) {
-            this.dependencies.addAll(dependencies);
-        }
+    @Override
+    public boolean equals(final Object o) {
+        return super.equals(o);
     }
 
     /**
-     * Get a dto based on the information in this entity.
-     *
-     * @return The dto
+     * {@inheritDoc}
      */
-    public Command getDTO() {
-        final Command.Builder builder = new Command.Builder(
-            this.getName(),
-            this.getUser(),
-            this.getVersion(),
-            this.status,
-            this.executable,
-            this.checkDelay
-        )
-            .withId(this.getId())
-            .withCreated(this.getCreated())
-            .withUpdated(this.getUpdated())
-            .withTags(this.getTags())
-            .withConfigs(this.configs)
-            .withMemory(this.memory)
-            .withDependencies(this.dependencies);
-
-        this.getDescription().ifPresent(builder::withDescription);
-        this.getSetupFile().ifPresent(builder::withSetupFile);
-
-        return builder.build();
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 }

@@ -27,7 +27,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.List;
+import java.util.Set;
 
 /**
  * Interface for the cluster load-balancer, which returns the "best" cluster to
@@ -57,7 +57,7 @@ public interface ClusterLoadBalancer extends Ordered {
      */
     @Nullable
     Cluster selectCluster(
-        @Nonnull @NonNull @NotEmpty final List<Cluster> clusters,
+        @Nonnull @NonNull @NotEmpty final Set<Cluster> clusters,
         @Nonnull @NonNull final JobRequest jobRequest
     ) throws GenieException;
 

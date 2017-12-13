@@ -119,7 +119,7 @@ public class S3FileTransferImpl implements FileTransfer {
                 );
             } catch (AmazonS3Exception ase) {
                 log.error("Error fetching file {} from s3 due to exception {}", srcRemotePath, ase.toString());
-                throw new GenieServerException("Error downloading file from s3. Filename: " + srcRemotePath);
+                throw new GenieServerException("Error downloading file from s3. Filename: " + srcRemotePath, ase);
             }
         } catch (Throwable t) {
             MetricsUtils.addFailureTagsWithException(tags, t);
@@ -151,7 +151,7 @@ public class S3FileTransferImpl implements FileTransfer {
                 this.s3Client.putObject(s3Uri.getBucket(), s3Uri.getKey(), new File(srcLocalPath));
             } catch (AmazonS3Exception ase) {
                 log.error("Error posting file {} to s3 due to exception {}", dstRemotePath, ase.toString());
-                throw new GenieServerException("Error uploading file to s3. Filename: " + dstRemotePath);
+                throw new GenieServerException("Error uploading file to s3. Filename: " + dstRemotePath, ase);
             }
         } catch (Throwable t) {
             MetricsUtils.addFailureTagsWithException(tags, t);

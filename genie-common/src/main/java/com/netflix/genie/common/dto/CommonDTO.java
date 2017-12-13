@@ -17,11 +17,16 @@
  */
 package com.netflix.genie.common.dto;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ImmutableSet;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import lombok.Getter;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.Size;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -46,7 +51,9 @@ public abstract class CommonDTO extends BaseDTO {
     @NotEmpty(message = "A name is required and must be at most 255 characters")
     @Size(max = 255, message = "The name can be no longer than 255 characters")
     private final String name;
+    @Size(max = 1000, message = "The description can be no longer than 1000 characters")
     private final String description;
+    private final JsonNode metadata;
     private final Set<String> tags;
 
     /**
@@ -61,6 +68,7 @@ public abstract class CommonDTO extends BaseDTO {
         this.user = builder.bUser;
         this.version = builder.bVersion;
         this.description = builder.bDescription;
+        this.metadata = builder.bMetadata;
         this.tags = ImmutableSet.copyOf(builder.bTags);
     }
 
@@ -71,6 +79,15 @@ public abstract class CommonDTO extends BaseDTO {
      */
     public Optional<String> getDescription() {
         return Optional.ofNullable(this.description);
+    }
+
+    /**
+     * Get the metadata of this resource as a JSON Node.
+     *
+     * @return Optional of the metadata if it exists
+     */
+    public Optional<JsonNode> getMetadata() {
+        return Optional.ofNullable(this.metadata);
     }
 
     /**
@@ -91,6 +108,7 @@ public abstract class CommonDTO extends BaseDTO {
         private final String bUser;
         private final String bVersion;
         private String bDescription;
+        private JsonNode bMetadata;
         private Set<String> bTags = new HashSet<>();
 
         protected Builder(final String name, final String user, final String version) {
@@ -105,7 +123,7 @@ public abstract class CommonDTO extends BaseDTO {
          * @param description The description to use
          * @return The builder
          */
-        public T withDescription(final String description) {
+        public T withDescription(@Nullable final String description) {
             this.bDescription = description;
             return (T) this;
         }
@@ -120,6 +138,38 @@ public abstract class CommonDTO extends BaseDTO {
             this.bTags.clear();
             if (tags != null) {
                 this.bTags.addAll(tags);
+            }
+            return (T) this;
+        }
+
+        /**
+         * With the metadata to set for the job as a JsonNode.
+         *
+         * @param metadata The metadata to set
+         * @return The builder
+         */
+        @JsonSetter
+        public T withMetadata(@Nullable final JsonNode metadata) {
+            this.bMetadata = metadata;
+            return (T) this;
+        }
+
+        /**
+         * With the metadata to set for the job as a string of valid JSON.
+         *
+         * @param metadata The metadata to set. Must be valid JSON
+         * @return The builder
+         * @throws GeniePreconditionException On invalid JSON
+         */
+        public T withMetadata(@Nullable final String metadata) throws GeniePreconditionException {
+            if (metadata == null) {
+                this.bMetadata = null;
+            } else {
+                try {
+                    this.bMetadata = MAPPER.readTree(metadata);
+                } catch (final IOException ioe) {
+                    throw new GeniePreconditionException("Invalid JSON string passed in " + metadata, ioe);
+                }
             }
             return (T) this;
         }

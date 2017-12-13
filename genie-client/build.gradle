@@ -31,6 +31,9 @@ dependencies {
 
     testCompile(project(":genie-test"))
     testCompile(project(":genie-web"))
+
+    testCompile("org.springframework.boot:spring-boot-starter-jetty")
+    testCompile("org.springframework.cloud:spring-cloud-contract-wiremock")
 }
 
 clean {

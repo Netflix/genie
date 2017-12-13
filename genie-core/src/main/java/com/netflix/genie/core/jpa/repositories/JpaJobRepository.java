@@ -17,12 +17,17 @@ package com.netflix.genie.core.jpa.repositories;
 
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.core.jpa.entities.JobEntity;
+import com.netflix.genie.core.jpa.entities.projections.IdProjection;
+import com.netflix.genie.core.jpa.entities.projections.JobHostNameProjection;
+import com.netflix.genie.core.jpa.entities.projections.JobProjection;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.jpa.repository.Modifying;
 
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -31,21 +36,52 @@ import java.util.Set;
  *
  * @author tgianos
  */
-public interface JpaJobRepository extends JpaRepository<JobEntity, String>, JpaSpecificationExecutor {
+public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
+
+    // TODO: Make interfaces generic but be aware of https://jira.spring.io/browse/DATAJPA-1185
+
+    /**
+     * Find jobs by host name and status.
+     *
+     * @param hostName The host name to search for
+     * @param statuses The job statuses to filter by
+     * @return The jobs
+     */
+    Set<JobProjection> findByHostNameAndStatusIn(final String hostName, final Set<JobStatus> statuses);
+
+    /**
+     * Find the jobs with one of the statuses entered.
+     *
+     * @param statuses The statuses to search
+     * @return The job information requested
+     */
+    Set<JobHostNameProjection> findByStatusIn(final Set<JobStatus> statuses);
+
     /**
      * Deletes all jobs for the given ids.
      *
      * @param ids list of ids for which the jobs should be deleted
      * @return no. of jobs deleted
      */
-    Long deleteByIdIn(@NotNull final List<String> ids);
+    @Modifying
+    Long deleteByIdIn(@NotNull final List<Long> ids);
 
     /**
      * Count all jobs that belong to a given user and are in any of the given states.
      *
-     * @param user the user name
+     * @param user     the user name
      * @param statuses the set of statuses
      * @return the count of jobs matching the search criteria
      */
     Long countJobsByUserAndStatusIn(@NotBlank final String user, @NotEmpty final Set<JobStatus> statuses);
+
+    /**
+     * Returns the slice of ids for job requests created before the given date.
+     *
+     * @param date     The date before which the job requests were created
+     * @param pageable The page of data to get
+     * @return List of job request ids
+     */
+    // TODO: Explore deleteFirst{N}ByCreatedBefore
+    Slice<IdProjection> findByCreatedBefore(@NotNull final Date date, @NotNull Pageable pageable);
 }

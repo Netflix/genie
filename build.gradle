@@ -1,9 +1,6 @@
 buildscript {
     repositories {
         jcenter()
-        maven {
-            url "http://repo.spring.io/milestone"
-        }
     }
 
     dependencies {
@@ -11,13 +8,13 @@ buildscript {
         classpath("org.asciidoctor:asciidoctor-gradle-plugin:1.5.3")
         classpath("gradle.plugin.com.gorylenko.gradle-git-properties:gradle-git-properties:1.4.17")
         classpath("com.netflix.nebula:gradle-aggregate-javadocs-plugin:3.0.1")
+        classpath("com.google.protobuf:protobuf-gradle-plugin:0.8.3")
     }
 }
 
 plugins {
     id "com.github.kt3k.coveralls" version "2.8.1"
-    id "io.spring.dependency-management" version "1.0.3.RELEASE"
-    id "nebula.netflixoss" version "4.0.0"
+    id "nebula.netflixoss" version "4.1.0"
     id "org.ajoberstar.github-pages" version "1.7.2"
 }
 
@@ -36,9 +33,6 @@ allprojects {
 
     repositories {
         jcenter()
-        maven {
-            url "http://repo.spring.io/milestone"
-        }
     }
 }
 
@@ -71,7 +65,7 @@ configure(javaProjects) {
             mavenBom "org.springframework.cloud:spring-cloud-dependencies:${spring_cloud_version}"
         }
         dependencies {
-            dependency("cglib:cglib-nodep:3.2.4")
+            dependency("cglib:cglib-nodep:3.2.5")
             dependency("com.github.fge:json-patch:1.9")
             dependency("com.github.springtestdbunit:spring-test-dbunit:1.3.0")
             dependencySet(group: "com.squareup.retrofit2", version: "2.1.0") {
@@ -82,7 +76,7 @@ configure(javaProjects) {
                 entry "servo-core"
                 entry "servo-internal"
             }
-            dependencySet(group: "com.netflix.spectator", version: "0.56.0") {
+            dependencySet(group: "com.netflix.spectator", version: "0.60.0") {
                 entry "spectator-api"
                 entry "spectator-reg-servo"
             }
@@ -91,13 +85,13 @@ configure(javaProjects) {
                 entry "springfox-swagger-ui"
                 entry "springfox-bean-validators"
             }
-            dependency("commons-validator:commons-validator:1.5.1")
+            dependency("commons-validator:commons-validator:1.6")
             dependency("net.sf.jtidy:jtidy:r938")
-            dependency("org.apache.commons:commons-configuration2:2.1")
+            dependency("org.apache.commons:commons-configuration2:2.2")
             dependency("org.apache.commons:commons-exec:1.3")
-            dependency("org.bitbucket.b_c:jose4j:0.5.4")
-            dependency("org.dbunit:dbunit:2.5.3")
-            dependencySet(group: "org.jruby", version:"9.1.12.0") {
+            dependency("org.bitbucket.b_c:jose4j:0.6.2")
+            dependency("org.dbunit:dbunit:2.5.4")
+            dependencySet(group: "org.jruby", version: "9.1.14.0") {
                 entry "jruby-complete"
                 entry "jruby-core"
                 entry "jruby-stdlib"
@@ -105,26 +99,40 @@ configure(javaProjects) {
             dependency("org.opensaml:opensaml:2.6.4")
             dependency("org.python:jython-standalone:2.7.1")
             dependency("org.springframework.security.extensions:spring-security-saml2-core:1.0.2.RELEASE")
+            dependencySet(group: "com.google.protobuf", version: "3.4.0") {
+              entry "protobuf-java"
+              entry "protoc"
+            }
+            dependencySet(group: "io.grpc", version: "1.6.1") {
+              entry "grpc-core"
+              entry "grpc-netty"
+              entry "grpc-stub"
+              entry "grpc-protobuf"
+              entry "protoc-gen-grpc-java"
+              entry "grpc-testing"
+            }
+            dependencySet(group: "net.devh", version: "1.3.0-RELEASE") {
+              entry "grpc-server-spring-boot-autoconfigure"
+              entry "grpc-server-spring-boot-starter"
+            }
         }
     }
 
     ext {
-        generatedSourcesDir = new File("${projectDir}/src/generated")
-        generatedSourcesJavaDir = new File(generatedSourcesDir, "/java")
+        generatedSourcesBaseDir = file("${buildDir}/generated-sources")
+        generatedSourcesDir = file(generatedSourcesBaseDir, "/main")
+        generatedSourcesJavaDir = file(new File(generatedSourcesDir, "/java"))
+        // Necessary due to limitations of proto plugin (${source-set-name}/${variant} is always appended)
+        generatedSourcesJavaProtobufDir = file(generatedSourcesBaseDir, "/main/java")
     }
 
     sourceSets {
         main {
             java {
                 srcDir generatedSourcesJavaDir
+                srcDir generatedSourcesJavaProtobufDir
             }
         }
-    }
-
-    clean {
-        delete "${projectDir}/genie-db"
-        delete "${projectDir}/data"
-        delete generatedSourcesDir.toString()
     }
 
     configurations {
@@ -169,6 +177,9 @@ configure(javaProjects) {
             excludeCategories "com.netflix.genie.test.categories.IntegrationTest"
             excludeCategories "com.netflix.genie.test.categories.DocumentationTest"
         }
+        outputs.upToDateWhen {
+            return false
+        }
     }
 
     task integrationTests(type: Test, group: "verification") {
@@ -176,6 +187,9 @@ configure(javaProjects) {
             includeCategories "com.netflix.genie.test.categories.IntegrationTest"
             excludeCategories "com.netflix.genie.test.categories.UnitTest"
             excludeCategories "com.netflix.genie.test.categories.DocumentationTest"
+        }
+        outputs.upToDateWhen {
+            return false
         }
     }
 
@@ -185,11 +199,32 @@ configure(javaProjects) {
             excludeCategories "com.netflix.genie.test.categories.UnitTest"
             excludeCategories "com.netflix.genie.test.categories.IntegrationTest"
         }
+        outputs.upToDateWhen {
+            return false
+        }
+    }
+
+    task removeGeneratedSources(type: Delete) {
+        generatedSourcesDir.deleteDir()
+    }
+
+    task removeIdeaOutDirectory(type: Delete) {
+        file("${projectDir}/out").deleteDir()
+    }
+
+    clean {
+        dependsOn(removeIdeaOutDirectory)
     }
 
     compileJava {
+        doFirst {
+            generatedSourcesDir.mkdirs()
+            generatedSourcesJavaDir.mkdirs()
+        }
+        dependsOn(removeGeneratedSources)
         options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
         options.incremental = true
+        options.compilerArgs += ['-s', generatedSourcesJavaDir]
     }
 
     compileTestJava {
@@ -202,9 +237,14 @@ configure(javaProjects) {
             minHeapSize = "256m"
             maxHeapSize = "2g"
 
-            // If the project is running on a CI server
-            if (System.getenv("CI") != null) {
-                systemProperty "CI", System.getenv("CI")
+            // Environment properties to be forwarded to the test runtime
+            [
+                    "CI",
+                    "INTEGRATION_TEST_DB",
+            ].each { envVariableName ->
+                if (System.getenv(envVariableName) != null) {
+                    systemProperty envVariableName, System.getenv(envVariableName)
+                }
             }
 
             reports.html.destination = file("${reporting.baseDir}/test/${task.name}")
@@ -212,7 +252,7 @@ configure(javaProjects) {
     }
 
     license {
-        excludes(["${projectDir}/src/generated/*"])
+        ignoreFailures false
     }
 
     checkstyle {

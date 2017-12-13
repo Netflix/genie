@@ -35,7 +35,6 @@ import com.netflix.genie.core.services.CommandService;
 import com.netflix.genie.test.categories.IntegrationTest;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -117,16 +116,6 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(5, cluster2.getTags().size());
         Assert.assertEquals(2, cluster2.getConfigs().size());
         Assert.assertEquals(0, cluster2.getDependencies().size());
-    }
-
-    /**
-     * Test the get cluster method.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testGetClusterNull() throws GenieException {
-        this.service.getCluster(null);
     }
 
     /**
@@ -285,23 +274,6 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
-     * Test the get clusters method order by a collection field should return the order by default value (updated).
-     */
-    @Ignore
-    @Test
-    public void testGetClustersOrderBysCollectionField() {
-        final Pageable tagPage = new PageRequest(0, 10, Sort.Direction.DESC, "tags");
-        final Page<Cluster> clusters = this.service.getClusters(null, null, null, null, null, tagPage);
-        Assert.assertEquals(2, clusters.getNumberOfElements());
-        Assert.assertEquals(
-            CLUSTER_2_ID, clusters.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new)
-        );
-        Assert.assertEquals(
-            CLUSTER_1_ID, clusters.getContent().get(1).getId().orElseThrow(IllegalArgumentException::new)
-        );
-    }
-
-    /**
      * Test the choseClusterForJobRequest function.
      *
      * @throws GenieException For any problem
@@ -312,12 +284,10 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
             Lists.newArrayList(new ClusterCriteria(Sets.newHashSet("genie.id:cluster1"))),
             Sets.newHashSet("pig")
         ).build();
         final JobRequest two = new JobRequest.Builder(
-            UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
@@ -328,12 +298,10 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
             Lists.newArrayList(new ClusterCriteria(Sets.newHashSet("genie.id:cluster1"))),
             Sets.newHashSet("pi")
         ).build();
         final JobRequest four = new JobRequest.Builder(
-            UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
@@ -344,19 +312,16 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
             Lists.newArrayList(new ClusterCriteria(Sets.newHashSet("pig", "hive"))),
             Sets.newHashSet("pig")
         ).build();
 
-        Assert.assertThat(this.service.chooseClusterForJobRequest(one).size(), Matchers.is(1));
-        Assert.assertThat(this.service.chooseClusterForJobRequest(two).size(), Matchers.is(0));
-        Assert.assertThat(this.service.chooseClusterForJobRequest(three).size(), Matchers.is(0));
-        Assert.assertThat(this.service.chooseClusterForJobRequest(four).size(), Matchers.is(2));
-        Assert.assertThat(this.service.chooseClusterForJobRequest(five).size(), Matchers.is(2));
+        Assert.assertThat(this.service.findClustersAndCommandsForJob(one).size(), Matchers.is(1));
+        Assert.assertThat(this.service.findClustersAndCommandsForJob(two).size(), Matchers.is(0));
+        Assert.assertThat(this.service.findClustersAndCommandsForJob(three).size(), Matchers.is(0));
+        Assert.assertThat(this.service.findClustersAndCommandsForJob(four).size(), Matchers.is(2));
+        Assert.assertThat(this.service.findClustersAndCommandsForJob(five).size(), Matchers.is(2));
     }
-
-    // TODO Add tests where jobRequest object is
 
     /**
      * Test the create method.
@@ -434,16 +399,6 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
                 ge.getErrorCode()
             );
         }
-    }
-
-    /**
-     * Test to make sure an exception is thrown when null is entered.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testCreateClusterNull() throws GenieException {
-        this.service.createCluster(null);
     }
 
     /**
@@ -546,26 +501,6 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
-     * Test to update a cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testUpdateClusterNullId() throws GenieException {
-        this.service.updateCluster(null, this.service.getCluster(CLUSTER_1_ID));
-    }
-
-    /**
-     * Test to update a cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testUpdateClusterNullUpdateCluster() throws GenieException {
-        this.service.updateCluster(CLUSTER_1_ID, null);
-    }
-
-    /**
      * Test to patch a cluster.
      *
      * @throws GenieException For any problem
@@ -638,16 +573,6 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
-     * Test delete.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testDeleteNoId() throws GenieException {
-        this.service.deleteCluster(null);
-    }
-
-    /**
      * Test add configurations to cluster.
      *
      * @throws GenieException For any problem
@@ -667,26 +592,6 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertTrue(finalConfigs.contains(newConfig1));
         Assert.assertTrue(finalConfigs.contains(newConfig2));
         Assert.assertTrue(finalConfigs.contains(newConfig3));
-    }
-
-    /**
-     * Test add configurations to cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testAddConfigsToClusterNoId() throws GenieException {
-        this.service.addConfigsForCluster(null, Sets.newHashSet());
-    }
-
-    /**
-     * Test add configurations to cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testAddConfigsToClusterNoConfigs() throws GenieException {
-        this.service.addConfigsForCluster(CLUSTER_1_ID, null);
     }
 
     /**
@@ -712,16 +617,6 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
-     * Test update configurations for cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testUpdateConfigsForClusterNoId() throws GenieException {
-        this.service.updateConfigsForCluster(null, Sets.newHashSet());
-    }
-
-    /**
      * Test get configurations for cluster.
      *
      * @throws GenieException For any problem
@@ -730,16 +625,6 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
     public void testGetConfigsForCluster() throws GenieException {
         Assert.assertEquals(1,
             this.service.getConfigsForCluster(CLUSTER_1_ID).size());
-    }
-
-    /**
-     * Test get configurations to cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testGetConfigsForClusterNoId() throws GenieException {
-        this.service.getConfigsForCluster(null);
     }
 
     /**
@@ -765,26 +650,6 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
-     * Test add dependencies to cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testAddDependenciesToClusterNoId() throws GenieException {
-        this.service.addDependenciesForCluster(null, Sets.newHashSet());
-    }
-
-    /**
-     * Test add dependencies to cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testAddDependenciesToClusterNoDependencies() throws GenieException {
-        this.service.addDependenciesForCluster(CLUSTER_1_ID, null);
-    }
-
-    /**
      * Test update configurations for cluster.
      *
      * @throws GenieException For any problem
@@ -807,16 +672,6 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
-     * Test update configurations for cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testUpdateDependenciesForClusterNoId() throws GenieException {
-        this.service.updateDependenciesForCluster(null, Sets.newHashSet());
-    }
-
-    /**
      * Test get configurations for cluster.
      *
      * @throws GenieException For any problem
@@ -825,16 +680,6 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
     public void testGetDependenciesForCluster() throws GenieException {
         Assert.assertEquals(2,
             this.service.getDependenciesForCluster(CLUSTER_1_ID).size());
-    }
-
-    /**
-     * Test get configurations to cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testGetDependenciesForClusterNoId() throws GenieException {
-        this.service.getDependenciesForCluster(null);
     }
 
     /**
@@ -873,26 +718,6 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(5, commands.size());
         Assert.assertEquals(command1Id, commands.get(3).getId().orElseThrow(IllegalArgumentException::new));
         Assert.assertEquals(command2Id, commands.get(4).getId().orElseThrow(IllegalArgumentException::new));
-    }
-
-    /**
-     * Test adding commands to the cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testAddCommandsForClusterNoId() throws GenieException {
-        this.service.addCommandsForCluster(null, new ArrayList<>());
-    }
-
-    /**
-     * Test adding commands to the cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testAddCommandsForClusterNoCommands() throws GenieException {
-        this.service.addCommandsForCluster(UUID.randomUUID().toString(), null);
     }
 
     /**
@@ -959,26 +784,6 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
-     * Test updating commands for the cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testUpdateCommandsForClusterNoId() throws GenieException {
-        this.service.setCommandsForCluster(null, new ArrayList<>());
-    }
-
-    /**
-     * Test updating commands for the cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testUpdateCommandsForClusterNoCommands() throws GenieException {
-        this.service.setCommandsForCluster(UUID.randomUUID().toString(), null);
-    }
-
-    /**
      * Test removing all commands for the cluster.
      *
      * @throws GenieException For any problem
@@ -995,41 +800,11 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
      *
      * @throws GenieException For any problem
      */
-    @Test(expected = ConstraintViolationException.class)
-    public void testRemoveAllCommandsForClusterNoId() throws GenieException {
-        this.service.removeAllCommandsForCluster(null);
-    }
-
-    /**
-     * Test removing all commands for the cluster.
-     *
-     * @throws GenieException For any problem
-     */
     @Test
     public void testRemoveCommandForCluster() throws GenieException {
         Assert.assertEquals(3, this.service.getCommandsForCluster(CLUSTER_1_ID, null).size());
         this.service.removeCommandForCluster(CLUSTER_1_ID, COMMAND_1_ID);
         Assert.assertEquals(2, this.service.getCommandsForCluster(CLUSTER_1_ID, null).size());
-    }
-
-    /**
-     * Test removing all commands for the cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testRemoveCommandForClusterNoId() throws GenieException {
-        this.service.removeCommandForCluster(null, COMMAND_1_ID);
-    }
-
-    /**
-     * Test removing all commands for the cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testRemoveCommandForClusterNoCmdId() throws GenieException {
-        this.service.removeCommandForCluster(CLUSTER_1_ID, null);
     }
 
     /**
@@ -1055,26 +830,6 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
-     * Test add tags to cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testAddTagsToClusterNoId() throws GenieException {
-        this.service.addTagsForCluster(null, Sets.newHashSet());
-    }
-
-    /**
-     * Test add tags to cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testAddTagsToClusterNoTags() throws GenieException {
-        this.service.addTagsForCluster(CLUSTER_1_ID, null);
-    }
-
-    /**
      * Test update tags for cluster.
      *
      * @throws GenieException For any problem
@@ -1097,16 +852,6 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
-     * Test update tags for cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testUpdateTagsForClusterNoId() throws GenieException {
-        this.service.updateTagsForCluster(null, Sets.newHashSet());
-    }
-
-    /**
      * Test get tags for cluster.
      *
      * @throws GenieException For any problem
@@ -1115,16 +860,6 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
     public void testGetTagsForCluster() throws GenieException {
         Assert.assertEquals(5,
             this.service.getTagsForCluster(CLUSTER_1_ID).size());
-    }
-
-    /**
-     * Test get tags to cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testGetTagsForClusterNoId() throws GenieException {
-        this.service.getTagsForCluster(null);
     }
 
     /**
@@ -1140,16 +875,6 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
     }
 
     /**
-     * Test remove all tags for cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testRemoveAllTagsForClusterNoId() throws GenieException {
-        this.service.removeAllTagsForCluster(null);
-    }
-
-    /**
      * Test remove tag for cluster.
      *
      * @throws GenieException For any problem
@@ -1159,25 +884,5 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertTrue(this.service.getTagsForCluster(CLUSTER_1_ID).contains("prod"));
         this.service.removeTagForCluster(CLUSTER_1_ID, "prod");
         Assert.assertFalse(this.service.getTagsForCluster(CLUSTER_1_ID).contains("prod"));
-    }
-
-    /**
-     * Test remove tag for cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testRemoveTagForClusterNullTag() throws GenieException {
-        this.service.removeTagForCluster(CLUSTER_1_ID, null);
-    }
-
-    /**
-     * Test remove configuration for cluster.
-     *
-     * @throws GenieException For any problem
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testRemoveTagForClusterNoId() throws GenieException {
-        this.service.removeTagForCluster(null, "something");
     }
 }

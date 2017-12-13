@@ -17,154 +17,138 @@
  */
 package com.netflix.genie.core.jpa.entities;
 
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.hibernate.validator.constraints.Length;
+import com.netflix.genie.core.jpa.entities.projections.BaseProjection;
+import com.netflix.genie.core.jpa.entities.projections.SetupFileProjection;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import org.hibernate.validator.constraints.NotBlank;
 
+import javax.annotation.Nullable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
-import javax.persistence.Id;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Version;
-import java.io.Serializable;
-import java.util.Date;
+import javax.validation.constraints.Size;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Abstract class to support basic columns for all entities for genie.
+ * The base for all Genie top level entities. e.g. Applications, Jobs, etc.
  *
+ * @author amsharma
  * @author tgianos
+ * @since 2.0.0
  */
+@Getter
+@Setter
+@EqualsAndHashCode(of = "uniqueId", callSuper = false)
+@ToString(callSuper = true, exclude = {"description", "setupFile"})
 @MappedSuperclass
-@Slf4j
-public class BaseEntity implements Serializable {
+public class BaseEntity extends AuditEntity implements BaseProjection, SetupFileProjection {
 
-    private static final long serialVersionUID = 7526472297322776147L;
-
-    @Id
-    @Column(name = "id", updatable = false)
-    @Length(max = 255, message = "Max length of id in database is 255 characters")
-    private String id;
+    private static final long serialVersionUID = -5040659007494311180L;
 
     @Basic(optional = false)
-    @Column(name = "created", nullable = false, updatable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date created = new Date();
+    @Column(name = "unique_id", nullable = false, unique = true, updatable = false)
+    @NotBlank(message = "A unique identifier is missing and is required.")
+    @Size(max = 255, message = "Max length in database is 255 characters")
+    private String uniqueId = UUID.randomUUID().toString();
 
     @Basic(optional = false)
-    @Column(name = "updated", nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updated = new Date();
+    @Column(name = "version", nullable = false)
+    @NotBlank(message = "Version is missing and is required.")
+    @Size(max = 255, message = "Max length in database is 255 characters")
+    private String version;
 
-    @Version
-    @Column(name = "entity_version", nullable = false)
-    private Integer entityVersion;
+    @Basic(optional = false)
+    @Column(name = "genie_user", nullable = false)
+    @NotBlank(message = "User name is missing and is required.")
+    @Size(max = 255, message = "Max length in database is 255 characters")
+    private String user;
+
+    @Basic(optional = false)
+    @Column(name = "name", nullable = false)
+    @NotBlank(message = "Name is missing and is required.")
+    @Size(max = 255, message = "Max length in database is 255 characters")
+    private String name;
+
+    @Basic
+    @Column(name = "description", length = 1000)
+    @Size(max = 1000, message = "Max length in database is 1000 characters")
+    private String description;
+
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "metadata")
+    private String metadata;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "setup_file")
+    private FileEntity setupFile;
 
     /**
-     * Updates the created and updated timestamps to be creation time.
+     * Default constructor.
      */
-    @PrePersist
-    protected void onCreateBaseEntity() {
-        final Date date = new Date();
-        this.updated = date;
-        this.created = date;
-
-        //Make sure we have an id if one wasn't entered beforehand
-        if (this.id == null) {
-            this.id = UUID.randomUUID().toString();
-        }
+    BaseEntity() {
+        super();
     }
 
     /**
-     * On any update to the entity will update the update time.
-     */
-    @PreUpdate
-    protected void onUpdateBaseEntity() {
-        this.updated = new Date();
-    }
-
-    /**
-     * Get the id.
+     * Gets the description of this entity.
      *
-     * @return The id
+     * @return description
      */
-    public String getId() {
-        return this.id;
+    public Optional<String> getDescription() {
+        return Optional.ofNullable(this.description);
     }
 
     /**
-     * Set the id.
+     * Set the description of this entity.
      *
-     * @param id The id to set. Not null/empty/blank.
-     * @throws GeniePreconditionException When precondition isn't met.
+     * @param description The description
      */
-    public void setId(final String id) throws GeniePreconditionException {
-        if (StringUtils.isBlank(this.id)) {
-            this.id = id;
-        } else {
-            throw new GeniePreconditionException("Id already set for this entity.");
-        }
+    public void setDescription(@Nullable final String description) {
+        this.description = description;
     }
 
     /**
-     * Get when this entity was created.
+     * Get the metadata of this entity which is unstructured JSON.
      *
-     * @return The created timestamps
+     * @return Optional of the metadata json node represented as a string
      */
-    public Date getCreated() {
-        return new Date(this.created.getTime());
+    public Optional<String> getMetadata() {
+        return Optional.ofNullable(this.metadata);
     }
 
     /**
-     * Set the created timestamp. This is a No-Op. Set once by system.
+     * Set the JSON metadata of this entity.
      *
-     * @param created The created timestamp
+     * @param metadata The metadata of this
      */
-    public void setCreated(final Date created) {
-        log.debug("Tried to set created to {} for entity {}. Will not be persisted.", created, this.id);
-        if (created.before(this.created)) {
-            this.created = new Date(created.getTime());
-        }
+    public void setMetadata(@Nullable final String metadata) {
+        this.metadata = metadata;
     }
 
     /**
-     * Get the time this entity was updated.
+     * Get the setup file for this entity.
      *
-     * @return The updated timestamp
+     * @return The setup file as an Optional in case it's null
      */
-    public Date getUpdated() {
-        return new Date(this.updated.getTime());
+    public Optional<FileEntity> getSetupFile() {
+        return Optional.ofNullable(this.setupFile);
     }
 
     /**
-     * Set the time this entity was updated. This is a No-Op. Updated automatically by system.
+     * Set the setup file for this entity.
      *
-     * @param updated The updated timestamp
+     * @param setupFile The setup file. Null clears reference in the database
      */
-    public void setUpdated(final Date updated) {
-        this.updated = new Date(updated.getTime());
-    }
-
-    /**
-     * Get the version of this entity.
-     *
-     * @return The entityVersion of this entity as handled by JPA
-     */
-    public Integer getEntityVersion() {
-        return this.entityVersion;
-    }
-
-    /**
-     * Set the version of this entity. Shouldn't be called. Handled by JPA.
-     *
-     * @param entityVersion The new entityVersion
-     */
-    protected void setEntityVersion(final Integer entityVersion) {
-        this.entityVersion = entityVersion;
+    public void setSetupFile(@Nullable final FileEntity setupFile) {
+        this.setupFile = setupFile;
     }
 }

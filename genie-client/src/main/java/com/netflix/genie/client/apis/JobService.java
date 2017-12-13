@@ -65,9 +65,8 @@ public interface JobService {
     /**
      * Submit a job with attachments.
      *
-     * @param request A JobRequest object containing all the details needed to run the job.
+     * @param request     A JobRequest object containing all the details needed to run the job.
      * @param attachments A list of all the attachment files to be sent to the server.
-     *
      * @return A callable object.
      */
     @Multipart
@@ -79,20 +78,21 @@ public interface JobService {
     /**
      * Method to get all jobs from Genie.
      *
-     * @param id          id for job
-     * @param name        name of job (can be a SQL-style pattern such as HIVE%)
-     * @param user        user who submitted job
-     * @param statuses    statuses of jobs to find
-     * @param tags        tags for the job
-     * @param clusterName the name of the cluster
-     * @param clusterId   the id of the cluster
-     * @param commandName the name of the command run by the job
-     * @param commandId   the id of the command run by the job
-     * @param minStarted  The time which the job had to start after in order to be return (inclusive)
-     * @param maxStarted  The time which the job had to start before in order to be returned (exclusive)
-     * @param minFinished The time which the job had to finish after in order to be return (inclusive)
-     * @param maxFinished The time which the job had to finish before in order to be returned (exclusive)
-     *
+     * @param id               id for job
+     * @param name             name of job (can be a SQL-style pattern such as HIVE%)
+     * @param user             user who submitted job
+     * @param statuses         statuses of jobs to find
+     * @param tags             tags for the job
+     * @param clusterName      the name of the cluster
+     * @param clusterId        the id of the cluster
+     * @param commandName      the name of the command run by the job
+     * @param commandId        the id of the command run by the job
+     * @param minStarted       The time which the job had to start after in order to be return (inclusive)
+     * @param maxStarted       The time which the job had to start before in order to be returned (exclusive)
+     * @param minFinished      The time which the job had to finish after in order to be return (inclusive)
+     * @param maxFinished      The time which the job had to finish before in order to be returned (exclusive)
+     * @param grouping         The grouping the job should be a member of
+     * @param groupingInstance The grouping instance the job should be a member of
      * @return A callable object.
      */
     @GET(JOBS_URL_SUFFIX)
@@ -109,7 +109,9 @@ public interface JobService {
         @Query("minStarted") final Long minStarted,
         @Query("maxStarted") final Long maxStarted,
         @Query("minFinished") final Long minFinished,
-        @Query("maxFinished") final Long maxFinished
+        @Query("maxFinished") final Long maxFinished,
+        @Query("grouping") final String grouping,
+        @Query("groupingInstance") final String groupingInstance
     );
 
     /**

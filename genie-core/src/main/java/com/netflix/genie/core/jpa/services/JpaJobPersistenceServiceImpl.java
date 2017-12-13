@@ -18,6 +18,7 @@
 package com.netflix.genie.core.jpa.services;
 
 import com.google.common.collect.Lists;
+import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobMetadata;
@@ -30,21 +31,23 @@ import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.jpa.entities.ApplicationEntity;
 import com.netflix.genie.core.jpa.entities.ClusterEntity;
 import com.netflix.genie.core.jpa.entities.CommandEntity;
+import com.netflix.genie.core.jpa.entities.CriterionEntity;
+import com.netflix.genie.core.jpa.entities.FileEntity;
 import com.netflix.genie.core.jpa.entities.JobEntity;
-import com.netflix.genie.core.jpa.entities.JobExecutionEntity;
-import com.netflix.genie.core.jpa.entities.JobMetadataEntity;
-import com.netflix.genie.core.jpa.entities.JobRequestEntity;
 import com.netflix.genie.core.jpa.entities.projections.IdProjection;
 import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
-import com.netflix.genie.core.jpa.repositories.JpaJobExecutionRepository;
-import com.netflix.genie.core.jpa.repositories.JpaJobMetadataRepository;
+import com.netflix.genie.core.jpa.repositories.JpaFileRepository;
 import com.netflix.genie.core.jpa.repositories.JpaJobRepository;
-import com.netflix.genie.core.jpa.repositories.JpaJobRequestRepository;
+import com.netflix.genie.core.jpa.repositories.JpaTagRepository;
+import com.netflix.genie.core.services.FileService;
 import com.netflix.genie.core.services.JobPersistenceService;
+import com.netflix.genie.core.services.TagService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -70,43 +73,40 @@ import java.util.stream.Collectors;
     }
 )
 @Slf4j
-public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
+public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobPersistenceService {
 
-    private final JpaJobRepository jobRepo;
-    private final JpaJobRequestRepository jobRequestRepo;
-    private final JpaJobExecutionRepository jobExecutionRepo;
-    private final JpaJobMetadataRepository jobMetadataRepository;
-    private final JpaApplicationRepository applicationRepo;
-    private final JpaClusterRepository clusterRepo;
-    private final JpaCommandRepository commandRepo;
+    private final JpaJobRepository jobRepository;
+    private final JpaApplicationRepository applicationRepository;
+    private final JpaClusterRepository clusterRepository;
+    private final JpaCommandRepository commandRepository;
 
     /**
      * Constructor.
      *
-     * @param jobRepo               The job repository to use
-     * @param jobRequestRepo        The job request repository to use
-     * @param jobMetadataRepository The job metadata repository to use
-     * @param jobExecutionRepo      The job execution repository to use
-     * @param applicationRepo       The application repository to use
-     * @param clusterRepo           The cluster repository to use
-     * @param commandRepo           The command repository to use
+     * @param tagService            The tag service to use
+     * @param tagRepository         The tag repository to use
+     * @param fileService           The file service to use
+     * @param fileRepository        The file repository to use
+     * @param jobRepository         The job repository to use
+     * @param applicationRepository The application repository to use
+     * @param clusterRepository     The cluster repository to use
+     * @param commandRepository     The command repository to use
      */
     public JpaJobPersistenceServiceImpl(
-        @NotNull final JpaJobRepository jobRepo,
-        @NotNull final JpaJobRequestRepository jobRequestRepo,
-        @NotNull final JpaJobMetadataRepository jobMetadataRepository,
-        @NotNull final JpaJobExecutionRepository jobExecutionRepo,
-        @NotNull final JpaApplicationRepository applicationRepo,
-        @NotNull final JpaClusterRepository clusterRepo,
-        @NotNull final JpaCommandRepository commandRepo
+        final TagService tagService,
+        final JpaTagRepository tagRepository,
+        final FileService fileService,
+        final JpaFileRepository fileRepository,
+        final JpaJobRepository jobRepository,
+        final JpaApplicationRepository applicationRepository,
+        final JpaClusterRepository clusterRepository,
+        final JpaCommandRepository commandRepository
     ) {
-        this.jobRepo = jobRepo;
-        this.jobRequestRepo = jobRequestRepo;
-        this.jobMetadataRepository = jobMetadataRepository;
-        this.jobExecutionRepo = jobExecutionRepo;
-        this.applicationRepo = applicationRepo;
-        this.clusterRepo = clusterRepo;
-        this.commandRepo = commandRepo;
+        super(tagService, tagRepository, fileService, fileRepository);
+        this.jobRepository = jobRepository;
+        this.applicationRepository = applicationRepository;
+        this.clusterRepository = clusterRepository;
+        this.commandRepository = commandRepository;
     }
 
     /**
@@ -128,42 +128,12 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         );
 
         final String jobId = jobRequest.getId().orElseThrow(() -> new GeniePreconditionException("No job id entered"));
-        if (this.jobRequestRepo.exists(jobId)) {
-            throw new GenieConflictException("A job with id " + jobId + " already exists");
+        final JobEntity jobEntity = this.toEntity(jobId, jobRequest, jobMetadata, job, jobExecution);
+        try {
+            this.jobRepository.save(jobEntity);
+        } catch (final DataIntegrityViolationException e) {
+            throw new GenieConflictException("A job with id " + jobId + " already exists", e);
         }
-
-        final JobRequestEntity jobRequestEntity = this.jobRequestDtoToEntity(jobId, jobRequest);
-        final JobMetadataEntity metadataEntity = this.jobMetadataDtoToEntity(jobMetadata);
-        final JobEntity jobEntity = this.jobDtoToEntity(job);
-        final JobExecutionEntity jobExecutionEntity = this.jobExecutionDtoToEntity(jobExecution);
-
-        this.jobRequestRepo.save(jobRequestEntity);
-
-        jobEntity.setRequest(jobRequestEntity);
-        this.jobRepo.save(jobEntity);
-        metadataEntity.setRequest(jobRequestEntity);
-        this.jobMetadataRepository.save(metadataEntity);
-        jobExecutionEntity.setJob(jobEntity);
-        this.jobExecutionRepo.save(jobExecutionEntity);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void updateJobStatus(
-        @NotBlank(message = "No job id entered. Unable to update.") final String id,
-        @NotNull(message = "Status cannot be null.") final JobStatus jobStatus,
-        @NotBlank(message = "Status message cannot be empty.") final String statusMsg
-    ) throws GenieException {
-        log.debug("Called to update job with id {}, status {} and statusMsg \"{}\"", id, jobStatus, statusMsg);
-
-        final JobEntity jobEntity = this.jobRepo.findOne(id);
-        if (jobEntity == null) {
-            throw new GenieNotFoundException("No job exists for the id specified");
-        }
-
-        this.updateJobStatus(jobEntity, jobStatus, statusMsg);
     }
 
     /**
@@ -185,27 +155,23 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
             applicationIds
         );
 
-        final JobEntity job = this.jobRepo.findOne(jobId);
-        if (job == null) {
-            throw new GenieNotFoundException("No job with id " + jobId + " exists.");
-        }
+        final JobEntity job = this.jobRepository
+            .findByUniqueId(jobId)
+            .orElseThrow(() -> new GenieNotFoundException("No job with id " + jobId + " exists."));
 
-        final ClusterEntity cluster = this.clusterRepo.findOne(clusterId);
-        if (cluster == null) {
-            throw new GenieNotFoundException("Cannot find cluster with ID " + clusterId);
-        }
+        final ClusterEntity cluster = this.clusterRepository
+            .findByUniqueId(clusterId)
+            .orElseThrow(() -> new GenieNotFoundException("Cannot find cluster with ID " + clusterId));
 
-        final CommandEntity command = this.commandRepo.findOne(commandId);
-        if (command == null) {
-            throw new GenieNotFoundException("Cannot find command with ID " + commandId);
-        }
+        final CommandEntity command = this.commandRepository
+            .findByUniqueId(commandId)
+            .orElseThrow(() -> new GenieNotFoundException("Cannot find command with ID " + commandId));
 
         final List<ApplicationEntity> applications = Lists.newArrayList();
         for (final String applicationId : applicationIds) {
-            final ApplicationEntity application = this.applicationRepo.findOne(applicationId);
-            if (application == null) {
-                throw new GenieNotFoundException("Cannot find application with ID + " + applicationId);
-            }
+            final ApplicationEntity application = this.applicationRepository
+                .findByUniqueId(applicationId)
+                .orElseThrow(() -> new GenieNotFoundException("Cannot find application with ID + " + applicationId));
             applications.add(application);
         }
 
@@ -214,11 +180,25 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         job.setApplications(applications);
 
         // Save the amount of memory to allocate to the job
-        final JobExecutionEntity jobExecutionEntity = this.jobExecutionRepo.findOne(jobId);
-        if (jobExecutionEntity == null) {
-            throw new GenieNotFoundException("No job execution with id " + jobId + " exists.");
-        }
-        jobExecutionEntity.setMemory(memory);
+        job.setMemoryUsed(memory);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateJobStatus(
+        @NotBlank(message = "No job id entered. Unable to update.") final String id,
+        @NotNull(message = "Status cannot be null.") final JobStatus jobStatus,
+        @NotBlank(message = "Status message cannot be empty.") final String statusMsg
+    ) throws GenieException {
+        log.debug("Called to update job with id {}, status {} and statusMsg \"{}\"", id, jobStatus, statusMsg);
+
+        final JobEntity jobEntity = this.jobRepository
+            .findByUniqueId(id)
+            .orElseThrow(() -> new GenieNotFoundException("No job exists for the id specified"));
+
+        this.updateJobStatus(jobEntity, jobStatus, statusMsg);
     }
 
     /**
@@ -233,20 +213,14 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
     ) throws GenieException {
         log.debug("Called with to update job {} with process id {}", id, processId);
 
-        final JobEntity jobEntity = this.jobRepo.findOne(id);
-        if (jobEntity == null) {
-            throw new GenieNotFoundException("No job with id " + id + " exists. Unable to update");
-        }
-
-        final JobExecutionEntity jobExecutionEntity = this.jobExecutionRepo.findOne(id);
-        if (jobExecutionEntity == null) {
-            throw new GenieNotFoundException("No job execution with id " + id + " exists. Unable to update.");
-        }
+        final JobEntity jobEntity = this.jobRepository
+            .findByUniqueId(id)
+            .orElseThrow(() -> new GenieNotFoundException("No job with id " + id + " exists. Unable to update"));
 
         this.updateJobStatus(jobEntity, JobStatus.RUNNING, "Job is Running.");
-        jobExecutionEntity.setProcessId(processId);
-        jobExecutionEntity.setCheckDelay(checkDelay);
-        jobExecutionEntity.setTimeout(timeout);
+        jobEntity.setProcessId(processId);
+        jobEntity.setCheckDelay(checkDelay);
+        jobEntity.setTimeout(timeout);
     }
 
     /**
@@ -270,29 +244,14 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
             stdOutSize,
             stdErrSize
         );
-        final JobEntity jobEntity = this.jobRepo.findOne(id);
-        if (jobEntity == null) {
-            throw new GenieNotFoundException("No job with id " + id + " exists unable to update");
-        }
-        this.updateJobStatus(jobEntity, status, statusMessage);
-        final JobExecutionEntity jobExecutionEntity = this.jobExecutionRepo.findOne(id);
-        if (jobExecutionEntity == null) {
-            throw new GenieNotFoundException("No job execution with id " + id + " exists. Unable to update.");
-        }
-        if (!jobExecutionEntity.getExitCode().isPresent()) {
-            jobExecutionEntity.setExitCode(exitCode);
-        }
+        final JobEntity jobEntity = this.jobRepository
+            .findByUniqueId(id)
+            .orElseThrow(() -> new GenieNotFoundException("No job with id " + id + " exists unable to update"));
 
-        // Save database query if we don't need it
-        if (stdOutSize != null || stdErrSize != null) {
-            final JobMetadataEntity jobMetadataEntity = this.jobMetadataRepository.findOne(id);
-            if (jobMetadataEntity != null) {
-                jobMetadataEntity.setStdOutSize(stdOutSize);
-                jobMetadataEntity.setStdErrSize(stdErrSize);
-            } else {
-                throw new GenieNotFoundException("No job metadata for job with id " + id + " exists");
-            }
-        }
+        this.updateJobStatus(jobEntity, status, statusMessage);
+        jobEntity.setExitCode(exitCode);
+        jobEntity.setStdOutSize(stdOutSize);
+        jobEntity.setStdErrSize(stdErrSize);
     }
 
     /**
@@ -309,17 +268,14 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
             maxDeleted,
             date.getTime()
         );
-        long jobExecutionsDeleted = 0;
-        long jobMetadatasDeleted = 0;
         long jobsDeleted = 0;
-        long jobRequestsDeleted = 0;
         long totalAttemptedDeletions = 0;
         final Pageable page = new PageRequest(0, pageSize);
         Slice<IdProjection> idProjections;
         do {
-            idProjections = this.jobRequestRepo.findByCreatedBefore(date, page);
+            idProjections = this.jobRepository.findByCreatedBefore(date, page);
             if (idProjections.hasContent()) {
-                final List<String> ids = idProjections
+                final List<Long> ids = idProjections
                     .getContent()
                     .stream()
                     .map(IdProjection::getId)
@@ -327,37 +283,11 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
 
                 final long toBeDeleted = ids.size();
                 totalAttemptedDeletions += toBeDeleted;
-                // Due to optimizations for queries these entity mappings aren't reversed so cascade delete
-                // isn't available and runtime exception thrown if you try to delete from the top.
-
-                log.debug("Attempting to delete {} rows from job_executions...", toBeDeleted);
-                final long deletedExecutions = this.jobExecutionRepo.deleteByIdIn(ids);
-                log.debug("Successfully deleted {} rows from job_executions...", deletedExecutions);
-                if (deletedExecutions != toBeDeleted) {
-                    log.error(
-                        "Deleted {} job execution records but expected to delete {}",
-                        deletedExecutions,
-                        toBeDeleted
-                    );
-                }
-                jobExecutionsDeleted += deletedExecutions;
-
-                log.debug("Attempting to delete {} rows from job_metadata...", toBeDeleted);
-                final long deletedMetadata = this.jobMetadataRepository.deleteByIdIn(ids);
-                log.debug("Successfully deleted {} rows from job_metadata...", deletedMetadata);
-                if (deletedMetadata != toBeDeleted) {
-                    log.error(
-                        "Deleted {} job metadata records but expected to delete {}",
-                        deletedMetadata,
-                        toBeDeleted
-                    );
-                }
-                jobMetadatasDeleted += deletedMetadata;
 
                 log.debug("Attempting to delete {} rows from jobs...", toBeDeleted);
-                final long deletedJobs = this.jobRepo.deleteByIdIn(ids);
+                final long deletedJobs = this.jobRepository.deleteByIdIn(ids);
                 log.debug("Successfully deleted {} rows from jobs...", deletedJobs);
-                if (deletedMetadata != toBeDeleted) {
+                if (deletedJobs != toBeDeleted) {
                     log.error(
                         "Deleted {} job records but expected to delete {}",
                         deletedJobs,
@@ -365,28 +295,13 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
                     );
                 }
                 jobsDeleted += deletedJobs;
-
-                log.debug("Attempting to delete {} rows from job_requests...", toBeDeleted);
-                final long deletedJobRequests = this.jobRequestRepo.deleteByIdIn(ids);
-                log.debug("Successfully deleted {} rows from job_requests...", deletedJobRequests);
-                if (deletedJobRequests != toBeDeleted) {
-                    log.error(
-                        "Deleted {} job request records but expected to delete {}",
-                        deletedJobRequests,
-                        toBeDeleted
-                    );
-                }
-                jobRequestsDeleted += deletedJobRequests;
             }
         } while (idProjections.hasNext() && totalAttemptedDeletions < maxDeleted);
 
         log.info(
-            "Deleted a chunk of {} job records: {} execution, {} metadata, {} job and {} job request records",
+            "Deleted a chunk of {} job records: {} job",
             totalAttemptedDeletions,
-            jobExecutionsDeleted,
-            jobMetadatasDeleted,
-            jobsDeleted,
-            jobRequestsDeleted
+            jobsDeleted
         );
         return totalAttemptedDeletions;
     }
@@ -409,63 +324,90 @@ public class JpaJobPersistenceServiceImpl implements JobPersistenceService {
         }
     }
 
-    private JobRequestEntity jobRequestDtoToEntity(final String id, final JobRequest jobRequest) throws GenieException {
-        final JobRequestEntity jobRequestEntity = new JobRequestEntity();
-        jobRequestEntity.setId(id);
-        jobRequestEntity.setName(jobRequest.getName());
-        jobRequestEntity.setUser(jobRequest.getUser());
-        jobRequestEntity.setVersion(jobRequest.getVersion());
-        jobRequest.getDescription().ifPresent(jobRequestEntity::setDescription);
-        jobRequestEntity.setCommandArgs(jobRequest.getCommandArgs());
-        jobRequest.getGroup().ifPresent(jobRequestEntity::setGroup);
-        jobRequest.getSetupFile().ifPresent(jobRequestEntity::setSetupFile);
-        jobRequestEntity.setClusterCriteriasFromList(jobRequest.getClusterCriterias());
-        jobRequestEntity.setCommandCriteriaFromSet(jobRequest.getCommandCriteria());
-        jobRequestEntity.setConfigsFromSet(jobRequest.getConfigs());
-        jobRequestEntity.setDependenciesFromSet(jobRequest.getDependencies());
-        jobRequestEntity.setDisableLogArchival(jobRequest.isDisableLogArchival());
-        jobRequest.getEmail().ifPresent(jobRequestEntity::setEmail);
-        jobRequestEntity.setTags(jobRequest.getTags());
-        jobRequest.getCpu().ifPresent(jobRequestEntity::setCpu);
-        jobRequest.getMemory().ifPresent(jobRequestEntity::setMemory);
-        jobRequestEntity.setApplicationsFromList(jobRequest.getApplications());
-        jobRequest.getTimeout().ifPresent(jobRequestEntity::setTimeout);
-        return jobRequestEntity;
-    }
-
-    private JobMetadataEntity jobMetadataDtoToEntity(final JobMetadata jobMetadata) throws GenieException {
-        final JobMetadataEntity metadataEntity = new JobMetadataEntity();
-        jobMetadata.getClientHost().ifPresent(metadataEntity::setClientHost);
-        jobMetadata.getUserAgent().ifPresent(metadataEntity::setUserAgent);
-        jobMetadata.getNumAttachments().ifPresent(metadataEntity::setNumAttachments);
-        jobMetadata.getTotalSizeOfAttachments().ifPresent(metadataEntity::setTotalSizeOfAttachments);
-        jobMetadata.getStdOutSize().ifPresent(metadataEntity::setStdOutSize);
-        jobMetadata.getStdErrSize().ifPresent(metadataEntity::setStdErrSize);
-        return metadataEntity;
-    }
-
-    private JobEntity jobDtoToEntity(final Job job) throws GenieException {
+    private JobEntity toEntity(
+        final String id,
+        final JobRequest jobRequest,
+        final JobMetadata jobMetadata,
+        final Job job,
+        final JobExecution jobExecution
+    ) throws GenieException {
         final JobEntity jobEntity = new JobEntity();
-        jobEntity.setName(job.getName());
-        jobEntity.setUser(job.getUser());
-        jobEntity.setVersion(job.getVersion());
+
+        // Fields from the original Job Request
+
+        jobEntity.setUniqueId(id);
+        jobEntity.setName(jobRequest.getName());
+        jobEntity.setUser(jobRequest.getUser());
+        jobEntity.setVersion(jobRequest.getVersion());
+        jobRequest.getDescription().ifPresent(jobEntity::setDescription);
+        JpaServiceUtils.setEntityMetadata(MAPPER, jobRequest, jobEntity);
+        jobRequest.getCommandArgs().ifPresent(
+            commandArgs ->
+                jobEntity.setCommandArgs(
+                    Lists.newArrayList(
+                        StringUtils.splitByWholeSeparator(commandArgs, StringUtils.SPACE)
+                    )
+                )
+        );
+        jobRequest.getGroup().ifPresent(jobEntity::setGenieUserGroup);
+        final FileEntity setupFile = jobRequest.getSetupFile().isPresent()
+            ? this.createAndGetFileEntity(jobRequest.getSetupFile().get())
+            : null;
+        if (setupFile != null) {
+            jobEntity.setSetupFile(setupFile);
+        }
+        final List<CriterionEntity> clusterCriteria
+            = Lists.newArrayListWithExpectedSize(jobRequest.getClusterCriterias().size());
+
+        for (final ClusterCriteria clusterCriterion : jobRequest.getClusterCriterias()) {
+            clusterCriteria.add(new CriterionEntity(this.createAndGetTagEntities(clusterCriterion.getTags())));
+        }
+        jobEntity.setClusterCriteria(clusterCriteria);
+
+        jobEntity.setCommandCriterion(
+            new CriterionEntity(this.createAndGetTagEntities(jobRequest.getCommandCriteria()))
+        );
+        jobEntity.setConfigs(this.createAndGetFileEntities(jobRequest.getConfigs()));
+        jobEntity.setDependencies(this.createAndGetFileEntities(jobRequest.getDependencies()));
+        jobEntity.setDisableLogArchival(jobRequest.isDisableLogArchival());
+        jobRequest.getEmail().ifPresent(jobEntity::setEmail);
+        if (!jobRequest.getTags().isEmpty()) {
+            jobEntity.setTags(this.createAndGetTagEntities(jobRequest.getTags()));
+        }
+        jobRequest.getCpu().ifPresent(jobEntity::setCpuRequested);
+        jobRequest.getMemory().ifPresent(jobEntity::setMemoryRequested);
+        if (!jobRequest.getApplications().isEmpty()) {
+            jobEntity.setApplicationsRequested(jobRequest.getApplications());
+        }
+        jobRequest.getTimeout().ifPresent(jobEntity::setTimeoutRequested);
+
+        jobRequest.getGrouping().ifPresent(jobEntity::setGrouping);
+        jobRequest.getGroupingInstance().ifPresent(jobEntity::setGroupingInstance);
+
+        // Fields collected as metadata
+
+        jobMetadata.getClientHost().ifPresent(jobEntity::setClientHost);
+        jobMetadata.getUserAgent().ifPresent(jobEntity::setUserAgent);
+        jobMetadata.getNumAttachments().ifPresent(jobEntity::setNumAttachments);
+        jobMetadata.getTotalSizeOfAttachments().ifPresent(jobEntity::setTotalSizeOfAttachments);
+        jobMetadata.getStdErrSize().ifPresent(jobEntity::setStdErrSize);
+        jobMetadata.getStdOutSize().ifPresent(jobEntity::setStdOutSize);
+
+        // Fields a user cares about (job dto)
+
         job.getArchiveLocation().ifPresent(jobEntity::setArchiveLocation);
-        job.getDescription().ifPresent(jobEntity::setDescription);
         job.getStarted().ifPresent(jobEntity::setStarted);
+        job.getFinished().ifPresent(jobEntity::setFinished);
         jobEntity.setStatus(job.getStatus());
         job.getStatusMsg().ifPresent(jobEntity::setStatusMsg);
-        jobEntity.setTags(job.getTags());
-        jobEntity.setCommandArgs(job.getCommandArgs());
-        return jobEntity;
-    }
 
-    private JobExecutionEntity jobExecutionDtoToEntity(final JobExecution jobExecution) throws GenieException {
-        final JobExecutionEntity jobExecutionEntity = new JobExecutionEntity();
-        jobExecutionEntity.setHostName(jobExecution.getHostName());
-        jobExecution.getProcessId().ifPresent(jobExecutionEntity::setProcessId);
-        jobExecution.getCheckDelay().ifPresent(jobExecutionEntity::setCheckDelay);
-        jobExecution.getTimeout().ifPresent(jobExecutionEntity::setTimeout);
-        jobExecution.getMemory().ifPresent(jobExecutionEntity::setMemory);
-        return jobExecutionEntity;
+        // Fields set by system as part of job execution
+        jobEntity.setHostName(jobExecution.getHostName());
+        jobExecution.getProcessId().ifPresent(jobEntity::setProcessId);
+        jobExecution.getCheckDelay().ifPresent(jobEntity::setCheckDelay);
+        jobExecution.getTimeout().ifPresent(jobEntity::setTimeout);
+        jobExecution.getMemory().ifPresent(jobEntity::setMemoryUsed);
+
+        return jobEntity;
     }
 }

@@ -156,11 +156,13 @@ public class JobClient extends BaseGenieClient {
      * @throws IOException          For Network and other IO issues.
      */
     public List<JobSearchResult> getJobs() throws IOException, GenieClientException {
-        return this.getJobs(null, null, null, null, null, null, null, null, null, null, null, null, null);
+        return this.getJobs(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
     }
 
     /**
      * Method to get a list of all the jobs from Genie for the query parameters specified.
+     * <p>
+     * Deprecated: For new search fields
      *
      * @param id          id for job
      * @param name        name of job (can be a SQL-style pattern such as HIVE%)
@@ -176,9 +178,27 @@ public class JobClient extends BaseGenieClient {
      * @param minFinished The time which the job had to finish after in order to be return (inclusive)
      * @param maxFinished The time which the job had to finish before in order to be returned (exclusive)
      * @return A list of jobs.
-     * @throws GenieClientException If the response recieved is not 2xx.
+     * @throws GenieClientException If the response received is not 2xx.
      * @throws IOException          For Network and other IO issues.
+     * @see #getJobs(
+     *String,
+     * String,
+     * String,
+     * Set,
+     * Set,
+     * String,
+     * String,
+     * String,
+     * String,
+     * Long,
+     * Long,
+     * Long,
+     * Long,
+     * String,
+     * String
+     *)
      */
+    @Deprecated
     public List<JobSearchResult> getJobs(
         final String id,
         final String name,
@@ -195,7 +215,7 @@ public class JobClient extends BaseGenieClient {
         final Long maxFinished
     ) throws IOException, GenieClientException {
 
-        final JsonNode jnode = jobService.getJobs(
+        final JsonNode jnode = this.jobService.getJobs(
             id,
             name,
             user,
@@ -208,7 +228,77 @@ public class JobClient extends BaseGenieClient {
             minStarted,
             maxStarted,
             minFinished,
-            maxFinished
+            maxFinished,
+            null,
+            null
+        ).execute().body()
+            .get("_embedded")
+            .get("jobSearchResultList");
+
+        final List<JobSearchResult> jobList = new ArrayList<>();
+        for (final JsonNode objNode : jnode) {
+            final JobSearchResult jobSearchResult = this.treeToValue(objNode, JobSearchResult.class);
+            jobList.add(jobSearchResult);
+        }
+        return jobList;
+    }
+
+    /**
+     * Method to get a list of all the jobs from Genie for the query parameters specified.
+     *
+     * @param id               id for job
+     * @param name             name of job (can be a SQL-style pattern such as HIVE%)
+     * @param user             user who submitted job
+     * @param statuses         statuses of jobs to find
+     * @param tags             tags for the job
+     * @param clusterName      the name of the cluster
+     * @param clusterId        the id of the cluster
+     * @param commandName      the name of the command run by the job
+     * @param commandId        the id of the command run by the job
+     * @param minStarted       The time which the job had to start after in order to be return (inclusive)
+     * @param maxStarted       The time which the job had to start before in order to be returned (exclusive)
+     * @param minFinished      The time which the job had to finish after in order to be return (inclusive)
+     * @param maxFinished      The time which the job had to finish before in order to be returned (exclusive)
+     * @param grouping         The grouping the job should be a member of
+     * @param groupingInstance The grouping instance the job should be a member of
+     * @return A list of jobs.
+     * @throws GenieClientException If the response received is not 2xx.
+     * @throws IOException          For Network and other IO issues.
+     */
+    public List<JobSearchResult> getJobs(
+        @Nullable final String id,
+        @Nullable final String name,
+        @Nullable final String user,
+        @Nullable final Set<String> statuses,
+        @Nullable final Set<String> tags,
+        @Nullable final String clusterName,
+        @Nullable final String clusterId,
+        @Nullable final String commandName,
+        @Nullable final String commandId,
+        @Nullable final Long minStarted,
+        @Nullable final Long maxStarted,
+        @Nullable final Long minFinished,
+        @Nullable final Long maxFinished,
+        @Nullable final String grouping,
+        @Nullable final String groupingInstance
+    ) throws IOException, GenieClientException {
+
+        final JsonNode jnode = this.jobService.getJobs(
+            id,
+            name,
+            user,
+            statuses,
+            tags,
+            clusterName,
+            clusterId,
+            commandName,
+            commandId,
+            minStarted,
+            maxStarted,
+            minFinished,
+            maxFinished,
+            grouping,
+            groupingInstance
         ).execute().body()
             .get("_embedded")
             .get("jobSearchResultList");

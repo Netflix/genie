@@ -20,6 +20,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.core.services.FileTransferFactory;
 import com.netflix.spectator.api.Registry;
+import com.netflix.spectator.api.patterns.PolledMeter;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -31,7 +32,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
-import java.util.function.ToDoubleFunction;
 
 /**
  * Caches the downloaded file from the remote location.
@@ -72,12 +72,21 @@ public class CacheGenieFileTransferService extends GenieFileTransferService {
         super(fileTransferFactory);
         this.baseCacheLocation = this.createDirectories(baseCacheLocation).toString();
         this.localFileTransfer = localFileTransfer;
-        registry.gauge("genie.jobs.file.cache.hitRate", fileCache,
-            (ToDoubleFunction<LoadingCache<String, File>>) value -> value.stats().hitRate());
-        registry.gauge("genie.jobs.file.cache.missRate", fileCache,
-            (ToDoubleFunction<LoadingCache<String, File>>) value -> value.stats().missRate());
-        registry.gauge("genie.jobs.file.cache.loadExceptionRate", fileCache,
-            (ToDoubleFunction<LoadingCache<String, File>>) value -> value.stats().loadExceptionRate());
+
+        PolledMeter
+            .using(registry)
+            .withName("genie.jobs.file.cache.hitRate")
+            .monitorValue(this.fileCache, value -> value.stats().hitRate());
+
+        PolledMeter
+            .using(registry)
+            .withName("genie.jobs.file.cache.missRate")
+            .monitorValue(this.fileCache, value -> value.stats().missRate());
+
+        PolledMeter
+            .using(registry)
+            .withName("genie.jobs.file.cache.loadExceptionRate")
+            .monitorValue(this.fileCache, value -> value.stats().loadExceptionRate());
     }
 
     /**
@@ -94,7 +103,7 @@ public class CacheGenieFileTransferService extends GenieFileTransferService {
         log.debug("Called with src path {} and destination path {}", srcRemotePath, dstLocalPath);
         File cachedFile;
         try {
-            cachedFile = fileCache.get(srcRemotePath);
+            cachedFile = this.fileCache.get(srcRemotePath);
             // Before using the cached file check if the real file has been modified after we have cached
             final long lastModifiedTime = getFileTransfer(srcRemotePath).getLastModifiedTime(srcRemotePath);
             if (lastModifiedTime > cachedFile.lastModified()) {
@@ -102,9 +111,9 @@ public class CacheGenieFileTransferService extends GenieFileTransferService {
                     // Check the modification time again because threads that were waiting for a file might have
                     // been refreshed by a previous thread.
                     if (lastModifiedTime > cachedFile.lastModified()) {
-                        fileCache.invalidate(srcRemotePath);
-                        deleteFile(cachedFile);
-                        cachedFile = fileCache.get(srcRemotePath);
+                        this.fileCache.invalidate(srcRemotePath);
+                        this.deleteFile(cachedFile);
+                        cachedFile = this.fileCache.get(srcRemotePath);
                     }
                 }
             }
@@ -113,7 +122,7 @@ public class CacheGenieFileTransferService extends GenieFileTransferService {
             log.error(message);
             throw new GenieServerException(message, e);
         }
-        localFileTransfer.getFile(cachedFile.getPath(), dstLocalPath);
+        this.localFileTransfer.getFile(cachedFile.getPath(), dstLocalPath);
     }
 
     protected void deleteFile(final File file) throws IOException {
@@ -144,7 +153,7 @@ public class CacheGenieFileTransferService extends GenieFileTransferService {
     protected File loadFile(final String path) throws GenieException {
         final byte[] pathBytes = path.getBytes(Charset.forName("UTF-8"));
         final String pathUUID = UUID.nameUUIDFromBytes(pathBytes).toString();
-        final String cacheFilePath = String.format("%s/%s", baseCacheLocation, pathUUID);
+        final String cacheFilePath = String.format("%s/%s", this.baseCacheLocation, pathUUID);
         final File cacheFile = new File(cacheFilePath);
         if (!cacheFile.exists()) {
             getFileTransfer(path).getFile(path, cacheFilePath);

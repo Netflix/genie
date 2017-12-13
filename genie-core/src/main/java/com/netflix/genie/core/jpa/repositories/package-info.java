@@ -21,4 +21,7 @@
  *
  * @author tgianos
  */
+@ParametersAreNonnullByDefault
 package com.netflix.genie.core.jpa.repositories;
+
+import javax.annotation.ParametersAreNonnullByDefault;

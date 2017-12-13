@@ -26,6 +26,8 @@ import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.core.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
+import com.netflix.genie.core.jpa.repositories.JpaFileRepository;
+import com.netflix.genie.core.jpa.repositories.JpaTagRepository;
 import com.netflix.genie.web.hateoas.resources.ApplicationResource;
 import org.hamcrest.Matchers;
 import org.junit.After;
@@ -79,6 +81,12 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
     @Autowired
     private JpaCommandRepository jpaCommandRepository;
 
+    @Autowired
+    private JpaFileRepository fileRepository;
+
+    @Autowired
+    private JpaTagRepository tagRepository;
+
     /**
      * Common setup for all tests.
      */
@@ -86,6 +94,8 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
     public void setup() {
         this.jpaCommandRepository.deleteAll();
         this.jpaApplicationRepository.deleteAll();
+        this.fileRepository.deleteAll();
+        this.tagRepository.deleteAll();
     }
 
     /**
@@ -95,6 +105,8 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
     public void cleanup() {
         this.jpaCommandRepository.deleteAll();
         this.jpaApplicationRepository.deleteAll();
+        this.fileRepository.deleteAll();
+        this.tagRepository.deleteAll();
     }
 
     /**

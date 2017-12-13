@@ -40,7 +40,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  * @since 3.0.0
  */
 @Configuration
-@ConditionalOnProperty("genie.swagger.enabled")
+@ConditionalOnProperty(value = "genie.swagger.enabled", havingValue = "true")
 @EnableSwagger2
 @Import(BeanValidatorPluginsConfiguration.class)
 public class SwaggerConfig {

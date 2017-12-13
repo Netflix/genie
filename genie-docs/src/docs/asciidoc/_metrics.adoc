@@ -86,8 +86,14 @@ and system metrics and statistics.
 |JobCoordinatorServiceImpl
 |status, exceptionClass
 
+|genie.jobs.coordination.clusterCommandQuery.timer
+|Time taken to query the database and find clusters and commands matching the supplied criteria.
+|nanoseconds
+|JobCoordinatorServiceImpl
+|status, exceptionClass
+
 |genie.jobs.submit.localRunner.selectCluster.timer
-|Time taken to select a cluster based on criteria and load balancing strategy
+|Time taken to select a cluster using the load balancing strategy
 |nanoseconds
 |JobCoordinatorServiceImpl
 |status, exceptionClass
@@ -409,6 +415,30 @@ and system metrics and statistics.
 |count
 |DiskCleanupTask
 |-
+
+|genie.health.endpoint.timer
+|Time taken for the Health endpoint to collect and aggregate state from health indicators
+|nanoseconds
+|HealthCheckMetricsAspect
+|status, exceptionClass
+
+|genie.health.indicator.timer
+|Time taken for each health indicator to report its status
+|nanoseconds
+|HealthCheckMetricsAspect
+|status, exceptionClass, healthIndicatorClass
+
+|genie.health.indicator.counter
+|Counter for of calls each health indicator tagged by reported status
+|count
+|HealthCheckMetricsAspect
+|status, exceptionClass, healthIndicatorName
+
+|genie.health.failure.counter
+|Counter for calls each health indicator that reports status other than UP
+|count
+|HealthCheckMetricsAspect
+|status, exceptionClass, healthIndicatorName
 
 |===
 

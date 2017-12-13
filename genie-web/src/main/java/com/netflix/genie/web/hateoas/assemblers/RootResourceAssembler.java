@@ -25,6 +25,7 @@ import com.netflix.genie.web.controllers.CommandRestController;
 import com.netflix.genie.web.controllers.JobRestController;
 import com.netflix.genie.web.controllers.RootRestController;
 import com.netflix.genie.web.hateoas.resources.RootResource;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.hateoas.ResourceAssembler;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.stereotype.Component;
@@ -42,6 +43,7 @@ public class RootResourceAssembler implements ResourceAssembler<JsonNode, RootRe
      * {@inheritDoc}
      */
     @Override
+    @SuppressFBWarnings("NP_NULL_PARAM_DEREF_ALL_TARGETS_DANGEROUS")
     public RootResource toResource(final JsonNode metadata) {
         final RootResource rootResource = new RootResource(metadata);
 

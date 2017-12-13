@@ -39,8 +39,6 @@ import org.junit.Rule
 import org.junit.experimental.categories.Category
 import org.junit.rules.TemporaryFolder
 import org.springframework.core.env.Environment
-import org.springframework.core.io.DefaultResourceLoader
-import org.springframework.core.io.ResourceLoader
 import org.springframework.core.task.AsyncTaskExecutor
 import org.springframework.scheduling.TaskScheduler
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
@@ -67,14 +65,14 @@ class ScriptLoadBalancerSpec extends Specification {
     def mapper = new ObjectMapper().registerModule(new Jdk8Module())
 
     @Shared
-    def clustersGood = Lists.newArrayList(
+    def clustersGood = Sets.newHashSet(
             new Cluster.Builder("a", "b", "c", ClusterStatus.UP).withId("2").build(),
             new Cluster.Builder("d", "e", "f", ClusterStatus.UP).withId("0").build(),
             new Cluster.Builder("g", "h", "i", ClusterStatus.UP).withId("1").build()
     )
 
     @Shared
-    def clustersBad = Lists.newArrayList(
+    def clustersBad = Sets.newHashSet(
             new Cluster.Builder("j", "k", "l", ClusterStatus.UP).withId("3").build(),
             new Cluster.Builder("m", "n", "o", ClusterStatus.UP).withId("4").build()
     )
@@ -84,7 +82,6 @@ class ScriptLoadBalancerSpec extends Specification {
             "jobName",
             "jobUser",
             "jobVersion",
-            "jobCommandAgs",
             Lists.newArrayList(
                     new ClusterCriteria(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
             ),
