@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 3.3.0-SNAPSHOT,</span>
-<span id="revdate">2017-12-12</span>
+<span id="revdate">2017-12-14</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -977,6 +977,12 @@ support natively</p>
 </li>
 </ul>
 </div>
+</li>
+<li>
+<p>Switch to <a href="http://h2database.com/html/main.html">H2</a> for in memory database</p>
+</li>
+<li>
+<p>Turn on Hibernate schema validation at boot</p>
 </li>
 </ul>
 </div>
@@ -4248,7 +4254,7 @@ seen in the <a href="#_properties">Properties</a> section below.</p>
 <div class="paragraph">
 <p>By default since Genie will launch with the <code>dev</code> profile active it will launch with an in memory database running as
 part of its process. This means when you shut Genie down all data will be lost. It is meant for development only. Genie
-ships with JDBC drivers for <code>MySql</code>, <code>PostgreSQL</code> and <code>HSQLDB</code>. If you want to use a different database you should load
+ships with JDBC drivers for <code>MySql</code>, <code>PostgreSQL</code> and <code>H2</code>. If you want to use a different database you should load
 the JDBC driver jar file somewhere on the Genie classpath.</p>
 </div>
 <div class="paragraph">
@@ -5067,6 +5073,11 @@ property is true</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">UTC</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.jpa.hibernate.ddl-auto</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">DDL mode. This is actually a shortcut for the "hibernate.hbm2ddl.auto" property.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">validate</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">spring.profiles.active</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The default active profiles when Genie is run</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">dev</p></td>
@@ -5121,25 +5132,14 @@ for more information. Currently on classpath only none, hash_map, redis and jdbc
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">spring.jpa.hibernate.ddl-auto</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">DDL mode. This is actually a shortcut for the "hibernate.hbm2ddl.auto" property. Default to "create-drop" when using
-an embedded database, "none" otherwise.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">update</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">spring.jpa.hibernate.naming.strategy</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Naming strategy fully qualified name.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">org.hibernate.cfg.ImprovedNamingStrategy</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.url</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">JDBC URL of the database</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">jdbc:hsqldb:mem:genie-db;shutdown=true</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jdbc:h2:mem:genie</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.username</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Username for the datasource</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">SA</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">root</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.password</p></td>
@@ -5806,7 +5806,7 @@ and system metrics and statistics.</p>
 <div id="footer">
 <div id="footer-text">
 Version 3.3.0-SNAPSHOT<br>
-Last updated 2017-12-12 18:46:26 +00:00
+Last updated 2017-12-14 03:11:26 +00:00
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
