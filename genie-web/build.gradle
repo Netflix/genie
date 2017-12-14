@@ -16,6 +16,7 @@ dependencies {
      *******************************/
 
     compile(project(":genie-core"))
+    compile(project(":genie-proto"))
 
     // Swagger libs
     compile("io.springfox:springfox-swagger2")
@@ -53,6 +54,10 @@ dependencies {
     compile("org.springframework.security.oauth:spring-security-oauth2")
     compile("org.springframework.session:spring-session")
 
+    //gRPC and protobuf
+    compile("net.devh:grpc-server-spring-boot-autoconfigure")
+    compile("net.devh:grpc-server-spring-boot-starter")
+
     /*******************************
      * Provided Dependencies
      *******************************/
@@ -83,6 +88,7 @@ dependencies {
     testCompile("org.springframework.restdocs:spring-restdocs-core")
     testCompile("org.springframework.restdocs:spring-restdocs-mockmvc")
     testCompile("org.springframework.security:spring-security-test")
+    testCompile("io.grpc:grpc-testing")
 }
 
 license {

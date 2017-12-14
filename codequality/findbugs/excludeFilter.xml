@@ -9,4 +9,9 @@
     <Match>
         <Class name="~.*_"/>
     </Match>
+
+    <!-- Generated Protobuf/gRPC, ignore -->
+    <Match>
+      <Package name="~com.netflix.genie.proto.*" />
+    </Match>
 </FindBugsFilter>
