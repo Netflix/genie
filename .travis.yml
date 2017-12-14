@@ -1,5 +1,6 @@
 sudo: required
 dist: trusty
+group: travis_lts
 addons:
   postgresql: "9.6"
   apt:
