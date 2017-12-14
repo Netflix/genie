@@ -84,7 +84,7 @@ public class BaseEntity extends AuditEntity implements BaseProjection, SetupFile
 
     @Lob
     @Basic(fetch = FetchType.LAZY)
-    @Column(name = "metadata")
+    @Column(name = "metadata", columnDefinition = "TEXT DEFAULT NULL")
     private String metadata;
 
     @ManyToOne(fetch = FetchType.LAZY)
