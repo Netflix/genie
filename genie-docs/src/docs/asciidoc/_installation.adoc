@@ -83,7 +83,7 @@ seen in the <<Properties>> section below.
 
 By default since Genie will launch with the `dev` profile active it will launch with an in memory database running as
 part of its process. This means when you shut Genie down all data will be lost. It is meant for development only. Genie
-ships with JDBC drivers for `MySql`, `PostgreSQL` and `HSQLDB`. If you want to use a different database you should load
+ships with JDBC drivers for `MySql`, `PostgreSQL` and `H2`. If you want to use a different database you should load
 the JDBC driver jar file somewhere on the Genie classpath.
 
 For production you should probably enable the `prod` profile which creates a connection pool for the database and then

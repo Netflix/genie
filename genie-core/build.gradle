@@ -42,8 +42,8 @@ dependencies {
      *******************************/
 
     // Database Libs
+    runtime("com.h2database:h2")
     runtime("mysql:mysql-connector-java")
-    runtime("org.hsqldb:hsqldb")
     runtime("org.postgresql:postgresql")
 
     /*******************************

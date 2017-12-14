@@ -437,6 +437,10 @@ property is true
 |Time zone used when formatting dates. For instance `America/Los_Angeles`
 |UTC
 
+|spring.jpa.hibernate.ddl-auto
+|DDL mode. This is actually a shortcut for the "hibernate.hbm2ddl.auto" property.
+|validate
+
 |spring.profiles.active
 |The default active profiles when Genie is run
 |dev
@@ -472,22 +476,13 @@ for more information. Currently on classpath only none, hash_map, redis and jdbc
 |===
 |Property |Description| Default Value
 
-|spring.jpa.hibernate.ddl-auto
-|DDL mode. This is actually a shortcut for the "hibernate.hbm2ddl.auto" property. Default to "create-drop" when using
-an embedded database, "none" otherwise.
-|update
-
-|spring.jpa.hibernate.naming.strategy
-|Naming strategy fully qualified name.
-|org.hibernate.cfg.ImprovedNamingStrategy
-
 |spring.datasource.url
 |JDBC URL of the database
-|jdbc:hsqldb:mem:genie-db;shutdown=true
+|jdbc:h2:mem:genie
 
 |spring.datasource.username
 |Username for the datasource
-|SA
+|root
 
 |spring.datasource.password
 |Database password

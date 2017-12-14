@@ -26,12 +26,12 @@ genie:
 spring:
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: validate
     properties:
       hibernate:
         show_sql: true
         type: trace
   datasource:
-    url: jdbc:hsqldb:mem:genie-int-db;shutdown=true
-    username: SA
+    url: jdbc:h2:mem:genie
+    username: root
     password:

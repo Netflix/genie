@@ -18,6 +18,6 @@
 
 spring:
   datasource:
-    url: jdbc:hsqldb:mem:genie-int-db;shutdown=true
-    username: SA
+    url: jdbc:h2:mem:genie
+    username: root
     password:
