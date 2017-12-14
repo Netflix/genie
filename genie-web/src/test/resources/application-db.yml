@@ -29,3 +29,6 @@ spring:
       min-evictable-idle-time-millis: 60000
       time-between-eviction-runs-millis: 10000
       jdbc-interceptors: org.apache.tomcat.jdbc.pool.interceptor.QueryTimeoutInterceptor
+  jpa:
+    hibernate:
+      ddl-auto: validate

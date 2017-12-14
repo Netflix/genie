@@ -25,6 +25,8 @@ workflow
 *** Stored as blob so no search available. Meant for use by higher level systems to take metadata and parse it
 themselves for use in building up business use cases (lineage, relationships, etc) that the Genie data model doesn't
 support natively
+* Switch to http://h2database.com/html/main.html[H2] for in memory database
+* Turn on Hibernate schema validation at boot
 
 === Upgrade Instructions
 
