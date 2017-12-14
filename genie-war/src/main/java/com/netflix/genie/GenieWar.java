@@ -17,6 +17,7 @@
  */
 package com.netflix.genie;
 
+import net.devh.springboot.autoconfigure.grpc.server.GrpcServerAutoConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
@@ -33,7 +34,8 @@ import org.springframework.boot.web.support.SpringBootServletInitializer;
 @SpringBootApplication(
     exclude = {
         RedisAutoConfiguration.class,
-        RedisRepositoriesAutoConfiguration.class
+        RedisRepositoriesAutoConfiguration.class,
+        GrpcServerAutoConfiguration.class,
     }
 )
 public class GenieWar extends SpringBootServletInitializer {
