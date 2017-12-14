@@ -146,7 +146,7 @@ spring:
     time-zone: UTC
   jpa:
     hibernate:
-      ddl-auto: none # TODO: Switch to validate
+      ddl-auto: validate
   profiles:
     active: dev
   session:
