@@ -97,7 +97,7 @@ configure(javaProjects) {
             }
             dependency("org.opensaml:opensaml:2.6.4")
             dependency("org.python:jython-standalone:2.7.1")
-            dependency("org.springframework.security.extensions:spring-security-saml2-core:1.0.2.RELEASE")
+            dependency("org.springframework.security.extensions:spring-security-saml2-core:1.0.3.RELEASE")
         }
     }
 
