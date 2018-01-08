@@ -52,7 +52,9 @@ public class JpaFileServiceImpl implements FileService {
      */
     @Override
 //    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void createFileIfNotExists(@NotBlank final String file) throws GenieException {
+    public void createFileIfNotExists(
+        @NotBlank(message = "File path cannot be blank") final String file
+    ) throws GenieException {
         if (this.fileRepository.existsByFile(file)) {
             return;
         }

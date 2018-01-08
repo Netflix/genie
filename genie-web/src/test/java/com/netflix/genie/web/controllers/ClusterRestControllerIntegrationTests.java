@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
@@ -57,6 +58,7 @@ import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -1239,6 +1241,48 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
             Assert.assertEquals(doubleEncodedNameQuery, params.get("name"));
             final String decoded = URLDecoder.decode(params.get("name"), StandardCharsets.UTF_8.name());
             Assert.assertEquals(singleEncodedNameQuery, decoded);
+        }
+    }
+
+    /**
+     * Test creating a cluster with blank files and tag resources.
+     * @throws Exception when an unexpected error is encountered
+     */
+    @Test
+    public void cantCreateClusterWithBlankFields() throws Exception {
+
+        final List<Cluster> invalidClusterResources = Lists.newArrayList(
+            new Cluster
+                .Builder(NAME, USER, VERSION, ClusterStatus.UP)
+                .withId(ID)
+                .withSetupFile(" ")
+                .build(),
+
+            new Cluster
+                .Builder(NAME, USER, VERSION, ClusterStatus.UP)
+                .withId(ID)
+                .withConfigs(Sets.newHashSet("foo", " "))
+                .build(),
+
+            new Cluster
+                .Builder(NAME, USER, VERSION, ClusterStatus.UP)
+                .withId(ID)
+                .withTags(Sets.newHashSet("foo", " "))
+                .build()
+        );
+
+        for (Cluster invalidClusterResource : invalidClusterResources) {
+            Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
+
+            this.mvc
+                .perform(
+                    MockMvcRequestBuilders.post(CLUSTERS_API)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(this.objectMapper.writeValueAsBytes(invalidClusterResource))
+                )
+                .andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
+
+            Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
         }
     }
 }
