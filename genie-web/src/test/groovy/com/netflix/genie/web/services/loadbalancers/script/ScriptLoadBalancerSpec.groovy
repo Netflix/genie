@@ -27,10 +27,10 @@ import com.netflix.genie.common.dto.ClusterCriteria
 import com.netflix.genie.common.dto.ClusterStatus
 import com.netflix.genie.common.dto.JobRequest
 import com.netflix.genie.common.util.GenieDateFormat
-import com.netflix.genie.core.services.ClusterLoadBalancer
-import com.netflix.genie.core.services.impl.GenieFileTransferService
-import com.netflix.genie.core.util.MetricsConstants
 import com.netflix.genie.test.categories.UnitTest
+import com.netflix.genie.web.services.ClusterLoadBalancer
+import com.netflix.genie.web.services.impl.GenieFileTransferService
+import com.netflix.genie.web.util.MetricsConstants
 import com.netflix.spectator.api.Id
 import com.netflix.spectator.api.Registry
 import com.netflix.spectator.api.Timer

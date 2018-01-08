@@ -23,15 +23,15 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
-import com.netflix.genie.core.events.GenieEventBus;
-import com.netflix.genie.core.events.JobFinishedEvent;
-import com.netflix.genie.core.events.JobFinishedReason;
-import com.netflix.genie.core.events.JobStartedEvent;
-import com.netflix.genie.core.jobs.JobConstants;
-import com.netflix.genie.core.properties.JobsProperties;
-import com.netflix.genie.core.services.JobSearchService;
-import com.netflix.genie.core.services.JobSubmitterService;
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.genie.web.events.GenieEventBus;
+import com.netflix.genie.web.events.JobFinishedEvent;
+import com.netflix.genie.web.events.JobFinishedReason;
+import com.netflix.genie.web.events.JobStartedEvent;
+import com.netflix.genie.web.jobs.JobConstants;
+import com.netflix.genie.web.properties.JobsProperties;
+import com.netflix.genie.web.services.JobSearchService;
+import com.netflix.genie.web.services.JobSubmitterService;
 import com.netflix.spectator.api.DefaultRegistry;
 import org.apache.commons.exec.Executor;
 import org.hamcrest.Matchers;
@@ -192,7 +192,7 @@ public class JobMonitoringCoordinatorUnitTests {
     }
 
     /**
-     * Make sure when a {@link com.netflix.genie.core.events.JobStartedEvent} is sent a new monitor is spawned.
+     * Make sure when a {@link com.netflix.genie.web.events.JobStartedEvent} is sent a new monitor is spawned.
      */
     @Test
     @SuppressWarnings("unchecked")
@@ -261,7 +261,7 @@ public class JobMonitoringCoordinatorUnitTests {
     }
 
     /**
-     * Make sure when a {@link com.netflix.genie.core.events.JobFinishedEvent} is sent the monitor is cancelled.
+     * Make sure when a {@link com.netflix.genie.web.events.JobFinishedEvent} is sent the monitor is cancelled.
      *
      * @throws GenieException on error
      */

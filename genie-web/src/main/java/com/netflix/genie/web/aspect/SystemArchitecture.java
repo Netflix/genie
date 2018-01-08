@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Application pointcut expressions.
+ *
  * @author amajumdar
  * @since 3.0.0
  */
@@ -35,23 +36,26 @@ public class SystemArchitecture {
      * under that.
      */
     @Pointcut("within(com.netflix.genie.web.controllers..*)")
-    public void inResourceLayer() { }
+    public void inResourceLayer() {
+    }
 
     /**
      * A join point is in the service layer if the method is defined
-     * in a type in the com.netflix.genie.core.services package or any sub-package
+     * in a type in the com.netflix.genie.web.services package or any sub-package
      * under that.
      */
-    @Pointcut("within(com.netflix.genie.core.services..*)")
-    public void inServiceLayer() { }
+    @Pointcut("within(com.netflix.genie.web.services..*)")
+    public void inServiceLayer() {
+    }
 
     /**
      * A join point is in the data service layer if the method is defined
-     * in a type in the com.netflix.genie.core.jpa.services package or any sub-package
+     * in a type in the com.netflix.genie.web.jpa.services package or any sub-package
      * under that.
      */
-    @Pointcut("within(com.netflix.genie.core.jpa.services..*)")
-    public void inDataLayer() { }
+    @Pointcut("within(com.netflix.genie.web.jpa.services..*)")
+    public void inDataLayer() {
+    }
 
     /**
      * A resource service is the execution of any method defined on a controller.
@@ -59,21 +63,24 @@ public class SystemArchitecture {
      * "resources" package, and that implementation types are in sub-packages.
      */
     @Pointcut("execution(* com.netflix.genie.web.controllers.*.*(..))")
-    public void resourceOperation() { }
+    public void resourceOperation() {
+    }
 
     /**
      * A service operation is the execution of any method defined on a
      * service class/interface. This definition assumes that interfaces are placed in the
      * "service" package, and that implementation types are in sub-packages.
      */
-    @Pointcut("execution(* com.netflix.genie.core.services.*.*(..))")
-    public void serviceOperation() { }
+    @Pointcut("execution(* com.netflix.genie.web.services.*.*(..))")
+    public void serviceOperation() {
+    }
 
     /**
      * A data service operation is the execution of any method defined on a
      * dao interface. This definition assumes that interfaces are placed in the
      * "dao" package, and that implementation types are in sub-packages.
      */
-    @Pointcut("execution(* com.netflix.genie.core.jpa.services.*.*(..))")
-    public void dataOperation() { }
+    @Pointcut("execution(* com.netflix.genie.web.jpa.services.*.*(..))")
+    public void dataOperation() {
+    }
 }

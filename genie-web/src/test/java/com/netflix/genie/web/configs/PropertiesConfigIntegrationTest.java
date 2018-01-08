@@ -17,10 +17,10 @@
  */
 package com.netflix.genie.web.configs;
 
-import com.netflix.genie.core.properties.DataServiceRetryProperties;
-import com.netflix.genie.core.properties.HealthProperties;
-import com.netflix.genie.core.properties.JobsProperties;
 import com.netflix.genie.test.categories.IntegrationTest;
+import com.netflix.genie.web.properties.DataServiceRetryProperties;
+import com.netflix.genie.web.properties.HealthProperties;
+import com.netflix.genie.web.properties.JobsProperties;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;

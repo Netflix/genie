@@ -17,12 +17,12 @@
  */
 package com.netflix.genie.web.tasks.leader;
 
-import com.netflix.genie.core.jobs.JobConstants;
-import com.netflix.genie.core.services.JobPersistenceService;
-import com.netflix.genie.core.util.MetricsUtils;
+import com.netflix.genie.web.jobs.JobConstants;
 import com.netflix.genie.web.properties.DatabaseCleanupProperties;
+import com.netflix.genie.web.services.JobPersistenceService;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import com.netflix.genie.web.tasks.TaskUtils;
+import com.netflix.genie.web.util.MetricsUtils;
 import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Registry;
 import com.netflix.spectator.api.patterns.PolledMeter;

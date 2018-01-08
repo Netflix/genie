@@ -17,8 +17,8 @@
  */
 package com.netflix.genie.web.tasks.leader;
 
-import com.netflix.genie.core.events.GenieEventBus;
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.genie.web.events.GenieEventBus;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

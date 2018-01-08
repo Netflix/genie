@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.configs;
 
-import com.netflix.genie.core.events.GenieEventBusImpl;
+import com.netflix.genie.web.events.GenieEventBusImpl;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -17,10 +17,10 @@
  */
 package com.netflix.genie.web.configs;
 
-import com.netflix.genie.core.properties.DataServiceRetryProperties;
-import com.netflix.genie.core.properties.HealthProperties;
-import com.netflix.genie.core.properties.JobsProperties;
-import com.netflix.genie.core.properties.S3FileTransferProperties;
+import com.netflix.genie.web.properties.DataServiceRetryProperties;
+import com.netflix.genie.web.properties.HealthProperties;
+import com.netflix.genie.web.properties.JobsProperties;
+import com.netflix.genie.web.properties.S3FileTransferProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

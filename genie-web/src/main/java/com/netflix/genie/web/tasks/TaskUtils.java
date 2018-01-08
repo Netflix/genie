@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.tasks;
 
-import com.netflix.genie.core.jobs.JobConstants;
+import com.netflix.genie.web.jobs.JobConstants;
 
 import javax.validation.constraints.NotNull;
 import java.util.Calendar;

@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.health;
 
-import com.netflix.genie.core.properties.HealthProperties;
+import com.netflix.genie.web.properties.HealthProperties;
 import com.netflix.servo.monitor.BasicDistributionSummary;
 import com.netflix.servo.monitor.MonitorConfig;
 import com.netflix.spectator.api.Registry;

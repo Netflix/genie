@@ -17,9 +17,9 @@
  */
 package com.netflix.genie.web.health;
 
-import com.netflix.genie.core.properties.JobsProperties;
-import com.netflix.genie.core.services.JobMetricsService;
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.genie.web.properties.JobsProperties;
+import com.netflix.genie.web.services.JobMetricsService;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;

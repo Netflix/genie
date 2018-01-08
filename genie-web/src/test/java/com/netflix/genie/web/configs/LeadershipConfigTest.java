@@ -18,8 +18,8 @@
 package com.netflix.genie.web.configs;
 
 import com.google.common.collect.Sets;
-import com.netflix.genie.core.events.GenieEventBus;
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.properties.ZookeeperProperties;
 import com.netflix.genie.web.tasks.leader.LeadershipTask;
 import org.apache.curator.framework.CuratorFramework;

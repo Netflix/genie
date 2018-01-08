@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.security.oauth2.pingfederate;
 
-import com.netflix.genie.core.util.MetricsConstants;
+import com.netflix.genie.web.util.MetricsConstants;
 import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Registry;
 import com.netflix.spectator.api.Timer;

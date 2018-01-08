@@ -19,12 +19,12 @@ package com.netflix.genie.web.tasks.job;
 
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobStatusMessages;
-import com.netflix.genie.core.events.GenieEventBus;
-import com.netflix.genie.core.events.JobFinishedEvent;
-import com.netflix.genie.core.events.KillJobEvent;
-import com.netflix.genie.core.jobs.JobConstants;
-import com.netflix.genie.core.properties.JobsProperties;
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.genie.web.events.GenieEventBus;
+import com.netflix.genie.web.events.JobFinishedEvent;
+import com.netflix.genie.web.events.KillJobEvent;
+import com.netflix.genie.web.jobs.JobConstants;
+import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import com.netflix.spectator.api.Counter;
 import com.netflix.spectator.api.Registry;

@@ -19,10 +19,10 @@ package com.netflix.genie.web.tasks.node;
 
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.core.jobs.JobConstants;
-import com.netflix.genie.core.properties.JobsProperties;
-import com.netflix.genie.core.services.JobSearchService;
+import com.netflix.genie.web.jobs.JobConstants;
 import com.netflix.genie.web.properties.DiskCleanupProperties;
+import com.netflix.genie.web.properties.JobsProperties;
+import com.netflix.genie.web.services.JobSearchService;
 import com.netflix.genie.web.tasks.TaskUtils;
 import com.netflix.spectator.api.Counter;
 import com.netflix.spectator.api.Registry;
