@@ -33,6 +33,7 @@ import com.netflix.genie.core.services.TagService;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.validator.constraints.NotBlank;
 
 import java.text.DateFormat;
 import java.util.Set;
@@ -94,7 +95,9 @@ class JpaBaseService {
      * @return The file entity that has been persisted in the database
      * @throws GenieException on error
      */
-    FileEntity createAndGetFileEntity(final String file) throws GenieException {
+    FileEntity createAndGetFileEntity(
+        @NotBlank(message = "File path cannot be blank") final String file
+    ) throws GenieException {
         this.fileService.createFileIfNotExists(file);
         return this.fileRepository.findByFile(file).orElseThrow(
             () -> new GenieNotFoundException("Couldn't find file entity for file " + file)
@@ -123,7 +126,9 @@ class JpaBaseService {
      * @return The tag entity that has been persisted in the database
      * @throws GenieException on error
      */
-    TagEntity createAndGetTagEntity(final String tag) throws GenieException {
+    TagEntity createAndGetTagEntity(
+        @NotBlank(message = "Tag name cannot be blank") final String tag
+    ) throws GenieException {
         this.tagService.createTagIfNotExists(tag);
         return this.tagRepository.findByTag(tag).orElseThrow(
             () -> new GenieNotFoundException("Couldn't find tag entity for tag " + tag)

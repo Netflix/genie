@@ -36,5 +36,7 @@ public interface TagService {
      * @param tag the tag to create. Not blank.
      * @throws GenieException on any error except that the tag already exists
      */
-    void createTagIfNotExists(@NotBlank final String tag) throws GenieException;
+    void createTagIfNotExists(
+        @NotBlank(message = "Tag name cannot be blank") final String tag
+    ) throws GenieException;
 }

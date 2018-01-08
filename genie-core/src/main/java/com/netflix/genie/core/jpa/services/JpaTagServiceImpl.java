@@ -52,7 +52,9 @@ public class JpaTagServiceImpl implements TagService {
      */
     @Override
 //    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void createTagIfNotExists(@NotBlank final String tag) throws GenieException {
+    public void createTagIfNotExists(
+        @NotBlank(message = "Tag name cannot be blank") final String tag
+    ) throws GenieException {
         if (this.tagRepository.existsByTag(tag)) {
             return;
         }
