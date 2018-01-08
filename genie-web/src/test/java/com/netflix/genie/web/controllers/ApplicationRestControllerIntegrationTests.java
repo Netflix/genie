@@ -1082,4 +1082,54 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(command1Id)))
             .andDo(getResultHandler);
     }
+
+    /**
+     * Test creating an application with blank files and tag resources.
+     * @throws Exception when an unexpected error is encountered
+     */
+    @Test
+    public void cantCreateApplicationWithBlankFields() throws Exception {
+
+        final Set<String> stringSetWithBlank = Sets.newHashSet("foo", " ");
+
+        final List<Application> invalidApplicationResources = Lists.newArrayList(
+            new Application
+                .Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE)
+                .withId(ID)
+                .withSetupFile(" ")
+                .build(),
+
+            new Application
+                .Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE)
+                .withId(ID)
+                .withConfigs(stringSetWithBlank)
+                .build(),
+
+            new Application
+                .Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE)
+                .withId(ID)
+                .withDependencies(stringSetWithBlank)
+                .build(),
+
+            new Application
+                .Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE)
+                .withId(ID)
+                .withTags(stringSetWithBlank)
+                .build()
+        );
+
+        for (Application invalidApplicationResource : invalidApplicationResources) {
+            Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
+
+            this.mvc
+                .perform(
+                    MockMvcRequestBuilders.post(APPLICATIONS_API)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(this.objectMapper.writeValueAsBytes(invalidApplicationResource))
+                )
+                .andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
+
+            Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
+        }
+    }
 }

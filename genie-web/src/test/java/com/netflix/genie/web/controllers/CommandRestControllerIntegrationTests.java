@@ -1508,4 +1508,51 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(cluster1Id)))
             .andDo(getResultHandler);
     }
+
+    /**
+     * Test creating a command with blank files and tag resources.
+     * @throws Exception when an unexpected error is encountered
+     */
+    @Test
+    public void cantCreateCommandWithBlankFields() throws Exception {
+
+        final Set<String> stringSetWithBlank = Sets.newHashSet("foo", " ");
+
+        final List<Command> invalidCommandResources = Lists.newArrayList(
+            new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
+                .withId(ID)
+                .withSetupFile(" ")
+                .build(),
+
+            new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
+                .withId(ID)
+                .withConfigs(stringSetWithBlank)
+                .build(),
+
+            new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
+                .withId(ID)
+                .withDependencies(stringSetWithBlank)
+
+                .build(),
+
+            new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
+                .withId(ID)
+                .withTags(stringSetWithBlank)
+                .build()
+            );
+
+        for (Command invalidCommandResource : invalidCommandResources) {
+            Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
+
+            this.mvc
+                .perform(
+                    MockMvcRequestBuilders.post(COMMANDS_API)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(this.objectMapper.writeValueAsBytes(invalidCommandResource))
+                )
+                .andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
+
+            Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
+        }
+    }
 }

@@ -36,5 +36,7 @@ public interface FileService {
      * @param file the file to create. Not blank.
      * @throws GenieException on any error except that the file already exists
      */
-    void createFileIfNotExists(@NotBlank final String file) throws GenieException;
+    void createFileIfNotExists(
+        @NotBlank(message = "File path cannot be blank") final String file
+    ) throws GenieException;
 }
