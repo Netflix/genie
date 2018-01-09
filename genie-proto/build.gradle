@@ -54,7 +54,7 @@ protobuf {
     }
 }
 
-//Ignore the generated classes from all our style/coverage/bug/license finding tools
+//Ignore the generated classes from all our style/coverage/bug/license/doc tools
 
 tasks.withType(Checkstyle) {
     exclude protoIgnorePattern
@@ -78,6 +78,10 @@ jacocoTestReport {
 
 license {
   exclude protoIgnorePattern
+}
+
+javadoc {
+    exclude protoIgnorePattern
 }
 
 // Generate proto files before generating the IDEA project
