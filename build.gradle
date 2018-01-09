@@ -303,10 +303,14 @@ task jacocoRootReport(type: JacocoReport, group: "Coverage reports") {
         )
     }
     afterEvaluate {
+        // Exclude generated files from top-level coverage report
         classDirectories = files(
-                classDirectories.files.collect {
-                    fileTree(dir: it, exclude: ["com/netflix/genie/core/jpa/entities/*_*"])
-                }
+            classDirectories.files.collect {
+                fileTree(dir: it, exclude: [
+                  "**/com/netflix/genie/proto/**",
+                  "**/com/netflix/genie/web/jpa/entities/**",
+                ])
+            }
         )
     }
 }
