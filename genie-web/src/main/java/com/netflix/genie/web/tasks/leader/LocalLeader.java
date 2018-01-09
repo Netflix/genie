@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.tasks.leader;
 
-import com.netflix.genie.core.events.GenieEventBus;
+import com.netflix.genie.web.events.GenieEventBus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;

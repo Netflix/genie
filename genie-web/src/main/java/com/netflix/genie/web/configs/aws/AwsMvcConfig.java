@@ -24,8 +24,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
-
 /**
  * Beans and configuration specifically for MVC on AWS.
  *
@@ -47,10 +45,9 @@ public class AwsMvcConfig {
      *
      * @param restTemplate The rest template to use to call the Amazon endpoints
      * @return The hostname
-     * @throws IOException When the host can't be calculated
      */
     @Bean
-    public String hostName(@Qualifier("genieRestTemplate") final RestTemplate restTemplate) throws IOException {
+    public String hostName(@Qualifier("genieRestTemplate") final RestTemplate restTemplate) {
         String result;
         try {
             result = restTemplate.getForObject(publicHostNameGet, String.class);

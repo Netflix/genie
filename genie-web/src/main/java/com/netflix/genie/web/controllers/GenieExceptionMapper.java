@@ -19,7 +19,7 @@ package com.netflix.genie.web.controllers;
 
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieUserLimitExceededException;
-import com.netflix.genie.core.util.MetricsConstants;
+import com.netflix.genie.web.util.MetricsConstants;
 import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Registry;
 import lombok.extern.slf4j.Slf4j;

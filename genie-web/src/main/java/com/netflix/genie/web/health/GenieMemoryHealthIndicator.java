@@ -17,9 +17,9 @@
  */
 package com.netflix.genie.web.health;
 
-import com.netflix.genie.core.properties.JobsMemoryProperties;
-import com.netflix.genie.core.properties.JobsProperties;
-import com.netflix.genie.core.services.JobMetricsService;
+import com.netflix.genie.web.properties.JobsMemoryProperties;
+import com.netflix.genie.web.properties.JobsProperties;
+import com.netflix.genie.web.services.JobMetricsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;

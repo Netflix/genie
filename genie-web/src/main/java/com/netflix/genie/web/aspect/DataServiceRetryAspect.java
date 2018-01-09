@@ -20,7 +20,7 @@ package com.netflix.genie.web.aspect;
 import com.google.common.collect.ImmutableMap;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
-import com.netflix.genie.core.properties.DataServiceRetryProperties;
+import com.netflix.genie.web.properties.DataServiceRetryProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -46,6 +46,7 @@ import javax.validation.ConstraintViolationException;
 
 /**
  * Aspect implementation of retrying the data service methods on certain failures.
+ *
  * @author amajumdar
  * @since 3.0.0
  */
@@ -57,6 +58,7 @@ public class DataServiceRetryAspect implements Ordered {
 
     /**
      * Constructor.
+     *
      * @param dataServiceRetryProperties retry properties
      */
     @Autowired
@@ -83,6 +85,7 @@ public class DataServiceRetryAspect implements Ordered {
 
     /**
      * Sets the retry listeners for the retry template in use.
+     *
      * @param retryListeners retry listeners
      */
     public void setRetryListeners(final RetryListener[] retryListeners) {
@@ -91,6 +94,7 @@ public class DataServiceRetryAspect implements Ordered {
 
     /**
      * Aspect implementation method of retrying the data service method on certain failures.
+     *
      * @param pjp join point
      * @return return the data method response
      * @throws GenieException any exception thrown by the data service method

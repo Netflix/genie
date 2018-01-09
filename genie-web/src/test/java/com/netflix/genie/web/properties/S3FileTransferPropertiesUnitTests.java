@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.web.properties;
 
-import com.netflix.genie.core.properties.S3FileTransferProperties;
 import com.netflix.genie.test.categories.UnitTest;
 import org.junit.Assert;
 import org.junit.Before;

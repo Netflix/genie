@@ -18,7 +18,7 @@
 package com.netflix.genie.web.tasks.job;
 
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.core.events.JobFinishedEvent;
+import com.netflix.genie.web.events.JobFinishedEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;

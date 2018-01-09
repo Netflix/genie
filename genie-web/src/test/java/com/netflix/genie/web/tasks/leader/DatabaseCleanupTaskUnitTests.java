@@ -17,10 +17,10 @@
  */
 package com.netflix.genie.web.tasks.leader;
 
-import com.netflix.genie.core.jobs.JobConstants;
-import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.genie.web.jobs.JobConstants;
 import com.netflix.genie.web.properties.DatabaseCleanupProperties;
+import com.netflix.genie.web.services.JobPersistenceService;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import com.netflix.spectator.api.DefaultRegistry;
 import org.hamcrest.Matchers;

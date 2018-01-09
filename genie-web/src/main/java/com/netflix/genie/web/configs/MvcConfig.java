@@ -18,7 +18,7 @@
 package com.netflix.genie.web.configs;
 
 import com.google.common.collect.Lists;
-import com.netflix.genie.core.properties.JobsProperties;
+import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.resources.handlers.GenieResourceHttpRequestHandler;
 import com.netflix.genie.web.resources.writers.DefaultDirectoryWriter;
 import com.netflix.genie.web.resources.writers.DirectoryWriter;

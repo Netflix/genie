@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.configs;
 
-import com.netflix.genie.core.events.GenieEventBus;
+import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.properties.ZookeeperProperties;
 import com.netflix.genie.web.tasks.leader.LeadershipTask;
 import com.netflix.genie.web.tasks.leader.LeadershipTasksCoordinator;

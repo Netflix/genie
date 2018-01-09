@@ -18,8 +18,8 @@
 package com.netflix.genie.web.aspect;
 
 import com.google.common.collect.Maps;
-import com.netflix.genie.core.util.MetricsConstants;
-import com.netflix.genie.core.util.MetricsUtils;
+import com.netflix.genie.web.util.MetricsConstants;
+import com.netflix.genie.web.util.MetricsUtils;
 import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Registry;
 import lombok.extern.slf4j.Slf4j;
@@ -65,6 +65,7 @@ public class HealthCheckMetricsAspect {
 
     /**
      * Autowired constructor.
+     *
      * @param registry metrics registry
      */
     @Autowired
@@ -78,6 +79,7 @@ public class HealthCheckMetricsAspect {
 
     /**
      * Intercept call to the Health endpoint publish a timer tagged with error, status.
+     *
      * @param joinPoint joinPoint for the actual call to invoke()
      * @return Health, as returned by the actual invocation
      * @throws Throwable as thrown by joinPoint.proceed()
@@ -113,6 +115,7 @@ public class HealthCheckMetricsAspect {
 
     /**
      * Intercept call to HealthIndicator beans loaded and publish a timer tagged with error, if any.
+     *
      * @param joinPoint joinPoint for the actual call to health()
      * @return Health, as returned by the actual invocation
      * @throws Throwable as thrown by joinPoint.proceed()
@@ -144,6 +147,7 @@ public class HealthCheckMetricsAspect {
      * Intercept call to AbstractHealthIndicator beans loaded and publish a timer tagged with error, if any.
      * This interception is required because these beans are not captured by HealthIndicator.doHealthCheck(),
      * even tho they implement that interface.
+     *
      * @param joinPoint joinPoint for the actual call to doHealthCheck()
      * @throws Throwable as thrown by joinPoint.proceed()
      */
@@ -182,7 +186,7 @@ public class HealthCheckMetricsAspect {
         );
         final Map<String, String> tags;
         if (throwable == null) {
-             tags = MetricsUtils.newSuccessTagsMap();
+            tags = MetricsUtils.newSuccessTagsMap();
         } else {
             tags = MetricsUtils.newFailureTagsMapForException(throwable);
         }
@@ -195,6 +199,7 @@ public class HealthCheckMetricsAspect {
     /**
      * Intercept calls to the main AbstractHealthAggregator and publish counters for number of invocation and failures,
      * tagged with status and indicator name.
+     *
      * @param joinPoint joinPoint for the aggregateDetails() call
      */
     @Before(
@@ -209,8 +214,7 @@ public class HealthCheckMetricsAspect {
 
         final Map<String, Health> healthDetailsMap;
         try {
-            @SuppressWarnings("unchecked")
-            final Map<String, Health> map = (Map<String, Health>) joinPoint.getArgs()[0];
+            @SuppressWarnings("unchecked") final Map<String, Health> map = (Map<String, Health>) joinPoint.getArgs()[0];
             healthDetailsMap = map;
         } catch (final Throwable t) {
             log.warn(

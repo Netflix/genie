@@ -7,7 +7,10 @@ apply plugin: "org.asciidoctor.convert"
 project.parent.tasks.collectDocumentation.dependsOn project.tasks.asciidoctor
 
 ext {
+    metaModelIgnorePattern = "**/com/netflix/genie/web/jpa/entities/*_.java"
     snippetsDir = new File(project.buildDir, "generated-snippets")
+    static_build_dir = new File(project.projectDir, "/src/main/resources/static/build")
+    static_project_dir = new File(project.projectDir, "/src/main/resources/static")
 }
 
 dependencies {
@@ -15,27 +18,26 @@ dependencies {
      * Compile Dependencies
      *******************************/
 
-    compile(project(":genie-core"))
+    compile(project(":genie-common"))
     compile(project(":genie-proto"))
 
-    // Swagger libs
+    compile("com.amazonaws:aws-java-sdk-sts")
+    compile("com.github.fge:json-patch")
+    compile("commons-httpclient:commons-httpclient")
+    compile("commons-io:commons-io")
+    compile("commons-validator:commons-validator")
     compile("io.springfox:springfox-swagger2")
     compile("io.springfox:springfox-swagger-ui")
     compile("io.springfox:springfox-bean-validators")
-
-    // Commons
+    compile("net.devh:grpc-server-spring-boot-autoconfigure")
+    compile("net.devh:grpc-server-spring-boot-starter")
     compile("org.apache.commons:commons-exec")
     compile("org.apache.httpcomponents:httpclient")
-    compile("commons-validator:commons-validator")
-
-    // JWT JOSE implementation lib
     compile("org.bitbucket.b_c:jose4j")
-
-    // Flyway for database migrations
     compile("org.flywaydb:flyway-core")
-
-    // Spring Libs
     compile("org.springframework.boot:spring-boot-starter-actuator")
+    compile("org.springframework.boot:spring-boot-starter-aop")
+    compile("org.springframework.boot:spring-boot-starter-data-jpa")
     compile("org.springframework.boot:spring-boot-starter-data-redis")
     compile("org.springframework.boot:spring-boot-starter-mail")
     compile("org.springframework.boot:spring-boot-starter-hateoas")
@@ -44,19 +46,16 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-thymeleaf")
     compile("org.springframework.boot:spring-boot-starter-tomcat")
     compile("org.springframework.boot:spring-boot-starter-web")
-    compile("org.springframework.integration:spring-integration-zookeeper")
-    compile("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
+    compile("org.springframework.cloud:spring-cloud-aws-context")
     compile("org.springframework.cloud:spring-cloud-starter-netflix-spectator")
+    compile("org.springframework.integration:spring-integration-zookeeper")
+    compile("org.springframework.retry:spring-retry")
     compile("org.springframework.security:spring-security-jwt")
     compile("org.springframework.security.extensions:spring-security-saml2-core") {
         exclude group: "org.bouncycastle", module: "bcprov-jdk15"
     }
     compile("org.springframework.security.oauth:spring-security-oauth2")
     compile("org.springframework.session:spring-session")
-
-    //gRPC and protobuf
-    compile("net.devh:grpc-server-spring-boot-autoconfigure")
-    compile("net.devh:grpc-server-spring-boot-starter")
 
     /*******************************
      * Provided Dependencies
@@ -66,13 +65,17 @@ dependencies {
      * Optional Dependencies
      *******************************/
 
+    compileOnly("org.hibernate:hibernate-jpamodelgen")
     compileOnly("org.springframework.boot:spring-boot-configuration-processor")
 
     /*******************************
      * Runtime Dependencies
      *******************************/
 
+    runtime("com.h2database:h2")
+    runtime("mysql:mysql-connector-java")
     runtime("org.codehaus.groovy:groovy-all")
+    runtime("org.postgresql:postgresql")
 
     /*******************************
      * Test Dependencies
@@ -92,7 +95,12 @@ dependencies {
 }
 
 license {
-    excludes(["static/*", "templates/*", "*.yml", "genie-banner.txt", "db/**/*.sql"])
+    exclude "static/*"
+    exclude "templates/*"
+    exclude "*.yml"
+    exclude "genie-banner.txt"
+    exclude "db/**/*.sql"
+    exclude "**/com/netflix/genie/web/jpa/entities/*_.java"
 }
 
 test {
@@ -105,8 +113,8 @@ def genieVersion = project.version.toString()
 asciidoctor {
     dependsOn test
     inputs.dir snippetsDir
-    attributes  \
-             "snippets": snippetsDir,
+    attributes    \
+               "snippets": snippetsDir,
             "revnumber": genieVersion,
             "docinfo1": ""
 
@@ -148,9 +156,6 @@ node {
     download = true
 }
 
-def static_build_dir = new File(project.projectDir, "/src/main/resources/static/build")
-def static_project_dir = new File(project.projectDir, "/src/main/resources/static")
-
 clean {
     delete static_build_dir
 }
@@ -181,5 +186,26 @@ jar {
 
     from(static_build_dir) {
         into "static"
+    }
+}
+
+//Ignore the generated classes from all our style/coverage/bug finding tools
+tasks.withType(Checkstyle) {
+    exclude metaModelIgnorePattern
+}
+
+tasks.withType(Pmd) {
+    exclude metaModelIgnorePattern
+}
+
+test {
+    jacoco {
+        excludes = ["com/netflix/genie/web/jpa/entities/*_*"]
+    }
+}
+
+jacocoTestReport {
+    doFirst {
+        classDirectories = (FileCollection) fileTree(dir: "${buildDir}/classes/main/").exclude(["com/netflix/genie/web/jpa/entities/*_*"])
     }
 }
