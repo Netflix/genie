@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
@@ -1240,5 +1241,80 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
             final String decoded = URLDecoder.decode(params.get("name"), StandardCharsets.UTF_8.name());
             Assert.assertEquals(singleEncodedNameQuery, decoded);
         }
+    }
+
+    /**
+     * Test creating a Cluster with a blank setup file path.
+     *
+     * @throws Exception When issue in creation
+     */
+    @Test
+    public void cantCreateClusterWithBlankSetupFile() throws Exception {
+        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
+
+        final Cluster clusterResource = new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP)
+            .withId(ID)
+            .withSetupFile(" ")
+            .build();
+
+        this.mvc
+            .perform(
+                MockMvcRequestBuilders.post(CLUSTERS_API)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(this.objectMapper.writeValueAsBytes(clusterResource))
+            )
+            .andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
+
+        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
+    }
+
+    /**
+     * Test creating a Cluster with a blank config file path.
+     *
+     * @throws Exception When issue in creation
+     */
+    @Test
+    public void cantCreateClusterWithBlankConfigFile() throws Exception {
+        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
+
+        final Cluster clusterResource = new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP)
+            .withId(ID)
+            .withConfigs(Sets.newHashSet("foo", " "))
+            .build();
+
+        this.mvc
+            .perform(
+                MockMvcRequestBuilders.post(CLUSTERS_API)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(this.objectMapper.writeValueAsBytes(clusterResource))
+            )
+            .andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
+
+        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
+    }
+
+    /**
+     * Test creating a Cluster with a blank tag.
+     *
+     * @throws Exception When issue in creation
+     */
+    @Test
+    public void cantCreateClusterWithBlankTag() throws Exception {
+        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
+
+        final Cluster clusterResource = new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP)
+            .withId(ID)
+            .withTags(Sets.newHashSet("foo", " "))
+            .build();
+
+        this.mvc
+            .perform(
+                MockMvcRequestBuilders.post(CLUSTERS_API)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(this.objectMapper.writeValueAsBytes(clusterResource))
+            )
+            .andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
+
+        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
     }
 }
