@@ -18,7 +18,6 @@
 package com.netflix.genie.web.jpa.services;
 
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
-import com.netflix.genie.web.controllers.IntegrationTestActiveProfilesResolver;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -44,6 +43,12 @@ import org.springframework.test.context.transaction.TransactionalTestExecutionLi
         TransactionDbUnitTestExecutionListener.class
     }
 )
-@ActiveProfiles(resolver = IntegrationTestActiveProfilesResolver.class)
+@ActiveProfiles(
+    {
+        "integration",
+        "db",
+        "db-h2",
+    }
+)
 public abstract class DBUnitTestBase {
 }
