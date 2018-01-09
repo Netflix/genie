@@ -54,7 +54,7 @@ protobuf {
     }
 }
 
-//Ignore the generated classes from all our style/coverage/bug/license/doc tools
+//Ignore the generated classes from all our style/bug/license/doc tools
 
 tasks.withType(Checkstyle) {
     exclude protoIgnorePattern
@@ -62,18 +62,6 @@ tasks.withType(Checkstyle) {
 
 tasks.withType(Pmd) {
     exclude protoIgnorePattern
-}
-
-test {
-    jacoco {
-        excludes = [protoIgnorePattern]
-    }
-}
-
-jacocoTestReport {
-    doFirst {
-        classDirectories = fileTree(dir: "${buildDir}/classes/main/").exclude([protoIgnorePattern])
-    }
 }
 
 license {
