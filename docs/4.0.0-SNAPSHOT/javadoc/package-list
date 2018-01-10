@@ -10,7 +10,6 @@ com.netflix.genie.common.dto
 com.netflix.genie.common.dto.search
 com.netflix.genie.common.exceptions
 com.netflix.genie.common.util
-com.netflix.genie.proto
 com.netflix.genie.test.categories
 com.netflix.genie.test.suppliers
 com.netflix.genie.web.aspect
