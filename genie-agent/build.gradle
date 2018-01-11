@@ -1,0 +1,28 @@
+dependencies {
+    /*******************************
+     * Compile Dependencies
+     *******************************/
+
+    compile project(":genie-common")
+    compile project(":genie-proto")
+
+    // Spring
+    compile("org.springframework.boot:spring-boot-starter")
+
+    // Misc
+    compile("com.beust:jcommander")
+
+    /*******************************
+     * Provided Dependencies
+     *******************************/
+
+    /*******************************
+     * Runtime Dependencies
+     *******************************/
+
+    /*******************************
+     * Test Dependencies
+     *******************************/
+
+    testCompile(project(":genie-test"))
+}
