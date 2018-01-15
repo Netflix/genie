@@ -46,8 +46,10 @@ import org.springframework.data.domain.Sort;
 import javax.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.time.Month;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
@@ -189,10 +191,9 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void testGetClustersByMinUpdateTime() {
-        final Calendar time = Calendar.getInstance();
-        time.clear();
-        time.set(2014, Calendar.JULY, 9, 2, 58, 59);
-        final Page<Cluster> clusters = this.service.getClusters(null, null, null, time.getTime(), null, PAGE);
+        final ZonedDateTime time = ZonedDateTime.of(2014, Month.JULY.getValue(), 9, 2, 58, 59, 0, ZoneId.of("UTC"));
+        final Page<Cluster> clusters
+            = this.service.getClusters(null, null, null, new Date(time.toInstant().toEpochMilli()), null, PAGE);
         Assert.assertEquals(1, clusters.getNumberOfElements());
         Assert.assertEquals(
             CLUSTER_2_ID, clusters.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new)
@@ -204,10 +205,9 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void testGetClustersByMaxUpdateTime() {
-        final Calendar time = Calendar.getInstance();
-        time.clear();
-        time.set(2014, Calendar.JULY, 8, 3, 0, 0);
-        final Page<Cluster> clusters = this.service.getClusters(null, null, null, null, time.getTime(), PAGE);
+        final ZonedDateTime time = ZonedDateTime.of(2014, Month.JULY.getValue(), 8, 3, 0, 0, 0, ZoneId.of("UTC"));
+        final Page<Cluster> clusters
+            = this.service.getClusters(null, null, null, null, new Date(time.toInstant().toEpochMilli()), PAGE);
         Assert.assertEquals(1, clusters.getNumberOfElements());
         Assert.assertEquals(
             CLUSTER_1_ID, clusters.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new)

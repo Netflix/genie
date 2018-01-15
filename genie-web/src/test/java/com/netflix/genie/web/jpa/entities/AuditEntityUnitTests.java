@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.web.jpa.entities;
 
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.test.categories.UnitTest;
 import org.junit.Assert;
 import org.junit.Test;
@@ -46,11 +45,10 @@ public class AuditEntityUnitTests {
     /**
      * Test to make sure @PrePersist annotation will do what we want before persistence.
      *
-     * @throws InterruptedException       If the process is interrupted
-     * @throws GeniePreconditionException If any precondition isn't met.
+     * @throws InterruptedException If the process is interrupted
      */
     @Test
-    public void testOnCreateAuditEntity() throws InterruptedException, GeniePreconditionException {
+    public void testOnCreateAuditEntity() throws InterruptedException {
         final AuditEntity a = new AuditEntity();
         Assert.assertNotNull(a.getCreated());
         Assert.assertNotNull(a.getUpdated());
