@@ -29,6 +29,7 @@ dependencies {
     compile("io.springfox:springfox-swagger2")
     compile("io.springfox:springfox-swagger-ui")
     compile("io.springfox:springfox-bean-validators")
+    compile("javax.persistence:javax.persistence-api:2.2")
     compile("net.devh:grpc-server-spring-boot-autoconfigure")
     compile("net.devh:grpc-server-spring-boot-starter")
     compile("org.apache.commons:commons-exec")
@@ -37,7 +38,10 @@ dependencies {
     compile("org.flywaydb:flyway-core")
     compile("org.springframework.boot:spring-boot-starter-actuator")
     compile("org.springframework.boot:spring-boot-starter-aop")
-    compile("org.springframework.boot:spring-boot-starter-data-jpa")
+    compile("org.springframework.boot:spring-boot-starter-data-jpa") {
+        exclude group: "org.hibernate", module: "hibernate-entitymanager"
+        exclude group: "org.hibernate.javax.persistence"
+    }
     compile("org.springframework.boot:spring-boot-starter-data-redis")
     compile("org.springframework.boot:spring-boot-starter-mail")
     compile("org.springframework.boot:spring-boot-starter-hateoas")

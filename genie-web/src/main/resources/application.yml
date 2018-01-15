@@ -147,6 +147,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC # SEE: https://moelholm.com/2016/11/09/spring-boot-controlling-timezones-with-hibernate/
   profiles:
     active: dev
   session:

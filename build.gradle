@@ -86,6 +86,7 @@ configure(javaProjects) {
                 entry "springfox-bean-validators"
             }
             dependency("commons-validator:commons-validator:1.6")
+            dependency("javax.persistence:javax.persistence-api:2.2")
             dependency("net.sf.jtidy:jtidy:r938")
             dependency("org.apache.commons:commons-configuration2:2.2")
             dependency("org.apache.commons:commons-exec:1.3")

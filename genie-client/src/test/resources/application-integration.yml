@@ -31,6 +31,7 @@ spring:
       hibernate:
         show_sql: true
         type: trace
+        time_zone: UTC
   datasource:
     url: jdbc:h2:mem:genie
     username: root
