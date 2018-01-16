@@ -13,6 +13,7 @@ dependencies {
 
     // Misc
     compile("com.beust:jcommander")
+    compile("io.grpc:grpc-netty")
 
     /*******************************
      * Provided Dependencies
