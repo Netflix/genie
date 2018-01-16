@@ -141,7 +141,7 @@ public class JobMonitoringCoordinator extends JobStateServiceImpl {
      */
     @EventListener
     public void onJobFinished(final JobFinishedEvent event) throws GenieException {
-        done(event.getId());
+        this.done(event.getId());
     }
 
     private void reAttach(final ApplicationEvent event) throws GenieException {

@@ -52,7 +52,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.dao.DuplicateKeyException;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -354,7 +354,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
     public void testUpdateJobStatusForStatusKilled() throws GenieException {
         final String id = UUID.randomUUID().toString();
         final JobEntity jobEntity = new JobEntity();
-        jobEntity.setStarted(new Date(0));
+        jobEntity.setStarted(Instant.EPOCH);
 
         Mockito.when(this.jobRepository.findByUniqueId(Mockito.eq(id))).thenReturn(Optional.of(jobEntity));
         this.jobPersistenceService.updateJobStatus(id, JobStatus.KILLED, JOB_1_STATUS_MSG);
@@ -373,7 +373,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
     public void testUpdateJobStatusForStatusSucceeded() throws GenieException {
         final String id = UUID.randomUUID().toString();
         final JobEntity jobEntity = new JobEntity();
-        jobEntity.setStarted(new Date(0));
+        jobEntity.setStarted(Instant.EPOCH);
 
         Mockito.when(this.jobRepository.findByUniqueId(Mockito.eq(id))).thenReturn(Optional.of(jobEntity));
         this.jobPersistenceService.updateJobStatus(id, JobStatus.SUCCEEDED, JOB_1_STATUS_MSG);
@@ -392,7 +392,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
     public void testUpdateJobStatusFinishedTimeForSuccess() throws GenieException {
         final String id = UUID.randomUUID().toString();
         final JobEntity jobEntity = new JobEntity();
-        jobEntity.setStarted(new Date(0));
+        jobEntity.setStarted(Instant.EPOCH);
 
         Mockito.when(this.jobRepository.findByUniqueId(Mockito.eq(id))).thenReturn(Optional.of(jobEntity));
         this.jobPersistenceService.updateJobStatus(id, JobStatus.SUCCEEDED, JOB_1_STATUS_MSG);
@@ -480,7 +480,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
         final String id = UUID.randomUUID().toString();
 
         Mockito.when(this.jobRepository.findByUniqueId(id)).thenReturn(Optional.empty());
-        this.jobPersistenceService.setJobRunningInformation(id, 1, 1, new Date());
+        this.jobPersistenceService.setJobRunningInformation(id, 1, 1, Instant.now());
     }
 
     /**
@@ -493,7 +493,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
         final String id = UUID.randomUUID().toString();
         final int processId = 28042;
         final long checkDelay = 280234L;
-        final Date timeout = new Date();
+        final Instant timeout = Instant.now();
         final JobEntity jobEntity = Mockito.mock(JobEntity.class);
         Mockito.when(jobEntity.getStatus()).thenReturn(JobStatus.INIT);
         Mockito.when(this.jobRepository.findByUniqueId(id)).thenReturn(Optional.of(jobEntity));
@@ -512,7 +512,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
     public void cantUpdateJobRunningInformationIfNoJob() throws GenieException {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jobRepository.findByUniqueId(id)).thenReturn(Optional.empty());
-        this.jobPersistenceService.setJobRunningInformation(id, 212, 308L, new Date());
+        this.jobPersistenceService.setJobRunningInformation(id, 212, 308L, Instant.now());
     }
 
     /**

@@ -26,8 +26,8 @@ import javax.annotation.Nullable;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -81,10 +81,10 @@ public final class JpaJobSpecs {
         @Nullable final ClusterEntity cluster,
         @Nullable final String commandName,
         @Nullable final CommandEntity command,
-        @Nullable final Date minStarted,
-        @Nullable final Date maxStarted,
-        @Nullable final Date minFinished,
-        @Nullable final Date maxFinished,
+        @Nullable final Instant minStarted,
+        @Nullable final Instant maxStarted,
+        @Nullable final Instant minFinished,
+        @Nullable final Instant maxFinished,
         @Nullable final String grouping,
         @Nullable final String groupingInstance
     ) {

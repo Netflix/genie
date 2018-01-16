@@ -94,7 +94,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.EnumSet;
 import java.util.Enumeration;
 import java.util.List;
@@ -496,10 +496,10 @@ public class JobRestController {
                 clusterId,
                 commandName,
                 commandId,
-                minStarted == null ? null : new Date(minStarted),
-                maxStarted == null ? null : new Date(maxStarted),
-                minFinished == null ? null : new Date(minFinished),
-                maxFinished == null ? null : new Date(maxFinished),
+                minStarted == null ? null : Instant.ofEpochMilli(minStarted),
+                maxStarted == null ? null : Instant.ofEpochMilli(maxStarted),
+                minFinished == null ? null : Instant.ofEpochMilli(minFinished),
+                maxFinished == null ? null : Instant.ofEpochMilli(maxFinished),
                 grouping,
                 groupingInstance,
                 page

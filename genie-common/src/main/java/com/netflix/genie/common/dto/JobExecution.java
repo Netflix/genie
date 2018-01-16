@@ -19,13 +19,12 @@ package com.netflix.genie.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.netflix.genie.common.util.JsonDateDeserializer;
 import lombok.Getter;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
-import java.util.Date;
+import java.time.Instant;
 import java.util.Optional;
 
 /**
@@ -63,7 +62,7 @@ public class JobExecution extends BaseDTO {
         message = "The delay between checks must be at least 1 millisecond. Probably should be much more than that"
     )
     private final Long checkDelay;
-    private final Date timeout;
+    private final Instant timeout;
     private final Integer exitCode;
     @Min(
         value = 1,
@@ -83,11 +82,7 @@ public class JobExecution extends BaseDTO {
         this.checkDelay = builder.bCheckDelay;
         this.exitCode = builder.bExitCode;
         this.memory = builder.bMemory;
-        if (builder.bTimeout != null) {
-            this.timeout = new Date(builder.bTimeout.getTime());
-        } else {
-            this.timeout = null;
-        }
+        this.timeout = builder.bTimeout;
     }
 
     /**
@@ -113,12 +108,8 @@ public class JobExecution extends BaseDTO {
      *
      * @return The timeout date
      */
-    public Optional<Date> getTimeout() {
-        if (this.timeout == null) {
-            return Optional.empty();
-        } else {
-            return Optional.of(new Date(this.timeout.getTime()));
-        }
+    public Optional<Instant> getTimeout() {
+        return Optional.ofNullable(this.timeout);
     }
 
     /**
@@ -150,8 +141,7 @@ public class JobExecution extends BaseDTO {
         private final String bHostName;
         private Integer bProcessId;
         private Long bCheckDelay;
-        @JsonDeserialize(using = JsonDateDeserializer.class)
-        private Date bTimeout;
+        private Instant bTimeout;
         private Integer bExitCode;
         private Integer bMemory;
 
@@ -195,12 +185,8 @@ public class JobExecution extends BaseDTO {
          * @param timeout The timeout date
          * @return The builder
          */
-        public Builder withTimeout(final Date timeout) {
-            if (timeout != null) {
-                this.bTimeout = new Date(timeout.getTime());
-            } else {
-                this.bTimeout = null;
-            }
+        public Builder withTimeout(@Nullable final Instant timeout) {
+            this.bTimeout = timeout;
             return this;
         }
 

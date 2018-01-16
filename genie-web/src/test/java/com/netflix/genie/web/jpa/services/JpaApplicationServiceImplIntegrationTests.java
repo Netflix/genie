@@ -44,7 +44,7 @@ import org.springframework.data.domain.Sort;
 import javax.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.util.Date;
+import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
 
@@ -390,7 +390,7 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(APP_1_USER, getApp.getUser());
         Assert.assertEquals(ApplicationStatus.INACTIVE, getApp.getStatus());
         Assert.assertEquals(3, getApp.getTags().size());
-        final Date updateTime = getApp.getUpdated().orElseThrow(IllegalArgumentException::new);
+        final Instant updateTime = getApp.getUpdated().orElseThrow(IllegalArgumentException::new);
 
         final Set<String> tags = Sets.newHashSet("prod", "tez", "yarn", "hadoop");
         tags.addAll(getApp.getTags());
@@ -422,15 +422,15 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
     @Test
     public void testUpdateCreateAndUpdate() throws GenieException {
         final Application init = this.appService.getApplication(APP_1_ID);
-        final Date created = init.getCreated().orElseThrow(IllegalArgumentException::new);
-        final Date updated = init.getUpdated().orElseThrow(IllegalArgumentException::new);
+        final Instant created = init.getCreated().orElseThrow(IllegalArgumentException::new);
+        final Instant updated = init.getUpdated().orElseThrow(IllegalArgumentException::new);
 
         final Application.Builder updateApp = new Application.Builder(
             init.getName(), init.getUser(), init.getVersion(), init.getStatus()
         )
             .withId(init.getId().orElseThrow(IllegalArgumentException::new))
-            .withCreated(new Date())
-            .withUpdated(new Date(0))
+            .withCreated(Instant.now())
+            .withUpdated(Instant.EPOCH)
             .withTags(init.getTags())
             .withConfigs(init.getConfigs())
             .withDependencies(init.getDependencies());
@@ -443,7 +443,7 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
         final Application updatedApp = this.appService.getApplication(APP_1_ID);
         Assert.assertEquals(created, updatedApp.getCreated().orElseThrow(IllegalArgumentException::new));
         Assert.assertThat(updatedApp.getUpdated(), Matchers.not(updated));
-        Assert.assertNotEquals(new Date(0), updatedApp.getUpdated());
+        Assert.assertNotEquals(Instant.EPOCH, updatedApp.getUpdated());
         Assert.assertEquals(init.getTags(), updatedApp.getTags());
         Assert.assertEquals(init.getConfigs(), updatedApp.getConfigs());
         Assert.assertEquals(init.getDependencies(), updatedApp.getDependencies());
@@ -459,7 +459,7 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
     public void testPatchApplication() throws GenieException, IOException {
         final Application getApp = this.appService.getApplication(APP_1_ID);
         Assert.assertEquals(APP_1_USER, getApp.getUser());
-        final Date updateTime = getApp.getUpdated().orElseThrow(IllegalArgumentException::new);
+        final Instant updateTime = getApp.getUpdated().orElseThrow(IllegalArgumentException::new);
 
         final String patchString = "[{ \"op\": \"replace\", \"path\": \"/user\", \"value\": \"" + APP_2_USER + "\" }]";
         final JsonPatch patch = JsonPatch.fromJson(GenieObjectMapper.getMapper().readTree(patchString));

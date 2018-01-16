@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.jpa.entities.projections;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.Optional;
 
 /**
@@ -54,14 +54,14 @@ public interface JobSearchProjection extends JobStatusProjection {
      *
      * @return The time the job started
      */
-    Optional<Date> getStarted();
+    Optional<Instant> getStarted();
 
     /**
      * Get the time the job finished if it has finished.
      *
      * @return The time the job finished
      */
-    Optional<Date> getFinished();
+    Optional<Instant> getFinished();
 
     /**
      * Get the name of the cluster that is running or did run this job.

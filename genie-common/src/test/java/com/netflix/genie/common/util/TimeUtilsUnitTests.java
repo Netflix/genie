@@ -24,7 +24,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import java.time.Duration;
-import java.util.Date;
+import java.time.Instant;
 
 /**
  * Unit tests for TimeUtils.
@@ -36,29 +36,20 @@ import java.util.Date;
 public class TimeUtilsUnitTests {
 
     /**
-     * Just ignore the constructor.
-     */
-    @Test
-    public void canConstruct() {
-        Assert.assertNotNull(new TimeUtils());
-    }
-
-    /**
      * Can get the duration for various cases.
      */
     @Test
     public void canGetDuration() {
-        final Date epoch = new Date(0);
         final long durationMillis = 50823L;
         final Duration duration = Duration.ofMillis(durationMillis);
-        final Date started = new Date();
-        final Date finished = new Date(started.getTime() + durationMillis);
+        final Instant started = Instant.now();
+        final Instant finished = started.plusMillis(durationMillis);
 
         Assert.assertThat(TimeUtils.getDuration(null, finished), Matchers.is(Duration.ZERO));
-        Assert.assertThat(TimeUtils.getDuration(epoch, finished), Matchers.is(Duration.ZERO));
+        Assert.assertThat(TimeUtils.getDuration(Instant.EPOCH, finished), Matchers.is(Duration.ZERO));
 
         Assert.assertNotNull(TimeUtils.getDuration(started, null));
-        Assert.assertNotNull(TimeUtils.getDuration(started, epoch));
+        Assert.assertNotNull(TimeUtils.getDuration(started, Instant.EPOCH));
 
         Assert.assertThat(TimeUtils.getDuration(started, finished), Matchers.is(duration));
     }

@@ -43,8 +43,8 @@ import org.springframework.stereotype.Component;
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
-import java.util.Calendar;
-import java.util.Date;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -153,10 +153,10 @@ public class DiskCleanupTask implements Runnable {
                 }
 
                 // Delete anything with a finish time before today @12 AM UTC - retention
-                final Calendar retentionThreshold = TaskUtils.getMidnightUTC();
-                TaskUtils.subtractDaysFromDate(retentionThreshold, this.properties.getRetention());
-                final Optional<Date> finished = job.getFinished();
-                if (finished.isPresent() && finished.get().before(retentionThreshold.getTime())) {
+                final Instant midnightUTC = TaskUtils.getMidnightUTC();
+                final Instant retentionThreshold = midnightUTC.minus(this.properties.getRetention(), ChronoUnit.DAYS);
+                final Optional<Instant> finished = job.getFinished();
+                if (finished.isPresent() && finished.get().isBefore(retentionThreshold)) {
                     log.info("Attempting to delete job directory for job {}", id);
                     if (this.runAsUser) {
                         final CommandLine commandLine = new CommandLine("sudo");

@@ -24,7 +24,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
 
@@ -84,7 +84,7 @@ public class CommandUnitTests {
         final Set<String> dependencies = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
         builder.withDependencies(dependencies);
 
-        final Date created = new Date();
+        final Instant created = Instant.now();
         builder.withCreated(created);
 
         final String description = UUID.randomUUID().toString();
@@ -96,7 +96,7 @@ public class CommandUnitTests {
         final Set<String> tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
         builder.withTags(tags);
 
-        final Date updated = new Date();
+        final Instant updated = Instant.now();
         builder.withUpdated(updated);
 
         builder.withMemory(MEMORY);

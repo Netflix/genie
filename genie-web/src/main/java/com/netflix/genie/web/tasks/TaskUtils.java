@@ -17,10 +17,9 @@
  */
 package com.netflix.genie.web.tasks;
 
-import com.netflix.genie.web.jobs.JobConstants;
-
-import javax.validation.constraints.NotNull;
-import java.util.Calendar;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 /**
  * Utility methods used by various Genie tasks.
@@ -41,23 +40,7 @@ public final class TaskUtils {
      *
      * @return 12 AM UTC.
      */
-    public static Calendar getMidnightUTC() {
-        final Calendar cal = Calendar.getInstance(JobConstants.UTC);
-        // Make sure everything but the year, month, day is 0
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        return cal;
-    }
-
-    /**
-     * Subtract the given number of days from the given date.
-     *
-     * @param cal  The calendar object to modify
-     * @param days the number of days. If negative they won't be added they will just be subtracted.
-     */
-    public static void subtractDaysFromDate(@NotNull final Calendar cal, final int days) {
-        cal.add(Calendar.DAY_OF_YEAR, days < 0 ? days : days * -1);
+    public static Instant getMidnightUTC() {
+        return ZonedDateTime.now(ZoneId.of("UTC")).withHour(0).withMinute(0).withSecond(0).withNano(0).toInstant();
     }
 }

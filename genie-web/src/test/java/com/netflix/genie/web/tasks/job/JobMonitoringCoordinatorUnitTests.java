@@ -28,7 +28,6 @@ import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.events.JobFinishedEvent;
 import com.netflix.genie.web.events.JobFinishedReason;
 import com.netflix.genie.web.events.JobStartedEvent;
-import com.netflix.genie.web.jobs.JobConstants;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.services.JobSearchService;
 import com.netflix.genie.web.services.JobSubmitterService;
@@ -48,7 +47,8 @@ import org.springframework.scheduling.TaskScheduler;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Calendar;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
@@ -77,7 +77,7 @@ public class JobMonitoringCoordinatorUnitTests {
     private JobMonitoringCoordinator coordinator;
     private JobSearchService jobSearchService;
     private GenieEventBus genieEventBus;
-    private Date tomorrow;
+    private Instant tomorrow;
 
     /**
      * Setup for the tests.
@@ -86,9 +86,7 @@ public class JobMonitoringCoordinatorUnitTests {
      */
     @Before
     public void setup() throws IOException {
-        final Calendar cal = Calendar.getInstance(JobConstants.UTC);
-        cal.add(Calendar.DAY_OF_YEAR, 1);
-        this.tomorrow = cal.getTime();
+        this.tomorrow = Instant.now().plus(1, ChronoUnit.DAYS);
         this.jobSearchService = Mockito.mock(JobSearchService.class);
         final JobSubmitterService jobSubmitterService = Mockito.mock(JobSubmitterService.class);
         final Executor executor = Mockito.mock(Executor.class);
@@ -357,7 +355,7 @@ public class JobMonitoringCoordinatorUnitTests {
             = new JobFinishedEvent(jobId, JobFinishedReason.FAILED_TO_INIT, "something", this);
         Mockito.when(task.isDone()).thenReturn(true).thenReturn(false).thenReturn(false);
         Mockito.when(task.cancel(true)).thenReturn(true).thenReturn(false);
-        Mockito.when(scheduler.schedule(Mockito.any(), Mockito.any(Date.class))).thenReturn(task);
+        Mockito.when(this.scheduler.schedule(Mockito.any(), Mockito.any(Date.class))).thenReturn(task);
         Assert.assertThat(this.coordinator.getNumActiveJobs(), Matchers.is(0));
         Assert.assertThat(this.coordinator.getUsedMemory(), Matchers.is(0));
         coordinator.init(jobId);

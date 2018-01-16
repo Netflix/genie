@@ -26,7 +26,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -177,7 +177,7 @@ public class JobRequestUnitTests {
         final String setupFile = UUID.randomUUID().toString();
         builder.withSetupFile(setupFile);
 
-        final Date created = new Date();
+        final Instant created = Instant.now();
         builder.withCreated(created);
 
         final String description = UUID.randomUUID().toString();
@@ -193,7 +193,7 @@ public class JobRequestUnitTests {
         );
         builder.withTags(tags);
 
-        final Date updated = new Date();
+        final Instant updated = Instant.now();
         builder.withUpdated(updated);
 
         final List<String> applications = Lists.newArrayList(
@@ -289,7 +289,7 @@ public class JobRequestUnitTests {
         final String setupFile = UUID.randomUUID().toString();
         builder.withSetupFile(setupFile);
 
-        final Date created = new Date();
+        final Instant created = Instant.now();
         builder.withCreated(created);
 
         final String description = UUID.randomUUID().toString();
@@ -305,7 +305,7 @@ public class JobRequestUnitTests {
         );
         builder.withTags(tags);
 
-        final Date updated = new Date();
+        final Instant updated = Instant.now();
         builder.withUpdated(updated);
 
         final List<String> applications = Lists.newArrayList(

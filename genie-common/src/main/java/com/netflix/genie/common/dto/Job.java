@@ -32,7 +32,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.Duration;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,8 +51,8 @@ public class Job extends CommonDTO {
     private final JobStatus status;
     @Size(max = 255, message = "Max length of the status message is 255 characters")
     private final String statusMsg;
-    private final Date started;
-    private final Date finished;
+    private final Instant started;
+    private final Instant finished;
     @Size(max = 1024, message = "Max character length is 1024 characters for the archive location")
     private final String archiveLocation;
     @Size(max = 255, message = "Max character length is 255 characters for the cluster name")
@@ -78,8 +78,8 @@ public class Job extends CommonDTO {
             : StringUtils.join(builder.bCommandArgs, StringUtils.SPACE);
         this.status = builder.bStatus;
         this.statusMsg = builder.bStatusMsg;
-        this.started = builder.bStarted == null ? null : new Date(builder.bStarted.getTime());
-        this.finished = builder.bFinished == null ? null : new Date(builder.bFinished.getTime());
+        this.started = builder.bStarted;
+        this.finished = builder.bFinished;
         this.archiveLocation = builder.bArchiveLocation;
         this.clusterName = builder.bClusterName;
         this.commandName = builder.bCommandName;
@@ -159,8 +159,8 @@ public class Job extends CommonDTO {
      *
      * @return The started time or null if not set
      */
-    public Optional<Date> getStarted() {
-        return this.started == null ? Optional.empty() : Optional.of(new Date(this.started.getTime()));
+    public Optional<Instant> getStarted() {
+        return Optional.ofNullable(this.started);
     }
 
     /**
@@ -168,8 +168,8 @@ public class Job extends CommonDTO {
      *
      * @return The finished time or null if not set
      */
-    public Optional<Date> getFinished() {
-        return this.finished == null ? Optional.empty() : Optional.of(new Date(this.finished.getTime()));
+    public Optional<Instant> getFinished() {
+        return Optional.ofNullable(this.finished);
     }
 
     /**
@@ -183,8 +183,8 @@ public class Job extends CommonDTO {
         private final List<String> bCommandArgs;
         private JobStatus bStatus = JobStatus.INIT;
         private String bStatusMsg;
-        private Date bStarted;
-        private Date bFinished;
+        private Instant bStarted;
+        private Instant bFinished;
         private String bArchiveLocation;
         private String bClusterName;
         private String bCommandName;
@@ -241,8 +241,8 @@ public class Job extends CommonDTO {
          *
          * @param commandArgs The command args
          * @return The builder
-         * @since 3.3.0
          * @see #withCommandArgs(List)
+         * @since 3.3.0
          */
         @Deprecated
         public Builder withCommandArgs(@Nullable final String commandArgs) {
@@ -321,10 +321,8 @@ public class Job extends CommonDTO {
          * @param started The started time of the job
          * @return The builder
          */
-        public Builder withStarted(@Nullable final Date started) {
-            if (started != null) {
-                this.bStarted = new Date(started.getTime());
-            }
+        public Builder withStarted(@Nullable final Instant started) {
+            this.bStarted = started;
             return this;
         }
 
@@ -334,10 +332,8 @@ public class Job extends CommonDTO {
          * @param finished The time the job finished
          * @return The builder
          */
-        public Builder withFinished(@Nullable final Date finished) {
-            if (finished != null) {
-                this.bFinished = new Date(finished.getTime());
-            }
+        public Builder withFinished(@Nullable final Instant finished) {
+            this.bFinished = finished;
             return this;
         }
 

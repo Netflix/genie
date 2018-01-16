@@ -32,7 +32,7 @@ import org.hibernate.validator.constraints.NotBlank;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.time.Duration;
-import java.util.Date;
+import java.time.Instant;
 import java.util.Optional;
 
 /**
@@ -48,8 +48,8 @@ public class JobSearchResult extends BaseSearchResult {
     private static final long serialVersionUID = -3886685874572773514L;
 
     private final JobStatus status;
-    private final Date started;
-    private final Date finished;
+    private final Instant started;
+    private final Instant finished;
     private final String clusterName;
     private final String commandName;
     @JsonSerialize(using = ToStringSerializer.class)
@@ -70,19 +70,19 @@ public class JobSearchResult extends BaseSearchResult {
      */
     @JsonCreator
     public JobSearchResult(
-        @JsonProperty("started") final Date started,
-        @JsonProperty("finished") final Date finished,
         @JsonProperty("id") @NotBlank final String id,
         @JsonProperty("name") @NotBlank final String name,
         @JsonProperty("user") @NotBlank final String user,
         @JsonProperty("status") @NotNull final JobStatus status,
+        @JsonProperty("started") @Nullable final Instant started,
+        @JsonProperty("finished") @Nullable final Instant finished,
         @JsonProperty("clusterName") @Nullable final String clusterName,
         @JsonProperty("commandName") @Nullable final String commandName
     ) {
         super(id, name, user);
         this.status = status;
-        this.started = started == null ? null : new Date(started.getTime());
-        this.finished = finished == null ? null : new Date(finished.getTime());
+        this.started = started;
+        this.finished = finished;
         this.clusterName = clusterName;
         this.commandName = commandName;
 
@@ -94,8 +94,8 @@ public class JobSearchResult extends BaseSearchResult {
      *
      * @return The started time or null if not set
      */
-    public Optional<Date> getStarted() {
-        return this.started == null ? Optional.empty() : Optional.of(new Date(this.started.getTime()));
+    public Optional<Instant> getStarted() {
+        return Optional.ofNullable(this.started);
     }
 
     /**
@@ -103,8 +103,8 @@ public class JobSearchResult extends BaseSearchResult {
      *
      * @return The finished time or null if not set
      */
-    public Optional<Date> getFinished() {
-        return this.finished == null ? Optional.empty() : Optional.of(new Date(this.finished.getTime()));
+    public Optional<Instant> getFinished() {
+        return Optional.ofNullable(this.finished);
     }
 
     /**

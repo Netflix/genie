@@ -25,7 +25,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import java.time.Duration;
-import java.util.Date;
+import java.time.Instant;
 import java.util.UUID;
 
 /**
@@ -67,7 +67,7 @@ public class JobSearchResultUnitTests {
         );
         Assert.assertThat(
             searchResult.getRuntime(),
-            Matchers.is(Duration.ofMillis(finished.getTime() - started.getTime()))
+            Matchers.is(Duration.ofMillis(finished.toEpochMilli() - started.toEpochMilli()))
         );
 
         final JobSearchResult searchResult2 = new JobSearchResult(id, name, user, status, null, null, null, null);

@@ -32,7 +32,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import java.io.IOException;
-import java.util.Calendar;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 /**
  * Unit tests for UnixProcessChecker.
@@ -55,10 +56,8 @@ public class UnixProcessCheckerUnitTests {
     public void setup() {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
         this.executor = Mockito.mock(Executor.class);
-        final Calendar tomorrow = Calendar.getInstance();
-        // For standard tests this will keep it from dying
-        tomorrow.add(Calendar.DAY_OF_YEAR, 1);
-        this.processChecker = new UnixProcessChecker(PID, this.executor, tomorrow.getTime());
+        final Instant tomorrow = Instant.now().plus(1, ChronoUnit.DAYS);
+        this.processChecker = new UnixProcessChecker(PID, this.executor, tomorrow);
     }
 
     /**
@@ -89,9 +88,8 @@ public class UnixProcessCheckerUnitTests {
      */
     @Test(expected = GenieTimeoutException.class)
     public void canCheckProcessTimeout() throws GenieTimeoutException, IOException {
-        final Calendar yesterday = Calendar.getInstance();
-        yesterday.add(Calendar.DAY_OF_YEAR, -1);
-        this.processChecker = new UnixProcessChecker(PID, this.executor, yesterday.getTime());
+        final Instant yesterday = Instant.now().minus(1, ChronoUnit.DAYS);
+        this.processChecker = new UnixProcessChecker(PID, this.executor, yesterday);
         this.processChecker.checkProcess();
     }
 }

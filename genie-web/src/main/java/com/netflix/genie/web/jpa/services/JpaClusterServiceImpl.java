@@ -61,8 +61,8 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -154,8 +154,8 @@ public class JpaClusterServiceImpl extends JpaBaseService implements ClusterServ
         @Nullable final String name,
         @Nullable final Set<ClusterStatus> statuses,
         @Nullable final Set<String> tags,
-        @Nullable final Date minUpdateTime,
-        @Nullable final Date maxUpdateTime,
+        @Nullable final Instant minUpdateTime,
+        @Nullable final Instant maxUpdateTime,
         final Pageable page
     ) {
         log.debug("called");

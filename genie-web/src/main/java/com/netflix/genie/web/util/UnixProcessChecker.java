@@ -26,8 +26,7 @@ import org.apache.commons.lang3.SystemUtils;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Instant;
 
 /**
  * Implementation of ProcessChecker for Unix based systems.
@@ -39,8 +38,7 @@ public class UnixProcessChecker implements ProcessChecker {
 
     private final Executor executor;
     private final CommandLine commandLine;
-    private final Date timeout;
-    private final SimpleDateFormat dateFormatter;
+    private final Instant timeout;
 
     /**
      * Constructor.
@@ -49,7 +47,7 @@ public class UnixProcessChecker implements ProcessChecker {
      * @param executor The executor to use for generating system commands.
      * @param timeout  The time which after this job should be killed due to timeout
      */
-    public UnixProcessChecker(@Min(1) final int pid, @NotNull final Executor executor, @NotNull final Date timeout) {
+    public UnixProcessChecker(@Min(1) final int pid, @NotNull final Executor executor, @NotNull final Instant timeout) {
         if (!SystemUtils.IS_OS_UNIX) {
             throw new IllegalArgumentException("Not running on a Unix system.");
         }
@@ -62,8 +60,7 @@ public class UnixProcessChecker implements ProcessChecker {
         this.commandLine.addArgument("-p");
         this.commandLine.addArgument(Integer.toString(pid));
 
-        this.timeout = new Date(timeout.getTime());
-        this.dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        this.timeout = timeout;
     }
 
     /**
@@ -74,9 +71,9 @@ public class UnixProcessChecker implements ProcessChecker {
         this.executor.execute(this.commandLine);
 
         // If we get here the process is still running. Check if it should be killed due to timeout.
-        if (new Date().getTime() > this.timeout.getTime()) {
+        if (Instant.now().isAfter(this.timeout)) {
             throw new GenieTimeoutException(
-                "Job has exceeded its timeout time of " + this.dateFormatter.format(this.timeout)
+                "Job has exceeded its timeout time of " + this.timeout
             );
         }
     }

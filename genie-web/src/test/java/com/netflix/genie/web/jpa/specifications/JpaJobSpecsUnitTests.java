@@ -31,7 +31,8 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.util.Date;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Set;
 import java.util.UUID;
 
@@ -53,10 +54,10 @@ public class JpaJobSpecsUnitTests {
     private static final Set<String> TAGS = Sets.newHashSet();
     private static final Set<JobStatus> STATUSES = Sets.newHashSet();
     private static final String TAG = UUID.randomUUID().toString();
-    private static final Date MIN_STARTED = new Date();
-    private static final Date MAX_STARTED = new Date(MIN_STARTED.getTime() + 10);
-    private static final Date MIN_FINISHED = new Date(MAX_STARTED.getTime() + 10);
-    private static final Date MAX_FINISHED = new Date(MIN_FINISHED.getTime() + 10);
+    private static final Instant MIN_STARTED = Instant.now();
+    private static final Instant MAX_STARTED = MIN_STARTED.plus(10, ChronoUnit.MILLIS);
+    private static final Instant MIN_FINISHED = MAX_STARTED.plus(10, ChronoUnit.MILLIS);
+    private static final Instant MAX_FINISHED = MIN_FINISHED.plus(10, ChronoUnit.MILLIS);
     private static final String GROUPING = UUID.randomUUID().toString();
     private static final String GROUPING_INSTANCE = UUID.randomUUID().toString();
 
@@ -132,7 +133,7 @@ public class JpaJobSpecsUnitTests {
 
         this.tagLikeStatement = JpaSpecificationUtils.getTagLikeString(TAGS);
 
-        final Path<Date> startedPath = (Path<Date>) Mockito.mock(Path.class);
+        final Path<Instant> startedPath = (Path<Instant>) Mockito.mock(Path.class);
         final Predicate minStartedPredicate = Mockito.mock(Predicate.class);
         Mockito.when(this.root.get(JobEntity_.started)).thenReturn(startedPath);
         Mockito
@@ -144,7 +145,7 @@ public class JpaJobSpecsUnitTests {
             .when(this.cb.lessThan(Mockito.eq(startedPath), Mockito.eq(MAX_STARTED)))
             .thenReturn(maxStartedPredicate);
 
-        final Path<Date> finishedPath = (Path<Date>) Mockito.mock(Path.class);
+        final Path<Instant> finishedPath = (Path<Instant>) Mockito.mock(Path.class);
         final Predicate minFinishedPredicate = Mockito.mock(Predicate.class);
         Mockito.when(this.root.get(JobEntity_.finished)).thenReturn(finishedPath);
         Mockito

@@ -46,11 +46,11 @@ import org.springframework.data.domain.Sort;
 import javax.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.time.Instant;
 import java.time.Month;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -193,7 +193,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
     public void testGetClustersByMinUpdateTime() {
         final ZonedDateTime time = ZonedDateTime.of(2014, Month.JULY.getValue(), 9, 2, 58, 59, 0, ZoneId.of("UTC"));
         final Page<Cluster> clusters
-            = this.service.getClusters(null, null, null, new Date(time.toInstant().toEpochMilli()), null, PAGE);
+            = this.service.getClusters(null, null, null, time.toInstant(), null, PAGE);
         Assert.assertEquals(1, clusters.getNumberOfElements());
         Assert.assertEquals(
             CLUSTER_2_ID, clusters.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new)
@@ -207,7 +207,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
     public void testGetClustersByMaxUpdateTime() {
         final ZonedDateTime time = ZonedDateTime.of(2014, Month.JULY.getValue(), 8, 3, 0, 0, 0, ZoneId.of("UTC"));
         final Page<Cluster> clusters
-            = this.service.getClusters(null, null, null, null, new Date(time.toInstant().toEpochMilli()), PAGE);
+            = this.service.getClusters(null, null, null, null, time.toInstant(), PAGE);
         Assert.assertEquals(1, clusters.getNumberOfElements());
         Assert.assertEquals(
             CLUSTER_1_ID, clusters.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new)
@@ -470,8 +470,8 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
     @Test
     public void testUpdateCreateAndUpdate() throws GenieException {
         final Cluster getCluster = this.service.getCluster(CLUSTER_1_ID);
-        final Date created = getCluster.getCreated().orElseThrow(IllegalArgumentException::new);
-        final Date updated = getCluster.getUpdated().orElseThrow(IllegalArgumentException::new);
+        final Instant created = getCluster.getCreated().orElseThrow(IllegalArgumentException::new);
+        final Instant updated = getCluster.getUpdated().orElseThrow(IllegalArgumentException::new);
 
         final Cluster.Builder updateCluster = new Cluster.Builder(
             getCluster.getName(),
@@ -480,8 +480,8 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
             getCluster.getStatus()
         )
             .withId(getCluster.getId().orElseThrow(IllegalArgumentException::new))
-            .withCreated(new Date())
-            .withUpdated(new Date(0))
+            .withCreated(Instant.now())
+            .withUpdated(Instant.EPOCH)
             .withTags(getCluster.getTags())
             .withConfigs(getCluster.getConfigs())
             .withDependencies(getCluster.getDependencies());
@@ -493,7 +493,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         final Cluster updatedCluster = this.service.getCluster(CLUSTER_1_ID);
         Assert.assertEquals(created, updatedCluster.getCreated().orElseThrow(IllegalArgumentException::new));
         Assert.assertNotEquals(updated, updatedCluster.getUpdated());
-        Assert.assertNotEquals(new Date(0), updatedCluster.getUpdated());
+        Assert.assertNotEquals(Instant.EPOCH, updatedCluster.getUpdated().orElseThrow(IllegalArgumentException::new));
         Assert.assertEquals(getCluster.getTags(), updatedCluster.getTags());
         Assert.assertEquals(getCluster.getConfigs(), updatedCluster.getConfigs());
         Assert.assertEquals(getCluster.getDependencies(), updatedCluster.getDependencies());
@@ -509,7 +509,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
     public void testPatchCluster() throws GenieException, IOException {
         final Cluster getCluster = this.service.getCluster(CLUSTER_1_ID);
         Assert.assertThat(getCluster.getName(), Matchers.is(CLUSTER_1_NAME));
-        final Date updateTime = getCluster.getUpdated().orElseThrow(IllegalArgumentException::new);
+        final Instant updateTime = getCluster.getUpdated().orElseThrow(IllegalArgumentException::new);
 
         final String patchString
             = "[{ \"op\": \"replace\", \"path\": \"/name\", \"value\": \"" + CLUSTER_2_NAME + "\" }]";

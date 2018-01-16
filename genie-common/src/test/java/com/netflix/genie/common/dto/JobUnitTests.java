@@ -27,7 +27,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import java.time.Duration;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -124,10 +124,10 @@ public class JobUnitTests {
         final String commandName = UUID.randomUUID().toString();
         builder.withCommandName(commandName);
 
-        final Date finished = new Date();
+        final Instant finished = Instant.now();
         builder.withFinished(finished);
 
-        final Date started = new Date();
+        final Instant started = Instant.now();
         builder.withStarted(started);
 
         builder.withStatus(JobStatus.SUCCEEDED);
@@ -135,7 +135,7 @@ public class JobUnitTests {
         final String statusMsg = UUID.randomUUID().toString();
         builder.withStatusMsg(statusMsg);
 
-        final Date created = new Date();
+        final Instant created = Instant.now();
         builder.withCreated(created);
 
         final String description = UUID.randomUUID().toString();
@@ -151,7 +151,7 @@ public class JobUnitTests {
         );
         builder.withTags(tags);
 
-        final Date updated = new Date();
+        final Instant updated = Instant.now();
         builder.withUpdated(updated);
 
         final String grouping = UUID.randomUUID().toString();
@@ -182,7 +182,10 @@ public class JobUnitTests {
         Assert.assertThat(job.getId().orElseThrow(IllegalArgumentException::new), Matchers.is(id));
         Assert.assertThat(job.getTags(), Matchers.is(tags));
         Assert.assertThat(job.getUpdated().orElseThrow(IllegalArgumentException::new), Matchers.is(updated));
-        Assert.assertThat(job.getRuntime(), Matchers.is(Duration.ofMillis(finished.getTime() - started.getTime())));
+        Assert.assertThat(
+            job.getRuntime(),
+            Matchers.is(Duration.ofMillis(finished.toEpochMilli() - started.toEpochMilli()))
+        );
         Assert.assertThat(job.getGrouping().orElseThrow(IllegalArgumentException::new), Matchers.is(grouping));
         Assert.assertThat(
             job.getGroupingInstance().orElseThrow(IllegalArgumentException::new),
@@ -208,10 +211,10 @@ public class JobUnitTests {
         final String commandName = UUID.randomUUID().toString();
         builder.withCommandName(commandName);
 
-        final Date finished = new Date();
+        final Instant finished = Instant.now();
         builder.withFinished(finished);
 
-        final Date started = new Date();
+        final Instant started = Instant.now();
         builder.withStarted(started);
 
         builder.withStatus(JobStatus.SUCCEEDED);
@@ -219,7 +222,7 @@ public class JobUnitTests {
         final String statusMsg = UUID.randomUUID().toString();
         builder.withStatusMsg(statusMsg);
 
-        final Date created = new Date();
+        final Instant created = Instant.now();
         builder.withCreated(created);
 
         final String description = UUID.randomUUID().toString();
@@ -235,7 +238,7 @@ public class JobUnitTests {
         );
         builder.withTags(tags);
 
-        final Date updated = new Date();
+        final Instant updated = Instant.now();
         builder.withUpdated(updated);
 
         final String grouping = UUID.randomUUID().toString();
@@ -266,7 +269,10 @@ public class JobUnitTests {
         Assert.assertThat(job.getId().orElseThrow(IllegalArgumentException::new), Matchers.is(id));
         Assert.assertThat(job.getTags(), Matchers.is(tags));
         Assert.assertThat(job.getUpdated().orElseThrow(IllegalArgumentException::new), Matchers.is(updated));
-        Assert.assertThat(job.getRuntime(), Matchers.is(Duration.ofMillis(finished.getTime() - started.getTime())));
+        Assert.assertThat(
+            job.getRuntime(),
+            Matchers.is(Duration.ofMillis(finished.toEpochMilli() - started.toEpochMilli()))
+        );
         Assert.assertThat(job.getGrouping().orElseThrow(IllegalArgumentException::new), Matchers.is(grouping));
         Assert.assertThat(
             job.getGroupingInstance().orElseThrow(IllegalArgumentException::new),

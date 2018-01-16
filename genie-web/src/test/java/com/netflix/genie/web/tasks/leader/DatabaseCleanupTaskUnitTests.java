@@ -32,8 +32,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.scheduling.support.CronTrigger;
 
+import java.time.Instant;
 import java.util.Calendar;
-import java.util.Date;
 
 /**
  * Unit tests for DatabaseCleanupTask.
@@ -88,7 +88,7 @@ public class DatabaseCleanupTaskUnitTests {
         Mockito.when(this.cleanupProperties.getRetention()).thenReturn(days).thenReturn(negativeDays);
         Mockito.when(this.cleanupProperties.getPageSize()).thenReturn(pageSize);
         Mockito.when(this.cleanupProperties.getMaxDeletedPerTransaction()).thenReturn(maxDeleted);
-        final ArgumentCaptor<Date> argument = ArgumentCaptor.forClass(Date.class);
+        final ArgumentCaptor<Instant> argument = ArgumentCaptor.forClass(Instant.class);
 
         final long deletedCount1 = 6L;
         final long deletedCount2 = 18L;
@@ -96,7 +96,7 @@ public class DatabaseCleanupTaskUnitTests {
         Mockito
             .when(
                 this.jobPersistenceService.deleteBatchOfJobsCreatedBeforeDate(
-                    Mockito.any(Date.class),
+                    Mockito.any(Instant.class),
                     Mockito.anyInt(),
                     Mockito.anyInt()
                 )
@@ -123,8 +123,8 @@ public class DatabaseCleanupTaskUnitTests {
             date.set(Calendar.SECOND, 0);
             date.set(Calendar.MILLISECOND, 0);
             date.add(Calendar.DAY_OF_YEAR, negativeDays);
-            Assert.assertThat(argument.getAllValues().get(0), Matchers.is(date.getTime()));
-            Assert.assertThat(argument.getAllValues().get(1), Matchers.is(date.getTime()));
+            Assert.assertThat(argument.getAllValues().get(0).toEpochMilli(), Matchers.is(date.getTime().getTime()));
+            Assert.assertThat(argument.getAllValues().get(1).toEpochMilli(), Matchers.is(date.getTime().getTime()));
         }
     }
 
@@ -145,7 +145,7 @@ public class DatabaseCleanupTaskUnitTests {
         Mockito
             .when(
                 this.jobPersistenceService.deleteBatchOfJobsCreatedBeforeDate(
-                    Mockito.any(Date.class),
+                    Mockito.any(Instant.class),
                     Mockito.anyInt(),
                     Mockito.anyInt()
                 )

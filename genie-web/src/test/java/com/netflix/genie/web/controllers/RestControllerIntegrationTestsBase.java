@@ -50,7 +50,6 @@ import javax.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Set;
-import java.util.TimeZone;
 import java.util.UUID;
 
 /**
@@ -108,6 +107,31 @@ public abstract class RestControllerIntegrationTestsBase {
 
     @Autowired
     protected MockMvc mvc;
+
+    private static String getLinkedResourceExpectedUri(
+        final String entityApi,
+        final String entityId,
+        final Set<String> optionalHalParams,
+        final String linkedEntityType) throws URISyntaxException {
+        final String uriPath = new StringBuilder()
+            .append(entityApi)
+            .append("/")
+            .append(entityId)
+            .append("/")
+            .append(linkedEntityType)
+            .toString();
+        final String uriString = new URI(URI_SCHEME, URI_HOST, uriPath, null).toString();
+
+        // Append HAL parameters separately to avoid URI encoding
+        final StringBuilder halParamsStringBuilder = new StringBuilder();
+        if (optionalHalParams != null && !optionalHalParams.isEmpty()) {
+            halParamsStringBuilder
+                .append("{?")
+                .append(StringUtils.join(optionalHalParams, ","))
+                .append("}");
+        }
+        return uriString + halParamsStringBuilder.toString();
+    }
 
     void canAddElementsToResource(
         final String api,
@@ -387,32 +411,6 @@ public abstract class RestControllerIntegrationTestsBase {
         return location.substring(location.lastIndexOf("/") + 1);
     }
 
-    private static String getLinkedResourceExpectedUri(
-        final String entityApi,
-        final String entityId,
-        final Set<String> optionalHalParams,
-        final String linkedEntityType) throws URISyntaxException {
-        final String uriPath = new StringBuilder()
-            .append(entityApi)
-            .append("/")
-            .append(entityId)
-            .append("/")
-            .append(linkedEntityType)
-            .toString();
-        final String uriString = new URI(URI_SCHEME, URI_HOST, uriPath, null).toString();
-
-        // Append HAL parameters separately to avoid URI encoding
-        final StringBuilder halParamsStringBuilder = new StringBuilder();
-        if (optionalHalParams != null && !optionalHalParams.isEmpty()) {
-            halParamsStringBuilder
-                .append("{?")
-                .append(StringUtils.join(optionalHalParams, ","))
-                .append("}")
-                .toString();
-        }
-        return uriString + halParamsStringBuilder.toString();
-    }
-
     static class EntityLinkMatcher extends TypeSafeMatcher<String> {
 
         private final String expectedUri;
@@ -420,6 +418,17 @@ public abstract class RestControllerIntegrationTestsBase {
 
         EntityLinkMatcher(final String expectedUri) {
             this.expectedUri = expectedUri;
+        }
+
+        static EntityLinkMatcher matchUri(
+            final String entityApi,
+            final String linkedEntityKey,
+            final Set<String> optionalHalParams,
+            final String entityId)
+            throws URISyntaxException {
+            return new EntityLinkMatcher(
+                getLinkedResourceExpectedUri(entityApi, entityId, optionalHalParams, linkedEntityKey)
+            );
         }
 
         @Override
@@ -437,17 +446,6 @@ public abstract class RestControllerIntegrationTestsBase {
         public void describeTo(final Description description) {
             description.appendText(this.descriptionString);
         }
-
-        static EntityLinkMatcher matchUri(
-            final String entityApi,
-            final String linkedEntityKey,
-            final Set<String> optionalHalParams,
-            final String entityId)
-            throws URISyntaxException {
-            return new EntityLinkMatcher(
-                getLinkedResourceExpectedUri(entityApi, entityId, optionalHalParams, linkedEntityKey)
-            );
-        }
     }
 
     static class EntitiesLinksMatcher extends TypeSafeMatcher<Iterable<String>> {
@@ -455,8 +453,21 @@ public abstract class RestControllerIntegrationTestsBase {
         private final Set<String> expectedUris;
         private String mismatchDescription = "Not evaluated";
 
-        EntitiesLinksMatcher(final Set<String> expectedUris) throws URISyntaxException {
+        EntitiesLinksMatcher(final Set<String> expectedUris) {
             this.expectedUris = expectedUris;
+        }
+
+        static EntitiesLinksMatcher matchUrisAnyOrder(
+            final String entityApi,
+            final String linkedEntityKey,
+            final Set<String> optionalHalParams,
+            final Iterable<String> entityIds)
+            throws URISyntaxException {
+            final Set<String> expectedUris = Sets.newHashSet();
+            for (String entityId : entityIds) {
+                expectedUris.add(getLinkedResourceExpectedUri(entityApi, entityId, optionalHalParams, linkedEntityKey));
+            }
+            return new EntitiesLinksMatcher(expectedUris);
         }
 
         @Override
@@ -485,19 +496,6 @@ public abstract class RestControllerIntegrationTestsBase {
         @Override
         public void describeTo(final Description description) {
             description.appendText(mismatchDescription);
-        }
-
-        static EntitiesLinksMatcher matchUrisAnyOrder(
-            final String entityApi,
-            final String linkedEntityKey,
-            final Set<String> optionalHalParams,
-            final Iterable<String> entityIds)
-            throws URISyntaxException {
-            final Set<String> expectedUris = Sets.newHashSet();
-            for (String entityId : entityIds) {
-                expectedUris.add(getLinkedResourceExpectedUri(entityApi, entityId, optionalHalParams, linkedEntityKey));
-            }
-            return new EntitiesLinksMatcher(expectedUris);
         }
     }
 }
