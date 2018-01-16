@@ -35,6 +35,7 @@ import com.netflix.genie.web.services.JobPersistenceService;
 import com.netflix.genie.web.services.JobSubmitterService;
 import com.netflix.spectator.api.Registry;
 import com.netflix.spectator.api.Timer;
+import org.assertj.core.util.Sets;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -147,8 +148,8 @@ public class LocalJobRunnerUnitTests {
             JOB_1_NAME,
             USER,
             VERSION,
-            null,
-            null
+            Lists.newArrayList(),
+            Sets.newHashSet()
         )
             .withId(JOB_1_ID)
             .withApplications(Lists.newArrayList(app3, app1, app2))

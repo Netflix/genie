@@ -300,9 +300,7 @@ public class Job extends CommonDTO {
          * @see JobStatus
          */
         public Builder withStatus(final JobStatus status) {
-            if (status != null) {
-                this.bStatus = status;
-            }
+            this.bStatus = status;
             return this;
         }
 

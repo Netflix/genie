@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Getter;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -108,25 +109,15 @@ public class Command extends ExecutionEnvironmentDTO {
          *                   In milliseconds.
          */
         public Builder(
-            @JsonProperty("name")
-            final String name,
-            @JsonProperty("user")
-            final String user,
-            @JsonProperty("version")
-            final String version,
-            @JsonProperty("status")
-            final CommandStatus status,
-            @JsonProperty("executable")
-            final String executable,
-            @JsonProperty("checkDelay")
-            final long checkDelay
+            @JsonProperty("name") final String name,
+            @JsonProperty("user") final String user,
+            @JsonProperty("version") final String version,
+            @JsonProperty("status") final CommandStatus status,
+            @JsonProperty("executable") final String executable,
+            @JsonProperty("checkDelay") final long checkDelay
         ) {
             super(name, user, version);
-            if (status != null) {
-                this.bStatus = status;
-            } else {
-                this.bStatus = CommandStatus.INACTIVE;
-            }
+            this.bStatus = status;
             this.bExecutable = executable;
             this.bCheckDelay = checkDelay;
         }
@@ -137,7 +128,7 @@ public class Command extends ExecutionEnvironmentDTO {
          * @param memory The default amount of memory (in MB) for jobs to use
          * @return The builder
          */
-        public Builder withMemory(final Integer memory) {
+        public Builder withMemory(@Nullable final Integer memory) {
             this.bMemory = memory;
             return this;
         }

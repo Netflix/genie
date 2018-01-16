@@ -21,4 +21,7 @@
  *
  * @author tgianos
  */
+@ParametersAreNonnullByDefault
 package com.netflix.genie.common.exceptions;
+
+import javax.annotation.ParametersAreNonnullByDefault;

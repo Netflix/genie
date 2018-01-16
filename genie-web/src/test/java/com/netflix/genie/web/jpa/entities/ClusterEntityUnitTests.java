@@ -131,11 +131,9 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
 
     /**
      * Test setting the tags.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testSetTags() throws GeniePreconditionException {
+    public void testSetTags() {
         Assert.assertNotNull(this.c.getTags());
         final TagEntity prodTag = new TagEntity();
         prodTag.setTag("prod");

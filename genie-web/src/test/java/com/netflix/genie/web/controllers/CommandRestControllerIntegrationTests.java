@@ -276,7 +276,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
     @Test
     public void canHandleBadInputToCreateCommand() throws Exception {
         Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
-        final Command cluster = new Command.Builder(null, null, null, null, null, -1L).build();
+        final Command cluster = new Command.Builder(" ", " ", " ", CommandStatus.ACTIVE, " ", -1L).build();
         this.mvc.perform(
             MockMvcRequestBuilders
                 .post(COMMANDS_API)

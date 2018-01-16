@@ -60,11 +60,9 @@ public class JobExecutionUnitTests {
 
     /**
      * Test to make sure can build a valid JobExecution with optional parameters.
-     *
-     * @throws Exception on error
      */
     @Test
-    public void canBuildJobWithOptionals() throws Exception {
+    public void canBuildJobWithOptionals() {
         final JobExecution.Builder builder = new JobExecution.Builder(HOST_NAME);
 
         builder.withCheckDelay(CHECK_DELAY);

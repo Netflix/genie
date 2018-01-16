@@ -39,17 +39,15 @@ public class JobSearchResultUnitTests {
 
     /**
      * Make sure constructor works.
-     *
-     * @throws Exception on error
      */
     @Test
-    public void canConstruct() throws Exception {
+    public void canConstruct() {
         final String id = UUID.randomUUID().toString();
         final String name = UUID.randomUUID().toString();
         final String user = UUID.randomUUID().toString();
         final JobStatus status = JobStatus.FAILED;
-        final Date started = new Date();
-        final Date finished = new Date();
+        final Instant started = Instant.now();
+        final Instant finished = Instant.now();
         final String clusterName = UUID.randomUUID().toString();
         final String commandName = UUID.randomUUID().toString();
         final JobSearchResult searchResult

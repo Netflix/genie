@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Getter;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.util.Optional;
 
@@ -80,21 +81,13 @@ public class Application extends ExecutionEnvironmentDTO {
          * @param status  The status of the Application
          */
         public Builder(
-            @JsonProperty("name")
-            final String name,
-            @JsonProperty("user")
-            final String user,
-            @JsonProperty("version")
-            final String version,
-            @JsonProperty("status")
-            final ApplicationStatus status
+            @JsonProperty("name") final String name,
+            @JsonProperty("user") final String user,
+            @JsonProperty("version") final String version,
+            @JsonProperty("status") final ApplicationStatus status
         ) {
             super(name, user, version);
-            if (status != null) {
-                this.bStatus = status;
-            } else {
-                this.bStatus = ApplicationStatus.INACTIVE;
-            }
+            this.bStatus = status;
         }
 
         /**
@@ -103,7 +96,7 @@ public class Application extends ExecutionEnvironmentDTO {
          * @param type The type (e.g. Hadoop, Spark, etc) for grouping applications
          * @return The builder
          */
-        public Builder withType(final String type) {
+        public Builder withType(@Nullable final String type) {
             this.bType = type;
             return this;
         }

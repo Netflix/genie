@@ -139,7 +139,7 @@ public class JpaCommandServiceImplUnitTests {
         Mockito.when(this.jpaCommandRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         this.service.updateCommand(
             id,
-            new Command.Builder(null, null, null, null, null, 1803L).build()
+            new Command.Builder(" ", " ", " ", CommandStatus.ACTIVE, " ", 1803L).build()
         );
     }
 

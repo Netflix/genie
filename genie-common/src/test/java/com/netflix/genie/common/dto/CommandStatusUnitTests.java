@@ -64,6 +64,6 @@ public class CommandStatusUnitTests {
      */
     @Test(expected = GeniePreconditionException.class)
     public void testBlankCommandStatus() throws GeniePreconditionException {
-        CommandStatus.parse(null);
+        CommandStatus.parse("  ");
     }
 }

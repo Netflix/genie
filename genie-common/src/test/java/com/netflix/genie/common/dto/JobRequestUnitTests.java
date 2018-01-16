@@ -136,12 +136,10 @@ public class JobRequestUnitTests {
 
     /**
      * Test to make sure can build a valid JobRequest with optional parameters.
-     *
-     * @throws Exception on error
      */
     @Test
     @SuppressWarnings("deprecation")
-    public void canBuildJobRequestWithOptionalsDeprecated() throws Exception {
+    public void canBuildJobRequestWithOptionalsDeprecated() {
         final JobRequest.Builder builder
             = new JobRequest.Builder(NAME, USER, VERSION, CLUSTER_CRITERIAS, COMMAND_CRITERIA);
 
@@ -251,11 +249,9 @@ public class JobRequestUnitTests {
 
     /**
      * Test to make sure can build a valid JobRequest with optional parameters.
-     *
-     * @throws Exception on error
      */
     @Test
-    public void canBuildJobRequestWithOptionals() throws Exception {
+    public void canBuildJobRequestWithOptionals() {
         final JobRequest.Builder builder
             = new JobRequest.Builder(NAME, USER, VERSION, CLUSTER_CRITERIAS, COMMAND_CRITERIA);
 
@@ -368,7 +364,8 @@ public class JobRequestUnitTests {
      */
     @Test
     public void canBuildJobRequestWithNulls() {
-        final JobRequest.Builder builder = new JobRequest.Builder(NAME, USER, VERSION, null, null);
+        final JobRequest.Builder builder
+            = new JobRequest.Builder(NAME, USER, VERSION, Lists.newArrayList(), Sets.newHashSet());
         builder.withCommandArgs((List<String>) null);
         builder.withEmail(null);
         builder.withConfigs(null);
@@ -411,7 +408,8 @@ public class JobRequestUnitTests {
      */
     @Test
     public void canFindEquality() {
-        final JobRequest.Builder builder = new JobRequest.Builder(NAME, USER, VERSION, null, null);
+        final JobRequest.Builder builder
+            = new JobRequest.Builder(NAME, USER, VERSION, Lists.newArrayList(), Sets.newHashSet());
         builder.withEmail(null);
         builder.withConfigs(null);
         builder.withDependencies(null);
@@ -439,7 +437,8 @@ public class JobRequestUnitTests {
      */
     @Test
     public void canUseHashCode() {
-        final JobRequest.Builder builder = new JobRequest.Builder(NAME, USER, VERSION, null, null);
+        final JobRequest.Builder builder
+            = new JobRequest.Builder(NAME, USER, VERSION, Lists.newArrayList(), Sets.newHashSet());
         builder.withEmail(null);
         builder.withConfigs(null);
         builder.withDependencies(null);

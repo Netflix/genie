@@ -224,7 +224,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
     @Test
     public void canHandleBadInputToCreateCluster() throws Exception {
         Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
-        final Cluster cluster = new Cluster.Builder(null, null, null, null).build();
+        final Cluster cluster = new Cluster.Builder(" ", " ", " ", ClusterStatus.UP).build();
         this.mvc.perform(
             MockMvcRequestBuilders
                 .post(CLUSTERS_API)
@@ -1234,7 +1234,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
 
         // Pagination links are double-encoded
 
-        final String[] doubleEncodedHrefs = new String[] {
+        final String[] doubleEncodedHrefs = new String[]{
             "first", "next", "prev", "last",
         };
 
@@ -1255,6 +1255,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
 
     /**
      * Test creating a cluster with blank files and tag resources.
+     *
      * @throws Exception when an unexpected error is encountered
      */
     @Test

@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.netflix.genie.common.util.JsonDateDeserializer;
 import lombok.Getter;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 import java.util.Date;
@@ -160,8 +161,7 @@ public class JobExecution extends BaseDTO {
          * @param hostName The hostname where the job is running
          */
         public Builder(
-            @JsonProperty("hostName")
-            final String hostName
+            @JsonProperty("hostName") final String hostName
         ) {
             super();
             this.bHostName = hostName;
@@ -173,7 +173,7 @@ public class JobExecution extends BaseDTO {
          * @param processId The process id
          * @return The builder
          */
-        public Builder withProcessId(final Integer processId) {
+        public Builder withProcessId(@Nullable final Integer processId) {
             this.bProcessId = processId;
             return this;
         }
@@ -184,7 +184,7 @@ public class JobExecution extends BaseDTO {
          * @param checkDelay The check delay to use
          * @return The builder
          */
-        public Builder withCheckDelay(final Long checkDelay) {
+        public Builder withCheckDelay(@Nullable final Long checkDelay) {
             this.bCheckDelay = checkDelay;
             return this;
         }
@@ -210,7 +210,7 @@ public class JobExecution extends BaseDTO {
          * @param exitCode The exit code.
          * @return The builder
          */
-        public Builder withExitCode(final Integer exitCode) {
+        public Builder withExitCode(@Nullable final Integer exitCode) {
             this.bExitCode = exitCode;
             return this;
         }
@@ -221,7 +221,7 @@ public class JobExecution extends BaseDTO {
          * @param memory The amount of memory in megabytes
          * @return The builder
          */
-        public Builder withMemory(final Integer memory) {
+        public Builder withMemory(@Nullable final Integer memory) {
             this.bMemory = memory;
             return this;
         }

@@ -216,18 +216,14 @@ public class JobRequest extends ExecutionEnvironmentDTO {
         ) {
             super(name, user, version);
             this.bCommandArgs = Lists.newArrayList();
-            if (clusterCriterias != null) {
-                this.bClusterCriterias.addAll(clusterCriterias);
-            }
-            if (commandCriteria != null) {
-                commandCriteria.forEach(
-                    criteria -> {
-                        if (StringUtils.isNotBlank(criteria)) {
-                            this.bCommandCriteria.add(criteria);
-                        }
+            this.bClusterCriterias.addAll(clusterCriterias);
+            commandCriteria.forEach(
+                criteria -> {
+                    if (StringUtils.isNotBlank(criteria)) {
+                        this.bCommandCriteria.add(criteria);
                     }
-                );
-            }
+                }
+            );
         }
 
         /**
@@ -256,18 +252,14 @@ public class JobRequest extends ExecutionEnvironmentDTO {
             this.bCommandArgs = commandArgs == null
                 ? Lists.newArrayList()
                 : Lists.newArrayList(StringUtils.splitByWholeSeparator(commandArgs, StringUtils.SPACE));
-            if (clusterCriterias != null) {
-                this.bClusterCriterias.addAll(clusterCriterias);
-            }
-            if (commandCriteria != null) {
-                commandCriteria.forEach(
-                    criteria -> {
-                        if (StringUtils.isNotBlank(criteria)) {
-                            this.bCommandCriteria.add(criteria);
-                        }
+            this.bClusterCriterias.addAll(clusterCriterias);
+            commandCriteria.forEach(
+                criteria -> {
+                    if (StringUtils.isNotBlank(criteria)) {
+                        this.bCommandCriteria.add(criteria);
                     }
-                );
-            }
+                }
+            );
         }
 
         /**

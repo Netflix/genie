@@ -64,7 +64,7 @@ public class JobStatusUnitTests {
      */
     @Test(expected = GeniePreconditionException.class)
     public void testBlankJobStatus() throws GeniePreconditionException {
-        JobStatus.parse(null);
+        JobStatus.parse("  ");
     }
 
     /**

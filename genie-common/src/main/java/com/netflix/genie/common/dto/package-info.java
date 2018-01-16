@@ -17,9 +17,12 @@
  */
 
 /**
- * Data transfer objects for Genie for the APIs as well as the internal services. All DTO's should be read-only except
+ * Data transfer objects for Genie for the APIs as well as the internal services. All DTOs should be read-only except
  * for their constructors.
  *
  * @author tgianos
  */
+@ParametersAreNonnullByDefault
 package com.netflix.genie.common.dto;
+
+import javax.annotation.ParametersAreNonnullByDefault;

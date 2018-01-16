@@ -135,7 +135,7 @@ public abstract class CommonDTO extends BaseDTO {
          * @param tags The tags to use
          * @return The builder
          */
-        public T withTags(final Set<String> tags) {
+        public T withTags(@Nullable final Set<String> tags) {
             this.bTags.clear();
             if (tags != null) {
                 this.bTags.addAll(tags);
