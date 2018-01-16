@@ -116,6 +116,7 @@ configure(javaProjects) {
               entry "grpc-server-spring-boot-autoconfigure"
               entry "grpc-server-spring-boot-starter"
             }
+            dependency("com.beust:jcommander:1.72")
         }
     }
 
