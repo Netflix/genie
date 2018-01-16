@@ -3,27 +3,31 @@ syntax = "proto3";
 package com.netflix.genie.proto;
 
 import "google/protobuf/timestamp.proto";
-import "google/protobuf/empty.proto";
 
 option java_multiple_files = true;
 option java_package = "com.netflix.genie.proto";
 option java_outer_classname = "GenieProto";
 
 
-// The greeting service definition.
-service GreeterService {
+// The Ping service definition.
+service PingService {
 
   // Sends a greeting
-  rpc SayHello (HelloRequest) returns (HelloReply) {
+  rpc ping (PingRequest) returns (PongResponse) {
   }
 }
 
-// The request message containing the user's name.
-message HelloRequest {
-  string name = 1;
+// The Ping request with client metadata.
+message PingRequest {
+  string request_id = 1;
+  string source_name = 2;
+  google.protobuf.Timestamp timestamp = 3;
+  map<string, string> client_metadata = 4;
 }
 
-// The response message containing the greetings
-message HelloReply {
-  string message = 1;
+// The server response with server metadata.
+message PongResponse {
+  string request_id = 1;
+  google.protobuf.Timestamp timestamp = 2;
+  map<string, string> server_metadata = 3;
 }
