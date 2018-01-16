@@ -107,12 +107,10 @@ public class JobUnitTests {
 
     /**
      * Test to make sure can build a valid Job with optional parameters.
-     *
-     * @throws Exception on error
      */
     @Test
     @SuppressWarnings("deprecation")
-    public void canBuildJobWithOptionalsDeprecated() throws Exception {
+    public void canBuildJobWithOptionalsDeprecated() {
         final Job.Builder builder = new Job.Builder(NAME, USER, VERSION);
 
         builder.withCommandArgs(StringUtils.join(COMMAND_ARGS, StringUtils.SPACE));
@@ -194,11 +192,9 @@ public class JobUnitTests {
 
     /**
      * Test to make sure can build a valid Job with optional parameters.
-     *
-     * @throws Exception on error
      */
     @Test
-    public void canBuildJobWithOptionals() throws Exception {
+    public void canBuildJobWithOptionals() {
         final Job.Builder builder = new Job.Builder(NAME, USER, VERSION);
 
         builder.withCommandArgs(COMMAND_ARGS);
@@ -290,7 +286,7 @@ public class JobUnitTests {
         builder.withCommandName(null);
         builder.withFinished(null);
         builder.withStarted(null);
-        builder.withStatus(null);
+        builder.withStatus(JobStatus.INIT);
         builder.withStatusMsg(null);
         builder.withCreated(null);
         builder.withDescription(null);
@@ -330,7 +326,7 @@ public class JobUnitTests {
         builder.withCommandName(null);
         builder.withFinished(null);
         builder.withStarted(null);
-        builder.withStatus(null);
+        builder.withStatus(JobStatus.INIT);
         builder.withStatusMsg(null);
         builder.withCreated(null);
         builder.withDescription(null);
@@ -360,7 +356,7 @@ public class JobUnitTests {
         builder.withCommandName(null);
         builder.withFinished(null);
         builder.withStarted(null);
-        builder.withStatus(null);
+        builder.withStatus(JobStatus.INIT);
         builder.withStatusMsg(null);
         builder.withCreated(null);
         builder.withDescription(null);

@@ -61,27 +61,19 @@ public class Cluster extends ExecutionEnvironmentDTO {
         /**
          * Constructor which has required fields.
          *
-         * @param name        The name to use for the Cluster
-         * @param user        The user to use for the Cluster
-         * @param version     The version to use for the Cluster
-         * @param status      The status of the Cluster
+         * @param name    The name to use for the Cluster
+         * @param user    The user to use for the Cluster
+         * @param version The version to use for the Cluster
+         * @param status  The status of the Cluster
          */
         public Builder(
-            @JsonProperty("name")
-            final String name,
-            @JsonProperty("user")
-            final String user,
-            @JsonProperty("version")
-            final String version,
-            @JsonProperty("status")
-            final ClusterStatus status
+            @JsonProperty("name") final String name,
+            @JsonProperty("user") final String user,
+            @JsonProperty("version") final String version,
+            @JsonProperty("status") final ClusterStatus status
         ) {
             super(name, user, version);
-            if (status != null) {
-                this.bStatus = status;
-            } else {
-                this.bStatus = ClusterStatus.OUT_OF_SERVICE;
-            }
+            this.bStatus = status;
         }
 
         /**

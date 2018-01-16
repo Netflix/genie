@@ -60,6 +60,7 @@ import org.mockito.Captor;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -1250,7 +1251,7 @@ public class JobCoordinatorServiceImplUnitTests {
      */
     @Test(expected = GenieConflictException.class)
     public void cantCoordinateIfJobAlreadyExists() throws GenieException {
-        final JobRequest request = getJobRequest(false, null, null, null);
+        final JobRequest request = getJobRequest(false, Sets.newHashSet(), null, null);
         final JobMetadata metadata = Mockito.mock(JobMetadata.class);
         Mockito.doThrow(GenieConflictException.class).when(jobPersistenceService)
             .createJob(Mockito.eq(request), Mockito.eq(metadata),
@@ -1304,8 +1305,8 @@ public class JobCoordinatorServiceImplUnitTests {
     private JobRequest getJobRequest(
         final boolean disableLogArchival,
         final Set<String> commandCriteria,
-        final Integer memory,
-        final List<String> applications
+        @Nullable final Integer memory,
+        @Nullable final List<String> applications
     ) {
         final String email = "name@domain.com";
         final String setupFile = "setupFilePath";
@@ -1317,7 +1318,7 @@ public class JobCoordinatorServiceImplUnitTests {
             JOB_1_NAME,
             JOB_1_USER,
             JOB_1_VERSION,
-            null,
+            Lists.newArrayList(),
             commandCriteria
         ).withId(JOB_1_ID)
             .withDescription(description)

@@ -41,7 +41,6 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
@@ -89,11 +88,10 @@ public class ClusterCheckerTaskUnitTests {
     /**
      * Make sure run method works.
      *
-     * @throws IOException    on error
      * @throws GenieException on error
      */
     @Test
-    public void canRun() throws IOException, GenieException {
+    public void canRun() throws GenieException {
         final String host1 = UUID.randomUUID().toString();
         final String host2 = UUID.randomUUID().toString();
         final String host3 = UUID.randomUUID().toString();

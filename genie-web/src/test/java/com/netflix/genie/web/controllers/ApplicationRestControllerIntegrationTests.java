@@ -277,7 +277,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
     @Test
     public void canHandleBadInputToCreateApplication() throws Exception {
         Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
-        final Application app = new Application.Builder(null, null, null, null).build();
+        final Application app = new Application.Builder(" ", " ", " ", ApplicationStatus.ACTIVE).build();
         this.mvc.perform(
             MockMvcRequestBuilders
                 .post(APPLICATIONS_API)

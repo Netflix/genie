@@ -37,6 +37,7 @@ import com.netflix.spectator.api.Id
 import com.netflix.spectator.api.Registry
 import com.netflix.spectator.api.Timer
 import org.assertj.core.util.Lists
+import org.assertj.core.util.Sets
 import org.junit.Rule
 import org.junit.experimental.categories.Category
 import org.junit.rules.TemporaryFolder
@@ -180,7 +181,7 @@ class JobCompletionServiceSpec extends Specification {
         noExceptionThrown()
         1 * jobSearchService.getJob(jobId) >> new Job.Builder(NAME, USER, VERSION)
                 .withId(jobId).withStatus(JobStatus.RUNNING).withCommandArgs(COMMAND_ARGS).build()
-        1 * jobSearchService.getJobRequest(jobId) >> new JobRequest.Builder(NAME, USER, VERSION, null, null)
+        1 * jobSearchService.getJobRequest(jobId) >> new JobRequest.Builder(NAME, USER, VERSION, Lists.newArrayList(), Sets.newHashSet())
                 .withId(jobId).withCommandArgs(COMMAND_ARGS).withEmail('admin@netflix.com').build()
         1 * jobPersistenceService.updateJobStatus(jobId, _, _)
         1 * mailService.sendEmail('admin@netflix.com', _, _)

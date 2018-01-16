@@ -29,6 +29,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.hibernate.validator.constraints.NotBlank;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.time.Duration;
 import java.util.Date;
@@ -69,14 +70,14 @@ public class JobSearchResult extends BaseSearchResult {
      */
     @JsonCreator
     public JobSearchResult(
-        @NotBlank @JsonProperty("id") final String id,
-        @NotBlank @JsonProperty("name") final String name,
-        @NotBlank @JsonProperty("user") final String user,
-        @NotNull @JsonProperty("status") final JobStatus status,
         @JsonProperty("started") final Date started,
         @JsonProperty("finished") final Date finished,
-        @JsonProperty("clusterName") final String clusterName,
-        @JsonProperty("commandName") final String commandName
+        @JsonProperty("id") @NotBlank final String id,
+        @JsonProperty("name") @NotBlank final String name,
+        @JsonProperty("user") @NotBlank final String user,
+        @JsonProperty("status") @NotNull final JobStatus status,
+        @JsonProperty("clusterName") @Nullable final String clusterName,
+        @JsonProperty("commandName") @Nullable final String commandName
     ) {
         super(id, name, user);
         this.status = status;

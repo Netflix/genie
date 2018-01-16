@@ -20,6 +20,7 @@ package com.netflix.genie.common.dto;
 import com.google.common.collect.ImmutableSet;
 import lombok.Getter;
 
+import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
 import java.util.HashSet;
@@ -98,7 +99,7 @@ public abstract class ExecutionEnvironmentDTO extends CommonDTO {
          * @param setupFile The setup file location
          * @return The builder
          */
-        public T withSetupFile(final String setupFile) {
+        public T withSetupFile(@Nullable final String setupFile) {
             this.bSetupFile = setupFile;
             return (T) this;
         }
@@ -109,7 +110,7 @@ public abstract class ExecutionEnvironmentDTO extends CommonDTO {
          * @param configs The configuration file locations
          * @return The builder
          */
-        public T withConfigs(final Set<String> configs) {
+        public T withConfigs(@Nullable final Set<String> configs) {
             this.bConfigs.clear();
             if (configs != null) {
                 this.bConfigs.addAll(configs);
@@ -123,7 +124,7 @@ public abstract class ExecutionEnvironmentDTO extends CommonDTO {
          * @param dependencies The dependencies
          * @return The builder
          */
-        public T withDependencies(final Set<String> dependencies) {
+        public T withDependencies(@Nullable final Set<String> dependencies) {
             this.bDependencies.clear();
             if (dependencies != null) {
                 this.bDependencies.addAll(dependencies);

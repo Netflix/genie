@@ -51,19 +51,16 @@ public class ClusterCriteria implements Serializable {
      */
     @JsonCreator
     public ClusterCriteria(
-        @JsonProperty("tags")
-        final Set<String> tags
+        @JsonProperty("tags") final Set<String> tags
     ) {
         final ImmutableSet.Builder<String> builder = ImmutableSet.builder();
-        if (tags != null) {
-            tags.forEach(
-                tag -> {
-                    if (StringUtils.isNotBlank(tag)) {
-                        builder.add(tag);
-                    }
+        tags.forEach(
+            tag -> {
+                if (StringUtils.isNotBlank(tag)) {
+                    builder.add(tag);
                 }
-            );
-        }
+            }
+        );
         this.tags = builder.build();
     }
 }

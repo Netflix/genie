@@ -69,11 +69,9 @@ public class CommandUnitTests {
 
     /**
      * Test to make sure we can build a command with all optional parameters.
-     *
-     * @throws Exception on error
      */
     @Test
-    public void canBuildCommandWithOptionals() throws Exception {
+    public void canBuildCommandWithOptionals() {
         final Command.Builder builder
             = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
 
@@ -187,7 +185,8 @@ public class CommandUnitTests {
      */
     @Test
     public void canUseHashCode() {
-        final Command.Builder builder = new Command.Builder(NAME, USER, VERSION, null, EXECUTABLE, CHECK_DELAY);
+        final Command.Builder builder
+            = new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY);
         builder.withSetupFile(null);
         builder.withConfigs(null);
         builder.withDependencies(null);

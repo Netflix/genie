@@ -64,6 +64,6 @@ public class ClusterStatusUnitTests {
      */
     @Test(expected = GeniePreconditionException.class)
     public void testBlankClusterStatus() throws GeniePreconditionException {
-        ClusterStatus.parse(null);
+        ClusterStatus.parse("  ");
     }
 }

@@ -20,6 +20,7 @@ package com.netflix.genie.common.dto;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Getter;
 
+import javax.annotation.Nullable;
 import javax.validation.Valid;
 import java.util.Optional;
 
@@ -129,7 +130,7 @@ public class JobMetadata extends BaseDTO {
          * @param clientHost The hostname to use.
          * @return The builder
          */
-        public Builder withClientHost(final String clientHost) {
+        public Builder withClientHost(@Nullable final String clientHost) {
             this.bClientHost = clientHost;
             return this;
         }
@@ -140,7 +141,7 @@ public class JobMetadata extends BaseDTO {
          * @param userAgent The user agent string
          * @return The builder
          */
-        public Builder withUserAgent(final String userAgent) {
+        public Builder withUserAgent(@Nullable final String userAgent) {
             this.bUserAgent = userAgent;
             return this;
         }
@@ -151,7 +152,7 @@ public class JobMetadata extends BaseDTO {
          * @param numAttachments The number of attachments sent in with the job request
          * @return The builder
          */
-        public Builder withNumAttachments(final Integer numAttachments) {
+        public Builder withNumAttachments(@Nullable final Integer numAttachments) {
             this.bNumAttachments = numAttachments;
             return this;
         }
@@ -162,7 +163,7 @@ public class JobMetadata extends BaseDTO {
          * @param totalSizeOfAttachments The total size of the attachments sent in with the job request
          * @return The builder
          */
-        public Builder withTotalSizeOfAttachments(final Long totalSizeOfAttachments) {
+        public Builder withTotalSizeOfAttachments(@Nullable final Long totalSizeOfAttachments) {
             this.bTotalSizeOfAttachments = totalSizeOfAttachments;
             return this;
         }
@@ -173,7 +174,7 @@ public class JobMetadata extends BaseDTO {
          * @param stdOutSize The total size of the jobs' standard out file
          * @return The builder
          */
-        public Builder withStdOutSize(final Long stdOutSize) {
+        public Builder withStdOutSize(@Nullable final Long stdOutSize) {
             this.bStdOutSize = stdOutSize;
             return this;
         }
@@ -184,7 +185,7 @@ public class JobMetadata extends BaseDTO {
          * @param stdErrSize The total size of the jobs' standard error file
          * @return The builder
          */
-        public Builder withStdErrSize(final Long stdErrSize) {
+        public Builder withStdErrSize(@Nullable final Long stdErrSize) {
             this.bStdErrSize = stdErrSize;
             return this;
         }

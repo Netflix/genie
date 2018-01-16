@@ -141,7 +141,7 @@ public class JpaClusterServiceImplUnitTests {
     public void testUpdateClusterNoClusterExists() throws GenieException {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaClusterRepository.findByUniqueId(id)).thenReturn(Optional.empty());
-        this.service.updateCluster(id, new Cluster.Builder(null, null, null, null).build());
+        this.service.updateCluster(id, new Cluster.Builder(" ", " ", " ", ClusterStatus.UP).build());
     }
 
     /**

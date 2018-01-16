@@ -47,15 +47,6 @@ public class ClusterCriteriaUnitTests {
     }
 
     /**
-     * Make sure the constructor create sets properly.
-     */
-    @Test
-    public void canConstructWithNullTags() {
-        final ClusterCriteria cc = new ClusterCriteria(null);
-        Assert.assertThat(cc.getTags(), Matchers.empty());
-    }
-
-    /**
      * Test to make sure clients can't modify the internal state.
      */
     @Test(expected = UnsupportedOperationException.class)

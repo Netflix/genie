@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.web.jpa.entities;
 
-import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.test.categories.UnitTest;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
@@ -79,11 +78,9 @@ public class BaseEntityUnitTests extends EntityTestsBase {
 
     /**
      * Test to make sure validation works.
-     *
-     * @throws GenieException For any issue
      */
     @Test(expected = ConstraintViolationException.class)
-    public void testValidateWithNothing() throws GenieException {
+    public void testValidateWithNothing() {
         this.validate(new BaseEntity());
     }
 

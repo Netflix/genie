@@ -221,7 +221,7 @@ public class ApplicationUnitTests {
      */
     @Test
     public void canUseHashCode() {
-        final Application.Builder builder = new Application.Builder(NAME, USER, VERSION, null);
+        final Application.Builder builder = new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE);
         builder.withDependencies(null);
         builder.withType(null);
         builder.withSetupFile(null);

@@ -22,6 +22,7 @@ import com.netflix.genie.common.util.GenieObjectMapper;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.text.DateFormat;
@@ -132,7 +133,7 @@ public abstract class BaseDTO implements Serializable {
          * @param id The id
          * @return The builder
          */
-        public T withId(final String id) {
+        public T withId(@Nullable final String id) {
             this.bId = id;
             return (T) this;
         }

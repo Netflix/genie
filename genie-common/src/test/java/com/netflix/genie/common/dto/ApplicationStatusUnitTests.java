@@ -64,6 +64,6 @@ public class ApplicationStatusUnitTests {
      */
     @Test(expected = GeniePreconditionException.class)
     public void testBlankApplicationStatus() throws GeniePreconditionException {
-        ApplicationStatus.parse(null);
+        ApplicationStatus.parse(" ");
     }
 }

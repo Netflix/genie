@@ -36,11 +36,9 @@ public class JobMetadataUnitTests {
 
     /**
      * Test to make sure we can successfully build a JobMetadata class.
-     *
-     * @throws Exception on error
      */
     @Test
-    public void canBuild() throws Exception {
+    public void canBuild() {
         final String clientHost = UUID.randomUUID().toString();
         final String userAgent = UUID.randomUUID().toString();
         final int numAttachments = 38;

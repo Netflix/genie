@@ -63,11 +63,9 @@ public class ClusterUnitTests {
 
     /**
      * Test to make sure we can build a cluster with all optional parameters.
-     *
-     * @throws Exception on error
      */
     @Test
-    public void canBuildClusterWithOptionals() throws Exception {
+    public void canBuildClusterWithOptionals() {
         final Cluster.Builder builder = new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP);
 
         final Set<String> configs = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
@@ -167,7 +165,7 @@ public class ClusterUnitTests {
      */
     @Test
     public void canUseHashCode() {
-        final Cluster.Builder builder = new Cluster.Builder(NAME, USER, VERSION, null);
+        final Cluster.Builder builder = new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.TERMINATED);
         builder.withConfigs(null);
         builder.withDependencies(null);
         builder.withCreated(null);
