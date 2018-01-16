@@ -429,10 +429,6 @@ property is true
 |Max job request size. Values can use the suffixed "MB" or "KB" to indicate a Megabyte or Kilobyte size.
 |200MB
 
-|spring.jackson.date-format
-|Date format string or a fully-qualified date format class name. For instance `yyyy-MM-dd HH:mm:ss` for serializing JSON
-|com.netflix.genie.common.util.GenieDateFormat
-
 |spring.jackson.time-zone
 |Time zone used when formatting dates. For instance `America/Los_Angeles`
 |UTC
