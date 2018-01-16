@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.jpa.entities.projections;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.Optional;
 
 /**
@@ -68,5 +68,5 @@ public interface JobExecutionProjection extends AuditProjection, JobHostNameProj
      *
      * @return The timeout date
      */
-    Optional<Date> getTimeout();
+    Optional<Instant> getTimeout();
 }

@@ -58,7 +58,7 @@ import javax.annotation.Nullable;
 import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -210,7 +210,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         @NotBlank final String id,
         @Min(value = 0, message = "Must be no lower than zero") final int processId,
         @Min(value = 1, message = "Must be at least 1 millisecond, preferably much more") final long checkDelay,
-        @NotNull final Date timeout
+        @NotNull final Instant timeout
     ) throws GenieException {
         log.debug("Called with to update job {} with process id {}", id, processId);
 
@@ -260,14 +260,14 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
      */
     @Override
     public long deleteBatchOfJobsCreatedBeforeDate(
-        @NotNull final Date date,
+        @NotNull final Instant date,
         @Min(1) final int maxDeleted,
         @Min(1) final int pageSize
     ) {
         log.info(
             "Attempting to delete batch of jobs (at most {}) created before {} ms from epoch",
             maxDeleted,
-            date.getTime()
+            date.toEpochMilli()
         );
         long jobsDeleted = 0;
         long totalAttemptedDeletions = 0;
@@ -316,11 +316,11 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
 
             if (jobStatus.equals(JobStatus.RUNNING)) {
                 // Status being changed to running so set start date.
-                jobEntity.setStarted(new Date());
+                jobEntity.setStarted(Instant.now());
             } else if (jobEntity.getStarted().isPresent() && jobStatus.isFinished()) {
                 // Since start date is set the job was running previously and now has finished
                 // with status killed, failed or succeeded. So we set the job finish time.
-                jobEntity.setFinished(new Date());
+                jobEntity.setFinished(Instant.now());
             }
         }
     }

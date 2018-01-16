@@ -33,7 +33,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
@@ -78,10 +78,10 @@ public interface JobSearchService {
         @Nullable final String clusterId,
         @Nullable final String commandName,
         @Nullable final String commandId,
-        @Nullable final Date minStarted,
-        @Nullable final Date maxStarted,
-        @Nullable final Date minFinished,
-        @Nullable final Date maxFinished,
+        @Nullable final Instant minStarted,
+        @Nullable final Instant maxStarted,
+        @Nullable final Instant minFinished,
+        @Nullable final Instant maxFinished,
         @Nullable final String grouping,
         @Nullable final String groupingInstance,
         @NotNull final Pageable page

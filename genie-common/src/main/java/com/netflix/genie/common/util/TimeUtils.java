@@ -17,8 +17,9 @@
  */
 package com.netflix.genie.common.util;
 
+import javax.annotation.Nullable;
 import java.time.Duration;
-import java.util.Date;
+import java.time.Instant;
 
 /**
  * Utility methods for dealing with time. Particularly duration.
@@ -31,7 +32,7 @@ public final class TimeUtils {
     /**
      * Protected constructor for utility class.
      */
-    protected TimeUtils() {
+    private TimeUtils() {
     }
 
     /**
@@ -41,16 +42,16 @@ public final class TimeUtils {
      * @param finished The finish time. If null will use (current time - started time) to get the duration
      * @return The duration or zero if no duration
      */
-    public static Duration getDuration(final Date started, final Date finished) {
-        if (started == null || started.getTime() == 0) {
+    public static Duration getDuration(@Nullable final Instant started, @Nullable final Instant finished) {
+        if (started == null || started.toEpochMilli() == 0L) {
             // Never started
             return Duration.ZERO;
-        } else if (finished == null || finished.getTime() == 0) {
+        } else if (finished == null || finished.toEpochMilli() == 0L) {
             // Started but hasn't finished
-            return Duration.ofMillis(new Date().getTime() - started.getTime());
+            return Duration.ofMillis(Instant.now().toEpochMilli() - started.toEpochMilli());
         } else {
             // Started and finished
-            return Duration.ofMillis(finished.getTime() - started.getTime());
+            return Duration.ofMillis(finished.toEpochMilli() - started.toEpochMilli());
         }
     }
 }

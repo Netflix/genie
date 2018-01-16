@@ -41,7 +41,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
-import java.util.Date;
+import java.time.Instant;
 
 /**
  * Given a process id this class will check if the job client process is running or not.
@@ -103,7 +103,7 @@ public class JobMonitor extends NodeTask {
         this.genieEventBus = genieEventBus;
 
         final int processId = execution.getProcessId().orElseThrow(IllegalArgumentException::new);
-        final Date timeout = execution.getTimeout().orElseThrow(IllegalArgumentException::new);
+        final Instant timeout = execution.getTimeout().orElseThrow(IllegalArgumentException::new);
         this.processChecker = new UnixProcessChecker(processId, executor, timeout);
 
         this.stdOut = stdOut;

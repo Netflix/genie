@@ -23,7 +23,9 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import java.util.Calendar;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 /**
  * Unit tests for the utility methods for task.
@@ -47,25 +49,11 @@ public class TaskUtilsUnitTests {
      */
     @Test
     public void canGetMidnightUtc() {
-        final Calendar cal = TaskUtils.getMidnightUTC();
-        Assert.assertThat(cal.get(Calendar.MILLISECOND), Matchers.is(0));
-        Assert.assertThat(cal.get(Calendar.SECOND), Matchers.is(0));
-        Assert.assertThat(cal.get(Calendar.MINUTE), Matchers.is(0));
-        Assert.assertThat(cal.get(Calendar.HOUR_OF_DAY), Matchers.is(0));
-    }
-
-    /**
-     * Make sure we can subtract the number of desired days from a calendar date properly.
-     */
-    @Test
-    public void canSubtractDaysFromDate() {
-        final int currentDay = 25;
-        final Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.DAY_OF_YEAR, currentDay);
-        final int retention = 5;
-        TaskUtils.subtractDaysFromDate(cal, retention);
-        Assert.assertThat(cal.get(Calendar.DAY_OF_YEAR), Matchers.is(20));
-        TaskUtils.subtractDaysFromDate(cal, -1 * retention);
-        Assert.assertThat(cal.get(Calendar.DAY_OF_YEAR), Matchers.is(15));
+        final Instant midnightUTC = TaskUtils.getMidnightUTC();
+        final ZonedDateTime cal = ZonedDateTime.ofInstant(midnightUTC, ZoneId.of("UTC"));
+        Assert.assertThat(cal.getNano(), Matchers.is(0));
+        Assert.assertThat(cal.getSecond(), Matchers.is(0));
+        Assert.assertThat(cal.getMinute(), Matchers.is(0));
+        Assert.assertThat(cal.getHour(), Matchers.is(0));
     }
 }

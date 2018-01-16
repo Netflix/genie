@@ -51,13 +51,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OrderColumn;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -200,13 +198,11 @@ public class JobEntity extends BaseEntity implements
 
     @Basic
     @Column(name = "started")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date started;
+    private Instant started;
 
     @Basic
     @Column(name = "finished")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date finished;
+    private Instant finished;
 
     @Basic(optional = false)
     @Column(name = "host_name", nullable = false, updatable = false)
@@ -232,8 +228,7 @@ public class JobEntity extends BaseEntity implements
 
     @Basic
     @Column(name = "timeout")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date timeout;
+    private Instant timeout;
 
     @Basic
     @Column(name = "archive_location", length = 1024)
@@ -519,9 +514,9 @@ public class JobEntity extends BaseEntity implements
         this.status = jobStatus;
 
         if (jobStatus == JobStatus.INIT) {
-            this.setStarted(new Date());
+            this.setStarted(Instant.now());
         } else if (jobStatus.isFinished()) {
-            this.setFinished(new Date());
+            this.setFinished(Instant.now());
         }
     }
 
@@ -548,19 +543,19 @@ public class JobEntity extends BaseEntity implements
     /**
      * Gets the start time for this job.
      *
-     * @return startTime as a java.util.Date or null if not yet started
+     * @return startTime or empty optional if not yet started
      */
-    public Optional<Date> getStarted() {
-        return this.started == null ? Optional.empty() : Optional.of(new Date(this.started.getTime()));
+    public Optional<Instant> getStarted() {
+        return Optional.ofNullable(this.started);
     }
 
     /**
-     * Set the startTime for the job.
+     * Set the start time for the job.
      *
-     * @param started epoch time as java.util.Date or null
+     * @param started The started time.
      */
-    public void setStarted(@Nullable final Date started) {
-        this.started = started == null ? null : new Date(started.getTime());
+    public void setStarted(@Nullable final Instant started) {
+        this.started = started;
     }
 
     /**
@@ -568,8 +563,8 @@ public class JobEntity extends BaseEntity implements
      *
      * @return finished. The job finish timestamp.
      */
-    public Optional<Date> getFinished() {
-        return this.finished == null ? Optional.empty() : Optional.of(new Date(this.finished.getTime()));
+    public Optional<Instant> getFinished() {
+        return Optional.ofNullable(this.finished);
     }
 
     /**
@@ -577,8 +572,8 @@ public class JobEntity extends BaseEntity implements
      *
      * @param finished The finished time.
      */
-    public void setFinished(@Nullable final Date finished) {
-        this.finished = finished == null ? null : new Date(finished.getTime());
+    public void setFinished(@Nullable final Instant finished) {
+        this.finished = finished;
     }
 
     /**
@@ -649,8 +644,8 @@ public class JobEntity extends BaseEntity implements
      *
      * @return The timeout date
      */
-    public Optional<Date> getTimeout() {
-        return this.timeout == null ? Optional.empty() : Optional.of(new Date(this.timeout.getTime()));
+    public Optional<Instant> getTimeout() {
+        return Optional.ofNullable(this.timeout);
     }
 
     /**
@@ -658,8 +653,8 @@ public class JobEntity extends BaseEntity implements
      *
      * @param timeout The new timeout
      */
-    public void setTimeout(@Nullable final Date timeout) {
-        this.timeout = timeout == null ? null : new Date(timeout.getTime());
+    public void setTimeout(@Nullable final Instant timeout) {
+        this.timeout = timeout;
     }
 
     /**

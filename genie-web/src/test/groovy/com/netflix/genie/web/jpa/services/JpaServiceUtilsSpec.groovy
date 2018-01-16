@@ -28,6 +28,8 @@ import org.apache.commons.lang3.StringUtils
 import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
+import java.time.Instant
+
 /**
  * Specifications for the JpaServiceUtils class.
  *
@@ -94,8 +96,8 @@ class JpaServiceUtilsSpec extends Specification {
         application.getName() == name
         application.getUser() == user
         application.getVersion() == version
-        application.getCreated().orElseGet(RandomSuppliers.DATE) == created
-        application.getUpdated().orElseGet(RandomSuppliers.DATE) == updated
+        application.getCreated().orElseGet(RandomSuppliers.INSTANT) == created
+        application.getUpdated().orElseGet(RandomSuppliers.INSTANT) == updated
         application.getDescription().orElseGet(RandomSuppliers.STRING) == description
         application.getTags() == tags
         application.getConfigs() == configs
@@ -161,8 +163,8 @@ class JpaServiceUtilsSpec extends Specification {
         cluster.getVersion() == version
         cluster.getDescription().orElseGet(RandomSuppliers.STRING) == description
         cluster.getStatus() == ClusterStatus.TERMINATED
-        cluster.getCreated().orElseGet(RandomSuppliers.DATE) == created
-        cluster.getUpdated().orElseGet(RandomSuppliers.DATE) == updated
+        cluster.getCreated().orElseGet(RandomSuppliers.INSTANT) == created
+        cluster.getUpdated().orElseGet(RandomSuppliers.INSTANT) == updated
         cluster.getTags() == tags
         cluster.getConfigs() == confs
         cluster.getDependencies() == dependencies
@@ -235,8 +237,8 @@ class JpaServiceUtilsSpec extends Specification {
         command.getVersion() == version
         command.getStatus() == CommandStatus.DEPRECATED
         command.getDescription().orElseGet(RandomSuppliers.STRING) == description
-        command.getCreated().orElseGet(RandomSuppliers.DATE) == created
-        command.getUpdated().orElseGet(RandomSuppliers.DATE) == updated
+        command.getCreated().orElseGet(RandomSuppliers.INSTANT) == created
+        command.getUpdated().orElseGet(RandomSuppliers.INSTANT) == updated
         command.getExecutable() == executable
         command.getCheckDelay() == checkDelay
         command.getTags() == tags
@@ -279,9 +281,9 @@ class JpaServiceUtilsSpec extends Specification {
         entity.setTags(tagEntities)
         def archiveLocation = UUID.randomUUID().toString()
         entity.setArchiveLocation(archiveLocation)
-        def started = new Date()
+        def started = Instant.now()
         entity.setStarted(started)
-        def finished = new Date()
+        def finished = Instant.now()
         entity.setFinished(finished)
         entity.setStatus(JobStatus.SUCCEEDED)
         def statusMessage = UUID.randomUUID().toString()
@@ -296,14 +298,14 @@ class JpaServiceUtilsSpec extends Specification {
         job.getUser() == user
         job.getVersion() == version
         job.getDescription().orElseGet(RandomSuppliers.STRING) == description
-        job.getCreated().orElseGet(RandomSuppliers.DATE) == created
-        job.getUpdated().orElseGet(RandomSuppliers.DATE) == updated
+        job.getCreated().orElseGet(RandomSuppliers.INSTANT) == created
+        job.getUpdated().orElseGet(RandomSuppliers.INSTANT) == updated
         job.getClusterName().orElseGet(RandomSuppliers.STRING) == clusterName
         job.getCommandName().orElseGet(RandomSuppliers.STRING) == commandName
         job.getTags() == tags
         job.getArchiveLocation().orElseGet(RandomSuppliers.STRING) == archiveLocation
-        job.getStarted().orElseGet(RandomSuppliers.DATE) == started
-        job.getFinished().orElseGet(RandomSuppliers.DATE) == finished
+        job.getStarted().orElseGet(RandomSuppliers.INSTANT) == started
+        job.getFinished().orElseGet(RandomSuppliers.INSTANT) == finished
         job.getStatus() == JobStatus.SUCCEEDED
         job.getStatusMsg().orElseGet(RandomSuppliers.STRING) == statusMessage
         job.getMetadata().isPresent()
@@ -322,7 +324,7 @@ class JpaServiceUtilsSpec extends Specification {
         entity.setCheckDelay(checkDelay)
         def exitCode = 2084390
         entity.setExitCode(exitCode)
-        def timeout = new Date()
+        def timeout = Instant.now()
         entity.setTimeout(timeout)
         def memory = 10_265
         entity.setMemoryUsed(memory)
@@ -332,13 +334,13 @@ class JpaServiceUtilsSpec extends Specification {
 
         then:
         execution.getId().orElseGet(RandomSuppliers.STRING) == id
-        execution.getCreated().orElseGet(RandomSuppliers.DATE) == entity.getCreated()
-        execution.getUpdated().orElseGet(RandomSuppliers.DATE) == entity.getUpdated()
+        execution.getCreated().orElseGet(RandomSuppliers.INSTANT) == entity.getCreated()
+        execution.getUpdated().orElseGet(RandomSuppliers.INSTANT) == entity.getUpdated()
         execution.getExitCode().orElseGet(RandomSuppliers.INT) == exitCode
         execution.getHostName() == hostName
         execution.getProcessId().orElseGet(RandomSuppliers.INT) == processId
         execution.getCheckDelay().orElseGet(RandomSuppliers.LONG) == checkDelay
-        execution.getTimeout().orElseGet(RandomSuppliers.DATE) == timeout
+        execution.getTimeout().orElseGet(RandomSuppliers.INSTANT) == timeout
         execution.getMemory().orElseGet(RandomSuppliers.INT) == memory
     }
 
@@ -382,8 +384,8 @@ class JpaServiceUtilsSpec extends Specification {
         entity.setUser(user)
         def version = UUID.randomUUID().toString()
         entity.setVersion(version)
-        final Date created = entity.getCreated()
-        final Date updated = entity.getUpdated()
+        final Instant created = entity.getCreated()
+        final Instant updated = entity.getUpdated()
         def description = UUID.randomUUID().toString()
         entity.setDescription(description)
         def metadata = "[\"" + UUID.randomUUID().toString() + "\"]"
@@ -499,8 +501,8 @@ class JpaServiceUtilsSpec extends Specification {
         request.getUser() == user
         request.getVersion() == version
         request.getDescription().orElseGet(RandomSuppliers.STRING) == description
-        request.getCreated().orElseGet(RandomSuppliers.DATE) == created
-        request.getUpdated().orElseGet(RandomSuppliers.DATE) == updated
+        request.getCreated().orElseGet(RandomSuppliers.INSTANT) == created
+        request.getUpdated().orElseGet(RandomSuppliers.INSTANT) == updated
         request.getTags() == tags
         request.getCommandArgs().orElseGet(RandomSuppliers.STRING) == StringUtils.join(commandArgs, StringUtils.SPACE)
 

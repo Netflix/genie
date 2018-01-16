@@ -46,7 +46,8 @@ import org.springframework.core.io.Resource;
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
-import java.util.Calendar;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 /**
  * Implementation of the JobKillService interface which attempts to kill jobs running on the local node.
@@ -178,9 +179,8 @@ public class LocalJobKillServiceImpl implements JobKillService {
     private void killJobOnUnix(final int pid) throws GenieException {
         try {
             // Ensure this process check can't be timed out
-            final Calendar tomorrow = Calendar.getInstance(JobConstants.UTC);
-            tomorrow.add(Calendar.DAY_OF_YEAR, 1);
-            final ProcessChecker processChecker = new UnixProcessChecker(pid, this.executor, tomorrow.getTime());
+            final Instant tomorrow = Instant.now().plus(1, ChronoUnit.DAYS);
+            final ProcessChecker processChecker = new UnixProcessChecker(pid, this.executor, tomorrow);
             processChecker.checkProcess();
         } catch (final ExecuteException ee) {
             // This means the job was done already

@@ -42,8 +42,8 @@ import org.springframework.scheduling.Trigger;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Calendar;
-import java.util.Date;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -177,9 +177,7 @@ public class DiskCleanupTaskUnitTests {
         // Create some random junk file that should be ignored
         this.tmpJobDir.newFile(UUID.randomUUID().toString());
         final DiskCleanupProperties properties = new DiskCleanupProperties();
-        final Calendar cal = TaskUtils.getMidnightUTC();
-        TaskUtils.subtractDaysFromDate(cal, properties.getRetention());
-        final Date threshold = cal.getTime();
+        final Instant threshold = TaskUtils.getMidnightUTC().minus(properties.getRetention(), ChronoUnit.DAYS);
 
         final String job1Id = UUID.randomUUID().toString();
         final String job2Id = UUID.randomUUID().toString();
@@ -193,7 +191,7 @@ public class DiskCleanupTaskUnitTests {
         Mockito.when(job2.getStatus()).thenReturn(JobStatus.RUNNING);
         final Job job3 = Mockito.mock(Job.class);
         Mockito.when(job3.getStatus()).thenReturn(JobStatus.SUCCEEDED);
-        Mockito.when(job3.getFinished()).thenReturn(Optional.of(new Date(threshold.getTime() - 1)));
+        Mockito.when(job3.getFinished()).thenReturn(Optional.of(threshold.minus(1, ChronoUnit.MILLIS)));
         final Job job4 = Mockito.mock(Job.class);
         Mockito.when(job4.getStatus()).thenReturn(JobStatus.FAILED);
         Mockito.when(job4.getFinished()).thenReturn(Optional.of(threshold));

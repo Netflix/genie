@@ -34,10 +34,8 @@ import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -53,7 +51,6 @@ import java.util.concurrent.atomic.AtomicLong;
 @Slf4j
 public class DatabaseCleanupTask extends LeadershipTask {
 
-    private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
     private final DatabaseCleanupProperties cleanupProperties;
     private final JobPersistenceService jobPersistenceService;
 
@@ -109,17 +106,14 @@ public class DatabaseCleanupTask extends LeadershipTask {
         final long start = System.nanoTime();
         final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
         try {
-            final Calendar cal = TaskUtils.getMidnightUTC();
-            // Move the date back the number of days retention is set for
-            TaskUtils.subtractDaysFromDate(cal, this.cleanupProperties.getRetention());
-            final Date retentionLimit = cal.getTime();
-            final String retentionLimitString = this.dateFormat.format(retentionLimit);
+            final Instant midnightUTC = TaskUtils.getMidnightUTC();
+            final Instant retentionLimit = midnightUTC.minus(this.cleanupProperties.getRetention(), ChronoUnit.DAYS);
             final int batchSize = this.cleanupProperties.getMaxDeletedPerTransaction();
             final int pageSize = this.cleanupProperties.getPageSize();
 
             log.info(
                 "Attempting to delete jobs from before {} in batches of {} jobs per iteration",
-                retentionLimitString,
+                retentionLimit,
                 batchSize
             );
             long totalDeletedJobs = 0;
@@ -134,7 +128,7 @@ public class DatabaseCleanupTask extends LeadershipTask {
                     break;
                 }
             }
-            log.info("Deleted {} jobs from before {}", totalDeletedJobs, retentionLimitString);
+            log.info("Deleted {} jobs from before {}", totalDeletedJobs, retentionLimit);
             this.numDeletedJobs.set(totalDeletedJobs);
         } catch (Throwable t) {
             MetricsUtils.addFailureTagsWithException(tags, t);

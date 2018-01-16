@@ -25,10 +25,8 @@ import lombok.Getter;
 import javax.annotation.Nullable;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.text.DateFormat;
-import java.util.Date;
+import java.time.Instant;
 import java.util.Optional;
-import java.util.TimeZone;
 
 /**
  * Base fields for multiple DTOs.
@@ -43,8 +41,8 @@ public abstract class BaseDTO implements Serializable {
 
     @Size(max = 255, message = "Max length for the ID is 255 characters")
     private final String id;
-    private final Date created;
-    private final Date updated;
+    private final Instant created;
+    private final Instant updated;
 
     /**
      * Constructor.
@@ -53,8 +51,8 @@ public abstract class BaseDTO implements Serializable {
      */
     BaseDTO(final Builder builder) {
         this.id = builder.bId;
-        this.created = builder.bCreated == null ? null : new Date(builder.bCreated.getTime());
-        this.updated = builder.bUpdated == null ? null : new Date(builder.bUpdated.getTime());
+        this.created = builder.bCreated;
+        this.updated = builder.bUpdated;
     }
 
     /**
@@ -71,12 +69,8 @@ public abstract class BaseDTO implements Serializable {
      *
      * @return The creation time or null if not set.
      */
-    public Optional<Date> getCreated() {
-        if (this.created != null) {
-            return Optional.of(new Date(this.created.getTime()));
-        } else {
-            return Optional.empty();
-        }
+    public Optional<Instant> getCreated() {
+        return Optional.ofNullable(this.created);
     }
 
     /**
@@ -84,12 +78,8 @@ public abstract class BaseDTO implements Serializable {
      *
      * @return The update time or null if not set.
      */
-    public Optional<Date> getUpdated() {
-        if (this.updated != null) {
-            return Optional.of(new Date(this.updated.getTime()));
-        } else {
-            return Optional.empty();
-        }
+    public Optional<Instant> getUpdated() {
+        return Optional.ofNullable(this.updated);
     }
 
     /**
@@ -121,8 +111,8 @@ public abstract class BaseDTO implements Serializable {
     public abstract static class Builder<T extends Builder> {
 
         private String bId;
-        private Date bCreated;
-        private Date bUpdated;
+        private Instant bCreated;
+        private Instant bUpdated;
 
         protected Builder() {
         }
@@ -144,10 +134,8 @@ public abstract class BaseDTO implements Serializable {
          * @param created The created time
          * @return The builder
          */
-        public T withCreated(final Date created) {
-            if (created != null) {
-                this.bCreated = new Date(created.getTime());
-            }
+        public T withCreated(@Nullable final Instant created) {
+            this.bCreated = created;
             return (T) this;
         }
 
@@ -157,10 +145,8 @@ public abstract class BaseDTO implements Serializable {
          * @param updated The updated time
          * @return The builder
          */
-        public T withUpdated(final Date updated) {
-            if (updated != null) {
-                this.bUpdated = new Date(updated.getTime());
-            }
+        public T withUpdated(@Nullable final Instant updated) {
+            this.bUpdated = updated;
             return (T) this;
         }
     }

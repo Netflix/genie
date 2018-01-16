@@ -28,7 +28,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.UUID;
 
 /**
@@ -43,8 +43,8 @@ public class JobSearchResultResourceAssemblerUnitTests {
     private static final String ID = UUID.randomUUID().toString();
     private static final String NAME = UUID.randomUUID().toString();
     private static final String USER = UUID.randomUUID().toString();
-    private static final Date STARTED = new Date();
-    private static final Date FINISHED = new Date();
+    private static final Instant STARTED = Instant.now();
+    private static final Instant FINISHED = Instant.now();
     private static final String CLUSTER_NAME = UUID.randomUUID().toString();
     private static final String COMMAND_NAME = UUID.randomUUID().toString();
 

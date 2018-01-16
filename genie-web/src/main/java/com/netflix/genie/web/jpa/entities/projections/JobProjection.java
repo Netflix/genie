@@ -19,7 +19,7 @@ package com.netflix.genie.web.jpa.entities.projections;
 
 import com.netflix.genie.web.jpa.entities.ApplicationEntity;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,14 +43,14 @@ public interface JobProjection extends JobCommonFieldsProjection, JobStatusProje
      *
      * @return The start date
      */
-    Optional<Date> getStarted();
+    Optional<Instant> getStarted();
 
     /**
      * Get when the job was finished.
      *
      * @return The finish date
      */
-    Optional<Date> getFinished();
+    Optional<Instant> getFinished();
 
     /**
      * Get the location where the job was archived.

@@ -41,11 +41,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.Field;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -56,8 +56,6 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 public class JobKickoffTask extends GenieBaseTask {
-
-    private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
 
     private final boolean isRunAsUserEnabled;
     private final boolean isUserCreationEnabled;
@@ -162,14 +160,15 @@ public class JobKickoffTask extends GenieBaseTask {
             try {
                 final Process process = pb.start();
                 final int processId = this.getProcessId(process);
-                final Calendar calendar = Calendar.getInstance(UTC);
-                calendar.add(Calendar.SECOND, jobRequest.getTimeout().orElse(JobRequest.DEFAULT_TIMEOUT_DURATION));
+                final Instant timeout = Instant
+                    .now()
+                    .plus(jobRequest.getTimeout().orElse(JobRequest.DEFAULT_TIMEOUT_DURATION), ChronoUnit.SECONDS);
                 final JobExecution jobExecution = new JobExecution
                     .Builder(this.hostname)
                     .withId(jobId)
                     .withProcessId(processId)
                     .withCheckDelay(jobExecEnv.getCommand().getCheckDelay())
-                    .withTimeout(calendar.getTime())
+                    .withTimeout(timeout)
                     .withMemory(jobExecEnv.getMemory())
                     .build();
                 context.put(JobConstants.JOB_EXECUTION_DTO_KEY, jobExecution);

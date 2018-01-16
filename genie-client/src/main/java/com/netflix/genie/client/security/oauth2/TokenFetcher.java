@@ -26,8 +26,8 @@ import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import java.net.URL;
-import java.util.Calendar;
-import java.util.Date;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 
 /**
@@ -50,10 +50,10 @@ public class TokenFetcher {
     // An instance of the TokenService
     private final TokenService tokenService;
 
-    // The url of the IDP server to get OAuth credentails
+    // The url of the IDP server to get OAuth credentials
     private final String oauthUrl;
 
-    private Date expirationTime = new Date();
+    private Instant expirationTime = Instant.now();
 
     private AccessToken accessToken;
 
@@ -110,14 +110,14 @@ public class TokenFetcher {
             this.oauthUrl = oauthUrl;
 
             // Instantiate the token service
-            tokenService = retrofit.create(TokenService.class);
+            this.tokenService = retrofit.create(TokenService.class);
 
             // Construct the fields map to send to the IDP url.
-            credentialParams.put(CLIENT_ID, clientId);
-            credentialParams.put(CLIENT_SECRET, clientSecret);
-            credentialParams.put(GRANT_TYPE, grantType);
-            credentialParams.put(SCOPE, scope);
-        } catch (Exception e) {
+            this.credentialParams.put(CLIENT_ID, clientId);
+            this.credentialParams.put(CLIENT_SECRET, clientSecret);
+            this.credentialParams.put(GRANT_TYPE, grantType);
+            this.credentialParams.put(SCOPE, scope);
+        } catch (final Exception e) {
             throw new GenieClientException("Could not instantiate Token Service due to exception " + e);
         }
     }
@@ -129,24 +129,23 @@ public class TokenFetcher {
      * @throws GenieClientException If there is any problem.
      */
     public AccessToken getToken() throws GenieClientException {
-
         try {
-            if (new Date().after(this.expirationTime)) {
+            if (Instant.now().isAfter(this.expirationTime)) {
                 final Response<AccessToken> response = tokenService.getToken(oauthUrl, credentialParams).execute();
                 if (response.isSuccessful()) {
                     // Get current date, add expiresIn for the access token with a buffer of 5 minutes
-                    final Calendar cal = Calendar.getInstance();
-                    accessToken = response.body();
-                    cal.add(Calendar.SECOND, accessToken.getExpiresIn() - 300);
-                    this.expirationTime = cal.getTime();
-                    return accessToken;
+                    this.accessToken = response.body();
+                    this.expirationTime = Instant
+                        .now()
+                        .plus(this.accessToken.getExpiresIn() - 300, ChronoUnit.SECONDS);
+                    return this.accessToken;
                 } else {
                     throw new GenieClientException(response.code(), "Could not fetch Token");
                 }
             } else {
-                return accessToken;
+                return this.accessToken;
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new GenieClientException("Could not get access tokens" + e);
         }
     }

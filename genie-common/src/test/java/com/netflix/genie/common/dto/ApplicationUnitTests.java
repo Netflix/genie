@@ -30,7 +30,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import java.io.IOException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
 
@@ -88,7 +88,7 @@ public class ApplicationUnitTests {
         final Set<String> configs = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
         builder.withConfigs(configs);
 
-        final Date created = new Date();
+        final Instant created = Instant.now();
         builder.withCreated(created);
 
         final String description = UUID.randomUUID().toString();
@@ -100,7 +100,7 @@ public class ApplicationUnitTests {
         final Set<String> tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString());
         builder.withTags(tags);
 
-        final Date updated = new Date();
+        final Instant updated = Instant.now();
         builder.withUpdated(updated);
 
         final Application application = builder.build();
@@ -117,7 +117,7 @@ public class ApplicationUnitTests {
             application.getSetupFile().orElseGet(RandomSuppliers.STRING), Matchers.is(setupFile)
         );
         Assert.assertThat(application.getConfigs(), Matchers.is(configs));
-        Assert.assertThat(application.getCreated().orElseGet(RandomSuppliers.DATE), Matchers.is(created));
+        Assert.assertThat(application.getCreated().orElseGet(RandomSuppliers.INSTANT), Matchers.is(created));
         Assert.assertThat(
             application.getDescription().orElseThrow(IllegalArgumentException::new), Matchers.is(description)
         );

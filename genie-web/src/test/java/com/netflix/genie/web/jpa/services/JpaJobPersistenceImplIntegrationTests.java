@@ -28,7 +28,6 @@ import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.test.categories.IntegrationTest;
-import com.netflix.genie.web.jobs.JobConstants;
 import com.netflix.genie.web.jpa.entities.projections.JobMetadataProjection;
 import com.netflix.genie.web.jpa.repositories.JpaFileRepository;
 import com.netflix.genie.web.jpa.repositories.JpaJobRepository;
@@ -43,8 +42,10 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Calendar;
-import java.util.Date;
+import java.time.Instant;
+import java.time.Month;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -114,13 +115,13 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
     private static final String HOST_NAME = UUID.randomUUID().toString();
     private static final int PROCESS_ID = 3203;
     private static final long CHECK_DELAY = 8728L;
-    private static final Date TIMEOUT = new Date();
+    private static final Instant TIMEOUT = Instant.now();
     private static final int MEMORY = 2048;
 
     // Job fields
     private static final String ARCHIVE_LOCATION = UUID.randomUUID().toString();
-    private static final Date FINISHED = new Date();
-    private static final Date STARTED = new Date();
+    private static final Instant FINISHED = Instant.now();
+    private static final Instant STARTED = Instant.now();
     private static final JobStatus STATUS = JobStatus.RUNNING;
     private static final String STATUS_MSG = UUID.randomUUID().toString();
 
@@ -148,12 +149,11 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void canDeleteJobsCreatedBeforeDateWithMinTransactionAndPageSize() {
-        // Try to delete a single job from before Jan 1, 2016
-        final Calendar cal = Calendar.getInstance(JobConstants.UTC);
-        cal.set(2016, Calendar.JANUARY, 1, 0, 0, 0);
-        cal.set(Calendar.MILLISECOND, 0);
+        final Instant cal = ZonedDateTime
+            .of(2016, Month.JANUARY.getValue(), 1, 0, 0, 0, 0, ZoneId.of("UTC"))
+            .toInstant();
 
-        final long deleted = this.jobPersistenceService.deleteBatchOfJobsCreatedBeforeDate(cal.getTime(), 1, 1);
+        final long deleted = this.jobPersistenceService.deleteBatchOfJobsCreatedBeforeDate(cal, 1, 1);
 
         Assert.assertThat(deleted, Matchers.is(1L));
         Assert.assertThat(this.jobRepository.count(), Matchers.is(2L));
@@ -165,12 +165,11 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void canDeleteJobsCreatedBeforeDateWithPageLargerThanMax() {
-        // Try to delete a all jobs from before Jan 1, 2016
-        final Calendar cal = Calendar.getInstance(JobConstants.UTC);
-        cal.set(2016, Calendar.JANUARY, 1, 0, 0, 0);
-        cal.set(Calendar.MILLISECOND, 0);
+        final Instant cal = ZonedDateTime
+            .of(2016, Month.JANUARY.getValue(), 1, 0, 0, 0, 0, ZoneId.of("UTC"))
+            .toInstant();
 
-        final long deleted = this.jobPersistenceService.deleteBatchOfJobsCreatedBeforeDate(cal.getTime(), 1, 10);
+        final long deleted = this.jobPersistenceService.deleteBatchOfJobsCreatedBeforeDate(cal, 1, 10);
 
         Assert.assertThat(deleted, Matchers.is(2L));
         Assert.assertThat(this.jobRepository.count(), Matchers.is(1L));
@@ -182,12 +181,11 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void canDeleteJobsCreatedBeforeDateWithMaxLargerThanPage() {
-        // Try to delete a all jobs from before Jan 1, 2016
-        final Calendar cal = Calendar.getInstance(JobConstants.UTC);
-        cal.set(2016, Calendar.JANUARY, 1, 0, 0, 0);
-        cal.set(Calendar.MILLISECOND, 0);
+        final Instant cal = ZonedDateTime
+            .of(2016, Month.JANUARY.getValue(), 1, 0, 0, 0, 0, ZoneId.of("UTC"))
+            .toInstant();
 
-        final long deleted = this.jobPersistenceService.deleteBatchOfJobsCreatedBeforeDate(cal.getTime(), 10, 1);
+        final long deleted = this.jobPersistenceService.deleteBatchOfJobsCreatedBeforeDate(cal, 10, 1);
 
         Assert.assertThat(deleted, Matchers.is(2L));
         Assert.assertThat(this.jobRepository.count(), Matchers.is(1L));
@@ -199,12 +197,11 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void canDeleteJobsCreatedBeforeDateWithLargeTransactionAndPageSize() {
-        // Try to delete all jobs before Jan 1, 2016
-        final Calendar cal = Calendar.getInstance(JobConstants.UTC);
-        cal.set(2016, Calendar.JANUARY, 1, 0, 0, 0);
-        cal.set(Calendar.MILLISECOND, 0);
+        final Instant cal = ZonedDateTime
+            .of(2016, Month.JANUARY.getValue(), 1, 0, 0, 0, 0, ZoneId.of("UTC"))
+            .toInstant();
 
-        final long deleted = this.jobPersistenceService.deleteBatchOfJobsCreatedBeforeDate(cal.getTime(), 10_000, 1);
+        final long deleted = this.jobPersistenceService.deleteBatchOfJobsCreatedBeforeDate(cal, 10_000, 1);
 
         Assert.assertThat(deleted, Matchers.is(2L));
         Assert.assertThat(this.jobRepository.count(), Matchers.is(1L));

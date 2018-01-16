@@ -23,7 +23,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.UUID;
 
 /**
@@ -38,7 +38,7 @@ public class JobExecutionUnitTests {
     private static final String HOST_NAME = UUID.randomUUID().toString();
     private static final long CHECK_DELAY = 280843L;
     private static final int PROCESS_ID = 134234;
-    private static final Date TIMEOUT = new Date();
+    private static final Instant TIMEOUT = Instant.now();
     private static final int MEMORY = 1_024;
 
     /**
@@ -73,13 +73,13 @@ public class JobExecutionUnitTests {
         final int exitCode = 0;
         builder.withExitCode(exitCode);
 
-        final Date created = new Date();
+        final Instant created = Instant.now();
         builder.withCreated(created);
 
         final String id = UUID.randomUUID().toString();
         builder.withId(id);
 
-        final Date updated = new Date();
+        final Instant updated = Instant.now();
         builder.withUpdated(updated);
 
         final JobExecution execution = builder.build();

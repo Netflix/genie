@@ -35,7 +35,7 @@ import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.SetJoin;
-import java.util.Date;
+import java.time.Instant;
 import java.util.EnumSet;
 import java.util.Set;
 
@@ -55,8 +55,8 @@ public class JpaClusterSpecsUnitTests {
     private static final ClusterStatus STATUS_2 = ClusterStatus.OUT_OF_SERVICE;
     private static final Set<TagEntity> TAGS = Sets.newHashSet(TAG_1, TAG_2, TAG_3);
     private static final Set<ClusterStatus> STATUSES = EnumSet.noneOf(ClusterStatus.class);
-    private static final Date MIN_UPDATE_TIME = new Date(123467L);
-    private static final Date MAX_UPDATE_TIME = new Date(1234643L);
+    private static final Instant MIN_UPDATE_TIME = Instant.ofEpochMilli(123467L);
+    private static final Instant MAX_UPDATE_TIME = Instant.ofEpochMilli(1234643L);
 
     private Root<ClusterEntity> root;
     private CriteriaQuery<?> cq;
@@ -92,13 +92,13 @@ public class JpaClusterSpecsUnitTests {
         Mockito.when(this.cb.like(clusterNamePath, NAME)).thenReturn(likeNamePredicate);
         Mockito.when(this.cb.equal(clusterNamePath, NAME)).thenReturn(equalNamePredicate);
 
-        final Path<Date> minUpdatePath = (Path<Date>) Mockito.mock(Path.class);
+        final Path<Instant> minUpdatePath = (Path<Instant>) Mockito.mock(Path.class);
         final Predicate greaterThanOrEqualToPredicate = Mockito.mock(Predicate.class);
         Mockito.when(this.root.get(ClusterEntity_.updated)).thenReturn(minUpdatePath);
         Mockito.when(this.cb.greaterThanOrEqualTo(minUpdatePath, MIN_UPDATE_TIME))
             .thenReturn(greaterThanOrEqualToPredicate);
 
-        final Path<Date> maxUpdatePath = (Path<Date>) Mockito.mock(Path.class);
+        final Path<Instant> maxUpdatePath = (Path<Instant>) Mockito.mock(Path.class);
         final Predicate lessThanPredicate = Mockito.mock(Predicate.class);
         Mockito.when(this.root.get(ClusterEntity_.updated)).thenReturn(maxUpdatePath);
         Mockito.when(this.cb.lessThan(maxUpdatePath, MAX_UPDATE_TIME)).thenReturn(lessThanPredicate);

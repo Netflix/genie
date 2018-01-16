@@ -24,7 +24,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.UUID;
 
 /**
@@ -42,7 +42,7 @@ public class JobStartedEventUnitTests {
             .Builder(UUID.randomUUID().toString())
             .withProcessId(3029)
             .withCheckDelay(238124L)
-            .withTimeout(new Date())
+            .withTimeout(Instant.now())
             .withId(UUID.randomUUID().toString())
             .build();
         final Object source = new Object();

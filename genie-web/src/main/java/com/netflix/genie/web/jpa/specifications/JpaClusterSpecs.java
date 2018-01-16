@@ -30,8 +30,8 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -64,8 +64,8 @@ public final class JpaClusterSpecs {
         @Nullable final String name,
         @Nullable final Set<ClusterStatus> statuses,
         @Nullable final Set<TagEntity> tags,
-        @Nullable final Date minUpdateTime,
-        @Nullable final Date maxUpdateTime
+        @Nullable final Instant minUpdateTime,
+        @Nullable final Instant maxUpdateTime
     ) {
         return (final Root<ClusterEntity> root, final CriteriaQuery<?> cq, final CriteriaBuilder cb) -> {
             final List<Predicate> predicates = new ArrayList<>();

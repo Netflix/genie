@@ -22,7 +22,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import java.util.Date;
+import java.time.Instant;
 
 /**
  * Tests for the audit entity.
@@ -52,8 +52,8 @@ public class AuditEntityUnitTests {
         final AuditEntity a = new AuditEntity();
         Assert.assertNotNull(a.getCreated());
         Assert.assertNotNull(a.getUpdated());
-        final Date originalCreated = a.getCreated();
-        final Date originalUpdated = a.getUpdated();
+        final Instant originalCreated = a.getCreated();
+        final Instant originalUpdated = a.getUpdated();
         Thread.sleep(1);
         a.onCreateBaseEntity();
         Assert.assertNotNull(a.getCreated());
@@ -74,8 +74,8 @@ public class AuditEntityUnitTests {
         Assert.assertNotNull(a.getCreated());
         Assert.assertNotNull(a.getUpdated());
         a.onCreateBaseEntity();
-        final Date originalCreate = a.getCreated();
-        final Date originalUpdate = a.getUpdated();
+        final Instant originalCreate = a.getCreated();
+        final Instant originalUpdate = a.getUpdated();
         Thread.sleep(1);
         a.onUpdateBaseEntity();
         Assert.assertEquals(originalCreate, a.getCreated());

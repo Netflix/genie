@@ -27,10 +27,8 @@ import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.persistence.Version;
-import java.util.Date;
+import java.time.Instant;
 
 /**
  * Abstract class to support basic columns for all entities for genie.
@@ -44,17 +42,11 @@ public class AuditEntity extends IdEntity implements AuditProjection {
 
     @Basic(optional = false)
     @Column(name = "created", nullable = false, updatable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    // TODO: Test out this instead of all the pre-persist stuff
-//    @CreatedDate
-    private Date created = new Date();
+    private Instant created = Instant.now();
 
     @Basic(optional = false)
     @Column(name = "updated", nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    // TODO: Test out this instead of all the pre-persist stuff
-//    @LastModifiedDate
-    private Date updated = new Date();
+    private Instant updated = Instant.now();
 
     @Version
     @Column(name = "entity_version", nullable = false)
@@ -66,9 +58,9 @@ public class AuditEntity extends IdEntity implements AuditProjection {
      */
     @PrePersist
     protected void onCreateBaseEntity() {
-        final Date date = new Date();
-        this.updated = date;
-        this.created = date;
+        final Instant now = Instant.now();
+        this.updated = now;
+        this.created = now;
     }
 
     /**
@@ -76,7 +68,7 @@ public class AuditEntity extends IdEntity implements AuditProjection {
      */
     @PreUpdate
     protected void onUpdateBaseEntity() {
-        this.updated = new Date();
+        this.updated = Instant.now();
     }
 
     /**
@@ -84,8 +76,8 @@ public class AuditEntity extends IdEntity implements AuditProjection {
      *
      * @return The created timestamps
      */
-    public Date getCreated() {
-        return new Date(this.created.getTime());
+    public Instant getCreated() {
+        return this.created;
     }
 
     /**
@@ -93,8 +85,8 @@ public class AuditEntity extends IdEntity implements AuditProjection {
      *
      * @return The updated timestamp
      */
-    public Date getUpdated() {
-        return new Date(this.updated.getTime());
+    public Instant getUpdated() {
+        return this.updated;
     }
 
     /**

@@ -29,7 +29,7 @@ import org.springframework.validation.annotation.Validated;
 import javax.annotation.Nullable;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -102,7 +102,7 @@ public interface JobPersistenceService {
         @NotBlank final String id,
         @Min(value = 0, message = "Must be no lower than zero") final int processId,
         @Min(value = 1, message = "Must be at least 1 millisecond, preferably much more") final long checkDelay,
-        @NotNull final Date timeout
+        @NotNull final Instant timeout
     ) throws GenieException;
 
     /**
@@ -134,7 +134,9 @@ public interface JobPersistenceService {
      * @param pageSize   Page size used to iterate through jobs
      * @return the number of deleted jobs
      */
-    long deleteBatchOfJobsCreatedBeforeDate(@NotNull final Date date,
-                                            @Min(1) final int maxDeleted,
-                                            @Min(1) final int pageSize);
+    long deleteBatchOfJobsCreatedBeforeDate(
+        @NotNull final Instant date,
+        @Min(1) final int maxDeleted,
+        @Min(1) final int pageSize
+    );
 }

@@ -32,6 +32,8 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
+import java.time.Instant;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -172,7 +174,7 @@ public class DefaultDirectoryWriter implements DirectoryWriter {
             builder.append(FileUtils.byteCountToDisplaySize(entry.getSize()));
         }
         builder.append("</tt></td>");
-        final String lastModified = ConcurrentDateFormat.formatRfc1123(entry.getLastModified());
+        final String lastModified = ConcurrentDateFormat.formatRfc1123(Date.from(entry.getLastModified()));
         builder.append("<td align=\"right\"><tt>").append(lastModified).append("</tt></td>");
         builder.append("</tr>");
     }
@@ -197,7 +199,7 @@ public class DefaultDirectoryWriter implements DirectoryWriter {
             parent.setName("../");
             parent.setUrl(url);
             parent.setSize(0L);
-            parent.setLastModified(new Date(directory.getParentFile().getAbsoluteFile().lastModified()));
+            parent.setLastModified(Instant.ofEpochMilli(directory.getParentFile().getAbsoluteFile().lastModified()));
             dir.setParent(parent);
         }
 
@@ -208,7 +210,7 @@ public class DefaultDirectoryWriter implements DirectoryWriter {
         if (files != null) {
             for (final File file : files) {
                 final Entry entry = new Entry();
-                entry.setLastModified(new Date(file.getAbsoluteFile().lastModified()));
+                entry.setLastModified(Instant.ofEpochMilli(file.getAbsoluteFile().lastModified()));
                 if (file.isDirectory()) {
                     entry.setName(file.getName() + "/");
                     entry.setUrl(baseURL + file.getName() + "/");
@@ -224,18 +226,18 @@ public class DefaultDirectoryWriter implements DirectoryWriter {
         }
 
         dir.getDirectories().sort(
-            (final Entry entry1, final Entry entry2) -> entry1.getName().compareTo(entry2.getName())
+            Comparator.comparing(Entry::getName)
         );
 
         dir.getFiles().sort(
-            (final Entry entry1, final Entry entry2) -> entry1.getName().compareTo(entry2.getName())
+            Comparator.comparing(Entry::getName)
         );
 
         return dir;
     }
 
     @Data
-    protected static class Directory {
+    static class Directory {
         private Entry parent;
         private List<Entry> directories;
         private List<Entry> files;
@@ -243,34 +245,14 @@ public class DefaultDirectoryWriter implements DirectoryWriter {
 
     @Data
     @EqualsAndHashCode(exclude = {"lastModified"})
-    protected static class Entry {
+    static class Entry {
         @NotBlank
         private String name;
         @URL
         private String url;
         @Min(0)
         private long size;
-        @JsonSerialize(using = JsonDateSerializer.class)
-        @JsonDeserialize(using = JsonDateDeserializer.class)
         @NotNull
-        private Date lastModified;
-
-        /**
-         * Get the last modified time as a date.
-         *
-         * @return The time this entry was last modified
-         */
-        public Date getLastModified() {
-            return new Date(this.lastModified.getTime());
-        }
-
-        /**
-         * Set the last modified time as a date.
-         *
-         * @param lastModified the new last modified time
-         */
-        public void setLastModified(@NotNull final Date lastModified) {
-            this.lastModified = new Date(lastModified.getTime());
-        }
+        private Instant lastModified;
     }
 }

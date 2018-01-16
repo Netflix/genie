@@ -23,7 +23,6 @@ import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.events.JobFinishedEvent;
 import com.netflix.genie.web.events.KillJobEvent;
-import com.netflix.genie.web.jobs.JobConstants;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import com.netflix.spectator.api.Counter;
@@ -44,7 +43,8 @@ import org.springframework.context.ApplicationEvent;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Calendar;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 
@@ -80,12 +80,11 @@ public class JobMonitorUnitTests {
      */
     @Before
     public void setup() {
-        final Calendar tomorrow = Calendar.getInstance(JobConstants.UTC);
-        tomorrow.add(Calendar.DAY_OF_YEAR, 1);
+        final Instant tomorrow = Instant.now().plus(1, ChronoUnit.DAYS);
         this.jobExecution = new JobExecution.Builder(UUID.randomUUID().toString())
             .withProcessId(3808)
             .withCheckDelay(DELAY)
-            .withTimeout(tomorrow.getTime())
+            .withTimeout(tomorrow)
             .withId(UUID.randomUUID().toString())
             .build();
         this.executor = Mockito.mock(Executor.class);
@@ -262,20 +261,17 @@ public class JobMonitorUnitTests {
 
     /**
      * Make sure that a timed out process sends event.
-     *
-     * @throws IOException on error
      */
     @Test
-    public void canTryToKillTimedOutProcess() throws IOException {
+    public void canTryToKillTimedOutProcess() {
         Assume.assumeTrue(SystemUtils.IS_OS_UNIX);
 
         // Set timeout to yesterday to force timeout when check happens
-        final Calendar yesterday = Calendar.getInstance(JobConstants.UTC);
-        yesterday.add(Calendar.DAY_OF_YEAR, -1);
+        final Instant yesterday = Instant.now().minus(1, ChronoUnit.DAYS);
         this.jobExecution = new JobExecution.Builder(UUID.randomUUID().toString())
             .withProcessId(3808)
             .withCheckDelay(DELAY)
-            .withTimeout(yesterday.getTime())
+            .withTimeout(yesterday)
             .withId(UUID.randomUUID().toString())
             .build();
         this.monitor = new JobMonitor(

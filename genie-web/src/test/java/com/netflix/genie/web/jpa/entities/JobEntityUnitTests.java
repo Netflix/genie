@@ -20,8 +20,6 @@ package com.netflix.genie.web.jpa.entities;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.JobStatus;
-import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.test.suppliers.RandomSuppliers;
 import org.hamcrest.Matchers;
@@ -31,7 +29,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import javax.validation.ConstraintViolationException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -87,11 +85,9 @@ public class JobEntityUnitTests extends EntityTestsBase {
     /**
      * Test the onCreateOrUpdateJob method which is called before saving
      * or updating.
-     *
-     * @throws GeniePreconditionException If any precondition isn't met.
      */
     @Test
-    public void testOnCreateJob() throws GeniePreconditionException {
+    public void testOnCreateJob() {
         Assert.assertNull(this.jobEntity.getTagSearchString());
         this.jobEntity.onCreateJob();
         Assert.assertNull(this.jobEntity.getTagSearchString());
@@ -174,10 +170,10 @@ public class JobEntityUnitTests extends EntityTestsBase {
     @Test
     public void testSetGetStarted() {
         Assert.assertFalse(this.jobEntity.getStarted().isPresent());
-        final Date started = new Date(123453L);
+        final Instant started = Instant.ofEpochMilli(123453L);
         this.jobEntity.setStarted(started);
-        final Date actualStarted = this.jobEntity.getStarted().orElseThrow(IllegalArgumentException::new);
-        Assert.assertThat(actualStarted.getTime(), Matchers.is(started.getTime()));
+        final Instant actualStarted = this.jobEntity.getStarted().orElseThrow(IllegalArgumentException::new);
+        Assert.assertThat(actualStarted, Matchers.is(started));
         this.jobEntity.setStarted(null);
         Assert.assertFalse(this.jobEntity.getStarted().isPresent());
     }
@@ -188,10 +184,10 @@ public class JobEntityUnitTests extends EntityTestsBase {
     @Test
     public void testSetGetFinished() {
         Assert.assertFalse(this.jobEntity.getFinished().isPresent());
-        final Date finished = new Date(123453L);
+        final Instant finished = Instant.ofEpochMilli(123453L);
         this.jobEntity.setFinished(finished);
-        final Date actualFinished = this.jobEntity.getFinished().orElseThrow(IllegalArgumentException::new);
-        Assert.assertThat(actualFinished.getTime(), Matchers.is(finished.getTime()));
+        final Instant actualFinished = this.jobEntity.getFinished().orElseThrow(IllegalArgumentException::new);
+        Assert.assertThat(actualFinished, Matchers.is(finished));
         this.jobEntity.setFinished(null);
         Assert.assertFalse(this.jobEntity.getFinished().isPresent());
     }
@@ -226,16 +222,16 @@ public class JobEntityUnitTests extends EntityTestsBase {
         localJobEntity.setJobStatus(JobStatus.INIT);
         Assert.assertTrue(localJobEntity.getStarted().isPresent());
         Assert.assertFalse(localJobEntity.getFinished().isPresent());
-        final Date started = localJobEntity.getStarted().orElseThrow(IllegalArgumentException::new);
+        final Instant started = localJobEntity.getStarted().orElseThrow(IllegalArgumentException::new);
 
         // Shouldn't affect finish time
         localJobEntity.setJobStatus(JobStatus.RUNNING);
-        Assert.assertThat(localJobEntity.getStarted().orElseGet(RandomSuppliers.DATE), Matchers.is(started));
+        Assert.assertThat(localJobEntity.getStarted().orElseGet(RandomSuppliers.INSTANT), Matchers.is(started));
         Assert.assertFalse(localJobEntity.getFinished().isPresent());
 
         // finish time is non-zero on completion
         localJobEntity.setJobStatus(JobStatus.SUCCEEDED);
-        Assert.assertThat(localJobEntity.getStarted().orElseGet(RandomSuppliers.DATE), Matchers.is(started));
+        Assert.assertThat(localJobEntity.getStarted().orElseGet(RandomSuppliers.INSTANT), Matchers.is(started));
         Assert.assertTrue(localJobEntity.getFinished().isPresent());
 
         final JobEntity jobEntity2 = new JobEntity();
@@ -286,11 +282,9 @@ public class JobEntityUnitTests extends EntityTestsBase {
 
     /**
      * Test validate with exception from super class.
-     *
-     * @throws GenieException For any non-runtime issue
      */
     @Test(expected = ConstraintViolationException.class)
-    public void testValidateBadSuperClass() throws GenieException {
+    public void testValidateBadSuperClass() {
         this.validate(new JobEntity());
     }
 
@@ -334,11 +328,9 @@ public class JobEntityUnitTests extends EntityTestsBase {
 
     /**
      * Test the application set and get methods.
-     *
-     * @throws GenieException on any issue
      */
     @Test
-    public void canSetApplications() throws GenieException {
+    public void canSetApplications() {
         final ApplicationEntity application1 = new ApplicationEntity();
         application1.setUniqueId(UUID.randomUUID().toString());
         final ApplicationEntity application2 = new ApplicationEntity();
@@ -402,9 +394,9 @@ public class JobEntityUnitTests extends EntityTestsBase {
     @Test
     public void canSetTimeout() {
         Assert.assertFalse(this.jobEntity.getTimeout().isPresent());
-        final Date timeout = new Date();
+        final Instant timeout = Instant.now();
         this.jobEntity.setTimeout(timeout);
-        Assert.assertThat(this.jobEntity.getTimeout().orElseGet(RandomSuppliers.DATE), Matchers.is(timeout));
+        Assert.assertThat(this.jobEntity.getTimeout().orElseGet(RandomSuppliers.INSTANT), Matchers.is(timeout));
     }
 
     /**

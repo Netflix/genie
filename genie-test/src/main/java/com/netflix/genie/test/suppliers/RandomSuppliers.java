@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.test.suppliers;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -44,9 +44,9 @@ public final class RandomSuppliers {
     public static final Supplier<Long> LONG
         = () -> (long) (Math.random() * (Long.MAX_VALUE - 1)) + 1;
     /**
-     * Get a random date.
+     * Get a random instant.
      */
-    public static final Supplier<Date> DATE = () -> new Date(INT.get());
+    public static final Supplier<Instant> INSTANT = () -> Instant.ofEpochMilli(LONG.get());
 
     /**
      * Utility class.

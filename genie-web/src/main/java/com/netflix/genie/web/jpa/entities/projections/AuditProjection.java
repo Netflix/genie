@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.jpa.entities.projections;
 
-import java.util.Date;
+import java.time.Instant;
 
 /**
  * Returns all the base entity attributes.
@@ -32,12 +32,12 @@ public interface AuditProjection extends IdProjection {
      *
      * @return The created timestamp
      */
-    Date getCreated();
+    Instant getCreated();
 
     /**
      * Get when this entity was updated.
      *
      * @return The updated timestamp
      */
-    Date getUpdated();
+    Instant getUpdated();
 }

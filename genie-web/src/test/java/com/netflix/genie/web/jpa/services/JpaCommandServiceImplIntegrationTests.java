@@ -45,8 +45,8 @@ import org.springframework.data.domain.Sort;
 import javax.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -468,8 +468,8 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     @Test
     public void testUpdateCreateAndUpdate() throws GenieException {
         final Command init = this.service.getCommand(COMMAND_1_ID);
-        final Date created = init.getCreated().orElseThrow(IllegalArgumentException::new);
-        final Date updated = init.getUpdated().orElseThrow(IllegalArgumentException::new);
+        final Instant created = init.getCreated().orElseThrow(IllegalArgumentException::new);
+        final Instant updated = init.getUpdated().orElseThrow(IllegalArgumentException::new);
 
         final Command.Builder updateCommand = new Command.Builder(
             init.getName(),
@@ -480,8 +480,8 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
             init.getCheckDelay()
         )
             .withId(init.getId().orElseThrow(IllegalArgumentException::new))
-            .withCreated(new Date())
-            .withUpdated(new Date(0))
+            .withCreated(Instant.now())
+            .withUpdated(Instant.EPOCH)
             .withTags(init.getTags())
             .withConfigs(init.getConfigs())
             .withDependencies(init.getDependencies());
@@ -493,7 +493,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         final Command updatedCommand = this.service.getCommand(COMMAND_1_ID);
         Assert.assertEquals(created, updatedCommand.getCreated().orElseThrow(IllegalArgumentException::new));
         Assert.assertNotEquals(updated, updatedCommand.getUpdated().orElseThrow(IllegalArgumentException::new));
-        Assert.assertNotEquals(new Date(0), updatedCommand.getUpdated().orElseThrow(IllegalArgumentException::new));
+        Assert.assertNotEquals(Instant.EPOCH, updatedCommand.getUpdated().orElseThrow(IllegalArgumentException::new));
         Assert.assertEquals(init.getDependencies(), updatedCommand.getDependencies());
     }
 
@@ -507,7 +507,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     public void testPatchCommand() throws GenieException, IOException {
         final Command getCommand = this.service.getCommand(COMMAND_1_ID);
         Assert.assertThat(getCommand.getName(), Matchers.is(COMMAND_1_NAME));
-        final Date updateTime = getCommand.getUpdated().orElseThrow(IllegalArgumentException::new);
+        final Instant updateTime = getCommand.getUpdated().orElseThrow(IllegalArgumentException::new);
 
         final String patchString
             = "[{ \"op\": \"replace\", \"path\": \"/name\", \"value\": \"" + COMMAND_2_NAME + "\" }]";

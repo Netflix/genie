@@ -27,7 +27,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.Modifying;
 
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
@@ -83,5 +83,5 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
      * @return List of job request ids
      */
     // TODO: Explore deleteFirst{N}ByCreatedBefore
-    Slice<IdProjection> findByCreatedBefore(@NotNull final Date date, @NotNull Pageable pageable);
+    Slice<IdProjection> findByCreatedBefore(@NotNull final Instant date, @NotNull Pageable pageable);
 }
