@@ -35,38 +35,3 @@ dependencies {
     testCompile("org.springframework.boot:spring-boot-starter-jetty")
     testCompile("org.springframework.cloud:spring-cloud-contract-wiremock")
 }
-
-clean {
-    delete "src/main/python/nflx_genie_client.egg-info"
-    delete "src/main/python/dist"
-}
-
-task installPythonDependencies(type: Exec) {
-    dependsOn clean
-    workingDir "src/main/python"
-    commandLine "sudo", "pip", "install", "-U", "pip", "setuptools", "twine"
-}
-
-task installPythonPackage(type: Exec) {
-    dependsOn installPythonDependencies
-    workingDir "src/main/python"
-    commandLine "sudo", "pip", "install", "-U", "-e", "."
-}
-
-task testPythonPackage(type: Exec) {
-    dependsOn installPythonPackage
-    workingDir "src/main/python"
-    commandLine "sh", "-c", "nosetests"
-}
-
-task buildPythonPackage(type: Exec) {
-    dependsOn clean
-    workingDir "src/main/python"
-    commandLine "python", "setup.py", "sdist"
-}
-
-task uploadToPypi(type: Exec) {
-    dependsOn buildPythonPackage
-    workingDir "src/main/python"
-    commandLine "bash", "-c", "twine upload dist/*"
-}
