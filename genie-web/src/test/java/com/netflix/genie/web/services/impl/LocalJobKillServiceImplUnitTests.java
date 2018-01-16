@@ -17,13 +17,13 @@
  */
 package com.netflix.genie.web.services.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.Files;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.events.JobFinishedEvent;
@@ -89,7 +89,7 @@ public class LocalJobKillServiceImplUnitTests {
             false,
             this.genieEventBus,
             this.genieWorkingDir,
-            new ObjectMapper()
+            GenieObjectMapper.getMapper()
         );
 
         this.killCommand = new CommandLine("kill");
@@ -225,7 +225,7 @@ public class LocalJobKillServiceImplUnitTests {
             true,
             this.genieEventBus,
             this.genieWorkingDir,
-            new ObjectMapper()
+            GenieObjectMapper.getMapper()
         );
 
         final JobExecution jobExecution = Mockito.mock(JobExecution.class);

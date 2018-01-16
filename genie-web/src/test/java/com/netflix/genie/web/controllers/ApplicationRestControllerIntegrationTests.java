@@ -24,6 +24,7 @@ import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
+import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.hateoas.resources.ApplicationResource;
 import com.netflix.genie.web.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
@@ -281,7 +282,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             MockMvcRequestBuilders
                 .post(APPLICATIONS_API)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(app))
+                .content(GenieObjectMapper.getMapper().writeValueAsBytes(app))
         ).andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
         Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
     }
@@ -487,7 +488,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             null
         );
         final String applicationResource = APPLICATIONS_API + "/{id}";
-        final Application createdApp = this.objectMapper
+        final Application createdApp = GenieObjectMapper.getMapper()
             .readValue(
                 this.mvc.perform(
                     MockMvcRequestBuilders.get(applicationResource, id)
@@ -528,7 +529,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             RestDocumentationRequestBuilders
                 .put(applicationResource, id)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(this.objectMapper.writeValueAsBytes(newStatusApp.build()))
+                .content(GenieObjectMapper.getMapper().writeValueAsBytes(newStatusApp.build()))
         )
             .andExpect(MockMvcResultMatchers.status().isNoContent())
             .andDo(updateResultHandler);
@@ -563,7 +564,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
 
         final String newUser = UUID.randomUUID().toString();
         final String patchString = "[{ \"op\": \"replace\", \"path\": \"/user\", \"value\": \"" + newUser + "\" }]";
-        final JsonPatch patch = JsonPatch.fromJson(this.objectMapper.readTree(patchString));
+        final JsonPatch patch = JsonPatch.fromJson(GenieObjectMapper.getMapper().readTree(patchString));
 
         final RestDocumentationResultHandler patchResultHandler = MockMvcRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
@@ -578,7 +579,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             RestDocumentationRequestBuilders
                 .patch(applicationResource, id)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(this.objectMapper.writeValueAsBytes(patch))
+                .content(GenieObjectMapper.getMapper().writeValueAsBytes(patch))
         )
             .andExpect(MockMvcResultMatchers.status().isNoContent())
             .andDo(patchResultHandler);
@@ -1010,7 +1011,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
                 MockMvcRequestBuilders
                     .post(COMMANDS_API + "/" + command1Id + "/applications")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(this.objectMapper.writeValueAsBytes(appIds))
+                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(appIds))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
         this.mvc
@@ -1018,14 +1019,14 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
                 MockMvcRequestBuilders
                     .post(COMMANDS_API + "/" + command3Id + "/applications")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(this.objectMapper.writeValueAsBytes(appIds))
+                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(appIds))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
         final String applicationCommandsAPI = APPLICATIONS_API + "/{id}/commands";
 
         Arrays.asList(
-            this.objectMapper.readValue(
+            GenieObjectMapper.getMapper().readValue(
                 this.mvc
                     .perform(MockMvcRequestBuilders.get(applicationCommandsAPI, ID))
                     .andExpect(MockMvcResultMatchers.status().isOk())
@@ -1125,7 +1126,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
                 .perform(
                     MockMvcRequestBuilders.post(APPLICATIONS_API)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(this.objectMapper.writeValueAsBytes(invalidApplicationResource))
+                        .content(GenieObjectMapper.getMapper().writeValueAsBytes(invalidApplicationResource))
                 )
                 .andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
 

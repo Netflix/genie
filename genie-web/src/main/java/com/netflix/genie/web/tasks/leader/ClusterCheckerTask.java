@@ -17,13 +17,13 @@
  */
 package com.netflix.genie.web.tasks.leader;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.common.base.Splitter;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.properties.ClusterCheckerProperties;
 import com.netflix.genie.web.services.JobPersistenceService;
 import com.netflix.genie.web.services.JobSearchService;
@@ -67,7 +67,6 @@ public class ClusterCheckerTask extends LeadershipTask {
     private final RestTemplate restTemplate;
     private final String scheme;
     private final String healthEndpoint;
-    private final ObjectMapper mapper = new ObjectMapper();
     private final List<String> healthIndicatorsToIgnore;
 
     private final Map<String, Integer> errorCounts = new HashMap<>();
@@ -196,8 +195,11 @@ public class ClusterCheckerTask extends LeadershipTask {
         } catch (final HttpStatusCodeException e) {
             log.error("Failed validating host {}", host, e);
             try {
-                final Map<String, Object> responseMap = mapper.readValue(e.getResponseBodyAsByteArray(),
-                    TypeFactory.defaultInstance().constructMapType(Map.class, String.class, Object.class));
+                final Map<String, Object> responseMap = GenieObjectMapper.getMapper()
+                    .readValue(
+                        e.getResponseBodyAsByteArray(),
+                        TypeFactory.defaultInstance().constructMapType(Map.class, String.class, Object.class)
+                    );
                 for (Map.Entry<String, Object> responseEntry : responseMap.entrySet()) {
                     if (responseEntry.getValue() instanceof Map
                         && !healthIndicatorsToIgnore.contains(responseEntry.getKey())

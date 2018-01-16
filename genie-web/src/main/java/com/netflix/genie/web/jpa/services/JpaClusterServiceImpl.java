@@ -33,6 +33,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.jpa.entities.ClusterEntity;
 import com.netflix.genie.web.jpa.entities.CommandEntity;
 import com.netflix.genie.web.jpa.entities.FileEntity;
@@ -263,9 +264,9 @@ public class JpaClusterServiceImpl extends JpaBaseService implements ClusterServ
         try {
             final Cluster clusterToPatch = JpaServiceUtils.toClusterDto(clusterEntity);
             log.debug("Will patch cluster {}. Original state: {}", id, clusterToPatch);
-            final JsonNode clusterNode = MAPPER.readTree(clusterToPatch.toString());
+            final JsonNode clusterNode = GenieObjectMapper.getMapper().readTree(clusterToPatch.toString());
             final JsonNode postPatchNode = patch.apply(clusterNode);
-            final Cluster patchedCluster = MAPPER.treeToValue(postPatchNode, Cluster.class);
+            final Cluster patchedCluster = GenieObjectMapper.getMapper().treeToValue(postPatchNode, Cluster.class);
             log.debug("Finished patching cluster {}. New state: {}", id, patchedCluster);
             this.updateEntityWithDtoContents(clusterEntity, patchedCluster);
         } catch (final JsonPatchException | IOException e) {
@@ -613,7 +614,7 @@ public class JpaClusterServiceImpl extends JpaBaseService implements ClusterServ
         entity.setDependencies(dependencies);
         entity.setTags(tags);
         entity.setSetupFile(setupFile);
-        JpaServiceUtils.setEntityMetadata(MAPPER, dto, entity);
+        JpaServiceUtils.setEntityMetadata(GenieObjectMapper.getMapper(), dto, entity);
 
         this.setFinalTags(entity.getTags(), entity.getUniqueId(), entity.getName());
     }

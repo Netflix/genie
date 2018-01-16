@@ -28,6 +28,7 @@ import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.jpa.entities.ApplicationEntity;
 import com.netflix.genie.web.jpa.entities.ClusterEntity;
 import com.netflix.genie.web.jpa.entities.CommandEntity;
@@ -340,7 +341,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         jobEntity.setUser(jobRequest.getUser());
         jobEntity.setVersion(jobRequest.getVersion());
         jobRequest.getDescription().ifPresent(jobEntity::setDescription);
-        JpaServiceUtils.setEntityMetadata(MAPPER, jobRequest, jobEntity);
+        JpaServiceUtils.setEntityMetadata(GenieObjectMapper.getMapper(), jobRequest, jobEntity);
         jobRequest.getCommandArgs().ifPresent(
             commandArgs ->
                 jobEntity.setCommandArgs(

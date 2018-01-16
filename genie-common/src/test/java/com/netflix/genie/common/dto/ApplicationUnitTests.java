@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.test.suppliers.RandomSuppliers;
 import org.hamcrest.Matchers;
@@ -133,7 +134,7 @@ public class ApplicationUnitTests {
      */
     @Test
     public void canBuildWithMetadata() throws IOException, GeniePreconditionException {
-        final ObjectMapper objectMapper = new ObjectMapper();
+        final ObjectMapper objectMapper = GenieObjectMapper.getMapper();
         final String metadata = "{\"key1\":\"value1\",\"key2\":3}";
         final JsonNode metadataNode = objectMapper.readTree(metadata);
         final Application.Builder builder = new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE);

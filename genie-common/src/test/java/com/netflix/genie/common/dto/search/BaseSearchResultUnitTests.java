@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.common.dto.search;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.test.categories.UnitTest;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
@@ -104,8 +104,7 @@ public class BaseSearchResultUnitTests {
 
         final String json = searchResult.toString();
         try {
-            final ObjectMapper mapper = new ObjectMapper();
-            mapper.readTree(json);
+            GenieObjectMapper.getMapper().readTree(json);
         } catch (final IOException ioe) {
             Assert.fail();
         }

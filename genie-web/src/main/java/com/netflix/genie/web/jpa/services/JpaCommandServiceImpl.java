@@ -33,6 +33,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.jpa.entities.ApplicationEntity;
 import com.netflix.genie.web.jpa.entities.ClusterEntity;
 import com.netflix.genie.web.jpa.entities.CommandEntity;
@@ -219,9 +220,9 @@ public class JpaCommandServiceImpl extends JpaBaseService implements CommandServ
         try {
             final Command commandToPatch = JpaServiceUtils.toCommandDto(commandEntity);
             log.debug("Will patch command {}. Original state: {}", id, commandToPatch);
-            final JsonNode commandNode = MAPPER.readTree(commandToPatch.toString());
+            final JsonNode commandNode = GenieObjectMapper.getMapper().readTree(commandToPatch.toString());
             final JsonNode postPatchNode = patch.apply(commandNode);
-            final Command patchedCommand = MAPPER.treeToValue(postPatchNode, Command.class);
+            final Command patchedCommand = GenieObjectMapper.getMapper().treeToValue(postPatchNode, Command.class);
             log.debug("Finished patching command {}. New state: {}", id, patchedCommand);
             this.updateEntityWithDtoContents(commandEntity, patchedCommand);
         } catch (final JsonPatchException | IOException e) {
@@ -593,7 +594,7 @@ public class JpaCommandServiceImpl extends JpaBaseService implements CommandServ
         entity.setStatus(dto.getStatus());
         entity.setTags(tags);
         entity.setMemory(dto.getMemory().orElse(null));
-        JpaServiceUtils.setEntityMetadata(MAPPER, dto, entity);
+        JpaServiceUtils.setEntityMetadata(GenieObjectMapper.getMapper(), dto, entity);
 
         this.setFinalTags(entity.getTags(), entity.getUniqueId(), entity.getName());
     }

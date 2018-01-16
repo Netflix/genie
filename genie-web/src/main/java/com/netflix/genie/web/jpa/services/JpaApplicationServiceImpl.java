@@ -30,6 +30,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.jpa.entities.ApplicationEntity;
 import com.netflix.genie.web.jpa.entities.CommandEntity;
 import com.netflix.genie.web.jpa.entities.FileEntity;
@@ -207,9 +208,9 @@ public class JpaApplicationServiceImpl extends JpaBaseService implements Applica
         try {
             final Application appToPatch = JpaServiceUtils.toApplicationDto(applicationEntity);
             log.debug("Will patch application {}. Original state: {}", id, appToPatch);
-            final JsonNode applicationNode = MAPPER.readTree(appToPatch.toString());
+            final JsonNode applicationNode = GenieObjectMapper.getMapper().readTree(appToPatch.toString());
             final JsonNode postPatchNode = patch.apply(applicationNode);
-            final Application patchedApp = MAPPER.treeToValue(postPatchNode, Application.class);
+            final Application patchedApp = GenieObjectMapper.getMapper().treeToValue(postPatchNode, Application.class);
             log.debug("Finished patching application {}. New state: {}", id, patchedApp);
             this.updateEntityWithDtoContents(applicationEntity, patchedApp);
         } catch (final JsonPatchException | IOException e) {
@@ -479,7 +480,7 @@ public class JpaApplicationServiceImpl extends JpaBaseService implements Applica
         entity.setDependencies(dependencies);
         entity.setTags(tags);
         entity.setType(dto.getType().orElse(null));
-        JpaServiceUtils.setEntityMetadata(MAPPER, dto, entity);
+        JpaServiceUtils.setEntityMetadata(GenieObjectMapper.getMapper(), dto, entity);
 
         this.setFinalTags(entity.getTags(), entity.getUniqueId(), entity.getName());
     }

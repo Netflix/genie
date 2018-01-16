@@ -19,7 +19,6 @@ package com.netflix.genie.common.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import org.apache.commons.lang3.StringUtils;
@@ -49,8 +48,7 @@ public final class JsonUtils {
      */
     public static String marshall(final Object value) throws GenieException {
         try {
-            final ObjectMapper mapper = new ObjectMapper();
-            return mapper.writeValueAsString(value);
+            return GenieObjectMapper.getMapper().writeValueAsString(value);
         } catch (final JsonProcessingException jpe) {
             throw new GenieServerException("Failed to marshall object", jpe);
         }
@@ -70,11 +68,10 @@ public final class JsonUtils {
             final TypeReference<T> typeReference
     ) throws GenieException {
         try {
-            final ObjectMapper mapper = new ObjectMapper();
             if (StringUtils.isNotBlank(source)) {
-                return mapper.readValue(source, typeReference);
+                return GenieObjectMapper.getMapper().readValue(source, typeReference);
             } else {
-                return mapper.readValue("[]", typeReference);
+                return GenieObjectMapper.getMapper().readValue("[]", typeReference);
             }
         } catch (final IOException ioe) {
             throw new GenieServerException("Failed to read JSON value", ioe);

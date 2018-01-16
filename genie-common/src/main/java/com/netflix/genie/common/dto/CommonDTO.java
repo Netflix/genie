@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ImmutableSet;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.util.GenieObjectMapper;
 import lombok.Getter;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -166,7 +167,7 @@ public abstract class CommonDTO extends BaseDTO {
                 this.bMetadata = null;
             } else {
                 try {
-                    this.bMetadata = MAPPER.readTree(metadata);
+                    this.bMetadata = GenieObjectMapper.getMapper().readTree(metadata);
                 } catch (final IOException ioe) {
                     throw new GeniePreconditionException("Invalid JSON string passed in " + metadata, ioe);
                 }

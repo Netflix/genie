@@ -19,8 +19,8 @@ package com.netflix.genie.client.interceptors;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.genie.client.exceptions.GenieClientException;
+import com.netflix.genie.common.util.GenieObjectMapper;
 import okhttp3.Interceptor;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
@@ -38,13 +38,11 @@ public class ResponseMappingInterceptor implements Interceptor {
 
     private static final String EMPTY_STRING = "";
     private static final String ERROR_MESSAGE_KEY = "message";
-    private final ObjectMapper mapper;
 
     /**
      * Constructor.
      */
     public ResponseMappingInterceptor() {
-        this.mapper = new ObjectMapper();
     }
 
     /**
@@ -63,7 +61,7 @@ public class ResponseMappingInterceptor implements Interceptor {
 
                 if (bodyReader != null) {
                     try {
-                        final JsonNode responseBody = this.mapper.readTree(bodyReader);
+                        final JsonNode responseBody = GenieObjectMapper.getMapper().readTree(bodyReader);
                         final String errorMessage =
                             responseBody == null || !responseBody.has(ERROR_MESSAGE_KEY)
                                 ? EMPTY_STRING

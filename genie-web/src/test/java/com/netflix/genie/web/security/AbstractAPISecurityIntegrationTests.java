@@ -17,15 +17,13 @@
  */
 package com.netflix.genie.web.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
+import com.netflix.genie.common.util.GenieObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +38,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.TimeZone;
 import java.util.UUID;
 
 /**
@@ -78,20 +75,10 @@ public abstract class AbstractAPISecurityIntegrationTests {
             1000L
         ).build();
 
-    private static final ObjectMapper OBJECT_MAPPER;
-
-    static {
-        OBJECT_MAPPER = new ObjectMapper()
-            .setTimeZone(TimeZone.getTimeZone("UTC"))
-            .setDateFormat(new ISO8601DateFormat())
-            .registerModule(new Jdk8Module());
-    }
-
     private static final String APPLICATIONS_API = "/api/v3/applications";
     private static final String CLUSTERS_API = "/api/v3/clusters";
     private static final String COMMANDS_API = "/api/v3/commands";
     private static final String JOBS_API = "/api/v3/jobs";
-
     private static final ResultMatcher OK = MockMvcResultMatchers.status().isOk();
     private static final ResultMatcher BAD_REQUEST = MockMvcResultMatchers.status().isBadRequest();
     private static final ResultMatcher CREATED = MockMvcResultMatchers.status().isCreated();
@@ -226,7 +213,7 @@ public abstract class AbstractAPISecurityIntegrationTests {
                 MockMvcRequestBuilders
                     .post(endpoint)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(body))
+                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(body))
             ).andExpect(expectedStatus);
     }
 
@@ -236,7 +223,7 @@ public abstract class AbstractAPISecurityIntegrationTests {
                 MockMvcRequestBuilders
                     .put(endpoint)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(OBJECT_MAPPER.writeValueAsBytes(body))
+                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(body))
             ).andExpect(expectedStatus);
     }
 

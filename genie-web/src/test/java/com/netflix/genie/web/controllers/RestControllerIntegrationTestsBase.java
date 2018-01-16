@@ -17,16 +17,13 @@
  */
 package com.netflix.genie.web.controllers;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.collect.Sets;
 import com.netflix.genie.GenieWeb;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.ExecutionEnvironmentDTO;
-import com.netflix.genie.common.util.GenieDateFormat;
+import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.test.categories.IntegrationTest;
 import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.Description;
@@ -109,12 +106,6 @@ public abstract class RestControllerIntegrationTestsBase {
     static final Set<String> CLUSTERS_OPTIONAL_HAL_LINK_PARAMETERS = Sets.newHashSet("status");
     static final Set<String> COMMANDS_OPTIONAL_HAL_LINK_PARAMETERS = Sets.newHashSet("status");
 
-    protected final ObjectMapper objectMapper = new ObjectMapper()
-        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-        .setTimeZone(TimeZone.getTimeZone("UTC"))
-        .setDateFormat(new GenieDateFormat())
-        .registerModule(new Jdk8Module());
-
     @Autowired
     protected MockMvc mvc;
 
@@ -139,7 +130,7 @@ public abstract class RestControllerIntegrationTestsBase {
                 RestDocumentationRequestBuilders
                     .post(api, id)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(this.objectMapper.writeValueAsBytes(elements))
+                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(elements))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent())
             .andDo(addHandler);
@@ -167,7 +158,7 @@ public abstract class RestControllerIntegrationTestsBase {
                 MockMvcRequestBuilders
                     .post(api, id)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(this.objectMapper.writeValueAsBytes(elements))
+                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(elements))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
@@ -177,7 +168,7 @@ public abstract class RestControllerIntegrationTestsBase {
                 RestDocumentationRequestBuilders
                     .put(api, id)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(this.objectMapper.writeValueAsBytes(Sets.newHashSet(element3)))
+                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(Sets.newHashSet(element3)))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent())
             .andDo(resultHandler);
@@ -202,7 +193,7 @@ public abstract class RestControllerIntegrationTestsBase {
                 MockMvcRequestBuilders
                     .post(api, id)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(this.objectMapper.writeValueAsBytes(Sets.newHashSet(element1, element2)))
+                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(Sets.newHashSet(element1, element2)))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
@@ -241,7 +232,7 @@ public abstract class RestControllerIntegrationTestsBase {
                 RestDocumentationRequestBuilders
                     .post(api, id)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(this.objectMapper.writeValueAsBytes(configs))
+                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(configs))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent())
             .andDo(addHandler);
@@ -272,7 +263,7 @@ public abstract class RestControllerIntegrationTestsBase {
                 MockMvcRequestBuilders
                     .post(api, id)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(this.objectMapper.writeValueAsBytes(tags))
+                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(tags))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
@@ -282,7 +273,7 @@ public abstract class RestControllerIntegrationTestsBase {
                 RestDocumentationRequestBuilders
                     .put(api, id)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(this.objectMapper.writeValueAsBytes(Sets.newHashSet(tag3)))
+                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(Sets.newHashSet(tag3)))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent())
             .andDo(resultHandler);
@@ -310,7 +301,7 @@ public abstract class RestControllerIntegrationTestsBase {
                 MockMvcRequestBuilders
                     .post(api, id)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(this.objectMapper.writeValueAsBytes(Sets.newHashSet(tag1, tag2)))
+                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(Sets.newHashSet(tag1, tag2)))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
@@ -341,7 +332,7 @@ public abstract class RestControllerIntegrationTestsBase {
                 MockMvcRequestBuilders
                     .post(api, id)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsBytes(Sets.newHashSet(tag1, tag2)))
+                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(Sets.newHashSet(tag1, tag2)))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
@@ -380,7 +371,7 @@ public abstract class RestControllerIntegrationTestsBase {
                 MockMvcRequestBuilders
                     .post(endpoint)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(this.objectMapper.writeValueAsBytes(resource))
+                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(resource))
             )
             .andExpect(MockMvcResultMatchers.status().isCreated())
             .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()));
