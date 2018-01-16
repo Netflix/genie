@@ -24,6 +24,7 @@ import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.dto.Command;
+import com.netflix.genie.common.util.GenieObjectMapper;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -439,7 +440,7 @@ public class ApplicationClientIntegrationTests extends GenieClientsIntegrationTe
      */
     @Test
     public void testApplicationPatchMethod() throws Exception {
-        final ObjectMapper mapper = new ObjectMapper();
+        final ObjectMapper mapper = GenieObjectMapper.getMapper();
         final String newName = UUID.randomUUID().toString();
         final String patchString = "[{ \"op\": \"replace\", \"path\": \"/name\", \"value\": \"" + newName + "\" }]";
         final JsonPatch patch = JsonPatch.fromJson(mapper.readTree(patchString));

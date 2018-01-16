@@ -1,6 +1,6 @@
 package com.netflix.genie.web.jobs;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.test.categories.UnitTest;
 import org.junit.Assert;
 import org.junit.Test;
@@ -21,20 +21,20 @@ public class JobKillReasonFileTest {
 
     /**
      * Test serialization and deserialization of JobKillReasonFile.
+     *
      * @throws IOException in case of serialization error
      */
     @Test
     public void serializeThenLoad() throws IOException {
 
-        final ObjectMapper objectMapper = new ObjectMapper();
-
         final JobKillReasonFile orignalJobKillReasonFile = new JobKillReasonFile(KILL_REASON_STRING);
 
         Assert.assertEquals(KILL_REASON_STRING, orignalJobKillReasonFile.getKillReason());
 
-        final byte[] bytes = objectMapper.writeValueAsBytes(orignalJobKillReasonFile);
+        final byte[] bytes = GenieObjectMapper.getMapper().writeValueAsBytes(orignalJobKillReasonFile);
 
-        final JobKillReasonFile loadedJobKillReasonFile = objectMapper.readValue(bytes, JobKillReasonFile.class);
+        final JobKillReasonFile loadedJobKillReasonFile
+            = GenieObjectMapper.getMapper().readValue(bytes, JobKillReasonFile.class);
 
         Assert.assertEquals(KILL_REASON_STRING, loadedJobKillReasonFile.getKillReason());
     }

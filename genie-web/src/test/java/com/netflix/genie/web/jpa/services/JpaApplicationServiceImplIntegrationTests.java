@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.web.jpa.services;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseTearDown;
@@ -27,6 +26,7 @@ import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
+import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.test.categories.IntegrationTest;
 import com.netflix.genie.test.suppliers.RandomSuppliers;
 import com.netflix.genie.web.services.ApplicationService;
@@ -462,8 +462,7 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
         final Date updateTime = getApp.getUpdated().orElseThrow(IllegalArgumentException::new);
 
         final String patchString = "[{ \"op\": \"replace\", \"path\": \"/user\", \"value\": \"" + APP_2_USER + "\" }]";
-        final ObjectMapper mapper = new ObjectMapper();
-        final JsonPatch patch = JsonPatch.fromJson(mapper.readTree(patchString));
+        final JsonPatch patch = JsonPatch.fromJson(GenieObjectMapper.getMapper().readTree(patchString));
 
         this.appService.patchApplication(APP_1_ID, patch);
 

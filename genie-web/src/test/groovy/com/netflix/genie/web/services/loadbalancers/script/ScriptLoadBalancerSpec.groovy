@@ -18,7 +18,6 @@
 package com.netflix.genie.web.services.loadbalancers.script
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.Lists
 import com.google.common.collect.Sets
@@ -26,7 +25,7 @@ import com.netflix.genie.common.dto.Cluster
 import com.netflix.genie.common.dto.ClusterCriteria
 import com.netflix.genie.common.dto.ClusterStatus
 import com.netflix.genie.common.dto.JobRequest
-import com.netflix.genie.common.util.GenieDateFormat
+import com.netflix.genie.common.util.GenieObjectMapper
 import com.netflix.genie.test.categories.UnitTest
 import com.netflix.genie.web.services.ClusterLoadBalancer
 import com.netflix.genie.web.services.impl.GenieFileTransferService
@@ -62,9 +61,6 @@ class ScriptLoadBalancerSpec extends Specification {
     TemporaryFolder temporaryFolder
 
     @Shared
-    def mapper = new ObjectMapper().registerModule(new Jdk8Module())
-
-    @Shared
     def clustersGood = Sets.newHashSet(
             new Cluster.Builder("a", "b", "c", ClusterStatus.UP).withId("2").build(),
             new Cluster.Builder("d", "e", "f", ClusterStatus.UP).withId("0").build(),
@@ -92,10 +88,6 @@ class ScriptLoadBalancerSpec extends Specification {
     def executor = new ThreadPoolTaskExecutor()
 
     def setupSpec() {
-        def iso8601 = new GenieDateFormat()
-        iso8601.setTimeZone(TimeZone.getTimeZone("UTC"))
-        this.mapper.setDateFormat(iso8601)
-
         this.executor.setCorePoolSize(2)
         this.executor.initialize()
     }
@@ -166,7 +158,7 @@ class ScriptLoadBalancerSpec extends Specification {
                 scheduler,
                 fileTransferService,
                 environment,
-                this.mapper,
+                GenieObjectMapper.getMapper(),
                 registry
         )
 

@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.web.tasks.job;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
@@ -29,6 +28,7 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.events.JobFinishedEvent;
 import com.netflix.genie.web.events.JobFinishedReason;
 import com.netflix.genie.web.jobs.JobConstants;
@@ -91,7 +91,6 @@ public class JobCompletionService {
     private final Id jobCompletionTimerId;
     private final Id errorCounterId;
     private final RetryTemplate retryTemplate;
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * Constructor.
@@ -146,9 +145,8 @@ public class JobCompletionService {
      * Event listener for when a job is completed. Updates the status of the job.
      *
      * @param event The Spring Boot application ready event to startup on
-     * @throws GenieException If there is any problem
      */
-    void handleJobCompletion(final JobFinishedEvent event) throws GenieException {
+    void handleJobCompletion(final JobFinishedEvent event) {
         final long start = System.nanoTime();
         final String jobId = event.getId();
         final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
@@ -297,7 +295,7 @@ public class JobCompletionService {
 
         try {
             final File jobDir = new File(this.baseWorkingDir, id);
-            final JobDoneFile jobDoneFile = this.objectMapper.readValue(
+            final JobDoneFile jobDoneFile = GenieObjectMapper.getMapper().readValue(
                 new File(this.baseWorkingDir + "/" + id + "/" + JobConstants.GENIE_DONE_FILE_NAME),
                 JobDoneFile.class
             );
@@ -307,7 +305,7 @@ public class JobCompletionService {
                 + id + "/"
                 + JobConstants.GENIE_KILL_REASON_FILE_NAME);
             if (killReasonFile.exists()) {
-                killedStatusMessages = this.objectMapper.readValue(
+                killedStatusMessages = GenieObjectMapper.getMapper().readValue(
                     killReasonFile,
                     JobKillReasonFile.class
                 ).getKillReason();

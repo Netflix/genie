@@ -18,9 +18,7 @@
 package com.netflix.genie.common.dto;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.netflix.genie.common.util.GenieDateFormat;
+import com.netflix.genie.common.util.GenieObjectMapper;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
@@ -40,15 +38,7 @@ import java.util.TimeZone;
 @Getter
 @EqualsAndHashCode(of = "id", doNotUseGetters = true)
 public abstract class BaseDTO implements Serializable {
-
-    static final ObjectMapper MAPPER;
     private static final long serialVersionUID = 9093424855934127120L;
-
-    static {
-        final DateFormat iso8601 = new GenieDateFormat();
-        iso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
-        MAPPER = new ObjectMapper().registerModule(new Jdk8Module()).setDateFormat(iso8601);
-    }
 
     @Size(max = 255, message = "Max length for the ID is 255 characters")
     private final String id;
@@ -109,7 +99,7 @@ public abstract class BaseDTO implements Serializable {
     @Override
     public String toString() {
         try {
-            return MAPPER.writeValueAsString(this);
+            return GenieObjectMapper.getMapper().writeValueAsString(this);
         } catch (final JsonProcessingException ioe) {
             return ioe.getLocalizedMessage();
         }

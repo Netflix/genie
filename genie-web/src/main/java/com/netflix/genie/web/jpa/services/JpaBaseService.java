@@ -17,13 +17,10 @@
  */
 package com.netflix.genie.web.jpa.services;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GenieServerException;
-import com.netflix.genie.common.util.GenieDateFormat;
 import com.netflix.genie.web.jpa.entities.FileEntity;
 import com.netflix.genie.web.jpa.entities.TagEntity;
 import com.netflix.genie.web.jpa.repositories.JpaFileRepository;
@@ -35,9 +32,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.NotBlank;
 
-import java.text.DateFormat;
 import java.util.Set;
-import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 /**
@@ -50,18 +45,11 @@ import java.util.stream.Collectors;
 @Getter(AccessLevel.PACKAGE)
 class JpaBaseService {
 
-    static final ObjectMapper MAPPER;
     static final String GENIE_TAG_NAMESPACE = "genie.";
     static final String GENIE_ID_TAG_NAMESPACE = GENIE_TAG_NAMESPACE + "id:";
     static final String GENIE_NAME_TAG_NAMESPACE = GENIE_TAG_NAMESPACE + "name:";
     private static final char COMMA = ',';
     private static final String EMPTY_STRING = "";
-
-    static {
-        final DateFormat iso8601 = new GenieDateFormat();
-        iso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
-        MAPPER = new ObjectMapper().registerModule(new Jdk8Module()).setDateFormat(iso8601);
-    }
 
     private final TagService tagService;
     private final JpaTagRepository tagRepository;

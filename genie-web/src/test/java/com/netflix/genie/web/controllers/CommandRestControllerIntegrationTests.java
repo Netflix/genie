@@ -26,6 +26,7 @@ import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
+import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.hateoas.resources.ClusterResource;
 import com.netflix.genie.web.hateoas.resources.CommandResource;
 import com.netflix.genie.web.jpa.repositories.JpaApplicationRepository;
@@ -280,7 +281,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             MockMvcRequestBuilders
                 .post(COMMANDS_API)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(cluster))
+                .content(GenieObjectMapper.getMapper().writeValueAsBytes(cluster))
         ).andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
         Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
     }
@@ -435,7 +436,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             null
         );
         final String commandResource = COMMANDS_API + "/{id}";
-        final Command createdCommand = objectMapper
+        final Command createdCommand = GenieObjectMapper.getMapper()
             .readValue(
                 this.mvc.perform(
                     MockMvcRequestBuilders.get(commandResource, ID)
@@ -478,7 +479,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             RestDocumentationRequestBuilders
                 .put(commandResource, ID)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(this.objectMapper.writeValueAsBytes(updateCommand.build()))
+                .content(GenieObjectMapper.getMapper().writeValueAsBytes(updateCommand.build()))
         )
             .andExpect(MockMvcResultMatchers.status().isNoContent())
             .andDo(updateResultHandler);
@@ -518,7 +519,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
 
         final String newName = UUID.randomUUID().toString();
         final String patchString = "[{ \"op\": \"replace\", \"path\": \"/name\", \"value\": \"" + newName + "\" }]";
-        final JsonPatch patch = JsonPatch.fromJson(this.objectMapper.readTree(patchString));
+        final JsonPatch patch = JsonPatch.fromJson(GenieObjectMapper.getMapper().readTree(patchString));
 
         final RestDocumentationResultHandler patchResultHandler = MockMvcRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
@@ -534,7 +535,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                 RestDocumentationRequestBuilders
                     .patch(commandResource, id)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(this.objectMapper.writeValueAsBytes(patch))
+                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(patch))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent())
             .andDo(patchResultHandler);
@@ -1017,7 +1018,11 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                 RestDocumentationRequestBuilders
                     .post(commandApplicationsAPI, ID)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(this.objectMapper.writeValueAsBytes(Lists.newArrayList(applicationId1, applicationId2)))
+                    .content(
+                        GenieObjectMapper
+                            .getMapper()
+                            .writeValueAsBytes(Lists.newArrayList(applicationId1, applicationId2))
+                    )
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent())
             .andDo(addResultHandler);
@@ -1037,7 +1042,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                 MockMvcRequestBuilders
                     .post(commandApplicationsAPI, ID)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(this.objectMapper.writeValueAsBytes(Lists.newArrayList()))
+                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(Lists.newArrayList()))
             )
             .andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
 
@@ -1054,7 +1059,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                 MockMvcRequestBuilders
                     .post(commandApplicationsAPI, ID)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsBytes(Lists.newArrayList(applicationId3)))
+                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(Lists.newArrayList(applicationId3)))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
@@ -1151,7 +1156,11 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                 RestDocumentationRequestBuilders
                     .put(commandApplicationsAPI, ID)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(this.objectMapper.writeValueAsBytes(Lists.newArrayList(applicationId1, applicationId2)))
+                    .content(
+                        GenieObjectMapper
+                            .getMapper()
+                            .writeValueAsBytes(Lists.newArrayList(applicationId1, applicationId2))
+                    )
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent())
             .andDo(setResultHandler);
@@ -1171,7 +1180,11 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                 MockMvcRequestBuilders
                     .put(commandApplicationsAPI, ID)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(this.objectMapper.writeValueAsBytes(Lists.newArrayList(applicationId2, applicationId1)))
+                    .content(
+                        GenieObjectMapper
+                            .getMapper()
+                            .writeValueAsBytes(Lists.newArrayList(applicationId2, applicationId1))
+                    )
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
@@ -1191,7 +1204,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                     .put(commandApplicationsAPI, ID)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
-                        objectMapper.writeValueAsBytes(
+                        GenieObjectMapper.getMapper().writeValueAsBytes(
                             Lists.newArrayList(applicationId1, applicationId2, applicationId3))
                     )
             )
@@ -1213,7 +1226,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                 MockMvcRequestBuilders
                     .put(commandApplicationsAPI, ID)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsBytes(Lists.newArrayList()))
+                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(Lists.newArrayList()))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
@@ -1264,7 +1277,11 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                 MockMvcRequestBuilders
                     .post(commandApplicationsAPI, ID)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsBytes(Lists.newArrayList(applicationId1, applicationId2)))
+                    .content(
+                        GenieObjectMapper
+                            .getMapper()
+                            .writeValueAsBytes(Lists.newArrayList(applicationId1, applicationId2))
+                    )
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
@@ -1336,7 +1353,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                     .post(commandApplicationsAPI, ID)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
-                        this.objectMapper.writeValueAsBytes(
+                        GenieObjectMapper.getMapper().writeValueAsBytes(
                             Lists.newArrayList(applicationId1, applicationId2, applicationId3)
                         )
                     )
@@ -1437,7 +1454,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                 MockMvcRequestBuilders
                     .post(CLUSTERS_API + "/" + cluster1Id + "/commands")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(this.objectMapper.writeValueAsBytes(commandIds))
+                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(commandIds))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
         this.mvc
@@ -1445,12 +1462,12 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                 MockMvcRequestBuilders
                     .post(CLUSTERS_API + "/" + cluster3Id + "/commands")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(this.objectMapper.writeValueAsBytes(commandIds))
+                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(commandIds))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
         Arrays.stream(
-            this.objectMapper.readValue(
+            GenieObjectMapper.getMapper().readValue(
                 this.mvc
                     .perform(MockMvcRequestBuilders.get(COMMANDS_API + "/" + ID + "/clusters"))
                     .andExpect(MockMvcResultMatchers.status().isOk())
@@ -1511,6 +1528,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
 
     /**
      * Test creating a command with blank files and tag resources.
+     *
      * @throws Exception when an unexpected error is encountered
      */
     @Test
@@ -1539,7 +1557,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                 .withId(ID)
                 .withTags(stringSetWithBlank)
                 .build()
-            );
+        );
 
         for (Command invalidCommandResource : invalidCommandResources) {
             Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
@@ -1548,7 +1566,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                 .perform(
                     MockMvcRequestBuilders.post(COMMANDS_API)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(this.objectMapper.writeValueAsBytes(invalidCommandResource))
+                        .content(GenieObjectMapper.getMapper().writeValueAsBytes(invalidCommandResource))
                 )
                 .andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
 

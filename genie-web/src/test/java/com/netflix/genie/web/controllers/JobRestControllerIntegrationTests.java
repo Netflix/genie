@@ -18,7 +18,6 @@
 package com.netflix.genie.web.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Application;
@@ -32,6 +31,7 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.JobStatusMessages;
+import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.web.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
@@ -216,7 +216,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
 
         this.schedulerJobName = UUID.randomUUID().toString();
         this.schedulerRunId = UUID.randomUUID().toString();
-        this.metadata = new ObjectMapper().readTree(
+        this.metadata = GenieObjectMapper.getMapper().readTree(
             "{\""
                 + SCHEDULER_JOB_NAME_KEY
                 + "\":\""
@@ -369,7 +369,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                 "request",
                 "",
                 MediaType.APPLICATION_JSON_VALUE,
-                this.objectMapper.writeValueAsBytes(jobRequest)
+                GenieObjectMapper.getMapper().writeValueAsBytes(jobRequest)
             );
 
             final MockMultipartHttpServletRequestBuilder builder = RestDocumentationRequestBuilders
@@ -403,7 +403,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                     MockMvcRequestBuilders
                         .post(JOBS_API)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(this.objectMapper.writeValueAsBytes(jobRequest))
+                        .content(GenieObjectMapper.getMapper().writeValueAsBytes(jobRequest))
                 )
                 .andExpect(MockMvcResultMatchers.status().isAccepted())
                 .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()))
@@ -818,7 +818,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                 MockMvcRequestBuilders
                     .post(JOBS_API)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(this.objectMapper.writeValueAsBytes(jobConflictRequest))
+                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(jobConflictRequest))
             )
             .andExpect(MockMvcResultMatchers.status().isConflict());
     }
@@ -933,7 +933,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                 MockMvcRequestBuilders
                     .post(JOBS_API)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(this.objectMapper.writeValueAsBytes(jobRequest))
+                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(jobRequest))
                     .accept(MediaType.APPLICATION_JSON)
             )
             .andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
@@ -974,7 +974,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                 MockMvcRequestBuilders
                     .post(JOBS_API)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(this.objectMapper.writeValueAsBytes(jobRequest))
+                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(jobRequest))
                     .accept(MediaType.APPLICATION_JSON)
             )
             .andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
@@ -1017,7 +1017,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                 MockMvcRequestBuilders
                     .post(JOBS_API)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(this.objectMapper.writeValueAsBytes(jobRequest))
+                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(jobRequest))
                     .accept(MediaType.APPLICATION_JSON)
             ).andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
 
@@ -1061,7 +1061,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                 MockMvcRequestBuilders
                     .post(JOBS_API)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsBytes(jobRequest))
+                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(jobRequest))
             )
             .andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
 
@@ -1100,7 +1100,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                 MockMvcRequestBuilders
                     .post(JOBS_API)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(this.objectMapper.writeValueAsBytes(jobRequest))
+                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(jobRequest))
             )
             .andExpect(MockMvcResultMatchers.status().isAccepted())
             .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()))
@@ -1176,7 +1176,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                 MockMvcRequestBuilders
                     .post(JOBS_API)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsBytes(jobRequest))
+                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(jobRequest))
             ).andReturn();
 
         if (result.getResponse().getStatus() != HttpStatus.ACCEPTED.value()) {
@@ -1235,7 +1235,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                 MockMvcRequestBuilders
                     .post(JOBS_API)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(this.objectMapper.writeValueAsBytes(jobRequest))
+                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(jobRequest))
             )
             .andExpect(MockMvcResultMatchers.status().isAccepted())
             .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()))
@@ -1281,7 +1281,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                 MockMvcRequestBuilders
                     .post(JOBS_API)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(this.objectMapper.writeValueAsBytes(jobRequest))
+                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(jobRequest))
             )
             .andExpect(MockMvcResultMatchers.status().isAccepted())
             .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()))
@@ -1398,7 +1398,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                 MockMvcRequestBuilders
                     .post(COMMANDS_API + FILE_DELIMITER + CMD1_ID + FILE_DELIMITER + APPLICATIONS_LINK_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsBytes(apps))
+                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(apps))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
@@ -1409,7 +1409,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                 MockMvcRequestBuilders
                     .post(CLUSTERS_API + FILE_DELIMITER + CLUSTER1_ID + FILE_DELIMITER + COMMANDS_LINK_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(this.objectMapper.writeValueAsBytes(cmds))
+                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(cmds))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
     }
@@ -1466,7 +1466,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                 MockMvcRequestBuilders
                     .post(APPLICATIONS_API)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(this.objectMapper.writeValueAsBytes(app))
+                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(app))
             )
             .andExpect(MockMvcResultMatchers.status().isCreated())
             .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()));
@@ -1518,7 +1518,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                 MockMvcRequestBuilders
                     .post(CLUSTERS_API)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsBytes(cluster))
+                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(cluster))
             )
             .andExpect(MockMvcResultMatchers.status().isCreated())
             .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()));
@@ -1575,7 +1575,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                 MockMvcRequestBuilders
                     .post(COMMANDS_API)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsBytes(cmd))
+                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(cmd))
             )
             .andExpect(MockMvcResultMatchers.status().isCreated())
             .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()));

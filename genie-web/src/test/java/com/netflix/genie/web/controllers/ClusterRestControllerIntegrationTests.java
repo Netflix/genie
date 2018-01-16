@@ -18,7 +18,6 @@
 package com.netflix.genie.web.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -27,6 +26,7 @@ import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
+import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.hateoas.resources.ClusterResource;
 import com.netflix.genie.web.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
@@ -229,7 +229,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
             MockMvcRequestBuilders
                 .post(CLUSTERS_API)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsBytes(cluster))
+                .content(GenieObjectMapper.getMapper().writeValueAsBytes(cluster))
         ).andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
         Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
     }
@@ -357,7 +357,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
             null
         );
         final String clusterResource = CLUSTERS_API + "/{id}";
-        final Cluster createdCluster = this.objectMapper
+        final Cluster createdCluster = GenieObjectMapper.getMapper()
             .readValue(
                 this.mvc.perform(MockMvcRequestBuilders.get(clusterResource, ID))
                     .andReturn()
@@ -396,7 +396,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
             RestDocumentationRequestBuilders
                 .put(clusterResource, ID)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(this.objectMapper.writeValueAsBytes(updateCluster.build()))
+                .content(GenieObjectMapper.getMapper().writeValueAsBytes(updateCluster.build()))
         )
             .andExpect(MockMvcResultMatchers.status().isNoContent())
             .andDo(updateResultHandler);
@@ -433,7 +433,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
 
         final String newName = UUID.randomUUID().toString();
         final String patchString = "[{ \"op\": \"replace\", \"path\": \"/name\", \"value\": \"" + newName + "\" }]";
-        final JsonPatch patch = JsonPatch.fromJson(this.objectMapper.readTree(patchString));
+        final JsonPatch patch = JsonPatch.fromJson(GenieObjectMapper.getMapper().readTree(patchString));
 
         final RestDocumentationResultHandler patchResultHandler = MockMvcRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
@@ -448,7 +448,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
             RestDocumentationRequestBuilders
                 .patch(clusterResource, id)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(this.objectMapper.writeValueAsBytes(patch))
+                .content(GenieObjectMapper.getMapper().writeValueAsBytes(patch))
         )
             .andExpect(MockMvcResultMatchers.status().isNoContent())
             .andDo(patchResultHandler);
@@ -827,7 +827,9 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
                 RestDocumentationRequestBuilders
                     .post(clusterCommandsAPI, ID)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(this.objectMapper.writeValueAsBytes(Lists.newArrayList(commandId1, commandId2)))
+                    .content(
+                        GenieObjectMapper.getMapper().writeValueAsBytes(Lists.newArrayList(commandId1, commandId2))
+                    )
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent())
             .andDo(addResultHandler);
@@ -847,7 +849,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
                 MockMvcRequestBuilders
                     .post(clusterCommandsAPI, ID)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(this.objectMapper.writeValueAsBytes(Lists.newArrayList()))
+                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(Lists.newArrayList()))
             )
             .andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
 
@@ -864,7 +866,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
                 MockMvcRequestBuilders
                     .post(clusterCommandsAPI, ID)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(this.objectMapper.writeValueAsBytes(Lists.newArrayList(commandId3)))
+                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(Lists.newArrayList(commandId3)))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
@@ -967,7 +969,9 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
                 RestDocumentationRequestBuilders
                     .put(clusterCommandsAPI, ID)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(this.objectMapper.writeValueAsBytes(Lists.newArrayList(commandId1, commandId2)))
+                    .content(
+                        GenieObjectMapper.getMapper().writeValueAsBytes(Lists.newArrayList(commandId1, commandId2))
+                    )
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent())
             .andDo(setResultHandler);
@@ -987,7 +991,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
                 MockMvcRequestBuilders
                     .put(clusterCommandsAPI, ID)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(this.objectMapper.writeValueAsBytes(Lists.newArrayList()))
+                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(Lists.newArrayList()))
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
@@ -1032,7 +1036,9 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
                 MockMvcRequestBuilders
                     .post(clusterCommandsAPI, ID)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsBytes(Lists.newArrayList(commandId1, commandId2)))
+                    .content(
+                        GenieObjectMapper.getMapper().writeValueAsBytes(Lists.newArrayList(commandId1, commandId2))
+                    )
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
 
@@ -1098,7 +1104,9 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
                     .post(clusterCommandsAPI, ID)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
-                        this.objectMapper.writeValueAsBytes(Lists.newArrayList(commandId1, commandId2, commandId3))
+                        GenieObjectMapper
+                            .getMapper()
+                            .writeValueAsBytes(Lists.newArrayList(commandId1, commandId2, commandId3))
                     )
             )
             .andExpect(MockMvcResultMatchers.status().isNoContent());
@@ -1212,7 +1220,8 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
             .andExpect(MockMvcResultMatchers.jsonPath(CLUSTERS_LIST_PATH, Matchers.hasSize(1)))
             .andReturn();
 
-        final JsonNode responseJsonNode = new ObjectMapper().readTree(response.getResponse().getContentAsString());
+        final JsonNode responseJsonNode
+            = GenieObjectMapper.getMapper().readTree(response.getResponse().getContentAsString());
 
         // Self link is not double-encoded
         Assert.assertTrue(
@@ -1278,7 +1287,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
                 .perform(
                     MockMvcRequestBuilders.post(CLUSTERS_API)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(this.objectMapper.writeValueAsBytes(invalidClusterResource))
+                        .content(GenieObjectMapper.getMapper().writeValueAsBytes(invalidClusterResource))
                 )
                 .andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
 

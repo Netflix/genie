@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.common.dto;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.test.categories.UnitTest;
 import org.junit.Assert;
 import org.junit.Test;
@@ -49,8 +49,7 @@ public class BaseDTOUnitTests {
 
         final String json = application.toString();
         try {
-            final ObjectMapper mapper = new ObjectMapper();
-            mapper.readTree(json);
+            GenieObjectMapper.getMapper().readTree(json);
         } catch (final IOException ioe) {
             Assert.fail();
         }

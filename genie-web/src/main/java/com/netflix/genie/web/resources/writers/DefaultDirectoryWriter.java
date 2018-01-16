@@ -17,12 +17,8 @@
  */
 package com.netflix.genie.web.resources.writers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.collect.Lists;
-import com.netflix.genie.common.util.JsonDateDeserializer;
-import com.netflix.genie.common.util.JsonDateSerializer;
+import com.netflix.genie.common.util.GenieObjectMapper;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.catalina.util.ConcurrentDateFormat;
@@ -151,8 +147,7 @@ public class DefaultDirectoryWriter implements DirectoryWriter {
         final boolean includeParent
     ) throws Exception {
         final Directory dir = this.getDirectory(directory, requestURL, includeParent);
-        final ObjectMapper mapper = new ObjectMapper();
-        return mapper.writeValueAsString(dir);
+        return GenieObjectMapper.getMapper().writeValueAsString(dir);
     }
 
     private void writeFileHtml(

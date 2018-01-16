@@ -17,10 +17,10 @@
  */
 package com.netflix.genie.web.jpa.services
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.collect.Lists
 import com.google.common.collect.Sets
 import com.netflix.genie.common.dto.*
+import com.netflix.genie.common.util.GenieObjectMapper
 import com.netflix.genie.test.categories.UnitTest
 import com.netflix.genie.test.suppliers.RandomSuppliers
 import com.netflix.genie.web.jpa.entities.*
@@ -36,7 +36,6 @@ import spock.lang.Specification
  */
 @Category(UnitTest.class)
 class JpaServiceUtilsSpec extends Specification {
-    def mapper = new ObjectMapper()
 
     def "Can convert application entity to application dto"() {
         def entity = new ApplicationEntity()
@@ -104,7 +103,7 @@ class JpaServiceUtilsSpec extends Specification {
         application.getDependencies() == dependencies
         application.getStatus() == ApplicationStatus.ACTIVE
         application.getMetadata().isPresent()
-        this.mapper.writeValueAsString(application.getMetadata().get()) == metadata
+        GenieObjectMapper.getMapper().writeValueAsString(application.getMetadata().get()) == metadata
     }
 
     def "Can convert cluster entity to cluster dto"() {
@@ -168,7 +167,7 @@ class JpaServiceUtilsSpec extends Specification {
         cluster.getConfigs() == confs
         cluster.getDependencies() == dependencies
         cluster.getMetadata().isPresent()
-        this.mapper.writeValueAsString(cluster.getMetadata().get()) == metadata
+        GenieObjectMapper.getMapper().writeValueAsString(cluster.getMetadata().get()) == metadata
     }
 
     def "Can convert command entity to command DTO"() {
@@ -246,7 +245,7 @@ class JpaServiceUtilsSpec extends Specification {
         command.getDependencies() == dependencies
         command.getMemory().orElseGet(RandomSuppliers.INT) == memory
         command.getMetadata().isPresent()
-        this.mapper.writeValueAsString(command.getMetadata().get()) == metadata
+        GenieObjectMapper.getMapper().writeValueAsString(command.getMetadata().get()) == metadata
     }
 
     def "Can convert Job Projection of Job Entity to Job DTO"() {
@@ -308,7 +307,7 @@ class JpaServiceUtilsSpec extends Specification {
         job.getStatus() == JobStatus.SUCCEEDED
         job.getStatusMsg().orElseGet(RandomSuppliers.STRING) == statusMessage
         job.getMetadata().isPresent()
-        this.mapper.writeValueAsString(job.getMetadata().get()) == metadata
+        GenieObjectMapper.getMapper().writeValueAsString(job.getMetadata().get()) == metadata
     }
 
     def "Can convert Job Execution Projection to Job Execution DTO"() {
@@ -523,6 +522,6 @@ class JpaServiceUtilsSpec extends Specification {
         request.getApplications() == applications
         request.getTimeout().orElseGet(RandomSuppliers.INT) == timeout
         request.getMetadata().isPresent()
-        this.mapper.writeValueAsString(request.getMetadata().get()) == metadata
+        GenieObjectMapper.getMapper().writeValueAsString(request.getMetadata().get()) == metadata
     }
 }

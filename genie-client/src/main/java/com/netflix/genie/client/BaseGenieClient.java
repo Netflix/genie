@@ -17,14 +17,11 @@
  */
 package com.netflix.genie.client;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.netflix.genie.client.configs.GenieNetworkConfiguration;
 import com.netflix.genie.client.exceptions.GenieClientException;
 import com.netflix.genie.client.interceptors.ResponseMappingInterceptor;
-import com.netflix.genie.common.util.GenieDateFormat;
+import com.netflix.genie.common.util.GenieObjectMapper;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import org.apache.commons.lang3.StringUtils;
@@ -35,7 +32,6 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.List;
-import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -47,7 +43,6 @@ import java.util.concurrent.TimeUnit;
 abstract class BaseGenieClient {
 
     private Retrofit retrofit;
-    private ObjectMapper mapper;
 
     /**
      * Constructor that takes the service url and a security interceptor implementation.
@@ -73,12 +68,6 @@ abstract class BaseGenieClient {
             this.addConfigParamsFromConfig(builder, genieNetworkConfiguration);
         }
 
-        this.mapper = new ObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-            .setDateFormat(new GenieDateFormat())
-            .setTimeZone(TimeZone.getTimeZone("UTC"))
-            .registerModule(new Jdk8Module());
-
         // Add the interceptor to map the retrofit response code to corresponding Genie Exceptions in case of
         // 4xx and 5xx errors.
         builder.addInterceptor(new ResponseMappingInterceptor());
@@ -89,7 +78,7 @@ abstract class BaseGenieClient {
 
         this.retrofit = new Retrofit.Builder()
             .baseUrl(url)
-            .addConverterFactory(JacksonConverterFactory.create(this.mapper))
+            .addConverterFactory(JacksonConverterFactory.create(GenieObjectMapper.getMapper()))
             .client(client)
             .build();
     }
@@ -129,6 +118,6 @@ abstract class BaseGenieClient {
     }
 
     <T> T treeToValue(final JsonNode node, final Class<T> clazz) throws IOException {
-        return this.mapper.treeToValue(node, clazz);
+        return GenieObjectMapper.getMapper().treeToValue(node, clazz);
     }
 }

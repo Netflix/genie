@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.resources.writers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.test.categories.UnitTest;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
@@ -210,8 +210,8 @@ public class DefaultDirectoryWriterUnitTests {
         this.setupWithParent();
         final String json = this.writer.toJson(this.directory, REQUEST_URL_WITH_PARENT, true);
         Assert.assertThat(json, Matchers.notNullValue());
-        final ObjectMapper mapper = new ObjectMapper();
-        final DefaultDirectoryWriter.Directory dir = mapper.readValue(json, DefaultDirectoryWriter.Directory.class);
+        final DefaultDirectoryWriter.Directory dir
+            = GenieObjectMapper.getMapper().readValue(json, DefaultDirectoryWriter.Directory.class);
 
         Assert.assertThat(dir.getParent(), Matchers.notNullValue());
         Assert.assertThat(dir.getParent().getName(), Matchers.is(PARENT_NAME));
