@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.core.jpa.services;
 
-import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.jpa.entities.TagEntity;
 import com.netflix.genie.core.jpa.repositories.JpaTagRepository;
 import com.netflix.genie.core.services.TagService;
@@ -25,6 +24,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.validation.constraints.NotNull;
+import java.time.Instant;
+import java.util.Date;
 
 /**
  * JPA based implementation of the TagService interface.
@@ -51,10 +54,7 @@ public class JpaTagServiceImpl implements TagService {
      * {@inheritDoc}
      */
     @Override
-//    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void createTagIfNotExists(
-        @NotBlank(message = "Tag cannot be blank") final String tag
-    ) throws GenieException {
+    public void createTagIfNotExists(@NotBlank(message = "Tag cannot be blank") final String tag) {
         if (this.tagRepository.existsByTag(tag)) {
             return;
         }
@@ -65,5 +65,13 @@ public class JpaTagServiceImpl implements TagService {
             // Must've been created during the time between exists query and now
             log.error("Tag expected not to be there but seems to be {}", e.getMessage(), e);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int deleteUnusedTags(@NotNull final Instant createdThreshold) {
+        return this.tagRepository.deleteUnusedTags(Date.from(createdThreshold));
     }
 }

@@ -18,7 +18,11 @@
 package com.netflix.genie.core.jpa.repositories;
 
 import com.netflix.genie.core.jpa.entities.TagEntity;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
+import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
 
@@ -29,6 +33,19 @@ import java.util.Set;
  * @since 3.3.0
  */
 public interface JpaTagRepository extends JpaIdRepository<TagEntity> {
+
+    /**
+     * This is the query used to find and delete tags that aren't referenced by any of the other tables.
+     */
+    String DELETE_UNUSED_TAGS_SQL =
+        "DELETE "
+            + "FROM tags "
+            + "WHERE id NOT IN (SELECT DISTINCT(tag_id) FROM applications_tags) "
+            + "AND id NOT IN (SELECT DISTINCT(tag_id) FROM clusters_tags) "
+            + "AND id NOT IN (SELECT DISTINCT(tag_id) FROM commands_tags) "
+            + "AND id NOT IN (SELECT DISTINCT(tag_id) FROM criteria_tags) "
+            + "AND id NOT IN (SELECT DISTINCT(tag_id) FROM jobs_tags) "
+            + "AND created <= :createdThreshold ;";
 
     /**
      * Find a tag by its unique tag value.
@@ -50,7 +67,19 @@ public interface JpaTagRepository extends JpaIdRepository<TagEntity> {
      * Find tag entities where the tag value is in the given set of tags.
      *
      * @param tags The tags to find entities for
-     * @return The tag entites
+     * @return The tag entities
      */
     Set<TagEntity> findByTagIn(final Set<String> tags);
+
+    /**
+     * Delete all tags from the database that aren't referenced which were created before the supplied created
+     * threshold.
+     *
+     * @param createdThreshold The instant in time where tags created before this time that aren't referenced
+     *                         will be deleted. Inclusive
+     * @return The number of tags deleted
+     */
+    @Modifying
+    @Query(value = DELETE_UNUSED_TAGS_SQL, nativeQuery = true)
+    int deleteUnusedTags(@Param("createdThreshold") final Date createdThreshold);
 }

@@ -18,9 +18,13 @@
 package com.netflix.genie.core.jpa.services;
 
 import com.github.springtestdbunit.annotation.DatabaseTearDown;
+import com.google.common.collect.Sets;
+import com.netflix.genie.common.dto.Application;
+import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.jpa.entities.TagEntity;
 import com.netflix.genie.core.jpa.repositories.JpaTagRepository;
+import com.netflix.genie.core.services.ApplicationService;
 import com.netflix.genie.core.services.TagService;
 import com.netflix.genie.test.categories.IntegrationTest;
 import org.hamcrest.Matchers;
@@ -29,6 +33,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -49,14 +54,15 @@ public class JpaTagServiceImplIntegrationTest extends DBUnitTestBase {
     @Autowired
     private JpaTagRepository tagRepository;
 
+    @Autowired
+    private ApplicationService applicationService;
+
     /**
      * Make sure that no matter how many times we try to create a tag it doesn't throw an error on duplicate key it
      * just does nothing.
-     *
-     * @throws GenieException on error
      */
     @Test
-    public void canCreateTagIfNotExists() throws GenieException {
+    public void canCreateTagIfNotExists() {
         Assert.assertThat(this.tagRepository.count(), Matchers.is(0L));
         final String tag = UUID.randomUUID().toString();
         this.tagService.createTagIfNotExists(tag);
@@ -78,5 +84,37 @@ public class JpaTagServiceImplIntegrationTest extends DBUnitTestBase {
 
         // Make sure the ids are still equal
         Assert.assertThat(tagEntity2.getId(), Matchers.is(tagEntity.getId()));
+    }
+
+    /**
+     * Make sure we can delete tags that aren't attached to other resources.
+     *
+     * @throws GenieException on error
+     */
+    @Test
+    public void canDeleteUnusedTags() throws GenieException {
+        Assert.assertThat(this.tagRepository.count(), Matchers.is(0L));
+        final String tag1 = UUID.randomUUID().toString();
+        final String tag2 = UUID.randomUUID().toString();
+        this.tagService.createTagIfNotExists(tag1);
+
+        final Application app = new Application.Builder(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            ApplicationStatus.ACTIVE
+        )
+            .withTags(Sets.newHashSet(tag2))
+            .build();
+
+        this.applicationService.createApplication(app);
+
+        Assert.assertTrue(this.tagRepository.existsByTag(tag1));
+        Assert.assertTrue(this.tagRepository.existsByTag(tag2));
+
+        Assert.assertThat(this.tagService.deleteUnusedTags(Instant.now()), Matchers.is(1));
+
+        Assert.assertFalse(this.tagRepository.existsByTag(tag1));
+        Assert.assertTrue(this.tagRepository.existsByTag(tag2));
     }
 }
