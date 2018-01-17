@@ -17,9 +17,11 @@
  */
 package com.netflix.genie.web.services;
 
-import com.netflix.genie.common.exceptions.GenieException;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.validation.annotation.Validated;
+
+import javax.validation.constraints.NotNull;
+import java.time.Instant;
 
 /**
  * API definition for manipulating tag references within Genie.
@@ -34,9 +36,16 @@ public interface TagService {
      * Attempt to create a tag in the system if it doesn't already exist.
      *
      * @param tag the tag to create. Not blank.
-     * @throws GenieException on any error except that the tag already exists
      */
-    void createTagIfNotExists(
-        @NotBlank(message = "Tag cannot be blank") final String tag
-    ) throws GenieException;
+    void createTagIfNotExists(@NotBlank(message = "Tag cannot be blank") final String tag);
+
+    /**
+     * Delete all tags from the database that aren't referenced which were created before the supplied created
+     * threshold.
+     *
+     * @param createdThreshold The instant in time where tags created before this time that aren't referenced
+     *                         will be deleted. Inclusive
+     * @return The number of tags deleted
+     */
+    int deleteUnusedTags(@NotNull final Instant createdThreshold);
 }
