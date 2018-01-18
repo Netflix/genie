@@ -16,6 +16,7 @@
 package com.netflix.genie.core.jpa.repositories;
 
 import com.netflix.genie.core.jpa.entities.ClusterEntity;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -80,6 +81,71 @@ public interface JpaClusterRepository extends JpaBaseRepository<ClusterEntity> {
             + "  commands c on cc.command_id = c.id;";
 
     /**
+     * The SQL to find all clusters in a TERMINATED state that aren't attached to any jobs still in the database.
+     */
+    String DELETE_TERMINATED_CLUSTERS_SQL =
+        "DELETE "
+            + "FROM clusters "
+            + "WHERE id NOT IN (SELECT DISTINCT(cluster_id) FROM jobs WHERE cluster_id IS NOT NULL) "
+            + "AND status = 'TERMINATED';";
+
+    /**
+     * For referential integrity before clusters are deleted remove all tag references.
+     */
+    // TODO: Check when database scripts are used with proper cascade statements that this isn't needed. e.g. 4.0.0
+    String DELETE_TERMINATED_CLUSTERS_TAGS_REFERENCES_SQL =
+        "DELETE "
+            + "FROM clusters_tags "
+            + "WHERE cluster_id IN ("
+            + " SELECT id "
+            + " FROM clusters "
+            + " WHERE id NOT IN (SELECT DISTINCT(cluster_id) FROM jobs WHERE cluster_id IS NOT NULL) "
+            + " AND status = 'TERMINATED'"
+            + ");";
+
+    /**
+     * For referential integrity before clusters are deleted remove all config file references.
+     */
+    // TODO: Check when database scripts are used with proper cascade statements that this isn't needed. e.g. 4.0.0
+    String DELETE_TERMINATED_CLUSTERS_CONFIGS_FILE_REFERENCES_SQL =
+        "DELETE "
+            + "FROM clusters_configs "
+            + "WHERE cluster_id IN ("
+            + " SELECT id "
+            + " FROM clusters "
+            + " WHERE id NOT IN (SELECT DISTINCT(cluster_id) FROM jobs WHERE cluster_id IS NOT NULL) "
+            + " AND status = 'TERMINATED'"
+            + ");";
+
+    /**
+     * For referential integrity before clusters are deleted remove all dependency file references.
+     */
+    // TODO: Check when database scripts are used with proper cascade statements that this isn't needed. e.g. 4.0.0
+    String DELETE_TERMINATED_CLUSTERS_DEPENDENCIES_FILE_REFERENCES_SQL =
+        "DELETE "
+            + "FROM clusters_dependencies "
+            + "WHERE cluster_id IN ("
+            + " SELECT id "
+            + " FROM clusters "
+            + " WHERE id NOT IN (SELECT DISTINCT(cluster_id) FROM jobs WHERE cluster_id IS NOT NULL) "
+            + " AND status = 'TERMINATED'"
+            + ");";
+
+    /**
+     * For referential integrity before clusters are deleted remove all command links.
+     */
+    // TODO: Check when database scripts are used with proper cascade statements that this isn't needed. e.g. 4.0.0
+    String DELETE_TERMINATED_CLUSTERS_COMMANDS_REFERENCES_SQL =
+        "DELETE "
+            + "FROM clusters_commands "
+            + "WHERE cluster_id IN ("
+            + " SELECT id "
+            + " FROM clusters "
+            + " WHERE id NOT IN (SELECT DISTINCT(cluster_id) FROM jobs WHERE cluster_id IS NOT NULL) "
+            + " AND status = 'TERMINATED'"
+            + ");";
+
+    /**
      * Find the cluster and command ids for the given criterion tags. The data is returned as a list of
      * Long, Long results where the first Long is the cluster id and the second is the command id that should be used
      * if that cluster is selected. The command id should be the highest priority command that matches the command
@@ -99,4 +165,49 @@ public interface JpaClusterRepository extends JpaBaseRepository<ClusterEntity> {
         @Param("commandTags") final Set<String> commandTags,
         @Param("commandTagsCount") final int commandTagsSize
     );
+
+    /**
+     * Delete all clusters that are in a terminated state and aren't attached to any jobs.
+     *
+     * @return The number of clusters deleted
+     */
+    @Modifying
+    @Query(value = DELETE_TERMINATED_CLUSTERS_SQL, nativeQuery = true)
+    int deleteTerminatedClusters();
+
+    /**
+     * Delete all links to clusters that are about to be terminated from commands.
+     *
+     * @return The number of records deleted.
+     */
+    @Modifying
+    @Query(value = DELETE_TERMINATED_CLUSTERS_COMMANDS_REFERENCES_SQL, nativeQuery = true)
+    int deleteTerminatedClustersCommandsReferences();
+
+    /**
+     * Delete all links to clusters that are about to be terminated from config file references.
+     *
+     * @return The number of records deleted.
+     */
+    @Modifying
+    @Query(value = DELETE_TERMINATED_CLUSTERS_CONFIGS_FILE_REFERENCES_SQL, nativeQuery = true)
+    int deleteTerminatedClustersConfigsFileReferences();
+
+    /**
+     * Delete all links to clusters that are about to be terminated from dependency file references.
+     *
+     * @return The number of records deleted.
+     */
+    @Modifying
+    @Query(value = DELETE_TERMINATED_CLUSTERS_DEPENDENCIES_FILE_REFERENCES_SQL, nativeQuery = true)
+    int deleteTerminatedClustersDependenciesFileReferences();
+
+    /**
+     * Delete all links to clusters that are about to be terminated from tags.
+     *
+     * @return The number of records deleted.
+     */
+    @Modifying
+    @Query(value = DELETE_TERMINATED_CLUSTERS_TAGS_REFERENCES_SQL, nativeQuery = true)
+    int deleteTerminatedClustersTagsReferences();
 }

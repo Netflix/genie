@@ -30,6 +30,7 @@ import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.services.ClusterService;
 import com.netflix.genie.core.services.CommandService;
 import com.netflix.genie.test.categories.IntegrationTest;
@@ -89,6 +90,9 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
 
     @Autowired
     private CommandService commandService;
+
+    @Autowired
+    private JpaClusterRepository clusterRepository;
 
     /**
      * Test the get cluster method.
@@ -884,5 +888,57 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertTrue(this.service.getTagsForCluster(CLUSTER_1_ID).contains("prod"));
         this.service.removeTagForCluster(CLUSTER_1_ID, "prod");
         Assert.assertFalse(this.service.getTagsForCluster(CLUSTER_1_ID).contains("prod"));
+    }
+
+    /**
+     * Test the API for deleting all terminated clusters that aren't attached to jobs.
+     *
+     * @throws GenieException On Error
+     * @throws IOException    On JSON patch error
+     */
+    @Test
+    public void testDeleteTerminatedClusters() throws GenieException, IOException {
+        Assert.assertThat(this.clusterRepository.count(), Matchers.is(2L));
+        final String testClusterId = UUID.randomUUID().toString();
+        final Cluster testCluster = new Cluster.Builder(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            ClusterStatus.OUT_OF_SERVICE
+        )
+            .withId(testClusterId)
+            .withConfigs(Sets.newHashSet(UUID.randomUUID().toString()))
+            .withDependencies(Sets.newHashSet(UUID.randomUUID().toString()))
+            .withSetupFile(UUID.randomUUID().toString())
+            .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+            .build();
+        this.service.createCluster(testCluster);
+
+        // Shouldn't delete any clusters as all are UP or OOS
+        Assert.assertThat(this.service.deleteTerminatedClusters(), Matchers.is(0));
+
+        // Change status to UP
+        String patchString = "[{ \"op\": \"replace\", \"path\": \"/status\", \"value\": \"UP\" }]";
+        final ObjectMapper mapper = new ObjectMapper();
+        JsonPatch patch = JsonPatch.fromJson(mapper.readTree(patchString));
+        this.service.patchCluster(testClusterId, patch);
+        Assert.assertThat(this.service.getCluster(testClusterId).getStatus(), Matchers.is(ClusterStatus.UP));
+
+        // All clusters are UP/OOS or attached to jobs
+        Assert.assertThat(this.service.deleteTerminatedClusters(), Matchers.is(0));
+
+        // Change status to terminated
+        patchString = "[{ \"op\": \"replace\", \"path\": \"/status\", \"value\": \"TERMINATED\" }]";
+        patch = JsonPatch.fromJson(mapper.readTree(patchString));
+        this.service.patchCluster(testClusterId, patch);
+        Assert.assertThat(this.service.getCluster(testClusterId).getStatus(), Matchers.is(ClusterStatus.TERMINATED));
+
+        // All clusters are UP/OOS or attached to jobs
+        Assert.assertThat(this.service.deleteTerminatedClusters(), Matchers.is(1));
+
+        // Make sure it didn't delete any of the clusters we wanted
+        Assert.assertTrue(this.clusterRepository.existsByUniqueId(CLUSTER_1_ID));
+        Assert.assertTrue(this.clusterRepository.existsByUniqueId(CLUSTER_2_ID));
+        Assert.assertFalse(this.clusterRepository.existsByUniqueId(testClusterId));
     }
 }
