@@ -22,4 +22,7 @@
  * @author mprimi
  * @since 4.0.0
  */
+@ParametersAreNonnullByDefault
 package com.netflix.genie.agent.rpc;
+
+import javax.annotation.ParametersAreNonnullByDefault;
