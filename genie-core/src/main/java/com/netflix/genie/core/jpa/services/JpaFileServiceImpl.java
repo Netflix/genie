@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.core.jpa.services;
 
-import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.core.jpa.entities.FileEntity;
 import com.netflix.genie.core.jpa.repositories.JpaFileRepository;
 import com.netflix.genie.core.services.FileService;
@@ -25,6 +24,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.validation.constraints.NotNull;
+import java.time.Instant;
+import java.util.Date;
 
 /**
  * JPA based implementation of the FileService interface.
@@ -51,10 +54,7 @@ public class JpaFileServiceImpl implements FileService {
      * {@inheritDoc}
      */
     @Override
-//    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void createFileIfNotExists(
-        @NotBlank(message = "File path cannot be blank") final String file
-    ) throws GenieException {
+    public void createFileIfNotExists(@NotBlank(message = "File path cannot be blank") final String file) {
         if (this.fileRepository.existsByFile(file)) {
             return;
         }
@@ -68,5 +68,13 @@ public class JpaFileServiceImpl implements FileService {
             // Must've been created during the time between exists query and now
             log.error("File expected not to be there but seems to be {}", e.getMessage(), e);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int deleteUnusedFiles(@NotNull final Instant createdThreshold) {
+        return this.fileRepository.deleteUnusedFiles(Date.from(createdThreshold));
     }
 }
