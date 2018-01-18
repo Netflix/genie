@@ -19,7 +19,10 @@ package com.netflix.genie.web.tasks.leader;
 
 import com.netflix.genie.web.jobs.JobConstants;
 import com.netflix.genie.web.properties.DatabaseCleanupProperties;
+import com.netflix.genie.web.services.ClusterService;
+import com.netflix.genie.web.services.FileService;
 import com.netflix.genie.web.services.JobPersistenceService;
+import com.netflix.genie.web.services.TagService;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import com.netflix.genie.web.tasks.TaskUtils;
 import com.netflix.genie.web.util.MetricsUtils;
@@ -53,9 +56,15 @@ public class DatabaseCleanupTask extends LeadershipTask {
 
     private final DatabaseCleanupProperties cleanupProperties;
     private final JobPersistenceService jobPersistenceService;
+    private final ClusterService clusterService;
+    private final FileService fileService;
+    private final TagService tagService;
 
     private final Registry registry;
     private final AtomicLong numDeletedJobs;
+    private final AtomicLong numDeletedClusters;
+    private final AtomicLong numDeletedTags;
+    private final AtomicLong numDeletedFiles;
     private final Id deletionTimerId;
 
     /**
@@ -63,21 +72,42 @@ public class DatabaseCleanupTask extends LeadershipTask {
      *
      * @param cleanupProperties     The properties to use to configure this task
      * @param jobPersistenceService The persistence service to use to cleanup the data store
+     * @param clusterService        The cluster service to use to delete terminated clusters
+     * @param fileService           The file service to use to delete unused file references
+     * @param tagService            The tag service to use to delete unused tag references
      * @param registry              The metrics registry
      */
     @Autowired
     public DatabaseCleanupTask(
         @NotNull final DatabaseCleanupProperties cleanupProperties,
         @NotNull final JobPersistenceService jobPersistenceService,
+        @NotNull final ClusterService clusterService,
+        @NotNull final FileService fileService,
+        @NotNull final TagService tagService,
         @NotNull final Registry registry
     ) {
         this.registry = registry;
         this.cleanupProperties = cleanupProperties;
         this.jobPersistenceService = jobPersistenceService;
+        this.clusterService = clusterService;
+        this.fileService = fileService;
+        this.tagService = tagService;
 
         this.numDeletedJobs = PolledMeter
             .using(registry)
             .withName("genie.tasks.databaseCleanup.numDeletedJobs.gauge")
+            .monitorValue(new AtomicLong());
+        this.numDeletedClusters = PolledMeter
+            .using(registry)
+            .withName("genie.tasks.databaseCleanup.numDeletedClusters.gauge")
+            .monitorValue(new AtomicLong());
+        this.numDeletedTags = PolledMeter
+            .using(registry)
+            .withName("genie.tasks.databaseCleanup.numDeletedTags.gauge")
+            .monitorValue(new AtomicLong());
+        this.numDeletedFiles = PolledMeter
+            .using(registry)
+            .withName("genie.tasks.databaseCleanup.numDeletedFiles.gauge")
             .monitorValue(new AtomicLong());
         this.deletionTimerId = registry.createId("genie.tasks.databaseCleanup.duration.timer");
     }
@@ -106,38 +136,40 @@ public class DatabaseCleanupTask extends LeadershipTask {
         final long start = System.nanoTime();
         final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
         try {
-            final Instant midnightUTC = TaskUtils.getMidnightUTC();
-            final Instant retentionLimit = midnightUTC.minus(this.cleanupProperties.getRetention(), ChronoUnit.DAYS);
-            final int batchSize = this.cleanupProperties.getMaxDeletedPerTransaction();
-            final int pageSize = this.cleanupProperties.getPageSize();
+            // Delete jobs that are older than the retention threshold and are complete
+            this.deleteJobs();
 
+            // Delete all clusters that are marked terminated and aren't attached to any jobs after jobs were deleted
+            final int countDeletedClusters = this.clusterService.deleteTerminatedClusters();
             log.info(
-                "Attempting to delete jobs from before {} in batches of {} jobs per iteration",
-                retentionLimit,
-                batchSize
+                "Deleted {} clusters that were in TERMINATED state and weren't attached to any jobs",
+                countDeletedClusters
             );
-            long totalDeletedJobs = 0;
-            while (true) {
-                final long numberDeletedJobs = this.jobPersistenceService.deleteBatchOfJobsCreatedBeforeDate(
-                    retentionLimit,
-                    batchSize,
-                    pageSize
-                );
-                totalDeletedJobs += numberDeletedJobs;
-                if (numberDeletedJobs == 0) {
-                    break;
-                }
-            }
-            log.info("Deleted {} jobs from before {}", totalDeletedJobs, retentionLimit);
-            this.numDeletedJobs.set(totalDeletedJobs);
-        } catch (Throwable t) {
+            this.numDeletedClusters.set(countDeletedClusters);
+
+            // Get now - 1 hour to avoid deleting references that were created as part of new resources recently
+            final Instant creationThreshold = Instant.now().minus(1L, ChronoUnit.HOURS);
+            final int countDeletedFiles = this.fileService.deleteUnusedFiles(creationThreshold);
+            log.info(
+                "Deleted {} files that were unused by any resource and created over an hour ago",
+                countDeletedFiles
+            );
+            this.numDeletedFiles.set(countDeletedFiles);
+
+            final int countDeletedTags = this.tagService.deleteUnusedTags(creationThreshold);
+            log.info(
+                "Deleted {} tags that were unused by any resource and created over an hour ago",
+                countDeletedTags
+            );
+            this.numDeletedTags.set(countDeletedTags);
+        } catch (final Throwable t) {
             MetricsUtils.addFailureTagsWithException(tags, t);
             throw t;
         } finally {
             final long finish = System.nanoTime();
-            this.registry.timer(
-                deletionTimerId.withTags(tags)
-            ).record(finish - start, TimeUnit.NANOSECONDS);
+            this.registry
+                .timer(this.deletionTimerId.withTags(tags))
+                .record(finish - start, TimeUnit.NANOSECONDS);
         }
     }
 
@@ -147,5 +179,35 @@ public class DatabaseCleanupTask extends LeadershipTask {
     @Override
     public void cleanup() {
         this.numDeletedJobs.set(0L);
+        this.numDeletedClusters.set(0L);
+        this.numDeletedTags.set(0L);
+        this.numDeletedFiles.set(0L);
+    }
+
+    private void deleteJobs() {
+        final Instant midnightUTC = TaskUtils.getMidnightUTC();
+        final Instant retentionLimit = midnightUTC.minus(this.cleanupProperties.getRetention(), ChronoUnit.DAYS);
+        final int batchSize = this.cleanupProperties.getMaxDeletedPerTransaction();
+        final int pageSize = this.cleanupProperties.getPageSize();
+
+        log.info(
+            "Attempting to delete jobs from before {} in batches of {} jobs per iteration",
+            retentionLimit,
+            batchSize
+        );
+        long totalDeletedJobs = 0;
+        while (true) {
+            final long numberDeletedJobs = this.jobPersistenceService.deleteBatchOfJobsCreatedBeforeDate(
+                retentionLimit,
+                batchSize,
+                pageSize
+            );
+            totalDeletedJobs += numberDeletedJobs;
+            if (numberDeletedJobs == 0) {
+                break;
+            }
+        }
+        log.info("Deleted {} jobs from before {}", totalDeletedJobs, retentionLimit);
+        this.numDeletedJobs.set(totalDeletedJobs);
     }
 }

@@ -287,7 +287,8 @@ lost and failed by the Genie leader
 |http
 
 |genie.tasks.databaseCleanup.enabled
-|Whether or not to delete old job records from the database
+|Whether or not to delete old and unused records from the database at a scheduled interval.
+See: `genie.tasks.databaseCleanup.expression`
 |true
 
 |genie.tasks.databaseCleanup.maxDeletedPerTransaction
