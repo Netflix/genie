@@ -380,8 +380,26 @@ and system metrics and statistics.
 |ClusterCheckerTask
 |-
 
+|genie.tasks.databaseCleanup.numDeletedClusters.gauge
+|Number of terminated cluster records purged during the last database cleanup pass
+|amount
+|DatabaseCleanupTask
+|-
+
+|genie.tasks.databaseCleanup.numDeletedFiles.gauge
+|Number of unused file references purged during the last database cleanup pass
+|amount
+|DatabaseCleanupTask
+|-
+
 |genie.tasks.databaseCleanup.numDeletedJobs.gauge
-|Number of database records purged during the last database cleanup pass
+|Number of job records purged during the last database cleanup pass
+|amount
+|DatabaseCleanupTask
+|-
+
+|genie.tasks.databaseCleanup.numDeletedTags.gauge
+|Number of unused tag records purged during the last database cleanup pass
 |amount
 |DatabaseCleanupTask
 |-
