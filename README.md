@@ -50,3 +50,7 @@ This is the image that has Genie deployed as a WAR file within Tomcat. You can u
 `docker pull netflixoss/genie-war:{version}` to test the one you want.
 
 You can run via `docker run -t --rm -p 8080:8080 netflixoss/genie-war:{version}`
+
+## Python Client
+
+The [Genie Python](https://github.com/Netflix/pygenie) client has been moved into its own repo.
