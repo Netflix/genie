@@ -17,9 +17,11 @@
  */
 package com.netflix.genie.core.services;
 
-import com.netflix.genie.common.exceptions.GenieException;
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.validation.annotation.Validated;
+
+import javax.validation.constraints.NotNull;
+import java.time.Instant;
 
 /**
  * API definition for manipulating file references within Genie.
@@ -34,9 +36,16 @@ public interface FileService {
      * Attempt to create a file reference in the system if it doesn't already exist.
      *
      * @param file the file to create. Not blank.
-     * @throws GenieException on any error except that the file already exists
      */
-    void createFileIfNotExists(
-        @NotBlank(message = "File path cannot be blank") final String file
-    ) throws GenieException;
+    void createFileIfNotExists(@NotBlank(message = "File path cannot be blank") final String file);
+
+    /**
+     * Delete all files from the database that aren't referenced which were created before the supplied created
+     * threshold.
+     *
+     * @param createdThreshold The instant in time where files created before this time that aren't referenced
+     *                         will be deleted. Inclusive
+     * @return The number of files deleted
+     */
+    int deleteUnusedFiles(@NotNull final Instant createdThreshold);
 }
