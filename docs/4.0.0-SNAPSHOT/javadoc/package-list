@@ -1,4 +1,5 @@
 com.netflix.genie
+com.netflix.genie.agent.cli
 com.netflix.genie.client
 com.netflix.genie.client.apis
 com.netflix.genie.client.configs
