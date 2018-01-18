@@ -18,7 +18,10 @@
 package com.netflix.genie.web.tasks.leader;
 
 import com.netflix.genie.core.jobs.JobConstants;
+import com.netflix.genie.core.services.ClusterService;
+import com.netflix.genie.core.services.FileService;
 import com.netflix.genie.core.services.JobPersistenceService;
+import com.netflix.genie.core.services.TagService;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.properties.DatabaseCleanupProperties;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
@@ -32,6 +35,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.scheduling.support.CronTrigger;
 
+import java.time.Instant;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -46,6 +50,9 @@ public class DatabaseCleanupTaskUnitTests {
 
     private DatabaseCleanupProperties cleanupProperties;
     private JobPersistenceService jobPersistenceService;
+    private ClusterService clusterService;
+    private FileService fileService;
+    private TagService tagService;
     private DatabaseCleanupTask task;
 
     /**
@@ -55,7 +62,17 @@ public class DatabaseCleanupTaskUnitTests {
     public void setup() {
         this.cleanupProperties = Mockito.mock(DatabaseCleanupProperties.class);
         this.jobPersistenceService = Mockito.mock(JobPersistenceService.class);
-        this.task = new DatabaseCleanupTask(this.cleanupProperties, this.jobPersistenceService, new DefaultRegistry());
+        this.clusterService = Mockito.mock(ClusterService.class);
+        this.fileService = Mockito.mock(FileService.class);
+        this.tagService = Mockito.mock(TagService.class);
+        this.task = new DatabaseCleanupTask(
+            this.cleanupProperties,
+            this.jobPersistenceService,
+            this.clusterService,
+            this.fileService,
+            this.tagService,
+            new DefaultRegistry()
+        );
     }
 
     /**
@@ -107,6 +124,10 @@ public class DatabaseCleanupTaskUnitTests {
             .thenReturn(deletedCount3)
             .thenReturn(0L);
 
+        Mockito.when(this.clusterService.deleteTerminatedClusters()).thenReturn(1, 2);
+        Mockito.when(this.fileService.deleteUnusedFiles(Mockito.any(Instant.class))).thenReturn(3, 4);
+        Mockito.when(this.tagService.deleteUnusedTags(Mockito.any(Instant.class))).thenReturn(5, 6);
+
         // The multiple calendar instances are to protect against running this test when the day flips
         final Calendar before = Calendar.getInstance(JobConstants.UTC);
         this.task.run();
@@ -125,6 +146,13 @@ public class DatabaseCleanupTaskUnitTests {
             date.add(Calendar.DAY_OF_YEAR, negativeDays);
             Assert.assertThat(argument.getAllValues().get(0), Matchers.is(date.getTime()));
             Assert.assertThat(argument.getAllValues().get(1), Matchers.is(date.getTime()));
+            Mockito.verify(this.clusterService, Mockito.times(2)).deleteTerminatedClusters();
+            Mockito
+                .verify(this.fileService, Mockito.times(2))
+                .deleteUnusedFiles(Mockito.any(Instant.class));
+            Mockito
+                .verify(this.tagService, Mockito.times(2))
+                .deleteUnusedTags(Mockito.any(Instant.class));
         }
     }
 
