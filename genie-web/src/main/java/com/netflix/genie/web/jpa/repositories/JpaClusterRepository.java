@@ -16,6 +16,7 @@
 package com.netflix.genie.web.jpa.repositories;
 
 import com.netflix.genie.web.jpa.entities.ClusterEntity;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -80,6 +81,15 @@ public interface JpaClusterRepository extends JpaBaseRepository<ClusterEntity> {
             + "  commands c on cc.command_id = c.id;";
 
     /**
+     * The SQL to find all clusters in a TERMINATED state that aren't attached to any jobs still in the database.
+     */
+    String DELETE_TERMINATED_CLUSTERS_SQL =
+        "DELETE "
+            + "FROM clusters "
+            + "WHERE id NOT IN (SELECT DISTINCT(cluster_id) FROM jobs WHERE cluster_id IS NOT NULL) "
+            + "AND status = 'TERMINATED';";
+
+    /**
      * Find the cluster and command ids for the given criterion tags. The data is returned as a list of
      * Long, Long results where the first Long is the cluster id and the second is the command id that should be used
      * if that cluster is selected. The command id should be the highest priority command that matches the command
@@ -99,4 +109,13 @@ public interface JpaClusterRepository extends JpaBaseRepository<ClusterEntity> {
         @Param("commandTags") final Set<String> commandTags,
         @Param("commandTagsCount") final int commandTagsSize
     );
+
+    /**
+     * Delete all clusters that are in a terminated state and aren't attached to any jobs.
+     *
+     * @return The number of clusters deleted
+     */
+    @Modifying
+    @Query(value = DELETE_TERMINATED_CLUSTERS_SQL, nativeQuery = true)
+    int deleteTerminatedClusters();
 }

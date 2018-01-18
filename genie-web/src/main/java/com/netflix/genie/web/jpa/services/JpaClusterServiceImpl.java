@@ -580,6 +580,14 @@ public class JpaClusterServiceImpl extends JpaBaseService implements ClusterServ
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int deleteTerminatedClusters() {
+        return this.clusterRepository.deleteTerminatedClusters();
+    }
+
+    /**
      * Helper method to find a cluster entity to save code.
      *
      * @param id The id of the cluster to find

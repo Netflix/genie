@@ -387,4 +387,11 @@ public interface ClusterService {
         @NotBlank(message = "No cluster id entered. Unable to remove command.") final String id,
         @NotBlank(message = "No command id entered. Unable to remove command.") final String cmdId
     ) throws GenieException;
+
+    /**
+     * Delete all clusters that are in a terminated state and aren't attached to any jobs.
+     *
+     * @return The number of clusters deleted
+     */
+    int deleteTerminatedClusters();
 }
