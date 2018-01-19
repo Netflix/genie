@@ -16,6 +16,8 @@ export const fileUrl = url => {
   return `/file${path}`;
 };
 
+export const stripHateoasTemplateUrl = url => url.replace("{?status}", "");
+
 export const activeClusterUrl = url => url.replace("{?status}", "?status=UP");
 
 export const activeCommandUrl = url =>
