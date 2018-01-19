@@ -18,6 +18,8 @@
 package com.netflix.genie.web.tasks.job
 
 import com.netflix.genie.common.exceptions.GenieException
+import com.netflix.genie.test.categories.UnitTest
+import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
 /**
@@ -26,6 +28,7 @@ import spock.lang.Specification
  * @author amajumdar
  * @since 3.0.0
  */
+@Category(UnitTest.class)
 class JobCompletionHandlerSpec extends Specification{
     JobCompletionService jobCompletionService = Mock(JobCompletionService)
     JobCompletionHandler jobCompletionHandler = new JobCompletionHandler(jobCompletionService)

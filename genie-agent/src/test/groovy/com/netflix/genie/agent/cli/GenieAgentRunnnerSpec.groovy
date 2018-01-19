@@ -19,9 +19,12 @@
 package com.netflix.genie.agent.cli
 
 import com.beust.jcommander.ParameterException
+import com.netflix.genie.test.categories.UnitTest
+import org.junit.experimental.categories.Category
 import org.springframework.beans.factory.NoSuchBeanDefinitionException
 import spock.lang.Specification
 
+@Category(UnitTest.class)
 class GenieAgentRunnnerSpec extends Specification {
     ArgumentParser argsParser
     AgentCommand agentCommand

@@ -18,9 +18,12 @@
 
 package com.netflix.genie.agent.cli
 
+import com.netflix.genie.test.categories.UnitTest
+import org.junit.experimental.categories.Category
 import org.springframework.context.ConfigurableApplicationContext
 import spock.lang.Specification
 
+@Category(UnitTest.class)
 class InfoCommandSpec extends Specification {
     InfoCommand.InfoCommandArguments args
     ConfigurableApplicationContext ctx

@@ -18,10 +18,14 @@
 
 package com.netflix.genie.agent.rpc
 
+import com.netflix.genie.test.categories.UnitTest
 import io.grpc.ManagedChannel
+import org.junit.experimental.categories.Category
 import org.spockframework.util.Assert
 import spock.lang.Specification
 
+
+@Category(UnitTest.class)
 class ClientFactoryImplSpec extends Specification {
     ChannelFactory channelFactory
     ManagedChannel channel

@@ -19,8 +19,11 @@
 package com.netflix.genie.agent.cli
 
 import com.beust.jcommander.JCommander
+import com.netflix.genie.test.categories.UnitTest
+import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
+@Category(UnitTest.class)
 class ArgumentParserSpec extends Specification {
 
     JCommander mockJCommander

@@ -1,9 +1,11 @@
 package com.netflix.genie.web.controllers;
 
+import com.netflix.genie.test.categories.IntegrationTest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -20,6 +22,7 @@ import java.util.UUID;
  * @author mprimi
  * @since 3.2.0
  */
+@Category(IntegrationTest.class)
 @Slf4j
 public class UIControllerIntegrationTest extends RestControllerIntegrationTestsBase {
 
