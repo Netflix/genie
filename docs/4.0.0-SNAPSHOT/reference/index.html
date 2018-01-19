@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2018-01-18</span>
+<span id="revdate">2018-01-19</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -4950,7 +4950,8 @@ lost and failed by the Genie leader</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.databaseCleanup.enabled</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Whether or not to delete old job records from the database</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether or not to delete old and unused records from the database at a scheduled interval.
+See: <code>genie.tasks.databaseCleanup.expression</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
 </tr>
 <tr>
@@ -5795,8 +5796,29 @@ and system metrics and statistics.</p>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
 </tr>
 <tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.databaseCleanup.numDeletedClusters.gauge</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of terminated cluster records purged during the last database cleanup pass</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">amount</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>DatabaseCleanupTask</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.databaseCleanup.numDeletedFiles.gauge</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of unused file references purged during the last database cleanup pass</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">amount</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>DatabaseCleanupTask</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
+</tr>
+<tr>
 <td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.databaseCleanup.numDeletedJobs.gauge</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Number of database records purged during the last database cleanup pass</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of job records purged during the last database cleanup pass</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">amount</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>DatabaseCleanupTask</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.tasks.databaseCleanup.numDeletedTags.gauge</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of unused tag records purged during the last database cleanup pass</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">amount</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>DatabaseCleanupTask</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
@@ -5875,7 +5897,7 @@ and system metrics and statistics.</p>
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2018-01-18 21:10:32 UTC
+Last updated 2018-01-19 00:16:12 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
