@@ -18,10 +18,13 @@
 
 package com.netflix.genie.agent.cli
 
-import com.google.common.base.Strings;
+import com.google.common.base.Strings
+import com.netflix.genie.test.categories.UnitTest;
 import org.assertj.core.util.Sets
+import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
+@Category(UnitTest.class)
 class ExitCodeSpec extends Specification {
     ExitCode[] exitCodes
 

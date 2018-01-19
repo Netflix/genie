@@ -19,8 +19,11 @@ package com.netflix.genie.web.util
 
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.Maps
+import com.netflix.genie.test.categories.UnitTest
+import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
+@Category(UnitTest.class)
 class MetricsUtilsSpec extends Specification {
     Map<String, String> initialMap
     final static String FOO = "foo"

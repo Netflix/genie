@@ -18,9 +18,11 @@
 package com.netflix.genie.web.services.impl
 
 import com.netflix.genie.common.exceptions.GenieServerException
+import com.netflix.genie.test.categories.UnitTest
 import com.netflix.genie.web.services.FileTransferFactory
 import com.netflix.spectator.api.DefaultRegistry
 import com.netflix.spectator.api.Registry
+import org.junit.experimental.categories.Category
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -28,6 +30,7 @@ import spock.lang.Unroll
  * Unit tests for CacheGenieFileTransferService.
  * Created by amajumdar on 7/26/16.
  */
+@Category(UnitTest.class)
 @Unroll
 class CacheGenieFileTransferServiceSpec extends Specification{
     LocalFileTransferImpl localFileTransfer = Mock(LocalFileTransferImpl)
