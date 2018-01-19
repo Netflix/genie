@@ -5,8 +5,10 @@ import {
   momentFormat,
   fetch,
   activeCommandUrl,
-  activeClusterUrl
+  activeClusterUrl,
+  stripHateoasTemplateUrl
 } from "../utils";
+
 import $ from "jquery";
 
 import InfoTable from "./InfoTable";
@@ -39,8 +41,10 @@ export default class ClusterDetails extends React.Component {
     const { row } = props;
     const clusterUrl = activeClusterUrl(row._links.self.href);
     const commandsUrl = activeCommandUrl(row._links.commands.href);
+    const allCommandsUrl = stripHateoasTemplateUrl(row._links.commands.href)
 
     $.when(fetch(clusterUrl), fetch(commandsUrl)).done((cluster, commands) => {
+      cluster[0]._links.commands.href = allCommandsUrl;
       this.setState({ cluster: cluster[0], commands: commands[0] });
     });
   }

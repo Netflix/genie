@@ -1,7 +1,13 @@
 import T from "prop-types";
 import React from "react";
 
-import { momentFormat, fetch, activeClusterUrl } from "../utils";
+import {
+  momentFormat,
+  fetch,
+  activeClusterUrl,
+  stripHateoasTemplateUrl
+} from "../utils";
+
 import $ from "jquery";
 
 import InfoTable from "./InfoTable";
@@ -35,11 +41,14 @@ export default class CommandDetails extends React.Component {
     const commandUrl = row._links.self.href;
     const clustersUrl = activeClusterUrl(row._links.clusters.href);
     const applicationsUrl = row._links.applications.href;
+    const allClustersUrl = stripHateoasTemplateUrl(row._links.clusters.href);
+
     $.when(
       fetch(commandUrl),
       fetch(clustersUrl),
       fetch(applicationsUrl)
     ).done((command, clusters, applications) => {
+      command[0]._links.clusters.href = allClustersUrl
       this.setState({
         command: command[0],
         clusters: clusters[0],
