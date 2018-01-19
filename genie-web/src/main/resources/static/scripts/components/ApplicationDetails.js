@@ -4,7 +4,10 @@ import React from "react";
 import { momentFormat, fetch } from "../utils";
 import $ from "jquery";
 
-import { activeCommandUrl } from "../utils";
+import {
+  activeCommandUrl,
+  stripHateoasTemplateUrl
+} from "../utils";
 
 import InfoTable from "./InfoTable";
 
@@ -35,10 +38,13 @@ export default class ApplicationDetails extends React.Component {
     const { row } = props;
     const applicationUrl = row._links.self.href;
     const commandsUrl = activeCommandUrl(row._links.commands.href);
+    const allCommandsUrl = stripHateoasTemplateUrl(row._links.commands.href);
+
     $.when(
       fetch(applicationUrl),
       fetch(commandsUrl)
     ).done((application, commands) => {
+      application[0]._links.commands.href = allCommandsUrl
       this.setState({ application: application[0], commands: commands[0] });
     });
   }
