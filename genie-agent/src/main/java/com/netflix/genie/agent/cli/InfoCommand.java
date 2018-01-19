@@ -107,7 +107,7 @@ class InfoCommand implements AgentCommand {
     }
 
     @Component
-    @Parameters(commandNames = "info", commandDescription = "Print agent and environment information")
+    @Parameters(commandNames = CommandNames.INFO, commandDescription = "Print agent and environment information")
     @Getter
     static class InfoCommandArguments implements AgentCommandArguments {
         @Parameter(names = {"--beans"}, description = "Print beans")

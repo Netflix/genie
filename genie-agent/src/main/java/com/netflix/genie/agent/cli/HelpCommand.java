@@ -50,7 +50,7 @@ class HelpCommand implements AgentCommand {
     }
 
     @Component
-    @Parameters(commandNames = {"help", "usage", "?"}, commandDescription = "Print agent usage and help message")
+    @Parameters(commandNames = CommandNames.HELP, commandDescription = "Print agent usage and help message")
     @Getter
     static class HelpCommandArguments implements AgentCommandArguments {
         @Override

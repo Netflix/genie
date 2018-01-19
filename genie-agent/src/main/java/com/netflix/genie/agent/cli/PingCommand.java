@@ -105,7 +105,7 @@ class PingCommand implements AgentCommand {
     }
 
     @Component
-    @Parameters(commandNames = "ping", commandDescription = "Test connectivity with the server")
+    @Parameters(commandNames = CommandNames.PING, commandDescription = "Test connectivity with the server")
     static class PingCommandArguments implements AgentCommandArguments {
 
         @Parameter(

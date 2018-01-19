@@ -57,7 +57,7 @@ class ExecCommand implements AgentCommand {
     }
 
     @Component
-    @Parameters(commandNames = "exec", commandDescription = "Execute a Genie job")
+    @Parameters(commandNames = CommandNames.EXEC, commandDescription = "Execute a Genie job")
     @Getter
     static class ExecCommandArguments implements AgentCommandArguments {
         @Parameter(names = "timeout", description = "Job execution timeout")
