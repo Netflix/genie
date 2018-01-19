@@ -18,8 +18,8 @@
 
 package com.netflix.genie.agent.cli
 
-import com.google.common.base.Strings
-import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.genie.test.categories.UnitTest
+import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.util.Sets
 import org.junit.experimental.categories.Category
 import spock.lang.Specification
@@ -48,6 +48,6 @@ class ExitCodeSpec extends Specification {
         then:
         codes.size() == exitCodes.size()
         messages.size() == exitCodes.size()
-        !messages.any { message -> Strings.isNullOrEmpty(message) }
+        !messages.any { message -> StringUtils.isBlank(message) }
     }
 }
