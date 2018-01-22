@@ -913,7 +913,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         this.service.createCluster(testCluster);
 
         // Shouldn't delete any clusters as all are UP or OOS
-        Assert.assertThat(this.service.deleteTerminatedClusters(), Matchers.is(0));
+        Assert.assertThat(this.service.deleteTerminatedClusters(), Matchers.is(0L));
 
         // Change status to UP
         String patchString = "[{ \"op\": \"replace\", \"path\": \"/status\", \"value\": \"UP\" }]";
@@ -922,7 +922,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertThat(this.service.getCluster(testClusterId).getStatus(), Matchers.is(ClusterStatus.UP));
 
         // All clusters are UP/OOS or attached to jobs
-        Assert.assertThat(this.service.deleteTerminatedClusters(), Matchers.is(0));
+        Assert.assertThat(this.service.deleteTerminatedClusters(), Matchers.is(0L));
 
         // Change status to terminated
         patchString = "[{ \"op\": \"replace\", \"path\": \"/status\", \"value\": \"TERMINATED\" }]";
@@ -931,7 +931,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertThat(this.service.getCluster(testClusterId).getStatus(), Matchers.is(ClusterStatus.TERMINATED));
 
         // All clusters are UP/OOS or attached to jobs
-        Assert.assertThat(this.service.deleteTerminatedClusters(), Matchers.is(1));
+        Assert.assertThat(this.service.deleteTerminatedClusters(), Matchers.is(1L));
 
         // Make sure it didn't delete any of the clusters we wanted
         Assert.assertTrue(this.clusterRepository.existsByUniqueId(CLUSTER_1_ID));

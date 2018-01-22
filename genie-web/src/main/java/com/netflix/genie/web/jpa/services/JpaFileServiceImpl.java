@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotNull;
 import java.time.Instant;
+import java.util.stream.Collectors;
 
 /**
  * JPA based implementation of the FileService interface.
@@ -73,7 +74,13 @@ public class JpaFileServiceImpl implements FileService {
      * {@inheritDoc}
      */
     @Override
-    public int deleteUnusedFiles(@NotNull final Instant createdThreshold) {
-        return this.fileRepository.deleteUnusedFiles(createdThreshold);
+    public long deleteUnusedFiles(@NotNull final Instant createdThreshold) {
+        return this.fileRepository.deleteByIdIn(
+            this.fileRepository
+                .findUnusedFiles(createdThreshold)
+                .stream()
+                .map(Number::longValue)
+                .collect(Collectors.toSet())
+        );
     }
 }

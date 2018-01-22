@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotNull;
 import java.time.Instant;
+import java.util.stream.Collectors;
 
 /**
  * JPA based implementation of the TagService interface.
@@ -70,7 +71,13 @@ public class JpaTagServiceImpl implements TagService {
      * {@inheritDoc}
      */
     @Override
-    public int deleteUnusedTags(@NotNull final Instant createdThreshold) {
-        return this.tagRepository.deleteUnusedTags(createdThreshold);
+    public long deleteUnusedTags(@NotNull final Instant createdThreshold) {
+        return this.tagRepository.deleteByIdIn(
+            this.tagRepository
+                .findUnusedTags(createdThreshold)
+                .stream()
+                .map(Number::longValue)
+                .collect(Collectors.toSet())
+        );
     }
 }

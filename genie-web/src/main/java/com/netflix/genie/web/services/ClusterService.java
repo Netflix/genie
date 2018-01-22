@@ -393,5 +393,5 @@ public interface ClusterService {
      *
      * @return The number of clusters deleted
      */
-    int deleteTerminatedClusters();
+    long deleteTerminatedClusters();
 }
