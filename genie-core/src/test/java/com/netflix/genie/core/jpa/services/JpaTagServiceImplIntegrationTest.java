@@ -112,7 +112,7 @@ public class JpaTagServiceImplIntegrationTest extends DBUnitTestBase {
         Assert.assertTrue(this.tagRepository.existsByTag(tag1));
         Assert.assertTrue(this.tagRepository.existsByTag(tag2));
 
-        Assert.assertThat(this.tagService.deleteUnusedTags(Instant.now()), Matchers.is(1));
+        Assert.assertThat(this.tagService.deleteUnusedTags(Instant.now()), Matchers.is(1L));
 
         Assert.assertFalse(this.tagRepository.existsByTag(tag1));
         Assert.assertTrue(this.tagRepository.existsByTag(tag2));

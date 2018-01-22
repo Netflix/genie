@@ -24,6 +24,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Date;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Repository for file references.
@@ -34,10 +35,10 @@ import java.util.Optional;
 public interface JpaFileRepository extends JpaIdRepository<FileEntity> {
 
     /**
-     * The query used to delete any dangling file references.
+     * The query used to select any dangling file references.
      */
-    String DELETE_UNUSED_FILES_SQL =
-        "DELETE "
+    String SELECT_FOR_UPDATE_UNUSED_FILES_SQL =
+        "SELECT id "
             + "FROM files "
             + "WHERE id NOT IN (SELECT DISTINCT(setup_file) FROM applications WHERE setup_file IS NOT NULL) "
             + "AND id NOT IN (SELECT DISTINCT(file_id) FROM applications_configs) "
@@ -51,7 +52,8 @@ public interface JpaFileRepository extends JpaIdRepository<FileEntity> {
             + "AND id NOT IN (SELECT DISTINCT(setup_file) FROM jobs WHERE setup_file IS NOT NULL) "
             + "AND id NOT IN (SELECT DISTINCT(file_id) FROM jobs_configs) "
             + "AND id NOT IN (SELECT DISTINCT(file_id) FROM jobs_dependencies) "
-            + "AND created <= :createdThreshold ;";
+            + "AND created <= :createdThreshold "
+            + "FOR UPDATE;";
 
     /**
      * Find a file by its unique file value.
@@ -70,14 +72,22 @@ public interface JpaFileRepository extends JpaIdRepository<FileEntity> {
     boolean existsByFile(final String file);
 
     /**
-     * Delete all files from the database that aren't referenced which were created before the supplied created
+     * Find the ids of all files from the database that aren't referenced which were created before the supplied created
      * threshold.
      *
      * @param createdThreshold The instant in time where files created before this time that aren't referenced
-     *                         will be deleted. Inclusive.
+     *                         will be selected. Inclusive.
+     * @return The ids of the files which should be deleted
+     */
+    @Query(value = SELECT_FOR_UPDATE_UNUSED_FILES_SQL, nativeQuery = true)
+    Set<Number> findUnusedFiles(@Param("createdThreshold") final Date createdThreshold);
+
+    /**
+     * Delete all files from the database that are in the current set of ids.
+     *
+     * @param ids The unique ids of the files to delete
      * @return The number of files deleted
      */
     @Modifying
-    @Query(value = DELETE_UNUSED_FILES_SQL, nativeQuery = true)
-    int deleteUnusedFiles(@Param("createdThreshold") final Date createdThreshold);
+    Long deleteByIdIn(final Set<Long> ids);
 }
