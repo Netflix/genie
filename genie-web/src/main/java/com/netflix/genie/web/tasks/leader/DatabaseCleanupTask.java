@@ -174,7 +174,7 @@ public class DatabaseCleanupTask extends LeadershipTask {
                 log.debug("Skipping files cleanup");
                 this.numDeletedFiles.set(0);
             } else {
-                final int countDeletedFiles = this.fileService.deleteUnusedFiles(creationThreshold);
+                final long countDeletedFiles = this.fileService.deleteUnusedFiles(creationThreshold);
                 log.info(
                     "Deleted {} files that were unused by any resource and created over an hour ago",
                     countDeletedFiles
@@ -186,7 +186,7 @@ public class DatabaseCleanupTask extends LeadershipTask {
                 log.debug("Skipping tags cleanup");
                 this.numDeletedTags.set(0);
             } else {
-                final int countDeletedTags = this.tagService.deleteUnusedTags(creationThreshold);
+                final long countDeletedTags = this.tagService.deleteUnusedTags(creationThreshold);
                 log.info(
                     "Deleted {} tags that were unused by any resource and created over an hour ago",
                     countDeletedTags

@@ -122,7 +122,7 @@ public class JpaFileServiceImplIntegrationTest extends DBUnitTestBase {
         Assert.assertTrue(this.fileRepository.existsByFile(file4));
         Assert.assertTrue(this.fileRepository.existsByFile(file5));
 
-        Assert.assertThat(this.fileService.deleteUnusedFiles(Instant.now()), Matchers.is(2));
+        Assert.assertThat(this.fileService.deleteUnusedFiles(Instant.now()), Matchers.is(2L));
 
         Assert.assertFalse(this.fileRepository.existsByFile(file1));
         Assert.assertTrue(this.fileRepository.existsByFile(file2));

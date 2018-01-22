@@ -47,5 +47,5 @@ public interface TagService {
      *                         will be deleted. Inclusive
      * @return The number of tags deleted
      */
-    int deleteUnusedTags(@NotNull final Instant createdThreshold);
+    long deleteUnusedTags(@NotNull final Instant createdThreshold);
 }

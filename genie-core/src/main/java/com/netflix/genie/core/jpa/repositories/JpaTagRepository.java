@@ -35,17 +35,18 @@ import java.util.Set;
 public interface JpaTagRepository extends JpaIdRepository<TagEntity> {
 
     /**
-     * This is the query used to find and delete tags that aren't referenced by any of the other tables.
+     * This is the query used to find the ids of tags that aren't referenced by any of the other tables.
      */
-    String DELETE_UNUSED_TAGS_SQL =
-        "DELETE "
+    String SELECT_FOR_UPDATE_UNUSED_TAGS_SQL =
+        "SELECT id "
             + "FROM tags "
             + "WHERE id NOT IN (SELECT DISTINCT(tag_id) FROM applications_tags) "
             + "AND id NOT IN (SELECT DISTINCT(tag_id) FROM clusters_tags) "
             + "AND id NOT IN (SELECT DISTINCT(tag_id) FROM commands_tags) "
             + "AND id NOT IN (SELECT DISTINCT(tag_id) FROM criteria_tags) "
             + "AND id NOT IN (SELECT DISTINCT(tag_id) FROM jobs_tags) "
-            + "AND created <= :createdThreshold ;";
+            + "AND created <= :createdThreshold "
+            + "FOR UPDATE;";
 
     /**
      * Find a tag by its unique tag value.
@@ -72,14 +73,22 @@ public interface JpaTagRepository extends JpaIdRepository<TagEntity> {
     Set<TagEntity> findByTagIn(final Set<String> tags);
 
     /**
-     * Delete all tags from the database that aren't referenced which were created before the supplied created
+     * Find all tags from the database that aren't referenced which were created before the supplied created
      * threshold.
      *
      * @param createdThreshold The instant in time where tags created before this time that aren't referenced
-     *                         will be deleted. Inclusive
+     *                         will be returned. Inclusive
+     * @return The number of tags deleted
+     */
+    @Query(value = SELECT_FOR_UPDATE_UNUSED_TAGS_SQL, nativeQuery = true)
+    Set<Number> findUnusedTags(@Param("createdThreshold") final Date createdThreshold);
+
+    /**
+     * Delete all tags from the database whose ids are in the supplied set.
+     *
+     * @param ids The ids of the tags to delete
      * @return The number of tags deleted
      */
     @Modifying
-    @Query(value = DELETE_UNUSED_TAGS_SQL, nativeQuery = true)
-    int deleteUnusedTags(@Param("createdThreshold") final Date createdThreshold);
+    Long deleteByIdIn(final Set<Long> ids);
 }
