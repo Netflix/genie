@@ -137,36 +137,57 @@ public class DatabaseCleanupTask extends LeadershipTask {
         final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
         try {
             // Delete jobs that are older than the retention threshold and are complete
-            final long countDeletedJobs = this.deleteJobs();
-            log.info(
-                "Deleted {} jobs",
-                countDeletedJobs
-            );
-            this.numDeletedJobs.set(countDeletedJobs);
+            if (this.cleanupProperties.isSkipJobsCleanup()) {
+                log.debug("Skipping job cleanup");
+                this.numDeletedJobs.set(0);
+            } else {
+                final long countDeletedJobs = this.deleteJobs();
+                log.info(
+                    "Deleted {} jobs",
+                    countDeletedJobs
+                );
+                this.numDeletedJobs.set(countDeletedJobs);
+            }
 
             // Delete all clusters that are marked terminated and aren't attached to any jobs after jobs were deleted
-            final int countDeletedClusters = this.clusterService.deleteTerminatedClusters();
-            log.info(
-                "Deleted {} clusters that were in TERMINATED state and weren't attached to any jobs",
-                countDeletedClusters
-            );
-            this.numDeletedClusters.set(countDeletedClusters);
+            if (this.cleanupProperties.isSkipClustersCleanup()) {
+                log.debug("Skipping clusters cleanup");
+                this.numDeletedClusters.set(0);
+            } else {
+                final int countDeletedClusters = this.clusterService.deleteTerminatedClusters();
+                log.info(
+                    "Deleted {} clusters that were in TERMINATED state and weren't attached to any jobs",
+                    countDeletedClusters
+                );
+                this.numDeletedClusters.set(countDeletedClusters);
+            }
 
             // Get now - 1 hour to avoid deleting references that were created as part of new resources recently
             final Instant creationThreshold = Instant.now().minus(1L, ChronoUnit.HOURS);
-            final int countDeletedFiles = this.fileService.deleteUnusedFiles(creationThreshold);
-            log.info(
-                "Deleted {} files that were unused by any resource and created over an hour ago",
-                countDeletedFiles
-            );
-            this.numDeletedFiles.set(countDeletedFiles);
 
-            final int countDeletedTags = this.tagService.deleteUnusedTags(creationThreshold);
-            log.info(
-                "Deleted {} tags that were unused by any resource and created over an hour ago",
-                countDeletedTags
-            );
-            this.numDeletedTags.set(countDeletedTags);
+            if (this.cleanupProperties.isSkipFilesCleanup()) {
+                log.debug("Skipping files cleanup");
+                this.numDeletedFiles.set(0);
+            } else {
+                final int countDeletedFiles = this.fileService.deleteUnusedFiles(creationThreshold);
+                log.info(
+                    "Deleted {} files that were unused by any resource and created over an hour ago",
+                    countDeletedFiles
+                );
+                this.numDeletedFiles.set(countDeletedFiles);
+            }
+
+            if (this.cleanupProperties.isSkipTagsCleanup()) {
+                log.debug("Skipping tags cleanup");
+                this.numDeletedTags.set(0);
+            } else {
+                final int countDeletedTags = this.tagService.deleteUnusedTags(creationThreshold);
+                log.info(
+                    "Deleted {} tags that were unused by any resource and created over an hour ago",
+                    countDeletedTags
+                );
+                this.numDeletedTags.set(countDeletedTags);
+            }
         } catch (final Throwable t) {
             MetricsUtils.addFailureTagsWithException(tags, t);
             throw t;
