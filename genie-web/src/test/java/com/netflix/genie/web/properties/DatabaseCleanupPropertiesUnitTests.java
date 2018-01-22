@@ -55,6 +55,10 @@ public class DatabaseCleanupPropertiesUnitTests {
         Assert.assertThat(this.properties.getRetention(), Matchers.is(90));
         Assert.assertThat(this.properties.getMaxDeletedPerTransaction(), Matchers.is(1000));
         Assert.assertThat(this.properties.getPageSize(), Matchers.is(1000));
+        Assert.assertFalse(this.properties.isSkipJobsCleanup());
+        Assert.assertFalse(this.properties.isSkipClustersCleanup());
+        Assert.assertFalse(this.properties.isSkipTagsCleanup());
+        Assert.assertFalse(this.properties.isSkipFilesCleanup());
     }
 
     /**
@@ -104,5 +108,39 @@ public class DatabaseCleanupPropertiesUnitTests {
         final int size = 2318;
         this.properties.setPageSize(size);
         Assert.assertThat(this.properties.getPageSize(), Matchers.is(size));
+    }
+
+    /**
+     * Make sure can enable Jobs entities cleanup.
+     */
+    @Test
+    public void canEnableJobsCleanup() {
+        this.properties.setSkipJobsCleanup(true);
+        Assert.assertTrue(this.properties.isSkipJobsCleanup());
+    }
+
+    /**
+     * Make sure can enable Clusters entities cleanup.
+     */
+    @Test
+    public void canEnableClustersCleanup() {
+        this.properties.setSkipClustersCleanup(true);
+        Assert.assertTrue(this.properties.isSkipClustersCleanup());
+    }
+    /**
+     * Make sure can enable Tags entities cleanup.
+     */
+    @Test
+    public void canEnableTagsCleanup() {
+        this.properties.setSkipTagsCleanup(true);
+        Assert.assertTrue(this.properties.isSkipTagsCleanup());
+    }
+    /**
+     * Make sure can enable Files entities cleanup.
+     */
+    @Test
+    public void canEnableFilesCleanup() {
+        this.properties.setSkipFilesCleanup(true);
+        Assert.assertTrue(this.properties.isSkipFilesCleanup());
     }
 }

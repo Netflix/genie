@@ -310,6 +310,22 @@ See: `genie.tasks.databaseCleanup.expression`
 |The number of days to retain jobs in the database
 |90
 
+|genie.tasks.databaseCleanup.skipJobsCleanup
+|Skip the Jobs table when performing database cleanup
+|false
+
+|genie.tasks.databaseCleanup.skipClustersCleanup
+|Skip the Clusters table when performing database cleanup
+|false
+
+|genie.tasks.databaseCleanup.skipFilesCleanup
+|Skip the Files table when performing database cleanup
+|false
+
+|genie.tasks.databaseCleanup.skipTagsCleanup
+|Skip the Tags table when performing database cleanup
+|false
+
 |genie.tasks.diskCleanup.enabled
 |Whether or not to remove old job directories on the Genie node or not
 |true
