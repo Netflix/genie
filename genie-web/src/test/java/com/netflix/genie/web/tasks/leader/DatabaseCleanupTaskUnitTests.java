@@ -123,9 +123,9 @@ public class DatabaseCleanupTaskUnitTests {
             .thenReturn(deletedCount3)
             .thenReturn(0L);
 
-        Mockito.when(this.clusterService.deleteTerminatedClusters()).thenReturn(1, 2);
-        Mockito.when(this.fileService.deleteUnusedFiles(Mockito.any(Instant.class))).thenReturn(3, 4);
-        Mockito.when(this.tagService.deleteUnusedTags(Mockito.any(Instant.class))).thenReturn(5, 6);
+        Mockito.when(this.clusterService.deleteTerminatedClusters()).thenReturn(1L, 2L);
+        Mockito.when(this.fileService.deleteUnusedFiles(Mockito.any(Instant.class))).thenReturn(3L, 4L);
+        Mockito.when(this.tagService.deleteUnusedTags(Mockito.any(Instant.class))).thenReturn(5L, 6L);
 
         // The multiple calendar instances are to protect against running this test when the day flips
         final Calendar before = Calendar.getInstance(JobConstants.UTC);

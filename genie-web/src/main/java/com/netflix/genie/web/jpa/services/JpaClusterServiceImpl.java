@@ -583,8 +583,14 @@ public class JpaClusterServiceImpl extends JpaBaseService implements ClusterServ
      * {@inheritDoc}
      */
     @Override
-    public int deleteTerminatedClusters() {
-        return this.clusterRepository.deleteTerminatedClusters();
+    public long deleteTerminatedClusters() {
+        return this.clusterRepository.deleteByIdIn(
+            this.clusterRepository
+                .findTerminatedUnusedClusters()
+                .stream()
+                .map(Number::longValue)
+                .collect(Collectors.toSet())
+        );
     }
 
     /**

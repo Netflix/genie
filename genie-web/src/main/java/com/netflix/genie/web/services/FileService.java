@@ -47,5 +47,5 @@ public interface FileService {
      *                         will be deleted. Inclusive
      * @return The number of files deleted
      */
-    int deleteUnusedFiles(@NotNull final Instant createdThreshold);
+    long deleteUnusedFiles(@NotNull final Instant createdThreshold);
 }
