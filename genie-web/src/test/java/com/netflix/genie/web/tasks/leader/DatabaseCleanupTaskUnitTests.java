@@ -182,4 +182,35 @@ public class DatabaseCleanupTaskUnitTests {
 
         this.task.run();
     }
+
+    /**
+     * Make sure individual cleanup sub-tasks are skipped according to properties.
+     */
+    @Test
+    public void skipAll() {
+
+        Mockito.when(this.cleanupProperties.isSkipJobsCleanup()).thenReturn(true);
+        Mockito.when(this.cleanupProperties.isSkipClustersCleanup()).thenReturn(true);
+        Mockito.when(this.cleanupProperties.isSkipTagsCleanup()).thenReturn(true);
+        Mockito.when(this.cleanupProperties.isSkipFilesCleanup()).thenReturn(true);
+
+        this.task.run();
+
+        Mockito
+            .verify(this.jobPersistenceService, Mockito.never())
+            .deleteBatchOfJobsCreatedBeforeDate(
+                Mockito.any(Date.class),
+                Mockito.anyInt(),
+                Mockito.anyInt()
+            );
+        Mockito
+            .verify(this.clusterService, Mockito.never())
+            .deleteTerminatedClusters();
+        Mockito
+            .verify(this.fileService, Mockito.never())
+            .deleteUnusedFiles(Mockito.any(Instant.class));
+        Mockito
+            .verify(this.tagService, Mockito.never())
+            .deleteUnusedTags(Mockito.any(Instant.class));
+    }
 }

@@ -40,4 +40,8 @@ public class DatabaseCleanupProperties {
     private int retention = 90;
     private int maxDeletedPerTransaction = 1_000;
     private int pageSize = 1_000;
+    private boolean skipJobsCleanup;
+    private boolean skipClustersCleanup;
+    private boolean skipTagsCleanup;
+    private boolean skipFilesCleanup;
 }
