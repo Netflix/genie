@@ -142,7 +142,12 @@ public class DatabaseCleanupTask extends LeadershipTask {
         final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
         try {
             // Delete jobs that are older than the retention threshold and are complete
-            this.deleteJobs();
+            final long countDeletedJobs = this.deleteJobs();
+            log.info(
+                "Deleted {} jobs",
+                countDeletedJobs
+            );
+            this.numDeletedJobs.set(countDeletedJobs);
 
             // Delete all clusters that are marked terminated and aren't attached to any jobs after jobs were deleted
             final int countDeletedClusters = this.clusterService.deleteTerminatedClusters();
@@ -189,7 +194,7 @@ public class DatabaseCleanupTask extends LeadershipTask {
         this.numDeletedFiles.set(0L);
     }
 
-    private void deleteJobs() {
+    private long deleteJobs() {
         final Calendar cal = TaskUtils.getMidnightUTC();
         // Move the date back the number of days retention is set for
         TaskUtils.subtractDaysFromDate(cal, this.cleanupProperties.getRetention());
@@ -215,7 +220,6 @@ public class DatabaseCleanupTask extends LeadershipTask {
                 break;
             }
         }
-        log.info("Deleted {} jobs from before {}", totalDeletedJobs, retentionLimitString);
-        this.numDeletedJobs.set(totalDeletedJobs);
+        return totalDeletedJobs;
     }
 }
