@@ -21,7 +21,7 @@
   "dependencies": {
     "filesize": "^3.3.0",
     "install": "^0.6.2",
-    "jquery": "^2.2.3",
+    "jquery": "^3.3.1",
     "moment": "^2.13.0",
     "prop-types": "^15.5.10",
     "rc-calendar": "^7.5.2",
