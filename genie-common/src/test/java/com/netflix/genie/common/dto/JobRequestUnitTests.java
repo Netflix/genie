@@ -81,6 +81,10 @@ public class JobRequestUnitTests {
             request.getCommandArgs().orElseThrow(IllegalArgumentException::new),
             Matchers.is(StringUtils.join(COMMAND_ARGS, StringUtils.SPACE))
         );
+        Assert.assertThat(
+            request.getCommandArgsString(),
+            Matchers.is(StringUtils.join(COMMAND_ARGS, StringUtils.SPACE))
+        );
         Assert.assertThat(request.getClusterCriterias(), Matchers.is(CLUSTER_CRITERIAS));
         Assert.assertThat(request.getCommandCriteria(), Matchers.is(COMMAND_CRITERIA));
         Assert.assertFalse(request.getCpu().isPresent());
@@ -113,6 +117,7 @@ public class JobRequestUnitTests {
         Assert.assertThat(request.getUser(), Matchers.is(USER));
         Assert.assertThat(request.getVersion(), Matchers.is(VERSION));
         Assert.assertFalse(request.getCommandArgs().isPresent());
+        Assert.assertEquals("", request.getCommandArgsString());
         Assert.assertThat(request.getClusterCriterias(), Matchers.is(CLUSTER_CRITERIAS));
         Assert.assertThat(request.getCommandCriteria(), Matchers.is(COMMAND_CRITERIA));
         Assert.assertFalse(request.getCpu().isPresent());
@@ -221,6 +226,10 @@ public class JobRequestUnitTests {
         Assert.assertThat(request.getVersion(), Matchers.is(VERSION));
         Assert.assertThat(
             request.getCommandArgs().orElseThrow(IllegalArgumentException::new),
+            Matchers.is(StringUtils.join(COMMAND_ARGS, StringUtils.SPACE))
+        );
+        Assert.assertThat(
+            request.getCommandArgsString(),
             Matchers.is(StringUtils.join(COMMAND_ARGS, StringUtils.SPACE))
         );
         Assert.assertThat(request.getClusterCriterias(), Matchers.is(CLUSTER_CRITERIAS));
@@ -337,6 +346,10 @@ public class JobRequestUnitTests {
             request.getCommandArgs().orElseThrow(IllegalArgumentException::new),
             Matchers.is(StringUtils.join(COMMAND_ARGS, StringUtils.SPACE))
         );
+        Assert.assertThat(
+            request.getCommandArgsString(),
+            Matchers.is(StringUtils.join(COMMAND_ARGS, StringUtils.SPACE))
+        );
         Assert.assertThat(request.getClusterCriterias(), Matchers.is(CLUSTER_CRITERIAS));
         Assert.assertThat(request.getCommandCriteria(), Matchers.is(COMMAND_CRITERIA));
         Assert.assertThat(request.getCpu().orElseThrow(IllegalArgumentException::new), Matchers.is(cpu));
@@ -387,6 +400,7 @@ public class JobRequestUnitTests {
         Assert.assertThat(request.getUser(), Matchers.is(USER));
         Assert.assertThat(request.getVersion(), Matchers.is(VERSION));
         Assert.assertFalse(request.getCommandArgs().isPresent());
+        Assert.assertEquals("", request.getCommandArgsString());
         Assert.assertThat(request.getClusterCriterias(), Matchers.empty());
         Assert.assertThat(request.getCommandCriteria(), Matchers.empty());
         Assert.assertFalse(request.getCpu().isPresent());

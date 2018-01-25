@@ -61,6 +61,10 @@ public class JobUnitTests {
             job.getCommandArgs().orElseThrow(IllegalArgumentException::new),
             Matchers.is(StringUtils.join(COMMAND_ARGS, StringUtils.SPACE))
         );
+        Assert.assertThat(
+            job.getCommandArgsString(),
+            Matchers.is(StringUtils.join(COMMAND_ARGS, StringUtils.SPACE))
+        );
         Assert.assertFalse(job.getArchiveLocation().isPresent());
         Assert.assertFalse(job.getClusterName().isPresent());
         Assert.assertFalse(job.getCommandName().isPresent());
@@ -88,6 +92,7 @@ public class JobUnitTests {
         Assert.assertThat(job.getUser(), Matchers.is(USER));
         Assert.assertThat(job.getVersion(), Matchers.is(VERSION));
         Assert.assertThat(job.getCommandArgs(), Matchers.is(Optional.empty()));
+        Assert.assertThat(job.getCommandArgsString(), Matchers.isEmptyString());
         Assert.assertFalse(job.getArchiveLocation().isPresent());
         Assert.assertFalse(job.getClusterName().isPresent());
         Assert.assertFalse(job.getCommandName().isPresent());
@@ -168,6 +173,10 @@ public class JobUnitTests {
         Assert.assertThat(job.getVersion(), Matchers.is(VERSION));
         Assert.assertThat(
             job.getCommandArgs().orElseThrow(IllegalArgumentException::new),
+            Matchers.is(StringUtils.join(COMMAND_ARGS, StringUtils.SPACE))
+        );
+        Assert.assertThat(
+            job.getCommandArgsString(),
             Matchers.is(StringUtils.join(COMMAND_ARGS, StringUtils.SPACE))
         );
         Assert.assertThat(
@@ -257,6 +266,10 @@ public class JobUnitTests {
             Matchers.is(StringUtils.join(COMMAND_ARGS, StringUtils.SPACE))
         );
         Assert.assertThat(
+            job.getCommandArgsString(),
+            Matchers.is(StringUtils.join(COMMAND_ARGS, StringUtils.SPACE))
+        );
+        Assert.assertThat(
             job.getArchiveLocation().orElseThrow(IllegalArgumentException::new), Matchers.is(archiveLocation)
         );
         Assert.assertThat(job.getClusterName().orElseThrow(IllegalArgumentException::new), Matchers.is(clusterName));
@@ -303,6 +316,7 @@ public class JobUnitTests {
         Assert.assertThat(job.getUser(), Matchers.is(USER));
         Assert.assertThat(job.getVersion(), Matchers.is(VERSION));
         Assert.assertFalse(job.getCommandArgs().isPresent());
+        Assert.assertEquals("", job.getCommandArgsString());
         Assert.assertFalse(job.getArchiveLocation().isPresent());
         Assert.assertFalse(job.getClusterName().isPresent());
         Assert.assertFalse(job.getCommandName().isPresent());
