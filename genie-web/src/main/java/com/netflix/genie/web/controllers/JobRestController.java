@@ -38,6 +38,7 @@ import com.netflix.genie.web.hateoas.assemblers.ApplicationResourceAssembler;
 import com.netflix.genie.web.hateoas.assemblers.ClusterResourceAssembler;
 import com.netflix.genie.web.hateoas.assemblers.CommandResourceAssembler;
 import com.netflix.genie.web.hateoas.assemblers.JobExecutionResourceAssembler;
+import com.netflix.genie.web.hateoas.assemblers.JobMetadataResourceAssembler;
 import com.netflix.genie.web.hateoas.assemblers.JobRequestResourceAssembler;
 import com.netflix.genie.web.hateoas.assemblers.JobResourceAssembler;
 import com.netflix.genie.web.hateoas.assemblers.JobSearchResultResourceAssembler;
@@ -45,6 +46,7 @@ import com.netflix.genie.web.hateoas.resources.ApplicationResource;
 import com.netflix.genie.web.hateoas.resources.ClusterResource;
 import com.netflix.genie.web.hateoas.resources.CommandResource;
 import com.netflix.genie.web.hateoas.resources.JobExecutionResource;
+import com.netflix.genie.web.hateoas.resources.JobMetadataResource;
 import com.netflix.genie.web.hateoas.resources.JobRequestResource;
 import com.netflix.genie.web.hateoas.resources.JobResource;
 import com.netflix.genie.web.hateoas.resources.JobSearchResultResource;
@@ -131,6 +133,7 @@ public class JobRestController {
     private final JobResourceAssembler jobResourceAssembler;
     private final JobRequestResourceAssembler jobRequestResourceAssembler;
     private final JobExecutionResourceAssembler jobExecutionResourceAssembler;
+    private final JobMetadataResourceAssembler jobMetadataResourceAssembler;
     private final JobSearchResultResourceAssembler jobSearchResultResourceAssembler;
     private final String hostName;
     private final RestTemplate restTemplate;
@@ -153,6 +156,7 @@ public class JobRestController {
      * @param jobResourceAssembler             Assemble job resources out of jobs
      * @param jobRequestResourceAssembler      Assemble job request resources out of job requests
      * @param jobExecutionResourceAssembler    Assemble job execution resources out of job executions
+     * @param jobMetadataResourceAssembler     Assemble job metadata resources out of job metadata DTO
      * @param jobSearchResultResourceAssembler Assemble job search resources out of jobs
      * @param hostName                         The hostname this Genie instance is running on
      * @param restTemplate                     The rest template for http requests
@@ -162,6 +166,7 @@ public class JobRestController {
      * @param registry                         The metrics registry to use
      */
     @Autowired
+    @SuppressWarnings("checkstyle:parameternumber")
     public JobRestController(
         final JobCoordinatorService jobCoordinatorService,
         final JobSearchService jobSearchService,
@@ -172,6 +177,7 @@ public class JobRestController {
         final JobResourceAssembler jobResourceAssembler,
         final JobRequestResourceAssembler jobRequestResourceAssembler,
         final JobExecutionResourceAssembler jobExecutionResourceAssembler,
+        final JobMetadataResourceAssembler jobMetadataResourceAssembler,
         final JobSearchResultResourceAssembler jobSearchResultResourceAssembler,
         final String hostName,
         @Qualifier("genieRestTemplate") final RestTemplate restTemplate,
@@ -188,6 +194,7 @@ public class JobRestController {
         this.jobResourceAssembler = jobResourceAssembler;
         this.jobRequestResourceAssembler = jobRequestResourceAssembler;
         this.jobExecutionResourceAssembler = jobExecutionResourceAssembler;
+        this.jobMetadataResourceAssembler = jobMetadataResourceAssembler;
         this.jobSearchResultResourceAssembler = jobSearchResultResourceAssembler;
         this.hostName = hostName;
         this.restTemplate = restTemplate;
@@ -596,6 +603,21 @@ public class JobRestController {
     ) throws GenieException {
         log.info("[getJobExecution] Called for job execution with id {}", id);
         return this.jobExecutionResourceAssembler.toResource(this.jobSearchService.getJobExecution(id));
+    }
+
+    /**
+     * Get the metadata information about a job.
+     *
+     * @param id The id of the job
+     * @return The job metadata
+     * @throws GenieException On any internal error
+     * @since 3.3.5
+     */
+    @GetMapping(value = "/{id}/metadata", produces = MediaTypes.HAL_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public JobMetadataResource getJobMetadata(@PathVariable("id") final String id) throws GenieException {
+        log.info("[getJobMetadata] Called for job metadata with id {}", id);
+        return this.jobMetadataResourceAssembler.toResource(this.jobSearchService.getJobMetadata(id));
     }
 
     /**
