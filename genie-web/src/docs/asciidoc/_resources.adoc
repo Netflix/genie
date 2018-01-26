@@ -28,3 +28,7 @@ include::{snippets}/job-rest-controller-integration-tests/1/getJob/response-fiel
 === Job Execution
 
 include::{snippets}/job-rest-controller-integration-tests/1/getJobExecution/response-fields.adoc[]
+
+=== Job Metadata
+
+include::{snippets}/job-rest-controller-integration-tests/1/getJobMetadata/response-fields.adoc[]

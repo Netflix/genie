@@ -101,6 +101,14 @@ public class JobExecutionResourceAssembler implements ResourceAssembler<JobExecu
                         .getJobStatus(id)
                 ).withRel("status")
             );
+
+            jobExecutionResource.add(
+                ControllerLinkBuilder.linkTo(
+                    ControllerLinkBuilder
+                        .methodOn(JobRestController.class)
+                        .getJobMetadata(id)
+                ).withRel("metadata")
+            );
         } catch (final GenieException ge) {
             // If we can't convert it we might as well force a server exception
             throw new RuntimeException(ge);

@@ -24,6 +24,7 @@ import com.netflix.genie.web.hateoas.assemblers.ApplicationResourceAssembler;
 import com.netflix.genie.web.hateoas.assemblers.ClusterResourceAssembler;
 import com.netflix.genie.web.hateoas.assemblers.CommandResourceAssembler;
 import com.netflix.genie.web.hateoas.assemblers.JobExecutionResourceAssembler;
+import com.netflix.genie.web.hateoas.assemblers.JobMetadataResourceAssembler;
 import com.netflix.genie.web.hateoas.assemblers.JobRequestResourceAssembler;
 import com.netflix.genie.web.hateoas.assemblers.JobResourceAssembler;
 import com.netflix.genie.web.hateoas.assemblers.JobSearchResultResourceAssembler;
@@ -109,6 +110,7 @@ public class JobRestControllerUnitTests {
             Mockito.mock(JobResourceAssembler.class),
             Mockito.mock(JobRequestResourceAssembler.class),
             Mockito.mock(JobExecutionResourceAssembler.class),
+            Mockito.mock(JobMetadataResourceAssembler.class),
             Mockito.mock(JobSearchResultResourceAssembler.class),
             this.hostname,
             this.restTemplate,
@@ -497,6 +499,7 @@ public class JobRestControllerUnitTests {
             Mockito.mock(JobResourceAssembler.class),
             Mockito.mock(JobRequestResourceAssembler.class),
             Mockito.mock(JobExecutionResourceAssembler.class),
+            Mockito.mock(JobMetadataResourceAssembler.class),
             Mockito.mock(JobSearchResultResourceAssembler.class),
             this.hostname,
             template,

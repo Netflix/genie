@@ -98,6 +98,14 @@ public class JobResourceAssembler implements ResourceAssembler<Job, JobResource>
                 ControllerLinkBuilder.linkTo(
                     ControllerLinkBuilder
                         .methodOn(JobRestController.class)
+                        .getJobMetadata(id)
+                ).withRel("metadata")
+            );
+
+            jobResource.add(
+                ControllerLinkBuilder.linkTo(
+                    ControllerLinkBuilder
+                        .methodOn(JobRestController.class)
                         .getJobStatus(id)
                 ).withRel("status")
             );

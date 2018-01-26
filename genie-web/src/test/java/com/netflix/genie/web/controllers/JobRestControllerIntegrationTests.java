@@ -117,6 +117,12 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     private static final String PROCESS_ID_PATH = "$.processId";
     private static final String CHECK_DELAY_PATH = "$.checkDelay";
     private static final String EXIT_CODE_PATH = "$.exitCode";
+    private static final String CLIENT_HOST_PATH = "$.clientHost";
+    private static final String USER_AGENT_PATH = "$.userAgent";
+    private static final String NUM_ATTACHMENTS_PATH = "$.numAttachments";
+    private static final String TOTAL_SIZE_ATTACHMENTS_PATH = "$.totalSizeOfAttachments";
+    private static final String STD_OUT_SIZE_PATH = "$.stdOutSize";
+    private static final String STD_ERR_SIZE_PATH = "$.stdErrSize";
     private static final String JOBS_LIST_PATH = EMBEDDED_PATH + ".jobSearchResultList";
     private static final String JOB_COMMAND_LINK_PATH = "$._links.command.href";
     private static final String JOB_CLUSTER_LINK_PATH = "$._links.cluster.href";
@@ -313,6 +319,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             documentationId, id, commandArgs, setUpFile, clusterTag, commandTag, configFile1, depFile1
         );
         this.checkJobExecution(documentationId, id);
+        this.checkJobmetadata(documentationId, id);
         this.checkJobCluster(documentationId, id);
         this.checkJobCommand(documentationId, id);
         this.checkJobApplications(documentationId, id);
@@ -483,7 +490,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andExpect(MockMvcResultMatchers.jsonPath(ARCHIVE_LOCATION_PATH, Matchers.isEmptyOrNullString()))
             .andExpect(MockMvcResultMatchers.jsonPath(CLUSTER_NAME_PATH, Matchers.is(CLUSTER1_NAME)))
             .andExpect(MockMvcResultMatchers.jsonPath(COMMAND_NAME_PATH, Matchers.is(CMD1_NAME)))
-            .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH + ".*", Matchers.hasSize(8)))
+            .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH + ".*", Matchers.hasSize(9)))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(SELF_LINK_KEY)))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey("request")))
             .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey("execution")))
@@ -705,6 +712,31 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andExpect(MockMvcResultMatchers.jsonPath(PROCESS_ID_PATH, Matchers.notNullValue()))
             .andExpect(MockMvcResultMatchers.jsonPath(CHECK_DELAY_PATH, Matchers.is((int) CHECK_DELAY)))
             .andExpect(MockMvcResultMatchers.jsonPath(EXIT_CODE_PATH, Matchers.is(JobExecution.SUCCESS_EXIT_CODE)))
+            .andDo(getResultHandler);
+    }
+
+    private void checkJobmetadata(final int documentationId, final String id) throws Exception {
+        final RestDocumentationResultHandler getResultHandler = MockMvcRestDocumentation.document(
+            "{class-name}/" + documentationId + "/getJobMetadata/",
+            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            Snippets.ID_PATH_PARAM, // Path parameters
+            Snippets.HAL_CONTENT_TYPE_HEADER, // Response Headers
+            Snippets.getJobMetadataResponsePayload(), // Response fields
+            Snippets.JOB_METADATA_LINKS // Links
+        );
+        this.mvc
+            .perform(RestDocumentationRequestBuilders.get(JOBS_API + "/{id}/metadata", id))
+            .andExpect(MockMvcResultMatchers.status().isOk())
+            .andExpect(MockMvcResultMatchers.jsonPath(ID_PATH, Matchers.is(id)))
+            .andExpect(MockMvcResultMatchers.jsonPath(CREATED_PATH, Matchers.notNullValue()))
+            .andExpect(MockMvcResultMatchers.jsonPath(UPDATED_PATH, Matchers.notNullValue()))
+            .andExpect(MockMvcResultMatchers.jsonPath(CLIENT_HOST_PATH, Matchers.notNullValue()))
+            .andExpect(MockMvcResultMatchers.jsonPath(USER_AGENT_PATH, Matchers.nullValue()))
+            .andExpect(MockMvcResultMatchers.jsonPath(NUM_ATTACHMENTS_PATH, Matchers.notNullValue()))
+            .andExpect(MockMvcResultMatchers.jsonPath(TOTAL_SIZE_ATTACHMENTS_PATH, Matchers.notNullValue()))
+            .andExpect(MockMvcResultMatchers.jsonPath(STD_OUT_SIZE_PATH, Matchers.notNullValue()))
+            .andExpect(MockMvcResultMatchers.jsonPath(STD_ERR_SIZE_PATH, Matchers.notNullValue()))
             .andDo(getResultHandler);
     }
 

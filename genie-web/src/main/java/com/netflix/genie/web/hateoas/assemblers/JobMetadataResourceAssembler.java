@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2015 Netflix, Inc.
+ *  Copyright 2018 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@
  */
 package com.netflix.genie.web.hateoas.assemblers;
 
-import com.netflix.genie.common.dto.JobRequest;
+import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.web.controllers.JobRestController;
-import com.netflix.genie.web.hateoas.resources.JobRequestResource;
+import com.netflix.genie.web.hateoas.resources.JobMetadataResource;
 import org.springframework.hateoas.ResourceAssembler;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.stereotype.Component;
@@ -29,29 +29,29 @@ import org.springframework.stereotype.Component;
  * Assembles Job Request resources out of JobRequest DTOs.
  *
  * @author tgianos
- * @since 3.0.0
+ * @since 3.3.5
  */
 @Component
-public class JobRequestResourceAssembler implements ResourceAssembler<JobRequest, JobRequestResource> {
+public class JobMetadataResourceAssembler implements ResourceAssembler<JobMetadata, JobMetadataResource> {
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public JobRequestResource toResource(final JobRequest jobRequest) {
-        final String id = jobRequest.getId().orElseThrow(IllegalArgumentException::new);
-        final JobRequestResource jobRequestResource = new JobRequestResource(jobRequest);
+    public JobMetadataResource toResource(final JobMetadata jobMetadata) {
+        final String id = jobMetadata.getId().orElseThrow(IllegalArgumentException::new);
+        final JobMetadataResource jobMetadataResource = new JobMetadataResource(jobMetadata);
 
         try {
-            jobRequestResource.add(
+            jobMetadataResource.add(
                 ControllerLinkBuilder.linkTo(
                     ControllerLinkBuilder
                         .methodOn(JobRestController.class)
-                        .getJobRequest(id)
+                        .getJobMetadata(id)
                 ).withSelfRel()
             );
 
-            jobRequestResource.add(
+            jobMetadataResource.add(
                 ControllerLinkBuilder.linkTo(
                     ControllerLinkBuilder
                         .methodOn(JobRestController.class)
@@ -59,34 +59,16 @@ public class JobRequestResourceAssembler implements ResourceAssembler<JobRequest
                 ).withRel("job")
             );
 
-            jobRequestResource.add(
+            jobMetadataResource.add(
                 ControllerLinkBuilder.linkTo(
                     ControllerLinkBuilder
                         .methodOn(JobRestController.class)
-                        .getJobExecution(id)
-                ).withRel("execution")
+                        .getJobRequest(id)
+                ).withRel("request")
             );
 
-            // TODO: https://github.com/spring-projects/spring-hateoas/issues/186 should be fixed in .20 currently .19
-//            jobResource.add(
-//                ControllerLinkBuilder.linkTo(
-//                    JobRestController.class,
-//                    JobRestController.class.getMethod(
-//                        "getJobOutput",
-//                        String.class,
-//                        String.class,
-//                        HttpServletRequest.class,
-//                        HttpServletResponse.class
-//                    ),
-//                    job.getId(),
-//                    null,
-//                    null,
-//                    null
-//                ).withRel("output")
-//            );
-
             final String output = "output";
-            jobRequestResource.add(
+            jobMetadataResource.add(
                 ControllerLinkBuilder
                     .linkTo(JobRestController.class)
                     .slash(id)
@@ -94,7 +76,7 @@ public class JobRequestResourceAssembler implements ResourceAssembler<JobRequest
                     .withRel(output)
             );
 
-            jobRequestResource.add(
+            jobMetadataResource.add(
                 ControllerLinkBuilder.linkTo(
                     ControllerLinkBuilder
                         .methodOn(JobRestController.class)
@@ -102,18 +84,18 @@ public class JobRequestResourceAssembler implements ResourceAssembler<JobRequest
                 ).withRel("status")
             );
 
-            jobRequestResource.add(
+            jobMetadataResource.add(
                 ControllerLinkBuilder.linkTo(
                     ControllerLinkBuilder
                         .methodOn(JobRestController.class)
-                        .getJobMetadata(id)
-                ).withRel("metadata")
+                        .getJobExecution(id)
+                ).withRel("execution")
             );
         } catch (final GenieException ge) {
             // If we can't convert it we might as well force a server exception
             throw new RuntimeException(ge);
         }
 
-        return jobRequestResource;
+        return jobMetadataResource;
     }
 }
