@@ -22,6 +22,7 @@ import com.github.springtestdbunit.annotation.DatabaseTearDown;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Job;
+import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.search.JobSearchResult;
 import com.netflix.genie.common.exceptions.GenieException;
@@ -40,6 +41,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -231,11 +233,9 @@ public class JpaJobSearchServiceImplIntegrationTests extends DBUnitTestBase {
 
     /**
      * Make sure we can get the correct number of jobs which are active on a given host.
-     *
-     * @throws GenieException on error
      */
     @Test
-    public void canFindActiveJobsByHostName() throws GenieException {
+    public void canFindActiveJobsByHostName() {
         final String hostA = "a.netflix.com";
         final String hostB = "b.netflix.com";
         final String hostC = "c.netflix.com";
@@ -429,5 +429,21 @@ public class JpaJobSearchServiceImplIntegrationTests extends DBUnitTestBase {
     public void canGetActiveJobCountForUser() throws GenieException {
         Assert.assertThat(this.service.getActiveJobCountForUser("nobody"), Matchers.is(0L));
         Assert.assertThat(this.service.getActiveJobCountForUser("tgianos"), Matchers.is(2L));
+    }
+
+    /**
+     * Make sure the getting job execution method works.
+     *
+     * @throws GenieException on error
+     */
+    @Test
+    public void canGetJobMetadata() throws GenieException {
+        final JobMetadata jobMetadata = this.service.getJobMetadata(JOB_1_ID);
+        Assert.assertThat(jobMetadata.getClientHost(), Matchers.is(Optional.empty()));
+        Assert.assertThat(jobMetadata.getUserAgent(), Matchers.is(Optional.empty()));
+        Assert.assertThat(jobMetadata.getNumAttachments(), Matchers.is(Optional.of(2)));
+        Assert.assertThat(jobMetadata.getTotalSizeOfAttachments(), Matchers.is(Optional.of(38083L)));
+        Assert.assertThat(jobMetadata.getStdErrSize(), Matchers.is(Optional.empty()));
+        Assert.assertThat(jobMetadata.getStdOutSize(), Matchers.is(Optional.empty()));
     }
 }
