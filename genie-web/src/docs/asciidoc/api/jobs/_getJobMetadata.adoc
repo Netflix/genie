@@ -1,0 +1,26 @@
+=== Get Job Metadata
+
+==== Description
+
+Get metadata about a job beyond core information. Information like where a job was submitted from, how large its output
+files were, etc.
+
+==== Endpoint
+
+`GET /api/v3/jobs/{id}/metadata`
+
+:snippet-base: {snippets}/job-rest-controller-integration-tests/1/getJobMetadata
+:id-base: get-job-metadata
+:!request-headers:
+:request-path-params: {snippet-base}/path-parameters.adoc
+:!request-query-params:
+:!request-fields:
+:curl-request: {snippet-base}/curl-request.adoc
+:httpie-request: {snippet-base}/httpie-request.adoc
+:response-headers: {snippet-base}/response-headers.adoc
+:response-fields: {snippet-base}/response-fields.adoc
+:response-links: {snippet-base}/links.adoc
+:http-request: {snippet-base}/http-request.adoc
+:http-response: {snippet-base}/http-response.adoc
+
+include::../_apiTemplate.adoc[]

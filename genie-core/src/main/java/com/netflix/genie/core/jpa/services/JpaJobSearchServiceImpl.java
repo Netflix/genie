@@ -23,6 +23,7 @@ import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
+import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.search.JobSearchResult;
@@ -36,6 +37,7 @@ import com.netflix.genie.core.jpa.entities.projections.JobClusterProjection;
 import com.netflix.genie.core.jpa.entities.projections.JobCommandProjection;
 import com.netflix.genie.core.jpa.entities.projections.JobExecutionProjection;
 import com.netflix.genie.core.jpa.entities.projections.JobHostNameProjection;
+import com.netflix.genie.core.jpa.entities.projections.JobMetadataProjection;
 import com.netflix.genie.core.jpa.entities.projections.JobProjection;
 import com.netflix.genie.core.jpa.entities.projections.JobRequestProjection;
 import com.netflix.genie.core.jpa.entities.projections.JobStatusProjection;
@@ -364,5 +366,17 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
             );
         }
         return count;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JobMetadata getJobMetadata(@NotBlank final String id) throws GenieException {
+        return JpaServiceUtils.toJobMetadataDto(
+            this.jobRepository
+                .findByUniqueId(id, JobMetadataProjection.class)
+                .orElseThrow(() -> new GenieNotFoundException("No job metadata found for id " + id))
+        );
     }
 }

@@ -25,6 +25,7 @@ import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
+import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import org.apache.commons.lang3.ArrayUtils;
@@ -140,6 +141,9 @@ final class Snippets {
             .linkWithRel("execution")
             .description("The job execution that resulted from this request"),
         HypermediaDocumentation
+            .linkWithRel("metadata")
+            .description("The job metadata information for this job"),
+        HypermediaDocumentation
             .linkWithRel("output")
             .description("The output URI for the job"),
         HypermediaDocumentation
@@ -156,6 +160,9 @@ final class Snippets {
         HypermediaDocumentation
             .linkWithRel("execution")
             .description("The job execution information for this job"),
+        HypermediaDocumentation
+            .linkWithRel("metadata")
+            .description("The job metadata information for this job"),
         HypermediaDocumentation
             .linkWithRel("output")
             .description("The output URI for the job"),
@@ -185,6 +192,29 @@ final class Snippets {
         HypermediaDocumentation
             .linkWithRel("request")
             .description("The job request that spawned this execution"),
+        HypermediaDocumentation
+            .linkWithRel("metadata")
+            .description("The job metadata information for this job"),
+        HypermediaDocumentation
+            .linkWithRel("output")
+            .description("The output URI for the job"),
+        HypermediaDocumentation
+            .linkWithRel("status")
+            .description("The current status of the job")
+    );
+    static final LinksSnippet JOB_METADATA_LINKS = HypermediaDocumentation.links(
+        HypermediaDocumentation
+            .linkWithRel("self")
+            .description("URI for this job metadata"),
+        HypermediaDocumentation
+            .linkWithRel("job")
+            .description("The job associated with this execution"),
+        HypermediaDocumentation
+            .linkWithRel("request")
+            .description("The job request that spawned this execution"),
+        HypermediaDocumentation
+            .linkWithRel("execution")
+            .description("The job execution information for this job"),
         HypermediaDocumentation
             .linkWithRel("output")
             .description("The output URI for the job"),
@@ -526,6 +556,8 @@ final class Snippets {
     private static final ConstraintDescriptions JOB_CONSTRAINTS = new ConstraintDescriptions(Job.class);
     private static final ConstraintDescriptions JOB_EXECUTION_CONSTRAINTS
         = new ConstraintDescriptions(JobExecution.class);
+    private static final ConstraintDescriptions JOB_METADATA_CONSTRAINTS
+        = new ConstraintDescriptions(JobMetadata.class);
     private static final ConstraintDescriptions APPLICATION_CONSTRAINTS = new ConstraintDescriptions(Application.class);
     private static final ConstraintDescriptions CLUSTER_CONSTRAINTS = new ConstraintDescriptions(Cluster.class);
 
@@ -625,6 +657,21 @@ final class Snippets {
 
     static ResponseFieldsSnippet getJobExecutionResponsePayload() {
         return PayloadDocumentation.responseFields(getJobExecutionFieldDescriptors())
+            .and(
+                PayloadDocumentation
+                    .fieldWithPath("_links")
+                    .attributes(
+                        Attributes
+                            .key(CONSTRAINTS)
+                            .value("")
+                    )
+                    .description("<<_hateoas,Links>> to other resources.")
+                    .ignored()
+            );
+    }
+
+    static ResponseFieldsSnippet getJobMetadataResponsePayload() {
+        return PayloadDocumentation.responseFields(getJobMetadataFieldDescriptors())
             .and(
                 PayloadDocumentation
                     .fieldWithPath("_links")
@@ -809,13 +856,13 @@ final class Snippets {
                 .optional(),
             PayloadDocumentation
                 .fieldWithPath("grouping")
-                .attributes(getConstraintsForField(JOB_CONSTRAINTS, "grouping"))
+                .attributes(getConstraintsForField(JOB_REQUEST_CONSTRAINTS, "grouping"))
                 .description("The grouping of the job relative to other jobs. e.g. scheduler job name")
                 .type(JsonFieldType.STRING)
                 .optional(),
             PayloadDocumentation
                 .fieldWithPath("groupingInstance")
-                .attributes(getConstraintsForField(JOB_CONSTRAINTS, "groupingInstance"))
+                .attributes(getConstraintsForField(JOB_REQUEST_CONSTRAINTS, "groupingInstance"))
                 .description("The grouping instance of the job relative to other jobs. e.g. scheduler job run")
                 .type(JsonFieldType.STRING)
                 .optional()
@@ -898,37 +945,79 @@ final class Snippets {
             getBaseFieldDescriptors(JOB_EXECUTION_CONSTRAINTS),
             PayloadDocumentation
                 .fieldWithPath("hostName")
-                .attributes(getConstraintsForField(JOB_CONSTRAINTS, "hostName"))
+                .attributes(getConstraintsForField(JOB_EXECUTION_CONSTRAINTS, "hostName"))
                 .description("The host name of the Genie node responsible for the job")
                 .type(JsonFieldType.STRING),
             PayloadDocumentation
                 .fieldWithPath("processId")
-                .attributes(getConstraintsForField(JOB_CONSTRAINTS, "processId"))
+                .attributes(getConstraintsForField(JOB_EXECUTION_CONSTRAINTS, "processId"))
                 .description("The id of the job client process on the Genie node")
                 .type(JsonFieldType.NUMBER)
                 .optional(),
             PayloadDocumentation
                 .fieldWithPath("checkDelay")
-                .attributes(getConstraintsForField(JOB_CONSTRAINTS, "checkDelay"))
+                .attributes(getConstraintsForField(JOB_EXECUTION_CONSTRAINTS, "checkDelay"))
                 .description("The amount of time in milliseconds between checks of the job status by Genie")
                 .type(JsonFieldType.NUMBER)
                 .optional(),
             PayloadDocumentation
                 .fieldWithPath("timeout")
-                .attributes(getConstraintsForField(JOB_CONSTRAINTS, "timeout"))
+                .attributes(getConstraintsForField(JOB_EXECUTION_CONSTRAINTS, "timeout"))
                 .description("The date (UTC ISO8601 with millis) when the job will be killed by Genie due to timeout")
                 .type(JsonFieldType.STRING)
                 .optional(),
             PayloadDocumentation
                 .fieldWithPath("exitCode")
-                .attributes(getConstraintsForField(JOB_CONSTRAINTS, "exitCode"))
+                .attributes(getConstraintsForField(JOB_EXECUTION_CONSTRAINTS, "exitCode"))
                 .description("The job client process exit code after the job is done")
                 .type(JsonFieldType.NUMBER)
                 .optional(),
             PayloadDocumentation
                 .fieldWithPath("memory")
-                .attributes(getConstraintsForField(JOB_CONSTRAINTS, "memory"))
+                .attributes(getConstraintsForField(JOB_EXECUTION_CONSTRAINTS, "memory"))
                 .description("The amount of memory (in MB) allocated to the job client")
+                .type(JsonFieldType.NUMBER)
+                .optional()
+        );
+    }
+
+    private static FieldDescriptor[] getJobMetadataFieldDescriptors() {
+        return ArrayUtils.addAll(
+            getBaseFieldDescriptors(JOB_METADATA_CONSTRAINTS),
+            PayloadDocumentation
+                .fieldWithPath("clientHost")
+                .attributes(getConstraintsForField(JOB_METADATA_CONSTRAINTS, "clientHost"))
+                .description("The host name of the client that submitted the job to Genie")
+                .type(JsonFieldType.STRING)
+                .optional(),
+            PayloadDocumentation
+                .fieldWithPath("userAgent")
+                .attributes(getConstraintsForField(JOB_METADATA_CONSTRAINTS, "userAgent"))
+                .description("The user agent string that was passed to Genie on job request")
+                .type(JsonFieldType.STRING)
+                .optional(),
+            PayloadDocumentation
+                .fieldWithPath("numAttachments")
+                .attributes(getConstraintsForField(JOB_METADATA_CONSTRAINTS, "numAttachments"))
+                .description("The number of attachments sent to Genie with the job request")
+                .type(JsonFieldType.NUMBER)
+                .optional(),
+            PayloadDocumentation
+                .fieldWithPath("totalSizeOfAttachments")
+                .attributes(getConstraintsForField(JOB_METADATA_CONSTRAINTS, "totalSizeOfAttachments"))
+                .description("The total size of all attachments sent to Genie with the job request. In bytes.")
+                .type(JsonFieldType.NUMBER)
+                .optional(),
+            PayloadDocumentation
+                .fieldWithPath("stdOutSize")
+                .attributes(getConstraintsForField(JOB_METADATA_CONSTRAINTS, "stdOutSize"))
+                .description("The final size of the stdout file after a job is completed. In bytes.")
+                .type(JsonFieldType.NUMBER)
+                .optional(),
+            PayloadDocumentation
+                .fieldWithPath("stdErrSize")
+                .attributes(getConstraintsForField(JOB_METADATA_CONSTRAINTS, "stdErrSize"))
+                .description("The final size of the stderr file after a job is completed. In bytes.")
                 .type(JsonFieldType.NUMBER)
                 .optional()
         );

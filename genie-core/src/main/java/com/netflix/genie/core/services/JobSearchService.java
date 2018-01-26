@@ -22,6 +22,7 @@ import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
+import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.search.JobSearchResult;
@@ -183,4 +184,13 @@ public interface JobSearchService {
      * @throws GenieException If any error occurs
      */
     long getActiveJobCountForUser(@NotBlank final String user) throws GenieException;
+
+    /**
+     * Get the metadata about a job.
+     *
+     * @param id The id of the job to get metadata for
+     * @return The metadata for a job
+     * @throws GenieException If any error occurs
+     */
+    JobMetadata getJobMetadata(@NotBlank final String id) throws GenieException;
 }

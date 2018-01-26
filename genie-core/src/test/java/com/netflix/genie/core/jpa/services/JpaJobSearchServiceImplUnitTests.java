@@ -26,6 +26,7 @@ import com.netflix.genie.core.jpa.entities.projections.JobApplicationsProjection
 import com.netflix.genie.core.jpa.entities.projections.JobClusterProjection;
 import com.netflix.genie.core.jpa.entities.projections.JobCommandProjection;
 import com.netflix.genie.core.jpa.entities.projections.JobHostNameProjection;
+import com.netflix.genie.core.jpa.entities.projections.JobMetadataProjection;
 import com.netflix.genie.core.jpa.entities.projections.JobProjection;
 import com.netflix.genie.core.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.core.jpa.repositories.JpaCommandRepository;
@@ -208,5 +209,19 @@ public class JpaJobSearchServiceImplUnitTests {
             .thenReturn(Optional.of(jobEntity));
 
         Assert.assertThat(this.service.getJobHost(jobId), Matchers.is(hostName));
+    }
+
+    /**
+     * Make sure if a job metadata isn't found it returns a GenieNotFound exception.
+     *
+     * @throws GenieException for any problem
+     */
+    @Test(expected = GenieNotFoundException.class)
+    public void cantGetMetadataIfNoJob() throws GenieException {
+        final String jobId = UUID.randomUUID().toString();
+        Mockito
+            .when(this.jobRepository.findByUniqueId(jobId, JobMetadataProjection.class))
+            .thenReturn(Optional.empty());
+        this.service.getJobMetadata(jobId);
     }
 }
