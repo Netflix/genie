@@ -28,6 +28,7 @@ import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
+import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.JobStatusMessages;
@@ -159,6 +160,9 @@ public class JobClientIntegrationTests extends GenieClientsIntegrationTestsBase 
 
         final JobExecution jobExecution = jobClient.getJobExecution(jobId);
         Assert.assertEquals(jobId, jobExecution.getId().orElseThrow(IllegalArgumentException::new));
+
+        final JobMetadata jobMetadata = this.jobClient.getJobMetadata(jobId);
+        Assert.assertEquals(jobId, jobMetadata.getId().orElseThrow(IllegalArgumentException::new));
 
         Assert.assertEquals(CLUSTER_NAME, jobClient.getJobCluster(jobId).getName());
         Assert.assertEquals(COMMAND_NAME, jobClient.getJobCommand(jobId).getName());
