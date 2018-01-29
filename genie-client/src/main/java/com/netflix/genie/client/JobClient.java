@@ -27,6 +27,7 @@ import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
+import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.search.JobSearchResult;
@@ -366,7 +367,7 @@ public class JobClient extends BaseGenieClient {
      * Method to get the Job Request for the job.
      *
      * @param jobId The id of the job.
-     * @return The command object.
+     * @return The job requests object.
      * @throws GenieClientException If the response recieved is not 2xx.
      * @throws IOException          For Network and other IO issues.
      */
@@ -383,7 +384,7 @@ public class JobClient extends BaseGenieClient {
      * Method to get the Job Execution information for the job.
      *
      * @param jobId The id of the job.
-     * @return The command object.
+     * @return The job execution object.
      * @throws GenieClientException If the response recieved is not 2xx.
      * @throws IOException          For Network and other IO issues.
      */
@@ -394,6 +395,21 @@ public class JobClient extends BaseGenieClient {
             throw new IllegalArgumentException("Missing required parameter: jobId.");
         }
         return jobService.getJobExecution(jobId).execute().body();
+    }
+
+    /**
+     * Method to get the metadata information for the job.
+     *
+     * @param jobId The id of the job.
+     * @return The metadata object.
+     * @throws GenieClientException If the response recieved is not 2xx.
+     * @throws IOException          For Network and other IO issues.
+     */
+    public JobMetadata getJobMetadata(final String jobId) throws IOException, GenieClientException {
+        if (StringUtils.isEmpty(jobId)) {
+            throw new IllegalArgumentException("Missing required parameter: jobId.");
+        }
+        return this.jobService.getJobMetadata(jobId).execute().body();
     }
 
     /**
