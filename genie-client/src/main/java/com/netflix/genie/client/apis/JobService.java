@@ -23,6 +23,7 @@ import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
+import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
 import okhttp3.MultipartBody;
 import okhttp3.ResponseBody;
@@ -187,6 +188,15 @@ public interface JobService {
      */
     @GET(JOBS_URL_SUFFIX + "/{id}/execution")
     Call<JobExecution> getJobExecution(@Path("id") final String jobId);
+
+    /**
+     * Method to get the metadata information for a job.
+     *
+     * @param jobId The id of the job.
+     * @return A callable object.
+     */
+    @GET(JOBS_URL_SUFFIX + "/{id}/metadata")
+    Call<JobMetadata> getJobMetadata(@Path("id") final String jobId);
 
     /**
      * Method to get the Applications for a job.
