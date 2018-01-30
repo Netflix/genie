@@ -23,6 +23,7 @@ dependencies {
 
     compile("com.amazonaws:aws-java-sdk-sts")
     compile("com.github.fge:json-patch")
+    compile("com.google.guava:guava")
     compile("commons-httpclient:commons-httpclient")
     compile("commons-io:commons-io")
     compile("commons-validator:commons-validator")
@@ -33,6 +34,7 @@ dependencies {
     compile("net.devh:grpc-server-spring-boot-autoconfigure")
     compile("net.devh:grpc-server-spring-boot-starter")
     compile("org.apache.commons:commons-exec")
+    compile("org.apache.commons:commons-lang3")
     compile("org.apache.httpcomponents:httpclient")
     compile("org.bitbucket.b_c:jose4j")
     compile("org.flywaydb:flyway-core")

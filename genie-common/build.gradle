@@ -1,14 +1,21 @@
+apply plugin: "java-library"
+
 dependencies {
     /*******************************
-     * Compile Dependencies
+     * API Dependencies
      *******************************/
 
-    compile("com.fasterxml.jackson.core:jackson-databind")
-    compile("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
-    compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
-    compile("com.google.guava:guava")
-    compile("org.apache.commons:commons-lang3")
-    compile("org.hibernate:hibernate-validator")
+    api("com.fasterxml.jackson.core:jackson-databind")
+    api("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
+    api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+    api("org.hibernate:hibernate-validator")
+
+    /*******************************
+     * Implementation Dependencies
+     *******************************/
+
+    implementation("com.google.guava:guava")
+    implementation("org.apache.commons:commons-lang3")
 
     /*******************************
      * Provided Dependencies
@@ -22,5 +29,5 @@ dependencies {
      * Test Dependencies
      *******************************/
 
-    testCompile(project(":genie-test"))
+    testImplementation(project(":genie-test"))
 }
