@@ -18,6 +18,7 @@
 package com.netflix.genie.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.collect.ImmutableList;
@@ -108,6 +109,18 @@ public class JobRequest extends ExecutionEnvironmentDTO {
      */
     public Optional<String> getCommandArgs() {
         return Optional.ofNullable(this.commandArgs);
+    }
+
+    /**
+     * Get the arguments to be put on the command line along with the command executable as a string.
+     * @deprecated replaced by {@link #getCommandArgs()}
+     *
+     * @return The command arguments as a (possibly empty) string
+     */
+    @Deprecated
+    @JsonIgnore
+    public String getCommandArgsString() {
+        return this.commandArgs == null ? "" : this.commandArgs;
     }
 
     /**
