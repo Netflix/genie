@@ -230,6 +230,16 @@ configure(javaProjects) {
             jacocoTestReport.executionData += files("$buildDir/jacoco/${task.name}.exec")
     }
 
+    test {
+        testLogging {
+            if (System.getenv("CI") != null) {
+                events "passed", "skipped", "failed"
+            } else {
+                events "failed"
+            }
+        }
+    }
+
     license {
         ignoreFailures false
     }
