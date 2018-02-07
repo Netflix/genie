@@ -1,6 +1,6 @@
 ##
 #
-#  Copyright 2015 Netflix, Inc.
+#  Copyright 2017 Netflix, Inc.
 #
 #     Licensed under the Apache License, Version 2.0 (the "License");
 #     you may not use this file except in compliance with the License.
@@ -18,6 +18,15 @@
 
 spring:
   datasource:
-    url: jdbc:h2:mem:genie
-    username: root
-    password:
+    tomcat:
+      min-idle: 5
+      max-idle: 20
+      max-active: 40
+      test-on-borrow: true
+      test-on-connect: true
+      test-on-return: true
+      test-while-idle: true
+      min-evictable-idle-time-millis: 60000
+      time-between-eviction-runs-millis: 10000
+      jdbc-interceptors: org.apache.tomcat.jdbc.pool.interceptor.QueryTimeoutInterceptor
+    type: org.apache.tomcat.jdbc.pool.DataSource

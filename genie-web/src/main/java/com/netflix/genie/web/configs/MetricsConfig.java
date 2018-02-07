@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2016 Netflix, Inc.
+ *  Copyright 2018 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,27 +15,31 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie;
+package com.netflix.genie.web.configs;
 
-import com.netflix.genie.test.categories.UnitTest;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import com.netflix.spectator.api.DefaultRegistry;
+import com.netflix.spectator.api.Registry;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
- * Unit tests for the GenieWeb class.
+ * Configuration of Metrics.
  *
  * @author tgianos
- * @since 3.0.0
+ * @since 4.0.0
  */
-@Category(UnitTest.class)
-public class GenieWebUnitTests {
+@Configuration
+public class MetricsConfig {
 
     /**
-     * Make sure we can construct a new Genie Web instance.
+     * Placeholder default registry.
+     *
+     * @return The registry to use
      */
-    @Test
-    public void canConstruct() {
-        Assert.assertNotNull(new GenieWeb());
+    @Bean
+    @ConditionalOnMissingBean(Registry.class)
+    public Registry spectatorRegistry() {
+        return new DefaultRegistry();
     }
 }

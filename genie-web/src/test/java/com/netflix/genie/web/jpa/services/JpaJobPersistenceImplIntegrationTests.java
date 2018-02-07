@@ -29,9 +29,6 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.test.categories.IntegrationTest;
 import com.netflix.genie.web.jpa.entities.projections.JobMetadataProjection;
-import com.netflix.genie.web.jpa.repositories.JpaFileRepository;
-import com.netflix.genie.web.jpa.repositories.JpaJobRepository;
-import com.netflix.genie.web.jpa.repositories.JpaTagRepository;
 import com.netflix.genie.web.services.JobPersistenceService;
 import com.netflix.genie.web.services.JobSearchService;
 import org.assertj.core.util.Lists;
@@ -125,12 +122,6 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
     private static final JobStatus STATUS = JobStatus.RUNNING;
     private static final String STATUS_MSG = UUID.randomUUID().toString();
 
-    @Autowired
-    private JpaJobRepository jobRepository;
-    @Autowired
-    private JpaFileRepository fileRepository;
-    @Autowired
-    private JpaTagRepository tagRepository;
     @Autowired
     private JobPersistenceService jobPersistenceService;
     @Autowired

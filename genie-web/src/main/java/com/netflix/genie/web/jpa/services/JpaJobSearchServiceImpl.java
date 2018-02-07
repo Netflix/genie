@@ -194,7 +194,7 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
 
             final List<JobSearchResult> results = this.entityManager
                 .createQuery(contentQuery)
-                .setFirstResult(page.getOffset())
+                .setFirstResult(((Long) page.getOffset()).intValue())
                 .setMaxResults(page.getPageSize())
                 .getResultList();
 

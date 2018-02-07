@@ -15,13 +15,11 @@
  *     limitations under the License.
  *
  */
-
 package com.netflix.genie;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jmx.JmxAutoConfiguration;
-import org.springframework.boot.autoconfigure.web.WebClientAutoConfiguration;
 
 /**
  * Genie Agent application.
@@ -31,13 +29,13 @@ import org.springframework.boot.autoconfigure.web.WebClientAutoConfiguration;
  */
 @SpringBootApplication(
     exclude = {
-        WebClientAutoConfiguration.class,
         JmxAutoConfiguration.class,
     }
 )
 public class GenieAgentApplication {
     /**
      * Main method, actual execution is delegated to GenieAgentRunnner.
+     *
      * @param args command-line arguments
      */
     public static void main(final String[] args) {

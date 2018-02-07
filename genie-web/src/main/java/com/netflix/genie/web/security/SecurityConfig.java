@@ -20,14 +20,12 @@ package com.netflix.genie.web.security;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
 import java.util.Collection;
@@ -38,9 +36,7 @@ import java.util.Collection;
  * @author tgianos
  * @since 3.0.0
  */
-@Conditional(SecurityConditions.AnySecurityEnabled.class)
 @Configuration
-@EnableWebSecurity
 @Slf4j
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
@@ -54,26 +50,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
-    }
-
-    /**
-     * Configure the global authentication manager.
-     *
-     * @param auth The builder to configure
-     * @throws Exception on error
-     */
-    @Autowired
-    protected void configureGlobal(final AuthenticationManagerBuilder auth) throws Exception {
-        if (this.providers != null) {
-            for (final AuthenticationProvider provider : this.providers) {
-                log.debug("Adding authentication provider {} to authentication provider.", provider);
-                auth.authenticationProvider(provider);
-            }
-        } else {
-            // in the case nothing was configured
-            log.debug("No providers were found. Configuring in memory authentication to avoid NPE.");
-            auth.inMemoryAuthentication();
-        }
     }
 
     /**
@@ -95,6 +71,26 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // won't be able to call the server to get any information. As such that configuration (SAML off but something
         // else on) is kind of pointless if you want to use the UI.
         // TODO: Revisit if there is a way to enforce this or at least provide some in memory login if nothing else
-        http.antMatcher("/**").authorizeRequests().anyRequest().permitAll();
+        http.csrf().disable().authorizeRequests().anyRequest().permitAll();
+    }
+
+    /**
+     * Configure the global authentication manager.
+     *
+     * @param auth The builder to configure
+     * @throws Exception on error
+     */
+    @Autowired
+    protected void configureGlobal(final AuthenticationManagerBuilder auth) throws Exception {
+        if (this.providers != null) {
+            for (final AuthenticationProvider provider : this.providers) {
+                log.debug("Adding authentication provider {} to authentication provider.", provider);
+                auth.authenticationProvider(provider);
+            }
+        } else {
+            // in the case nothing was configured
+            log.debug("No providers were found. Configuring in memory authentication to avoid NPE.");
+            auth.inMemoryAuthentication();
+        }
     }
 }

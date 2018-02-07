@@ -148,7 +148,7 @@ public class JobCoordinatorServiceImplUnitTests {
             .when(registry.createId("genie.jobs.coordination.timer"))
             .thenReturn(this.coordinationTimerId);
         Mockito
-            .when(this.coordinationTimerId.withTags(Mockito.anyMapOf(String.class, String.class)))
+            .when(this.coordinationTimerId.withTags(Mockito.anyMap()))
             .thenReturn(this.coordinationTimerId);
         Mockito
             .when(registry.timer(Mockito.eq(this.coordinationTimerId)))
@@ -159,7 +159,7 @@ public class JobCoordinatorServiceImplUnitTests {
             .when(registry.createId("genie.jobs.submit.localRunner.selectCluster.timer"))
             .thenReturn(this.selectClusterTimerId);
         Mockito
-            .when(this.selectClusterTimerId.withTags(Mockito.anyMapOf(String.class, String.class)))
+            .when(this.selectClusterTimerId.withTags(Mockito.anyMap()))
             .thenReturn(this.selectClusterTimerId);
         Mockito
             .when(registry.timer(Mockito.eq(this.selectClusterTimerId)))
@@ -170,7 +170,7 @@ public class JobCoordinatorServiceImplUnitTests {
             .when(registry.createId("genie.jobs.submit.localRunner.selectCommand.timer"))
             .thenReturn(this.selectCommandTimerId);
         Mockito
-            .when(this.selectCommandTimerId.withTags(Mockito.anyMapOf(String.class, String.class)))
+            .when(this.selectCommandTimerId.withTags(Mockito.anyMap()))
             .thenReturn(this.selectCommandTimerId);
         Mockito
             .when(registry.timer(Mockito.eq(this.selectCommandTimerId)))
@@ -181,7 +181,7 @@ public class JobCoordinatorServiceImplUnitTests {
             .when(registry.createId("genie.jobs.submit.localRunner.selectApplications.timer"))
             .thenReturn(this.selectApplicationTimerId);
         Mockito
-            .when(this.selectApplicationTimerId.withTags(Mockito.anyMapOf(String.class, String.class)))
+            .when(this.selectApplicationTimerId.withTags(Mockito.anyMap()))
             .thenReturn(this.selectApplicationTimerId);
         Mockito
             .when(registry.timer(Mockito.eq(selectApplicationTimerId)))
@@ -192,7 +192,7 @@ public class JobCoordinatorServiceImplUnitTests {
             .when(registry.createId("genie.jobs.submit.localRunner.setJobEnvironment.timer"))
             .thenReturn(this.setJobEnvironmentTimerId);
         Mockito
-            .when(this.setJobEnvironmentTimerId.withTags(Mockito.anyMapOf(String.class, String.class)))
+            .when(this.setJobEnvironmentTimerId.withTags(Mockito.anyMap()))
             .thenReturn(this.setJobEnvironmentTimerId);
         Mockito
             .when(registry.timer(Mockito.eq(this.setJobEnvironmentTimerId)))
@@ -211,7 +211,7 @@ public class JobCoordinatorServiceImplUnitTests {
             .when(registry.createId("genie.jobs.submit.selectCluster.loadBalancer.counter"))
             .thenReturn(this.loadBalancerCounterId);
         Mockito
-            .when(this.loadBalancerCounterId.withTags(Mockito.anyMapOf(String.class, String.class)))
+            .when(this.loadBalancerCounterId.withTags(Mockito.anyMap()))
             .thenReturn(this.loadBalancerCounterId);
         Mockito
             .when(registry.counter(Mockito.eq(this.loadBalancerCounterId)))
@@ -223,7 +223,7 @@ public class JobCoordinatorServiceImplUnitTests {
             .when(registry.createId("genie.jobs.coordination.clusterCommandQuery.timer"))
             .thenReturn(clusterCommandQueryTimerId);
         Mockito
-            .when(clusterCommandQueryTimerId.withTags(Mockito.anyMapOf(String.class, String.class)))
+            .when(clusterCommandQueryTimerId.withTags(Mockito.anyMap()))
             .thenReturn(clusterCommandQueryTimerId);
         Mockito
             .when(registry.timer(clusterCommandQueryTimerId))
@@ -1110,7 +1110,7 @@ public class JobCoordinatorServiceImplUnitTests {
                 .getUsedMemory();
             Mockito
                 .verify(this.jobPersistenceService, Mockito.times(1))
-                .updateJobStatus(Mockito.eq(JOB_1_ID), Mockito.eq(JobStatus.FAILED), Mockito.anyString());
+                .updateJobStatus(Mockito.eq(JOB_1_ID), Mockito.eq(JobStatus.FAILED), Mockito.any());
 
             Mockito
                 .verify(this.coordinationTimer, Mockito.times(1))

@@ -26,16 +26,11 @@ import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.hateoas.resources.ApplicationResource;
-import com.netflix.genie.web.jpa.repositories.JpaApplicationRepository;
-import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
-import com.netflix.genie.web.jpa.repositories.JpaFileRepository;
-import com.netflix.genie.web.jpa.repositories.JpaTagRepository;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
@@ -76,38 +71,22 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
     private static final String APPLICATION_COMMANDS_LINK_PATH = "$._links.commands.href";
     private static final String APPLICATIONS_COMMANDS_LINK_PATH = "$.._links.commands.href";
 
-    @Autowired
-    private JpaApplicationRepository jpaApplicationRepository;
-
-    @Autowired
-    private JpaCommandRepository jpaCommandRepository;
-
-    @Autowired
-    private JpaFileRepository fileRepository;
-
-    @Autowired
-    private JpaTagRepository tagRepository;
-
     /**
-     * Common setup for all tests.
+     * {@inheritDoc}
      */
     @Before
-    public void setup() {
-        this.jpaCommandRepository.deleteAll();
-        this.jpaApplicationRepository.deleteAll();
-        this.fileRepository.deleteAll();
-        this.tagRepository.deleteAll();
+    @Override
+    public void setup() throws Exception {
+        super.setup();
     }
 
     /**
-     * Cleanup after tests.
+     * {@inheritDoc}
      */
     @After
-    public void cleanup() {
-        this.jpaCommandRepository.deleteAll();
-        this.jpaApplicationRepository.deleteAll();
-        this.fileRepository.deleteAll();
-        this.tagRepository.deleteAll();
+    @Override
+    public void cleanup() throws Exception {
+        super.cleanup();
     }
 
     /**
@@ -117,7 +96,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
      */
     @Test
     public void canCreateApplicationWithoutId() throws Exception {
-        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
 
         final RestDocumentationResultHandler creationResultHandler = MockMvcRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
@@ -196,7 +175,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
                     APPLICATIONS_API, COMMANDS_LINK_KEY, COMMANDS_OPTIONAL_HAL_LINK_PARAMETERS, id)))
             .andDo(getResultHandler);
 
-        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(1L));
+        Assert.assertThat(this.applicationRepository.count(), Matchers.is(1L));
     }
 
     /**
@@ -206,7 +185,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
      */
     @Test
     public void canCreateApplicationWithId() throws Exception {
-        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
 
         this.createConfigResource(
             new Application
@@ -266,7 +245,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
                 EntityLinkMatcher.matchUri(
                     APPLICATIONS_API, COMMANDS_LINK_KEY, COMMANDS_OPTIONAL_HAL_LINK_PARAMETERS, ID)));
 
-        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(1L));
+        Assert.assertThat(this.applicationRepository.count(), Matchers.is(1L));
     }
 
     /**
@@ -276,7 +255,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
      */
     @Test
     public void canHandleBadInputToCreateApplication() throws Exception {
-        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
         final Application app = new Application.Builder(" ", " ", " ", ApplicationStatus.ACTIVE).build();
         this.mvc.perform(
             MockMvcRequestBuilders
@@ -284,7 +263,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(GenieObjectMapper.getMapper().writeValueAsBytes(app))
         ).andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
-        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
     }
 
     /**
@@ -294,7 +273,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
      */
     @Test
     public void canFindApplications() throws Exception {
-        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
         final Application spark151 = new Application.Builder("spark", "genieUser1", "1.5.1", ApplicationStatus.ACTIVE)
             .withDependencies(Sets.newHashSet("s3://mybucket/spark/spark-1.5.1.tar.gz"))
             .withSetupFile("s3://mybucket/spark/setup-spark.sh")
@@ -472,7 +451,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
 
         //TODO: Add tests for sort, orderBy etc
 
-        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(7L));
+        Assert.assertThat(this.applicationRepository.count(), Matchers.is(7L));
     }
 
     /**
@@ -482,7 +461,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
      */
     @Test
     public void canUpdateApplication() throws Exception {
-        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
         final String id = this.createConfigResource(
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE).withId(ID).build(),
             null
@@ -540,7 +519,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
             .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(ApplicationStatus.INACTIVE.toString())));
-        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(1L));
+        Assert.assertThat(this.applicationRepository.count(), Matchers.is(1L));
     }
 
     /**
@@ -550,7 +529,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
      */
     @Test
     public void canPatchApplication() throws Exception {
-        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
         final String id = this.createConfigResource(
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE).withId(ID).build(),
             null
@@ -590,7 +569,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
             .andExpect(MockMvcResultMatchers.jsonPath(USER_PATH, Matchers.is(newUser)));
-        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(1L));
+        Assert.assertThat(this.applicationRepository.count(), Matchers.is(1L));
     }
 
     /**
@@ -600,7 +579,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
      */
     @Test
     public void canDeleteAllApplications() throws Exception {
-        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
         this.createConfigResource(
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE).build(),
             null
@@ -613,7 +592,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.INACTIVE).build(),
             null
         );
-        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(3L));
+        Assert.assertThat(this.applicationRepository.count(), Matchers.is(3L));
 
         final RestDocumentationResultHandler deleteResultHandler = MockMvcRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
@@ -626,7 +605,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             .andExpect(MockMvcResultMatchers.status().isNoContent())
             .andDo(deleteResultHandler);
 
-        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
     }
 
     /**
@@ -636,7 +615,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
      */
     @Test
     public void canDeleteAnApplication() throws Exception {
-        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
         final String id1 = UUID.randomUUID().toString();
         final String id2 = UUID.randomUUID().toString();
         final String id3 = UUID.randomUUID().toString();
@@ -672,7 +651,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
                 .build(),
             null
         );
-        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(3L));
+        Assert.assertThat(this.applicationRepository.count(), Matchers.is(3L));
 
         final RestDocumentationResultHandler deleteResultHandler = MockMvcRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
@@ -690,7 +669,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             .perform(MockMvcRequestBuilders.get(APPLICATIONS_API + "/{id}", id2))
             .andExpect(MockMvcResultMatchers.status().isNotFound());
 
-        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(2L));
+        Assert.assertThat(this.applicationRepository.count(), Matchers.is(2L));
     }
 
     /**
@@ -700,7 +679,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
      */
     @Test
     public void canAddConfigsToApplication() throws Exception {
-        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
         this.createConfigResource(
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE).withId(ID).build(),
             null
@@ -732,7 +711,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
      */
     @Test
     public void canUpdateConfigsForApplication() throws Exception {
-        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
         this.createConfigResource(
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE).withId(ID).build(),
             null
@@ -756,7 +735,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
      */
     @Test
     public void canDeleteConfigsForApplication() throws Exception {
-        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
         this.createConfigResource(
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE).withId(ID).build(),
             null
@@ -778,7 +757,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
      */
     @Test
     public void canAddDependenciesToApplication() throws Exception {
-        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
         this.createConfigResource(
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE).withId(ID).build(),
             null
@@ -815,7 +794,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
      */
     @Test
     public void canUpdateDependenciesForApplication() throws Exception {
-        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
         this.createConfigResource(
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE).withId(ID).build(),
             null
@@ -843,7 +822,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
      */
     @Test
     public void canDeleteDependenciesForApplication() throws Exception {
-        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
         this.createConfigResource(
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE).withId(ID).build(),
             null
@@ -869,7 +848,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
      */
     @Test
     public void canAddTagsToApplication() throws Exception {
-        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
         this.createConfigResource(
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE).withId(ID).build(),
             null
@@ -902,7 +881,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
      */
     @Test
     public void canUpdateTagsForApplication() throws Exception {
-        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
         this.createConfigResource(
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE).withId(ID).build(),
             null
@@ -927,7 +906,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
      */
     @Test
     public void canDeleteTagsForApplication() throws Exception {
-        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
         this.createConfigResource(
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE).withId(ID).build(),
             null
@@ -950,7 +929,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
      */
     @Test
     public void canDeleteTagForApplication() throws Exception {
-        Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
         this.createConfigResource(
             new Application.Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE).withId(ID).build(),
             null
@@ -1065,7 +1044,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
             Snippets.HAL_CONTENT_TYPE_HEADER, // Response Headers
             PayloadDocumentation.responseFields(
                 PayloadDocumentation
-                    .fieldWithPath("[]")
+                    .subsectionWithPath("[]")
                     .description("The list of commands found")
                     .attributes(Snippets.EMPTY_CONSTRAINTS)
             )
@@ -1086,6 +1065,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
 
     /**
      * Test creating an application with blank files and tag resources.
+     *
      * @throws Exception when an unexpected error is encountered
      */
     @Test
@@ -1120,7 +1100,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
         );
 
         for (Application invalidApplicationResource : invalidApplicationResources) {
-            Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
+            Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
 
             this.mvc
                 .perform(
@@ -1130,7 +1110,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
                 )
                 .andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
 
-            Assert.assertThat(this.jpaApplicationRepository.count(), Matchers.is(0L));
+            Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
         }
     }
 }

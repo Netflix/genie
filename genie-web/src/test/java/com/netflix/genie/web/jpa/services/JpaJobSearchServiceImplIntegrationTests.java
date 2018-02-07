@@ -70,7 +70,7 @@ public class JpaJobSearchServiceImplIntegrationTests extends DBUnitTestBase {
     @Test
     public void canFindJobs() {
         //TODO: add more cases
-        final Pageable page = new PageRequest(0, 10, Sort.Direction.DESC, "updated");
+        final Pageable page = PageRequest.of(0, 10, Sort.Direction.DESC, "updated");
         Page<JobSearchResult> jobs = this.service
             .findJobs(
                 null,

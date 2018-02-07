@@ -429,7 +429,7 @@ final class Snippets {
             ArrayUtils.addAll(
                 getSearchResultFields(),
                 PayloadDocumentation
-                    .fieldWithPath("_embedded.applicationList")
+                    .subsectionWithPath("_embedded.applicationList")
                     .description("The found applications.")
                     .type(JsonFieldType.ARRAY)
                     .attributes(EMPTY_CONSTRAINTS)
@@ -440,7 +440,7 @@ final class Snippets {
             ArrayUtils.addAll(
                 getSearchResultFields(),
                 PayloadDocumentation
-                    .fieldWithPath("_embedded.clusterList")
+                    .subsectionWithPath("_embedded.clusterList")
                     .description("The found clusters.")
                     .type(JsonFieldType.ARRAY)
                     .attributes(EMPTY_CONSTRAINTS)
@@ -451,7 +451,7 @@ final class Snippets {
             ArrayUtils.addAll(
                 getSearchResultFields(),
                 PayloadDocumentation
-                    .fieldWithPath("_embedded.commandList")
+                    .subsectionWithPath("_embedded.commandList")
                     .description("The found commands.")
                     .type(JsonFieldType.ARRAY)
                     .attributes(EMPTY_CONSTRAINTS)
@@ -462,7 +462,7 @@ final class Snippets {
             ArrayUtils.addAll(
                 getSearchResultFields(),
                 PayloadDocumentation
-                    .fieldWithPath("_embedded.jobSearchResultList")
+                    .subsectionWithPath("_embedded.jobSearchResultList")
                     .description("The found jobs.")
                     .type(JsonFieldType.ARRAY)
                     .attributes(EMPTY_CONSTRAINTS)
@@ -572,7 +572,7 @@ final class Snippets {
         return PayloadDocumentation.responseFields(getApplicationFieldDescriptors())
             .and(
                 PayloadDocumentation
-                    .fieldWithPath("_links")
+                    .subsectionWithPath("_links")
                     .attributes(
                         Attributes
                             .key(CONSTRAINTS)
@@ -591,7 +591,7 @@ final class Snippets {
         return PayloadDocumentation.responseFields(getClusterFieldDescriptors())
             .and(
                 PayloadDocumentation
-                    .fieldWithPath("_links")
+                    .subsectionWithPath("_links")
                     .attributes(
                         Attributes
                             .key(CONSTRAINTS)
@@ -610,7 +610,7 @@ final class Snippets {
         return PayloadDocumentation.responseFields(getCommandFieldDescriptors())
             .and(
                 PayloadDocumentation
-                    .fieldWithPath("_links")
+                    .subsectionWithPath("_links")
                     .attributes(
                         Attributes
                             .key(CONSTRAINTS)
@@ -629,7 +629,7 @@ final class Snippets {
         return PayloadDocumentation.responseFields(getJobRequestFieldDescriptors())
             .and(
                 PayloadDocumentation
-                    .fieldWithPath("_links")
+                    .subsectionWithPath("_links")
                     .attributes(
                         Attributes
                             .key(CONSTRAINTS)
@@ -644,7 +644,7 @@ final class Snippets {
         return PayloadDocumentation.responseFields(getJobFieldDescriptors())
             .and(
                 PayloadDocumentation
-                    .fieldWithPath("_links")
+                    .subsectionWithPath("_links")
                     .attributes(
                         Attributes
                             .key(CONSTRAINTS)
@@ -659,7 +659,7 @@ final class Snippets {
         return PayloadDocumentation.responseFields(getJobExecutionFieldDescriptors())
             .and(
                 PayloadDocumentation
-                    .fieldWithPath("_links")
+                    .subsectionWithPath("_links")
                     .attributes(
                         Attributes
                             .key(CONSTRAINTS)
@@ -674,7 +674,7 @@ final class Snippets {
         return PayloadDocumentation.responseFields(getJobMetadataFieldDescriptors())
             .and(
                 PayloadDocumentation
-                    .fieldWithPath("_links")
+                    .subsectionWithPath("_links")
                     .attributes(
                         Attributes
                             .key(CONSTRAINTS)
@@ -778,7 +778,7 @@ final class Snippets {
                 .type(JsonFieldType.STRING)
                 .optional(),
             PayloadDocumentation
-                .fieldWithPath("clusterCriterias")
+                .subsectionWithPath("clusterCriterias")
                 .attributes(getConstraintsForField(JOB_REQUEST_CONSTRAINTS, "clusterCriterias"))
                 .description(
                     "List of cluster criteria's for which a match will be attempted with register cluster tags."
@@ -1072,7 +1072,7 @@ final class Snippets {
                 .type(JsonFieldType.STRING)
                 .optional(),
             PayloadDocumentation
-                .fieldWithPath("metadata")
+                .subsectionWithPath("metadata")
                 .attributes(getConstraintsForField(constraintDescriptions, "metadata"))
                 .description("Any semi-structured metadata. Must be valid JSON")
                 .type(JsonFieldType.OBJECT)
@@ -1112,7 +1112,7 @@ final class Snippets {
     private static FieldDescriptor[] getSearchResultFields() {
         return new FieldDescriptor[]{
             PayloadDocumentation
-                .fieldWithPath("_links")
+                .subsectionWithPath("_links")
                 .description("<<_hateoas,Links>> to other resources.")
                 .attributes(EMPTY_CONSTRAINTS),
             PayloadDocumentation

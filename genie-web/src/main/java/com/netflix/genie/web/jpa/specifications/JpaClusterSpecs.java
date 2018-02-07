@@ -34,7 +34,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Specifications for JPA queries.
@@ -88,12 +87,14 @@ public final class JpaClusterSpecs {
             }
             if (statuses != null && !statuses.isEmpty()) {
                 //Could optimize this as we know size could use native array
-                final List<Predicate> orPredicates =
-                    statuses
-                        .stream()
-                        .map(status -> cb.equal(root.get(ClusterEntity_.status), status))
-                        .collect(Collectors.toList());
-                predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
+                predicates.add(
+                    cb.or(
+                        statuses
+                            .stream()
+                            .map(status -> cb.equal(root.get(ClusterEntity_.status), status))
+                            .toArray(Predicate[]::new)
+                    )
+                );
             }
 
             return cb.and(predicates.toArray(new Predicate[predicates.size()]));
@@ -119,11 +120,14 @@ public final class JpaClusterSpecs {
 
             if (statuses != null && !statuses.isEmpty()) {
                 //Could optimize this as we know size could use native array
-                final List<Predicate> orPredicates =
-                    statuses.stream()
-                        .map(status -> cb.equal(root.get(ClusterEntity_.status), status))
-                        .collect(Collectors.toList());
-                predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
+                predicates.add(
+                    cb.or(
+                        statuses
+                            .stream()
+                            .map(status -> cb.equal(root.get(ClusterEntity_.status), status))
+                            .toArray(Predicate[]::new)
+                    )
+                );
             }
 
             return cb.and(predicates.toArray(new Predicate[predicates.size()]));

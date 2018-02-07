@@ -80,7 +80,7 @@ public class JobLauncherUnitTests {
         this.timerId = Mockito.mock(Id.class);
         this.timer = Mockito.mock(Timer.class);
         Mockito.when(registry.createId("genie.jobs.submit.timer")).thenReturn(timerId);
-        Mockito.when(timerId.withTags(Mockito.anyMapOf(String.class, String.class))).thenReturn(timerId);
+        Mockito.when(timerId.withTags(Mockito.anyMap())).thenReturn(timerId);
         Mockito.when(registry.timer(Mockito.eq(timerId))).thenReturn(timer);
 
         this.jobLauncher = new JobLauncher(

@@ -49,7 +49,7 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Integration tests for the ApplicationServiceJPAImpl.
+ * Integration tests for the JpaApplicationServiceImpl.
  *
  * @author tgianos
  * @since 2.0.0
@@ -81,7 +81,7 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
     private static final String APP_3_TYPE = "storm";
     private static final ApplicationStatus APP_3_STATUS = ApplicationStatus.DEPRECATED;
 
-    private static final Pageable PAGEABLE = new PageRequest(0, 10, Sort.Direction.DESC, "updated");
+    private static final Pageable PAGEABLE = PageRequest.of(0, 10, Sort.Direction.DESC, "updated");
 
     @Autowired
     private ApplicationService appService;
@@ -254,9 +254,9 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
      * Test the get applications method with ascending sort.
      */
     @Test
-    public void testGetClustersAscending() {
+    public void testGetApplicationssAscending() {
         //Default to order by Updated
-        final Pageable ascendingPage = new PageRequest(0, 10, Sort.Direction.ASC, "updated");
+        final Pageable ascendingPage = PageRequest.of(0, 10, Sort.Direction.ASC, "updated");
         final Page<Application> applications
             = this.appService.getApplications(null, null, null, null, null, ascendingPage);
         Assert.assertEquals(3, applications.getNumberOfElements());
@@ -275,7 +275,7 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
      * Test the get applications method default order by.
      */
     @Test
-    public void testGetClustersOrderBysDefault() {
+    public void testGetApplicationssOrderBysDefault() {
         //Default to order by Updated
         final Page<Application> applications = this.appService.getApplications(null, null, null, null, null, PAGEABLE);
         Assert.assertEquals(3, applications.getNumberOfElements());
@@ -294,8 +294,8 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
      * Test the get applications method order by name.
      */
     @Test
-    public void testGetClustersOrderBysName() {
-        final Pageable orderByNamePage = new PageRequest(0, 10, Sort.Direction.DESC, "name");
+    public void testGetApplicationsOrderBysName() {
+        final Pageable orderByNamePage = PageRequest.of(0, 10, Sort.Direction.DESC, "name");
         final Page<Application> applications
             = this.appService.getApplications(null, null, null, null, null, orderByNamePage);
         Assert.assertEquals(3, applications.getNumberOfElements());
@@ -315,7 +315,7 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test(expected = RuntimeException.class)
     public void testGetApplicationsOrderBysInvalidField() {
-        final Pageable orderByInvalidPage = new PageRequest(0, 10, Sort.Direction.DESC, "I'mNotAValidField");
+        final Pageable orderByInvalidPage = PageRequest.of(0, 10, Sort.Direction.DESC, "I'mNotAValidField");
         this.appService.getApplications(null, null, null, null, null, orderByInvalidPage);
     }
 

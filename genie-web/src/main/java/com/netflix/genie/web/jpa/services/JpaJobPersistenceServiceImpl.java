@@ -271,7 +271,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         );
         long jobsDeleted = 0;
         long totalAttemptedDeletions = 0;
-        final Pageable page = new PageRequest(0, pageSize);
+        final Pageable page = PageRequest.of(0, pageSize);
         Slice<IdProjection> idProjections;
         do {
             idProjections = this.jobRepository.findByCreatedBefore(date, page);

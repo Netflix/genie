@@ -43,15 +43,15 @@ public class SecurityConditions {
             super(ConfigurationPhase.PARSE_CONFIGURATION);
         }
 
-        @ConditionalOnProperty("genie.security.saml.enabled")
+        @ConditionalOnProperty(value = "genie.security.saml.enabled", havingValue = "true")
         static class OnSAML {
         }
 
-        @ConditionalOnProperty("genie.security.x509.enabled")
+        @ConditionalOnProperty(value = "genie.security.x509.enabled", havingValue = "true")
         static class OnX509 {
         }
 
-        @ConditionalOnProperty("genie.security.oauth2.enabled")
+        @ConditionalOnProperty(value = "genie.security.oauth2.enabled", havingValue = "true")
         static class OnOAuth2 {
         }
     }

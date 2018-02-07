@@ -22,7 +22,7 @@ import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.springframework.boot.test.util.EnvironmentTestUtils;
+import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
@@ -142,7 +142,8 @@ public class SecurityConditionsUnitTests {
 
     private AnnotationConfigApplicationContext load(final Class<?> config, final String... env) {
         final AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-        EnvironmentTestUtils.addEnvironment(context, env);
+        final TestPropertyValues propertyValues = TestPropertyValues.of(env);
+        propertyValues.applyTo(context);
         context.register(config);
         context.refresh();
         return context;

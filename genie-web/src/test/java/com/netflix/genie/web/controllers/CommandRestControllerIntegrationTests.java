@@ -29,17 +29,11 @@ import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.hateoas.resources.ClusterResource;
 import com.netflix.genie.web.hateoas.resources.CommandResource;
-import com.netflix.genie.web.jpa.repositories.JpaApplicationRepository;
-import com.netflix.genie.web.jpa.repositories.JpaClusterRepository;
-import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
-import com.netflix.genie.web.jpa.repositories.JpaFileRepository;
-import com.netflix.genie.web.jpa.repositories.JpaTagRepository;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
@@ -95,43 +89,22 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
     private static final String COMMANDS_CLUSTERS_LINK_PATH = "$.._links.clusters.href";
     private static final String COMMANDS_ID_LIST_PATH = EMBEDDED_PATH + ".commandList..id";
 
-    @Autowired
-    private JpaApplicationRepository jpaApplicationRepository;
-
-    @Autowired
-    private JpaClusterRepository jpaClusterRepository;
-
-    @Autowired
-    private JpaCommandRepository jpaCommandRepository;
-
-    @Autowired
-    private JpaFileRepository fileRepository;
-
-    @Autowired
-    private JpaTagRepository tagRepository;
-
     /**
-     * Common setup for all tests.
+     * {@inheritDoc}
      */
     @Before
-    public void setup() {
-        this.jpaClusterRepository.deleteAll();
-        this.jpaCommandRepository.deleteAll();
-        this.jpaApplicationRepository.deleteAll();
-        this.fileRepository.deleteAll();
-        this.tagRepository.deleteAll();
+    @Override
+    public void setup() throws Exception {
+        super.setup();
     }
 
     /**
-     * Cleanup after tests.
+     * {@inheritDoc}
      */
     @After
-    public void cleanup() {
-        this.jpaClusterRepository.deleteAll();
-        this.jpaCommandRepository.deleteAll();
-        this.jpaApplicationRepository.deleteAll();
-        this.fileRepository.deleteAll();
-        this.tagRepository.deleteAll();
+    @Override
+    public void cleanup() throws Exception {
+        super.cleanup();
     }
 
     /**
@@ -141,7 +114,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canCreateCommandWithoutId() throws Exception {
-        Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
 
         final RestDocumentationResultHandler creationResultHandler = MockMvcRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
@@ -208,7 +181,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                 EntityLinkMatcher.matchUri(COMMANDS_API, APPLICATIONS_LINK_KEY, null, id)))
             .andDo(getResultHandler);
 
-        Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(1L));
+        Assert.assertThat(this.commandRepository.count(), Matchers.is(1L));
     }
 
     /**
@@ -218,7 +191,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canCreateCommandWithId() throws Exception {
-        Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
         this.createConfigResource(
             new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
                 .withId(ID)
@@ -265,7 +238,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             .andExpect(MockMvcResultMatchers.jsonPath(COMMAND_APPS_LINK_PATH,
                 EntityLinkMatcher.matchUri(COMMANDS_API, APPLICATIONS_LINK_KEY, null, ID)));
 
-        Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(1L));
+        Assert.assertThat(this.commandRepository.count(), Matchers.is(1L));
     }
 
     /**
@@ -275,7 +248,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canHandleBadInputToCreateCommand() throws Exception {
-        Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
         final Command cluster = new Command.Builder(" ", " ", " ", CommandStatus.ACTIVE, " ", -1L).build();
         this.mvc.perform(
             MockMvcRequestBuilders
@@ -283,7 +256,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(GenieObjectMapper.getMapper().writeValueAsBytes(cluster))
         ).andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
-        Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
     }
 
     /**
@@ -293,7 +266,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canFindCommands() throws Exception {
-        Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
         final String id1 = UUID.randomUUID().toString();
         final String id2 = UUID.randomUUID().toString();
         final String id3 = UUID.randomUUID().toString();
@@ -417,7 +390,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
 
         //TODO: Add tests for sort, orderBy etc
 
-        Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(3L));
+        Assert.assertThat(this.commandRepository.count(), Matchers.is(3L));
     }
 
     /**
@@ -427,7 +400,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canUpdateCommand() throws Exception {
-        Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
         this.createConfigResource(
             new Command
                 .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
@@ -492,7 +465,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             .andExpect(
                 MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(CommandStatus.INACTIVE.toString()))
             );
-        Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(1L));
+        Assert.assertThat(this.commandRepository.count(), Matchers.is(1L));
     }
 
     /**
@@ -502,7 +475,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canPatchCommand() throws Exception {
-        Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
         final String id = this.createConfigResource(
             new Command
                 .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
@@ -546,7 +519,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
             .andExpect(MockMvcResultMatchers.jsonPath(NAME_PATH, Matchers.is(newName)));
-        Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(1L));
+        Assert.assertThat(this.commandRepository.count(), Matchers.is(1L));
     }
 
     /**
@@ -556,7 +529,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canDeleteAllCommands() throws Exception {
-        Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
         this.createConfigResource(
             new Command
                 .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
@@ -575,7 +548,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                 .build(),
             null
         );
-        Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(3L));
+        Assert.assertThat(this.commandRepository.count(), Matchers.is(3L));
 
         final RestDocumentationResultHandler deleteResultHandler = MockMvcRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
@@ -588,7 +561,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             .andExpect(MockMvcResultMatchers.status().isNoContent())
             .andDo(deleteResultHandler);
 
-        Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
     }
 
     /**
@@ -598,7 +571,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canDeleteACommand() throws Exception {
-        Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
         final String id1 = UUID.randomUUID().toString();
         final String id2 = UUID.randomUUID().toString();
         final String id3 = UUID.randomUUID().toString();
@@ -636,7 +609,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                 .build(),
             null
         );
-        Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(3L));
+        Assert.assertThat(this.commandRepository.count(), Matchers.is(3L));
 
         final RestDocumentationResultHandler deleteResultHandler = MockMvcRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
@@ -654,7 +627,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             .perform(MockMvcRequestBuilders.get(COMMANDS_API + "/{id}", id2))
             .andExpect(MockMvcResultMatchers.status().isNotFound());
 
-        Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(2L));
+        Assert.assertThat(this.commandRepository.count(), Matchers.is(2L));
     }
 
     /**
@@ -664,7 +637,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canAddConfigsToCommand() throws Exception {
-        Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
         this.createConfigResource(
             new Command
                 .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
@@ -699,7 +672,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canUpdateConfigsForCommand() throws Exception {
-        Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
         this.createConfigResource(
             new Command
                 .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
@@ -726,7 +699,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canDeleteConfigsForCommand() throws Exception {
-        Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
         this.createConfigResource(
             new Command
                 .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
@@ -751,7 +724,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canAddDependenciesToCommand() throws Exception {
-        Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
         this.createConfigResource(
             new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
                 .withId(ID)
@@ -790,7 +763,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canUpdateDependenciesForCommand() throws Exception {
-        Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
         this.createConfigResource(
             new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
                 .withId(ID)
@@ -820,7 +793,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canDeleteDependenciesForCommand() throws Exception {
-        Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
         this.createConfigResource(
             new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
                 .withId(ID)
@@ -848,7 +821,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canAddTagsToCommand() throws Exception {
-        Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
         this.createConfigResource(
             new Command
                 .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
@@ -884,7 +857,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canUpdateTagsForCommand() throws Exception {
-        Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
         this.createConfigResource(
             new Command
                 .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
@@ -912,7 +885,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canDeleteTagsForCommand() throws Exception {
-        Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
         this.createConfigResource(
             new Command
                 .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
@@ -938,7 +911,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canDeleteTagForCommand() throws Exception {
-        Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
         this.createConfigResource(
             new Command
                 .Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
@@ -1071,7 +1044,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             Snippets.HAL_CONTENT_TYPE_HEADER, // Response Headers
             PayloadDocumentation.responseFields(
                 PayloadDocumentation
-                    .fieldWithPath("[]")
+                    .subsectionWithPath("[]")
                     .description("The set of applications this command depends on")
                     .attributes(Snippets.EMPTY_CONSTRAINTS)
             )
@@ -1507,7 +1480,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             Snippets.HAL_CONTENT_TYPE_HEADER, // Response Headers
             PayloadDocumentation.responseFields(
                 PayloadDocumentation
-                    .fieldWithPath("[]")
+                    .subsectionWithPath("[]")
                     .description("The list of clusters found")
                     .attributes(Snippets.EMPTY_CONSTRAINTS)
             )
@@ -1560,7 +1533,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
         );
 
         for (Command invalidCommandResource : invalidCommandResources) {
-            Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
+            Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
 
             this.mvc
                 .perform(
@@ -1570,7 +1543,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                 )
                 .andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
 
-            Assert.assertThat(this.jpaCommandRepository.count(), Matchers.is(0L));
+            Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
         }
     }
 }

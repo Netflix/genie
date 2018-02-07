@@ -397,12 +397,17 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                     .orElseThrow(() -> new GenieServerException("Couldn't get cluster when size was one"));
             } else {
                 for (final ClusterLoadBalancer loadBalancer : this.clusterLoadBalancers) {
-                    final String loadBalancerClass =
-                        (
-                            loadBalancer instanceof TargetClassAware
-                                ? ((TargetClassAware) loadBalancer).getTargetClass()
-                                : loadBalancer.getClass()
-                        ).getCanonicalName();
+                    final String loadBalancerClass;
+                    if (loadBalancer instanceof TargetClassAware) {
+                        final Class<?> targetClass = ((TargetClassAware) loadBalancer).getTargetClass();
+                        if (targetClass != null) {
+                            loadBalancerClass = targetClass.getCanonicalName();
+                        } else {
+                            loadBalancerClass = loadBalancer.getClass().getCanonicalName();
+                        }
+                    } else {
+                        loadBalancerClass = loadBalancer.getClass().getCanonicalName();
+                    }
                     counterTags.put(MetricsConstants.TagKeys.CLASS_NAME, loadBalancerClass);
                     try {
                         final Cluster selectedCluster = loadBalancer.selectCluster(clusters, jobRequest);

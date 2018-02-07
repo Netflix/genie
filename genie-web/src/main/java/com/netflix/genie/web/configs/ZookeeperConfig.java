@@ -30,7 +30,7 @@ import org.springframework.integration.zookeeper.config.CuratorFrameworkFactoryB
  * @since 3.1.0
  */
 @Configuration
-@ConditionalOnProperty("genie.zookeeper.enabled")
+@ConditionalOnProperty(value = "genie.zookeeper.enabled", havingValue = "true")
 public class ZookeeperConfig {
 
     /**

@@ -221,9 +221,6 @@ public class JpaClusterServiceImpl extends JpaBaseService implements ClusterServ
                     }
 
                     final ClusterEntity clusterEntity = this.clusterRepository.getOne(clusterId);
-                    if (clusterEntity == null) {
-                        throw new GenieNotFoundException("No cluster with id " + clusterId + " exists");
-                    }
                     foundClusters.put(JpaServiceUtils.toClusterDto(clusterEntity), commandUniqueId);
                 }
                 return foundClusters;

@@ -64,7 +64,6 @@ public class MailServiceImpl implements MailService {
         simpleMailMessage.setTo(toEmail);
         simpleMailMessage.setFrom(this.fromAddress);
         simpleMailMessage.setSubject(subject);
-        simpleMailMessage.setText(body);
 
         // check if body is not empty
         if (StringUtils.isNotBlank(body)) {

@@ -25,10 +25,17 @@ import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.ExecutionEnvironmentDTO;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.test.categories.IntegrationTest;
+import com.netflix.genie.web.jpa.repositories.JpaApplicationRepository;
+import com.netflix.genie.web.jpa.repositories.JpaClusterRepository;
+import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
+import com.netflix.genie.web.jpa.repositories.JpaFileRepository;
+import com.netflix.genie.web.jpa.repositories.JpaJobRepository;
+import com.netflix.genie.web.jpa.repositories.JpaTagRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.Description;
 import org.hamcrest.Matchers;
 import org.hamcrest.TypeSafeMatcher;
+import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +53,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -106,6 +114,24 @@ public abstract class RestControllerIntegrationTestsBase {
     static final Set<String> COMMANDS_OPTIONAL_HAL_LINK_PARAMETERS = Sets.newHashSet("status");
 
     @Autowired
+    protected JpaApplicationRepository applicationRepository;
+
+    @Autowired
+    protected JpaClusterRepository clusterRepository;
+
+    @Autowired
+    protected JpaCommandRepository commandRepository;
+
+    @Autowired
+    protected JpaJobRepository jobRepository;
+
+    @Autowired
+    protected JpaFileRepository fileRepository;
+
+    @Autowired
+    protected JpaTagRepository tagRepository;
+
+    @Autowired
     protected MockMvc mvc;
 
     private static String getLinkedResourceExpectedUri(
@@ -131,6 +157,34 @@ public abstract class RestControllerIntegrationTestsBase {
                 .append("}");
         }
         return uriString + halParamsStringBuilder.toString();
+    }
+
+    /**
+     * Clean out the db before every test.
+     *
+     * @throws Exception on error
+     */
+    public void setup() throws Exception {
+        this.jobRepository.deleteAll();
+        this.clusterRepository.deleteAll();
+        this.commandRepository.deleteAll();
+        this.applicationRepository.deleteAll();
+        this.fileRepository.deleteAll();
+        this.tagRepository.deleteAll();
+    }
+
+    /**
+     * Clean out the db after every test.
+     *
+     * @throws Exception on error
+     */
+    public void cleanup() throws Exception {
+        this.jobRepository.deleteAll();
+        this.clusterRepository.deleteAll();
+        this.commandRepository.deleteAll();
+        this.applicationRepository.deleteAll();
+        this.fileRepository.deleteAll();
+        this.tagRepository.deleteAll();
     }
 
     void canAddElementsToResource(
@@ -407,7 +461,10 @@ public abstract class RestControllerIntegrationTestsBase {
         return this.getIdFromLocation(resultActions.andReturn().getResponse().getHeader(HttpHeaders.LOCATION));
     }
 
-    private String getIdFromLocation(final String location) {
+    String getIdFromLocation(@Nullable final String location) {
+        if (location == null) {
+            Assert.fail();
+        }
         return location.substring(location.lastIndexOf("/") + 1);
     }
 

@@ -44,9 +44,11 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolationException;
 import java.io.IOException;
+import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Tests for the exception mapper.
@@ -57,7 +59,6 @@ import java.util.List;
 @Category(UnitTest.class)
 public class GenieExceptionMapperUnitTests {
 
-    private Registry registry;
     private HttpServletResponse response;
     private GenieExceptionMapper mapper;
     private Id counterId;
@@ -69,7 +70,7 @@ public class GenieExceptionMapperUnitTests {
     @Before
     public void setup() {
         this.response = Mockito.mock(HttpServletResponse.class);
-        this.registry = Mockito.mock(Registry.class);
+        final Registry registry = Mockito.mock(Registry.class);
         this.counterId = Mockito.mock(Id.class);
         this.counter = Mockito.mock(Counter.class);
         Mockito
@@ -150,6 +151,9 @@ public class GenieExceptionMapperUnitTests {
         }.getClass().getEnclosingMethod();
         final MethodParameter parameter = Mockito.mock(MethodParameter.class);
         Mockito.when(parameter.getMethod()).thenReturn(method);
+        final Executable executable = Mockito.mock(Executable.class);
+        Mockito.when(parameter.getExecutable()).thenReturn(executable);
+        Mockito.when(executable.toGenericString()).thenReturn(UUID.randomUUID().toString());
 
         final BindingResult bindingResult = Mockito.mock(BindingResult.class);
         Mockito.when(bindingResult.getAllErrors()).thenReturn(Lists.newArrayList());
@@ -167,10 +171,10 @@ public class GenieExceptionMapperUnitTests {
             .verify(this.response, Mockito.times(1))
             .sendError(Mockito.eq(HttpStatus.PRECONDITION_FAILED.value()), Mockito.anyString());
         Mockito
-            .verify(counterId, Mockito.times(1))
+            .verify(this.counterId, Mockito.times(1))
             .withTag(MetricsConstants.TagKeys.EXCEPTION_CLASS, exception.getClass().getCanonicalName());
         Mockito
-            .verify(counter, Mockito.times(1))
+            .verify(this.counter, Mockito.times(1))
             .increment();
     }
 }

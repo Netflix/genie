@@ -86,7 +86,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     private static final String COMMAND_3_EXECUTABLE = "pig";
     private static final CommandStatus COMMAND_3_STATUS = CommandStatus.DEPRECATED;
 
-    private static final Pageable PAGE = new PageRequest(0, 10, Sort.Direction.DESC, "updated");
+    private static final Pageable PAGE = PageRequest.of(0, 10, Sort.Direction.DESC, "updated");
 
     @Autowired
     private CommandService service;
@@ -259,7 +259,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void testGetCommandsAscending() {
-        final Pageable ascending = new PageRequest(0, 10, Sort.Direction.ASC, "updated");
+        final Pageable ascending = PageRequest.of(0, 10, Sort.Direction.ASC, "updated");
         //Default to order by Updated
         final Page<Command> commands = this.service.getCommands(null, null, null, null, ascending);
         Assert.assertEquals(3, commands.getNumberOfElements());
@@ -279,7 +279,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void testGetCommandsOrderBysName() {
-        final Pageable name = new PageRequest(0, 10, Sort.Direction.DESC, "name");
+        final Pageable name = PageRequest.of(0, 10, Sort.Direction.DESC, "name");
         final Page<Command> commands = this.service.getCommands(null, null, null, null, name);
         Assert.assertEquals(3, commands.getNumberOfElements());
         Assert.assertEquals(
@@ -298,7 +298,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test(expected = RuntimeException.class)
     public void testGetCommandsOrderBysInvalidField() {
-        final Pageable invalid = new PageRequest(0, 10, Sort.Direction.DESC, "I'mNotAValidField");
+        final Pageable invalid = PageRequest.of(0, 10, Sort.Direction.DESC, "I'mNotAValidField");
         final Page<Command> commands = this.service.getCommands(null, null, null, null, invalid);
         Assert.assertEquals(3, commands.getNumberOfElements());
         Assert.assertEquals(

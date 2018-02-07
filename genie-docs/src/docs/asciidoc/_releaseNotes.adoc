@@ -4,15 +4,46 @@ The following are the release notes for Genie {revnumber}.
 
 === Features
 
+* Upgrade to Spring Boot 2.0
 * Switched to https://jcp.org/en/jsr/detail?id=310[JSR 310] classes for date and time manipulation
 * Upgrade to JPA 2.2
 
 === Library Upgrades
 
+* Spring Boot 2.0
+** Many changes see their
+https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.0-Release-Notes[Release Notes] and
+https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.0-Migration-Guide[Migration Guide]
 * Upgrade to http://hibernate.org/orm/releases/5.2/[Hibernate 5.2.x]
 ** Supports JPA 2.2 specification and JSR 310 Java 8 Times (including `Instant` which isn't supported by JPA 2.2)
+* Switched to https://brettwooldridge.github.io/HikariCP/[HikariCP] for DB connection pool
 
 === Property Changes
+
+NOTE: Many Spring properties were changed as part of the Boot 2.0 release. Those are not documented here. Please
+refer to their documentation.
+
+==== Renamed
+
+|===
+|Old Name |New Name |Reason
+
+|genie.tasks.clusterChecker.*
+|genie.tasks.cluster-checker.*
+|Modifications to how Spring handled
+https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.0-Migration-Guide#relaxed-binding[property binding]
+
+|genie.tasks.databaseCleanup.*
+|genie.tasks.database-cleanup.*
+|Modifications to how Spring handled
+https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.0-Migration-Guide#relaxed-binding[property binding]
+
+|genie.tasks.diskCleanup.*
+|genie.tasks.disk-cleanup.*
+|Modifications to how Spring handled
+https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.0-Migration-Guide#relaxed-binding[property binding]
+
+|===
 
 ==== Removed
 

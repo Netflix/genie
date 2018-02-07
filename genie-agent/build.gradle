@@ -34,5 +34,5 @@ dependencies {
 }
 
 springBoot {
-    mainClass = 'com.netflix.genie.GenieAgentApplication'
+    mainClassName = "com.netflix.genie.GenieAgentApplication"
 }

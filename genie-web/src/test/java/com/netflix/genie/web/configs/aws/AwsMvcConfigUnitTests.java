@@ -26,7 +26,6 @@ import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
 import java.util.UUID;
 
 /**
@@ -50,11 +49,9 @@ public class AwsMvcConfigUnitTests {
 
     /**
      * Make sure we attempt public hostname first.
-     *
-     * @throws IOException on any problem
      */
     @Test
-    public void canGetPublicHostname() throws IOException {
+    public void canGetPublicHostname() {
         final RestTemplate restTemplate = Mockito.mock(RestTemplate.class);
         final String hostname = UUID.randomUUID().toString();
         Mockito.when(restTemplate.getForObject(this.awsMvcConfig.publicHostNameGet, String.class)).thenReturn(hostname);
@@ -70,17 +67,15 @@ public class AwsMvcConfigUnitTests {
 
     /**
      * Make sure we get IPv4 hostname if public hostname fails.
-     *
-     * @throws IOException on any problem
      */
     @Test
     @SuppressWarnings("unchecked")
-    public void canGetIPv4Hostname() throws IOException {
+    public void canGetIPv4Hostname() {
         final RestTemplate restTemplate = Mockito.mock(RestTemplate.class);
         final String hostname = UUID.randomUUID().toString();
         Mockito
             .when(restTemplate.getForObject(this.awsMvcConfig.publicHostNameGet, String.class))
-            .thenThrow(Exception.class);
+            .thenThrow(RuntimeException.class);
 
         Mockito.when(restTemplate.getForObject(this.awsMvcConfig.localIPV4HostNameGet, String.class))
             .thenReturn(hostname);
@@ -92,19 +87,17 @@ public class AwsMvcConfigUnitTests {
 
     /**
      * Make sure if both fails we throw an exception.
-     *
-     * @throws Exception on any problem
      */
-    @Test(expected = Exception.class)
+    @Test(expected = RuntimeException.class)
     @SuppressWarnings("unchecked")
-    public void cantGetHostname() throws Exception {
+    public void cantGetHostname() {
         final RestTemplate restTemplate = Mockito.mock(RestTemplate.class);
         Mockito
             .when(restTemplate.getForObject(this.awsMvcConfig.publicHostNameGet, String.class))
-            .thenThrow(Exception.class);
+            .thenThrow(RuntimeException.class);
         Mockito
             .when(restTemplate.getForObject(this.awsMvcConfig.localIPV4HostNameGet, String.class))
-            .thenThrow(Exception.class);
+            .thenThrow(RuntimeException.class);
 
         this.awsMvcConfig.hostName(restTemplate);
     }

@@ -16,19 +16,6 @@
 #
 ##
 
-banner:
-  location: genie-banner.txt
-
-eureka:
-  client:
-    enabled: false
-
-flyway:
-  locations: db/migration/{vendor}
-  baselineDescription: Base Version
-  baselineOnMigrate: true
-  baselineVersion: 3.2.0
-
 genie:
   file:
     cache:
@@ -92,17 +79,17 @@ genie:
   swagger:
     enabled: false
   tasks:
-    clusterChecker:
+    cluster-checker:
       scheme: http
       port: 8080
       rate: 300000
       lostThreshold: 3
       healthIndicatorsToIgnore: memory,genieMemory,discoveryComposite
-    databaseCleanup:
+    database-cleanup:
       enabled: true
       expression: 0 0 0 * * *
       retention: 90
-    diskCleanup:
+    disk-cleanup:
       enabled: true
       expression: 0 0 0 * * *
       retention: 3
@@ -118,29 +105,32 @@ info:
     version: GENIE_VERSION
 
 management:
-  context-path: /actuator
-  security:
-    roles: ADMIN
-  health:
-    redis:
-      enabled: false
-    mail:
-      enabled: false
-
-security:
-  basic:
-    enabled: false
-  oauth2:
-    resource:
-      filter-order: 3
+  metrics:
+    export:
+      atlas:
+        enabled: false
 
 spring:
   application:
     name: genie
-  http:
-    multipart:
-      max-file-size: 100MB
-      max-request-size: 200MB
+  banner:
+    location: genie-banner.txt
+  datasource:
+    url: jdbc:h2:mem:genie
+    username: root
+    password:
+    hikari:
+      auto-commit: false
+      connection-test-query: select 0;
+      leak-detection-threshold: 30000
+      maximum-pool-size: 40
+      minimum-idle: 5
+      pool-name: genie-hikari-db-pool
+  flyway:
+    locations: classpath:db/migration/{vendor}
+    baselineDescription: Base Version
+    baselineOnMigrate: true
+    baselineVersion: 3.2.0
   jackson:
     time-zone: UTC
     serialization:
@@ -152,7 +142,9 @@ spring:
       hibernate:
         jdbc:
           time_zone: UTC # SEE: https://moelholm.com/2016/11/09/spring-boot-controlling-timezones-with-hibernate/
-  profiles:
-    active: dev
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 200MB
   session:
-    store-type: hash_map
+    store-type: none
