@@ -27,6 +27,7 @@ dependencies {
     compile("commons-httpclient:commons-httpclient")
     compile("commons-io:commons-io")
     compile("commons-validator:commons-validator")
+    compile("io.micrometer:micrometer-registry-atlas")
     compile("io.springfox:springfox-swagger2")
     compile("io.springfox:springfox-swagger-ui")
     compile("io.springfox:springfox-bean-validators")
@@ -41,7 +42,6 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-actuator")
     compile("org.springframework.boot:spring-boot-starter-aop")
     compile("org.springframework.boot:spring-boot-starter-data-jpa") {
-        exclude group: "org.hibernate", module: "hibernate-entitymanager"
         exclude group: "org.hibernate.javax.persistence"
     }
     compile("org.springframework.boot:spring-boot-starter-data-redis")
@@ -53,7 +53,6 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-tomcat")
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.cloud:spring-cloud-aws-context")
-    compile("org.springframework.cloud:spring-cloud-starter-netflix-spectator")
     compile("org.springframework.integration:spring-integration-zookeeper")
     compile("org.springframework.retry:spring-retry")
     compile("org.springframework.security:spring-security-jwt")
@@ -61,7 +60,10 @@ dependencies {
         exclude group: "org.bouncycastle", module: "bcprov-jdk15"
     }
     compile("org.springframework.security.oauth:spring-security-oauth2")
-    compile("org.springframework.session:spring-session")
+    // TODO: Remove this as they move features into core spring security
+    //       https://spring.io/blog/2018/01/30/next-generation-oauth-2-0-support-with-spring-security
+    compile("org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure")
+    compile("org.springframework.session:spring-session-core")
 
     /*******************************
      * Provided Dependencies
@@ -82,6 +84,7 @@ dependencies {
     runtime("mysql:mysql-connector-java")
     runtime("org.codehaus.groovy:groovy-all")
     runtime("org.postgresql:postgresql")
+    runtime("org.springframework.session:spring-session-data-redis")
 
     /*******************************
      * Test Dependencies
@@ -91,11 +94,13 @@ dependencies {
     testCompile("com.github.springtestdbunit:spring-test-dbunit")
     testCompile("com.jayway.jsonpath:json-path")
     testCompile("net.sf.jtidy:jtidy")
+    testCompile("org.apache.tomcat:tomcat-jdbc")
     testCompile("org.dbunit:dbunit")
     testCompile("org.springframework.boot:spring-boot-starter-jetty")
     testCompile("org.springframework.cloud:spring-cloud-contract-wiremock")
     testCompile("org.springframework.restdocs:spring-restdocs-core")
     testCompile("org.springframework.restdocs:spring-restdocs-mockmvc")
+    testCompile("org.springframework.restdocs:spring-restdocs-restassured")
     testCompile("org.springframework.security:spring-security-test")
     testCompile("io.grpc:grpc-testing")
 }

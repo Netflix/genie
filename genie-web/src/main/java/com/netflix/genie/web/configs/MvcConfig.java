@@ -37,7 +37,7 @@ import org.springframework.retry.support.RetryTemplate;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,7 +53,7 @@ import java.util.Collections;
  * @since 3.0.0
  */
 @Configuration
-public class MvcConfig extends WebMvcConfigurerAdapter {
+public class MvcConfig implements WebMvcConfigurer {
 
     /**
      * {@inheritDoc}
@@ -209,6 +209,7 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 
     /**
      * Character encoding filter that forces content-type in response to be UTF-8.
+     *
      * @return The encoding filter
      */
     @Bean

@@ -33,7 +33,6 @@ import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Specifications for JPA queries.
@@ -77,12 +76,14 @@ public final class JpaCommandSpecs {
                 );
             }
             if (statuses != null && !statuses.isEmpty()) {
-                final List<Predicate> orPredicates =
-                    statuses
-                        .stream()
-                        .map(status -> cb.equal(root.get(CommandEntity_.status), status))
-                        .collect(Collectors.toList());
-                predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
+                predicates.add(
+                    cb.or(
+                        statuses
+                            .stream()
+                            .map(status -> cb.equal(root.get(CommandEntity_.status), status))
+                            .toArray(Predicate[]::new)
+                    )
+                );
             }
             if (tags != null && !tags.isEmpty()) {
                 final Join<CommandEntity, TagEntity> tagEntityJoin = root.join(CommandEntity_.tags);
@@ -112,12 +113,14 @@ public final class JpaCommandSpecs {
             predicates.add(cb.equal(application.get(ApplicationEntity_.uniqueId), applicationId));
 
             if (statuses != null && !statuses.isEmpty()) {
-                final List<Predicate> orPredicates =
-                    statuses
-                        .stream()
-                        .map(status -> cb.equal(root.get(CommandEntity_.status), status))
-                        .collect(Collectors.toList());
-                predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
+                predicates.add(
+                    cb.or(
+                        statuses
+                            .stream()
+                            .map(status -> cb.equal(root.get(CommandEntity_.status), status))
+                            .toArray(Predicate[]::new)
+                    )
+                );
             }
 
             return cb.and(predicates.toArray(new Predicate[predicates.size()]));

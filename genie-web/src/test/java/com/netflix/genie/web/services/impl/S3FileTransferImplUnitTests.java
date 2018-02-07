@@ -78,11 +78,9 @@ public class S3FileTransferImplUnitTests {
 
     /**
      * Setup the tests.
-     *
-     * @throws GenieException If there is a problem.
      */
     @Before
-    public void setup() throws GenieException {
+    public void setup() {
         MockitoAnnotations.initMocks(this);
         final Registry registry = Mockito.mock(Registry.class);
         this.downloadTimer = Mockito.mock(Timer.class);
@@ -92,12 +90,12 @@ public class S3FileTransferImplUnitTests {
         this.urlFailingStrictValidationCounter = Mockito.mock(Counter.class);
         Mockito.when(registry.createId("genie.files.s3.download.timer")).thenReturn(this.downloadTimerId);
         Mockito
-            .when(this.downloadTimerId.withTags(Mockito.anyMapOf(String.class, String.class)))
+            .when(this.downloadTimerId.withTags(Mockito.anyMap()))
             .thenReturn(this.downloadTimerId);
         Mockito.when(registry.timer(Mockito.eq(this.downloadTimerId))).thenReturn(this.downloadTimer);
         Mockito.when(registry.createId("genie.files.s3.upload.timer")).thenReturn(this.uploadTimerId);
         Mockito
-            .when(this.uploadTimerId.withTags(Mockito.anyMapOf(String.class, String.class)))
+            .when(this.uploadTimerId.withTags(Mockito.anyMap()))
             .thenReturn(this.uploadTimerId);
         Mockito.when(registry.timer(Mockito.eq(this.uploadTimerId))).thenReturn(this.uploadTimer);
         Mockito

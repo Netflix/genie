@@ -31,7 +31,6 @@ import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Specifications for JPA queries.
@@ -77,12 +76,14 @@ public final class JpaApplicationSpecs {
                 );
             }
             if (statuses != null && !statuses.isEmpty()) {
-                final List<Predicate> orPredicates =
-                    statuses
-                        .stream()
-                        .map(status -> cb.equal(root.get(ApplicationEntity_.status), status))
-                        .collect(Collectors.toList());
-                predicates.add(cb.or(orPredicates.toArray(new Predicate[orPredicates.size()])));
+                predicates.add(
+                    cb.or(
+                        statuses
+                            .stream()
+                            .map(status -> cb.equal(root.get(ApplicationEntity_.status), status))
+                            .toArray(Predicate[]::new)
+                    )
+                );
             }
             if (tags != null && !tags.isEmpty()) {
                 final Join<ApplicationEntity, TagEntity> tagEntityJoin = root.join(ApplicationEntity_.tags);

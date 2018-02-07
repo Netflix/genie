@@ -17,15 +17,12 @@
  */
 package com.netflix.genie;
 
-import com.google.common.collect.Maps;
 import net.devh.springboot.autoconfigure.grpc.server.GrpcServerAutoConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
-
-import java.util.Map;
 
 /**
  * Main Genie Spring Configuration class.
@@ -43,9 +40,6 @@ import java.util.Map;
 @EnableAspectJAutoProxy
 public class GenieWeb {
 
-    static final String SPRING_CONFIG_LOCATION = "spring.config.location";
-    static final String USER_HOME_GENIE = "${user.home}/.genie/";
-
     /**
      * Protected constructor.
      */
@@ -59,14 +53,6 @@ public class GenieWeb {
      * @throws Exception For any failure during program execution
      */
     public static void main(final String[] args) throws Exception {
-        final SpringApplication genie = new SpringApplication(GenieWeb.class);
-        genie.setDefaultProperties(getDefaultProperties());
-        genie.run(args);
-    }
-
-    static Map<String, Object> getDefaultProperties() {
-        final Map<String, Object> defaultProperties = Maps.newHashMap();
-        defaultProperties.put(SPRING_CONFIG_LOCATION, USER_HOME_GENIE);
-        return defaultProperties;
+        new SpringApplication(GenieWeb.class).run(args);
     }
 }

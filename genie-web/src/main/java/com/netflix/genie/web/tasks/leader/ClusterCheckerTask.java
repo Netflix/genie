@@ -34,7 +34,7 @@ import com.netflix.spectator.api.patterns.PolledMeter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.actuate.autoconfigure.ManagementServerProperties;
+import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.boot.actuate.health.Status;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -78,13 +78,13 @@ public class ClusterCheckerTask extends LeadershipTask {
     /**
      * Constructor.
      *
-     * @param hostName                   The host name of this node
-     * @param properties                 The properties to use to configure the task
-     * @param jobSearchService           The job search service to use
-     * @param jobPersistenceService      The job persistence service to use
-     * @param restTemplate               The rest template for http calls
-     * @param managementServerProperties The properties where Spring actuator is running
-     * @param registry                   The spectator registry for getting metrics
+     * @param hostName              The host name of this node
+     * @param properties            The properties to use to configure the task
+     * @param jobSearchService      The job search service to use
+     * @param jobPersistenceService The job persistence service to use
+     * @param restTemplate          The rest template for http calls
+     * @param webEndpointProperties The properties where Spring actuator is running
+     * @param registry              The spectator registry for getting metrics
      */
     @Autowired
     public ClusterCheckerTask(
@@ -93,7 +93,7 @@ public class ClusterCheckerTask extends LeadershipTask {
         @NotNull final JobSearchService jobSearchService,
         @NotNull final JobPersistenceService jobPersistenceService,
         @Qualifier("genieRestTemplate") @NotNull final RestTemplate restTemplate,
-        @NotNull final ManagementServerProperties managementServerProperties,
+        @NotNull final WebEndpointProperties webEndpointProperties,
         @NotNull final Registry registry
     ) {
         this.hostName = hostName;
@@ -102,7 +102,7 @@ public class ClusterCheckerTask extends LeadershipTask {
         this.jobPersistenceService = jobPersistenceService;
         this.restTemplate = restTemplate;
         this.scheme = this.properties.getScheme() + "://";
-        this.healthEndpoint = ":" + this.properties.getPort() + managementServerProperties.getContextPath() + "/health";
+        this.healthEndpoint = ":" + this.properties.getPort() + webEndpointProperties.getBasePath() + "/health";
         this.healthIndicatorsToIgnore = Splitter.on(",").omitEmptyStrings()
             .trimResults().splitToList(properties.getHealthIndicatorsToIgnore());
         // Keep track of the number of nodes currently unreachable from the the master

@@ -21,5 +21,3 @@ spring:
     url: jdbc:postgresql://127.0.0.1/genie
     username: postgres
     password:
-    tomcat:
-      validation-query: select 0;

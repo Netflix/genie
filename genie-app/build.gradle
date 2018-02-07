@@ -24,28 +24,28 @@ dependencies {
      *******************************/
 }
 
-jar {
+bootJar {
     manifest {
         attributes("Implementation-Version": version)
     }
 }
 
 springBoot {
-    layout = "ZIP"
-    mainClass = "com.netflix.genie.GenieWeb"
+    mainClassName = "com.netflix.genie.GenieWeb"
+    buildInfo()
 }
 
 def env = project.hasProperty("env") ? project.getProperty("env") : "dev"
 
 bootRun {
-    addResources = false
+//    addResources = false
     systemProperty "spring.profiles.active", env
 }
 
 def dockerDir = new File(project.buildDir, "/docker")
 
 task dockerCreateInputDir(type: Copy, group: "Docker", description: "Stage all the necessary files docker image") {
-    dependsOn tasks.jar, tasks.bootRepackage
+    dependsOn tasks.jar, tasks.bootJar
     from tasks.jar
     from new File(project.projectDir, "src/main/docker/Dockerfile")
     into dockerDir

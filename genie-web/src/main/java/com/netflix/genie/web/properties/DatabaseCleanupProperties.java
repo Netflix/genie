@@ -29,7 +29,7 @@ import org.springframework.validation.annotation.Validated;
  * @author tgianos
  * @since 3.0.0
  */
-@ConfigurationProperties(prefix = "genie.tasks.databaseCleanup")
+@ConfigurationProperties(prefix = "genie.tasks.database-cleanup")
 @Component
 @Getter
 @Setter

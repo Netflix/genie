@@ -32,12 +32,6 @@ import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.util.GenieObjectMapper;
-import com.netflix.genie.web.jpa.repositories.JpaApplicationRepository;
-import com.netflix.genie.web.jpa.repositories.JpaClusterRepository;
-import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
-import com.netflix.genie.web.jpa.repositories.JpaFileRepository;
-import com.netflix.genie.web.jpa.repositories.JpaJobRepository;
-import com.netflix.genie.web.jpa.repositories.JpaTagRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
@@ -179,24 +173,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     private String schedulerRunId;
 
     @Autowired
-    private JpaJobRepository jobRepository;
-
-    @Autowired
-    private JpaApplicationRepository applicationRepository;
-
-    @Autowired
-    private JpaCommandRepository commandRepository;
-
-    @Autowired
-    private JpaClusterRepository clusterRepository;
-
-    @Autowired
-    private JpaFileRepository fileRepository;
-
-    @Autowired
-    private JpaTagRepository tagRepository;
-
-    @Autowired
     private String hostname;
 
     @Autowired
@@ -206,19 +182,12 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     private String baseCacheLocation;
 
     /**
-     * Setup for tests.
-     *
-     * @throws Exception If there is an error.
+     * {@inheritDoc}
      */
     @Before
+    @Override
     public void setup() throws Exception {
-        // Ensure database is empty and doesn't bleed from other test classes
-        this.jobRepository.deleteAll();
-        this.clusterRepository.deleteAll();
-        this.commandRepository.deleteAll();
-        this.applicationRepository.deleteAll();
-        this.fileRepository.deleteAll();
-        this.tagRepository.deleteAll();
+        super.setup();
 
         this.schedulerJobName = UUID.randomUUID().toString();
         this.schedulerRunId = UUID.randomUUID().toString();
@@ -243,16 +212,12 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     }
 
     /**
-     * Cleanup after tests.
+     * {@inheritDoc}
      */
     @After
-    public void cleanup() {
-        this.jobRepository.deleteAll();
-        this.clusterRepository.deleteAll();
-        this.commandRepository.deleteAll();
-        this.applicationRepository.deleteAll();
-        this.fileRepository.deleteAll();
-        this.tagRepository.deleteAll();
+    @Override
+    public void cleanup() throws Exception {
+        super.cleanup();
     }
 
     /**
@@ -794,7 +759,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             Snippets.HAL_CONTENT_TYPE_HEADER, // Response Headers
             PayloadDocumentation.responseFields(
                 PayloadDocumentation
-                    .fieldWithPath("[]")
+                    .subsectionWithPath("[]")
                     .description("The applications for the job")
                     .attributes(Snippets.EMPTY_CONSTRAINTS)
             ) // Response fields
@@ -1361,10 +1326,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
             .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()));
-    }
-
-    private String getIdFromLocation(final String location) {
-        return location.substring(location.lastIndexOf("/") + 1);
     }
 
     private String getExpectedRunContents(

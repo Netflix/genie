@@ -18,7 +18,15 @@
 package com.netflix.genie.web.jpa.services;
 
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
+import com.netflix.genie.web.jpa.repositories.JpaApplicationRepository;
+import com.netflix.genie.web.jpa.repositories.JpaClusterRepository;
+import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
+import com.netflix.genie.web.jpa.repositories.JpaFileRepository;
+import com.netflix.genie.web.jpa.repositories.JpaJobRepository;
+import com.netflix.genie.web.jpa.repositories.JpaTagRepository;
+import org.junit.After;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestExecutionListeners;
@@ -47,8 +55,40 @@ import org.springframework.test.context.transaction.TransactionalTestExecutionLi
     {
         "integration",
         "db",
+        "db-tomcat", // Force use of Tomcat Connection pool since Hikari blows up spring dbunit
         "db-h2",
     }
 )
 public abstract class DBUnitTestBase {
+
+    @Autowired
+    protected JpaApplicationRepository applicationRepository;
+
+    @Autowired
+    protected JpaClusterRepository clusterRepository;
+
+    @Autowired
+    protected JpaCommandRepository commandRepository;
+
+    @Autowired
+    protected JpaJobRepository jobRepository;
+
+    @Autowired
+    protected JpaFileRepository fileRepository;
+
+    @Autowired
+    protected JpaTagRepository tagRepository;
+
+    /**
+     * Clean out the db after every test.
+     */
+    @After
+    public void cleanup() {
+        this.jobRepository.deleteAll();
+        this.clusterRepository.deleteAll();
+        this.commandRepository.deleteAll();
+        this.applicationRepository.deleteAll();
+        this.fileRepository.deleteAll();
+        this.tagRepository.deleteAll();
+    }
 }

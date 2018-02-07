@@ -94,13 +94,13 @@ public class HttpFileTransferImplTest {
         Mockito.when(registry.createId("genie.files.http.upload.timer")).thenReturn(this.uploadTimerId);
         Mockito.when(registry.createId("genie.files.http.getLastModified.timer")).thenReturn(this.metadataTimerId);
         Mockito
-            .when(this.downloadTimerId.withTags(Mockito.anyMapOf(String.class, String.class)))
+            .when(this.downloadTimerId.withTags(Mockito.anyMap()))
             .thenReturn(this.downloadTimerId);
         Mockito
-            .when(this.uploadTimerId.withTags(Mockito.anyMapOf(String.class, String.class)))
+            .when(this.uploadTimerId.withTags(Mockito.anyMap()))
             .thenReturn(this.uploadTimerId);
         Mockito
-            .when(this.metadataTimerId.withTags(Mockito.anyMapOf(String.class, String.class)))
+            .when(this.metadataTimerId.withTags(Mockito.anyMap()))
             .thenReturn(this.metadataTimerId);
         Mockito.when(registry.timer(this.downloadTimerId)).thenReturn(this.downloadTimer);
         Mockito.when(registry.timer(this.uploadTimerId)).thenReturn(this.uploadTimer);

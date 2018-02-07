@@ -115,7 +115,7 @@ public class JpaClusterSpecsUnitTests {
         Mockito.when(this.tagEntityJoin.in(TAGS)).thenReturn(tagInPredicate);
 
         final Expression<Long> idCountExpression = (Expression<Long>) Mockito.mock(Expression.class);
-        Mockito.when(this.cb.count(idPath)).thenReturn(idCountExpression);
+        Mockito.when(this.cb.count(Mockito.any())).thenReturn(idCountExpression);
         final Predicate havingPredicate = Mockito.mock(Predicate.class);
         Mockito.when(this.cb.equal(idCountExpression, TAGS.size())).thenReturn(havingPredicate);
     }

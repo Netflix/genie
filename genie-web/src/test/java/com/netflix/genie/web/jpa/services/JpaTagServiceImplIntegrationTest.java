@@ -24,7 +24,6 @@ import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.test.categories.IntegrationTest;
 import com.netflix.genie.web.jpa.entities.TagEntity;
-import com.netflix.genie.web.jpa.repositories.JpaTagRepository;
 import com.netflix.genie.web.services.ApplicationService;
 import com.netflix.genie.web.services.TagService;
 import org.hamcrest.Matchers;
@@ -50,9 +49,6 @@ public class JpaTagServiceImplIntegrationTest extends DBUnitTestBase {
     // This needs to be injected as a Spring Bean otherwise transactions don't work as there is no proxy
     @Autowired
     private TagService tagService;
-
-    @Autowired
-    private JpaTagRepository tagRepository;
 
     @Autowired
     private ApplicationService applicationService;

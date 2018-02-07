@@ -31,7 +31,6 @@ import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.test.categories.IntegrationTest;
-import com.netflix.genie.web.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.web.services.ClusterService;
 import com.netflix.genie.web.services.CommandService;
 import org.hamcrest.Matchers;
@@ -84,16 +83,13 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
     private static final String CLUSTER_2_VERSION = "2.4.0";
     private static final ClusterStatus CLUSTER_2_STATUS = ClusterStatus.UP;
 
-    private static final Pageable PAGE = new PageRequest(0, 10, Sort.Direction.DESC, "updated");
+    private static final Pageable PAGE = PageRequest.of(0, 10, Sort.Direction.DESC, "updated");
 
     @Autowired
     private ClusterService service;
 
     @Autowired
     private CommandService commandService;
-
-    @Autowired
-    private JpaClusterRepository clusterRepository;
 
     /**
      * Test the get cluster method.
@@ -239,7 +235,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void testGetClustersAscending() {
-        final Pageable ascendingPage = new PageRequest(0, 10, Sort.Direction.ASC, "updated");
+        final Pageable ascendingPage = PageRequest.of(0, 10, Sort.Direction.ASC, "updated");
         //Default to order by Updated
         final Page<Cluster> clusters = this.service.getClusters(null, null, null, null, null, ascendingPage);
         Assert.assertEquals(2, clusters.getNumberOfElements());
@@ -256,7 +252,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void testGetClustersOrderBysUser() {
-        final Pageable userPage = new PageRequest(0, 10, Sort.Direction.DESC, "user");
+        final Pageable userPage = PageRequest.of(0, 10, Sort.Direction.DESC, "user");
         final Page<Cluster> clusters = this.service.getClusters(null, null, null, null, null, userPage);
         Assert.assertEquals(2, clusters.getNumberOfElements());
         Assert.assertEquals(
@@ -272,7 +268,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test(expected = RuntimeException.class)
     public void testGetClustersOrderBysInvalidField() {
-        final Pageable badPage = new PageRequest(0, 10, Sort.Direction.DESC, "I'mNotAValidField");
+        final Pageable badPage = PageRequest.of(0, 10, Sort.Direction.DESC, "I'mNotAValidField");
         this.service.getClusters(null, null, null, null, null, badPage);
     }
 

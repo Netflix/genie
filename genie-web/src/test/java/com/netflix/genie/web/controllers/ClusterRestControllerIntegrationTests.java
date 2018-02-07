@@ -28,10 +28,6 @@ import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.hateoas.resources.ClusterResource;
-import com.netflix.genie.web.jpa.repositories.JpaClusterRepository;
-import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
-import com.netflix.genie.web.jpa.repositories.JpaFileRepository;
-import com.netflix.genie.web.jpa.repositories.JpaTagRepository;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.hamcrest.Matchers;
@@ -81,40 +77,24 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
     private static final String CLUSTERS_COMMANDS_LINK_PATH = "$.._links.commands.href";
 
     @Autowired
-    private JpaClusterRepository jpaClusterRepository;
-
-    @Autowired
-    private JpaCommandRepository jpaCommandRepository;
-
-    @Autowired
-    private JpaFileRepository fileRepository;
-
-    @Autowired
-    private JpaTagRepository tagRepository;
-
-    @Autowired
     private DataSource dataSource;
 
     /**
-     * Common setup for all tests.
+     * {@inheritDoc}
      */
     @Before
-    public void setup() {
-        this.jpaClusterRepository.deleteAll();
-        this.jpaCommandRepository.deleteAll();
-        this.fileRepository.deleteAll();
-        this.tagRepository.deleteAll();
+    @Override
+    public void setup() throws Exception {
+        super.setup();
     }
 
     /**
-     * Cleanup after tests.
+     * {@inheritDoc}
      */
     @After
-    public void cleanup() {
-        this.jpaClusterRepository.deleteAll();
-        this.jpaCommandRepository.deleteAll();
-        this.fileRepository.deleteAll();
-        this.tagRepository.deleteAll();
+    @Override
+    public void cleanup() throws Exception {
+        super.cleanup();
     }
 
     /**
@@ -124,7 +104,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canCreateClusterWithoutId() throws Exception {
-        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
 
         final RestDocumentationResultHandler creationResultHandler = MockMvcRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
@@ -175,7 +155,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
                     CLUSTERS_API, COMMANDS_LINK_KEY, COMMANDS_OPTIONAL_HAL_LINK_PARAMETERS, id)))
             .andDo(getResultHandler);
 
-        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(1L));
+        Assert.assertThat(this.clusterRepository.count(), Matchers.is(1L));
     }
 
     /**
@@ -185,7 +165,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canCreateClusterWithId() throws Exception {
-        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
         this.createConfigResource(
             new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(),
             null
@@ -213,7 +193,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
             .andExpect(MockMvcResultMatchers.jsonPath(CLUSTER_COMMANDS_LINK_PATH,
                 EntityLinkMatcher.matchUri(
                     CLUSTERS_API, COMMANDS_LINK_KEY, COMMANDS_OPTIONAL_HAL_LINK_PARAMETERS, ID)));
-        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(1L));
+        Assert.assertThat(this.clusterRepository.count(), Matchers.is(1L));
     }
 
     /**
@@ -223,7 +203,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canHandleBadInputToCreateCluster() throws Exception {
-        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
         final Cluster cluster = new Cluster.Builder(" ", " ", " ", ClusterStatus.UP).build();
         this.mvc.perform(
             MockMvcRequestBuilders
@@ -231,7 +211,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(GenieObjectMapper.getMapper().writeValueAsBytes(cluster))
         ).andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
-        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
     }
 
     /**
@@ -241,7 +221,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canFindClusters() throws Exception {
-        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
         final String id1 = UUID.randomUUID().toString();
         final String id2 = UUID.randomUUID().toString();
         final String id3 = UUID.randomUUID().toString();
@@ -341,7 +321,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         //TODO: Add tests for searching by min and max update time as those are available parameters
         //TODO: Add tests for sort, orderBy etc
 
-        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(3L));
+        Assert.assertThat(this.clusterRepository.count(), Matchers.is(3L));
     }
 
     /**
@@ -351,7 +331,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canUpdateCluster() throws Exception {
-        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
         this.createConfigResource(
             new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(),
             null
@@ -409,7 +389,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
             .andExpect(
                 MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(ClusterStatus.OUT_OF_SERVICE.toString()))
             );
-        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(1L));
+        Assert.assertThat(this.clusterRepository.count(), Matchers.is(1L));
     }
 
     /**
@@ -419,7 +399,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canPatchCluster() throws Exception {
-        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
         final String id = this.createConfigResource(
             new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(),
             null
@@ -459,7 +439,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
             .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
             .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
             .andExpect(MockMvcResultMatchers.jsonPath(NAME_PATH, Matchers.is(newName)));
-        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(1L));
+        Assert.assertThat(this.clusterRepository.count(), Matchers.is(1L));
     }
 
     /**
@@ -469,11 +449,11 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canDeleteAllClusters() throws Exception {
-        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).build(), null);
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.OUT_OF_SERVICE).build(), null);
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.TERMINATED).build(), null);
-        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(3L));
+        Assert.assertThat(this.clusterRepository.count(), Matchers.is(3L));
 
         final RestDocumentationResultHandler deleteResultHandler = MockMvcRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
@@ -486,7 +466,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
             .andExpect(MockMvcResultMatchers.status().isNoContent())
             .andDo(deleteResultHandler);
 
-        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
     }
 
     /**
@@ -496,7 +476,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canDeleteACluster() throws Exception {
-        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
         final String id1 = UUID.randomUUID().toString();
         final String id2 = UUID.randomUUID().toString();
         final String id3 = UUID.randomUUID().toString();
@@ -522,7 +502,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
             new Cluster.Builder(name3, user3, version3, ClusterStatus.TERMINATED).withId(id3).build(),
             null
         );
-        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(3L));
+        Assert.assertThat(this.clusterRepository.count(), Matchers.is(3L));
 
         final RestDocumentationResultHandler deleteResultHandler = MockMvcRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
@@ -540,7 +520,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
             .perform(MockMvcRequestBuilders.get(CLUSTERS_API + "/{id}", id2))
             .andExpect(MockMvcResultMatchers.status().isNotFound());
 
-        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(2L));
+        Assert.assertThat(this.clusterRepository.count(), Matchers.is(2L));
     }
 
     /**
@@ -550,7 +530,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canAddConfigsToCluster() throws Exception {
-        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
 
         final RestDocumentationResultHandler addResultHandler = MockMvcRestDocumentation.document(
@@ -579,7 +559,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canUpdateConfigsForCluster() throws Exception {
-        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
 
         final RestDocumentationResultHandler updateResultHandler = MockMvcRestDocumentation.document(
@@ -600,7 +580,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canDeleteConfigsForCluster() throws Exception {
-        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
 
         final RestDocumentationResultHandler deleteResultHandler = MockMvcRestDocumentation.document(
@@ -619,7 +599,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canAddDependenciesToCluster() throws Exception {
-        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
 
         final RestDocumentationResultHandler addResultHandler = MockMvcRestDocumentation.document(
@@ -648,7 +628,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canUpdateDependenciesForCluster() throws Exception {
-        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
 
         final RestDocumentationResultHandler updateResultHandler = MockMvcRestDocumentation.document(
@@ -669,7 +649,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canDeleteDependenciesForCluster() throws Exception {
-        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
 
         final RestDocumentationResultHandler deleteResultHandler = MockMvcRestDocumentation.document(
@@ -688,7 +668,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canAddTagsToCluster() throws Exception {
-        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
         final String api = CLUSTERS_API + "/{id}/tags";
 
@@ -718,7 +698,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canUpdateTagsForCluster() throws Exception {
-        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
         final String api = CLUSTERS_API + "/{id}/tags";
 
@@ -740,7 +720,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canDeleteTagsForCluster() throws Exception {
-        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
 
         final RestDocumentationResultHandler deleteResultHandler = MockMvcRestDocumentation.document(
@@ -760,7 +740,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void canDeleteTagForCluster() throws Exception {
-        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
         final String api = CLUSTERS_API + "/{id}/tags";
         final RestDocumentationResultHandler deleteResultHandler = MockMvcRestDocumentation.document(
@@ -898,7 +878,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
             Snippets.HAL_CONTENT_TYPE_HEADER, // Response Headers
             PayloadDocumentation.responseFields(
                 PayloadDocumentation
-                    .fieldWithPath("[]")
+                    .subsectionWithPath("[]")
                     .description("The list of commands found")
                     .attributes(Snippets.EMPTY_CONSTRAINTS)
             )
@@ -1170,7 +1150,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void testPagingDoubleEncoding() throws Exception {
-        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
+        Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
         final String id1 = UUID.randomUUID().toString();
         final String id2 = UUID.randomUUID().toString();
         final String id3 = UUID.randomUUID().toString();
@@ -1199,7 +1179,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
             null
         );
 
-        Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(3L));
+        Assert.assertThat(this.clusterRepository.count(), Matchers.is(3L));
 
         final URLEncoder urlEncoder = new URLEncoder();
 
@@ -1282,7 +1262,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         );
 
         for (Cluster invalidClusterResource : invalidClusterResources) {
-            Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
+            Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
 
             this.mvc
                 .perform(
@@ -1292,7 +1272,7 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
                 )
                 .andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
 
-            Assert.assertThat(this.jpaClusterRepository.count(), Matchers.is(0L));
+            Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
         }
     }
 }

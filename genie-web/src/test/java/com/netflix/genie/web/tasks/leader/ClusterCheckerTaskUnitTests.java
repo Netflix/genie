@@ -35,7 +35,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
-import org.springframework.boot.actuate.autoconfigure.ManagementServerProperties;
+import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
@@ -72,8 +72,8 @@ public class ClusterCheckerTaskUnitTests {
         this.jobSearchService = Mockito.mock(JobSearchService.class);
         this.jobPersistenceService = Mockito.mock(JobPersistenceService.class);
         this.restTemplate = Mockito.mock(RestTemplate.class);
-        final ManagementServerProperties serverProperties = Mockito.mock(ManagementServerProperties.class);
-        Mockito.when(serverProperties.getContextPath()).thenReturn("/actuator");
+        final WebEndpointProperties serverProperties = Mockito.mock(WebEndpointProperties.class);
+        Mockito.when(serverProperties.getBasePath()).thenReturn("/actuator");
         this.task = new ClusterCheckerTask(
             this.hostName,
             properties,
@@ -98,7 +98,7 @@ public class ClusterCheckerTaskUnitTests {
 
         // Mock the 9 invocations for 3 calls to run
         Mockito
-            .when(this.restTemplate.getForObject(Mockito.anyString(), Mockito.anyObject()))
+            .when(this.restTemplate.getForObject(Mockito.anyString(), Mockito.any()))
             .thenReturn("")
             .thenThrow(new RestClientException("blah"))
             .thenReturn("")

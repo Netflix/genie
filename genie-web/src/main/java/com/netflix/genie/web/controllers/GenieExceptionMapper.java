@@ -116,8 +116,9 @@ public class GenieExceptionMapper {
         final MethodArgumentNotValidException e
     ) throws IOException {
         this.countException(e);
-        log.error(e.getMessage(), e);
-        response.sendError(HttpStatus.PRECONDITION_FAILED.value(), e.getMessage());
+        final String errorMessage = e.getMessage();
+        log.error(errorMessage, e);
+        response.sendError(HttpStatus.PRECONDITION_FAILED.value(), errorMessage);
     }
 
     private void countException(final Exception e) {

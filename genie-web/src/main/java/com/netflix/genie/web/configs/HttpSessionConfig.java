@@ -18,6 +18,10 @@
 package com.netflix.genie.web.configs;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.session.SessionProperties;
+import org.springframework.boot.autoconfigure.session.StoreType;
+import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PostConstruct;
 
@@ -27,17 +31,23 @@ import javax.annotation.PostConstruct;
  * @author tgianos
  * @since 3.0.0
  */
-//@ConditionalOnProperty("genie.redis.enabled")
-//@Import(RedisAutoConfiguration.class)
-//@EnableRedisHttpSession
+@Configuration
 @Slf4j
 public class HttpSessionConfig {
+
+    @Autowired
+    private SessionProperties sessionProperties;
 
     /**
      * Log out that Redis based HTTP Session storage is enabled.
      */
     @PostConstruct
     public void postConstruct() {
-        log.info("Spring Session with Redis as storage is ENABLED");
+        log.info(
+            "Spring Session is configured to use {} as the store type",
+            this.sessionProperties == null
+                ? StoreType.NONE
+                : this.sessionProperties.getStoreType()
+        );
     }
 }

@@ -24,7 +24,6 @@ import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.test.categories.IntegrationTest;
 import com.netflix.genie.web.jpa.entities.FileEntity;
-import com.netflix.genie.web.jpa.repositories.JpaFileRepository;
 import com.netflix.genie.web.services.ApplicationService;
 import com.netflix.genie.web.services.FileService;
 import org.hamcrest.Matchers;
@@ -50,9 +49,6 @@ public class JpaFileServiceImplIntegrationTest extends DBUnitTestBase {
     // This needs to be injected as a Spring Bean otherwise transactions don't work as there is no proxy
     @Autowired
     private FileService fileService;
-
-    @Autowired
-    private JpaFileRepository fileRepository;
 
     @Autowired
     private ApplicationService applicationService;

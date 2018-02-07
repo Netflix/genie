@@ -31,7 +31,6 @@ import org.aspectj.lang.annotation.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.Status;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -46,7 +45,7 @@ import java.util.concurrent.TimeUnit;
  * @since 3.2.4
  */
 @Aspect
-@Component
+//@Component
 @Slf4j
 public class HealthCheckMetricsAspect {
 
@@ -87,7 +86,7 @@ public class HealthCheckMetricsAspect {
     @Around(
         "execution("
             + "  org.springframework.boot.actuate.health.Health"
-            + "  org.springframework.boot.actuate.endpoint.HealthEndpoint.invoke()"
+            + "  org.springframework.boot.actuate.health.HealthEndpoint.health()"
             + ")"
     )
     @SuppressWarnings("checkstyle:IllegalThrows") // For propagating Throwable from joinPoint.proceed()

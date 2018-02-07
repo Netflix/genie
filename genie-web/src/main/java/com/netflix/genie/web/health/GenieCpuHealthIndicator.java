@@ -18,10 +18,9 @@
 package com.netflix.genie.web.health;
 
 import com.netflix.genie.web.properties.HealthProperties;
-import com.netflix.servo.monitor.BasicDistributionSummary;
-import com.netflix.servo.monitor.MonitorConfig;
-import com.netflix.spectator.api.Registry;
 import com.sun.management.OperatingSystemMXBean;
+import io.micrometer.core.instrument.DistributionSummary;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.health.Health;
@@ -33,6 +32,7 @@ import java.lang.management.ManagementFactory;
 
 /**
  * Health indicator for system cpu usage. Mark the service out-of-service if it crosses the threshold.
+ *
  * @author amajumdar
  * @since 3.0.0
  */
@@ -42,8 +42,9 @@ public class GenieCpuHealthIndicator implements HealthIndicator {
     private final double maxCpuLoadPercent;
     private final int maxCpuLoadConsecutiveOccurrences;
     private final OperatingSystemMXBean operatingSystemMXBean;
-    private final BasicDistributionSummary summaryCpuMetric;
+    private final DistributionSummary summaryCpuMetric;
     private int cpuLoadConsecutiveOccurrences;
+
     /**
      * Constructor.
      *
@@ -54,21 +55,25 @@ public class GenieCpuHealthIndicator implements HealthIndicator {
     @Autowired
     public GenieCpuHealthIndicator(
         @NotNull final HealthProperties healthProperties,
-        @NotNull final Registry registry,
+        @NotNull final MeterRegistry registry,
         @NotNull final TaskScheduler taskScheduler
     ) {
-        this(healthProperties.getMaxCpuLoadPercent(),
+        this(
+            healthProperties.getMaxCpuLoadPercent(),
             healthProperties.getMaxCpuLoadConsecutiveOccurrences(),
             (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean(),
-            new BasicDistributionSummary(MonitorConfig.builder("genie.cpuLoad").build()),
-            taskScheduler);
+            registry.summary("genie.cpuLoad"),
+            taskScheduler
+        );
     }
 
-    GenieCpuHealthIndicator(final double maxCpuLoadPercent,
+    GenieCpuHealthIndicator(
+        final double maxCpuLoadPercent,
         final int maxCpuLoadConsecutiveOccurrences,
         final OperatingSystemMXBean operatingSystemMXBean,
-        final BasicDistributionSummary summaryCpuMetric,
-        final TaskScheduler taskScheduler) {
+        final DistributionSummary summaryCpuMetric,
+        final TaskScheduler taskScheduler
+    ) {
         this.maxCpuLoadPercent = maxCpuLoadPercent;
         this.maxCpuLoadConsecutiveOccurrences = maxCpuLoadConsecutiveOccurrences;
         this.operatingSystemMXBean = operatingSystemMXBean;
@@ -81,8 +86,8 @@ public class GenieCpuHealthIndicator implements HealthIndicator {
     @Override
     public Health health() {
         // Use the distribution summary to get an average of the cpu metrics.
-        final long cpuCount = summaryCpuMetric.getCount();
-        final long cpuTotal = summaryCpuMetric.getTotalAmount();
+        final long cpuCount = this.summaryCpuMetric.count();
+        final double cpuTotal = this.summaryCpuMetric.totalAmount();
         final double currentCpuLoadPercent =
             cpuCount == 0 ? operatingSystemMXBean.getSystemCpuLoad() : (cpuTotal / (double) cpuCount);
         if (currentCpuLoadPercent > maxCpuLoadPercent) {

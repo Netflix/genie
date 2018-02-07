@@ -25,9 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.util.Assert;
 import org.springframework.web.servlet.HandlerMapping;
-import org.springframework.web.servlet.resource.EncodedResource;
 import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
-import org.springframework.web.servlet.resource.VersionedResource;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -53,8 +51,6 @@ public class GenieResourceHttpRequestHandler extends ResourceHttpRequestHandler 
         = GenieResourceHttpRequestHandler.class.getName() + ".isRootDirectory";
 
     private static final Charset UTF_8 = Charset.forName("UTF-8");
-    private static final String CONTENT_LENGTH = "Content-Length";
-    private static final String BYTES = "bytes";
 
     private DirectoryWriter directoryWriter;
 
@@ -140,36 +136,7 @@ public class GenieResourceHttpRequestHandler extends ResourceHttpRequestHandler 
 
     /**
      * {@inheritDoc}
-     *
-     * Overriding this method so can handle content lengths greater than Integer.MAX_VALUE.
-     */
-    @Override
-    protected void setHeaders(
-        final HttpServletResponse response,
-        final Resource resource,
-        final MediaType mediaType
-    ) throws IOException {
-        // Note: This API call is only in Servlet spec 3.1+ (Tomcat 8.x or greater)
-        // This is to get around the resources with content lengths greater than Integer.MAX_VALUE which was limiting
-        // our ability to serve large files
-        response.setContentLengthLong(resource.contentLength());
-
-        // The rest of this is taken directly from the super implementation
-        if (mediaType != null) {
-            response.setContentType(mediaType.toString());
-        }
-        if (resource instanceof EncodedResource) {
-            response.setHeader(HttpHeaders.CONTENT_ENCODING, ((EncodedResource) resource).getContentEncoding());
-        }
-        if (resource instanceof VersionedResource) {
-            response.setHeader(HttpHeaders.ETAG, "\"" + ((VersionedResource) resource).getVersion() + "\"");
-        }
-        response.setHeader(HttpHeaders.ACCEPT_RANGES, BYTES);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
+     * <p>
      * Overriding to handle case where media type was unknown to default to Text
      */
     @Override

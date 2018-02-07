@@ -32,9 +32,6 @@ import org.junit.experimental.categories.Category;
 @Category(UnitTest.class)
 public class HttpSessionConfigUnitTests {
 
-    //TODO: Add more tests as these tests are pretty much useless.
-    //      Likely integration tests to make sure sessions are persisted in Redis.
-
     private HttpSessionConfig httpSessionConfig;
 
     /**

@@ -19,9 +19,9 @@ package com.netflix.genie.web.health
 
 import com.netflix.genie.test.categories.UnitTest
 import com.netflix.genie.web.configs.PropertiesConfig
-import com.netflix.servo.monitor.BasicDistributionSummary
-import com.netflix.servo.monitor.MonitorConfig
 import com.sun.management.OperatingSystemMXBean
+import io.micrometer.core.instrument.DistributionSummary
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import org.junit.experimental.categories.Category
 import org.springframework.boot.actuate.health.Status
 import org.springframework.scheduling.concurrent.DefaultManagedTaskScheduler
@@ -36,14 +36,14 @@ import spock.lang.Unroll
  */
 @Category(UnitTest.class)
 @Unroll
-class GenieCpuHealthIndicatorSpec extends Specification{
+class GenieCpuHealthIndicatorSpec extends Specification {
     OperatingSystemMXBean operatingSystemMXBean
-    GenieCpuHealthIndicator cpuHealthIndicator;
-    BasicDistributionSummary summary;
+    GenieCpuHealthIndicator cpuHealthIndicator
+    DistributionSummary summary
 
-    def setup(){
+    def setup() {
         operatingSystemMXBean = Mock(OperatingSystemMXBean)
-        summary = Mock(BasicDistributionSummary)
+        summary = Mock(DistributionSummary)
         def props = new PropertiesConfig().healthProperties()
         cpuHealthIndicator = new GenieCpuHealthIndicator(
                 props.getMaxCpuLoadPercent(),
@@ -53,37 +53,47 @@ class GenieCpuHealthIndicatorSpec extends Specification{
                 new DefaultManagedTaskScheduler())
     }
 
-    def 'Health should be #status when totalCpuLoad is #cpuLoad'(){
+    def 'Health should be #status when totalCpuLoad is #cpuLoad'() {
         given:
-        1 * summary.getTotalAmount() >> cpuLoad
-        1 * summary.getCount() >> count
+        1 * summary.totalAmount() >> cpuLoad
+        1 * summary.count() >> count
         expect:
         cpuHealthIndicator.health().getStatus() == status
         where:
-        cpuLoad  | count    | status
-        90       | 1        | Status.OUT_OF_SERVICE
-        171      | 2        | Status.OUT_OF_SERVICE
-        81.1     | 1        | Status.OUT_OF_SERVICE
-        80.1     | 0        | Status.UP
-        80       | 5        | Status.UP
-        20.2     | 1        | Status.UP
-        60       | 2        | Status.UP
-        50       | 5        | Status.UP
+        cpuLoad | count | status
+        90      | 1     | Status.OUT_OF_SERVICE
+        171     | 2     | Status.OUT_OF_SERVICE
+        81.1    | 1     | Status.OUT_OF_SERVICE
+        80.1    | 0     | Status.UP
+        80      | 5     | Status.UP
+        20.2    | 1     | Status.UP
+        60      | 2     | Status.UP
+        50      | 5     | Status.UP
     }
 
-    def checkHealth(){
+    def checkHealth() {
         when:
         def okOperatingSystemMXBean = Mock(OperatingSystemMXBean)
         okOperatingSystemMXBean.getSystemCpuLoad() >> 0.75
-        def indicator = new GenieCpuHealthIndicator( 80, 1, okOperatingSystemMXBean,
-                new BasicDistributionSummary(MonitorConfig.builder('s').build()), new DefaultManagedTaskScheduler())
+        def indicator = new GenieCpuHealthIndicator(
+                80,
+                1,
+                okOperatingSystemMXBean,
+                DistributionSummary.builder("s").register(new SimpleMeterRegistry()),
+                new DefaultManagedTaskScheduler()
+        )
         then:
         indicator.health().getStatus() == Status.UP
         when:
         def outOperatingSystemMXBean = Mock(OperatingSystemMXBean)
         outOperatingSystemMXBean.getSystemCpuLoad() >> 0.85
-        indicator = new GenieCpuHealthIndicator( 80, 1, outOperatingSystemMXBean,
-                new BasicDistributionSummary(MonitorConfig.builder('s').build()), new DefaultManagedTaskScheduler())
+        indicator = new GenieCpuHealthIndicator(
+                80,
+                1,
+                outOperatingSystemMXBean,
+                DistributionSummary.builder("s").register(new SimpleMeterRegistry()),
+                new DefaultManagedTaskScheduler()
+        )
         then:
         indicator.health().getStatus() == Status.OUT_OF_SERVICE
     }
