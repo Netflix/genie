@@ -32,6 +32,8 @@ import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.JobStatusMessages;
 import com.netflix.genie.common.util.GenieObjectMapper;
+import io.restassured.RestAssured;
+import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
@@ -52,23 +54,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.headers.HeaderDocumentation;
-import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
-import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
-import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
-import org.springframework.restdocs.operation.preprocess.Preprocessors;
 import org.springframework.restdocs.payload.PayloadDocumentation;
 import org.springframework.restdocs.request.RequestDocumentation;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.restdocs.restassured3.RestAssuredRestDocumentation;
+import org.springframework.restdocs.restassured3.RestDocumentationFilter;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Instant;
@@ -92,35 +87,35 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     private static final String SCHEDULER_JOB_NAME_KEY = "schedulerJobName";
     private static final String SCHEDULER_RUN_ID_KEY = "schedulerRunId";
 
-    private static final String COMMAND_ARGS_PATH = "$.commandArgs";
-    private static final String STATUS_MESSAGE_PATH = "$.statusMsg";
-    private static final String CLUSTER_NAME_PATH = "$.clusterName";
-    private static final String COMMAND_NAME_PATH = "$.commandName";
-    private static final String ARCHIVE_LOCATION_PATH = "$.archiveLocation";
-    private static final String STARTED_PATH = "$.started";
-    private static final String FINISHED_PATH = "$.finished";
-    private static final String CLUSTER_CRITERIAS_PATH = "$.clusterCriterias";
-    private static final String COMMAND_CRITERIA_PATH = "$.commandCriteria";
-    private static final String GROUP_PATH = "$.group";
-    private static final String DISABLE_LOG_ARCHIVAL_PATH = "$.disableLogArchival";
-    private static final String EMAIL_PATH = "$.email";
-    private static final String CPU_PATH = "$.cpu";
-    private static final String MEMORY_PATH = "$.memory";
-    private static final String APPLICATIONS_PATH = "$.applications";
-    private static final String HOST_NAME_PATH = "$.hostName";
-    private static final String PROCESS_ID_PATH = "$.processId";
-    private static final String CHECK_DELAY_PATH = "$.checkDelay";
-    private static final String EXIT_CODE_PATH = "$.exitCode";
-    private static final String CLIENT_HOST_PATH = "$.clientHost";
-    private static final String USER_AGENT_PATH = "$.userAgent";
-    private static final String NUM_ATTACHMENTS_PATH = "$.numAttachments";
-    private static final String TOTAL_SIZE_ATTACHMENTS_PATH = "$.totalSizeOfAttachments";
-    private static final String STD_OUT_SIZE_PATH = "$.stdOutSize";
-    private static final String STD_ERR_SIZE_PATH = "$.stdErrSize";
+    private static final String COMMAND_ARGS_PATH = "commandArgs";
+    private static final String STATUS_MESSAGE_PATH = "statusMsg";
+    private static final String CLUSTER_NAME_PATH = "clusterName";
+    private static final String COMMAND_NAME_PATH = "commandName";
+    private static final String ARCHIVE_LOCATION_PATH = "archiveLocation";
+    private static final String STARTED_PATH = "started";
+    private static final String FINISHED_PATH = "finished";
+    private static final String CLUSTER_CRITERIAS_PATH = "clusterCriterias";
+    private static final String COMMAND_CRITERIA_PATH = "commandCriteria";
+    private static final String GROUP_PATH = "group";
+    private static final String DISABLE_LOG_ARCHIVAL_PATH = "disableLogArchival";
+    private static final String EMAIL_PATH = "email";
+    private static final String CPU_PATH = "cpu";
+    private static final String MEMORY_PATH = "memory";
+    private static final String APPLICATIONS_PATH = "applications";
+    private static final String HOST_NAME_PATH = "hostName";
+    private static final String PROCESS_ID_PATH = "processId";
+    private static final String CHECK_DELAY_PATH = "checkDelay";
+    private static final String EXIT_CODE_PATH = "exitCode";
+    private static final String CLIENT_HOST_PATH = "clientHost";
+    private static final String USER_AGENT_PATH = "userAgent";
+    private static final String NUM_ATTACHMENTS_PATH = "numAttachments";
+    private static final String TOTAL_SIZE_ATTACHMENTS_PATH = "totalSizeOfAttachments";
+    private static final String STD_OUT_SIZE_PATH = "stdOutSize";
+    private static final String STD_ERR_SIZE_PATH = "stdErrSize";
     private static final String JOBS_LIST_PATH = EMBEDDED_PATH + ".jobSearchResultList";
-    private static final String JOB_COMMAND_LINK_PATH = "$._links.command.href";
-    private static final String JOB_CLUSTER_LINK_PATH = "$._links.cluster.href";
-    private static final String JOB_APPLICATIONS_LINK_PATH = "$._links.applications.href";
+    private static final String JOB_COMMAND_LINK_PATH = "_links.command.href";
+    private static final String JOB_CLUSTER_LINK_PATH = "_links.cluster.href";
+    private static final String JOB_APPLICATIONS_LINK_PATH = "_links.applications.href";
 
     private static final long CHECK_DELAY = 1L;
 
@@ -284,7 +279,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             documentationId, id, commandArgs, setUpFile, clusterTag, commandTag, configFile1, depFile1
         );
         this.checkJobExecution(documentationId, id);
-        this.checkJobmetadata(documentationId, id);
+        this.checkJobMetadata(documentationId, id);
         this.checkJobCluster(documentationId, id);
         this.checkJobCommand(documentationId, id);
         this.checkJobApplications(documentationId, id);
@@ -314,13 +309,11 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         final JobRequest jobRequest,
         final List<MockMultipartFile> attachments
     ) throws Exception {
-        final MvcResult result;
-
         if (attachments != null) {
-            final RestDocumentationResultHandler createResultHandler = MockMvcRestDocumentation.document(
+            final RestDocumentationFilter createResultFilter = RestAssuredRestDocumentation.document(
                 "{class-name}/" + documentationId + "/submitJobWithAttachments/",
-                Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-                Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                this.getRequestPreprocessor(),
+                this.getResponsePreprocessor(),
                 HeaderDocumentation.requestHeaders(
                     HeaderDocumentation
                         .headerWithName(HttpHeaders.CONTENT_TYPE)
@@ -337,60 +330,70 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                 Snippets.LOCATION_HEADER // Response Headers
             );
 
-            final MockMultipartFile json = new MockMultipartFile(
-                "request",
-                "",
-                MediaType.APPLICATION_JSON_VALUE,
-                GenieObjectMapper.getMapper().writeValueAsBytes(jobRequest)
-            );
-
-            final MockMultipartHttpServletRequestBuilder builder = RestDocumentationRequestBuilders
-                .fileUpload(JOBS_API)
-                .file(json);
+            final RequestSpecification jobRequestSpecification = RestAssured
+                .given(this.getRequestSpecification())
+                .filter(createResultFilter)
+                .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+                .multiPart(
+                    "request",
+                    GenieObjectMapper.getMapper().writeValueAsString(jobRequest),
+                    MediaType.APPLICATION_JSON_VALUE
+                );
 
             for (final MockMultipartFile attachment : attachments) {
-                builder.file(attachment);
+                jobRequestSpecification.multiPart(
+                    "attachment",
+                    attachment.getOriginalFilename(),
+                    attachment.getBytes(),
+                    MediaType.APPLICATION_OCTET_STREAM_VALUE
+                );
             }
 
-            builder.contentType(MediaType.MULTIPART_FORM_DATA);
-            result = this.mvc
-                .perform(builder)
-                .andExpect(MockMvcResultMatchers.status().isAccepted())
-                .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()))
-                .andDo(createResultHandler)
-                .andReturn();
+            return this.getIdFromLocation(
+                jobRequestSpecification
+                    .when()
+                    .port(this.port)
+                    .post(JOBS_API)
+                    .then()
+                    .statusCode(Matchers.is(HttpStatus.ACCEPTED.value()))
+                    .header(HttpHeaders.LOCATION, Matchers.notNullValue())
+                    .extract()
+                    .header(HttpHeaders.LOCATION)
+            );
         } else {
             // Use regular POST
-            final RestDocumentationResultHandler createResultHandler = MockMvcRestDocumentation.document(
+            final RestDocumentationFilter createResultFilter = RestAssuredRestDocumentation.document(
                 "{class-name}/" + documentationId + "/submitJobWithoutAttachments/",
-                Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-                Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                this.getRequestPreprocessor(),
+                this.getResponsePreprocessor(),
                 Snippets.CONTENT_TYPE_HEADER, // Request headers
                 Snippets.getJobRequestRequestPayload(), // Request Fields
                 Snippets.LOCATION_HEADER // Response Headers
             );
 
-            result = this.mvc
-                .perform(
-                    MockMvcRequestBuilders
-                        .post(JOBS_API)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(GenieObjectMapper.getMapper().writeValueAsBytes(jobRequest))
-                )
-                .andExpect(MockMvcResultMatchers.status().isAccepted())
-                .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()))
-                .andDo(createResultHandler)
-                .andReturn();
+            return this.getIdFromLocation(
+                RestAssured
+                    .given(this.getRequestSpecification())
+                    .filter(createResultFilter)
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                    .body(GenieObjectMapper.getMapper().writeValueAsBytes(jobRequest))
+                    .when()
+                    .port(this.port)
+                    .post(JOBS_API)
+                    .then()
+                    .statusCode(Matchers.is(HttpStatus.ACCEPTED.value()))
+                    .header(HttpHeaders.LOCATION, Matchers.notNullValue())
+                    .extract()
+                    .header(HttpHeaders.LOCATION)
+            );
         }
-
-        return this.getIdFromLocation(result.getResponse().getHeader(HttpHeaders.LOCATION));
     }
 
-    private void checkJobStatus(final int documentationId, final String id) throws Exception {
-        final RestDocumentationResultHandler getResultHandler = MockMvcRestDocumentation.document(
+    private void checkJobStatus(final int documentationId, final String id) {
+        final RestDocumentationFilter getResultFilter = RestAssuredRestDocumentation.document(
             "{class-name}/" + documentationId + "/getJobStatus/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM, // Path parameters
             Snippets.JSON_CONTENT_TYPE_HEADER, // Response Headers
             PayloadDocumentation.responseFields(
@@ -401,84 +404,81 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             ) // Response fields
         );
 
-        this.mvc
-            .perform(RestDocumentationRequestBuilders.get(JOBS_API + "/{id}/status", id))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-            .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(JobStatus.SUCCEEDED.toString())))
-            .andDo(getResultHandler);
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(getResultFilter)
+            .when()
+            .port(this.port)
+            .get(JOBS_API + "/{id}/status", id)
+            .then()
+            .contentType(Matchers.containsString(MediaType.APPLICATION_JSON_VALUE))
+            .body(STATUS_PATH, Matchers.is(JobStatus.SUCCEEDED.toString()));
     }
 
-    private void checkJob(final int documentationId, final String id, final List<String> commandArgs) throws Exception {
-        final RestDocumentationResultHandler getResultHandler = MockMvcRestDocumentation.document(
+    private void checkJob(final int documentationId, final String id, final List<String> commandArgs) {
+        final RestDocumentationFilter getResultFilter = RestAssuredRestDocumentation.document(
             "{class-name}/" + documentationId + "/getJob/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM, // Path parameters
             Snippets.HAL_CONTENT_TYPE_HEADER, // Response Headers
             Snippets.getJobResponsePayload(), // Response fields
             Snippets.JOB_LINKS // Links
         );
-        this.mvc
-            .perform(RestDocumentationRequestBuilders.get(JOBS_API + "/{id}", id))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.jsonPath(ID_PATH, Matchers.is(id)))
-            .andExpect(MockMvcResultMatchers.jsonPath(CREATED_PATH, Matchers.notNullValue()))
-            .andExpect(MockMvcResultMatchers.jsonPath(UPDATED_PATH, Matchers.notNullValue()))
-            .andExpect(MockMvcResultMatchers.jsonPath(VERSION_PATH, Matchers.is(JOB_VERSION)))
-            .andExpect(MockMvcResultMatchers.jsonPath(USER_PATH, Matchers.is(JOB_USER)))
-            .andExpect(MockMvcResultMatchers.jsonPath(NAME_PATH, Matchers.is(JOB_NAME)))
-            .andExpect(MockMvcResultMatchers.jsonPath(DESCRIPTION_PATH, Matchers.is(JOB_DESCRIPTION)))
-            .andExpect(
-                MockMvcResultMatchers.jsonPath(
-                    METADATA_PATH + "." + SCHEDULER_JOB_NAME_KEY,
-                    Matchers.is(this.schedulerJobName)
-                )
-            )
-            .andExpect(
-                MockMvcResultMatchers.jsonPath(
-                    METADATA_PATH + "." + SCHEDULER_RUN_ID_KEY,
-                    Matchers.is(this.schedulerRunId)
-                )
-            )
-            .andExpect(
-                MockMvcResultMatchers.jsonPath(
-                    COMMAND_ARGS_PATH,
-                    Matchers.is(StringUtils.join(commandArgs, StringUtils.SPACE))
-                )
-            )
-            .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(JobStatus.SUCCEEDED.toString())))
-            .andExpect(MockMvcResultMatchers.jsonPath(STATUS_MESSAGE_PATH, Matchers.is(JOB_STATUS_MSG)))
-            .andExpect(MockMvcResultMatchers.jsonPath(STARTED_PATH, Matchers.not(Instant.EPOCH)))
-            .andExpect(MockMvcResultMatchers.jsonPath(FINISHED_PATH, Matchers.notNullValue()))
-            .andExpect(MockMvcResultMatchers.jsonPath(ARCHIVE_LOCATION_PATH, Matchers.isEmptyOrNullString()))
-            .andExpect(MockMvcResultMatchers.jsonPath(CLUSTER_NAME_PATH, Matchers.is(CLUSTER1_NAME)))
-            .andExpect(MockMvcResultMatchers.jsonPath(COMMAND_NAME_PATH, Matchers.is(CMD1_NAME)))
-            .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH + ".*", Matchers.hasSize(9)))
-            .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(SELF_LINK_KEY)))
-            .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey("request")))
-            .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey("execution")))
-            .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey("output")))
-            .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey("status")))
-            .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey("cluster")))
-            .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey("command")))
-            .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey("applications")))
-            .andExpect(MockMvcResultMatchers.jsonPath(JOB_CLUSTER_LINK_PATH,
-                EntityLinkMatcher.matchUri(JOBS_API, "cluster", null, id)))
-            .andExpect(MockMvcResultMatchers.jsonPath(JOB_COMMAND_LINK_PATH,
-                EntityLinkMatcher.matchUri(JOBS_API, "command", null, id)))
-            .andExpect(MockMvcResultMatchers.jsonPath(JOB_APPLICATIONS_LINK_PATH,
-                EntityLinkMatcher.matchUri(JOBS_API, APPLICATIONS_LINK_KEY, null, id)))
-            .andDo(getResultHandler);
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(getResultFilter)
+            .when()
+            .port(this.port)
+            .get(JOBS_API + "/{id}", id)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.is(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body(ID_PATH, Matchers.is(id))
+            .body(CREATED_PATH, Matchers.notNullValue())
+            .body(UPDATED_PATH, Matchers.notNullValue())
+            .body(VERSION_PATH, Matchers.is(JOB_VERSION))
+            .body(USER_PATH, Matchers.is(JOB_USER))
+            .body(NAME_PATH, Matchers.is(JOB_NAME))
+            .body(DESCRIPTION_PATH, Matchers.is(JOB_DESCRIPTION))
+            .body(METADATA_PATH + "." + SCHEDULER_JOB_NAME_KEY, Matchers.is(this.schedulerJobName))
+            .body(METADATA_PATH + "." + SCHEDULER_RUN_ID_KEY, Matchers.is(this.schedulerRunId))
+            .body(COMMAND_ARGS_PATH, Matchers.is(StringUtils.join(commandArgs, StringUtils.SPACE)))
+            .body(STATUS_PATH, Matchers.is(JobStatus.SUCCEEDED.toString()))
+            .body(STATUS_MESSAGE_PATH, Matchers.is(JOB_STATUS_MSG))
+            .body(STARTED_PATH, Matchers.not(Instant.EPOCH))
+            .body(FINISHED_PATH, Matchers.notNullValue())
+            .body(ARCHIVE_LOCATION_PATH, Matchers.isEmptyOrNullString())
+            .body(CLUSTER_NAME_PATH, Matchers.is(CLUSTER1_NAME))
+            .body(COMMAND_NAME_PATH, Matchers.is(CMD1_NAME))
+            .body(LINKS_PATH + ".keySet().size()", Matchers.is(9))
+            .body(LINKS_PATH, Matchers.hasKey(SELF_LINK_KEY))
+            .body(LINKS_PATH, Matchers.hasKey("request"))
+            .body(LINKS_PATH, Matchers.hasKey("execution"))
+            .body(LINKS_PATH, Matchers.hasKey("output"))
+            .body(LINKS_PATH, Matchers.hasKey("status"))
+            .body(LINKS_PATH, Matchers.hasKey("cluster"))
+            .body(LINKS_PATH, Matchers.hasKey("command"))
+            .body(LINKS_PATH, Matchers.hasKey("applications"))
+            .body(LINKS_PATH, Matchers.hasKey("metadata"))
+            .body(
+                JOB_CLUSTER_LINK_PATH,
+                EntityLinkMatcher.matchUri(JOBS_API, "cluster", null, id))
+            .body(
+                JOB_COMMAND_LINK_PATH,
+                EntityLinkMatcher.matchUri(JOBS_API, "command", null, id))
+            .body(
+                JOB_APPLICATIONS_LINK_PATH,
+                EntityLinkMatcher.matchUri(JOBS_API, APPLICATIONS_LINK_KEY, null, id)
+            );
     }
 
     private void checkJobOutput(final int documentationId, final String id) throws Exception {
         // Check getting a directory as json
-        final RestDocumentationResultHandler jsonResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter jsonResultFilter = RestAssuredRestDocumentation.document(
             "{class-name}/" + documentationId + "/getJobOutput/json/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM.and(
                 RequestDocumentation
                     .parameterWithName("filePath")
@@ -498,25 +498,30 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             ), // Response Headers
             Snippets.OUTPUT_DIRECTORY_FIELDS
         );
-        this.mvc
-            .perform(RestDocumentationRequestBuilders.get(JOBS_API + "/{id}/output/{filePath}", id, ""))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-            .andExpect(MockMvcResultMatchers.jsonPath("parent", Matchers.isEmptyOrNullString()))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.directories[0].name", Matchers.is("genie/")))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.files[0].name", Matchers.is("config1")))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.files[1].name", Matchers.is("dep1")))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.files[2].name", Matchers.is("jobsetupfile")))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.files[3].name", Matchers.is("run")))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.files[4].name", Matchers.is("stderr")))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.files[5].name", Matchers.is("stdout")))
-            .andDo(jsonResultHandler);
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(jsonResultFilter)
+            .accept(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .port(this.port)
+            .get(JOBS_API + "/{id}/output/{filePath}", id, "")
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .body("parent", Matchers.isEmptyOrNullString())
+            .body("directories[0].name", Matchers.is("genie/"))
+            .body("files[0].name", Matchers.is("config1"))
+            .body("files[1].name", Matchers.is("dep1"))
+            .body("files[2].name", Matchers.is("jobsetupfile"))
+            .body("files[3].name", Matchers.is("run"))
+            .body("files[4].name", Matchers.is("stderr"))
+            .body("files[5].name", Matchers.is("stdout"));
 
         // Check getting a directory as HTML
-        final RestDocumentationResultHandler htmlResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter htmlResultFilter = RestAssuredRestDocumentation.document(
             "{class-name}/" + documentationId + "/getJobOutput/html/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM.and(
                 RequestDocumentation
                     .parameterWithName("filePath")
@@ -534,22 +539,25 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                     .description(MediaType.TEXT_HTML)
             ) // Response Headers
         );
-        this.mvc
-            .perform(RestDocumentationRequestBuilders
-                .get(JOBS_API + "/{id}/output/{filePath}", id, "")
-                .accept(MediaType.TEXT_HTML)
-            )
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
-            .andDo(htmlResultHandler);
+
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(htmlResultFilter)
+            .accept(MediaType.TEXT_HTML_VALUE)
+            .when()
+            .port(this.port)
+            .get(JOBS_API + "/{id}/output/{filePath}", id, "")
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.containsString(MediaType.TEXT_HTML_VALUE));
 
         // Check getting a file
 
         // Check getting a directory as HTML
-        final RestDocumentationResultHandler fileResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter fileResultFilter = RestAssuredRestDocumentation.document(
             "{class-name}/" + documentationId + "/getJobOutput/file/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM.and(
                 RequestDocumentation
                     .parameterWithName("filePath")
@@ -582,13 +590,15 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         final String jobWorkingDir = this.jobDirResource.getFile().getCanonicalPath() + FILE_DELIMITER + id;
         final String expectedRunScriptContent = this.getExpectedRunContents(runFileContents, jobWorkingDir, id);
 
-        this.mvc
-            .perform(RestDocumentationRequestBuilders
-                .get(JOBS_API + "/{id}/output/{filePath}", id, "run")
-            )
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().string(expectedRunScriptContent))
-            .andDo(fileResultHandler);
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(fileResultFilter)
+            .when()
+            .port(this.port)
+            .get(JOBS_API + "/{id}/output/{filePath}", id, "run")
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .body(Matchers.is(expectedRunScriptContent));
     }
 
     private void checkJobRequest(
@@ -600,161 +610,176 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         final String commandTag,
         final String configFile1,
         final String depFile1
-    ) throws Exception {
-        final RestDocumentationResultHandler getResultHandler = MockMvcRestDocumentation.document(
+    ) {
+        final RestDocumentationFilter getResultFilter = RestAssuredRestDocumentation.document(
             "{class-name}/" + documentationId + "/getJobRequest/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM, // Path parameters
             Snippets.HAL_CONTENT_TYPE_HEADER, // Response Headers
             Snippets.getJobRequestResponsePayload(), // Response fields
             Snippets.JOB_REQUEST_LINKS // Links
         );
-        this.mvc
-            .perform(RestDocumentationRequestBuilders.get(JOBS_API + "/{id}/request", id))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.jsonPath(ID_PATH, Matchers.is(id)))
-            .andExpect(MockMvcResultMatchers.jsonPath(CREATED_PATH, Matchers.notNullValue()))
-            .andExpect(MockMvcResultMatchers.jsonPath(UPDATED_PATH, Matchers.notNullValue()))
-            .andExpect(MockMvcResultMatchers.jsonPath(NAME_PATH, Matchers.is(JOB_NAME)))
-            .andExpect(MockMvcResultMatchers.jsonPath(VERSION_PATH, Matchers.is(JOB_VERSION)))
-            .andExpect(MockMvcResultMatchers.jsonPath(USER_PATH, Matchers.is(JOB_USER)))
-            .andExpect(MockMvcResultMatchers.jsonPath(DESCRIPTION_PATH, Matchers.is(JOB_DESCRIPTION)))
-            .andExpect(
-                MockMvcResultMatchers.jsonPath(
-                    METADATA_PATH + "." + SCHEDULER_JOB_NAME_KEY,
-                    Matchers.is(this.schedulerJobName)
-                )
-            )
-            .andExpect(
-                MockMvcResultMatchers.jsonPath(
-                    METADATA_PATH + "." + SCHEDULER_RUN_ID_KEY,
-                    Matchers.is(this.schedulerRunId)
-                )
-            )
-            .andExpect(
-                MockMvcResultMatchers.jsonPath(
-                    COMMAND_ARGS_PATH,
-                    Matchers.is(StringUtils.join(commandArgs, StringUtils.SPACE))
-                )
-            )
-            .andExpect(MockMvcResultMatchers.jsonPath(SETUP_FILE_PATH, Matchers.is(setupFile)))
-            .andExpect(MockMvcResultMatchers.jsonPath(CLUSTER_CRITERIAS_PATH, Matchers.hasSize(1)))
-            .andExpect(MockMvcResultMatchers.jsonPath(CLUSTER_CRITERIAS_PATH + "[0].tags", Matchers.hasSize(1)))
-            .andExpect(MockMvcResultMatchers.jsonPath(CLUSTER_CRITERIAS_PATH + "[0].tags[0]", Matchers.is(clusterTag)))
-            .andExpect(MockMvcResultMatchers.jsonPath(COMMAND_CRITERIA_PATH, Matchers.hasSize(1)))
-            .andExpect(MockMvcResultMatchers.jsonPath(COMMAND_CRITERIA_PATH + "[0]", Matchers.is(commandTag)))
-            .andExpect(MockMvcResultMatchers.jsonPath(GROUP_PATH, Matchers.nullValue()))
-            .andExpect(MockMvcResultMatchers.jsonPath(DISABLE_LOG_ARCHIVAL_PATH, Matchers.is(true)))
-            .andExpect(MockMvcResultMatchers.jsonPath(CONFIGS_PATH, Matchers.hasSize(1)))
-            .andExpect(MockMvcResultMatchers.jsonPath(CONFIGS_PATH + "[0]", Matchers.is(configFile1)))
-            .andExpect(MockMvcResultMatchers.jsonPath(DEPENDENCIES_PATH, Matchers.hasSize(1)))
-            .andExpect(MockMvcResultMatchers.jsonPath(DEPENDENCIES_PATH + "[0]", Matchers.is(depFile1)))
-            .andExpect(MockMvcResultMatchers.jsonPath(EMAIL_PATH, Matchers.nullValue()))
-            .andExpect(MockMvcResultMatchers.jsonPath(CPU_PATH, Matchers.nullValue()))
-            .andExpect(MockMvcResultMatchers.jsonPath(MEMORY_PATH, Matchers.nullValue()))
-            .andExpect(MockMvcResultMatchers.jsonPath(APPLICATIONS_PATH, Matchers.empty()))
-            .andDo(getResultHandler);
+
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(getResultFilter)
+            .when()
+            .port(this.port)
+            .get(JOBS_API + "/{id}/request", id)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.is(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body(ID_PATH, Matchers.is(id))
+            .body(CREATED_PATH, Matchers.notNullValue())
+            .body(UPDATED_PATH, Matchers.notNullValue())
+            .body(NAME_PATH, Matchers.is(JOB_NAME))
+            .body(VERSION_PATH, Matchers.is(JOB_VERSION))
+            .body(USER_PATH, Matchers.is(JOB_USER))
+            .body(DESCRIPTION_PATH, Matchers.is(JOB_DESCRIPTION))
+            .body(METADATA_PATH + "." + SCHEDULER_JOB_NAME_KEY, Matchers.is(this.schedulerJobName))
+            .body(METADATA_PATH + "." + SCHEDULER_RUN_ID_KEY, Matchers.is(this.schedulerRunId))
+            .body(COMMAND_ARGS_PATH, Matchers.is(StringUtils.join(commandArgs, StringUtils.SPACE)))
+            .body(SETUP_FILE_PATH, Matchers.is(setupFile))
+            .body(CLUSTER_CRITERIAS_PATH, Matchers.hasSize(1))
+            .body(CLUSTER_CRITERIAS_PATH + "[0].tags", Matchers.hasSize(1))
+            .body(CLUSTER_CRITERIAS_PATH + "[0].tags[0]", Matchers.is(clusterTag))
+            .body(COMMAND_CRITERIA_PATH, Matchers.hasSize(1))
+            .body(COMMAND_CRITERIA_PATH + "[0]", Matchers.is(commandTag))
+            .body(GROUP_PATH, Matchers.nullValue())
+            .body(DISABLE_LOG_ARCHIVAL_PATH, Matchers.is(true))
+            .body(CONFIGS_PATH, Matchers.hasSize(1))
+            .body(CONFIGS_PATH + "[0]", Matchers.is(configFile1))
+            .body(DEPENDENCIES_PATH, Matchers.hasSize(1))
+            .body(DEPENDENCIES_PATH + "[0]", Matchers.is(depFile1))
+            .body(EMAIL_PATH, Matchers.nullValue())
+            .body(CPU_PATH, Matchers.nullValue())
+            .body(MEMORY_PATH, Matchers.nullValue())
+            .body(APPLICATIONS_PATH, Matchers.empty());
     }
 
-    private void checkJobExecution(final int documentationId, final String id) throws Exception {
-        final RestDocumentationResultHandler getResultHandler = MockMvcRestDocumentation.document(
+    private void checkJobExecution(final int documentationId, final String id) {
+        final RestDocumentationFilter getResultFilter = RestAssuredRestDocumentation.document(
             "{class-name}/" + documentationId + "/getJobExecution/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM, // Path parameters
             Snippets.HAL_CONTENT_TYPE_HEADER, // Response Headers
             Snippets.getJobExecutionResponsePayload(), // Response fields
             Snippets.JOB_EXECUTION_LINKS // Links
         );
-        this.mvc
-            .perform(RestDocumentationRequestBuilders.get(JOBS_API + "/{id}/execution", id))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.jsonPath(ID_PATH, Matchers.is(id)))
-            .andExpect(MockMvcResultMatchers.jsonPath(CREATED_PATH, Matchers.notNullValue()))
-            .andExpect(MockMvcResultMatchers.jsonPath(UPDATED_PATH, Matchers.notNullValue()))
-            .andExpect(MockMvcResultMatchers.jsonPath(HOST_NAME_PATH, Matchers.is(this.hostname)))
-            .andExpect(MockMvcResultMatchers.jsonPath(PROCESS_ID_PATH, Matchers.notNullValue()))
-            .andExpect(MockMvcResultMatchers.jsonPath(CHECK_DELAY_PATH, Matchers.is((int) CHECK_DELAY)))
-            .andExpect(MockMvcResultMatchers.jsonPath(EXIT_CODE_PATH, Matchers.is(JobExecution.SUCCESS_EXIT_CODE)))
-            .andDo(getResultHandler);
+
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(getResultFilter)
+            .when()
+            .port(this.port)
+            .get(JOBS_API + "/{id}/execution", id)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.is(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body(ID_PATH, Matchers.is(id))
+            .body(CREATED_PATH, Matchers.notNullValue())
+            .body(UPDATED_PATH, Matchers.notNullValue())
+            .body(HOST_NAME_PATH, Matchers.is(this.hostname))
+            .body(PROCESS_ID_PATH, Matchers.notNullValue())
+            .body(CHECK_DELAY_PATH, Matchers.is((int) CHECK_DELAY))
+            .body(EXIT_CODE_PATH, Matchers.is(JobExecution.SUCCESS_EXIT_CODE));
     }
 
-    private void checkJobmetadata(final int documentationId, final String id) throws Exception {
-        final RestDocumentationResultHandler getResultHandler = MockMvcRestDocumentation.document(
+    private void checkJobMetadata(final int documentationId, final String id) {
+        final RestDocumentationFilter getResultFilter = RestAssuredRestDocumentation.document(
             "{class-name}/" + documentationId + "/getJobMetadata/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM, // Path parameters
             Snippets.HAL_CONTENT_TYPE_HEADER, // Response Headers
             Snippets.getJobMetadataResponsePayload(), // Response fields
             Snippets.JOB_METADATA_LINKS // Links
         );
-        this.mvc
-            .perform(RestDocumentationRequestBuilders.get(JOBS_API + "/{id}/metadata", id))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.jsonPath(ID_PATH, Matchers.is(id)))
-            .andExpect(MockMvcResultMatchers.jsonPath(CREATED_PATH, Matchers.notNullValue()))
-            .andExpect(MockMvcResultMatchers.jsonPath(UPDATED_PATH, Matchers.notNullValue()))
-            .andExpect(MockMvcResultMatchers.jsonPath(CLIENT_HOST_PATH, Matchers.notNullValue()))
-            .andExpect(MockMvcResultMatchers.jsonPath(USER_AGENT_PATH, Matchers.nullValue()))
-            .andExpect(MockMvcResultMatchers.jsonPath(NUM_ATTACHMENTS_PATH, Matchers.notNullValue()))
-            .andExpect(MockMvcResultMatchers.jsonPath(TOTAL_SIZE_ATTACHMENTS_PATH, Matchers.notNullValue()))
-            .andExpect(MockMvcResultMatchers.jsonPath(STD_OUT_SIZE_PATH, Matchers.notNullValue()))
-            .andExpect(MockMvcResultMatchers.jsonPath(STD_ERR_SIZE_PATH, Matchers.notNullValue()))
-            .andDo(getResultHandler);
+
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(getResultFilter)
+            .when()
+            .port(this.port)
+            .get(JOBS_API + "/{id}/metadata", id)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.is(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body(ID_PATH, Matchers.is(id))
+            .body(CREATED_PATH, Matchers.notNullValue())
+            .body(UPDATED_PATH, Matchers.notNullValue())
+            .body(CLIENT_HOST_PATH, Matchers.notNullValue())
+            .body(USER_AGENT_PATH, Matchers.notNullValue())
+            .body(NUM_ATTACHMENTS_PATH, Matchers.notNullValue())
+            .body(TOTAL_SIZE_ATTACHMENTS_PATH, Matchers.notNullValue())
+            .body(STD_OUT_SIZE_PATH, Matchers.notNullValue())
+            .body(STD_ERR_SIZE_PATH, Matchers.notNullValue());
     }
 
-    private void checkJobCluster(final int documentationId, final String id) throws Exception {
-        final RestDocumentationResultHandler getResultHandler = MockMvcRestDocumentation.document(
+    private void checkJobCluster(final int documentationId, final String id) {
+        final RestDocumentationFilter getResultFilter = RestAssuredRestDocumentation.document(
             "{class-name}/" + documentationId + "/getJobCluster/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM, // Path parameters
             Snippets.HAL_CONTENT_TYPE_HEADER, // Response Headers
             Snippets.getClusterResponsePayload(), // Response fields
             Snippets.CLUSTER_LINKS // Links
         );
-        this.mvc
-            .perform(RestDocumentationRequestBuilders.get(JOBS_API + "/{id}/cluster", id))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.jsonPath(ID_PATH, Matchers.is(CLUSTER1_ID)))
-            .andExpect(MockMvcResultMatchers.jsonPath(CREATED_PATH, Matchers.notNullValue()))
-            .andExpect(MockMvcResultMatchers.jsonPath(UPDATED_PATH, Matchers.notNullValue()))
-            .andExpect(MockMvcResultMatchers.jsonPath(NAME_PATH, Matchers.is(CLUSTER1_NAME)))
-            .andExpect(MockMvcResultMatchers.jsonPath(USER_PATH, Matchers.is(CLUSTER1_USER)))
-            .andExpect(MockMvcResultMatchers.jsonPath(VERSION_PATH, Matchers.is(CLUSTER1_VERSION)))
-            .andDo(getResultHandler);
+
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(getResultFilter)
+            .when()
+            .port(this.port)
+            .get(JOBS_API + "/{id}/cluster", id)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.is(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body(ID_PATH, Matchers.is(CLUSTER1_ID))
+            .body(CREATED_PATH, Matchers.notNullValue())
+            .body(UPDATED_PATH, Matchers.notNullValue())
+            .body(NAME_PATH, Matchers.is(CLUSTER1_NAME))
+            .body(USER_PATH, Matchers.is(CLUSTER1_USER))
+            .body(VERSION_PATH, Matchers.is(CLUSTER1_VERSION));
     }
 
-    private void checkJobCommand(final int documentationId, final String id) throws Exception {
-        final RestDocumentationResultHandler getResultHandler = MockMvcRestDocumentation.document(
+    private void checkJobCommand(final int documentationId, final String id) {
+        final RestDocumentationFilter getResultFilter = RestAssuredRestDocumentation.document(
             "{class-name}/" + documentationId + "/getJobCommand/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM, // Path parameters
             Snippets.HAL_CONTENT_TYPE_HEADER, // Response Headers
             Snippets.getCommandResponsePayload(), // Response fields
             Snippets.COMMAND_LINKS // Links
         );
-        this.mvc
-            .perform(RestDocumentationRequestBuilders.get(JOBS_API + "/{id}/command", id))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.jsonPath(ID_PATH, Matchers.is(CMD1_ID)))
-            .andExpect(MockMvcResultMatchers.jsonPath(CREATED_PATH, Matchers.notNullValue()))
-            .andExpect(MockMvcResultMatchers.jsonPath(UPDATED_PATH, Matchers.notNullValue()))
-            .andExpect(MockMvcResultMatchers.jsonPath(NAME_PATH, Matchers.is(CMD1_NAME)))
-            .andExpect(MockMvcResultMatchers.jsonPath(USER_PATH, Matchers.is(CMD1_USER)))
-            .andExpect(MockMvcResultMatchers.jsonPath(VERSION_PATH, Matchers.is(CMD1_VERSION)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.executable", Matchers.is(CMD1_EXECUTABLE)))
-            .andDo(getResultHandler);
+
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(getResultFilter)
+            .when()
+            .port(this.port)
+            .get(JOBS_API + "/{id}/command", id)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.is(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body(ID_PATH, Matchers.is(CMD1_ID))
+            .body(CREATED_PATH, Matchers.notNullValue())
+            .body(UPDATED_PATH, Matchers.notNullValue())
+            .body(NAME_PATH, Matchers.is(CMD1_NAME))
+            .body(USER_PATH, Matchers.is(CMD1_USER))
+            .body(VERSION_PATH, Matchers.is(CMD1_VERSION))
+            .body("executable", Matchers.is(CMD1_EXECUTABLE));
     }
 
-    private void checkJobApplications(final int documentationId, final String id) throws Exception {
-        final RestDocumentationResultHandler getResultHandler = MockMvcRestDocumentation.document(
+    private void checkJobApplications(final int documentationId, final String id) {
+        final RestDocumentationFilter getResultFilter = RestAssuredRestDocumentation.document(
             "{class-name}/" + documentationId + "/getJobApplications/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM, // Path parameters
             Snippets.HAL_CONTENT_TYPE_HEADER, // Response Headers
             PayloadDocumentation.responseFields(
@@ -764,32 +789,44 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
                     .attributes(Snippets.EMPTY_CONSTRAINTS)
             ) // Response fields
         );
-        this.mvc
-            .perform(RestDocumentationRequestBuilders.get(JOBS_API + "/{id}/applications", id))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(APP1_ID)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[1].id", Matchers.is(APP2_ID)))
-            .andDo(getResultHandler);
+
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(getResultFilter)
+            .when()
+            .port(this.port)
+            .get(JOBS_API + "/{id}/applications", id)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.is(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body("$", Matchers.hasSize(2))
+            .body("[0].id", Matchers.is(APP1_ID))
+            .body("[1].id", Matchers.is(APP2_ID));
     }
 
-    private void checkFindJobs(final int documentationId, final String id, final String user) throws Exception {
-        final RestDocumentationResultHandler findResultHandler = MockMvcRestDocumentation.document(
+    private void checkFindJobs(final int documentationId, final String id, final String user) {
+        final RestDocumentationFilter findResultFilter = RestAssuredRestDocumentation.document(
             "{class-name}/" + documentationId + "/findJobs/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.JOB_SEARCH_QUERY_PARAMETERS, // Request query parameters
             Snippets.HAL_CONTENT_TYPE_HEADER, // Response headers
             Snippets.JOB_SEARCH_RESULT_FIELDS, // Result fields
             Snippets.SEARCH_LINKS // HAL Links
         );
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(JOBS_API).param("user", user))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.jsonPath(JOBS_LIST_PATH, Matchers.hasSize(1)))
-            .andExpect(MockMvcResultMatchers.jsonPath(JOBS_LIST_PATH + "[0].id", Matchers.is(id)))
-            .andDo(findResultHandler);
+
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(findResultFilter)
+            .param("user", user)
+            .when()
+            .port(this.port)
+            .get(JOBS_API)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.is(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body(JOBS_LIST_PATH, Matchers.hasSize(1))
+            .body(JOBS_LIST_PATH + "[0].id", Matchers.is(id));
     }
 
     private void testForConflicts(
@@ -810,14 +847,15 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .withDisableLogArchival(true)
             .build();
 
-        this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .post(JOBS_API)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(jobConflictRequest))
-            )
-            .andExpect(MockMvcResultMatchers.status().isConflict());
+        RestAssured
+            .given(this.getRequestSpecification())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(jobConflictRequest))
+            .when()
+            .port(this.port)
+            .post(JOBS_API)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.CONFLICT.value()));
     }
 
     /**
@@ -925,15 +963,15 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .withDisableLogArchival(true)
             .build();
 
-        this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .post(JOBS_API)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(jobRequest))
-                    .accept(MediaType.APPLICATION_JSON)
-            )
-            .andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
+        RestAssured
+            .given(this.getRequestSpecification())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(jobRequest))
+            .when()
+            .port(this.port)
+            .post(JOBS_API)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.PRECONDITION_FAILED.value()));
 
         Assert.assertThat(this.getStatus(jobId), Matchers.is("{\"status\":\"FAILED\"}"));
     }
@@ -966,19 +1004,23 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .withDisableLogArchival(true)
             .build();
 
-        this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .post(JOBS_API)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(jobRequest))
-                    .accept(MediaType.APPLICATION_JSON)
-            )
-            .andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
+        RestAssured
+            .given(this.getRequestSpecification())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(jobRequest))
+            .when()
+            .port(this.port)
+            .post(JOBS_API)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.PRECONDITION_FAILED.value()));
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(JOBS_API + "/{id}/status", jobId))
-            .andExpect(MockMvcResultMatchers.status().isNotFound());
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(JOBS_API + "/{id}/status", jobId)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NOT_FOUND.value()));
     }
 
     /**
@@ -1009,18 +1051,23 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .withDisableLogArchival(true)
             .build();
 
-        this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .post(JOBS_API)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(jobRequest))
-                    .accept(MediaType.APPLICATION_JSON)
-            ).andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
+        RestAssured
+            .given(this.getRequestSpecification())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(jobRequest))
+            .when()
+            .port(this.port)
+            .post(JOBS_API)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.PRECONDITION_FAILED.value()));
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(JOBS_API + "/{id}/status", jobId))
-            .andExpect(MockMvcResultMatchers.status().isNotFound());
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(JOBS_API + "/{id}/status", jobId)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NOT_FOUND.value()));
     }
 
     /**
@@ -1053,14 +1100,15 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .withDisableLogArchival(true)
             .build();
 
-        this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .post(JOBS_API)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(jobRequest))
-            )
-            .andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
+        RestAssured
+            .given(this.getRequestSpecification())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(jobRequest))
+            .when()
+            .port(this.port)
+            .post(JOBS_API)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.PRECONDITION_FAILED.value()));
 
         Assert.assertThat(this.getStatus(jobId), Matchers.is("{\"status\":\"FAILED\"}"));
     }
@@ -1092,52 +1140,67 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .withDisableLogArchival(true)
             .build();
 
-        final MvcResult result = this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .post(JOBS_API)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(jobRequest))
-            )
-            .andExpect(MockMvcResultMatchers.status().isAccepted())
-            .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()))
-            .andReturn();
 
-        final String jobId = this.getIdFromLocation(result.getResponse().getHeader(HttpHeaders.LOCATION));
+        final String jobId = this.getIdFromLocation(
+            RestAssured
+                .given(this.getRequestSpecification())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(GenieObjectMapper.getMapper().writeValueAsBytes(jobRequest))
+                .when()
+                .port(this.port)
+                .post(JOBS_API)
+                .then()
+                .statusCode(Matchers.is(HttpStatus.ACCEPTED.value()))
+                .header(HttpHeaders.LOCATION, Matchers.notNullValue())
+                .extract()
+                .header(HttpHeaders.LOCATION)
+        );
+
         this.waitForRunning(jobId);
 
         // Let it run for a couple of seconds
         Thread.sleep(2000);
 
         // Send a kill request to the job.
-        final RestDocumentationResultHandler killResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter killResultFilter = RestAssuredRestDocumentation.document(
             "{class-name}/killJob/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM
         );
-        this.mvc
-            .perform(RestDocumentationRequestBuilders.delete(JOBS_API + "/{id}", jobId))
-            .andExpect(MockMvcResultMatchers.status().isAccepted())
-            .andDo(killResultHandler);
+
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(killResultFilter)
+            .when()
+            .port(this.port)
+            .delete(JOBS_API + "/{id}", jobId)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.ACCEPTED.value()));
 
         this.waitForDone(jobId);
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(JOBS_API + "/" + jobId))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath(ID_PATH, Matchers.is(jobId)))
-            .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(JobStatus.KILLED.toString())))
-            .andExpect(MockMvcResultMatchers.jsonPath(
-                STATUS_MESSAGE_PATH, Matchers.is(JobStatusMessages.JOB_KILLED_BY_USER)
-            ));
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(JOBS_API + "/{id}", jobId)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.is(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body(ID_PATH, Matchers.is(jobId))
+            .body(STATUS_PATH, Matchers.is(JobStatus.KILLED.toString()))
+            .body(STATUS_MESSAGE_PATH, Matchers.is(JobStatusMessages.JOB_KILLED_BY_USER));
 
         // Kill the job again to make sure it doesn't cause a problem.
-        this.mvc
-            .perform(MockMvcRequestBuilders.delete(JOBS_API + "/" + jobId))
-            .andExpect(MockMvcResultMatchers.status().isAccepted());
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(killResultFilter)
+            .when()
+            .port(this.port)
+            .delete(JOBS_API + "/{id}", jobId)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.ACCEPTED.value()));
     }
 
     /**
@@ -1168,36 +1231,34 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .withDisableLogArchival(true)
             .build();
 
-        final MvcResult result = this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .post(JOBS_API)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(jobRequest))
-            ).andReturn();
-
-        if (result.getResponse().getStatus() != HttpStatus.ACCEPTED.value()) {
-            log.error(
-                "RESPONSE WASN'T 202 IT WAS: {} AND THE ERROR MESSAGE IS: {} AND THE CONTENT IS {}",
-                result.getResponse().getStatus(),
-                result.getResponse().getErrorMessage(),
-                result.getResponse().getContentAsString()
-            );
-            Assert.fail();
-        }
-
-        final String id = this.getIdFromLocation(result.getResponse().getHeader(HttpHeaders.LOCATION));
+        final String id = this.getIdFromLocation(
+            RestAssured
+                .given(this.getRequestSpecification())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(GenieObjectMapper.getMapper().writeValueAsBytes(jobRequest))
+                .when()
+                .port(this.port)
+                .post(JOBS_API)
+                .then()
+                .statusCode(Matchers.is(HttpStatus.ACCEPTED.value()))
+                .header(HttpHeaders.LOCATION, Matchers.notNullValue())
+                .extract()
+                .header(HttpHeaders.LOCATION)
+        );
 
         this.waitForDone(id);
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(JOBS_API + "/{id}", id))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath(ID_PATH, Matchers.is(id)))
-            .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(JobStatus.KILLED.toString())))
-            .andExpect(MockMvcResultMatchers.jsonPath(STATUS_MESSAGE_PATH, Matchers.is("Job exceeded timeout.")));
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(JOBS_API + "/{id}", id)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.is(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body(ID_PATH, Matchers.is(id))
+            .body(STATUS_PATH, Matchers.is(JobStatus.KILLED.toString()))
+            .body(STATUS_MESSAGE_PATH, Matchers.is("Job exceeded timeout."));
     }
 
     /**
@@ -1227,33 +1288,40 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .withDisableLogArchival(true)
             .build();
 
-        final MvcResult result = this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .post(JOBS_API)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(jobRequest))
-            )
-            .andExpect(MockMvcResultMatchers.status().isAccepted())
-            .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()))
-            .andReturn();
+        final String id = this.getIdFromLocation(
+            RestAssured
+                .given(this.getRequestSpecification())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(GenieObjectMapper.getMapper().writeValueAsBytes(jobRequest))
+                .when()
+                .port(this.port)
+                .post(JOBS_API)
+                .then()
+                .statusCode(Matchers.is(HttpStatus.ACCEPTED.value()))
+                .header(HttpHeaders.LOCATION, Matchers.notNullValue())
+                .extract()
+                .header(HttpHeaders.LOCATION)
+        );
 
-        final String id = this.getIdFromLocation(result.getResponse().getHeader(HttpHeaders.LOCATION));
         this.waitForDone(id);
+
         Assert.assertEquals(this.getStatus(id), "{\"status\":\"FAILED\"}");
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(JOBS_API + "/{id}", id))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath(ID_PATH, Matchers.is(id)))
-            .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(JobStatus.FAILED.toString())))
-            .andExpect(MockMvcResultMatchers.jsonPath(STATUS_MESSAGE_PATH, Matchers.is(JobStatusMessages.JOB_FAILED)));
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(JOBS_API + "/{id}", id)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.is(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body(ID_PATH, Matchers.is(id))
+            .body(STATUS_PATH, Matchers.is(JobStatus.FAILED.toString()))
+            .body(STATUS_MESSAGE_PATH, Matchers.is(JobStatusMessages.JOB_FAILED));
     }
 
     /**
-     * Test the job submit method for success.
+     * Test the response content types to ensure UTF-8.
      *
      * @throws Exception If there is a problem.
      */
@@ -1273,59 +1341,86 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .withDisableLogArchival(true)
             .build();
 
-        final MvcResult result = this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .post(JOBS_API)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(jobRequest))
-            )
-            .andExpect(MockMvcResultMatchers.status().isAccepted())
-            .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()))
-            .andReturn();
+        final String jobId = this.getIdFromLocation(
+            RestAssured
+                .given(this.getRequestSpecification())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(GenieObjectMapper.getMapper().writeValueAsBytes(jobRequest))
+                .when()
+                .port(this.port)
+                .post(JOBS_API)
+                .then()
+                .statusCode(Matchers.is(HttpStatus.ACCEPTED.value()))
+                .header(HttpHeaders.LOCATION, Matchers.notNullValue())
+                .extract()
+                .header(HttpHeaders.LOCATION)
+        );
 
-        final String jobId = this.getIdFromLocation(result.getResponse().getHeader(HttpHeaders.LOCATION));
         this.waitForDone(jobId);
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(JOBS_API + "/" + jobId + "/output/genie/logs/env.log"))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()));
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(JOBS_API + "/" + jobId + "/output/genie/logs/env.log")
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.containsString(MediaType.TEXT_PLAIN_VALUE))
+            .contentType(Matchers.containsString("utf-8"));
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(JOBS_API + "/" + jobId + "/output/genie/logs/genie.log"))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()));
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(JOBS_API + "/" + jobId + "/output/genie/logs/genie.log")
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.containsString(MediaType.TEXT_PLAIN_VALUE))
+            .contentType(Matchers.containsString("utf-8"));
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(JOBS_API + "/" + jobId + "/output/genie/genie.done"))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()));
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(JOBS_API + "/" + jobId + "/output/genie/genie.done")
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.containsString(MediaType.TEXT_PLAIN_VALUE))
+            .contentType(Matchers.containsString("utf-8"));
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(JOBS_API + "/" + jobId + "/output/stdout").accept(MediaType.ALL))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()));
+        RestAssured
+            .given(this.getRequestSpecification())
+            .accept(MediaType.ALL_VALUE)
+            .when()
+            .port(this.port)
+            .get(JOBS_API + "/" + jobId + "/output/stdout")
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.containsString(MediaType.TEXT_PLAIN_VALUE))
+            .contentType(Matchers.containsString("utf-8"));
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(JOBS_API + "/" + jobId + "/output/stderr").accept(MediaType.ALL))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()));
-
+        RestAssured
+            .given(this.getRequestSpecification())
+            .accept(MediaType.ALL_VALUE)
+            .when()
+            .port(this.port)
+            .get(JOBS_API + "/" + jobId + "/output/stderr")
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.containsString(MediaType.TEXT_PLAIN_VALUE))
+            .contentType(Matchers.containsString("utf-8"));
 
         // Verify the file is served as UTF-8 even if it's not
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(
-                JOBS_API + "/" + jobId + "/output/genie/command/" + CMD1_ID + "/config/" + GB18030_TXT
-            ).accept(MediaType.ALL))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.TEXT_PLAIN))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()));
+        RestAssured
+            .given(this.getRequestSpecification())
+            .accept(MediaType.ALL_VALUE)
+            .when()
+            .port(this.port)
+            .get(JOBS_API + "/" + jobId + "/output/genie/command/" + CMD1_ID + "/config/" + GB18030_TXT)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.containsString(MediaType.TEXT_PLAIN_VALUE))
+            .contentType(Matchers.containsString("utf-8"));
     }
 
     private String getExpectedRunContents(
@@ -1344,13 +1439,13 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .replace("CLUSTER_TAGS_PLACEHOLDER", CLUSTER1_TAGS);
     }
 
-    private String getStatus(final String jobId) throws Exception {
-        return this.mvc
-            .perform(MockMvcRequestBuilders.get(JOBS_API + "/{id}/status", jobId))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
+    private String getStatus(final String jobId) {
+        return RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(JOBS_API + "/{id}/status", jobId)
+            .asString();
     }
 
     private void waitForDone(final String jobId) throws Exception {
@@ -1386,25 +1481,27 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         apps.add(APP1_ID);
         apps.add(APP2_ID);
 
-        this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .post(COMMANDS_API + FILE_DELIMITER + CMD1_ID + FILE_DELIMITER + APPLICATIONS_LINK_KEY)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(apps))
-            )
-            .andExpect(MockMvcResultMatchers.status().isNoContent());
+        RestAssured
+            .given(this.getRequestSpecification())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(apps))
+            .when()
+            .port(this.port)
+            .post(COMMANDS_API + FILE_DELIMITER + CMD1_ID + FILE_DELIMITER + APPLICATIONS_LINK_KEY)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
 
         final List<String> cmds = Lists.newArrayList(CMD1_ID);
 
-        this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .post(CLUSTERS_API + FILE_DELIMITER + CLUSTER1_ID + FILE_DELIMITER + COMMANDS_LINK_KEY)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(cmds))
-            )
-            .andExpect(MockMvcResultMatchers.status().isNoContent());
+        RestAssured
+            .given(this.getRequestSpecification())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(cmds))
+            .when()
+            .port(this.port)
+            .post(CLUSTERS_API + FILE_DELIMITER + CLUSTER1_ID + FILE_DELIMITER + COMMANDS_LINK_KEY)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
     }
 
     private void createAnApplication(final String id, final String appName) throws Exception {
@@ -1454,15 +1551,16 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .withDependencies(app1Dependencies)
             .build();
 
-        this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .post(APPLICATIONS_API)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(app))
-            )
-            .andExpect(MockMvcResultMatchers.status().isCreated())
-            .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()));
+        RestAssured
+            .given(this.getRequestSpecification())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(app))
+            .when()
+            .port(this.port)
+            .post(APPLICATIONS_API)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.CREATED.value()))
+            .header(HttpHeaders.LOCATION, Matchers.notNullValue());
     }
 
     private void createAllClusters() throws Exception {
@@ -1506,15 +1604,16 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .withTags(tags)
             .build();
 
-        this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .post(CLUSTERS_API)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(cluster))
-            )
-            .andExpect(MockMvcResultMatchers.status().isCreated())
-            .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()));
+        RestAssured
+            .given(this.getRequestSpecification())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(cluster))
+            .when()
+            .port(this.port)
+            .post(CLUSTERS_API)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.CREATED.value()))
+            .header(HttpHeaders.LOCATION, Matchers.notNullValue());
     }
 
     private void createAllCommands() throws Exception {
@@ -1563,14 +1662,15 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .withTags(tags)
             .build();
 
-        this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .post(COMMANDS_API)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(cmd))
-            )
-            .andExpect(MockMvcResultMatchers.status().isCreated())
-            .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()));
+        RestAssured
+            .given(this.getRequestSpecification())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(cmd))
+            .when()
+            .port(this.port)
+            .post(COMMANDS_API)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.CREATED.value()))
+            .header(HttpHeaders.LOCATION, Matchers.notNullValue());
     }
 }

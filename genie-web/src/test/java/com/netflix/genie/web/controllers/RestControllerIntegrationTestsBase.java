@@ -31,34 +31,40 @@ import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.web.jpa.repositories.JpaFileRepository;
 import com.netflix.genie.web.jpa.repositories.JpaJobRepository;
 import com.netflix.genie.web.jpa.repositories.JpaTagRepository;
+import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.specification.RequestSpecification;
+import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.Description;
 import org.hamcrest.Matchers;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
-import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
+import org.springframework.restdocs.JUnitRestDocumentation;
+import org.springframework.restdocs.operation.preprocess.OperationRequestPreprocessor;
+import org.springframework.restdocs.operation.preprocess.OperationResponsePreprocessor;
+import org.springframework.restdocs.operation.preprocess.Preprocessors;
+import org.springframework.restdocs.restassured3.RestAssuredRestDocumentation;
+import org.springframework.restdocs.restassured3.RestDocumentationFilter;
+import org.springframework.restdocs.restassured3.operation.preprocess.RestAssuredPreprocessors;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Base class for all integration tests for the controllers.
@@ -70,48 +76,46 @@ import java.util.UUID;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = GenieWeb.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(resolver = IntegrationTestActiveProfilesResolver.class)
-@AutoConfigureMockMvc
-@AutoConfigureRestDocs(
-    value = "build/generated-snippets",
-    uriHost = RestControllerIntegrationTestsBase.URI_HOST,
-    uriScheme = RestControllerIntegrationTestsBase.URI_SCHEME,
-    uriPort = 443
-)
 public abstract class RestControllerIntegrationTestsBase {
-
-    static final String URI_HOST = "genie.example.com";
-    static final String URI_SCHEME = "https";
 
     static final String APPLICATIONS_API = "/api/v3/applications";
     static final String CLUSTERS_API = "/api/v3/clusters";
     static final String COMMANDS_API = "/api/v3/commands";
     static final String JOBS_API = "/api/v3/jobs";
-
-    static final String ID_PATH = "$.id";
-    static final String CREATED_PATH = "$.created";
-    static final String UPDATED_PATH = "$.updated";
-    static final String NAME_PATH = "$.name";
-    static final String VERSION_PATH = "$.version";
-    static final String USER_PATH = "$.user";
-    static final String DESCRIPTION_PATH = "$.description";
-    static final String METADATA_PATH = "$.metadata";
-    static final String TAGS_PATH = "$.tags";
-    static final String SETUP_FILE_PATH = "$.setupFile";
-    static final String STATUS_PATH = "$.status";
-    static final String CONFIGS_PATH = "$.configs";
-    static final String DEPENDENCIES_PATH = "$.dependencies";
-    static final String LINKS_PATH = "$._links";
-    static final String EMBEDDED_PATH = "$._embedded";
-
+    static final String ID_PATH = "id";
+    static final String CREATED_PATH = "created";
+    static final String UPDATED_PATH = "updated";
+    static final String NAME_PATH = "name";
+    static final String VERSION_PATH = "version";
+    static final String USER_PATH = "user";
+    static final String DESCRIPTION_PATH = "description";
+    static final String METADATA_PATH = "metadata";
+    static final String TAGS_PATH = "tags";
+    static final String SETUP_FILE_PATH = "setupFile";
+    static final String STATUS_PATH = "status";
+    static final String CONFIGS_PATH = "configs";
+    static final String DEPENDENCIES_PATH = "dependencies";
+    static final String LINKS_PATH = "_links";
+    static final String EMBEDDED_PATH = "_embedded";
     // Link Keys
     static final String SELF_LINK_KEY = "self";
     static final String COMMANDS_LINK_KEY = "commands";
     static final String CLUSTERS_LINK_KEY = "clusters";
     static final String APPLICATIONS_LINK_KEY = "applications";
     static final String JOBS_LINK_KEY = "jobs";
-
     static final Set<String> CLUSTERS_OPTIONAL_HAL_LINK_PARAMETERS = Sets.newHashSet("status");
     static final Set<String> COMMANDS_OPTIONAL_HAL_LINK_PARAMETERS = Sets.newHashSet("status");
+    private static final String URI_HOST = "genie.example.com";
+    private static final String URI_SCHEME = "https";
+
+    /**
+     * Setup for the Spring Rest Docs wiring.
+     */
+    @Rule
+    public final JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation();
+
+    @LocalServerPort
+    protected int port;
 
     @Autowired
     protected JpaApplicationRepository applicationRepository;
@@ -131,22 +135,16 @@ public abstract class RestControllerIntegrationTestsBase {
     @Autowired
     protected JpaTagRepository tagRepository;
 
-    @Autowired
-    protected MockMvc mvc;
+    @Getter
+    private RequestSpecification requestSpecification;
 
     private static String getLinkedResourceExpectedUri(
         final String entityApi,
         final String entityId,
         final Set<String> optionalHalParams,
-        final String linkedEntityType) throws URISyntaxException {
-        final String uriPath = new StringBuilder()
-            .append(entityApi)
-            .append("/")
-            .append(entityId)
-            .append("/")
-            .append(linkedEntityType)
-            .toString();
-        final String uriString = new URI(URI_SCHEME, URI_HOST, uriPath, null).toString();
+        final String linkedEntityType
+    ) {
+        final String uriPath = entityApi + "/" + entityId + "/" + linkedEntityType;
 
         // Append HAL parameters separately to avoid URI encoding
         final StringBuilder halParamsStringBuilder = new StringBuilder();
@@ -156,7 +154,7 @@ public abstract class RestControllerIntegrationTestsBase {
                 .append(StringUtils.join(optionalHalParams, ","))
                 .append("}");
         }
-        return uriString + halParamsStringBuilder.toString();
+        return uriPath + halParamsStringBuilder.toString();
     }
 
     /**
@@ -171,6 +169,10 @@ public abstract class RestControllerIntegrationTestsBase {
         this.applicationRepository.deleteAll();
         this.fileRepository.deleteAll();
         this.tagRepository.deleteAll();
+
+        this.requestSpecification = new RequestSpecBuilder()
+            .addFilter(RestAssuredRestDocumentation.documentationConfiguration(this.restDocumentation))
+            .build();
     }
 
     /**
@@ -190,248 +192,312 @@ public abstract class RestControllerIntegrationTestsBase {
     void canAddElementsToResource(
         final String api,
         final String id,
-        final RestDocumentationResultHandler addHandler,
-        final RestDocumentationResultHandler getHandler
+        final RestDocumentationFilter addFilter,
+        final RestDocumentationFilter getFilter
     ) throws Exception {
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(api, id))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.empty()));
+        RestAssured
+            .given(this.requestSpecification)
+            .when()
+            .port(this.port)
+            .get(api, id)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .body("$", Matchers.empty());
 
         final String element1 = UUID.randomUUID().toString();
         final String element2 = UUID.randomUUID().toString();
         final Set<String> elements = Sets.newHashSet(element1, element2);
 
-        this.mvc
-            .perform(
-                RestDocumentationRequestBuilders
-                    .post(api, id)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(elements))
-            )
-            .andExpect(MockMvcResultMatchers.status().isNoContent())
-            .andDo(addHandler);
+        RestAssured
+            .given(this.requestSpecification)
+            .filter(addFilter)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(elements))
+            .when()
+            .port(this.port)
+            .post(api, id)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
 
-        this.mvc
-            .perform(RestDocumentationRequestBuilders.get(api, id))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem(element1)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem(element2)))
-            .andDo(getHandler);
+        RestAssured
+            .given(this.requestSpecification)
+            .filter(getFilter)
+            .when()
+            .port(this.port)
+            .get(api, id)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .body("$", Matchers.hasSize(2))
+            .body("$", Matchers.hasItem(element1))
+            .body("$", Matchers.hasItem(element2));
     }
 
     void canUpdateElementsForResource(
         final String api,
         final String id,
-        final RestDocumentationResultHandler resultHandler
+        final RestDocumentationFilter updateFilter
     ) throws Exception {
         final String element1 = UUID.randomUUID().toString();
         final String element2 = UUID.randomUUID().toString();
         final Set<String> elements = Sets.newHashSet(element1, element2);
-        this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .post(api, id)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(elements))
-            )
-            .andExpect(MockMvcResultMatchers.status().isNoContent());
+
+        RestAssured
+            .given(this.requestSpecification)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(elements))
+            .when()
+            .port(this.port)
+            .post(api, id)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
 
         final String element3 = UUID.randomUUID().toString();
-        this.mvc
-            .perform(
-                RestDocumentationRequestBuilders
-                    .put(api, id)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(Sets.newHashSet(element3)))
-            )
-            .andExpect(MockMvcResultMatchers.status().isNoContent())
-            .andDo(resultHandler);
+        RestAssured
+            .given(this.requestSpecification)
+            .filter(updateFilter)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(Sets.newHashSet(element3)))
+            .when()
+            .port(this.port)
+            .put(api, id)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(api, id))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(1)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem(element3)));
+        RestAssured
+            .given(this.requestSpecification)
+            .when()
+            .port(this.port)
+            .get(api, id)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .body("$", Matchers.hasSize(1))
+            .body("$", Matchers.hasItem(element3));
     }
 
     void canDeleteElementsFromResource(
         final String api,
         final String id,
-        final RestDocumentationResultHandler resultHandler
+        final RestDocumentationFilter deleteFilter
     ) throws Exception {
         final String element1 = UUID.randomUUID().toString();
         final String element2 = UUID.randomUUID().toString();
-        this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .post(api, id)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(Sets.newHashSet(element1, element2)))
-            )
-            .andExpect(MockMvcResultMatchers.status().isNoContent());
 
-        this.mvc
-            .perform(RestDocumentationRequestBuilders.delete(api, id))
-            .andExpect(MockMvcResultMatchers.status().isNoContent())
-            .andDo(resultHandler);
+        RestAssured
+            .given(this.requestSpecification)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(Sets.newHashSet(element1, element2)))
+            .when()
+            .port(this.port)
+            .post(api, id)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(api, id))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.empty()));
+        RestAssured
+            .given(this.requestSpecification)
+            .filter(deleteFilter)
+            .when()
+            .port(this.port)
+            .delete(api, id)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
+
+        RestAssured
+            .given(this.requestSpecification)
+            .when()
+            .port(this.port)
+            .get(api, id)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .body("$", Matchers.empty());
     }
 
     void canAddTagsToResource(
         final String api,
         final String id,
         final String name,
-        final RestDocumentationResultHandler addHandler,
-        final RestDocumentationResultHandler getHandler
+        final RestDocumentationFilter addFilter,
+        final RestDocumentationFilter getFilter
     ) throws Exception {
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(api, id))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem("genie.id:" + id)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem("genie.name:" + name)));
+        RestAssured
+            .given(this.requestSpecification)
+            .when()
+            .port(this.port)
+            .get(api, id)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .body("$", Matchers.hasSize(2))
+            .body("$", Matchers.hasItem("genie.id:" + id))
+            .body("$", Matchers.hasItem("genie.name:" + name));
 
         final String tag1 = UUID.randomUUID().toString();
         final String tag2 = UUID.randomUUID().toString();
-        final Set<String> configs = Sets.newHashSet(tag1, tag2);
-        this.mvc
-            .perform(
-                RestDocumentationRequestBuilders
-                    .post(api, id)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(configs))
-            )
-            .andExpect(MockMvcResultMatchers.status().isNoContent())
-            .andDo(addHandler);
+        final Set<String> tags = Sets.newHashSet(tag1, tag2);
 
-        this.mvc
-            .perform(RestDocumentationRequestBuilders.get(api, id))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(4)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem("genie.id:" + id)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem("genie.name:" + name)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem(tag1)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem(tag2)))
-            .andDo(getHandler);
+        RestAssured
+            .given(this.requestSpecification)
+            .filter(addFilter)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(tags))
+            .when()
+            .port(this.port)
+            .post(api, id)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
+
+        RestAssured
+            .given(this.requestSpecification)
+            .filter(getFilter)
+            .when()
+            .port(this.port)
+            .get(api, id)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .body("$", Matchers.hasSize(4))
+            .body("$", Matchers.hasItem("genie.id:" + id))
+            .body("$", Matchers.hasItem("genie.name:" + name))
+            .body("$", Matchers.hasItem(tag1))
+            .body("$", Matchers.hasItem(tag2));
     }
 
     void canUpdateTagsForResource(
         final String api,
         final String id,
         final String name,
-        final RestDocumentationResultHandler resultHandler
+        final RestDocumentationFilter updateFilter
     ) throws Exception {
         final String tag1 = UUID.randomUUID().toString();
         final String tag2 = UUID.randomUUID().toString();
         final Set<String> tags = Sets.newHashSet(tag1, tag2);
-        this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .post(api, id)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(tags))
-            )
-            .andExpect(MockMvcResultMatchers.status().isNoContent());
+
+        RestAssured
+            .given(this.requestSpecification)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(tags))
+            .when()
+            .port(this.port)
+            .post(api, id)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
 
         final String tag3 = UUID.randomUUID().toString();
-        this.mvc
-            .perform(
-                RestDocumentationRequestBuilders
-                    .put(api, id)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(Sets.newHashSet(tag3)))
-            )
-            .andExpect(MockMvcResultMatchers.status().isNoContent())
-            .andDo(resultHandler);
+        RestAssured
+            .given(this.requestSpecification)
+            .filter(updateFilter)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(Sets.newHashSet(tag3)))
+            .when()
+            .port(this.port)
+            .put(api, id)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(api, id))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(3)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem("genie.id:" + id)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem("genie.name:" + name)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem(tag3)));
+        RestAssured
+            .given(this.requestSpecification)
+            .when()
+            .port(this.port)
+            .get(api, id)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .body("$", Matchers.hasSize(3))
+            .body("$", Matchers.hasItem("genie.id:" + id))
+            .body("$", Matchers.hasItem("genie.name:" + name))
+            .body("$", Matchers.hasItem(tag3));
     }
 
     void canDeleteTagsForResource(
         final String api,
         final String id,
         final String name,
-        final RestDocumentationResultHandler resultHandler
+        final RestDocumentationFilter deleteFilter
     ) throws Exception {
         final String tag1 = UUID.randomUUID().toString();
         final String tag2 = UUID.randomUUID().toString();
-        this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .post(api, id)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(Sets.newHashSet(tag1, tag2)))
-            )
-            .andExpect(MockMvcResultMatchers.status().isNoContent());
+        final Set<String> tags = Sets.newHashSet(tag1, tag2);
 
-        this.mvc
-            .perform(RestDocumentationRequestBuilders.delete(api, id))
-            .andExpect(MockMvcResultMatchers.status().isNoContent())
-            .andDo(resultHandler);
+        RestAssured
+            .given(this.requestSpecification)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(tags))
+            .when()
+            .port(this.port)
+            .post(api, id)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(api, id))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem("genie.id:" + id)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem("genie.name:" + name)));
+        RestAssured
+            .given(this.requestSpecification)
+            .filter(deleteFilter)
+            .when()
+            .port(this.port)
+            .delete(api, id)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
+
+        RestAssured
+            .given(this.requestSpecification)
+            .when()
+            .port(this.port)
+            .get(api, id)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .body("$", Matchers.hasSize(2))
+            .body("$", Matchers.hasItem("genie.id:" + id))
+            .body("$", Matchers.hasItem("genie.name:" + name));
     }
 
     void canDeleteTagForResource(
         final String api,
         final String id,
         final String name,
-        final RestDocumentationResultHandler resultHandler
+        final RestDocumentationFilter deleteFilter
     ) throws Exception {
         final String tag1 = UUID.randomUUID().toString();
         final String tag2 = UUID.randomUUID().toString();
-        this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .post(api, id)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(Sets.newHashSet(tag1, tag2)))
-            )
-            .andExpect(MockMvcResultMatchers.status().isNoContent());
 
-        this.mvc
-            .perform(RestDocumentationRequestBuilders.delete(api + "/{tag}", id, tag1))
-            .andExpect(MockMvcResultMatchers.status().isNoContent())
-            .andDo(resultHandler);
+        RestAssured
+            .given(this.requestSpecification)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(Sets.newHashSet(tag1, tag2)))
+            .when()
+            .port(this.port)
+            .post(api, id)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(api, id))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(3)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem("genie.id:" + id)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem("genie.name:" + name)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasItem(tag2)));
+        RestAssured
+            .given(this.requestSpecification)
+            .filter(deleteFilter)
+            .when()
+            .port(this.port)
+            .delete(api + "/{tag}", id, tag1)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
+
+        RestAssured
+            .given(this.requestSpecification)
+            .when()
+            .port(this.port)
+            .get(api, id)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .body("$", Matchers.hasSize(3))
+            .body("$", Matchers.hasItem("genie.id:" + id))
+            .body("$", Matchers.hasItem("genie.name:" + name))
+            .body("$", Matchers.hasItem(tag2));
     }
 
     <R extends ExecutionEnvironmentDTO> String createConfigResource(
         @NotNull final R resource,
-        final RestDocumentationResultHandler documentationResultHandler
+        @Nullable final RestDocumentationFilter documentationFilter
     ) throws Exception {
         final String endpoint;
         if (resource instanceof Application) {
@@ -444,21 +510,26 @@ public abstract class RestControllerIntegrationTestsBase {
             throw new IllegalArgumentException("Unexpected type: " + resource.getClass().getCanonicalName());
         }
 
-        final ResultActions resultActions = this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .post(endpoint)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(resource))
-            )
-            .andExpect(MockMvcResultMatchers.status().isCreated())
-            .andExpect(MockMvcResultMatchers.header().string(HttpHeaders.LOCATION, Matchers.notNullValue()));
+        final RequestSpecification configRequestSpec = RestAssured
+            .given(this.requestSpecification)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(resource));
 
-        if (documentationResultHandler != null) {
-            resultActions.andDo(documentationResultHandler);
+        if (documentationFilter != null) {
+            configRequestSpec.filter(documentationFilter);
         }
 
-        return this.getIdFromLocation(resultActions.andReturn().getResponse().getHeader(HttpHeaders.LOCATION));
+        return this.getIdFromLocation(
+            configRequestSpec
+                .when()
+                .port(this.port)
+                .post(endpoint)
+                .then()
+                .statusCode(Matchers.is(HttpStatus.CREATED.value()))
+                .header(HttpHeaders.LOCATION, Matchers.notNullValue())
+                .extract()
+                .header(HttpHeaders.LOCATION)
+        );
     }
 
     String getIdFromLocation(@Nullable final String location) {
@@ -466,6 +537,20 @@ public abstract class RestControllerIntegrationTestsBase {
             Assert.fail();
         }
         return location.substring(location.lastIndexOf("/") + 1);
+    }
+
+    OperationRequestPreprocessor getRequestPreprocessor() {
+        return Preprocessors.preprocessRequest(
+            Preprocessors.prettyPrint(),
+            RestAssuredPreprocessors.modifyUris().scheme(URI_SCHEME).host(URI_HOST).removePort()
+        );
+    }
+
+    OperationResponsePreprocessor getResponsePreprocessor() {
+        return Preprocessors.preprocessResponse(
+            Preprocessors.prettyPrint(),
+            RestAssuredPreprocessors.modifyUris().host(URI_HOST).scheme(URI_SCHEME).removePort()
+        );
     }
 
     static class EntityLinkMatcher extends TypeSafeMatcher<String> {
@@ -481,8 +566,8 @@ public abstract class RestControllerIntegrationTestsBase {
             final String entityApi,
             final String linkedEntityKey,
             final Set<String> optionalHalParams,
-            final String entityId)
-            throws URISyntaxException {
+            final String entityId
+        ) {
             return new EntityLinkMatcher(
                 getLinkedResourceExpectedUri(entityApi, entityId, optionalHalParams, linkedEntityKey)
             );
@@ -490,8 +575,8 @@ public abstract class RestControllerIntegrationTestsBase {
 
         @Override
         protected boolean matchesSafely(final String actualUrl) {
-            if (!this.expectedUri.equals(actualUrl)) {
-                this.descriptionString = "Expected: " + this.expectedUri + " got: " + actualUrl;
+            if (!actualUrl.endsWith(this.expectedUri)) {
+                this.descriptionString = "Expected to end with: " + this.expectedUri + " got: " + actualUrl;
                 return false;
             } else {
                 this.descriptionString = "Successfully matched: " + this.expectedUri;
@@ -518,8 +603,8 @@ public abstract class RestControllerIntegrationTestsBase {
             final String entityApi,
             final String linkedEntityKey,
             final Set<String> optionalHalParams,
-            final Iterable<String> entityIds)
-            throws URISyntaxException {
+            final Iterable<String> entityIds
+        ) {
             final Set<String> expectedUris = Sets.newHashSet();
             for (String entityId : entityIds) {
                 expectedUris.add(getLinkedResourceExpectedUri(entityApi, entityId, optionalHalParams, linkedEntityKey));
@@ -527,32 +612,40 @@ public abstract class RestControllerIntegrationTestsBase {
             return new EntitiesLinksMatcher(expectedUris);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected boolean matchesSafely(final Iterable<String> inputUrls) {
-            final Set<String> urisToMatch = Sets.newHashSet(expectedUris);
-            for (String inputUri : inputUrls) {
-                if (!urisToMatch.contains(inputUri)) {
-                    if (!expectedUris.contains(inputUri)) {
-                        mismatchDescription = "Unexpected input URL: " + inputUri;
-                    } else {
-                        mismatchDescription = "Duplicate input URL: " + inputUri;
-                    }
+            final Set<String> urisToMatch = Sets.newHashSet(this.expectedUris);
+            for (String inputUrl : inputUrls) {
+                final List<String> matchedUrls = urisToMatch
+                    .stream()
+                    .filter(inputUrl::endsWith)
+                    .collect(Collectors.toList());
+
+                if (matchedUrls.size() == 1) {
+                    urisToMatch.remove(matchedUrls.get(0));
+                } else if (matchedUrls.size() == 0) {
+                    this.mismatchDescription = "Unexpected input URL: " + inputUrl;
                     return false;
                 } else {
-                    urisToMatch.remove(inputUri);
+                    this.mismatchDescription = "Duplicate input URL: " + inputUrl;
+                    return false;
                 }
             }
+
             if (!urisToMatch.isEmpty()) {
-                mismatchDescription = "Unmatched URLs: " + urisToMatch.toString();
+                this.mismatchDescription = "Unmatched URLs: " + urisToMatch.toString();
                 return false;
             }
-            mismatchDescription = "Successfully matched";
+            this.mismatchDescription = "Successfully matched";
             return true;
         }
 
         @Override
         public void describeTo(final Description description) {
-            description.appendText(mismatchDescription);
+            description.appendText(this.mismatchDescription);
         }
     }
 }
