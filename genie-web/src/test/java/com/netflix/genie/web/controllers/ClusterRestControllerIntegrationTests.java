@@ -28,6 +28,7 @@ import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.hateoas.resources.ClusterResource;
+import io.restassured.RestAssured;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.hamcrest.Matchers;
@@ -35,21 +36,15 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
-import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
-import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
-import org.springframework.restdocs.operation.preprocess.Preprocessors;
 import org.springframework.restdocs.payload.PayloadDocumentation;
 import org.springframework.restdocs.request.RequestDocumentation;
+import org.springframework.restdocs.restassured3.RestAssuredRestDocumentation;
+import org.springframework.restdocs.restassured3.RestDocumentationFilter;
 import org.springframework.restdocs.snippet.Attributes;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import javax.sql.DataSource;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -72,12 +67,9 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
     private static final String VERSION = "2.7.1";
 
     private static final String CLUSTERS_LIST_PATH = EMBEDDED_PATH + ".clusterList";
-    private static final String CLUSTERS_ID_LIST_PATH = EMBEDDED_PATH + ".clusterList..id";
-    private static final String CLUSTER_COMMANDS_LINK_PATH = "$._links.commands.href";
-    private static final String CLUSTERS_COMMANDS_LINK_PATH = "$.._links.commands.href";
-
-    @Autowired
-    private DataSource dataSource;
+    private static final String CLUSTERS_ID_LIST_PATH = CLUSTERS_LIST_PATH + ".id";
+    private static final String CLUSTER_COMMANDS_LINK_PATH = "_links.commands.href";
+    private static final String CLUSTERS_COMMANDS_LINK_PATH = CLUSTERS_LIST_PATH + "._links.commands.href";
 
     /**
      * {@inheritDoc}
@@ -106,10 +98,10 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
     public void canCreateClusterWithoutId() throws Exception {
         Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
 
-        final RestDocumentationResultHandler creationResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter createFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.CONTENT_TYPE_HEADER, // Request headers
             Snippets.getClusterRequestPayload(), // Request fields
             Snippets.LOCATION_HEADER // Response headers
@@ -117,43 +109,50 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
 
         final String id = this.createConfigResource(
             new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).build(),
-            creationResultHandler
+            createFilter
         );
 
-        final RestDocumentationResultHandler getResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter getFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM, // path parameters
             Snippets.HAL_CONTENT_TYPE_HEADER, // response headers
             Snippets.getClusterResponsePayload(), // response payload
             Snippets.CLUSTER_LINKS // response links
         );
 
-        this.mvc
-            .perform(RestDocumentationRequestBuilders.get(CLUSTERS_API + "/{id}", id))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath(ID_PATH, Matchers.is(id)))
-            .andExpect(MockMvcResultMatchers.jsonPath(CREATED_PATH, Matchers.notNullValue()))
-            .andExpect(MockMvcResultMatchers.jsonPath(UPDATED_PATH, Matchers.notNullValue()))
-            .andExpect(MockMvcResultMatchers.jsonPath(NAME_PATH, Matchers.is(NAME)))
-            .andExpect(MockMvcResultMatchers.jsonPath(USER_PATH, Matchers.is(USER)))
-            .andExpect(MockMvcResultMatchers.jsonPath(VERSION_PATH, Matchers.is(VERSION)))
-            .andExpect(MockMvcResultMatchers.jsonPath(TAGS_PATH, Matchers.hasItem("genie.id:" + id)))
-            .andExpect(MockMvcResultMatchers.jsonPath(TAGS_PATH, Matchers.hasItem("genie.name:" + NAME)))
-            .andExpect(MockMvcResultMatchers.jsonPath(SETUP_FILE_PATH, Matchers.nullValue()))
-            .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(ClusterStatus.UP.toString())))
-            .andExpect(MockMvcResultMatchers.jsonPath(CONFIGS_PATH, Matchers.hasSize(0)))
-            .andExpect(MockMvcResultMatchers.jsonPath(DEPENDENCIES_PATH, Matchers.hasSize(0)))
-            .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH + ".*", Matchers.hasSize(2)))
-            .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(SELF_LINK_KEY)))
-            .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(COMMANDS_LINK_KEY)))
-            .andExpect(MockMvcResultMatchers.jsonPath(CLUSTER_COMMANDS_LINK_PATH,
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(getFilter)
+            .when()
+            .port(this.port)
+            .get(CLUSTERS_API + "/{id}", id)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body(ID_PATH, Matchers.is(id))
+            .body(CREATED_PATH, Matchers.notNullValue())
+            .body(UPDATED_PATH, Matchers.notNullValue())
+            .body(NAME_PATH, Matchers.is(NAME))
+            .body(USER_PATH, Matchers.is(USER))
+            .body(VERSION_PATH, Matchers.is(VERSION))
+            .body(TAGS_PATH, Matchers.hasItem("genie.id:" + id))
+            .body(TAGS_PATH, Matchers.hasItem("genie.name:" + NAME))
+            .body(SETUP_FILE_PATH, Matchers.nullValue())
+            .body(STATUS_PATH, Matchers.is(ClusterStatus.UP.toString()))
+            .body(CONFIGS_PATH, Matchers.hasSize(0))
+            .body(DEPENDENCIES_PATH, Matchers.hasSize(0))
+            .body(LINKS_PATH + ".keySet().size()", Matchers.is(2))
+            .body(LINKS_PATH, Matchers.hasKey(SELF_LINK_KEY))
+            .body(LINKS_PATH, Matchers.hasKey(COMMANDS_LINK_KEY))
+            .body(
+                CLUSTER_COMMANDS_LINK_PATH,
                 EntityLinkMatcher.matchUri(
-                    CLUSTERS_API, COMMANDS_LINK_KEY, COMMANDS_OPTIONAL_HAL_LINK_PARAMETERS, id)))
-            .andDo(getResultHandler);
+                    CLUSTERS_API, COMMANDS_LINK_KEY, COMMANDS_OPTIONAL_HAL_LINK_PARAMETERS,
+                    id
+                )
+            );
 
         Assert.assertThat(this.clusterRepository.count(), Matchers.is(1L));
     }
@@ -170,29 +169,38 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
             new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(),
             null
         );
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(CLUSTERS_API + "/" + ID))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath(ID_PATH, Matchers.is(ID)))
-            .andExpect(MockMvcResultMatchers.jsonPath(CREATED_PATH, Matchers.notNullValue()))
-            .andExpect(MockMvcResultMatchers.jsonPath(UPDATED_PATH, Matchers.notNullValue()))
-            .andExpect(MockMvcResultMatchers.jsonPath(NAME_PATH, Matchers.is(NAME)))
-            .andExpect(MockMvcResultMatchers.jsonPath(USER_PATH, Matchers.is(USER)))
-            .andExpect(MockMvcResultMatchers.jsonPath(VERSION_PATH, Matchers.is(VERSION)))
-            .andExpect(MockMvcResultMatchers.jsonPath(TAGS_PATH, Matchers.hasItem("genie.id:" + ID)))
-            .andExpect(MockMvcResultMatchers.jsonPath(TAGS_PATH, Matchers.hasItem("genie.name:" + NAME)))
-            .andExpect(MockMvcResultMatchers.jsonPath(SETUP_FILE_PATH, Matchers.nullValue()))
-            .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(ClusterStatus.UP.toString())))
-            .andExpect(MockMvcResultMatchers.jsonPath(CONFIGS_PATH, Matchers.hasSize(0)))
-            .andExpect(MockMvcResultMatchers.jsonPath(DEPENDENCIES_PATH, Matchers.hasSize(0)))
-            .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH + ".*", Matchers.hasSize(2)))
-            .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(SELF_LINK_KEY)))
-            .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(COMMANDS_LINK_KEY)))
-            .andExpect(MockMvcResultMatchers.jsonPath(CLUSTER_COMMANDS_LINK_PATH,
+
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(CLUSTERS_API + "/{id}", ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body(ID_PATH, Matchers.is(ID))
+            .body(CREATED_PATH, Matchers.notNullValue())
+            .body(UPDATED_PATH, Matchers.notNullValue())
+            .body(NAME_PATH, Matchers.is(NAME))
+            .body(USER_PATH, Matchers.is(USER))
+            .body(VERSION_PATH, Matchers.is(VERSION))
+            .body(TAGS_PATH, Matchers.hasItem("genie.id:" + ID))
+            .body(TAGS_PATH, Matchers.hasItem("genie.name:" + NAME))
+            .body(SETUP_FILE_PATH, Matchers.nullValue())
+            .body(STATUS_PATH, Matchers.is(ClusterStatus.UP.toString()))
+            .body(CONFIGS_PATH, Matchers.hasSize(0))
+            .body(DEPENDENCIES_PATH, Matchers.hasSize(0))
+            .body(LINKS_PATH + ".keySet().size()", Matchers.is(2))
+            .body(LINKS_PATH, Matchers.hasKey(SELF_LINK_KEY))
+            .body(LINKS_PATH, Matchers.hasKey(COMMANDS_LINK_KEY))
+            .body(
+                CLUSTER_COMMANDS_LINK_PATH,
                 EntityLinkMatcher.matchUri(
-                    CLUSTERS_API, COMMANDS_LINK_KEY, COMMANDS_OPTIONAL_HAL_LINK_PARAMETERS, ID)));
+                    CLUSTERS_API, COMMANDS_LINK_KEY, COMMANDS_OPTIONAL_HAL_LINK_PARAMETERS,
+                    ID
+                )
+            );
+
         Assert.assertThat(this.clusterRepository.count(), Matchers.is(1L));
     }
 
@@ -205,12 +213,17 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
     public void canHandleBadInputToCreateCluster() throws Exception {
         Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
         final Cluster cluster = new Cluster.Builder(" ", " ", " ", ClusterStatus.UP).build();
-        this.mvc.perform(
-            MockMvcRequestBuilders
-                .post(CLUSTERS_API)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(GenieObjectMapper.getMapper().writeValueAsBytes(cluster))
-        ).andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
+
+        RestAssured
+            .given(this.getRequestSpecification())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(cluster))
+            .when()
+            .port(this.port)
+            .post(CLUSTERS_API)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.PRECONDITION_FAILED.value()));
+
         Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
     }
 
@@ -250,10 +263,10 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
             null
         );
 
-        final RestDocumentationResultHandler findResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter findFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.CLUSTER_SEARCH_QUERY_PARAMETERS, // Request query parameters
             Snippets.HAL_CONTENT_TYPE_HEADER, // Response headers
             Snippets.CLUSTER_SEARCH_RESULT_FIELDS, // Result fields
@@ -261,62 +274,80 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         );
 
         // Test finding all clusters
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(CLUSTERS_API))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath(CLUSTERS_LIST_PATH, Matchers.hasSize(3)))
-            .andExpect(MockMvcResultMatchers.jsonPath(CLUSTERS_ID_LIST_PATH, Matchers.containsInAnyOrder(
-                id1, id2, id3)))
-            .andExpect(MockMvcResultMatchers.jsonPath(CLUSTERS_COMMANDS_LINK_PATH,
-                EntitiesLinksMatcher.matchUrisAnyOrder(CLUSTERS_API, COMMANDS_LINK_KEY,
-                    COMMANDS_OPTIONAL_HAL_LINK_PARAMETERS, Lists.newArrayList(id1, id2, id3))))
-            .andDo(findResultHandler);
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(findFilter)
+            .when()
+            .port(this.port)
+            .get(CLUSTERS_API)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body(CLUSTERS_LIST_PATH, Matchers.hasSize(3))
+            .body(CLUSTERS_ID_LIST_PATH, Matchers.containsInAnyOrder(id1, id2, id3))
+            .body(
+                CLUSTERS_COMMANDS_LINK_PATH,
+                EntitiesLinksMatcher.matchUrisAnyOrder(
+                    CLUSTERS_API, COMMANDS_LINK_KEY, COMMANDS_OPTIONAL_HAL_LINK_PARAMETERS,
+                    Lists.newArrayList(id1, id2, id3)
+                )
+            );
 
         // Try to limit the number of results
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(CLUSTERS_API).param("size", "2"))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath(CLUSTERS_LIST_PATH, Matchers.hasSize(2)))
-            .andDo(findResultHandler);
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(findFilter)
+            .param("size", 2)
+            .when()
+            .port(this.port)
+            .get(CLUSTERS_API)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body(CLUSTERS_LIST_PATH, Matchers.hasSize(2));
 
         // Query by name
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(CLUSTERS_API).param("name", name2))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath(CLUSTERS_LIST_PATH, Matchers.hasSize(1)))
-            .andExpect(MockMvcResultMatchers.jsonPath(CLUSTERS_LIST_PATH + "[0].id", Matchers.is(id2)))
-            .andDo(findResultHandler);
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(findFilter)
+            .param("name", name2)
+            .when()
+            .port(this.port)
+            .get(CLUSTERS_API)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body(CLUSTERS_LIST_PATH, Matchers.hasSize(1))
+            .body(CLUSTERS_LIST_PATH + "[0].id", Matchers.is(id2));
 
         // Query by statuses
-        this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .get(CLUSTERS_API)
-                    .param("status", ClusterStatus.UP.toString(), ClusterStatus.TERMINATED.toString())
-            )
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath(CLUSTERS_LIST_PATH, Matchers.hasSize(2)))
-            .andExpect(MockMvcResultMatchers.jsonPath(CLUSTERS_LIST_PATH + "[0].id", Matchers.is(id3)))
-            .andExpect(MockMvcResultMatchers.jsonPath(CLUSTERS_LIST_PATH + "[1].id", Matchers.is(id1)))
-            .andDo(findResultHandler);
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(findFilter)
+            .param("status", ClusterStatus.UP.toString(), ClusterStatus.TERMINATED.toString())
+            .when()
+            .port(this.port)
+            .get(CLUSTERS_API)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body(CLUSTERS_LIST_PATH, Matchers.hasSize(2))
+            .body(CLUSTERS_LIST_PATH + "[0].id", Matchers.is(id3))
+            .body(CLUSTERS_LIST_PATH + "[1].id", Matchers.is(id1));
 
         // Query by tags
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(CLUSTERS_API).param("tag", "genie.id:" + id1))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath(CLUSTERS_LIST_PATH, Matchers.hasSize(1)))
-            .andExpect(MockMvcResultMatchers.jsonPath(CLUSTERS_LIST_PATH + "[0].id", Matchers.is(id1)))
-            .andDo(findResultHandler);
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(findFilter)
+            .param("tag", "genie.id:" + id1)
+            .when()
+            .port(this.port)
+            .get(CLUSTERS_API)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body(CLUSTERS_LIST_PATH, Matchers.hasSize(1))
+            .body(CLUSTERS_LIST_PATH + "[0].id", Matchers.is(id1));
 
         //TODO: Add tests for searching by min and max update time as those are available parameters
         //TODO: Add tests for sort, orderBy etc
@@ -339,10 +370,16 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         final String clusterResource = CLUSTERS_API + "/{id}";
         final Cluster createdCluster = GenieObjectMapper.getMapper()
             .readValue(
-                this.mvc.perform(MockMvcRequestBuilders.get(clusterResource, ID))
-                    .andReturn()
-                    .getResponse()
-                    .getContentAsByteArray(),
+                RestAssured
+                    .given(this.getRequestSpecification())
+                    .when()
+                    .port(this.port)
+                    .get(clusterResource, ID)
+                    .then()
+                    .statusCode(Matchers.is(HttpStatus.OK.value()))
+                    .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+                    .extract()
+                    .asByteArray(),
                 ClusterResource.class
             ).getContent();
         Assert.assertThat(createdCluster.getStatus(), Matchers.is(ClusterStatus.UP));
@@ -363,32 +400,36 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         createdCluster.getDescription().ifPresent(updateCluster::withDescription);
         createdCluster.getSetupFile().ifPresent(updateCluster::withSetupFile);
 
-        final RestDocumentationResultHandler updateResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter updateFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.CONTENT_TYPE_HEADER, // request header
             Snippets.ID_PATH_PARAM, // path parameters
             Snippets.getClusterRequestPayload() // payload fields
         );
 
-        this.mvc.perform(
-            RestDocumentationRequestBuilders
-                .put(clusterResource, ID)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(GenieObjectMapper.getMapper().writeValueAsBytes(updateCluster.build()))
-        )
-            .andExpect(MockMvcResultMatchers.status().isNoContent())
-            .andDo(updateResultHandler);
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(updateFilter)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(updateCluster.build()))
+            .when()
+            .port(this.port)
+            .put(clusterResource, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(clusterResource, ID))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(
-                MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(ClusterStatus.OUT_OF_SERVICE.toString()))
-            );
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(clusterResource, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body(STATUS_PATH, Matchers.is(ClusterStatus.OUT_OF_SERVICE.toString()));
+
         Assert.assertThat(this.clusterRepository.count(), Matchers.is(1L));
     }
 
@@ -405,40 +446,51 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
             null
         );
         final String clusterResource = CLUSTERS_API + "/{id}";
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(clusterResource, id))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.jsonPath(NAME_PATH, Matchers.is(NAME)));
 
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(clusterResource, id)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body(NAME_PATH, Matchers.is(NAME));
 
         final String newName = UUID.randomUUID().toString();
         final String patchString = "[{ \"op\": \"replace\", \"path\": \"/name\", \"value\": \"" + newName + "\" }]";
         final JsonPatch patch = JsonPatch.fromJson(GenieObjectMapper.getMapper().readTree(patchString));
 
-        final RestDocumentationResultHandler patchResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter patchFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.CONTENT_TYPE_HEADER, // request headers
             Snippets.ID_PATH_PARAM, // path params
             Snippets.PATCH_FIELDS // request payload
         );
 
-        this.mvc.perform(
-            RestDocumentationRequestBuilders
-                .patch(clusterResource, id)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(GenieObjectMapper.getMapper().writeValueAsBytes(patch))
-        )
-            .andExpect(MockMvcResultMatchers.status().isNoContent())
-            .andDo(patchResultHandler);
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(patchFilter)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(patch))
+            .when()
+            .port(this.port)
+            .patch(clusterResource, id)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(clusterResource, id))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath(NAME_PATH, Matchers.is(newName)));
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(clusterResource, id)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body(NAME_PATH, Matchers.is(newName));
+
         Assert.assertThat(this.clusterRepository.count(), Matchers.is(1L));
     }
 
@@ -455,16 +507,20 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.TERMINATED).build(), null);
         Assert.assertThat(this.clusterRepository.count(), Matchers.is(3L));
 
-        final RestDocumentationResultHandler deleteResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter deleteFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint())
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor()
         );
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.delete(CLUSTERS_API))
-            .andExpect(MockMvcResultMatchers.status().isNoContent())
-            .andDo(deleteResultHandler);
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(deleteFilter)
+            .when()
+            .port(this.port)
+            .delete(CLUSTERS_API)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
 
         Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
     }
@@ -504,21 +560,29 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         );
         Assert.assertThat(this.clusterRepository.count(), Matchers.is(3L));
 
-        final RestDocumentationResultHandler deleteResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter deleteFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM // path parameters
         );
 
-        this.mvc
-            .perform(RestDocumentationRequestBuilders.delete(CLUSTERS_API + "/{id}", id2))
-            .andExpect(MockMvcResultMatchers.status().isNoContent())
-            .andDo(deleteResultHandler);
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(deleteFilter)
+            .when()
+            .port(this.port)
+            .delete(CLUSTERS_API + "/{id}", id2)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(CLUSTERS_API + "/{id}", id2))
-            .andExpect(MockMvcResultMatchers.status().isNotFound());
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(CLUSTERS_API + "/{id}", id2)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NOT_FOUND.value()));
 
         Assert.assertThat(this.clusterRepository.count(), Matchers.is(2L));
     }
@@ -533,23 +597,23 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
 
-        final RestDocumentationResultHandler addResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter addFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM, // path params
             Snippets.CONTENT_TYPE_HEADER, // request header
             PayloadDocumentation.requestFields(Snippets.CONFIG_FIELDS) // response fields
         );
-        final RestDocumentationResultHandler getResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter getFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM, // path params
             Snippets.JSON_CONTENT_TYPE_HEADER, // response headers
             PayloadDocumentation.responseFields(Snippets.CONFIG_FIELDS) // response fields
         );
-        this.canAddElementsToResource(CLUSTERS_API + "/{id}/configs", ID, addResultHandler, getResultHandler);
+        this.canAddElementsToResource(CLUSTERS_API + "/{id}/configs", ID, addFilter, getFilter);
     }
 
     /**
@@ -562,15 +626,15 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
 
-        final RestDocumentationResultHandler updateResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter updateFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.CONTENT_TYPE_HEADER, // Request header
             Snippets.ID_PATH_PARAM, // Path parameters
             PayloadDocumentation.requestFields(Snippets.CONFIG_FIELDS) // Request fields
         );
-        this.canUpdateElementsForResource(CLUSTERS_API + "/{id}/configs", ID, updateResultHandler);
+        this.canUpdateElementsForResource(CLUSTERS_API + "/{id}/configs", ID, updateFilter);
     }
 
     /**
@@ -583,13 +647,13 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
 
-        final RestDocumentationResultHandler deleteResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter deleteFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM
         );
-        this.canDeleteElementsFromResource(CLUSTERS_API + "/{id}/configs", ID, deleteResultHandler);
+        this.canDeleteElementsFromResource(CLUSTERS_API + "/{id}/configs", ID, deleteFilter);
     }
 
     /**
@@ -602,23 +666,23 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
 
-        final RestDocumentationResultHandler addResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter addFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM, // path params
             Snippets.CONTENT_TYPE_HEADER, // request header
             PayloadDocumentation.requestFields(Snippets.DEPENDENCIES_FIELDS) // response fields
         );
-        final RestDocumentationResultHandler getResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter getFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM, // path params
             Snippets.JSON_CONTENT_TYPE_HEADER, // response headers
             PayloadDocumentation.responseFields(Snippets.DEPENDENCIES_FIELDS) // response fields
         );
-        this.canAddElementsToResource(CLUSTERS_API + "/{id}/dependencies", ID, addResultHandler, getResultHandler);
+        this.canAddElementsToResource(CLUSTERS_API + "/{id}/dependencies", ID, addFilter, getFilter);
     }
 
     /**
@@ -631,15 +695,15 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
 
-        final RestDocumentationResultHandler updateResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter updateFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.CONTENT_TYPE_HEADER, // Request header
             Snippets.ID_PATH_PARAM, // Path parameters
             PayloadDocumentation.requestFields(Snippets.DEPENDENCIES_FIELDS) // Request fields
         );
-        this.canUpdateElementsForResource(CLUSTERS_API + "/{id}/configs", ID, updateResultHandler);
+        this.canUpdateElementsForResource(CLUSTERS_API + "/{id}/configs", ID, updateFilter);
     }
 
     /**
@@ -652,13 +716,13 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
 
-        final RestDocumentationResultHandler deleteResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter deleteFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM
         );
-        this.canDeleteElementsFromResource(CLUSTERS_API + "/{id}/dependencies", ID, deleteResultHandler);
+        this.canDeleteElementsFromResource(CLUSTERS_API + "/{id}/dependencies", ID, deleteFilter);
     }
 
     /**
@@ -672,23 +736,23 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
         final String api = CLUSTERS_API + "/{id}/tags";
 
-        final RestDocumentationResultHandler addResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter addFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.CONTENT_TYPE_HEADER, // Request header
             Snippets.ID_PATH_PARAM, // Path parameters
             PayloadDocumentation.requestFields(Snippets.TAGS_FIELDS) // Request fields
         );
-        final RestDocumentationResultHandler getResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter getFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM, // Path parameters
             Snippets.JSON_CONTENT_TYPE_HEADER, // Response header
             PayloadDocumentation.responseFields(Snippets.TAGS_FIELDS)
         );
-        this.canAddTagsToResource(api, ID, NAME, addResultHandler, getResultHandler);
+        this.canAddTagsToResource(api, ID, NAME, addFilter, getFilter);
     }
 
     /**
@@ -702,15 +766,15 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
         final String api = CLUSTERS_API + "/{id}/tags";
 
-        final RestDocumentationResultHandler updateResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter updateFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.CONTENT_TYPE_HEADER, // Request header
             Snippets.ID_PATH_PARAM, // Path parameters
             PayloadDocumentation.requestFields(Snippets.TAGS_FIELDS) // Request fields
         );
-        this.canUpdateTagsForResource(api, ID, NAME, updateResultHandler);
+        this.canUpdateTagsForResource(api, ID, NAME, updateFilter);
     }
 
     /**
@@ -723,14 +787,14 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
 
-        final RestDocumentationResultHandler deleteResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter deleteFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM
         );
         final String api = CLUSTERS_API + "/{id}/tags";
-        this.canDeleteTagsForResource(api, ID, NAME, deleteResultHandler);
+        this.canDeleteTagsForResource(api, ID, NAME, deleteFilter);
     }
 
     /**
@@ -743,15 +807,13 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
         final String api = CLUSTERS_API + "/{id}/tags";
-        final RestDocumentationResultHandler deleteResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter deleteFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
-            Snippets.ID_PATH_PARAM.and(
-                RequestDocumentation.parameterWithName("tag").description("The tag to remove")
-            )
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
+            Snippets.ID_PATH_PARAM.and(RequestDocumentation.parameterWithName("tag").description("The tag to remove"))
         );
-        this.canDeleteTagForResource(api, ID, NAME, deleteResultHandler);
+        this.canDeleteTagForResource(api, ID, NAME, deleteFilter);
     }
 
     /**
@@ -763,12 +825,16 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
     public void canAddCommandsForACluster() throws Exception {
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
         final String clusterCommandsAPI = CLUSTERS_API + "/{id}/commands";
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(clusterCommandsAPI, ID))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.empty()));
+
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(clusterCommandsAPI, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body("$", Matchers.empty());
 
         final String placeholder = UUID.randomUUID().toString();
         final String commandId1 = UUID.randomUUID().toString();
@@ -788,10 +854,10 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
             null
         );
 
-        final RestDocumentationResultHandler addResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter addFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.CONTENT_TYPE_HEADER, // Request Headers
             Snippets.ID_PATH_PARAM, // Path parameters
             PayloadDocumentation.requestFields(
@@ -802,36 +868,39 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
             ) // Request payload
         );
 
-        this.mvc
-            .perform(
-                RestDocumentationRequestBuilders
-                    .post(clusterCommandsAPI, ID)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(
-                        GenieObjectMapper.getMapper().writeValueAsBytes(Lists.newArrayList(commandId1, commandId2))
-                    )
-            )
-            .andExpect(MockMvcResultMatchers.status().isNoContent())
-            .andDo(addResultHandler);
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(addFilter)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(Lists.newArrayList(commandId1, commandId2)))
+            .when()
+            .port(this.port)
+            .post(clusterCommandsAPI, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(clusterCommandsAPI, ID))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(commandId1)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[1].id", Matchers.is(commandId2)));
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(clusterCommandsAPI, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body("$", Matchers.hasSize(2))
+            .body("[0].id", Matchers.is(commandId1))
+            .body("[1].id", Matchers.is(commandId2));
 
         //Shouldn't add anything
-        this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .post(clusterCommandsAPI, ID)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(Lists.newArrayList()))
-            )
-            .andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
+        RestAssured
+            .given(this.getRequestSpecification())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(Lists.newArrayList()))
+            .when()
+            .port(this.port)
+            .post(clusterCommandsAPI, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.PRECONDITION_FAILED.value()));
 
         final String commandId3 = UUID.randomUUID().toString();
         this.createConfigResource(
@@ -841,38 +910,42 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
                 .build(),
             null
         );
-        this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .post(clusterCommandsAPI, ID)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(Lists.newArrayList(commandId3)))
-            )
-            .andExpect(MockMvcResultMatchers.status().isNoContent());
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(clusterCommandsAPI, ID))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(3)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(commandId1)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[1].id", Matchers.is(commandId2)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[2].id", Matchers.is(commandId3)));
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(addFilter)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(Lists.newArrayList(commandId3)))
+            .when()
+            .port(this.port)
+            .post(clusterCommandsAPI, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
+
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(clusterCommandsAPI, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body("$", Matchers.hasSize(3))
+            .body("[0].id", Matchers.is(commandId1))
+            .body("[1].id", Matchers.is(commandId2))
+            .body("[2].id", Matchers.is(commandId3));
 
         // Test the filtering
-        final RestDocumentationResultHandler getResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter getFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM, // Path parameters
             RequestDocumentation.requestParameters(
                 RequestDocumentation
                     .parameterWithName("status")
                     .description("The status of commands to search for")
-                    .attributes(
-                        Attributes.key(Snippets.CONSTRAINTS).value(CommandStatus.values())
-                    )
+                    .attributes(Attributes.key(Snippets.CONSTRAINTS).value(CommandStatus.values()))
                     .optional()
             ), // Query Parameters
             Snippets.HAL_CONTENT_TYPE_HEADER, // Response Headers
@@ -883,17 +956,19 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
                     .attributes(Snippets.EMPTY_CONSTRAINTS)
             )
         );
-        this.mvc
-            .perform(
-                RestDocumentationRequestBuilders
-                    .get(clusterCommandsAPI, ID).param("status", CommandStatus.INACTIVE.toString())
-            )
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(1)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(commandId3)))
-            .andDo(getResultHandler);
+
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(getFilter)
+            .param("status", CommandStatus.INACTIVE.toString())
+            .when()
+            .port(this.port)
+            .get(clusterCommandsAPI, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body("$", Matchers.hasSize(1))
+            .body("[0].id", Matchers.is(commandId3));
     }
 
     /**
@@ -905,12 +980,16 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
     public void canSetCommandsForACluster() throws Exception {
         this.createConfigResource(new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP).withId(ID).build(), null);
         final String clusterCommandsAPI = CLUSTERS_API + "/{id}/commands";
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(clusterCommandsAPI, ID))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.empty()));
+
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(clusterCommandsAPI, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body("$", Matchers.empty());
 
         final String placeholder = UUID.randomUUID().toString();
         final String commandId1 = UUID.randomUUID().toString();
@@ -930,10 +1009,10 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
             null
         );
 
-        final RestDocumentationResultHandler setResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter setFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.CONTENT_TYPE_HEADER, // Request Headers
             Snippets.ID_PATH_PARAM, // Path parameters
             PayloadDocumentation.requestFields(
@@ -944,43 +1023,49 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
             ) // Request payload
         );
 
-        this.mvc
-            .perform(
-                RestDocumentationRequestBuilders
-                    .put(clusterCommandsAPI, ID)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(
-                        GenieObjectMapper.getMapper().writeValueAsBytes(Lists.newArrayList(commandId1, commandId2))
-                    )
-            )
-            .andExpect(MockMvcResultMatchers.status().isNoContent())
-            .andDo(setResultHandler);
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(setFilter)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(Lists.newArrayList(commandId1, commandId2)))
+            .when()
+            .port(this.port)
+            .put(clusterCommandsAPI, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(clusterCommandsAPI, ID))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(commandId1)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[1].id", Matchers.is(commandId2)));
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(clusterCommandsAPI, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body("$", Matchers.hasSize(2))
+            .body("[0].id", Matchers.is(commandId1))
+            .body("[1].id", Matchers.is(commandId2));
 
         //Should clear commands
-        this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .put(clusterCommandsAPI, ID)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(Lists.newArrayList()))
-            )
-            .andExpect(MockMvcResultMatchers.status().isNoContent());
+        RestAssured
+            .given(this.getRequestSpecification())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(Lists.newArrayList()))
+            .when()
+            .port(this.port)
+            .put(clusterCommandsAPI, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(clusterCommandsAPI, ID))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.empty()));
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(clusterCommandsAPI, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body("$", Matchers.empty());
     }
 
     /**
@@ -1011,35 +1096,41 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
             null
         );
 
-        this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .post(clusterCommandsAPI, ID)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(
-                        GenieObjectMapper.getMapper().writeValueAsBytes(Lists.newArrayList(commandId1, commandId2))
-                    )
-            )
-            .andExpect(MockMvcResultMatchers.status().isNoContent());
+        RestAssured
+            .given(this.getRequestSpecification())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(Lists.newArrayList(commandId1, commandId2)))
+            .when()
+            .port(this.port)
+            .post(clusterCommandsAPI, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
 
-        final RestDocumentationResultHandler deleteResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter deleteFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM // Path parameters
         );
 
-        this.mvc
-            .perform(RestDocumentationRequestBuilders.delete(clusterCommandsAPI, ID))
-            .andExpect(MockMvcResultMatchers.status().isNoContent())
-            .andDo(deleteResultHandler);
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(deleteFilter)
+            .when()
+            .port(this.port)
+            .delete(clusterCommandsAPI, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(clusterCommandsAPI, ID))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.empty()));
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(clusterCommandsAPI, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body("$", Matchers.empty());
     }
 
     /**
@@ -1078,65 +1169,80 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
             null
         );
 
-        this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .post(clusterCommandsAPI, ID)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(
-                        GenieObjectMapper
-                            .getMapper()
-                            .writeValueAsBytes(Lists.newArrayList(commandId1, commandId2, commandId3))
-                    )
+        RestAssured
+            .given(this.getRequestSpecification())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(
+                GenieObjectMapper.getMapper().writeValueAsBytes(Lists.newArrayList(commandId1, commandId2, commandId3))
             )
-            .andExpect(MockMvcResultMatchers.status().isNoContent());
+            .when()
+            .port(this.port)
+            .post(clusterCommandsAPI, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
 
-        final RestDocumentationResultHandler deleteResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter deleteFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM.and(
                 RequestDocumentation.parameterWithName("commandId").description("The id of the command to remove")
             ) // Path parameters
         );
 
-        this.mvc
-            .perform(RestDocumentationRequestBuilders.delete(clusterCommandsAPI + "/{commandId}", ID, commandId2))
-            .andExpect(MockMvcResultMatchers.status().isNoContent())
-            .andDo(deleteResultHandler);
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(deleteFilter)
+            .when()
+            .port(this.port)
+            .delete(clusterCommandsAPI + "/{commandId}", ID, commandId2)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(clusterCommandsAPI, ID))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(commandId1)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[1].id", Matchers.is(commandId3)));
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(clusterCommandsAPI, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body("$", Matchers.hasSize(2))
+            .body("[0].id", Matchers.is(commandId1))
+            .body("[1].id", Matchers.is(commandId3));
 
         // Check reverse side of relationship
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(COMMANDS_API + "/{id}/clusters", commandId1))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(1)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(ID)));
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(COMMANDS_API + "/{id}/clusters", commandId1)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body("$", Matchers.hasSize(1))
+            .body("[0].id", Matchers.is(ID));
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(COMMANDS_API + "/{id}/clusters", commandId2))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.empty()));
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(COMMANDS_API + "/{id}/clusters", commandId2)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body("$", Matchers.empty());
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(COMMANDS_API + "/{id}/clusters", commandId3))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(1)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(ID)));
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(COMMANDS_API + "/{id}/clusters", commandId3)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body("$", Matchers.hasSize(1))
+            .body("[0].id", Matchers.is(ID));
     }
 
     /**
@@ -1188,20 +1294,22 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         final String doubleEncodedNameQuery = urlEncoder.encode(singleEncodedNameQuery, StandardCharsets.UTF_8);
 
         // Query by name with wildcard and get the second page containing a single result (out of 3)
-        final MvcResult response = this.mvc
-            .perform(MockMvcRequestBuilders.get(CLUSTERS_API)
+        final JsonNode responseJsonNode = GenieObjectMapper.getMapper().readTree(
+            RestAssured
+                .given(this.getRequestSpecification())
                 .param("name", unencodedNameQuery)
-                .param("size", "1")
-                .param("page", "1")
-            )
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath(CLUSTERS_LIST_PATH, Matchers.hasSize(1)))
-            .andReturn();
-
-        final JsonNode responseJsonNode
-            = GenieObjectMapper.getMapper().readTree(response.getResponse().getContentAsString());
+                .param("size", 1)
+                .param("page", 1)
+                .when()
+                .port(this.port)
+                .get(CLUSTERS_API)
+                .then()
+                .statusCode(Matchers.is(HttpStatus.OK.value()))
+                .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+                .body(CLUSTERS_LIST_PATH, Matchers.hasSize(1))
+                .extract()
+                .asByteArray()
+        );
 
         // Self link is not double-encoded
         Assert.assertTrue(
@@ -1213,12 +1321,11 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
                 .contains(singleEncodedNameQuery));
 
         // Pagination links are double-encoded
-
-        final String[] doubleEncodedHrefs = new String[]{
+        final String[] doubleEncodedHREFS = new String[]{
             "first", "next", "prev", "last",
         };
 
-        for (String doubleEncodedHref : doubleEncodedHrefs) {
+        for (String doubleEncodedHref : doubleEncodedHREFS) {
             final String linkString = responseJsonNode.get("_links").get(doubleEncodedHref).get("href").asText();
             Assert.assertNotNull(linkString);
             final HashMap<String, String> params = Maps.newHashMap();
@@ -1240,7 +1347,6 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
      */
     @Test
     public void cantCreateClusterWithBlankFields() throws Exception {
-
         final List<Cluster> invalidClusterResources = Lists.newArrayList(
             new Cluster
                 .Builder(NAME, USER, VERSION, ClusterStatus.UP)
@@ -1264,13 +1370,15 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
         for (Cluster invalidClusterResource : invalidClusterResources) {
             Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
 
-            this.mvc
-                .perform(
-                    MockMvcRequestBuilders.post(CLUSTERS_API)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(GenieObjectMapper.getMapper().writeValueAsBytes(invalidClusterResource))
-                )
-                .andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
+            RestAssured
+                .given(this.getRequestSpecification())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(GenieObjectMapper.getMapper().writeValueAsBytes(invalidClusterResource))
+                .when()
+                .port(this.port)
+                .post(CLUSTERS_API)
+                .then()
+                .statusCode(Matchers.is(HttpStatus.PRECONDITION_FAILED.value()));
 
             Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
         }

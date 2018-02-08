@@ -17,11 +17,13 @@
  */
 package com.netflix.genie.web.controllers;
 
+import io.restassured.RestAssured;
 import org.hamcrest.Matchers;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.hateoas.MediaTypes;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.http.HttpStatus;
 
 /**
  * Integration tests for the Root REST API.
@@ -32,22 +34,42 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 public class RootRestControllerIntegrationTests extends RestControllerIntegrationTestsBase {
 
     /**
+     * {@inheritDoc}
+     */
+    @Before
+    @Override
+    public void setup() throws Exception {
+        super.setup();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @After
+    @Override
+    public void cleanup() throws Exception {
+        super.cleanup();
+    }
+
+    /**
      * Make sure we can get the root resource.
-     *
-     * @throws Exception on configuration issue
      */
     @Test
-    public void canGetRootResource() throws Exception {
-        this.mvc
-            .perform(MockMvcRequestBuilders.get("/api/v3"))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.content.description", Matchers.notNullValue()))
-            .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH + ".*", Matchers.hasSize(5)))
-            .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(SELF_LINK_KEY)))
-            .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(APPLICATIONS_LINK_KEY)))
-            .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(COMMANDS_LINK_KEY)))
-            .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(CLUSTERS_LINK_KEY)))
-            .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(JOBS_LINK_KEY)));
+    public void canGetRootResource() {
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get("/api/v3")
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body("content.description", Matchers.notNullValue())
+            .body(LINKS_PATH + ".keySet().size()", Matchers.is(5))
+            .body(LINKS_PATH, Matchers.hasKey(SELF_LINK_KEY))
+            .body(LINKS_PATH, Matchers.hasKey(APPLICATIONS_LINK_KEY))
+            .body(LINKS_PATH, Matchers.hasKey(COMMANDS_LINK_KEY))
+            .body(LINKS_PATH, Matchers.hasKey(CLUSTERS_LINK_KEY))
+            .body(LINKS_PATH, Matchers.hasKey(JOBS_LINK_KEY));
     }
 }

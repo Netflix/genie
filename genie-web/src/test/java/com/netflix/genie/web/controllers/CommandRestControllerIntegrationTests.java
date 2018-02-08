@@ -29,24 +29,21 @@ import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.hateoas.resources.ClusterResource;
 import com.netflix.genie.web.hateoas.resources.CommandResource;
+import io.restassured.RestAssured;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
-import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
-import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
-import org.springframework.restdocs.operation.preprocess.Preprocessors;
 import org.springframework.restdocs.payload.PayloadDocumentation;
 import org.springframework.restdocs.request.RequestDocumentation;
+import org.springframework.restdocs.restassured3.RestAssuredRestDocumentation;
+import org.springframework.restdocs.restassured3.RestDocumentationFilter;
 import org.springframework.restdocs.snippet.Attributes;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -79,15 +76,15 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
     private static final String TAG_2 = "tag:bar";
     private static final Set<String> TAGS = Sets.newHashSet(TAG_1, TAG_2);
 
-    private static final String EXECUTABLE_PATH = "$.executable";
-    private static final String CHECK_DELAY_PATH = "$.checkDelay";
-    private static final String MEMORY_PATH = "$.memory";
+    private static final String EXECUTABLE_PATH = "executable";
+    private static final String CHECK_DELAY_PATH = "checkDelay";
+    private static final String MEMORY_PATH = "memory";
     private static final String COMMANDS_LIST_PATH = EMBEDDED_PATH + ".commandList";
-    private static final String COMMAND_APPS_LINK_PATH = "$._links.applications.href";
-    private static final String COMMANDS_APPS_LINK_PATH = "$.._links.applications.href";
-    private static final String COMMAND_CLUSTERS_LINK_PATH = "$._links.clusters.href";
-    private static final String COMMANDS_CLUSTERS_LINK_PATH = "$.._links.clusters.href";
-    private static final String COMMANDS_ID_LIST_PATH = EMBEDDED_PATH + ".commandList..id";
+    private static final String COMMAND_APPS_LINK_PATH = "_links.applications.href";
+    private static final String COMMANDS_APPS_LINK_PATH = COMMANDS_LIST_PATH + "._links.applications.href";
+    private static final String COMMAND_CLUSTERS_LINK_PATH = "_links.clusters.href";
+    private static final String COMMANDS_CLUSTERS_LINK_PATH = COMMANDS_LIST_PATH + "._links.clusters.href";
+    private static final String COMMANDS_ID_LIST_PATH = EMBEDDED_PATH + ".commandList.id";
 
     /**
      * {@inheritDoc}
@@ -116,10 +113,10 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
     public void canCreateCommandWithoutId() throws Exception {
         Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
 
-        final RestDocumentationResultHandler creationResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter createFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.CONTENT_TYPE_HEADER, // Request headers
             Snippets.getCommandRequestPayload(), // Request fields
             Snippets.LOCATION_HEADER // Response headers
@@ -133,53 +130,69 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                 .withDependencies(DEPENDENCIES)
                 .withTags(TAGS)
                 .build(),
-            creationResultHandler
+            createFilter
         );
 
-        final RestDocumentationResultHandler getResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter getFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM, // path parameters
             Snippets.HAL_CONTENT_TYPE_HEADER, // response headers
             Snippets.getCommandResponsePayload(), // response payload
             Snippets.COMMAND_LINKS // response links
         );
 
-        this.mvc
-            .perform(RestDocumentationRequestBuilders.get(COMMANDS_API + "/{id}", id))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath(ID_PATH, Matchers.is(id)))
-            .andExpect(MockMvcResultMatchers.jsonPath(CREATED_PATH, Matchers.notNullValue()))
-            .andExpect(MockMvcResultMatchers.jsonPath(UPDATED_PATH, Matchers.notNullValue()))
-            .andExpect(MockMvcResultMatchers.jsonPath(NAME_PATH, Matchers.is(NAME)))
-            .andExpect(MockMvcResultMatchers.jsonPath(USER_PATH, Matchers.is(USER)))
-            .andExpect(MockMvcResultMatchers.jsonPath(VERSION_PATH, Matchers.is(VERSION)))
-            .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(CommandStatus.ACTIVE.toString())))
-            .andExpect(MockMvcResultMatchers.jsonPath(EXECUTABLE_PATH, Matchers.is(EXECUTABLE)))
-            .andExpect(MockMvcResultMatchers.jsonPath(CHECK_DELAY_PATH, Matchers.is((int) CHECK_DELAY)))
-            .andExpect(MockMvcResultMatchers.jsonPath(DESCRIPTION_PATH, Matchers.is(DESCRIPTION)))
-            .andExpect(MockMvcResultMatchers.jsonPath(MEMORY_PATH, Matchers.is(MEMORY)))
-            .andExpect(MockMvcResultMatchers.jsonPath(CONFIGS_PATH, Matchers.hasSize(2)))
-            .andExpect(MockMvcResultMatchers.jsonPath(CONFIGS_PATH, Matchers.hasItems(CONFIG_1, CONFIG_2)))
-            .andExpect(MockMvcResultMatchers.jsonPath(DEPENDENCIES_PATH, Matchers.hasSize(2)))
-            .andExpect(MockMvcResultMatchers.jsonPath(DEPENDENCIES_PATH, Matchers.hasItems(DEP_1, DEP_2)))
-            .andExpect(MockMvcResultMatchers.jsonPath(TAGS_PATH, Matchers.hasSize(4)))
-            .andExpect(MockMvcResultMatchers.jsonPath(TAGS_PATH, Matchers.hasItem("genie.id:" + id)))
-            .andExpect(MockMvcResultMatchers.jsonPath(TAGS_PATH, Matchers.hasItem("genie.name:" + NAME)))
-            .andExpect(MockMvcResultMatchers.jsonPath(TAGS_PATH, Matchers.hasItems(TAG_1, TAG_2)))
-            .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH + ".*", Matchers.hasSize(3)))
-            .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(SELF_LINK_KEY)))
-            .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(CLUSTERS_LINK_KEY)))
-            .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(APPLICATIONS_LINK_KEY)))
-            .andExpect(MockMvcResultMatchers.jsonPath(COMMAND_CLUSTERS_LINK_PATH,
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(getFilter)
+            .when()
+            .port(this.port)
+            .get(COMMANDS_API + "/{id}", id)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body(ID_PATH, Matchers.is(id))
+            .body(CREATED_PATH, Matchers.notNullValue())
+            .body(UPDATED_PATH, Matchers.notNullValue())
+            .body(NAME_PATH, Matchers.is(NAME))
+            .body(USER_PATH, Matchers.is(USER))
+            .body(VERSION_PATH, Matchers.is(VERSION))
+            .body(STATUS_PATH, Matchers.is(CommandStatus.ACTIVE.toString()))
+            .body(EXECUTABLE_PATH, Matchers.is(EXECUTABLE))
+            .body(CHECK_DELAY_PATH, Matchers.is((int) CHECK_DELAY))
+            .body(DESCRIPTION_PATH, Matchers.is(DESCRIPTION))
+            .body(MEMORY_PATH, Matchers.is(MEMORY))
+            .body(CONFIGS_PATH, Matchers.hasSize(2))
+            .body(CONFIGS_PATH, Matchers.hasItems(CONFIG_1, CONFIG_2))
+            .body(DEPENDENCIES_PATH, Matchers.hasSize(2))
+            .body(DEPENDENCIES_PATH, Matchers.hasItems(DEP_1, DEP_2))
+            .body(TAGS_PATH, Matchers.hasSize(4))
+            .body(TAGS_PATH, Matchers.hasItem("genie.id:" + id))
+            .body(TAGS_PATH, Matchers.hasItem("genie.name:" + NAME))
+            .body(TAGS_PATH, Matchers.hasItems(TAG_1, TAG_2))
+            .body(LINKS_PATH + ".keySet().size()", Matchers.is(3))
+            .body(LINKS_PATH, Matchers.hasKey(SELF_LINK_KEY))
+            .body(LINKS_PATH, Matchers.hasKey(CLUSTERS_LINK_KEY))
+            .body(LINKS_PATH, Matchers.hasKey(APPLICATIONS_LINK_KEY))
+            .body(
+                COMMAND_CLUSTERS_LINK_PATH,
                 EntityLinkMatcher.matchUri(
-                    COMMANDS_API, CLUSTERS_LINK_KEY, CLUSTERS_OPTIONAL_HAL_LINK_PARAMETERS, id)))
-            .andExpect(MockMvcResultMatchers.jsonPath(COMMAND_APPS_LINK_PATH,
-                EntityLinkMatcher.matchUri(COMMANDS_API, APPLICATIONS_LINK_KEY, null, id)))
-            .andDo(getResultHandler);
+                    COMMANDS_API,
+                    CLUSTERS_LINK_KEY,
+                    CLUSTERS_OPTIONAL_HAL_LINK_PARAMETERS,
+                    id
+                )
+            )
+            .body(
+                COMMAND_APPS_LINK_PATH,
+                EntityLinkMatcher.matchUri(
+                    COMMANDS_API,
+                    APPLICATIONS_LINK_KEY,
+                    null,
+                    id
+                )
+            );
 
         Assert.assertThat(this.commandRepository.count(), Matchers.is(1L));
     }
@@ -204,39 +217,55 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             null
         );
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(COMMANDS_API + "/" + ID))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath(ID_PATH, Matchers.is(ID)))
-            .andExpect(MockMvcResultMatchers.jsonPath(CREATED_PATH, Matchers.notNullValue()))
-            .andExpect(MockMvcResultMatchers.jsonPath(UPDATED_PATH, Matchers.notNullValue()))
-            .andExpect(MockMvcResultMatchers.jsonPath(NAME_PATH, Matchers.is(NAME)))
-            .andExpect(MockMvcResultMatchers.jsonPath(USER_PATH, Matchers.is(USER)))
-            .andExpect(MockMvcResultMatchers.jsonPath(VERSION_PATH, Matchers.is(VERSION)))
-            .andExpect(MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(CommandStatus.ACTIVE.toString())))
-            .andExpect(MockMvcResultMatchers.jsonPath(EXECUTABLE_PATH, Matchers.is(EXECUTABLE)))
-            .andExpect(MockMvcResultMatchers.jsonPath(CHECK_DELAY_PATH, Matchers.is((int) CHECK_DELAY)))
-            .andExpect(MockMvcResultMatchers.jsonPath(DESCRIPTION_PATH, Matchers.is(DESCRIPTION)))
-            .andExpect(MockMvcResultMatchers.jsonPath(MEMORY_PATH, Matchers.is(MEMORY)))
-            .andExpect(MockMvcResultMatchers.jsonPath(CONFIGS_PATH, Matchers.hasSize(2)))
-            .andExpect(MockMvcResultMatchers.jsonPath(CONFIGS_PATH, Matchers.hasItems(CONFIG_1, CONFIG_2)))
-            .andExpect(MockMvcResultMatchers.jsonPath(DEPENDENCIES_PATH, Matchers.hasSize(2)))
-            .andExpect(MockMvcResultMatchers.jsonPath(DEPENDENCIES_PATH, Matchers.hasItems(DEP_1, DEP_2)))
-            .andExpect(MockMvcResultMatchers.jsonPath(TAGS_PATH, Matchers.hasSize(4)))
-            .andExpect(MockMvcResultMatchers.jsonPath(TAGS_PATH, Matchers.hasItem("genie.id:" + ID)))
-            .andExpect(MockMvcResultMatchers.jsonPath(TAGS_PATH, Matchers.hasItem("genie.name:" + NAME)))
-            .andExpect(MockMvcResultMatchers.jsonPath(TAGS_PATH, Matchers.hasItems(TAG_1, TAG_2)))
-            .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH + ".*", Matchers.hasSize(3)))
-            .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(SELF_LINK_KEY)))
-            .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(CLUSTERS_LINK_KEY)))
-            .andExpect(MockMvcResultMatchers.jsonPath(LINKS_PATH, Matchers.hasKey(APPLICATIONS_LINK_KEY)))
-            .andExpect(MockMvcResultMatchers.jsonPath(COMMAND_CLUSTERS_LINK_PATH,
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(COMMANDS_API + "/{id}", ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body(ID_PATH, Matchers.is(ID))
+            .body(CREATED_PATH, Matchers.notNullValue())
+            .body(UPDATED_PATH, Matchers.notNullValue())
+            .body(NAME_PATH, Matchers.is(NAME))
+            .body(USER_PATH, Matchers.is(USER))
+            .body(VERSION_PATH, Matchers.is(VERSION))
+            .body(STATUS_PATH, Matchers.is(CommandStatus.ACTIVE.toString()))
+            .body(EXECUTABLE_PATH, Matchers.is(EXECUTABLE))
+            .body(CHECK_DELAY_PATH, Matchers.is((int) CHECK_DELAY))
+            .body(DESCRIPTION_PATH, Matchers.is(DESCRIPTION))
+            .body(MEMORY_PATH, Matchers.is(MEMORY))
+            .body(CONFIGS_PATH, Matchers.hasSize(2))
+            .body(CONFIGS_PATH, Matchers.hasItems(CONFIG_1, CONFIG_2))
+            .body(DEPENDENCIES_PATH, Matchers.hasSize(2))
+            .body(DEPENDENCIES_PATH, Matchers.hasItems(DEP_1, DEP_2))
+            .body(TAGS_PATH, Matchers.hasSize(4))
+            .body(TAGS_PATH, Matchers.hasItem("genie.id:" + ID))
+            .body(TAGS_PATH, Matchers.hasItem("genie.name:" + NAME))
+            .body(TAGS_PATH, Matchers.hasItems(TAG_1, TAG_2))
+            .body(LINKS_PATH + ".keySet().size()", Matchers.is(3))
+            .body(LINKS_PATH, Matchers.hasKey(SELF_LINK_KEY))
+            .body(LINKS_PATH, Matchers.hasKey(CLUSTERS_LINK_KEY))
+            .body(LINKS_PATH, Matchers.hasKey(APPLICATIONS_LINK_KEY))
+            .body(
+                COMMAND_CLUSTERS_LINK_PATH,
                 EntityLinkMatcher.matchUri(
-                    COMMANDS_API, CLUSTERS_LINK_KEY, CLUSTERS_OPTIONAL_HAL_LINK_PARAMETERS, ID)))
-            .andExpect(MockMvcResultMatchers.jsonPath(COMMAND_APPS_LINK_PATH,
-                EntityLinkMatcher.matchUri(COMMANDS_API, APPLICATIONS_LINK_KEY, null, ID)));
+                    COMMANDS_API,
+                    CLUSTERS_LINK_KEY,
+                    CLUSTERS_OPTIONAL_HAL_LINK_PARAMETERS,
+                    ID
+                )
+            )
+            .body(
+                COMMAND_APPS_LINK_PATH,
+                EntityLinkMatcher.matchUri(
+                    COMMANDS_API,
+                    APPLICATIONS_LINK_KEY,
+                    null,
+                    ID
+                )
+            );
 
         Assert.assertThat(this.commandRepository.count(), Matchers.is(1L));
     }
@@ -250,12 +279,16 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
     public void canHandleBadInputToCreateCommand() throws Exception {
         Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
         final Command cluster = new Command.Builder(" ", " ", " ", CommandStatus.ACTIVE, " ", -1L).build();
-        this.mvc.perform(
-            MockMvcRequestBuilders
-                .post(COMMANDS_API)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(GenieObjectMapper.getMapper().writeValueAsBytes(cluster))
-        ).andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
+        RestAssured
+            .given(this.getRequestSpecification())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(cluster))
+            .when()
+            .port(this.port)
+            .post(COMMANDS_API)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.PRECONDITION_FAILED.value()));
+
         Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
     }
 
@@ -307,10 +340,10 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             null
         );
 
-        final RestDocumentationResultHandler findResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter findFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.COMMAND_SEARCH_QUERY_PARAMETERS, // Request query parameters
             Snippets.HAL_CONTENT_TYPE_HEADER, // Response headers
             Snippets.COMMAND_SEARCH_RESULT_FIELDS, // Result fields
@@ -318,75 +351,107 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
         );
 
         // Test finding all commands
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(COMMANDS_API))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath(COMMANDS_LIST_PATH, Matchers.hasSize(3)))
-            .andExpect(MockMvcResultMatchers.jsonPath(COMMANDS_ID_LIST_PATH, Matchers.containsInAnyOrder(
-                id1, id2, id3)))
-            .andExpect(MockMvcResultMatchers.jsonPath(COMMANDS_APPS_LINK_PATH,
-                EntitiesLinksMatcher.matchUrisAnyOrder(COMMANDS_API, APPLICATIONS_LINK_KEY,
-                    null, Lists.newArrayList(id1, id2, id3))))
-            .andExpect(MockMvcResultMatchers.jsonPath(COMMANDS_CLUSTERS_LINK_PATH,
-                EntitiesLinksMatcher.matchUrisAnyOrder(COMMANDS_API, CLUSTERS_LINK_KEY,
-                    CLUSTERS_OPTIONAL_HAL_LINK_PARAMETERS, Lists.newArrayList(id1, id2, id3))))
-            .andDo(findResultHandler);
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(findFilter)
+            .when()
+            .port(this.port)
+            .get(COMMANDS_API)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body(COMMANDS_LIST_PATH, Matchers.hasSize(3))
+            .body(COMMANDS_ID_LIST_PATH, Matchers.containsInAnyOrder(id1, id2, id3))
+            .body(
+                COMMANDS_APPS_LINK_PATH,
+                EntitiesLinksMatcher
+                    .matchUrisAnyOrder(
+                        COMMANDS_API,
+                        APPLICATIONS_LINK_KEY,
+                        null,
+                        Lists.newArrayList(id1, id2, id3)
+                    )
+            )
+            .body(
+                COMMANDS_CLUSTERS_LINK_PATH,
+                EntitiesLinksMatcher.
+                    matchUrisAnyOrder(
+                        COMMANDS_API,
+                        CLUSTERS_LINK_KEY,
+                        CLUSTERS_OPTIONAL_HAL_LINK_PARAMETERS,
+                        Lists.newArrayList(id1, id2, id3)
+                    )
+            );
 
         // Try to limit the number of results
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(COMMANDS_API).param("size", "2"))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath(COMMANDS_LIST_PATH, Matchers.hasSize(2)))
-            .andDo(findResultHandler);
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(findFilter)
+            .param("size", 2)
+            .when()
+            .port(this.port)
+            .get(COMMANDS_API)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body(COMMANDS_LIST_PATH, Matchers.hasSize(2));
 
         // Query by name
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(COMMANDS_API).param("name", name2))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath(COMMANDS_LIST_PATH, Matchers.hasSize(1)))
-            .andExpect(MockMvcResultMatchers.jsonPath(COMMANDS_LIST_PATH + "[0].id", Matchers.is(id2)))
-            .andDo(findResultHandler);
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(findFilter)
+            .param("name", name2)
+            .when()
+            .port(this.port)
+            .get(COMMANDS_API)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body(COMMANDS_LIST_PATH, Matchers.hasSize(1))
+            .body(COMMANDS_LIST_PATH + "[0].id", Matchers.is(id2));
 
         // Query by user
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(COMMANDS_API).param("user", user3))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath(COMMANDS_LIST_PATH, Matchers.hasSize(1)))
-            .andExpect(MockMvcResultMatchers.jsonPath(COMMANDS_LIST_PATH + "[0].id", Matchers.is(id3)))
-            .andDo(findResultHandler);
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(findFilter)
+            .param("user", user3)
+            .when()
+            .port(this.port)
+            .get(COMMANDS_API)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body(COMMANDS_LIST_PATH, Matchers.hasSize(1))
+            .body(COMMANDS_LIST_PATH + "[0].id", Matchers.is(id3));
 
         // Query by statuses
-        this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .get(COMMANDS_API)
-                    .param("status", CommandStatus.ACTIVE.toString(), CommandStatus.INACTIVE.toString())
-            )
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath(COMMANDS_LIST_PATH, Matchers.hasSize(2)))
-            .andExpect(MockMvcResultMatchers.jsonPath(COMMANDS_LIST_PATH + "[0].id", Matchers.is(id3)))
-            .andExpect(MockMvcResultMatchers.jsonPath(COMMANDS_LIST_PATH + "[1].id", Matchers.is(id1)))
-            .andDo(findResultHandler);
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(findFilter)
+            .param("status", CommandStatus.ACTIVE.toString(), CommandStatus.INACTIVE.toString())
+            .when()
+            .port(this.port)
+            .get(COMMANDS_API)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body(COMMANDS_LIST_PATH, Matchers.hasSize(2))
+            .body(COMMANDS_LIST_PATH + "[0].id", Matchers.is(id3))
+            .body(COMMANDS_LIST_PATH + "[1].id", Matchers.is(id1));
 
         // Query by tags
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(COMMANDS_API).param("tag", "genie.id:" + id1))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath(COMMANDS_LIST_PATH, Matchers.hasSize(1)))
-            .andExpect(MockMvcResultMatchers.jsonPath(COMMANDS_LIST_PATH + "[0].id", Matchers.is(id1)))
-            .andDo(findResultHandler);
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(findFilter)
+            .param("tag", "genie.id:" + id1)
+            .when()
+            .port(this.port)
+            .get(COMMANDS_API)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body(COMMANDS_LIST_PATH, Matchers.hasSize(1))
+            .body(COMMANDS_LIST_PATH + "[0].id", Matchers.is(id1));
 
         //TODO: Add tests for sort, orderBy etc
 
@@ -411,12 +476,16 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
         final String commandResource = COMMANDS_API + "/{id}";
         final Command createdCommand = GenieObjectMapper.getMapper()
             .readValue(
-                this.mvc.perform(
-                    MockMvcRequestBuilders.get(commandResource, ID)
-                )
-                    .andReturn()
-                    .getResponse()
-                    .getContentAsByteArray(),
+                RestAssured
+                    .given(this.getRequestSpecification())
+                    .when()
+                    .port(this.port)
+                    .get(commandResource, ID)
+                    .then()
+                    .statusCode(Matchers.is(HttpStatus.OK.value()))
+                    .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+                    .extract()
+                    .asByteArray(),
                 CommandResource.class
             ).getContent();
         Assert.assertThat(createdCommand.getStatus(), Matchers.is(CommandStatus.ACTIVE));
@@ -439,32 +508,36 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
         createdCommand.getDescription().ifPresent(updateCommand::withDescription);
         createdCommand.getSetupFile().ifPresent(updateCommand::withSetupFile);
 
-        final RestDocumentationResultHandler updateResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter updateFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.CONTENT_TYPE_HEADER, // request header
             Snippets.ID_PATH_PARAM, // path parameters
             Snippets.getCommandRequestPayload() // payload fields
         );
 
-        this.mvc.perform(
-            RestDocumentationRequestBuilders
-                .put(commandResource, ID)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(GenieObjectMapper.getMapper().writeValueAsBytes(updateCommand.build()))
-        )
-            .andExpect(MockMvcResultMatchers.status().isNoContent())
-            .andDo(updateResultHandler);
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(updateFilter)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(updateCommand.build()))
+            .when()
+            .port(this.port)
+            .put(commandResource, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(commandResource, ID))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(
-                MockMvcResultMatchers.jsonPath(STATUS_PATH, Matchers.is(CommandStatus.INACTIVE.toString()))
-            );
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(commandResource, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body(STATUS_PATH, Matchers.is(CommandStatus.INACTIVE.toString()));
+
         Assert.assertThat(this.commandRepository.count(), Matchers.is(1L));
     }
 
@@ -484,41 +557,51 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             null
         );
         final String commandResource = COMMANDS_API + "/{id}";
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(commandResource, id))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.jsonPath(NAME_PATH, Matchers.is(NAME)));
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(commandResource, id)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body(NAME_PATH, Matchers.is(NAME));
 
 
         final String newName = UUID.randomUUID().toString();
         final String patchString = "[{ \"op\": \"replace\", \"path\": \"/name\", \"value\": \"" + newName + "\" }]";
         final JsonPatch patch = JsonPatch.fromJson(GenieObjectMapper.getMapper().readTree(patchString));
 
-        final RestDocumentationResultHandler patchResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter patchFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.CONTENT_TYPE_HEADER, // request headers
             Snippets.ID_PATH_PARAM, // path params
             Snippets.PATCH_FIELDS // request payload
         );
 
-        this.mvc
-            .perform(
-                RestDocumentationRequestBuilders
-                    .patch(commandResource, id)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(patch))
-            )
-            .andExpect(MockMvcResultMatchers.status().isNoContent())
-            .andDo(patchResultHandler);
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(patchFilter)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(patch))
+            .when()
+            .port(this.port)
+            .patch(commandResource, id)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(commandResource, id))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath(NAME_PATH, Matchers.is(newName)));
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(commandResource, id)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body(NAME_PATH, Matchers.is(newName));
+
         Assert.assertThat(this.commandRepository.count(), Matchers.is(1L));
     }
 
@@ -550,16 +633,20 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
         );
         Assert.assertThat(this.commandRepository.count(), Matchers.is(3L));
 
-        final RestDocumentationResultHandler deleteResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter deleteFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint())
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor()
         );
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.delete(COMMANDS_API))
-            .andExpect(MockMvcResultMatchers.status().isNoContent())
-            .andDo(deleteResultHandler);
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(deleteFilter)
+            .when()
+            .port(this.port)
+            .delete(COMMANDS_API)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
 
         Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
     }
@@ -611,21 +698,29 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
         );
         Assert.assertThat(this.commandRepository.count(), Matchers.is(3L));
 
-        final RestDocumentationResultHandler deleteResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter deleteFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM // path parameters
         );
 
-        this.mvc
-            .perform(RestDocumentationRequestBuilders.delete(COMMANDS_API + "/{id}", id2))
-            .andExpect(MockMvcResultMatchers.status().isNoContent())
-            .andDo(deleteResultHandler);
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(deleteFilter)
+            .when()
+            .port(this.port)
+            .delete(COMMANDS_API + "/{id}", id2)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(COMMANDS_API + "/{id}", id2))
-            .andExpect(MockMvcResultMatchers.status().isNotFound());
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(COMMANDS_API + "/{id}", id2)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NOT_FOUND.value()));
 
         Assert.assertThat(this.commandRepository.count(), Matchers.is(2L));
     }
@@ -646,23 +741,23 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             null
         );
 
-        final RestDocumentationResultHandler addResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter addFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM, // path params
             Snippets.CONTENT_TYPE_HEADER, // request header
             PayloadDocumentation.requestFields(Snippets.CONFIG_FIELDS) // response fields
         );
-        final RestDocumentationResultHandler getResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter getFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM, // path params
             Snippets.JSON_CONTENT_TYPE_HEADER, // response headers
             PayloadDocumentation.responseFields(Snippets.CONFIG_FIELDS) // response fields
         );
-        this.canAddElementsToResource(COMMANDS_API + "/{id}/configs", ID, addResultHandler, getResultHandler);
+        this.canAddElementsToResource(COMMANDS_API + "/{id}/configs", ID, addFilter, getFilter);
     }
 
     /**
@@ -681,15 +776,15 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             null
         );
 
-        final RestDocumentationResultHandler updateResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter updateFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.CONTENT_TYPE_HEADER, // Request header
             Snippets.ID_PATH_PARAM, // Path parameters
             PayloadDocumentation.requestFields(Snippets.CONFIG_FIELDS) // Request fields
         );
-        this.canUpdateElementsForResource(COMMANDS_API + "/{id}/configs", ID, updateResultHandler);
+        this.canUpdateElementsForResource(COMMANDS_API + "/{id}/configs", ID, updateFilter);
     }
 
     /**
@@ -708,13 +803,13 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             null
         );
 
-        final RestDocumentationResultHandler deleteResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter deleteFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM
         );
-        this.canDeleteElementsFromResource(COMMANDS_API + "/{id}/configs", ID, deleteResultHandler);
+        this.canDeleteElementsFromResource(COMMANDS_API + "/{id}/configs", ID, deleteFilter);
     }
 
     /**
@@ -732,18 +827,18 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             null
         );
 
-        final RestDocumentationResultHandler addResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter addFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM, // path params
             Snippets.CONTENT_TYPE_HEADER, // request header
             PayloadDocumentation.requestFields(Snippets.DEPENDENCIES_FIELDS) // response fields
         );
-        final RestDocumentationResultHandler getResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter getFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM, // path params
             Snippets.JSON_CONTENT_TYPE_HEADER, // response headers
             PayloadDocumentation.responseFields(Snippets.DEPENDENCIES_FIELDS) // response fields
@@ -751,8 +846,8 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
         this.canAddElementsToResource(
             COMMANDS_API + "/{id}/dependencies",
             ID,
-            addResultHandler,
-            getResultHandler
+            addFilter,
+            getFilter
         );
     }
 
@@ -771,10 +866,10 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             null
         );
 
-        final RestDocumentationResultHandler updateResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter updateFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.CONTENT_TYPE_HEADER, // Request header
             Snippets.ID_PATH_PARAM, // Path parameters
             PayloadDocumentation.requestFields(Snippets.DEPENDENCIES_FIELDS) // Request fields
@@ -782,7 +877,7 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
         this.canUpdateElementsForResource(
             COMMANDS_API + "/{id}/dependencies",
             ID,
-            updateResultHandler
+            updateFilter
         );
     }
 
@@ -801,16 +896,16 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             null
         );
 
-        final RestDocumentationResultHandler deleteResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter deleteFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM // Path variables
         );
         this.canDeleteElementsFromResource(
             COMMANDS_API + "/{id}/dependencies",
             ID,
-            deleteResultHandler
+            deleteFilter
         );
     }
 
@@ -831,23 +926,23 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
         );
         final String api = COMMANDS_API + "/{id}/tags";
 
-        final RestDocumentationResultHandler addResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter addFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.CONTENT_TYPE_HEADER, // Request header
             Snippets.ID_PATH_PARAM, // Path parameters
             PayloadDocumentation.requestFields(Snippets.TAGS_FIELDS) // Request fields
         );
-        final RestDocumentationResultHandler getResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter getFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM, // Path parameters
             Snippets.JSON_CONTENT_TYPE_HEADER, // Response header
             PayloadDocumentation.responseFields(Snippets.TAGS_FIELDS)
         );
-        this.canAddTagsToResource(api, ID, NAME, addResultHandler, getResultHandler);
+        this.canAddTagsToResource(api, ID, NAME, addFilter, getFilter);
     }
 
     /**
@@ -867,15 +962,15 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
         );
         final String api = COMMANDS_API + "/{id}/tags";
 
-        final RestDocumentationResultHandler updateResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter updateFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.CONTENT_TYPE_HEADER, // Request header
             Snippets.ID_PATH_PARAM, // Path parameters
             PayloadDocumentation.requestFields(Snippets.TAGS_FIELDS) // Request fields
         );
-        this.canUpdateTagsForResource(api, ID, NAME, updateResultHandler);
+        this.canUpdateTagsForResource(api, ID, NAME, updateFilter);
     }
 
     /**
@@ -895,13 +990,13 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
         );
         final String api = COMMANDS_API + "/{id}/tags";
 
-        final RestDocumentationResultHandler deleteResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter deleteFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM
         );
-        this.canDeleteTagsForResource(api, ID, NAME, deleteResultHandler);
+        this.canDeleteTagsForResource(api, ID, NAME, deleteFilter);
     }
 
     /**
@@ -921,15 +1016,15 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
         );
         final String api = COMMANDS_API + "/{id}/tags";
 
-        final RestDocumentationResultHandler deleteResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter deleteFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM.and(
                 RequestDocumentation.parameterWithName("tag").description("The tag to remove")
             )
         );
-        this.canDeleteTagForResource(api, ID, NAME, deleteResultHandler);
+        this.canDeleteTagForResource(api, ID, NAME, deleteFilter);
     }
 
     /**
@@ -947,12 +1042,16 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             null
         );
         final String commandApplicationsAPI = COMMANDS_API + "/{id}/applications";
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(commandApplicationsAPI, ID))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.empty()));
+
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(commandApplicationsAPI, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body("$", Matchers.empty());
 
         final String placeholder = UUID.randomUUID().toString();
         final String applicationId1 = UUID.randomUUID().toString();
@@ -972,10 +1071,10 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             null
         );
 
-        final RestDocumentationResultHandler addResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter addFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.CONTENT_TYPE_HEADER, // Request Headers
             Snippets.ID_PATH_PARAM, // Path parameters
             PayloadDocumentation.requestFields(
@@ -986,38 +1085,43 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             ) // Request payload
         );
 
-        this.mvc
-            .perform(
-                RestDocumentationRequestBuilders
-                    .post(commandApplicationsAPI, ID)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(
-                        GenieObjectMapper
-                            .getMapper()
-                            .writeValueAsBytes(Lists.newArrayList(applicationId1, applicationId2))
-                    )
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(addFilter)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(
+                GenieObjectMapper
+                    .getMapper()
+                    .writeValueAsBytes(Lists.newArrayList(applicationId1, applicationId2))
             )
-            .andExpect(MockMvcResultMatchers.status().isNoContent())
-            .andDo(addResultHandler);
+            .when()
+            .port(this.port)
+            .post(commandApplicationsAPI, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(commandApplicationsAPI, ID))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(applicationId1)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[1].id", Matchers.is(applicationId2)));
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(commandApplicationsAPI, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body("$", Matchers.hasSize(2))
+            .body("[0].id", Matchers.is(applicationId1))
+            .body("[1].id", Matchers.is(applicationId2));
 
         //Shouldn't add anything
-        this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .post(commandApplicationsAPI, ID)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(Lists.newArrayList()))
-            )
-            .andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
+        RestAssured
+            .given(this.getRequestSpecification())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(Lists.newArrayList()))
+            .when()
+            .port(this.port)
+            .post(commandApplicationsAPI, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.PRECONDITION_FAILED.value()));
 
         final String applicationId3 = UUID.randomUUID().toString();
         this.createConfigResource(
@@ -1027,19 +1131,21 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                 .build(),
             null
         );
-        this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .post(commandApplicationsAPI, ID)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(Lists.newArrayList(applicationId3)))
-            )
-            .andExpect(MockMvcResultMatchers.status().isNoContent());
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(addFilter)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(Lists.newArrayList(applicationId3)))
+            .when()
+            .port(this.port)
+            .post(commandApplicationsAPI, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
 
-        final RestDocumentationResultHandler getResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter getFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM, // Path parameters
             Snippets.HAL_CONTENT_TYPE_HEADER, // Response Headers
             PayloadDocumentation.responseFields(
@@ -1050,16 +1156,19 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             )
         );
 
-        this.mvc
-            .perform(RestDocumentationRequestBuilders.get(commandApplicationsAPI, ID))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(3)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(applicationId1)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[1].id", Matchers.is(applicationId2)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[2].id", Matchers.is(applicationId3)))
-            .andDo(getResultHandler);
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(getFilter)
+            .when()
+            .port(this.port)
+            .get(commandApplicationsAPI, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body("$", Matchers.hasSize(3))
+            .body("[0].id", Matchers.is(applicationId1))
+            .body("[1].id", Matchers.is(applicationId2))
+            .body("[2].id", Matchers.is(applicationId3));
     }
 
     /**
@@ -1077,12 +1186,15 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             null
         );
         final String commandApplicationsAPI = COMMANDS_API + "/{id}/applications";
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(commandApplicationsAPI, ID))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.empty()));
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(commandApplicationsAPI, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body("$", Matchers.empty());
 
         final String placeholder = UUID.randomUUID().toString();
         final String applicationId1 = UUID.randomUUID().toString();
@@ -1110,10 +1222,10 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             null
         );
 
-        final RestDocumentationResultHandler setResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter setFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.CONTENT_TYPE_HEADER, // Request Headers
             Snippets.ID_PATH_PARAM, // Path parameters
             PayloadDocumentation.requestFields(
@@ -1124,91 +1236,100 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             ) // Request payload
         );
 
-        this.mvc
-            .perform(
-                RestDocumentationRequestBuilders
-                    .put(commandApplicationsAPI, ID)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(
-                        GenieObjectMapper
-                            .getMapper()
-                            .writeValueAsBytes(Lists.newArrayList(applicationId1, applicationId2))
-                    )
-            )
-            .andExpect(MockMvcResultMatchers.status().isNoContent())
-            .andDo(setResultHandler);
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(setFilter)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(Lists.newArrayList(applicationId1, applicationId2)))
+            .when()
+            .port(this.port)
+            .put(commandApplicationsAPI, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(commandApplicationsAPI, ID))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(applicationId1)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[1].id", Matchers.is(applicationId2)));
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(commandApplicationsAPI, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body("$", Matchers.hasSize(2))
+            .body("[0].id", Matchers.is(applicationId1))
+            .body("[1].id", Matchers.is(applicationId2));
 
         // Should flip the order
-        this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .put(commandApplicationsAPI, ID)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(
-                        GenieObjectMapper
-                            .getMapper()
-                            .writeValueAsBytes(Lists.newArrayList(applicationId2, applicationId1))
-                    )
-            )
-            .andExpect(MockMvcResultMatchers.status().isNoContent());
+        RestAssured
+            .given(this.getRequestSpecification())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(Lists.newArrayList(applicationId2, applicationId1)))
+            .when()
+            .port(this.port)
+            .put(commandApplicationsAPI, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(commandApplicationsAPI, ID))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(applicationId2)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[1].id", Matchers.is(applicationId1)));
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(commandApplicationsAPI, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body("$", Matchers.hasSize(2))
+            .body("[0].id", Matchers.is(applicationId2))
+            .body("[1].id", Matchers.is(applicationId1));
 
         // Should reorder and add a new one
-        this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .put(commandApplicationsAPI, ID)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(
-                        GenieObjectMapper.getMapper().writeValueAsBytes(
-                            Lists.newArrayList(applicationId1, applicationId2, applicationId3))
-                    )
+        RestAssured
+            .given(this.getRequestSpecification())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(
+                GenieObjectMapper
+                    .getMapper()
+                    .writeValueAsBytes(Lists.newArrayList(applicationId1, applicationId2, applicationId3))
             )
-            .andExpect(MockMvcResultMatchers.status().isNoContent());
+            .when()
+            .port(this.port)
+            .put(commandApplicationsAPI, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(commandApplicationsAPI, ID))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(3)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(applicationId1)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[1].id", Matchers.is(applicationId2)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[2].id", Matchers.is(applicationId3)));
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(commandApplicationsAPI, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body("$", Matchers.hasSize(3))
+            .body("[0].id", Matchers.is(applicationId1))
+            .body("[1].id", Matchers.is(applicationId2))
+            .body("[2].id", Matchers.is(applicationId3));
 
         //Should clear applications
-        this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .put(commandApplicationsAPI, ID)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(Lists.newArrayList()))
-            )
-            .andExpect(MockMvcResultMatchers.status().isNoContent());
+        RestAssured
+            .given(this.getRequestSpecification())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(Lists.newArrayList()))
+            .when()
+            .port(this.port)
+            .put(commandApplicationsAPI, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(commandApplicationsAPI, ID))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.empty()));
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(commandApplicationsAPI, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body("$", Matchers.empty());
     }
 
     /**
@@ -1245,37 +1366,41 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             null
         );
 
-        this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .post(commandApplicationsAPI, ID)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(
-                        GenieObjectMapper
-                            .getMapper()
-                            .writeValueAsBytes(Lists.newArrayList(applicationId1, applicationId2))
-                    )
-            )
-            .andExpect(MockMvcResultMatchers.status().isNoContent());
+        RestAssured
+            .given(this.getRequestSpecification())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(Lists.newArrayList(applicationId1, applicationId2)))
+            .when()
+            .port(this.port)
+            .post(commandApplicationsAPI, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
 
-        final RestDocumentationResultHandler deleteResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter deleteFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM // Path parameters
         );
 
-        this.mvc
-            .perform(RestDocumentationRequestBuilders.delete(commandApplicationsAPI, ID))
-            .andExpect(MockMvcResultMatchers.status().isNoContent())
-            .andDo(deleteResultHandler);
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(deleteFilter)
+            .when()
+            .port(this.port)
+            .delete(commandApplicationsAPI, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(commandApplicationsAPI, ID))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.empty()));
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(commandApplicationsAPI, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body("$", Matchers.empty());
     }
 
     /**
@@ -1320,23 +1445,24 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             null
         );
 
-        this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .post(commandApplicationsAPI, ID)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(
-                        GenieObjectMapper.getMapper().writeValueAsBytes(
-                            Lists.newArrayList(applicationId1, applicationId2, applicationId3)
-                        )
-                    )
+        RestAssured
+            .given(this.getRequestSpecification())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(
+                GenieObjectMapper
+                    .getMapper()
+                    .writeValueAsBytes(Lists.newArrayList(applicationId1, applicationId2, applicationId3))
             )
-            .andExpect(MockMvcResultMatchers.status().isNoContent());
+            .when()
+            .port(this.port)
+            .post(commandApplicationsAPI, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
 
-        final RestDocumentationResultHandler deleteResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter deleteFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM.and(
                 RequestDocumentation
                     .parameterWithName("applicationId")
@@ -1344,44 +1470,59 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             ) // Path parameters
         );
 
-        this.mvc
-            .perform(RestDocumentationRequestBuilders
-                .delete(commandApplicationsAPI + "/{applicationId}", ID, applicationId2))
-            .andExpect(MockMvcResultMatchers.status().isNoContent())
-            .andDo(deleteResultHandler);
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(deleteFilter)
+            .when()
+            .port(this.port)
+            .delete(commandApplicationsAPI + "/{applicationId}", ID, applicationId2)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(commandApplicationsAPI, ID))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(applicationId1)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[1].id", Matchers.is(applicationId3)));
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(commandApplicationsAPI, ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body("$", Matchers.hasSize(2))
+            .body("[0].id", Matchers.is(applicationId1))
+            .body("[1].id", Matchers.is(applicationId3));
 
         // Check reverse side of relationship
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(APPLICATIONS_API + "/{id}/commands", applicationId1))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(1)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(ID)));
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(APPLICATIONS_API + "/{id}/commands", applicationId1)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body("$", Matchers.hasSize(1))
+            .body("[0].id", Matchers.is(ID));
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(APPLICATIONS_API + "/{id}/commands", applicationId2))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.empty()));
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(APPLICATIONS_API + "/{id}/commands", applicationId2)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body("$", Matchers.empty());
 
-        this.mvc
-            .perform(MockMvcRequestBuilders.get(APPLICATIONS_API + "/{id}/commands", applicationId3))
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(1)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(ID)));
+        RestAssured
+            .given(this.getRequestSpecification())
+            .when()
+            .port(this.port)
+            .get(APPLICATIONS_API + "/{id}/commands", applicationId3)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body("$", Matchers.hasSize(1))
+            .body("[0].id", Matchers.is(ID));
     }
 
     /**
@@ -1422,34 +1563,40 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
         );
 
         final List<String> commandIds = Lists.newArrayList(ID);
-        this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .post(CLUSTERS_API + "/" + cluster1Id + "/commands")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(commandIds))
-            )
-            .andExpect(MockMvcResultMatchers.status().isNoContent());
-        this.mvc
-            .perform(
-                MockMvcRequestBuilders
-                    .post(CLUSTERS_API + "/" + cluster3Id + "/commands")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(GenieObjectMapper.getMapper().writeValueAsBytes(commandIds))
-            )
-            .andExpect(MockMvcResultMatchers.status().isNoContent());
+        RestAssured
+            .given(this.getRequestSpecification())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(commandIds))
+            .when()
+            .port(this.port)
+            .post(CLUSTERS_API + "/{id}/commands", cluster1Id)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
+
+        RestAssured
+            .given(this.getRequestSpecification())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(GenieObjectMapper.getMapper().writeValueAsBytes(commandIds))
+            .when()
+            .port(this.port)
+            .post(CLUSTERS_API + "/{id}/commands", cluster3Id)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.NO_CONTENT.value()));
 
         Arrays.stream(
             GenieObjectMapper.getMapper().readValue(
-                this.mvc
-                    .perform(MockMvcRequestBuilders.get(COMMANDS_API + "/" + ID + "/clusters"))
-                    .andExpect(MockMvcResultMatchers.status().isOk())
-                    .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-                    .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-                    .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(2)))
-                    .andReturn()
-                    .getResponse()
-                    .getContentAsByteArray(), ClusterResource[].class
+                RestAssured
+                    .given(this.getRequestSpecification())
+                    .when()
+                    .port(this.port)
+                    .get(COMMANDS_API + "/{id}/clusters", ID)
+                    .then()
+                    .statusCode(Matchers.is(HttpStatus.OK.value()))
+                    .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+                    .body("$", Matchers.hasSize(2))
+                    .extract()
+                    .asByteArray(),
+                ClusterResource[].class
             )
         )
             .map(ClusterResource::getContent)
@@ -1463,10 +1610,10 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
             );
 
         // Test filtering
-        final RestDocumentationResultHandler getResultHandler = MockMvcRestDocumentation.document(
+        final RestDocumentationFilter getFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
-            Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+            this.getRequestPreprocessor(),
+            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM, // Path parameters
             RequestDocumentation.requestParameters(
                 RequestDocumentation
@@ -1485,18 +1632,19 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                     .attributes(Snippets.EMPTY_CONSTRAINTS)
             )
         );
-        this.mvc
-            .perform(
-                RestDocumentationRequestBuilders
-                    .get(COMMANDS_API + "/{id}/clusters", ID)
-                    .param("status", ClusterStatus.UP.toString())
-            )
-            .andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaTypes.HAL_JSON))
-            .andExpect(MockMvcResultMatchers.content().encoding(StandardCharsets.UTF_8.name()))
-            .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(1)))
-            .andExpect(MockMvcResultMatchers.jsonPath("$[0].id", Matchers.is(cluster1Id)))
-            .andDo(getResultHandler);
+
+        RestAssured
+            .given(this.getRequestSpecification())
+            .filter(getFilter)
+            .param("status", ClusterStatus.UP.toString())
+            .when()
+            .port(this.port)
+            .get(COMMANDS_API + "/{id}/clusters", ID)
+            .then()
+            .statusCode(Matchers.is(HttpStatus.OK.value()))
+            .contentType(Matchers.equalToIgnoringCase(MediaTypes.HAL_JSON_UTF8_VALUE))
+            .body("$", Matchers.hasSize(1))
+            .body("[0].id", Matchers.is(cluster1Id));
     }
 
     /**
@@ -1535,13 +1683,15 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
         for (Command invalidCommandResource : invalidCommandResources) {
             Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
 
-            this.mvc
-                .perform(
-                    MockMvcRequestBuilders.post(COMMANDS_API)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(GenieObjectMapper.getMapper().writeValueAsBytes(invalidCommandResource))
-                )
-                .andExpect(MockMvcResultMatchers.status().isPreconditionFailed());
+            RestAssured
+                .given(this.getRequestSpecification())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(GenieObjectMapper.getMapper().writeValueAsBytes(invalidCommandResource))
+                .when()
+                .port(this.port)
+                .post(COMMANDS_API)
+                .then()
+                .statusCode(Matchers.is(HttpStatus.PRECONDITION_FAILED.value()));
 
             Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
         }

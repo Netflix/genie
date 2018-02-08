@@ -1,12 +1,20 @@
 package com.netflix.genie.web.controllers;
 
+import com.netflix.genie.GenieWeb;
 import com.netflix.genie.test.categories.IntegrationTest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
@@ -23,16 +31,23 @@ import java.util.UUID;
  * @since 3.2.0
  */
 @Category(IntegrationTest.class)
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = GenieWeb.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles(resolver = IntegrationTestActiveProfilesResolver.class)
+@AutoConfigureMockMvc
 @Slf4j
-public class UIControllerIntegrationTest extends RestControllerIntegrationTestsBase {
+public class UIControllerIntegrationTest {
+
+    @Autowired
+    private MockMvc mvc;
 
     /**
      * Test forwarding of various UI pages to index.html.
+     *
      * @throws Exception in case of error
      */
     @Test
     public void testForwardingToIndex() throws Exception {
-
         final List<String> validPaths = Arrays.asList(
             "/",
             "/applications",
@@ -53,11 +68,11 @@ public class UIControllerIntegrationTest extends RestControllerIntegrationTestsB
 
     /**
      * Test serving of the index.html file.
+     *
      * @throws Exception in case of error
      */
     @Test
     public void testGetIndex() throws Exception {
-
         final String indexContent;
         InputStream is = null;
 
@@ -94,11 +109,11 @@ public class UIControllerIntegrationTest extends RestControllerIntegrationTestsB
 
     /**
      * Test forwarding of job files to the jobs API.
+     *
      * @throws Exception in case of error
      */
     @Test
     public void getFile() throws Exception {
-
         final String jobId = UUID.randomUUID().toString();
         final String file = "foo/bar.txt";
 
