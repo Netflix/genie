@@ -20,6 +20,8 @@ package com.netflix.genie.agent.cli;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine;
+import com.netflix.genie.agent.execution.statemachine.States;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
@@ -37,23 +39,35 @@ import org.springframework.stereotype.Component;
 class ExecCommand implements AgentCommand {
 
     private final ExecCommandArguments execCommandArguments;
+    private final JobExecutionStateMachine stateMachine;
 
-    ExecCommand(final ExecCommandArguments execCommandArguments) {
+    ExecCommand(
+        final ExecCommandArguments execCommandArguments,
+        final JobExecutionStateMachine stateMachine
+    ) {
         this.execCommandArguments = execCommandArguments;
+        this.stateMachine = stateMachine;
     }
 
     @Override
     public void run() {
-        try {
-            // TODO placeholder for actual job launch...
-            log.info("Executing job...");
-            Thread.sleep(execCommandArguments.getJobTimeout());
-            log.info("Job completed");
+        log.info("Running job state machine");
+        stateMachine.start();
 
-        } catch (final InterruptedException e) {
-            log.warn("Interrupted during job execution");
-            Thread.currentThread().interrupt();
+        final States finalstate;
+        try {
+            finalstate = stateMachine.waitForStop();
+        } catch (final Exception e) {
+            log.warn("Job state machine execution failed", e);
+            throw new RuntimeException("Job execution error", e);
         }
+
+        if (!States.END.equals(finalstate)) {
+            log.warn("Job execution failed with with exception");
+            throw new RuntimeException("Job execution failed (final state: {})" + finalstate);
+        }
+
+        log.info("Job execution completed");
     }
 
     @Component
