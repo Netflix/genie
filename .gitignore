@@ -9,6 +9,7 @@
 *.pyc
 genie-web-int-tests/bin/
 genie-web/bin/
+*.pdf
 
 # Per Build Generated Sources #
 ###############################
