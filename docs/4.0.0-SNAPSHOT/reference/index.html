@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2018-02-05</span>
+<span id="revdate">2018-02-09</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -730,7 +730,8 @@ b.conum * { color: inherit !important; }
 <li><a href="#_library_upgrades">2.2. Library Upgrades</a></li>
 <li><a href="#_property_changes">2.3. Property Changes</a>
 <ul class="sectlevel3">
-<li><a href="#_removed">2.3.1. Removed</a></li>
+<li><a href="#_renamed">2.3.1. Renamed</a></li>
+<li><a href="#_removed">2.3.2. Removed</a></li>
 </ul>
 </li>
 </ul>
@@ -760,7 +761,7 @@ b.conum * { color: inherit !important; }
 <li><a href="#_added">5.3.1. Added</a></li>
 <li><a href="#_changed_default_value">5.3.2. Changed Default Value</a></li>
 <li><a href="#_removed_2">5.3.3. Removed</a></li>
-<li><a href="#_renamed">5.3.4. Renamed</a></li>
+<li><a href="#_renamed_2">5.3.4. Renamed</a></li>
 </ul>
 </li>
 <li><a href="#_database_upgrades_2">5.4. Database Upgrades</a></li>
@@ -911,6 +912,9 @@ For a demo of this version of Genie please see the
 <div class="ulist">
 <ul>
 <li>
+<p>Upgrade to Spring Boot 2.0</p>
+</li>
+<li>
 <p>Switched to <a href="https://jcp.org/en/jsr/detail?id=310">JSR 310</a> classes for date and time manipulation</p>
 </li>
 <li>
@@ -924,6 +928,18 @@ For a demo of this version of Genie please see the
 <div class="ulist">
 <ul>
 <li>
+<p>Spring Boot 2.0</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Many changes see their
+<a href="https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.0-Release-Notes">Release Notes</a> and
+<a href="https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.0-Migration-Guide">Migration Guide</a></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
 <p>Upgrade to <a href="http://hibernate.org/orm/releases/5.2/">Hibernate 5.2.x</a></p>
 <div class="ulist">
 <ul>
@@ -933,13 +949,66 @@ For a demo of this version of Genie please see the
 </ul>
 </div>
 </li>
+<li>
+<p>Switched to <a href="https://brettwooldridge.github.io/HikariCP/">HikariCP</a> for DB connection pool</p>
+</li>
 </ul>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_property_changes"><a class="anchor" href="#_property_changes"></a>2.3. Property Changes</h3>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Many Spring properties were changed as part of the Boot 2.0 release. Those are not documented here. Please
+refer to their documentation.
+</td>
+</tr>
+</table>
+</div>
 <div class="sect3">
-<h4 id="_removed"><a class="anchor" href="#_removed"></a>2.3.1. Removed</h4>
+<h4 id="_renamed"><a class="anchor" href="#_renamed"></a>2.3.1. Renamed</h4>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 33%;">
+<col style="width: 33%;">
+<col style="width: 33%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Old Name</th>
+<th class="tableblock halign-left valign-top">New Name</th>
+<th class="tableblock halign-left valign-top">Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.clusterChecker.*</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.cluster-checker.*</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Modifications to how Spring handled
+<a href="https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.0-Migration-Guide#relaxed-binding">property binding</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.databaseCleanup.*</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.*</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Modifications to how Spring handled
+<a href="https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.0-Migration-Guide#relaxed-binding">property binding</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.diskCleanup.*</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.disk-cleanup.*</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Modifications to how Spring handled
+<a href="https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.0-Migration-Guide#relaxed-binding">property binding</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_removed"><a class="anchor" href="#_removed"></a>2.3.2. Removed</h4>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 50%;">
@@ -1094,24 +1163,24 @@ drop them yourself if they&#8217;re no longer needed.
 <div class="ulist">
 <ul>
 <li>
-<p>Upgrade Spring Boot to 1.5.10.RELEASE</p>
+<p>Upgrade Spring Boot to 2.0.0.RC1</p>
 </li>
 <li>
-<p>Upgrade to Spring Platform IO Brussels-SR7 for library dependency management</p>
+<p>Upgrade to Spring Platform IO Cairo-BUILD-SNAPSHOT for library dependency management</p>
 <div class="ulist">
 <ul>
 <li>
-<p><a href="http://docs.spring.io/platform/docs/Brussels-SR7/reference/htmlsingle/">Reference Docs</a></p>
+<p><a href="http://docs.spring.io/platform/docs/Cairo-BUILD-SNAPSHOT/reference/htmlsingle/">Reference Docs</a></p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p>Upgrade to Spring Cloud Edgware.SR1 for cloud dependency management</p>
+<p>Upgrade to Spring Cloud Finchley.M5 for cloud dependency management</p>
 <div class="ulist">
 <ul>
 <li>
-<p><a href="http://cloud.spring.io/spring-cloud-static/Edgware.SR1/">Reference Docs</a></p>
+<p><a href="http://cloud.spring.io/spring-cloud-static/Finchley.M5/">Reference Docs</a></p>
 </li>
 </ul>
 </div>
@@ -1404,7 +1473,7 @@ time are deleted.</p></td>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">spring.session.store-type</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The back end storage system for Spring to store HTTP session information. See
-<a href="http://docs.spring.io/spring-boot/docs/1.5.10.RELEASE/reference/htmlsingle/#boot-features-session">Spring Boot Session</a>
+<a href="http://docs.spring.io/spring-boot/docs/2.0.0.RC1/reference/htmlsingle/#boot-features-session">Spring Boot Session</a>
 for more information. Currently on classpath only none, hash_map, redis and jdbc will work.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">hash_map</p></td>
 </tr>
@@ -1445,7 +1514,7 @@ for more information. Currently on classpath only none, hash_map, redis and jdbc
 
 </div>
 <div class="sect3">
-<h4 id="_renamed"><a class="anchor" href="#_renamed"></a>5.3.4. Renamed</h4>
+<h4 id="_renamed_2"><a class="anchor" href="#_renamed_2"></a>5.3.4. Renamed</h4>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 50%;">
@@ -4275,7 +4344,7 @@ from a <code>.genie/</code> directory stored in the users home directory (e.g. <
 </div>
 <div class="paragraph">
 <p>For more details see the
-<a href="http://docs.spring.io/spring-boot/docs/1.5.10.RELEASE/reference/htmlsingle/#boot-features-external-config">Spring Boot</a>
+<a href="http://docs.spring.io/spring-boot/docs/2.0.0.RC1/reference/htmlsingle/#boot-features-external-config">Spring Boot</a>
 documentation on external configuration.</p>
 </div>
 </div>
@@ -4303,7 +4372,7 @@ Genie and it may be more overhead than you&#8217;re comfortable with.</p>
 <div class="paragraph">
 <p>Genie has a lot of available configuration options. For descriptions of specific properties you can see the
 <a href="#_properties">Properties</a> section below. Additionally if you want to know how to configure more parts of the application you
-should have a look at the <a href="http://docs.spring.io/spring-boot/docs/1.5.10.RELEASE/reference/htmlsingle/">Spring Boot</a>
+should have a look at the <a href="http://docs.spring.io/spring-boot/docs/2.0.0.RC1/reference/htmlsingle/">Spring Boot</a>
 docs as they will go in depth on how to configure the various Spring components used in Genie.</p>
 </div>
 <div class="sect3">
@@ -4311,7 +4380,7 @@ docs as they will go in depth on how to configure the various Spring components 
 <div class="paragraph">
 <p>Spring provides a mechanism of segregating parts of application configuration and activating them in certain
 conditions. This mechanism is known as
-<a href="http://docs.spring.io/spring-boot/docs/1.5.10.RELEASE/reference/htmlsingle/#boot-features-profiles">profiles</a>. By
+<a href="http://docs.spring.io/spring-boot/docs/2.0.0.RC1/reference/htmlsingle/#boot-features-profiles">profiles</a>. By
 default Genie will run with the <code>dev</code> profile activated. This means that all the properties in <code>application-dev.yml</code>
 will be appended to, or overwrite, the properties in <code>application.yml</code> which are the defaults. Changing the active
 profiles is easy you just need to change the property <code>spring.profiles.active</code> and pass in a comma separated list of
@@ -4589,8 +4658,8 @@ the <a href="#_properties">Properties</a> section below for the properties you&#
 <div class="paragraph">
 <p>This section describes the various properties that can be set to control the behavior of your Genie node and cluster.
 For more information on Spring properties you should see the
-<a href="http://docs.spring.io/spring-boot/docs/1.5.10.RELEASE/reference/htmlsingle/">Spring Boot</a> reference documentation
-and the <a href="http://cloud.spring.io/spring-cloud-static/Edgware.SR1/">Spring Cloud</a> documentation.
+<a href="http://docs.spring.io/spring-boot/docs/2.0.0.RC1/reference/htmlsingle/">Spring Boot</a> reference documentation
+and the <a href="http://cloud.spring.io/spring-cloud-static/Finchley.M5/">Spring Cloud</a> documentation.
 The Spring properties described here are ones that we have overridden from Spring defaults.</p>
 </div>
 <div class="sect2">
@@ -4922,40 +4991,40 @@ determined by Zookeeper or other mechanism via Spring</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.clusterChecker.healthIndicatorsToIgnore</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.cluster-checker.healthIndicatorsToIgnore</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The health indicator groups from the actuator /health endpoint to ignore when determining if a node is lost or not as
 a comma separated list</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">memory,genieMemory,discoveryComposite</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.clusterChecker.lostThreshold</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.cluster-checker.lostThreshold</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The number of times a Genie nodes need to fail health check in order for jobs running on that node to be marked as
 lost and failed by the Genie leader</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.clusterChecker.port</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.cluster-checker.port</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The port to connect to other Genie nodes on</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">8080</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.clusterChecker.rate</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.cluster-checker.rate</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The number of milliseconds to wait between health checks to other Genie nodes</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">300000</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.clusterChecker.scheme</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.cluster-checker.scheme</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The scheme (http or https) for connecting to other Genie nodes</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">http</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.databaseCleanup.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.enabled</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether or not to delete old and unused records from the database at a scheduled interval.
-See: <code>genie.tasks.databaseCleanup.expression</code></p></td>
+See: <code>genie.tasks.database-cleanup.expression</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.databaseCleanup.maxDeletedPerTransaction</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.maxDeletedPerTransaction</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The number of job records (across multiple tables) to delete from the database
  in a single transaction. Genie will loop and perform multiple transactions until
  all jobs older than the retention time are deleted.
@@ -4963,52 +5032,52 @@ See: <code>genie.tasks.databaseCleanup.expression</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1000</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.databaseCleanup.pageSize</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.pageSize</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The page size used within each cleanup transaction to iterate through the job records</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1000</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.databaseCleanup.expression</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.expression</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The cron expression for how often to run the database cleanup task</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0 0 0 * * *</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.databaseCleanup.retention</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.retention</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The number of days to retain jobs in the database</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">90</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.databaseCleanup.skipJobsCleanup</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.skipJobsCleanup</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Skip the Jobs table when performing database cleanup</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.databaseCleanup.skipClustersCleanup</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.skipClustersCleanup</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Skip the Clusters table when performing database cleanup</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.databaseCleanup.skipFilesCleanup</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.skipFilesCleanup</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Skip the Files table when performing database cleanup</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.databaseCleanup.skipTagsCleanup</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.database-cleanup.skipTagsCleanup</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Skip the Tags table when performing database cleanup</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.diskCleanup.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.disk-cleanup.enabled</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether or not to remove old job directories on the Genie node or not</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.diskCleanup.expression</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.disk-cleanup.expression</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">How often to run the disk cleanup task as a cron expression</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">0 0 0 * * *</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.diskCleanup.retention</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.tasks.disk-cleanup.retention</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The number of days to leave old job directories on disk</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
 </tr>
@@ -5050,7 +5119,7 @@ to the number of CPU cores x 2 + 1</p></td>
 <div class="sect3">
 <h4 id="_spring_properties"><a class="anchor" href="#_spring_properties"></a>9.1.2. Spring Properties</h4>
 <div class="paragraph">
-<p><a href="http://docs.spring.io/spring-boot/docs/1.5.10.RELEASE/reference/htmlsingle/#common-application-properties">Spring Properties</a></p>
+<p><a href="http://docs.spring.io/spring-boot/docs/2.0.0.RC1/reference/htmlsingle/#common-application-properties">Spring Properties</a></p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
@@ -5067,49 +5136,13 @@ to the number of CPU cores x 2 + 1</p></td>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">banner.location</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Banner file location</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie-banner.txt</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">eureka.client.enabled</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to create a eureka client or not</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">eureka.client.serviceUrl.defaultZone</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The URL of the Eureka service</p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">eureka.client.register-with-eureka</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Whether or not to register this Genie node with the Eureka service. Will only happen if the <code>eureka.client.enabled</code>
-property is true</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">info.genie.version</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The Genie version to be displayed by the UI and returned by the actuator /info endpoint. Set by the build.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Current build version</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">management.context-path</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Where the actuator endpoints are mounted within the Genie application</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">/actuator</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">management.security.enabled</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to enable basic security on the actuator endpoints</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">management.security.roles</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The roles a user needs to have in order to access the Actuator endpoints</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">ADMIN</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">security.basic.enabled</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Enable basic authentication</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">management.metrics.export.atlas.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to publish metrics to configured Atlas instance</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
 </tr>
 <tr>
@@ -5143,19 +5176,85 @@ property is true</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.banner.location</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Banner file location</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie-banner.txt</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">spring.data.redis.repositories.enabled</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether Spring data repositories should attempt to be created for Redis</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">spring.http.multipart.max-file-size</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Max attachment file size. Values can use the suffixed "MB" or "KB" to indicate a Megabyte or Kilobyte size.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">100MB</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.url</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">JDBC URL of the database</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jdbc:h2:mem:genie</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">spring.http.multipart.max-request-size</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Max job request size. Values can use the suffixed "MB" or "KB" to indicate a Megabyte or Kilobyte size.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">200MB</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.username</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Username for the datasource</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">root</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.password</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Database password</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.hikari.auto-commit</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to auto commit transactions</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.hikari.connection-test-query</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Query to use to check if connections are ok</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Select 0;</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.hikari.leak-detection-threshold</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">How long to wait (in milliseconds) before a connection should be considered leaked out of the pool if it hasn&#8217;t been
+returned</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">30000</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.hikari.maximum-pool-size</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Maximum connection pool size</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">40</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.hikari.minimum-idle</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Fewest allowed idle connections</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.hikari.pool-name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The name of the connection pool. Will show up in logs under this name.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie-hikari-db-pool</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.flyway.baselineDescription</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Description for the initial baseline of a database instance</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Base Version</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.flyway.baselineOnMigrate</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether or not to baseline when Flyway is present and the datasource targets a DB that isn&#8217;t managed by Flyway</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.flyway.baselineVersion</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Initial DB version (When Genie migrated to Flyway is current setting. Shouldn&#8217;t touch)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3.2.0</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.flyway.locations</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Where flyway should look for database migration files</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">classpath:db/migration/{vendor}</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.jackson.serialization.write-dates-as-timestamps</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to serialize instants as timestamps or ISO8601 strings</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">spring.jackson.time-zone</p></td>
@@ -5166,6 +5265,12 @@ property is true</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">spring.jpa.hibernate.ddl-auto</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">DDL mode. This is actually a shortcut for the "hibernate.hbm2ddl.auto" property.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">validate</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.jpa.hibernate.properties.hibernate.jdbc.time_zone</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The timezone to use when writing dates to the database
+<a href="https://moelholm.com/2016/11/09/spring-boot-controlling-timezones-with-hibernate/">see article</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">UTC</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">spring.profiles.active</p></td>
@@ -5188,16 +5293,21 @@ property is true</p></td>
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">spring.session.store-type</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The back end storage system for Spring to store HTTP session information. See
-<a href="http://docs.spring.io/spring-boot/docs/1.5.10.RELEASE/reference/htmlsingle/#boot-features-session">Spring Boot Session</a>
-for more information. Currently on classpath only none, hash_map, redis and jdbc will work.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">hash_map</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.servlet.multipart.max-file-size</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Max attachment file size. Values can use the suffixed "MB" or "KB" to indicate a Megabyte or Kilobyte size.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">100MB</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">spring.velocity.enabled</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Whether <a href="http://velocity.apache.org/">velocity</a> should be enabled for Spring MVC</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.servlet.multipart.max-request-size</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Max job request size. Values can use the suffixed "MB" or "KB" to indicate a Megabyte or Kilobyte size.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">200MB</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.session.store-type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The back end storage system for Spring to store HTTP session information. See
+<a href="http://docs.spring.io/spring-boot/docs/2.0.0.RC1/reference/htmlsingle/#boot-features-session">Spring Boot Session</a>
+for more information. Currently on classpath only none, redis and jdbc will work.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">none</p></td>
 </tr>
 </tbody>
 </table>
@@ -5220,23 +5330,6 @@ for more information. Currently on classpath only none, hash_map, redis and jdbc
 <th class="tableblock halign-left valign-top">Default Value</th>
 </tr>
 </thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.url</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">JDBC URL of the database</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">jdbc:h2:mem:genie</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.username</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Username for the datasource</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">root</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.password</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Database password</p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-</tbody>
 </table>
 </div>
 <div class="sect3">
@@ -5258,7 +5351,7 @@ for more information. Currently on classpath only none, hash_map, redis and jdbc
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.url</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">JDBC URL of the database</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">jdbc:mysql://127.0.0.1/genie</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">jdbc:mysql://127.0.0.1/genie?useUnicode=yes&amp;characterEncoding=UTF-8&amp;useLegacyDatetimeCode=false</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.username</p></td>
@@ -5271,54 +5364,54 @@ for more information. Currently on classpath only none, hash_map, redis and jdbc
 <td class="tableblock halign-left valign-top"></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.tomcat.min-idle</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Minimum number of idle connection pool threads</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">5</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.tomcat.max-idle</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Maximum number of idle connection pool threads</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">20</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.tomcat.max-active</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Maximum number of active database connection pool threads</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">40</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.tomcat.validation-query</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Query to use to test a healthy connection</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">select 0;</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.tomcat.test-on-borrow</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Test the connection when a new connection is borrowed from the pool</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.hikari.data-source-properties.cachePrepStmts</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration">MySQL Tuning</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.tomcat.test-on-connect</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Test the connection health when connecting</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.hikari.data-source-properties.prepStmtCacheSize</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration">MySQL Tuning</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">250</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.hikari.data-source-properties.prepStmtCacheSqlLimit</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration">MySQL Tuning</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2048</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.hikari.data-source-properties.useServerPrepStmts</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration">MySQL Tuning</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.tomcat.test-on-return</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Test the connection health on return to the pool</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.hikari.data-source-properties.useLocalSessionState</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration">MySQL Tuning</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.tomcat.test-while-idle</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Test the connection health of a thread while it is idle</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.hikari.data-source-properties.useLocalTransactionState</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration">MySQL Tuning</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.tomcat.min-evictable-idle-time-millis</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time before a connection thread is evicted from the pool if its been idle</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">60000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.hikari.data-source-properties.rewriteBatchedStatements</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration">MySQL Tuning</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.tomcat.time-between-eviction-run-millis</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The time between runs of the eviction process</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">10000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.hikari.data-source-properties.cacheResultSetMetadata</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration">MySQL Tuning</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.hikari.data-source-properties.elideSetAutoCommits</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration">MySQL Tuning</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.hikari.data-source-properties.maintainTimeStats</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration">MySQL Tuning</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
 </tr>
 </tbody>
 </table>
@@ -5917,7 +6010,7 @@ and system metrics and statistics.</p>
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2018-02-05 21:01:19 UTC
+Last updated 2018-02-09 19:11:27 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
