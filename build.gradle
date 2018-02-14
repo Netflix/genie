@@ -99,7 +99,7 @@ configure(javaProjects) {
                 entry "protoc-gen-grpc-java"
                 entry "grpc-testing"
             }
-            // TODO: Remove once Boot 2.0 fully released and all poms standardize
+            // TODO: Remove once Boot 2.0 fully released and all boms standardize
             dependencySet(group: "io.micrometer", version: "1.0.0-rc.9") {
                 entry "micrometer-core"
                 entry "micrometer-registry-atlas"
@@ -129,6 +129,33 @@ configure(javaProjects) {
             dependencySet(group: "org.spockframework", version: "1.1-groovy-2.4") {
                 entry "spock-core"
                 entry "spock-spring"
+            }
+            // TODO: Remove once Boot 2.0 fully released and all boms standardize
+            dependencySet(group: "org.springframework.boot", version: "${spring_boot_version}") {
+                entry "spring-boot"
+                entry "spring-boot-actuator"
+                entry "spring-boot-actuator-autoconfigure"
+                entry "spring-boot-autoconfigure"
+                entry "spring-boot-configuration-processor"
+                entry "spring-boot-starter"
+                entry "spring-boot-starter-actuator"
+                entry "spring-boot-starter-aop"
+                entry "spring-boot-starter-data-jpa"
+                entry "spring-boot-starter-data-redis"
+                entry "spring-boot-starter-hateoas"
+                entry "spring-boot-starter-integration"
+                entry "spring-boot-starter-jdbc"
+                entry "spring-boot-starter-jetty"
+                entry "spring-boot-starter-json"
+                entry "spring-boot-starter-logging"
+                entry "spring-boot-starter-mail"
+                entry "spring-boot-starter-security"
+                entry "spring-boot-starter-test"
+                entry "spring-boot-starter-thymeleaf"
+                entry "spring-boot-starter-tomcat"
+                entry "spring-boot-starter-web"
+                entry "spring-boot-test"
+                entry "spring-boot-test-autoconfigure"
             }
             dependency("org.springframework.security.extensions:spring-security-saml2-core:1.0.3.RELEASE")
             dependency("org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:2.0.0.BUILD-SNAPSHOT")
