@@ -46,12 +46,11 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.cloud.contract.wiremock.restdocs.WireMockSnippet;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.JUnitRestDocumentation;
-import org.springframework.restdocs.operation.preprocess.OperationRequestPreprocessor;
-import org.springframework.restdocs.operation.preprocess.OperationResponsePreprocessor;
 import org.springframework.restdocs.operation.preprocess.Preprocessors;
 import org.springframework.restdocs.restassured3.RestAssuredRestDocumentation;
 import org.springframework.restdocs.restassured3.RestDocumentationFilter;
@@ -171,7 +170,21 @@ public abstract class RestControllerIntegrationTestsBase {
         this.tagRepository.deleteAll();
 
         this.requestSpecification = new RequestSpecBuilder()
-            .addFilter(RestAssuredRestDocumentation.documentationConfiguration(this.restDocumentation))
+            .addFilter(
+                RestAssuredRestDocumentation
+                    .documentationConfiguration(this.restDocumentation)
+                    .snippets().withAdditionalDefaults(new WireMockSnippet())
+                    .and()
+                    .operationPreprocessors()
+                    .withRequestDefaults(
+                        Preprocessors.prettyPrint(),
+                        RestAssuredPreprocessors.modifyUris().scheme(URI_SCHEME).host(URI_HOST).removePort()
+                    )
+                    .withResponseDefaults(
+                        Preprocessors.prettyPrint(),
+                        RestAssuredPreprocessors.modifyUris().host(URI_HOST).scheme(URI_SCHEME).removePort()
+                    )
+            )
             .build();
     }
 
@@ -537,20 +550,6 @@ public abstract class RestControllerIntegrationTestsBase {
             Assert.fail();
         }
         return location.substring(location.lastIndexOf("/") + 1);
-    }
-
-    OperationRequestPreprocessor getRequestPreprocessor() {
-        return Preprocessors.preprocessRequest(
-            Preprocessors.prettyPrint(),
-            RestAssuredPreprocessors.modifyUris().scheme(URI_SCHEME).host(URI_HOST).removePort()
-        );
-    }
-
-    OperationResponsePreprocessor getResponsePreprocessor() {
-        return Preprocessors.preprocessResponse(
-            Preprocessors.prettyPrint(),
-            RestAssuredPreprocessors.modifyUris().host(URI_HOST).scheme(URI_SCHEME).removePort()
-        );
     }
 
     static class EntityLinkMatcher extends TypeSafeMatcher<String> {
