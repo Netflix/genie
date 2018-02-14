@@ -312,8 +312,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         if (attachments != null) {
             final RestDocumentationFilter createResultFilter = RestAssuredRestDocumentation.document(
                 "{class-name}/" + documentationId + "/submitJobWithAttachments/",
-                this.getRequestPreprocessor(),
-                this.getResponsePreprocessor(),
                 HeaderDocumentation.requestHeaders(
                     HeaderDocumentation
                         .headerWithName(HttpHeaders.CONTENT_TYPE)
@@ -364,8 +362,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             // Use regular POST
             final RestDocumentationFilter createResultFilter = RestAssuredRestDocumentation.document(
                 "{class-name}/" + documentationId + "/submitJobWithoutAttachments/",
-                this.getRequestPreprocessor(),
-                this.getResponsePreprocessor(),
                 Snippets.CONTENT_TYPE_HEADER, // Request headers
                 Snippets.getJobRequestRequestPayload(), // Request Fields
                 Snippets.LOCATION_HEADER // Response Headers
@@ -392,8 +388,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     private void checkJobStatus(final int documentationId, final String id) {
         final RestDocumentationFilter getResultFilter = RestAssuredRestDocumentation.document(
             "{class-name}/" + documentationId + "/getJobStatus/",
-            this.getRequestPreprocessor(),
-            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM, // Path parameters
             Snippets.JSON_CONTENT_TYPE_HEADER, // Response Headers
             PayloadDocumentation.responseFields(
@@ -418,8 +412,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     private void checkJob(final int documentationId, final String id, final List<String> commandArgs) {
         final RestDocumentationFilter getResultFilter = RestAssuredRestDocumentation.document(
             "{class-name}/" + documentationId + "/getJob/",
-            this.getRequestPreprocessor(),
-            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM, // Path parameters
             Snippets.HAL_CONTENT_TYPE_HEADER, // Response Headers
             Snippets.getJobResponsePayload(), // Response fields
@@ -477,8 +469,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         // Check getting a directory as json
         final RestDocumentationFilter jsonResultFilter = RestAssuredRestDocumentation.document(
             "{class-name}/" + documentationId + "/getJobOutput/json/",
-            this.getRequestPreprocessor(),
-            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM.and(
                 RequestDocumentation
                     .parameterWithName("filePath")
@@ -520,8 +510,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         // Check getting a directory as HTML
         final RestDocumentationFilter htmlResultFilter = RestAssuredRestDocumentation.document(
             "{class-name}/" + documentationId + "/getJobOutput/html/",
-            this.getRequestPreprocessor(),
-            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM.and(
                 RequestDocumentation
                     .parameterWithName("filePath")
@@ -556,8 +544,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         // Check getting a directory as HTML
         final RestDocumentationFilter fileResultFilter = RestAssuredRestDocumentation.document(
             "{class-name}/" + documentationId + "/getJobOutput/file/",
-            this.getRequestPreprocessor(),
-            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM.and(
                 RequestDocumentation
                     .parameterWithName("filePath")
@@ -613,8 +599,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     ) {
         final RestDocumentationFilter getResultFilter = RestAssuredRestDocumentation.document(
             "{class-name}/" + documentationId + "/getJobRequest/",
-            this.getRequestPreprocessor(),
-            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM, // Path parameters
             Snippets.HAL_CONTENT_TYPE_HEADER, // Response Headers
             Snippets.getJobRequestResponsePayload(), // Response fields
@@ -661,8 +645,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     private void checkJobExecution(final int documentationId, final String id) {
         final RestDocumentationFilter getResultFilter = RestAssuredRestDocumentation.document(
             "{class-name}/" + documentationId + "/getJobExecution/",
-            this.getRequestPreprocessor(),
-            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM, // Path parameters
             Snippets.HAL_CONTENT_TYPE_HEADER, // Response Headers
             Snippets.getJobExecutionResponsePayload(), // Response fields
@@ -690,8 +672,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     private void checkJobMetadata(final int documentationId, final String id) {
         final RestDocumentationFilter getResultFilter = RestAssuredRestDocumentation.document(
             "{class-name}/" + documentationId + "/getJobMetadata/",
-            this.getRequestPreprocessor(),
-            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM, // Path parameters
             Snippets.HAL_CONTENT_TYPE_HEADER, // Response Headers
             Snippets.getJobMetadataResponsePayload(), // Response fields
@@ -721,8 +701,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     private void checkJobCluster(final int documentationId, final String id) {
         final RestDocumentationFilter getResultFilter = RestAssuredRestDocumentation.document(
             "{class-name}/" + documentationId + "/getJobCluster/",
-            this.getRequestPreprocessor(),
-            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM, // Path parameters
             Snippets.HAL_CONTENT_TYPE_HEADER, // Response Headers
             Snippets.getClusterResponsePayload(), // Response fields
@@ -749,8 +727,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     private void checkJobCommand(final int documentationId, final String id) {
         final RestDocumentationFilter getResultFilter = RestAssuredRestDocumentation.document(
             "{class-name}/" + documentationId + "/getJobCommand/",
-            this.getRequestPreprocessor(),
-            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM, // Path parameters
             Snippets.HAL_CONTENT_TYPE_HEADER, // Response Headers
             Snippets.getCommandResponsePayload(), // Response fields
@@ -778,8 +754,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     private void checkJobApplications(final int documentationId, final String id) {
         final RestDocumentationFilter getResultFilter = RestAssuredRestDocumentation.document(
             "{class-name}/" + documentationId + "/getJobApplications/",
-            this.getRequestPreprocessor(),
-            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM, // Path parameters
             Snippets.HAL_CONTENT_TYPE_HEADER, // Response Headers
             PayloadDocumentation.responseFields(
@@ -807,8 +781,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     private void checkFindJobs(final int documentationId, final String id, final String user) {
         final RestDocumentationFilter findResultFilter = RestAssuredRestDocumentation.document(
             "{class-name}/" + documentationId + "/findJobs/",
-            this.getRequestPreprocessor(),
-            this.getResponsePreprocessor(),
             Snippets.JOB_SEARCH_QUERY_PARAMETERS, // Request query parameters
             Snippets.HAL_CONTENT_TYPE_HEADER, // Response headers
             Snippets.JOB_SEARCH_RESULT_FIELDS, // Result fields
@@ -1164,8 +1136,6 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         // Send a kill request to the job.
         final RestDocumentationFilter killResultFilter = RestAssuredRestDocumentation.document(
             "{class-name}/killJob/",
-            this.getRequestPreprocessor(),
-            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM
         );
 

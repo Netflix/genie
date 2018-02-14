@@ -97,8 +97,6 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
 
         final RestDocumentationFilter creationResultFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            this.getRequestPreprocessor(),
-            this.getResponsePreprocessor(),
             Snippets.CONTENT_TYPE_HEADER, // Request headers
             Snippets.getApplicationRequestPayload(), // Request fields
             Snippets.LOCATION_HEADER // Response headers
@@ -119,8 +117,6 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
 
         final RestDocumentationFilter getResultFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            this.getRequestPreprocessor(),
-            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM, // path parameters
             Snippets.HAL_CONTENT_TYPE_HEADER, // response headers
             Snippets.getApplicationResponsePayload(), // response payload
@@ -339,8 +335,6 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
 
         final RestDocumentationFilter findFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            this.getRequestPreprocessor(),
-            this.getResponsePreprocessor(),
             Snippets.APPLICATION_SEARCH_QUERY_PARAMETERS, // Request query parameters
             Snippets.HAL_CONTENT_TYPE_HEADER, // Response headers
             Snippets.APPLICATION_SEARCH_RESULT_FIELDS, // Result fields
@@ -500,8 +494,6 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
 
         final RestDocumentationFilter updateResultFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            this.getRequestPreprocessor(),
-            this.getResponsePreprocessor(),
             Snippets.CONTENT_TYPE_HEADER, // request header
             Snippets.ID_PATH_PARAM, // path parameters
             Snippets.getApplicationRequestPayload() // payload fields
@@ -561,8 +553,6 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
 
         final RestDocumentationFilter patchFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            this.getRequestPreprocessor(),
-            this.getResponsePreprocessor(),
             Snippets.CONTENT_TYPE_HEADER, // request headers
             Snippets.ID_PATH_PARAM, // path params
             Snippets.PATCH_FIELDS // request payload
@@ -615,9 +605,7 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
         Assert.assertThat(this.applicationRepository.count(), Matchers.is(3L));
 
         final RestDocumentationFilter deleteFilter = RestAssuredRestDocumentation.document(
-            "{class-name}/{method-name}/{step}/",
-            this.getRequestPreprocessor(),
-            this.getResponsePreprocessor()
+            "{class-name}/{method-name}/{step}/"
         );
 
         RestAssured
@@ -679,8 +667,6 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
 
         final RestDocumentationFilter deleteFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            this.getRequestPreprocessor(),
-            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM // path parameters
         );
 
@@ -719,16 +705,12 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
 
         final RestDocumentationFilter addFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            this.getRequestPreprocessor(),
-            this.getResponsePreprocessor(),
             Snippets.CONTENT_TYPE_HEADER, // request headers
             Snippets.ID_PATH_PARAM, // path parameters
             PayloadDocumentation.requestFields(Snippets.CONFIG_FIELDS) // request payload fields
         );
         final RestDocumentationFilter getFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            this.getRequestPreprocessor(),
-            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM, // path parameters
             Snippets.JSON_CONTENT_TYPE_HEADER, // response headers
             PayloadDocumentation.responseFields(Snippets.CONFIG_FIELDS) // response fields
@@ -751,8 +733,6 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
 
         final RestDocumentationFilter updateFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            this.getRequestPreprocessor(),
-            this.getResponsePreprocessor(),
             Snippets.CONTENT_TYPE_HEADER, // Request header
             Snippets.ID_PATH_PARAM, // Path parameters
             PayloadDocumentation.requestFields(Snippets.CONFIG_FIELDS) // Request fields
@@ -775,8 +755,6 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
 
         final RestDocumentationFilter deleteFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            this.getRequestPreprocessor(),
-            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM // Path parameters
         );
         this.canDeleteElementsFromResource(APPLICATIONS_API + "/{id}/configs", ID, deleteFilter);
@@ -797,16 +775,12 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
 
         final RestDocumentationFilter addFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            this.getRequestPreprocessor(),
-            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM, // path params
             Snippets.CONTENT_TYPE_HEADER, // request header
             PayloadDocumentation.requestFields(Snippets.DEPENDENCIES_FIELDS) // response fields
         );
         final RestDocumentationFilter getFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            this.getRequestPreprocessor(),
-            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM, // path params
             Snippets.JSON_CONTENT_TYPE_HEADER, // response headers
             PayloadDocumentation.responseFields(Snippets.DEPENDENCIES_FIELDS) // response fields
@@ -834,8 +808,6 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
 
         final RestDocumentationFilter updateFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            this.getRequestPreprocessor(),
-            this.getResponsePreprocessor(),
             Snippets.CONTENT_TYPE_HEADER, // Request header
             Snippets.ID_PATH_PARAM, // Path parameters
             PayloadDocumentation.requestFields(Snippets.DEPENDENCIES_FIELDS) // Request fields
@@ -862,8 +834,6 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
 
         final RestDocumentationFilter deleteFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            this.getRequestPreprocessor(),
-            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM // Path variables
         );
         this.canDeleteElementsFromResource(
@@ -889,16 +859,12 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
 
         final RestDocumentationFilter addFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            this.getRequestPreprocessor(),
-            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM, // path params
             Snippets.CONTENT_TYPE_HEADER, // request header
             PayloadDocumentation.requestFields(Snippets.TAGS_FIELDS) // response fields
         );
         final RestDocumentationFilter getFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            this.getRequestPreprocessor(),
-            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM, // path parameters
             Snippets.JSON_CONTENT_TYPE_HEADER, // response headers
             PayloadDocumentation.responseFields(Snippets.TAGS_FIELDS) // response fields
@@ -922,8 +888,6 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
 
         final RestDocumentationFilter updateFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            this.getRequestPreprocessor(),
-            this.getResponsePreprocessor(),
             Snippets.CONTENT_TYPE_HEADER, // Request header
             Snippets.ID_PATH_PARAM, // Path parameters
             PayloadDocumentation.requestFields(Snippets.TAGS_FIELDS) // Request fields
@@ -947,8 +911,6 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
 
         final RestDocumentationFilter deleteFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            this.getRequestPreprocessor(),
-            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM
         );
         this.canDeleteTagsForResource(api, ID, NAME, deleteFilter);
@@ -970,8 +932,6 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
 
         final RestDocumentationFilter deleteFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            this.getRequestPreprocessor(),
-            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM.and(
                 RequestDocumentation.parameterWithName("tag").description("The tag to remove")
             )
@@ -1064,8 +1024,6 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
         // Filter by status
         final RestDocumentationFilter getFilter = RestAssuredRestDocumentation.document(
             "{class-name}/{method-name}/{step}/",
-            this.getRequestPreprocessor(),
-            this.getResponsePreprocessor(),
             Snippets.ID_PATH_PARAM, // Path parameters
             RequestDocumentation.requestParameters(
                 RequestDocumentation
