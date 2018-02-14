@@ -18,14 +18,15 @@
 package com.netflix.genie.web.services.loadbalancers.script;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.web.services.ClusterLoadBalancer;
 import com.netflix.genie.web.services.impl.GenieFileTransferService;
 import com.netflix.genie.web.util.MetricsConstants;
-import com.netflix.spectator.api.Registry;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -55,7 +56,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -111,7 +111,7 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
     private final GenieFileTransferService fileTransferService;
     private final Environment environment;
     private final ObjectMapper mapper;
-    private final Registry registry;
+    private final MeterRegistry registry;
     private final int order;
 
     private final AtomicReference<CompiledScript> script = new AtomicReference<>(null);
@@ -134,7 +134,7 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
         @Qualifier("cacheGenieFileTransferService") final GenieFileTransferService fileTransferService,
         final Environment environment,
         final ObjectMapper mapper,
-        final Registry registry
+        final MeterRegistry registry
     ) {
         this.asyncTaskExecutor = asyncTaskExecutor;
         this.fileTransferService = fileTransferService;
@@ -168,7 +168,7 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
     ) throws GenieException {
         final long selectStart = System.nanoTime();
         log.debug("Called");
-        final Map<String, String> tags = Maps.newHashMap();
+        final Set<Tag> tags = Sets.newHashSet();
         try {
             if (this.isConfigured.get() && this.script != null && this.script.get() != null) {
                 log.debug("Evaluating script for job {}", jobRequest.getId().orElse("without id"));
@@ -185,7 +185,7 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
                 if (clusterId != null) {
                     for (final Cluster cluster : clusters) {
                         if (cluster.getId().isPresent() && clusterId.equals(cluster.getId().get())) {
-                            tags.put(MetricsConstants.TagKeys.STATUS, STATUS_TAG_FOUND);
+                            tags.add(Tag.of(MetricsConstants.TagKeys.STATUS, STATUS_TAG_FOUND));
                             return cluster;
                         }
                     }
@@ -193,21 +193,21 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
                 log.warn("Script returned a cluster not in the input list: {}", clusterId);
             } else {
                 log.debug("Script returned null");
-                tags.put(MetricsConstants.TagKeys.STATUS, STATUS_TAG_NOT_CONFIGURED);
+                tags.add(Tag.of(MetricsConstants.TagKeys.STATUS, STATUS_TAG_NOT_CONFIGURED));
                 return null;
             }
 
-            tags.put(MetricsConstants.TagKeys.STATUS, STATUS_TAG_NOT_FOUND);
+            tags.add(Tag.of(MetricsConstants.TagKeys.STATUS, STATUS_TAG_NOT_FOUND));
             // Defer to any subsequent load balancer in the chain
             return null;
         } catch (final Exception e) {
-            tags.put(MetricsConstants.TagKeys.STATUS, STATUS_TAG_FAILED);
-            tags.put(MetricsConstants.TagKeys.EXCEPTION_CLASS, e.getClass().getCanonicalName());
+            tags.add(Tag.of(MetricsConstants.TagKeys.STATUS, STATUS_TAG_FAILED));
+            tags.add(Tag.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, e.getClass().getCanonicalName()));
             log.error("Unable to execute script due to {}", e.getMessage(), e);
             return null;
         } finally {
             this.registry
-                .timer(this.registry.createId(SELECT_TIMER_NAME, tags))
+                .timer(SELECT_TIMER_NAME, tags)
                 .record(System.nanoTime() - selectStart, TimeUnit.NANOSECONDS);
         }
     }
@@ -226,7 +226,7 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
     public void refresh() {
         log.debug("Refreshing");
         final long updateStart = System.nanoTime();
-        final Map<String, String> tags = Maps.newHashMap();
+        final Set<Tag> tags = Sets.newHashSet();
         try {
             this.isUpdating.set(true);
 
@@ -297,12 +297,12 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
                 this.script.set(compilable.compile(reader));
             }
 
-            tags.put(MetricsConstants.TagKeys.STATUS, STATUS_TAG_OK);
+            tags.add(Tag.of(MetricsConstants.TagKeys.STATUS, STATUS_TAG_OK));
 
             this.isConfigured.set(true);
         } catch (final GenieException | IOException | ScriptException | RuntimeException | URISyntaxException e) {
-            tags.put(MetricsConstants.TagKeys.STATUS, STATUS_TAG_FAILED);
-            tags.put(MetricsConstants.TagKeys.EXCEPTION_CLASS, e.getClass().getName());
+            tags.add(Tag.of(MetricsConstants.TagKeys.STATUS, STATUS_TAG_FAILED));
+            tags.add(Tag.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, e.getClass().getName()));
             log.error(
                 "Refreshing the load balancing script for ScriptLoadBalancer failed due to {}",
                 e.getMessage(),
@@ -312,7 +312,7 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
         } finally {
             this.isUpdating.set(false);
             this.registry
-                .timer(this.registry.createId(UPDATE_TIMER_NAME, tags))
+                .timer(UPDATE_TIMER_NAME, tags)
                 .record(System.nanoTime() - updateStart, TimeUnit.NANOSECONDS);
             log.debug("Refresh completed");
         }

@@ -23,7 +23,9 @@ import com.netflix.genie.web.jobs.AdminResources;
 import com.netflix.genie.web.jobs.FileType;
 import com.netflix.genie.web.jobs.JobConstants;
 import com.netflix.genie.web.jobs.workflow.WorkflowTask;
-import com.netflix.spectator.api.Registry;
+import io.micrometer.core.instrument.MeterRegistry;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -42,38 +44,32 @@ import java.io.Writer;
 @Slf4j
 public abstract class GenieBaseTask implements WorkflowTask {
 
-    protected static final String NO_ID_FOUND = "<no id>";
-    private final Registry registry;
+    static final String NO_ID_FOUND = "<no id>";
 
-    protected GenieBaseTask(final Registry registry) {
+    @Getter(AccessLevel.PROTECTED)
+    private final MeterRegistry registry;
+
+    GenieBaseTask(final MeterRegistry registry) {
         this.registry = registry;
     }
 
     /**
      * Helper Function to fetch file to local dir.
      *
-     * @param dir The directory where to copy the file
-     * @param id The id to be appended to the destination path
-     * @param filePath Source file path
-     * @param fileType Type of file like setup, config or dependency
+     * @param dir            The directory where to copy the file
+     * @param id             The id to be appended to the destination path
+     * @param filePath       Source file path
+     * @param fileType       Type of file like setup, config or dependency
      * @param adminResources Entity type Application, Cluster, Command or Job
      * @return Local file path constructed where the file is copied to
-     *
-     * @throws GenieException If there is any problem
      */
     protected String buildLocalFilePath(
-        @NotBlank
-        final String dir,
-        @NotBlank
-        final String id,
-        @NotBlank
-        final String filePath,
-        @NotNull
-        final FileType fileType,
-        @NotNull
-        final AdminResources adminResources
-    ) throws GenieException {
-
+        @NotBlank final String dir,
+        @NotBlank final String id,
+        @NotBlank final String filePath,
+        @NotNull final FileType fileType,
+        @NotNull final AdminResources adminResources
+    ) {
         String entityPathVar = null;
         String filePathVar = null;
 
@@ -111,7 +107,7 @@ public abstract class GenieBaseTask implements WorkflowTask {
             .append(JobConstants.GENIE_PATH_VAR);
 
         localPath.append(JobConstants.FILE_PATH_DELIMITER)
-                .append(entityPathVar);
+            .append(entityPathVar);
 
         localPath.append(JobConstants.FILE_PATH_DELIMITER)
             .append(id);
@@ -130,19 +126,15 @@ public abstract class GenieBaseTask implements WorkflowTask {
      * Helper method to create the directory for a particular application, cluster or command in the
      * current working directory for the job.
      *
-     * @param genieDir The genie directory in the cwd for the job
-     * @param id The id of entity instance
+     * @param genieDir       The genie directory in the cwd for the job
+     * @param id             The id of entity instance
      * @param adminResources The type of entity Application, Cluster or Command
-     *
      * @throws GenieException If there is any problem
      */
-    protected void createEntityInstanceDirectory(
-        @NotBlank
-        final String genieDir,
-        @NotBlank
-        final String id,
-        @NotNull
-        final AdminResources adminResources
+    void createEntityInstanceDirectory(
+        @NotBlank final String genieDir,
+        @NotBlank final String id,
+        @NotNull final AdminResources adminResources
     ) throws GenieException {
         String entityPathVar = null;
 
@@ -172,19 +164,15 @@ public abstract class GenieBaseTask implements WorkflowTask {
      * Helper method to create the config directory for a particular application, cluster or command in the
      * current working directory for the job.
      *
-     * @param genieDir The genie directory in the cwd for the job
-     * @param id The id of entity instance
+     * @param genieDir       The genie directory in the cwd for the job
+     * @param id             The id of entity instance
      * @param adminResources The type of entity Application, Cluster or Command
-     *
      * @throws GenieException If there is any problem
      */
-    protected void createEntityInstanceConfigDirectory(
-        @NotBlank
-        final String genieDir,
-        @NotBlank
-        final String id,
-        @NotNull
-        final AdminResources adminResources
+    void createEntityInstanceConfigDirectory(
+        @NotBlank final String genieDir,
+        @NotBlank final String id,
+        @NotNull final AdminResources adminResources
     ) throws GenieException {
         String entityPathVar = null;
 
@@ -216,19 +204,15 @@ public abstract class GenieBaseTask implements WorkflowTask {
      * Helper method to create the dependency directory for a particular application, cluster or command in the
      * current working directory for the job.
      *
-     * @param genieDir The genie directory in the cwd for the job
-     * @param id The id of entity instance
+     * @param genieDir       The genie directory in the cwd for the job
+     * @param id             The id of entity instance
      * @param adminResources The type of entity Application, Cluster or Command
-     *
      * @throws GenieException If there is any problem
      */
-    protected void createEntityInstanceDependenciesDirectory(
-        @NotBlank
-        final String genieDir,
-        @NotBlank
-        final String id,
-        @NotNull
-        final AdminResources adminResources
+    void createEntityInstanceDependenciesDirectory(
+        @NotBlank final String genieDir,
+        @NotBlank final String id,
+        @NotNull final AdminResources adminResources
     ) throws GenieException {
         String entityPathVar = null;
 
@@ -262,9 +246,8 @@ public abstract class GenieBaseTask implements WorkflowTask {
      * @param dirPath The directory path to create
      * @throws GenieException If there is a problem.
      */
-    protected void createDirectory(
-        @NotBlank(message = "Directory path cannot be blank.")
-        final String dirPath
+    void createDirectory(
+        @NotBlank(message = "Directory path cannot be blank.") final String dirPath
     ) throws GenieException {
         final File dir = new File(dirPath);
         if (!dir.mkdirs()) {
@@ -272,7 +255,7 @@ public abstract class GenieBaseTask implements WorkflowTask {
         }
     }
 
-    protected void generateSetupFileSourceSnippet(
+    void generateSetupFileSourceSnippet(
         final String id,
         final String type,
         final String filePath,
@@ -288,9 +271,5 @@ public abstract class GenieBaseTask implements WorkflowTask {
 
         // Append new line
         writer.write(System.lineSeparator());
-    }
-
-    protected Registry getRegistry() {
-        return registry;
     }
 }

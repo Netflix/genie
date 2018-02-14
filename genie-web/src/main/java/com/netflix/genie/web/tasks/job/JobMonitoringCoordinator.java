@@ -32,8 +32,8 @@ import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.services.JobSearchService;
 import com.netflix.genie.web.services.JobSubmitterService;
 import com.netflix.genie.web.services.impl.JobStateServiceImpl;
-import com.netflix.spectator.api.Counter;
-import com.netflix.spectator.api.Registry;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.Executor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,7 +91,7 @@ public class JobMonitoringCoordinator extends JobStateServiceImpl {
         final GenieEventBus genieEventBus,
         @Qualifier("genieTaskScheduler") final TaskScheduler scheduler,
         final Executor executor,
-        final Registry registry,
+        final MeterRegistry registry,
         final Resource jobsDir,
         final JobsProperties jobsProperties,
         final JobSubmitterService jobSubmitterService

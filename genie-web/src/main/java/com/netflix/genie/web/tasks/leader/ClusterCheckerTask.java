@@ -28,9 +28,8 @@ import com.netflix.genie.web.properties.ClusterCheckerProperties;
 import com.netflix.genie.web.services.JobPersistenceService;
 import com.netflix.genie.web.services.JobSearchService;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
-import com.netflix.spectator.api.Counter;
-import com.netflix.spectator.api.Registry;
-import com.netflix.spectator.api.patterns.PolledMeter;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -94,7 +93,7 @@ public class ClusterCheckerTask extends LeadershipTask {
         @NotNull final JobPersistenceService jobPersistenceService,
         @Qualifier("genieRestTemplate") @NotNull final RestTemplate restTemplate,
         @NotNull final WebEndpointProperties webEndpointProperties,
-        @NotNull final Registry registry
+        @NotNull final MeterRegistry registry
     ) {
         this.hostName = hostName;
         this.properties = properties;
@@ -106,10 +105,7 @@ public class ClusterCheckerTask extends LeadershipTask {
         this.healthIndicatorsToIgnore = Splitter.on(",").omitEmptyStrings()
             .trimResults().splitToList(properties.getHealthIndicatorsToIgnore());
         // Keep track of the number of nodes currently unreachable from the the master
-        PolledMeter
-            .using(registry)
-            .withName("genie.tasks.clusterChecker.errorCounts.gauge")
-            .monitorSize(this.errorCounts);
+        registry.gauge("genie.tasks.clusterChecker.errorCounts.gauge", this.errorCounts, Map::size);
         this.lostJobsCounter = registry.counter("genie.tasks.clusterChecker.lostJobs.rate");
         this.unableToUpdateJobCounter = registry.counter("genie.tasks.clusterChecker.unableToUpdateJob.rate");
     }

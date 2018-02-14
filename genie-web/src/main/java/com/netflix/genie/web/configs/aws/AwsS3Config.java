@@ -27,7 +27,7 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.web.properties.S3FileTransferProperties;
 import com.netflix.genie.web.services.impl.S3FileTransferImpl;
-import com.netflix.spectator.api.Registry;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -115,7 +115,7 @@ public class AwsS3Config {
     @ConditionalOnBean(AmazonS3.class)
     public S3FileTransferImpl s3FileTransferImpl(
         final AmazonS3 s3Client,
-        final Registry registry,
+        final MeterRegistry registry,
         final S3FileTransferProperties s3FileTransferProperties
     ) throws GenieException {
         return new S3FileTransferImpl(s3Client, registry, s3FileTransferProperties);

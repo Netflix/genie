@@ -33,8 +33,8 @@ import com.netflix.genie.web.resources.handlers.GenieResourceHttpRequestHandler;
 import com.netflix.genie.web.services.AttachmentService;
 import com.netflix.genie.web.services.JobCoordinatorService;
 import com.netflix.genie.web.services.JobSearchService;
-import com.netflix.spectator.api.Counter;
-import com.netflix.spectator.api.Registry;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.catalina.ssi.ByteArrayServletOutputStream;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -96,7 +96,7 @@ public class JobRestControllerUnitTests {
         this.genieResourceHttpRequestHandler = Mockito.mock(GenieResourceHttpRequestHandler.class);
         this.jobsProperties = new JobsProperties();
 
-        final Registry registry = Mockito.mock(Registry.class);
+        final MeterRegistry registry = Mockito.mock(MeterRegistry.class);
         final Counter counter = Mockito.mock(Counter.class);
         Mockito.when(registry.counter(Mockito.anyString())).thenReturn(counter);
 
@@ -485,7 +485,7 @@ public class JobRestControllerUnitTests {
             .thenReturn(new HttpHeaders());
         Mockito.when(factory.createRequest(Mockito.any(), Mockito.any())).thenReturn(clientHttpRequest);
         final RestTemplate template = new RestTemplate(factory);
-        final Registry registry = Mockito.mock(Registry.class);
+        final MeterRegistry registry = Mockito.mock(MeterRegistry.class);
         final Counter counter = Mockito.mock(Counter.class);
         Mockito.when(registry.counter(Mockito.anyString())).thenReturn(counter);
 

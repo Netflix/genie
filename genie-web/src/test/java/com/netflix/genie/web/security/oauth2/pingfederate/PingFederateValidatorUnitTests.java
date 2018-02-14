@@ -19,8 +19,8 @@ package com.netflix.genie.web.security.oauth2.pingfederate;
 
 import com.google.common.collect.Sets;
 import com.netflix.genie.test.categories.UnitTest;
-import com.netflix.spectator.api.Registry;
-import com.netflix.spectator.api.Timer;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import org.jose4j.jwt.JwtClaims;
 import org.jose4j.jwt.MalformedClaimException;
 import org.jose4j.jwt.consumer.JwtContext;
@@ -53,7 +53,7 @@ public class PingFederateValidatorUnitTests {
     @Before
     public void setup() {
         this.jwtValidationTimer = Mockito.mock(Timer.class);
-        final Registry registry = Mockito.mock(Registry.class);
+        final MeterRegistry registry = Mockito.mock(MeterRegistry.class);
         Mockito.when(registry.timer(Mockito.anyString())).thenReturn(this.jwtValidationTimer);
         this.validator = new PingFederateValidator(registry);
     }

@@ -26,7 +26,7 @@ import com.netflix.genie.web.properties.DiskCleanupProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.services.JobSearchService;
 import com.netflix.genie.web.tasks.TaskUtils;
-import com.netflix.spectator.api.DefaultRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.lang3.SystemUtils;
 import org.junit.Assert;
@@ -81,7 +81,7 @@ public class DiskCleanupTaskUnitTests {
                 Mockito.mock(JobSearchService.class),
                 properties,
                 Mockito.mock(Executor.class),
-                new DefaultRegistry()
+                new SimpleMeterRegistry()
             )
         );
     }
@@ -105,7 +105,7 @@ public class DiskCleanupTaskUnitTests {
                 Mockito.mock(JobSearchService.class),
                 new JobsProperties(),
                 Mockito.mock(Executor.class),
-                new DefaultRegistry()
+                new SimpleMeterRegistry()
             )
         );
         Mockito.verify(scheduler, Mockito.never()).schedule(Mockito.any(Runnable.class), Mockito.any(Trigger.class));
@@ -130,7 +130,7 @@ public class DiskCleanupTaskUnitTests {
                 Mockito.mock(JobSearchService.class),
                 new JobsProperties(),
                 Mockito.mock(Executor.class),
-                new DefaultRegistry()
+                new SimpleMeterRegistry()
             )
         );
         Mockito.verify(scheduler, Mockito.times(1)).schedule(Mockito.any(Runnable.class), Mockito.any(Trigger.class));
@@ -157,7 +157,7 @@ public class DiskCleanupTaskUnitTests {
                 Mockito.mock(JobSearchService.class),
                 properties,
                 Mockito.mock(Executor.class),
-                new DefaultRegistry()
+                new SimpleMeterRegistry()
             )
         );
         Mockito.verify(scheduler, Mockito.times(1)).schedule(Mockito.any(Runnable.class), Mockito.any(Trigger.class));
@@ -221,7 +221,7 @@ public class DiskCleanupTaskUnitTests {
             jobSearchService,
             jobsProperties,
             Mockito.mock(Executor.class),
-            new DefaultRegistry()
+            new SimpleMeterRegistry()
         );
         task.run();
         Assert.assertTrue(new File(jobDir.getFile(), job1Id).exists());

@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.security.oauth2.pingfederate;
 
-import com.netflix.spectator.api.Registry;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.lang3.StringUtils;
 import org.jose4j.jwt.consumer.JwtConsumer;
 import org.jose4j.jwt.consumer.JwtConsumerBuilder;
@@ -56,7 +56,7 @@ public class PingFederateJWTConfig {
      * @return The validator
      */
     @Bean
-    public PingFederateValidator pingFederateValidator(final Registry registry) {
+    public PingFederateValidator pingFederateValidator(final MeterRegistry registry) {
         return new PingFederateValidator(registry);
     }
 
@@ -127,7 +127,7 @@ public class PingFederateJWTConfig {
     @Primary
     public PingFederateJWTTokenServices pingFederateJWTTokenServices(
         final JwtConsumer jwtConsumer,
-        final Registry registry
+        final MeterRegistry registry
     ) {
         return new PingFederateJWTTokenServices(jwtConsumer, registry);
     }

@@ -27,6 +27,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
 
+import javax.annotation.Nonnull;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -69,8 +70,8 @@ public class GenieResourceHttpRequestHandler extends ResourceHttpRequestHandler 
      */
     @Override
     public void handleRequest(
-        final HttpServletRequest request,
-        final HttpServletResponse response
+        @Nonnull final HttpServletRequest request,
+        @Nonnull final HttpServletResponse response
     ) throws ServletException, IOException {
         Assert.state(this.getLocations().size() == 1, "Too many resource locations");
         Assert.state(
@@ -140,7 +141,7 @@ public class GenieResourceHttpRequestHandler extends ResourceHttpRequestHandler 
      * Overriding to handle case where media type was unknown to default to Text
      */
     @Override
-    protected MediaType getMediaType(final HttpServletRequest request, final Resource resource) {
+    protected MediaType getMediaType(final HttpServletRequest request, @Nonnull final Resource resource) {
         final MediaType mediaType = super.getMediaType(request, resource);
         return mediaType == null ? MediaType.TEXT_PLAIN : mediaType;
     }

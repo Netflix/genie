@@ -25,8 +25,8 @@ import com.netflix.genie.web.jobs.JobExecutionEnvironment;
 import com.netflix.genie.web.services.AttachmentService;
 import com.netflix.genie.web.services.impl.GenieFileTransferService;
 import com.netflix.genie.web.util.MetricsUtils;
-import com.netflix.spectator.api.Id;
-import com.netflix.spectator.api.Registry;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -36,6 +36,7 @@ import java.io.Writer;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -47,9 +48,9 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class JobTask extends GenieBaseTask {
 
+    private static final String JOB_TASK_TIMER_NAME = "genie.jobs.tasks.jobTask.timer";
     private static final String EMPTY_STRING = "";
     private final AttachmentService attachmentService;
-    private final Id timerId;
     private final GenieFileTransferService fts;
 
     /**
@@ -58,19 +59,14 @@ public class JobTask extends GenieBaseTask {
      * @param attachmentService An implementation of the Attachment Service
      * @param registry          The metrics registry to use
      * @param fts               File transfer service
-     * @throws GenieException If there is any problem.
      */
     public JobTask(
-        @NotNull
-        final AttachmentService attachmentService,
-        @NotNull
-        final Registry registry,
-        @NotNull
-        final GenieFileTransferService fts
-    ) throws GenieException {
+        @NotNull final AttachmentService attachmentService,
+        @NotNull final MeterRegistry registry,
+        @NotNull final GenieFileTransferService fts
+    ) {
         super(registry);
         this.attachmentService = attachmentService;
-        this.timerId = registry.createId("genie.jobs.tasks.jobTask.timer");
         this.fts = fts;
     }
 
@@ -80,7 +76,7 @@ public class JobTask extends GenieBaseTask {
     @Override
     public void executeTask(@NotNull final Map<String, Object> context) throws GenieException, IOException {
         final long start = System.nanoTime();
-        final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
+        final Set<Tag> tags = Sets.newHashSet();
         try {
             final JobExecutionEnvironment jobExecEnv
                 = (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
@@ -190,14 +186,14 @@ public class JobTask extends GenieBaseTask {
             writer.write("echo End: `date '+%Y-%m-%d %H:%M:%S'`\n");
 
             log.info("Finished Job Task for job {}", jobId);
-        } catch (Throwable t) {
+            MetricsUtils.addSuccessTags(tags);
+        } catch (final Throwable t) {
             MetricsUtils.addFailureTagsWithException(tags, t);
             throw t;
         } finally {
-            final long finish = System.nanoTime();
-            this.getRegistry().timer(
-                timerId.withTags(tags)
-            ).record(finish - start, TimeUnit.NANOSECONDS);
+            this.getRegistry()
+                .timer(JOB_TASK_TIMER_NAME, tags)
+                .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
     }
 }

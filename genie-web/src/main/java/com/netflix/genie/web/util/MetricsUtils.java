@@ -17,9 +17,10 @@
  */
 package com.netflix.genie.web.util;
 
-import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import io.micrometer.core.instrument.Tag;
 
-import java.util.Map;
+import java.util.Set;
 
 /**
  * Utility methods for metrics.
@@ -29,6 +30,15 @@ import java.util.Map;
  */
 public final class MetricsUtils {
 
+    private static final Tag SUCCESS_STATUS_TAG = Tag.of(
+        MetricsConstants.TagKeys.STATUS,
+        MetricsConstants.TagValues.SUCCESS
+    );
+    private static final Tag FAILURE_STATUS_TAG = Tag.of(
+        MetricsConstants.TagKeys.STATUS,
+        MetricsConstants.TagValues.FAILURE
+    );
+
     /**
      * Utility class private constructor.
      */
@@ -36,48 +46,48 @@ public final class MetricsUtils {
     }
 
     /**
-     * Convenience method to add failure status and exception cause to an existing map of tags.
+     * Convenience method that creates a tag set pre-populated with success status.
      *
-     * @param tagsMap   the map of tags
-     * @param throwable the exception to be tagged
-     * @return the updated map of tags
+     * @return a new set containing success tags
      */
-    public static Map<String, String> addFailureTagsWithException(
-        final Map<String, String> tagsMap,
-        final Throwable throwable
-    ) {
-        tagsMap.put(MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.FAILURE);
-        tagsMap.put(MetricsConstants.TagKeys.EXCEPTION_CLASS, throwable.getClass().getCanonicalName());
-        return tagsMap;
+    public static Set<Tag> newSuccessTagsSet() {
+        final Set<Tag> tags = Sets.newHashSet();
+        addSuccessTags(tags);
+        return tags;
     }
 
     /**
-     * Convenience method to add success tag to an existing map of tags.
+     * Convenience method to add success tag to an existing set of tags.
      *
-     * @param tagsMap the map of tags
-     * @return the updated map of tags
+     * @param tags the set of tags to add success tags to
      */
-    public static Map<String, String> addSuccessTags(final Map<String, String> tagsMap) {
-        tagsMap.put(MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.SUCCESS);
-        return tagsMap;
+    public static void addSuccessTags(final Set<Tag> tags) {
+        tags.add(SUCCESS_STATUS_TAG);
     }
 
     /**
-     * Convenience method that creates a tag map pre-populated with success status.
-     *
-     * @return a new map containing success tags
-     */
-    public static Map<String, String> newSuccessTagsMap() {
-        return addSuccessTags(Maps.newHashMap());
-    }
-
-    /**
-     * Convenience method that creates a tag map pre-populated with failure status and exception details.
+     * Convenience method that creates a tag set pre-populated with failure status and exception details.
      *
      * @param t the exception
-     * @return a new map containing failure tags
+     * @return a new set containing failure tags
      */
-    public static Map<String, String> newFailureTagsMapForException(final Throwable t) {
-        return addFailureTagsWithException(Maps.newHashMap(), t);
+    public static Set<Tag> newFailureTagsSetForException(final Throwable t) {
+        final Set<Tag> tags = Sets.newHashSet();
+        addFailureTagsWithException(tags, t);
+        return tags;
+    }
+
+    /**
+     * Convenience method to add failure status and exception cause to an existing set of tags.
+     *
+     * @param tags      the set of existing tags
+     * @param throwable the exception to be tagged
+     */
+    public static void addFailureTagsWithException(
+        final Set<Tag> tags,
+        final Throwable throwable
+    ) {
+        tags.add(FAILURE_STATUS_TAG);
+        tags.add(Tag.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, throwable.getClass().getCanonicalName()));
     }
 }

@@ -18,6 +18,7 @@
 package com.netflix.genie.web.controllers;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
@@ -28,10 +29,10 @@ import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
 import com.netflix.genie.common.exceptions.GenieTimeoutException;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.util.MetricsConstants;
-import com.netflix.spectator.api.Counter;
-import com.netflix.spectator.api.Id;
-import com.netflix.spectator.api.Registry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -61,7 +62,7 @@ public class GenieExceptionMapperUnitTests {
 
     private HttpServletResponse response;
     private GenieExceptionMapper mapper;
-    private Id counterId;
+    private MeterRegistry registry;
     private Counter counter;
 
     /**
@@ -70,19 +71,17 @@ public class GenieExceptionMapperUnitTests {
     @Before
     public void setup() {
         this.response = Mockito.mock(HttpServletResponse.class);
-        final Registry registry = Mockito.mock(Registry.class);
-        this.counterId = Mockito.mock(Id.class);
+        this.registry = Mockito.mock(MeterRegistry.class);
         this.counter = Mockito.mock(Counter.class);
         Mockito
-            .when(registry.createId("genie.web.controllers.exception"))
-            .thenReturn(this.counterId);
-        Mockito
-            .when(this.counterId.withTag(Mockito.anyString(), Mockito.anyString()))
-            .thenReturn(this.counterId);
-        Mockito
-            .when(registry.counter(counterId))
+            .when(
+                this.registry.counter(
+                    Mockito.eq(GenieExceptionMapper.CONTROLLER_EXCEPTION_COUNTER_NAME),
+                    Mockito.anySet()
+                )
+            )
             .thenReturn(this.counter);
-        this.mapper = new GenieExceptionMapper(registry);
+        this.mapper = new GenieExceptionMapper(this.registry);
     }
 
     /**
@@ -92,7 +91,6 @@ public class GenieExceptionMapperUnitTests {
      */
     @Test
     public void canHandleGenieExceptions() throws IOException {
-
         final List<GenieException> exceptions = Arrays.asList(
             new GenieBadRequestException("bad"),
             new GenieConflictException("conflict"),
@@ -104,18 +102,20 @@ public class GenieExceptionMapperUnitTests {
             new GenieException(568, "Other")
         );
 
-        for (GenieException exception : exceptions) {
+        for (final GenieException exception : exceptions) {
             this.mapper.handleGenieException(this.response, exception);
             Mockito
-                .verify(counterId, Mockito.times(1))
-                .withTag(MetricsConstants.TagKeys.EXCEPTION_CLASS, exception.getClass().getCanonicalName());
+                .verify(this.registry, Mockito.times(1))
+                .counter(
+                    GenieExceptionMapper.CONTROLLER_EXCEPTION_COUNTER_NAME,
+                    Sets.newHashSet(
+                        Tag.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, exception.getClass().getCanonicalName())
+                    )
+                );
         }
 
         Mockito
-            .verify(counterId, Mockito.times(exceptions.size()))
-            .withTag(Mockito.anyString(), Mockito.anyString());
-        Mockito
-            .verify(counter, Mockito.times(exceptions.size()))
+            .verify(this.counter, Mockito.times(exceptions.size()))
             .increment();
     }
 
@@ -128,13 +128,19 @@ public class GenieExceptionMapperUnitTests {
     public void canHandleConstraintViolationExceptions() throws IOException {
         final ConstraintViolationException exception = new ConstraintViolationException("cve", null);
         this.mapper.handleConstraintViolation(this.response, exception);
-        Mockito.verify(this.response, Mockito.times(1))
+        Mockito
+            .verify(this.response, Mockito.times(1))
             .sendError(Mockito.eq(HttpStatus.PRECONDITION_FAILED.value()), Mockito.anyString());
         Mockito
-            .verify(counterId, Mockito.times(1))
-            .withTag(MetricsConstants.TagKeys.EXCEPTION_CLASS, exception.getClass().getCanonicalName());
+            .verify(this.registry, Mockito.times(1))
+            .counter(
+                GenieExceptionMapper.CONTROLLER_EXCEPTION_COUNTER_NAME,
+                Sets.newHashSet(
+                    Tag.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, exception.getClass().getCanonicalName())
+                )
+            );
         Mockito
-            .verify(counter, Mockito.times(1))
+            .verify(this.counter, Mockito.times(1))
             .increment();
     }
 
@@ -163,16 +169,18 @@ public class GenieExceptionMapperUnitTests {
             bindingResult
         );
 
-        this.mapper.handleMethodArgumentNotValidException(
-            this.response,
-            exception
-        );
+        this.mapper.handleMethodArgumentNotValidException(this.response, exception);
         Mockito
             .verify(this.response, Mockito.times(1))
             .sendError(Mockito.eq(HttpStatus.PRECONDITION_FAILED.value()), Mockito.anyString());
         Mockito
-            .verify(this.counterId, Mockito.times(1))
-            .withTag(MetricsConstants.TagKeys.EXCEPTION_CLASS, exception.getClass().getCanonicalName());
+            .verify(this.registry, Mockito.times(1))
+            .counter(
+                GenieExceptionMapper.CONTROLLER_EXCEPTION_COUNTER_NAME,
+                Sets.newHashSet(
+                    Tag.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, exception.getClass().getCanonicalName())
+                )
+            );
         Mockito
             .verify(this.counter, Mockito.times(1))
             .increment();

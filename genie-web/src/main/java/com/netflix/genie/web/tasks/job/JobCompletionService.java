@@ -18,7 +18,7 @@
 package com.netflix.genie.web.tasks.job;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Job;
@@ -41,8 +41,8 @@ import com.netflix.genie.web.services.MailService;
 import com.netflix.genie.web.services.impl.GenieFileTransferService;
 import com.netflix.genie.web.util.MetricsConstants;
 import com.netflix.genie.web.util.MetricsUtils;
-import com.netflix.spectator.api.Id;
-import com.netflix.spectator.api.Registry;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
@@ -59,8 +59,8 @@ import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -74,8 +74,10 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class JobCompletionService {
 
-    private static final String ERROR_SOURCE_TAG = "error";
-    private static final String JOB_FINAL_STATE = "jobFinalState";
+    static final String JOB_COMPLETION_TIMER_NAME = "genie.jobs.completion.timer";
+    static final String JOB_COMPLETION_ERROR_COUNTER_NAME = "genie.jobs.errors.count";
+    static final String ERROR_SOURCE_TAG = "error";
+    static final String JOB_FINAL_STATE = "jobFinalState";
     private final JobPersistenceService jobPersistenceService;
     private final JobSearchService jobSearchService;
     private final GenieFileTransferService genieFileTransferService;
@@ -87,9 +89,7 @@ public class JobCompletionService {
     private final boolean runAsUserEnabled;
 
     // Metrics
-    private final Registry registry;
-    private final Id jobCompletionTimerId;
-    private final Id errorCounterId;
+    private final MeterRegistry registry;
     private final RetryTemplate retryTemplate;
 
     /**
@@ -112,7 +112,7 @@ public class JobCompletionService {
         final GenieFileTransferService genieFileTransferService,
         @Qualifier("jobsDir") final Resource genieWorkingDir,
         final MailService mailServiceImpl,
-        final Registry registry,
+        final MeterRegistry registry,
         final JobsProperties jobsProperties,
         @Qualifier("genieRetryTemplate") @NotNull final RetryTemplate retryTemplate
     ) throws GenieException {
@@ -135,8 +135,6 @@ public class JobCompletionService {
 
         // Set up the metrics
         this.registry = registry;
-        this.jobCompletionTimerId = registry.createId("genie.jobs.completion.timer");
-        this.errorCounterId = registry.createId("genie.jobs.errors.count");
         // Retry template
         this.retryTemplate = retryTemplate;
     }
@@ -149,7 +147,7 @@ public class JobCompletionService {
     void handleJobCompletion(final JobFinishedEvent event) {
         final long start = System.nanoTime();
         final String jobId = event.getId();
-        final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
+        final Set<Tag> tags = Sets.newHashSet();
 
         try {
             final Job job = this.retryTemplate.execute(context -> this.getJob(jobId));
@@ -177,12 +175,13 @@ public class JobCompletionService {
                     this.incrementErrorCounter("JOB_UPDATE_FAILURE", e);
                 }
             }
+            MetricsUtils.addSuccessTags(tags);
         } catch (final Exception e) {
             log.error("Failed getting job with id: {}", jobId, e);
             MetricsUtils.addFailureTagsWithException(tags, e);
         } finally {
             this.registry
-                .timer(this.jobCompletionTimerId.withTags(tags))
+                .timer(JOB_COMPLETION_TIMER_NAME, tags)
                 .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
     }
@@ -194,7 +193,7 @@ public class JobCompletionService {
     private Void updateJob(
         final Job job,
         final JobFinishedEvent event,
-        final Map<String, String> tags
+        final Set<Tag> tags
     ) throws GenieException {
         try {
             final String jobId = event.getId();
@@ -227,19 +226,19 @@ public class JobCompletionService {
                     try {
                         final String finalStatus =
                             this.retryTemplate.execute(context -> updateFinalStatusForJob(jobId).toString());
-                        tags.put(JOB_FINAL_STATE, finalStatus);
+                        tags.add(Tag.of(JOB_FINAL_STATE, finalStatus));
                         cleanupProcesses(jobId);
                     } catch (Exception e) {
                         log.error("Failed updating the exit code and status for job: {}", jobId, e);
                     }
                 } else {
-                    tags.put(JOB_FINAL_STATE, JobStatus.FAILED.toString());
+                    tags.add(Tag.of(JOB_FINAL_STATE, JobStatus.FAILED.toString()));
                     eventStatus = JobStatus.FAILED;
                 }
             }
 
             if (eventStatus != null) {
-                tags.put(JOB_FINAL_STATE, status.toString());
+                tags.add(Tag.of(JOB_FINAL_STATE, status.toString()));
                 this.jobPersistenceService.updateJobStatus(jobId, eventStatus, event.getMessage());
             }
         } catch (Throwable t) {
@@ -647,18 +646,18 @@ public class JobCompletionService {
 
     private void incrementErrorCounter(final String errorTagValue, final Throwable throwable) {
         this.incrementErrorCounter(
-            ImmutableMap.of(
-                ERROR_SOURCE_TAG, errorTagValue,
-                MetricsConstants.TagKeys.EXCEPTION_CLASS, throwable.getClass().getCanonicalName()
+            ImmutableSet.of(
+                Tag.of(ERROR_SOURCE_TAG, errorTagValue),
+                Tag.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, throwable.getClass().getCanonicalName())
             )
         );
     }
 
     private void incrementErrorCounter(final String errorTagValue) {
-        this.incrementErrorCounter(ImmutableMap.of(ERROR_SOURCE_TAG, errorTagValue));
+        this.incrementErrorCounter(ImmutableSet.of(Tag.of(ERROR_SOURCE_TAG, errorTagValue)));
     }
 
-    private void incrementErrorCounter(final Map<String, String> tags) {
-        this.registry.counter(this.errorCounterId.withTags(tags)).increment();
+    private void incrementErrorCounter(final Set<Tag> tags) {
+        this.registry.counter(JOB_COMPLETION_ERROR_COUNTER_NAME, tags).increment();
     }
 }

@@ -18,7 +18,7 @@
 package com.netflix.genie.web.security.oauth2.pingfederate;
 
 import com.netflix.genie.test.categories.UnitTest;
-import com.netflix.spectator.api.Registry;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.jose4j.jwt.consumer.JwtConsumer;
 import org.jose4j.lang.JoseException;
 import org.junit.Assert;
@@ -70,7 +70,7 @@ public class PingFederateJWTConfigUnitTests {
      */
     @Test
     public void canGetValidator() {
-        Assert.assertNotNull(this.config.pingFederateValidator(Mockito.mock(Registry.class)));
+        Assert.assertNotNull(this.config.pingFederateValidator(Mockito.mock(MeterRegistry.class)));
     }
 
     /**
@@ -117,7 +117,7 @@ public class PingFederateJWTConfigUnitTests {
     @Test
     public void canGetTokenServices() {
         final JwtConsumer consumer = Mockito.mock(JwtConsumer.class);
-        final Registry registry = Mockito.mock(Registry.class);
+        final MeterRegistry registry = Mockito.mock(MeterRegistry.class);
         Assert.assertNotNull(this.config.pingFederateJWTTokenServices(consumer, registry));
     }
 }

@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.jobs.workflow.impl;
 
-import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
@@ -28,8 +28,8 @@ import com.netflix.genie.web.jobs.JobExecutionEnvironment;
 import com.netflix.genie.web.services.impl.GenieFileTransferService;
 import com.netflix.genie.web.util.MetricsConstants;
 import com.netflix.genie.web.util.MetricsUtils;
-import com.netflix.spectator.api.Id;
-import com.netflix.spectator.api.Registry;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -50,8 +51,10 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class ApplicationTask extends GenieBaseTask {
 
-    private final Id timerId;
-    private final Id applicationTimerId;
+    private static final String APPLICATION_TASK_TIMER_NAME = "genie.jobs.tasks.applicationTask.timer";
+    private static final String APPLICATION_SETUP_TIMER_NAME
+        = "genie.jobs.tasks.applicationTask.applicationSetup.timer";
+
     private final GenieFileTransferService fts;
 
     /**
@@ -60,11 +63,8 @@ public class ApplicationTask extends GenieBaseTask {
      * @param registry The metrics registry to use for recording any metrics
      * @param fts      File transfer service
      */
-    public ApplicationTask(@NotNull final Registry registry,
-                           @NotNull final GenieFileTransferService fts) {
+    public ApplicationTask(@NotNull final MeterRegistry registry, @NotNull final GenieFileTransferService fts) {
         super(registry);
-        this.timerId = registry.createId("genie.jobs.tasks.applicationTask.timer");
-        this.applicationTimerId = registry.createId("genie.jobs.tasks.applicationTask.applicationSetup.timer");
         this.fts = fts;
     }
 
@@ -72,11 +72,8 @@ public class ApplicationTask extends GenieBaseTask {
      * {@inheritDoc}
      */
     @Override
-    public void executeTask(
-        @NotNull
-        final Map<String, Object> context
-    ) throws GenieException, IOException {
-        final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
+    public void executeTask(@NotNull final Map<String, Object> context) throws GenieException, IOException {
+        final Set<Tag> tags = Sets.newHashSet();
         final long start = System.nanoTime();
         try {
             final JobExecutionEnvironment jobExecEnv =
@@ -92,12 +89,14 @@ public class ApplicationTask extends GenieBaseTask {
             if (jobExecEnv.getApplications() != null) {
                 for (Application application : jobExecEnv.getApplications()) {
                     final long applicationStart = System.nanoTime();
-                    final Map<String, String> applicationTags = Maps.newHashMap();
-                    applicationTags.put(
-                        MetricsConstants.TagKeys.APPLICATION_ID,
-                        application.getId().orElse(NO_ID_FOUND)
+                    final Set<Tag> applicationTags = Sets.newHashSet();
+                    applicationTags.add(
+                        Tag.of(
+                            MetricsConstants.TagKeys.APPLICATION_ID,
+                            application.getId().orElse(NO_ID_FOUND)
+                        )
                     );
-                    applicationTags.put(MetricsConstants.TagKeys.APPLICATION_NAME, application.getName());
+                    applicationTags.add(Tag.of(MetricsConstants.TagKeys.APPLICATION_NAME, application.getName()));
 
                     try {
                         final String applicationId = application
@@ -177,21 +176,21 @@ public class ApplicationTask extends GenieBaseTask {
                         throw t;
                     } finally {
                         final long applicationFinish = System.nanoTime();
-                        this.getRegistry().timer(
-                            applicationTimerId.withTags(applicationTags)
-                        ).record(applicationFinish - applicationStart, TimeUnit.NANOSECONDS);
+                        this.getRegistry()
+                            .timer(APPLICATION_SETUP_TIMER_NAME, applicationTags)
+                            .record(applicationFinish - applicationStart, TimeUnit.NANOSECONDS);
                     }
                 }
             }
             log.info("Finished Application Task for job {}", jobExecEnv.getJobRequest().getId().orElse(NO_ID_FOUND));
-        } catch (Throwable t) {
+            MetricsUtils.addSuccessTags(tags);
+        } catch (final Throwable t) {
             MetricsUtils.addFailureTagsWithException(tags, t);
             throw t;
         } finally {
-            final long finish = System.nanoTime();
-            this.getRegistry().timer(
-                timerId.withTags(tags)
-            ).record(finish - start, TimeUnit.NANOSECONDS);
+            this.getRegistry()
+                .timer(APPLICATION_TASK_TIMER_NAME, tags)
+                .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
     }
 }

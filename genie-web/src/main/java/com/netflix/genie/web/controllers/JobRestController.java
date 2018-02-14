@@ -51,8 +51,8 @@ import com.netflix.genie.web.resources.handlers.GenieResourceHttpRequestHandler;
 import com.netflix.genie.web.services.AttachmentService;
 import com.netflix.genie.web.services.JobCoordinatorService;
 import com.netflix.genie.web.services.JobSearchService;
-import com.netflix.spectator.api.Counter;
-import com.netflix.spectator.api.Registry;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -183,7 +183,7 @@ public class JobRestController {
         @Qualifier("genieRestTemplate") final RestTemplate restTemplate,
         final GenieResourceHttpRequestHandler resourceHttpRequestHandler,
         final JobsProperties jobsProperties,
-        final Registry registry
+        final MeterRegistry registry
     ) {
         this.jobCoordinatorService = jobCoordinatorService;
         this.jobSearchService = jobSearchService;

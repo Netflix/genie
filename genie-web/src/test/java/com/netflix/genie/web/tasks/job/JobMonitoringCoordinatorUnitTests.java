@@ -31,7 +31,7 @@ import com.netflix.genie.web.events.JobStartedEvent;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.services.JobSearchService;
 import com.netflix.genie.web.services.JobSubmitterService;
-import com.netflix.spectator.api.DefaultRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.apache.commons.exec.Executor;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
@@ -103,7 +103,7 @@ public class JobMonitoringCoordinatorUnitTests {
             this.genieEventBus,
             this.scheduler,
             executor,
-            new DefaultRegistry(),
+            new SimpleMeterRegistry(),
             jobsDir,
             new JobsProperties(),
             jobSubmitterService

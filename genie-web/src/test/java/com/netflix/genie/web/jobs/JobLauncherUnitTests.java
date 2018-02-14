@@ -27,20 +27,15 @@ import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.services.JobSubmitterService;
 import com.netflix.genie.web.util.MetricsUtils;
-import com.netflix.spectator.api.Id;
-import com.netflix.spectator.api.Registry;
-import com.netflix.spectator.api.Timer;
-import org.junit.Assert;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -58,11 +53,9 @@ public class JobLauncherUnitTests {
     private Cluster cluster;
     private Command command;
     private List<Application> applications;
+    private MeterRegistry registry;
     private Timer timer;
     private int memory;
-    private Id timerId;
-    @Captor
-    private ArgumentCaptor<Map<String, String>> tagsCaptor;
 
     /**
      * Setup for the tests.
@@ -76,12 +69,11 @@ public class JobLauncherUnitTests {
         this.applications = Lists.newArrayList(Mockito.mock(Application.class));
         this.jobSubmitterService = Mockito.mock(JobSubmitterService.class);
         this.memory = 1_024;
-        final Registry registry = Mockito.mock(Registry.class);
-        this.timerId = Mockito.mock(Id.class);
+        this.registry = Mockito.mock(MeterRegistry.class);
         this.timer = Mockito.mock(Timer.class);
-        Mockito.when(registry.createId("genie.jobs.submit.timer")).thenReturn(timerId);
-        Mockito.when(timerId.withTags(Mockito.anyMap())).thenReturn(timerId);
-        Mockito.when(registry.timer(Mockito.eq(timerId))).thenReturn(timer);
+        Mockito
+            .when(this.registry.timer(Mockito.eq(JobLauncher.JOB_SUBMIT_TIMER_NAME), Mockito.anySet()))
+            .thenReturn(this.timer);
 
         this.jobLauncher = new JobLauncher(
             this.jobSubmitterService,
@@ -90,7 +82,7 @@ public class JobLauncherUnitTests {
             this.command,
             this.applications,
             this.memory,
-            registry
+            this.registry
         );
     }
 
@@ -102,15 +94,15 @@ public class JobLauncherUnitTests {
     @Test
     public void canRun() throws GenieException {
         this.jobLauncher.run();
-        Mockito.verify(this.jobSubmitterService, Mockito.times(1))
+        Mockito.
+            verify(this.jobSubmitterService, Mockito.times(1))
             .submitJob(this.jobRequest, this.cluster, this.command, this.applications, this.memory);
         Mockito
             .verify(this.timer, Mockito.times(1))
             .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
         Mockito
-            .verify(this.timerId, Mockito.times(1))
-            .withTags(tagsCaptor.capture());
-        Assert.assertEquals(MetricsUtils.newSuccessTagsMap(), tagsCaptor.getValue());
+            .verify(this.registry, Mockito.times(1))
+            .timer(JobLauncher.JOB_SUBMIT_TIMER_NAME, MetricsUtils.newSuccessTagsSet());
     }
 
     /**
@@ -121,19 +113,20 @@ public class JobLauncherUnitTests {
     @Test
     public void cantRun() throws GenieException {
         final GenieServerException exception = new GenieServerException("test");
-        Mockito.doThrow(exception).when(this.jobSubmitterService)
+        Mockito
+            .doThrow(exception)
+            .when(this.jobSubmitterService)
             .submitJob(this.jobRequest, this.cluster, this.command, this.applications, this.memory);
         this.jobLauncher.run();
         Mockito
             .verify(this.timer, Mockito.times(1))
             .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
         Mockito
-            .verify(this.timerId, Mockito.times(1))
-            .withTags(tagsCaptor.capture());
-        Assert.assertEquals(
-            MetricsUtils.newFailureTagsMapForException(new GenieServerException("test")),
-            tagsCaptor.getValue()
-        );
+            .verify(this.registry, Mockito.times(1))
+            .timer(
+                JobLauncher.JOB_SUBMIT_TIMER_NAME,
+                MetricsUtils.newFailureTagsSetForException(new GenieServerException("test"))
+            );
     }
 
     /**
@@ -153,12 +146,11 @@ public class JobLauncherUnitTests {
                 .verify(this.timer, Mockito.times(1))
                 .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
             Mockito
-                .verify(this.timerId, Mockito.times(1))
-                .withTags(tagsCaptor.capture());
-            Assert.assertEquals(
-                MetricsUtils.newFailureTagsMapForException(new RuntimeException("test")),
-                tagsCaptor.getValue()
-            );
+                .verify(this.registry, Mockito.times(1))
+                .timer(
+                    JobLauncher.JOB_SUBMIT_TIMER_NAME,
+                    MetricsUtils.newFailureTagsSetForException(new RuntimeException("test"))
+                );
         }
     }
 }

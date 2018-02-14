@@ -5,6 +5,9 @@ The following are the release notes for Genie {revnumber}.
 === Features
 
 * Upgrade to Spring Boot 2.0
+* Switch metric collection to use http://micrometer.io/[Micrometer]
+** Allows users to plugin their own backend (Atlas, DataDog, etc)
+** Standard for Boot 2.0
 * Switched to https://jcp.org/en/jsr/detail?id=310[JSR 310] classes for date and time manipulation
 * Upgrade to JPA 2.2
 

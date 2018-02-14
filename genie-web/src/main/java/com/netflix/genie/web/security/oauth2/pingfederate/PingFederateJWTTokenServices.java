@@ -18,8 +18,8 @@
 package com.netflix.genie.web.security.oauth2.pingfederate;
 
 import com.google.common.collect.Sets;
-import com.netflix.spectator.api.Registry;
-import com.netflix.spectator.api.Timer;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import lombok.extern.slf4j.Slf4j;
 import org.jose4j.jwt.JwtClaims;
 import org.jose4j.jwt.MalformedClaimException;
@@ -66,7 +66,7 @@ public class PingFederateJWTTokenServices implements ResourceServerTokenServices
      */
     public PingFederateJWTTokenServices(
         @NotNull final JwtConsumer jwtConsumer,
-        @NotNull final Registry registry
+        @NotNull final MeterRegistry registry
     ) {
         this.jwtConsumer = jwtConsumer;
         this.loadAuthenticationTimer = registry.timer("genie.security.oauth2.pingFederate.authentication.timer");

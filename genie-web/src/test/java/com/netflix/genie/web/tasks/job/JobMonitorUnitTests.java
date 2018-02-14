@@ -25,8 +25,8 @@ import com.netflix.genie.web.events.JobFinishedEvent;
 import com.netflix.genie.web.events.KillJobEvent;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
-import com.netflix.spectator.api.Counter;
-import com.netflix.spectator.api.Registry;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.Executor;
@@ -65,7 +65,7 @@ public class JobMonitorUnitTests {
     private JobExecution jobExecution;
     private Executor executor;
     private GenieEventBus genieEventBus;
-    private Registry registry;
+    private MeterRegistry registry;
     private File stdOut;
     private File stdErr;
     private Counter successfulCheckRate;
@@ -95,7 +95,7 @@ public class JobMonitorUnitTests {
         this.unsuccessfulCheckRate = Mockito.mock(Counter.class);
         this.stdOutTooLarge = Mockito.mock(Counter.class);
         this.stdErrTooLarge = Mockito.mock(Counter.class);
-        this.registry = Mockito.mock(Registry.class);
+        this.registry = Mockito.mock(MeterRegistry.class);
         this.stdOut = Mockito.mock(File.class);
         this.stdErr = Mockito.mock(File.class);
         Mockito

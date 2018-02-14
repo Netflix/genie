@@ -60,7 +60,7 @@ import com.netflix.genie.web.services.impl.LocalJobKillServiceImpl;
 import com.netflix.genie.web.services.impl.LocalJobRunner;
 import com.netflix.genie.web.services.impl.MailServiceImpl;
 import com.netflix.genie.web.services.impl.RandomizedClusterLoadBalancerImpl;
-import com.netflix.spectator.api.Registry;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.exec.Executor;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -333,7 +333,7 @@ public class ServicesConfig {
         final FileTransferFactory fileTransferFactory,
         @Value("${genie.file.cache.location}") final String baseCacheLocation,
         final LocalFileTransferImpl localFileTransfer,
-        final Registry registry
+        final MeterRegistry registry
     ) throws GenieException {
         return new CacheGenieFileTransferService(fileTransferFactory, baseCacheLocation, localFileTransfer, registry);
     }
@@ -354,7 +354,7 @@ public class ServicesConfig {
         final GenieEventBus genieEventBus,
         final List<WorkflowTask> workflowTasks,
         @Qualifier("jobsDir") final Resource genieWorkingDir,
-        final Registry registry
+        final MeterRegistry registry
     ) {
         return new LocalJobRunner(
             jobPersistenceService,
@@ -392,7 +392,7 @@ public class ServicesConfig {
         final ClusterService clusterService,
         final CommandService commandService,
         final List<ClusterLoadBalancer> clusterLoadBalancers,
-        final Registry registry,
+        final MeterRegistry registry,
         final String hostName
     ) {
         if (clusterLoadBalancers.isEmpty()) {

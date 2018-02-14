@@ -18,12 +18,13 @@
 package com.netflix.genie.web.services.impl;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.web.services.FileTransfer;
 import com.netflix.genie.web.util.MetricsUtils;
-import com.netflix.spectator.api.Id;
-import com.netflix.spectator.api.Registry;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.validator.routines.UrlValidator;
@@ -39,7 +40,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.time.Instant;
-import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -51,13 +52,14 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class HttpFileTransferImpl implements FileTransfer {
 
+    static final String DOWNLOAD_TIMER_NAME = "genie.files.http.download.timer";
+    static final String UPLOAD_TIMER_NAME = "genie.files.http.upload.timer";
+    static final String GET_LAST_MODIFIED_TIMER_NAME = "genie.files.http.getLastModified.timer";
+
     private final UrlValidator validator
         = new UrlValidator(new String[]{"http", "https"}, UrlValidator.ALLOW_LOCAL_URLS);
     private final RestTemplate restTemplate;
-    private final Registry registry;
-    private final Id downloadTimerId;
-    private final Id uploadTimerId;
-    private final Id getLastModifiedTimerId;
+    private final MeterRegistry registry;
 
     /**
      * Constructor.
@@ -65,12 +67,9 @@ public class HttpFileTransferImpl implements FileTransfer {
      * @param restTemplate The rest template to use
      * @param registry     The metrics registry to use
      */
-    public HttpFileTransferImpl(@NotNull final RestTemplate restTemplate, @NotNull final Registry registry) {
+    public HttpFileTransferImpl(@NotNull final RestTemplate restTemplate, @NotNull final MeterRegistry registry) {
         this.restTemplate = restTemplate;
         this.registry = registry;
-        this.downloadTimerId = registry.createId("genie.files.http.download.timer");
-        this.uploadTimerId = registry.createId("genie.files.http.upload.timer");
-        this.getLastModifiedTimerId = registry.createId("genie.files.http.getLastModified.timer");
     }
 
     /**
@@ -87,13 +86,11 @@ public class HttpFileTransferImpl implements FileTransfer {
      */
     @Override
     public void getFile(
-        @NotBlank(message = "Source file path cannot be empty.")
-        final String srcRemotePath,
-        @NotBlank(message = "Destination local path cannot be empty")
-        final String dstLocalPath
+        @NotBlank(message = "Source file path cannot be empty.") final String srcRemotePath,
+        @NotBlank(message = "Destination local path cannot be empty") final String dstLocalPath
     ) throws GenieException {
         final long start = System.nanoTime();
-        final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
+        final Set<Tag> tags = Sets.newHashSet();
         log.debug("Called with src path {} and destination path {}", srcRemotePath, dstLocalPath);
 
         try {
@@ -112,13 +109,12 @@ public class HttpFileTransferImpl implements FileTransfer {
                     return null;
                 }
             );
-        } catch (GenieException | RuntimeException e) {
+            MetricsUtils.addSuccessTags(tags);
+        } catch (final GenieException | RuntimeException e) {
             MetricsUtils.addFailureTagsWithException(tags, e);
             throw e;
         } finally {
-            this.registry.timer(
-                downloadTimerId.withTags(tags)
-            ).record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+            this.registry.timer(DOWNLOAD_TIMER_NAME, tags).record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
     }
 
@@ -127,24 +123,20 @@ public class HttpFileTransferImpl implements FileTransfer {
      */
     @Override
     public void putFile(
-        @NotBlank(message = "Source local path cannot be empty.")
-        final String srcLocalPath,
-        @NotBlank(message = "Destination remote path cannot be empty")
-        final String dstRemotePath
+        @NotBlank(message = "Source local path cannot be empty.") final String srcLocalPath,
+        @NotBlank(message = "Destination remote path cannot be empty") final String dstRemotePath
     ) throws GenieException {
         final long start = System.nanoTime();
-        final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
+        final Set<Tag> tags = Sets.newHashSet();
         try {
             throw new UnsupportedOperationException(
                 "Saving a file to an HttpEndpoint isn't implemented in this version"
             );
-        } catch (Throwable t) {
+        } catch (final Throwable t) {
             MetricsUtils.addFailureTagsWithException(tags, t);
             throw t;
         } finally {
-            this.registry.timer(
-                uploadTimerId.withTags(tags)
-            ).record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+            this.registry.timer(UPLOAD_TIMER_NAME, tags).record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
     }
 
@@ -154,24 +146,25 @@ public class HttpFileTransferImpl implements FileTransfer {
     @Override
     public long getLastModifiedTime(final String path) throws GenieException {
         final long start = System.nanoTime();
-        final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
+        final Set<Tag> tags = Sets.newHashSet();
         final long lastModtime;
         try {
             final URL url = new URL(path);
             final long time = this.restTemplate.headForHeaders(url.toURI()).getLastModified();
             // Returns now if there was no last modified header as best we can do is assume file is brand new
             lastModtime = time != -1 ? time : Instant.now().toEpochMilli();
+            MetricsUtils.addSuccessTags(tags);
         } catch (final MalformedURLException | URISyntaxException e) {
             log.error(e.getLocalizedMessage(), e);
             MetricsUtils.addFailureTagsWithException(tags, e);
             throw new GenieServerException("Failed to get metadata for invalid URL", e);
-        } catch (Throwable t) {
+        } catch (final Throwable t) {
             MetricsUtils.addFailureTagsWithException(tags, t);
             throw t;
         } finally {
-            this.registry.timer(
-                getLastModifiedTimerId.withTags(tags)
-            ).record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+            this.registry
+                .timer(GET_LAST_MODIFIED_TIMER_NAME, tags)
+                .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
         return lastModtime;
     }

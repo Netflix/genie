@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.jobs;
 
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
@@ -24,14 +25,14 @@ import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.web.services.JobSubmitterService;
 import com.netflix.genie.web.util.MetricsUtils;
-import com.netflix.spectator.api.Id;
-import com.netflix.spectator.api.Registry;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -44,14 +45,14 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class JobLauncher implements Runnable {
 
+    static final String JOB_SUBMIT_TIMER_NAME = "genie.jobs.submit.timer";
     private final JobSubmitterService jobSubmitterService;
     private final JobRequest jobRequest;
     private final Cluster cluster;
     private final Command command;
     private final List<Application> applications;
     private final int memory;
-    private final Registry registry;
-    private final Id submitTimerId;
+    private final MeterRegistry registry;
 
     /**
      * Constructor.
@@ -71,7 +72,7 @@ public class JobLauncher implements Runnable {
         @NotNull final Command command,
         @NotNull final List<Application> applications,
         @Min(1) final int memory,
-        @NotNull final Registry registry
+        @NotNull final MeterRegistry registry
     ) {
         this.jobSubmitterService = jobSubmitterService;
         this.jobRequest = jobRequest;
@@ -80,7 +81,6 @@ public class JobLauncher implements Runnable {
         this.applications = applications;
         this.memory = memory;
         this.registry = registry;
-        this.submitTimerId = this.registry.createId("genie.jobs.submit.timer");
     }
 
     /**
@@ -89,7 +89,7 @@ public class JobLauncher implements Runnable {
     @Override
     public void run() {
         final long start = System.nanoTime();
-        final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
+        final Set<Tag> tags = Sets.newHashSet();
         try {
             this.jobSubmitterService.submitJob(
                 this.jobRequest,
@@ -98,17 +98,15 @@ public class JobLauncher implements Runnable {
                 this.applications,
                 this.memory
             );
+            MetricsUtils.addSuccessTags(tags);
         } catch (final GenieException e) {
             log.error("Unable to submit job due to exception: {}", e.getMessage(), e);
             MetricsUtils.addFailureTagsWithException(tags, e);
-        } catch (Throwable t) {
+        } catch (final Throwable t) {
             MetricsUtils.addFailureTagsWithException(tags, t);
             throw t;
         } finally {
-            final long finish = System.nanoTime();
-            this.registry.timer(
-                submitTimerId.withTags(tags)
-            ).record(finish - start, TimeUnit.NANOSECONDS);
+            this.registry.timer(JOB_SUBMIT_TIMER_NAME, tags).record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
     }
 }

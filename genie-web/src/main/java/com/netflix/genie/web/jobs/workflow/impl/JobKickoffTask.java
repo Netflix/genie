@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.jobs.workflow.impl;
 
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
@@ -25,8 +26,8 @@ import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.web.jobs.JobConstants;
 import com.netflix.genie.web.jobs.JobExecutionEnvironment;
 import com.netflix.genie.web.util.MetricsUtils;
-import com.netflix.spectator.api.Id;
-import com.netflix.spectator.api.Registry;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.Executor;
@@ -46,6 +47,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -57,11 +59,11 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class JobKickoffTask extends GenieBaseTask {
 
+    private static final String JOB_KICKOFF_TASK_TIMER_NAME = "genie.jobs.tasks.jobKickoffTask.timer";
     private final boolean isRunAsUserEnabled;
     private final boolean isUserCreationEnabled;
     private final Executor executor;
     private final String hostname;
-    private final Id timerId;
     private final RetryTemplate retryTemplate;
 
     /**
@@ -78,16 +80,15 @@ public class JobKickoffTask extends GenieBaseTask {
         final boolean userCreationEnabled,
         @NotNull final Executor executor,
         @NotNull final String hostname,
-        @NotNull final Registry registry
+        @NotNull final MeterRegistry registry
     ) {
         super(registry);
         this.isRunAsUserEnabled = runAsUserEnabled;
         this.isUserCreationEnabled = userCreationEnabled;
         this.executor = executor;
         this.hostname = hostname;
-        this.timerId = registry.createId("genie.jobs.tasks.jobKickoffTask.timer");
-        retryTemplate = new RetryTemplate();
-        retryTemplate.setBackOffPolicy(new ExponentialBackOffPolicy());
+        this.retryTemplate = new RetryTemplate();
+        this.retryTemplate.setBackOffPolicy(new ExponentialBackOffPolicy());
     }
 
     /**
@@ -96,7 +97,7 @@ public class JobKickoffTask extends GenieBaseTask {
     @Override
     public void executeTask(@NotNull final Map<String, Object> context) throws GenieException, IOException {
         final long start = System.nanoTime();
-        final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
+        final Set<Tag> tags = Sets.newHashSet();
         try {
             final JobExecutionEnvironment jobExecEnv =
                 (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
@@ -176,14 +177,14 @@ public class JobKickoffTask extends GenieBaseTask {
                 throw new GenieServerException("Unable to start command " + String.valueOf(command), ie);
             }
             log.info("Finished Job Kickoff Task for job {}", jobId);
-        } catch (Throwable t) {
+            MetricsUtils.addSuccessTags(tags);
+        } catch (final Throwable t) {
             MetricsUtils.addFailureTagsWithException(tags, t);
             throw t;
         } finally {
-            final long finish = System.nanoTime();
-            this.getRegistry().timer(
-                timerId.withTags(tags)
-            ).record(finish - start, TimeUnit.NANOSECONDS);
+            this.getRegistry()
+                .timer(JOB_KICKOFF_TASK_TIMER_NAME, tags)
+                .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
     }
 
