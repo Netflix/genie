@@ -25,7 +25,7 @@ import com.netflix.genie.web.services.FileService;
 import com.netflix.genie.web.services.JobPersistenceService;
 import com.netflix.genie.web.services.TagService;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
-import com.netflix.spectator.api.DefaultRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -70,7 +70,7 @@ public class DatabaseCleanupTaskUnitTests {
             this.clusterService,
             this.fileService,
             this.tagService,
-            new DefaultRegistry()
+            new SimpleMeterRegistry()
         );
     }
 

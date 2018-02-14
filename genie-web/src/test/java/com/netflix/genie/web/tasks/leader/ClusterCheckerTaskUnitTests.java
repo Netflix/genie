@@ -28,7 +28,7 @@ import com.netflix.genie.web.properties.ClusterCheckerProperties;
 import com.netflix.genie.web.services.JobPersistenceService;
 import com.netflix.genie.web.services.JobSearchService;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
-import com.netflix.spectator.api.DefaultRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -81,7 +81,7 @@ public class ClusterCheckerTaskUnitTests {
             this.jobPersistenceService,
             this.restTemplate,
             serverProperties,
-            new DefaultRegistry()
+            new SimpleMeterRegistry()
         );
     }
 

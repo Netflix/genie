@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.web.configs;
 
-import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.web.jobs.workflow.WorkflowTask;
 import com.netflix.genie.web.jobs.workflow.impl.ApplicationTask;
 import com.netflix.genie.web.jobs.workflow.impl.ClusterTask;
@@ -31,7 +30,7 @@ import com.netflix.genie.web.services.AttachmentService;
 import com.netflix.genie.web.services.impl.GenieFileTransferService;
 import com.netflix.genie.web.services.impl.HttpFileTransferImpl;
 import com.netflix.genie.web.services.impl.LocalFileTransferImpl;
-import com.netflix.spectator.api.Registry;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.exec.Executor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -68,7 +67,7 @@ public class JobConfig {
      */
     @Bean(name = {"file.system.http", "file.system.https"})
     @Order(value = 3)
-    public HttpFileTransferImpl httpFileTransfer(final RestTemplate restTemplate, final Registry registry) {
+    public HttpFileTransferImpl httpFileTransfer(final RestTemplate restTemplate, final MeterRegistry registry) {
         return new HttpFileTransferImpl(restTemplate, registry);
     }
 
@@ -81,7 +80,7 @@ public class JobConfig {
      */
     @Bean
     @Order(value = 0)
-    public WorkflowTask jobKillLogicTask(final Registry registry) {
+    public WorkflowTask jobKillLogicTask(final MeterRegistry registry) {
         return new JobFailureAndKillHandlerLogicTask(registry);
     }
 
@@ -93,7 +92,7 @@ public class JobConfig {
      */
     @Bean
     @Order(value = 1)
-    public WorkflowTask initialSetupTask(final Registry registry) {
+    public WorkflowTask initialSetupTask(final MeterRegistry registry) {
         return new InitialSetupTask(registry);
     }
 
@@ -107,9 +106,9 @@ public class JobConfig {
     @Bean
     @Order(value = 2)
     public WorkflowTask clusterProcessorTask(
-        final Registry registry,
-        @Qualifier("cacheGenieFileTransferService")
-        final GenieFileTransferService fts) {
+        final MeterRegistry registry,
+        @Qualifier("cacheGenieFileTransferService") final GenieFileTransferService fts
+    ) {
         return new ClusterTask(registry, fts);
     }
 
@@ -123,9 +122,9 @@ public class JobConfig {
     @Bean
     @Order(value = 3)
     public WorkflowTask applicationProcessorTask(
-        final Registry registry,
-        @Qualifier("cacheGenieFileTransferService")
-        final GenieFileTransferService fts) {
+        final MeterRegistry registry,
+        @Qualifier("cacheGenieFileTransferService") final GenieFileTransferService fts
+    ) {
         return new ApplicationTask(registry, fts);
     }
 
@@ -139,9 +138,9 @@ public class JobConfig {
     @Bean
     @Order(value = 4)
     public WorkflowTask commandProcessorTask(
-        final Registry registry,
-        @Qualifier("cacheGenieFileTransferService")
-        final GenieFileTransferService fts) {
+        final MeterRegistry registry,
+        @Qualifier("cacheGenieFileTransferService") final GenieFileTransferService fts
+    ) {
         return new CommandTask(registry, fts);
     }
 
@@ -152,17 +151,15 @@ public class JobConfig {
      * @param registry          The metrics registry to use
      * @param fts               File transfer implementation
      * @return An job task object
-     * @throws GenieException if there is any problem
      */
     @Bean
     @Order(value = 5)
     @Autowired
     public WorkflowTask jobProcessorTask(
         final AttachmentService attachmentService,
-        final Registry registry,
-        @Qualifier("genieFileTransferService")
-        final GenieFileTransferService fts
-    ) throws GenieException {
+        final MeterRegistry registry,
+        @Qualifier("genieFileTransferService") final GenieFileTransferService fts
+    ) {
         return new JobTask(attachmentService, registry, fts);
     }
 
@@ -182,7 +179,7 @@ public class JobConfig {
         final JobsProperties jobsProperties,
         final Executor executor,
         final String hostName,
-        final Registry registry
+        final MeterRegistry registry
     ) {
         return new JobKickoffTask(
             jobsProperties.getUsers().isRunAsUserEnabled(),

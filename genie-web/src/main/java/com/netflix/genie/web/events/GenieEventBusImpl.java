@@ -28,6 +28,8 @@ import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.context.event.SimpleApplicationEventMulticaster;
 import org.springframework.core.ResolvableType;
 
+import javax.annotation.Nullable;
+
 /**
  * An event bus implementation for the Genie application to use.
  *
@@ -139,7 +141,7 @@ public class GenieEventBusImpl implements
      * {@inheritDoc}
      */
     @Override
-    public void multicastEvent(final ApplicationEvent event, final ResolvableType eventType) {
+    public void multicastEvent(final ApplicationEvent event, @Nullable final ResolvableType eventType) {
         // TODO: Metric here?
         log.debug("Multi-casting event {} of type {}", event, eventType);
         this.asyncMulticaster.multicastEvent(event, eventType);

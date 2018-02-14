@@ -23,11 +23,10 @@ import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.netflix.genie.test.categories.UnitTest;
-import com.netflix.spectator.api.Counter;
-import com.netflix.spectator.api.Id;
-import com.netflix.spectator.api.Registry;
-import com.netflix.spectator.api.Timer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -79,8 +78,7 @@ public class PingFederateRemoteTokenServicesUnitTests {
     public WireMockRule wireMockRule = new WireMockRule(Options.DYNAMIC_PORT);
 
     private ResourceServerProperties resourceServerProperties;
-    private Registry registry;
-    private Id validationError;
+    private MeterRegistry registry;
     private Timer authenticationTimer;
 
     /**
@@ -90,11 +88,9 @@ public class PingFederateRemoteTokenServicesUnitTests {
     public void setup() {
         this.resourceServerProperties = new ResourceServerProperties(CLIENT_ID, CLIENT_SECRET);
         this.resourceServerProperties.setTokenInfoUri(CHECK_TOKEN_ENDPOINT_URL);
-        this.registry = Mockito.mock(Registry.class);
-        this.validationError = Mockito.mock(Id.class);
+        this.registry = Mockito.mock(MeterRegistry.class);
         this.authenticationTimer = Mockito.mock(Timer.class);
         final Timer pingFederateAPITimer = Mockito.mock(Timer.class);
-        Mockito.when(this.registry.createId(Mockito.anyString())).thenReturn(this.validationError);
         Mockito
             .when(this.registry.timer(PingFederateRemoteTokenServices.AUTHENTICATION_TIMER_NAME))
             .thenReturn(this.authenticationTimer);
@@ -249,14 +245,13 @@ public class PingFederateRemoteTokenServicesUnitTests {
             = new PingFederateRemoteTokenServices(this.resourceServerProperties, converter, this.registry);
         final String accessToken = UUID.randomUUID().toString();
         final Counter restErrorCounter = Mockito.mock(Counter.class);
-        final Id finalValidationId = Mockito.mock(Id.class);
         Mockito
-            .when(this.validationError.withTag(
-                Mockito.anyString(),
-                Mockito.eq(Integer.toString(status)))
+            .when(
+                this.registry.counter(
+                    Mockito.eq(PingFederateRemoteTokenServices.TOKEN_VALIDATION_ERROR_COUNTER_NAME),
+                    Mockito.anySet())
             )
-            .thenReturn(finalValidationId);
-        Mockito.when(this.registry.counter(finalValidationId)).thenReturn(restErrorCounter);
+            .thenReturn(restErrorCounter);
 
         // Should throw exception based on error key being present
         try {

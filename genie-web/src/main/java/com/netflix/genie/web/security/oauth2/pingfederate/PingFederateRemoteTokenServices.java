@@ -17,10 +17,11 @@
  */
 package com.netflix.genie.web.security.oauth2.pingfederate;
 
+import com.google.common.collect.Sets;
 import com.netflix.genie.web.util.MetricsConstants;
-import com.netflix.spectator.api.Id;
-import com.netflix.spectator.api.Registry;
-import com.netflix.spectator.api.Timer;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.Timer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
@@ -62,27 +63,25 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class PingFederateRemoteTokenServices extends RemoteTokenServices {
 
-    protected static final String TOKEN_NAME_KEY = "token";
     protected static final String CLIENT_ID_KEY = "client_id";
-    protected static final String CLIENT_SECRET_KEY = "client_secret";
-    protected static final String GRANT_TYPE_KEY = "grant_type";
     protected static final String ERROR_KEY = "error";
     protected static final String SCOPE_KEY = "scope";
-    protected static final String GRANT_TYPE = "urn:pingidentity.com:oauth2:grant_type:validate_bearer";
     protected static final String AUTHENTICATION_TIMER_NAME = "genie.security.oauth2.pingFederate.authentication.timer";
     protected static final String API_TIMER_NAME = "genie.security.oauth2.pingFederate.api.timer";
-
+    static final String TOKEN_VALIDATION_ERROR_COUNTER_NAME
+        = "genie.security.oauth2.pingFederate.tokenValidation.error.rate";
+    private static final String TOKEN_NAME_KEY = "token";
+    private static final String CLIENT_SECRET_KEY = "client_secret";
+    private static final String GRANT_TYPE_KEY = "grant_type";
+    private static final String GRANT_TYPE = "urn:pingidentity.com:oauth2:grant_type:validate_bearer";
     private final AccessTokenConverter converter;
-    private RestTemplate localRestTemplate;
-
     private final String checkTokenEndpointUrl;
     private final String clientId;
     private final String clientSecret;
-
     // Metrics
-    private final Id tokenValidationError;
     private final Timer authenticationTimer;
     private final Timer pingFederateAPITimer;
+    private RestTemplate localRestTemplate;
 
     /**
      * Constructor.
@@ -94,10 +93,9 @@ public class PingFederateRemoteTokenServices extends RemoteTokenServices {
     public PingFederateRemoteTokenServices(
         @NotNull final ResourceServerProperties serverProperties,
         @NotNull final AccessTokenConverter converter,
-        @NotNull final Registry registry
+        @NotNull final MeterRegistry registry
     ) {
         super();
-        this.tokenValidationError = registry.createId("genie.security.oauth2.pingFederate.tokenValidation.error.rate");
         this.authenticationTimer = registry.timer(AUTHENTICATION_TIMER_NAME);
         this.pingFederateAPITimer = registry.timer(API_TIMER_NAME);
         final HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
@@ -122,10 +120,12 @@ public class PingFederateRemoteTokenServices extends RemoteTokenServices {
                 @Override
                 public void handleError(final ClientHttpResponse response) throws IOException {
                     final int errorCode = response.getRawStatusCode();
-                    registry.counter(
-                        tokenValidationError
-                        .withTag(MetricsConstants.TagKeys.STATUS, Integer.toString(errorCode))
-                    ).increment();
+                    registry
+                        .counter(
+                            TOKEN_VALIDATION_ERROR_COUNTER_NAME,
+                            Sets.newHashSet(Tag.of(MetricsConstants.TagKeys.STATUS, Integer.toString(errorCode)))
+                        )
+                        .increment();
                     if (response.getRawStatusCode() != HttpStatus.BAD_REQUEST.value()) {
                         super.handleError(response);
                     }
@@ -201,12 +201,10 @@ public class PingFederateRemoteTokenServices extends RemoteTokenServices {
     private Map<String, Object> postForMap(final String path, final MultiValueMap<String, String> formData) {
         final HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        @SuppressWarnings("rawtypes")
-        final Map map = this.localRestTemplate.exchange(
+        @SuppressWarnings("rawtypes") final Map map = this.localRestTemplate.exchange(
             path, HttpMethod.POST, new HttpEntity<>(formData, headers), Map.class
         ).getBody();
-        @SuppressWarnings("unchecked")
-        final Map<String, Object> result = map;
+        @SuppressWarnings("unchecked") final Map<String, Object> result = map;
         return result;
     }
 

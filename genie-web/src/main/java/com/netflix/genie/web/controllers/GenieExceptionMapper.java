@@ -17,11 +17,13 @@
  */
 package com.netflix.genie.web.controllers;
 
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieUserLimitExceededException;
 import com.netflix.genie.web.util.MetricsConstants;
-import com.netflix.spectator.api.Id;
-import com.netflix.spectator.api.Registry;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.Tags;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,6 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.io.IOException;
+import java.util.Set;
 
 /**
  * Exception mapper for Genie Exceptions.
@@ -44,10 +47,12 @@ import java.io.IOException;
 @ControllerAdvice
 public class GenieExceptionMapper {
 
+    static final String CONTROLLER_EXCEPTION_COUNTER_NAME = "genie.web.controllers.exception";
     private static final String NEW_LINE = "\n";
+    private static final String USER_NAME_TAG_KEY = "user";
+    private static final String LIMIT_TAG_KEY = "limit";
 
-    private final Registry registry;
-    private final Id exceptionCounterId;
+    private final MeterRegistry registry;
 
     /**
      * Constructor.
@@ -55,9 +60,8 @@ public class GenieExceptionMapper {
      * @param registry The metrics registry
      */
     @Autowired
-    public GenieExceptionMapper(final Registry registry) {
+    public GenieExceptionMapper(final MeterRegistry registry) {
         this.registry = registry;
-        this.exceptionCounterId = registry.createId("genie.web.controllers.exception");
     }
 
     /**
@@ -122,16 +126,16 @@ public class GenieExceptionMapper {
     }
 
     private void countException(final Exception e) {
-        Id taggedId = this.exceptionCounterId
-            .withTag(MetricsConstants.TagKeys.EXCEPTION_CLASS, e.getClass().getCanonicalName());
+        final Set<Tag> tags = Sets.newHashSet(
+            Tags.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, e.getClass().getCanonicalName())
+        );
 
         if (e instanceof GenieUserLimitExceededException) {
             final GenieUserLimitExceededException userLimitExceededException = (GenieUserLimitExceededException) e;
-            taggedId = taggedId
-                .withTag("user", userLimitExceededException.getUser())
-                .withTag("limit", userLimitExceededException.getExceededLimitName());
+            tags.add(Tag.of(USER_NAME_TAG_KEY, userLimitExceededException.getUser()));
+            tags.add(Tag.of(LIMIT_TAG_KEY, userLimitExceededException.getExceededLimitName()));
         }
 
-        this.registry.counter(taggedId).increment();
+        this.registry.counter(CONTROLLER_EXCEPTION_COUNTER_NAME, tags).increment();
     }
 }

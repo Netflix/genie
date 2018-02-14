@@ -19,8 +19,8 @@ package com.netflix.genie.web.security.oauth2.pingfederate;
 
 import com.google.common.collect.Sets;
 import com.netflix.genie.test.categories.UnitTest;
-import com.netflix.spectator.api.Registry;
-import com.netflix.spectator.api.Timer;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import org.assertj.core.util.Lists;
 import org.hamcrest.Matchers;
 import org.jose4j.jwt.JwtClaims;
@@ -63,7 +63,7 @@ public class PingFederateJWTTokenServicesUnitTests {
     @Before
     public void setup() {
         this.loadAuthenticationTimer = Mockito.mock(Timer.class);
-        final Registry registry = Mockito.mock(Registry.class);
+        final MeterRegistry registry = Mockito.mock(MeterRegistry.class);
         Mockito.when(registry.timer(Mockito.anyString())).thenReturn(this.loadAuthenticationTimer);
         this.jwtConsumer = Mockito.mock(JwtConsumer.class);
         this.tokenServices = new PingFederateJWTTokenServices(this.jwtConsumer, registry);

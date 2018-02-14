@@ -20,7 +20,7 @@ package com.netflix.genie.web.jobs.workflow.impl;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.test.categories.UnitTest;
-import com.netflix.spectator.api.Registry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.Executor;
@@ -54,15 +54,13 @@ public class JobKickoffTaskUnitTests {
      */
     @Before
     public void setUp() {
-        final Registry registry = Mockito.mock(Registry.class);
-
         this.executor = Mockito.mock(Executor.class);
-        jobKickoffTask = new JobKickoffTask(
+        this.jobKickoffTask = new JobKickoffTask(
             false,
             false,
             this.executor,
             "localhost",
-            registry
+            new SimpleMeterRegistry()
         );
     }
 

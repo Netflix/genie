@@ -17,11 +17,11 @@
  */
 package com.netflix.genie.web.aspect;
 
-import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.netflix.genie.web.util.MetricsConstants;
 import com.netflix.genie.web.util.MetricsUtils;
-import com.netflix.spectator.api.Id;
-import com.netflix.spectator.api.Registry;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -33,8 +33,8 @@ import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.Status;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -49,18 +49,14 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class HealthCheckMetricsAspect {
 
-    private static final String HEALTH_ENDPOINT_TIMER_NAME = "genie.health.endpoint.timer";
-    private static final String HEALTH_INDICATOR_TIMER_METRIC_NAME = "genie.health.indicator.timer";
+    static final String HEALTH_ENDPOINT_TIMER_NAME = "genie.health.endpoint.timer";
+    static final String HEALTH_INDICATOR_TIMER_METRIC_NAME = "genie.health.indicator.timer";
     private static final String HEALTH_INDICATOR_COUNTER_METRIC_NAME = "genie.health.indicator.counter";
     private static final String HEALTH_FAILURES_COUNTER_METRIC_NAME = "genie.health.failure.counter";
     private static final String HEALTH_INDICATOR_CLASS_TAG_NAME = "healthIndicatorClass";
     private static final String HEALTH_INDICATOR_NAME_TAG_NAME = "healthIndicatorName";
 
-    private final Registry registry;
-    private final Id healthEndpointTimerId;
-    private final Id healthIndicatorTimerId;
-    private final Id healthIndicatorCounterId;
-    private final Id healthIndicatorFailureCounterId;
+    private final MeterRegistry registry;
 
     /**
      * Autowired constructor.
@@ -68,12 +64,8 @@ public class HealthCheckMetricsAspect {
      * @param registry metrics registry
      */
     @Autowired
-    public HealthCheckMetricsAspect(final Registry registry) {
+    public HealthCheckMetricsAspect(final MeterRegistry registry) {
         this.registry = registry;
-        this.healthEndpointTimerId = registry.createId(HEALTH_ENDPOINT_TIMER_NAME);
-        this.healthIndicatorTimerId = registry.createId(HEALTH_INDICATOR_TIMER_METRIC_NAME);
-        this.healthIndicatorCounterId = registry.createId(HEALTH_INDICATOR_COUNTER_METRIC_NAME);
-        this.healthIndicatorFailureCounterId = registry.createId(HEALTH_FAILURES_COUNTER_METRIC_NAME);
     }
 
     /**
@@ -94,19 +86,19 @@ public class HealthCheckMetricsAspect {
         final long start = System.nanoTime();
         final Health health;
         Status status = Status.UNKNOWN;
-        final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
+        final Set<Tag> tags = Sets.newHashSet();
         try {
             health = (Health) joinPoint.proceed(joinPoint.getArgs());
             status = health.getStatus();
         } catch (final Throwable t) {
-            MetricsUtils.addFailureTagsWithException(tags, t);
+            tags.add(Tag.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, t.getClass().getCanonicalName()));
             throw t;
         } finally {
             final long turnaround = System.nanoTime() - start;
-            tags.put(MetricsConstants.TagKeys.STATUS, status.toString());
+            tags.add(Tag.of(MetricsConstants.TagKeys.STATUS, status.toString()));
             log.debug("HealthEndpoint.invoke() completed in {} ns", turnaround);
-            registry
-                .timer(healthEndpointTimerId.withTags(tags))
+            this.registry
+                .timer(HEALTH_ENDPOINT_TIMER_NAME, tags)
                 .record(turnaround, TimeUnit.NANOSECONDS);
         }
         return health;
@@ -183,15 +175,15 @@ public class HealthCheckMetricsAspect {
             turnaround,
             throwable != null ? throwable.getClass().getSimpleName() : "none"
         );
-        final Map<String, String> tags;
+        final Set<Tag> tags;
         if (throwable == null) {
-            tags = MetricsUtils.newSuccessTagsMap();
+            tags = MetricsUtils.newSuccessTagsSet();
         } else {
-            tags = MetricsUtils.newFailureTagsMapForException(throwable);
+            tags = MetricsUtils.newFailureTagsSetForException(throwable);
         }
-        tags.put(HEALTH_INDICATOR_CLASS_TAG_NAME, joinPoint.getTarget().getClass().getSimpleName());
-        registry
-            .timer(healthIndicatorTimerId.withTags(tags))
+        tags.add(Tag.of(HEALTH_INDICATOR_CLASS_TAG_NAME, joinPoint.getTarget().getClass().getSimpleName()));
+        this.registry
+            .timer(HEALTH_INDICATOR_TIMER_METRIC_NAME, tags)
             .record(turnaround, TimeUnit.NANOSECONDS);
     }
 
@@ -210,7 +202,6 @@ public class HealthCheckMetricsAspect {
             + ")"
     )
     public void abstractHealthAggregatorAggregateDetailsMonitor(final JoinPoint joinPoint) {
-
         final Map<String, Health> healthDetailsMap;
         try {
             @SuppressWarnings("unchecked") final Map<String, Health> map = (Map<String, Health>) joinPoint.getArgs()[0];
@@ -226,24 +217,23 @@ public class HealthCheckMetricsAspect {
 
         healthDetailsMap.forEach(
             (name, health) -> {
-
-                final HashMap<String, String> tags = Maps.newHashMap();
-                tags.put(HEALTH_INDICATOR_NAME_TAG_NAME, name);
-                tags.put(MetricsConstants.TagKeys.STATUS, health.getStatus().getCode());
+                final Set<Tag> tags = Sets.newHashSet();
+                tags.add(Tag.of(HEALTH_INDICATOR_NAME_TAG_NAME, name));
+                tags.add(Tag.of(MetricsConstants.TagKeys.STATUS, health.getStatus().getCode()));
                 final boolean isUp = Status.UP.equals(health.getStatus());
 
                 // Count individual health-check executed, and publish tagged with name and status.
                 // Good for dashboards, can be grouped and filtered by either.
-                registry
-                    .counter(healthIndicatorCounterId.withTags(tags))
+                this.registry
+                    .counter(HEALTH_INDICATOR_COUNTER_METRIC_NAME, tags)
                     .increment();
 
                 //Count failures (if a healthcheck passees, this counter is incremented by 0), publish tagged with
                 // name and status.
                 // Good for alerting, any aggregate that is greater than zero for some period of time signals a
                 // check that is consistently failing.
-                registry
-                    .counter(healthIndicatorFailureCounterId.withTags(tags))
+                this.registry
+                    .counter(HEALTH_FAILURES_COUNTER_METRIC_NAME, tags)
                     .increment(isUp ? 0 : 1);
             }
         );

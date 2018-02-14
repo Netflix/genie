@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.tasks.leader;
 
+import com.google.common.collect.Sets;
 import com.netflix.genie.web.jobs.JobConstants;
 import com.netflix.genie.web.properties.DatabaseCleanupProperties;
 import com.netflix.genie.web.services.ClusterService;
@@ -26,9 +27,8 @@ import com.netflix.genie.web.services.TagService;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import com.netflix.genie.web.tasks.TaskUtils;
 import com.netflix.genie.web.util.MetricsUtils;
-import com.netflix.spectator.api.Id;
-import com.netflix.spectator.api.Registry;
-import com.netflix.spectator.api.patterns.PolledMeter;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -39,7 +39,7 @@ import org.springframework.stereotype.Component;
 import javax.validation.constraints.NotNull;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -54,18 +54,18 @@ import java.util.concurrent.atomic.AtomicLong;
 @Slf4j
 public class DatabaseCleanupTask extends LeadershipTask {
 
+    private static final String DATABASE_CLEANUP_DURATION_TIMER_NAME = "genie.tasks.databaseCleanup.duration.timer";
     private final DatabaseCleanupProperties cleanupProperties;
     private final JobPersistenceService jobPersistenceService;
     private final ClusterService clusterService;
     private final FileService fileService;
     private final TagService tagService;
 
-    private final Registry registry;
+    private final MeterRegistry registry;
     private final AtomicLong numDeletedJobs;
     private final AtomicLong numDeletedClusters;
     private final AtomicLong numDeletedTags;
     private final AtomicLong numDeletedFiles;
-    private final Id deletionTimerId;
 
     /**
      * Constructor.
@@ -84,7 +84,7 @@ public class DatabaseCleanupTask extends LeadershipTask {
         @NotNull final ClusterService clusterService,
         @NotNull final FileService fileService,
         @NotNull final TagService tagService,
-        @NotNull final Registry registry
+        @NotNull final MeterRegistry registry
     ) {
         this.registry = registry;
         this.cleanupProperties = cleanupProperties;
@@ -93,23 +93,22 @@ public class DatabaseCleanupTask extends LeadershipTask {
         this.fileService = fileService;
         this.tagService = tagService;
 
-        this.numDeletedJobs = PolledMeter
-            .using(registry)
-            .withName("genie.tasks.databaseCleanup.numDeletedJobs.gauge")
-            .monitorValue(new AtomicLong());
-        this.numDeletedClusters = PolledMeter
-            .using(registry)
-            .withName("genie.tasks.databaseCleanup.numDeletedClusters.gauge")
-            .monitorValue(new AtomicLong());
-        this.numDeletedTags = PolledMeter
-            .using(registry)
-            .withName("genie.tasks.databaseCleanup.numDeletedTags.gauge")
-            .monitorValue(new AtomicLong());
-        this.numDeletedFiles = PolledMeter
-            .using(registry)
-            .withName("genie.tasks.databaseCleanup.numDeletedFiles.gauge")
-            .monitorValue(new AtomicLong());
-        this.deletionTimerId = registry.createId("genie.tasks.databaseCleanup.duration.timer");
+        this.numDeletedJobs = this.registry.gauge(
+            "genie.tasks.databaseCleanup.numDeletedJobs.gauge",
+            new AtomicLong()
+        );
+        this.numDeletedClusters = this.registry.gauge(
+            "genie.tasks.databaseCleanup.numDeletedClusters.gauge",
+            new AtomicLong()
+        );
+        this.numDeletedTags = this.registry.gauge(
+            "genie.tasks.databaseCleanup.numDeletedTags.gauge",
+            new AtomicLong()
+        );
+        this.numDeletedFiles = this.registry.gauge(
+            "genie.tasks.databaseCleanup.numDeletedFiles.gauge",
+            new AtomicLong()
+        );
     }
 
     /**
@@ -134,7 +133,7 @@ public class DatabaseCleanupTask extends LeadershipTask {
     @Override
     public void run() {
         final long start = System.nanoTime();
-        final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
+        final Set<Tag> tags = Sets.newHashSet();
         try {
             // Delete jobs that are older than the retention threshold and are complete
             if (this.cleanupProperties.isSkipJobsCleanup()) {
@@ -188,14 +187,15 @@ public class DatabaseCleanupTask extends LeadershipTask {
                 );
                 this.numDeletedTags.set(countDeletedTags);
             }
+
+            MetricsUtils.addSuccessTags(tags);
         } catch (final Throwable t) {
             MetricsUtils.addFailureTagsWithException(tags, t);
             throw t;
         } finally {
-            final long finish = System.nanoTime();
             this.registry
-                .timer(this.deletionTimerId.withTags(tags))
-                .record(finish - start, TimeUnit.NANOSECONDS);
+                .timer(DATABASE_CLEANUP_DURATION_TIMER_NAME, tags)
+                .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
     }
 

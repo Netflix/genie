@@ -17,12 +17,13 @@
  */
 package com.netflix.genie.web.aspect
 
+import com.google.common.collect.Sets
 import com.netflix.genie.test.categories.UnitTest
 import com.netflix.genie.web.health.GenieCpuHealthIndicator
-import com.netflix.spectator.api.Counter
-import com.netflix.spectator.api.Id
-import com.netflix.spectator.api.Registry
-import com.netflix.spectator.api.Timer
+import com.netflix.genie.web.util.MetricsConstants
+import io.micrometer.core.instrument.Counter
+import io.micrometer.core.instrument.MeterRegistry
+import io.micrometer.core.instrument.Tag
 import org.aspectj.lang.ProceedingJoinPoint
 import org.junit.experimental.categories.Category
 import org.springframework.boot.actuate.health.Health
@@ -37,58 +38,54 @@ import java.util.concurrent.TimeUnit
  * @since 3.2.4
  */
 @Category(UnitTest.class)
-class HealthCheckMetricsAspectSpec extends Specification{
-    Registry registry;
-    Id metricId;
-    Timer timer;
-    Counter counter;
+class HealthCheckMetricsAspectSpec extends Specification {
+    MeterRegistry registry
+    io.micrometer.core.instrument.Timer timer
+    Counter counter
     HealthCheckMetricsAspect aspect
 
-    def setup(){
-        registry = Mock(Registry.class)
-        metricId = Mock(Id.class)
-        timer = Mock(Timer.class)
+    def setup() {
+        registry = Mock(MeterRegistry.class)
+        timer = Mock(io.micrometer.core.instrument.Timer.class)
         counter = Mock(Counter.class)
-        registry.createId(_) >> metricId
-        registry.timer(_) >> timer
-        registry.counter(_) >> counter
+//        registry.counter(_ as String, _ as Set<Tag>) >> counter
         aspect = new HealthCheckMetricsAspect(registry)
     }
 
-    def testHealtEndpointTimer() {
+    def testHealthEndpointTimer() {
         given:
-        def expectedTags = [
-                status:'UP',
-        ]
+        def expectedTags = Sets.newHashSet(Tag.of(MetricsConstants.TagKeys.STATUS, "UP"))
         def joinPoint = Mock(ProceedingJoinPoint.class)
         def health = new Health.Builder().up().build()
-        joinPoint.proceed(_) >> health;
+        joinPoint.getArgs() >> new Object[0]
+        joinPoint.proceed(_ as Object[]) >> health
         Health retVal
 
         when:
         retVal = aspect.healthEndpointInvokeMonitor(joinPoint)
 
         then:
-        1 * metricId.withTags(expectedTags)
-        1 * timer.record(_, TimeUnit.NANOSECONDS);
+        1 * registry.timer(HealthCheckMetricsAspect.HEALTH_ENDPOINT_TIMER_NAME, expectedTags) >> timer
+        1 * timer.record(_ as Long, TimeUnit.NANOSECONDS)
         retVal == health
     }
 
-    def testHealtEndpointTimerException() {
+    def testHealthEndpointTimerException() {
         given:
-        def expectedTags = [
-                status:'UNKNOWN',
-                exceptionClass: 'java.lang.RuntimeException'
-        ]
+        def expectedTags = Sets.newHashSet(
+                Tag.of("status", "UNKNOWN"),
+                Tag.of("exceptionClass", "java.lang.RuntimeException")
+        )
         def joinPoint = Mock(ProceedingJoinPoint.class)
-        joinPoint.proceed(_) >> { throw new RuntimeException("test") }
+        joinPoint.getArgs() >> new Object[0]
+        joinPoint.proceed(_ as Object[]) >> { throw new RuntimeException("test") }
 
         when:
         aspect.healthEndpointInvokeMonitor(joinPoint)
 
         then:
-        1 * metricId.withTags(expectedTags)
-        1 * timer.record(_, TimeUnit.NANOSECONDS);
+        1 * registry.timer(HealthCheckMetricsAspect.HEALTH_ENDPOINT_TIMER_NAME, expectedTags) >> timer
+        1 * timer.record(_ as Long, TimeUnit.NANOSECONDS)
         thrown(RuntimeException.class)
     }
 
@@ -99,11 +96,13 @@ class HealthCheckMetricsAspectSpec extends Specification{
         target.getClass() >> GenieCpuHealthIndicator.class
         def joinPoint = Mock(ProceedingJoinPoint.class)
         joinPoint.getTarget() >> target
-        joinPoint.proceed(_) >> health
-        def timerTagsCapture
-        metricId.withTags(_) >> { args ->
-            timerTagsCapture = args[0]
-            return metricId;
+        joinPoint.getArgs() >> new Object[0]
+        joinPoint.proceed(_ as Object[]) >> health
+        Set<Tag> timerTagsCapture
+        registry.timer(HealthCheckMetricsAspect.HEALTH_INDICATOR_TIMER_METRIC_NAME, _ as Set<Tag>) >> {
+            args ->
+                timerTagsCapture = (Set<Tag>) args[1]
+                return timer
         }
         Health retVal
 
@@ -111,9 +110,15 @@ class HealthCheckMetricsAspectSpec extends Specification{
         retVal = aspect.healthIndicatorHealthMonitor(joinPoint)
 
         then:
-        1 * timer.record(_, TimeUnit.NANOSECONDS)
-        timerTagsCapture.get("status") == 'success'
-        timerTagsCapture.get("healthIndicatorClass").startsWith(GenieCpuHealthIndicator.class.getSimpleName())
+        1 * timer.record(_ as Long, TimeUnit.NANOSECONDS)
+        timerTagsCapture.size() == 2
+        timerTagsCapture.each { tag ->
+            if (tag.key == "status") {
+                tag.value == "success"
+            } else if (tag.key == "healthIndicatorClass") {
+                tag.value.startsWith(GenieCpuHealthIndicator.class.getSimpleName())
+            }
+        }
         retVal == health
     }
 
@@ -123,20 +128,22 @@ class HealthCheckMetricsAspectSpec extends Specification{
         target.getClass() >> GenieCpuHealthIndicator.class
         def joinPoint = Mock(ProceedingJoinPoint.class)
         joinPoint.getTarget() >> target
-        joinPoint.proceed(_) >> {throw new RuntimeException("test")}
-        def timerTagsCapture
-        metricId.withTags(_) >> { args ->
-            timerTagsCapture = args[0]
-            return metricId;
-        }
+        joinPoint.getArgs() >> new Object[0]
+        joinPoint.proceed(_ as Object[]) >> { throw new RuntimeException("test") }
 
         when:
         aspect.healthIndicatorHealthMonitor(joinPoint)
 
         then:
-        1 * timer.record(_, TimeUnit.NANOSECONDS)
-        timerTagsCapture.get("status") == 'failure'
-        timerTagsCapture.get("exceptionClass") == RuntimeException.getCanonicalName()
+        1 * timer.record(_ as Long, TimeUnit.NANOSECONDS)
+        1 * registry.timer(
+                HealthCheckMetricsAspect.HEALTH_INDICATOR_TIMER_METRIC_NAME,
+                Sets.newHashSet(
+                        Tag.of("status", "failure"),
+                        Tag.of("exceptionClass", RuntimeException.getCanonicalName()),
+                        Tag.of("healthIndicatorClass", target.getClass().getSimpleName())
+                )
+        ) >> timer
         thrown(RuntimeException.class)
     }
 
@@ -146,20 +153,28 @@ class HealthCheckMetricsAspectSpec extends Specification{
         target.getClass() >> GenieCpuHealthIndicator.class
         def joinPoint = Mock(ProceedingJoinPoint.class)
         joinPoint.getTarget() >> target
-        joinPoint.proceed(_) >> new Health.Builder().up().build()
-        def timerTagsCapture
-        metricId.withTags(_) >> { args ->
-            timerTagsCapture = args[0]
-            return metricId;
+        joinPoint.getArgs() >> new Object[0]
+        joinPoint.proceed(_ as Object[]) >> new Health.Builder().up().build()
+        Set<Tag> timerTagsCapture
+        registry.timer(HealthCheckMetricsAspect.HEALTH_INDICATOR_TIMER_METRIC_NAME, _ as Set<Tag>) >> {
+            args ->
+                timerTagsCapture = (Set<Tag>) args[1]
+                return timer
         }
 
         when:
         aspect.abstractHealthIndicatorDoHealthCheckMonitor(joinPoint)
 
         then:
-        1 * timer.record(_, TimeUnit.NANOSECONDS)
-        timerTagsCapture.get("status") == 'success'
-        timerTagsCapture.get("healthIndicatorClass").startsWith(GenieCpuHealthIndicator.class.getSimpleName())
+        1 * timer.record(_ as Long, TimeUnit.NANOSECONDS)
+        timerTagsCapture.size() == 2
+        timerTagsCapture.each { tag ->
+            if (tag.key == "status") {
+                tag.value == "success"
+            } else if (tag.key == "healthIndicatorClass") {
+                tag.value.startsWith(GenieCpuHealthIndicator.class.getSimpleName())
+            }
+        }
     }
 
     def testAbstractHealthIndicatorTimerException() {
@@ -168,20 +183,22 @@ class HealthCheckMetricsAspectSpec extends Specification{
         target.getClass() >> GenieCpuHealthIndicator.class
         def joinPoint = Mock(ProceedingJoinPoint.class)
         joinPoint.getTarget() >> target
-        joinPoint.proceed(_) >> {throw new RuntimeException("test")}
-        def timerTagsCapture = new ArrayList()
-        metricId.withTags(_) >> { args ->
-            timerTagsCapture = args[0]
-            return metricId;
-        }
+        joinPoint.getArgs() >> new Object[0]
+        joinPoint.proceed(_ as Object[]) >> { throw new RuntimeException("test") }
 
         when:
         aspect.abstractHealthIndicatorDoHealthCheckMonitor(joinPoint)
 
         then:
-        1 * timer.record(_, TimeUnit.NANOSECONDS)
-        timerTagsCapture.get("status") == 'failure'
-        timerTagsCapture.get("exceptionClass") == RuntimeException.getCanonicalName()
+        1 * timer.record(_ as Long, TimeUnit.NANOSECONDS)
+        1 * registry.timer(
+                HealthCheckMetricsAspect.HEALTH_INDICATOR_TIMER_METRIC_NAME,
+                Sets.newHashSet(
+                        Tag.of("status", "failure"),
+                        Tag.of("exceptionClass", RuntimeException.class.getCanonicalName()),
+                        Tag.of("healthIndicatorClass", target.getClass().getSimpleName())
+                )
+        ) >> timer
         thrown(RuntimeException.class)
     }
 
@@ -194,21 +211,21 @@ class HealthCheckMetricsAspectSpec extends Specification{
         ]
         joinPoint.getArgs() >> [detailsMap]
 
-        def expectedTags1 = [
-                healthIndicatorName: 'indicator1',
-                status:'UP',
-        ]
-        def expectedTags2 = [
-                healthIndicatorName: 'indicator2',
-                status:'OUT_OF_SERVICE',
-        ]
+        def expectedTags1 = Sets.newHashSet(
+                Tag.of("healthIndicatorName", "indicator1"),
+                Tag.of("status", "UP")
+        )
+        def expectedTags2 = Sets.newHashSet(
+                Tag.of("healthIndicatorName", "indicator2"),
+                Tag.of("status", "OUT_OF_SERVICE")
+        )
 
-        def counterTagsCapture = new ArrayList()
-        metricId.withTags(_) >> { args ->
-            counterTagsCapture.add(args[0])
-            return metricId;
-
+        def counterTagsCapture = new ArrayList<Set<Tag>>()
+        registry.counter(_ as String, _ as Set<Tag>) >> { args ->
+            counterTagsCapture.add((Set<Tag>) args[1])
+            return counter
         }
+
         when:
         aspect.abstractHealthAggregatorAggregateDetailsMonitor(joinPoint)
 
@@ -228,16 +245,14 @@ class HealthCheckMetricsAspectSpec extends Specification{
     def testAbstractHealthAggregatorCountersError() {
         given:
         def joinPoint = Mock(ProceedingJoinPoint.class)
-        joinPoint.getArgs() >> null
-
-        metricId.withTags(_) >> metricId
+        joinPoint.getArgs() >> new Object[0]
 
         when:
         aspect.abstractHealthAggregatorAggregateDetailsMonitor(joinPoint)
 
         then:
         0 * counter.increment()
-        0 * counter.increment(_)
+        0 * counter.increment(_ as double)
     }
 
 }

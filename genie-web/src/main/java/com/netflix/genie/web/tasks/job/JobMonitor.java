@@ -29,8 +29,8 @@ import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import com.netflix.genie.web.tasks.node.NodeTask;
 import com.netflix.genie.web.util.ProcessChecker;
 import com.netflix.genie.web.util.UnixProcessChecker;
-import com.netflix.spectator.api.Counter;
-import com.netflix.spectator.api.Registry;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.ExecuteException;
@@ -90,7 +90,7 @@ public class JobMonitor extends NodeTask {
         @NotNull final File stdErr,
         @NotNull final Executor executor,
         @NonNull final GenieEventBus genieEventBus,
-        @NotNull final Registry registry,
+        @NotNull final MeterRegistry registry,
         @NotNull final JobsProperties jobsProperties
     ) {
         if (!SystemUtils.IS_OS_UNIX) {

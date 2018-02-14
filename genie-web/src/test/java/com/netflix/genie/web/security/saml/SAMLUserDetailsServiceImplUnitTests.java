@@ -18,8 +18,8 @@
 package com.netflix.genie.web.security.saml;
 
 import com.netflix.genie.test.categories.UnitTest;
-import com.netflix.spectator.api.Registry;
-import com.netflix.spectator.api.Timer;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -70,7 +70,7 @@ public class SAMLUserDetailsServiceImplUnitTests {
         attributes.setGroups(groups);
         samlProperties.setAttributes(attributes);
         this.loadAuthenticationTimer = Mockito.mock(Timer.class);
-        final Registry registry = Mockito.mock(Registry.class);
+        final MeterRegistry registry = Mockito.mock(MeterRegistry.class);
         Mockito.when(registry.timer(Mockito.anyString())).thenReturn(this.loadAuthenticationTimer);
         this.service = new SAMLUserDetailsServiceImpl(samlProperties, registry);
     }

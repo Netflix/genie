@@ -18,6 +18,7 @@
 package com.netflix.genie.web.jobs.workflow.impl;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.Command;
@@ -28,8 +29,8 @@ import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.web.jobs.JobConstants;
 import com.netflix.genie.web.jobs.JobExecutionEnvironment;
 import com.netflix.genie.web.util.MetricsUtils;
-import com.netflix.spectator.api.Id;
-import com.netflix.spectator.api.Registry;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -54,19 +55,17 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class InitialSetupTask extends GenieBaseTask {
 
+    static final String SETUP_TASK_TIMER_NAME = "genie.jobs.tasks.initialSetupTask.timer";
     private static final String GENIE_VERSION_EXPORT = "export GENIE_VERSION=3";
     private static final String LINE_SEPARATOR = System.lineSeparator();
-
-    private final Id timerId;
 
     /**
      * Constructor.
      *
      * @param registry The metrics registry to use
      */
-    public InitialSetupTask(@NotNull final Registry registry) {
+    public InitialSetupTask(@NotNull final MeterRegistry registry) {
         super(registry);
-        this.timerId = getRegistry().createId("genie.jobs.tasks.initialSetupTask.timer");
     }
 
     /**
@@ -75,7 +74,7 @@ public class InitialSetupTask extends GenieBaseTask {
     @Override
     public void executeTask(@NotNull final Map<String, Object> context) throws GenieException, IOException {
         final long start = System.nanoTime();
-        final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
+        final Set<Tag> tags = Sets.newHashSet();
         try {
             final JobExecutionEnvironment jobExecEnv
                 = (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
@@ -118,13 +117,14 @@ public class InitialSetupTask extends GenieBaseTask {
             writer.write(LINE_SEPARATOR);
 
             log.info("Finished Initial Setup Task for job {}", jobId);
-        } catch (Throwable t) {
+            MetricsUtils.addSuccessTags(tags);
+        } catch (final Throwable t) {
             MetricsUtils.addFailureTagsWithException(tags, t);
             throw t;
         } finally {
-            this.getRegistry().timer(
-                timerId.withTags(tags)
-            ).record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+            this.getRegistry()
+                .timer(SETUP_TASK_TIMER_NAME, tags)
+                .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
     }
 
@@ -175,8 +175,7 @@ public class InitialSetupTask extends GenieBaseTask {
     }
 
     @VisibleForTesting
-    void createJobDirEnvironmentVariables(final Writer writer, final String jobWorkingDirectory)
-        throws GenieException, IOException {
+    void createJobDirEnvironmentVariables(final Writer writer, final String jobWorkingDirectory) throws IOException {
         // set environment variable for the job directory
         writer.write(JobConstants.EXPORT
             + JobConstants.GENIE_JOB_DIR_ENV_VAR
@@ -191,8 +190,7 @@ public class InitialSetupTask extends GenieBaseTask {
     }
 
     @VisibleForTesting
-    void createApplicationEnvironmentVariables(final Writer writer)
-        throws GenieException, IOException {
+    void createApplicationEnvironmentVariables(final Writer writer) throws IOException {
         // create environment variable for the application directory
         writer.write(JobConstants.EXPORT
             + JobConstants.GENIE_APPLICATION_DIR_ENV_VAR
@@ -345,7 +343,7 @@ public class InitialSetupTask extends GenieBaseTask {
         final String jobId,
         final String jobName,
         final int memory
-    ) throws GenieException, IOException {
+    ) throws IOException {
         writer.write(JobConstants.EXPORT
             + JobConstants.GENIE_JOB_ID_ENV_VAR
             + JobConstants.EQUALS_SYMBOL
@@ -440,6 +438,7 @@ public class InitialSetupTask extends GenieBaseTask {
      * Helper to convert a set of tags into a string that is a suitable value for a shell environment variable.
      * Adds double quotes as necessary (i.e. in case of spaces, newlines), performs escaping of in-tag quotes.
      * Input tags are sorted to produce a deterministic output value.
+     *
      * @param tags a set of tags or null
      * @return a CSV string
      */

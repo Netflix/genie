@@ -99,6 +99,11 @@ configure(javaProjects) {
                 entry "protoc-gen-grpc-java"
                 entry "grpc-testing"
             }
+            // TODO: Remove once Boot 2.0 fully released and all poms standardize
+            dependencySet(group: "io.micrometer", version: "1.0.0-rc.9") {
+                entry "micrometer-core"
+                entry "micrometer-registry-atlas"
+            }
             dependencySet(group: "io.springfox", version: "2.8.0") {
                 entry "springfox-swagger2"
                 entry "springfox-swagger-ui"

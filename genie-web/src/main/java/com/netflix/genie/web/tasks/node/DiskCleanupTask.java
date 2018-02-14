@@ -24,9 +24,8 @@ import com.netflix.genie.web.properties.DiskCleanupProperties;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.services.JobSearchService;
 import com.netflix.genie.web.tasks.TaskUtils;
-import com.netflix.spectator.api.Counter;
-import com.netflix.spectator.api.Registry;
-import com.netflix.spectator.api.patterns.PolledMeter;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.Executor;
@@ -88,7 +87,7 @@ public class DiskCleanupTask implements Runnable {
         @NotNull final JobSearchService jobSearchService,
         @NotNull final JobsProperties jobsProperties,
         @NotNull final Executor processExecutor,
-        @NotNull final Registry registry
+        @NotNull final MeterRegistry registry
     ) throws IOException {
         // Job Directory is guaranteed to exist by the MvcConfig bean creation but just in case someone overrides
         if (!jobsDir.exists()) {
@@ -101,14 +100,14 @@ public class DiskCleanupTask implements Runnable {
         this.runAsUser = jobsProperties.getUsers().isRunAsUserEnabled();
         this.processExecutor = processExecutor;
 
-        this.numberOfDeletedJobDirs = PolledMeter
-            .using(registry)
-            .withName("genie.tasks.diskCleanup.numberDeletedJobDirs.gauge")
-            .monitorValue(new AtomicLong());
-        this.numberOfDirsUnableToDelete = PolledMeter
-            .using(registry)
-            .withName("genie.tasks.diskCleanup.numberDirsUnableToDelete.gauge")
-            .monitorValue(new AtomicLong());
+        this.numberOfDeletedJobDirs = registry.gauge(
+            "genie.tasks.diskCleanup.numberDeletedJobDirs.gauge",
+            new AtomicLong()
+        );
+        this.numberOfDirsUnableToDelete = registry.gauge(
+            "genie.tasks.diskCleanup.numberDirsUnableToDelete.gauge",
+            new AtomicLong()
+        );
         this.unableToGetJobCounter = registry.counter("genie.tasks.diskCleanup.unableToGetJobs.rate");
         this.unableToDeleteJobDirCounter = registry.counter("genie.tasks.diskCleanup.unableToDeleteJobsDir.rate");
 

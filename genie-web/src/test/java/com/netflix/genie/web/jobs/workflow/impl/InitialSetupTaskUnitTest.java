@@ -24,7 +24,8 @@ import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.jobs.JobConstants;
-import com.netflix.spectator.api.Registry;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -33,6 +34,7 @@ import org.junit.experimental.categories.Category;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
 
+import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
@@ -58,16 +60,19 @@ public class InitialSetupTaskUnitTest {
 
     /**
      * Setup to run before each test.
-     * @throws IOException if a temporary folder cannot be created
      */
     @Before
-    public void setUp() throws IOException {
-        final Registry registry = Mockito.mock(Registry.class);
+    public void setUp() {
+        final MeterRegistry registry = Mockito.mock(MeterRegistry.class);
+        Mockito
+            .when(registry.timer(Mockito.eq(InitialSetupTask.SETUP_TASK_TIMER_NAME), Mockito.anySet()))
+            .thenReturn(Mockito.mock(Timer.class));
         this.initialSetupTask = new InitialSetupTask(registry);
     }
 
     /**
      * Test the method that sets up the job working directory.
+     *
      * @throws Exception if an error occurs
      */
     @Test
@@ -105,6 +110,7 @@ public class InitialSetupTaskUnitTest {
 
     /**
      * Test the methods composing environment variables written to the run script.
+     *
      * @throws Exception if an error occurs
      */
     @Test
@@ -192,9 +198,9 @@ public class InitialSetupTaskUnitTest {
             + "export GENIE_REQUESTED_COMMAND_TAGS=\"" + cmdCritTag1 + "," + cmdCritTag2 + "," + cmdCritTag3 + "\"\n"
             + "\n"
             + "export GENIE_REQUESTED_CLUSTER_TAGS=\"["
-                + "[" + cltCritTag1 + "," + cltCritTag2 + "," + cltCritTag3 + "],"
-                + "[" + cltCritTag1 + "," + cltCritTag3 + "],"
-                + "[" + cltCritTag3 + "]"
+            + "[" + cltCritTag1 + "," + cltCritTag2 + "," + cltCritTag3 + "],"
+            + "[" + cltCritTag1 + "," + cltCritTag3 + "],"
+            + "[" + cltCritTag3 + "]"
             + "]\"" + "\n"
             + "export GENIE_REQUESTED_CLUSTER_TAGS_0=\"" + cltCritTag1 + "," + cltCritTag2 + "," + cltCritTag3 + "\"\n"
             + "export GENIE_REQUESTED_CLUSTER_TAGS_1=\"" + cltCritTag1 + "," + cltCritTag3 + "\"\n"
@@ -204,31 +210,6 @@ public class InitialSetupTaskUnitTest {
         Assert.assertEquals(expextedOutput, mockWriter.getString());
     }
 
-    private static class StringWriter extends Writer {
-
-        private final StringBuilder stringBuilder = new StringBuilder();
-
-        @Override
-        public void write(final char[] cbuf, final int off, final int len) throws IOException {
-            stringBuilder.append(cbuf, off, len);
-        }
-
-        @Override
-        public void flush() throws IOException {
-            // noop
-        }
-
-        @Override
-        public void close() throws IOException {
-            // noop
-        }
-
-        public String getString() {
-            return stringBuilder.toString();
-        }
-    }
-
-
     /**
      * Test helper method to serialize cluster/command tags.
      */
@@ -237,7 +218,7 @@ public class InitialSetupTaskUnitTest {
 
         Assert.assertEquals("", initialSetupTask.tagsToString(null));
 
-        final String[][] inputs = new String[][] {
+        final String[][] inputs = new String[][]{
             {},
             {"some.tag:t"},
             {"foo", "bar"},
@@ -266,6 +247,30 @@ public class InitialSetupTaskUnitTest {
             final String expectedOutputString = outputs[i];
             final HashSet<String> tags = new HashSet<>(Arrays.asList(inputs[i]));
             Assert.assertEquals(expectedOutputString, this.initialSetupTask.tagsToString(tags));
+        }
+    }
+
+    private static class StringWriter extends Writer {
+
+        private final StringBuilder stringBuilder = new StringBuilder();
+
+        @Override
+        public void write(@Nonnull final char[] cbuf, final int off, final int len) throws IOException {
+            this.stringBuilder.append(cbuf, off, len);
+        }
+
+        @Override
+        public void flush() throws IOException {
+            // noop
+        }
+
+        @Override
+        public void close() throws IOException {
+            // noop
+        }
+
+        public String getString() {
+            return this.stringBuilder.toString();
         }
     }
 }

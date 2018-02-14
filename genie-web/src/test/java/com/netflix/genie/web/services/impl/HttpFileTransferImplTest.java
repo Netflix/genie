@@ -21,9 +21,8 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.util.MetricsUtils;
-import com.netflix.spectator.api.Id;
-import com.netflix.spectator.api.Registry;
-import com.netflix.spectator.api.Timer;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -69,9 +68,7 @@ public class HttpFileTransferImplTest {
     private MockRestServiceServer server;
     private HttpFileTransferImpl httpFileTransfer;
 
-    private Id downloadTimerId;
-    private Id uploadTimerId;
-    private Id metadataTimerId;
+    private MeterRegistry registry;
     private Timer downloadTimer;
     private Timer uploadTimer;
     private Timer metadataTimer;
@@ -86,26 +83,17 @@ public class HttpFileTransferImplTest {
         this.downloadTimer = Mockito.mock(Timer.class);
         this.uploadTimer = Mockito.mock(Timer.class);
         this.metadataTimer = Mockito.mock(Timer.class);
-        this.downloadTimerId = Mockito.mock(Id.class);
-        this.uploadTimerId = Mockito.mock(Id.class);
-        this.metadataTimerId = Mockito.mock(Id.class);
-        final Registry registry = Mockito.mock(Registry.class);
-        Mockito.when(registry.createId("genie.files.http.download.timer")).thenReturn(this.downloadTimerId);
-        Mockito.when(registry.createId("genie.files.http.upload.timer")).thenReturn(this.uploadTimerId);
-        Mockito.when(registry.createId("genie.files.http.getLastModified.timer")).thenReturn(this.metadataTimerId);
+        this.registry = Mockito.mock(MeterRegistry.class);
         Mockito
-            .when(this.downloadTimerId.withTags(Mockito.anyMap()))
-            .thenReturn(this.downloadTimerId);
+            .when(registry.timer(Mockito.eq(HttpFileTransferImpl.DOWNLOAD_TIMER_NAME), Mockito.anySet()))
+            .thenReturn(this.downloadTimer);
         Mockito
-            .when(this.uploadTimerId.withTags(Mockito.anyMap()))
-            .thenReturn(this.uploadTimerId);
+            .when(registry.timer(Mockito.eq(HttpFileTransferImpl.UPLOAD_TIMER_NAME), Mockito.anySet()))
+            .thenReturn(this.uploadTimer);
         Mockito
-            .when(this.metadataTimerId.withTags(Mockito.anyMap()))
-            .thenReturn(this.metadataTimerId);
-        Mockito.when(registry.timer(this.downloadTimerId)).thenReturn(this.downloadTimer);
-        Mockito.when(registry.timer(this.uploadTimerId)).thenReturn(this.uploadTimer);
-        Mockito.when(registry.timer(this.metadataTimerId)).thenReturn(this.metadataTimer);
-        this.httpFileTransfer = new HttpFileTransferImpl(restTemplate, registry);
+            .when(registry.timer(Mockito.eq(HttpFileTransferImpl.GET_LAST_MODIFIED_TIMER_NAME), Mockito.anySet()))
+            .thenReturn(this.metadataTimer);
+        this.httpFileTransfer = new HttpFileTransferImpl(restTemplate, this.registry);
     }
 
     /**
@@ -146,8 +134,8 @@ public class HttpFileTransferImplTest {
 
         this.server.verify();
         Mockito
-            .verify(this.downloadTimerId, Mockito.times(1))
-            .withTags(MetricsUtils.newSuccessTagsMap());
+            .verify(this.registry, Mockito.times(1))
+            .timer(HttpFileTransferImpl.DOWNLOAD_TIMER_NAME, MetricsUtils.newSuccessTagsSet());
         Mockito
             .verify(this.downloadTimer, Mockito.times(1))
             .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
@@ -168,8 +156,11 @@ public class HttpFileTransferImplTest {
             );
         } finally {
             Mockito
-                .verify(this.downloadTimerId, Mockito.times(1))
-                .withTags(MetricsUtils.newFailureTagsMapForException(new GenieServerException("test")));
+                .verify(this.registry, Mockito.times(1))
+                .timer(
+                    HttpFileTransferImpl.DOWNLOAD_TIMER_NAME,
+                    MetricsUtils.newFailureTagsSetForException(new GenieServerException("test"))
+                );
             Mockito
                 .verify(this.downloadTimer, Mockito.times(1))
                 .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
@@ -195,8 +186,11 @@ public class HttpFileTransferImplTest {
             this.httpFileTransfer.getFile(TEST_URL, this.temporaryFolder.getRoot().getCanonicalPath());
         } finally {
             Mockito
-                .verify(this.downloadTimerId, Mockito.times(1))
-                .withTags(MetricsUtils.newFailureTagsMapForException(new ResourceAccessException("test")));
+                .verify(this.registry, Mockito.times(1))
+                .timer(
+                    HttpFileTransferImpl.DOWNLOAD_TIMER_NAME,
+                    MetricsUtils.newFailureTagsSetForException(new ResourceAccessException("test"))
+                );
             Mockito
                 .verify(this.downloadTimer, Mockito.times(1))
                 .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
@@ -215,8 +209,11 @@ public class HttpFileTransferImplTest {
             this.httpFileTransfer.putFile(file, file);
         } finally {
             Mockito
-                .verify(this.uploadTimerId, Mockito.times(1))
-                .withTags(MetricsUtils.newFailureTagsMapForException(new UnsupportedOperationException("test")));
+                .verify(this.registry, Mockito.times(1))
+                .timer(
+                    HttpFileTransferImpl.UPLOAD_TIMER_NAME,
+                    MetricsUtils.newFailureTagsSetForException(new UnsupportedOperationException("test"))
+                );
             Mockito
                 .verify(this.uploadTimer, Mockito.times(1))
                 .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
@@ -241,8 +238,8 @@ public class HttpFileTransferImplTest {
         Assert.assertThat(this.httpFileTransfer.getLastModifiedTime(TEST_URL), Matchers.is(lastModified));
         this.server.verify();
         Mockito
-            .verify(this.metadataTimerId, Mockito.times(1))
-            .withTags(MetricsUtils.newSuccessTagsMap());
+            .verify(this.registry, Mockito.times(1))
+            .timer(HttpFileTransferImpl.GET_LAST_MODIFIED_TIMER_NAME, MetricsUtils.newSuccessTagsSet());
         Mockito
             .verify(this.metadataTimer, Mockito.times(1))
             .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
@@ -262,8 +259,8 @@ public class HttpFileTransferImplTest {
             .andRespond(MockRestResponseCreators.withSuccess());
         Assert.assertTrue(this.httpFileTransfer.getLastModifiedTime(TEST_URL) > time);
         Mockito
-            .verify(this.metadataTimerId, Mockito.times(1))
-            .withTags(MetricsUtils.newSuccessTagsMap());
+            .verify(this.registry, Mockito.times(1))
+            .timer(HttpFileTransferImpl.GET_LAST_MODIFIED_TIMER_NAME, MetricsUtils.newSuccessTagsSet());
         Mockito
             .verify(this.metadataTimer, Mockito.times(1))
             .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
@@ -283,8 +280,11 @@ public class HttpFileTransferImplTest {
             throw e;
         } finally {
             Mockito
-                .verify(this.metadataTimerId, Mockito.times(1))
-                .withTags(MetricsUtils.newFailureTagsMapForException(new MalformedURLException("test")));
+                .verify(this.registry, Mockito.times(1))
+                .timer(
+                    HttpFileTransferImpl.GET_LAST_MODIFIED_TIMER_NAME,
+                    MetricsUtils.newFailureTagsSetForException(new MalformedURLException("test"))
+                );
             Mockito
                 .verify(this.metadataTimer, Mockito.times(1))
                 .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));

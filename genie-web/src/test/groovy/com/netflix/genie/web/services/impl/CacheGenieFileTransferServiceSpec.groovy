@@ -20,33 +20,35 @@ package com.netflix.genie.web.services.impl
 import com.netflix.genie.common.exceptions.GenieServerException
 import com.netflix.genie.test.categories.UnitTest
 import com.netflix.genie.web.services.FileTransferFactory
-import com.netflix.spectator.api.DefaultRegistry
-import com.netflix.spectator.api.Registry
+import io.micrometer.core.instrument.MeterRegistry
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import org.junit.experimental.categories.Category
 import spock.lang.Specification
 import spock.lang.Unroll
 
 /**
  * Unit tests for CacheGenieFileTransferService.
- * Created by amajumdar on 7/26/16.
+ *
+ * @author amajumdar
+ * @since 7/26/16.
  */
 @Category(UnitTest.class)
 @Unroll
-class CacheGenieFileTransferServiceSpec extends Specification{
+class CacheGenieFileTransferServiceSpec extends Specification {
     LocalFileTransferImpl localFileTransfer = Mock(LocalFileTransferImpl)
-    FileTransferFactory fileTransferFactory = Mock(FileTransferFactory){
+    FileTransferFactory fileTransferFactory = Mock(FileTransferFactory) {
         get(_) >> localFileTransfer
     }
     File cachedFile = Mock(File)
-    Registry registry = new DefaultRegistry()
+    MeterRegistry registry = new SimpleMeterRegistry()
     CacheGenieFileTransferService s =
-            Spy( CacheGenieFileTransferService,
-                    constructorArgs: [fileTransferFactory, "/tmp", localFileTransfer, registry]){
+            Spy(CacheGenieFileTransferService,
+                    constructorArgs: [fileTransferFactory, "/tmp", localFileTransfer, registry]) {
                 createDirectories(_) >> null
                 deleteFile(_) >> null
             }
 
-    def 'Test getFile'(){
+    def 'Test getFile'() {
         when:
         s.getFile('file:/tmp/setup', 'file:/mnt/')
         then:
@@ -73,7 +75,7 @@ class CacheGenieFileTransferServiceSpec extends Specification{
         s.getFile('file:/tmp/setup', 'file:/mnt/')
         then:
         thrown(GenieServerException)
-        1 * s.loadFile(_) >> {throw new GenieServerException("null")}
+        1 * s.loadFile(_) >> { throw new GenieServerException("null") }
         cachedFile.lastModified() >> -1
     }
 }

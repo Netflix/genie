@@ -33,8 +33,8 @@ import com.netflix.genie.web.jobs.JobConstants;
 import com.netflix.genie.web.jobs.workflow.WorkflowTask;
 import com.netflix.genie.web.services.JobPersistenceService;
 import com.netflix.genie.web.services.JobSubmitterService;
-import com.netflix.spectator.api.Registry;
-import com.netflix.spectator.api.Timer;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import org.assertj.core.util.Sets;
 import org.junit.Assert;
 import org.junit.Before;
@@ -102,7 +102,7 @@ public class LocalJobRunnerUnitTests {
         final Resource baseWorkingDirResource = Mockito.mock(Resource.class);
         Mockito.when(baseWorkingDirResource.getFile()).thenReturn(tmpFolder);
 
-        final Registry registry = Mockito.mock(Registry.class);
+        final MeterRegistry registry = Mockito.mock(MeterRegistry.class);
         Mockito.when(registry.timer(Mockito.anyString())).thenReturn(Mockito.mock(Timer.class));
 
         this.jobSubmitterService = new LocalJobRunner(

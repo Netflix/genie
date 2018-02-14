@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.security.oauth2.pingfederate;
 
-import com.netflix.spectator.api.Registry;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
@@ -77,7 +77,7 @@ public class PingFederateRemoteConfig {
     public PingFederateRemoteTokenServices pingFederateTokenServices(
         final DefaultAccessTokenConverter converter,
         final ResourceServerProperties resourceServerProperties,
-        final Registry registry
+        final MeterRegistry registry
     ) {
         return new PingFederateRemoteTokenServices(resourceServerProperties, converter, registry);
     }

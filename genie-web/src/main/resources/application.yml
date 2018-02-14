@@ -104,12 +104,6 @@ info:
   genie:
     version: GENIE_VERSION
 
-management:
-  metrics:
-    export:
-      atlas:
-        enabled: false
-
 spring:
   application:
     name: genie

@@ -19,8 +19,7 @@ import com.google.common.cache.LoadingCache;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.web.services.FileTransferFactory;
-import com.netflix.spectator.api.Registry;
-import com.netflix.spectator.api.patterns.PolledMeter;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -35,7 +34,9 @@ import java.util.UUID;
 
 /**
  * Caches the downloaded file from the remote location.
- * Created by amajumdar on 7/22/16.
+ *
+ * @author amajumdar
+ * @since 7/22/16
  */
 @Slf4j
 public class CacheGenieFileTransferService extends GenieFileTransferService {
@@ -67,26 +68,19 @@ public class CacheGenieFileTransferService extends GenieFileTransferService {
         @NotNull final FileTransferFactory fileTransferFactory,
         @NotNull final String baseCacheLocation,
         @NotNull final LocalFileTransferImpl localFileTransfer,
-        @NotNull final Registry registry
+        @NotNull final MeterRegistry registry
     ) throws GenieException {
         super(fileTransferFactory);
         this.baseCacheLocation = this.createDirectories(baseCacheLocation).toString();
         this.localFileTransfer = localFileTransfer;
 
-        PolledMeter
-            .using(registry)
-            .withName("genie.jobs.file.cache.hitRate")
-            .monitorValue(this.fileCache, value -> value.stats().hitRate());
-
-        PolledMeter
-            .using(registry)
-            .withName("genie.jobs.file.cache.missRate")
-            .monitorValue(this.fileCache, value -> value.stats().missRate());
-
-        PolledMeter
-            .using(registry)
-            .withName("genie.jobs.file.cache.loadExceptionRate")
-            .monitorValue(this.fileCache, value -> value.stats().loadExceptionRate());
+        // TODO: May want to switch to DistributionSummary
+        registry.gauge("genie.jobs.file.cache.hitRate", this.fileCache, value -> value.stats().hitRate());
+        registry.gauge("genie.jobs.file.cache.missRate", this.fileCache, value -> value.stats().missRate());
+        registry.gauge(
+            "genie.jobs.file.cache.loadExceptionRate",
+            this.fileCache, value -> value.stats().loadExceptionCount()
+        );
     }
 
     /**

@@ -17,99 +17,68 @@
  */
 package com.netflix.genie.web.util
 
-import com.google.common.collect.ImmutableMap
-import com.google.common.collect.Maps
+import com.google.common.collect.ImmutableSet
+import com.google.common.collect.Sets
 import com.netflix.genie.test.categories.UnitTest
+import io.micrometer.core.instrument.Tag
 import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
+/**
+ * Specifications for the Metrics Utility class.
+ *
+ * @author mprimi
+ * @author tgianos
+ * @since 3.3.0
+ */
 @Category(UnitTest.class)
 class MetricsUtilsSpec extends Specification {
-    Map<String, String> initialMap
-    final static String FOO = "foo"
-    final static String BAR = "bar"
+    Tag fooBarTag = Tag.of("foo", "bar")
+    Set<Tag> initialTags = Sets.newHashSet(fooBarTag)
 
-    void setup() {
-        initialMap = Maps.newHashMap()
-        initialMap.put(FOO, BAR)
-    }
-
-    void cleanup() {
-    }
-
-    def "AddFailureTagsWithException"() {
+    def "Can add failure tags for exception"() {
         setup:
         def exception = new RuntimeException("test")
         when:
-        def taggedMap = MetricsUtils.addFailureTagsWithException(initialMap, exception)
+        MetricsUtils.addFailureTagsWithException(initialTags, exception)
         then:
-        taggedMap == initialMap
-        taggedMap == ImmutableMap.of(
-                FOO, BAR,
-                MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.FAILURE,
-                MetricsConstants.TagKeys.EXCEPTION_CLASS, exception.getClass().getCanonicalName()
+        initialTags == ImmutableSet.of(
+                fooBarTag,
+                Tag.of(MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.FAILURE),
+                Tag.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, exception.getClass().getCanonicalName())
         )
     }
 
-    def "AddFailureTagsToNullMap"() {
+    def "Can add success tags to an empty set"() {
         setup:
-        def exception = new RuntimeException("test")
+        Set<Tag> emptyTags = Sets.newHashSet()
         when:
-        MetricsUtils.addFailureTagsWithException(null, exception)
+        MetricsUtils.addSuccessTags(emptyTags)
         then:
-        thrown(NullPointerException)
-    }
-
-    def "AddFailureTagsToNullException"() {
-        setup:
-        def exception = new RuntimeException("test")
-        when:
-        MetricsUtils.addFailureTagsWithException(initialMap, null)
-        then:
-        thrown(NullPointerException)
-    }
-
-    def "AddSuccessTags"() {
-        setup:
-        def exception = new RuntimeException("test")
-        when:
-        def taggedMap = MetricsUtils.addSuccessTags(initialMap)
-        then:
-        taggedMap == initialMap
-        taggedMap == ImmutableMap.of(
-                FOO, BAR,
-                MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.SUCCESS,
+        emptyTags == ImmutableSet.of(
+                Tag.of(MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.SUCCESS)
         )
     }
 
-    def "AddSuccessTagsToNullMap"() {
-        setup:
-        def exception = new RuntimeException("test")
-        when:
-        MetricsUtils.addSuccessTags(null)
-        then:
-        thrown(NullPointerException)
-    }
 
-
-    def "NewSuccessTagsMap"() {
+    def "Can get a new success tags set"() {
         when:
-        def taggedMap = MetricsUtils.newSuccessTagsMap()
+        def finalTags = MetricsUtils.newSuccessTagsSet()
         then:
-        taggedMap == ImmutableMap.of(
-                MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.SUCCESS,
+        finalTags == ImmutableSet.of(
+                Tag.of(MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.SUCCESS)
         )
     }
 
-    def "NewFailureTagsMapForException"() {
+    def "Can get a new tag set for a given exception"() {
         setup:
         def exception = new RuntimeException("test")
         when:
-        def taggedMap = MetricsUtils.newFailureTagsMapForException(exception)
+        def finalTags = MetricsUtils.newFailureTagsSetForException(exception)
         then:
-        taggedMap == ImmutableMap.of(
-                MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.FAILURE,
-                MetricsConstants.TagKeys.EXCEPTION_CLASS, exception.getClass().getCanonicalName()
+        finalTags == ImmutableSet.of(
+                Tag.of(MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.FAILURE),
+                Tag.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, exception.getClass().getCanonicalName())
         )
     }
 }

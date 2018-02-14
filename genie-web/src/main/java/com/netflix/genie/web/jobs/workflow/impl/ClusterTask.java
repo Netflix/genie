@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.jobs.workflow.impl;
 
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
@@ -27,8 +28,8 @@ import com.netflix.genie.web.jobs.JobExecutionEnvironment;
 import com.netflix.genie.web.services.impl.GenieFileTransferService;
 import com.netflix.genie.web.util.MetricsConstants;
 import com.netflix.genie.web.util.MetricsUtils;
-import com.netflix.spectator.api.Id;
-import com.netflix.spectator.api.Registry;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -37,6 +38,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -49,19 +51,17 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class ClusterTask extends GenieBaseTask {
 
-    private final Id timerId;
+    private static final String CLUSTER_TASK_TIMER_NAME = "genie.jobs.tasks.clusterTask.timer";
     private final GenieFileTransferService fts;
 
     /**
      * Constructor.
      *
      * @param registry The metrics registry to use
-     * @param fts File transfer service
+     * @param fts      File transfer service
      */
-    public ClusterTask(@NotNull final Registry registry,
-            @NotNull final GenieFileTransferService fts) {
+    public ClusterTask(@NotNull final MeterRegistry registry, @NotNull final GenieFileTransferService fts) {
         super(registry);
-        this.timerId = registry.createId("genie.jobs.tasks.clusterTask.timer");
         this.fts = fts;
     }
 
@@ -70,14 +70,14 @@ public class ClusterTask extends GenieBaseTask {
      */
     @Override
     public void executeTask(@NotNull final Map<String, Object> context) throws GenieException, IOException {
-        final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
+        final Set<Tag> tags = Sets.newHashSet();
         final long start = System.nanoTime();
         try {
             final JobExecutionEnvironment jobExecEnv =
                 (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
             final Cluster cluster = jobExecEnv.getCluster();
-            tags.put(MetricsConstants.TagKeys.CLUSTER_NAME, cluster.getName());
-            tags.put(MetricsConstants.TagKeys.CLUSTER_ID, cluster.getId().orElse(NO_ID_FOUND));
+            tags.add(Tag.of(MetricsConstants.TagKeys.CLUSTER_NAME, cluster.getName()));
+            tags.add(Tag.of(MetricsConstants.TagKeys.CLUSTER_ID, cluster.getId().orElse(NO_ID_FOUND)));
             final String jobWorkingDirectory = jobExecEnv.getJobWorkingDir().getCanonicalPath();
             final String genieDir = jobWorkingDirectory
                 + JobConstants.FILE_PATH_DELIMITER
@@ -124,7 +124,7 @@ public class ClusterTask extends GenieBaseTask {
                         AdminResources.CLUSTER
                     );
 
-                    fts.getFile(clusterSetupFile, localPath);
+                    this.fts.getFile(clusterSetupFile, localPath);
 
                     super.generateSetupFileSourceSnippet(
                         clusterId,
@@ -144,7 +144,7 @@ public class ClusterTask extends GenieBaseTask {
                     FileType.CONFIG,
                     AdminResources.CLUSTER
                 );
-                fts.getFile(configFile, localPath);
+                this.fts.getFile(configFile, localPath);
             }
 
             // Iterate over and get all dependencies
@@ -156,17 +156,17 @@ public class ClusterTask extends GenieBaseTask {
                     FileType.DEPENDENCIES,
                     AdminResources.CLUSTER
                 );
-                fts.getFile(dependencyFile, localPath);
+                this.fts.getFile(dependencyFile, localPath);
             }
             log.info("Finished Cluster Task for job {}", jobExecEnv.getJobRequest().getId().orElse(NO_ID_FOUND));
-        } catch (Throwable t) {
+            MetricsUtils.addSuccessTags(tags);
+        } catch (final Throwable t) {
             MetricsUtils.addFailureTagsWithException(tags, t);
             throw t;
         } finally {
-            final long finish = System.nanoTime();
-            this.getRegistry().timer(
-                timerId.withTags(tags)
-            ).record(finish - start, TimeUnit.NANOSECONDS);
+            this.getRegistry()
+                .timer(CLUSTER_TASK_TIMER_NAME, tags)
+                .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
     }
 }

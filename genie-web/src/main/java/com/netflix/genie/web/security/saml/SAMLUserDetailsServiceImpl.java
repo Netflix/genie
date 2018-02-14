@@ -18,8 +18,8 @@
 package com.netflix.genie.web.security.saml;
 
 import com.google.common.collect.Lists;
-import com.netflix.spectator.api.Registry;
-import com.netflix.spectator.api.Timer;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +43,7 @@ import java.util.concurrent.TimeUnit;
  * @author tgianos
  * @since 3.0.0
  */
-@ConditionalOnProperty("genie.security.saml.enabled")
+@ConditionalOnProperty(value = "genie.security.saml.enabled", havingValue = "true")
 @Component
 @Slf4j
 public class SAMLUserDetailsServiceImpl implements SAMLUserDetailsService {
@@ -61,7 +61,10 @@ public class SAMLUserDetailsServiceImpl implements SAMLUserDetailsService {
      * @param registry       The metrics registry to use
      */
     @Autowired
-    public SAMLUserDetailsServiceImpl(@NotNull final SAMLProperties samlProperties, @NotNull final Registry registry) {
+    public SAMLUserDetailsServiceImpl(
+        @NotNull final SAMLProperties samlProperties,
+        @NotNull final MeterRegistry registry
+    ) {
         this.samlProperties = samlProperties;
         this.loadTimer = registry.timer("genie.security.saml.parse.timer");
     }

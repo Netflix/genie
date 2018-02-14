@@ -17,8 +17,8 @@
  */
 package com.netflix.genie.web.security.oauth2.pingfederate;
 
-import com.netflix.spectator.api.Registry;
-import com.netflix.spectator.api.Timer;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import org.jose4j.jwt.JwtClaims;
 import org.jose4j.jwt.MalformedClaimException;
 import org.jose4j.jwt.consumer.JwtContext;
@@ -42,7 +42,7 @@ public class PingFederateValidator implements Validator {
      *
      * @param registry The registry to use
      */
-    public PingFederateValidator(final Registry registry) {
+    public PingFederateValidator(final MeterRegistry registry) {
         this.jwtValidationTimer = registry.timer("genie.security.oauth2.pingFederate.jwt.validation.timer");
     }
 

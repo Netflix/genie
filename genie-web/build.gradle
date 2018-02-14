@@ -27,7 +27,6 @@ dependencies {
     compile("commons-httpclient:commons-httpclient")
     compile("commons-io:commons-io")
     compile("commons-validator:commons-validator")
-    compile("io.micrometer:micrometer-registry-atlas")
     compile("io.springfox:springfox-swagger2")
     compile("io.springfox:springfox-swagger-ui")
     compile("io.springfox:springfox-bean-validators")

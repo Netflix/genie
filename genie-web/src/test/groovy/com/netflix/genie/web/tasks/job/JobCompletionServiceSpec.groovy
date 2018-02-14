@@ -18,7 +18,7 @@
 package com.netflix.genie.web.tasks.job
 
 import com.google.common.collect.ImmutableList
-import com.google.common.collect.ImmutableMap
+import com.google.common.collect.ImmutableSet
 import com.google.common.io.Files
 import com.netflix.genie.common.dto.*
 import com.netflix.genie.common.exceptions.GenieServerException
@@ -31,11 +31,9 @@ import com.netflix.genie.web.services.JobSearchService
 import com.netflix.genie.web.services.MailService
 import com.netflix.genie.web.services.impl.GenieFileTransferService
 import com.netflix.genie.web.util.MetricsConstants
-import com.netflix.genie.web.util.MetricsUtils
-import com.netflix.spectator.api.Counter
-import com.netflix.spectator.api.Id
-import com.netflix.spectator.api.Registry
-import com.netflix.spectator.api.Timer
+import io.micrometer.core.instrument.Counter
+import io.micrometer.core.instrument.MeterRegistry
+import io.micrometer.core.instrument.Tag
 import org.assertj.core.util.Lists
 import org.assertj.core.util.Sets
 import org.junit.Rule
@@ -46,7 +44,6 @@ import org.springframework.retry.support.RetryTemplate
 import spock.lang.Specification
 
 import java.util.concurrent.TimeUnit
-
 /**
  * Unit tests for JobCompletionHandler
  *
@@ -65,13 +62,11 @@ class JobCompletionServiceSpec extends Specification {
     MailService mailService
     GenieFileTransferService genieFileTransferService
     JobsProperties jobsProperties
-    Registry registry
-    Id completionTimerId
-    Timer completionTimer
-    Map<String, String> timerTagsCapture
-    Id errorCounterId
+    MeterRegistry registry
+    io.micrometer.core.instrument.Timer completionTimer
+    Set<Tag> timerTagsCapture
     Counter errorCounter
-    List<Map<String, String>> counterTagsCaptures
+    List<Set<Tag>> counterTagsCaptures
 
     /**
      * Temporary folder used for storing fake job files. Deleted after tests are done.
@@ -86,23 +81,17 @@ class JobCompletionServiceSpec extends Specification {
         genieFileTransferService = Mock(GenieFileTransferService.class)
         jobsProperties = new JobsProperties()
         counterTagsCaptures = new ArrayList<>()
-        registry = Mock(Registry.class)
+        registry = Mock(MeterRegistry.class)
         errorCounter = Mock(Counter.class)
-        errorCounterId = Mock(Id.class)
-        completionTimerId = Mock(Id.class)
-        completionTimerId.withTags(_) >> { args ->
-            timerTagsCapture = args[0]
-            return completionTimerId
+        completionTimer = Mock(io.micrometer.core.instrument.Timer.class)
+        registry.timer(JobCompletionService.JOB_COMPLETION_TIMER_NAME, _ as Set<Tag>) >> { args ->
+            timerTagsCapture = (Set<Tag>) args[1]
+            return completionTimer
         }
-        errorCounterId.withTags(_) >> { args ->
-            counterTagsCaptures.add(args[0])
-            return errorCounterId
+        registry.counter(JobCompletionService.JOB_COMPLETION_ERROR_COUNTER_NAME, _ as Set<Tag>) >> { args ->
+            counterTagsCaptures.add((Set<Tag>) args[1])
+            return errorCounter
         }
-        completionTimer = Mock(Timer.class)
-        registry.createId("genie.jobs.completion.timer") >> completionTimerId
-        registry.createId("genie.jobs.errors.count") >> errorCounterId
-        registry.counter(errorCounterId) >> errorCounter
-        registry.timer(completionTimerId) >> completionTimer
         jobsProperties.cleanup.deleteArchiveFile = false
         jobsProperties.cleanup.deleteDependencies = false
         jobsProperties.users.runAsUserEnabled = false
@@ -122,11 +111,10 @@ class JobCompletionServiceSpec extends Specification {
                 { throw new GenieServerException("null") } >>
                 { throw new GenieServerException("null") } >>
                 { throw new GenieServerException("null") }
-        completionTimerId.withTags(MetricsUtils.newFailureTagsMapForException(new GenieServerException("null")))
-        1 * completionTimer.record(_, TimeUnit.NANOSECONDS)
-        timerTagsCapture == ImmutableMap.of(
-                MetricsConstants.TagKeys.EXCEPTION_CLASS, GenieServerException.class.canonicalName,
-                MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.FAILURE,
+        1 * completionTimer.record(_ as Long, TimeUnit.NANOSECONDS)
+        timerTagsCapture == ImmutableSet.of(
+                Tag.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, GenieServerException.class.canonicalName),
+                Tag.of(MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.FAILURE)
         )
         0 * errorCounter.increment()
 
@@ -136,9 +124,9 @@ class JobCompletionServiceSpec extends Specification {
         noExceptionThrown()
         1 * jobSearchService.getJob(jobId) >> new Job.Builder(NAME, USER, VERSION)
                 .withId(jobId).withStatus(JobStatus.SUCCEEDED).withCommandArgs(COMMAND_ARGS).build()
-        0 * jobPersistenceService.updateJobStatus(jobId, _, _)
-        timerTagsCapture == ImmutableMap.of(
-                MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.SUCCESS,
+        0 * jobPersistenceService.updateJobStatus(jobId, _ as JobStatus, _ as String)
+        timerTagsCapture == ImmutableSet.of(
+                Tag.of(MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.SUCCESS)
         )
         0 * errorCounter.increment()
 
@@ -148,30 +136,30 @@ class JobCompletionServiceSpec extends Specification {
         noExceptionThrown()
         1 * jobSearchService.getJob(jobId) >> new Job.Builder(NAME, USER, VERSION)
                 .withId(jobId).withStatus(JobStatus.RUNNING).withCommandArgs(COMMAND_ARGS).build()
-        1 * jobPersistenceService.updateJobStatus(jobId, _, _)
-        1 * completionTimer.record(_, TimeUnit.NANOSECONDS)
-        timerTagsCapture == ImmutableMap.of(
-                MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.SUCCESS,
-                JobCompletionService.JOB_FINAL_STATE, JobStatus.FAILED.toString()
+        1 * jobPersistenceService.updateJobStatus(jobId, _ as JobStatus, _ as String)
+        1 * completionTimer.record(_ as Long, TimeUnit.NANOSECONDS)
+        timerTagsCapture == ImmutableSet.of(
+                Tag.of(MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.SUCCESS),
+                Tag.of(JobCompletionService.JOB_FINAL_STATE, JobStatus.FAILED.toString())
         )
         4 * errorCounter.increment()
         counterTagsCaptures.containsAll(ImmutableList.of(
-                ImmutableMap.of(
-                        JobCompletionService.ERROR_SOURCE_TAG, "JOB_FINAL_UPDATE_FAILURE",
-                        MetricsConstants.TagKeys.EXCEPTION_CLASS, FileNotFoundException.class.getCanonicalName()
+                ImmutableSet.of(
+                        Tag.of(JobCompletionService.ERROR_SOURCE_TAG, "JOB_FINAL_UPDATE_FAILURE"),
+                        Tag.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, FileNotFoundException.class.getCanonicalName())
                 ),
-                ImmutableMap.of(
-                        JobCompletionService.ERROR_SOURCE_TAG, "JOB_PROCESS_CLEANUP_FAILURE",
-                        MetricsConstants.TagKeys.EXCEPTION_CLASS, NullPointerException.class.canonicalName
+                ImmutableSet.of(
+                        Tag.of(JobCompletionService.ERROR_SOURCE_TAG, "JOB_PROCESS_CLEANUP_FAILURE"),
+                        Tag.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, NullPointerException.class.canonicalName)
                 ),
-                ImmutableMap.of(
-                        JobCompletionService.ERROR_SOURCE_TAG, "JOB_DIRECTORY_FAILURE",
-                        MetricsConstants.TagKeys.EXCEPTION_CLASS, NullPointerException.class.canonicalName
+                ImmutableSet.of(
+                        Tag.of(JobCompletionService.ERROR_SOURCE_TAG, "JOB_DIRECTORY_FAILURE"),
+                        Tag.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, NullPointerException.class.canonicalName)
 
                 ),
-                ImmutableMap.of(
-                        JobCompletionService.ERROR_SOURCE_TAG, "JOB_UPDATE_FAILURE",
-                        MetricsConstants.TagKeys.EXCEPTION_CLASS, NullPointerException.class.canonicalName
+                ImmutableSet.of(
+                        Tag.of(JobCompletionService.ERROR_SOURCE_TAG, "JOB_UPDATE_FAILURE"),
+                        Tag.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, NullPointerException.class.canonicalName)
                 )
         ))
 
@@ -183,12 +171,12 @@ class JobCompletionServiceSpec extends Specification {
                 .withId(jobId).withStatus(JobStatus.RUNNING).withCommandArgs(COMMAND_ARGS).build()
         1 * jobSearchService.getJobRequest(jobId) >> new JobRequest.Builder(NAME, USER, VERSION, Lists.newArrayList(), Sets.newHashSet())
                 .withId(jobId).withCommandArgs(COMMAND_ARGS).withEmail('admin@netflix.com').build()
-        1 * jobPersistenceService.updateJobStatus(jobId, _, _)
-        1 * mailService.sendEmail('admin@netflix.com', _, _)
-        1 * completionTimer.record(_, TimeUnit.NANOSECONDS)
-        timerTagsCapture == ImmutableMap.of(
-                MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.SUCCESS,
-                JobCompletionService.JOB_FINAL_STATE, JobStatus.FAILED.toString()
+        1 * jobPersistenceService.updateJobStatus(jobId, _ as JobStatus, _ as String)
+        1 * mailService.sendEmail('admin@netflix.com', _ as String, _ as String)
+        1 * completionTimer.record(_ as Long, TimeUnit.NANOSECONDS)
+        timerTagsCapture == ImmutableSet.of(
+                Tag.of(MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.SUCCESS),
+                Tag.of(JobCompletionService.JOB_FINAL_STATE, JobStatus.FAILED.toString())
         )
         3 * errorCounter.increment()
     }
@@ -205,15 +193,15 @@ class JobCompletionServiceSpec extends Specification {
         dependencyDirs.forEach({ d -> Files.createParentDirs(new File(d, "a_dependency")) })
         def jobId = "1"
         def app1 = Mock(Application)
-        app1.getId() >> new Optional<String>("app1")
+        app1.getId() >> Optional.ofNullable("app1")
         def app2 = Mock(Application)
-        app2.getId() >> new Optional<String>("app2")
+        app2.getId() >> Optional.ofNullable("app2")
         jobSearchService.getJobApplications(jobId) >> Arrays.asList(app1, app2)
         def cluster = Mock(Cluster)
-        cluster.getId() >> new Optional<String>("cluster-x")
+        cluster.getId() >> Optional.ofNullable("cluster-x")
         jobSearchService.getJobCluster(jobId) >> cluster
         def command = Mock(Command)
-        command.getId() >> new Optional<String>("command-y")
+        command.getId() >> Optional.ofNullable("command-y")
         jobSearchService.getJobCommand(jobId) >> command
 
         when:

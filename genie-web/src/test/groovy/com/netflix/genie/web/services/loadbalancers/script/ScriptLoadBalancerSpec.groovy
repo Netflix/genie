@@ -18,7 +18,7 @@
 package com.netflix.genie.web.services.loadbalancers.script
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.google.common.collect.ImmutableMap
+import com.google.common.collect.ImmutableSet
 import com.google.common.collect.Lists
 import com.google.common.collect.Sets
 import com.netflix.genie.common.dto.Cluster
@@ -30,9 +30,8 @@ import com.netflix.genie.test.categories.UnitTest
 import com.netflix.genie.web.services.ClusterLoadBalancer
 import com.netflix.genie.web.services.impl.GenieFileTransferService
 import com.netflix.genie.web.util.MetricsConstants
-import com.netflix.spectator.api.Id
-import com.netflix.spectator.api.Registry
-import com.netflix.spectator.api.Timer
+import io.micrometer.core.instrument.MeterRegistry
+import io.micrometer.core.instrument.Tag
 import org.apache.commons.lang.StringUtils
 import org.junit.Rule
 import org.junit.experimental.categories.Category
@@ -106,7 +105,7 @@ class ScriptLoadBalancerSpec extends Specification {
                 Mock(GenieFileTransferService),
                 environment,
                 Mock(ObjectMapper),
-                Mock(Registry)
+                Mock(MeterRegistry)
         )
 
         expect:
@@ -145,11 +144,9 @@ class ScriptLoadBalancerSpec extends Specification {
         def scheduler = Mock(TaskScheduler)
         def environment = Mock(Environment)
         def fileTransferService = Mock(GenieFileTransferService)
-        def registry = Mock(Registry)
-        def updateId = Mock(Id)
-        def selectId = Mock(Id)
-        def updateTimer = Mock(Timer)
-        def selectTimer = Mock(Timer)
+        def registry = Mock(MeterRegistry)
+        def updateTimer = Mock(io.micrometer.core.instrument.Timer)
+        def selectTimer = Mock(io.micrometer.core.instrument.Timer)
         def destDir = StringUtils.substringBeforeLast(file, "/")
 
         when: "Constructed"
@@ -180,14 +177,10 @@ class ScriptLoadBalancerSpec extends Specification {
 
         then: "Should skip running script and do nothing"
         cluster == null
-        1 * registry.createId(
+        1 * registry.timer(
                 ScriptLoadBalancer.SELECT_TIMER_NAME,
-                ImmutableMap.of(
-                        MetricsConstants.TagKeys.STATUS,
-                        ScriptLoadBalancer.STATUS_TAG_NOT_CONFIGURED
-                )
-        ) >> selectId
-        1 * registry.timer(selectId) >> selectTimer
+                ImmutableSet.of(Tag.of(MetricsConstants.TagKeys.STATUS, ScriptLoadBalancer.STATUS_TAG_NOT_CONFIGURED))
+        ) >> selectTimer
         1 * selectTimer.record(_ as Long, TimeUnit.NANOSECONDS)
 
         when: "refresh is called but fails"
@@ -196,16 +189,13 @@ class ScriptLoadBalancerSpec extends Specification {
         then: "Metrics are recorded"
         1 * environment.getProperty(ScriptLoadBalancer.SCRIPT_TIMEOUT_PROPERTY_KEY, Long.class, _ as Long) >> 5_000L
         1 * environment.getProperty(ScriptLoadBalancer.SCRIPT_FILE_SOURCE_PROPERTY_KEY) >> null
-        1 * registry.createId(
+        1 * registry.timer(
                 ScriptLoadBalancer.UPDATE_TIMER_NAME,
-                ImmutableMap.of(
-                        MetricsConstants.TagKeys.STATUS,
-                        ScriptLoadBalancer.STATUS_TAG_FAILED,
-                        MetricsConstants.TagKeys.EXCEPTION_CLASS,
-                        IllegalStateException.class.getName()
+                ImmutableSet.of(
+                        Tag.of(MetricsConstants.TagKeys.STATUS, ScriptLoadBalancer.STATUS_TAG_FAILED),
+                        Tag.of(MetricsConstants.TagKeys.EXCEPTION_CLASS, IllegalStateException.class.getName())
                 )
-        ) >> updateId
-        1 * registry.timer(updateId) >> updateTimer
+        ) >> updateTimer
         1 * updateTimer.record(_ as Long, TimeUnit.NANOSECONDS)
 
         when: "Try to select after failed update"
@@ -213,14 +203,12 @@ class ScriptLoadBalancerSpec extends Specification {
 
         then: "Should skip running script and do nothing"
         cluster == null
-        1 * registry.createId(
+        1 * registry.timer(
                 ScriptLoadBalancer.SELECT_TIMER_NAME,
-                ImmutableMap.of(
-                        MetricsConstants.TagKeys.STATUS,
-                        ScriptLoadBalancer.STATUS_TAG_NOT_CONFIGURED
+                ImmutableSet.of(
+                        Tag.of(MetricsConstants.TagKeys.STATUS, ScriptLoadBalancer.STATUS_TAG_NOT_CONFIGURED)
                 )
-        ) >> selectId
-        1 * registry.timer(selectId) >> selectTimer
+        ) >> selectTimer
         1 * selectTimer.record(_ as Long, TimeUnit.NANOSECONDS)
 
         when: "Call refresh again"
@@ -231,14 +219,10 @@ class ScriptLoadBalancerSpec extends Specification {
         1 * environment.getProperty(ScriptLoadBalancer.SCRIPT_FILE_SOURCE_PROPERTY_KEY) >> file
         1 * environment.getProperty(ScriptLoadBalancer.SCRIPT_FILE_DESTINATION_PROPERTY_KEY) >> destDir
         1 * fileTransferService.getFile(file, file)
-        1 * registry.createId(
+        1 * registry.timer(
                 ScriptLoadBalancer.UPDATE_TIMER_NAME,
-                ImmutableMap.of(
-                        MetricsConstants.TagKeys.STATUS,
-                        ScriptLoadBalancer.STATUS_TAG_OK
-                )
-        ) >> updateId
-        1 * registry.timer(updateId) >> updateTimer
+                ImmutableSet.of(Tag.of(MetricsConstants.TagKeys.STATUS, ScriptLoadBalancer.STATUS_TAG_OK))
+        ) >> updateTimer
         1 * updateTimer.record(_ as Long, TimeUnit.NANOSECONDS)
 
         when: "Script is compiled after refresh. select is called again"
@@ -247,14 +231,10 @@ class ScriptLoadBalancerSpec extends Specification {
         then: "Can successfully find a cluster"
         cluster != null
         cluster.getId().get() == "1"
-        1 * registry.createId(
+        1 * registry.timer(
                 ScriptLoadBalancer.SELECT_TIMER_NAME,
-                ImmutableMap.of(
-                        MetricsConstants.TagKeys.STATUS,
-                        ScriptLoadBalancer.STATUS_TAG_FOUND
-                )
-        ) >> selectId
-        1 * registry.timer(selectId) >> selectTimer
+                ImmutableSet.of(Tag.of(MetricsConstants.TagKeys.STATUS, ScriptLoadBalancer.STATUS_TAG_FOUND))
+        ) >> selectTimer
         1 * selectTimer.record(_ as Long, TimeUnit.NANOSECONDS)
 
         when: "Script is called with unhandled clusters"
@@ -262,14 +242,10 @@ class ScriptLoadBalancerSpec extends Specification {
 
         then: "Can't find a cluster"
         cluster == null
-        1 * registry.createId(
+        1 * registry.timer(
                 ScriptLoadBalancer.SELECT_TIMER_NAME,
-                ImmutableMap.of(
-                        MetricsConstants.TagKeys.STATUS,
-                        ScriptLoadBalancer.STATUS_TAG_NOT_FOUND
-                )
-        ) >> selectId
-        1 * registry.timer(selectId) >> selectTimer
+                ImmutableSet.of(Tag.of(MetricsConstants.TagKeys.STATUS, ScriptLoadBalancer.STATUS_TAG_NOT_FOUND))
+        ) >> selectTimer
         1 * selectTimer.record(_ as Long, TimeUnit.NANOSECONDS)
 
         where:

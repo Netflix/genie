@@ -39,7 +39,7 @@ import com.netflix.genie.web.services.JobPersistenceService;
 import com.netflix.genie.web.services.JobSearchService;
 import com.netflix.genie.web.services.JobStateService;
 import com.netflix.genie.web.services.TagService;
-import com.netflix.spectator.api.Registry;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.exec.Executor;
 import org.assertj.core.util.Lists;
 import org.junit.Assert;
@@ -230,7 +230,7 @@ public class ServicesConfigUnitTests {
                 genieEventBus,
                 workflowTasks,
                 resource,
-                Mockito.mock(Registry.class)
+                Mockito.mock(MeterRegistry.class)
             )
         );
     }
@@ -251,7 +251,7 @@ public class ServicesConfigUnitTests {
                 Mockito.mock(ClusterService.class),
                 Mockito.mock(CommandService.class),
                 Lists.newArrayList(Mockito.mock(ClusterLoadBalancer.class)),
-                Mockito.mock(Registry.class),
+                Mockito.mock(MeterRegistry.class),
                 UUID.randomUUID().toString()
             )
         );
@@ -273,7 +273,7 @@ public class ServicesConfigUnitTests {
                 Mockito.mock(ClusterService.class),
                 Mockito.mock(CommandService.class),
                 Lists.newArrayList(),
-                Mockito.mock(Registry.class),
+                Mockito.mock(MeterRegistry.class),
                 UUID.randomUUID().toString()
             )
         );

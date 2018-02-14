@@ -27,9 +27,8 @@ import com.netflix.genie.web.events.JobScheduledEvent;
 import com.netflix.genie.web.jobs.JobLauncher;
 import com.netflix.genie.web.services.JobStateService;
 import com.netflix.genie.web.services.JobSubmitterService;
-import com.netflix.spectator.api.Counter;
-import com.netflix.spectator.api.Registry;
-import com.netflix.spectator.api.patterns.PolledMeter;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -52,7 +51,7 @@ import java.util.function.Supplier;
 @Slf4j
 public class JobStateServiceImpl implements JobStateService {
     protected final TaskScheduler scheduler;
-    protected final Registry registry;
+    protected final MeterRegistry registry;
     protected final GenieEventBus genieEventBus;
     private final Map<String, JobInfo> jobs = Collections.synchronizedMap(new HashMap<>());
     private final JobSubmitterService jobSubmitterService;
@@ -70,27 +69,17 @@ public class JobStateServiceImpl implements JobStateService {
         final JobSubmitterService jobSubmitterService,
         final TaskScheduler scheduler,
         final GenieEventBus genieEventBus,
-        final Registry registry
+        final MeterRegistry registry
     ) {
         this.jobSubmitterService = jobSubmitterService;
         this.scheduler = scheduler;
         this.registry = registry;
         this.genieEventBus = genieEventBus;
 
-        PolledMeter
-            .using(registry)
-            .withName("genie.jobs.running.gauge")
-            .monitorSize(this.jobs);
-
-        PolledMeter
-            .using(registry)
-            .withName("genie.jobs.active.gauge")
-            .monitorValue(this, JobStateServiceImpl::getNumActiveJobs);
-
-        PolledMeter
-            .using(registry)
-            .withName("genie.jobs.memory.used.gauge")
-            .monitorValue(this, JobStateServiceImpl::getUsedMemory);
+        // TODO: Active and running seems backwards here. Might want to review
+        this.registry.gauge("genie.jobs.running.gauge", this.jobs, Map::size);
+        this.registry.gauge("genie.jobs.active.gauge", this, JobStateServiceImpl::getNumActiveJobs);
+        this.registry.gauge("genie.jobs.memory.used.gauge", this, JobStateServiceImpl::getUsedMemory);
 
         this.unableToCancel = registry.counter("genie.jobs.unableToCancel.rate");
     }

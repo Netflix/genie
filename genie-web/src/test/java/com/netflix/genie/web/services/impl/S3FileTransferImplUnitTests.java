@@ -29,10 +29,10 @@ import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.properties.S3FileTransferProperties;
 import com.netflix.genie.web.util.MetricsUtils;
-import com.netflix.spectator.api.Counter;
-import com.netflix.spectator.api.Id;
-import com.netflix.spectator.api.Registry;
-import com.netflix.spectator.api.Timer;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.Timer;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -45,6 +45,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.io.File;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -61,20 +62,19 @@ public class S3FileTransferImplUnitTests {
     private static final String S3_KEY = "key";
     private static final String S3_PATH = S3_PREFIX + S3_BUCKET + "/" + S3_KEY;
     private static final String LOCAL_PATH = "local";
-    private static final Map SUCCESS_TAGS = MetricsUtils.newSuccessTagsMap();
-    private static final Map FAILURE_TAGS =
-        MetricsUtils.newFailureTagsMapForException(new GenieServerException("test"));
+    private static final Set<Tag> SUCCESS_TAGS = MetricsUtils.newSuccessTagsSet();
+    private static final Set<Tag> FAILURE_TAGS
+        = MetricsUtils.newFailureTagsSetForException(new GenieServerException("test"));
 
+    private MeterRegistry registry;
     private S3FileTransferImpl s3FileTransfer;
     private AmazonS3Client s3Client;
     private S3FileTransferProperties s3FileTransferProperties;
-    private Id downloadTimerId;
     private Timer downloadTimer;
-    private Id uploadTimerId;
     private Timer uploadTimer;
     private Counter urlFailingStrictValidationCounter;
     @Captor
-    private ArgumentCaptor<Map<String, String>> tagsCaptor;
+    private ArgumentCaptor<Set<Tag>> tagsCaptor;
 
     /**
      * Setup the tests.
@@ -82,28 +82,22 @@ public class S3FileTransferImplUnitTests {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final Registry registry = Mockito.mock(Registry.class);
+        this.registry = Mockito.mock(MeterRegistry.class);
         this.downloadTimer = Mockito.mock(Timer.class);
-        this.downloadTimerId = Mockito.mock(Id.class);
         this.uploadTimer = Mockito.mock(Timer.class);
-        this.uploadTimerId = Mockito.mock(Id.class);
         this.urlFailingStrictValidationCounter = Mockito.mock(Counter.class);
-        Mockito.when(registry.createId("genie.files.s3.download.timer")).thenReturn(this.downloadTimerId);
+        Mockito.
+            when(registry.timer(Mockito.eq(S3FileTransferImpl.DOWNLOAD_TIMER_NAME), Mockito.anySet()))
+            .thenReturn(this.downloadTimer);
+        Mockito.
+            when(registry.timer(Mockito.eq(S3FileTransferImpl.UPLOAD_TIMER_NAME), Mockito.anySet()))
+            .thenReturn(this.uploadTimer);
         Mockito
-            .when(this.downloadTimerId.withTags(Mockito.anyMap()))
-            .thenReturn(this.downloadTimerId);
-        Mockito.when(registry.timer(Mockito.eq(this.downloadTimerId))).thenReturn(this.downloadTimer);
-        Mockito.when(registry.createId("genie.files.s3.upload.timer")).thenReturn(this.uploadTimerId);
-        Mockito
-            .when(this.uploadTimerId.withTags(Mockito.anyMap()))
-            .thenReturn(this.uploadTimerId);
-        Mockito.when(registry.timer(Mockito.eq(this.uploadTimerId))).thenReturn(this.uploadTimer);
-        Mockito
-            .when(registry.counter("genie.files.s3.failStrictValidation.counter"))
+            .when(registry.counter(S3FileTransferImpl.STRICT_VALIDATION_COUNTER_NAME))
             .thenReturn(this.urlFailingStrictValidationCounter);
         this.s3Client = Mockito.mock(AmazonS3Client.class);
         this.s3FileTransferProperties = Mockito.mock(S3FileTransferProperties.class);
-        this.s3FileTransfer = new S3FileTransferImpl(this.s3Client, registry, this.s3FileTransferProperties);
+        this.s3FileTransfer = new S3FileTransferImpl(this.s3Client, this.registry, this.s3FileTransferProperties);
     }
 
     /**
@@ -314,15 +308,15 @@ public class S3FileTransferImplUnitTests {
     public void testGetFileMethodInvalidS3Path() throws GenieException {
         final String invalidS3Path = "filepath";
         try {
-            s3FileTransfer.getFile(invalidS3Path, LOCAL_PATH);
+            this.s3FileTransfer.getFile(invalidS3Path, LOCAL_PATH);
         } finally {
             Mockito
                 .verify(this.downloadTimer, Mockito.times(1))
                 .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
             Mockito
-                .verify(this.downloadTimerId, Mockito.times(1))
-                .withTags(tagsCaptor.capture());
-            Assert.assertEquals(FAILURE_TAGS, tagsCaptor.getValue());
+                .verify(this.registry, Mockito.times(1))
+                .timer(Mockito.eq(S3FileTransferImpl.DOWNLOAD_TIMER_NAME), this.tagsCaptor.capture());
+            Assert.assertEquals(FAILURE_TAGS, this.tagsCaptor.getValue());
         }
     }
 
@@ -333,7 +327,6 @@ public class S3FileTransferImplUnitTests {
      */
     @Test
     public void testGetFileMethodValidS3Path() throws GenieException {
-
         final ObjectMetadata objectMetadata = Mockito.mock(ObjectMetadata.class);
         Mockito.when(this.s3Client.getObject(Mockito.any(GetObjectRequest.class), Mockito.any(File.class)))
             .thenReturn(objectMetadata);
@@ -347,9 +340,9 @@ public class S3FileTransferImplUnitTests {
             .verify(this.downloadTimer, Mockito.times(1))
             .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
         Mockito
-            .verify(this.downloadTimerId, Mockito.times(1))
-            .withTags(tagsCaptor.capture());
-        Assert.assertEquals(SUCCESS_TAGS, tagsCaptor.getValue());
+            .verify(this.registry, Mockito.times(1))
+            .timer(Mockito.eq(S3FileTransferImpl.DOWNLOAD_TIMER_NAME), this.tagsCaptor.capture());
+        Assert.assertEquals(SUCCESS_TAGS, this.tagsCaptor.getValue());
 
     }
 
@@ -365,7 +358,7 @@ public class S3FileTransferImplUnitTests {
         final ArgumentCaptor<GetObjectRequest> argument = ArgumentCaptor.forClass(GetObjectRequest.class);
 
         try {
-            s3FileTransfer.getFile(S3_PATH, LOCAL_PATH);
+            this.s3FileTransfer.getFile(S3_PATH, LOCAL_PATH);
         } finally {
             Mockito.verify(this.s3Client).getObject(argument.capture(), Mockito.any());
             Assert.assertEquals(S3_BUCKET, argument.getValue().getBucketName());
@@ -374,9 +367,9 @@ public class S3FileTransferImplUnitTests {
                 .verify(this.downloadTimer, Mockito.times(1))
                 .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
             Mockito
-                .verify(this.downloadTimerId, Mockito.times(1))
-                .withTags(tagsCaptor.capture());
-            Assert.assertEquals(FAILURE_TAGS, tagsCaptor.getValue());
+                .verify(this.registry, Mockito.times(1))
+                .timer(Mockito.eq(S3FileTransferImpl.DOWNLOAD_TIMER_NAME), this.tagsCaptor.capture());
+            Assert.assertEquals(FAILURE_TAGS, this.tagsCaptor.getValue());
         }
     }
 
@@ -395,9 +388,9 @@ public class S3FileTransferImplUnitTests {
                 .verify(this.uploadTimer, Mockito.times(1))
                 .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
             Mockito
-                .verify(this.uploadTimerId, Mockito.times(1))
-                .withTags(tagsCaptor.capture());
-            Assert.assertEquals(FAILURE_TAGS, tagsCaptor.getValue());
+                .verify(this.registry, Mockito.times(1))
+                .timer(Mockito.eq(S3FileTransferImpl.UPLOAD_TIMER_NAME), this.tagsCaptor.capture());
+            Assert.assertEquals(FAILURE_TAGS, this.tagsCaptor.getValue());
         }
     }
 
@@ -408,7 +401,6 @@ public class S3FileTransferImplUnitTests {
      */
     @Test
     public void testPutFileMethodValidS3Path() throws GenieException {
-
         final PutObjectResult putObjectResult = Mockito.mock(PutObjectResult.class);
         Mockito.when(this.s3Client.putObject(Mockito.any(), Mockito.any(), Mockito.any(File.class)))
             .thenReturn(putObjectResult);
@@ -425,9 +417,9 @@ public class S3FileTransferImplUnitTests {
             .verify(this.uploadTimer, Mockito.times(1))
             .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
         Mockito
-            .verify(this.uploadTimerId, Mockito.times(1))
-            .withTags(tagsCaptor.capture());
-        Assert.assertEquals(SUCCESS_TAGS, tagsCaptor.getValue());
+            .verify(this.registry, Mockito.times(1))
+            .timer(Mockito.eq(S3FileTransferImpl.UPLOAD_TIMER_NAME), this.tagsCaptor.capture());
+        Assert.assertEquals(SUCCESS_TAGS, this.tagsCaptor.getValue());
     }
 
     /**
@@ -455,9 +447,9 @@ public class S3FileTransferImplUnitTests {
                 .verify(this.uploadTimer, Mockito.times(1))
                 .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
             Mockito
-                .verify(this.uploadTimerId, Mockito.times(1))
-                .withTags(tagsCaptor.capture());
-            Assert.assertEquals(FAILURE_TAGS, tagsCaptor.getValue());
+                .verify(this.registry, Mockito.times(1))
+                .timer(Mockito.eq(S3FileTransferImpl.UPLOAD_TIMER_NAME), this.tagsCaptor.capture());
+            Assert.assertEquals(FAILURE_TAGS, this.tagsCaptor.getValue());
         }
     }
 }

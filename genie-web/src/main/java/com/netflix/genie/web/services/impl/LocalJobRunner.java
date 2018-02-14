@@ -35,9 +35,9 @@ import com.netflix.genie.web.jobs.JobExecutionEnvironment;
 import com.netflix.genie.web.jobs.workflow.WorkflowTask;
 import com.netflix.genie.web.services.JobPersistenceService;
 import com.netflix.genie.web.services.JobSubmitterService;
-import com.netflix.spectator.api.Registry;
-import com.netflix.spectator.api.Timer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
@@ -94,7 +94,7 @@ public class LocalJobRunner implements JobSubmitterService {
         @NonNull final GenieEventBus genieEventBus,
         @NotNull final List<WorkflowTask> workflowTasks,
         @NotNull final Resource genieWorkingDir,
-        @NotNull final Registry registry
+        @NotNull final MeterRegistry registry
     ) {
         this.jobPersistenceService = jobPersistenceService;
         this.genieEventBus = genieEventBus;
