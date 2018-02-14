@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2018-02-09</span>
+<span id="revdate">2018-02-14</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -913,6 +913,19 @@ For a demo of this version of Genie please see the
 <ul>
 <li>
 <p>Upgrade to Spring Boot 2.0</p>
+</li>
+<li>
+<p>Switch metric collection to use <a href="http://micrometer.io/">Micrometer</a></p>
+<div class="ulist">
+<ul>
+<li>
+<p>Allows users to plugin their own backend (Atlas, DataDog, etc)</p>
+</li>
+<li>
+<p>Standard for Boot 2.0</p>
+</li>
+</ul>
+</div>
 </li>
 <li>
 <p>Switched to <a href="https://jcp.org/en/jsr/detail?id=310">JSR 310</a> classes for date and time manipulation</p>
@@ -1176,11 +1189,11 @@ drop them yourself if they&#8217;re no longer needed.
 </div>
 </li>
 <li>
-<p>Upgrade to Spring Cloud Finchley.M5 for cloud dependency management</p>
+<p>Upgrade to Spring Cloud Finchley.M6 for cloud dependency management</p>
 <div class="ulist">
 <ul>
 <li>
-<p><a href="http://cloud.spring.io/spring-cloud-static/Finchley.M5/">Reference Docs</a></p>
+<p><a href="http://cloud.spring.io/spring-cloud-static/Finchley.M6/">Reference Docs</a></p>
 </li>
 </ul>
 </div>
@@ -4659,7 +4672,7 @@ the <a href="#_properties">Properties</a> section below for the properties you&#
 <p>This section describes the various properties that can be set to control the behavior of your Genie node and cluster.
 For more information on Spring properties you should see the
 <a href="http://docs.spring.io/spring-boot/docs/2.0.0.RC1/reference/htmlsingle/">Spring Boot</a> reference documentation
-and the <a href="http://cloud.spring.io/spring-cloud-static/Finchley.M5/">Spring Cloud</a> documentation.
+and the <a href="http://cloud.spring.io/spring-cloud-static/Finchley.M6/">Spring Cloud</a> documentation.
 The Spring properties described here are ones that we have overridden from Spring defaults.</p>
 </div>
 <div class="sect2">
@@ -5141,11 +5154,6 @@ to the number of CPU cores x 2 + 1</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Current build version</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">management.metrics.export.atlas.enabled</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to publish metrics to configured Atlas instance</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">security.oauth2.client.client-id</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The id of the OAuth2 client</p></td>
 <td class="tableblock halign-left valign-top"></td>
@@ -5455,6 +5463,12 @@ for more information. Currently on classpath only none, redis and jdbc will work
 <p>The following is an extensive list of metrics (counters, timers, gauges, &#8230;&#8203;)
 published organically by Genie, in addition to metrics published by Spring, JVM
 and system metrics and statistics.</p>
+</div>
+<div class="paragraph">
+<p>Metrics are collected using <a href="http://micrometer.io/">Micrometer</a> which allows system admins to plugin a variety of backend
+collection systems (Atlas, Datadog, Graphite, Ganglia, etc). See <a href="http://micrometer.io/">website</a> for more details. Genie
+ships with no backend system compiled in. It will have to be added if one is desired otherwise metrics are just
+published within the local JVM and available on the Actuator <code>/metrics</code> endpoint.</p>
 </div>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
@@ -6010,7 +6024,7 @@ and system metrics and statistics.</p>
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2018-02-09 19:11:27 UTC
+Last updated 2018-02-14 21:07:09 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
