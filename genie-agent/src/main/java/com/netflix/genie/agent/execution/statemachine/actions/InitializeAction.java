@@ -18,6 +18,9 @@
 
 package com.netflix.genie.agent.execution.statemachine.actions;
 
+import com.netflix.genie.agent.execution.ExecutionContext;
+import com.netflix.genie.agent.execution.exceptions.AgentRegistrationException;
+import com.netflix.genie.agent.execution.services.AgentRegistrationService;
 import com.netflix.genie.agent.execution.statemachine.Events;
 import com.netflix.genie.agent.execution.statemachine.States;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +30,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Action performed when in state INITIALIZE.
+ *
  * @author mprimi
  * @since 4.0.0
  */
@@ -35,13 +39,35 @@ import org.springframework.stereotype.Component;
 @Lazy
 class InitializeAction extends BaseStateAction implements StateAction.Initialize {
 
+    private final AgentRegistrationService agentRegistrationService;
+    private final ExecutionContext executionContext;
+
+    InitializeAction(
+        final AgentRegistrationService agentRegistrationService,
+        final ExecutionContext executionContext
+    ) {
+        this.agentRegistrationService = agentRegistrationService;
+        this.executionContext = executionContext;
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected Events executeStateAction(final StateContext<States, Events> context) {
         log.info("Initializing...");
-        //TODO implement this action
+
+        final String agentId;
+        try {
+            agentId = agentRegistrationService.registerAgent();
+        } catch (final AgentRegistrationException e) {
+            throw new RuntimeException("Failed to obtain agent id", e);
+        }
+
+        log.info("Obtained agent ID: {}", agentId);
+
+        executionContext.setAgentId(agentId);
+
         return Events.INITIALIZE_COMPLETE;
     }
 }
