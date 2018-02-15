@@ -38,3 +38,11 @@ dependencies {
 springBoot {
     mainClassName = "com.netflix.genie.GenieAgentApplication"
 }
+
+def genieVersion = project.version.toString()
+
+jar {
+    manifest {
+        attributes("Implementation-Version": genieVersion)
+    }
+}
