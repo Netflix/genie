@@ -18,20 +18,29 @@
 
 package com.netflix.genie.agent.cli
 
+import com.netflix.genie.agent.AgentMetadata
 import com.netflix.genie.test.categories.UnitTest
 import org.junit.experimental.categories.Category
 import org.springframework.context.ConfigurableApplicationContext
+import org.springframework.core.env.ConfigurableEnvironment
+import org.springframework.core.env.Environment
+import org.springframework.core.env.MutablePropertySources
 import spock.lang.Specification
 
 @Category(UnitTest.class)
 class InfoCommandSpec extends Specification {
     InfoCommand.InfoCommandArguments args
     ConfigurableApplicationContext ctx
+    AgentMetadata agentMetadata
+    ConfigurableEnvironment env
+    Map<String, Object> map = ["Foo" : "foo", "Bar" : new Object(), "Baz" : null]
 
 
     void setup() {
         args = Mock()
         ctx = Mock()
+        env = Mock()
+        agentMetadata = Mock()
     }
 
     void cleanup() {
@@ -39,31 +48,46 @@ class InfoCommandSpec extends Specification {
 
     def "Run"() {
         setup:
-        def cmd = new InfoCommand(args, ctx)
+        def cmd = new InfoCommand(args, ctx, agentMetadata)
 
         when:
         cmd.run()
 
         then:
+        1 * agentMetadata.getAgentVersion() >> "1.0.0"
+        1 * agentMetadata.getAgentHostName() >> "host-name"
+        1 * agentMetadata.getAgentPid() >> "12345"
         1 * args.getIncludeBeans() >> true
         1 * ctx.getBeanDefinitionCount() >> 0
         1 * ctx.getBeanDefinitionNames() >> new String[0]
         1 * args.getIncludeEnvironment() >> true
         1 * args.isIncludeProperties() >> true
+        5 * ctx.getEnvironment() >> env
+        1 * env.getActiveProfiles() >> ["foo", "bar"]
+        1 * env.getDefaultProfiles() >> ["default"]
+        1 * env.getSystemEnvironment() >> map
+        1 * env.getSystemProperties() >> map
+        1 * env.getPropertySources() >> new MutablePropertySources()
     }
 
     def "Run skip all"() {
         setup:
-        def cmd = new InfoCommand(args, ctx)
+        def cmd = new InfoCommand(args, ctx, agentMetadata)
 
         when:
         cmd.run()
 
         then:
+        1 * agentMetadata.getAgentVersion() >> "1.0.0"
+        1 * agentMetadata.getAgentHostName() >> "host-name"
+        1 * agentMetadata.getAgentPid() >> "12345"
         1 * args.getIncludeBeans() >> false
         0 * ctx.getBeanDefinitionCount()
         0 * ctx.getBeanDefinitionNames()
         1 * args.getIncludeEnvironment() >> false
         1 * args.isIncludeProperties() >> false
+        2 * ctx.getEnvironment() >> env
+        1 * env.getActiveProfiles() >> ["foo", "bar"]
+        1 * env.getDefaultProfiles() >> ["default"]
     }
 }
