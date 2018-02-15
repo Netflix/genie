@@ -30,6 +30,9 @@ import java.util.Map;
 
 /**
  * Implementation of the Ping service definition.
+ *
+ * @author mprimi
+ * @since 4.0.0
  */
 @GrpcService(
     value = PingServiceGrpc.class,

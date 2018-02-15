@@ -20,14 +20,18 @@ package com.netflix.genie.agent.cli;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.netflix.genie.agent.AgentMetadata;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.core.env.PropertySource;
+import org.springframework.core.env.PropertySources;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Command to print diagnostic information such as environment variables, beans, etc.
@@ -42,20 +46,63 @@ class InfoCommand implements AgentCommand {
 
     private final InfoCommandArguments infoCommandArguments;
     private final ConfigurableApplicationContext applicationContext;
+    private final AgentMetadata agentMetadata;
 
     InfoCommand(
         final InfoCommandArguments infoCommandArguments,
-        final ConfigurableApplicationContext applicationContext
-    ) {
+        final ConfigurableApplicationContext applicationContext,
+        final AgentMetadata agentMetadata) {
         this.infoCommandArguments = infoCommandArguments;
         this.applicationContext = applicationContext;
+        this.agentMetadata = agentMetadata;
     }
 
     @Override
     public void run() {
 
+        final StringBuilder messageBuilder = new StringBuilder();
+
+        messageBuilder
+            .append("Agent info:")
+            .append(System.lineSeparator())
+            .append("  version:")
+            .append(agentMetadata.getAgentVersion())
+            .append(System.lineSeparator())
+            .append("  host:")
+            .append(agentMetadata.getAgentHostName())
+            .append(System.lineSeparator())
+            .append("  pid:")
+            .append(agentMetadata.getAgentPid())
+            .append(System.lineSeparator());
+
+        messageBuilder
+            .append("Active profiles:")
+            .append(System.lineSeparator());
+
+        for (String profileName : applicationContext.getEnvironment().getActiveProfiles()) {
+            messageBuilder
+                .append("  - ")
+                .append(profileName)
+                .append(System.lineSeparator());
+        }
+
+        messageBuilder
+            .append("Default profiles:")
+            .append(System.lineSeparator());
+
+        for (String profileName : applicationContext.getEnvironment().getDefaultProfiles()) {
+            messageBuilder
+                .append("  - ")
+                .append(profileName)
+                .append(System.lineSeparator());
+        }
+
         if (infoCommandArguments.getIncludeBeans()) {
-            System.out.println("Beans in context: " + applicationContext.getBeanDefinitionCount());
+            messageBuilder
+                .append("Beans in context: ")
+                .append(applicationContext.getBeanDefinitionCount())
+                .append(System.lineSeparator());
+
             final String[] beanNames = applicationContext.getBeanDefinitionNames();
             for (String beanName : beanNames) {
 
@@ -68,42 +115,81 @@ class InfoCommand implements AgentCommand {
                     .append(beanDefinition.isSingleton() ? ", singleton" : "")
                     .toString();
 
-                System.out.println(
-                    String.format(
-                        "  - %s (%s) [%s]",
-                        beanName,
-                        beanClass,
-                        description
+                messageBuilder
+                    .append(
+                        String.format(
+                            "  - %s (%s) [%s]",
+                            beanName,
+                            beanClass == null ? "?" : beanClass,
+                            description
+                        )
                     )
-                );
+                    .append(System.lineSeparator());
             }
         }
 
         if (infoCommandArguments.getIncludeEnvironment()) {
-            System.out.println("Environment variables:");
-            for (Map.Entry<String, String> envEntry : System.getenv().entrySet()) {
-                System.out.println(
-                    String.format(
-                        "  - %s=%s",
-                        envEntry.getKey(),
-                        envEntry.getValue()
+
+            final Set<Map.Entry<String, Object>> envEntries =
+                applicationContext.getEnvironment().getSystemEnvironment().entrySet();
+
+            messageBuilder
+                .append("Environment variables: ")
+                .append(envEntries.size())
+                .append(System.lineSeparator());
+
+            for (Map.Entry<String, Object> envEntry : envEntries) {
+                messageBuilder
+                    .append(
+                        String.format(
+                            "  - %s=%s",
+                            envEntry.getKey(),
+                            envEntry.getValue()
+                        )
                     )
-                );
+                    .append(System.lineSeparator());
             }
         }
 
         if (infoCommandArguments.isIncludeProperties()) {
-            System.out.println("Properties:");
-            for (String propertyName : System.getProperties().stringPropertyNames()) {
-                System.out.println(
-                    String.format(
-                        "  - %s=%s",
-                        propertyName,
-                        System.getProperty(propertyName)
+
+            final Set<Map.Entry<String, Object>> properties =
+                applicationContext.getEnvironment().getSystemProperties().entrySet();
+
+            messageBuilder
+                .append("Properties: ")
+                .append(properties.size())
+                .append(System.lineSeparator());
+            for (Map.Entry<String, Object> property : properties) {
+                messageBuilder
+                    .append(
+                        String.format(
+                            "  - %s=%s",
+                            property.getKey(),
+                            property.getValue()
+                        )
                     )
-                );
+                    .append(System.lineSeparator());
+            }
+
+            final PropertySources propertySources = applicationContext.getEnvironment().getPropertySources();
+            messageBuilder
+                .append("Property sources: ")
+                .append(System.lineSeparator());
+            for (PropertySource<?> propertySource : propertySources) {
+                messageBuilder
+                    .append(
+                        String.format(
+                            "  - %s (%s)",
+                            propertySource.getName(),
+                            propertySource.getClass().getSimpleName()
+                        )
+                    )
+                    .append(System.lineSeparator());
             }
         }
+
+        System.out.println(messageBuilder.toString());
     }
 
     @Component

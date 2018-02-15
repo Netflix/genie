@@ -20,20 +20,22 @@ package com.netflix.genie.agent.cli;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.beust.jcommander.ParametersDelegate;
 import com.google.protobuf.util.Timestamps;
-import com.netflix.genie.agent.rpc.ClientFactory;
+import com.netflix.genie.agent.AgentMetadata;
 import com.netflix.genie.proto.PingRequest;
 import com.netflix.genie.proto.PingServiceGrpc;
 import com.netflix.genie.proto.PongResponse;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Command to ping the server and test for connectivity and latency.
@@ -46,40 +48,34 @@ import java.util.concurrent.TimeUnit;
 @Lazy
 class PingCommand implements AgentCommand {
 
-    private static final String CLIENT_HOST_NAME_METADATA_KEY = "clientHostName";
+    static final String CLIENT_HOST_NAME_METADATA_KEY = "clientHostName";
     private final PingCommandArguments pingCommandArguments;
-    private final ClientFactory clientFactory;
+    private final PingServiceGrpc.PingServiceFutureStub pingServiceClient;
+    private final AgentMetadata agentMetadata;
 
     PingCommand(
         final PingCommandArguments pingCommandArguments,
-        final ClientFactory clientFactory
+        final PingServiceGrpc.PingServiceFutureStub pingServiceClient,
+        final AgentMetadata agentMetadata
     ) {
         this.pingCommandArguments = pingCommandArguments;
-        this.clientFactory = clientFactory;
+        this.pingServiceClient = pingServiceClient;
+        this.agentMetadata = agentMetadata;
     }
 
     @Override
     public void run() {
 
-        final PingServiceGrpc.PingServiceBlockingStub client =
-            clientFactory.getBlockingPingClient(pingCommandArguments.serverHost, pingCommandArguments.serverPort);
-
-        String localHostName = "unknown";
-        try {
-             localHostName = InetAddress.getLocalHost().getHostName();
-        } catch (UnknownHostException e) {
-            log.warn("Failed to get local host name", e);
-        }
-
         final String requestID =
-            pingCommandArguments.requestId == null
-                ? UUID.randomUUID().toString() : pingCommandArguments.requestId;
+            pingCommandArguments.getRequestId() == null
+                ? UUID.randomUUID().toString() : pingCommandArguments.getRequestId();
 
+        final String source = agentMetadata.getAgentPid() + "@" + agentMetadata.getAgentHostName();
         final PingRequest request = PingRequest.newBuilder()
             .setRequestId(requestID)
-            .setSourceName(PingCommand.class.getCanonicalName())
+            .setSourceName(source)
             .setTimestamp(Timestamps.fromMillis(System.currentTimeMillis()))
-            .putClientMetadata(CLIENT_HOST_NAME_METADATA_KEY, localHostName)
+            .putClientMetadata(CLIENT_HOST_NAME_METADATA_KEY, agentMetadata.getAgentHostName())
             .build();
 
         log.info(
@@ -89,7 +85,15 @@ class PingCommand implements AgentCommand {
         );
 
         final long start = System.nanoTime();
-        final PongResponse response = client.ping(request);
+        final PongResponse response;
+        try {
+            response = pingServiceClient.ping(request).get(
+                pingCommandArguments.getRpcTimeout(),
+                TimeUnit.SECONDS
+            );
+        } catch (final InterruptedException | ExecutionException | TimeoutException e) {
+            throw new RuntimeException("Failed to ping server", e);
+        }
         final long end = System.nanoTime();
 
         final long elapsedMillis = TimeUnit.MILLISECONDS.convert(end - start, TimeUnit.NANOSECONDS);
@@ -108,29 +112,36 @@ class PingCommand implements AgentCommand {
     @Parameters(commandNames = CommandNames.PING, commandDescription = "Test connectivity with the server")
     static class PingCommandArguments implements AgentCommandArguments {
 
-        @Parameter(
-            names = {"--serverHost"},
-            description = "Server hostname or address",
-            validateWith = ArgumentValidators.StringValidator.class
-        )
-        private String serverHost = "genie.prod.netflix.net";
-
-        @Parameter(
-            names = {"--serverPort"},
-            description = "Server port",
-            validateWith = ArgumentValidators.PortValidator.class
-        )
-        private int serverPort = 7979;
+        @ParametersDelegate
+        private final ArgumentDelegates.ServerArguments serverArguments;
 
         @Parameter(
             names = {"--requestId"},
-            description = "Request id (defaults to UUID)"
+            description = "Request id (defaults to UUID)",
+            validateWith = ArgumentValidators.StringValidator.class
         )
+        @Getter
         private String requestId;
+
+        PingCommandArguments(final ArgumentDelegates.ServerArguments serverArguments) {
+            this.serverArguments = serverArguments;
+        }
 
         @Override
         public Class<? extends AgentCommand> getConsumerClass() {
             return PingCommand.class;
+        }
+
+        String getServerHost() {
+            return serverArguments.getServerHost();
+        }
+
+        int getServerPort() {
+            return serverArguments.getServerPort();
+        }
+
+        long getRpcTimeout() {
+            return serverArguments.getRpcTimeout();
         }
     }
 }

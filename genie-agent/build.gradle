@@ -32,6 +32,7 @@ dependencies {
      *******************************/
 
     testCompile(project(":genie-test"))
+    testCompile("io.grpc:grpc-testing")
     testCompile("org.springframework.statemachine:spring-statemachine-test")
 }
 
