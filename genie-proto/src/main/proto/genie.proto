@@ -8,44 +8,43 @@ option java_multiple_files = true;
 option java_package = "com.netflix.genie.proto";
 option java_outer_classname = "GenieProto";
 
-
 // The Ping service definition.
 service PingService {
 
-  // Sends a greeting
-  rpc ping (PingRequest) returns (PongResponse) {
-  }
+    // Sends a greeting
+    rpc ping (PingRequest) returns (PongResponse) {
+    }
 }
 
 // The Ping request with client metadata.
 message PingRequest {
-  string request_id = 1;
-  string source_name = 2;
-  google.protobuf.Timestamp timestamp = 3;
-  map<string, string> client_metadata = 4;
+    string request_id = 1;
+    string source_name = 2;
+    google.protobuf.Timestamp timestamp = 3;
+    map<string, string> client_metadata = 4;
 }
 
 // The server response with server metadata.
 message PongResponse {
-  string request_id = 1;
-  google.protobuf.Timestamp timestamp = 2;
-  map<string, string> server_metadata = 3;
+    string request_id = 1;
+    google.protobuf.Timestamp timestamp = 2;
+    map<string, string> server_metadata = 3;
 }
 
 //
 service AgentRegistrationService {
-  rpc registerAgent (AgentRegistrationRequest) returns (AgentRegistrationResponse);
+    rpc registerAgent (AgentRegistrationRequest) returns (AgentRegistrationResponse);
 }
 
 message AgentRegistrationRequest {
-  string agentVersion = 1;
-  string agentHostname = 2;
-  string agentPid = 3;
+    string agentVersion = 1;
+    string agentHostname = 2;
+    string agentPid = 3;
 }
 
 message AgentRegistrationResponse {
-  string serverHostname = 1;
-  string agentId = 2;
-  bool agentAccepted = 3;
-  string serverMessage = 4;
+    string serverHostname = 1;
+    string agentId = 2;
+    bool agentAccepted = 3;
+    string serverMessage = 4;
 }
