@@ -1336,7 +1336,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
             .contentType(Matchers.containsString(MediaType.TEXT_PLAIN_VALUE))
-            .contentType(Matchers.containsString("utf-8"));
+            .contentType(Matchers.containsString("UTF-8"));
 
         RestAssured
             .given(this.getRequestSpecification())
@@ -1346,7 +1346,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
             .contentType(Matchers.containsString(MediaType.TEXT_PLAIN_VALUE))
-            .contentType(Matchers.containsString("utf-8"));
+            .contentType(Matchers.containsString("UTF-8"));
 
         RestAssured
             .given(this.getRequestSpecification())
@@ -1356,7 +1356,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
             .contentType(Matchers.containsString(MediaType.TEXT_PLAIN_VALUE))
-            .contentType(Matchers.containsString("utf-8"));
+            .contentType(Matchers.containsString("UTF-8"));
 
         RestAssured
             .given(this.getRequestSpecification())
@@ -1367,7 +1367,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
             .contentType(Matchers.containsString(MediaType.TEXT_PLAIN_VALUE))
-            .contentType(Matchers.containsString("utf-8"));
+            .contentType(Matchers.containsString("UTF-8"));
 
         RestAssured
             .given(this.getRequestSpecification())
@@ -1378,7 +1378,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
             .contentType(Matchers.containsString(MediaType.TEXT_PLAIN_VALUE))
-            .contentType(Matchers.containsString("utf-8"));
+            .contentType(Matchers.containsString("UTF-8"));
 
         // Verify the file is served as UTF-8 even if it's not
         RestAssured
@@ -1390,7 +1390,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .then()
             .statusCode(Matchers.is(HttpStatus.OK.value()))
             .contentType(Matchers.containsString(MediaType.TEXT_PLAIN_VALUE))
-            .contentType(Matchers.containsString("utf-8"));
+            .contentType(Matchers.containsString("UTF-8"));
     }
 
     private String getExpectedRunContents(
