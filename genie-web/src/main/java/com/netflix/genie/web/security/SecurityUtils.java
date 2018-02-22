@@ -18,12 +18,12 @@
 package com.netflix.genie.web.security;
 
 import com.netflix.genie.web.security.x509.X509UserDetailsService;
-import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.savedrequest.NullRequestCache;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**

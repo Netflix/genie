@@ -21,10 +21,10 @@ import com.netflix.genie.web.jpa.entities.FileEntity;
 import com.netflix.genie.web.jpa.repositories.JpaFileRepository;
 import com.netflix.genie.web.services.FileService;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.stream.Collectors;

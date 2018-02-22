@@ -24,9 +24,9 @@ import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.util.ArrayList;

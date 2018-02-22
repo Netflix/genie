@@ -27,8 +27,8 @@ import io.micrometer.core.instrument.MeterRegistry;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.validator.constraints.NotBlank;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;

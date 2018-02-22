@@ -19,11 +19,11 @@
 package com.netflix.genie.agent.execution;
 
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.concurrent.ThreadSafe;
+import javax.validation.constraints.NotBlank;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**

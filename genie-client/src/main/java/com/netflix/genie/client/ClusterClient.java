@@ -27,9 +27,9 @@ import com.netflix.genie.common.dto.Command;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Interceptor;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotEmpty;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;

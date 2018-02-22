@@ -18,7 +18,7 @@
 
 package com.netflix.genie.agent;
 
-import org.hibernate.validator.constraints.NotBlank;
+import javax.validation.constraints.NotBlank;
 
 /**
  * Container for Genie agent metadata and runtime information.

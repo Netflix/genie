@@ -18,11 +18,11 @@
 package com.netflix.genie.web.services;
 
 import com.netflix.genie.common.exceptions.GenieException;
-import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotBlank;
 
 /**
  * An interface for sending emails.

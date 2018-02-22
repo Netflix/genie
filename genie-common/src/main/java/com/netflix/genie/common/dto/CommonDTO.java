@@ -23,9 +23,9 @@ import com.google.common.collect.ImmutableSet;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import lombok.Getter;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.io.IOException;
 import java.util.HashSet;

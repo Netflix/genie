@@ -25,12 +25,12 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.validator.constraints.Email;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.annotation.Nullable;
 import javax.validation.Valid;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.HashSet;

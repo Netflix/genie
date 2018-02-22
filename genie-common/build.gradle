@@ -8,7 +8,7 @@ dependencies {
     api("com.fasterxml.jackson.core:jackson-databind")
     api("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
     api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
-    api("org.hibernate:hibernate-validator")
+    api("org.hibernate.validator:hibernate-validator")
 
     /*******************************
      * Implementation Dependencies

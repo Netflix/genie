@@ -25,10 +25,10 @@ import org.apache.catalina.util.ConcurrentDateFormat;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.URL;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;

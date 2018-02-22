@@ -23,10 +23,10 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.web.services.ClusterLoadBalancer;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.core.Ordered;
 
 import javax.annotation.Nonnull;
+import javax.validation.constraints.NotEmpty;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Set;

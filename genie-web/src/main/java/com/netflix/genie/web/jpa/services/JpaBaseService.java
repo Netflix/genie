@@ -30,8 +30,8 @@ import com.netflix.genie.web.services.TagService;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.validator.constraints.NotBlank;
 
+import javax.validation.constraints.NotBlank;
 import java.util.Set;
 import java.util.stream.Collectors;
 

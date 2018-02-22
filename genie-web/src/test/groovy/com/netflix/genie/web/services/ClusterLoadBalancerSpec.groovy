@@ -22,12 +22,12 @@ import com.netflix.genie.common.dto.JobRequest
 import com.netflix.genie.common.exceptions.GenieException
 import com.netflix.genie.test.categories.UnitTest
 import lombok.NonNull
-import org.hibernate.validator.constraints.NotEmpty
 import org.junit.experimental.categories.Category
 import org.springframework.core.Ordered
 import spock.lang.Specification
 
 import javax.annotation.Nonnull
+import javax.validation.constraints.NotEmpty
 
 /**
  * Specifications for the ClusterLoadBalancer interface.
