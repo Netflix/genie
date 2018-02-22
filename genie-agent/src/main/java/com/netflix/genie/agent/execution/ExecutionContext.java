@@ -18,9 +18,8 @@
 
 package com.netflix.genie.agent.execution;
 
-import org.hibernate.validator.constraints.NotBlank;
-
 import javax.annotation.concurrent.ThreadSafe;
+import javax.validation.constraints.NotBlank;
 
 /**
  * Stateful context used by execution components to track state.
@@ -32,17 +31,17 @@ import javax.annotation.concurrent.ThreadSafe;
 public interface ExecutionContext {
 
     /**
+     * Get the agent identifier.
+     *
+     * @return a non-blank string if the agent identifier was set, or null.
+     */
+    String getAgentId();
+
+    /**
      * Set the unique agent identifier obtained by the server.
      *
      * @param agentId a non-blank string
      * @throws RuntimeException if the agent id is already set
      */
     void setAgentId(@NotBlank final String agentId);
-
-    /**
-     * Get the agent identifier.
-     *
-     * @return a non-blank string if the agent identifier was set, or null.
-     */
-    String getAgentId();
 }

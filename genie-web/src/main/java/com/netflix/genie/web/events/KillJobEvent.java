@@ -18,7 +18,8 @@
 package com.netflix.genie.web.events;
 
 import lombok.Getter;
-import org.hibernate.validator.constraints.NotBlank;
+
+import javax.validation.constraints.NotBlank;
 
 /**
  * An event fired from within the Genie system when it needs a specific job killed.

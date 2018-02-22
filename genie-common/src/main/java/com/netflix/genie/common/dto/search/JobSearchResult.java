@@ -27,9 +27,9 @@ import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.util.TimeUtils;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import org.hibernate.validator.constraints.NotBlank;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.Duration;
 import java.time.Instant;

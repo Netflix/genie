@@ -20,10 +20,10 @@ package com.netflix.genie.web.services.impl;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.web.services.MailService;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.validator.constraints.NotBlank;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotBlank;
 
 /**
  * Default No-Op implementation of Mail Service Interface.

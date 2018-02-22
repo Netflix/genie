@@ -22,8 +22,8 @@ import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.web.services.FileTransfer;
 import com.netflix.genie.web.services.FileTransferFactory;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.validator.constraints.NotBlank;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;

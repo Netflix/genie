@@ -39,10 +39,10 @@ import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okio.BufferedSink;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.validator.constraints.NotEmpty;
 import retrofit2.Response;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotEmpty;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;

@@ -21,12 +21,12 @@ import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import lombok.NonNull;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.core.Ordered;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotEmpty;
 import java.util.Set;
 
 /**

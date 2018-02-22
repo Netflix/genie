@@ -31,8 +31,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.validator.constraints.Email;
-import org.hibernate.validator.constraints.Length;
 
 import javax.annotation.Nullable;
 import javax.persistence.Basic;
@@ -51,6 +49,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OrderColumn;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -193,7 +192,7 @@ public class JobEntity extends BaseEntity implements
 
     @Basic
     @Column(name = "status_msg")
-    @Length(max = 255, message = "Max length in database is 255 characters")
+    @Size(max = 255, message = "Max length in database is 255 characters")
     private String statusMsg;
 
     @Basic

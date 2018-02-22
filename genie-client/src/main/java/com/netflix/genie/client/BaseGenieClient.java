@@ -25,11 +25,11 @@ import com.netflix.genie.common.util.GenieObjectMapper;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.validator.constraints.NotEmpty;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotEmpty;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;

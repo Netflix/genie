@@ -23,8 +23,6 @@ import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.NotBlank;
 
 import javax.annotation.Nullable;
 import javax.persistence.Basic;
@@ -39,7 +37,9 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -70,7 +70,7 @@ public class CommandEntity extends BaseEntity {
     @Basic(optional = false)
     @Column(name = "executable", nullable = false)
     @NotBlank(message = "No executable entered for command and is required.")
-    @Length(max = 255, message = "Max length in database is 255 characters")
+    @Size(max = 255, message = "Max length in database is 255 characters")
     private String executable;
 
     @Basic(optional = false)

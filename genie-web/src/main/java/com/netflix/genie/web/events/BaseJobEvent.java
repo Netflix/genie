@@ -18,9 +18,9 @@
 package com.netflix.genie.web.events;
 
 import lombok.Getter;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.context.ApplicationEvent;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 /**

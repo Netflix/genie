@@ -23,8 +23,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import org.hibernate.validator.constraints.NotBlank;
 
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 
 /**
