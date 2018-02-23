@@ -18,35 +18,31 @@
 
 package com.netflix.genie.agent.cli;
 
+import com.beust.jcommander.Parameter;
+import com.google.common.annotations.VisibleForTesting;
+import lombok.Getter;
+import org.springframework.stereotype.Component;
+
 import java.io.File;
 
 /**
- * Interfaces for command-line delegates (groups of options shared by multiple commands).
+ * Implementation of CacheArguments delegate.
  *
  * @author mprimi
  * @since 4.0.0
  */
-public interface ArgumentDelegates {
+@Getter
+@Component
+class CacheArgumentsImpl implements ArgumentDelegates.CacheArguments {
 
-    /**
-     * Delegate for server connection options.
-     */
-    interface ServerArguments {
+    @VisibleForTesting
+    static final String DEFAULT_CACHE_PATH = "/tmp/genie/cache";
 
-        String getServerHost();
-
-        int getServerPort();
-
-        long getRpcTimeout();
-    }
-
-    /**
-     * Delegate for agent dependencies cache.
-     */
-    interface CacheArguments {
-
-        File getCacheDirectory();
-
-    }
-
+    @Parameter(
+        names = {"--cacheDirectory"},
+        description = "Location of the Genie Agent dependencies cache",
+        converter = ArgumentConverters.FileConverter.class,
+        validateWith = ArgumentValidators.StringValidator.class
+    )
+    private File cacheDirectory = new File(DEFAULT_CACHE_PATH);
 }
