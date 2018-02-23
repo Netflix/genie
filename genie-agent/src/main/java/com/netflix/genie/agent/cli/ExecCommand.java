@@ -20,6 +20,7 @@ package com.netflix.genie.agent.cli;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.beust.jcommander.ParametersDelegate;
 import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine;
 import com.netflix.genie.agent.execution.statemachine.States;
 import lombok.Getter;
@@ -76,6 +77,20 @@ class ExecCommand implements AgentCommand {
     static class ExecCommandArguments implements AgentCommandArguments {
         @Parameter(names = "timeout", description = "Job execution timeout")
         private int jobTimeout = 2000;
+
+        @ParametersDelegate
+        private final ArgumentDelegates.ServerArguments serverArguments;
+
+        @ParametersDelegate
+        private final ArgumentDelegates.CacheArguments cacheArgumentsArguments;
+
+        ExecCommandArguments(
+            final ArgumentDelegates.ServerArguments serverArguments,
+            final ArgumentDelegates.CacheArguments cacheArgumentsArguments
+        ) {
+            this.serverArguments = serverArguments;
+            this.cacheArgumentsArguments = cacheArgumentsArguments;
+        }
 
         @Override
         public Class<? extends AgentCommand> getConsumerClass() {
