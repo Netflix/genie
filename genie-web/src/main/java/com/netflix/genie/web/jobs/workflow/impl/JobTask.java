@@ -20,7 +20,7 @@ package com.netflix.genie.web.jobs.workflow.impl;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.netflix.genie.web.jobs.JobConstants;
+import com.netflix.genie.common.jobs.JobConstants;
 import com.netflix.genie.web.jobs.JobExecutionEnvironment;
 import com.netflix.genie.web.services.AttachmentService;
 import com.netflix.genie.web.services.impl.GenieFileTransferService;

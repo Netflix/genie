@@ -21,7 +21,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.web.jobs.AdminResources;
 import com.netflix.genie.web.jobs.FileType;
-import com.netflix.genie.web.jobs.JobConstants;
+import com.netflix.genie.common.jobs.JobConstants;
 import com.netflix.genie.web.jobs.workflow.WorkflowTask;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.AccessLevel;

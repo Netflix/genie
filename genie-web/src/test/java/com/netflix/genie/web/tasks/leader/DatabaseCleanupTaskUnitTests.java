@@ -18,7 +18,7 @@
 package com.netflix.genie.web.tasks.leader;
 
 import com.netflix.genie.test.categories.UnitTest;
-import com.netflix.genie.web.jobs.JobConstants;
+import com.netflix.genie.common.jobs.JobConstants;
 import com.netflix.genie.web.properties.DatabaseCleanupProperties;
 import com.netflix.genie.web.services.ClusterService;
 import com.netflix.genie.web.services.FileService;

@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.jobs;
+package com.netflix.genie.common.jobs;
 
 import com.netflix.genie.common.dto.JobExecution;
 import org.apache.commons.lang3.SystemUtils;
@@ -27,6 +27,7 @@ import java.util.TimeZone;
  *
  * @author amsharma
  * @author tgianos
+ * @author mprimi
  * @since 3.0.0
  */
 public final class JobConstants {

@@ -23,7 +23,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.web.jobs.AdminResources;
 import com.netflix.genie.web.jobs.FileType;
-import com.netflix.genie.web.jobs.JobConstants;
+import com.netflix.genie.common.jobs.JobConstants;
 import com.netflix.genie.web.jobs.JobExecutionEnvironment;
 import com.netflix.genie.web.services.impl.GenieFileTransferService;
 import com.netflix.genie.web.util.MetricsConstants;

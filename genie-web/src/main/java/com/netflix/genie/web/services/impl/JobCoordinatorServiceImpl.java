@@ -33,7 +33,7 @@ import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
 import com.netflix.genie.common.exceptions.GenieUserLimitExceededException;
-import com.netflix.genie.web.jobs.JobConstants;
+import com.netflix.genie.common.jobs.JobConstants;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.properties.JobsUsersActiveLimitProperties;
 import com.netflix.genie.web.services.ApplicationService;
