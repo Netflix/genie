@@ -29,7 +29,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.events.GenieEventBus;
-import com.netflix.genie.web.jobs.JobConstants;
+import com.netflix.genie.common.jobs.JobConstants;
 import com.netflix.genie.web.jobs.workflow.WorkflowTask;
 import com.netflix.genie.web.services.JobPersistenceService;
 import com.netflix.genie.web.services.JobSubmitterService;

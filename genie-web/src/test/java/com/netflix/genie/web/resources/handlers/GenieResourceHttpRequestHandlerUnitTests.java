@@ -19,7 +19,7 @@ package com.netflix.genie.web.resources.handlers;
 
 import com.google.common.collect.Lists;
 import com.netflix.genie.test.categories.UnitTest;
-import com.netflix.genie.web.jobs.JobConstants;
+import com.netflix.genie.common.jobs.JobConstants;
 import com.netflix.genie.web.resources.writers.DirectoryWriter;
 import org.junit.Before;
 import org.junit.Ignore;

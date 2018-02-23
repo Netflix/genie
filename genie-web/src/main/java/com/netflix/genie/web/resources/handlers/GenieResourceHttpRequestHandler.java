@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.resources.handlers;
 
-import com.netflix.genie.web.jobs.JobConstants;
+import com.netflix.genie.common.jobs.JobConstants;
 import com.netflix.genie.web.resources.writers.DirectoryWriter;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;

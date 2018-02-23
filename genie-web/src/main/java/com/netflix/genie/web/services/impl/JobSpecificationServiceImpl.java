@@ -34,7 +34,7 @@ import com.netflix.genie.common.dto.v4.JobSpecification;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
-import com.netflix.genie.web.jobs.JobConstants;
+import com.netflix.genie.common.jobs.JobConstants;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.services.ApplicationService;
 import com.netflix.genie.web.services.ClusterLoadBalancer;

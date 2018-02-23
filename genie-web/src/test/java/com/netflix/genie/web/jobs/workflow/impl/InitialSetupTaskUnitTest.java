@@ -23,7 +23,7 @@ import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.test.categories.UnitTest;
-import com.netflix.genie.web.jobs.JobConstants;
+import com.netflix.genie.common.jobs.JobConstants;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import org.junit.Assert;

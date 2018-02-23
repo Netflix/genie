@@ -30,7 +30,7 @@ import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.events.JobFinishedEvent;
 import com.netflix.genie.web.events.JobFinishedReason;
 import com.netflix.genie.web.events.JobStartedEvent;
-import com.netflix.genie.web.jobs.JobConstants;
+import com.netflix.genie.common.jobs.JobConstants;
 import com.netflix.genie.web.jobs.JobExecutionEnvironment;
 import com.netflix.genie.web.jobs.workflow.WorkflowTask;
 import com.netflix.genie.web.services.JobPersistenceService;

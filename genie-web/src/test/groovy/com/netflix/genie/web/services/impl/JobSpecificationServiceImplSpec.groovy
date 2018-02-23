@@ -25,9 +25,9 @@ import com.netflix.genie.common.dto.ClusterStatus
 import com.netflix.genie.common.dto.Command
 import com.netflix.genie.common.dto.CommandStatus
 import com.netflix.genie.common.dto.v4.*
+import com.netflix.genie.common.jobs.JobConstants
 import com.netflix.genie.common.util.GenieObjectMapper
 import com.netflix.genie.test.categories.UnitTest
-import com.netflix.genie.web.jobs.JobConstants
 import com.netflix.genie.web.properties.JobsProperties
 import com.netflix.genie.web.services.ApplicationService
 import com.netflix.genie.web.services.ClusterLoadBalancer

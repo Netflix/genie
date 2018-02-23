@@ -31,7 +31,7 @@ import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.events.JobFinishedEvent;
 import com.netflix.genie.web.events.JobFinishedReason;
-import com.netflix.genie.web.jobs.JobConstants;
+import com.netflix.genie.common.jobs.JobConstants;
 import com.netflix.genie.web.jobs.JobDoneFile;
 import com.netflix.genie.web.jobs.JobKillReasonFile;
 import com.netflix.genie.web.properties.JobsProperties;
