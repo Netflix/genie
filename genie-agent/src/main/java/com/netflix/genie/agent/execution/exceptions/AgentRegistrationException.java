@@ -40,7 +40,7 @@ public class AgentRegistrationException extends Exception {
      * @param message message
      * @param cause cause
      */
-    public AgentRegistrationException(final String message, final Exception cause) {
+    public AgentRegistrationException(final String message, final Throwable cause) {
         super(message, cause);
     }
 }
