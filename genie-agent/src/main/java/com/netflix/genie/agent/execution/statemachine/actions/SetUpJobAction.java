@@ -24,7 +24,6 @@ import com.netflix.genie.agent.execution.exceptions.DownloadException;
 import com.netflix.genie.agent.execution.exceptions.SetUpJobException;
 import com.netflix.genie.agent.execution.services.DownloadService;
 import com.netflix.genie.agent.execution.statemachine.Events;
-import com.netflix.genie.agent.execution.statemachine.States;
 import com.netflix.genie.agent.utils.EnvUtils;
 import com.netflix.genie.agent.utils.PathUtils;
 import com.netflix.genie.common.dto.v4.ExecutionEnvironment;
@@ -34,7 +33,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.statemachine.StateContext;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -58,14 +56,13 @@ import java.util.Map;
 @Lazy
 class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
 
-    private final ExecutionContext executionContext;
     private DownloadService downloadService;
 
     SetUpJobAction(
         final ExecutionContext executionContext,
         final DownloadService downloadService
     ) {
-        this.executionContext = executionContext;
+        super(executionContext);
         this.downloadService = downloadService;
     }
 
@@ -74,10 +71,10 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
      */
     @Override
     protected Events executeStateAction(
-        final StateContext<States, Events> context
+        final ExecutionContext executionContext
     ) {
         try {
-            performJobSetup();
+            performJobSetup(executionContext);
         } catch (final SetUpJobException e) {
             throw new RuntimeException("Failed to set up job", e);
         }
@@ -87,7 +84,7 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
         return Events.SETUP_JOB_COMPLETE;
     }
 
-    private void performJobSetup() throws SetUpJobException {
+    private void performJobSetup(final ExecutionContext executionContext) throws SetUpJobException {
 
         log.info("Setting up job...");
 

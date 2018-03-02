@@ -18,18 +18,17 @@
 
 package com.netflix.genie.agent.execution.statemachine.actions
 
+import com.netflix.genie.agent.execution.ExecutionContext
 import com.netflix.genie.agent.execution.statemachine.Events
-import com.netflix.genie.agent.execution.statemachine.States
-import org.springframework.statemachine.StateContext
 import spock.lang.Specification
 
 class ConfigureAgentActionSpec extends Specification {
-    StateContext<States, Events> stateContext
+    ExecutionContext executionContext
     ConfigureAgentAction action
 
     void setup() {
-        this.stateContext = Mock(StateContext)
-        this.action = new ConfigureAgentAction()
+        this.executionContext = Mock(ExecutionContext)
+        this.action = new ConfigureAgentAction(executionContext)
     }
 
     void cleanup() {
@@ -37,7 +36,7 @@ class ConfigureAgentActionSpec extends Specification {
 
     def "ExecuteStateAction"() {
         when:
-        def event = action.executeStateAction(stateContext)
+        def event = action.executeStateAction(executionContext)
         then:
         event == Events.CONFIGURE_AGENT_COMPLETE
     }

@@ -22,10 +22,8 @@ import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.exceptions.JobLaunchException;
 import com.netflix.genie.agent.execution.services.LaunchJobService;
 import com.netflix.genie.agent.execution.statemachine.Events;
-import com.netflix.genie.agent.execution.statemachine.States;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.statemachine.StateContext;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
@@ -40,14 +38,13 @@ import java.lang.reflect.Field;
 @Lazy
 class LaunchJobAction extends BaseStateAction implements StateAction.LaunchJob {
 
-    private final ExecutionContext executionContext;
     private final LaunchJobService launchJobService;
 
     LaunchJobAction(
         final ExecutionContext executionContext,
         final LaunchJobService launchJobService
     ) {
-        this.executionContext = executionContext;
+        super(executionContext);
         this.launchJobService = launchJobService;
     }
 
@@ -55,7 +52,7 @@ class LaunchJobAction extends BaseStateAction implements StateAction.LaunchJob {
      * {@inheritDoc}
      */
     @Override
-    protected Events executeStateAction(final StateContext<States, Events> context) {
+    protected Events executeStateAction(final ExecutionContext executionContext) {
         log.info("Launching job...");
 
         final Process jobProcess;

@@ -18,20 +18,19 @@
 
 package com.netflix.genie.agent.execution.statemachine.actions
 
+import com.netflix.genie.agent.execution.ExecutionContext
 import com.netflix.genie.agent.execution.statemachine.Events
-import com.netflix.genie.agent.execution.statemachine.States
 import com.netflix.genie.test.categories.UnitTest
 import org.junit.experimental.categories.Category
-import org.springframework.statemachine.StateContext
 import spock.lang.Specification
 
 @Category(UnitTest.class)
 class ShutdownActionSpec extends Specification {
-    StateContext<States, Events> stateContext
+    ExecutionContext executionContext
     ShutdownAction action
 
     void setup() {
-        this.stateContext = Mock(StateContext)
+        this.executionContext = Mock(ExecutionContext)
         this.action = new ShutdownAction()
     }
 
@@ -40,7 +39,7 @@ class ShutdownActionSpec extends Specification {
 
     def "ExecuteStateAction"() {
         when:
-        def event = action.executeStateAction(stateContext)
+        def event = action.executeStateAction(executionContext)
         then:
         event == Events.SHUTDOWN_COMPLETE
     }

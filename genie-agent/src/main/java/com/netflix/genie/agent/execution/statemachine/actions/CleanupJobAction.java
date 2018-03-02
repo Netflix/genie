@@ -18,11 +18,10 @@
 
 package com.netflix.genie.agent.execution.statemachine.actions;
 
+import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.statemachine.Events;
-import com.netflix.genie.agent.execution.statemachine.States;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.statemachine.StateContext;
 import org.springframework.stereotype.Component;
 
 /**
@@ -35,11 +34,15 @@ import org.springframework.stereotype.Component;
 @Lazy
 class CleanupJobAction extends BaseStateAction implements StateAction.CleanupJob {
 
+    CleanupJobAction(final ExecutionContext executionContext) {
+        super(executionContext);
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
-    protected Events executeStateAction(final StateContext<States, Events> context) {
+    protected Events executeStateAction(final ExecutionContext executionContext) {
         log.info("Cleaning up job...");
         //TODO implement this action
         return Events.CLEANUP_JOB_COMPLETE;
