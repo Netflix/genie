@@ -30,6 +30,11 @@ import org.springframework.statemachine.action.Action;
 public interface StateAction extends Action<States, Events> {
 
     /**
+     * Clean up any cruft create by the action once the job has executed (or aborted).
+     */
+    void cleanup();
+
+    /**
      * INITIALIZE state action interface.
      */
     interface Initialize extends StateAction {

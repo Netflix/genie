@@ -47,6 +47,9 @@ public abstract class BaseStateAction implements StateAction {
         final States currentState = context.getStateMachine().getState().getId();
         final String currentActionName = this.getClass().getSimpleName();
 
+        // Enqueue this action for later cleanup
+        executionContext.getCleanupActions().addLast(this);
+
         Events nextEvent;
         try {
             log.info("Performing state {} action: {}", currentState, currentActionName);
@@ -62,7 +65,7 @@ public abstract class BaseStateAction implements StateAction {
             }
             log.error(
                 "Action {} failed with exception",
-                this.getClass().getSimpleName(),
+                currentActionName,
                 e
             );
         }
@@ -77,5 +80,20 @@ public abstract class BaseStateAction implements StateAction {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final void cleanup() {
+        final String currentActionName = this.getClass().getSimpleName();
+        log.info("Executing cleanup for action {}", currentActionName);
+        executeStateActionCleanup(executionContext);
+    }
+
     protected abstract Events executeStateAction(final ExecutionContext ctx);
+
+    protected void executeStateActionCleanup(final ExecutionContext ctx) {
+        log.debug("Action has no cleanup");
+    }
+
 }
