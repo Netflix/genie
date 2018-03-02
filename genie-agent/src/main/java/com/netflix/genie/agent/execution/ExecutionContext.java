@@ -18,11 +18,13 @@
 
 package com.netflix.genie.agent.execution;
 
+import com.netflix.genie.agent.execution.statemachine.actions.StateAction;
 import com.netflix.genie.common.dto.v4.JobSpecification;
 
 import javax.annotation.concurrent.ThreadSafe;
 import javax.validation.constraints.NotBlank;
 import java.io.File;
+import java.util.Deque;
 import java.util.Map;
 
 /**
@@ -97,11 +99,16 @@ public interface ExecutionContext {
      */
     Map<String, String> getJobEnvironment();
 
-
     /**
      * Set the job environment variables map.
      *
      * @param jobEnvironment a map of environment variables and their value to be passed to the job process at launch
      */
     void setJobEnvironment(final Map<String, String> jobEnvironment);
+
+    /**
+     * Get the queue of states visited for the purpose of tracking post-job cleanup execution.
+     * @return a deque of state actions executed
+     */
+    Deque<StateAction> getCleanupActions();
 }

@@ -31,12 +31,15 @@ class BaseStateActionSpec extends Specification {
     StateMachine<States, Events> stateMachine
     State<States, Events> state
     ExecutionContext executionContext
+    Deque<StateAction> cleanupDeque = new ArrayDeque()
 
     void setup() {
         this.stateContext = Mock(StateContext)
         this.stateMachine = Mock(StateMachine)
         this.state = Mock(State)
         this.executionContext = Mock(ExecutionContext)
+
+        executionContext.getCleanupActions() >> cleanupDeque
     }
 
     void cleanup() {
@@ -59,6 +62,10 @@ class BaseStateActionSpec extends Specification {
         1 * stateMachine.getState() >> state
         1 * state.getId() >> States.READY
         1 * stateMachine.sendEvent(Events.INITIALIZE_COMPLETE) >> true
+
+        expect:
+        executionContext.getCleanupActions().size() == 1
+        executionContext.getCleanupActions().contains(stateAction)
     }
 
     def "ExecuteThrows"() {
@@ -81,6 +88,10 @@ class BaseStateActionSpec extends Specification {
         1 * stateMachine.sendEvent(Events.ERROR) >> true
         1 * stateMachine.setStateMachineError(exception)
         1 * stateMachine.hasStateMachineError() >> false
+
+        expect:
+        executionContext.getCleanupActions().size() == 1
+        executionContext.getCleanupActions().contains(stateAction)
     }
 
     def "ExecuteThrowsWithErrorSet"() {
@@ -103,5 +114,9 @@ class BaseStateActionSpec extends Specification {
         1 * stateMachine.sendEvent(Events.ERROR) >> false
         0 * stateMachine.setStateMachineError(exception)
         1 * stateMachine.hasStateMachineError() >> true
+
+        expect:
+        executionContext.getCleanupActions().size() == 1
+        executionContext.getCleanupActions().contains(stateAction)
     }
 }

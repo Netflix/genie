@@ -18,6 +18,8 @@
 
 package com.netflix.genie.agent.execution;
 
+import com.google.common.collect.Queues;
+import com.netflix.genie.agent.execution.statemachine.actions.StateAction;
 import com.netflix.genie.common.dto.v4.JobSpecification;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
@@ -26,6 +28,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.validation.constraints.NotBlank;
 import java.io.File;
+import java.util.Deque;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -46,6 +49,7 @@ class ExecutionContextImpl implements ExecutionContext {
     private final AtomicReference<File> jobDirectoryRef = new AtomicReference<>();
     private final AtomicReference<JobSpecification> jobSpecRef = new AtomicReference<>();
     private final AtomicReference<Map<String, String>> jobEnvironmentRef = new AtomicReference<>();
+    private final Deque<StateAction> cleanupActions = Queues.newArrayDeque();
 
     /**
      * {@inheritDoc}
@@ -125,6 +129,14 @@ class ExecutionContextImpl implements ExecutionContext {
     @Override
     public void setJobEnvironment(final Map<String, String> jobEnvironment) {
         setIfNullOrTrow(jobEnvironment, jobEnvironmentRef);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Deque<StateAction> getCleanupActions() {
+        return cleanupActions;
     }
 
     private static <T> void setIfNullOrTrow(final T value, final AtomicReference<T> reference) {

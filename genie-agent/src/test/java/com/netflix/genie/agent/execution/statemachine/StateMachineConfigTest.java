@@ -925,6 +925,10 @@ public class StateMachineConfigTest {
         int getExecutionCount() {
             return executionCount.get();
         }
+
+        @Override
+        public void cleanup() {
+        }
     }
 
 }
