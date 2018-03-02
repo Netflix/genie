@@ -18,6 +18,7 @@
 
 package com.netflix.genie.agent.execution.statemachine.actions;
 
+import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.statemachine.Events;
 import com.netflix.genie.agent.execution.statemachine.States;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,12 @@ import org.springframework.statemachine.StateContext;
  */
 @Slf4j
 public abstract class BaseStateAction implements StateAction {
+
+    private final ExecutionContext executionContext;
+
+    protected BaseStateAction(final ExecutionContext executionContext) {
+        this.executionContext = executionContext;
+    }
 
     /**
      * {@inheritDoc}
@@ -44,7 +51,7 @@ public abstract class BaseStateAction implements StateAction {
         try {
             log.info("Performing state {} action: {}", currentState, currentActionName);
             // State action returns the next event to send (or null)
-            nextEvent = executeStateAction(context);
+            nextEvent = executeStateAction(executionContext);
             log.info("State action {} returned {} as next event", currentActionName, nextEvent);
         } catch (final Exception e) {
             nextEvent = Events.ERROR;
@@ -70,5 +77,5 @@ public abstract class BaseStateAction implements StateAction {
         }
     }
 
-    protected abstract Events executeStateAction(final StateContext<States, Events> context);
+    protected abstract Events executeStateAction(final ExecutionContext ctx);
 }

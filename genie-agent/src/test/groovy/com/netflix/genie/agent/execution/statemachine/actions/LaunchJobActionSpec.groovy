@@ -30,14 +30,12 @@ import spock.lang.Specification
 
 @Category(UnitTest.class)
 class LaunchJobActionSpec extends Specification {
-    StateContext<States, Events> stateContext
-    LaunchJobAction action
     ExecutionContext executionContext
+    LaunchJobAction action
     LaunchJobService launchJobService
     Process process
 
     void setup() {
-        this.stateContext = Mock(StateContext)
         this.executionContext = Mock(ExecutionContext)
         this.launchJobService = Mock(LaunchJobService)
         this.process = Mock(Process)
@@ -49,7 +47,7 @@ class LaunchJobActionSpec extends Specification {
 
     def "Success"() {
         when:
-        def event = action.executeStateAction(stateContext)
+        def event = action.executeStateAction(executionContext)
 
         then:
         1 * launchJobService.launchProcess() >> process
@@ -61,7 +59,7 @@ class LaunchJobActionSpec extends Specification {
 
     def "Error"() {
         when:
-        action.executeStateAction(stateContext)
+        action.executeStateAction(executionContext)
 
         then:
         1 * launchJobService.launchProcess() >> {throw new JobLaunchException("")}
@@ -75,7 +73,7 @@ class LaunchJobActionSpec extends Specification {
         process = new ProcessBuilder().command("echo").start()
 
         when:
-        def event = action.executeStateAction(stateContext)
+        def event = action.executeStateAction(executionContext)
 
         then:
         1 * launchJobService.launchProcess() >> process

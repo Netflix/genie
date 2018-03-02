@@ -43,7 +43,7 @@ class SetUpJobActionSpec extends Specification {
     @Rule
     TemporaryFolder temporaryFolder
 
-    StateContext<States, Events> stateContext
+    ExecutionContext executionContext
 
     Set<URI> manifestUris
     File dummyFile
@@ -51,7 +51,6 @@ class SetUpJobActionSpec extends Specification {
     DownloadService.Manifest manifest
     DownloadService.Manifest.Builder manifestBuilder
     DownloadService downloadService
-    ExecutionContext executionContext
     SetUpJobAction action
 
     JobSpecification spec
@@ -100,8 +99,7 @@ class SetUpJobActionSpec extends Specification {
         temporaryFolder.create()
         dummyFile = temporaryFolder.newFile()
 
-        stateContext = Mock(StateContext)
-        executionContext = Mock()
+        executionContext = Mock(ExecutionContext)
 
         manifestUris = Sets.newHashSet()
 
@@ -218,7 +216,7 @@ class SetUpJobActionSpec extends Specification {
         Map<String, String> envMap
 
         when:
-        def event = action.executeStateAction(stateContext)
+        def event = action.executeStateAction(executionContext)
 
         then:
         executionContext.getJobSpecification() >> spec
@@ -275,7 +273,7 @@ class SetUpJobActionSpec extends Specification {
         )
 
         when:
-        def event = action.executeStateAction(stateContext)
+        def event = action.executeStateAction(executionContext)
 
         then:
         executionContext.getJobSpecification() >> spec
@@ -327,7 +325,7 @@ class SetUpJobActionSpec extends Specification {
     def "Null job spec"() {
 
         when:
-        action.executeStateAction(stateContext)
+        action.executeStateAction(executionContext)
 
         then:
         executionContext.getJobSpecification() >> null
@@ -339,7 +337,7 @@ class SetUpJobActionSpec extends Specification {
         setup:
 
         when:
-        action.executeStateAction(stateContext)
+        action.executeStateAction(executionContext)
 
         then:
         executionContext.getJobSpecification() >> spec
@@ -352,7 +350,7 @@ class SetUpJobActionSpec extends Specification {
         setup:
 
         when:
-        action.executeStateAction(stateContext)
+        action.executeStateAction(executionContext)
 
         then:
         executionContext.getJobSpecification() >> spec
@@ -365,7 +363,7 @@ class SetUpJobActionSpec extends Specification {
         setup:
 
         when:
-        action.executeStateAction(stateContext)
+        action.executeStateAction(executionContext)
 
         then:
         executionContext.getJobSpecification() >> spec
@@ -378,7 +376,7 @@ class SetUpJobActionSpec extends Specification {
         setup:
 
         when:
-        action.executeStateAction(stateContext)
+        action.executeStateAction(executionContext)
 
         then:
         executionContext.getJobSpecification() >> spec
@@ -392,7 +390,7 @@ class SetUpJobActionSpec extends Specification {
         temporaryFolder.newFolder(jobId)
 
         when:
-        action.executeStateAction(stateContext)
+        action.executeStateAction(executionContext)
 
         then:
         executionContext.getJobSpecification() >> spec
@@ -406,7 +404,7 @@ class SetUpJobActionSpec extends Specification {
         jobSetup = Optional.of(setupFileUri.toString())
 
         when:
-        action.executeStateAction(stateContext)
+        action.executeStateAction(executionContext)
 
         then:
         executionContext.getJobSpecification() >> spec
@@ -425,7 +423,7 @@ class SetUpJobActionSpec extends Specification {
         jobSetup = Optional.of("://")
 
         when:
-        action.executeStateAction(stateContext)
+        action.executeStateAction(executionContext)
 
         then:
         executionContext.getJobSpecification() >> spec
@@ -440,7 +438,7 @@ class SetUpJobActionSpec extends Specification {
         setup:
 
         when:
-        action.executeStateAction(stateContext)
+        action.executeStateAction(executionContext)
 
         then:
         executionContext.getJobSpecification() >> spec
@@ -460,7 +458,7 @@ class SetUpJobActionSpec extends Specification {
         dummyFile.write("exit 1\n")
 
         when:
-        action.executeStateAction(stateContext)
+        action.executeStateAction(executionContext)
 
         then:
         executionContext.getJobSpecification() >> spec
@@ -487,7 +485,7 @@ class SetUpJobActionSpec extends Specification {
         dummyFile.write("echo \"syntax error!\" >> " + envFile.getAbsolutePath() + "\n")
 
         when:
-        action.executeStateAction(stateContext)
+        action.executeStateAction(executionContext)
 
         then:
         executionContext.getJobSpecification() >> spec

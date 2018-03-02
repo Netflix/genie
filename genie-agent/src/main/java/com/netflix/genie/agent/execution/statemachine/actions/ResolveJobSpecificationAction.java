@@ -18,11 +18,10 @@
 
 package com.netflix.genie.agent.execution.statemachine.actions;
 
+import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.statemachine.Events;
-import com.netflix.genie.agent.execution.statemachine.States;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.statemachine.StateContext;
 import org.springframework.stereotype.Component;
 
 /**
@@ -35,11 +34,15 @@ import org.springframework.stereotype.Component;
 @Lazy
 class ResolveJobSpecificationAction extends BaseStateAction implements StateAction.ResolveJobSpecification {
 
+    ResolveJobSpecificationAction(final ExecutionContext executionContext) {
+        super(executionContext);
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
-    protected Events executeStateAction(final StateContext<States, Events> context) {
+    protected Events executeStateAction(final ExecutionContext executionContext) {
         log.info("Resolving job specification...");
         //TODO implement this action
         return Events.RESOLVE_JOB_SPECIFICATION_COMPLETE;

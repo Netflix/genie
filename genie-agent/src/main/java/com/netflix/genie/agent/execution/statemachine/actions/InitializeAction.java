@@ -22,10 +22,8 @@ import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.exceptions.AgentRegistrationException;
 import com.netflix.genie.agent.execution.services.AgentRegistrationService;
 import com.netflix.genie.agent.execution.statemachine.Events;
-import com.netflix.genie.agent.execution.statemachine.States;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.statemachine.StateContext;
 import org.springframework.stereotype.Component;
 
 /**
@@ -40,21 +38,20 @@ import org.springframework.stereotype.Component;
 class InitializeAction extends BaseStateAction implements StateAction.Initialize {
 
     private final AgentRegistrationService agentRegistrationService;
-    private final ExecutionContext executionContext;
 
     InitializeAction(
         final AgentRegistrationService agentRegistrationService,
         final ExecutionContext executionContext
     ) {
+        super(executionContext);
         this.agentRegistrationService = agentRegistrationService;
-        this.executionContext = executionContext;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected Events executeStateAction(final StateContext<States, Events> context) {
+    protected Events executeStateAction(final ExecutionContext executionContext) {
         log.info("Initializing...");
 
         final String agentId;

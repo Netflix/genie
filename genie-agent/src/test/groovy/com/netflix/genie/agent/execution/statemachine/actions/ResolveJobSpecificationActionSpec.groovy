@@ -18,17 +18,16 @@
 
 package com.netflix.genie.agent.execution.statemachine.actions
 
+import com.netflix.genie.agent.execution.ExecutionContext
 import com.netflix.genie.agent.execution.statemachine.Events
-import com.netflix.genie.agent.execution.statemachine.States
-import org.springframework.statemachine.StateContext
 import spock.lang.Specification
 
 class ResolveJobSpecificationActionSpec extends Specification {
-    StateContext<States, Events> stateContext
+    ExecutionContext executionContext
     ResolveJobSpecificationAction action
 
     void setup() {
-        this.stateContext = Mock(StateContext)
+        this.executionContext = Mock(ExecutionContext)
         this.action = new ResolveJobSpecificationAction()
     }
 
@@ -37,7 +36,7 @@ class ResolveJobSpecificationActionSpec extends Specification {
 
     def "ExecuteStateAction"() {
         when:
-        def event = action.executeStateAction(stateContext)
+        def event = action.executeStateAction(executionContext)
         then:
         event == Events.RESOLVE_JOB_SPECIFICATION_COMPLETE
     }

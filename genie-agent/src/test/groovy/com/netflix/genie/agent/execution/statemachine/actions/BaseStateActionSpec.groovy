@@ -18,6 +18,7 @@
 
 package com.netflix.genie.agent.execution.statemachine.actions
 
+import com.netflix.genie.agent.execution.ExecutionContext
 import com.netflix.genie.agent.execution.statemachine.Events
 import com.netflix.genie.agent.execution.statemachine.States
 import org.springframework.statemachine.StateContext
@@ -29,11 +30,13 @@ class BaseStateActionSpec extends Specification {
     StateContext<States, Events> stateContext
     StateMachine<States, Events> stateMachine
     State<States, Events> state
+    ExecutionContext executionContext
 
     void setup() {
         this.stateContext = Mock(StateContext)
         this.stateMachine = Mock(StateMachine)
         this.state = Mock(State)
+        this.executionContext = Mock(ExecutionContext)
     }
 
     void cleanup() {
@@ -41,9 +44,9 @@ class BaseStateActionSpec extends Specification {
 
     def "Execute"() {
         setup:
-        def stateAction = new BaseStateAction() {
+        def stateAction = new BaseStateAction(executionContext) {
             @Override
-            protected Events executeStateAction(StateContext<States, Events> context) {
+            protected Events executeStateAction(ExecutionContext executionContext) {
                 return Events.INITIALIZE_COMPLETE
             }
         }
@@ -61,9 +64,9 @@ class BaseStateActionSpec extends Specification {
     def "ExecuteThrows"() {
         setup:
         def exception = new RuntimeException()
-        def stateAction = new BaseStateAction() {
+        def stateAction = new BaseStateAction(executionContext) {
             @Override
-            protected Events executeStateAction(StateContext<States, Events> context) {
+            protected Events executeStateAction(ExecutionContext executionContext) {
                 throw exception
             }
         }
@@ -83,9 +86,9 @@ class BaseStateActionSpec extends Specification {
     def "ExecuteThrowsWithErrorSet"() {
         setup:
         def exception = new IOException()
-        def stateAction = new BaseStateAction() {
+        def stateAction = new BaseStateAction(executionContext) {
             @Override
-            protected Events executeStateAction(StateContext<States, Events> context) {
+            protected Events executeStateAction(ExecutionContext executionContext) {
                 throw exception
             }
         }
