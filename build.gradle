@@ -100,7 +100,7 @@ configure(javaProjects) {
                 entry "grpc-testing"
             }
             // TODO: Remove once Boot 2.0 fully released and all boms standardize
-            dependencySet(group: "io.micrometer", version: "1.0.0") {
+            dependencySet(group: "io.micrometer", version: "1.0.1") {
                 entry "micrometer-core"
                 entry "micrometer-registry-atlas"
             }
@@ -158,8 +158,8 @@ configure(javaProjects) {
                 entry "spring-boot-test-autoconfigure"
             }
             dependency("org.springframework.security.extensions:spring-security-saml2-core:1.0.3.RELEASE")
-            dependency("org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:2.0.0.BUILD-SNAPSHOT")
-            dependencySet(group: "org.springframework.statemachine", version: "2.0.0.M2") {
+            dependency("org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:2.0.0.RELEASE")
+            dependencySet(group: "org.springframework.statemachine", version: "2.0.0.M5") {
               entry "spring-statemachine-core"
               entry "spring-statemachine-test"
             }
