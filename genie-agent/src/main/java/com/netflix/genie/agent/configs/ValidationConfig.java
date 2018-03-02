@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.agent;
+package com.netflix.genie.agent.configs;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -40,7 +40,7 @@ class ValidationConfig {
      * @return The bean validator
      */
     @Bean
-    @ConditionalOnMissingBean
+    @ConditionalOnMissingBean(Validator.class)
     public Validator localValidatorFactoryBean() {
         return new LocalValidatorFactoryBean();
     }
@@ -51,7 +51,7 @@ class ValidationConfig {
      * @return The method validation processor
      */
     @Bean
-    @ConditionalOnMissingBean
+    @ConditionalOnMissingBean(MethodValidationPostProcessor.class)
     public MethodValidationPostProcessor methodValidationPostProcessor() {
         return new MethodValidationPostProcessor();
     }
