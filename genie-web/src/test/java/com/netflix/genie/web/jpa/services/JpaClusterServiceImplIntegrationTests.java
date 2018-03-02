@@ -28,6 +28,7 @@ import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.dto.JobRequest;
+import com.netflix.genie.common.dto.v4.Criterion;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.test.categories.IntegrationTest;
@@ -320,6 +321,51 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertThat(this.service.findClustersAndCommandsForJob(three).size(), Matchers.is(0));
         Assert.assertThat(this.service.findClustersAndCommandsForJob(four).size(), Matchers.is(2));
         Assert.assertThat(this.service.findClustersAndCommandsForJob(five).size(), Matchers.is(2));
+    }
+
+    /**
+     * Test the choseClusterForJobRequest function.
+     *
+     * @throws GenieException For any problem
+     */
+    @Test
+    public void testChooseClusterAndCommandForCriteria() throws GenieException {
+        final Criterion pigCriterion = new Criterion.Builder().withTags(Sets.newHashSet("pig")).build();
+        final Criterion piCriterion = new Criterion.Builder().withTags(Sets.newHashSet("pi")).build();
+
+        final List<Criterion> cluster1 = Lists.newArrayList(
+            new Criterion.Builder().withTags(Sets.newHashSet("genie.id:cluster1")).build()
+        );
+        final List<Criterion> cluster = Lists.newArrayList(
+            new Criterion.Builder().withTags(Sets.newHashSet("genie.id:cluster")).build()
+        );
+        final List<Criterion> pigCluster = Lists.newArrayList(
+            new Criterion.Builder().withTags(Sets.newHashSet("pig")).build()
+        );
+        final List<Criterion> pigHiveCluster = Lists.newArrayList(
+            new Criterion.Builder().withTags(Sets.newHashSet("pig", "hive")).build()
+        );
+
+        Assert.assertThat(
+            this.service.findClustersAndCommandsForCriteria(cluster1, pigCriterion).size(),
+            Matchers.is(1)
+        );
+        Assert.assertThat(
+            this.service.findClustersAndCommandsForCriteria(cluster, pigCriterion).size(),
+            Matchers.is(0)
+        );
+        Assert.assertThat(
+            this.service.findClustersAndCommandsForCriteria(cluster1, piCriterion).size(),
+            Matchers.is(0)
+        );
+        Assert.assertThat(
+            this.service.findClustersAndCommandsForCriteria(pigCluster, pigCriterion).size(),
+            Matchers.is(2)
+        );
+        Assert.assertThat(
+            this.service.findClustersAndCommandsForCriteria(pigHiveCluster, pigCriterion).size(),
+            Matchers.is(2)
+        );
     }
 
     /**
