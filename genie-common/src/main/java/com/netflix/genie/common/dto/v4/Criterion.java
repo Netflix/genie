@@ -60,7 +60,7 @@ public class Criterion {
     /**
      * Get the id of the resource desired if it exists.
      *
-     * @return {@link Optional<String>} wrapping the id
+     * @return {@link Optional} wrapping the id
      */
     public Optional<String> getId() {
         return Optional.ofNullable(this.id);
@@ -69,7 +69,7 @@ public class Criterion {
     /**
      * Get the name of the resource desired if it exists.
      *
-     * @return {@link Optional<String>} wrapping the name
+     * @return {@link Optional} wrapping the name
      */
     public Optional<String> getName() {
         return Optional.ofNullable(this.name);
@@ -78,7 +78,7 @@ public class Criterion {
     /**
      * Get the desired status of the resource if it has been set by the creator.
      *
-     * @return {@link Optional<String>} wrapping the status
+     * @return {@link Optional} wrapping the status
      */
     public Optional<String> getStatus() {
         return Optional.ofNullable(this.status);

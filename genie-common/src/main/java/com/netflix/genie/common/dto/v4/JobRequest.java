@@ -153,7 +153,7 @@ public final class JobRequest {
         /**
          * Set the timeout (in seconds) that the job should be killed after by the service after it has started.
          *
-         * @param timeout The timeout. Must be greater >= 1 but preferably much higher
+         * @param timeout The timeout. Must be greater greater than or equal to 1 but preferably much higher
          * @return The builder
          */
         public Builder withTimeout(@Nullable final Integer timeout) {
