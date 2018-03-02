@@ -24,6 +24,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+import java.util.Deque;
+
 /**
  * Action performed when in state CLEANUP_JOB.
  * @author mprimi
@@ -44,7 +46,27 @@ class CleanupJobAction extends BaseStateAction implements StateAction.CleanupJob
     @Override
     protected Events executeStateAction(final ExecutionContext executionContext) {
         log.info("Cleaning up job...");
-        //TODO implement this action
+
+        final Deque<StateAction> deque = executionContext.getCleanupActions();
+        while (!deque.isEmpty()) {
+            final StateAction nextAction = deque.pop();
+
+            if (nextAction == this) {
+                // Skip self
+                continue;
+            }
+
+            try {
+                nextAction.cleanup();
+            } catch (final Exception e) {
+                log.warn(
+                    "Exception during action {} cleanup",
+                    nextAction.getClass().getSimpleName(),
+                    e
+                );
+            }
+        }
+
         return Events.CLEANUP_JOB_COMPLETE;
     }
 }

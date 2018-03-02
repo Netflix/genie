@@ -25,20 +25,61 @@ import spock.lang.Specification
 class CleanupJobActionSpec extends Specification {
     ExecutionContext executionContext
     CleanupJobAction action
+    Deque<StateAction> cleanupDeque
 
 
     void setup() {
         this.executionContext = Mock(ExecutionContext)
         this.action = new CleanupJobAction(executionContext)
+        this.cleanupDeque = new ArrayDeque<>()
+
+        executionContext.getCleanupActions() >> cleanupDeque
     }
 
     void cleanup() {
     }
 
-    def "ExecuteStateAction"() {
+    def "Execute with empty queue"() {
         when:
         def event = action.executeStateAction(executionContext)
         then:
         event == Events.CLEANUP_JOB_COMPLETE
+    }
+
+
+    def "Execute with actions and self"() {
+        setup:
+        def action1 = Mock(StateAction)
+        def action2 = Mock(StateAction)
+        cleanupDeque.addLast(action1)
+        cleanupDeque.addLast(action2)
+        cleanupDeque.addLast(action)
+
+        when:
+        def event = action.executeStateAction(executionContext)
+
+        then:
+        event == Events.CLEANUP_JOB_COMPLETE
+        1 * action1.cleanup()
+        1 * action2.cleanup()
+        0 * action.cleanup()
+    }
+
+    def "Execute with throwing action"() {
+        setup:
+        def action1 = Mock(StateAction)
+        def action2 = Mock(StateAction)
+        cleanupDeque.addLast(action1)
+        cleanupDeque.addLast(action2)
+        cleanupDeque.addLast(action)
+
+        when:
+        def event = action.executeStateAction(executionContext)
+
+        then:
+        event == Events.CLEANUP_JOB_COMPLETE
+        1 * action1.cleanup()
+        1 * action2.cleanup() >> {throw new RuntimeException()}
+        0 * action.cleanup()
     }
 }
