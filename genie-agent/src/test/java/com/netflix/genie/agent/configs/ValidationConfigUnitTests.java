@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.agent;
+package com.netflix.genie.agent.configs;
 
 import com.netflix.genie.test.categories.UnitTest;
 import org.junit.Assert;
