@@ -23,6 +23,7 @@ import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.dto.JobRequest;
+import com.netflix.genie.common.dto.v4.Criterion;
 import com.netflix.genie.common.exceptions.GenieException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -101,6 +102,19 @@ public interface ClusterService {
      */
     Map<Cluster, String> findClustersAndCommandsForJob(
         @NotNull(message = "JobRequest object is null. Unable to continue.") final JobRequest jobRequest
+    ) throws GenieException;
+
+    /**
+     * Find the clusters and commands that can run a job given the criteria the user asked for in the job.
+     *
+     * @param clusterCriteria  The ordered list of cluster criterion provided by user to select a cluster for a job
+     * @param commandCriterion The criterion to use to select a command for a job on a cluster
+     * @return a map of cluster to the unique id of the command to use if that cluster is used
+     * @throws GenieException if there is an error
+     */
+    Map<Cluster, String> findClustersAndCommandsForCriteria(
+        @NotEmpty final List<@NotNull Criterion> clusterCriteria,
+        @NotNull final Criterion commandCriterion
     ) throws GenieException;
 
     /**

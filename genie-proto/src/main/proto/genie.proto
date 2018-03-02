@@ -48,3 +48,86 @@ message AgentRegistrationResponse {
     bool agentAccepted = 3;
     string serverMessage = 4;
 }
+
+//
+// Job Specification APIs
+//
+service JobSpecificationService {
+    rpc resolveJobSpecification (ResolveJobSpecificationRequest) returns (JobSpecificationResponse);
+    rpc getJobSpecification (GetJobSpecificationRequest) returns (JobSpecificationResponse);
+}
+
+message Criterion {
+    repeated string tags = 1;
+    string id = 2;
+    string name = 3;
+    string status = 4;
+}
+
+message JobMetadata {
+    string id = 1;
+    string name = 2;
+    string user = 3;
+    string version = 4;
+    string description = 5;
+    repeated string tags = 6;
+    string metadata = 7;
+    string email = 8;
+    string grouping = 9;
+    string grouping_instance = 10;
+    string setup_file = 11;
+    repeated string configs = 12;
+    repeated string dependencies = 13;
+    repeated string command_args = 14;
+    bool is_interactive = 15;
+}
+
+message ExecutionResourceCriteria {
+    repeated Criterion cluster_criteria = 1;
+    Criterion command_criterion = 2;
+    repeated string application_ids = 3;
+}
+
+message ResolveJobSpecificationRequest {
+    JobMetadata metadata = 1;
+    ExecutionResourceCriteria criteria = 2;
+}
+
+message GetJobSpecificationRequest {
+    string id = 1;
+}
+
+message ExecutionResource {
+    string id = 1;
+    string setup_file = 2;
+    repeated string configs = 3;
+    repeated string dependences = 4;
+}
+
+message JobSpecification {
+    repeated string command_args = 1;
+    ExecutionResource job = 2;
+    ExecutionResource cluster = 3;
+    ExecutionResource command = 4;
+    repeated ExecutionResource applications = 5;
+    map<string, string> environment_variables = 6;
+    bool is_interactive = 7;
+}
+
+message JobSpecificationServiceError {
+    enum Type {
+        UNKNOWN = 0;
+        JOB_ID_IN_USE = 1;
+        NO_CLUSTER_FOUND = 2;
+        NO_SPECIFICATION_FOUND = 3;
+    }
+    Type type = 1;
+    string message = 2;
+}
+
+message JobSpecificationResponse {
+    oneof response {
+        JobSpecification specification = 1;
+        JobSpecificationServiceError error = 2;
+    }
+}

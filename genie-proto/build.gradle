@@ -10,9 +10,10 @@ dependencies {
      * Compile Dependencies
      *******************************/
 
-     compile("com.google.protobuf:protobuf-java")
-     compile("io.grpc:grpc-stub")
-     compile("io.grpc:grpc-protobuf")
+    compile(project(":genie-common"))
+    compile("com.google.protobuf:protobuf-java")
+    compile("io.grpc:grpc-stub")
+    compile("io.grpc:grpc-protobuf")
 
     /*******************************
      * Provided Dependencies
@@ -26,6 +27,7 @@ dependencies {
      * Test Dependencies
      *******************************/
 
+    testCompile(project(":genie-test"))
 }
 
 // Configure protobuf classes and grpc stubs generation
@@ -65,7 +67,7 @@ tasks.withType(Pmd) {
 }
 
 license {
-  exclude protoIgnorePattern
+    exclude protoIgnorePattern
 }
 
 javadoc {

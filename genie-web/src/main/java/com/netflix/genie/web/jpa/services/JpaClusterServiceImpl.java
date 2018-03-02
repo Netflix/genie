@@ -27,6 +27,7 @@ import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.dto.JobRequest;
+import com.netflix.genie.common.dto.v4.Criterion;
 import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
@@ -190,45 +191,35 @@ public class JpaClusterServiceImpl extends JpaBaseService implements ClusterServ
     ) throws GenieException {
         log.debug("Called");
 
-        final List<ClusterCriteria> clusterCriteria = jobRequest.getClusterCriterias();
+        final List<Set<String>> clusterCriteria = jobRequest
+            .getClusterCriterias()
+            .stream()
+            .map(ClusterCriteria::getTags)
+            .collect(Collectors.toList());
         final Set<String> commandCriterion = jobRequest.getCommandCriteria();
-        final Map<Cluster, String> foundClusters = Maps.newHashMap();
 
-        for (final ClusterCriteria clusterCriterion : clusterCriteria) {
-            final List<Object[]> clusterCommands = this.clusterRepository.findClustersAndCommandsForCriterion(
-                clusterCriterion.getTags(),
-                clusterCriterion.getTags().size(),
-                commandCriterion,
-                commandCriterion.size()
-            );
+        return this.findClustersAndCommandsForJob(clusterCriteria, commandCriterion);
+    }
 
-            if (!clusterCommands.isEmpty()) {
-                for (final Object[] ids : clusterCommands) {
-                    if (ids.length != 2) {
-                        throw new GenieServerException("Expected result length 2 but got " + ids.length);
-                    }
-                    final long clusterId;
-                    if (ids[0] instanceof Number) {
-                        clusterId = ((Number) ids[0]).longValue();
-                    } else {
-                        throw new GenieServerException("Expected number type but got " + ids[0].getClass().getName());
-                    }
-                    final String commandUniqueId;
-                    if (ids[1] instanceof String) {
-                        commandUniqueId = (String) ids[1];
-                    } else {
-                        throw new GenieServerException("Expected String type but got " + ids[1].getClass().getName());
-                    }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Map<Cluster, String> findClustersAndCommandsForCriteria(
+        @NotEmpty final List<@NotNull Criterion> clusterCriteria,
+        @NotNull final Criterion commandCriterion
+    ) throws GenieException {
+        log.debug(
+            "Attempting to find cluster and commands for cluster criteria {} and command criterion {}",
+            clusterCriteria,
+            commandCriterion
+        );
 
-                    final ClusterEntity clusterEntity = this.clusterRepository.getOne(clusterId);
-                    foundClusters.put(JpaServiceUtils.toClusterDto(clusterEntity), commandUniqueId);
-                }
-                return foundClusters;
-            }
-        }
-
-        //if we've gotten to here no clusters were found so return empty map
-        return foundClusters;
+        return this.findClustersAndCommandsForJob(
+            clusterCriteria.stream().map(Criterion::getTags).collect(Collectors.toList()),
+            commandCriterion.getTags()
+        );
     }
 
     /**
@@ -588,6 +579,48 @@ public class JpaClusterServiceImpl extends JpaBaseService implements ClusterServ
                 .map(Number::longValue)
                 .collect(Collectors.toSet())
         );
+    }
+
+    private Map<Cluster, String> findClustersAndCommandsForJob(
+        final List<Set<String>> clusterCriteria,
+        final Set<String> commandCriterion
+    ) throws GenieServerException {
+        final Map<Cluster, String> foundClusters = Maps.newHashMap();
+        for (final Set<String> clusterCriterion : clusterCriteria) {
+            final List<Object[]> clusterCommands = this.clusterRepository.findClustersAndCommandsForCriterion(
+                clusterCriterion,
+                clusterCriterion.size(),
+                commandCriterion,
+                commandCriterion.size()
+            );
+
+            if (!clusterCommands.isEmpty()) {
+                for (final Object[] ids : clusterCommands) {
+                    if (ids.length != 2) {
+                        throw new GenieServerException("Expected result length 2 but got " + ids.length);
+                    }
+                    final long clusterId;
+                    if (ids[0] instanceof Number) {
+                        clusterId = ((Number) ids[0]).longValue();
+                    } else {
+                        throw new GenieServerException("Expected number type but got " + ids[0].getClass().getName());
+                    }
+                    final String commandUniqueId;
+                    if (ids[1] instanceof String) {
+                        commandUniqueId = (String) ids[1];
+                    } else {
+                        throw new GenieServerException("Expected String type but got " + ids[1].getClass().getName());
+                    }
+
+                    final ClusterEntity clusterEntity = this.clusterRepository.getOne(clusterId);
+                    foundClusters.put(JpaServiceUtils.toClusterDto(clusterEntity), commandUniqueId);
+                }
+                return foundClusters;
+            }
+        }
+
+        //if we've gotten to here no clusters were found so return empty map
+        return foundClusters;
     }
 
     /**
