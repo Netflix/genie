@@ -4,6 +4,7 @@ com.netflix.genie.agent.cli
 com.netflix.genie.agent.execution
 com.netflix.genie.agent.execution.exceptions
 com.netflix.genie.agent.execution.services
+com.netflix.genie.agent.execution.services.impl.grpc
 com.netflix.genie.agent.execution.statemachine
 com.netflix.genie.agent.execution.statemachine.actions
 com.netflix.genie.agent.execution.statemachine.listeners
@@ -16,6 +17,7 @@ com.netflix.genie.client.security.oauth2
 com.netflix.genie.client.security.oauth2.impl
 com.netflix.genie.common.dto
 com.netflix.genie.common.dto.search
+com.netflix.genie.common.dto.v4
 com.netflix.genie.common.exceptions
 com.netflix.genie.common.util
 com.netflix.genie.test.categories
@@ -39,6 +41,7 @@ com.netflix.genie.web.jpa.specifications
 com.netflix.genie.web.properties
 com.netflix.genie.web.resources.handlers
 com.netflix.genie.web.resources.writers
+com.netflix.genie.web.rpc.grpc.services.impl.v4
 com.netflix.genie.web.rpc.interceptors
 com.netflix.genie.web.rpc.services.impl
 com.netflix.genie.web.security
