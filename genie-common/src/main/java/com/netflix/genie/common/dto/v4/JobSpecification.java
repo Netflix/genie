@@ -20,6 +20,7 @@ package com.netflix.genie.common.dto.v4;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import lombok.Value;
+import lombok.experimental.NonFinal;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -33,6 +34,7 @@ import java.util.Map;
  * @since 4.0.0
  */
 @Value
+@NonFinal
 public class JobSpecification {
 
     private final ImmutableList<String> commandArgs;
@@ -113,6 +115,7 @@ public class JobSpecification {
      * @since 4.0.0
      */
     @Value
+    @NonFinal
     public static class ExecutionResource {
 
         private final String id;
