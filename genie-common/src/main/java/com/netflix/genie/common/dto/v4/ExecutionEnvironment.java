@@ -19,6 +19,7 @@ package com.netflix.genie.common.dto.v4;
 
 import com.google.common.collect.ImmutableSet;
 import lombok.Value;
+import lombok.experimental.NonFinal;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.Size;
@@ -32,6 +33,7 @@ import java.util.Set;
  * @since 4.0.0
  */
 @Value
+@NonFinal
 public class ExecutionEnvironment {
     private final ImmutableSet<@Size(max = 1024, message = "Config file name is longer than 1024 characters") String>
         configs;
