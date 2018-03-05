@@ -80,6 +80,7 @@ message JobMetadata {
     repeated string dependencies = 13;
     repeated string command_args = 14;
     bool is_interactive = 15;
+    string jobDirectoryLocation = 16;
 }
 
 message ExecutionResourceCriteria {
@@ -112,6 +113,7 @@ message JobSpecification {
     repeated ExecutionResource applications = 5;
     map<string, string> environment_variables = 6;
     bool is_interactive = 7;
+    string jobDirectoryLocation = 8;
 }
 
 message JobSpecificationServiceError {

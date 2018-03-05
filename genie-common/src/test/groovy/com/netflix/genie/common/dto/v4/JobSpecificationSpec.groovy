@@ -43,7 +43,7 @@ class JobSpecificationSpec extends Specification {
         def command = new JobSpecification.ExecutionResource(commandId, new ExecutionEnvironment(null, null, null))
 
         when:
-        def jobSpecification = new JobSpecification(null, job, cluster, command, null, null, true)
+        def jobSpecification = new JobSpecification(null, job, cluster, command, null, null, true, null)
 
         then:
         jobSpecification.getCommandArgs().isEmpty()
@@ -53,6 +53,7 @@ class JobSpecificationSpec extends Specification {
         jobSpecification.getApplications().isEmpty()
         jobSpecification.getEnvironmentVariables().isEmpty()
         jobSpecification.isInteractive()
+        jobSpecification.getJobDirectoryLocation() == null
     }
 
     def "Can construct new job specification with optionals"() {
@@ -72,6 +73,7 @@ class JobSpecificationSpec extends Specification {
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString()
         )
+        def jobDirectoryLocation = new File(".")
 
         when:
         def jobSpecification = new JobSpecification(
@@ -81,7 +83,8 @@ class JobSpecificationSpec extends Specification {
                 command,
                 applications,
                 environmentVariables,
-                false
+                false,
+                jobDirectoryLocation
         )
 
         then:
@@ -92,6 +95,7 @@ class JobSpecificationSpec extends Specification {
         jobSpecification.getApplications() == applications
         jobSpecification.getEnvironmentVariables() == environmentVariables
         !jobSpecification.isInteractive()
+        jobSpecification.getJobDirectoryLocation() == jobDirectoryLocation
     }
 
     def "Can construct execution resource without optionals"() {

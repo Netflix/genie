@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableMap;
 import lombok.Value;
 
 import javax.annotation.Nullable;
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +42,7 @@ public class JobSpecification {
     private final ImmutableList<ExecutionResource> applications;
     private final ImmutableMap<String, String> environmentVariables;
     private final boolean interactive;
+    private final File jobDirectoryLocation;
 
     /**
      * Constructor.
@@ -52,6 +54,7 @@ public class JobSpecification {
      * @param applications         The execution resources of all applications used for a job. Optional
      * @param environmentVariables The environment variables the agent should set when running the job. Optional
      * @param interactive          Whether the job is interactive or not
+     * @param jobDirectoryLocation Location on disk where the job directory will be created
      */
     public JobSpecification(
         @Nullable final List<String> commandArgs,
@@ -60,7 +63,8 @@ public class JobSpecification {
         final ExecutionResource command,
         @Nullable final List<ExecutionResource> applications,
         @Nullable final Map<String, String> environmentVariables,
-        final boolean interactive
+        final boolean interactive,
+        final File jobDirectoryLocation
     ) {
         this.commandArgs = commandArgs == null ? ImmutableList.of() : ImmutableList.copyOf(commandArgs);
         this.job = job;
@@ -71,6 +75,7 @@ public class JobSpecification {
             ? ImmutableMap.of()
             : ImmutableMap.copyOf(environmentVariables);
         this.interactive = interactive;
+        this.jobDirectoryLocation = jobDirectoryLocation;
     }
 
     /**

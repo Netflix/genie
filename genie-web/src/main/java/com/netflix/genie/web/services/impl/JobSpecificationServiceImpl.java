@@ -199,7 +199,8 @@ public class JobSpecificationServiceImpl implements JobSpecificationService {
                 this.toExecutionResource(command),
                 applicationResources,
                 this.generateEnvironmentVariables(id, jobRequest, cluster, command),
-                jobRequest.isInteractive()
+                jobRequest.isInteractive(),
+                jobRequest.getJobDirectoryLocation()
             );
 
             MetricsUtils.addSuccessTags(tags);
