@@ -35,7 +35,9 @@ import com.netflix.genie.proto.GetJobSpecificationRequest;
 import com.netflix.genie.proto.JobSpecificationResponse;
 import com.netflix.genie.proto.JobSpecificationServiceError;
 import com.netflix.genie.proto.ResolveJobSpecificationRequest;
+import io.opencensus.internal.StringUtil;
 
+import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -133,6 +135,9 @@ public final class JobSpecificationServiceAdapter {
             .withRequestedId(jobMetadata.getId())
             .withCommandArgs(jobMetadata.getCommandArgsList())
             .withInteractive(jobMetadata.getIsInteractive())
+            .withJobDirectoryLocation(
+                jobMetadata.getJobDirectoryLocation() == null ? null : new File(jobMetadata.getJobDirectoryLocation())
+            )
             .build();
     }
 
@@ -192,7 +197,8 @@ public final class JobSpecificationServiceAdapter {
                 .map(JobSpecificationServiceAdapter::toExecutionResourceDTO)
                 .collect(Collectors.toList()),
             protoSpec.getEnvironmentVariablesMap(),
-            protoSpec.getIsInteractive()
+            protoSpec.getIsInteractive(),
+            protoSpec.getJobDirectoryLocation() == null ? null : new File(protoSpec.getJobDirectoryLocation())
         );
     }
 
@@ -215,6 +221,9 @@ public final class JobSpecificationServiceAdapter {
         );
         builder.putAllEnvironmentVariables(jobSpecification.getEnvironmentVariables());
         builder.setIsInteractive(jobSpecification.isInteractive());
+        if (jobSpecification.getJobDirectoryLocation() != null) {
+            builder.setJobDirectoryLocation(jobSpecification.getJobDirectoryLocation().getAbsolutePath());
+        }
         return builder.build();
     }
 
@@ -291,6 +300,9 @@ public final class JobSpecificationServiceAdapter {
         builder.addAllDependencies(jobResources.getDependencies());
         builder.addAllCommandArgs(jobRequest.getCommandArgs());
         builder.setIsInteractive(jobRequest.isInteractive());
+        if (jobRequest.getJobDirectoryLocation() != null) {
+            builder.setJobDirectoryLocation(jobRequest.getJobDirectoryLocation().getAbsolutePath());
+        }
         return builder.build();
     }
 

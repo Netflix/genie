@@ -23,7 +23,9 @@ import lombok.Value;
 import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,6 +55,8 @@ public final class JobRequest {
     private final JobMetadata metadata;
     @Valid
     private final ExecutionResourceCriteria criteria;
+    @NotNull
+    private final File jobDirectoryLocation;
 
     @SuppressWarnings("unchecked")
     private JobRequest(final Builder builder) {
@@ -68,6 +72,7 @@ public final class JobRequest {
         this.resources = builder.bResources == null
             ? new ExecutionEnvironment(null, null, null)
             : builder.bResources;
+        this.jobDirectoryLocation = builder.bJobDirectoryLocation;
     }
 
     /**
@@ -114,6 +119,7 @@ public final class JobRequest {
         private boolean bDisableArchival;
         private boolean bInteractive;
         private ExecutionEnvironment bResources;
+        private File bJobDirectoryLocation;
 
         /**
          * Constructor with required parameters.
@@ -191,6 +197,17 @@ public final class JobRequest {
          */
         public Builder withResources(@Nullable final ExecutionEnvironment resources) {
             this.bResources = resources;
+            return this;
+        }
+
+        /**
+         * Set the directory location where to create the job working directory.
+         *
+         * @param jobDirectoryLocation the directory location
+         * @return The builder
+         */
+        public Builder withJobDirectoryLocation(final File jobDirectoryLocation) {
+            this.bJobDirectoryLocation = jobDirectoryLocation;
             return this;
         }
 

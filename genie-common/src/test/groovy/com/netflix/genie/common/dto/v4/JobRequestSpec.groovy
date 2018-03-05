@@ -41,6 +41,7 @@ class JobRequestSpec extends Specification {
         def interactive = true
         def disableArchival = true
         def jobResources = new ExecutionEnvironment(null, null, UUID.randomUUID().toString())
+        def jobDirectoryLocation = new File("/tmp")
         JobRequest jobRequest
 
         when:
@@ -51,6 +52,7 @@ class JobRequestSpec extends Specification {
                 .withTimeout(timeout)
                 .withInteractive(interactive)
                 .withResources(jobResources)
+                .withJobDirectoryLocation(jobDirectoryLocation)
                 .build()
 
         then:
@@ -62,6 +64,7 @@ class JobRequestSpec extends Specification {
         jobRequest.isInteractive()
         jobRequest.getTimeout().orElse(-1) == timeout
         jobRequest.getResources() == jobResources
+        jobRequest.getJobDirectoryLocation() == jobDirectoryLocation
 
         when:
         jobRequest = new JobRequest.Builder(metadata, criteria)
@@ -76,6 +79,7 @@ class JobRequestSpec extends Specification {
         !jobRequest.isInteractive()
         !jobRequest.getTimeout().isPresent()
         jobRequest.getResources() != null
+        jobRequest.getJobDirectoryLocation() == null
 
         when:
         jobRequest = new JobRequest.Builder(metadata, criteria)
@@ -91,5 +95,6 @@ class JobRequestSpec extends Specification {
         !jobRequest.isInteractive()
         !jobRequest.getTimeout().isPresent()
         jobRequest.getResources() != null
+        jobRequest.getJobDirectoryLocation() == null
     }
 }

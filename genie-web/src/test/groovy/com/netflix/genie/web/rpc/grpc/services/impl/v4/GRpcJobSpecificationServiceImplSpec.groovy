@@ -58,6 +58,7 @@ class GRpcJobSpecificationServiceImplSpec extends Specification {
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString()
     )
+    def jobDirectoryLocation = new File("/tmp").getAbsolutePath()
 
     def configs = Sets.newHashSet(
             UUID.randomUUID().toString(),
@@ -197,6 +198,7 @@ class GRpcJobSpecificationServiceImplSpec extends Specification {
                 .addAllDependencies(dependencies)
                 .addAllCommandArgs(commandArgs)
                 .setIsInteractive(interactive)
+                .setJobDirectoryLocation(jobDirectoryLocation)
                 .build()
 
         def executionResourceCriteriaProto = ExecutionResourceCriteria.newBuilder()
@@ -276,7 +278,8 @@ class GRpcJobSpecificationServiceImplSpec extends Specification {
                         )
                 ),
                 environmentVariables,
-                interactive
+                interactive,
+                new File(jobDirectoryLocation)
         )
     }
 }
