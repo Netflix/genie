@@ -16,30 +16,29 @@
  *
  */
 
-package com.netflix.genie.agent.execution.exceptions
+package com.netflix.genie.agent.execution.exceptions;
 
-import spock.lang.Specification
-
-class AgentRegistrationExceptionSpec extends Specification {
-
-    final String message = "message"
-    final Exception cause = new RuntimeException()
-
-    def "Construct with message"() {
-        when:
-        def e = new AgentRegistrationException(message)
-
-        then:
-        message == e.getMessage()
+/**
+ * Exception during the set up of a job.
+ *
+ * @author mprimi
+ * @since 4.0.0
+ */
+public class SetUpJobException extends Exception {
+    /**
+     * Construct with message.
+     * @param messsage a message
+     */
+    public SetUpJobException(final String messsage) {
+        super(messsage);
     }
 
-
-    def "Construct with message and cause"() {
-        when:
-        def e = new AgentRegistrationException(message, cause)
-
-        then:
-        message == e.getMessage()
-        cause == e.getCause()
+    /**
+     * Construct with a message and a cause.
+     * @param message a message
+     * @param cause a cause
+     */
+    public SetUpJobException(final String message, final Throwable cause) {
+        super(message, cause);
     }
 }
