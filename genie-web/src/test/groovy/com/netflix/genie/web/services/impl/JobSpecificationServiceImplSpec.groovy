@@ -101,17 +101,24 @@ class JobSpecificationServiceImplSpec extends Specification {
                 .build()
 
         def clusters = Sets.newHashSet(cluster1, cluster2)
+        def executableBinary = UUID.randomUUID().toString()
+        def executableArgument0 = UUID.randomUUID().toString()
+        def executableArgument1 = UUID.randomUUID().toString()
+        def executable = executableBinary + ' ' + executableArgument0 + ' ' + executableArgument1 + ' '
         def command = new Command.Builder(
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
                 CommandStatus.ACTIVE,
-                UUID.randomUUID().toString(),
+                executable,
                 100L
         )
                 .withId(commandId)
                 .withTags(commandTags)
                 .build()
+
+        def jobCommandArgs = Lists.newArrayList(executableBinary, executableArgument0, executableArgument1)
+        jobCommandArgs.addAll(commandArgs)
 
         def jobsProperties = new JobsProperties()
         Map<Cluster, String> clusterCommandMap = Maps.newHashMap()
@@ -141,7 +148,7 @@ class JobSpecificationServiceImplSpec extends Specification {
         def jobSpec = service.resolveJobSpecification(jobId, jobRequest)
 
         then:
-        jobSpec.getCommandArgs() == commandArgs
+        jobSpec.getCommandArgs() == jobCommandArgs
         jobSpec.getJob().getId() == jobId
         jobSpec.getCluster().getId() == cluster1Id
         jobSpec.getCommand().getId() == commandId
