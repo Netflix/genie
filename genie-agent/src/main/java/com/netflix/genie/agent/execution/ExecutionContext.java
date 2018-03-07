@@ -18,8 +18,12 @@
 
 package com.netflix.genie.agent.execution;
 
+import com.netflix.genie.common.dto.v4.JobSpecification;
+
 import javax.annotation.concurrent.ThreadSafe;
 import javax.validation.constraints.NotBlank;
+import java.io.File;
+import java.util.Map;
 
 /**
  * Stateful context used by execution components to track state.
@@ -44,4 +48,60 @@ public interface ExecutionContext {
      * @throws RuntimeException if the agent id is already set
      */
     void setAgentId(@NotBlank final String agentId);
+
+    /**
+     * Set the job process once it has been launched.
+     *
+     * @param jobProcess a process handle for the children job
+     */
+    void setJobProcess(final Process jobProcess);
+
+    /**
+     * Get the job process.
+     *
+     * @return a Process, if it was set, or null
+     */
+    Process getJobProcess();
+
+    /**
+     * Get the job run directory.
+     *
+     * @return the job directory File if one was set up, or null
+     */
+    File getJobDirectory();
+
+    /**
+     * Set the job directory.
+     *
+     * @param jobDirectory the job directory
+     */
+    void setJobDirectory(final File jobDirectory);
+
+    /**
+     * Set the job specification.
+     * @param jobSpecification the job specification
+     */
+    void setJobSpecification(final JobSpecification jobSpecification);
+
+    /**
+     * Get the job specification.
+     *
+     * @return the job specification if it was set, or null
+     */
+    JobSpecification getJobSpecification();
+
+    /**
+     * Get the environment variables map for the job process.
+     *
+     * @return a map of environment variables and values if one was set, or null
+     */
+    Map<String, String> getJobEnvironment();
+
+
+    /**
+     * Set the job environment variables map.
+     *
+     * @param jobEnvironment a map of environment variables and their value to be passed to the job process at launch
+     */
+    void setJobEnvironment(final Map<String, String> jobEnvironment);
 }

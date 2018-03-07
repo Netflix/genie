@@ -18,33 +18,70 @@
 
 package com.netflix.genie.agent.execution
 
+import com.netflix.genie.common.dto.v4.JobSpecification
+import com.netflix.genie.test.categories.UnitTest
+import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
+@Category(UnitTest.class)
 class ExecutionContextImplSpec extends Specification {
-    ExecutionContextImpl executionContext
 
-    void setup() {
-        executionContext = new ExecutionContextImpl()
-    }
-
-    void cleanup() {
-    }
-
-    def "AgentId"() {
+    def "Get and set all"() {
         setup:
-        def agentId = "foo"
+        ExecutionContext executionContext = new ExecutionContextImpl()
+        String agentId = "foo"
+        Process process = Mock()
+        File directory = Mock()
+        JobSpecification spec = Mock()
+        Map<String, String> env = [ "foo": "bar" ]
 
         expect:
         null == executionContext.getAgentId()
+        null == executionContext.getJobProcess()
+        null == executionContext.getJobDirectory()
+        null == executionContext.getJobSpecification()
+        null == executionContext.getJobEnvironment()
 
         when:
         executionContext.setAgentId(agentId)
+        executionContext.setJobProcess(process)
+        executionContext.setJobDirectory(directory)
+        executionContext.setJobSpecification(spec)
+        executionContext.setJobEnvironment(env)
 
         then:
         agentId == executionContext.getAgentId()
+        process == executionContext.getJobProcess()
+        directory == executionContext.getJobDirectory()
+        spec == executionContext.getJobSpecification()
+        env == executionContext.getJobEnvironment()
 
         when:
         executionContext.setAgentId("bar")
+
+        then:
+        thrown(RuntimeException)
+
+        when:
+        executionContext.setJobProcess(Mock(Process))
+
+        then:
+        thrown(RuntimeException)
+
+        when:
+        executionContext.setJobDirectory(Mock(File))
+
+        then:
+        thrown(RuntimeException)
+
+        when:
+        executionContext.setJobSpecification(Mock(JobSpecification))
+
+        then:
+        thrown(RuntimeException)
+
+        when:
+        executionContext.setJobEnvironment(new HashMap<String, String>())
 
         then:
         thrown(RuntimeException)

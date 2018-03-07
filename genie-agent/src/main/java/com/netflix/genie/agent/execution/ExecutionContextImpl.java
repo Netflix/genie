@@ -18,12 +18,15 @@
 
 package com.netflix.genie.agent.execution;
 
+import com.netflix.genie.common.dto.v4.JobSpecification;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.concurrent.ThreadSafe;
 import javax.validation.constraints.NotBlank;
+import java.io.File;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -39,16 +42,17 @@ import java.util.concurrent.atomic.AtomicReference;
 class ExecutionContextImpl implements ExecutionContext {
 
     private final AtomicReference<String> agentIdRef = new AtomicReference<>();
+    private final AtomicReference<Process> jobProcessRef = new AtomicReference<>();
+    private final AtomicReference<File> jobDirectoryRef = new AtomicReference<>();
+    private final AtomicReference<JobSpecification> jobSpecRef = new AtomicReference<>();
+    private final AtomicReference<Map<String, String>> jobEnvironmentRef = new AtomicReference<>();
 
     /**
      * {@inheritDoc}
      */
     @Override
     public void setAgentId(@NotBlank final String agentId) {
-        if (!this.agentIdRef.compareAndSet(null, agentId)) {
-            throw new RuntimeException("Agent id is already set");
-        }
-        log.debug("Set agent id: {}", this.agentIdRef.get());
+        setIfNullOrTrow(agentId, agentIdRef);
     }
 
     /**
@@ -57,5 +61,75 @@ class ExecutionContextImpl implements ExecutionContext {
     @Override
     public String getAgentId() {
         return agentIdRef.get();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setJobProcess(final Process jobProcess) {
+        setIfNullOrTrow(jobProcess, jobProcessRef);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Process getJobProcess() {
+        return jobProcessRef.get();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setJobDirectory(final File jobDirectory) {
+        setIfNullOrTrow(jobDirectory, jobDirectoryRef);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public File getJobDirectory() {
+        return jobDirectoryRef.get();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setJobSpecification(final JobSpecification jobSpecification) {
+        setIfNullOrTrow(jobSpecification, jobSpecRef);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JobSpecification getJobSpecification() {
+        return jobSpecRef.get();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<String, String> getJobEnvironment() {
+        return jobEnvironmentRef.get();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setJobEnvironment(final Map<String, String> jobEnvironment) {
+        setIfNullOrTrow(jobEnvironment, jobEnvironmentRef);
+    }
+
+    private static <T> void setIfNullOrTrow(final T value, final AtomicReference<T> reference) {
+        if (!reference.compareAndSet(null, value)) {
+            throw new RuntimeException("Trying to update context object that already has a value");
+        }
     }
 }
