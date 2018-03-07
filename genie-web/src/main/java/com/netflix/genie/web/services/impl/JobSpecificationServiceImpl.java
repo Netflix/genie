@@ -188,8 +188,12 @@ public class JobSpecificationServiceImpl implements JobSpecificationService {
                 applicationResources.add(this.toExecutionResource(application));
             }
 
+            //TODO: Right now split on space for 3.x backwards compatibility. In 4.0 fix command executable to be array
+            final List<String> commandArgs = Lists.newArrayList(StringUtils.split(command.getExecutable(), ' '));
+            commandArgs.addAll(jobRequest.getCommandArgs());
+
             final JobSpecification jobSpecification = new JobSpecification(
-                jobRequest.getCommandArgs(),
+                commandArgs,
                 new JobSpecification.ExecutionResource(id, jobRequest.getResources()),
                 this.toExecutionResource(cluster),
                 this.toExecutionResource(command),
