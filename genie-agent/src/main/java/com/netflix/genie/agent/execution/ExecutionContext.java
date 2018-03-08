@@ -21,6 +21,7 @@ package com.netflix.genie.agent.execution;
 import com.netflix.genie.agent.execution.statemachine.actions.StateAction;
 import com.netflix.genie.common.dto.v4.JobSpecification;
 
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.validation.constraints.NotBlank;
 import java.io.File;
@@ -49,7 +50,7 @@ public interface ExecutionContext {
      * @param agentId a non-blank string
      * @throws RuntimeException if the agent id is already set
      */
-    void setAgentId(@NotBlank final String agentId);
+    @Nullable void setAgentId(@NotBlank final String agentId);
 
     /**
      * Set the job process once it has been launched.
@@ -63,14 +64,14 @@ public interface ExecutionContext {
      *
      * @return a Process, if it was set, or null
      */
-    Process getJobProcess();
+    @Nullable Process getJobProcess();
 
     /**
      * Get the job run directory.
      *
      * @return the job directory File if one was set up, or null
      */
-    File getJobDirectory();
+    @Nullable File getJobDirectory();
 
     /**
      * Set the job directory.
@@ -90,14 +91,14 @@ public interface ExecutionContext {
      *
      * @return the job specification if it was set, or null
      */
-    JobSpecification getJobSpecification();
+    @Nullable JobSpecification getJobSpecification();
 
     /**
      * Get the environment variables map for the job process.
      *
      * @return a map of environment variables and values if one was set, or null
      */
-    Map<String, String> getJobEnvironment();
+    @Nullable Map<String, String> getJobEnvironment();
 
     /**
      * Set the job environment variables map.
