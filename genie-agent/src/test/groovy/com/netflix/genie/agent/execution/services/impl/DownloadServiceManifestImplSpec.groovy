@@ -16,8 +16,9 @@
  *
  */
 
-package com.netflix.genie.agent.execution.services
+package com.netflix.genie.agent.execution.services.impl
 
+import com.netflix.genie.agent.execution.services.DownloadService
 import spock.lang.Specification
 
 class DownloadServiceManifestImplSpec extends Specification {

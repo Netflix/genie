@@ -16,7 +16,7 @@
  *
  */
 
-package com.netflix.genie.agent.execution.services
+package com.netflix.genie.agent.execution.services.impl
 
 import com.netflix.genie.agent.cli.ArgumentDelegates
 import com.netflix.genie.agent.execution.exceptions.DownloadException
@@ -31,7 +31,6 @@ import org.springframework.core.io.ResourceLoader
 import spock.lang.Specification
 
 import java.nio.charset.StandardCharsets
-import java.nio.file.Files
 
 @Category(UnitTest.class)
 class NaiveFetchingCacheServiceSpec extends Specification {

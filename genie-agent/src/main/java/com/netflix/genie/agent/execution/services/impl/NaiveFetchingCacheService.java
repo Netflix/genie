@@ -16,12 +16,13 @@
  *
  */
 
-package com.netflix.genie.agent.execution.services;
+package com.netflix.genie.agent.execution.services.impl;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.io.Files;
 import com.netflix.genie.agent.cli.ArgumentDelegates;
 import com.netflix.genie.agent.execution.exceptions.DownloadException;
+import com.netflix.genie.agent.execution.services.FetchingCacheService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.context.annotation.Lazy;

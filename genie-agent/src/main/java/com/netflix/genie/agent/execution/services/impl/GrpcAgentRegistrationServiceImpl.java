@@ -16,12 +16,13 @@
  *
  */
 
-package com.netflix.genie.agent.execution.services;
+package com.netflix.genie.agent.execution.services.impl;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.netflix.genie.agent.AgentMetadata;
 import com.netflix.genie.agent.cli.ArgumentDelegates;
 import com.netflix.genie.agent.execution.exceptions.AgentRegistrationException;
+import com.netflix.genie.agent.execution.services.AgentRegistrationService;
 import com.netflix.genie.proto.AgentRegistrationRequest;
 import com.netflix.genie.proto.AgentRegistrationResponse;
 import com.netflix.genie.proto.AgentRegistrationServiceGrpc;

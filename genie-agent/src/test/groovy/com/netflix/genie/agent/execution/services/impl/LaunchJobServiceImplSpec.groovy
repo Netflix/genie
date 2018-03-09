@@ -16,10 +16,11 @@
  *
  */
 
-package com.netflix.genie.agent.execution.services
+package com.netflix.genie.agent.execution.services.impl
 
 import com.netflix.genie.agent.execution.ExecutionContext
 import com.netflix.genie.agent.execution.exceptions.JobLaunchException
+import com.netflix.genie.agent.execution.services.LaunchJobService
 import com.netflix.genie.agent.utils.PathUtils
 import com.netflix.genie.common.dto.v4.JobSpecification
 import org.junit.Rule
