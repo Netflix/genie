@@ -16,9 +16,11 @@
  *
  */
 
-package com.netflix.genie.agent.execution.services
+package com.netflix.genie.agent.execution.services.impl
 
 import com.netflix.genie.agent.execution.exceptions.DownloadException
+import com.netflix.genie.agent.execution.services.DownloadService
+import com.netflix.genie.agent.execution.services.FetchingCacheService
 import com.netflix.genie.test.categories.UnitTest
 import org.apache.commons.lang3.tuple.Pair
 import org.junit.Rule

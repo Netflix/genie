@@ -16,11 +16,13 @@
  *
  */
 
-package com.netflix.genie.agent.execution.services;
+package com.netflix.genie.agent.execution.services.impl;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.netflix.genie.agent.execution.exceptions.DownloadException;
+import com.netflix.genie.agent.execution.services.DownloadService;
+import com.netflix.genie.agent.execution.services.FetchingCacheService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;

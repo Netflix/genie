@@ -16,7 +16,7 @@
  *
  */
 
-package com.netflix.genie.agent.execution.services
+package com.netflix.genie.agent.execution.services.impl
 
 import com.netflix.genie.agent.AgentMetadata
 import com.netflix.genie.agent.cli.ArgumentDelegates
