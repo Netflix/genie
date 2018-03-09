@@ -22,7 +22,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ImmutableSet;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.util.GenieObjectMapper;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
@@ -37,8 +39,10 @@ import java.util.Set;
  * @author tgianos
  * @since 4.0.0
  */
-@Data
-public abstract class CommonUserMetadata {
+@Getter
+@EqualsAndHashCode(doNotUseGetters = true)
+@ToString(doNotUseGetters = true)
+abstract class CommonMetadata {
     @NotEmpty(message = "A name is required and must be at most 255 characters")
     @Size(max = 255, message = "The name can be no longer than 255 characters")
     private final String name;
@@ -52,8 +56,13 @@ public abstract class CommonUserMetadata {
     private final JsonNode metadata;
     private final ImmutableSet<@Size(max = 255, message = "A tag can't be longer than 255 characters") String> tags;
 
+    /**
+     * Constructor.
+     *
+     * @param builder The builder containing the values to use.
+     */
     @SuppressWarnings("unchecked")
-    CommonUserMetadata(final Builder builder) {
+    CommonMetadata(final Builder builder) {
         this.name = builder.bName;
         this.user = builder.bUser;
         this.version = builder.bVersion;
@@ -111,7 +120,7 @@ public abstract class CommonUserMetadata {
     //       http://bugs.java.com/bugdatabase/view_bug.do?bug_id=4283544
     //       Setting them to public seems to have solved the issue at the expense of "proper" code design
     @SuppressWarnings("unchecked")
-    public abstract static class Builder<T extends Builder> {
+    public static class Builder<T extends Builder> {
 
         private final String bName;
         private final String bUser;
@@ -120,7 +129,16 @@ public abstract class CommonUserMetadata {
         private JsonNode bMetadata;
         private ImmutableSet<String> bTags;
 
-        protected Builder(final String name, final String user) {
+        /**
+         * Constructor with required fields.
+         *
+         * @param name The name of the resource
+         * @param user The user owning the resource
+         */
+        protected Builder(
+            final String name,
+            final String user
+        ) {
             this.bName = name;
             this.bUser = user;
         }
@@ -171,7 +189,7 @@ public abstract class CommonUserMetadata {
         }
 
         /**
-         * With the adhoc metadata to set for the resource as a string of valid JSON.
+         * With the ad-hoc metadata to set for the resource as a string of valid JSON.
          *
          * @param metadata The metadata to set. Must be valid JSON
          * @return The builder

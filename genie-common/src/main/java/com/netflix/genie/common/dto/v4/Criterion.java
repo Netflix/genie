@@ -17,9 +17,12 @@
  */
 package com.netflix.genie.common.dto.v4;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.collect.ImmutableSet;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import lombok.Value;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
@@ -33,7 +36,10 @@ import java.util.Set;
  * @author tgianos
  * @since 4.0.0
  */
-@Value
+@Getter
+@EqualsAndHashCode(doNotUseGetters = true)
+@ToString(doNotUseGetters = true)
+@JsonDeserialize(builder = Criterion.Builder.class)
 public class Criterion {
 
     private final String id;
