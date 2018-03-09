@@ -17,8 +17,12 @@
  */
 package com.netflix.genie.common.dto.v4;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
-import lombok.Value;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
 import javax.annotation.Nullable;
 import javax.validation.Valid;
@@ -32,7 +36,9 @@ import java.util.List;
  * @author tgianos
  * @since 4.0.0
  */
-@Value
+@Getter
+@EqualsAndHashCode(doNotUseGetters = true)
+@ToString(doNotUseGetters = true)
 public class ExecutionResourceCriteria {
 
     @NotEmpty(message = "At least one cluster criterion is required")
@@ -51,10 +57,11 @@ public class ExecutionResourceCriteria {
      * @param applicationIds   The ordered list of application ids to override the applications associated with
      *                         selected command for job execution. Optional.
      */
+    @JsonCreator
     public ExecutionResourceCriteria(
-        final List<Criterion> clusterCriteria,
-        final Criterion commandCriterion,
-        @Nullable final List<String> applicationIds
+        @JsonProperty(value = "clusterCriteria", required = true) final List<Criterion> clusterCriteria,
+        @JsonProperty(value = "commandCriterion", required = true) final Criterion commandCriterion,
+        @JsonProperty("applicationIds") @Nullable final List<String> applicationIds
     ) {
         this.clusterCriteria = ImmutableList.copyOf(clusterCriteria);
         this.commandCriterion = commandCriterion;

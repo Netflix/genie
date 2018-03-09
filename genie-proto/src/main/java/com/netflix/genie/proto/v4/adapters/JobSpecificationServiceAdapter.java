@@ -21,6 +21,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.netflix.genie.common.dto.v4.AgentJobRequest;
 import com.netflix.genie.common.dto.v4.Criterion;
 import com.netflix.genie.common.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.dto.v4.ExecutionResourceCriteria;
@@ -35,7 +36,6 @@ import com.netflix.genie.proto.GetJobSpecificationRequest;
 import com.netflix.genie.proto.JobSpecificationResponse;
 import com.netflix.genie.proto.JobSpecificationServiceError;
 import com.netflix.genie.proto.ResolveJobSpecificationRequest;
-import io.opencensus.internal.StringUtil;
 
 import java.io.File;
 import java.util.List;
@@ -67,7 +67,7 @@ public final class JobSpecificationServiceAdapter {
      */
     // TODO: Make it throw a runtime exception
     public static ResolveJobSpecificationRequest toProtoResolveJobSpecificationRequest(
-        final JobRequest jobRequest
+        final AgentJobRequest jobRequest
     ) throws JsonProcessingException {
         return ResolveJobSpecificationRequest
             .newBuilder()
@@ -127,18 +127,17 @@ public final class JobSpecificationServiceAdapter {
             jobMetadata.getSetupFile()
         );
 
-        return new JobRequest.Builder(
+        return new JobRequest(
+            jobMetadata.getId(),
+            jobResources,
+            jobMetadata.getCommandArgsList(),
+            false,
+            null,
+            jobMetadata.getIsInteractive(),
             userMetadata,
-            executionResourceCriteria
-        )
-            .withResources(jobResources)
-            .withRequestedId(jobMetadata.getId())
-            .withCommandArgs(jobMetadata.getCommandArgsList())
-            .withInteractive(jobMetadata.getIsInteractive())
-            .withJobDirectoryLocation(
-                jobMetadata.getJobDirectoryLocation() == null ? null : new File(jobMetadata.getJobDirectoryLocation())
-            )
-            .build();
+            executionResourceCriteria,
+            jobMetadata.getJobDirectoryLocation() == null ? null : new File(jobMetadata.getJobDirectoryLocation())
+        );
     }
 
     /**
@@ -198,7 +197,7 @@ public final class JobSpecificationServiceAdapter {
                 .collect(Collectors.toList()),
             protoSpec.getEnvironmentVariablesMap(),
             protoSpec.getIsInteractive(),
-            protoSpec.getJobDirectoryLocation() == null ? null : new File(protoSpec.getJobDirectoryLocation())
+            new File(protoSpec.getJobDirectoryLocation())
         );
     }
 
@@ -221,9 +220,7 @@ public final class JobSpecificationServiceAdapter {
         );
         builder.putAllEnvironmentVariables(jobSpecification.getEnvironmentVariables());
         builder.setIsInteractive(jobSpecification.isInteractive());
-        if (jobSpecification.getJobDirectoryLocation() != null) {
-            builder.setJobDirectoryLocation(jobSpecification.getJobDirectoryLocation().getAbsolutePath());
-        }
+        builder.setJobDirectoryLocation(jobSpecification.getJobDirectoryLocation().getAbsolutePath());
         return builder.build();
     }
 
@@ -274,7 +271,7 @@ public final class JobSpecificationServiceAdapter {
     }
 
     private static com.netflix.genie.proto.JobMetadata toProtoJobMetadata(
-        final JobRequest jobRequest
+        final AgentJobRequest jobRequest
     ) throws JsonProcessingException {
         final JobMetadata userMetadata = jobRequest.getMetadata();
         final ExecutionEnvironment jobResources = jobRequest.getResources();
@@ -300,9 +297,9 @@ public final class JobSpecificationServiceAdapter {
         builder.addAllDependencies(jobResources.getDependencies());
         builder.addAllCommandArgs(jobRequest.getCommandArgs());
         builder.setIsInteractive(jobRequest.isInteractive());
-        if (jobRequest.getJobDirectoryLocation() != null) {
-            builder.setJobDirectoryLocation(jobRequest.getJobDirectoryLocation().getAbsolutePath());
-        }
+        jobRequest
+            .getJobDirectoryLocation()
+            .ifPresent(location -> builder.setJobDirectoryLocation(location.getAbsolutePath()));
         return builder.build();
     }
 

@@ -219,7 +219,7 @@ class JobSpecificationServiceAdapterSpec extends Specification {
         response.getError().getMessage() == message
     }
 
-    JobRequest createJobRequest() {
+    AgentJobRequest createJobRequest() {
         def jobMetadata = new JobMetadata.Builder(name, user)
                 .withVersion(version)
                 .withDescription(description)
@@ -264,12 +264,11 @@ class JobSpecificationServiceAdapterSpec extends Specification {
                 applicationIds
         )
 
-        return new JobRequest.Builder(jobMetadata, executionResourceCriteria)
+        return new AgentJobRequest.Builder(jobMetadata, executionResourceCriteria, jobDirectoryLocation)
                 .withRequestedId(id)
                 .withInteractive(interactive)
                 .withCommandArgs(commandArgs)
                 .withResources(new ExecutionEnvironment(configs, dependencies, setupFile))
-                .withJobDirectoryLocation(jobDirectoryLocation)
                 .build()
     }
 

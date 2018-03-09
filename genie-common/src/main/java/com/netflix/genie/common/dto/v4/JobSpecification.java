@@ -17,10 +17,13 @@
  */
 package com.netflix.genie.common.dto.v4;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import lombok.Value;
-import lombok.experimental.NonFinal;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -33,8 +36,9 @@ import java.util.Map;
  * @author tgianos
  * @since 4.0.0
  */
-@Value
-@NonFinal
+@Getter
+@EqualsAndHashCode(doNotUseGetters = true)
+@ToString(doNotUseGetters = true)
 public class JobSpecification {
 
     private final ImmutableList<String> commandArgs;
@@ -58,15 +62,16 @@ public class JobSpecification {
      * @param interactive          Whether the job is interactive or not
      * @param jobDirectoryLocation Location on disk where the job directory will be created
      */
+    @JsonCreator
     public JobSpecification(
-        @Nullable final List<String> commandArgs,
-        final ExecutionResource job,
-        final ExecutionResource cluster,
-        final ExecutionResource command,
-        @Nullable final List<ExecutionResource> applications,
-        @Nullable final Map<String, String> environmentVariables,
-        final boolean interactive,
-        final File jobDirectoryLocation
+        @JsonProperty("commandArgs") @Nullable final List<String> commandArgs,
+        @JsonProperty(value = "job", required = true) final ExecutionResource job,
+        @JsonProperty(value = "cluster", required = true) final ExecutionResource cluster,
+        @JsonProperty(value = "command", required = true) final ExecutionResource command,
+        @JsonProperty("applications") @Nullable final List<ExecutionResource> applications,
+        @JsonProperty("environmentVariables") @Nullable final Map<String, String> environmentVariables,
+        @JsonProperty("interactive") final boolean interactive,
+        @JsonProperty("jobDirectoryLocation") final File jobDirectoryLocation
     ) {
         this.commandArgs = commandArgs == null ? ImmutableList.of() : ImmutableList.copyOf(commandArgs);
         this.job = job;
@@ -114,8 +119,9 @@ public class JobSpecification {
      * @author tgianos
      * @since 4.0.0
      */
-    @Value
-    @NonFinal
+    @Getter
+    @EqualsAndHashCode(doNotUseGetters = true)
+    @ToString(doNotUseGetters = true)
     public static class ExecutionResource {
 
         private final String id;
@@ -127,9 +133,13 @@ public class JobSpecification {
          * @param id                   The unique identifier of this execution resource
          * @param executionEnvironment The environment that should be setup for this resource
          */
+        @JsonCreator
         public ExecutionResource(
-            final String id,
-            final ExecutionEnvironment executionEnvironment
+            @JsonProperty(value = "id", required = true) final String id,
+            @JsonProperty(
+                value = "executionEnvironment",
+                required = true
+            ) final ExecutionEnvironment executionEnvironment
         ) {
             this.id = id;
             this.executionEnvironment = executionEnvironment;

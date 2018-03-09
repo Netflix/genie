@@ -19,9 +19,10 @@ package com.netflix.genie.common.dto.v4;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.ToString;
-import lombok.Value;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.Email;
@@ -29,15 +30,16 @@ import javax.validation.constraints.Size;
 import java.util.Optional;
 
 /**
- * Metadata supplied by a user when a job request is made to Genie.
+ * Metadata supplied by a user for a job.
  *
  * @author tgianos
  * @since 4.0.0
  */
-@Value
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
-public final class JobMetadata extends CommonUserMetadata {
+@Getter
+@ToString(callSuper = true, doNotUseGetters = true)
+@EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
+@JsonDeserialize(builder = JobMetadata.Builder.class)
+public final class JobMetadata extends CommonMetadata {
 
     @Size(max = 255, message = "Max length of the group is 255 characters")
     private final String group;
@@ -98,7 +100,7 @@ public final class JobMetadata extends CommonUserMetadata {
      * @author tgianos
      * @since 4.0.0
      */
-    public static class Builder extends CommonUserMetadata.Builder<Builder> {
+    public static class Builder extends CommonMetadata.Builder<Builder> {
 
         private String bGroup;
         private String bEmail;
@@ -112,7 +114,10 @@ public final class JobMetadata extends CommonUserMetadata {
          * @param user The user to use for the Job
          */
         @JsonCreator
-        public Builder(@JsonProperty("name") final String name, @JsonProperty("user") final String user) {
+        public Builder(
+            @JsonProperty(value = "name", required = true) final String name,
+            @JsonProperty(value = "user", required = true) final String user
+        ) {
             super(name, user);
         }
 

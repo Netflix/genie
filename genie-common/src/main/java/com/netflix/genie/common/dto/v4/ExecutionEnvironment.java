@@ -17,9 +17,12 @@
  */
 package com.netflix.genie.common.dto.v4;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableSet;
-import lombok.Value;
-import lombok.experimental.NonFinal;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.Size;
@@ -32,8 +35,9 @@ import java.util.Set;
  * @author tgianos
  * @since 4.0.0
  */
-@Value
-@NonFinal
+@Getter
+@EqualsAndHashCode(doNotUseGetters = true)
+@ToString(doNotUseGetters = true)
 public class ExecutionEnvironment {
     private final ImmutableSet<@Size(max = 1024, message = "Config file name is longer than 1024 characters") String>
         configs;
@@ -52,10 +56,11 @@ public class ExecutionEnvironment {
      * @param setupFile    Any file that should be run to setup a resource at execution time. 1024 characters max.
      *                     Optional
      */
+    @JsonCreator
     public ExecutionEnvironment(
-        @Nullable final Set<String> configs,
-        @Nullable final Set<String> dependencies,
-        @Nullable final String setupFile
+        @JsonProperty("configs") @Nullable final Set<String> configs,
+        @JsonProperty("dependencies") @Nullable final Set<String> dependencies,
+        @JsonProperty("setupFile") @Nullable final String setupFile
     ) {
         this.configs = configs == null ? ImmutableSet.of() : ImmutableSet.copyOf(configs);
         this.dependencies = dependencies == null ? ImmutableSet.of() : ImmutableSet.copyOf(dependencies);

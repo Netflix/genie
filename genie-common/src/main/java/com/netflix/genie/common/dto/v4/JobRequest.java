@@ -18,12 +18,13 @@
 package com.netflix.genie.common.dto.v4;
 
 import com.google.common.collect.ImmutableList;
-import lombok.Value;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
 import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.File;
 import java.util.List;
@@ -35,11 +36,10 @@ import java.util.Optional;
  * @author tgianos
  * @since 4.0.0
  */
-@Value
-public final class JobRequest {
-
-    @Size(max = 255, message = "Max length for the ID is 255 characters")
-    private final String requestedId;
+@Getter
+@EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
+@ToString(callSuper = true, doNotUseGetters = true)
+public final class JobRequest extends CommonRequestImpl implements AgentJobRequest, ApiJobRequest {
     private final ImmutableList<
         @Size(
             max = 10_000,
@@ -50,174 +50,95 @@ public final class JobRequest {
     private final Integer timeout;
     private final boolean interactive;
     @Valid
-    private final ExecutionEnvironment resources;
-    @Valid
     private final JobMetadata metadata;
     @Valid
     private final ExecutionResourceCriteria criteria;
-    @NotNull
     private final File jobDirectoryLocation;
 
-    @SuppressWarnings("unchecked")
-    private JobRequest(final Builder builder) {
-        this.requestedId = builder.bRequestedId;
-        this.commandArgs = builder.bCommandArgs == null
-            ? ImmutableList.of()
-            : ImmutableList.copyOf(builder.bCommandArgs);
-        this.disableArchiving = builder.bDisableArchival;
-        this.timeout = builder.bTimeout;
-        this.interactive = builder.bInteractive;
-        this.metadata = builder.bMetadata;
-        this.criteria = builder.bCriteria;
-        this.resources = builder.bResources == null
-            ? new ExecutionEnvironment(null, null, null)
-            : builder.bResources;
-        this.jobDirectoryLocation = builder.bJobDirectoryLocation;
+    JobRequest(final AgentJobRequest.Builder builder) {
+        this(
+            builder.getBRequestedId(),
+            builder.getBResources(),
+            builder.getBCommandArgs(),
+            builder.isBDisableArchiving(),
+            builder.getBTimeout(),
+            builder.isBInteractive(),
+            builder.getBMetadata(),
+            builder.getBCriteria(),
+            builder.getBJobDirectoryLocation()
+        );
+    }
+
+    JobRequest(final ApiJobRequest.Builder builder) {
+        this(
+            builder.getBRequestedId(),
+            builder.getBResources(),
+            builder.getBCommandArgs(),
+            builder.isBDisableArchiving(),
+            builder.getBTimeout(),
+            builder.isBInteractive(),
+            builder.getBMetadata(),
+            builder.getBCriteria(),
+            builder.getBJobLocationDirectory()
+        );
     }
 
     /**
-     * Get the ID the user has requested for this Job if one was.
+     * Constructor.
      *
-     * @return The ID wrapped in an {@link Optional}
+     * @param requestedId          The requested id of the job if one was provided by the user
+     * @param resources            The execution resources (if any) provided by the user
+     * @param commandArgs          Any command args provided by the user
+     * @param disableArchiving     Whether to disable archiving of the job directory after job completion
+     * @param timeout              The timeout (in seconds) of the job
+     * @param interactive          Whether the job is interactive or not
+     * @param metadata             Any metadata related to the job provided by the user
+     * @param criteria             The criteria used by the server to determine execution resources
+     *                             (cluster, command, etc)
+     * @param jobDirectoryLocation The optional location where the Genie agent will run the job
      */
-    public Optional<String> getRequestedId() {
-        return Optional.ofNullable(this.requestedId);
+    public JobRequest(
+        @Nullable final String requestedId,
+        @Nullable final ExecutionEnvironment resources,
+        @Nullable final List<String> commandArgs,
+        final boolean disableArchiving,
+        @Nullable final Integer timeout,
+        final boolean interactive,
+        final JobMetadata metadata,
+        final ExecutionResourceCriteria criteria,
+        @Nullable final File jobDirectoryLocation
+    ) {
+        super(requestedId, resources);
+        this.commandArgs = commandArgs == null ? ImmutableList.of() : ImmutableList.copyOf(commandArgs);
+        this.disableArchiving = disableArchiving;
+        this.timeout = timeout;
+        this.interactive = interactive;
+        this.metadata = metadata;
+        this.criteria = criteria;
+        this.jobDirectoryLocation = jobDirectoryLocation;
     }
 
     /**
-     * Get the timeout a user has requested for this job as number of seconds from job start that the server will
-     * kill it.
-     *
-     * @return The timeout duration (in seconds) if one was requested wrapped in an {@link Optional}
+     * {@inheritDoc}
      */
+    @Override
     public Optional<Integer> getTimeout() {
         return Optional.ofNullable(this.timeout);
     }
 
     /**
-     * Get the command arguments a user has requested be appended to a command executable for their job.
-     *
-     * @return The command arguments as an immutable list. Any attempt to modify will throw exception
+     * {@inheritDoc}
      */
+    @Override
     public List<String> getCommandArgs() {
         return this.commandArgs;
     }
 
     /**
-     * Builder for a V4 Job Request.
-     *
-     * @author tgianos
-     * @since 4.0.0
+     * {@inheritDoc}
      */
-    public static class Builder {
-
-        private final JobMetadata bMetadata;
-        private final ExecutionResourceCriteria bCriteria;
-        private String bRequestedId;
-        private ImmutableList<String> bCommandArgs;
-        private Integer bTimeout;
-        private boolean bDisableArchival;
-        private boolean bInteractive;
-        private ExecutionEnvironment bResources;
-        private File bJobDirectoryLocation;
-
-        /**
-         * Constructor with required parameters.
-         *
-         * @param metadata All user supplied metadata
-         * @param criteria All user supplied execution criteria
-         */
-        public Builder(final JobMetadata metadata, final ExecutionResourceCriteria criteria) {
-            this.bMetadata = metadata;
-            this.bCriteria = criteria;
-        }
-
-        /**
-         * Set the id being requested for the job. Will be rejected if the ID is already used by another job. If not
-         * included a GUID will be supplied.
-         *
-         * @param requestedId The requested id. Max of 255 characters.
-         * @return The builder
-         */
-        public Builder withRequestedId(@Nullable final String requestedId) {
-            this.bRequestedId = requestedId;
-            return this;
-        }
-
-        /**
-         * Set the ordered list of command line arguments to append to the command executable at runtime.
-         *
-         * @param commandArgs The arguments in the order they should be placed on the command line. Maximum of 10,000
-         *                    characters per argument
-         * @return The builder
-         */
-        public Builder withCommandArgs(@Nullable final List<String> commandArgs) {
-            this.bCommandArgs = commandArgs == null ? ImmutableList.of() : ImmutableList.copyOf(commandArgs);
-            return this;
-        }
-
-        /**
-         * Set the timeout (in seconds) that the job should be killed after by the service after it has started.
-         *
-         * @param timeout The timeout. Must be greater greater than or equal to 1 but preferably much higher
-         * @return The builder
-         */
-        public Builder withTimeout(@Nullable final Integer timeout) {
-            this.bTimeout = timeout;
-            return this;
-        }
-
-        /**
-         * Set whether to disable log archive for the job.
-         *
-         * @param disableArchival true if you want to disable log archival
-         * @return The builder
-         */
-        public Builder withDisableArchival(final boolean disableArchival) {
-            this.bDisableArchival = disableArchival;
-            return this;
-        }
-
-        /**
-         * Set whether the job should be treated as an interactive job or not.
-         *
-         * @param interactive true if the job is interactive
-         * @return The builder
-         */
-        public Builder withInteractive(final boolean interactive) {
-            this.bInteractive = interactive;
-            return this;
-        }
-
-        /**
-         * Set the execution resources for this job. e.g. setup file or configuration files etc
-         *
-         * @param resources The job resources to use
-         * @return The builder
-         */
-        public Builder withResources(@Nullable final ExecutionEnvironment resources) {
-            this.bResources = resources;
-            return this;
-        }
-
-        /**
-         * Set the directory location where to create the job working directory.
-         *
-         * @param jobDirectoryLocation the directory location
-         * @return The builder
-         */
-        public Builder withJobDirectoryLocation(final File jobDirectoryLocation) {
-            this.bJobDirectoryLocation = jobDirectoryLocation;
-            return this;
-        }
-
-        /**
-         * Build an immutable job request instance.
-         *
-         * @return An immutable representation of the user supplied information for a job request
-         */
-        public JobRequest build() {
-            return new JobRequest(this);
-        }
+    @Override
+    public Optional<File> getJobDirectoryLocation() {
+        return Optional.ofNullable(this.jobDirectoryLocation);
     }
 }

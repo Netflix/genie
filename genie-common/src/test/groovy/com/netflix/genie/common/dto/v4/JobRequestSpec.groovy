@@ -28,7 +28,142 @@ import spock.lang.Specification
  */
 class JobRequestSpec extends Specification {
 
-    def "Can build immutable job request"() {
+    def "Can build immutable api job request"() {
+        def metadata = new JobMetadata.Builder(UUID.randomUUID().toString(), UUID.randomUUID().toString()).build()
+        def criteria = new ExecutionResourceCriteria(
+                Lists.newArrayList(new Criterion.Builder().withId(UUID.randomUUID().toString()).build()),
+                new Criterion.Builder().withId(UUID.randomUUID().toString()).build(),
+                null
+        )
+        def requestedId = UUID.randomUUID().toString()
+        def commandArgs = Lists.newArrayList(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def timeout = 180
+        def interactive = true
+        def disableArchival = true
+        def jobResources = new ExecutionEnvironment(null, null, UUID.randomUUID().toString())
+        def jobDirectoryLocation = new File("/tmp")
+        ApiJobRequest jobRequest
+
+        when:
+        jobRequest = new ApiJobRequest.Builder(metadata, criteria)
+                .withRequestedId(requestedId)
+                .withCommandArgs(commandArgs)
+                .withDisableArchiving(disableArchival)
+                .withTimeout(timeout)
+                .withInteractive(interactive)
+                .withResources(jobResources)
+                .withJobDirectoryLocation(jobDirectoryLocation)
+                .build()
+
+        then:
+        jobRequest.getMetadata() == metadata
+        jobRequest.getCriteria() == criteria
+        jobRequest.getRequestedId().orElse(UUID.randomUUID().toString()) == requestedId
+        jobRequest.getCommandArgs() == commandArgs
+        jobRequest.isDisableArchiving()
+        jobRequest.isInteractive()
+        jobRequest.getTimeout().orElse(-1) == timeout
+        jobRequest.getResources() == jobResources
+        jobRequest.getJobDirectoryLocation().orElse(null) == jobDirectoryLocation
+
+        when:
+        jobRequest = new ApiJobRequest.Builder(metadata, criteria).build()
+
+        then:
+        jobRequest.getMetadata() == metadata
+        jobRequest.getCriteria() == criteria
+        !jobRequest.getRequestedId().isPresent()
+        jobRequest.getCommandArgs().isEmpty()
+        !jobRequest.isDisableArchiving()
+        !jobRequest.isInteractive()
+        !jobRequest.getTimeout().isPresent()
+        jobRequest.getResources() != null
+        !jobRequest.getJobDirectoryLocation().isPresent()
+
+        when:
+        jobRequest = new ApiJobRequest.Builder(metadata, criteria).withCommandArgs(null).build()
+
+        then:
+        jobRequest.getMetadata() == metadata
+        jobRequest.getCriteria() == criteria
+        !jobRequest.getRequestedId().isPresent()
+        jobRequest.getCommandArgs().isEmpty()
+        !jobRequest.isDisableArchiving()
+        !jobRequest.isInteractive()
+        !jobRequest.getTimeout().isPresent()
+        jobRequest.getResources() != null
+        !jobRequest.getJobDirectoryLocation().isPresent()
+    }
+
+    def "Can build immutable agent job request"() {
+        def metadata = new JobMetadata.Builder(UUID.randomUUID().toString(), UUID.randomUUID().toString()).build()
+        def criteria = new ExecutionResourceCriteria(
+                Lists.newArrayList(new Criterion.Builder().withId(UUID.randomUUID().toString()).build()),
+                new Criterion.Builder().withId(UUID.randomUUID().toString()).build(),
+                null
+        )
+        def requestedId = UUID.randomUUID().toString()
+        def commandArgs = Lists.newArrayList(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def timeout = 180
+        def interactive = true
+        def disableArchival = true
+        def jobResources = new ExecutionEnvironment(null, null, UUID.randomUUID().toString())
+        def jobDirectoryLocation = new File("/tmp")
+        AgentJobRequest jobRequest
+
+        when:
+        jobRequest = new AgentJobRequest.Builder(metadata, criteria, jobDirectoryLocation)
+                .withRequestedId(requestedId)
+                .withCommandArgs(commandArgs)
+                .withDisableArchiving(disableArchival)
+                .withTimeout(timeout)
+                .withInteractive(interactive)
+                .withResources(jobResources)
+                .build()
+
+        then:
+        jobRequest.getMetadata() == metadata
+        jobRequest.getCriteria() == criteria
+        jobRequest.getRequestedId().orElse(UUID.randomUUID().toString()) == requestedId
+        jobRequest.getCommandArgs() == commandArgs
+        jobRequest.isDisableArchiving()
+        jobRequest.isInteractive()
+        jobRequest.getTimeout().orElse(-1) == timeout
+        jobRequest.getResources() == jobResources
+        jobRequest.getJobDirectoryLocation().orElse(null) == jobDirectoryLocation
+
+        when:
+        jobRequest = new AgentJobRequest.Builder(metadata, criteria, jobDirectoryLocation).build()
+
+        then:
+        jobRequest.getMetadata() == metadata
+        jobRequest.getCriteria() == criteria
+        !jobRequest.getRequestedId().isPresent()
+        jobRequest.getCommandArgs().isEmpty()
+        !jobRequest.isDisableArchiving()
+        !jobRequest.isInteractive()
+        !jobRequest.getTimeout().isPresent()
+        jobRequest.getResources() != null
+        jobRequest.getJobDirectoryLocation().orElse(null) == jobDirectoryLocation
+
+        when:
+        jobRequest = new AgentJobRequest.Builder(metadata, criteria, jobDirectoryLocation)
+                .withCommandArgs(null)
+                .build()
+
+        then:
+        jobRequest.getMetadata() == metadata
+        jobRequest.getCriteria() == criteria
+        !jobRequest.getRequestedId().isPresent()
+        jobRequest.getCommandArgs().isEmpty()
+        !jobRequest.isDisableArchiving()
+        !jobRequest.isInteractive()
+        !jobRequest.getTimeout().isPresent()
+        jobRequest.getResources() != null
+        jobRequest.getJobDirectoryLocation().orElse(null) == jobDirectoryLocation
+    }
+
+    def "Can build job request"() {
         def metadata = new JobMetadata.Builder(UUID.randomUUID().toString(), UUID.randomUUID().toString()).build()
         def criteria = new ExecutionResourceCriteria(
                 Lists.newArrayList(new Criterion.Builder().withId(UUID.randomUUID().toString()).build()),
@@ -45,15 +180,17 @@ class JobRequestSpec extends Specification {
         JobRequest jobRequest
 
         when:
-        jobRequest = new JobRequest.Builder(metadata, criteria)
-                .withRequestedId(requestedId)
-                .withCommandArgs(commandArgs)
-                .withDisableArchival(disableArchival)
-                .withTimeout(timeout)
-                .withInteractive(interactive)
-                .withResources(jobResources)
-                .withJobDirectoryLocation(jobDirectoryLocation)
-                .build()
+        jobRequest = new JobRequest(
+                requestedId,
+                jobResources,
+                commandArgs,
+                disableArchival,
+                timeout,
+                interactive,
+                metadata,
+                criteria,
+                jobDirectoryLocation
+        )
 
         then:
         jobRequest.getMetadata() == metadata
@@ -64,11 +201,20 @@ class JobRequestSpec extends Specification {
         jobRequest.isInteractive()
         jobRequest.getTimeout().orElse(-1) == timeout
         jobRequest.getResources() == jobResources
-        jobRequest.getJobDirectoryLocation() == jobDirectoryLocation
+        jobRequest.getJobDirectoryLocation().orElse(null) == jobDirectoryLocation
 
         when:
-        jobRequest = new JobRequest.Builder(metadata, criteria)
-                .build()
+        jobRequest = new JobRequest(
+                null,
+                null,
+                null,
+                false,
+                null,
+                false,
+                metadata,
+                criteria,
+                null
+        )
 
         then:
         jobRequest.getMetadata() == metadata
@@ -79,22 +225,6 @@ class JobRequestSpec extends Specification {
         !jobRequest.isInteractive()
         !jobRequest.getTimeout().isPresent()
         jobRequest.getResources() != null
-        jobRequest.getJobDirectoryLocation() == null
-
-        when:
-        jobRequest = new JobRequest.Builder(metadata, criteria)
-                .withCommandArgs(null)
-                .build()
-
-        then:
-        jobRequest.getMetadata() == metadata
-        jobRequest.getCriteria() == criteria
-        !jobRequest.getRequestedId().isPresent()
-        jobRequest.getCommandArgs().isEmpty()
-        !jobRequest.isDisableArchiving()
-        !jobRequest.isInteractive()
-        !jobRequest.getTimeout().isPresent()
-        jobRequest.getResources() != null
-        jobRequest.getJobDirectoryLocation() == null
+        !jobRequest.getJobDirectoryLocation().isPresent()
     }
 }

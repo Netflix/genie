@@ -54,6 +54,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.validation.constraints.NotEmpty;
+import java.io.File;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -107,6 +108,8 @@ public class JobSpecificationServiceImpl implements JobSpecificationService {
      */
     private static final String SELECT_LOAD_BALANCER_COUNTER_NAME
         = "genie.services.specification.loadBalancer.counter";
+
+    private static final File DEFAULT_JOB_DIRECTORY = new File("/tmp/genie/jobs");
 
     private static final String NO_ID_FOUND = "No id found";
 
@@ -189,6 +192,7 @@ public class JobSpecificationServiceImpl implements JobSpecificationService {
             }
 
             //TODO: Right now split on space for 3.x backwards compatibility. In 4.0 fix command executable to be array
+            //TODO: Set the default job location as a server property?
             final List<String> commandArgs = Lists.newArrayList(StringUtils.split(command.getExecutable(), ' '));
             commandArgs.addAll(jobRequest.getCommandArgs());
 
@@ -200,7 +204,7 @@ public class JobSpecificationServiceImpl implements JobSpecificationService {
                 applicationResources,
                 this.generateEnvironmentVariables(id, jobRequest, cluster, command),
                 jobRequest.isInteractive(),
-                jobRequest.getJobDirectoryLocation()
+                jobRequest.getJobDirectoryLocation().orElse(DEFAULT_JOB_DIRECTORY)
             );
 
             MetricsUtils.addSuccessTags(tags);

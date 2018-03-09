@@ -75,12 +75,17 @@ class JobSpecificationServiceImplSpec extends Specification {
                         .build()
         )
         def commandCriterion = new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build()
-        def jobRequest = new JobRequest.Builder(
+        def jobRequest = new JobRequest(
+                null,
+                null,
+                commandArgs,
+                false,
+                null,
+                false,
                 new JobMetadata.Builder(jobName, UUID.randomUUID().toString()).build(),
-                new ExecutionResourceCriteria(clusterCriteria, commandCriterion, null)
+                new ExecutionResourceCriteria(clusterCriteria, commandCriterion, null),
+                null
         )
-                .withCommandArgs(commandArgs)
-                .build()
         def cluster1 = new Cluster.Builder(
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
@@ -212,11 +217,17 @@ class JobSpecificationServiceImplSpec extends Specification {
                         .build()
         )
         def commandCriterion = new Criterion.Builder().withTags(Sets.newHashSet(UUID.randomUUID().toString())).build()
-        def jobRequest = new JobRequest.Builder(
+        def jobRequest = new JobRequest(
+                null,
+                null,
+                null,
+                false,
+                null,
+                false,
                 new JobMetadata.Builder(jobName, UUID.randomUUID().toString()).build(),
-                new ExecutionResourceCriteria(clusterCriteria, commandCriterion, null)
+                new ExecutionResourceCriteria(clusterCriteria, commandCriterion, null),
+                null
         )
-                .build()
         def cluster = new Cluster.Builder(
                 clusterName,
                 UUID.randomUUID().toString(),
@@ -349,7 +360,13 @@ class JobSpecificationServiceImplSpec extends Specification {
                 jobsProperties
         )
 
-        def jobRequest = new JobRequest.Builder(
+        def jobRequest = new JobRequest(
+                null,
+                new ExecutionEnvironment(configs, dependencies, setupFile),
+                commandArgs,
+                true,
+                timeout,
+                true,
                 new JobMetadata.Builder(name, user)
                         .withTags(tags)
                         .withGroupingInstance(groupingInstance)
@@ -360,14 +377,9 @@ class JobSpecificationServiceImplSpec extends Specification {
                         .withDescription(description)
                         .withVersion(version)
                         .build(),
-                new ExecutionResourceCriteria(clusterCriteria, commandCriterion, applicationIds)
+                new ExecutionResourceCriteria(clusterCriteria, commandCriterion, applicationIds),
+                null
         )
-                .withCommandArgs(commandArgs)
-                .withInteractive(true)
-                .withTimeout(timeout)
-                .withDisableArchival(true)
-                .withResources(new ExecutionEnvironment(configs, dependencies, setupFile))
-                .build()
 
         when:
         def v3JobRequest = service.toV3JobRequest(id, jobRequest)
