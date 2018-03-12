@@ -77,7 +77,7 @@ public interface DownloadService {
         Set<URI> getSourceFileUris();
 
         /**
-         * Get the entries: URI source -> File target.
+         * Get the manifest entries.
          * @return an immutable set of entries in this manifest
          */
         Set<Pair<URI, File>> getEntries();
