@@ -13,7 +13,7 @@ if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
   # ... and PostgreSQL
   INTEGRATION_TEST_DB=postgresql ./gradlew --no-daemon genie-web:integrationTests
   # Build Docker images and compile documentation
-  ./gradlew --no-daemon asciidoc dockerBuildAllImages
+  ./gradlew --no-daemon javadoc asciidoc dockerBuildAllImages
 elif [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_TAG" == "" ]; then
   echo -e 'Build Branch with Snapshot => Branch ['$TRAVIS_BRANCH']'
   ./gradlew --no-daemon -Prelease.travisBranch=$TRAVIS_BRANCH -Prelease.travisci=true -PbintrayUser="${bintrayUser}" -PbintrayKey="${bintrayKey}" -PsonatypeUsername="${sonatypeUsername}" -PsonatypePassword="${sonatypePassword}" snapshot coveralls publishGhPages dockerPush
