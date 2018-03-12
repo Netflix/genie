@@ -8,6 +8,7 @@ com.netflix.genie.agent.execution.services.impl.grpc
 com.netflix.genie.agent.execution.statemachine
 com.netflix.genie.agent.execution.statemachine.actions
 com.netflix.genie.agent.execution.statemachine.listeners
+com.netflix.genie.agent.utils
 com.netflix.genie.client
 com.netflix.genie.client.apis
 com.netflix.genie.client.configs
@@ -19,6 +20,7 @@ com.netflix.genie.common.dto
 com.netflix.genie.common.dto.search
 com.netflix.genie.common.dto.v4
 com.netflix.genie.common.exceptions
+com.netflix.genie.common.jobs
 com.netflix.genie.common.util
 com.netflix.genie.test.categories
 com.netflix.genie.test.suppliers
