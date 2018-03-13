@@ -37,7 +37,8 @@ import javax.validation.constraints.NotNull;
 @ToString(callSuper = true, doNotUseGetters = true)
 @EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 @JsonDeserialize(builder = CommandMetadata.Builder.class)
-public final class CommandMetadata extends CommonMetadata {
+@SuppressWarnings("checkstyle:finalclass")
+public class CommandMetadata extends CommonMetadata {
 
     @NotNull(message = "A command status is required")
     private final CommandStatus status;

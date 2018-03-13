@@ -39,7 +39,8 @@ import java.util.Optional;
 @ToString(callSuper = true, doNotUseGetters = true)
 @EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 @JsonDeserialize(builder = JobMetadata.Builder.class)
-public final class JobMetadata extends CommonMetadata {
+@SuppressWarnings("checkstyle:finalclass")
+public class JobMetadata extends CommonMetadata {
 
     @Size(max = 255, message = "Max length of the group is 255 characters")
     private final String group;

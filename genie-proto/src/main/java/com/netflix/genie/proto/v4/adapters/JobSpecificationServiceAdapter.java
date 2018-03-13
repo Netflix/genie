@@ -21,6 +21,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.netflix.genie.common.dto.v4.AgentEnvironmentRequest;
 import com.netflix.genie.common.dto.v4.AgentJobRequest;
 import com.netflix.genie.common.dto.v4.Criterion;
 import com.netflix.genie.common.dto.v4.ExecutionEnvironment;
@@ -136,7 +137,11 @@ public final class JobSpecificationServiceAdapter {
             jobMetadata.getIsInteractive(),
             userMetadata,
             executionResourceCriteria,
-            jobMetadata.getJobDirectoryLocation() == null ? null : new File(jobMetadata.getJobDirectoryLocation())
+            jobMetadata.getJobDirectoryLocation() == null
+                ? null
+                : new AgentEnvironmentRequest.Builder()
+                .withRequestedJobDirectoryLocation(jobMetadata.getJobDirectoryLocation())
+                .build()
         );
     }
 
@@ -298,7 +303,7 @@ public final class JobSpecificationServiceAdapter {
         builder.addAllCommandArgs(jobRequest.getCommandArgs());
         builder.setIsInteractive(jobRequest.isInteractive());
         jobRequest
-            .getJobDirectoryLocation()
+            .getRequestedJobDirectoryLocation()
             .ifPresent(location -> builder.setJobDirectoryLocation(location.getAbsolutePath()));
         return builder.build();
     }

@@ -204,7 +204,7 @@ public class JobSpecificationServiceImpl implements JobSpecificationService {
                 applicationResources,
                 this.generateEnvironmentVariables(id, jobRequest, cluster, command),
                 jobRequest.isInteractive(),
-                jobRequest.getJobDirectoryLocation().orElse(DEFAULT_JOB_DIRECTORY)
+                jobRequest.getRequestedJobDirectoryLocation().orElse(DEFAULT_JOB_DIRECTORY)
             );
 
             MetricsUtils.addSuccessTags(tags);
@@ -496,7 +496,7 @@ public class JobSpecificationServiceImpl implements JobSpecificationService {
             .withId(id)
             .withApplications(jobRequest.getCriteria().getApplicationIds())
             .withCommandArgs(jobRequest.getCommandArgs())
-            .withDisableLogArchival(jobRequest.isDisableArchiving())
+            .withDisableLogArchival(jobRequest.isArchivingDisabled())
             .withTags(jobRequest.getMetadata().getTags());
 
         final JobMetadata metadata = jobRequest.getMetadata();

@@ -57,7 +57,7 @@ public interface AgentJobRequest extends CommonRequest {
      *
      * @return True if archiving is disabled
      */
-    boolean isDisableArchiving();
+    boolean isArchivingDisabled();
 
     /**
      * Whether this job is interactive or not.
@@ -85,7 +85,7 @@ public interface AgentJobRequest extends CommonRequest {
      *
      * @return The job directory wrapped in an {@link Optional}
      */
-    Optional<File> getJobDirectoryLocation();
+    Optional<File> getRequestedJobDirectoryLocation();
 
     /**
      * Builder for a V4 Job Request.
@@ -98,29 +98,29 @@ public interface AgentJobRequest extends CommonRequest {
 
         private final JobMetadata bMetadata;
         private final ExecutionResourceCriteria bCriteria;
-        private final File bJobDirectoryLocation;
+        private final File bRequestedJobDirectoryLocation;
         private ImmutableList<String> bCommandArgs;
         private Integer bTimeout;
-        private boolean bDisableArchiving;
+        private boolean bArchivingDisabled;
         private boolean bInteractive;
 
         /**
          * Constructor with required parameters.
          *
-         * @param metadata             All user supplied metadata
-         * @param criteria             All user supplied execution criteria
-         * @param jobDirectoryLocation The location on the agent box the job directory will be placed
+         * @param metadata                      All user supplied metadata
+         * @param criteria                      All user supplied execution criteria
+         * @param requestedJobDirectoryLocation The location on the agent box the job directory will be placed
          */
         @JsonCreator
         public Builder(
             @JsonProperty(value = "metadata", required = true) final JobMetadata metadata,
             @JsonProperty(value = "criteria", required = true) final ExecutionResourceCriteria criteria,
-            @JsonProperty(value = "jobDirectoryLocation", required = true) final File jobDirectoryLocation
+            @JsonProperty(value = "jobDirectoryLocation", required = true) final String requestedJobDirectoryLocation
         ) {
             super();
             this.bMetadata = metadata;
             this.bCriteria = criteria;
-            this.bJobDirectoryLocation = jobDirectoryLocation;
+            this.bRequestedJobDirectoryLocation = new File(requestedJobDirectoryLocation);
         }
 
         /**
@@ -149,11 +149,11 @@ public interface AgentJobRequest extends CommonRequest {
         /**
          * Set whether to disable log archive for the job.
          *
-         * @param disableArchival true if you want to disable log archival
+         * @param archivingDisabled true if you want to disable log archival
          * @return The builder
          */
-        public Builder withDisableArchiving(final boolean disableArchival) {
-            this.bDisableArchiving = disableArchival;
+        public Builder withArchivingDisabled(final boolean archivingDisabled) {
+            this.bArchivingDisabled = archivingDisabled;
             return this;
         }
 

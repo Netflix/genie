@@ -64,7 +64,7 @@ class JobSpecificationServiceAdapterSpec extends Specification {
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString()
     )
-    def jobDirectoryLocation = new File("/tmp")
+    def jobDirectoryLocation = "/tmp"
 
     def configs = Sets.newHashSet(
             UUID.randomUUID().toString(),
@@ -290,7 +290,7 @@ class JobSpecificationServiceAdapterSpec extends Specification {
                 .addAllDependencies(dependencies)
                 .addAllCommandArgs(commandArgs)
                 .setIsInteractive(interactive)
-                .setJobDirectoryLocation(jobDirectoryLocation.getAbsolutePath())
+                .setJobDirectoryLocation(jobDirectoryLocation)
                 .build()
 
         def executionResourceCriteriaProto = com.netflix.genie.proto.ExecutionResourceCriteria.newBuilder()
@@ -371,7 +371,7 @@ class JobSpecificationServiceAdapterSpec extends Specification {
                 ),
                 environmentVariables,
                 interactive,
-                jobDirectoryLocation
+                new File(jobDirectoryLocation)
         )
     }
 
@@ -419,7 +419,7 @@ class JobSpecificationServiceAdapterSpec extends Specification {
         def jobSpecification = com.netflix.genie.proto.JobSpecification
                 .newBuilder()
                 .setIsInteractive(interactive)
-                .setJobDirectoryLocation(jobDirectoryLocation.getAbsolutePath())
+                .setJobDirectoryLocation(jobDirectoryLocation)
                 .putAllEnvironmentVariables(environmentVariables)
                 .addAllCommandArgs(commandArgs)
                 .setJob(job)
