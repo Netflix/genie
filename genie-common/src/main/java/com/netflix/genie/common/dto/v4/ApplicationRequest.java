@@ -36,7 +36,8 @@ import javax.validation.Valid;
 @EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 @ToString(callSuper = true, doNotUseGetters = true)
 @JsonDeserialize(builder = ApplicationRequest.Builder.class)
-public final class ApplicationRequest extends CommonRequestImpl {
+@SuppressWarnings("checkstyle:finalclass")
+public class ApplicationRequest extends CommonRequestImpl {
 
     @Valid
     private final ApplicationMetadata metadata;

@@ -25,7 +25,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 
 import javax.annotation.Nullable;
-import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,7 +56,7 @@ public interface ApiJobRequest extends CommonRequest {
      *
      * @return True if archiving is disabled
      */
-    boolean isDisableArchiving();
+    boolean isArchivingDisabled();
 
     /**
      * Whether this job is interactive or not.
@@ -81,11 +80,11 @@ public interface ApiJobRequest extends CommonRequest {
     ExecutionResourceCriteria getCriteria();
 
     /**
-     * The directory requested to place the job when the agent runs.
+     * Get the environment parameters the user requested to be associated with the Agent.
      *
-     * @return The job directory wrapped in an {@link Optional}
+     * @return The requested agent environment
      */
-    Optional<File> getJobDirectoryLocation();
+    AgentEnvironmentRequest getRequestedAgentEnvironment();
 
     /**
      * Builder for a V4 Job Request.
@@ -100,9 +99,9 @@ public interface ApiJobRequest extends CommonRequest {
         private final ExecutionResourceCriteria bCriteria;
         private ImmutableList<String> bCommandArgs;
         private Integer bTimeout;
-        private boolean bDisableArchiving;
+        private boolean bArchivingDisabled;
         private boolean bInteractive;
-        private File bJobLocationDirectory;
+        private AgentEnvironmentRequest bRequestedAgentEnvironment;
 
         /**
          * Constructor with required parameters.
@@ -146,11 +145,11 @@ public interface ApiJobRequest extends CommonRequest {
         /**
          * Set whether to disable log archive for the job.
          *
-         * @param disableArchival true if you want to disable log archival
+         * @param archivingDisabled true if you want to disable log archival
          * @return The builder
          */
-        public Builder withDisableArchiving(final boolean disableArchival) {
-            this.bDisableArchiving = disableArchival;
+        public Builder withArchivingDisabled(final boolean archivingDisabled) {
+            this.bArchivingDisabled = archivingDisabled;
             return this;
         }
 
@@ -166,13 +165,15 @@ public interface ApiJobRequest extends CommonRequest {
         }
 
         /**
-         * Set the directory location where to create the job working directory.
+         * Set the information provided by a user for the Agent execution environment.
          *
-         * @param jobDirectoryLocation the directory location
+         * @param requestedAgentEnvironment the requested Genie Agent environment parameters
          * @return The builder
          */
-        public Builder withJobDirectoryLocation(final File jobDirectoryLocation) {
-            this.bJobLocationDirectory = jobDirectoryLocation;
+        public Builder withRequestedAgentEnvironment(
+            @Nullable final AgentEnvironmentRequest requestedAgentEnvironment
+        ) {
+            this.bRequestedAgentEnvironment = requestedAgentEnvironment;
             return this;
         }
 

@@ -43,7 +43,8 @@ import java.util.Optional;
 @EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 @ToString(callSuper = true, doNotUseGetters = true)
 @JsonDeserialize(builder = CommandRequest.Builder.class)
-public final class CommandRequest extends CommonRequestImpl {
+@SuppressWarnings("checkstyle:finalclass")
+public class CommandRequest extends CommonRequestImpl {
 
     @Valid
     private final CommandMetadata metadata;

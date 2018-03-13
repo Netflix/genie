@@ -39,13 +39,14 @@ import java.util.Optional;
 @Getter
 @EqualsAndHashCode(callSuper = true, doNotUseGetters = true)
 @ToString(callSuper = true, doNotUseGetters = true)
-public final class JobRequest extends CommonRequestImpl implements AgentJobRequest, ApiJobRequest {
+@SuppressWarnings("checkstyle:finalclass")
+public class JobRequest extends CommonRequestImpl implements AgentJobRequest, ApiJobRequest {
     private final ImmutableList<
         @Size(
             max = 10_000,
             message = "Max length of an individual command line argument is 10,000 characters"
         ) String> commandArgs;
-    private final boolean disableArchiving;
+    private final boolean archivingDisabled;
     @Min(value = 1, message = "The timeout must be at least 1 second, preferably much more.")
     private final Integer timeout;
     private final boolean interactive;
@@ -53,19 +54,23 @@ public final class JobRequest extends CommonRequestImpl implements AgentJobReque
     private final JobMetadata metadata;
     @Valid
     private final ExecutionResourceCriteria criteria;
-    private final File jobDirectoryLocation;
+    @Valid
+    private final AgentEnvironmentRequest requestedAgentEnvironment;
 
     JobRequest(final AgentJobRequest.Builder builder) {
         this(
             builder.getBRequestedId(),
             builder.getBResources(),
             builder.getBCommandArgs(),
-            builder.isBDisableArchiving(),
+            builder.isBArchivingDisabled(),
             builder.getBTimeout(),
             builder.isBInteractive(),
             builder.getBMetadata(),
             builder.getBCriteria(),
-            builder.getBJobDirectoryLocation()
+            new AgentEnvironmentRequest
+                .Builder()
+                .withRequestedJobDirectoryLocation(builder.getBRequestedJobDirectoryLocation())
+                .build()
         );
     }
 
@@ -74,48 +79,50 @@ public final class JobRequest extends CommonRequestImpl implements AgentJobReque
             builder.getBRequestedId(),
             builder.getBResources(),
             builder.getBCommandArgs(),
-            builder.isBDisableArchiving(),
+            builder.isBArchivingDisabled(),
             builder.getBTimeout(),
             builder.isBInteractive(),
             builder.getBMetadata(),
             builder.getBCriteria(),
-            builder.getBJobLocationDirectory()
+            builder.getBRequestedAgentEnvironment()
         );
     }
 
     /**
      * Constructor.
      *
-     * @param requestedId          The requested id of the job if one was provided by the user
-     * @param resources            The execution resources (if any) provided by the user
-     * @param commandArgs          Any command args provided by the user
-     * @param disableArchiving     Whether to disable archiving of the job directory after job completion
-     * @param timeout              The timeout (in seconds) of the job
-     * @param interactive          Whether the job is interactive or not
-     * @param metadata             Any metadata related to the job provided by the user
-     * @param criteria             The criteria used by the server to determine execution resources
-     *                             (cluster, command, etc)
-     * @param jobDirectoryLocation The optional location where the Genie agent will run the job
+     * @param requestedId               The requested id of the job if one was provided by the user
+     * @param resources                 The execution resources (if any) provided by the user
+     * @param commandArgs               Any command args provided by the user
+     * @param archivingDisabled         Whether to disable archiving of the job directory after job completion
+     * @param timeout                   The timeout (in seconds) of the job
+     * @param interactive               Whether the job is interactive or not
+     * @param metadata                  Any metadata related to the job provided by the user
+     * @param criteria                  The criteria used by the server to determine execution resources
+     *                                  (cluster, command, etc)
+     * @param requestedAgentEnvironment The optional agent environment request parameters
      */
     public JobRequest(
         @Nullable final String requestedId,
         @Nullable final ExecutionEnvironment resources,
         @Nullable final List<String> commandArgs,
-        final boolean disableArchiving,
+        final boolean archivingDisabled,
         @Nullable final Integer timeout,
         final boolean interactive,
         final JobMetadata metadata,
         final ExecutionResourceCriteria criteria,
-        @Nullable final File jobDirectoryLocation
+        @Nullable final AgentEnvironmentRequest requestedAgentEnvironment
     ) {
         super(requestedId, resources);
         this.commandArgs = commandArgs == null ? ImmutableList.of() : ImmutableList.copyOf(commandArgs);
-        this.disableArchiving = disableArchiving;
+        this.archivingDisabled = archivingDisabled;
         this.timeout = timeout;
         this.interactive = interactive;
         this.metadata = metadata;
         this.criteria = criteria;
-        this.jobDirectoryLocation = jobDirectoryLocation;
+        this.requestedAgentEnvironment = requestedAgentEnvironment == null
+            ? new AgentEnvironmentRequest.Builder().build()
+            : requestedAgentEnvironment;
     }
 
     /**
@@ -138,7 +145,7 @@ public final class JobRequest extends CommonRequestImpl implements AgentJobReque
      * {@inheritDoc}
      */
     @Override
-    public Optional<File> getJobDirectoryLocation() {
-        return Optional.ofNullable(this.jobDirectoryLocation);
+    public Optional<File> getRequestedJobDirectoryLocation() {
+        return this.requestedAgentEnvironment.getRequestedJobDirectoryLocation();
     }
 }
