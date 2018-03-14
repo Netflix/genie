@@ -242,7 +242,6 @@ configure(javaProjects) {
             generatedSourcesJavaDir.mkdirs()
             generatedSourcesGRPCJavaDir.mkdirs()
         }
-        dependsOn(removeGeneratedSources)
         options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
         options.incremental = true
         options.compilerArgs += ['-s', generatedSourcesJavaDir]
@@ -268,7 +267,7 @@ configure(javaProjects) {
                 }
             }
 
-            reports.html.destination = file("${reporting.baseDir}/test/${task.name}")
+            reports.html.setDestination(new File("${reporting.baseDir}/test/${task.name}"))
             jacocoTestReport.executionData += files("$buildDir/jacoco/${task.name}.exec")
     }
 
