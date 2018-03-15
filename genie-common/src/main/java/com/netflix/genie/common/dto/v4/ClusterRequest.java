@@ -40,7 +40,7 @@ import javax.validation.Valid;
 public class ClusterRequest extends CommonRequestImpl {
 
     @Valid
-    private final CommonMetadata metadata;
+    private final ClusterMetadata metadata;
 
     private ClusterRequest(final Builder builder) {
         super(builder);
@@ -55,7 +55,7 @@ public class ClusterRequest extends CommonRequestImpl {
      */
     public static class Builder extends CommonRequestImpl.Builder<Builder> {
 
-        private final CommonMetadata bMetadata;
+        private final ClusterMetadata bMetadata;
 
         /**
          * Constructor which has required fields.
@@ -64,7 +64,7 @@ public class ClusterRequest extends CommonRequestImpl {
          */
         @JsonCreator
         public Builder(
-            @JsonProperty(value = "metadata", required = true) final CommonMetadata metadata
+            @JsonProperty(value = "metadata", required = true) final ClusterMetadata metadata
         ) {
             super();
             this.bMetadata = metadata;
