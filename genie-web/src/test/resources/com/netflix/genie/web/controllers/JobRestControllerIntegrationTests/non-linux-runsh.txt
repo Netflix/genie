@@ -89,6 +89,8 @@ export GENIE_JOB_NAME="List * ... Directories bash job"
 
 export GENIE_JOB_MEMORY=1024
 
+export GENIE_JOB_TAGS="JOB_TAGS_PLACEHOLDER"
+
 export GENIE_REQUESTED_COMMAND_TAGS="bash"
 
 export GENIE_REQUESTED_CLUSTER_TAGS="[[localhost]]"
