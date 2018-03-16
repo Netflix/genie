@@ -106,7 +106,8 @@ public class InitialSetupTask extends GenieBaseTask {
                 writer,
                 jobId,
                 jobExecEnv.getJobRequest().getName(),
-                jobExecEnv.getMemory()
+                jobExecEnv.getMemory(),
+                jobExecEnv.getJobRequest().getTags()
             );
 
             // create environment variables for the job request
@@ -344,7 +345,8 @@ public class InitialSetupTask extends GenieBaseTask {
         final Writer writer,
         final String jobId,
         final String jobName,
-        final int memory
+        final int memory,
+        final Set<String> jobTags
     ) throws GenieException, IOException {
         writer.write(JobConstants.EXPORT
             + JobConstants.GENIE_JOB_ID_ENV_VAR
@@ -375,6 +377,21 @@ public class InitialSetupTask extends GenieBaseTask {
                 + JobConstants.GENIE_JOB_MEMORY_ENV_VAR
                 + JobConstants.EQUALS_SYMBOL
                 + memory
+                + LINE_SEPARATOR
+        );
+
+        // Append new line
+        writer.write(LINE_SEPARATOR);
+
+
+        // create environment variable for the job tags
+        writer.write(
+            JobConstants.EXPORT
+                + JobConstants.GENIE_JOB_TAGS_ENV_VAR
+                + JobConstants.EQUALS_SYMBOL
+                + JobConstants.DOUBLE_QUOTE_SYMBOL
+                + this.tagsToString(jobTags)
+                + JobConstants.DOUBLE_QUOTE_SYMBOL
                 + LINE_SEPARATOR
         );
 
