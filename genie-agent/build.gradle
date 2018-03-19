@@ -10,10 +10,13 @@ dependencies {
 
     // Spring
     compile("org.springframework.boot:spring-boot-starter")
+    compile("org.springframework.cloud:spring-cloud-aws-context")
+    compile("org.springframework.cloud:spring-cloud-starter-aws")
     compile("org.springframework.statemachine:spring-statemachine-core")
 
     // Misc
     compile("com.beust:jcommander")
+    compile("com.amazonaws:aws-java-sdk-sts")
     compile("io.grpc:grpc-netty")
     compile("javax.el:javax.el-api")
     compile("org.apache.commons:commons-lang3")
