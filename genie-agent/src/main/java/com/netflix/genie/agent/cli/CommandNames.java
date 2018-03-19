@@ -34,5 +34,7 @@ final class CommandNames {
 
     static final String PING = "ping";
 
+    static final String DOWNLOAD = "download";
+
     private CommandNames() { }
 }
