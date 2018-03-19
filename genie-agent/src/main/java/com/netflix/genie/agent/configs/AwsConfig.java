@@ -15,46 +15,31 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie;
+package com.netflix.genie.agent.configs;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jmx.JmxAutoConfiguration;
 import org.springframework.cloud.aws.autoconfigure.context.ContextCredentialsAutoConfiguration;
 import org.springframework.cloud.aws.autoconfigure.context.ContextRegionProviderAutoConfiguration;
 import org.springframework.cloud.aws.autoconfigure.context.ContextResourceLoaderAutoConfiguration;
 import org.springframework.cloud.aws.autoconfigure.context.ContextStackAutoConfiguration;
+import org.springframework.cloud.aws.context.annotation.ConditionalOnAwsCloudEnvironment;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 /**
- * Genie Agent application.
+ * Configuration for AWS interaction.
  *
- * @author mprimi
+ * @author tgianos
  * @since 4.0.0
  */
-@SpringBootApplication(
-    exclude = {
-        JmxAutoConfiguration.class,
+@Configuration
+@ConditionalOnAwsCloudEnvironment
+@Import(
+    {
         ContextCredentialsAutoConfiguration.class,
         ContextResourceLoaderAutoConfiguration.class,
         ContextRegionProviderAutoConfiguration.class,
         ContextStackAutoConfiguration.class,
     }
 )
-public class GenieAgentApplication {
-    /**
-     * Main method, actual execution is delegated to GenieAgentRunner.
-     *
-     * @param args command-line arguments
-     */
-    public static void main(final String[] args) {
-        System.exit(new GenieAgentApplication().run(args));
-    }
-
-    private int run(final String[] args) {
-        return SpringApplication.exit(
-            SpringApplication.run(
-                GenieAgentApplication.class, args
-            )
-        );
-    }
+public class AwsConfig {
 }
