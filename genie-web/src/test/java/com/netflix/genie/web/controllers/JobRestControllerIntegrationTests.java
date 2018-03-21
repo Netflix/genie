@@ -79,6 +79,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -1376,6 +1377,12 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
         final String jobWorkingDir,
         final String jobId
     ) {
+        /* Sort the job tags in the same order as they are created in the run script by the server.
+         * Else test might fail sometimes.
+         */
+        final List<String> sortedJobTags = Arrays.asList(JOB_TAG1, JOB_TAG2);
+        sortedJobTags.sort(Comparator.naturalOrder());
+
         return runFileContents
             .replace("TEST_GENIE_JOB_WORKING_DIR_PLACEHOLDER", jobWorkingDir)
             .replace("JOB_ID_PLACEHOLDER", jobId)
@@ -1385,7 +1392,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
             .replace("CLUSTER_ID_PLACEHOLDER", CLUSTER1_ID)
             .replace("CLUSTER_NAME_PLACEHOLDER", CLUSTER1_NAME)
             .replace("CLUSTER_TAGS_PLACEHOLDER", CLUSTER1_TAGS)
-            .replace("JOB_TAGS_PLACEHOLDER", StringUtils.join(Arrays.asList(JOB_TAG1, JOB_TAG2), ","));
+            .replace("JOB_TAGS_PLACEHOLDER", StringUtils.join(sortedJobTags, ","));
 
     }
 

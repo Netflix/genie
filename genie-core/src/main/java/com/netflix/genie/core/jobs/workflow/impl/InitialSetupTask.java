@@ -383,7 +383,6 @@ public class InitialSetupTask extends GenieBaseTask {
         // Append new line
         writer.write(LINE_SEPARATOR);
 
-
         // create environment variable for the job tags
         writer.write(
             JobConstants.EXPORT
