@@ -42,7 +42,7 @@ import java.util.Set;
 @Getter
 @EqualsAndHashCode(doNotUseGetters = true)
 @ToString(doNotUseGetters = true)
-abstract class CommonMetadata {
+public abstract class CommonMetadata {
     @NotEmpty(message = "A name is required and must be at most 255 characters")
     @Size(max = 255, message = "The name can be no longer than 255 characters")
     private final String name;
