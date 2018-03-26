@@ -1,6 +1,7 @@
 com.netflix.genie
 com.netflix.genie.agent
 com.netflix.genie.agent.cli
+com.netflix.genie.agent.configs
 com.netflix.genie.agent.execution
 com.netflix.genie.agent.execution.exceptions
 com.netflix.genie.agent.execution.services
