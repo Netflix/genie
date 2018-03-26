@@ -159,7 +159,7 @@ class JobSpecificationServiceImplSpec extends Specification {
         jobSpec.getCommand().getId() == commandId
         jobSpec.getApplications().isEmpty()
         !jobSpec.isInteractive()
-        jobSpec.getEnvironmentVariables().size() == 14
+        jobSpec.getEnvironmentVariables().size() == 15
     }
 
     def "Can convert tags to string"() {
@@ -224,7 +224,10 @@ class JobSpecificationServiceImplSpec extends Specification {
                 false,
                 null,
                 false,
-                new JobMetadata.Builder(jobName, UUID.randomUUID().toString()).build(),
+                new JobMetadata
+                        .Builder(jobName, UUID.randomUUID().toString())
+                        .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+                        .build(),
                 new ExecutionResourceCriteria(clusterCriteria, commandCriterion, null),
                 null
         )
@@ -267,6 +270,7 @@ class JobSpecificationServiceImplSpec extends Specification {
         envVariables.get(JobConstants.GENIE_REQUESTED_CLUSTER_TAGS_ENV_VAR + "_0") == service.tagsToString(clusterCriteria.get(0).getTags())
         envVariables.get(JobConstants.GENIE_REQUESTED_CLUSTER_TAGS_ENV_VAR + "_1") == service.tagsToString(clusterCriteria.get(1).getTags())
         envVariables.get(JobConstants.GENIE_REQUESTED_CLUSTER_TAGS_ENV_VAR) == "[[" + service.tagsToString(clusterCriteria.get(0).getTags()) + "],[" + service.tagsToString(clusterCriteria.get(1).getTags()) + "]]"
+        envVariables.get(JobConstants.GENIE_JOB_TAGS_ENV_VAR) == service.tagsToString(jobRequest.getMetadata().getTags())
     }
 
     def "Can convert V4 Criterion to V3 tags"() {
