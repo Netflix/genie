@@ -452,6 +452,7 @@ public class JobSpecificationServiceImpl implements JobSpecificationService {
             JobConstants.GENIE_JOB_MEMORY_ENV_VAR,
             String.valueOf(command.getMemory().orElse(this.defaultMemory))
         );
+        envVariables.put(JobConstants.GENIE_JOB_TAGS_ENV_VAR, this.tagsToString(jobRequest.getMetadata().getTags()));
         envVariables.put(
             JobConstants.GENIE_REQUESTED_COMMAND_TAGS_ENV_VAR,
             this.tagsToString(jobRequest.getCriteria().getCommandCriterion().getTags())
