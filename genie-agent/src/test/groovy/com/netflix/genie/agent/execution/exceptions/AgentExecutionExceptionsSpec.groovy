@@ -48,5 +48,6 @@ class AgentExecutionExceptionsSpec extends Specification {
         DownloadException.class                     | _
         SetUpJobException.class                     | _
         JobLaunchException.class                    | _
+        JobSpecificationResolutionException.class   | _
     }
 }
