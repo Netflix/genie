@@ -18,6 +18,16 @@
 
 package com.netflix.genie.agent.cli;
 
+import com.google.common.annotations.VisibleForTesting;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 /**
  * Constants for command names.
  *
@@ -36,5 +46,26 @@ final class CommandNames {
 
     static final String DOWNLOAD = "download";
 
+    private static final Set<Field> COMMAND_NAMES_FIELDS;
+
+    static {
+        final Field[] fields = CommandNames.class.getDeclaredFields();
+        final List<Field> superFields = Arrays.asList(CommandNames.class.getSuperclass().getDeclaredFields());
+        COMMAND_NAMES_FIELDS = Collections.unmodifiableSet(
+            Arrays.stream(fields)
+            .filter(f -> Modifier.isStatic(f.getModifiers()))
+            .filter(f -> Modifier.isFinal(f.getModifiers()))
+            .filter(f -> f.getType() == String.class)
+            .filter(f -> !superFields.contains(f))
+            .peek(f -> f.setAccessible(true))
+            .collect(Collectors.toSet())
+        );
+    }
+
     private CommandNames() { }
+
+    @VisibleForTesting
+    static Set<Field> getCommandNamesFields() {
+        return COMMAND_NAMES_FIELDS;
+    }
 }
