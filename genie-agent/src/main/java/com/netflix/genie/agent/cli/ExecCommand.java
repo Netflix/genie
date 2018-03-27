@@ -18,7 +18,6 @@
 
 package com.netflix.genie.agent.cli;
 
-import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
 import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine;
@@ -75,21 +74,23 @@ class ExecCommand implements AgentCommand {
     @Parameters(commandNames = CommandNames.EXEC, commandDescription = "Execute a Genie job")
     @Getter
     static class ExecCommandArguments implements AgentCommandArguments {
-        @Parameter(names = "timeout", description = "Job execution timeout")
-        private int jobTimeout = 2000;
-
         @ParametersDelegate
         private final ArgumentDelegates.ServerArguments serverArguments;
 
         @ParametersDelegate
-        private final ArgumentDelegates.CacheArguments cacheArgumentsArguments;
+        private final ArgumentDelegates.CacheArguments cacheArguments;
+
+        @ParametersDelegate
+        private final ArgumentDelegates.JobRequestArguments jobRequestArguments;
 
         ExecCommandArguments(
             final ArgumentDelegates.ServerArguments serverArguments,
-            final ArgumentDelegates.CacheArguments cacheArgumentsArguments
+            final ArgumentDelegates.CacheArguments cacheArguments,
+            final ArgumentDelegates.JobRequestArguments jobRequestArguments
         ) {
             this.serverArguments = serverArguments;
-            this.cacheArgumentsArguments = cacheArgumentsArguments;
+            this.cacheArguments = cacheArguments;
+            this.jobRequestArguments = jobRequestArguments;
         }
 
         @Override
