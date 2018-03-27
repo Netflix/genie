@@ -17,11 +17,16 @@
  */
 package com.netflix.genie.web.controllers;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.JsonPatchException;
+import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.hateoas.assemblers.ApplicationResourceAssembler;
 import com.netflix.genie.web.hateoas.assemblers.CommandResourceAssembler;
 import com.netflix.genie.web.hateoas.resources.ApplicationResource;
@@ -29,6 +34,8 @@ import com.netflix.genie.web.hateoas.resources.CommandResource;
 import com.netflix.genie.web.services.ApplicationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -54,7 +61,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.IOException;
 import java.util.EnumSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -102,7 +112,7 @@ public class ApplicationRestController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Void> createApplication(@RequestBody final Application app) throws GenieException {
         log.debug("Called to create new application");
-        final String id = this.applicationService.createApplication(app);
+        final String id = this.applicationService.createApplication(DtoAdapters.toV4ApplicationRequest(app));
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
             ServletUriComponentsBuilder
@@ -161,6 +171,54 @@ public class ApplicationRestController {
             }
         }
 
+        final Page<Application> applications;
+        if (tags != null && tags.stream().filter(tag -> tag.startsWith(DtoAdapters.GENIE_ID_PREFIX)).count() >= 1L) {
+            // TODO: This doesn't take into account others as compounded find...not sure if good or bad
+            final List<Application> applicationList = Lists.newArrayList();
+            final int prefixLength = DtoAdapters.GENIE_ID_PREFIX.length();
+            tags
+                .stream()
+                .filter(tag -> tag.startsWith(DtoAdapters.GENIE_ID_PREFIX))
+                .forEach(
+                    tag -> {
+                        final String id = tag.substring(prefixLength);
+                        try {
+                            applicationList.add(
+                                DtoAdapters.toV3Application(this.applicationService.getApplication(id))
+                            );
+                        } catch (final GenieException ge) {
+                            log.debug("No application with id {} found", id, ge);
+                        }
+                    }
+                );
+            applications = new PageImpl<>(applicationList);
+        } else if (tags != null
+            && tags.stream().filter(tag -> tag.startsWith(DtoAdapters.GENIE_NAME_PREFIX)).count() >= 1L) {
+            final Set<String> finalTags = tags
+                .stream()
+                .filter(tag -> !tag.startsWith(DtoAdapters.GENIE_NAME_PREFIX))
+                .collect(Collectors.toSet());
+            if (name == null) {
+                final Optional<String> finalName = tags
+                    .stream()
+                    .filter(tag -> tag.startsWith(DtoAdapters.GENIE_NAME_PREFIX))
+                    .map(tag -> tag.substring(DtoAdapters.GENIE_NAME_PREFIX.length()))
+                    .findFirst();
+
+                applications = this.applicationService
+                    .getApplications(finalName.orElse(null), user, enumStatuses, finalTags, type, page)
+                    .map(DtoAdapters::toV3Application);
+            } else {
+                applications = this.applicationService
+                    .getApplications(name, user, enumStatuses, finalTags, type, page)
+                    .map(DtoAdapters::toV3Application);
+            }
+        } else {
+            applications = this.applicationService
+                .getApplications(name, user, enumStatuses, tags, type, page)
+                .map(DtoAdapters::toV3Application);
+        }
+
         final Link self = ControllerLinkBuilder.linkTo(
             ControllerLinkBuilder
                 .methodOn(ApplicationRestController.class)
@@ -168,7 +226,7 @@ public class ApplicationRestController {
         ).withSelfRel();
 
         return assembler.toResource(
-            this.applicationService.getApplications(name, user, enumStatuses, tags, type, page),
+            applications,
             this.applicationResourceAssembler,
             self
         );
@@ -185,7 +243,9 @@ public class ApplicationRestController {
     @ResponseStatus(HttpStatus.OK)
     public ApplicationResource getApplication(@PathVariable("id") final String id) throws GenieException {
         log.debug("Called to get Application for id {}", id);
-        return this.applicationResourceAssembler.toResource(this.applicationService.getApplication(id));
+        return this.applicationResourceAssembler.toResource(
+            DtoAdapters.toV3Application(this.applicationService.getApplication(id))
+        );
     }
 
     /**
@@ -202,7 +262,7 @@ public class ApplicationRestController {
         @RequestBody final Application updateApp
     ) throws GenieException {
         log.debug("called to update application {} with info {}", id, updateApp);
-        this.applicationService.updateApplication(id, updateApp);
+        this.applicationService.updateApplication(id, DtoAdapters.toV4Application(updateApp));
     }
 
     /**
@@ -219,7 +279,19 @@ public class ApplicationRestController {
         @RequestBody final JsonPatch patch
     ) throws GenieException {
         log.debug("Called to patch application {} with patch {}", id, patch);
-        this.applicationService.patchApplication(id, patch);
+        final Application currentApp = DtoAdapters.toV3Application(this.applicationService.getApplication(id));
+
+        try {
+            log.debug("Will patch application {}. Original state: {}", id, currentApp);
+            final JsonNode applicationNode = GenieObjectMapper.getMapper().valueToTree(currentApp);
+            final JsonNode postPatchNode = patch.apply(applicationNode);
+            final Application patchedApp = GenieObjectMapper.getMapper().treeToValue(postPatchNode, Application.class);
+            log.debug("Finished patching application {}. New state: {}", id, patchedApp);
+            this.applicationService.updateApplication(id, DtoAdapters.toV4Application(patchedApp));
+        } catch (final JsonPatchException | IOException e) {
+            log.error("Unable to patch application {} with patch {} due to exception.", id, patch, e);
+            throw new GenieServerException(e.getLocalizedMessage(), e);
+        }
     }
 
     /**
@@ -397,7 +469,7 @@ public class ApplicationRestController {
     @ResponseStatus(HttpStatus.OK)
     public Set<String> getTagsForApplication(@PathVariable("id") final String id) throws GenieException {
         log.debug("Called with id {}", id);
-        return this.applicationService.getTagsForApplication(id);
+        return DtoAdapters.toV3Application(this.applicationService.getApplication(id)).getTags();
     }
 
     /**
@@ -477,6 +549,7 @@ public class ApplicationRestController {
 
         return this.applicationService.getCommandsForApplication(id, enumStatuses)
             .stream()
+            .map(DtoAdapters::toV3Command)
             .map(this.commandResourceAssembler::toResource)
             .collect(Collectors.toSet());
     }

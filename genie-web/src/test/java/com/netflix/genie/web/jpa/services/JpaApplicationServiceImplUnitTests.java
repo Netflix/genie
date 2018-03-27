@@ -19,8 +19,11 @@ package com.netflix.genie.web.jpa.services;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
+import com.netflix.genie.common.dto.v4.Application;
+import com.netflix.genie.common.dto.v4.ApplicationMetadata;
+import com.netflix.genie.common.dto.v4.ApplicationRequest;
+import com.netflix.genie.common.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
@@ -42,6 +45,7 @@ import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
 import org.springframework.dao.DuplicateKeyException;
 
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -98,10 +102,16 @@ public class JpaApplicationServiceImplUnitTests {
      */
     @Test(expected = GenieConflictException.class)
     public void testCreateApplicationAlreadyExists() throws GenieException {
-        final Application app = new Application.Builder(
-            APP_1_NAME, APP_1_USER, APP_1_VERSION, ApplicationStatus.ACTIVE
+        final ApplicationRequest request = new ApplicationRequest.Builder(
+            new ApplicationMetadata.Builder(
+                APP_1_NAME,
+                APP_1_USER,
+                ApplicationStatus.ACTIVE
+            )
+                .withVersion(APP_1_VERSION)
+                .build()
         )
-            .withId(APP_1_ID)
+            .withRequestedId(APP_1_ID)
             .build();
 
         Mockito
@@ -110,7 +120,7 @@ public class JpaApplicationServiceImplUnitTests {
         Mockito
             .when(this.jpaApplicationRepository.save(Mockito.any(ApplicationEntity.class)))
             .thenThrow(new DuplicateKeyException("Duplicate Key"));
-        this.appService.createApplication(app);
+        this.appService.createApplication(request);
     }
 
     /**
@@ -120,11 +130,19 @@ public class JpaApplicationServiceImplUnitTests {
      */
     @Test(expected = GenieNotFoundException.class)
     public void testUpdateApplicationNoAppExists() throws GenieException {
-        final Application app = new Application.Builder(
-            APP_1_NAME, APP_1_USER, APP_1_VERSION, ApplicationStatus.ACTIVE
-        )
-            .withId(APP_1_ID)
-            .build();
+        final Application app = new Application(
+            APP_1_ID,
+            Instant.now(),
+            Instant.now(),
+            new ExecutionEnvironment(null, null, null),
+            new ApplicationMetadata.Builder(
+                APP_1_NAME,
+                APP_1_USER,
+                ApplicationStatus.ACTIVE
+            )
+                .withVersion(APP_1_VERSION)
+                .build()
+        );
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaApplicationRepository.findByUniqueId(Mockito.eq(id))).thenReturn(Optional.empty());
         this.appService.updateApplication(id, app);
@@ -138,11 +156,19 @@ public class JpaApplicationServiceImplUnitTests {
     @Test(expected = GenieBadRequestException.class)
     public void testUpdateApplicationIdsDontMatch() throws GenieException {
         final String id = UUID.randomUUID().toString();
-        final Application app = new Application.Builder(
-            APP_1_NAME, APP_1_USER, APP_1_VERSION, ApplicationStatus.ACTIVE
-        )
-            .withId(UUID.randomUUID().toString())
-            .build();
+        final Application app = new Application(
+            UUID.randomUUID().toString(),
+            Instant.now(),
+            Instant.now(),
+            new ExecutionEnvironment(null, null, null),
+            new ApplicationMetadata.Builder(
+                APP_1_NAME,
+                APP_1_USER,
+                ApplicationStatus.ACTIVE
+            )
+                .withVersion(APP_1_VERSION)
+                .build()
+        );
         Mockito.when(this.jpaApplicationRepository.existsByUniqueId(id)).thenReturn(true);
         this.appService.updateApplication(id, app);
     }

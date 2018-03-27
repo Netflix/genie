@@ -21,11 +21,11 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.ExecutionEnvironmentDTO;
+import com.netflix.genie.common.dto.v4.Application;
 import com.netflix.genie.common.dto.v4.Criterion;
 import com.netflix.genie.common.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.dto.v4.JobMetadata;
@@ -35,6 +35,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.jobs.JobConstants;
+import com.netflix.genie.web.controllers.DtoAdapters;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.services.ApplicationService;
 import com.netflix.genie.web.services.ClusterLoadBalancer;
@@ -58,7 +59,6 @@ import java.io.File;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -188,7 +188,9 @@ public class JobSpecificationServiceImpl implements JobSpecificationService {
             // Resolve the applications to use based on the command that was selected
             final List<JobSpecification.ExecutionResource> applicationResources = Lists.newArrayList();
             for (final Application application : this.getApplications(id, jobRequest, command)) {
-                applicationResources.add(this.toExecutionResource(application));
+                applicationResources.add(
+                    new JobSpecification.ExecutionResource(application.getId(), application.getResources())
+                );
             }
 
             //TODO: Right now split on space for 3.x backwards compatibility. In 4.0 fix command executable to be array
@@ -323,7 +325,12 @@ public class JobSpecificationServiceImpl implements JobSpecificationService {
             // TODO: What do we do about application status? Should probably check here
             final List<Application> applications = Lists.newArrayList();
             if (jobRequest.getCriteria().getApplicationIds().isEmpty()) {
-                applications.addAll(this.commandService.getApplicationsForCommand(commandId));
+                applications.addAll(
+                    this.commandService.getApplicationsForCommand(commandId)
+                        .stream()
+                        .map(DtoAdapters::toV4Application)
+                        .collect(Collectors.toList())
+                );
             } else {
                 for (final String applicationId : jobRequest.getCriteria().getApplicationIds()) {
                     applications.add(this.applicationService.getApplication(applicationId));
@@ -334,8 +341,6 @@ public class JobSpecificationServiceImpl implements JobSpecificationService {
                 applications
                     .stream()
                     .map(Application::getId)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
                     .reduce((one, two) -> one + "," + two)
                     .orElse(NO_ID_FOUND),
                 id

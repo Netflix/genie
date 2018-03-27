@@ -21,6 +21,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Application;
+import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.Job;
@@ -28,6 +29,8 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.dto.v4.ApplicationMetadata;
+import com.netflix.genie.common.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
@@ -36,6 +39,7 @@ import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
 import com.netflix.genie.common.exceptions.GenieUserLimitExceededException;
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.genie.web.controllers.DtoAdapters;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.services.ApplicationService;
 import com.netflix.genie.web.services.ClusterLoadBalancer;
@@ -62,6 +66,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import javax.annotation.Nullable;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -617,10 +622,21 @@ public class JobCoordinatorServiceImplUnitTests {
 
         Mockito.when(this.commandService.getCommand(commandId)).thenReturn(command);
 
-        final Application application = Mockito.mock(Application.class);
-        Mockito.when(application.getId()).thenReturn(Optional.of(applicationId));
+        final com.netflix.genie.common.dto.v4.Application v4Application
+            = new com.netflix.genie.common.dto.v4.Application(
+            applicationId,
+            Instant.now(),
+            Instant.now(),
+            new ExecutionEnvironment(null, null, null),
+            new ApplicationMetadata.Builder(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                ApplicationStatus.ACTIVE
+            ).build()
+        );
 
-        Mockito.when(this.applicationService.getApplication(applicationId)).thenReturn(application);
+        Mockito.when(this.applicationService.getApplication(applicationId)).thenReturn(v4Application);
+        final Application application = DtoAdapters.toV3Application(v4Application);
 
         Mockito.when(this.jobStateService.getUsedMemory()).thenReturn(0);
 

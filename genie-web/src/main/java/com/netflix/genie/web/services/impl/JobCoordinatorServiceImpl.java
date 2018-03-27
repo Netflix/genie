@@ -34,6 +34,7 @@ import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
 import com.netflix.genie.common.exceptions.GenieUserLimitExceededException;
 import com.netflix.genie.common.jobs.JobConstants;
+import com.netflix.genie.web.controllers.DtoAdapters;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.properties.JobsUsersActiveLimitProperties;
 import com.netflix.genie.web.services.ApplicationService;
@@ -507,7 +508,9 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                 applications.addAll(this.commandService.getApplicationsForCommand(commandId));
             } else {
                 for (final String applicationId : jobRequest.getApplications()) {
-                    applications.add(this.applicationService.getApplication(applicationId));
+                    applications.add(
+                        DtoAdapters.toV3Application(this.applicationService.getApplication(applicationId))
+                    );
                 }
             }
             log.info(

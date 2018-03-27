@@ -19,8 +19,10 @@ package com.netflix.genie.web.jpa.services;
 
 import com.github.springtestdbunit.annotation.DatabaseTearDown;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
+import com.netflix.genie.common.dto.v4.ApplicationMetadata;
+import com.netflix.genie.common.dto.v4.ApplicationRequest;
+import com.netflix.genie.common.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.test.categories.IntegrationTest;
 import com.netflix.genie.web.jpa.entities.FileEntity;
@@ -99,15 +101,19 @@ public class JpaFileServiceImplIntegrationTest extends DBUnitTestBase {
         this.fileService.createFileIfNotExists(file1);
         this.fileService.createFileIfNotExists(file4);
 
-        final Application app = new Application.Builder(
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            ApplicationStatus.ACTIVE
-        )
-            .withDependencies(Sets.newHashSet(file2))
-            .withConfigs(Sets.newHashSet(file3))
-            .withSetupFile(file5)
+        final ApplicationRequest app = new ApplicationRequest.Builder(
+            new ApplicationMetadata.Builder(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                ApplicationStatus.ACTIVE
+            ).build())
+            .withResources(
+                new ExecutionEnvironment(
+                    Sets.newHashSet(file3),
+                    Sets.newHashSet(file2),
+                    file5
+                )
+            )
             .build();
 
         final String appId = this.applicationService.createApplication(app);
