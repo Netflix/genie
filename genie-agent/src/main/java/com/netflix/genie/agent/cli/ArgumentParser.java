@@ -58,6 +58,12 @@ class ArgumentParser {
     String getUsageMessage() {
         final StringBuilder stringBuilder = new StringBuilder();
         jCommander.usage(stringBuilder);
+
+        stringBuilder
+            .append("\n\n")
+            .append(ArgumentConverters.CriterionConverter.CRITERION_SYNTAX_MESSAGE)
+            .append("\n");
+
         return stringBuilder.toString();
     }
 
