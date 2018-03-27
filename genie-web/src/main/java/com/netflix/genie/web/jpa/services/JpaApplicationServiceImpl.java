@@ -20,10 +20,13 @@ package com.netflix.genie.web.jpa.services;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
-import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
-import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
+import com.netflix.genie.common.dto.v4.Application;
+import com.netflix.genie.common.dto.v4.ApplicationMetadata;
+import com.netflix.genie.common.dto.v4.ApplicationRequest;
+import com.netflix.genie.common.dto.v4.Command;
+import com.netflix.genie.common.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
@@ -35,6 +38,7 @@ import com.netflix.genie.web.jpa.entities.ApplicationEntity;
 import com.netflix.genie.web.jpa.entities.CommandEntity;
 import com.netflix.genie.web.jpa.entities.FileEntity;
 import com.netflix.genie.web.jpa.entities.TagEntity;
+import com.netflix.genie.web.jpa.entities.v4.EntityDtoConverters;
 import com.netflix.genie.web.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.web.jpa.repositories.JpaFileRepository;
@@ -60,7 +64,6 @@ import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -113,12 +116,10 @@ public class JpaApplicationServiceImpl extends JpaBaseService implements Applica
     @Override
     public String createApplication(
         @NotNull(message = "No application entered to create.")
-        @Valid final Application app
+        @Valid final ApplicationRequest applicationRequest
     ) throws GenieException {
-        log.debug("Called with application: {}", app);
-        final ApplicationEntity applicationEntity = new ApplicationEntity();
-        applicationEntity.setUniqueId(app.getId().orElse(UUID.randomUUID().toString()));
-        this.updateEntityWithDtoContents(applicationEntity, app);
+        log.debug("Called to create new application with request metadata {}", applicationRequest);
+        final ApplicationEntity applicationEntity = this.createApplicationEntity(applicationRequest);
         try {
             this.applicationRepository.save(applicationEntity);
         } catch (final DataIntegrityViolationException e) {
@@ -139,7 +140,7 @@ public class JpaApplicationServiceImpl extends JpaBaseService implements Applica
         @NotBlank(message = "No id entered. Unable to get") final String id
     ) throws GenieException {
         log.debug("Called with id {}", id);
-        return JpaServiceUtils.toApplicationDto(this.findApplication(id));
+        return EntityDtoConverters.toV4ApplicationDto(this.findApplication(id));
     }
 
     /**
@@ -175,7 +176,7 @@ public class JpaApplicationServiceImpl extends JpaBaseService implements Applica
                 page
             );
 
-        return applicationEntities.map(JpaServiceUtils::toApplicationDto);
+        return applicationEntities.map(EntityDtoConverters::toV4ApplicationDto);
     }
 
     /**
@@ -190,8 +191,8 @@ public class JpaApplicationServiceImpl extends JpaBaseService implements Applica
         if (!this.applicationRepository.existsByUniqueId(id)) {
             throw new GenieNotFoundException("No application with id " + id + " exists. Unable to update.");
         }
-        final Optional<String> updateId = updateApp.getId();
-        if (updateId.isPresent() && !id.equals(updateId.get())) {
+        final String updateId = updateApp.getId();
+        if (!id.equals(updateId)) {
             throw new GenieBadRequestException("Application id inconsistent with id passed in.");
         }
 
@@ -206,9 +207,9 @@ public class JpaApplicationServiceImpl extends JpaBaseService implements Applica
     public void patchApplication(@NotBlank final String id, @NotNull final JsonPatch patch) throws GenieException {
         final ApplicationEntity applicationEntity = this.findApplication(id);
         try {
-            final Application appToPatch = JpaServiceUtils.toApplicationDto(applicationEntity);
+            final Application appToPatch = EntityDtoConverters.toV4ApplicationDto(applicationEntity);
             log.debug("Will patch application {}. Original state: {}", id, appToPatch);
-            final JsonNode applicationNode = GenieObjectMapper.getMapper().readTree(appToPatch.toString());
+            final JsonNode applicationNode = GenieObjectMapper.getMapper().valueToTree(appToPatch);
             final JsonNode postPatchNode = patch.apply(applicationNode);
             final Application patchedApp = GenieObjectMapper.getMapper().treeToValue(postPatchNode, Application.class);
             log.debug("Finished patching application {}. New state: {}", id, patchedApp);
@@ -387,7 +388,6 @@ public class JpaApplicationServiceImpl extends JpaBaseService implements Applica
     ) throws GenieException {
         final ApplicationEntity applicationEntity = this.findApplication(id);
         final Set<TagEntity> newTags = this.createAndGetTagEntities(tags);
-        this.setFinalTags(newTags, applicationEntity.getUniqueId(), applicationEntity.getName());
         applicationEntity.setTags(newTags);
     }
 
@@ -440,7 +440,7 @@ public class JpaApplicationServiceImpl extends JpaBaseService implements Applica
         );
         return commandEntities
             .stream()
-            .map(JpaServiceUtils::toCommandDto)
+            .map(EntityDtoConverters::toV4CommandDto)
             .collect(Collectors.toSet());
     }
 
@@ -457,32 +457,64 @@ public class JpaApplicationServiceImpl extends JpaBaseService implements Applica
             .orElseThrow(() -> new GenieNotFoundException("No application with id " + id));
     }
 
+    private ApplicationEntity createApplicationEntity(final ApplicationRequest request) throws GenieException {
+        final ExecutionEnvironment resources = request.getResources();
+        final ApplicationMetadata metadata = request.getMetadata();
+
+        final ApplicationEntity entity = new ApplicationEntity();
+        entity.setUniqueId(request.getRequestedId().orElse(UUID.randomUUID().toString()));
+        this.setEntityResources(entity, resources);
+        this.setEntityTags(entity, metadata);
+        this.setEntityApplicationMetadata(entity, metadata);
+
+        return entity;
+    }
+
     private void updateEntityWithDtoContents(
         final ApplicationEntity entity,
         final Application dto
     ) throws GenieException {
-        // Save all the unowned entities first to avoid unintended flushes
-        final Set<FileEntity> configs = this.createAndGetFileEntities(dto.getConfigs());
-        final Set<FileEntity> dependencies = this.createAndGetFileEntities(dto.getDependencies());
-        final FileEntity setupFile = dto.getSetupFile().isPresent()
-            ? this.createAndGetFileEntity(dto.getSetupFile().get())
-            : null;
-        final Set<TagEntity> tags = this.createAndGetTagEntities(dto.getTags());
+        final ExecutionEnvironment resources = dto.getResources();
+        final ApplicationMetadata metadata = dto.getMetadata();
 
+        // Save all the unowned entities first to avoid unintended flushes
+        this.setEntityResources(entity, resources);
+        this.setEntityTags(entity, metadata);
+        this.setEntityApplicationMetadata(entity, metadata);
+    }
+
+    private void setEntityApplicationMetadata(final ApplicationEntity entity, final ApplicationMetadata metadata) {
         // NOTE: These are all called in case someone has changed it to set something to null. DO NOT use ifPresent
-        entity.setName(dto.getName());
-        entity.setUser(dto.getUser());
-        entity.setVersion(dto.getVersion());
-        entity.setDescription(dto.getDescription().orElse(null));
-        entity.setStatus(dto.getStatus());
-        entity.setSetupFile(setupFile);
+        entity.setName(metadata.getName());
+        entity.setUser(metadata.getUser());
+        entity.setVersion(metadata.getVersion().orElse(null));
+        entity.setDescription(metadata.getDescription().orElse(null));
+        entity.setStatus(metadata.getStatus());
+        entity.setType(metadata.getType().orElse(null));
+        EntityDtoConverters.setEntityMetadata(GenieObjectMapper.getMapper(), metadata, entity);
+    }
+
+    private void setEntityResources(
+        final ApplicationEntity entity,
+        final ExecutionEnvironment resources
+    ) throws GenieException {
+        // Save all the unowned entities first to avoid unintended flushes
+        final Set<FileEntity> configs = this.createAndGetFileEntities(resources.getConfigs());
+        final Set<FileEntity> dependencies = this.createAndGetFileEntities(resources.getDependencies());
+        final FileEntity setupFile = resources.getSetupFile().isPresent()
+            ? this.createAndGetFileEntity(resources.getSetupFile().get())
+            : null;
+
         entity.setConfigs(configs);
         entity.setDependencies(dependencies);
-        entity.setTags(tags);
-        entity.setType(dto.getType().orElse(null));
-        JpaServiceUtils.setEntityMetadata(GenieObjectMapper.getMapper(), dto, entity);
+        entity.setSetupFile(setupFile);
+    }
 
-        this.setFinalTags(entity.getTags(), entity.getUniqueId(), entity.getName());
+    private void setEntityTags(
+        final ApplicationEntity entity,
+        final ApplicationMetadata metadata
+    ) throws GenieException {
+        entity.setTags(this.createAndGetTagEntities(metadata.getTags()));
     }
 
     private void checkCommands(final ApplicationEntity applicationEntity) throws GeniePreconditionException {

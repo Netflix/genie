@@ -84,70 +84,14 @@
         created="2014-08-08 01:45:00"
         updated="2014-08-08 01:45:00"
         entity_version="0"
-        tag="genie.id:app1"
+        tag="prod"
     />
     <tags
         id="1"
         created="2014-08-08 01:45:00"
         updated="2014-08-08 01:45:00"
         entity_version="0"
-        tag="genie.name:tez"
-    />
-    <tags
-        id="2"
-        created="2014-08-08 01:45:00"
-        updated="2014-08-08 01:45:00"
-        entity_version="0"
-        tag="prod"
-    />
-    <tags
-        id="3"
-        created="2014-08-08 01:45:00"
-        updated="2014-08-08 01:45:00"
-        entity_version="0"
-        tag="genie.id:app2"
-    />
-    <tags
-        id="4"
-        created="2014-08-08 01:45:00"
-        updated="2014-08-08 01:45:00"
-        entity_version="0"
-        tag="genie.name:spark"
-    />
-    <tags
-        id="5"
-        created="2014-08-08 01:45:00"
-        updated="2014-08-08 01:45:00"
-        entity_version="0"
         tag="yarn"
-    />
-    <tags
-        id="6"
-        created="2014-08-08 01:45:00"
-        updated="2014-08-08 01:45:00"
-        entity_version="0"
-        tag="genie.id:app3"
-    />
-    <tags
-        id="7"
-        created="2014-08-08 01:45:00"
-        updated="2014-08-08 01:45:00"
-        entity_version="0"
-        tag="genie.name:storm"
-    />
-    <tags
-        id="8"
-        created="2014-08-08 01:45:00"
-        updated="2014-08-08 01:45:00"
-        entity_version="0"
-        tag="genie.id:command1"
-    />
-    <tags
-        id="9"
-        created="2014-08-08 01:45:00"
-        updated="2014-08-08 01:45:00"
-        entity_version="0"
-        tag="genie.name:pig_13_prod"
     />
 
     <applications
@@ -181,14 +125,6 @@
         application_id="0"
         tag_id="0"
     />
-    <applications_tags
-        application_id="0"
-        tag_id="1"
-    />
-    <applications_tags
-        application_id="0"
-        tag_id="2"
-    />
 
     <applications
         id="1"
@@ -216,19 +152,11 @@
     />
     <applications_tags
         application_id="1"
-        tag_id="3"
+        tag_id="0"
     />
     <applications_tags
         application_id="1"
-        tag_id="4"
-    />
-    <applications_tags
-        application_id="1"
-        tag_id="2"
-    />
-    <applications_tags
-        application_id="1"
-        tag_id="5"
+        tag_id="1"
     />
 
     <applications
@@ -257,15 +185,7 @@
     />
     <applications_tags
         application_id="2"
-        tag_id="6"
-    />
-    <applications_tags
-        application_id="2"
-        tag_id="7"
-    />
-    <applications_tags
-        application_id="2"
-        tag_id="2"
+        tag_id="0"
     />
 
     <commands
@@ -280,15 +200,6 @@
         executable="pig"
         check_delay="10000"
         status="INACTIVE"
-    />
-
-    <commands_tags
-        command_id="0"
-        tag_id="8"
-    />
-    <commands_tags
-        command_id="0"
-        tag_id="9"
     />
 
     <commands_applications command_id="0" application_id="0" application_order="0"/>

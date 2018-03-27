@@ -19,8 +19,9 @@ package com.netflix.genie.web.jpa.services;
 
 import com.github.springtestdbunit.annotation.DatabaseTearDown;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
+import com.netflix.genie.common.dto.v4.ApplicationMetadata;
+import com.netflix.genie.common.dto.v4.ApplicationRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.test.categories.IntegrationTest;
 import com.netflix.genie.web.jpa.entities.TagEntity;
@@ -94,14 +95,15 @@ public class JpaTagServiceImplIntegrationTest extends DBUnitTestBase {
         final String tag2 = UUID.randomUUID().toString();
         this.tagService.createTagIfNotExists(tag1);
 
-        final Application app = new Application.Builder(
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            ApplicationStatus.ACTIVE
-        )
-            .withTags(Sets.newHashSet(tag2))
-            .build();
+        final ApplicationRequest app = new ApplicationRequest.Builder(
+            new ApplicationMetadata.Builder(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                ApplicationStatus.ACTIVE
+            )
+                .withTags(Sets.newHashSet(tag2))
+                .build()
+        ).build();
 
         this.applicationService.createApplication(app);
 

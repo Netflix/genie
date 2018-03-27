@@ -18,10 +18,11 @@
 package com.netflix.genie.web.services;
 
 import com.github.fge.jsonpatch.JsonPatch;
-import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
-import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
+import com.netflix.genie.common.dto.v4.Application;
+import com.netflix.genie.common.dto.v4.ApplicationRequest;
+import com.netflix.genie.common.dto.v4.Command;
 import com.netflix.genie.common.exceptions.GenieException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -46,13 +47,13 @@ public interface ApplicationService {
     /**
      * Create new application.
      *
-     * @param app The application configuration to create
+     * @param applicationRequest The application request containing the metadata of the application to create
      * @return The id of the application that was created
      * @throws GenieException if there is an error
      */
     String createApplication(
         @NotNull(message = "No application entered to create.")
-        @Valid final Application app
+        @Valid final ApplicationRequest applicationRequest
     ) throws GenieException;
 
     /**
@@ -125,6 +126,8 @@ public interface ApplicationService {
     void deleteApplication(
         @NotBlank(message = "No application id entered. Unable to delete.") final String id
     ) throws GenieException;
+
+    // TODO: Look into removing all these extraneous APIs
 
     /**
      * Add a configuration file to the application.

@@ -62,7 +62,9 @@ public abstract class AbstractAPISecurityIntegrationTests {
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
             ApplicationStatus.ACTIVE
-        ).build();
+        )
+            .withId(UUID.randomUUID().toString())
+            .build();
 
     private static final Cluster CLUSTER =
         new Cluster.Builder(
@@ -70,7 +72,9 @@ public abstract class AbstractAPISecurityIntegrationTests {
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
             ClusterStatus.UP
-        ).build();
+        )
+            .withId(UUID.randomUUID().toString())
+            .build();
 
     private static final Command COMMAND =
         new Command.Builder(
@@ -80,7 +84,9 @@ public abstract class AbstractAPISecurityIntegrationTests {
             CommandStatus.ACTIVE,
             UUID.randomUUID().toString(),
             1000L
-        ).build();
+        )
+            .withId(UUID.randomUUID().toString())
+            .build();
 
     private static final String APPLICATIONS_API = "/api/v3/applications";
     private static final String CLUSTERS_API = "/api/v3/clusters";

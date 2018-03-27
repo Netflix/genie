@@ -549,11 +549,13 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
             }
         }
         Assert.assertTrue(found);
-        Set<Command> appCommands = this.appService.getCommandsForApplication(APP_1_ID, null);
+        // TODO: Fix once Command service goes to V4
+        Set<com.netflix.genie.common.dto.v4.Command> appCommands
+            = this.appService.getCommandsForApplication(APP_1_ID, null);
         Assert.assertEquals(1, appCommands.size());
         found = false;
-        for (final Command command : appCommands) {
-            if (COMMAND_1_ID.equals(command.getId().orElseThrow(IllegalArgumentException::new))) {
+        for (final com.netflix.genie.common.dto.v4.Command command : appCommands) {
+            if (COMMAND_1_ID.equals(command.getId())) {
                 found = true;
                 break;
             }
@@ -754,17 +756,19 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
 
         final List<String> appIds = new ArrayList<>();
         appIds.add(APP_1_ID);
-        final Set<Command> preCommands = this.appService.getCommandsForApplication(APP_1_ID, null);
+        final Set<com.netflix.genie.common.dto.v4.Command> preCommands
+            = this.appService.getCommandsForApplication(APP_1_ID, null);
         Assert.assertEquals(1, preCommands.size());
         Assert.assertEquals(1, preCommands
             .stream()
-            .filter(command -> COMMAND_1_ID.equals(command.getId().orElseGet(RandomSuppliers.STRING)))
+            .filter(command -> COMMAND_1_ID.equals(command.getId()))
             .count()
         );
 
         this.service.addApplicationsForCommand(COMMAND_2_ID, appIds);
 
-        final Set<Command> savedCommands = this.appService.getCommandsForApplication(APP_1_ID, null);
+        final Set<com.netflix.genie.common.dto.v4.Command> savedCommands
+            = this.appService.getCommandsForApplication(APP_1_ID, null);
         Assert.assertEquals(2, savedCommands.size());
         Assert.assertThat(
             this.service.getApplicationsForCommand(COMMAND_2_ID)
@@ -785,17 +789,19 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertTrue(this.service.getApplicationsForCommand(COMMAND_2_ID).isEmpty());
 
         final List<String> appIds = Lists.newArrayList(APP_1_ID);
-        final Set<Command> preCommands = this.appService.getCommandsForApplication(APP_1_ID, null);
+        final Set<com.netflix.genie.common.dto.v4.Command> preCommands
+            = this.appService.getCommandsForApplication(APP_1_ID, null);
         Assert.assertEquals(1, preCommands.size());
         Assert.assertEquals(1, preCommands
             .stream()
-            .filter(command -> COMMAND_1_ID.equals(command.getId().orElseThrow(IllegalArgumentException::new)))
+            .filter(command -> COMMAND_1_ID.equals(command.getId()))
             .count()
         );
 
         this.service.setApplicationsForCommand(COMMAND_2_ID, appIds);
 
-        final Set<Command> savedCommands = this.appService.getCommandsForApplication(APP_1_ID, null);
+        final Set<com.netflix.genie.common.dto.v4.Command> savedCommands
+            = this.appService.getCommandsForApplication(APP_1_ID, null);
         Assert.assertEquals(2, savedCommands.size());
         Assert.assertEquals(
             1,
