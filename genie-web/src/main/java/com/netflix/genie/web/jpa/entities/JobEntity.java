@@ -94,8 +94,6 @@ public class JobEntity extends BaseEntity implements
     JobCommandProjection,
     JobSearchProjection {
 
-    static final String DEFAULT_VERSION = "NA";
-
     private static final long serialVersionUID = 2849367731657512224L;
 
     @Basic
@@ -335,7 +333,6 @@ public class JobEntity extends BaseEntity implements
      */
     public JobEntity() {
         super();
-        this.setVersion(DEFAULT_VERSION);
     }
 
     /**

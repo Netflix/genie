@@ -36,9 +36,9 @@ public interface BaseProjection extends AuditProjection {
     /**
      * Get the version.
      *
-     * @return The version of the resource (job, app, etc)
+     * @return The version of the resource (job, app, etc) wrapped in {@link Optional}
      */
-    String getVersion();
+    Optional<String> getVersion();
 
     /**
      * Get the user who created the resource.

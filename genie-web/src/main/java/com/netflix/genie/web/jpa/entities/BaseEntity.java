@@ -47,7 +47,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @EqualsAndHashCode(of = "uniqueId", callSuper = false)
-@ToString(callSuper = true, exclude = {"description", "setupFile"})
+@ToString(callSuper = true, exclude = {"description", "setupFile", "metadata"})
 @MappedSuperclass
 public class BaseEntity extends AuditEntity implements BaseProjection, SetupFileProjection {
 
@@ -59,9 +59,8 @@ public class BaseEntity extends AuditEntity implements BaseProjection, SetupFile
     @Size(max = 255, message = "Max length in database is 255 characters")
     private String uniqueId = UUID.randomUUID().toString();
 
-    @Basic(optional = false)
-    @Column(name = "version", nullable = false)
-    @NotBlank(message = "Version is missing and is required.")
+    @Basic
+    @Column(name = "version")
     @Size(max = 255, message = "Max length in database is 255 characters")
     private String version;
 
@@ -99,10 +98,26 @@ public class BaseEntity extends AuditEntity implements BaseProjection, SetupFile
     }
 
     /**
-     * Gets the description of this entity.
-     *
-     * @return description
+     * {@inheritDoc}
      */
+    @Override
+    public Optional<String> getVersion() {
+        return Optional.ofNullable(this.version);
+    }
+
+    /**
+     * Set the version of the resource this entity represents.
+     *
+     * @param version The new version or null if there isn't one
+     */
+    public void setVersion(@Nullable final String version) {
+        this.version = version;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Optional<String> getDescription() {
         return Optional.ofNullable(this.description);
     }
@@ -117,10 +132,9 @@ public class BaseEntity extends AuditEntity implements BaseProjection, SetupFile
     }
 
     /**
-     * Get the metadata of this entity which is unstructured JSON.
-     *
-     * @return Optional of the metadata json node represented as a string
+     * {@inheritDoc}
      */
+    @Override
     public Optional<String> getMetadata() {
         return Optional.ofNullable(this.metadata);
     }
@@ -135,10 +149,9 @@ public class BaseEntity extends AuditEntity implements BaseProjection, SetupFile
     }
 
     /**
-     * Get the setup file for this entity.
-     *
-     * @return The setup file as an Optional in case it's null
+     * {@inheritDoc}
      */
+    @Override
     public Optional<FileEntity> getSetupFile() {
         return Optional.ofNullable(this.setupFile);
     }

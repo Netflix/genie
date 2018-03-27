@@ -68,7 +68,6 @@ public class JobEntityUnitTests extends EntityTestsBase {
     public void testDefaultConstructor() {
         final JobEntity localJobEntity = new JobEntity();
         Assert.assertNotNull(localJobEntity.getUniqueId());
-        Assert.assertEquals(JobEntity.DEFAULT_VERSION, localJobEntity.getVersion());
     }
 
     /**
@@ -79,7 +78,7 @@ public class JobEntityUnitTests extends EntityTestsBase {
         Assert.assertNotNull(this.jobEntity.getUniqueId());
         Assert.assertEquals(NAME, this.jobEntity.getName());
         Assert.assertEquals(USER, this.jobEntity.getUser());
-        Assert.assertEquals(VERSION, this.jobEntity.getVersion());
+        Assert.assertThat(this.jobEntity.getVersion().orElse(UUID.randomUUID().toString()), Matchers.is(VERSION));
     }
 
     /**

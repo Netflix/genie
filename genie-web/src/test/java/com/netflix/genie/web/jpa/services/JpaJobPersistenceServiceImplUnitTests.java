@@ -176,7 +176,10 @@ public class JpaJobPersistenceServiceImplUnitTests {
         // Make sure id supplied is used to create the JobRequest
         Assert.assertEquals(JOB_1_ID, argument.getValue().getUniqueId());
         Assert.assertEquals(JOB_1_USER, argument.getValue().getUser());
-        Assert.assertEquals(JOB_1_VERSION, argument.getValue().getVersion());
+        Assert.assertThat(
+            argument.getValue().getVersion().orElse(UUID.randomUUID().toString()),
+            Matchers.is(JOB_1_VERSION)
+        );
         Assert.assertEquals(JOB_1_NAME, argument.getValue().getName());
         final int actualCpu = argument.getValue().getCpuRequested().orElseThrow(IllegalArgumentException::new);
         Assert.assertThat(actualCpu, Matchers.is(cpu));
