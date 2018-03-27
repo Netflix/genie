@@ -46,6 +46,8 @@ final class CommandNames {
 
     static final String DOWNLOAD = "download";
 
+    static final String RESOLVE = "resolve";
+
     private static final Set<Field> COMMAND_NAMES_FIELDS;
 
     static {
