@@ -74,7 +74,7 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
         Assert.assertNull(entity.getName());
         Assert.assertNull(entity.getStatus());
         Assert.assertNull(entity.getUser());
-        Assert.assertNull(entity.getVersion());
+        Assert.assertFalse(entity.getVersion().isPresent());
         Assert.assertNotNull(entity.getConfigs());
         Assert.assertTrue(entity.getConfigs().isEmpty());
         Assert.assertNotNull(entity.getDependencies());
@@ -108,15 +108,6 @@ public class ClusterEntityUnitTests extends EntityTestsBase {
     @Test(expected = ConstraintViolationException.class)
     public void testValidateNoUser() {
         this.c.setUser(" ");
-        this.validate(this.c);
-    }
-
-    /**
-     * Make sure validation works on with failure from super class.
-     */
-    @Test(expected = ConstraintViolationException.class)
-    public void testValidateNoVersion() {
-        this.c.setVersion("");
         this.validate(this.c);
     }
 

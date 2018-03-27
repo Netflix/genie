@@ -63,7 +63,7 @@ public class BaseEntityUnitTests extends EntityTestsBase {
         Assert.assertNotNull(local.getUniqueId());
         Assert.assertNull(local.getName());
         Assert.assertNull(local.getUser());
-        Assert.assertNull(local.getVersion());
+        Assert.assertFalse(local.getVersion().isPresent());
         Assert.assertFalse(local.getDescription().isPresent());
         Assert.assertFalse(local.getSetupFile().isPresent());
     }
@@ -105,7 +105,7 @@ public class BaseEntityUnitTests extends EntityTestsBase {
     /**
      * Test to make sure validation works and throws exception when no name entered.
      */
-    @Test(expected = ConstraintViolationException.class)
+    @Test
     public void testValidateNoVersion() {
         this.b.setVersion("");
         this.validate(this.b);
@@ -151,9 +151,9 @@ public class BaseEntityUnitTests extends EntityTestsBase {
     @Test
     public void testSetVersion() {
         final BaseEntity local = new BaseEntity();
-        Assert.assertNull(local.getVersion());
+        Assert.assertFalse(local.getVersion().isPresent());
         local.setVersion(VERSION);
-        Assert.assertEquals(VERSION, local.getVersion());
+        Assert.assertThat(local.getVersion().orElse(UUID.randomUUID().toString()), Matchers.is(VERSION));
     }
 
     /**

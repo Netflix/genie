@@ -17,7 +17,9 @@
  */
 package com.netflix.genie.web.jpa.entities.v4;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.v4.Application;
 import com.netflix.genie.common.dto.v4.ApplicationMetadata;
@@ -29,6 +31,7 @@ import com.netflix.genie.common.dto.v4.CommonMetadata;
 import com.netflix.genie.common.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.web.jpa.entities.ApplicationEntity;
+import com.netflix.genie.web.jpa.entities.BaseEntity;
 import com.netflix.genie.web.jpa.entities.ClusterEntity;
 import com.netflix.genie.web.jpa.entities.CommandEntity;
 import com.netflix.genie.web.jpa.entities.FileEntity;
@@ -57,15 +60,15 @@ public final class EntityDtoConverters {
      * @param applicationEntity The entity to convert
      * @return The immutable DTO representation of the entity data
      */
-    static Application toV4ApplicationDto(final ApplicationEntity applicationEntity) {
+    public static Application toV4ApplicationDto(final ApplicationEntity applicationEntity) {
         final ApplicationMetadata.Builder metadataBuilder = new ApplicationMetadata.Builder(
             applicationEntity.getName(),
             applicationEntity.getUser(),
             applicationEntity.getStatus()
         )
-            .withVersion(applicationEntity.getVersion())
             .withTags(applicationEntity.getTags().stream().map(TagEntity::getTag).collect(Collectors.toSet()));
 
+        applicationEntity.getVersion().ifPresent(metadataBuilder::withVersion);
         applicationEntity.getType().ifPresent(metadataBuilder::withType);
         applicationEntity.getDescription().ifPresent(metadataBuilder::withDescription);
         setDtoMetadata(metadataBuilder, applicationEntity);
@@ -89,15 +92,15 @@ public final class EntityDtoConverters {
      * @param clusterEntity The entity to convert
      * @return The immutable DTO representation of the entity data
      */
-    static Cluster toV4ClusterDto(final ClusterEntity clusterEntity) {
+    public static Cluster toV4ClusterDto(final ClusterEntity clusterEntity) {
         final ClusterMetadata.Builder metadataBuilder = new ClusterMetadata.Builder(
             clusterEntity.getName(),
             clusterEntity.getUser(),
             clusterEntity.getStatus()
         )
-            .withVersion(clusterEntity.getVersion())
             .withTags(clusterEntity.getTags().stream().map(TagEntity::getTag).collect(Collectors.toSet()));
 
+        clusterEntity.getVersion().ifPresent(metadataBuilder::withVersion);
         clusterEntity.getDescription().ifPresent(metadataBuilder::withDescription);
         setDtoMetadata(metadataBuilder, clusterEntity);
 
@@ -120,15 +123,15 @@ public final class EntityDtoConverters {
      * @param commandEntity The entity to convert
      * @return The immutable DTO representation of the entity data
      */
-    static Command toV4CommandDto(final CommandEntity commandEntity) {
+    public static Command toV4CommandDto(final CommandEntity commandEntity) {
         final CommandMetadata.Builder metadataBuilder = new CommandMetadata.Builder(
             commandEntity.getName(),
             commandEntity.getUser(),
             commandEntity.getStatus()
         )
-            .withVersion(commandEntity.getVersion())
             .withTags(commandEntity.getTags().stream().map(TagEntity::getTag).collect(Collectors.toSet()));
 
+        commandEntity.getVersion().ifPresent(metadataBuilder::withVersion);
         commandEntity.getDescription().ifPresent(metadataBuilder::withDescription);
         setDtoMetadata(metadataBuilder, commandEntity);
 
@@ -159,6 +162,33 @@ public final class EntityDtoConverters {
                 log.error("Invalid JSON metadata. Should never happen.", gpe);
                 builder.withMetadata((JsonNode) null);
             }
+        }
+    }
+
+    /**
+     * Set the metadata field on the supplied entity given the data supplied.
+     *
+     * @param mapper   The object mapper to use
+     * @param metadata The entire metadata contents including the raw ad-hoc metadata field to convert
+     * @param entity   The entity to set the ad-hoc metadata field on
+     * @param <M>      The extension of {@link CommonMetadata} to use
+     * @param <E>      The extension of {@link BaseEntity} to use
+     */
+    public static <M extends CommonMetadata, E extends BaseEntity> void setEntityMetadata(
+        final ObjectMapper mapper,
+        final M metadata,
+        final E entity
+    ) {
+        if (metadata.getMetadata().isPresent()) {
+            try {
+                entity.setMetadata(mapper.writeValueAsString(metadata.getMetadata().get()));
+            } catch (final JsonProcessingException jpe) {
+                // Should never happen. Swallow and set to null as metadata is not Genie critical
+                log.error("Invalid JSON, unable to convert to string", jpe);
+                entity.setMetadata(null);
+            }
+        } else {
+            entity.setMetadata(null);
         }
     }
 }

@@ -35,6 +35,7 @@ import com.netflix.genie.common.dto.v4.JobMetadata;
 import com.netflix.genie.common.dto.v4.JobRequest;
 import org.apache.commons.lang3.StringUtils;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -45,7 +46,7 @@ import java.util.stream.Collectors;
  * @author tgianos
  * @since 4.0.0
  */
-final class DtoAdapters {
+public final class DtoAdapters {
 
     static final String NO_VERSION_SPECIFIED = "No Version Specified";
     static final String GENIE_ID_PREFIX = "genie.id:";
@@ -82,7 +83,47 @@ final class DtoAdapters {
         return builder.build();
     }
 
-    static com.netflix.genie.common.dto.Application toV3Application(final Application v4Application) {
+    /**
+     * Convert a V3 Application DTO to a V4 Application DTO.
+     *
+     * @param v3Application The V3 application to convert
+     * @return The V4 application representation of the data in the V3 DTO
+     */
+    public static Application toV4Application(
+        final com.netflix.genie.common.dto.Application v3Application
+    ) {
+        final ApplicationMetadata.Builder metadataBuilder = new ApplicationMetadata.Builder(
+            v3Application.getName(),
+            v3Application.getUser(),
+            v3Application.getStatus()
+        )
+            .withVersion(v3Application.getVersion())
+            .withTags(toV4Tags(v3Application.getTags()));
+
+        v3Application.getMetadata().ifPresent(metadataBuilder::withMetadata);
+        v3Application.getType().ifPresent(metadataBuilder::withType);
+        v3Application.getDescription().ifPresent(metadataBuilder::withDescription);
+
+        return new Application(
+            v3Application.getId().orElseThrow(IllegalArgumentException::new),
+            v3Application.getCreated().orElse(Instant.now()),
+            v3Application.getUpdated().orElse(Instant.now()),
+            new ExecutionEnvironment(
+                v3Application.getConfigs(),
+                v3Application.getDependencies(),
+                v3Application.getSetupFile().orElse(null)
+            ),
+            metadataBuilder.build()
+        );
+    }
+
+    /**
+     * Convert a V4 Application DTO to a V3 application DTO.
+     *
+     * @param v4Application The V4 application to convert
+     * @return The V3 application representation of the data in the V4 DTO
+     */
+    public static com.netflix.genie.common.dto.Application toV3Application(final Application v4Application) {
         final ApplicationMetadata applicationMetadata = v4Application.getMetadata();
         final ExecutionEnvironment resources = v4Application.getResources();
         final com.netflix.genie.common.dto.Application.Builder builder

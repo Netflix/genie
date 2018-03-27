@@ -80,7 +80,7 @@ public class CommandEntityUnitTests extends EntityTestsBase {
         Assert.assertNull(entity.getName());
         Assert.assertNull(entity.getStatus());
         Assert.assertNull(entity.getUser());
-        Assert.assertNull(entity.getVersion());
+        Assert.assertFalse(entity.getVersion().isPresent());
         Assert.assertNotNull(entity.getConfigs());
         Assert.assertTrue(entity.getConfigs().isEmpty());
         Assert.assertNotNull(entity.getDependencies());
@@ -123,7 +123,7 @@ public class CommandEntityUnitTests extends EntityTestsBase {
     /**
      * Make sure validation works on with failure from super class.
      */
-    @Test(expected = ConstraintViolationException.class)
+    @Test
     public void testValidateNoVersion() {
         this.c.setVersion("");
         this.validate(this.c);

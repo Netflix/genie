@@ -122,6 +122,73 @@ class DtoAdaptersSpec extends Specification {
         applicationRequest.getResources().getDependencies().isEmpty()
     }
 
+    def "Can convert V3 Application to V4 Application"() {
+        def id = UUID.randomUUID().toString()
+        def created = Instant.now()
+        def updated = Instant.now()
+        def name = UUID.randomUUID().toString()
+        def user = UUID.randomUUID().toString()
+        def version = UUID.randomUUID().toString()
+        def status = ApplicationStatus.DEPRECATED
+        def tags = Sets.newHashSet(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                DtoAdapters.GENIE_ID_PREFIX + id,
+                DtoAdapters.GENIE_NAME_PREFIX + name
+        )
+        def metadata = "{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"
+        def type = UUID.randomUUID().toString()
+        def description = UUID.randomUUID().toString()
+        def configs = Sets.newHashSet(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString()
+        )
+        def dependencies = Sets.newHashSet(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString()
+        )
+        def setupFile = UUID.randomUUID().toString()
+        com.netflix.genie.common.dto.Application v3Application
+        Application v4Application
+
+        when:
+        v3Application = new com.netflix.genie.common.dto.Application.Builder(
+                name,
+                user,
+                version,
+                status
+        )
+                .withId(id)
+                .withCreated(created)
+                .withUpdated(updated)
+                .withType(type)
+                .withTags(tags)
+                .withMetadata(metadata)
+                .withDescription(description)
+                .withConfigs(configs)
+                .withDependencies(dependencies)
+                .withSetupFile(setupFile)
+                .build()
+        v4Application = DtoAdapters.toV4Application(v3Application)
+
+        then:
+        v4Application.getMetadata().getStatus() == status
+        v4Application.getMetadata().getType().orElse(null) == type
+        v4Application.getMetadata().getMetadata().isPresent()
+        v4Application.getMetadata().getTags().size() == 2
+        v4Application.getMetadata().getDescription().orElse(null) == description
+        v4Application.getMetadata().getVersion().orElse(null) == version
+        v4Application.getMetadata().getUser() == user
+        v4Application.getMetadata().getName() == name
+        v4Application.getId() == id
+        v4Application.getResources().getSetupFile().orElse(null) == setupFile
+        v4Application.getResources().getConfigs() == configs
+        v4Application.getResources().getDependencies() == dependencies
+        v4Application.getCreated() == created
+        v4Application.getUpdated() == updated
+    }
+
     def "Can convert V4 Application to V3 Application"() {
         def id = UUID.randomUUID().toString()
         def name = UUID.randomUUID().toString()
