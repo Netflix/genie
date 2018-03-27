@@ -17,11 +17,13 @@
  */
 package com.netflix.genie.agent.execution.services;
 
-import com.netflix.genie.common.dto.v4.JobRequest;
+import com.netflix.genie.agent.execution.exceptions.JobSpecificationResolutionException;
+import com.netflix.genie.common.dto.v4.AgentJobRequest;
 import com.netflix.genie.common.dto.v4.JobSpecification;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 
 /**
  * Agent side job specification service for resolving and retrieving job specifications from the server.
@@ -35,16 +37,22 @@ public interface AgentJobSpecificationService {
     /**
      * Given the parameters supplied by the job request attempt to resolve a job specification on the server.
      *
-     * @param jobRequest The job request
+     * @param agentJobRequest The agent job request
      * @return The job specification
+     * @throws JobSpecificationResolutionException if the specification cannot be resolved
      */
-    JobSpecification resolveJobSpecification(@Valid final JobRequest jobRequest);
+    JobSpecification resolveJobSpecification(
+        @Valid final AgentJobRequest agentJobRequest
+    ) throws JobSpecificationResolutionException;
 
     /**
      * Given a job id retrieve the job specification from the server.
      *
      * @param id The id of the job to get the specification for
      * @return The job specification
+     * @throws JobSpecificationResolutionException if the specification cannot be retrieved
      */
-    JobSpecification getJobSpecification(final String id);
+    JobSpecification getJobSpecification(
+        @NotEmpty final String id
+    ) throws JobSpecificationResolutionException;
 }
