@@ -18,8 +18,14 @@
 
 package com.netflix.genie.agent.execution.statemachine.actions;
 
+import com.netflix.genie.agent.cli.ArgumentDelegates;
+import com.netflix.genie.agent.cli.JobRequestConverter;
 import com.netflix.genie.agent.execution.ExecutionContext;
+import com.netflix.genie.agent.execution.exceptions.JobSpecificationResolutionException;
+import com.netflix.genie.agent.execution.services.AgentJobSpecificationService;
 import com.netflix.genie.agent.execution.statemachine.Events;
+import com.netflix.genie.common.dto.v4.AgentJobRequest;
+import com.netflix.genie.common.dto.v4.JobSpecification;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -34,8 +40,20 @@ import org.springframework.stereotype.Component;
 @Lazy
 class ResolveJobSpecificationAction extends BaseStateAction implements StateAction.ResolveJobSpecification {
 
-    ResolveJobSpecificationAction(final ExecutionContext executionContext) {
+    private final ArgumentDelegates.JobRequestArguments jobRequestArguments;
+    private final AgentJobSpecificationService agentJobSpecificationService;
+    private final JobRequestConverter jobRequestConverter;
+
+    ResolveJobSpecificationAction(
+        final ExecutionContext executionContext,
+        final ArgumentDelegates.JobRequestArguments jobRequestArguments,
+        final AgentJobSpecificationService agentJobSpecificationService,
+        final JobRequestConverter jobRequestConverter
+    ) {
         super(executionContext);
+        this.jobRequestArguments = jobRequestArguments;
+        this.agentJobSpecificationService = agentJobSpecificationService;
+        this.jobRequestConverter = jobRequestConverter;
     }
 
     /**
@@ -44,7 +62,19 @@ class ResolveJobSpecificationAction extends BaseStateAction implements StateActi
     @Override
     protected Events executeStateAction(final ExecutionContext executionContext) {
         log.info("Resolving job specification...");
-        //TODO implement this action
+        // Compose a job request from argument
+        final AgentJobRequest agentJobRequest =
+                jobRequestConverter.agentJobRequestArgsToDTO(jobRequestArguments);
+
+        // Resolve via service
+        final JobSpecification jobSpecification;
+        try {
+            jobSpecification = agentJobSpecificationService.resolveJobSpecification(agentJobRequest);
+        } catch (final JobSpecificationResolutionException e) {
+            throw new RuntimeException("Failed to resolve job specification", e);
+        }
+
+        executionContext.setJobSpecification(jobSpecification);
         return Events.RESOLVE_JOB_SPECIFICATION_COMPLETE;
     }
 }
