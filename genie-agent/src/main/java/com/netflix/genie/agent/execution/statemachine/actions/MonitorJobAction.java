@@ -44,7 +44,16 @@ class MonitorJobAction extends BaseStateAction implements StateAction.MonitorJob
     @Override
     protected Events executeStateAction(final ExecutionContext executionContext) {
         log.info("Monitoring job...");
-        //TODO implement this action
+
+        final int exitCode;
+        try {
+             exitCode = executionContext.getJobProcess().waitFor();
+        } catch (final InterruptedException e) {
+            throw new RuntimeException("Interrupted while waiting for job completion", e);
+        }
+
+        log.info("Job process completed with exit code: {}", exitCode);
+
         return Events.MONITOR_JOB_COMPLETE;
     }
 }

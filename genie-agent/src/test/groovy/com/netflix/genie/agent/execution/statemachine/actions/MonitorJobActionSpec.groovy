@@ -28,10 +28,12 @@ import spock.lang.Specification
 class MonitorJobActionSpec extends Specification {
     ExecutionContext executionContext
     MonitorJobAction action
+    Process process
 
     void setup() {
         this.executionContext = Mock(ExecutionContext)
         this.action = new MonitorJobAction()
+        this.process = Mock(Process)
     }
 
     void cleanup() {
@@ -40,7 +42,24 @@ class MonitorJobActionSpec extends Specification {
     def "ExecuteStateAction"() {
         when:
         def event = action.executeStateAction(executionContext)
+
         then:
+        1 * executionContext.getJobProcess() >> process
+        1 * process.waitFor() >> 0
         event == Events.MONITOR_JOB_COMPLETE
+    }
+
+    def "Process interrupt"() {
+        setup:
+        def interruptException = new InterruptedException("test")
+
+        when:
+        action.executeStateAction(executionContext)
+
+        then:
+        1 * executionContext.getJobProcess() >> process
+        1 * process.waitFor() >> { throw interruptException }
+        Exception e = thrown(RuntimeException)
+        e.getCause() == interruptException
     }
 }
