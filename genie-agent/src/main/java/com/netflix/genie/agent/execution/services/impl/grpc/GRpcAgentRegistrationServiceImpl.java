@@ -16,7 +16,7 @@
  *
  */
 
-package com.netflix.genie.agent.execution.services.impl;
+package com.netflix.genie.agent.execution.services.impl.grpc;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.netflix.genie.agent.AgentMetadata;
@@ -44,12 +44,12 @@ import java.util.concurrent.TimeoutException;
 @Service
 @Lazy
 @Slf4j
-class GrpcAgentRegistrationServiceImpl implements AgentRegistrationService {
+class GRpcAgentRegistrationServiceImpl implements AgentRegistrationService {
     private final ArgumentDelegates.ServerArguments serverArguments;
     private final AgentRegistrationServiceGrpc.AgentRegistrationServiceFutureStub client;
     private final AgentMetadata agentMetadata;
 
-    GrpcAgentRegistrationServiceImpl(
+    GRpcAgentRegistrationServiceImpl(
         final ArgumentDelegates.ServerArguments serverArguments,
         final AgentRegistrationServiceGrpc.AgentRegistrationServiceFutureStub client,
         final AgentMetadata agentMetadata
