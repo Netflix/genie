@@ -86,8 +86,14 @@ class ResolveJobSpecCommand implements AgentCommand {
 
         } else {
             // Compose a job request from argument
-            final AgentJobRequest agentJobRequest =
-                jobRequestConverter.agentJobRequestArgsToDTO(resolveJobSpecCommandArguments.getJobRequestArguments());
+            final AgentJobRequest agentJobRequest;
+            try {
+                final ArgumentDelegates.JobRequestArguments jobArgs
+                    = resolveJobSpecCommandArguments.getJobRequestArguments();
+                agentJobRequest = jobRequestConverter.agentJobRequestArgsToDTO(jobArgs);
+            } catch (final JobRequestConverter.ConversionException e) {
+                throw new RuntimeException("Failed to construct job request from arguments", e);
+            }
 
             // Print request
             if (!resolveJobSpecCommandArguments.isPrintRequestDisabled()) {

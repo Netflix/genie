@@ -26,13 +26,18 @@ import org.assertj.core.util.Sets
 import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
+import javax.validation.ConstraintViolation
+import javax.validation.Validator
+
 @Category(UnitTest.class)
 class JobRequestConverterSpec extends Specification {
 
     JobRequestConverter converter
+    Validator validator
 
     void setup() {
-        converter = new JobRequestConverter()
+        validator = Mock(Validator)
+        converter = new JobRequestConverter(validator)
     }
 
     def "Convert with defaults"() {
@@ -64,6 +69,7 @@ class JobRequestConverterSpec extends Specification {
         jobRequest.getMetadata().getMetadata() == Optional.ofNullable(jobRequestArgs.getJobMetadata())
         jobRequest.getMetadata().getGroup() == Optional.ofNullable(null)
         jobRequest.getMetadata().getUser() == System.getProperty('user.name')
+        validator.validate(_ as AgentJobRequest) >> Sets.newHashSet()
     }
 
     def "Convert with non defaults"() {
@@ -114,6 +120,21 @@ class JobRequestConverterSpec extends Specification {
         jobRequest.getMetadata().getMetadata() == Optional.of(metadata)
         jobRequestArgs.getUser() >> "u"
         jobRequest.getMetadata().getUser() == "u"
+        validator.validate(_ as AgentJobRequest) >> Sets.newHashSet()
     }
 
+    def "Convert fail validation"() {
+
+        setup:
+        ArgumentDelegates.JobRequestArguments jobRequestArgs = new JobRequestArgumentsImpl()
+        ConstraintViolation<AgentJobRequest> violation = Mock()
+
+        when:
+        converter.agentJobRequestArgsToDTO(jobRequestArgs)
+
+        then:
+        validator.validate(_ as AgentJobRequest) >> Sets.newHashSet([violation])
+        violation.getMessage() >> "NO!"
+        thrown(JobRequestConverter.ConversionException)
+    }
 }

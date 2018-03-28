@@ -26,7 +26,10 @@ import com.netflix.genie.agent.execution.services.AgentJobSpecificationService
 import com.netflix.genie.agent.execution.statemachine.Events
 import com.netflix.genie.common.dto.v4.AgentJobRequest
 import com.netflix.genie.common.dto.v4.JobSpecification
+import org.assertj.core.util.Sets
 import spock.lang.Specification
+
+import javax.validation.ConstraintViolation
 
 class ResolveJobSpecificationActionSpec extends Specification {
     ExecutionContext executionContext
@@ -67,6 +70,22 @@ class ResolveJobSpecificationActionSpec extends Specification {
         1 * executionContext.setJobSpecification(spec)
 
         event == Events.RESOLVE_JOB_SPECIFICATION_COMPLETE
+    }
+
+    def "ExecuteStateAction with arguments error"() {
+        setup:
+        ConstraintViolation<AgentJobRequest> cv = Mock() {
+            _ * getMessage() >> "Constraint violated!"
+        }
+        def conversionException = new JobRequestConverter.ConversionException(Sets.newHashSet([cv]))
+
+        when:
+        action.executeStateAction(executionContext)
+
+        then:
+        1 * converter.agentJobRequestArgsToDTO(arguments) >> { throw conversionException}
+        def e = thrown(RuntimeException)
+        e.getCause() == conversionException
     }
 
     def "ExecuteStateAction with service error"() {

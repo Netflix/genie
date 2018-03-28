@@ -62,9 +62,14 @@ class ResolveJobSpecificationAction extends BaseStateAction implements StateActi
     @Override
     protected Events executeStateAction(final ExecutionContext executionContext) {
         log.info("Resolving job specification...");
+
         // Compose a job request from argument
-        final AgentJobRequest agentJobRequest =
-                jobRequestConverter.agentJobRequestArgsToDTO(jobRequestArguments);
+        final AgentJobRequest agentJobRequest;
+        try {
+            agentJobRequest = jobRequestConverter.agentJobRequestArgsToDTO(jobRequestArguments);
+        } catch (final JobRequestConverter.ConversionException e) {
+            throw new RuntimeException("Failed to construct job request from arguments", e);
+        }
 
         // Resolve via service
         final JobSpecification jobSpecification;
