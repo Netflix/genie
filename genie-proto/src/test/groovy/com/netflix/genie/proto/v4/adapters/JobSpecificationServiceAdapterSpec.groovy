@@ -184,6 +184,36 @@ class JobSpecificationServiceAdapterSpec extends Specification {
         request.getId() == id
     }
 
+    def "Can convert JobSpecification with default values"() {
+        setup:
+        def originalSpecification = new JobSpecification(
+                ["echo"].asList(),
+                new JobSpecification.ExecutionResource(
+                    "my-job",
+                        new ExecutionEnvironment(null, null, null)
+                ),
+                new JobSpecification.ExecutionResource(
+                        "my-cluster",
+                        new ExecutionEnvironment(null, null, null)
+                ),
+                new JobSpecification.ExecutionResource(
+                        "my-command",
+                        new ExecutionEnvironment(null, null, null)
+                ),
+                null,
+                null,
+                false,
+                new File("/tmp/jobs")
+        )
+
+        when:
+        def specResponseProto = JobSpecificationServiceAdapter.toProtoJobSpecificationResponse(originalSpecification)
+        def convertedSpecification = JobSpecificationServiceAdapter.toJobSpecificationDTO(specResponseProto)
+
+        then:
+        originalSpecification == convertedSpecification
+    }
+
     def "Can convert JobSpecification to JobSpecificationResponse and vice versa"() {
         def jobSpecification = createJobSpecification()
         def jobSpecificationResponse = createJobSpecificationResponse()
