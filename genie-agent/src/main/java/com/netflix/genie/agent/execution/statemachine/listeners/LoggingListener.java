@@ -63,7 +63,7 @@ public class LoggingListener implements JobExecutionListener {
             "Entered state: {} ({}/{}/{} entry/state/exit actions)",
             getStateNameString(state),
             state.getEntryActions() == null ? 0 : state.getEntryActions().size(),
-            "?",
+            state.getStateActions() == null ? 0 : state.getStateActions().size(),
             state.getExitActions() == null ? 0 : state.getExitActions().size()
         );
     }

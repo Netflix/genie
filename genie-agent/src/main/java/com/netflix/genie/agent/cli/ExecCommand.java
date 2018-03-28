@@ -64,7 +64,7 @@ class ExecCommand implements AgentCommand {
 
         if (!States.END.equals(finalstate)) {
             log.warn("Job execution failed with with exception");
-            throw new RuntimeException("Job execution failed (final state: {})" + finalstate);
+            throw new RuntimeException("Job execution failed (final state: " + finalstate + ")");
         }
 
         log.info("Job execution completed");

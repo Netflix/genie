@@ -30,6 +30,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -136,6 +137,7 @@ class LaunchJobServiceImpl implements LaunchJobService {
         }
 
         // Configure arguments
+        log.debug("Job command-line: {}", Arrays.toString(commandLineArguments.toArray()));
         processBuilder.command(commandLineArguments);
     }
 
