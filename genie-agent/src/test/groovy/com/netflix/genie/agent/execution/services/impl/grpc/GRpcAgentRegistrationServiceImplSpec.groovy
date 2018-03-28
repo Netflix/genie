@@ -16,7 +16,7 @@
  *
  */
 
-package com.netflix.genie.agent.execution.services.impl
+package com.netflix.genie.agent.execution.services.impl.grpc
 
 import com.netflix.genie.agent.AgentMetadata
 import com.netflix.genie.agent.cli.ArgumentDelegates
@@ -32,7 +32,7 @@ import spock.lang.Ignore
 import spock.lang.Specification
 
 
-class GrpcAgentRegistrationServiceImplSpec extends Specification {
+class GRpcAgentRegistrationServiceImplSpec extends Specification {
 
     final String agentHostName = "agent.com"
     final String agentVersion = "1.2.3"
@@ -89,7 +89,7 @@ class GrpcAgentRegistrationServiceImplSpec extends Specification {
                 .build()
 
         when:
-        String agentIdInResponse = new GrpcAgentRegistrationServiceImpl(
+        String agentIdInResponse = new GRpcAgentRegistrationServiceImpl(
                 serverArgs,
                 client,
                 agentMetadata
@@ -118,7 +118,7 @@ class GrpcAgentRegistrationServiceImplSpec extends Specification {
                 .build()
 
         when:
-        new GrpcAgentRegistrationServiceImpl(
+        new GRpcAgentRegistrationServiceImpl(
                 serverArgs,
                 client,
                 agentMetadata
@@ -146,7 +146,7 @@ class GrpcAgentRegistrationServiceImplSpec extends Specification {
                 .build()
 
         when:
-        new GrpcAgentRegistrationServiceImpl(
+        new GRpcAgentRegistrationServiceImpl(
                 serverArgs,
                 client,
                 agentMetadata
@@ -170,7 +170,7 @@ class GrpcAgentRegistrationServiceImplSpec extends Specification {
         serverException = new RuntimeException("error")
 
         when:
-        new GrpcAgentRegistrationServiceImpl(
+        new GRpcAgentRegistrationServiceImpl(
                 serverArgs,
                 client,
                 agentMetadata
@@ -194,7 +194,7 @@ class GrpcAgentRegistrationServiceImplSpec extends Specification {
         serverError = new RuntimeException("error")
 
         when:
-        new GrpcAgentRegistrationServiceImpl(
+        new GRpcAgentRegistrationServiceImpl(
                 serverArgs,
                 client,
                 agentMetadata
@@ -219,7 +219,7 @@ class GrpcAgentRegistrationServiceImplSpec extends Specification {
         setup:
 
         when:
-        service = new GrpcAgentRegistrationServiceImpl(
+        service = new GRpcAgentRegistrationServiceImpl(
                 serverArgs,
                 client,
                 agentMetadata
