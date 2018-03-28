@@ -235,7 +235,7 @@ public final class JobSpecificationServiceAdapter {
             new ExecutionEnvironment(
                 ImmutableSet.copyOf(protoResource.getConfigsList()),
                 ImmutableSet.copyOf(protoResource.getDependencesList()),
-                protoResource.getSetupFile()
+                protoResource.getSetupFile().isEmpty() ? null : protoResource.getSetupFile()
             )
         );
     }
