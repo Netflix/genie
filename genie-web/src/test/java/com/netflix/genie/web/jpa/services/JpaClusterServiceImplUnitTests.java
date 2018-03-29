@@ -19,8 +19,11 @@ package com.netflix.genie.web.jpa.services;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
+import com.netflix.genie.common.dto.v4.Cluster;
+import com.netflix.genie.common.dto.v4.ClusterMetadata;
+import com.netflix.genie.common.dto.v4.ClusterRequest;
+import com.netflix.genie.common.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
@@ -30,7 +33,6 @@ import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.jpa.entities.ClusterEntity;
 import com.netflix.genie.web.jpa.entities.CommandEntity;
 import com.netflix.genie.web.jpa.entities.FileEntity;
-import com.netflix.genie.web.jpa.entities.TagEntity;
 import com.netflix.genie.web.jpa.entities.projections.ClusterCommandsProjection;
 import com.netflix.genie.web.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
@@ -44,6 +46,7 @@ import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
 import org.springframework.dao.DuplicateKeyException;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -67,7 +70,6 @@ public class JpaClusterServiceImplUnitTests {
     private JpaClusterServiceImpl service;
     private JpaClusterRepository jpaClusterRepository;
     private JpaCommandRepository jpaCommandRepository;
-    private JpaTagRepository jpaTagRepository;
     private JpaFileRepository jpaFileRepository;
 
     /**
@@ -77,11 +79,10 @@ public class JpaClusterServiceImplUnitTests {
     public void setup() {
         this.jpaClusterRepository = Mockito.mock(JpaClusterRepository.class);
         this.jpaCommandRepository = Mockito.mock(JpaCommandRepository.class);
-        this.jpaTagRepository = Mockito.mock(JpaTagRepository.class);
         this.jpaFileRepository = Mockito.mock(JpaFileRepository.class);
         this.service = new JpaClusterServiceImpl(
             Mockito.mock(TagService.class),
-            this.jpaTagRepository,
+            Mockito.mock(JpaTagRepository.class),
             Mockito.mock(FileService.class),
             this.jpaFileRepository,
             this.jpaClusterRepository,
@@ -109,27 +110,26 @@ public class JpaClusterServiceImplUnitTests {
     @Test(expected = GenieConflictException.class)
     public void testCreateClusterAlreadyExists() throws GenieException {
         final Set<String> configs = Sets.newHashSet("a config", "another config", "yet another config");
-        final Cluster cluster = new Cluster.Builder(
-            CLUSTER_1_NAME,
-            CLUSTER_1_USER,
-            CLUSTER_1_VERSION,
-            ClusterStatus.OUT_OF_SERVICE
+        final ClusterRequest request = new ClusterRequest.Builder(
+            new ClusterMetadata.Builder(
+                CLUSTER_1_NAME,
+                CLUSTER_1_USER,
+                ClusterStatus.OUT_OF_SERVICE
+            )
+                .withVersion(CLUSTER_1_VERSION)
+                .build()
         )
-            .withId(CLUSTER_1_ID)
-            .withConfigs(configs)
+            .withRequestedId(CLUSTER_1_ID)
+            .withResources(new ExecutionEnvironment(configs, null, null))
             .build();
 
-
-        Mockito
-            .when(this.jpaTagRepository.findByTag(Mockito.anyString()))
-            .thenReturn(Optional.of(new TagEntity(UUID.randomUUID().toString())));
         Mockito
             .when(this.jpaFileRepository.findByFile(Mockito.anyString()))
             .thenReturn(Optional.of(new FileEntity(UUID.randomUUID().toString())));
         Mockito
             .when(this.jpaClusterRepository.save(Mockito.any(ClusterEntity.class)))
             .thenThrow(new DuplicateKeyException("Duplicate Key"));
-        this.service.createCluster(cluster);
+        this.service.createCluster(request);
     }
 
     /**
@@ -141,7 +141,16 @@ public class JpaClusterServiceImplUnitTests {
     public void testUpdateClusterNoClusterExists() throws GenieException {
         final String id = UUID.randomUUID().toString();
         Mockito.when(this.jpaClusterRepository.findByUniqueId(id)).thenReturn(Optional.empty());
-        this.service.updateCluster(id, new Cluster.Builder(" ", " ", " ", ClusterStatus.UP).build());
+        this.service.updateCluster(
+            id,
+            new Cluster(
+                id,
+                Instant.now(),
+                Instant.now(),
+                new ExecutionEnvironment(null, null, null),
+                new ClusterMetadata.Builder(" ", " ", ClusterStatus.UP).build()
+            )
+        );
     }
 
     /**
@@ -154,7 +163,7 @@ public class JpaClusterServiceImplUnitTests {
         final String id = UUID.randomUUID().toString();
         final Cluster cluster = Mockito.mock(Cluster.class);
         Mockito.when(this.jpaClusterRepository.existsByUniqueId(id)).thenReturn(true);
-        Mockito.when(cluster.getId()).thenReturn(Optional.of(UUID.randomUUID().toString()));
+        Mockito.when(cluster.getId()).thenReturn(UUID.randomUUID().toString());
         this.service.updateCluster(id, cluster);
     }
 

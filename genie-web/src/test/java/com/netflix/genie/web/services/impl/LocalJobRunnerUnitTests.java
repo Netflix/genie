@@ -18,18 +18,22 @@
 package com.netflix.genie.web.services.impl;
 
 import com.google.common.collect.Lists;
-import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
-import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
-import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.dto.JobRequest;
+import com.netflix.genie.common.dto.v4.Application;
+import com.netflix.genie.common.dto.v4.ApplicationMetadata;
+import com.netflix.genie.common.dto.v4.Cluster;
+import com.netflix.genie.common.dto.v4.ClusterMetadata;
+import com.netflix.genie.common.dto.v4.Command;
+import com.netflix.genie.common.dto.v4.CommandMetadata;
+import com.netflix.genie.common.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.common.jobs.JobConstants;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.events.GenieEventBus;
-import com.netflix.genie.common.jobs.JobConstants;
 import com.netflix.genie.web.jobs.workflow.WorkflowTask;
 import com.netflix.genie.web.services.JobPersistenceService;
 import com.netflix.genie.web.services.JobSubmitterService;
@@ -47,6 +51,7 @@ import org.springframework.core.io.Resource;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -98,9 +103,9 @@ public class LocalJobRunnerUnitTests {
         jobWorkflowTasks.add(task1);
         jobWorkflowTasks.add(this.task2);
 
-        tmpFolder = this.folder.newFolder();
+        this.tmpFolder = this.folder.newFolder();
         final Resource baseWorkingDirResource = Mockito.mock(Resource.class);
-        Mockito.when(baseWorkingDirResource.getFile()).thenReturn(tmpFolder);
+        Mockito.when(baseWorkingDirResource.getFile()).thenReturn(this.tmpFolder);
 
         final MeterRegistry registry = Mockito.mock(MeterRegistry.class);
         Mockito.when(registry.timer(Mockito.anyString())).thenReturn(Mockito.mock(Timer.class));
@@ -133,15 +138,36 @@ public class LocalJobRunnerUnitTests {
         final String app2 = UUID.randomUUID().toString();
         final String app3 = UUID.randomUUID().toString();
         final List<Application> applications = Lists.newArrayList(
-            new Application.Builder(placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE)
-                .withId(app3)
-                .build(),
-            new Application.Builder(placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE)
-                .withId(app1)
-                .build(),
-            new Application.Builder(placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE)
-                .withId(app2)
-                .build()
+            new Application(
+                app3,
+                Instant.now(),
+                Instant.now(),
+                new ExecutionEnvironment(null, null, null),
+                new ApplicationMetadata
+                    .Builder(placeholder, placeholder, ApplicationStatus.ACTIVE)
+                    .withVersion(placeholder)
+                    .build()
+            ),
+            new Application(
+                app1,
+                Instant.now(),
+                Instant.now(),
+                new ExecutionEnvironment(null, null, null),
+                new ApplicationMetadata
+                    .Builder(placeholder, placeholder, ApplicationStatus.ACTIVE)
+                    .withVersion(placeholder)
+                    .build()
+            ),
+            new Application(
+                app2,
+                Instant.now(),
+                Instant.now(),
+                new ExecutionEnvironment(null, null, null),
+                new ApplicationMetadata
+                    .Builder(placeholder, placeholder, ApplicationStatus.ACTIVE)
+                    .withVersion(placeholder)
+                    .build()
+            )
         );
 
         final JobRequest jobRequest = new JobRequest.Builder(
@@ -155,25 +181,24 @@ public class LocalJobRunnerUnitTests {
             .withApplications(Lists.newArrayList(app3, app1, app2))
             .build();
 
-        final Cluster cluster = new Cluster.Builder(
-            CLUSTER_NAME,
-            USER,
-            VERSION,
-            ClusterStatus.UP
-        )
-            .withId(CLUSTER_ID)
-            .build();
+        final Cluster cluster = new Cluster(
+            CLUSTER_ID,
+            Instant.now(),
+            Instant.now(),
+            new ExecutionEnvironment(null, null, null),
+            new ClusterMetadata.Builder(CLUSTER_NAME, USER, ClusterStatus.UP).withVersion(VERSION).build()
+        );
 
-        final Command command = new Command.Builder(
-            COMMAND_NAME,
-            USER,
-            VERSION,
-            CommandStatus.ACTIVE,
-            "foo",
+        final Command command = new Command(
+            COMMAND_ID,
+            Instant.now(),
+            Instant.now(),
+            new ExecutionEnvironment(null, null, null),
+            new CommandMetadata.Builder(COMMAND_NAME, USER, CommandStatus.ACTIVE).withVersion(VERSION).build(),
+            Lists.newArrayList("foo"),
+            null,
             5000L
-        )
-            .withId(COMMAND_ID)
-            .build();
+        );
 
         final int memory = 2438;
 

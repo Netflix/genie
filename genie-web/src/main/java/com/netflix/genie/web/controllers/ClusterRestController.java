@@ -17,11 +17,16 @@
  */
 package com.netflix.genie.web.controllers;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.JsonPatchException;
+import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.hateoas.assemblers.ClusterResourceAssembler;
 import com.netflix.genie.web.hateoas.assemblers.CommandResourceAssembler;
 import com.netflix.genie.web.hateoas.resources.ClusterResource;
@@ -29,6 +34,8 @@ import com.netflix.genie.web.hateoas.resources.CommandResource;
 import com.netflix.genie.web.services.ClusterService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -54,9 +61,12 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.validation.Valid;
+import java.io.IOException;
 import java.time.Instant;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -103,9 +113,9 @@ ClusterRestController {
      */
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Void> createCluster(@RequestBody final Cluster cluster) throws GenieException {
+    public ResponseEntity<Void> createCluster(@RequestBody @Valid final Cluster cluster) throws GenieException {
         log.debug("Called to create new cluster {}", cluster);
-        final String id = this.clusterService.createCluster(cluster);
+        final String id = this.clusterService.createCluster(DtoAdapters.toV4ClusterRequest(cluster));
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
             ServletUriComponentsBuilder
@@ -128,7 +138,7 @@ ClusterRestController {
     @ResponseStatus(HttpStatus.OK)
     public ClusterResource getCluster(@PathVariable("id") final String id) throws GenieException {
         log.debug("Called with id: {}", id);
-        return this.clusterResourceAssembler.toResource(this.clusterService.getCluster(id));
+        return this.clusterResourceAssembler.toResource(DtoAdapters.toV3Cluster(this.clusterService.getCluster(id)));
     }
 
     /**
@@ -167,6 +177,73 @@ ClusterRestController {
             }
         }
 
+        final Page<Cluster> clusters;
+        if (tags != null && tags.stream().filter(tag -> tag.startsWith(DtoAdapters.GENIE_ID_PREFIX)).count() >= 1L) {
+            // TODO: This doesn't take into account others as compounded find...not sure if good or bad
+            final List<Cluster> clusterList = Lists.newArrayList();
+            final int prefixLength = DtoAdapters.GENIE_ID_PREFIX.length();
+            tags
+                .stream()
+                .filter(tag -> tag.startsWith(DtoAdapters.GENIE_ID_PREFIX))
+                .forEach(
+                    tag -> {
+                        final String id = tag.substring(prefixLength);
+                        try {
+                            clusterList.add(DtoAdapters.toV3Cluster(this.clusterService.getCluster(id)));
+                        } catch (final GenieException ge) {
+                            log.debug("No cluster with id {} found", id, ge);
+                        }
+                    }
+                );
+            clusters = new PageImpl<>(clusterList);
+        } else if (tags != null
+            && tags.stream().filter(tag -> tag.startsWith(DtoAdapters.GENIE_NAME_PREFIX)).count() >= 1L) {
+            final Set<String> finalTags = tags
+                .stream()
+                .filter(tag -> !tag.startsWith(DtoAdapters.GENIE_NAME_PREFIX))
+                .collect(Collectors.toSet());
+            if (name == null) {
+                final Optional<String> finalName = tags
+                    .stream()
+                    .filter(tag -> tag.startsWith(DtoAdapters.GENIE_NAME_PREFIX))
+                    .map(tag -> tag.substring(DtoAdapters.GENIE_NAME_PREFIX.length()))
+                    .findFirst();
+
+                clusters = this.clusterService
+                    .getClusters(
+                        finalName.orElse(null),
+                        enumStatuses,
+                        finalTags,
+                        minUpdateTime == null ? null : Instant.ofEpochMilli(minUpdateTime),
+                        maxUpdateTime == null ? null : Instant.ofEpochMilli(maxUpdateTime),
+                        page
+                    )
+                    .map(DtoAdapters::toV3Cluster);
+            } else {
+                clusters = this.clusterService
+                    .getClusters(
+                        name,
+                        enumStatuses,
+                        finalTags,
+                        minUpdateTime == null ? null : Instant.ofEpochMilli(minUpdateTime),
+                        maxUpdateTime == null ? null : Instant.ofEpochMilli(maxUpdateTime),
+                        page
+                    )
+                    .map(DtoAdapters::toV3Cluster);
+            }
+        } else {
+            clusters = this.clusterService
+                .getClusters(
+                    name,
+                    enumStatuses,
+                    tags,
+                    minUpdateTime == null ? null : Instant.ofEpochMilli(minUpdateTime),
+                    maxUpdateTime == null ? null : Instant.ofEpochMilli(maxUpdateTime),
+                    page
+                )
+                .map(DtoAdapters::toV3Cluster);
+        }
+
         // Build the self link which will be used for the next, previous, etc links
         final Link self = ControllerLinkBuilder
             .linkTo(
@@ -184,14 +261,7 @@ ClusterRestController {
             ).withSelfRel();
 
         return assembler.toResource(
-            this.clusterService.getClusters(
-                name,
-                enumStatuses,
-                tags,
-                minUpdateTime == null ? null : Instant.ofEpochMilli(minUpdateTime),
-                maxUpdateTime == null ? null : Instant.ofEpochMilli(maxUpdateTime),
-                page
-            ),
+            clusters,
             this.clusterResourceAssembler,
             self
         );
@@ -211,7 +281,7 @@ ClusterRestController {
         @RequestBody final Cluster updateCluster
     ) throws GenieException {
         log.debug("Called to update cluster with id {} update fields {}", id, updateCluster);
-        this.clusterService.updateCluster(id, updateCluster);
+        this.clusterService.updateCluster(id, DtoAdapters.toV4Cluster(updateCluster));
     }
 
     /**
@@ -228,7 +298,20 @@ ClusterRestController {
         @RequestBody final JsonPatch patch
     ) throws GenieException {
         log.debug("Called to patch cluster {} with patch {}", id, patch);
-        this.clusterService.patchCluster(id, patch);
+
+        final Cluster currentCluster = DtoAdapters.toV3Cluster(this.clusterService.getCluster(id));
+
+        try {
+            log.debug("Will patch cluster {}. Original state: {}", id, currentCluster);
+            final JsonNode clusterNode = GenieObjectMapper.getMapper().valueToTree(currentCluster);
+            final JsonNode postPatchNode = patch.apply(clusterNode);
+            final Cluster patchedCluster = GenieObjectMapper.getMapper().treeToValue(postPatchNode, Cluster.class);
+            log.debug("Finished patching cluster {}. New state: {}", id, patchedCluster);
+            this.clusterService.updateCluster(id, DtoAdapters.toV4Cluster(patchedCluster));
+        } catch (final JsonPatchException | IOException e) {
+            log.error("Unable to patch cluster {} with patch {} due to exception.", id, patch, e);
+            throw new GenieServerException(e.getLocalizedMessage(), e);
+        }
     }
 
     /**
@@ -416,11 +499,9 @@ ClusterRestController {
      */
     @GetMapping(value = "/{id}/tags", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public Set<String> getTagsForCluster(
-        @PathVariable("id") final String id
-    ) throws GenieException {
+    public Set<String> getTagsForCluster(@PathVariable("id") final String id) throws GenieException {
         log.debug("Called with id {}", id);
-        return this.clusterService.getTagsForCluster(id);
+        return DtoAdapters.toV3Cluster(this.clusterService.getCluster(id)).getTags();
     }
 
     /**
@@ -519,6 +600,7 @@ ClusterRestController {
 
         return this.clusterService.getCommandsForCluster(id, enumStatuses)
             .stream()
+            .map(DtoAdapters::toV3Command)
             .map(this.commandResourceAssembler::toResource)
             .collect(Collectors.toList());
     }

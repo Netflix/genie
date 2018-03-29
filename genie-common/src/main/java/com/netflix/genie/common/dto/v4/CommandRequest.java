@@ -56,12 +56,20 @@ public class CommandRequest extends CommonRequestImpl {
         message = "The minimum amount of memory if desired is 1 MB. Probably should be much more than that"
     )
     private final Integer memory;
+    @Min(
+        value = 1,
+        message = "The delay between checks must be at least 1 millisecond. Probably should be much more than that"
+    )
+    // TODO: This is here for backwards compatibility with Genie 3 while the agent is in development
+    //       It will no longer be relevant once the agent is 1 to 1 with a job and not polling
+    private final Long checkDelay;
 
     private CommandRequest(final Builder builder) {
         super(builder);
         this.metadata = builder.bMetadata;
         this.executable = builder.bExecutable;
         this.memory = builder.bMemory;
+        this.checkDelay = builder.bCheckDelay;
     }
 
     /**
@@ -71,6 +79,15 @@ public class CommandRequest extends CommonRequestImpl {
      */
     public Optional<Integer> getMemory() {
         return Optional.ofNullable(this.memory);
+    }
+
+    /**
+     * Get the requested amount of time (in milliseconds) between checks of job status for jobs run using this command.
+     *
+     * @return The amount of time if one was requested wrapped in an {@link Optional}
+     */
+    public Optional<Long> getCheckDelay() {
+        return Optional.ofNullable(this.checkDelay);
     }
 
     /**
@@ -94,6 +111,7 @@ public class CommandRequest extends CommonRequestImpl {
         private final CommandMetadata bMetadata;
         private final ImmutableList<String> bExecutable;
         private Integer bMemory;
+        private Long bCheckDelay;
 
         /**
          * Constructor which has required fields.
@@ -120,6 +138,18 @@ public class CommandRequest extends CommonRequestImpl {
          */
         public Builder withMemory(@Nullable final Integer memory) {
             this.bMemory = memory;
+            return this;
+        }
+
+        /**
+         * Set the amount of time (in milliseconds) desired to delay between checks of the job status for jobs run
+         * using this command.
+         *
+         * @param checkDelay The amount of time (in milliseconds) between checks. Minimum 1 preferably much more
+         * @return The builder
+         */
+        public Builder withCheckDelay(@Nullable final Long checkDelay) {
+            this.bCheckDelay = checkDelay;
             return this;
         }
 

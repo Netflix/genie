@@ -45,151 +45,81 @@
     />
 
     <tags
-        id="1"
-        created="2014-08-08 01:47:00"
-        updated="2014-08-08 01:59:00"
-        entity_version="0"
-        tag="genie.id:command1"
-    />
-    <tags
-        id="2"
-        created="2014-08-08 01:47:00"
-        updated="2014-08-08 01:59:00"
-        entity_version="0"
-        tag="genie:name:pig_13_prod"
-    />
-    <tags
-        id="3"
+        id="0"
         created="2014-08-08 01:47:00"
         updated="2014-08-08 01:59:00"
         entity_version="0"
         tag="pig"
     />
     <tags
-        id="4"
+        id="1"
         created="2014-08-08 01:47:00"
         updated="2014-08-08 01:59:00"
         entity_version="0"
         tag="prod"
     />
     <tags
-        id="5"
+        id="2"
         created="2014-08-08 01:47:00"
         updated="2014-08-08 01:59:00"
         entity_version="0"
         tag="tez"
     />
     <tags
-        id="6"
-        created="2014-08-08 01:47:00"
-        updated="2014-08-08 01:59:00"
-        entity_version="0"
-        tag="genie.id:command2"
-    />
-    <tags
-        id="7"
-        created="2014-08-08 01:47:00"
-        updated="2014-08-08 01:59:00"
-        entity_version="0"
-        tag="genie:name:hive_11_prod"
-    />
-    <tags
-        id="8"
+        id="3"
         created="2014-08-08 01:47:00"
         updated="2014-08-08 01:59:00"
         entity_version="0"
         tag="hive"
     />
     <tags
-        id="9"
-        created="2014-08-08 01:47:00"
-        updated="2014-08-08 01:59:00"
-        entity_version="0"
-        tag="genie.id:cluster1"
-    />
-    <tags
-        id="10"
-        created="2014-08-08 01:47:00"
-        updated="2014-08-08 01:59:00"
-        entity_version="0"
-        tag="genie.name:h2prod"
-    />
-    <tags
-        id="11"
-        created="2014-08-08 01:47:00"
-        updated="2014-08-08 01:59:00"
-        entity_version="0"
-        tag="genie.id:cluster2"
-    />
-    <tags
-        id="12"
-        created="2014-08-08 01:47:00"
-        updated="2014-08-08 01:59:00"
-        entity_version="0"
-        tag="genie:name:h2query"
-    />
-    <tags
-        id="13"
+        id="4"
         created="2014-08-08 01:47:00"
         updated="2014-08-08 01:59:00"
         entity_version="0"
         tag="query"
     />
     <tags
-        id="14"
+        id="5"
         created="2014-08-08 01:47:00"
         updated="2014-08-08 01:59:00"
         entity_version="0"
         tag="sla"
     />
     <tags
-        id="15"
+        id="6"
         created="2014-08-08 01:47:00"
         updated="2014-08-08 01:59:00"
         entity_version="0"
         tag="adhoc"
     />
     <tags
-        id="16"
+        id="7"
         created="2014-08-08 01:47:00"
         updated="2014-08-08 01:59:00"
         entity_version="0"
         tag="yarn"
     />
     <tags
-        id="17"
+        id="8"
         created="2014-08-08 01:47:00"
         updated="2014-08-08 01:59:00"
         entity_version="0"
         tag="0.15.0"
     />
     <tags
-        id="18"
+        id="9"
         created="2014-08-08 01:47:00"
         updated="2014-08-08 01:59:00"
         entity_version="0"
         tag="spark"
     />
     <tags
-        id="19"
+        id="10"
         created="2014-08-08 01:47:00"
         updated="2014-08-08 01:59:00"
         entity_version="0"
         tag="deprecated"
-    />
-    <tags
-        id="20"
-        created="2014-08-08 01:47:00"
-        updated="2014-08-08 01:59:00"
-        entity_version="0"
-        tag="genie.id:command3"
-    />
-    <tags
-        id="21"
-        created="2014-08-08 01:47:00"
-        updated="2014-08-08 01:59:00"
-        entity_version="0"
-        tag="genie:name:pig_11_prod"
     />
 
     <commands
@@ -215,23 +145,15 @@
     />
     <commands_tags
         command_id="1"
+        tag_id="0"
+    />
+    <commands_tags
+        command_id="1"
         tag_id="1"
     />
     <commands_tags
         command_id="1"
         tag_id="2"
-    />
-    <commands_tags
-        command_id="1"
-        tag_id="3"
-    />
-    <commands_tags
-        command_id="1"
-        tag_id="4"
-    />
-    <commands_tags
-        command_id="1"
-        tag_id="5"
     />
 
     <commands
@@ -253,19 +175,11 @@
     />
     <commands_tags
         command_id="2"
-        tag_id="6"
+        tag_id="3"
     />
     <commands_tags
         command_id="2"
-        tag_id="7"
-    />
-    <commands_tags
-        command_id="2"
-        tag_id="8"
-    />
-    <commands_tags
-        command_id="2"
-        tag_id="4"
+        tag_id="1"
     />
 
     <commands
@@ -287,23 +201,15 @@
     />
     <commands_tags
         command_id="3"
-        tag_id="19"
+        tag_id="10"
     />
     <commands_tags
         command_id="3"
-        tag_id="20"
+        tag_id="0"
     />
     <commands_tags
         command_id="3"
-        tag_id="21"
-    />
-    <commands_tags
-        command_id="3"
-        tag_id="3"
-    />
-    <commands_tags
-        command_id="3"
-        tag_id="4"
+        tag_id="1"
     />
 
     <clusters
@@ -331,23 +237,15 @@
     />
     <clusters_tags
         cluster_id="1"
-        tag_id="9"
-    />
-    <clusters_tags
-        cluster_id="1"
-        tag_id="10"
-    />
-    <clusters_tags
-        cluster_id="1"
-        tag_id="8"
-    />
-    <clusters_tags
-        cluster_id="1"
         tag_id="3"
     />
     <clusters_tags
         cluster_id="1"
-        tag_id="4"
+        tag_id="0"
+    />
+    <clusters_tags
+        cluster_id="1"
+        tag_id="1"
     />
 
     <clusters_commands
@@ -387,23 +285,15 @@
     />
     <clusters_tags
         cluster_id="2"
-        tag_id="11"
-    />
-    <clusters_tags
-        cluster_id="2"
-        tag_id="12"
-    />
-    <clusters_tags
-        cluster_id="2"
-        tag_id="8"
-    />
-    <clusters_tags
-        cluster_id="2"
         tag_id="3"
     />
     <clusters_tags
         cluster_id="2"
-        tag_id="13"
+        tag_id="0"
+    />
+    <clusters_tags
+        cluster_id="2"
+        tag_id="4"
     />
 
     <clusters_commands
@@ -427,11 +317,11 @@
     />
     <criteria_tags
         criterion_id="0"
-        tag_id="3"
+        tag_id="0"
     />
     <criteria_tags
         criterion_id="0"
-        tag_id="17"
+        tag_id="8"
     />
     <jobs
         id="1"
@@ -466,11 +356,11 @@
     />
     <criteria_tags
         criterion_id="1"
-        tag_id="14"
+        tag_id="5"
     />
     <criteria_tags
         criterion_id="1"
-        tag_id="16"
+        tag_id="7"
     />
     <jobs_cluster_criteria
         job_id="1"
@@ -483,11 +373,11 @@
     />
     <criteria_tags
         criterion_id="2"
-        tag_id="15"
+        tag_id="6"
     />
     <criteria_tags
         criterion_id="2"
-        tag_id="16"
+        tag_id="7"
     />
     <jobs_cluster_criteria
         job_id="1"
@@ -500,7 +390,7 @@
     />
     <criteria_tags
         criterion_id="3"
-        tag_id="18"
+        tag_id="9"
     />
     <jobs
         id="2"
@@ -535,11 +425,11 @@
     />
     <criteria_tags
         criterion_id="4"
-        tag_id="14"
+        tag_id="5"
     />
     <criteria_tags
         criterion_id="4"
-        tag_id="16"
+        tag_id="7"
     />
     <jobs_cluster_criteria
         job_id="2"
@@ -551,11 +441,11 @@
     />
     <criteria_tags
         criterion_id="5"
-        tag_id="15"
+        tag_id="6"
     />
     <criteria_tags
         criterion_id="5"
-        tag_id="16"
+        tag_id="7"
     />
     <jobs_cluster_criteria
         job_id="2"

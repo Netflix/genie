@@ -18,11 +18,12 @@
 package com.netflix.genie.web.services;
 
 import com.github.fge.jsonpatch.JsonPatch;
-import com.netflix.genie.common.dto.Application;
-import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
-import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
+import com.netflix.genie.common.dto.v4.Application;
+import com.netflix.genie.common.dto.v4.Cluster;
+import com.netflix.genie.common.dto.v4.Command;
+import com.netflix.genie.common.dto.v4.CommandRequest;
 import com.netflix.genie.common.exceptions.GenieException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -49,14 +50,14 @@ public interface CommandService {
     /**
      * Create new command configuration.
      *
-     * @param command encapsulates the command configuration information to
+     * @param request encapsulates the command configuration information to
      *                create. Not null. Valid.
      * @return The id of the command created
      * @throws GenieException if there is an error
      */
     String createCommand(
         @NotNull(message = "No command entered. Unable to create.")
-        @Valid final Command command
+        @Valid final CommandRequest request
     ) throws GenieException;
 
     /**

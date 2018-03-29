@@ -17,10 +17,10 @@
  */
 package com.netflix.genie.web.services;
 
-import com.netflix.genie.common.dto.Application;
-import com.netflix.genie.common.dto.Cluster;
-import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.JobRequest;
+import com.netflix.genie.common.dto.v4.Application;
+import com.netflix.genie.common.dto.v4.Cluster;
+import com.netflix.genie.common.dto.v4.Command;
 import com.netflix.genie.common.exceptions.GenieException;
 
 import java.util.List;
@@ -49,8 +49,14 @@ public interface JobStateService extends JobMetricsService {
      * @param applications applications to use based on the command that was selected
      * @param memory       job memory
      */
-    void schedule(final String jobId, final JobRequest jobRequest, final Cluster cluster, final Command command,
-                  final List<Application> applications, final int memory);
+    void schedule(
+        final String jobId,
+        final JobRequest jobRequest,
+        final Cluster cluster,
+        final Command command,
+        final List<Application> applications,
+        final int memory
+    );
 
     /**
      * Called when the job is done.

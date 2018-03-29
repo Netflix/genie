@@ -20,16 +20,16 @@ package com.netflix.genie.web.services.impl;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
-import com.netflix.genie.common.dto.Cluster;
-import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.dto.v4.Application;
 import com.netflix.genie.common.dto.v4.ApplicationMetadata;
+import com.netflix.genie.common.dto.v4.Cluster;
+import com.netflix.genie.common.dto.v4.Command;
 import com.netflix.genie.common.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
@@ -39,7 +39,6 @@ import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
 import com.netflix.genie.common.exceptions.GenieUserLimitExceededException;
 import com.netflix.genie.test.categories.UnitTest;
-import com.netflix.genie.web.controllers.DtoAdapters;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.services.ApplicationService;
 import com.netflix.genie.web.services.ClusterLoadBalancer;
@@ -392,8 +391,8 @@ public class JobCoordinatorServiceImplUnitTests {
         final Command command = Mockito.mock(Command.class);
         final Map<Cluster, String> clustersCommandsMap = Maps.newHashMap();
         clustersCommandsMap.put(cluster, commandId);
-        Mockito.when(cluster.getId()).thenReturn(Optional.of(clusterId));
-        Mockito.when(command.getId()).thenReturn(Optional.of(commandId));
+        Mockito.when(cluster.getId()).thenReturn(clusterId);
+        Mockito.when(command.getId()).thenReturn(commandId);
         Mockito.when(command.getMemory()).thenReturn(Optional.empty());
 
         Mockito
@@ -404,7 +403,7 @@ public class JobCoordinatorServiceImplUnitTests {
 
         final String applicationId = UUID.randomUUID().toString();
         final Application application = Mockito.mock(Application.class);
-        Mockito.when(application.getId()).thenReturn(Optional.of(applicationId));
+        Mockito.when(application.getId()).thenReturn(applicationId);
         final List<Application> applications = Lists.newArrayList(application);
 
         Mockito.when(this.commandService.getApplicationsForCommand(commandId)).thenReturn(applications);
@@ -492,10 +491,10 @@ public class JobCoordinatorServiceImplUnitTests {
         final String clusterId = UUID.randomUUID().toString();
         final Cluster cluster1 = Mockito.mock(Cluster.class);
         final Cluster cluster2 = Mockito.mock(Cluster.class);
-        Mockito.when(cluster1.getId()).thenReturn(Optional.of(clusterId));
+        Mockito.when(cluster1.getId()).thenReturn(clusterId);
         final String commandId = UUID.randomUUID().toString();
         final Command command = Mockito.mock(Command.class);
-        Mockito.when(command.getId()).thenReturn(Optional.of(commandId));
+        Mockito.when(command.getId()).thenReturn(commandId);
         Mockito.when(command.getMemory()).thenReturn(Optional.empty());
         final Map<Cluster, String> clustersCommandsMap = Maps.newHashMap();
         clustersCommandsMap.put(cluster1, commandId);
@@ -519,7 +518,7 @@ public class JobCoordinatorServiceImplUnitTests {
 
         final String applicationId = UUID.randomUUID().toString();
         final Application application = Mockito.mock(Application.class);
-        Mockito.when(application.getId()).thenReturn(Optional.of(applicationId));
+        Mockito.when(application.getId()).thenReturn(applicationId);
         final List<Application> applications = Lists.newArrayList(application);
 
         Mockito.when(this.commandService.getApplicationsForCommand(commandId)).thenReturn(applications);
@@ -606,9 +605,9 @@ public class JobCoordinatorServiceImplUnitTests {
         final Cluster cluster = Mockito.mock(Cluster.class);
         final String commandId = UUID.randomUUID().toString();
         final Command command = Mockito.mock(Command.class);
-        Mockito.when(command.getId()).thenReturn(Optional.of(commandId));
+        Mockito.when(command.getId()).thenReturn(commandId);
         Mockito.when(command.getMemory()).thenReturn(Optional.empty());
-        Mockito.when(cluster.getId()).thenReturn(Optional.of(clusterId));
+        Mockito.when(cluster.getId()).thenReturn(clusterId);
         final Map<Cluster, String> clustersCommandsMap = Maps.newHashMap();
         clustersCommandsMap.put(cluster, commandId);
 
@@ -622,8 +621,7 @@ public class JobCoordinatorServiceImplUnitTests {
 
         Mockito.when(this.commandService.getCommand(commandId)).thenReturn(command);
 
-        final com.netflix.genie.common.dto.v4.Application v4Application
-            = new com.netflix.genie.common.dto.v4.Application(
+        final Application application = new Application(
             applicationId,
             Instant.now(),
             Instant.now(),
@@ -635,8 +633,7 @@ public class JobCoordinatorServiceImplUnitTests {
             ).build()
         );
 
-        Mockito.when(this.applicationService.getApplication(applicationId)).thenReturn(v4Application);
-        final Application application = DtoAdapters.toV3Application(v4Application);
+        Mockito.when(this.applicationService.getApplication(applicationId)).thenReturn(application);
 
         Mockito.when(this.jobStateService.getUsedMemory()).thenReturn(0);
 
@@ -714,10 +711,10 @@ public class JobCoordinatorServiceImplUnitTests {
 
         final String clusterId = UUID.randomUUID().toString();
         final Cluster cluster = Mockito.mock(Cluster.class);
-        Mockito.when(cluster.getId()).thenReturn(Optional.of(clusterId));
+        Mockito.when(cluster.getId()).thenReturn(clusterId);
         final String commandId = UUID.randomUUID().toString();
         final Command command = Mockito.mock(Command.class);
-        Mockito.when(command.getId()).thenReturn(Optional.of(commandId));
+        Mockito.when(command.getId()).thenReturn(commandId);
         Mockito.when(command.getMemory()).thenReturn(Optional.empty());
         final Map<Cluster, String> clustersCommandsMap = Maps.newHashMap();
         clustersCommandsMap.put(cluster, commandId);
@@ -734,7 +731,7 @@ public class JobCoordinatorServiceImplUnitTests {
 
         final String applicationId = UUID.randomUUID().toString();
         final Application application = Mockito.mock(Application.class);
-        Mockito.when(application.getId()).thenReturn(Optional.of(applicationId));
+        Mockito.when(application.getId()).thenReturn(applicationId);
         final List<Application> applications = Lists.newArrayList(application);
 
         Mockito.when(this.commandService.getApplicationsForCommand(commandId)).thenReturn(applications);
@@ -803,10 +800,10 @@ public class JobCoordinatorServiceImplUnitTests {
 
         final String clusterId = UUID.randomUUID().toString();
         final Cluster cluster = Mockito.mock(Cluster.class);
-        Mockito.when(cluster.getId()).thenReturn(Optional.of(clusterId));
+        Mockito.when(cluster.getId()).thenReturn(clusterId);
         final String commandId = UUID.randomUUID().toString();
         final Command command = Mockito.mock(Command.class);
-        Mockito.when(command.getId()).thenReturn(Optional.of(commandId));
+        Mockito.when(command.getId()).thenReturn(commandId);
         Mockito.when(command.getMemory()).thenReturn(Optional.of(1));
         final Map<Cluster, String> clustersCommandsMap = Maps.newHashMap();
         clustersCommandsMap.put(cluster, commandId);
@@ -823,7 +820,7 @@ public class JobCoordinatorServiceImplUnitTests {
 
         final String applicationId = UUID.randomUUID().toString();
         final Application application = Mockito.mock(Application.class);
-        Mockito.when(application.getId()).thenReturn(Optional.of(applicationId));
+        Mockito.when(application.getId()).thenReturn(applicationId);
         final List<Application> applications = Lists.newArrayList(application);
 
         Mockito.when(this.commandService.getApplicationsForCommand(commandId)).thenReturn(applications);
@@ -911,10 +908,10 @@ public class JobCoordinatorServiceImplUnitTests {
 
         final String clusterId = UUID.randomUUID().toString();
         final Cluster cluster = Mockito.mock(Cluster.class);
-        Mockito.when(cluster.getId()).thenReturn(Optional.of(clusterId));
+        Mockito.when(cluster.getId()).thenReturn(clusterId);
         final String commandId = UUID.randomUUID().toString();
         final Command command = Mockito.mock(Command.class);
-        Mockito.when(command.getId()).thenReturn(Optional.of(commandId));
+        Mockito.when(command.getId()).thenReturn(commandId);
         Mockito.when(command.getMemory()).thenReturn(Optional.of(1));
         final Map<Cluster, String> clustersCommandsMap = Maps.newHashMap();
         clustersCommandsMap.put(cluster, commandId);
@@ -931,7 +928,7 @@ public class JobCoordinatorServiceImplUnitTests {
 
         final String applicationId = UUID.randomUUID().toString();
         final Application application = Mockito.mock(Application.class);
-        Mockito.when(application.getId()).thenReturn(Optional.of(applicationId));
+        Mockito.when(application.getId()).thenReturn(applicationId);
         final List<Application> applications = Lists.newArrayList(application);
 
         Mockito.when(this.commandService.getApplicationsForCommand(commandId)).thenReturn(applications);
@@ -1001,10 +998,10 @@ public class JobCoordinatorServiceImplUnitTests {
 
         final String clusterId = UUID.randomUUID().toString();
         final Cluster cluster = Mockito.mock(Cluster.class);
-        Mockito.when(cluster.getId()).thenReturn(Optional.of(clusterId));
+        Mockito.when(cluster.getId()).thenReturn(clusterId);
         final String commandId = UUID.randomUUID().toString();
         final Command command = Mockito.mock(Command.class);
-        Mockito.when(command.getId()).thenReturn(Optional.of(commandId));
+        Mockito.when(command.getId()).thenReturn(commandId);
         Mockito.when(command.getMemory()).thenReturn(Optional.of(1));
         final Map<Cluster, String> clustersCommandsMap = Maps.newHashMap();
         clustersCommandsMap.put(cluster, commandId);
@@ -1021,7 +1018,7 @@ public class JobCoordinatorServiceImplUnitTests {
 
         final String applicationId = UUID.randomUUID().toString();
         final Application application = Mockito.mock(Application.class);
-        Mockito.when(application.getId()).thenReturn(Optional.of(applicationId));
+        Mockito.when(application.getId()).thenReturn(applicationId);
         final List<Application> applications = Lists.newArrayList(application);
 
         Mockito.when(this.commandService.getApplicationsForCommand(commandId)).thenReturn(applications);
@@ -1094,10 +1091,10 @@ public class JobCoordinatorServiceImplUnitTests {
 
         final String clusterId = UUID.randomUUID().toString();
         final Cluster cluster = Mockito.mock(Cluster.class);
-        Mockito.when(cluster.getId()).thenReturn(Optional.of(clusterId));
+        Mockito.when(cluster.getId()).thenReturn(clusterId);
         final String commandId = UUID.randomUUID().toString();
         final Command command = Mockito.mock(Command.class);
-        Mockito.when(command.getId()).thenReturn(Optional.of(commandId));
+        Mockito.when(command.getId()).thenReturn(commandId);
         Mockito.when(command.getMemory()).thenReturn(Optional.of(1));
         final Map<Cluster, String> clustersCommandsMap = Maps.newHashMap();
         clustersCommandsMap.put(cluster, commandId);
@@ -1114,7 +1111,7 @@ public class JobCoordinatorServiceImplUnitTests {
 
         final String applicationId = UUID.randomUUID().toString();
         final Application application = Mockito.mock(Application.class);
-        Mockito.when(application.getId()).thenReturn(Optional.of(applicationId));
+        Mockito.when(application.getId()).thenReturn(applicationId);
         final List<Application> applications = Lists.newArrayList(application);
 
         Mockito.when(this.commandService.getApplicationsForCommand(commandId)).thenReturn(applications);
@@ -1196,10 +1193,10 @@ public class JobCoordinatorServiceImplUnitTests {
 
         final String clusterId = UUID.randomUUID().toString();
         final Cluster cluster = Mockito.mock(Cluster.class);
-        Mockito.when(cluster.getId()).thenReturn(Optional.of(clusterId));
+        Mockito.when(cluster.getId()).thenReturn(clusterId);
         final String commandId = UUID.randomUUID().toString();
         final Command command = Mockito.mock(Command.class);
-        Mockito.when(command.getId()).thenReturn(Optional.of(commandId));
+        Mockito.when(command.getId()).thenReturn(commandId);
         Mockito.when(command.getMemory()).thenReturn(Optional.of(1));
         final Map<Cluster, String> clustersCommandsMap = Maps.newHashMap();
         clustersCommandsMap.put(cluster, commandId);

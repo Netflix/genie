@@ -19,8 +19,11 @@ package com.netflix.genie.web.jpa.services;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
+import com.netflix.genie.common.dto.v4.Command;
+import com.netflix.genie.common.dto.v4.CommandMetadata;
+import com.netflix.genie.common.dto.v4.CommandRequest;
+import com.netflix.genie.common.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
@@ -29,7 +32,6 @@ import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.jpa.entities.ApplicationEntity;
 import com.netflix.genie.web.jpa.entities.CommandEntity;
-import com.netflix.genie.web.jpa.entities.TagEntity;
 import com.netflix.genie.web.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.web.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
@@ -43,6 +45,7 @@ import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
 import org.springframework.dao.DuplicateKeyException;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -60,7 +63,7 @@ public class JpaCommandServiceImplUnitTests {
     private static final String COMMAND_1_NAME = "pig_13_prod";
     private static final String COMMAND_1_USER = "tgianos";
     private static final String COMMAND_1_VERSION = "1.2.3";
-    private static final String COMMAND_1_EXECUTABLE = "pig";
+    private static final List<String> COMMAND_1_EXECUTABLE = Lists.newArrayList("pig");
     private static final long COMMAND_1_CHECK_DELAY = 18000L;
 
     private static final String COMMAND_2_ID = "command2";
@@ -68,7 +71,6 @@ public class JpaCommandServiceImplUnitTests {
     private JpaCommandServiceImpl service;
     private JpaCommandRepository jpaCommandRepository;
     private JpaApplicationRepository jpaApplicationRepository;
-    private JpaTagRepository jpaTagRepository;
 
     /**
      * Setup the tests.
@@ -77,10 +79,9 @@ public class JpaCommandServiceImplUnitTests {
     public void setup() {
         this.jpaCommandRepository = Mockito.mock(JpaCommandRepository.class);
         this.jpaApplicationRepository = Mockito.mock(JpaApplicationRepository.class);
-        this.jpaTagRepository = Mockito.mock(JpaTagRepository.class);
         this.service = new JpaCommandServiceImpl(
             Mockito.mock(TagService.class),
-            this.jpaTagRepository,
+            Mockito.mock(JpaTagRepository.class),
             Mockito.mock(FileService.class),
             Mockito.mock(JpaFileRepository.class),
             this.jpaCommandRepository,
@@ -108,20 +109,20 @@ public class JpaCommandServiceImplUnitTests {
      */
     @Test(expected = GenieConflictException.class)
     public void testCreateCommandAlreadyExists() throws GenieException {
-        final Command command = new Command.Builder(
-            COMMAND_1_NAME,
-            COMMAND_1_USER,
-            COMMAND_1_VERSION,
-            CommandStatus.ACTIVE,
-            COMMAND_1_EXECUTABLE,
-            COMMAND_1_CHECK_DELAY
+        final CommandRequest command = new CommandRequest.Builder(
+            new CommandMetadata.Builder(
+                COMMAND_1_NAME,
+                COMMAND_1_USER,
+                CommandStatus.ACTIVE
+            )
+                .withVersion(COMMAND_1_VERSION)
+                .build(),
+            COMMAND_1_EXECUTABLE
         )
-            .withId(COMMAND_1_ID)
+            .withRequestedId(COMMAND_1_ID)
+            .withCheckDelay(COMMAND_1_CHECK_DELAY)
             .build();
 
-        Mockito
-            .when(this.jpaTagRepository.findByTag(Mockito.anyString()))
-            .thenReturn(Optional.of(new TagEntity(UUID.randomUUID().toString())));
         Mockito
             .when(this.jpaCommandRepository.save(Mockito.any(CommandEntity.class)))
             .thenThrow(new DuplicateKeyException("Duplicate Key"));
@@ -139,7 +140,20 @@ public class JpaCommandServiceImplUnitTests {
         Mockito.when(this.jpaCommandRepository.findByUniqueId(id)).thenReturn(Optional.empty());
         this.service.updateCommand(
             id,
-            new Command.Builder(" ", " ", " ", CommandStatus.ACTIVE, " ", 1803L).build()
+            new Command(
+                id,
+                Instant.now(),
+                Instant.now(),
+                new ExecutionEnvironment(null, null, null),
+                new CommandMetadata.Builder(
+                    " ",
+                    " ",
+                    CommandStatus.ACTIVE
+                ).build(),
+                Lists.newArrayList(UUID.randomUUID().toString()),
+                null,
+                1803L
+            )
         );
     }
 
@@ -152,7 +166,7 @@ public class JpaCommandServiceImplUnitTests {
     public void testUpdateCommandIdsDontMatch() throws GenieException {
         Mockito.when(this.jpaCommandRepository.existsByUniqueId(COMMAND_2_ID)).thenReturn(true);
         final Command command = Mockito.mock(Command.class);
-        Mockito.when(command.getId()).thenReturn(Optional.of(UUID.randomUUID().toString()));
+        Mockito.when(command.getId()).thenReturn(UUID.randomUUID().toString());
         this.service.updateCommand(COMMAND_2_ID, command);
     }
 

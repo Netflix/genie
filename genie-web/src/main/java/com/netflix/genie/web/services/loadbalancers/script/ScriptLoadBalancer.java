@@ -19,9 +19,10 @@ package com.netflix.genie.web.services.loadbalancers.script;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.JobRequest;
+import com.netflix.genie.common.dto.v4.Cluster;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.web.controllers.DtoAdapters;
 import com.netflix.genie.web.services.ClusterLoadBalancer;
 import com.netflix.genie.web.services.impl.GenieFileTransferService;
 import com.netflix.genie.web.util.MetricsConstants;
@@ -61,6 +62,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 /**
  * An implementation of the ClusterLoadBalancer interface which uses user a supplied script to make decisions based
@@ -173,7 +175,17 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
             if (this.isConfigured.get() && this.script != null && this.script.get() != null) {
                 log.debug("Evaluating script for job {}", jobRequest.getId().orElse("without id"));
                 final Bindings bindings = new SimpleBindings();
-                bindings.put(CLUSTERS_BINDING, this.mapper.writeValueAsString(clusters));
+                // TODO: For now for backwards compatibility with balancer scripts continue writing Clusters out in
+                //       V3 format. Change to V4 once stabalize a bit more
+                bindings.put(
+                    CLUSTERS_BINDING,
+                    this.mapper.writeValueAsString(
+                        clusters
+                            .stream()
+                            .map(DtoAdapters::toV3Cluster)
+                            .collect(Collectors.toSet())
+                    )
+                );
                 bindings.put(JOB_REQUEST_BINDING, this.mapper.writeValueAsString(jobRequest));
 
                 // Run as callable and timeout after the configured timeout length
@@ -184,7 +196,7 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
                 // Find the cluster if not null
                 if (clusterId != null) {
                     for (final Cluster cluster : clusters) {
-                        if (cluster.getId().isPresent() && clusterId.equals(cluster.getId().get())) {
+                        if (clusterId.equals(cluster.getId())) {
                             tags.add(Tag.of(MetricsConstants.TagKeys.STATUS, STATUS_TAG_FOUND));
                             return cluster;
                         }

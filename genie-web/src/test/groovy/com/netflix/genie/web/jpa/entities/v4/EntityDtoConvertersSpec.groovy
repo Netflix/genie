@@ -239,5 +239,6 @@ class EntityDtoConvertersSpec extends Specification {
         command.getMemory().orElseGet(RandomSuppliers.INT) == memory
         command.getMetadata().getMetadata().isPresent()
         GenieObjectMapper.getMapper().writeValueAsString(command.getMetadata().getMetadata().get()) == metadata
+        command.getCheckDelay() == checkDelay
     }
 }

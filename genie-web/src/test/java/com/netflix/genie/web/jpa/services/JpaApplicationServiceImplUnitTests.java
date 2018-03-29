@@ -32,7 +32,6 @@ import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.jpa.entities.ApplicationEntity;
 import com.netflix.genie.web.jpa.entities.CommandEntity;
-import com.netflix.genie.web.jpa.entities.TagEntity;
 import com.netflix.genie.web.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.web.jpa.repositories.JpaFileRepository;
@@ -64,7 +63,6 @@ public class JpaApplicationServiceImplUnitTests {
 
     private JpaApplicationRepository jpaApplicationRepository;
     private JpaApplicationServiceImpl appService;
-    private JpaTagRepository jpaTagRepository;
 
     /**
      * Setup the tests.
@@ -72,10 +70,9 @@ public class JpaApplicationServiceImplUnitTests {
     @Before
     public void setup() {
         this.jpaApplicationRepository = Mockito.mock(JpaApplicationRepository.class);
-        this.jpaTagRepository = Mockito.mock(JpaTagRepository.class);
         this.appService = new JpaApplicationServiceImpl(
             Mockito.mock(TagService.class),
-            this.jpaTagRepository,
+            Mockito.mock(JpaTagRepository.class),
             Mockito.mock(FileService.class),
             Mockito.mock(JpaFileRepository.class),
             this.jpaApplicationRepository,
@@ -114,9 +111,6 @@ public class JpaApplicationServiceImplUnitTests {
             .withRequestedId(APP_1_ID)
             .build();
 
-        Mockito
-            .when(this.jpaTagRepository.findByTag(Mockito.anyString()))
-            .thenReturn(Optional.of(new TagEntity(UUID.randomUUID().toString())));
         Mockito
             .when(this.jpaApplicationRepository.save(Mockito.any(ApplicationEntity.class)))
             .thenThrow(new DuplicateKeyException("Duplicate Key"));

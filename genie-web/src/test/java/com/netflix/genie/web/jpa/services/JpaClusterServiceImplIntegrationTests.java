@@ -22,13 +22,18 @@ import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseTearDown;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.ClusterStatus;
-import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.dto.JobRequest;
+import com.netflix.genie.common.dto.v4.Cluster;
+import com.netflix.genie.common.dto.v4.ClusterMetadata;
+import com.netflix.genie.common.dto.v4.ClusterRequest;
+import com.netflix.genie.common.dto.v4.Command;
+import com.netflix.genie.common.dto.v4.CommandMetadata;
+import com.netflix.genie.common.dto.v4.CommandRequest;
 import com.netflix.genie.common.dto.v4.Criterion;
+import com.netflix.genie.common.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.test.categories.IntegrationTest;
@@ -100,24 +105,30 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
     @Test
     public void testGetCluster() throws GenieException {
         final Cluster cluster1 = this.service.getCluster(CLUSTER_1_ID);
-        Assert.assertEquals(CLUSTER_1_ID, cluster1.getId().orElseThrow(IllegalArgumentException::new));
-        Assert.assertEquals(CLUSTER_1_NAME, cluster1.getName());
-        Assert.assertEquals(CLUSTER_1_USER, cluster1.getUser());
-        Assert.assertEquals(CLUSTER_1_VERSION, cluster1.getVersion());
-        Assert.assertEquals(CLUSTER_1_STATUS, cluster1.getStatus());
-        Assert.assertEquals(5, cluster1.getTags().size());
-        Assert.assertEquals(1, cluster1.getConfigs().size());
-        Assert.assertEquals(2, cluster1.getDependencies().size());
+        Assert.assertEquals(CLUSTER_1_ID, cluster1.getId());
+        Assert.assertEquals(CLUSTER_1_NAME, cluster1.getMetadata().getName());
+        Assert.assertEquals(CLUSTER_1_USER, cluster1.getMetadata().getUser());
+        Assert.assertEquals(
+            CLUSTER_1_VERSION,
+            cluster1.getMetadata().getVersion().orElse(UUID.randomUUID().toString())
+        );
+        Assert.assertEquals(CLUSTER_1_STATUS, cluster1.getMetadata().getStatus());
+        Assert.assertEquals(3, cluster1.getMetadata().getTags().size());
+        Assert.assertEquals(1, cluster1.getResources().getConfigs().size());
+        Assert.assertEquals(2, cluster1.getResources().getDependencies().size());
 
         final Cluster cluster2 = this.service.getCluster(CLUSTER_2_ID);
-        Assert.assertEquals(CLUSTER_2_ID, cluster2.getId().orElseThrow(IllegalArgumentException::new));
-        Assert.assertEquals(CLUSTER_2_NAME, cluster2.getName());
-        Assert.assertEquals(CLUSTER_2_USER, cluster2.getUser());
-        Assert.assertEquals(CLUSTER_2_VERSION, cluster2.getVersion());
-        Assert.assertEquals(CLUSTER_2_STATUS, cluster2.getStatus());
-        Assert.assertEquals(5, cluster2.getTags().size());
-        Assert.assertEquals(2, cluster2.getConfigs().size());
-        Assert.assertEquals(0, cluster2.getDependencies().size());
+        Assert.assertEquals(CLUSTER_2_ID, cluster2.getId());
+        Assert.assertEquals(CLUSTER_2_NAME, cluster2.getMetadata().getName());
+        Assert.assertEquals(CLUSTER_2_USER, cluster2.getMetadata().getUser());
+        Assert.assertEquals(
+            CLUSTER_2_VERSION,
+            cluster2.getMetadata().getVersion().orElse(UUID.randomUUID().toString())
+        );
+        Assert.assertEquals(CLUSTER_2_STATUS, cluster2.getMetadata().getStatus());
+        Assert.assertEquals(3, cluster2.getMetadata().getTags().size());
+        Assert.assertEquals(2, cluster2.getResources().getConfigs().size());
+        Assert.assertEquals(0, cluster2.getResources().getDependencies().size());
     }
 
     /**
@@ -127,9 +138,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
     public void testGetClustersByName() {
         final Page<Cluster> clusters = this.service.getClusters(CLUSTER_2_NAME, null, null, null, null, PAGE);
         Assert.assertEquals(1, clusters.getNumberOfElements());
-        Assert.assertEquals(
-            CLUSTER_2_ID, clusters.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new)
-        );
+        Assert.assertEquals(CLUSTER_2_ID, clusters.getContent().get(0).getId());
     }
 
     /**
@@ -141,12 +150,8 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         statuses.add(ClusterStatus.UP);
         final Page<Cluster> clusters = this.service.getClusters(null, statuses, null, null, null, PAGE);
         Assert.assertEquals(2, clusters.getNumberOfElements());
-        Assert.assertEquals(
-            CLUSTER_2_ID, clusters.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new)
-        );
-        Assert.assertEquals(
-            CLUSTER_1_ID, clusters.getContent().get(1).getId().orElseThrow(IllegalArgumentException::new)
-        );
+        Assert.assertEquals(CLUSTER_2_ID, clusters.getContent().get(0).getId());
+        Assert.assertEquals(CLUSTER_1_ID, clusters.getContent().get(1).getId());
     }
 
     /**
@@ -157,20 +162,14 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         final Set<String> tags = Sets.newHashSet("prod");
         Page<Cluster> clusters = this.service.getClusters(null, null, tags, null, null, PAGE);
         Assert.assertEquals(1, clusters.getNumberOfElements());
-        Assert.assertEquals(
-            CLUSTER_1_ID, clusters.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new)
-        );
+        Assert.assertEquals(CLUSTER_1_ID, clusters.getContent().get(0).getId());
 
         tags.clear();
         tags.add("hive");
         clusters = this.service.getClusters(null, null, tags, null, null, PAGE);
         Assert.assertEquals(2, clusters.getNumberOfElements());
-        Assert.assertEquals(
-            CLUSTER_2_ID, clusters.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new)
-        );
-        Assert.assertEquals(
-            CLUSTER_1_ID, clusters.getContent().get(1).getId().orElseThrow(IllegalArgumentException::new)
-        );
+        Assert.assertEquals(CLUSTER_2_ID, clusters.getContent().get(0).getId());
+        Assert.assertEquals(CLUSTER_1_ID, clusters.getContent().get(1).getId());
 
         tags.add("somethingThatWouldNeverReallyExist");
         clusters = this.service.getClusters(null, null, tags, null, null, PAGE);
@@ -179,12 +178,8 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         tags.clear();
         clusters = this.service.getClusters(null, null, tags, null, null, PAGE);
         Assert.assertEquals(2, clusters.getNumberOfElements());
-        Assert.assertEquals(
-            CLUSTER_2_ID, clusters.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new)
-        );
-        Assert.assertEquals(
-            CLUSTER_1_ID, clusters.getContent().get(1).getId().orElseThrow(IllegalArgumentException::new)
-        );
+        Assert.assertEquals(CLUSTER_2_ID, clusters.getContent().get(0).getId());
+        Assert.assertEquals(CLUSTER_1_ID, clusters.getContent().get(1).getId());
     }
 
     /**
@@ -196,9 +191,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         final Page<Cluster> clusters
             = this.service.getClusters(null, null, null, time.toInstant(), null, PAGE);
         Assert.assertEquals(1, clusters.getNumberOfElements());
-        Assert.assertEquals(
-            CLUSTER_2_ID, clusters.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new)
-        );
+        Assert.assertEquals(CLUSTER_2_ID, clusters.getContent().get(0).getId());
     }
 
     /**
@@ -210,9 +203,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         final Page<Cluster> clusters
             = this.service.getClusters(null, null, null, null, time.toInstant(), PAGE);
         Assert.assertEquals(1, clusters.getNumberOfElements());
-        Assert.assertEquals(
-            CLUSTER_1_ID, clusters.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new)
-        );
+        Assert.assertEquals(CLUSTER_1_ID, clusters.getContent().get(0).getId());
     }
 
     /**
@@ -223,12 +214,8 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         //Default to order by Updated
         final Page<Cluster> clusters = this.service.getClusters(null, null, null, null, null, PAGE);
         Assert.assertEquals(2, clusters.getNumberOfElements());
-        Assert.assertEquals(
-            CLUSTER_2_ID, clusters.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new)
-        );
-        Assert.assertEquals(
-            CLUSTER_1_ID, clusters.getContent().get(1).getId().orElseThrow(IllegalArgumentException::new)
-        );
+        Assert.assertEquals(CLUSTER_2_ID, clusters.getContent().get(0).getId());
+        Assert.assertEquals(CLUSTER_1_ID, clusters.getContent().get(1).getId());
     }
 
     /**
@@ -240,12 +227,8 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         //Default to order by Updated
         final Page<Cluster> clusters = this.service.getClusters(null, null, null, null, null, ascendingPage);
         Assert.assertEquals(2, clusters.getNumberOfElements());
-        Assert.assertEquals(
-            CLUSTER_1_ID, clusters.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new)
-        );
-        Assert.assertEquals(
-            CLUSTER_2_ID, clusters.getContent().get(1).getId().orElseThrow(IllegalArgumentException::new)
-        );
+        Assert.assertEquals(CLUSTER_1_ID, clusters.getContent().get(0).getId());
+        Assert.assertEquals(CLUSTER_2_ID, clusters.getContent().get(1).getId());
     }
 
     /**
@@ -256,12 +239,8 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         final Pageable userPage = PageRequest.of(0, 10, Sort.Direction.DESC, "user");
         final Page<Cluster> clusters = this.service.getClusters(null, null, null, null, null, userPage);
         Assert.assertEquals(2, clusters.getNumberOfElements());
-        Assert.assertEquals(
-            CLUSTER_1_ID, clusters.getContent().get(0).getId().orElseThrow(IllegalArgumentException::new)
-        );
-        Assert.assertEquals(
-            CLUSTER_2_ID, clusters.getContent().get(1).getId().orElseThrow(IllegalArgumentException::new)
-        );
+        Assert.assertEquals(CLUSTER_1_ID, clusters.getContent().get(0).getId());
+        Assert.assertEquals(CLUSTER_2_ID, clusters.getContent().get(1).getId());
     }
 
     /**
@@ -334,10 +313,10 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         final Criterion piCriterion = new Criterion.Builder().withTags(Sets.newHashSet("pi")).build();
 
         final List<Criterion> cluster1 = Lists.newArrayList(
-            new Criterion.Builder().withTags(Sets.newHashSet("genie.id:cluster1")).build()
+            new Criterion.Builder().withId("cluster1").build()
         );
         final List<Criterion> cluster = Lists.newArrayList(
-            new Criterion.Builder().withTags(Sets.newHashSet("genie.id:cluster")).build()
+            new Criterion.Builder().withId("cluster").build()
         );
         final List<Criterion> pigCluster = Lists.newArrayList(
             new Criterion.Builder().withTags(Sets.newHashSet("pig")).build()
@@ -378,25 +357,27 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         final Set<String> configs = Sets.newHashSet("a config", "another config", "yet another config");
         final Set<String> dependencies = Sets.newHashSet("a dependency");
         final String id = UUID.randomUUID().toString();
-        final Cluster cluster = new Cluster.Builder(
-            CLUSTER_1_NAME,
-            CLUSTER_1_USER,
-            CLUSTER_1_VERSION,
-            ClusterStatus.OUT_OF_SERVICE
+        final ClusterRequest cluster = new ClusterRequest.Builder(
+            new ClusterMetadata.Builder(
+                CLUSTER_1_NAME,
+                CLUSTER_1_USER,
+                ClusterStatus.OUT_OF_SERVICE
+            )
+                .withVersion(CLUSTER_1_VERSION)
+                .build()
         )
-            .withId(id)
-            .withConfigs(configs)
-            .withDependencies(dependencies)
+            .withRequestedId(id)
+            .withResources(new ExecutionEnvironment(configs, dependencies, null))
             .build();
         this.service.createCluster(cluster);
         final Cluster created = this.service.getCluster(id);
         Assert.assertNotNull(created);
-        Assert.assertEquals(id, created.getId().orElseThrow(IllegalArgumentException::new));
-        Assert.assertEquals(CLUSTER_1_NAME, created.getName());
-        Assert.assertEquals(CLUSTER_1_USER, created.getUser());
-        Assert.assertEquals(ClusterStatus.OUT_OF_SERVICE, created.getStatus());
-        Assert.assertEquals(3, created.getConfigs().size());
-        Assert.assertEquals(1, created.getDependencies().size());
+        Assert.assertEquals(id, created.getId());
+        Assert.assertEquals(CLUSTER_1_NAME, created.getMetadata().getName());
+        Assert.assertEquals(CLUSTER_1_USER, created.getMetadata().getUser());
+        Assert.assertEquals(ClusterStatus.OUT_OF_SERVICE, created.getMetadata().getStatus());
+        Assert.assertEquals(3, created.getResources().getConfigs().size());
+        Assert.assertEquals(1, created.getResources().getDependencies().size());
         this.service.deleteCluster(id);
         try {
             this.service.getCluster(id);
@@ -418,25 +399,27 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
     public void testCreateClusterNoId() throws GenieException {
         final Set<String> configs = Sets.newHashSet("a config", "another config", "yet another config");
         final Set<String> dependencies = Sets.newHashSet("a dependency");
-        final Cluster cluster = new Cluster.Builder(
-            CLUSTER_1_NAME,
-            CLUSTER_1_USER,
-            CLUSTER_1_VERSION,
-            ClusterStatus.OUT_OF_SERVICE
+        final ClusterRequest cluster = new ClusterRequest.Builder(
+            new ClusterMetadata.Builder(
+                CLUSTER_1_NAME,
+                CLUSTER_1_USER,
+                ClusterStatus.OUT_OF_SERVICE
+            )
+                .withVersion(CLUSTER_1_VERSION)
+                .build()
         )
-            .withConfigs(configs)
-            .withDependencies(dependencies)
+            .withResources(new ExecutionEnvironment(configs, dependencies, null))
             .build();
         final String id = this.service.createCluster(cluster);
         final Cluster created = this.service.getCluster(id);
-        Assert.assertEquals(CLUSTER_1_NAME, created.getName());
-        Assert.assertEquals(CLUSTER_1_USER, created.getUser());
-        Assert.assertEquals(ClusterStatus.OUT_OF_SERVICE, created.getStatus());
-        Assert.assertEquals(3, created.getConfigs().size());
-        Assert.assertEquals(1, created.getDependencies().size());
-        this.service.deleteCluster(created.getId().orElseThrow(IllegalArgumentException::new));
+        Assert.assertEquals(CLUSTER_1_NAME, created.getMetadata().getName());
+        Assert.assertEquals(CLUSTER_1_USER, created.getMetadata().getUser());
+        Assert.assertEquals(ClusterStatus.OUT_OF_SERVICE, created.getMetadata().getStatus());
+        Assert.assertEquals(3, created.getResources().getConfigs().size());
+        Assert.assertEquals(1, created.getResources().getDependencies().size());
+        this.service.deleteCluster(created.getId());
         try {
-            this.service.getCluster(created.getId().orElseThrow(IllegalArgumentException::new));
+            this.service.getCluster(created.getId());
             Assert.fail("Should have thrown exception");
         } catch (final GenieException ge) {
             Assert.assertEquals(
@@ -454,34 +437,39 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
     @Test
     public void testUpdateClusterNoId() throws GenieException {
         final Cluster getCluster = this.service.getCluster(CLUSTER_1_ID);
-        Assert.assertEquals(CLUSTER_1_USER, getCluster.getUser());
-        Assert.assertEquals(ClusterStatus.UP, getCluster.getStatus());
-        Assert.assertEquals(5, getCluster.getTags().size());
+        Assert.assertEquals(CLUSTER_1_USER, getCluster.getMetadata().getUser());
+        Assert.assertEquals(ClusterStatus.UP, getCluster.getMetadata().getStatus());
+        Assert.assertEquals(3, getCluster.getMetadata().getTags().size());
 
         final Set<String> tags = Sets.newHashSet("tez", "yarn", "hadoop");
-        tags.addAll(getCluster.getTags());
+        tags.addAll(getCluster.getMetadata().getTags());
 
-        final Cluster.Builder updateCluster = new Cluster.Builder(
-            getCluster.getName(),
-            CLUSTER_2_USER,
-            getCluster.getVersion(),
-            ClusterStatus.OUT_OF_SERVICE
-        )
-            .withId(getCluster.getId().orElseThrow(IllegalArgumentException::new))
-            .withCreated(getCluster.getCreated().orElseThrow(IllegalArgumentException::new))
-            .withUpdated(getCluster.getUpdated().orElseThrow(IllegalArgumentException::new))
-            .withTags(tags)
-            .withConfigs(getCluster.getConfigs());
+        final Cluster updateCluster = new Cluster(
+            getCluster.getId(),
+            getCluster.getCreated(),
+            getCluster.getUpdated(),
+            new ExecutionEnvironment(
+                getCluster.getResources().getConfigs(),
+                getCluster.getResources().getDependencies(),
+                getCluster.getResources().getSetupFile().orElse(null)
+            ),
+            new ClusterMetadata.Builder(
+                getCluster.getMetadata().getName(),
+                CLUSTER_2_USER,
+                ClusterStatus.OUT_OF_SERVICE
+            )
+                .withVersion(getCluster.getMetadata().getVersion().orElse(null))
+                .withTags(tags)
+                .withDescription(getCluster.getMetadata().getDescription().orElse(null))
+                .build()
+        );
 
-        getCluster.getDescription().ifPresent(updateCluster::withDescription);
-        getCluster.getSetupFile().ifPresent(updateCluster::withSetupFile);
-
-        this.service.updateCluster(CLUSTER_1_ID, updateCluster.build());
+        this.service.updateCluster(CLUSTER_1_ID, updateCluster);
 
         final Cluster updated = this.service.getCluster(CLUSTER_1_ID);
-        Assert.assertEquals(CLUSTER_2_USER, updated.getUser());
-        Assert.assertEquals(ClusterStatus.OUT_OF_SERVICE, updated.getStatus());
-        Assert.assertEquals(8, updated.getTags().size());
+        Assert.assertEquals(CLUSTER_2_USER, updated.getMetadata().getUser());
+        Assert.assertEquals(ClusterStatus.OUT_OF_SERVICE, updated.getMetadata().getStatus());
+        Assert.assertEquals(6, updated.getMetadata().getTags().size());
     }
 
     /**
@@ -492,18 +480,29 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
     @Test(expected = ConstraintViolationException.class)
     public void testUpdateClusterWithInvalidCluster() throws GenieException {
         final Cluster getCluster = this.service.getCluster(CLUSTER_1_ID);
-        Assert.assertEquals(CLUSTER_1_USER, getCluster.getUser());
-        Assert.assertEquals(ClusterStatus.UP, getCluster.getStatus());
-        Assert.assertEquals(5, getCluster.getTags().size());
+        Assert.assertEquals(CLUSTER_1_USER, getCluster.getMetadata().getUser());
+        Assert.assertEquals(ClusterStatus.UP, getCluster.getMetadata().getStatus());
+        Assert.assertEquals(3, getCluster.getMetadata().getTags().size());
 
-        final Cluster updateCluster = new Cluster.Builder(
-            "", //invalid
-            getCluster.getUser(),
-            getCluster.getVersion(),
-            ClusterStatus.OUT_OF_SERVICE
-        )
-            .withId(getCluster.getId().orElseThrow(IllegalArgumentException::new))
-            .build();
+        final Cluster updateCluster = new Cluster(
+            getCluster.getId(),
+            getCluster.getCreated(),
+            getCluster.getUpdated(),
+            new ExecutionEnvironment(
+                getCluster.getResources().getConfigs(),
+                getCluster.getResources().getDependencies(),
+                getCluster.getResources().getSetupFile().orElse(null)
+            ),
+            new ClusterMetadata.Builder(
+                "",
+                getCluster.getMetadata().getUser(),
+                ClusterStatus.OUT_OF_SERVICE
+            )
+                .withVersion(getCluster.getMetadata().getVersion().orElse(null))
+                .withTags(getCluster.getMetadata().getTags())
+                .withDescription(getCluster.getMetadata().getDescription().orElse(null))
+                .build()
+        );
 
         this.service.updateCluster(CLUSTER_1_ID, updateCluster);
     }
@@ -516,33 +515,40 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
     @Test
     public void testUpdateCreateAndUpdate() throws GenieException {
         final Cluster getCluster = this.service.getCluster(CLUSTER_1_ID);
-        final Instant created = getCluster.getCreated().orElseThrow(IllegalArgumentException::new);
-        final Instant updated = getCluster.getUpdated().orElseThrow(IllegalArgumentException::new);
+        final Instant created = getCluster.getCreated();
+        final Instant updated = getCluster.getUpdated();
 
-        final Cluster.Builder updateCluster = new Cluster.Builder(
-            getCluster.getName(),
-            getCluster.getUser(),
-            getCluster.getVersion(),
-            getCluster.getStatus()
-        )
-            .withId(getCluster.getId().orElseThrow(IllegalArgumentException::new))
-            .withCreated(Instant.now())
-            .withUpdated(Instant.EPOCH)
-            .withTags(getCluster.getTags())
-            .withConfigs(getCluster.getConfigs())
-            .withDependencies(getCluster.getDependencies());
+        final Cluster updateCluster = new Cluster(
+            getCluster.getId(),
+            Instant.now(),
+            Instant.EPOCH,
+            new ExecutionEnvironment(
+                getCluster.getResources().getConfigs(),
+                getCluster.getResources().getDependencies(),
+                getCluster.getResources().getSetupFile().orElse(null)
+            ),
+            new ClusterMetadata.Builder(
+                getCluster.getMetadata().getUser(),
+                getCluster.getMetadata().getUser(),
+                getCluster.getMetadata().getStatus()
+            )
+                .withVersion(getCluster.getMetadata().getVersion().orElse(null))
+                .withTags(getCluster.getMetadata().getTags())
+                .withDescription(getCluster.getMetadata().getDescription().orElse(null))
+                .build()
+        );
 
-        getCluster.getDescription().ifPresent(updateCluster::withDescription);
-        getCluster.getSetupFile().ifPresent(updateCluster::withSetupFile);
-
-        this.service.updateCluster(CLUSTER_1_ID, updateCluster.build());
+        this.service.updateCluster(CLUSTER_1_ID, updateCluster);
         final Cluster updatedCluster = this.service.getCluster(CLUSTER_1_ID);
-        Assert.assertEquals(created, updatedCluster.getCreated().orElseThrow(IllegalArgumentException::new));
+        Assert.assertEquals(created, updatedCluster.getCreated());
         Assert.assertNotEquals(updated, updatedCluster.getUpdated());
-        Assert.assertNotEquals(Instant.EPOCH, updatedCluster.getUpdated().orElseThrow(IllegalArgumentException::new));
-        Assert.assertEquals(getCluster.getTags(), updatedCluster.getTags());
-        Assert.assertEquals(getCluster.getConfigs(), updatedCluster.getConfigs());
-        Assert.assertEquals(getCluster.getDependencies(), updatedCluster.getDependencies());
+        Assert.assertNotEquals(Instant.EPOCH, updatedCluster.getUpdated());
+        Assert.assertEquals(getCluster.getMetadata().getTags(), updatedCluster.getMetadata().getTags());
+        Assert.assertEquals(getCluster.getResources().getConfigs(), updatedCluster.getResources().getConfigs());
+        Assert.assertEquals(
+            getCluster.getResources().getDependencies(),
+            updatedCluster.getResources().getDependencies()
+        );
     }
 
     /**
@@ -554,18 +560,18 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
     @Test
     public void testPatchCluster() throws GenieException, IOException {
         final Cluster getCluster = this.service.getCluster(CLUSTER_1_ID);
-        Assert.assertThat(getCluster.getName(), Matchers.is(CLUSTER_1_NAME));
-        final Instant updateTime = getCluster.getUpdated().orElseThrow(IllegalArgumentException::new);
+        Assert.assertThat(getCluster.getMetadata().getName(), Matchers.is(CLUSTER_1_NAME));
+        final Instant updateTime = getCluster.getUpdated();
 
         final String patchString
-            = "[{ \"op\": \"replace\", \"path\": \"/name\", \"value\": \"" + CLUSTER_2_NAME + "\" }]";
+            = "[{ \"op\": \"replace\", \"path\": \"/metadata/name\", \"value\": \"" + CLUSTER_2_NAME + "\" }]";
         final JsonPatch patch = JsonPatch.fromJson(GenieObjectMapper.getMapper().readTree(patchString));
 
         this.service.patchCluster(CLUSTER_1_ID, patch);
 
         final Cluster updated = this.service.getCluster(CLUSTER_1_ID);
         Assert.assertNotEquals(updated.getUpdated(), Matchers.is(updateTime));
-        Assert.assertThat(updated.getName(), Matchers.is(CLUSTER_2_NAME));
+        Assert.assertThat(updated.getMetadata().getName(), Matchers.is(CLUSTER_2_NAME));
     }
 
     /**
@@ -597,21 +603,21 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(1,
             this.commandService.getClustersForCommand(COMMAND_1_ID, null)
                 .stream()
-                .filter(cluster -> CLUSTER_2_ID.equals(cluster.getId().orElseThrow(IllegalArgumentException::new)))
+                .filter(cluster -> CLUSTER_2_ID.equals(cluster.getId()))
                 .count()
         );
         Assert.assertEquals(1, this.commandService.getClustersForCommand(COMMAND_2_ID, null).size());
         Assert.assertEquals(1,
             this.commandService.getClustersForCommand(COMMAND_2_ID, null)
                 .stream()
-                .filter(cluster -> CLUSTER_2_ID.equals(cluster.getId().orElseThrow(IllegalArgumentException::new)))
+                .filter(cluster -> CLUSTER_2_ID.equals(cluster.getId()))
                 .count()
         );
         Assert.assertEquals(1, this.commandService.getClustersForCommand(COMMAND_3_ID, null).size());
         Assert.assertEquals(1,
             this.commandService.getClustersForCommand(COMMAND_3_ID, null)
                 .stream()
-                .filter(cluster -> CLUSTER_2_ID.equals(cluster.getId().orElseThrow(IllegalArgumentException::new)))
+                .filter(cluster -> CLUSTER_2_ID.equals(cluster.getId()))
                 .count()
         );
     }
@@ -734,24 +740,32 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
     @Test
     public void testAddCommandsForCluster() throws GenieException {
         final String command1Id = this.commandService.createCommand(
-            new Command.Builder(
-                "name",
-                "user",
-                "23.1.0",
-                CommandStatus.ACTIVE,
-                "pig",
-                8108123L
-            ).build()
+            new CommandRequest.Builder(
+                new CommandMetadata.Builder(
+                    "name",
+                    "user",
+                    CommandStatus.ACTIVE
+                )
+                    .withVersion("23.1.0")
+                    .build(),
+                Lists.newArrayList("pig")
+            )
+                .withCheckDelay(8108123L)
+                .build()
         );
         final String command2Id = this.commandService.createCommand(
-            new Command.Builder(
-                "name2",
-                "user2",
-                "23.1.1",
-                CommandStatus.INACTIVE,
-                "pig2",
-                8023423L
-            ).build()
+            new CommandRequest.Builder(
+                new CommandMetadata.Builder(
+                    "name2",
+                    "user2",
+                    CommandStatus.INACTIVE
+                )
+                    .withVersion("23.1.1")
+                    .build(),
+                Lists.newArrayList("pig2")
+            )
+                .withCheckDelay(8023423L)
+                .build()
         );
         final List<String> newCommandIds = new ArrayList<>();
         newCommandIds.add(command1Id);
@@ -760,8 +774,8 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         this.service.addCommandsForCluster(CLUSTER_1_ID, newCommandIds);
         final List<Command> commands = this.service.getCommandsForCluster(CLUSTER_1_ID, null);
         Assert.assertEquals(5, commands.size());
-        Assert.assertEquals(command1Id, commands.get(3).getId().orElseThrow(IllegalArgumentException::new));
-        Assert.assertEquals(command2Id, commands.get(4).getId().orElseThrow(IllegalArgumentException::new));
+        Assert.assertEquals(command1Id, commands.get(3).getId());
+        Assert.assertEquals(command2Id, commands.get(4).getId());
     }
 
     /**
@@ -774,9 +788,9 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         final List<Command> commands
             = this.service.getCommandsForCluster(CLUSTER_1_ID, null);
         Assert.assertEquals(3, commands.size());
-        Assert.assertEquals(COMMAND_1_ID, commands.get(0).getId().orElseThrow(IllegalArgumentException::new));
-        Assert.assertEquals(COMMAND_3_ID, commands.get(1).getId().orElseThrow(IllegalArgumentException::new));
-        Assert.assertEquals(COMMAND_2_ID, commands.get(2).getId().orElseThrow(IllegalArgumentException::new));
+        Assert.assertEquals(COMMAND_1_ID, commands.get(0).getId());
+        Assert.assertEquals(COMMAND_3_ID, commands.get(1).getId());
+        Assert.assertEquals(COMMAND_2_ID, commands.get(2).getId());
     }
 
     /**
@@ -797,24 +811,32 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
     @Test
     public void testUpdateCommandsForCluster() throws GenieException {
         final String command1Id = this.commandService.createCommand(
-            new Command.Builder(
-                "name",
-                "user",
-                "23.1.0",
-                CommandStatus.ACTIVE,
-                "pig",
-                137324L
-            ).build()
+            new CommandRequest.Builder(
+                new CommandMetadata.Builder(
+                    "name",
+                    "user",
+                    CommandStatus.ACTIVE
+                )
+                    .withVersion("23.1.0")
+                    .build(),
+                Lists.newArrayList("pig")
+            )
+                .withCheckDelay(137324L)
+                .build()
         );
         final String command2Id = this.commandService.createCommand(
-            new Command.Builder(
-                "name2",
-                "user2",
-                "23.1.1",
-                CommandStatus.INACTIVE,
-                "pig2",
-                23423L
-            ).build()
+            new CommandRequest.Builder(
+                new CommandMetadata.Builder(
+                    "name2",
+                    "user2",
+                    CommandStatus.INACTIVE
+                )
+                    .withVersion("23.1.1")
+                    .build(),
+                Lists.newArrayList("pig2")
+            )
+                .withCheckDelay(23423L)
+                .build()
         );
         final List<String> newCommandIds = new ArrayList<>();
         newCommandIds.add(command1Id);
@@ -823,8 +845,8 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         this.service.setCommandsForCluster(CLUSTER_1_ID, newCommandIds);
         final List<Command> commands = this.service.getCommandsForCluster(CLUSTER_1_ID, null);
         Assert.assertEquals(2, commands.size());
-        Assert.assertEquals(command1Id, commands.get(0).getId().orElseThrow(IllegalArgumentException::new));
-        Assert.assertEquals(command2Id, commands.get(1).getId().orElseThrow(IllegalArgumentException::new));
+        Assert.assertEquals(command1Id, commands.get(0).getId());
+        Assert.assertEquals(command2Id, commands.get(1).getId());
     }
 
     /**
@@ -864,10 +886,10 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
 
         final Set<String> newTags = Sets.newHashSet(newTag1, newTag2, newTag3);
 
-        Assert.assertEquals(5, this.service.getTagsForCluster(CLUSTER_1_ID).size());
+        Assert.assertEquals(3, this.service.getTagsForCluster(CLUSTER_1_ID).size());
         this.service.addTagsForCluster(CLUSTER_1_ID, newTags);
         final Set<String> finalTags = this.service.getTagsForCluster(CLUSTER_1_ID);
-        Assert.assertEquals(8, finalTags.size());
+        Assert.assertEquals(6, finalTags.size());
         Assert.assertTrue(finalTags.contains(newTag1));
         Assert.assertTrue(finalTags.contains(newTag2));
         Assert.assertTrue(finalTags.contains(newTag3));
@@ -886,10 +908,10 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
 
         final Set<String> newTags = Sets.newHashSet(newTag1, newTag2, newTag3);
 
-        Assert.assertEquals(5, this.service.getTagsForCluster(CLUSTER_1_ID).size());
+        Assert.assertEquals(3, this.service.getTagsForCluster(CLUSTER_1_ID).size());
         this.service.updateTagsForCluster(CLUSTER_1_ID, newTags);
         final Set<String> finalTags = this.service.getTagsForCluster(CLUSTER_1_ID);
-        Assert.assertEquals(5, finalTags.size());
+        Assert.assertEquals(3, finalTags.size());
         Assert.assertTrue(finalTags.contains(newTag1));
         Assert.assertTrue(finalTags.contains(newTag2));
         Assert.assertTrue(finalTags.contains(newTag3));
@@ -902,8 +924,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void testGetTagsForCluster() throws GenieException {
-        Assert.assertEquals(5,
-            this.service.getTagsForCluster(CLUSTER_1_ID).size());
+        Assert.assertEquals(3, this.service.getTagsForCluster(CLUSTER_1_ID).size());
     }
 
     /**
@@ -913,9 +934,9 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void testRemoveAllTagsForCluster() throws GenieException {
-        Assert.assertEquals(5, this.service.getTagsForCluster(CLUSTER_1_ID).size());
+        Assert.assertEquals(3, this.service.getTagsForCluster(CLUSTER_1_ID).size());
         this.service.removeAllTagsForCluster(CLUSTER_1_ID);
-        Assert.assertEquals(2, this.service.getTagsForCluster(CLUSTER_1_ID).size());
+        Assert.assertEquals(0, this.service.getTagsForCluster(CLUSTER_1_ID).size());
     }
 
     /**
@@ -940,37 +961,48 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
     public void testDeleteTerminatedClusters() throws GenieException, IOException {
         Assert.assertThat(this.clusterRepository.count(), Matchers.is(2L));
         final String testClusterId = UUID.randomUUID().toString();
-        final Cluster testCluster = new Cluster.Builder(
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            ClusterStatus.OUT_OF_SERVICE
+        final ClusterRequest testCluster = new ClusterRequest.Builder(
+            new ClusterMetadata.Builder(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                ClusterStatus.OUT_OF_SERVICE
+            )
+                .withVersion(UUID.randomUUID().toString())
+                .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+                .build()
         )
-            .withId(testClusterId)
-            .withConfigs(Sets.newHashSet(UUID.randomUUID().toString()))
-            .withDependencies(Sets.newHashSet(UUID.randomUUID().toString()))
-            .withSetupFile(UUID.randomUUID().toString())
-            .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
-            .build();
+            .withRequestedId(testClusterId)
+            .withResources(
+                new ExecutionEnvironment(
+                    Sets.newHashSet(UUID.randomUUID().toString()),
+                    Sets.newHashSet(UUID.randomUUID().toString()),
+                    UUID.randomUUID().toString())
+            ).build();
         this.service.createCluster(testCluster);
 
         // Shouldn't delete any clusters as all are UP or OOS
         Assert.assertThat(this.service.deleteTerminatedClusters(), Matchers.is(0L));
 
         // Change status to UP
-        String patchString = "[{ \"op\": \"replace\", \"path\": \"/status\", \"value\": \"UP\" }]";
+        String patchString = "[{ \"op\": \"replace\", \"path\": \"/metadata/status\", \"value\": \"UP\" }]";
         JsonPatch patch = JsonPatch.fromJson(GenieObjectMapper.getMapper().readTree(patchString));
         this.service.patchCluster(testClusterId, patch);
-        Assert.assertThat(this.service.getCluster(testClusterId).getStatus(), Matchers.is(ClusterStatus.UP));
+        Assert.assertThat(
+            this.service.getCluster(testClusterId).getMetadata().getStatus(),
+            Matchers.is(ClusterStatus.UP)
+        );
 
         // All clusters are UP/OOS or attached to jobs
         Assert.assertThat(this.service.deleteTerminatedClusters(), Matchers.is(0L));
 
         // Change status to terminated
-        patchString = "[{ \"op\": \"replace\", \"path\": \"/status\", \"value\": \"TERMINATED\" }]";
+        patchString = "[{ \"op\": \"replace\", \"path\": \"/metadata/status\", \"value\": \"TERMINATED\" }]";
         patch = JsonPatch.fromJson(GenieObjectMapper.getMapper().readTree(patchString));
         this.service.patchCluster(testClusterId, patch);
-        Assert.assertThat(this.service.getCluster(testClusterId).getStatus(), Matchers.is(ClusterStatus.TERMINATED));
+        Assert.assertThat(
+            this.service.getCluster(testClusterId).getMetadata().getStatus(),
+            Matchers.is(ClusterStatus.TERMINATED)
+        );
 
         // All clusters are UP/OOS or attached to jobs
         Assert.assertThat(this.service.deleteTerminatedClusters(), Matchers.is(1L));

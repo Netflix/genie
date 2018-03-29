@@ -17,20 +17,20 @@
  */
 package com.netflix.genie.web.services.impl;
 
-import com.netflix.genie.common.dto.Application;
-import com.netflix.genie.common.dto.Cluster;
-import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatusMessages;
+import com.netflix.genie.common.dto.v4.Application;
+import com.netflix.genie.common.dto.v4.Cluster;
+import com.netflix.genie.common.dto.v4.Command;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.common.jobs.JobConstants;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.events.JobFinishedEvent;
 import com.netflix.genie.web.events.JobFinishedReason;
 import com.netflix.genie.web.events.JobStartedEvent;
-import com.netflix.genie.common.jobs.JobConstants;
 import com.netflix.genie.web.jobs.JobExecutionEnvironment;
 import com.netflix.genie.web.jobs.workflow.WorkflowTask;
 import com.netflix.genie.web.services.JobPersistenceService;
@@ -161,7 +161,9 @@ public class LocalJobRunner implements JobSubmitterService {
                                 .orElseThrow(() ->
                                     new GenieServerException("No process id returned. Unable to persist")
                                 ),
-                            jobExecution.getCheckDelay().orElse(Command.DEFAULT_CHECK_DELAY),
+                            jobExecution
+                                .getCheckDelay()
+                                .orElse(com.netflix.genie.common.dto.Command.DEFAULT_CHECK_DELAY),
                             jobExecution
                                 .getTimeout()
                                 .orElseThrow(() ->

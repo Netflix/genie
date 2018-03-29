@@ -386,9 +386,7 @@ public class JpaApplicationServiceImpl extends JpaBaseService implements Applica
         @NotBlank(message = "No application id entered. Unable to update tags.") final String id,
         @NotNull(message = "No tags entered unable to update tags.") final Set<String> tags
     ) throws GenieException {
-        final ApplicationEntity applicationEntity = this.findApplication(id);
-        final Set<TagEntity> newTags = this.createAndGetTagEntities(tags);
-        applicationEntity.setTags(newTags);
+        this.findApplication(id).setTags(this.createAndGetTagEntities(tags));
     }
 
     /**
@@ -398,16 +396,7 @@ public class JpaApplicationServiceImpl extends JpaBaseService implements Applica
     public void removeAllTagsForApplication(
         @NotBlank(message = "No application id entered. Unable to remove tags.") final String id
     ) throws GenieException {
-        final Set<TagEntity> tags = this.findApplication(id).getTags();
-        // Remove all the tags except the ones that start with "genie."
-        tags.removeAll(
-            tags
-                .stream()
-                .filter(
-                    tagEntity -> !tagEntity.getTag().startsWith(JpaBaseService.GENIE_TAG_NAMESPACE)
-                )
-                .collect(Collectors.toSet())
-        );
+        this.findApplication(id).getTags().clear();
     }
 
     /**
@@ -418,9 +407,7 @@ public class JpaApplicationServiceImpl extends JpaBaseService implements Applica
         @NotBlank(message = "No application id entered. Unable to remove tag.") final String id,
         @NotBlank(message = "No tag entered. Unable to remove.") final String tag
     ) throws GenieException {
-        if (!tag.startsWith(JpaBaseService.GENIE_TAG_NAMESPACE)) {
-            this.getTagRepository().findByTag(tag).ifPresent(this.findApplication(id).getTags()::remove);
-        }
+        this.getTagRepository().findByTag(tag).ifPresent(this.findApplication(id).getTags()::remove);
     }
 
     /**

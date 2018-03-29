@@ -19,7 +19,9 @@ package com.netflix.genie.web.controllers;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.ClusterCriteria;
+import com.netflix.genie.common.dto.v4.AgentEnvironmentRequest;
 import com.netflix.genie.common.dto.v4.Application;
 import com.netflix.genie.common.dto.v4.ApplicationMetadata;
 import com.netflix.genie.common.dto.v4.ApplicationRequest;
@@ -31,8 +33,10 @@ import com.netflix.genie.common.dto.v4.CommandMetadata;
 import com.netflix.genie.common.dto.v4.CommandRequest;
 import com.netflix.genie.common.dto.v4.Criterion;
 import com.netflix.genie.common.dto.v4.ExecutionEnvironment;
+import com.netflix.genie.common.dto.v4.ExecutionResourceCriteria;
 import com.netflix.genie.common.dto.v4.JobMetadata;
 import com.netflix.genie.common.dto.v4.JobRequest;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.Instant;
@@ -174,7 +178,44 @@ public final class DtoAdapters {
         return builder.build();
     }
 
-    static com.netflix.genie.common.dto.Cluster toV3Cluster(final Cluster v4Cluster) {
+    /**
+     * Convert a V3 Cluster to a V4 cluster.
+     *
+     * @param v3Cluster The cluster to convert
+     * @return The V4 representation of the cluster
+     */
+    public static Cluster toV4Cluster(final com.netflix.genie.common.dto.Cluster v3Cluster) {
+        final ClusterMetadata.Builder metadataBuilder = new ClusterMetadata.Builder(
+            v3Cluster.getName(),
+            v3Cluster.getUser(),
+            v3Cluster.getStatus()
+        )
+            .withVersion(v3Cluster.getVersion())
+            .withTags(toV4Tags(v3Cluster.getTags()));
+
+        v3Cluster.getMetadata().ifPresent(metadataBuilder::withMetadata);
+        v3Cluster.getDescription().ifPresent(metadataBuilder::withDescription);
+
+        return new Cluster(
+            v3Cluster.getId().orElseThrow(IllegalArgumentException::new),
+            v3Cluster.getCreated().orElse(Instant.now()),
+            v3Cluster.getUpdated().orElse(Instant.now()),
+            new ExecutionEnvironment(
+                v3Cluster.getConfigs(),
+                v3Cluster.getDependencies(),
+                v3Cluster.getSetupFile().orElse(null)
+            ),
+            metadataBuilder.build()
+        );
+    }
+
+    /**
+     * Convert a V4 Cluster to a V3 Cluster.
+     *
+     * @param v4Cluster The cluster to convert
+     * @return The v3 cluster
+     */
+    public static com.netflix.genie.common.dto.Cluster toV3Cluster(final Cluster v4Cluster) {
         final ClusterMetadata clusterMetadata = v4Cluster.getMetadata();
         final ExecutionEnvironment resources = v4Cluster.getResources();
         final com.netflix.genie.common.dto.Cluster.Builder builder
@@ -212,7 +253,9 @@ public final class DtoAdapters {
         v3Command.getDescription().ifPresent(metadataBuilder::withDescription);
 
         final List<String> executable = Lists.newArrayList(StringUtils.split(v3Command.getExecutable(), ' '));
-        final CommandRequest.Builder builder = new CommandRequest.Builder(metadataBuilder.build(), executable);
+        final CommandRequest.Builder builder = new CommandRequest
+            .Builder(metadataBuilder.build(), executable)
+            .withCheckDelay(v3Command.getCheckDelay());
         v3Command.getId().ifPresent(builder::withRequestedId);
         v3Command.getMemory().ifPresent(builder::withMemory);
         builder.withResources(
@@ -226,17 +269,52 @@ public final class DtoAdapters {
         return builder.build();
     }
 
+    /**
+     * Convert a V3 Command to a V4 Command.
+     *
+     * @param v3Command The V3 Command to convert
+     * @return The V4 representation of the supplied command
+     */
+    public static Command toV4Command(final com.netflix.genie.common.dto.Command v3Command) {
+        final CommandMetadata.Builder metadataBuilder = new CommandMetadata.Builder(
+            v3Command.getName(),
+            v3Command.getUser(),
+            v3Command.getStatus()
+        )
+            .withVersion(v3Command.getVersion())
+            .withTags(toV4Tags(v3Command.getTags()));
+
+        v3Command.getDescription().ifPresent(metadataBuilder::withDescription);
+        v3Command.getMetadata().ifPresent(metadataBuilder::withMetadata);
+
+        final ExecutionEnvironment resources = new ExecutionEnvironment(
+            v3Command.getConfigs(),
+            v3Command.getDependencies(),
+            v3Command.getSetupFile().orElse(null)
+        );
+
+        return new Command(
+            v3Command.getId().orElseThrow(IllegalArgumentException::new),
+            v3Command.getCreated().orElse(Instant.now()),
+            v3Command.getUpdated().orElse(Instant.now()),
+            resources,
+            metadataBuilder.build(),
+            Lists.newArrayList(StringUtils.split(v3Command.getExecutable(), ' ')),
+            v3Command.getMemory().orElse(null),
+            v3Command.getCheckDelay()
+        );
+    }
+
     static com.netflix.genie.common.dto.Command toV3Command(final Command v4Command) {
         final CommandMetadata commandMetadata = v4Command.getMetadata();
         final ExecutionEnvironment resources = v4Command.getResources();
-        final com.netflix.genie.common.dto.Command.Builder builder
-            = new com.netflix.genie.common.dto.Command.Builder(
+        final com.netflix.genie.common.dto.Command.Builder builder = new com.netflix.genie.common.dto.Command.Builder(
             commandMetadata.getName(),
             commandMetadata.getUser(),
             commandMetadata.getVersion().orElse(NO_VERSION_SPECIFIED),
             commandMetadata.getStatus(),
             StringUtils.join(v4Command.getExecutable(), ' '),
-            com.netflix.genie.common.dto.Command.DEFAULT_CHECK_DELAY
+            v4Command.getCheckDelay()
         )
             .withId(v4Command.getId())
             .withTags(toV3Tags(v4Command.getId(), commandMetadata.getName(), commandMetadata.getTags()))
@@ -255,9 +333,64 @@ public final class DtoAdapters {
         return builder.build();
     }
 
-//    public static JobRequest toV4JobRequest(com.netflix.genie.common.dto.JobRequest v3JobRequest) {
-//
-//    }
+    /**
+     * Convert a V3 Job Request to a V4 Job Request.
+     *
+     * @param v3JobRequest The v3 request to convert
+     * @return The V4 version of the information contained in the V3 request
+     * @throws GeniePreconditionException When the criteria is invalid
+     */
+    public static JobRequest toV4JobRequest(
+        final com.netflix.genie.common.dto.JobRequest v3JobRequest
+    ) throws GeniePreconditionException {
+        final ExecutionEnvironment resources = new ExecutionEnvironment(
+            v3JobRequest.getConfigs(),
+            v3JobRequest.getDependencies(),
+            v3JobRequest.getSetupFile().orElse(null)
+        );
+
+        final JobMetadata.Builder metadataBuilder = new JobMetadata.Builder(
+            v3JobRequest.getName(),
+            v3JobRequest.getUser()
+        )
+            .withTags(v3JobRequest.getTags())
+            .withVersion(v3JobRequest.getVersion());
+
+        v3JobRequest.getMetadata().ifPresent(metadataBuilder::withMetadata);
+        v3JobRequest.getEmail().ifPresent(metadataBuilder::withEmail);
+        v3JobRequest.getGroup().ifPresent(metadataBuilder::withGroup);
+        v3JobRequest.getGrouping().ifPresent(metadataBuilder::withGrouping);
+        v3JobRequest.getGroupingInstance().ifPresent(metadataBuilder::withGroupingInstance);
+        v3JobRequest.getDescription().ifPresent(metadataBuilder::withDescription);
+
+        final List<Criterion> clusterCriteria = Lists.newArrayList();
+        for (final ClusterCriteria criterion : v3JobRequest.getClusterCriterias()) {
+            clusterCriteria.add(toV4Criterion(criterion));
+        }
+        final ExecutionResourceCriteria criteria = new ExecutionResourceCriteria(
+            clusterCriteria,
+            toV4Criterion(v3JobRequest.getCommandCriteria()),
+            v3JobRequest.getApplications()
+        );
+
+        final AgentEnvironmentRequest.Builder agentEnvironmentBuilder = new AgentEnvironmentRequest.Builder();
+        v3JobRequest.getCpu().ifPresent(agentEnvironmentBuilder::withRequestedJobCpu);
+        v3JobRequest.getMemory().ifPresent(agentEnvironmentBuilder::withRequestedJobMemory);
+
+        return new JobRequest(
+            v3JobRequest.getId().orElse(null),
+            resources,
+            v3JobRequest.getCommandArgs().isPresent()
+                ? Lists.newArrayList(StringUtils.split(v3JobRequest.getCommandArgs().get(), ' '))
+                : null,
+            v3JobRequest.isDisableLogArchival(),
+            v3JobRequest.getTimeout().orElse(null),
+            false,
+            metadataBuilder.build(),
+            criteria,
+            agentEnvironmentBuilder.build()
+        );
+    }
 
     /**
      * Helper method to convert a v4 JobRequest to a v3 job request.
@@ -329,5 +462,26 @@ public final class DtoAdapters {
 
     private static ClusterCriteria toClusterCriteria(final Criterion criterion) {
         return new ClusterCriteria(toV3CriterionTags(criterion));
+    }
+
+    private static Criterion toV4Criterion(final ClusterCriteria criteria) throws GeniePreconditionException {
+        return toV4Criterion(criteria.getTags());
+    }
+
+    private static Criterion toV4Criterion(final Set<String> tags) throws GeniePreconditionException {
+        final Criterion.Builder builder = new Criterion.Builder();
+        final Set<String> v4Tags = Sets.newHashSet();
+        for (final String tag : tags) {
+            if (tag.startsWith(GENIE_ID_PREFIX)) {
+                builder.withId(tag.substring(GENIE_ID_PREFIX.length()));
+            } else if (tag.startsWith(GENIE_NAME_PREFIX)) {
+                builder.withName(tag.substring(GENIE_NAME_PREFIX.length()));
+            } else {
+                v4Tags.add(tag);
+            }
+        }
+        builder.withTags(v4Tags);
+
+        return builder.build();
     }
 }
