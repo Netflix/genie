@@ -22,7 +22,7 @@ import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.v4.Cluster;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.web.controllers.DtoAdapters;
+import com.netflix.genie.web.controllers.DtoConverters;
 import com.netflix.genie.web.services.ClusterLoadBalancer;
 import com.netflix.genie.web.services.impl.GenieFileTransferService;
 import com.netflix.genie.web.util.MetricsConstants;
@@ -182,7 +182,7 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
                     this.mapper.writeValueAsString(
                         clusters
                             .stream()
-                            .map(DtoAdapters::toV3Cluster)
+                            .map(DtoConverters::toV3Cluster)
                             .collect(Collectors.toSet())
                     )
                 );
