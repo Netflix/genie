@@ -21,10 +21,12 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.collect.ImmutableSet
 import com.google.common.collect.Lists
 import com.google.common.collect.Sets
-import com.netflix.genie.common.dto.Cluster
 import com.netflix.genie.common.dto.ClusterCriteria
 import com.netflix.genie.common.dto.ClusterStatus
 import com.netflix.genie.common.dto.JobRequest
+import com.netflix.genie.common.dto.v4.Cluster
+import com.netflix.genie.common.dto.v4.ClusterMetadata
+import com.netflix.genie.common.dto.v4.ExecutionEnvironment
 import com.netflix.genie.common.util.GenieObjectMapper
 import com.netflix.genie.test.categories.UnitTest
 import com.netflix.genie.web.services.ClusterLoadBalancer
@@ -45,6 +47,7 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 import java.nio.file.Paths
+import java.time.Instant
 import java.util.concurrent.TimeUnit
 
 /**
@@ -61,15 +64,65 @@ class ScriptLoadBalancerSpec extends Specification {
 
     @Shared
     def clustersGood = Sets.newHashSet(
-            new Cluster.Builder("a", "b", "c", ClusterStatus.UP).withId("2").build(),
-            new Cluster.Builder("d", "e", "f", ClusterStatus.UP).withId("0").build(),
-            new Cluster.Builder("g", "h", "i", ClusterStatus.UP).withId("1").build()
+            new Cluster(
+                    "2",
+                    Instant.now(),
+                    Instant.now(),
+                    new ExecutionEnvironment(null, null, null),
+                    new ClusterMetadata.Builder(
+                            "a",
+                            "b",
+                            ClusterStatus.UP
+                    ).withVersion("c").build()
+            ),
+            new Cluster(
+                    "0",
+                    Instant.now(),
+                    Instant.now(),
+                    new ExecutionEnvironment(null, null, null),
+                    new ClusterMetadata.Builder(
+                            "d",
+                            "e",
+                            ClusterStatus.UP
+                    ).withVersion("f").build()
+            ),
+            new Cluster(
+                    "1",
+                    Instant.now(),
+                    Instant.now(),
+                    new ExecutionEnvironment(null, null, null),
+                    new ClusterMetadata.Builder(
+                            "g",
+                            "h",
+                            ClusterStatus.UP
+                    ).withVersion("i").build()
+            )
     )
 
     @Shared
     def clustersBad = Sets.newHashSet(
-            new Cluster.Builder("j", "k", "l", ClusterStatus.UP).withId("3").build(),
-            new Cluster.Builder("m", "n", "o", ClusterStatus.UP).withId("4").build()
+            new Cluster(
+                    "3",
+                    Instant.now(),
+                    Instant.now(),
+                    new ExecutionEnvironment(null, null, null),
+                    new ClusterMetadata.Builder(
+                            "j",
+                            "k",
+                            ClusterStatus.UP
+                    ).withVersion("l").build()
+            ),
+            new Cluster(
+                    "4",
+                    Instant.now(),
+                    Instant.now(),
+                    new ExecutionEnvironment(null, null, null),
+                    new ClusterMetadata.Builder(
+                            "m",
+                            "n",
+                            ClusterStatus.UP
+                    ).withVersion("o").build()
+            )
     )
 
     @Shared
@@ -230,7 +283,7 @@ class ScriptLoadBalancerSpec extends Specification {
 
         then: "Can successfully find a cluster"
         cluster != null
-        cluster.getId().get() == "1"
+        cluster.getId() == "1"
         1 * registry.timer(
                 ScriptLoadBalancer.SELECT_TIMER_NAME,
                 ImmutableSet.of(Tag.of(MetricsConstants.TagKeys.STATUS, ScriptLoadBalancer.STATUS_TAG_FOUND))

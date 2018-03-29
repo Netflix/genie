@@ -27,11 +27,11 @@ public class JobKillReasonFileTest {
     @Test
     public void serializeThenLoad() throws IOException {
 
-        final JobKillReasonFile orignalJobKillReasonFile = new JobKillReasonFile(KILL_REASON_STRING);
+        final JobKillReasonFile originalJobKillReasonFile = new JobKillReasonFile(KILL_REASON_STRING);
 
-        Assert.assertEquals(KILL_REASON_STRING, orignalJobKillReasonFile.getKillReason());
+        Assert.assertEquals(KILL_REASON_STRING, originalJobKillReasonFile.getKillReason());
 
-        final byte[] bytes = GenieObjectMapper.getMapper().writeValueAsBytes(orignalJobKillReasonFile);
+        final byte[] bytes = GenieObjectMapper.getMapper().writeValueAsBytes(originalJobKillReasonFile);
 
         final JobKillReasonFile loadedJobKillReasonFile
             = GenieObjectMapper.getMapper().readValue(bytes, JobKillReasonFile.class);

@@ -17,11 +17,16 @@
  */
 package com.netflix.genie.web.controllers;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.JsonPatchException;
+import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.hateoas.assemblers.ApplicationResourceAssembler;
 import com.netflix.genie.web.hateoas.assemblers.ClusterResourceAssembler;
 import com.netflix.genie.web.hateoas.assemblers.CommandResourceAssembler;
@@ -31,6 +36,8 @@ import com.netflix.genie.web.hateoas.resources.CommandResource;
 import com.netflix.genie.web.services.CommandService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -56,8 +63,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.validation.Valid;
+import java.io.IOException;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -108,9 +118,9 @@ public class CommandRestController {
      */
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Void> createCommand(@RequestBody final Command command) throws GenieException {
+    public ResponseEntity<Void> createCommand(@RequestBody @Valid final Command command) throws GenieException {
         log.debug("called to create new command configuration {}", command);
-        final String id = this.commandService.createCommand(command);
+        final String id = this.commandService.createCommand(DtoAdapters.toV4CommandRequest(command));
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
             ServletUriComponentsBuilder
@@ -133,7 +143,7 @@ public class CommandRestController {
     @ResponseStatus(HttpStatus.OK)
     public CommandResource getCommand(@PathVariable("id") final String id) throws GenieException {
         log.debug("Called to get command with id {}", id);
-        return this.commandResourceAssembler.toResource(this.commandService.getCommand(id));
+        return this.commandResourceAssembler.toResource(DtoAdapters.toV3Command(this.commandService.getCommand(id)));
     }
 
     /**
@@ -169,6 +179,70 @@ public class CommandRestController {
             }
         }
 
+        final Page<Command> commands;
+        if (tags != null && tags.stream().filter(tag -> tag.startsWith(DtoAdapters.GENIE_ID_PREFIX)).count() >= 1L) {
+            // TODO: This doesn't take into account others as compounded find...not sure if good or bad
+            final List<Command> commandList = Lists.newArrayList();
+            final int prefixLength = DtoAdapters.GENIE_ID_PREFIX.length();
+            tags
+                .stream()
+                .filter(tag -> tag.startsWith(DtoAdapters.GENIE_ID_PREFIX))
+                .forEach(
+                    tag -> {
+                        final String id = tag.substring(prefixLength);
+                        try {
+                            commandList.add(DtoAdapters.toV3Command(this.commandService.getCommand(id)));
+                        } catch (final GenieException ge) {
+                            log.debug("No command with id {} found", id, ge);
+                        }
+                    }
+                );
+            commands = new PageImpl<>(commandList);
+        } else if (tags != null
+            && tags.stream().filter(tag -> tag.startsWith(DtoAdapters.GENIE_NAME_PREFIX)).count() >= 1L) {
+            final Set<String> finalTags = tags
+                .stream()
+                .filter(tag -> !tag.startsWith(DtoAdapters.GENIE_NAME_PREFIX))
+                .collect(Collectors.toSet());
+            if (name == null) {
+                final Optional<String> finalName = tags
+                    .stream()
+                    .filter(tag -> tag.startsWith(DtoAdapters.GENIE_NAME_PREFIX))
+                    .map(tag -> tag.substring(DtoAdapters.GENIE_NAME_PREFIX.length()))
+                    .findFirst();
+
+                commands = this.commandService
+                    .getCommands(
+                        finalName.orElse(null),
+                        user,
+                        enumStatuses,
+                        finalTags,
+                        page
+                    )
+                    .map(DtoAdapters::toV3Command);
+            } else {
+                commands = this.commandService
+                    .getCommands(
+                        name,
+                        user,
+                        enumStatuses,
+                        finalTags,
+                        page
+                    )
+                    .map(DtoAdapters::toV3Command);
+            }
+        } else {
+            commands = this.commandService
+                .getCommands(
+                    name,
+                    user,
+                    enumStatuses,
+                    tags,
+                    page
+                )
+                .map(DtoAdapters::toV3Command);
+        }
+
         // Build the self link which will be used for the next, previous, etc links
         final Link self = ControllerLinkBuilder
             .linkTo(
@@ -185,7 +259,7 @@ public class CommandRestController {
             ).withSelfRel();
 
         return assembler.toResource(
-            this.commandService.getCommands(name, user, enumStatuses, tags, page),
+            commands,
             this.commandResourceAssembler,
             self
         );
@@ -205,7 +279,7 @@ public class CommandRestController {
         @RequestBody final Command updateCommand
     ) throws GenieException {
         log.debug("Called to update command {}", updateCommand);
-        this.commandService.updateCommand(id, updateCommand);
+        this.commandService.updateCommand(id, DtoAdapters.toV4Command(updateCommand));
     }
 
     /**
@@ -222,7 +296,20 @@ public class CommandRestController {
         @RequestBody final JsonPatch patch
     ) throws GenieException {
         log.debug("Called to patch command {} with patch {}", id, patch);
-        this.commandService.patchCommand(id, patch);
+
+        final Command currentCommand = DtoAdapters.toV3Command(this.commandService.getCommand(id));
+
+        try {
+            log.debug("Will patch cluster {}. Original state: {}", id, currentCommand);
+            final JsonNode commandNode = GenieObjectMapper.getMapper().valueToTree(currentCommand);
+            final JsonNode postPatchNode = patch.apply(commandNode);
+            final Command patchedCommand = GenieObjectMapper.getMapper().treeToValue(postPatchNode, Command.class);
+            log.debug("Finished patching command {}. New state: {}", id, patchedCommand);
+            this.commandService.updateCommand(id, DtoAdapters.toV4Command(patchedCommand));
+        } catch (final JsonPatchException | IOException e) {
+            log.error("Unable to patch command {} with patch {} due to exception.", id, patch, e);
+            throw new GenieServerException(e.getLocalizedMessage(), e);
+        }
     }
 
     /**
@@ -412,7 +499,7 @@ public class CommandRestController {
     @ResponseStatus(HttpStatus.OK)
     public Set<String> getTagsForCommand(@PathVariable("id") final String id) throws GenieException {
         log.debug("Called with id {}", id);
-        return this.commandService.getTagsForCommand(id);
+        return DtoAdapters.toV3Command(this.commandService.getCommand(id)).getTags();
     }
 
     /**
@@ -500,6 +587,7 @@ public class CommandRestController {
         log.debug("Called with id {}", id);
         return this.commandService.getApplicationsForCommand(id)
             .stream()
+            .map(DtoAdapters::toV3Application)
             .map(this.applicationResourceAssembler::toResource)
             .collect(Collectors.toList());
     }
@@ -581,6 +669,7 @@ public class CommandRestController {
 
         return this.commandService.getClustersForCommand(id, enumStatuses)
             .stream()
+            .map(DtoAdapters::toV3Cluster)
             .map(this.clusterResourceAssembler::toResource)
             .collect(Collectors.toSet());
     }

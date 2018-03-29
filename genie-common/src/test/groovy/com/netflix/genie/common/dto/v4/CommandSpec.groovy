@@ -43,6 +43,7 @@ class CommandSpec extends Specification {
         def updated = Instant.now()
         def executable = Lists.newArrayList(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         def memory = 280
+        def checkDelay = 389_132L
         Command command
 
         when:
@@ -53,7 +54,8 @@ class CommandSpec extends Specification {
                 resources,
                 metadata,
                 executable,
-                memory
+                memory,
+                checkDelay
         )
 
         then:
@@ -64,6 +66,7 @@ class CommandSpec extends Specification {
         command.getMetadata() == metadata
         command.getExecutable() == executable
         command.getMemory().orElse(-1) == memory
+        command.getCheckDelay() == checkDelay
 
         when:
         command = new Command(
@@ -73,7 +76,8 @@ class CommandSpec extends Specification {
                 null,
                 metadata,
                 executable,
-                null
+                null,
+                checkDelay
         )
 
         then:
@@ -84,5 +88,6 @@ class CommandSpec extends Specification {
         command.getMetadata() == metadata
         command.getExecutable() == executable
         !command.getMemory().isPresent()
+        command.getCheckDelay() == checkDelay
     }
 }

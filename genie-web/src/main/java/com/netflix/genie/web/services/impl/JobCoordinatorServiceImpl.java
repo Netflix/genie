@@ -19,14 +19,14 @@ package com.netflix.genie.web.services.impl;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.dto.Application;
-import com.netflix.genie.common.dto.Cluster;
-import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.dto.v4.Application;
+import com.netflix.genie.common.dto.v4.Cluster;
+import com.netflix.genie.common.dto.v4.Command;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
@@ -34,7 +34,6 @@ import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
 import com.netflix.genie.common.exceptions.GenieUserLimitExceededException;
 import com.netflix.genie.common.jobs.JobConstants;
-import com.netflix.genie.web.controllers.DtoAdapters;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.properties.JobsUsersActiveLimitProperties;
 import com.netflix.genie.web.services.ApplicationService;
@@ -62,7 +61,6 @@ import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -261,7 +259,14 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                     );
                     // Tell the system a new job has been scheduled so any actions can be taken
                     log.info("Publishing job scheduled event for job {}", jobId);
-                    this.jobStateService.schedule(jobId, jobRequest, cluster, command, applications, memory);
+                    this.jobStateService.schedule(
+                        jobId,
+                        jobRequest,
+                        cluster,
+                        command,
+                        applications,
+                        memory
+                    );
                     MetricsUtils.addSuccessTags(tags);
                     return jobId;
                 } else {
@@ -332,12 +337,8 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
         final long jobEnvironmentStart = System.nanoTime();
         final Set<Tag> tags = Sets.newHashSet();
         try {
-            final String clusterId = cluster
-                .getId()
-                .orElseThrow(() -> new GenieServerException("Cluster has no id"));
-            final String commandId = command
-                .getId()
-                .orElseThrow(() -> new GenieServerException("Command has no id"));
+            final String clusterId = cluster.getId();
+            final String commandId = command.getId();
             this.jobPersistenceService.updateJobWithRuntimeEnvironment(
                 jobId,
                 clusterId,
@@ -345,8 +346,6 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                 applications
                     .stream()
                     .map(Application::getId)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
                     .collect(Collectors.toList()),
                 memory
             );
@@ -416,7 +415,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                             if (clusters.contains(selectedCluster)) {
                                 log.debug(
                                     "Successfully selected cluster {} using load balancer {}",
-                                    selectedCluster.getId().orElse(NO_ID_FOUND),
+                                    selectedCluster.getId(),
                                     loadBalancerClass
                                 );
                                 counterTags.add(Tag.of(MetricsConstants.TagKeys.STATUS, LOAD_BALANCER_STATUS_SUCCESS));
@@ -427,7 +426,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                                 log.error(
                                     "Successfully selected cluster {} using load balancer {} but "
                                         + "it wasn't in original cluster list {}",
-                                    selectedCluster.getId().orElse(NO_ID_FOUND),
+                                    selectedCluster.getId(),
                                     loadBalancerClass,
                                     clusters
                                 );
@@ -458,7 +457,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
 
             log.info(
                 "Selected cluster {} for job {}",
-                cluster.getId().orElse(NO_ID_FOUND),
+                cluster.getId(),
                 jobRequest.getId().orElse(NO_ID_FOUND)
             );
             MetricsUtils.addSuccessTags(timerTags);
@@ -500,7 +499,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
         final Set<Tag> tags = Sets.newHashSet();
         try {
             final String jobId = jobRequest.getId().orElseThrow(() -> new GenieServerException("No job Id"));
-            final String commandId = command.getId().orElseThrow(() -> new GenieServerException("No command Id"));
+            final String commandId = command.getId();
             log.info("Selecting applications for job {} and command {}", jobId, commandId);
             // TODO: What do we do about application status? Should probably check here
             final List<Application> applications = new ArrayList<>();
@@ -508,9 +507,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                 applications.addAll(this.commandService.getApplicationsForCommand(commandId));
             } else {
                 for (final String applicationId : jobRequest.getApplications()) {
-                    applications.add(
-                        DtoAdapters.toV3Application(this.applicationService.getApplication(applicationId))
-                    );
+                    applications.add(this.applicationService.getApplication(applicationId));
                 }
             }
             log.info(
@@ -518,8 +515,6 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                 applications
                     .stream()
                     .map(Application::getId)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
                     .reduce((one, two) -> one + "," + two)
                     .orElse(NO_ID_FOUND),
                 jobRequest.getId().orElse(NO_ID_FOUND)

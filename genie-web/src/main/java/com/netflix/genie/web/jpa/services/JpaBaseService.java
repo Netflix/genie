@@ -20,7 +20,6 @@ package com.netflix.genie.web.jpa.services;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
-import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.web.jpa.entities.FileEntity;
 import com.netflix.genie.web.jpa.entities.TagEntity;
 import com.netflix.genie.web.jpa.repositories.JpaFileRepository;
@@ -33,7 +32,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.NotBlank;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Base service for other services to extend for common functionality.
@@ -45,9 +43,6 @@ import java.util.stream.Collectors;
 @Getter(AccessLevel.PACKAGE)
 class JpaBaseService {
 
-    static final String GENIE_TAG_NAMESPACE = "genie.";
-    static final String GENIE_ID_TAG_NAMESPACE = GENIE_TAG_NAMESPACE + "id:";
-    static final String GENIE_NAME_TAG_NAMESPACE = GENIE_TAG_NAMESPACE + "name:";
     private static final char COMMA = ',';
     private static final String EMPTY_STRING = "";
 
@@ -136,51 +131,5 @@ class JpaBaseService {
             tagEntities.add(this.createAndGetTagEntity(tag));
         }
         return tagEntities;
-    }
-
-    /**
-     * Get the tags with the current genie.id and genie.name tags added into the set.
-     *
-     * @param tags The set of tags to modify
-     * @param id   The id of the entity
-     * @param name The name of the entity
-     * @throws GenieException On any exception
-     */
-    void setFinalTags(final Set<TagEntity> tags, final String id, final String name) throws GenieException {
-        // Make sure the id tag is there. Should never be updated
-        final Set<String> idTags = tags
-            .stream()
-            .filter(tagEntity -> tagEntity.getTag().startsWith(GENIE_ID_TAG_NAMESPACE))
-            .map(TagEntity::getTag)
-            .collect(Collectors.toSet());
-        if (idTags.size() > 1) {
-            throw new GenieServerException(
-                "Should only have one id tag instead have: " + idTags
-                    .stream()
-                    .reduce((one, two) -> one + COMMA + two)
-                    .orElse(EMPTY_STRING));
-        } else if (idTags.isEmpty()) {
-            tags.add(this.createAndGetTagEntity(GENIE_ID_TAG_NAMESPACE + id));
-        }
-
-        final String nameTag = GENIE_NAME_TAG_NAMESPACE + name;
-
-        // Remove any name tags that aren't the one we want
-        tags.removeAll(
-            tags
-                .stream()
-                .filter(
-                    tagEntity -> {
-                        final String tag = tagEntity.getTag();
-                        return tag.startsWith(GENIE_NAME_TAG_NAMESPACE) && !tag.equals(nameTag);
-                    }
-                )
-                .collect(Collectors.toSet())
-        );
-
-        // Check if the tags contains the name tag now
-        if (tags.stream().filter(tagEntity -> tagEntity.getTag().equals(nameTag)).count() < 1) {
-            tags.add(this.createAndGetTagEntity(nameTag));
-        }
     }
 }

@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * An immutable V4 Cluster resource.
+ * An immutable V4 Command resource.
  *
  * @author tgianos
  * @since 4.0.0
@@ -53,6 +53,12 @@ public class Command extends CommonResource {
         message = "The minimum amount of memory if desired is 1 MB. Probably should be much more than that"
     )
     private final Integer memory;
+    @Min(
+        value = 1,
+        message = "The delay between checks must be at least 1 millisecond. Probably should be much more than that"
+    )
+    // TODO: This is here for Genie 3 backwards compatibility while Genie 4 agent is still in development
+    private final long checkDelay;
 
     /**
      * Constructor.
@@ -66,6 +72,8 @@ public class Command extends CommonResource {
      *                   this will start with the binary and be followed optionally by default arguments. Must have
      *                   at least one
      * @param memory     The default memory that should be used to run a job with this command
+     * @param checkDelay The amount of time (in milliseconds) to delay between checks of job status for jobs run using
+     *                   this command. Min 1 but preferably much more
      */
     @JsonCreator
     public Command(
@@ -75,12 +83,14 @@ public class Command extends CommonResource {
         @JsonProperty(value = "resources") @Nullable final ExecutionEnvironment resources,
         @JsonProperty(value = "metadata", required = true) final CommandMetadata metadata,
         @JsonProperty(value = "executable", required = true) final List<String> executable,
-        @JsonProperty(value = "memory") @Nullable final Integer memory
+        @JsonProperty(value = "memory") @Nullable final Integer memory,
+        @JsonProperty(value = "checkDelay", required = true) final long checkDelay
     ) {
         super(id, created, updated, resources);
         this.metadata = metadata;
         this.executable = ImmutableList.copyOf(executable);
         this.memory = memory;
+        this.checkDelay = checkDelay;
     }
 
     /**

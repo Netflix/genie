@@ -18,12 +18,11 @@
 package com.netflix.genie.web.jobs.workflow.impl;
 
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.dto.Command;
+import com.netflix.genie.common.dto.v4.Command;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.jobs.JobConstants;
 import com.netflix.genie.web.jobs.AdminResources;
 import com.netflix.genie.web.jobs.FileType;
-import com.netflix.genie.common.jobs.JobConstants;
 import com.netflix.genie.web.jobs.JobExecutionEnvironment;
 import com.netflix.genie.web.services.impl.GenieFileTransferService;
 import com.netflix.genie.web.util.MetricsConstants;
@@ -76,8 +75,8 @@ public class CommandTask extends GenieBaseTask {
             final JobExecutionEnvironment jobExecEnv =
                 (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
             final Command command = jobExecEnv.getCommand();
-            tags.add(Tag.of(MetricsConstants.TagKeys.COMMAND_NAME, command.getName()));
-            tags.add(Tag.of(MetricsConstants.TagKeys.COMMAND_ID, command.getId().orElse(NO_ID_FOUND)));
+            tags.add(Tag.of(MetricsConstants.TagKeys.COMMAND_NAME, command.getMetadata().getName()));
+            tags.add(Tag.of(MetricsConstants.TagKeys.COMMAND_ID, command.getId()));
             final String jobWorkingDirectory = jobExecEnv.getJobWorkingDir().getCanonicalPath();
             final String genieDir = jobWorkingDirectory
                 + JobConstants.FILE_PATH_DELIMITER
@@ -86,10 +85,7 @@ public class CommandTask extends GenieBaseTask {
 
             log.info("Starting Command Task for job {}", jobExecEnv.getJobRequest().getId().orElse(NO_ID_FOUND));
 
-            final String commandId = jobExecEnv
-                .getCommand()
-                .getId()
-                .orElseThrow(() -> new GeniePreconditionException("No command id found"));
+            final String commandId = command.getId();
 
             // Create the directory for this command under command dir in the cwd
             createEntityInstanceDirectory(
@@ -113,7 +109,7 @@ public class CommandTask extends GenieBaseTask {
             );
 
             // Get the setup file if specified and add it as source command in launcher script
-            final Optional<String> setupFile = jobExecEnv.getCommand().getSetupFile();
+            final Optional<String> setupFile = command.getResources().getSetupFile();
             if (setupFile.isPresent()) {
                 final String commandSetupFile = setupFile.get();
                 if (StringUtils.isNotBlank(commandSetupFile)) {
@@ -137,7 +133,7 @@ public class CommandTask extends GenieBaseTask {
             }
 
             // Iterate over and get all configuration files
-            for (final String configFile : jobExecEnv.getCommand().getConfigs()) {
+            for (final String configFile : command.getResources().getConfigs()) {
                 final String localPath = super.buildLocalFilePath(
                     jobWorkingDirectory,
                     commandId,
@@ -149,7 +145,7 @@ public class CommandTask extends GenieBaseTask {
             }
 
             // Iterate over and get all dependencies
-            for (final String dependencyFile : jobExecEnv.getCommand().getDependencies()) {
+            for (final String dependencyFile : command.getResources().getDependencies()) {
                 final String localPath = super.buildLocalFilePath(
                     jobWorkingDirectory,
                     commandId,

@@ -21,11 +21,10 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterCriteria;
-import com.netflix.genie.common.dto.Command;
-import com.netflix.genie.common.dto.ExecutionEnvironmentDTO;
 import com.netflix.genie.common.dto.v4.Application;
+import com.netflix.genie.common.dto.v4.Cluster;
+import com.netflix.genie.common.dto.v4.Command;
 import com.netflix.genie.common.dto.v4.Criterion;
 import com.netflix.genie.common.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.dto.v4.JobMetadata;
@@ -35,7 +34,6 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.jobs.JobConstants;
-import com.netflix.genie.web.controllers.DtoAdapters;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.services.ApplicationService;
 import com.netflix.genie.web.services.ClusterLoadBalancer;
@@ -193,16 +191,15 @@ public class JobSpecificationServiceImpl implements JobSpecificationService {
                 );
             }
 
-            //TODO: Right now split on space for 3.x backwards compatibility. In 4.0 fix command executable to be array
-            //TODO: Set the default job location as a server property?
-            final List<String> commandArgs = Lists.newArrayList(StringUtils.split(command.getExecutable(), ' '));
+            final List<String> commandArgs = Lists.newArrayList(command.getExecutable());
             commandArgs.addAll(jobRequest.getCommandArgs());
 
+            //TODO: Set the default job location as a server property?
             final JobSpecification jobSpecification = new JobSpecification(
                 commandArgs,
                 new JobSpecification.ExecutionResource(id, jobRequest.getResources()),
-                this.toExecutionResource(cluster),
-                this.toExecutionResource(command),
+                new JobSpecification.ExecutionResource(cluster.getId(), cluster.getResources()),
+                new JobSpecification.ExecutionResource(command.getId(), command.getResources()),
                 applicationResources,
                 this.generateEnvironmentVariables(id, jobRequest, cluster, command),
                 jobRequest.isInteractive(),
@@ -276,7 +273,7 @@ public class JobSpecificationServiceImpl implements JobSpecificationService {
                 cluster = this.selectClusterWithLoadBalancer(counterTags, clusters, id, jobRequest);
             }
 
-            log.info("Selected cluster {} for job {}", cluster.getId().orElse(NO_ID_FOUND), id);
+            log.info("Selected cluster {} for job {}", cluster.getId(), id);
             MetricsUtils.addSuccessTags(timerTags);
             return cluster;
         } catch (final Throwable t) {
@@ -320,17 +317,12 @@ public class JobSpecificationServiceImpl implements JobSpecificationService {
         final long start = System.nanoTime();
         final Set<Tag> tags = Sets.newHashSet();
         try {
-            final String commandId = command.getId().orElseThrow(() -> new GenieServerException("No command Id"));
+            final String commandId = command.getId();
             log.info("Selecting applications for job {} and command {}", id, commandId);
             // TODO: What do we do about application status? Should probably check here
             final List<Application> applications = Lists.newArrayList();
             if (jobRequest.getCriteria().getApplicationIds().isEmpty()) {
-                applications.addAll(
-                    this.commandService.getApplicationsForCommand(commandId)
-                        .stream()
-                        .map(DtoAdapters::toV4Application)
-                        .collect(Collectors.toList())
-                );
+                applications.addAll(this.commandService.getApplicationsForCommand(commandId));
             } else {
                 for (final String applicationId : jobRequest.getCriteria().getApplicationIds()) {
                     applications.add(this.applicationService.getApplication(applicationId));
@@ -378,14 +370,16 @@ public class JobSpecificationServiceImpl implements JobSpecificationService {
             }
             counterTags.add(Tag.of(MetricsConstants.TagKeys.CLASS_NAME, loadBalancerClass));
             try {
-                final Cluster selectedCluster
-                    = loadBalancer.selectCluster(clusters, this.toV3JobRequest(id, jobRequest));
+                final Cluster selectedCluster = loadBalancer.selectCluster(
+                    clusters,
+                    this.toV3JobRequest(id, jobRequest)
+                );
                 if (selectedCluster != null) {
                     // Make sure the cluster existed in the original list of clusters
                     if (clusters.contains(selectedCluster)) {
                         log.debug(
                             "Successfully selected cluster {} using load balancer {}",
-                            selectedCluster.getId().orElse(NO_ID_FOUND),
+                            selectedCluster.getId(),
                             loadBalancerClass
                         );
                         counterTags.add(Tag.of(MetricsConstants.TagKeys.STATUS, LOAD_BALANCER_STATUS_SUCCESS));
@@ -396,7 +390,7 @@ public class JobSpecificationServiceImpl implements JobSpecificationService {
                         log.error(
                             "Successfully selected cluster {} using load balancer {} but it wasn't in original cluster "
                                 + "list {}",
-                            selectedCluster.getId().orElse(NO_ID_FOUND),
+                            selectedCluster.getId(),
                             loadBalancerClass,
                             clusters
                         );
@@ -432,25 +426,15 @@ public class JobSpecificationServiceImpl implements JobSpecificationService {
         final JobRequest jobRequest,
         final Cluster cluster,
         final Command command
-    ) throws GenieServerException {
+    ) {
         final ImmutableMap.Builder<String, String> envVariables = ImmutableMap.builder();
         envVariables.put("GENIE_VERSION", "4");
-        envVariables.put(
-            JobConstants.GENIE_CLUSTER_ID_ENV_VAR,
-            cluster
-                .getId()
-                .orElseThrow(() -> new GenieServerException("Cluster " + cluster + " has no id and it should."))
-        );
-        envVariables.put(JobConstants.GENIE_CLUSTER_NAME_ENV_VAR, cluster.getName());
-        envVariables.put(JobConstants.GENIE_CLUSTER_TAGS_ENV_VAR, this.tagsToString(cluster.getTags()));
-        envVariables.put(
-            JobConstants.GENIE_COMMAND_ID_ENV_VAR,
-            command
-                .getId()
-                .orElseThrow(() -> new GenieServerException("Command " + command + " has no id and it should."))
-        );
-        envVariables.put(JobConstants.GENIE_COMMAND_NAME_ENV_VAR, command.getName());
-        envVariables.put(JobConstants.GENIE_COMMAND_TAGS_ENV_VAR, this.tagsToString(command.getTags()));
+        envVariables.put(JobConstants.GENIE_CLUSTER_ID_ENV_VAR, cluster.getId());
+        envVariables.put(JobConstants.GENIE_CLUSTER_NAME_ENV_VAR, cluster.getMetadata().getName());
+        envVariables.put(JobConstants.GENIE_CLUSTER_TAGS_ENV_VAR, this.tagsToString(cluster.getMetadata().getTags()));
+        envVariables.put(JobConstants.GENIE_COMMAND_ID_ENV_VAR, command.getId());
+        envVariables.put(JobConstants.GENIE_COMMAND_NAME_ENV_VAR, command.getMetadata().getName());
+        envVariables.put(JobConstants.GENIE_COMMAND_TAGS_ENV_VAR, this.tagsToString(command.getMetadata().getTags()));
         envVariables.put(JobConstants.GENIE_JOB_ID_ENV_VAR, id);
         envVariables.put(JobConstants.GENIE_JOB_NAME_ENV_VAR, jobRequest.getMetadata().getName());
         envVariables.put(
@@ -533,21 +517,6 @@ public class JobSpecificationServiceImpl implements JobSpecificationService {
         criterion.getName().ifPresent(name -> tags.add("genie.name:" + name));
         tags.addAll(criterion.getTags());
         return tags;
-    }
-
-    private <E extends ExecutionEnvironmentDTO> JobSpecification.ExecutionResource toExecutionResource(
-        final E executionEnvironment
-    ) throws GenieServerException {
-        return new JobSpecification.ExecutionResource(
-            executionEnvironment
-                .getId()
-                .orElseThrow(() -> new GenieServerException("Resource " + executionEnvironment + " has no id")),
-            new ExecutionEnvironment(
-                executionEnvironment.getConfigs(),
-                executionEnvironment.getDependencies(),
-                executionEnvironment.getSetupFile().orElse(null)
-            )
-        );
     }
 
     /**

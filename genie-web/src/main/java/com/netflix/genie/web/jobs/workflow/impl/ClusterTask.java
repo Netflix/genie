@@ -18,12 +18,11 @@
 package com.netflix.genie.web.jobs.workflow.impl;
 
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.dto.Cluster;
+import com.netflix.genie.common.dto.v4.Cluster;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.jobs.JobConstants;
 import com.netflix.genie.web.jobs.AdminResources;
 import com.netflix.genie.web.jobs.FileType;
-import com.netflix.genie.common.jobs.JobConstants;
 import com.netflix.genie.web.jobs.JobExecutionEnvironment;
 import com.netflix.genie.web.services.impl.GenieFileTransferService;
 import com.netflix.genie.web.util.MetricsConstants;
@@ -76,8 +75,8 @@ public class ClusterTask extends GenieBaseTask {
             final JobExecutionEnvironment jobExecEnv =
                 (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
             final Cluster cluster = jobExecEnv.getCluster();
-            tags.add(Tag.of(MetricsConstants.TagKeys.CLUSTER_NAME, cluster.getName()));
-            tags.add(Tag.of(MetricsConstants.TagKeys.CLUSTER_ID, cluster.getId().orElse(NO_ID_FOUND)));
+            tags.add(Tag.of(MetricsConstants.TagKeys.CLUSTER_NAME, cluster.getMetadata().getName()));
+            tags.add(Tag.of(MetricsConstants.TagKeys.CLUSTER_ID, cluster.getId()));
             final String jobWorkingDirectory = jobExecEnv.getJobWorkingDir().getCanonicalPath();
             final String genieDir = jobWorkingDirectory
                 + JobConstants.FILE_PATH_DELIMITER
@@ -85,10 +84,7 @@ public class ClusterTask extends GenieBaseTask {
             final Writer writer = (Writer) context.get(JobConstants.WRITER_KEY);
             log.info("Starting Cluster Task for job {}", jobExecEnv.getJobRequest().getId().orElse(NO_ID_FOUND));
 
-            final String clusterId = jobExecEnv
-                .getCluster()
-                .getId()
-                .orElseThrow(() -> new GeniePreconditionException("No cluster id found"));
+            final String clusterId = cluster.getId();
 
             // Create the directory for this application under applications in the cwd
             createEntityInstanceDirectory(
@@ -112,7 +108,7 @@ public class ClusterTask extends GenieBaseTask {
             );
 
             // Get the set up file for cluster and add it to source in launcher script
-            final Optional<String> setupFile = jobExecEnv.getCluster().getSetupFile();
+            final Optional<String> setupFile = cluster.getResources().getSetupFile();
             if (setupFile.isPresent()) {
                 final String clusterSetupFile = setupFile.get();
                 if (StringUtils.isNotBlank(clusterSetupFile)) {
@@ -136,7 +132,7 @@ public class ClusterTask extends GenieBaseTask {
             }
 
             // Iterate over and get all configuration files
-            for (final String configFile : jobExecEnv.getCluster().getConfigs()) {
+            for (final String configFile : cluster.getResources().getConfigs()) {
                 final String localPath = super.buildLocalFilePath(
                     jobWorkingDirectory,
                     clusterId,
@@ -148,7 +144,7 @@ public class ClusterTask extends GenieBaseTask {
             }
 
             // Iterate over and get all dependencies
-            for (final String dependencyFile : cluster.getDependencies()) {
+            for (final String dependencyFile : cluster.getResources().getDependencies()) {
                 final String localPath = super.buildLocalFilePath(
                     jobWorkingDirectory,
                     clusterId,

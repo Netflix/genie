@@ -20,9 +20,7 @@ package com.netflix.genie.web.services.impl
 import com.google.common.collect.Lists
 import com.google.common.collect.Maps
 import com.google.common.collect.Sets
-import com.netflix.genie.common.dto.Cluster
 import com.netflix.genie.common.dto.ClusterStatus
-import com.netflix.genie.common.dto.Command
 import com.netflix.genie.common.dto.CommandStatus
 import com.netflix.genie.common.dto.v4.*
 import com.netflix.genie.common.jobs.JobConstants
@@ -38,6 +36,8 @@ import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import org.apache.commons.lang3.StringUtils
 import org.junit.experimental.categories.Category
 import spock.lang.Specification
+
+import java.time.Instant
 
 /**
  * Specifications for the {@link JobSpecificationServiceImpl} class.
@@ -86,41 +86,48 @@ class JobSpecificationServiceImplSpec extends Specification {
                 new ExecutionResourceCriteria(clusterCriteria, commandCriterion, null),
                 null
         )
-        def cluster1 = new Cluster.Builder(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                ClusterStatus.UP
+        def cluster1 = new Cluster(
+                cluster1Id,
+                Instant.now(),
+                Instant.now(),
+                new ExecutionEnvironment(null, null, null),
+                new ClusterMetadata.Builder(
+                        UUID.randomUUID().toString(),
+                        UUID.randomUUID().toString(),
+                        ClusterStatus.UP
+                ).withTags(clusterTags).build()
         )
-                .withId(cluster1Id)
-                .withTags(clusterTags)
-                .build()
-        def cluster2 = new Cluster.Builder(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                ClusterStatus.UP
+        def cluster2 = new Cluster(
+                cluster2Id,
+                Instant.now(),
+                Instant.now(),
+                new ExecutionEnvironment(null, null, null),
+                new ClusterMetadata.Builder(
+                        UUID.randomUUID().toString(),
+                        UUID.randomUUID().toString(),
+                        ClusterStatus.UP
+                ).withTags(clusterTags).build()
         )
-                .withId(cluster2Id)
-                .withTags(clusterTags)
-                .build()
 
         def clusters = Sets.newHashSet(cluster1, cluster2)
         def executableBinary = UUID.randomUUID().toString()
         def executableArgument0 = UUID.randomUUID().toString()
         def executableArgument1 = UUID.randomUUID().toString()
-        def executable = executableBinary + ' ' + executableArgument0 + ' ' + executableArgument1 + ' '
-        def command = new Command.Builder(
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                CommandStatus.ACTIVE,
+        def executable = Lists.newArrayList(executableBinary, executableArgument0, executableArgument1)
+        def command = new Command(
+                commandId,
+                Instant.now(),
+                Instant.now(),
+                new ExecutionEnvironment(null, null, null),
+                new CommandMetadata.Builder(
+                        UUID.randomUUID().toString(),
+                        UUID.randomUUID().toString(),
+                        CommandStatus.ACTIVE
+                ).withTags(commandTags).build(),
                 executable,
+                null,
                 100L
         )
-                .withId(commandId)
-                .withTags(commandTags)
-                .build()
 
         def jobCommandArgs = Lists.newArrayList(executableBinary, executableArgument0, executableArgument1)
         jobCommandArgs.addAll(commandArgs)
@@ -231,26 +238,31 @@ class JobSpecificationServiceImplSpec extends Specification {
                 new ExecutionResourceCriteria(clusterCriteria, commandCriterion, null),
                 null
         )
-        def cluster = new Cluster.Builder(
-                clusterName,
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                ClusterStatus.UP
+        def cluster = new Cluster(
+                clusterId,
+                Instant.now(),
+                Instant.now(),
+                new ExecutionEnvironment(null, null, null),
+                new ClusterMetadata.Builder(
+                        clusterName,
+                        UUID.randomUUID().toString(),
+                        ClusterStatus.UP
+                ).withTags(clusterTags).build()
         )
-                .withId(clusterId)
-                .withTags(clusterTags)
-                .build()
-        def command = new Command.Builder(
-                commandName,
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                CommandStatus.ACTIVE,
-                UUID.randomUUID().toString(),
+        def command = new Command(
+                commandId,
+                Instant.now(),
+                Instant.now(),
+                new ExecutionEnvironment(null, null, null),
+                new CommandMetadata.Builder(
+                        commandName,
+                        UUID.randomUUID().toString(),
+                        CommandStatus.ACTIVE
+                ).withTags(commandTags).build(),
+                Lists.newArrayList(UUID.randomUUID().toString()),
+                null,
                 100L
         )
-                .withId(commandId)
-                .withTags(commandTags)
-                .build()
 
         when:
         def envVariables = service.generateEnvironmentVariables(jobId, jobRequest, cluster, command)

@@ -39,6 +39,7 @@ class CommandRequestSpec extends Specification {
         def resources = new ExecutionEnvironment(null, null, UUID.randomUUID().toString())
         def executable = Lists.newArrayList(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         def memory = 3_820
+        def checkDelay = 380_324L
         CommandRequest request
 
         when:
@@ -46,6 +47,7 @@ class CommandRequestSpec extends Specification {
                 .withRequestedId(requestedId)
                 .withResources(resources)
                 .withMemory(memory)
+                .withCheckDelay(checkDelay)
                 .build()
 
         then:
@@ -54,6 +56,7 @@ class CommandRequestSpec extends Specification {
         request.getResources() == resources
         request.getExecutable() == executable
         request.getMemory().orElse(-1) == memory
+        request.getCheckDelay().orElse(null) == checkDelay
 
         when:
         request = new CommandRequest.Builder(metadata, executable).build()
@@ -64,5 +67,6 @@ class CommandRequestSpec extends Specification {
         request.getResources() != null
         request.getExecutable() == executable
         !request.getMemory().isPresent()
+        !request.getCheckDelay().isPresent()
     }
 }

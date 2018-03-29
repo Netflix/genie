@@ -18,11 +18,12 @@
 package com.netflix.genie.web.services;
 
 import com.github.fge.jsonpatch.JsonPatch;
-import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
-import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.dto.JobRequest;
+import com.netflix.genie.common.dto.v4.Cluster;
+import com.netflix.genie.common.dto.v4.ClusterRequest;
+import com.netflix.genie.common.dto.v4.Command;
 import com.netflix.genie.common.dto.v4.Criterion;
 import com.netflix.genie.common.exceptions.GenieException;
 import org.springframework.data.domain.Page;
@@ -52,13 +53,13 @@ public interface ClusterService {
     /**
      * Create new cluster configuration.
      *
-     * @param cluster The cluster to create
+     * @param request The cluster information to create
      * @return The created clusters id
      * @throws GenieException if there is an error
      */
     String createCluster(
-        @NotNull(message = "No cluster entered. Unable to create.")
-        @Valid final Cluster cluster
+        @NotNull(message = "No cluster request entered. Unable to create.")
+        @Valid final ClusterRequest request
     ) throws GenieException;
 
     /**

@@ -18,10 +18,10 @@
 package com.netflix.genie.web.services.impl
 
 import com.google.common.collect.Lists
-import com.netflix.genie.common.dto.Application
-import com.netflix.genie.common.dto.Cluster
-import com.netflix.genie.common.dto.Command
 import com.netflix.genie.common.dto.JobRequest
+import com.netflix.genie.common.dto.v4.Application
+import com.netflix.genie.common.dto.v4.Cluster
+import com.netflix.genie.common.dto.v4.Command
 import com.netflix.genie.test.categories.UnitTest
 import com.netflix.genie.web.events.GenieEventBus
 import com.netflix.genie.web.services.JobStateService
@@ -31,6 +31,7 @@ import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import org.junit.experimental.categories.Category
 import org.springframework.scheduling.TaskScheduler
 import spock.lang.Specification
+
 /**
  * Test JobStateService
  *

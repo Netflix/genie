@@ -17,8 +17,8 @@
  */
 package com.netflix.genie.web.services;
 
-import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.JobRequest;
+import com.netflix.genie.common.dto.v4.Cluster;
 import com.netflix.genie.common.exceptions.GenieException;
 import lombok.NonNull;
 import org.springframework.core.Ordered;

@@ -20,6 +20,7 @@ package com.netflix.genie.web.controllers
 import com.google.common.collect.Lists
 import com.google.common.collect.Sets
 import com.netflix.genie.common.dto.ApplicationStatus
+import com.netflix.genie.common.dto.ClusterCriteria
 import com.netflix.genie.common.dto.ClusterStatus
 import com.netflix.genie.common.dto.CommandStatus
 import com.netflix.genie.common.dto.v4.*
@@ -361,6 +362,64 @@ class DtoAdaptersSpec extends Specification {
         clusterRequest.getResources().getDependencies().isEmpty()
     }
 
+    def "Can convert V3 Cluster to V4 Cluster"() {
+        def id = UUID.randomUUID().toString()
+        def name = UUID.randomUUID().toString()
+        def user = UUID.randomUUID().toString()
+        def version = UUID.randomUUID().toString()
+        def status = ClusterStatus.TERMINATED
+        def tags = Sets.newHashSet(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                DtoAdapters.GENIE_ID_PREFIX + id,
+                DtoAdapters.GENIE_NAME_PREFIX + name
+        )
+        def metadata = "{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"
+        def description = UUID.randomUUID().toString()
+        def configs = Sets.newHashSet(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString()
+        )
+        def dependencies = Sets.newHashSet(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString()
+        )
+        def setupFile = UUID.randomUUID().toString()
+        com.netflix.genie.common.dto.Cluster v3Cluster
+        Cluster v4Cluster
+
+        when:
+        v3Cluster = new com.netflix.genie.common.dto.Cluster.Builder(
+                name,
+                user,
+                version,
+                status
+        )
+                .withId(id)
+                .withTags(tags)
+                .withMetadata(metadata)
+                .withDescription(description)
+                .withConfigs(configs)
+                .withDependencies(dependencies)
+                .withSetupFile(setupFile)
+                .build()
+        v4Cluster = DtoAdapters.toV4Cluster(v3Cluster)
+
+        then:
+        v4Cluster.getMetadata().getStatus() == status
+        v4Cluster.getMetadata().getMetadata().isPresent()
+        v4Cluster.getMetadata().getTags().size() == 2
+        v4Cluster.getMetadata().getDescription().orElse(null) == description
+        v4Cluster.getMetadata().getVersion().orElse(null) == version
+        v4Cluster.getMetadata().getUser() == user
+        v4Cluster.getMetadata().getName() == name
+        v4Cluster.getId() == id
+        v4Cluster.getResources().getSetupFile().orElse(null) == setupFile
+        v4Cluster.getResources().getConfigs() == configs
+        v4Cluster.getResources().getDependencies() == dependencies
+    }
+
     def "Can convert V4 Cluster to V3 Cluster"() {
         def id = UUID.randomUUID().toString()
         def name = UUID.randomUUID().toString()
@@ -477,6 +536,7 @@ class DtoAdaptersSpec extends Specification {
                 UUID.randomUUID().toString()
         )
         def setupFile = UUID.randomUUID().toString()
+        def checkDelay = 380_234L
         com.netflix.genie.common.dto.Command v3Command
         CommandRequest commandRequest
 
@@ -487,7 +547,7 @@ class DtoAdaptersSpec extends Specification {
                 version,
                 status,
                 executable,
-                com.netflix.genie.common.dto.Command.DEFAULT_CHECK_DELAY
+                checkDelay
         )
                 .withId(id)
                 .withTags(tags)
@@ -516,6 +576,7 @@ class DtoAdaptersSpec extends Specification {
         commandRequest.getExecutable().size() == 2
         commandRequest.getExecutable().get(0) == binary
         commandRequest.getExecutable().get(1) == defaultBinaryArgument
+        commandRequest.getCheckDelay().orElse(null) == checkDelay
 
         when:
         v3Command = new com.netflix.genie.common.dto.Command.Builder(
@@ -524,7 +585,7 @@ class DtoAdaptersSpec extends Specification {
                 version,
                 status,
                 executable,
-                com.netflix.genie.common.dto.Command.DEFAULT_CHECK_DELAY
+                checkDelay
         ).build()
         commandRequest = DtoAdapters.toV4CommandRequest(v3Command)
 
@@ -544,6 +605,115 @@ class DtoAdaptersSpec extends Specification {
         commandRequest.getExecutable().size() == 2
         commandRequest.getExecutable().get(0) == binary
         commandRequest.getExecutable().get(1) == defaultBinaryArgument
+        commandRequest.getCheckDelay().orElse(null) == checkDelay
+    }
+
+    def "Can convert V3 Command to V4 Command"() {
+        def id = UUID.randomUUID().toString()
+        def name = UUID.randomUUID().toString()
+        def user = UUID.randomUUID().toString()
+        def version = UUID.randomUUID().toString()
+        def status = CommandStatus.DEPRECATED
+        def tags = Sets.newHashSet(
+                DtoAdapters.GENIE_ID_PREFIX + id,
+                DtoAdapters.GENIE_NAME_PREFIX + name,
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString()
+        )
+        def binary = UUID.randomUUID().toString()
+        def defaultBinaryArgument = UUID.randomUUID().toString()
+        def executable = Lists.newArrayList(binary, defaultBinaryArgument)
+        def memory = 128_347
+        def metadata = "{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"
+        def description = UUID.randomUUID().toString()
+        def configs = Sets.newHashSet(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString()
+        )
+        def dependencies = Sets.newHashSet(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString()
+        )
+        def setupFile = UUID.randomUUID().toString()
+        def created = Instant.now()
+        def updated = Instant.now()
+        def checkDelay = 987_345L
+        Command v4Command
+        com.netflix.genie.common.dto.Command v3Command
+
+        when:
+        v3Command = new com.netflix.genie.common.dto.Command.Builder(
+                name,
+                user,
+                version,
+                status,
+                binary + ' ' + defaultBinaryArgument,
+                checkDelay
+        )
+                .withId(id)
+                .withCreated(created)
+                .withUpdated(updated)
+                .withConfigs(configs)
+                .withDependencies(dependencies)
+                .withSetupFile(setupFile)
+                .withMetadata(metadata)
+                .withTags(tags)
+                .withDescription(description)
+                .withMemory(memory)
+                .build()
+        v4Command = DtoAdapters.toV4Command(v3Command)
+
+        then:
+        v4Command.getId() == id
+        v4Command.getCreated() == created
+        v4Command.getUpdated() == updated
+        v4Command.getCheckDelay() == checkDelay
+        v4Command.getMemory().orElse(null) == memory
+        v4Command.getExecutable() == executable
+        v4Command.getMetadata().getName() == name
+        v4Command.getMetadata().getUser() == user
+        v4Command.getMetadata().getVersion().orElse(null) == version
+        v4Command.getMetadata().getTags().size() == 2
+        !v4Command.getMetadata().getTags().contains(DtoAdapters.GENIE_ID_PREFIX + id)
+        !v4Command.getMetadata().getTags().contains(DtoAdapters.GENIE_NAME_PREFIX + name)
+        v4Command.getMetadata().getStatus() == status
+        v4Command.getMetadata().getDescription().orElse(null) == description
+        v4Command.getMetadata().getMetadata().orElse(null) == GenieObjectMapper.getMapper().readTree(metadata)
+        v4Command.getResources().getConfigs() == configs
+        v4Command.getResources().getDependencies() == dependencies
+        v4Command.getResources().getSetupFile().orElse(null) == setupFile
+
+        when:
+        v3Command = new com.netflix.genie.common.dto.Command.Builder(
+                name,
+                user,
+                version,
+                status,
+                binary + ' ' + defaultBinaryArgument,
+                checkDelay
+        )
+                .withId(id)
+                .build()
+        v4Command = DtoAdapters.toV4Command(v3Command)
+
+        then:
+        v4Command.getId() == id
+        v4Command.getCreated() != null
+        v4Command.getUpdated() != null
+        v4Command.getCheckDelay() == checkDelay
+        !v4Command.getMemory().isPresent()
+        v4Command.getExecutable() == executable
+        v4Command.getMetadata().getName() == name
+        v4Command.getMetadata().getUser() == user
+        v4Command.getMetadata().getVersion().orElse(null) == version
+        v4Command.getMetadata().getTags().isEmpty()
+        v4Command.getMetadata().getStatus() == status
+        !v4Command.getMetadata().getDescription().isPresent()
+        !v4Command.getMetadata().getMetadata().isPresent()
+        v4Command.getResources().getConfigs().isEmpty()
+        v4Command.getResources().getDependencies().isEmpty()
+        !v4Command.getResources().getSetupFile().isPresent()
     }
 
     def "Can convert V4 Command to V3 Command"() {
@@ -574,6 +744,7 @@ class DtoAdaptersSpec extends Specification {
         def setupFile = UUID.randomUUID().toString()
         def created = Instant.now()
         def updated = Instant.now()
+        def checkDelay = 987_345L
         Command v4Command
         com.netflix.genie.common.dto.Command v3Command
 
@@ -594,7 +765,8 @@ class DtoAdaptersSpec extends Specification {
                         .withVersion(version)
                         .build(),
                 executable,
-                memory
+                memory,
+                checkDelay
         )
         v3Command = DtoAdapters.toV3Command(v4Command)
 
@@ -615,6 +787,7 @@ class DtoAdaptersSpec extends Specification {
         v3Command.getDependencies() == dependencies
         v3Command.getExecutable() == binary + ' ' + defaultBinaryArgument
         v3Command.getMemory().orElse(-1) == memory
+        v3Command.getCheckDelay() == checkDelay
 
         when:
         v4Command = new Command(
@@ -624,7 +797,8 @@ class DtoAdaptersSpec extends Specification {
                 null,
                 new CommandMetadata.Builder(name, user, status).build(),
                 executable,
-                null
+                null,
+                checkDelay
         )
         v3Command = DtoAdapters.toV3Command(v4Command)
 
@@ -644,6 +818,7 @@ class DtoAdaptersSpec extends Specification {
         v3Command.getDependencies().isEmpty()
         v3Command.getExecutable() == binary + ' ' + defaultBinaryArgument
         !v3Command.getMemory().isPresent()
+        v3Command.getCheckDelay() == checkDelay
     }
 
     def "Can convert V4 Job Request to V3"() {
@@ -726,5 +901,101 @@ class DtoAdaptersSpec extends Specification {
         v3JobRequest.getClusterCriterias().size() == 2
         v3JobRequest.getClusterCriterias().get(0).getTags() == DtoAdapters.toV3CriterionTags(clusterCriteria.get(0))
         v3JobRequest.getClusterCriterias().get(1).getTags() == DtoAdapters.toV3CriterionTags(clusterCriteria.get(1))
+    }
+
+    def "Can convert V3 Job Request to V4"() {
+        def id = UUID.randomUUID().toString()
+        def name = UUID.randomUUID().toString()
+        def user = UUID.randomUUID().toString()
+        def version = UUID.randomUUID().toString()
+        def clusterCriteria = Lists.newArrayList(
+                new ClusterCriteria(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())),
+                new ClusterCriteria(
+                        Sets.newHashSet(
+                                DtoAdapters.GENIE_ID_PREFIX + UUID.randomUUID().toString(),
+                                DtoAdapters.GENIE_NAME_PREFIX + UUID.randomUUID().toString()
+                        )
+                )
+        )
+        def commandCriterion = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def applicationIds = Lists.newArrayList(UUID.randomUUID().toString())
+        def commandArgs = Lists.newArrayList(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def tags = Sets.newHashSet(UUID.randomUUID().toString())
+        def email = UUID.randomUUID().toString()
+        def group = UUID.randomUUID().toString()
+        def grouping = UUID.randomUUID().toString()
+        def groupingInstance = UUID.randomUUID().toString()
+        def description = UUID.randomUUID().toString()
+        def metadata = GenieObjectMapper.mapper.createObjectNode()
+        def configs = Sets.newHashSet(UUID.randomUUID().toString())
+        def dependencies = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def setupFile = UUID.randomUUID().toString()
+        def timeout = 10835
+        def cpu = 3
+        def memory = 1512
+
+        def v3JobRequest = new com.netflix.genie.common.dto.JobRequest.Builder(
+                name,
+                user,
+                version,
+                clusterCriteria,
+                commandCriterion
+        )
+                .withId(id)
+                .withCommandArgs(commandArgs)
+                .withApplications(applicationIds)
+                .withTags(tags)
+                .withEmail(email)
+                .withGroup(group)
+                .withGrouping(grouping)
+                .withGroupingInstance(groupingInstance)
+                .withDescription(description)
+                .withMetadata(metadata)
+                .withConfigs(configs)
+                .withDependencies(dependencies)
+                .withSetupFile(setupFile)
+                .withTimeout(timeout)
+                .withCpu(cpu)
+                .withMemory(memory)
+                .build()
+
+        when:
+        def v4JobRequest = DtoAdapters.toV4JobRequest(v3JobRequest)
+
+        then:
+        v4JobRequest.getRequestedId().orElse(null) == id
+        v4JobRequest.getMetadata().getName() == name
+        v4JobRequest.getMetadata().getUser() == user
+        v4JobRequest.getMetadata().getVersion().orElse(null) == version
+        v4JobRequest.getMetadata().getTags() == tags
+        v4JobRequest.getCriteria().getApplicationIds() == applicationIds
+        v4JobRequest.getCommandArgs() == commandArgs
+        v4JobRequest.getRequestedAgentEnvironment().getRequestedJobMemory().orElse(null) == memory
+        v4JobRequest.getTimeout().orElse(-1) == timeout
+        v4JobRequest.getMetadata().getMetadata().orElse(null) == metadata
+        v4JobRequest.getMetadata().getGrouping().orElse(null) == grouping
+        v4JobRequest.getMetadata().getGroupingInstance().orElse(null) == groupingInstance
+        v4JobRequest.getMetadata().getGroup().orElse(null) == group
+        v4JobRequest.getMetadata().getDescription().orElse(null) == description
+        v4JobRequest.getRequestedAgentEnvironment().getRequestedJobCpu().orElse(null) == cpu
+        !v4JobRequest.getRequestedAgentEnvironment().getRequestedJobDirectoryLocation().isPresent()
+        !v4JobRequest.getRequestedAgentEnvironment().getExt().isPresent()
+        v4JobRequest.getResources().getDependencies() == dependencies
+        v4JobRequest.getResources().getConfigs() == configs
+        v4JobRequest.getResources().getSetupFile().orElse(null) == setupFile
+        v4JobRequest.getMetadata().getEmail().orElse(UUID.randomUUID().toString()) == email
+        !v4JobRequest.getCriteria().getCommandCriterion().getId().isPresent()
+        !v4JobRequest.getCriteria().getCommandCriterion().getName().isPresent()
+        !v4JobRequest.getCriteria().getCommandCriterion().getStatus().isPresent()
+        v4JobRequest.getCriteria().getCommandCriterion().getTags() == commandCriterion
+        v4JobRequest.getCriteria().getClusterCriteria().size() == 2
+        !v4JobRequest.getCriteria().getClusterCriteria().get(0).getId().isPresent()
+        !v4JobRequest.getCriteria().getClusterCriteria().get(0).getName().isPresent()
+        !v4JobRequest.getCriteria().getClusterCriteria().get(0).getStatus().isPresent()
+        v4JobRequest.getCriteria().getClusterCriteria().get(0).getTags() == clusterCriteria.get(0).getTags()
+        v4JobRequest.getCriteria().getClusterCriteria().get(1).getId().isPresent()
+        v4JobRequest.getCriteria().getClusterCriteria().get(1).getName().isPresent()
+        !v4JobRequest.getCriteria().getClusterCriteria().get(1).getStatus().isPresent()
+        v4JobRequest.getCriteria().getClusterCriteria().get(1).getTags().isEmpty()
     }
 }

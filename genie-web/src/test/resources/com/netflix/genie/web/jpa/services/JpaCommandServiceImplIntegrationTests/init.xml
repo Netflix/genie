@@ -59,116 +59,46 @@
     />
 
     <tags
-        id="1"
-        created="2014-08-08 01:45:00"
-        updated="2014-08-08 01:50:00"
-        entity_version="0"
-        tag="genie.id:app1"
-    />
-    <tags
-        id="2"
-        created="2014-08-08 01:45:00"
-        updated="2014-08-08 01:50:00"
-        entity_version="0"
-        tag="genie.name:tez"
-    />
-    <tags
-        id="3"
+        id="0"
         created="2014-08-08 01:45:00"
         updated="2014-08-08 01:50:00"
         entity_version="0"
         tag="prod"
     />
     <tags
-        id="4"
+        id="1"
         created="2014-08-08 01:45:00"
         updated="2014-08-08 01:50:00"
         entity_version="0"
         tag="yarn"
     />
     <tags
-        id="5"
-        created="2014-08-08 01:45:00"
-        updated="2014-08-08 01:50:00"
-        entity_version="0"
-        tag="genie.id:command1"
-    />
-    <tags
-        id="6"
-        created="2014-08-08 01:45:00"
-        updated="2014-08-08 01:50:00"
-        entity_version="0"
-        tag="genie.name:pig_13_prod"
-    />
-    <tags
-        id="7"
+        id="2"
         created="2014-08-08 01:45:00"
         updated="2014-08-08 01:50:00"
         entity_version="0"
         tag="pig"
     />
     <tags
-        id="8"
+        id="3"
         created="2014-08-08 01:45:00"
         updated="2014-08-08 01:50:00"
         entity_version="0"
         tag="tez"
     />
     <tags
-        id="9"
-        created="2014-08-08 01:45:00"
-        updated="2014-08-08 01:50:00"
-        entity_version="0"
-        tag="genie.id:command2"
-    />
-    <tags
-        id="10"
-        created="2014-08-08 01:45:00"
-        updated="2014-08-08 01:50:00"
-        entity_version="0"
-        tag="genie.name:hive_11_prod"
-    />
-    <tags
-        id="11"
+        id="4"
         created="2014-08-08 01:45:00"
         updated="2014-08-08 01:50:00"
         entity_version="0"
         tag="hive"
     />
     <tags
-        id="12"
-        created="2014-08-08 01:45:00"
-        updated="2014-08-08 01:50:00"
-        entity_version="0"
-        tag="genie.id:command3"
-    />
-    <tags
-        id="13"
-        created="2014-08-08 01:45:00"
-        updated="2014-08-08 01:50:00"
-        entity_version="0"
-        tag="genie.name:pig_11_prod"
-    />
-    <tags
-        id="14"
+        id="5"
         created="2014-08-08 01:45:00"
         updated="2014-08-08 01:50:00"
         entity_version="0"
         tag="deprecated"
-    />
-    <tags
-        id="15"
-        created="2014-08-08 01:45:00"
-        updated="2014-08-08 01:50:00"
-        entity_version="0"
-        tag="genie.id:cluster1"
-    />
-    <tags
-        id="16"
-        created="2014-08-08 01:45:00"
-        updated="2014-08-08 01:50:00"
-        entity_version="0"
-        tag="genie.name:h2prod"
     />
 
     <applications
@@ -200,19 +130,11 @@
     />
     <applications_tags
         application_id="1"
+        tag_id="0"
+    />
+    <applications_tags
+        application_id="1"
         tag_id="1"
-    />
-    <applications_tags
-        application_id="1"
-        tag_id="2"
-    />
-    <applications_tags
-        application_id="1"
-        tag_id="3"
-    />
-    <applications_tags
-        application_id="1"
-        tag_id="4"
     />
 
     <commands
@@ -238,23 +160,15 @@
     />
     <commands_tags
         command_id="1"
-        tag_id="5"
+        tag_id="2"
     />
     <commands_tags
         command_id="1"
-        tag_id="6"
-    />
-    <commands_tags
-        command_id="1"
-        tag_id="7"
+        tag_id="0"
     />
     <commands_tags
         command_id="1"
         tag_id="3"
-    />
-    <commands_tags
-        command_id="1"
-        tag_id="8"
     />
 
     <commands_applications
@@ -286,19 +200,11 @@
     />
     <commands_tags
         command_id="2"
-        tag_id="9"
+        tag_id="4"
     />
     <commands_tags
         command_id="2"
-        tag_id="10"
-    />
-    <commands_tags
-        command_id="2"
-        tag_id="11"
-    />
-    <commands_tags
-        command_id="2"
-        tag_id="3"
+        tag_id="0"
     />
 
     <commands
@@ -328,23 +234,15 @@
         file_id="6"/>
     <commands_tags
         command_id="3"
-        tag_id="14"
+        tag_id="5"
     />
     <commands_tags
         command_id="3"
-        tag_id="12"
+        tag_id="2"
     />
     <commands_tags
         command_id="3"
-        tag_id="13"
-    />
-    <commands_tags
-        command_id="3"
-        tag_id="7"
-    />
-    <commands_tags
-        command_id="3"
-        tag_id="3"
+        tag_id="0"
     />
 
     <clusters
@@ -364,35 +262,30 @@
     />
     <clusters_tags
         cluster_id="1"
-        tag_id="15"
+        tag_id="4"
     />
     <clusters_tags
         cluster_id="1"
-        tag_id="16"
+        tag_id="2"
     />
     <clusters_tags
         cluster_id="1"
-        tag_id="11"
-    />
-    <clusters_tags
-        cluster_id="1"
-        tag_id="7"
-    />
-    <clusters_tags
-        cluster_id="1"
-        tag_id="3"
+        tag_id="0"
     />
 
     <clusters_commands
         cluster_id="1"
         command_id="1"
-        command_order="0"/>
+        command_order="0"
+    />
     <clusters_commands
         cluster_id="1"
         command_id="2"
-        command_order="2"/>
+        command_order="2"
+    />
     <clusters_commands
         cluster_id="1"
         command_id="3"
-        command_order="1"/>
+        command_order="1"
+    />
 </dataset>

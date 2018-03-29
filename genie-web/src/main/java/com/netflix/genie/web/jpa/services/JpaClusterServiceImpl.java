@@ -21,13 +21,16 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.google.common.collect.Maps;
-import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.ClusterStatus;
-import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.dto.JobRequest;
+import com.netflix.genie.common.dto.v4.Cluster;
+import com.netflix.genie.common.dto.v4.ClusterMetadata;
+import com.netflix.genie.common.dto.v4.ClusterRequest;
+import com.netflix.genie.common.dto.v4.Command;
 import com.netflix.genie.common.dto.v4.Criterion;
+import com.netflix.genie.common.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
@@ -40,6 +43,7 @@ import com.netflix.genie.web.jpa.entities.CommandEntity;
 import com.netflix.genie.web.jpa.entities.FileEntity;
 import com.netflix.genie.web.jpa.entities.TagEntity;
 import com.netflix.genie.web.jpa.entities.projections.ClusterCommandsProjection;
+import com.netflix.genie.web.jpa.entities.v4.EntityDtoConverters;
 import com.netflix.genie.web.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.web.jpa.repositories.JpaFileRepository;
@@ -116,13 +120,11 @@ public class JpaClusterServiceImpl extends JpaBaseService implements ClusterServ
      */
     @Override
     public String createCluster(
-        @NotNull(message = "No cluster entered. Unable to create.")
-        @Valid final Cluster cluster
+        @NotNull(message = "No cluster request entered. Unable to create.")
+        @Valid final ClusterRequest request
     ) throws GenieException {
-        log.debug("Called to create cluster {}", cluster);
-        final ClusterEntity clusterEntity = new ClusterEntity();
-        clusterEntity.setUniqueId(cluster.getId().orElse(UUID.randomUUID().toString()));
-        this.updateEntityWithDtoContents(clusterEntity, cluster);
+        log.debug("Called to create cluster with request {}", request);
+        final ClusterEntity clusterEntity = this.createClusterEntity(request);
         try {
             this.clusterRepository.save(clusterEntity);
         } catch (final DataIntegrityViolationException e) {
@@ -143,7 +145,7 @@ public class JpaClusterServiceImpl extends JpaBaseService implements ClusterServ
         @NotBlank(message = "No id entered. Unable to get.") final String id
     ) throws GenieException {
         log.debug("Called with id {}", id);
-        return JpaServiceUtils.toClusterDto(this.findCluster(id));
+        return EntityDtoConverters.toV4ClusterDto(this.findCluster(id));
     }
 
     /**
@@ -178,7 +180,7 @@ public class JpaClusterServiceImpl extends JpaBaseService implements ClusterServ
             page
         );
 
-        return clusterEntities.map(JpaServiceUtils::toClusterDto);
+        return clusterEntities.map(EntityDtoConverters::toV4ClusterDto);
     }
 
     /**
@@ -235,8 +237,8 @@ public class JpaClusterServiceImpl extends JpaBaseService implements ClusterServ
         if (!this.clusterRepository.existsByUniqueId(id)) {
             throw new GenieNotFoundException("No cluster exists with the given id. Unable to update.");
         }
-        final Optional<String> updateId = updateCluster.getId();
-        if (updateId.isPresent() && !id.equals(updateId.get())) {
+        final String updateId = updateCluster.getId();
+        if (!id.equals(updateId)) {
             throw new GenieBadRequestException("Cluster id inconsistent with id passed in.");
         }
 
@@ -250,9 +252,9 @@ public class JpaClusterServiceImpl extends JpaBaseService implements ClusterServ
     public void patchCluster(@NotBlank final String id, @NotNull final JsonPatch patch) throws GenieException {
         final ClusterEntity clusterEntity = this.findCluster(id);
         try {
-            final Cluster clusterToPatch = JpaServiceUtils.toClusterDto(clusterEntity);
+            final Cluster clusterToPatch = EntityDtoConverters.toV4ClusterDto(clusterEntity);
             log.debug("Will patch cluster {}. Original state: {}", id, clusterToPatch);
-            final JsonNode clusterNode = GenieObjectMapper.getMapper().readTree(clusterToPatch.toString());
+            final JsonNode clusterNode = GenieObjectMapper.getMapper().valueToTree(clusterToPatch);
             final JsonNode postPatchNode = patch.apply(clusterNode);
             final Cluster patchedCluster = GenieObjectMapper.getMapper().treeToValue(postPatchNode, Cluster.class);
             log.debug("Finished patching cluster {}. New state: {}", id, patchedCluster);
@@ -426,10 +428,6 @@ public class JpaClusterServiceImpl extends JpaBaseService implements ClusterServ
         @NotEmpty(message = "No tags entered. Unable to update.") final Set<String> tags
     ) throws GenieException {
         this.findCluster(id).setTags(this.createAndGetTagEntities(tags));
-        final ClusterEntity clusterEntity = this.findCluster(id);
-        final Set<TagEntity> newTags = this.createAndGetTagEntities(tags);
-        this.setFinalTags(newTags, clusterEntity.getUniqueId(), clusterEntity.getName());
-        clusterEntity.setTags(newTags);
     }
 
     /**
@@ -439,16 +437,7 @@ public class JpaClusterServiceImpl extends JpaBaseService implements ClusterServ
     public void removeAllTagsForCluster(
         @NotBlank(message = "No cluster id entered. Unable to remove tags.") final String id
     ) throws GenieException {
-        final Set<TagEntity> tags = this.findCluster(id).getTags();
-        // Remove all the tags except the ones that start with "genie."
-        tags.removeAll(
-            tags
-                .stream()
-                .filter(
-                    tagEntity -> !tagEntity.getTag().startsWith(JpaBaseService.GENIE_TAG_NAMESPACE)
-                )
-                .collect(Collectors.toSet())
-        );
+        this.findCluster(id).getTags().clear();
     }
 
     /**
@@ -459,9 +448,7 @@ public class JpaClusterServiceImpl extends JpaBaseService implements ClusterServ
         @NotBlank(message = "No cluster id entered. Unable to remove tag.") final String id,
         @NotBlank(message = "No tag entered. Unable to remove.") final String tag
     ) throws GenieException {
-        if (!tag.startsWith(JpaBaseService.GENIE_TAG_NAMESPACE)) {
-            this.getTagRepository().findByTag(tag).ifPresent(this.findCluster(id).getTags()::remove);
-        }
+        this.getTagRepository().findByTag(tag).ifPresent(this.findCluster(id).getTags()::remove);
     }
 
     /**
@@ -506,10 +493,10 @@ public class JpaClusterServiceImpl extends JpaBaseService implements ClusterServ
         if (statuses != null) {
             return commandEntities.stream()
                 .filter(command -> statuses.contains(command.getStatus()))
-                .map(JpaServiceUtils::toCommandDto)
+                .map(EntityDtoConverters::toV4CommandDto)
                 .collect(Collectors.toList());
         } else {
-            return commandEntities.stream().map(JpaServiceUtils::toCommandDto).collect(Collectors.toList());
+            return commandEntities.stream().map(EntityDtoConverters::toV4CommandDto).collect(Collectors.toList());
         }
     }
 
@@ -581,6 +568,65 @@ public class JpaClusterServiceImpl extends JpaBaseService implements ClusterServ
         );
     }
 
+    private ClusterEntity createClusterEntity(final ClusterRequest request) throws GenieException {
+        final ExecutionEnvironment resources = request.getResources();
+        final ClusterMetadata metadata = request.getMetadata();
+
+        final ClusterEntity entity = new ClusterEntity();
+        entity.setUniqueId(request.getRequestedId().orElse(UUID.randomUUID().toString()));
+        this.setEntityResources(entity, resources);
+        this.setEntityTags(entity, metadata);
+        this.setEntityClusterMetadata(entity, metadata);
+
+        return entity;
+    }
+
+    private void updateEntityWithDtoContents(
+        final ClusterEntity entity,
+        final Cluster dto
+    ) throws GenieException {
+        final ExecutionEnvironment resources = dto.getResources();
+        final ClusterMetadata metadata = dto.getMetadata();
+
+        // Save all the unowned entities first to avoid unintended flushes
+        this.setEntityResources(entity, resources);
+        this.setEntityTags(entity, metadata);
+        this.setEntityClusterMetadata(entity, metadata);
+    }
+
+    private void setEntityClusterMetadata(final ClusterEntity entity, final ClusterMetadata metadata) {
+        // NOTE: These are all called in case someone has changed it to set something to null. DO NOT use ifPresent
+        entity.setName(metadata.getName());
+        entity.setUser(metadata.getUser());
+        entity.setVersion(metadata.getVersion().orElse(null));
+        entity.setDescription(metadata.getDescription().orElse(null));
+        entity.setStatus(metadata.getStatus());
+        EntityDtoConverters.setEntityMetadata(GenieObjectMapper.getMapper(), metadata, entity);
+    }
+
+    private void setEntityResources(
+        final ClusterEntity entity,
+        final ExecutionEnvironment resources
+    ) throws GenieException {
+        // Save all the unowned entities first to avoid unintended flushes
+        final Set<FileEntity> configs = this.createAndGetFileEntities(resources.getConfigs());
+        final Set<FileEntity> dependencies = this.createAndGetFileEntities(resources.getDependencies());
+        final FileEntity setupFile = resources.getSetupFile().isPresent()
+            ? this.createAndGetFileEntity(resources.getSetupFile().get())
+            : null;
+
+        entity.setConfigs(configs);
+        entity.setDependencies(dependencies);
+        entity.setSetupFile(setupFile);
+    }
+
+    private void setEntityTags(
+        final ClusterEntity entity,
+        final ClusterMetadata metadata
+    ) throws GenieException {
+        entity.setTags(this.createAndGetTagEntities(metadata.getTags()));
+    }
+
     private Map<Cluster, String> findClustersAndCommandsForJob(
         final List<Set<String>> clusterCriteria,
         final Set<String> commandCriterion
@@ -613,7 +659,7 @@ public class JpaClusterServiceImpl extends JpaBaseService implements ClusterServ
                     }
 
                     final ClusterEntity clusterEntity = this.clusterRepository.getOne(clusterId);
-                    foundClusters.put(JpaServiceUtils.toClusterDto(clusterEntity), commandUniqueId);
+                    foundClusters.put(EntityDtoConverters.toV4ClusterDto(clusterEntity), commandUniqueId);
                 }
                 return foundClusters;
             }
@@ -634,32 +680,5 @@ public class JpaClusterServiceImpl extends JpaBaseService implements ClusterServ
         return this.clusterRepository
             .findByUniqueId(id)
             .orElseThrow(() -> new GenieNotFoundException("No cluster with id " + id + " exists."));
-    }
-
-    private void updateEntityWithDtoContents(
-        final ClusterEntity entity,
-        final Cluster dto
-    ) throws GenieException {
-        // Save all the unowned entities first to avoid unintended flushes
-        final Set<FileEntity> configs = this.createAndGetFileEntities(dto.getConfigs());
-        final Set<FileEntity> dependencies = this.createAndGetFileEntities(dto.getDependencies());
-        final FileEntity setupFile = dto.getSetupFile().isPresent()
-            ? this.createAndGetFileEntity(dto.getSetupFile().get())
-            : null;
-        final Set<TagEntity> tags = this.createAndGetTagEntities(dto.getTags());
-
-        // NOTE: These are all called in case someone has changed it to set something to null. DO NOT use ifPresent
-        entity.setName(dto.getName());
-        entity.setUser(dto.getUser());
-        entity.setVersion(dto.getVersion());
-        entity.setDescription(dto.getDescription().orElse(null));
-        entity.setStatus(dto.getStatus());
-        entity.setConfigs(configs);
-        entity.setDependencies(dependencies);
-        entity.setTags(tags);
-        entity.setSetupFile(setupFile);
-        JpaServiceUtils.setEntityMetadata(GenieObjectMapper.getMapper(), dto, entity);
-
-        this.setFinalTags(entity.getTags(), entity.getUniqueId(), entity.getName());
     }
 }

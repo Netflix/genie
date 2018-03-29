@@ -22,11 +22,14 @@ import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.dto.Application;
-import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
-import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
+import com.netflix.genie.common.dto.v4.Application;
+import com.netflix.genie.common.dto.v4.Cluster;
+import com.netflix.genie.common.dto.v4.Command;
+import com.netflix.genie.common.dto.v4.CommandMetadata;
+import com.netflix.genie.common.dto.v4.CommandRequest;
+import com.netflix.genie.common.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
@@ -39,6 +42,7 @@ import com.netflix.genie.web.jpa.entities.ClusterEntity;
 import com.netflix.genie.web.jpa.entities.CommandEntity;
 import com.netflix.genie.web.jpa.entities.FileEntity;
 import com.netflix.genie.web.jpa.entities.TagEntity;
+import com.netflix.genie.web.jpa.entities.v4.EntityDtoConverters;
 import com.netflix.genie.web.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.web.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
@@ -50,6 +54,7 @@ import com.netflix.genie.web.services.CommandService;
 import com.netflix.genie.web.services.FileService;
 import com.netflix.genie.web.services.TagService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -65,7 +70,6 @@ import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -121,12 +125,10 @@ public class JpaCommandServiceImpl extends JpaBaseService implements CommandServ
     @Override
     public String createCommand(
         @NotNull(message = "No command entered. Unable to create.")
-        @Valid final Command command
+        @Valid final CommandRequest request
     ) throws GenieException {
-        log.debug("Called to create command {}", command);
-        final CommandEntity commandEntity = new CommandEntity();
-        commandEntity.setUniqueId(command.getId().orElse(UUID.randomUUID().toString()));
-        this.updateEntityWithDtoContents(commandEntity, command);
+        log.debug("Called to create command {}", request);
+        final CommandEntity commandEntity = this.createCommandEntity(request);
         try {
             this.commandRepository.save(commandEntity);
         } catch (final DataIntegrityViolationException e) {
@@ -147,7 +149,7 @@ public class JpaCommandServiceImpl extends JpaBaseService implements CommandServ
         @NotBlank(message = "No id entered unable to get.") final String id
     ) throws GenieException {
         log.debug("called");
-        return JpaServiceUtils.toCommandDto(this.findCommand(id));
+        return EntityDtoConverters.toV4CommandDto(this.findCommand(id));
     }
 
     /**
@@ -186,7 +188,7 @@ public class JpaCommandServiceImpl extends JpaBaseService implements CommandServ
             page
         );
 
-        return commandEntities.map(JpaServiceUtils::toCommandDto);
+        return commandEntities.map(EntityDtoConverters::toV4CommandDto);
     }
 
     /**
@@ -201,8 +203,8 @@ public class JpaCommandServiceImpl extends JpaBaseService implements CommandServ
         if (!this.commandRepository.existsByUniqueId(id)) {
             throw new GenieNotFoundException("No command exists with the given id. Unable to update.");
         }
-        final Optional<String> updateId = updateCommand.getId();
-        if (updateId.isPresent() && !id.equals(updateId.get())) {
+        final String updateId = updateCommand.getId();
+        if (!id.equals(updateId)) {
             throw new GenieBadRequestException("Command id inconsistent with id passed in.");
         }
 
@@ -218,9 +220,9 @@ public class JpaCommandServiceImpl extends JpaBaseService implements CommandServ
     public void patchCommand(@NotBlank final String id, @NotNull final JsonPatch patch) throws GenieException {
         final CommandEntity commandEntity = this.findCommand(id);
         try {
-            final Command commandToPatch = JpaServiceUtils.toCommandDto(commandEntity);
+            final Command commandToPatch = EntityDtoConverters.toV4CommandDto(commandEntity);
             log.debug("Will patch command {}. Original state: {}", id, commandToPatch);
-            final JsonNode commandNode = GenieObjectMapper.getMapper().readTree(commandToPatch.toString());
+            final JsonNode commandNode = GenieObjectMapper.getMapper().valueToTree(commandToPatch);
             final JsonNode postPatchNode = patch.apply(commandNode);
             final Command patchedCommand = GenieObjectMapper.getMapper().treeToValue(postPatchNode, Command.class);
             log.debug("Finished patching command {}. New state: {}", id, patchedCommand);
@@ -405,10 +407,7 @@ public class JpaCommandServiceImpl extends JpaBaseService implements CommandServ
         @NotBlank(message = "No command id entered. Unable to update tags.") final String id,
         @NotEmpty(message = "No tags entered. Unable to update.") final Set<String> tags
     ) throws GenieException {
-        final CommandEntity commandEntity = this.findCommand(id);
-        final Set<TagEntity> newTags = this.createAndGetTagEntities(tags);
-        this.setFinalTags(newTags, commandEntity.getUniqueId(), commandEntity.getName());
-        commandEntity.setTags(newTags);
+        this.findCommand(id).setTags(this.createAndGetTagEntities(tags));
     }
 
     /**
@@ -418,16 +417,7 @@ public class JpaCommandServiceImpl extends JpaBaseService implements CommandServ
     public void removeAllTagsForCommand(
         @NotBlank(message = "No command id entered. Unable to remove tags.") final String id
     ) throws GenieException {
-        final Set<TagEntity> tags = this.findCommand(id).getTags();
-        // Remove all the tags except the ones that start with "genie."
-        tags.removeAll(
-            tags
-                .stream()
-                .filter(
-                    tagEntity -> !tagEntity.getTag().startsWith(JpaBaseService.GENIE_TAG_NAMESPACE)
-                )
-                .collect(Collectors.toSet())
-        );
+        this.findCommand(id).getTags().clear();
     }
 
     /**
@@ -438,9 +428,7 @@ public class JpaCommandServiceImpl extends JpaBaseService implements CommandServ
         @NotBlank(message = "No command id entered. Unable to remove tag.") final String id,
         @NotBlank(message = "No tag entered. Unable to remove.") final String tag
     ) throws GenieException {
-        if (!tag.startsWith(JpaBaseService.GENIE_TAG_NAMESPACE)) {
-            this.getTagRepository().findByTag(tag).ifPresent(this.findCommand(id).getTags()::remove);
-        }
+        this.getTagRepository().findByTag(tag).ifPresent(this.findCommand(id).getTags()::remove);
     }
 
     /**
@@ -506,7 +494,7 @@ public class JpaCommandServiceImpl extends JpaBaseService implements CommandServ
         return commandEntity
             .getApplications()
             .stream()
-            .map(JpaServiceUtils::toApplicationDto)
+            .map(EntityDtoConverters::toV4ApplicationDto)
             .collect(Collectors.toList());
     }
 
@@ -552,7 +540,7 @@ public class JpaCommandServiceImpl extends JpaBaseService implements CommandServ
 
         return clusterEntities
             .stream()
-            .map(JpaServiceUtils::toClusterDto)
+            .map(EntityDtoConverters::toV4ClusterDto)
             .collect(Collectors.toSet());
     }
 
@@ -569,33 +557,73 @@ public class JpaCommandServiceImpl extends JpaBaseService implements CommandServ
             .orElseThrow(() -> new GenieNotFoundException("No command with id " + id + " exists."));
     }
 
+    private CommandEntity createCommandEntity(final CommandRequest request) throws GenieException {
+        final ExecutionEnvironment resources = request.getResources();
+        final CommandMetadata metadata = request.getMetadata();
+
+        final CommandEntity entity = new CommandEntity();
+        entity.setUniqueId(request.getRequestedId().orElse(UUID.randomUUID().toString()));
+        entity.setCheckDelay(request.getCheckDelay().orElse(com.netflix.genie.common.dto.Command.DEFAULT_CHECK_DELAY));
+        // TODO: Once entity executable saved as List modify this
+        entity.setExecutable(StringUtils.join(request.getExecutable(), ' '));
+        request.getMemory().ifPresent(entity::setMemory);
+        this.setEntityResources(entity, resources);
+        this.setEntityTags(entity, metadata);
+        this.setEntityCommandMetadata(entity, metadata);
+
+        return entity;
+    }
+
     private void updateEntityWithDtoContents(
         final CommandEntity entity,
         final Command dto
     ) throws GenieException {
-        // Save all the unowned entities first to avoid unintended flushes
-        final Set<FileEntity> configs = this.createAndGetFileEntities(dto.getConfigs());
-        final Set<FileEntity> dependencies = this.createAndGetFileEntities(dto.getDependencies());
-        final FileEntity setupFile = dto.getSetupFile().isPresent()
-            ? this.createAndGetFileEntity(dto.getSetupFile().get())
-            : null;
-        final Set<TagEntity> tags = this.createAndGetTagEntities(dto.getTags());
+        final ExecutionEnvironment resources = dto.getResources();
+        final CommandMetadata metadata = dto.getMetadata();
 
-        // NOTE: These are all called in case someone has changed it to set something to null. DO NOT use ifPresent
-        entity.setName(dto.getName());
-        entity.setUser(dto.getUser());
-        entity.setVersion(dto.getVersion());
-        entity.setDescription(dto.getDescription().orElse(null));
-        entity.setExecutable(dto.getExecutable());
+        // Save all the unowned entities first to avoid unintended flushes
+        this.setEntityResources(entity, resources);
+        this.setEntityTags(entity, metadata);
+        this.setEntityCommandMetadata(entity, metadata);
+
         entity.setCheckDelay(dto.getCheckDelay());
+        // TODO: Once entity executable saved as List modify this
+        entity.setExecutable(StringUtils.join(dto.getExecutable(), ' '));
+        entity.setMemory(dto.getMemory().orElse(null));
+    }
+
+    // TODO: Try to reuse code here once big bang changes are done
+
+    private void setEntityCommandMetadata(final CommandEntity entity, final CommandMetadata metadata) {
+        // NOTE: These are all called in case someone has changed it to set something to null. DO NOT use ifPresent
+        entity.setName(metadata.getName());
+        entity.setUser(metadata.getUser());
+        entity.setVersion(metadata.getVersion().orElse(null));
+        entity.setDescription(metadata.getDescription().orElse(null));
+        entity.setStatus(metadata.getStatus());
+        EntityDtoConverters.setEntityMetadata(GenieObjectMapper.getMapper(), metadata, entity);
+    }
+
+    private void setEntityResources(
+        final CommandEntity entity,
+        final ExecutionEnvironment resources
+    ) throws GenieException {
+        // Save all the unowned entities first to avoid unintended flushes
+        final Set<FileEntity> configs = this.createAndGetFileEntities(resources.getConfigs());
+        final Set<FileEntity> dependencies = this.createAndGetFileEntities(resources.getDependencies());
+        final FileEntity setupFile = resources.getSetupFile().isPresent()
+            ? this.createAndGetFileEntity(resources.getSetupFile().get())
+            : null;
+
         entity.setConfigs(configs);
         entity.setDependencies(dependencies);
         entity.setSetupFile(setupFile);
-        entity.setStatus(dto.getStatus());
-        entity.setTags(tags);
-        entity.setMemory(dto.getMemory().orElse(null));
-        JpaServiceUtils.setEntityMetadata(GenieObjectMapper.getMapper(), dto, entity);
+    }
 
-        this.setFinalTags(entity.getTags(), entity.getUniqueId(), entity.getName());
+    private void setEntityTags(
+        final CommandEntity entity,
+        final CommandMetadata metadata
+    ) throws GenieException {
+        entity.setTags(this.createAndGetTagEntities(metadata.getTags()));
     }
 }

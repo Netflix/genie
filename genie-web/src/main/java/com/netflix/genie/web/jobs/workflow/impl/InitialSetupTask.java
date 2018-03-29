@@ -19,10 +19,10 @@ package com.netflix.genie.web.jobs.workflow.impl;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterCriteria;
-import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.JobRequest;
+import com.netflix.genie.common.dto.v4.Cluster;
+import com.netflix.genie.common.dto.v4.Command;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
@@ -211,9 +211,8 @@ public class InitialSetupTask extends GenieBaseTask {
     }
 
     @VisibleForTesting
-    void createCommandEnvironmentVariables(final Writer writer, final Command command)
-        throws GenieException, IOException {
-        final String commandId = command.getId().orElseThrow(() -> new GenieServerException("No command id"));
+    void createCommandEnvironmentVariables(final Writer writer, final Command command) throws IOException {
+        final String commandId = command.getId();
         writer.write(JobConstants.EXPORT
             + JobConstants.GENIE_COMMAND_DIR_ENV_VAR
             + JobConstants.EQUALS_SYMBOL
@@ -251,7 +250,7 @@ public class InitialSetupTask extends GenieBaseTask {
                 + JobConstants.GENIE_COMMAND_NAME_ENV_VAR
                 + JobConstants.EQUALS_SYMBOL
                 + JobConstants.DOUBLE_QUOTE_SYMBOL
-                + command.getName()
+                + command.getMetadata().getName()
                 + JobConstants.DOUBLE_QUOTE_SYMBOL
                 + LINE_SEPARATOR
         );
@@ -264,7 +263,7 @@ public class InitialSetupTask extends GenieBaseTask {
                 + JobConstants.GENIE_COMMAND_TAGS_ENV_VAR
                 + JobConstants.EQUALS_SYMBOL
                 + JobConstants.DOUBLE_QUOTE_SYMBOL
-                + tagsToString(command.getTags())
+                + this.tagsToString(command.getMetadata().getTags())
                 + JobConstants.DOUBLE_QUOTE_SYMBOL
                 + LINE_SEPARATOR
         );
@@ -274,9 +273,8 @@ public class InitialSetupTask extends GenieBaseTask {
     }
 
     @VisibleForTesting
-    void createClusterEnvironmentVariables(final Writer writer, final Cluster cluster)
-        throws GenieException, IOException {
-        final String clusterId = cluster.getId().orElseThrow(() -> new GenieServerException("No cluster id"));
+    void createClusterEnvironmentVariables(final Writer writer, final Cluster cluster) throws IOException {
+        final String clusterId = cluster.getId();
 
         writer.write(JobConstants.EXPORT
             + JobConstants.GENIE_CLUSTER_DIR_ENV_VAR
@@ -315,7 +313,7 @@ public class InitialSetupTask extends GenieBaseTask {
                 + JobConstants.GENIE_CLUSTER_NAME_ENV_VAR
                 + JobConstants.EQUALS_SYMBOL
                 + JobConstants.DOUBLE_QUOTE_SYMBOL
-                + cluster.getName()
+                + cluster.getMetadata().getName()
                 + JobConstants.DOUBLE_QUOTE_SYMBOL
                 + LINE_SEPARATOR
         );
@@ -328,7 +326,7 @@ public class InitialSetupTask extends GenieBaseTask {
                 + JobConstants.GENIE_CLUSTER_TAGS_ENV_VAR
                 + JobConstants.EQUALS_SYMBOL
                 + JobConstants.DOUBLE_QUOTE_SYMBOL
-                + this.tagsToString(cluster.getTags())
+                + this.tagsToString(cluster.getMetadata().getTags())
                 + JobConstants.DOUBLE_QUOTE_SYMBOL
                 + LINE_SEPARATOR
         );

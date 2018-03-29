@@ -146,7 +146,8 @@ public final class EntityDtoConverters {
             ),
             metadataBuilder.build(),
             Lists.newArrayList(StringUtils.split(commandEntity.getExecutable(), ' ')),
-            commandEntity.getMemory().orElse(null)
+            commandEntity.getMemory().orElse(null),
+            commandEntity.getCheckDelay()
         );
     }
 
