@@ -31,13 +31,13 @@ import spock.lang.Specification
 import java.time.Instant
 
 /**
- * Specifications for the {@link DtoAdapters} class which handles converting between v3 and v4 DTOs for API
+ * Specifications for the {@link DtoConverters} class which handles converting between v3 and v4 DTOs for API
  * backwards compatibility.
  *
  * @author tgianos
  * @since 4.0.0
  */
-class DtoAdaptersSpec extends Specification {
+class DtoConvertersSpec extends Specification {
 
     def "Can convert V3 Application to V4 Application Request"() {
         def id = UUID.randomUUID().toString()
@@ -48,8 +48,8 @@ class DtoAdaptersSpec extends Specification {
         def tags = Sets.newHashSet(
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
-                DtoAdapters.GENIE_ID_PREFIX + id,
-                DtoAdapters.GENIE_NAME_PREFIX + name
+                DtoConverters.GENIE_ID_PREFIX + id,
+                DtoConverters.GENIE_NAME_PREFIX + name
         )
         def metadata = "{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"
         def type = UUID.randomUUID().toString()
@@ -83,7 +83,7 @@ class DtoAdaptersSpec extends Specification {
                 .withDependencies(dependencies)
                 .withSetupFile(setupFile)
                 .build()
-        applicationRequest = DtoAdapters.toV4ApplicationRequest(v3Application)
+        applicationRequest = DtoConverters.toV4ApplicationRequest(v3Application)
 
         then:
         applicationRequest.getMetadata().getStatus() == status
@@ -106,7 +106,7 @@ class DtoAdaptersSpec extends Specification {
                 version,
                 status
         ).build()
-        applicationRequest = DtoAdapters.toV4ApplicationRequest(v3Application)
+        applicationRequest = DtoConverters.toV4ApplicationRequest(v3Application)
 
         then:
         applicationRequest.getMetadata().getStatus() == status
@@ -134,8 +134,8 @@ class DtoAdaptersSpec extends Specification {
         def tags = Sets.newHashSet(
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
-                DtoAdapters.GENIE_ID_PREFIX + id,
-                DtoAdapters.GENIE_NAME_PREFIX + name
+                DtoConverters.GENIE_ID_PREFIX + id,
+                DtoConverters.GENIE_NAME_PREFIX + name
         )
         def metadata = "{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"
         def type = UUID.randomUUID().toString()
@@ -171,7 +171,7 @@ class DtoAdaptersSpec extends Specification {
                 .withDependencies(dependencies)
                 .withSetupFile(setupFile)
                 .build()
-        v4Application = DtoAdapters.toV4Application(v3Application)
+        v4Application = DtoConverters.toV4Application(v3Application)
 
         then:
         v4Application.getMetadata().getStatus() == status
@@ -236,7 +236,7 @@ class DtoAdaptersSpec extends Specification {
                         .withVersion(version)
                         .build()
         )
-        v3Application = DtoAdapters.toV3Application(v4Application)
+        v3Application = DtoConverters.toV3Application(v4Application)
 
         then:
         v3Application.getStatus() == status
@@ -244,8 +244,8 @@ class DtoAdaptersSpec extends Specification {
         v3Application.getMetadata().isPresent()
         v3Application.getTags().size() == 4
         v3Application.getTags().containsAll(tags)
-        v3Application.getTags().contains(DtoAdapters.GENIE_ID_PREFIX + id)
-        v3Application.getTags().contains(DtoAdapters.GENIE_NAME_PREFIX + name)
+        v3Application.getTags().contains(DtoConverters.GENIE_ID_PREFIX + id)
+        v3Application.getTags().contains(DtoConverters.GENIE_NAME_PREFIX + name)
         v3Application.getDescription().orElse(null) == description
         v3Application.getVersion() == version
         v3Application.getUser() == user
@@ -263,17 +263,17 @@ class DtoAdaptersSpec extends Specification {
                 null,
                 new ApplicationMetadata.Builder(name, user, status).build()
         )
-        v3Application = DtoAdapters.toV3Application(v4Application)
+        v3Application = DtoConverters.toV3Application(v4Application)
 
         then:
         v3Application.getStatus() == status
         !v3Application.getType().isPresent()
         !v3Application.getMetadata().isPresent()
         v3Application.getTags().size() == 2
-        v3Application.getTags().contains(DtoAdapters.GENIE_ID_PREFIX + id)
-        v3Application.getTags().contains(DtoAdapters.GENIE_NAME_PREFIX + name)
+        v3Application.getTags().contains(DtoConverters.GENIE_ID_PREFIX + id)
+        v3Application.getTags().contains(DtoConverters.GENIE_NAME_PREFIX + name)
         !v3Application.getDescription().isPresent()
-        v3Application.getVersion() == DtoAdapters.NO_VERSION_SPECIFIED
+        v3Application.getVersion() == DtoConverters.NO_VERSION_SPECIFIED
         v3Application.getUser() == user
         v3Application.getName() == name
         v3Application.getId().orElse(null) == id
@@ -291,8 +291,8 @@ class DtoAdaptersSpec extends Specification {
         def tags = Sets.newHashSet(
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
-                DtoAdapters.GENIE_ID_PREFIX + id,
-                DtoAdapters.GENIE_NAME_PREFIX + name
+                DtoConverters.GENIE_ID_PREFIX + id,
+                DtoConverters.GENIE_NAME_PREFIX + name
         )
         def metadata = "{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"
         def description = UUID.randomUUID().toString()
@@ -324,7 +324,7 @@ class DtoAdaptersSpec extends Specification {
                 .withDependencies(dependencies)
                 .withSetupFile(setupFile)
                 .build()
-        clusterRequest = DtoAdapters.toV4ClusterRequest(v3Cluster)
+        clusterRequest = DtoConverters.toV4ClusterRequest(v3Cluster)
 
         then:
         clusterRequest.getMetadata().getStatus() == status
@@ -346,7 +346,7 @@ class DtoAdaptersSpec extends Specification {
                 version,
                 status
         ).build()
-        clusterRequest = DtoAdapters.toV4ClusterRequest(v3Cluster)
+        clusterRequest = DtoConverters.toV4ClusterRequest(v3Cluster)
 
         then:
         clusterRequest.getMetadata().getStatus() == status
@@ -371,8 +371,8 @@ class DtoAdaptersSpec extends Specification {
         def tags = Sets.newHashSet(
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
-                DtoAdapters.GENIE_ID_PREFIX + id,
-                DtoAdapters.GENIE_NAME_PREFIX + name
+                DtoConverters.GENIE_ID_PREFIX + id,
+                DtoConverters.GENIE_NAME_PREFIX + name
         )
         def metadata = "{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"
         def description = UUID.randomUUID().toString()
@@ -404,7 +404,7 @@ class DtoAdaptersSpec extends Specification {
                 .withDependencies(dependencies)
                 .withSetupFile(setupFile)
                 .build()
-        v4Cluster = DtoAdapters.toV4Cluster(v3Cluster)
+        v4Cluster = DtoConverters.toV4Cluster(v3Cluster)
 
         then:
         v4Cluster.getMetadata().getStatus() == status
@@ -464,15 +464,15 @@ class DtoAdaptersSpec extends Specification {
                         .withVersion(version)
                         .build()
         )
-        v3Cluster = DtoAdapters.toV3Cluster(v4Cluster)
+        v3Cluster = DtoConverters.toV3Cluster(v4Cluster)
 
         then:
         v3Cluster.getStatus() == status
         v3Cluster.getMetadata().isPresent()
         v3Cluster.getTags().size() == 4
         v3Cluster.getTags().containsAll(tags)
-        v3Cluster.getTags().contains(DtoAdapters.GENIE_ID_PREFIX + id)
-        v3Cluster.getTags().contains(DtoAdapters.GENIE_NAME_PREFIX + name)
+        v3Cluster.getTags().contains(DtoConverters.GENIE_ID_PREFIX + id)
+        v3Cluster.getTags().contains(DtoConverters.GENIE_NAME_PREFIX + name)
         v3Cluster.getDescription().orElse(null) == description
         v3Cluster.getVersion() == version
         v3Cluster.getUser() == user
@@ -490,16 +490,16 @@ class DtoAdaptersSpec extends Specification {
                 null,
                 new ClusterMetadata.Builder(name, user, status).build()
         )
-        v3Cluster = DtoAdapters.toV3Cluster(v4Cluster)
+        v3Cluster = DtoConverters.toV3Cluster(v4Cluster)
 
         then:
         v3Cluster.getStatus() == status
         !v3Cluster.getMetadata().isPresent()
         v3Cluster.getTags().size() == 2
-        v3Cluster.getTags().contains(DtoAdapters.GENIE_ID_PREFIX + id)
-        v3Cluster.getTags().contains(DtoAdapters.GENIE_NAME_PREFIX + name)
+        v3Cluster.getTags().contains(DtoConverters.GENIE_ID_PREFIX + id)
+        v3Cluster.getTags().contains(DtoConverters.GENIE_NAME_PREFIX + name)
         !v3Cluster.getDescription().isPresent()
-        v3Cluster.getVersion() == DtoAdapters.NO_VERSION_SPECIFIED
+        v3Cluster.getVersion() == DtoConverters.NO_VERSION_SPECIFIED
         v3Cluster.getUser() == user
         v3Cluster.getName() == name
         v3Cluster.getId().orElse(null) == id
@@ -517,8 +517,8 @@ class DtoAdaptersSpec extends Specification {
         def tags = Sets.newHashSet(
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
-                DtoAdapters.GENIE_ID_PREFIX + id,
-                DtoAdapters.GENIE_NAME_PREFIX + name
+                DtoConverters.GENIE_ID_PREFIX + id,
+                DtoConverters.GENIE_NAME_PREFIX + name
         )
         def binary = UUID.randomUUID().toString()
         def defaultBinaryArgument = UUID.randomUUID().toString()
@@ -558,7 +558,7 @@ class DtoAdaptersSpec extends Specification {
                 .withSetupFile(setupFile)
                 .withMemory(memory)
                 .build()
-        commandRequest = DtoAdapters.toV4CommandRequest(v3Command)
+        commandRequest = DtoConverters.toV4CommandRequest(v3Command)
 
         then:
         commandRequest.getMetadata().getStatus() == status
@@ -587,7 +587,7 @@ class DtoAdaptersSpec extends Specification {
                 executable,
                 checkDelay
         ).build()
-        commandRequest = DtoAdapters.toV4CommandRequest(v3Command)
+        commandRequest = DtoConverters.toV4CommandRequest(v3Command)
 
         then:
         commandRequest.getMetadata().getStatus() == status
@@ -615,8 +615,8 @@ class DtoAdaptersSpec extends Specification {
         def version = UUID.randomUUID().toString()
         def status = CommandStatus.DEPRECATED
         def tags = Sets.newHashSet(
-                DtoAdapters.GENIE_ID_PREFIX + id,
-                DtoAdapters.GENIE_NAME_PREFIX + name,
+                DtoConverters.GENIE_ID_PREFIX + id,
+                DtoConverters.GENIE_NAME_PREFIX + name,
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString()
         )
@@ -662,7 +662,7 @@ class DtoAdaptersSpec extends Specification {
                 .withDescription(description)
                 .withMemory(memory)
                 .build()
-        v4Command = DtoAdapters.toV4Command(v3Command)
+        v4Command = DtoConverters.toV4Command(v3Command)
 
         then:
         v4Command.getId() == id
@@ -675,8 +675,8 @@ class DtoAdaptersSpec extends Specification {
         v4Command.getMetadata().getUser() == user
         v4Command.getMetadata().getVersion().orElse(null) == version
         v4Command.getMetadata().getTags().size() == 2
-        !v4Command.getMetadata().getTags().contains(DtoAdapters.GENIE_ID_PREFIX + id)
-        !v4Command.getMetadata().getTags().contains(DtoAdapters.GENIE_NAME_PREFIX + name)
+        !v4Command.getMetadata().getTags().contains(DtoConverters.GENIE_ID_PREFIX + id)
+        !v4Command.getMetadata().getTags().contains(DtoConverters.GENIE_NAME_PREFIX + name)
         v4Command.getMetadata().getStatus() == status
         v4Command.getMetadata().getDescription().orElse(null) == description
         v4Command.getMetadata().getMetadata().orElse(null) == GenieObjectMapper.getMapper().readTree(metadata)
@@ -695,7 +695,7 @@ class DtoAdaptersSpec extends Specification {
         )
                 .withId(id)
                 .build()
-        v4Command = DtoAdapters.toV4Command(v3Command)
+        v4Command = DtoConverters.toV4Command(v3Command)
 
         then:
         v4Command.getId() == id
@@ -768,15 +768,15 @@ class DtoAdaptersSpec extends Specification {
                 memory,
                 checkDelay
         )
-        v3Command = DtoAdapters.toV3Command(v4Command)
+        v3Command = DtoConverters.toV3Command(v4Command)
 
         then:
         v3Command.getStatus() == status
         v3Command.getMetadata().isPresent()
         v3Command.getTags().size() == 4
         v3Command.getTags().containsAll(tags)
-        v3Command.getTags().contains(DtoAdapters.GENIE_ID_PREFIX + id)
-        v3Command.getTags().contains(DtoAdapters.GENIE_NAME_PREFIX + name)
+        v3Command.getTags().contains(DtoConverters.GENIE_ID_PREFIX + id)
+        v3Command.getTags().contains(DtoConverters.GENIE_NAME_PREFIX + name)
         v3Command.getDescription().orElse(null) == description
         v3Command.getVersion() == version
         v3Command.getUser() == user
@@ -800,16 +800,16 @@ class DtoAdaptersSpec extends Specification {
                 null,
                 checkDelay
         )
-        v3Command = DtoAdapters.toV3Command(v4Command)
+        v3Command = DtoConverters.toV3Command(v4Command)
 
         then:
         v3Command.getStatus() == status
         !v3Command.getMetadata().isPresent()
         v3Command.getTags().size() == 2
-        v3Command.getTags().contains(DtoAdapters.GENIE_ID_PREFIX + id)
-        v3Command.getTags().contains(DtoAdapters.GENIE_NAME_PREFIX + name)
+        v3Command.getTags().contains(DtoConverters.GENIE_ID_PREFIX + id)
+        v3Command.getTags().contains(DtoConverters.GENIE_NAME_PREFIX + name)
         !v3Command.getDescription().isPresent()
-        v3Command.getVersion() == DtoAdapters.NO_VERSION_SPECIFIED
+        v3Command.getVersion() == DtoConverters.NO_VERSION_SPECIFIED
         v3Command.getUser() == user
         v3Command.getName() == name
         v3Command.getId().orElse(null) == id
@@ -875,7 +875,7 @@ class DtoAdaptersSpec extends Specification {
         )
 
         when:
-        def v3JobRequest = DtoAdapters.toV3JobRequest(jobRequest)
+        def v3JobRequest = DtoConverters.toV3JobRequest(jobRequest)
 
         then:
         v3JobRequest.getId().orElse(UUID.randomUUID().toString()) == id
@@ -899,8 +899,8 @@ class DtoAdaptersSpec extends Specification {
         v3JobRequest.getEmail().orElse(UUID.randomUUID().toString()) == email
         v3JobRequest.getCommandCriteria() == commandCriterion.getTags()
         v3JobRequest.getClusterCriterias().size() == 2
-        v3JobRequest.getClusterCriterias().get(0).getTags() == DtoAdapters.toV3CriterionTags(clusterCriteria.get(0))
-        v3JobRequest.getClusterCriterias().get(1).getTags() == DtoAdapters.toV3CriterionTags(clusterCriteria.get(1))
+        v3JobRequest.getClusterCriterias().get(0).getTags() == DtoConverters.toV3CriterionTags(clusterCriteria.get(0))
+        v3JobRequest.getClusterCriterias().get(1).getTags() == DtoConverters.toV3CriterionTags(clusterCriteria.get(1))
     }
 
     def "Can convert V3 Job Request to V4"() {
@@ -912,8 +912,8 @@ class DtoAdaptersSpec extends Specification {
                 new ClusterCriteria(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())),
                 new ClusterCriteria(
                         Sets.newHashSet(
-                                DtoAdapters.GENIE_ID_PREFIX + UUID.randomUUID().toString(),
-                                DtoAdapters.GENIE_NAME_PREFIX + UUID.randomUUID().toString()
+                                DtoConverters.GENIE_ID_PREFIX + UUID.randomUUID().toString(),
+                                DtoConverters.GENIE_NAME_PREFIX + UUID.randomUUID().toString()
                         )
                 )
         )
@@ -960,7 +960,7 @@ class DtoAdaptersSpec extends Specification {
                 .build()
 
         when:
-        def v4JobRequest = DtoAdapters.toV4JobRequest(v3JobRequest)
+        def v4JobRequest = DtoConverters.toV4JobRequest(v3JobRequest)
 
         then:
         v4JobRequest.getRequestedId().orElse(null) == id

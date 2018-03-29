@@ -50,13 +50,13 @@ import java.util.stream.Collectors;
  * @author tgianos
  * @since 4.0.0
  */
-public final class DtoAdapters {
+public final class DtoConverters {
 
     static final String NO_VERSION_SPECIFIED = "No Version Specified";
     static final String GENIE_ID_PREFIX = "genie.id:";
     static final String GENIE_NAME_PREFIX = "genie.name:";
 
-    private DtoAdapters() {
+    private DtoConverters() {
     }
 
     static ApplicationRequest toV4ApplicationRequest(
@@ -408,7 +408,7 @@ public final class DtoAdapters {
                 .getCriteria()
                 .getClusterCriteria()
                 .stream()
-                .map(DtoAdapters::toClusterCriteria)
+                .map(DtoConverters::toClusterCriteria)
                 .collect(Collectors.toList()),
             toV3CriterionTags(v4JobRequest.getCriteria().getCommandCriterion())
         )

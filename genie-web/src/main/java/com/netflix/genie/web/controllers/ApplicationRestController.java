@@ -112,7 +112,7 @@ public class ApplicationRestController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Void> createApplication(@RequestBody final Application app) throws GenieException {
         log.debug("Called to create new application");
-        final String id = this.applicationService.createApplication(DtoAdapters.toV4ApplicationRequest(app));
+        final String id = this.applicationService.createApplication(DtoConverters.toV4ApplicationRequest(app));
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
             ServletUriComponentsBuilder
@@ -172,19 +172,19 @@ public class ApplicationRestController {
         }
 
         final Page<Application> applications;
-        if (tags != null && tags.stream().filter(tag -> tag.startsWith(DtoAdapters.GENIE_ID_PREFIX)).count() >= 1L) {
+        if (tags != null && tags.stream().filter(tag -> tag.startsWith(DtoConverters.GENIE_ID_PREFIX)).count() >= 1L) {
             // TODO: This doesn't take into account others as compounded find...not sure if good or bad
             final List<Application> applicationList = Lists.newArrayList();
-            final int prefixLength = DtoAdapters.GENIE_ID_PREFIX.length();
+            final int prefixLength = DtoConverters.GENIE_ID_PREFIX.length();
             tags
                 .stream()
-                .filter(tag -> tag.startsWith(DtoAdapters.GENIE_ID_PREFIX))
+                .filter(tag -> tag.startsWith(DtoConverters.GENIE_ID_PREFIX))
                 .forEach(
                     tag -> {
                         final String id = tag.substring(prefixLength);
                         try {
                             applicationList.add(
-                                DtoAdapters.toV3Application(this.applicationService.getApplication(id))
+                                DtoConverters.toV3Application(this.applicationService.getApplication(id))
                             );
                         } catch (final GenieException ge) {
                             log.debug("No application with id {} found", id, ge);
@@ -193,30 +193,30 @@ public class ApplicationRestController {
                 );
             applications = new PageImpl<>(applicationList);
         } else if (tags != null
-            && tags.stream().filter(tag -> tag.startsWith(DtoAdapters.GENIE_NAME_PREFIX)).count() >= 1L) {
+            && tags.stream().filter(tag -> tag.startsWith(DtoConverters.GENIE_NAME_PREFIX)).count() >= 1L) {
             final Set<String> finalTags = tags
                 .stream()
-                .filter(tag -> !tag.startsWith(DtoAdapters.GENIE_NAME_PREFIX))
+                .filter(tag -> !tag.startsWith(DtoConverters.GENIE_NAME_PREFIX))
                 .collect(Collectors.toSet());
             if (name == null) {
                 final Optional<String> finalName = tags
                     .stream()
-                    .filter(tag -> tag.startsWith(DtoAdapters.GENIE_NAME_PREFIX))
-                    .map(tag -> tag.substring(DtoAdapters.GENIE_NAME_PREFIX.length()))
+                    .filter(tag -> tag.startsWith(DtoConverters.GENIE_NAME_PREFIX))
+                    .map(tag -> tag.substring(DtoConverters.GENIE_NAME_PREFIX.length()))
                     .findFirst();
 
                 applications = this.applicationService
                     .getApplications(finalName.orElse(null), user, enumStatuses, finalTags, type, page)
-                    .map(DtoAdapters::toV3Application);
+                    .map(DtoConverters::toV3Application);
             } else {
                 applications = this.applicationService
                     .getApplications(name, user, enumStatuses, finalTags, type, page)
-                    .map(DtoAdapters::toV3Application);
+                    .map(DtoConverters::toV3Application);
             }
         } else {
             applications = this.applicationService
                 .getApplications(name, user, enumStatuses, tags, type, page)
-                .map(DtoAdapters::toV3Application);
+                .map(DtoConverters::toV3Application);
         }
 
         final Link self = ControllerLinkBuilder.linkTo(
@@ -244,7 +244,7 @@ public class ApplicationRestController {
     public ApplicationResource getApplication(@PathVariable("id") final String id) throws GenieException {
         log.debug("Called to get Application for id {}", id);
         return this.applicationResourceAssembler.toResource(
-            DtoAdapters.toV3Application(this.applicationService.getApplication(id))
+            DtoConverters.toV3Application(this.applicationService.getApplication(id))
         );
     }
 
@@ -262,7 +262,7 @@ public class ApplicationRestController {
         @RequestBody final Application updateApp
     ) throws GenieException {
         log.debug("called to update application {} with info {}", id, updateApp);
-        this.applicationService.updateApplication(id, DtoAdapters.toV4Application(updateApp));
+        this.applicationService.updateApplication(id, DtoConverters.toV4Application(updateApp));
     }
 
     /**
@@ -279,7 +279,7 @@ public class ApplicationRestController {
         @RequestBody final JsonPatch patch
     ) throws GenieException {
         log.debug("Called to patch application {} with patch {}", id, patch);
-        final Application currentApp = DtoAdapters.toV3Application(this.applicationService.getApplication(id));
+        final Application currentApp = DtoConverters.toV3Application(this.applicationService.getApplication(id));
 
         try {
             log.debug("Will patch application {}. Original state: {}", id, currentApp);
@@ -287,7 +287,7 @@ public class ApplicationRestController {
             final JsonNode postPatchNode = patch.apply(applicationNode);
             final Application patchedApp = GenieObjectMapper.getMapper().treeToValue(postPatchNode, Application.class);
             log.debug("Finished patching application {}. New state: {}", id, patchedApp);
-            this.applicationService.updateApplication(id, DtoAdapters.toV4Application(patchedApp));
+            this.applicationService.updateApplication(id, DtoConverters.toV4Application(patchedApp));
         } catch (final JsonPatchException | IOException e) {
             log.error("Unable to patch application {} with patch {} due to exception.", id, patch, e);
             throw new GenieServerException(e.getLocalizedMessage(), e);
@@ -469,7 +469,7 @@ public class ApplicationRestController {
     @ResponseStatus(HttpStatus.OK)
     public Set<String> getTagsForApplication(@PathVariable("id") final String id) throws GenieException {
         log.debug("Called with id {}", id);
-        return DtoAdapters.toV3Application(this.applicationService.getApplication(id)).getTags();
+        return DtoConverters.toV3Application(this.applicationService.getApplication(id)).getTags();
     }
 
     /**
@@ -549,7 +549,7 @@ public class ApplicationRestController {
 
         return this.applicationService.getCommandsForApplication(id, enumStatuses)
             .stream()
-            .map(DtoAdapters::toV3Command)
+            .map(DtoConverters::toV3Command)
             .map(this.commandResourceAssembler::toResource)
             .collect(Collectors.toSet());
     }

@@ -120,7 +120,7 @@ public class CommandRestController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Void> createCommand(@RequestBody @Valid final Command command) throws GenieException {
         log.debug("called to create new command configuration {}", command);
-        final String id = this.commandService.createCommand(DtoAdapters.toV4CommandRequest(command));
+        final String id = this.commandService.createCommand(DtoConverters.toV4CommandRequest(command));
         final HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setLocation(
             ServletUriComponentsBuilder
@@ -143,7 +143,7 @@ public class CommandRestController {
     @ResponseStatus(HttpStatus.OK)
     public CommandResource getCommand(@PathVariable("id") final String id) throws GenieException {
         log.debug("Called to get command with id {}", id);
-        return this.commandResourceAssembler.toResource(DtoAdapters.toV3Command(this.commandService.getCommand(id)));
+        return this.commandResourceAssembler.toResource(DtoConverters.toV3Command(this.commandService.getCommand(id)));
     }
 
     /**
@@ -180,18 +180,18 @@ public class CommandRestController {
         }
 
         final Page<Command> commands;
-        if (tags != null && tags.stream().filter(tag -> tag.startsWith(DtoAdapters.GENIE_ID_PREFIX)).count() >= 1L) {
+        if (tags != null && tags.stream().filter(tag -> tag.startsWith(DtoConverters.GENIE_ID_PREFIX)).count() >= 1L) {
             // TODO: This doesn't take into account others as compounded find...not sure if good or bad
             final List<Command> commandList = Lists.newArrayList();
-            final int prefixLength = DtoAdapters.GENIE_ID_PREFIX.length();
+            final int prefixLength = DtoConverters.GENIE_ID_PREFIX.length();
             tags
                 .stream()
-                .filter(tag -> tag.startsWith(DtoAdapters.GENIE_ID_PREFIX))
+                .filter(tag -> tag.startsWith(DtoConverters.GENIE_ID_PREFIX))
                 .forEach(
                     tag -> {
                         final String id = tag.substring(prefixLength);
                         try {
-                            commandList.add(DtoAdapters.toV3Command(this.commandService.getCommand(id)));
+                            commandList.add(DtoConverters.toV3Command(this.commandService.getCommand(id)));
                         } catch (final GenieException ge) {
                             log.debug("No command with id {} found", id, ge);
                         }
@@ -199,16 +199,16 @@ public class CommandRestController {
                 );
             commands = new PageImpl<>(commandList);
         } else if (tags != null
-            && tags.stream().filter(tag -> tag.startsWith(DtoAdapters.GENIE_NAME_PREFIX)).count() >= 1L) {
+            && tags.stream().filter(tag -> tag.startsWith(DtoConverters.GENIE_NAME_PREFIX)).count() >= 1L) {
             final Set<String> finalTags = tags
                 .stream()
-                .filter(tag -> !tag.startsWith(DtoAdapters.GENIE_NAME_PREFIX))
+                .filter(tag -> !tag.startsWith(DtoConverters.GENIE_NAME_PREFIX))
                 .collect(Collectors.toSet());
             if (name == null) {
                 final Optional<String> finalName = tags
                     .stream()
-                    .filter(tag -> tag.startsWith(DtoAdapters.GENIE_NAME_PREFIX))
-                    .map(tag -> tag.substring(DtoAdapters.GENIE_NAME_PREFIX.length()))
+                    .filter(tag -> tag.startsWith(DtoConverters.GENIE_NAME_PREFIX))
+                    .map(tag -> tag.substring(DtoConverters.GENIE_NAME_PREFIX.length()))
                     .findFirst();
 
                 commands = this.commandService
@@ -219,7 +219,7 @@ public class CommandRestController {
                         finalTags,
                         page
                     )
-                    .map(DtoAdapters::toV3Command);
+                    .map(DtoConverters::toV3Command);
             } else {
                 commands = this.commandService
                     .getCommands(
@@ -229,7 +229,7 @@ public class CommandRestController {
                         finalTags,
                         page
                     )
-                    .map(DtoAdapters::toV3Command);
+                    .map(DtoConverters::toV3Command);
             }
         } else {
             commands = this.commandService
@@ -240,7 +240,7 @@ public class CommandRestController {
                     tags,
                     page
                 )
-                .map(DtoAdapters::toV3Command);
+                .map(DtoConverters::toV3Command);
         }
 
         // Build the self link which will be used for the next, previous, etc links
@@ -279,7 +279,7 @@ public class CommandRestController {
         @RequestBody final Command updateCommand
     ) throws GenieException {
         log.debug("Called to update command {}", updateCommand);
-        this.commandService.updateCommand(id, DtoAdapters.toV4Command(updateCommand));
+        this.commandService.updateCommand(id, DtoConverters.toV4Command(updateCommand));
     }
 
     /**
@@ -297,7 +297,7 @@ public class CommandRestController {
     ) throws GenieException {
         log.debug("Called to patch command {} with patch {}", id, patch);
 
-        final Command currentCommand = DtoAdapters.toV3Command(this.commandService.getCommand(id));
+        final Command currentCommand = DtoConverters.toV3Command(this.commandService.getCommand(id));
 
         try {
             log.debug("Will patch cluster {}. Original state: {}", id, currentCommand);
@@ -305,7 +305,7 @@ public class CommandRestController {
             final JsonNode postPatchNode = patch.apply(commandNode);
             final Command patchedCommand = GenieObjectMapper.getMapper().treeToValue(postPatchNode, Command.class);
             log.debug("Finished patching command {}. New state: {}", id, patchedCommand);
-            this.commandService.updateCommand(id, DtoAdapters.toV4Command(patchedCommand));
+            this.commandService.updateCommand(id, DtoConverters.toV4Command(patchedCommand));
         } catch (final JsonPatchException | IOException e) {
             log.error("Unable to patch command {} with patch {} due to exception.", id, patch, e);
             throw new GenieServerException(e.getLocalizedMessage(), e);
@@ -499,7 +499,7 @@ public class CommandRestController {
     @ResponseStatus(HttpStatus.OK)
     public Set<String> getTagsForCommand(@PathVariable("id") final String id) throws GenieException {
         log.debug("Called with id {}", id);
-        return DtoAdapters.toV3Command(this.commandService.getCommand(id)).getTags();
+        return DtoConverters.toV3Command(this.commandService.getCommand(id)).getTags();
     }
 
     /**
@@ -587,7 +587,7 @@ public class CommandRestController {
         log.debug("Called with id {}", id);
         return this.commandService.getApplicationsForCommand(id)
             .stream()
-            .map(DtoAdapters::toV3Application)
+            .map(DtoConverters::toV3Application)
             .map(this.applicationResourceAssembler::toResource)
             .collect(Collectors.toList());
     }
@@ -669,7 +669,7 @@ public class CommandRestController {
 
         return this.commandService.getClustersForCommand(id, enumStatuses)
             .stream()
-            .map(DtoAdapters::toV3Cluster)
+            .map(DtoConverters::toV3Cluster)
             .map(this.clusterResourceAssembler::toResource)
             .collect(Collectors.toSet());
     }
