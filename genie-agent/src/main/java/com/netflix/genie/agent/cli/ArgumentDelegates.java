@@ -94,6 +94,8 @@ public interface ArgumentDelegates {
         String getJobVersion();
 
         JsonNode getJobMetadata();
+
+        File getJobSpecificationFile();
     }
 
 }

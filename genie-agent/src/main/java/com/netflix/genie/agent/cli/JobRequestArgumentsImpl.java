@@ -156,4 +156,11 @@ class JobRequestArgumentsImpl implements ArgumentDelegates.JobRequestArguments {
         converter = ArgumentConverters.JSONConverter.class
     )
     private JsonNode jobMetadata = GenieObjectMapper.getMapper().createObjectNode();
+
+    @Parameter(
+        names = {"--jobSpecificationFile"},
+        description = "The local file where to load a job specification from, rather than resolving via server",
+        converter = ArgumentConverters.FileConverter.class
+    )
+    private File jobSpecificationFile;
 }
