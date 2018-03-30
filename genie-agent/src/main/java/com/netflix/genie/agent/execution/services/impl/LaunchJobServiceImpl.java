@@ -137,7 +137,7 @@ class LaunchJobServiceImpl implements LaunchJobService {
         }
 
         // Configure arguments
-        log.debug("Job command-line: {}", Arrays.toString(commandLineArguments.toArray()));
+        log.info("Job command-line: {}", Arrays.toString(commandLineArguments.toArray()));
         processBuilder.command(commandLineArguments);
     }
 
