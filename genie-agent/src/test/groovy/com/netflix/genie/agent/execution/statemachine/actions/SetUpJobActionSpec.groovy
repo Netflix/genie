@@ -231,7 +231,10 @@ class SetUpJobActionSpec extends Specification {
         expect:
         event == Events.SETUP_JOB_COMPLETE
         envMap != null
-        envMap.get("GENIE_JOB_DIR") == jobDir.toString()
+        envMap.get(JobConstants.GENIE_JOB_DIR_ENV_VAR) == jobDir.toString()
+        envMap.get(JobConstants.GENIE_APPLICATION_DIR_ENV_VAR) == jobDir.toString() + "/" + JobConstants.GENIE_PATH_VAR + "/" + JobConstants.APPLICATION_PATH_VAR
+        envMap.get(JobConstants.GENIE_COMMAND_DIR_ENV_VAR) == jobDir.toString() + "/" + JobConstants.GENIE_PATH_VAR + "/" + JobConstants.COMMAND_PATH_VAR + "/" + command.getId()
+        envMap.get(JobConstants.GENIE_CLUSTER_DIR_ENV_VAR) == jobDir.toString() + "/" + JobConstants.GENIE_PATH_VAR + "/" + JobConstants.CLUSTER_PATH_VAR + "/" + cluster.getId()
 
         for (File entityDir : [jobDir, app1Dir, app2Dir, clusterDir, commandDir]) {
             assert entityDir.exists()
@@ -311,7 +314,10 @@ class SetUpJobActionSpec extends Specification {
         clusterDir.exists()
         commandDir.exists()
         envMap != null
-        envMap.get("GENIE_JOB_DIR") == jobDir.toString()
+        envMap.get(JobConstants.GENIE_JOB_DIR_ENV_VAR) == jobDir.toString()
+        envMap.get(JobConstants.GENIE_APPLICATION_DIR_ENV_VAR) == jobDir.toString() + "/" + JobConstants.GENIE_PATH_VAR + "/" + JobConstants.APPLICATION_PATH_VAR
+        envMap.get(JobConstants.GENIE_COMMAND_DIR_ENV_VAR) == jobDir.toString() + "/" + JobConstants.GENIE_PATH_VAR + "/" + JobConstants.COMMAND_PATH_VAR + "/" + command.getId()
+        envMap.get(JobConstants.GENIE_CLUSTER_DIR_ENV_VAR) == jobDir.toString() + "/" + JobConstants.GENIE_PATH_VAR + "/" + JobConstants.CLUSTER_PATH_VAR + "/" + cluster.getId()
         envMap.get("SERVER_VARIABLE_KEY") == "SERVER VARIABLE VALUE"
         envMap.get("SETUP_VARIABLE_KEY") == "SETUP VARIABLE VALUE"
         new File(jobDir, "created-by-setup-file.txt").exists()

@@ -64,6 +64,22 @@ public final class PathUtils {
         return composePath(baseDirectory.toFile(), children);
     }
 
+
+    /**
+     * Compose the path to the applications directory inside a job directory.
+     * @param jobDirectory the job directory
+     * @return a Path
+     */
+    public static Path jobApplicationsDirectoryPath(
+        final File jobDirectory
+    ) {
+        return composePath(
+            jobDirectory,
+            JobConstants.GENIE_PATH_VAR,
+            JobConstants.APPLICATION_PATH_VAR
+        );
+    }
+
     /**
      * Compose the path to an application directory inside a job directory.
      * @param jobDirectory the job directory
@@ -75,9 +91,7 @@ public final class PathUtils {
         final String appId
     ) {
         return composePath(
-            jobDirectory,
-            JobConstants.GENIE_PATH_VAR,
-            JobConstants.APPLICATION_PATH_VAR,
+            jobApplicationsDirectoryPath(jobDirectory),
             appId
         );
     }
