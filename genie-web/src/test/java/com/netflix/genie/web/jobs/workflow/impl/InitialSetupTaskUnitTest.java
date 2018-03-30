@@ -26,6 +26,7 @@ import com.netflix.genie.common.dto.v4.Command;
 import com.netflix.genie.common.dto.v4.CommandMetadata;
 import com.netflix.genie.common.jobs.JobConstants;
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.genie.web.controllers.DtoConverters;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import org.junit.Assert;
@@ -168,14 +169,14 @@ public class InitialSetupTaskUnitTest {
             );
 
         final StringWriter mockWriter = new StringWriter();
-        this.initialSetupTask.createJobDirEnvironmentVariables(mockWriter, tempDir.getRoot().getAbsolutePath());
+        this.initialSetupTask.createJobDirEnvironmentVariables(mockWriter, this.tempDir.getRoot().getAbsolutePath());
         this.initialSetupTask.createApplicationEnvironmentVariables(mockWriter);
         this.initialSetupTask.createCommandEnvironmentVariables(mockWriter, mockCommand);
         this.initialSetupTask.createClusterEnvironmentVariables(mockWriter, mockCluster);
         this.initialSetupTask.createJobEnvironmentVariables(mockWriter, jobId, jobName, memory);
         this.initialSetupTask.createJobRequestEnvironmentVariables(mockWriter, mockJobRequest);
 
-        final String expextedOutput = ""
+        final String expectedOutput = ""
             + "export GENIE_JOB_DIR=\"" + tempDir.getRoot().getAbsolutePath() + "\"\n"
             + "\n"
             + "export GENIE_APPLICATION_DIR=\"${GENIE_JOB_DIR}/genie/applications\"\n"
@@ -186,7 +187,8 @@ public class InitialSetupTaskUnitTest {
             + "\n"
             + "export GENIE_COMMAND_NAME=\"" + commandName + "\"\n"
             + "\n"
-            + "export GENIE_COMMAND_TAGS=\"" + commandTag1 + "," + commandTag2 + "\"\n"
+            + "export GENIE_COMMAND_TAGS=\"" + commandTag1 + "," + commandTag2 + "," + DtoConverters.GENIE_ID_PREFIX
+            + commandId + "," + DtoConverters.GENIE_NAME_PREFIX + commandName + "\"\n"
             + "\n"
             + "export GENIE_CLUSTER_DIR=\"${GENIE_JOB_DIR}/genie/cluster/" + clusterId + "\"\n"
             + "\n"
@@ -194,7 +196,8 @@ public class InitialSetupTaskUnitTest {
             + "\n"
             + "export GENIE_CLUSTER_NAME=\"" + clusterName + "\"\n"
             + "\n"
-            + "export GENIE_CLUSTER_TAGS=\"" + clusterTag2 + "," + clusterTag1 + "\"\n"
+            + "export GENIE_CLUSTER_TAGS=\"" + clusterTag2 + "," + clusterTag1 + "," + DtoConverters.GENIE_ID_PREFIX
+            + clusterId + "," + DtoConverters.GENIE_NAME_PREFIX + clusterName + "\"\n"
             + "\n"
             + "export GENIE_JOB_ID=\"" + jobId + "\"\n"
             + "\n"
@@ -214,7 +217,7 @@ public class InitialSetupTaskUnitTest {
             + "export GENIE_REQUESTED_CLUSTER_TAGS_2=\"" + cltCritTag3 + "\"\n"
             + "\n";
 
-        Assert.assertEquals(expextedOutput, mockWriter.getString());
+        Assert.assertEquals(expectedOutput, mockWriter.getString());
     }
 
     /**

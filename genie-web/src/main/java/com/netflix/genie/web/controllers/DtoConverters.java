@@ -52,9 +52,15 @@ import java.util.stream.Collectors;
  */
 public final class DtoConverters {
 
+    /**
+     * The Genie 3 prefix for resource ID added to the set of tags by the system.
+     */
+    public static final String GENIE_ID_PREFIX = "genie.id:";
+    /**
+     * The Genie 3 prefix for resource names added to the set of tags by the system.
+     */
+    public static final String GENIE_NAME_PREFIX = "genie.name:";
     static final String NO_VERSION_SPECIFIED = "No Version Specified";
-    static final String GENIE_ID_PREFIX = "genie.id:";
-    static final String GENIE_NAME_PREFIX = "genie.name:";
 
     private DtoConverters() {
     }
@@ -437,7 +443,15 @@ public final class DtoConverters {
         return v3Builder.build();
     }
 
-    private static ImmutableSet<String> toV3Tags(final String id, final String name, final Set<String> tags) {
+    /**
+     * Convert the V4 values supplied to how the tags would have looked in Genie V3.
+     *
+     * @param id   The id of the resource
+     * @param name The name of the resource
+     * @param tags The tags on the resource
+     * @return The set of tags as they would have been in Genie 3
+     */
+    public static ImmutableSet<String> toV3Tags(final String id, final String name, final Set<String> tags) {
         final ImmutableSet.Builder<String> v3Tags = ImmutableSet.builder();
         v3Tags.addAll(tags);
         v3Tags.add(GENIE_ID_PREFIX + id);
@@ -464,11 +478,25 @@ public final class DtoConverters {
         return new ClusterCriteria(toV3CriterionTags(criterion));
     }
 
-    private static Criterion toV4Criterion(final ClusterCriteria criteria) throws GeniePreconditionException {
+    /**
+     * Convert a V3 Cluster Criteria to a V4 Criterion.
+     *
+     * @param criteria The criteria to convert
+     * @return The criterion
+     * @throws GeniePreconditionException If the criteria converts to an invalid criterion
+     */
+    public static Criterion toV4Criterion(final ClusterCriteria criteria) throws GeniePreconditionException {
         return toV4Criterion(criteria.getTags());
     }
 
-    private static Criterion toV4Criterion(final Set<String> tags) throws GeniePreconditionException {
+    /**
+     * Convert a set of V3 criterion tags to a V4 criterion object.
+     *
+     * @param tags The tags to convert
+     * @return The V4 criterion
+     * @throws GeniePreconditionException If the tags convert to an invalid criterion
+     */
+    public static Criterion toV4Criterion(final Set<String> tags) throws GeniePreconditionException {
         final Criterion.Builder builder = new Criterion.Builder();
         final Set<String> v4Tags = Sets.newHashSet();
         for (final String tag : tags) {

@@ -20,6 +20,7 @@ package com.netflix.genie.web.jpa.services;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.ClusterStatus;
@@ -38,6 +39,7 @@ import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.util.GenieObjectMapper;
+import com.netflix.genie.web.controllers.DtoConverters;
 import com.netflix.genie.web.jpa.entities.ClusterEntity;
 import com.netflix.genie.web.jpa.entities.CommandEntity;
 import com.netflix.genie.web.jpa.entities.FileEntity;
@@ -193,12 +195,12 @@ public class JpaClusterServiceImpl extends JpaBaseService implements ClusterServ
     ) throws GenieException {
         log.debug("Called");
 
-        final List<Set<String>> clusterCriteria = jobRequest
-            .getClusterCriterias()
-            .stream()
-            .map(ClusterCriteria::getTags)
-            .collect(Collectors.toList());
-        final Set<String> commandCriterion = jobRequest.getCommandCriteria();
+        final List<Criterion> clusterCriteria = Lists.newArrayList();
+        for (final ClusterCriteria criteria : jobRequest.getClusterCriterias()) {
+            clusterCriteria.add(DtoConverters.toV4Criterion(criteria));
+        }
+
+        final Criterion commandCriterion = DtoConverters.toV4Criterion(jobRequest.getCommandCriteria());
 
         return this.findClustersAndCommandsForJob(clusterCriteria, commandCriterion);
     }
@@ -218,10 +220,7 @@ public class JpaClusterServiceImpl extends JpaBaseService implements ClusterServ
             commandCriterion
         );
 
-        return this.findClustersAndCommandsForJob(
-            clusterCriteria.stream().map(Criterion::getTags).collect(Collectors.toList()),
-            commandCriterion.getTags()
-        );
+        return this.findClustersAndCommandsForJob(clusterCriteria, commandCriterion);
     }
 
     /**
@@ -628,16 +627,14 @@ public class JpaClusterServiceImpl extends JpaBaseService implements ClusterServ
     }
 
     private Map<Cluster, String> findClustersAndCommandsForJob(
-        final List<Set<String>> clusterCriteria,
-        final Set<String> commandCriterion
+        final List<Criterion> clusterCriteria,
+        final Criterion commandCriterion
     ) throws GenieServerException {
         final Map<Cluster, String> foundClusters = Maps.newHashMap();
-        for (final Set<String> clusterCriterion : clusterCriteria) {
-            final List<Object[]> clusterCommands = this.clusterRepository.findClustersAndCommandsForCriterion(
+        for (final Criterion clusterCriterion : clusterCriteria) {
+            final List<Object[]> clusterCommands = this.clusterRepository.resolveClustersAndCommands(
                 clusterCriterion,
-                clusterCriterion.size(),
-                commandCriterion,
-                commandCriterion.size()
+                commandCriterion
             );
 
             if (!clusterCommands.isEmpty()) {

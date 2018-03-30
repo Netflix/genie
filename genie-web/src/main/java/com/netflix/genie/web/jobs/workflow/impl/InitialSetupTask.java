@@ -27,6 +27,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.jobs.JobConstants;
+import com.netflix.genie.web.controllers.DtoConverters;
 import com.netflix.genie.web.jobs.JobExecutionEnvironment;
 import com.netflix.genie.web.util.MetricsUtils;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -263,7 +264,13 @@ public class InitialSetupTask extends GenieBaseTask {
                 + JobConstants.GENIE_COMMAND_TAGS_ENV_VAR
                 + JobConstants.EQUALS_SYMBOL
                 + JobConstants.DOUBLE_QUOTE_SYMBOL
-                + this.tagsToString(command.getMetadata().getTags())
+                + this.tagsToString(
+                DtoConverters.toV3Tags(
+                    command.getId(),
+                    command.getMetadata().getName(),
+                    command.getMetadata().getTags()
+                )
+            )
                 + JobConstants.DOUBLE_QUOTE_SYMBOL
                 + LINE_SEPARATOR
         );
@@ -326,7 +333,13 @@ public class InitialSetupTask extends GenieBaseTask {
                 + JobConstants.GENIE_CLUSTER_TAGS_ENV_VAR
                 + JobConstants.EQUALS_SYMBOL
                 + JobConstants.DOUBLE_QUOTE_SYMBOL
-                + this.tagsToString(cluster.getMetadata().getTags())
+                + this.tagsToString(
+                DtoConverters.toV3Tags(
+                    cluster.getId(),
+                    cluster.getMetadata().getName(),
+                    cluster.getMetadata().getTags()
+                )
+            )
                 + JobConstants.DOUBLE_QUOTE_SYMBOL
                 + LINE_SEPARATOR
         );
