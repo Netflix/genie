@@ -118,7 +118,9 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
         final File jobEnvironmentFile = createJobEnvironmentFile(
             jobDirectory,
             setupFiles,
-            jobSpec.getEnvironmentVariables()
+            jobSpec.getEnvironmentVariables(),
+            jobSpec.getCommand().getId(),
+            jobSpec.getCluster().getId()
         );
 
         // Collect environment variables into a map
@@ -311,7 +313,9 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
     private File createJobEnvironmentFile(
         final File jobDirectory,
         final List<File> setUpFiles,
-        final Map<String, String> serverProvidedEnvironment
+        final Map<String, String> serverProvidedEnvironment,
+        final String commandId,
+        final String clusterId
     ) throws SetUpJobException {
         final Path genieDirectory = PathUtils.jobGenieDirectoryPath(jobDirectory);
         final Path envScriptPath = PathUtils.composePath(
@@ -353,6 +357,21 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
 
         serverProvidedEnvironment.forEach(
             (k, v) -> processBuilder.environment().put(k, v)
+        );
+
+        processBuilder.environment().put(
+            JobConstants.GENIE_APPLICATION_DIR_ENV_VAR,
+            PathUtils.jobApplicationsDirectoryPath(jobDirectory).toString()
+        );
+
+        processBuilder.environment().put(
+            JobConstants.GENIE_COMMAND_DIR_ENV_VAR,
+            PathUtils.jobCommandDirectoryPath(jobDirectory, commandId).toString()
+        );
+
+        processBuilder.environment().put(
+            JobConstants.GENIE_CLUSTER_DIR_ENV_VAR,
+            PathUtils.jobClusterDirectoryPath(jobDirectory, clusterId).toString()
         );
 
         final List<String> commandArgs = Lists.newArrayList(
