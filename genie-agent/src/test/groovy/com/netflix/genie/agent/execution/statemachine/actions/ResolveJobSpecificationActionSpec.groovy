@@ -18,6 +18,7 @@
 
 package com.netflix.genie.agent.execution.statemachine.actions
 
+import com.google.common.collect.Maps
 import com.netflix.genie.agent.cli.ArgumentDelegates
 import com.netflix.genie.agent.cli.JobRequestConverter
 import com.netflix.genie.agent.execution.ExecutionContext
@@ -25,8 +26,12 @@ import com.netflix.genie.agent.execution.exceptions.JobSpecificationResolutionEx
 import com.netflix.genie.agent.execution.services.AgentJobSpecificationService
 import com.netflix.genie.agent.execution.statemachine.Events
 import com.netflix.genie.common.dto.v4.AgentJobRequest
+import com.netflix.genie.common.dto.v4.ExecutionEnvironment
 import com.netflix.genie.common.dto.v4.JobSpecification
+import com.netflix.genie.common.util.GenieObjectMapper
 import org.assertj.core.util.Sets
+import org.junit.Rule
+import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
 import javax.validation.ConstraintViolation
@@ -40,6 +45,9 @@ class ResolveJobSpecificationActionSpec extends Specification {
     AgentJobRequest request
     JobSpecification spec
     JobSpecificationResolutionException exception
+
+    @Rule
+    TemporaryFolder temporaryFolder
 
     void setup() {
         this.executionContext = Mock(ExecutionContext)
@@ -55,6 +63,8 @@ class ResolveJobSpecificationActionSpec extends Specification {
         this.request = Mock(AgentJobRequest)
         this.spec = Mock(JobSpecification)
         this.exception = new JobSpecificationResolutionException("error")
+
+        this.temporaryFolder.create()
     }
 
     void cleanup() {
@@ -67,9 +77,61 @@ class ResolveJobSpecificationActionSpec extends Specification {
         then:
         1 * converter.agentJobRequestArgsToDTO(arguments) >> request
         1 * service.resolveJobSpecification(request) >> spec
-        1 * executionContext.setJobSpecification(spec)
+        1 * executionContext.setJobSpecification(_ as JobSpecification)
 
         event == Events.RESOLVE_JOB_SPECIFICATION_COMPLETE
+    }
+
+    def "ExecuteStateAction with spec file"() {
+        setup:
+        def specFile = temporaryFolder.newFile()
+        def minimalJobSpec =
+                new JobSpecification(
+                        [],
+                        new JobSpecification.ExecutionResource(
+                                "my-job",
+                                new ExecutionEnvironment(Sets.newHashSet(), Sets.newHashSet(), "file:///foo"),
+                        ),
+                        new JobSpecification.ExecutionResource(
+                                "my-cluster",
+                                new ExecutionEnvironment(Sets.newHashSet(), Sets.newHashSet(), "file:///foo"),
+                        ),
+                        new JobSpecification.ExecutionResource(
+                                "my-command",
+                                new ExecutionEnvironment(Sets.newHashSet(), Sets.newHashSet(), "file:///foo"),
+                        ),
+                        [].toList(),
+                        Maps.newHashMap(),
+                        false,
+                        new File("/tmp")
+                );
+        GenieObjectMapper.getMapper().writeValue(specFile, minimalJobSpec)
+
+        when:
+        def event = action.executeStateAction(executionContext)
+
+        then:
+        2 * arguments.getJobSpecificationFile() >> specFile
+        0 * converter.agentJobRequestArgsToDTO(arguments)
+        0 * service.resolveJobSpecification(request)
+        1 * executionContext.setJobSpecification(minimalJobSpec)
+        event == Events.RESOLVE_JOB_SPECIFICATION_COMPLETE
+    }
+
+    def "ExecuteStateAction with nonexistent spec file"() {
+        setup:
+        def specFile = temporaryFolder.newFile()
+
+        when:
+        def event = action.executeStateAction(executionContext)
+
+        then:
+        2 * arguments.getJobSpecificationFile() >> specFile
+        0 * converter.agentJobRequestArgsToDTO(arguments)
+        0 * service.resolveJobSpecification(request)
+        0 * executionContext.setJobSpecification(_)
+        Throwable e = thrown(RuntimeException)
+        IOException.isInstance(e.getCause())
     }
 
     def "ExecuteStateAction with arguments error"() {

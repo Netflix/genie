@@ -26,9 +26,12 @@ import com.netflix.genie.agent.execution.services.AgentJobSpecificationService;
 import com.netflix.genie.agent.execution.statemachine.Events;
 import com.netflix.genie.common.dto.v4.AgentJobRequest;
 import com.netflix.genie.common.dto.v4.JobSpecification;
+import com.netflix.genie.common.util.GenieObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
 
 /**
  * Action performed when in state RESOLVE_JOB_SPECIFICATION.
@@ -61,22 +64,37 @@ class ResolveJobSpecificationAction extends BaseStateAction implements StateActi
      */
     @Override
     protected Events executeStateAction(final ExecutionContext executionContext) {
-        log.info("Resolving job specification...");
 
-        // Compose a job request from argument
-        final AgentJobRequest agentJobRequest;
-        try {
-            agentJobRequest = jobRequestConverter.agentJobRequestArgsToDTO(jobRequestArguments);
-        } catch (final JobRequestConverter.ConversionException e) {
-            throw new RuntimeException("Failed to construct job request from arguments", e);
-        }
-
-        // Resolve via service
         final JobSpecification jobSpecification;
-        try {
-            jobSpecification = agentJobSpecificationService.resolveJobSpecification(agentJobRequest);
-        } catch (final JobSpecificationResolutionException e) {
-            throw new RuntimeException("Failed to resolve job specification", e);
+
+        if (jobRequestArguments.getJobSpecificationFile() != null) {
+            log.info("Loading job specification from file: ");
+
+            try {
+                jobSpecification = GenieObjectMapper.getMapper().readValue(
+                    jobRequestArguments.getJobSpecificationFile(),
+                    JobSpecification.class
+                );
+            } catch (final IOException e) {
+                throw new RuntimeException("Failed to load job specification", e);
+            }
+        } else {
+            log.info("Resolving job specification...");
+
+            // Compose a job request from argument
+            final AgentJobRequest agentJobRequest;
+            try {
+                agentJobRequest = jobRequestConverter.agentJobRequestArgsToDTO(jobRequestArguments);
+            } catch (final JobRequestConverter.ConversionException e) {
+                throw new RuntimeException("Failed to construct job request from arguments", e);
+            }
+
+            // Resolve via service
+            try {
+                jobSpecification = agentJobSpecificationService.resolveJobSpecification(agentJobRequest);
+            } catch (final JobSpecificationResolutionException e) {
+                throw new RuntimeException("Failed to resolve job specification", e);
+            }
         }
 
         executionContext.setJobSpecification(jobSpecification);
