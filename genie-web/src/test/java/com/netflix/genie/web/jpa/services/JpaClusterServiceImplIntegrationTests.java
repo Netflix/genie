@@ -59,6 +59,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -76,6 +77,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
     private static final String COMMAND_1_ID = "command1";
     private static final String COMMAND_2_ID = "command2";
     private static final String COMMAND_3_ID = "command3";
+    private static final String COMMAND_4_ID = "command4";
 
     private static final String CLUSTER_1_ID = "cluster1";
     private static final String CLUSTER_1_USER = "tgianos";
@@ -308,42 +310,174 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
      * @throws GenieException For any problem
      */
     @Test
+    // TODO: This would be much easier with a spock data test
     public void testChooseClusterAndCommandForCriteria() throws GenieException {
-        final Criterion pigCriterion = new Criterion.Builder().withTags(Sets.newHashSet("pig")).build();
-        final Criterion piCriterion = new Criterion.Builder().withTags(Sets.newHashSet("pi")).build();
+        Map<Cluster, String> clustersAndCommands;
 
-        final List<Criterion> cluster1 = Lists.newArrayList(
-            new Criterion.Builder().withId("cluster1").build()
+        // All Good
+        clustersAndCommands = this.service.findClustersAndCommandsForCriteria(
+            Lists.newArrayList(
+                new Criterion
+                    .Builder()
+                    .withId(CLUSTER_1_ID)
+                    .build()
+            ),
+            new Criterion
+                .Builder()
+                .withTags(Sets.newHashSet("pig"))
+                .build()
         );
-        final List<Criterion> cluster = Lists.newArrayList(
-            new Criterion.Builder().withId("cluster").build()
-        );
-        final List<Criterion> pigCluster = Lists.newArrayList(
-            new Criterion.Builder().withTags(Sets.newHashSet("pig")).build()
-        );
-        final List<Criterion> pigHiveCluster = Lists.newArrayList(
-            new Criterion.Builder().withTags(Sets.newHashSet("pig", "hive")).build()
-        );
+        Assert.assertThat(clustersAndCommands.size(), Matchers.is(1));
+        Assert.assertThat(
+            clustersAndCommands
+                .entrySet()
+                .stream()
+                .filter(entry -> entry.getKey().getId().equals(CLUSTER_1_ID))
+                .count(),
+            Matchers.is(1L));
+        Assert.assertTrue(clustersAndCommands.containsValue(COMMAND_1_ID));
 
-        Assert.assertThat(
-            this.service.findClustersAndCommandsForCriteria(cluster1, pigCriterion).size(),
-            Matchers.is(1)
+        // Cluster id won't be found
+        clustersAndCommands = this.service.findClustersAndCommandsForCriteria(
+            Lists.newArrayList(
+                new Criterion
+                    .Builder()
+                    .withId(CLUSTER_1_ID + UUID.randomUUID().toString())
+                    .build()
+            ),
+            new Criterion
+                .Builder()
+                .withTags(Sets.newHashSet("pig"))
+                .build()
         );
-        Assert.assertThat(
-            this.service.findClustersAndCommandsForCriteria(cluster, pigCriterion).size(),
-            Matchers.is(0)
+        Assert.assertTrue(clustersAndCommands.isEmpty());
+
+        // Cluster is UP so this should fail even though the id matches
+        clustersAndCommands = this.service.findClustersAndCommandsForCriteria(
+            Lists.newArrayList(
+                new Criterion
+                    .Builder()
+                    .withId(CLUSTER_1_ID)
+                    .withStatus(ClusterStatus.OUT_OF_SERVICE.toString())
+                    .build()
+            ),
+            new Criterion
+                .Builder()
+                .withTags(Sets.newHashSet("pig"))
+                .build()
         );
-        Assert.assertThat(
-            this.service.findClustersAndCommandsForCriteria(cluster1, piCriterion).size(),
-            Matchers.is(0)
+        Assert.assertTrue(clustersAndCommands.isEmpty());
+
+        // Second cluster criterion should match Cluster 2
+        clustersAndCommands = this.service.findClustersAndCommandsForCriteria(
+            Lists.newArrayList(
+                new Criterion
+                    .Builder()
+                    .withId(CLUSTER_1_ID)
+                    .withStatus(ClusterStatus.OUT_OF_SERVICE.toString())
+                    .build(),
+                new Criterion
+                    .Builder()
+                    .withTags(Sets.newHashSet("hive", "pig", "query"))
+                    .build()
+            ),
+            new Criterion
+                .Builder()
+                .withId(COMMAND_1_ID)
+                .withTags(Sets.newHashSet("pig"))
+                .build()
         );
+        Assert.assertThat(clustersAndCommands.size(), Matchers.is(1));
         Assert.assertThat(
-            this.service.findClustersAndCommandsForCriteria(pigCluster, pigCriterion).size(),
-            Matchers.is(2)
+            clustersAndCommands
+                .entrySet()
+                .stream()
+                .filter(entry -> entry.getKey().getId().equals(CLUSTER_2_ID))
+                .count(),
+            Matchers.is(1L));
+        Assert.assertTrue(clustersAndCommands.containsValue(COMMAND_1_ID));
+
+        // Matches both clusters and the deprecated pig command
+        clustersAndCommands = this.service.findClustersAndCommandsForCriteria(
+            Lists.newArrayList(
+                new Criterion
+                    .Builder()
+                    .withTags(Sets.newHashSet("hive", "pig"))
+                    .build()
+            ),
+            new Criterion
+                .Builder()
+                .withStatus(CommandStatus.DEPRECATED.toString())
+                .withTags(Sets.newHashSet("pig"))
+                .build()
         );
+        Assert.assertThat(clustersAndCommands.size(), Matchers.is(2));
         Assert.assertThat(
-            this.service.findClustersAndCommandsForCriteria(pigHiveCluster, pigCriterion).size(),
-            Matchers.is(2)
+            clustersAndCommands
+                .entrySet()
+                .stream()
+                .filter(
+                    entry -> entry.getKey().getId().equals(CLUSTER_2_ID) || entry.getKey().getId().equals(CLUSTER_1_ID)
+                )
+                .count(),
+            Matchers.is(2L));
+        Assert.assertTrue(clustersAndCommands.containsValue(COMMAND_3_ID));
+        Assert.assertFalse(clustersAndCommands.containsValue(COMMAND_1_ID));
+        Assert.assertFalse(clustersAndCommands.containsValue(COMMAND_2_ID));
+
+        // By name
+        clustersAndCommands = this.service.findClustersAndCommandsForCriteria(
+            Lists.newArrayList(
+                new Criterion
+                    .Builder()
+                    .withName(CLUSTER_2_NAME)
+                    .build()
+            ),
+            new Criterion
+                .Builder()
+                .withName("hive_11_prod")
+                .withStatus(CommandStatus.INACTIVE.toString())
+                .build()
+        );
+        Assert.assertThat(clustersAndCommands.size(), Matchers.is(1));
+        Assert.assertThat(
+            clustersAndCommands
+                .entrySet()
+                .stream()
+                .filter(entry -> entry.getKey().getId().equals(CLUSTER_2_ID))
+                .count(),
+            Matchers.is(1L));
+        Assert.assertTrue(clustersAndCommands.containsValue(COMMAND_2_ID));
+
+        // In this case we're testing the priority ordering. The two clusters have the same pig command only cluster 2
+        // has a different pig command in the highest priority order so the result set should be different for both
+        clustersAndCommands = this.service.findClustersAndCommandsForCriteria(
+            Lists.newArrayList(
+                new Criterion
+                    .Builder()
+                    .withTags(Sets.newHashSet("hive", "pig"))
+                    .build()
+            ),
+            new Criterion
+                .Builder()
+                .withTags(Sets.newHashSet("pig"))
+                .build()
+        );
+        Assert.assertThat(clustersAndCommands.size(), Matchers.is(2));
+        clustersAndCommands.forEach(
+            (key, value) -> {
+                switch (key.getId()) {
+                    case CLUSTER_1_ID:
+                        Assert.assertThat(value, Matchers.is(COMMAND_1_ID));
+                        break;
+                    case CLUSTER_2_ID:
+                        Assert.assertThat(value, Matchers.is(COMMAND_4_ID));
+                        break;
+                    default:
+                        Assert.fail();
+                        break;
+                }
+            }
         );
     }
 

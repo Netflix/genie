@@ -145,7 +145,7 @@ public class JobTask extends GenieBaseTask {
                 + System.lineSeparator());
 
             writer.write(
-                jobExecEnv.getCommand().getExecutable()
+                StringUtils.join(jobExecEnv.getCommand().getExecutable(), ' ')
                     + JobConstants.WHITE_SPACE
                     + jobExecEnv.getJobRequest().getCommandArgs().orElse(EMPTY_STRING)
                     + JobConstants.STDOUT_REDIRECT

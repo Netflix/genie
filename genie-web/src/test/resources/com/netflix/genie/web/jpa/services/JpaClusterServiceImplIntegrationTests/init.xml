@@ -212,6 +212,40 @@
         tag_id="1"
     />
 
+    <commands
+        id="4"
+        created="2014-08-08 01:47:00"
+        updated="2014-08-08 01:59:00"
+        entity_version="0"
+        unique_id="command4"
+        genie_user="tgianos"
+        name="pig_13_prod"
+        version="1.2.3"
+        executable="pig"
+        check_delay="15000"
+        status="ACTIVE"
+    />
+    <commands_configs
+        command_id="4"
+        file_id="1"
+    />
+    <commands_configs
+        command_id="4"
+        file_id="2"
+    />
+    <commands_tags
+        command_id="4"
+        tag_id="0"
+    />
+    <commands_tags
+        command_id="4"
+        tag_id="1"
+    />
+    <commands_tags
+        command_id="4"
+        tag_id="2"
+    />
+
     <clusters
         id="1"
         created="2014-07-08 01:49:00"
@@ -298,18 +332,23 @@
 
     <clusters_commands
         cluster_id="2"
-        command_id="1"
+        command_id="4"
         command_order="0"
     />
     <clusters_commands
         cluster_id="2"
-        command_id="2"
+        command_id="1"
         command_order="1"
     />
     <clusters_commands
         cluster_id="2"
-        command_id="3"
+        command_id="2"
         command_order="2"
+    />
+    <clusters_commands
+        cluster_id="2"
+        command_id="3"
+        command_order="3"
     />
 
     <criteria
