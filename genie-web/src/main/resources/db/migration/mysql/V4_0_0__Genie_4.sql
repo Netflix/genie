@@ -16,6 +16,24 @@
  *
  */
 
+DROP TABLE IF EXISTS
+`job_metadata_320`,
+`job_executions_320`,
+`jobs_applications_320`,
+`jobs_320`,
+`job_requests_320`,
+`application_configs_320`,
+`application_dependencies_320`,
+`cluster_configs_320`,
+`cluster_dependencies_320`,
+`command_configs_320`,
+`command_dependencies_320`,
+`commands_applications_320`,
+`clusters_commands_320`,
+`applications_320`,
+`clusters_320`,
+`commands_320`;
+
 ALTER TABLE `applications`
   CHANGE `version` `version` VARCHAR(255) DEFAULT NULL;
 
