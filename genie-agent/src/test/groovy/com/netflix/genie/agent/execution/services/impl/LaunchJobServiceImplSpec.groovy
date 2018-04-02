@@ -78,16 +78,17 @@ class LaunchJobServiceImplSpec extends Specification {
         !stdOut.exists()
     }
 
-    def "LaunchProcess noninteractive"() {
+    def "LaunchProcess noninteractive with variable expansion"() {
         setup:
         String helloWorld = "Hello World!"
         LaunchJobService service = new LaunchJobServiceImpl()
+        envMap.put("ECHO_COMMAND", "echo")
 
         when:
         Process process = service.launchProcess(
                 temporaryFolder.getRoot(),
                 envMap,
-                ["echo", helloWorld],
+                ["\${ECHO_COMMAND}", helloWorld],
                 false
         )
 
@@ -172,6 +173,22 @@ class LaunchJobServiceImplSpec extends Specification {
                 envMap,
                 [uuid],
                 false)
+
+        then:
+        thrown(JobLaunchException)
+    }
+
+    def "LaunchProcess missing environment variable"() {
+        setup:
+        LaunchJobService service = new LaunchJobServiceImpl()
+
+        when:
+        service.launchProcess(
+                temporaryFolder.getRoot(),
+                envMap,
+                ["\$COMMAND"],
+                false
+        )
 
         then:
         thrown(JobLaunchException)
