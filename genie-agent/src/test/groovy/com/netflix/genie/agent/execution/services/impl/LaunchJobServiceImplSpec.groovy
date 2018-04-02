@@ -18,11 +18,9 @@
 
 package com.netflix.genie.agent.execution.services.impl
 
-import com.netflix.genie.agent.execution.ExecutionContext
 import com.netflix.genie.agent.execution.exceptions.JobLaunchException
 import com.netflix.genie.agent.execution.services.LaunchJobService
 import com.netflix.genie.agent.utils.PathUtils
-import com.netflix.genie.common.dto.v4.JobSpecification
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
@@ -36,16 +34,12 @@ class LaunchJobServiceImplSpec extends Specification {
     @Rule
     TemporaryFolder temporaryFolder
 
-    ExecutionContext ctx
-    JobSpecification spec
     Map<String, String> envMap
     File stdOut
     File stdErr
 
     void setup() {
         temporaryFolder.create()
-        ctx = Mock()
-        spec = Mock()
         envMap = [:]
         stdOut = PathUtils.jobStdOutPath(temporaryFolder.getRoot()).toFile()
         stdErr = PathUtils.jobStdErrPath(temporaryFolder.getRoot()).toFile()
@@ -58,18 +52,19 @@ class LaunchJobServiceImplSpec extends Specification {
 
     def "LaunchProcess interactive"() {
         setup:
-        LaunchJobService service = new LaunchJobServiceImpl(ctx)
+        LaunchJobService service = new LaunchJobServiceImpl()
         File expectedFile = new File(temporaryFolder.getRoot(), UUID.randomUUID().toString())
+        envMap.put("PATH", System.getenv("PATH") + ":/foo")
 
         when:
-        Process process = service.launchProcess()
+        Process process = service.launchProcess(
+                temporaryFolder.getRoot(),
+                envMap,
+                ["touch", expectedFile.getAbsolutePath()],
+                true
+        )
 
         then:
-        ctx.getJobSpecification() >> spec
-        ctx.getJobDirectory() >> temporaryFolder.getRoot()
-        ctx.getJobEnvironment() >> envMap
-        spec.getCommandArgs() >> ["touch", expectedFile.getAbsolutePath()]
-        spec.isInteractive() >> true
         process != null
 
         when:
@@ -86,17 +81,17 @@ class LaunchJobServiceImplSpec extends Specification {
     def "LaunchProcess noninteractive"() {
         setup:
         String helloWorld = "Hello World!"
-        LaunchJobService service = new LaunchJobServiceImpl(ctx)
+        LaunchJobService service = new LaunchJobServiceImpl()
 
         when:
-        Process process = service.launchProcess()
+        Process process = service.launchProcess(
+                temporaryFolder.getRoot(),
+                envMap,
+                ["echo", helloWorld],
+                false
+        )
 
         then:
-        ctx.getJobSpecification() >> spec
-        ctx.getJobDirectory() >> temporaryFolder.getRoot()
-        ctx.getJobEnvironment() >> envMap
-        spec.getCommandArgs() >> ["echo", helloWorld]
-        spec.isInteractive() >> false
         process != null
 
         when:
@@ -115,17 +110,17 @@ class LaunchJobServiceImplSpec extends Specification {
         String uuid = UUID.randomUUID().toString()
         envMap.put("GENIE_UUID", uuid)
         String expectedString = "GENIE_UUID=" + uuid
-        LaunchJobService service = new LaunchJobServiceImpl(ctx)
+        LaunchJobService service = new LaunchJobServiceImpl()
 
         when:
-        Process process = service.launchProcess()
+        Process process = service.launchProcess(
+                temporaryFolder.getRoot(),
+                envMap,
+                ["env"],
+                false
+        )
 
         then:
-        ctx.getJobSpecification() >> spec
-        ctx.getJobDirectory() >> temporaryFolder.getRoot()
-        ctx.getJobEnvironment() >> envMap
-        spec.getCommandArgs() >> ["env"]
-        spec.isInteractive() >> false
         process != null
 
         when:
@@ -142,17 +137,17 @@ class LaunchJobServiceImplSpec extends Specification {
     def "LaunchProcess command error"() {
         setup:
         File nonExistentFile = new File(temporaryFolder.getRoot(), UUID.randomUUID().toString())
-        LaunchJobService service = new LaunchJobServiceImpl(ctx)
+        LaunchJobService service = new LaunchJobServiceImpl()
 
         when:
-        Process process = service.launchProcess()
+        Process process = service.launchProcess(
+                temporaryFolder.getRoot(),
+                envMap,
+                ["rm", nonExistentFile.absolutePath],
+                false
+        )
 
         then:
-        ctx.getJobSpecification() >> spec
-        ctx.getJobDirectory() >> temporaryFolder.getRoot()
-        ctx.getJobEnvironment() >> envMap
-        spec.getCommandArgs() >> ["rm", nonExistentFile.absolutePath]
-        spec.isInteractive() >> false
         process != null
 
         when:
@@ -169,113 +164,110 @@ class LaunchJobServiceImplSpec extends Specification {
     def "LaunchProcess missing executable"() {
         setup:
         String uuid = UUID.randomUUID().toString()
-        LaunchJobService service = new LaunchJobServiceImpl(ctx)
+        LaunchJobService service = new LaunchJobServiceImpl()
 
         when:
-        Process process = service.launchProcess()
+        Process process = service.launchProcess(
+                temporaryFolder.getRoot(),
+                envMap,
+                [uuid],
+                false)
 
         then:
-        ctx.getJobSpecification() >> spec
-        ctx.getJobDirectory() >> temporaryFolder.getRoot()
-        ctx.getJobEnvironment() >> envMap
-        spec.getCommandArgs() >> [uuid]
-        spec.isInteractive() >> false
         thrown(JobLaunchException)
     }
 
-    def "Spec not set in context"() {
+    def "Job directory null"() {
         setup:
-        LaunchJobService service = new LaunchJobServiceImpl(ctx)
+        LaunchJobService service = new LaunchJobServiceImpl()
 
         when:
-        service.launchProcess()
+        service.launchProcess(
+                null,
+                envMap,
+                ["echo"],
+                false
+        )
 
         then:
-        ctx.getJobSpecification() >> null
-        thrown(JobLaunchException)
-    }
-
-    def "Job directory not set in context"() {
-        setup:
-        LaunchJobService service = new LaunchJobServiceImpl(ctx)
-
-        when:
-        service.launchProcess()
-
-        then:
-        ctx.getJobSpecification() >> spec
-        ctx.getJobDirectory() >> null
         thrown(JobLaunchException)
     }
 
     def "Job directory not a directory"() {
         setup:
-        LaunchJobService service = new LaunchJobServiceImpl(ctx)
+        LaunchJobService service = new LaunchJobServiceImpl()
 
         when:
-        service.launchProcess()
+        service.launchProcess(
+                temporaryFolder.newFile("foo"),
+                envMap,
+                ["echo"],
+                false
+        )
 
         then:
-        ctx.getJobSpecification() >> spec
-        ctx.getJobDirectory() >> temporaryFolder.newFile()
         thrown(JobLaunchException)
     }
 
     def "Job folder not existing"() {
         setup:
-        LaunchJobService service = new LaunchJobServiceImpl(ctx)
+        LaunchJobService service = new LaunchJobServiceImpl()
 
         when:
-        service.launchProcess()
+        service.launchProcess(
+                new File(temporaryFolder.getRoot(), "foo"),
+                envMap,
+                ["echo"],
+                false
+        )
 
         then:
-        ctx.getJobSpecification() >> spec
-        ctx.getJobDirectory() >> new File(temporaryFolder.getRoot(), "foo")
         thrown(JobLaunchException)
     }
 
-    def "Environment not set in context"() {
+    def "Environment null"() {
         setup:
-        LaunchJobService service = new LaunchJobServiceImpl(ctx)
+        LaunchJobService service = new LaunchJobServiceImpl()
 
         when:
-        service.launchProcess()
+        service.launchProcess(
+                temporaryFolder.getRoot(),
+                null,
+                ["echo"],
+                false)
 
         then:
-        ctx.getJobSpecification() >> spec
-        ctx.getJobDirectory() >> temporaryFolder.getRoot()
-        ctx.getJobEnvironment() >> null
         thrown(JobLaunchException)
     }
 
     def "Args not set"() {
         setup:
-        LaunchJobService service = new LaunchJobServiceImpl(ctx)
+        LaunchJobService service = new LaunchJobServiceImpl()
 
         when:
-        service.launchProcess()
+        service.launchProcess(
+                temporaryFolder.getRoot(),
+                envMap,
+                null,
+                false)
 
         then:
-        ctx.getJobSpecification() >> spec
-        ctx.getJobDirectory() >> temporaryFolder.getRoot()
-        ctx.getJobEnvironment() >> envMap
-        spec.getCommandArgs() >> null
         thrown(JobLaunchException)
     }
 
     def "Args empty"() {
         setup:
-        LaunchJobService service = new LaunchJobServiceImpl(ctx)
+        LaunchJobService service = new LaunchJobServiceImpl()
 
         when:
-        service.launchProcess()
+        service.launchProcess(
+                temporaryFolder.getRoot(),
+                envMap,
+                [],
+                false
+        )
 
         then:
-        ctx.getJobSpecification() >> spec
-        ctx.getJobDirectory() >> temporaryFolder.getRoot()
-        ctx.getJobEnvironment() >> envMap
-        spec.getCommandArgs() >> []
         thrown(JobLaunchException)
     }
-
 }

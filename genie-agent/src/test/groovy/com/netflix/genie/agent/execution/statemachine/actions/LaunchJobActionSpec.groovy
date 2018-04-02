@@ -22,21 +22,30 @@ import com.netflix.genie.agent.execution.ExecutionContext
 import com.netflix.genie.agent.execution.exceptions.JobLaunchException
 import com.netflix.genie.agent.execution.services.LaunchJobService
 import com.netflix.genie.agent.execution.statemachine.Events
-import com.netflix.genie.agent.execution.statemachine.States
+import com.netflix.genie.common.dto.v4.JobSpecification
 import com.netflix.genie.test.categories.UnitTest
 import org.junit.experimental.categories.Category
-import org.springframework.statemachine.StateContext
 import spock.lang.Specification
 
 @Category(UnitTest.class)
 class LaunchJobActionSpec extends Specification {
     ExecutionContext executionContext
+    JobSpecification jobSpec
+    Map<String, String> jobEnvironment
     LaunchJobAction action
     LaunchJobService launchJobService
     Process process
+    File jobRunDirectory
+    List<String> jobCommandLine
+    boolean interactive
 
     void setup() {
         this.executionContext = Mock(ExecutionContext)
+        this.jobSpec = Mock(JobSpecification)
+        this.jobRunDirectory = Mock(File)
+        this.jobEnvironment = Mock(Map)
+        this.jobCommandLine = Mock(List)
+        this.interactive = true
         this.launchJobService = Mock(LaunchJobService)
         this.process = Mock(Process)
         this.action = new LaunchJobAction(executionContext, launchJobService)
@@ -50,7 +59,12 @@ class LaunchJobActionSpec extends Specification {
         def event = action.executeStateAction(executionContext)
 
         then:
-        1 * launchJobService.launchProcess() >> process
+        1 * executionContext.getJobSpecification() >> jobSpec
+        1 * executionContext.getJobDirectory() >> jobRunDirectory
+        1 * executionContext.getJobEnvironment() >> jobEnvironment
+        1 * jobSpec.getCommandArgs() >> jobCommandLine
+        1 * jobSpec.isInteractive() >> interactive
+        1 * launchJobService.launchProcess(jobRunDirectory, jobEnvironment, jobCommandLine, interactive) >> process
         1 * executionContext.setJobProcess(process)
 
         expect:
@@ -62,7 +76,12 @@ class LaunchJobActionSpec extends Specification {
         action.executeStateAction(executionContext)
 
         then:
-        1 * launchJobService.launchProcess() >> {throw new JobLaunchException("")}
+        1 * executionContext.getJobSpecification() >> jobSpec
+        1 * executionContext.getJobDirectory() >> jobRunDirectory
+        1 * executionContext.getJobEnvironment() >> jobEnvironment
+        1 * jobSpec.getCommandArgs() >> jobCommandLine
+        1 * jobSpec.isInteractive() >> interactive
+        1 * launchJobService.launchProcess(jobRunDirectory, jobEnvironment, jobCommandLine, interactive) >> {throw new JobLaunchException("")}
         0 * executionContext.setJobProcess(process)
         def e = thrown(RuntimeException)
         e.getCause().getClass() == JobLaunchException
@@ -76,7 +95,12 @@ class LaunchJobActionSpec extends Specification {
         def event = action.executeStateAction(executionContext)
 
         then:
-        1 * launchJobService.launchProcess() >> process
+        1 * executionContext.getJobSpecification() >> jobSpec
+        1 * executionContext.getJobDirectory() >> jobRunDirectory
+        1 * executionContext.getJobEnvironment() >> jobEnvironment
+        1 * jobSpec.getCommandArgs() >> jobCommandLine
+        1 * jobSpec.isInteractive() >> interactive
+        1 * launchJobService.launchProcess(jobRunDirectory, jobEnvironment, jobCommandLine, interactive) >> process
         1 * executionContext.setJobProcess(process)
 
         expect:

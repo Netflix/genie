@@ -22,11 +22,15 @@ import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.exceptions.JobLaunchException;
 import com.netflix.genie.agent.execution.services.LaunchJobService;
 import com.netflix.genie.agent.execution.statemachine.Events;
+import com.netflix.genie.common.dto.v4.JobSpecification;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Action performed when in state LAUNCH_JOB.
@@ -55,9 +59,20 @@ class LaunchJobAction extends BaseStateAction implements StateAction.LaunchJob {
     protected Events executeStateAction(final ExecutionContext executionContext) {
         log.info("Launching job...");
 
+        final JobSpecification jobSpec = executionContext.getJobSpecification();
+        final File jobRunDirectory = executionContext.getJobDirectory();
+        final Map<String, String> jobEnvironment = executionContext.getJobEnvironment();
+        final List<String> jobCommandLine = jobSpec.getCommandArgs();
+        final boolean interactive = jobSpec.isInteractive();
+
         final Process jobProcess;
         try {
-            jobProcess = launchJobService.launchProcess();
+            jobProcess = launchJobService.launchProcess(
+                jobRunDirectory,
+                jobEnvironment,
+                jobCommandLine,
+                interactive
+            );
         } catch (final JobLaunchException e) {
             throw new RuntimeException("Failed to launch job", e);
         }
@@ -83,7 +98,7 @@ class LaunchJobAction extends BaseStateAction implements StateAction.LaunchJob {
             } else {
                 log.debug("Don't know how to access PID for class {}", processClassName);
             }
-        } catch (Throwable t) {
+        } catch (final Throwable t) {
             log.warn("Failed to determine job process PID");
         }
         return pid;
