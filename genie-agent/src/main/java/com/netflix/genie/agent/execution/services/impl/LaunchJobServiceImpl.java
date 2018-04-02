@@ -18,11 +18,9 @@
 
 package com.netflix.genie.agent.execution.services.impl;
 
-import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.exceptions.JobLaunchException;
 import com.netflix.genie.agent.execution.services.LaunchJobService;
 import com.netflix.genie.agent.utils.PathUtils;
-import com.netflix.genie.common.dto.v4.JobSpecification;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Lazy;
@@ -45,66 +43,41 @@ import java.util.Map;
 @Lazy
 class LaunchJobServiceImpl implements LaunchJobService {
 
-    private final ExecutionContext executionContext;
-
-    LaunchJobServiceImpl(final ExecutionContext executionContext) {
-        this.executionContext = executionContext;
-    }
-
     /**
      * {@inheritDoc}
      */
     @Override
-    public Process launchProcess() throws JobLaunchException {
-        final JobSpecification jobSpec = executionContext.getJobSpecification();
-
-        if (jobSpec == null) {
-            throw new JobLaunchException("Job specification is not set in execution context");
-        }
+    public Process launchProcess(
+        final File runDirectory,
+        final Map<String, String> environmentVariablesMap,
+        final List<String> commandLine,
+        final boolean interactive
+    ) throws JobLaunchException {
 
         final ProcessBuilder processBuilder = new ProcessBuilder();
 
-        configureEnvironment(processBuilder);
-        configureCommandArguments(processBuilder, jobSpec);
-        configureIO(processBuilder, jobSpec);
-
-        try {
-            return processBuilder.start();
-        } catch (final IOException | SecurityException e) {
-            throw new JobLaunchException("Failed to launch job: ", e);
-        }
-    }
-
-    private void configureEnvironment(
-        final ProcessBuilder processBuilder
-    ) throws JobLaunchException {
-
-        final File jobDirectory = executionContext.getJobDirectory();
-
         // Validate job running directory
-        if (jobDirectory == null) {
-            throw new JobLaunchException("Job directory is not set in execution context");
-        } else if (!jobDirectory.exists()) {
-            throw new JobLaunchException("Job directory does not exist: " + jobDirectory);
-        } else if (!jobDirectory.isDirectory()) {
-            throw new JobLaunchException("Job directory is not a directory: " + jobDirectory);
-        } else if (!jobDirectory.canWrite()) {
-            throw new JobLaunchException("Job directory is not writeable: " + jobDirectory);
+        if (runDirectory == null) {
+            throw new JobLaunchException("Job directory is null");
+        } else if (!runDirectory.exists()) {
+            throw new JobLaunchException("Job directory does not exist: " + runDirectory);
+        } else if (!runDirectory.isDirectory()) {
+            throw new JobLaunchException("Job directory is not a directory: " + runDirectory);
+        } else if (!runDirectory.canWrite()) {
+            throw new JobLaunchException("Job directory is not writable: " + runDirectory);
         }
 
         // Configure job running directory
-        processBuilder.directory(jobDirectory);
+        processBuilder.directory(runDirectory);
 
         final Map<String, String> currentEnvironmentVariables = processBuilder.environment();
-        final Map<String, String> jobEnvironmentVariables = executionContext.getJobEnvironment();
 
-        // Validate additional environment variables
-        if (jobEnvironmentVariables == null) {
-            throw new JobLaunchException("Job environment variables map is not set in execution context");
+        if (environmentVariablesMap == null) {
+            throw new JobLaunchException("Job environment variables map is null");
         }
 
-        // Configure job environment variables
-        jobEnvironmentVariables.forEach((key, value) -> {
+        // Merge job environment variables into process inherited environment
+        environmentVariablesMap.forEach((key, value) -> {
             final String replacedValue = currentEnvironmentVariables.put(key, value);
             if (StringUtils.isBlank(replacedValue)) {
                 log.debug(
@@ -121,36 +94,29 @@ class LaunchJobServiceImpl implements LaunchJobService {
                 );
             }
         });
-    }
-
-    private void configureCommandArguments(
-        final ProcessBuilder processBuilder,
-        final JobSpecification jobSpec
-    ) throws JobLaunchException {
-        final List<String> commandLineArguments = jobSpec.getCommandArgs();
 
         // Validate arguments
-        if (commandLineArguments == null) {
-            throw new JobLaunchException("Job command-line arguments not set in execution context");
-        } else if (commandLineArguments.isEmpty()) {
+        if (commandLine == null) {
+            throw new JobLaunchException("Job command-line arguments is null");
+        } else if (commandLine.isEmpty()) {
             throw new JobLaunchException("Job command-line arguments are empty");
         }
 
         // Configure arguments
-        log.info("Job command-line: {}", Arrays.toString(commandLineArguments.toArray()));
-        processBuilder.command(commandLineArguments);
-    }
+        log.info("Job command-line: {}", Arrays.toString(commandLine.toArray()));
+        processBuilder.command(commandLine);
 
-    private void configureIO(
-        final ProcessBuilder processBuilder,
-        final JobSpecification jobSpec
-    ) {
-        if (jobSpec.isInteractive()) {
+        if (interactive) {
             processBuilder.inheritIO();
         } else {
-            final File jobDirectory = executionContext.getJobDirectory();
-            processBuilder.redirectError(PathUtils.jobStdErrPath(jobDirectory).toFile());
-            processBuilder.redirectOutput(PathUtils.jobStdOutPath(jobDirectory).toFile());
+            processBuilder.redirectError(PathUtils.jobStdErrPath(runDirectory).toFile());
+            processBuilder.redirectOutput(PathUtils.jobStdOutPath(runDirectory).toFile());
+        }
+
+        try {
+            return processBuilder.start();
+        } catch (final IOException | SecurityException e) {
+            throw new JobLaunchException("Failed to launch job: ", e);
         }
     }
 }

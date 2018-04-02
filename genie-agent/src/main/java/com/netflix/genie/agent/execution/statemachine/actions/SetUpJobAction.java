@@ -18,6 +18,7 @@
 
 package com.netflix.genie.agent.execution.statemachine.actions;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.exceptions.DownloadException;
@@ -114,13 +115,15 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
             throw new SetUpJobException("Failed to download job dependencies", e);
         }
 
+        // Create additional environment variables
+        final Map<String, String> extraEnvironmentVariables = createAdditionalEnvironmentMap(jobDirectory, jobSpec);
+
         // Source set up files and collect resulting environment variables into a file
         final File jobEnvironmentFile = createJobEnvironmentFile(
             jobDirectory,
             setupFiles,
             jobSpec.getEnvironmentVariables(),
-            jobSpec.getCommand().getId(),
-            jobSpec.getCluster().getId()
+            extraEnvironmentVariables
         );
 
         // Collect environment variables into a map
@@ -310,12 +313,41 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
         }
     }
 
+
+    private Map<String, String> createAdditionalEnvironmentMap(
+        final File jobDirectory,
+        final JobSpecification jobSpec
+    ) {
+        final ImmutableMap.Builder<String, String> mapBuilder = new ImmutableMap.Builder<>();
+
+        mapBuilder.put(
+            JobConstants.GENIE_JOB_DIR_ENV_VAR,
+            jobDirectory.toString()
+        );
+
+        mapBuilder.put(
+            JobConstants.GENIE_APPLICATION_DIR_ENV_VAR,
+            PathUtils.jobApplicationsDirectoryPath(jobDirectory).toString()
+        );
+
+        mapBuilder.put(
+            JobConstants.GENIE_COMMAND_DIR_ENV_VAR,
+            PathUtils.jobCommandDirectoryPath(jobDirectory, jobSpec.getCommand().getId()).toString()
+        );
+
+        mapBuilder.put(
+            JobConstants.GENIE_CLUSTER_DIR_ENV_VAR,
+            PathUtils.jobClusterDirectoryPath(jobDirectory, jobSpec.getCluster().getId()).toString()
+        );
+
+        return mapBuilder.build();
+    }
+
     private File createJobEnvironmentFile(
         final File jobDirectory,
         final List<File> setUpFiles,
         final Map<String, String> serverProvidedEnvironment,
-        final String commandId,
-        final String clusterId
+        final Map<String, String> extraEnvironment
     ) throws SetUpJobException {
         final Path genieDirectory = PathUtils.jobGenieDirectoryPath(jobDirectory);
         final Path envScriptPath = PathUtils.composePath(
@@ -350,29 +382,8 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
             .directory(jobDirectory)
             .inheritIO();
 
-        processBuilder.environment().put(
-            JobConstants.GENIE_JOB_DIR_ENV_VAR,
-            jobDirectory.toString()
-        );
-
-        serverProvidedEnvironment.forEach(
-            (k, v) -> processBuilder.environment().put(k, v)
-        );
-
-        processBuilder.environment().put(
-            JobConstants.GENIE_APPLICATION_DIR_ENV_VAR,
-            PathUtils.jobApplicationsDirectoryPath(jobDirectory).toString()
-        );
-
-        processBuilder.environment().put(
-            JobConstants.GENIE_COMMAND_DIR_ENV_VAR,
-            PathUtils.jobCommandDirectoryPath(jobDirectory, commandId).toString()
-        );
-
-        processBuilder.environment().put(
-            JobConstants.GENIE_CLUSTER_DIR_ENV_VAR,
-            PathUtils.jobClusterDirectoryPath(jobDirectory, clusterId).toString()
-        );
+        processBuilder.environment().putAll(serverProvidedEnvironment);
+        processBuilder.environment().putAll(extraEnvironment);
 
         final List<String> commandArgs = Lists.newArrayList(
             envScriptPath.toString(),
