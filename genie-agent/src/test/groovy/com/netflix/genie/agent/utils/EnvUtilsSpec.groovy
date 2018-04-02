@@ -120,4 +120,32 @@ class EnvUtilsSpec extends Specification {
         "/usr/local/bin/mate -w" == envMap.get("EDITOR")
         "foo\nbar" == envMap.get("multiline")
     }
+
+    @Unroll
+    def "Shell variable substitution: #inputString"(
+            String inputString,
+            String expectedString,
+            Map<String, String> envMap
+    ) {
+        when:
+        String outputString = EnvUtils.expandShellVariables(inputString, envMap)
+
+        then:
+        expectedString == outputString
+
+        where:
+        inputString             | expectedString      | envMap
+        "foo"                   | "foo"               | [:]
+        "\${123}"               | "\${123}"           | [:]
+        "\${foo}"               | "bar"               | [foo: "bar"]
+        "\${_foo}"              | "bar"               | [_foo: "bar"]
+        "\${foo_foo}"           | "bar"               | [foo_foo: "bar"]
+        "\${foo_2}"             | "bar"               | [foo_2: "bar"]
+        "foo \$foo \${foo} foo" | "foo bar bar foo"   | [foo: "bar"]
+        "foo \$FOO \${FOO} foo" | "foo bar bar foo"   | [FOO: "bar", foo: "x"]
+        "\$foo\$foo\$foo"       | "barbarbar"         | [foo: "bar"]
+        "\$FOO\$FOO\$FOO"       | "barbarbar"         | [FOO: "bar"]
+        "\"\$/\$FOO/\$BAR/\$\"" | "\"\$/foo/bar/\$\"" | [FOO: "foo", BAR: "bar"]
+    }
+
 }

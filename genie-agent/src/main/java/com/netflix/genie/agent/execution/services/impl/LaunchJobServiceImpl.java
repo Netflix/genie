@@ -20,6 +20,7 @@ package com.netflix.genie.agent.execution.services.impl;
 
 import com.netflix.genie.agent.execution.exceptions.JobLaunchException;
 import com.netflix.genie.agent.execution.services.LaunchJobService;
+import com.netflix.genie.agent.utils.EnvUtils;
 import com.netflix.genie.agent.utils.PathUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -28,7 +29,9 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -104,7 +107,22 @@ class LaunchJobServiceImpl implements LaunchJobService {
 
         // Configure arguments
         log.info("Job command-line: {}", Arrays.toString(commandLine.toArray()));
-        processBuilder.command(commandLine);
+
+        final List<String> expandedCommandLine;
+        try {
+            expandedCommandLine = expandCommandLineVariables(
+                commandLine,
+                Collections.unmodifiableMap(currentEnvironmentVariables)
+            );
+        } catch (final EnvUtils.VariableSubstitutionException e) {
+            throw new JobLaunchException("Job command-line arguments variables could not be expanded");
+        }
+
+        if (!commandLine.equals(expandedCommandLine)) {
+            log.info("Job command-line with variables expanded: {}", Arrays.toString(expandedCommandLine.toArray()));
+        }
+
+        processBuilder.command(expandedCommandLine);
 
         if (interactive) {
             processBuilder.inheritIO();
@@ -118,5 +136,20 @@ class LaunchJobServiceImpl implements LaunchJobService {
         } catch (final IOException | SecurityException e) {
             throw new JobLaunchException("Failed to launch job: ", e);
         }
+    }
+
+    private List<String> expandCommandLineVariables(
+        final List<String> commandLine,
+        final Map<String, String> environmentVariables
+    ) throws EnvUtils.VariableSubstitutionException {
+        final ArrayList<String> expandedCommandLine = new ArrayList<>(commandLine.size());
+
+        for (final String argument : commandLine) {
+            expandedCommandLine.add(
+                EnvUtils.expandShellVariables(argument, environmentVariables)
+            );
+        }
+
+        return Collections.unmodifiableList(expandedCommandLine);
     }
 }

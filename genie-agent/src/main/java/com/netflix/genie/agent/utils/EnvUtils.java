@@ -26,6 +26,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.regex.Matcher;
@@ -38,6 +39,13 @@ import java.util.regex.Pattern;
  * @since 4.0.0
  */
 public final class EnvUtils {
+    private static final Pattern SHELL_VARIABLE_REGEX = Pattern.compile(
+        ".*\\$([a-zA-Z_][a-zA-Z0-9_]*).*"
+    );
+
+    private static final Pattern SHELL_VARIABLE_WITH_BRACES_REGEX = Pattern.compile(
+        ".*\\$\\{([a-zA-Z_][a-zA-Z0-9_]*)}.*"
+    );
 
     // Note: all regex expect values to be enclosed in single quotes because that's how the script (genie-env.sh)
     // outputs them.
@@ -173,11 +181,72 @@ public final class EnvUtils {
     }
 
     /**
+     * Performs shell environment variables expansion on the given string.
+     *
+     * @param inputString a string, possibly containing shell variables
+     * @param environmentVariablesMap a map of string environment variables
+     * @return a new string with variables expanded
+     * @throws VariableSubstitutionException if the value for a variable appearing in input is not found in the map
+     */
+    public static String expandShellVariables(
+        final String inputString,
+        final Map<String, String> environmentVariablesMap
+    ) throws VariableSubstitutionException {
+        String outputString = inputString;
+
+        boolean variableSubstituted = true;
+        while (variableSubstituted) {
+            variableSubstituted = false;
+
+            Matcher matcher;
+
+            matcher = SHELL_VARIABLE_REGEX.matcher(outputString);
+            if (matcher.matches()) {
+                final String variableName = matcher.group(1);
+                final String variableValue = environmentVariablesMap.get(variableName);
+                if (variableValue == null) {
+                    throw new VariableSubstitutionException(variableName, environmentVariablesMap);
+                }
+                outputString = outputString.replaceAll("\\$" + variableName, variableValue);
+                variableSubstituted = true;
+            }
+
+            matcher = SHELL_VARIABLE_WITH_BRACES_REGEX.matcher(outputString);
+            if (matcher.matches()) {
+                final String variableName = matcher.group(1);
+                final String variableValue = environmentVariablesMap.get(variableName);
+                if (variableValue == null) {
+                    throw new VariableSubstitutionException(variableName, environmentVariablesMap);
+                }
+                outputString = outputString.replaceAll("\\$\\{" + variableName + "}", variableValue);
+                variableSubstituted = true;
+            }
+        }
+
+        return outputString;
+    }
+
+    /**
      * Exception for parsing errors.
      */
     public static final class ParseException extends Exception {
         private ParseException(final String message) {
             super(message);
+        }
+    }
+
+    /**
+     * Exception for failed variable expansion due to missing value.
+     */
+    public static final class VariableSubstitutionException extends Exception {
+        private VariableSubstitutionException(final String variableName, final Map<String, String> envMap) {
+            super(
+                "Failed to substitute variable: "
+                    + variableName
+                    + "(environment variables: "
+                    + Arrays.toString(envMap.keySet().toArray())
+                    + ")"
+            );
         }
     }
 }
