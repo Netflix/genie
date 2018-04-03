@@ -57,12 +57,8 @@ public abstract class BaseStateAction implements StateAction {
             nextEvent = executeStateAction(executionContext);
             log.info("State action {} returned {} as next event", currentActionName, nextEvent);
         } catch (final Exception e) {
+            executionContext.setStateActionError(currentState, this.getClass(), e);
             nextEvent = Events.ERROR;
-            if (!context.getStateMachine().hasStateMachineError()) {
-                // Set error, will enable transitions to HANDLE_ERROR state.
-                // Don't override if an earlier one is set, original one is more relevant.
-                context.getStateMachine().setStateMachineError(e);
-            }
             log.error(
                 "Action {} failed with exception",
                 currentActionName,

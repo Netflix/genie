@@ -18,14 +18,18 @@
 
 package com.netflix.genie.agent.execution;
 
+import com.netflix.genie.agent.execution.statemachine.States;
 import com.netflix.genie.agent.execution.statemachine.actions.StateAction;
 import com.netflix.genie.common.dto.v4.JobSpecification;
+import org.apache.commons.lang3.tuple.Triple;
+import org.springframework.statemachine.action.Action;
 
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.validation.constraints.NotBlank;
 import java.io.File;
 import java.util.Deque;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -112,4 +116,31 @@ public interface ExecutionContext {
      * @return a deque of state actions executed
      */
     Deque<StateAction> getCleanupActions();
+
+    /**
+     * Record a state action failure to execute and threw an exception.
+     *
+     * @param state the state whose action failed with an exception
+     * @param actionClass the class of the state action that failed
+     * @param exception the exception thrown by the state action
+     */
+    void setStateActionError(
+        final States state,
+        final Class<? extends Action> actionClass,
+        final Exception exception
+    );
+
+    /**
+     * Whether any state action executed so far failed.
+     *
+     * @return true if at least one state action failed with exception rather than completing successfully
+     */
+    boolean hasStateActionError();
+
+    /**
+     * Get the list of state actions that failed during execution, if any.
+     *
+     * @return a list of actions that failed in the form of a Triple.
+     */
+    List<Triple<States, Class<? extends Action>, Exception>> getStateActionErrors();
 }
