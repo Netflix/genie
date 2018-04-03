@@ -18,17 +18,23 @@
 
 package com.netflix.genie.agent.execution;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
+import com.netflix.genie.agent.execution.statemachine.States;
 import com.netflix.genie.agent.execution.statemachine.actions.StateAction;
 import com.netflix.genie.common.dto.v4.JobSpecification;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Triple;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.statemachine.action.Action;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.concurrent.ThreadSafe;
 import javax.validation.constraints.NotBlank;
 import java.io.File;
+import java.util.Collections;
 import java.util.Deque;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -50,6 +56,8 @@ class ExecutionContextImpl implements ExecutionContext {
     private final AtomicReference<JobSpecification> jobSpecRef = new AtomicReference<>();
     private final AtomicReference<Map<String, String>> jobEnvironmentRef = new AtomicReference<>();
     private final Deque<StateAction> cleanupActions = Queues.newArrayDeque();
+    private final List<Triple<States, Class<? extends Action>, Exception>> stateActionErrors
+        = Collections.synchronizedList(Lists.newArrayList());
 
     /**
      * {@inheritDoc}
@@ -137,6 +145,34 @@ class ExecutionContextImpl implements ExecutionContext {
     @Override
     public Deque<StateAction> getCleanupActions() {
         return cleanupActions;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setStateActionError(
+        final States state,
+        final Class<? extends Action> actionClass,
+        final Exception exception
+    ) {
+        stateActionErrors.add(Triple.of(state, actionClass, exception));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean hasStateActionError() {
+        return !stateActionErrors.isEmpty();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<Triple<States, Class<? extends Action>, Exception>> getStateActionErrors() {
+        return Collections.unmodifiableList(stateActionErrors);
     }
 
     private static <T> void setIfNullOrTrow(final T value, final AtomicReference<T> reference) {

@@ -21,8 +21,10 @@ package com.netflix.genie.agent.execution.statemachine.actions
 import com.netflix.genie.agent.execution.ExecutionContext
 import com.netflix.genie.agent.execution.statemachine.Events
 import com.netflix.genie.agent.execution.statemachine.States
+import org.apache.commons.lang3.tuple.Triple
 import org.springframework.statemachine.StateContext
 import org.springframework.statemachine.StateMachine
+import org.springframework.statemachine.action.Action
 import org.springframework.statemachine.state.State
 import spock.lang.Specification
 
@@ -82,38 +84,11 @@ class BaseStateActionSpec extends Specification {
         stateAction.execute(stateContext)
 
         then:
-        4 * stateContext.getStateMachine() >> stateMachine
+        2 * stateContext.getStateMachine() >> stateMachine
         1 * stateMachine.getState() >> state
         1 * state.getId() >> States.READY
         1 * stateMachine.sendEvent(Events.ERROR) >> true
-        1 * stateMachine.setStateMachineError(exception)
-        1 * stateMachine.hasStateMachineError() >> false
-
-        expect:
-        executionContext.getCleanupActions().size() == 1
-        executionContext.getCleanupActions().contains(stateAction)
-    }
-
-    def "ExecuteThrowsWithErrorSet"() {
-        setup:
-        def exception = new IOException()
-        def stateAction = new BaseStateAction(executionContext) {
-            @Override
-            protected Events executeStateAction(ExecutionContext executionContext) {
-                throw exception
-            }
-        }
-
-        when:
-        stateAction.execute(stateContext)
-
-        then:
-        3 * stateContext.getStateMachine() >> stateMachine
-        1 * stateMachine.getState() >> state
-        1 * state.getId() >> States.READY
-        1 * stateMachine.sendEvent(Events.ERROR) >> false
-        0 * stateMachine.setStateMachineError(exception)
-        1 * stateMachine.hasStateMachineError() >> true
+        1 * executionContext.setStateActionError(States.READY, stateAction.getClass() as Class<? extends Action>, exception)
 
         expect:
         executionContext.getCleanupActions().size() == 1

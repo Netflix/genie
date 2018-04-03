@@ -18,20 +18,27 @@
 
 package com.netflix.genie.agent.cli
 
+import com.google.common.collect.Lists
+import com.netflix.genie.agent.execution.ExecutionContext
 import com.netflix.genie.agent.execution.statemachine.JobExecutionStateMachine
 import com.netflix.genie.agent.execution.statemachine.States
+import com.netflix.genie.agent.execution.statemachine.actions.BaseStateAction
 import com.netflix.genie.test.categories.UnitTest
+import org.apache.commons.lang3.tuple.Triple
 import org.junit.experimental.categories.Category
+import org.springframework.statemachine.action.Action
 import spock.lang.Specification
 
 @Category(UnitTest.class)
 class ExecCommandSpec extends Specification {
     ExecCommand.ExecCommandArguments args
     JobExecutionStateMachine stateMachine;
+    ExecutionContext execContext
 
     void setup() {
         args = Mock()
         stateMachine = Mock()
+        execContext = Mock()
     }
 
     void cleanup() {
@@ -39,7 +46,7 @@ class ExecCommandSpec extends Specification {
 
     def "Run"() {
         setup:
-        def execCommand = new ExecCommand(args, stateMachine)
+        def execCommand = new ExecCommand(args, stateMachine, execContext)
 
         when:
         execCommand.run()
@@ -51,7 +58,7 @@ class ExecCommandSpec extends Specification {
 
     def "Run interrupted"() {
         setup:
-        def execCommand = new ExecCommand(args, stateMachine)
+        def execCommand = new ExecCommand(args, stateMachine, execContext)
 
         when:
         execCommand.run()
@@ -65,7 +72,7 @@ class ExecCommandSpec extends Specification {
 
     def "Run fail"() {
         setup:
-        def execCommand = new ExecCommand(args, stateMachine)
+        def execCommand = new ExecCommand(args, stateMachine, execContext)
 
         when:
         execCommand.run()
@@ -73,6 +80,25 @@ class ExecCommandSpec extends Specification {
         then:
         1 * stateMachine.start()
         1 * stateMachine.waitForStop() >> null
+
+        thrown(RuntimeException.class)
+    }
+
+    def "Exec error"() {
+        setup:
+        List<Triple<States, Class<? extends Action>, Exception>> actionErrors = Lists.newArrayList(
+                Triple.of(States.SETUP_JOB, BaseStateAction.class, new RuntimeException())
+        )
+        def execCommand = new ExecCommand(args, stateMachine, execContext)
+
+        when:
+        execCommand.run()
+
+        then:
+        1 * stateMachine.start()
+        1 * stateMachine.waitForStop() >> States.END
+        1 * execContext.hasStateActionError() >> true
+        1 * execContext.getStateActionErrors() >> actionErrors
 
         thrown(RuntimeException.class)
     }
