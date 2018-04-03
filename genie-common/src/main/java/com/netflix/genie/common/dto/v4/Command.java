@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableList;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
 import javax.validation.Valid;
@@ -32,6 +33,7 @@ import javax.validation.constraints.Size;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * An immutable V4 Command resource.
@@ -46,8 +48,9 @@ public class Command extends CommonResource {
     @Valid
     private final CommandMetadata metadata;
     @NotEmpty(message = "At least one executable entry is required")
-    private final ImmutableList<@Size(max = 255, message = "Executable elements can only be 255 characters") String>
-        executable;
+    private final ImmutableList<
+        @NotEmpty(message = "A default executable element shouldn't be an empty string")
+        @Size(max = 255, message = "Executable elements can only be 255 characters") String> executable;
     @Min(
         value = 1,
         message = "The minimum amount of memory if desired is 1 MB. Probably should be much more than that"
@@ -70,7 +73,7 @@ public class Command extends CommonResource {
      * @param metadata   The metadata associated with this command
      * @param executable The executable command that will be used when a job is run with this command. Generally
      *                   this will start with the binary and be followed optionally by default arguments. Must have
-     *                   at least one
+     *                   at least one. Blanks will be removed
      * @param memory     The default memory that should be used to run a job with this command
      * @param checkDelay The amount of time (in milliseconds) to delay between checks of job status for jobs run using
      *                   this command. Min 1 but preferably much more
@@ -88,7 +91,12 @@ public class Command extends CommonResource {
     ) {
         super(id, created, updated, resources);
         this.metadata = metadata;
-        this.executable = ImmutableList.copyOf(executable);
+        this.executable = ImmutableList.copyOf(
+            executable
+                .stream()
+                .filter(StringUtils::isNotBlank)
+                .collect(Collectors.toList())
+        );
         this.memory = memory;
         this.checkDelay = checkDelay;
     }

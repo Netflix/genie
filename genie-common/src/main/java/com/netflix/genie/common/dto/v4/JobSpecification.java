@@ -24,11 +24,13 @@ import com.google.common.collect.ImmutableMap;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * This DTO represents all the information needed to execute a job by the Genie Agent.
@@ -53,7 +55,7 @@ public class JobSpecification {
     /**
      * Constructor.
      *
-     * @param commandArgs          Any command arguments for the job. Optional.
+     * @param commandArgs          Any command arguments for the job. Optional. Any blanks will be removed
      * @param job                  The execution resources for a specific job
      * @param cluster              The execution resources for a specific cluster used for a job
      * @param command              The execution resources for a specific command used for a job
@@ -73,7 +75,12 @@ public class JobSpecification {
         @JsonProperty("interactive") final boolean interactive,
         @JsonProperty("jobDirectoryLocation") final File jobDirectoryLocation
     ) {
-        this.commandArgs = commandArgs == null ? ImmutableList.of() : ImmutableList.copyOf(commandArgs);
+        this.commandArgs = commandArgs == null ? ImmutableList.of() : ImmutableList.copyOf(
+            commandArgs
+                .stream()
+                .filter(StringUtils::isNotBlank)
+                .collect(Collectors.toList())
+        );
         this.job = job;
         this.cluster = cluster;
         this.command = command;

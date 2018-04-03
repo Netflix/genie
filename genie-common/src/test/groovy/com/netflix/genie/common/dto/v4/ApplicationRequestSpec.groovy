@@ -56,5 +56,13 @@ class ApplicationRequestSpec extends Specification {
         request.getMetadata() == metadata
         !request.getRequestedId().isPresent()
         request.getResources() != null
+
+        when: "Requested id is blank it's ignored"
+        request = new ApplicationRequest.Builder(metadata).withRequestedId("   ").build()
+
+        then:
+        request.getMetadata() == metadata
+        !request.getRequestedId().isPresent()
+        request.getResources() != null
     }
 }

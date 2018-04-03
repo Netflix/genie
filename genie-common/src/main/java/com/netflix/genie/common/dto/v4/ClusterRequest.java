@@ -63,9 +63,7 @@ public class ClusterRequest extends CommonRequestImpl {
          * @param metadata The user supplied metadata about a cluster resource
          */
         @JsonCreator
-        public Builder(
-            @JsonProperty(value = "metadata", required = true) final ClusterMetadata metadata
-        ) {
+        public Builder(@JsonProperty(value = "metadata", required = true) final ClusterMetadata metadata) {
             super();
             this.bMetadata = metadata;
         }

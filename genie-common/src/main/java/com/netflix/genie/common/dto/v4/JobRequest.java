@@ -21,14 +21,17 @@ import com.google.common.collect.ImmutableList;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.io.File;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * All details a user will provide to Genie in order to run a job.
@@ -42,6 +45,7 @@ import java.util.Optional;
 @SuppressWarnings("checkstyle:finalclass")
 public class JobRequest extends CommonRequestImpl implements AgentJobRequest, ApiJobRequest {
     private final ImmutableList<
+        @NotEmpty(message = "A command argument shouldn't be an empty string")
         @Size(
             max = 10_000,
             message = "Max length of an individual command line argument is 10,000 characters"
@@ -114,7 +118,12 @@ public class JobRequest extends CommonRequestImpl implements AgentJobRequest, Ap
         @Nullable final AgentEnvironmentRequest requestedAgentEnvironment
     ) {
         super(requestedId, resources);
-        this.commandArgs = commandArgs == null ? ImmutableList.of() : ImmutableList.copyOf(commandArgs);
+        this.commandArgs = commandArgs == null ? ImmutableList.of() : ImmutableList.copyOf(
+            commandArgs
+                .stream()
+                .filter(StringUtils::isNotBlank)
+                .collect(Collectors.toList())
+        );
         this.archivingDisabled = archivingDisabled;
         this.timeout = timeout;
         this.interactive = interactive;

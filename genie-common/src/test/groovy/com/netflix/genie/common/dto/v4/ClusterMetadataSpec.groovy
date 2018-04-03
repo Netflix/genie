@@ -85,5 +85,24 @@ class ClusterMetadataSpec extends Specification {
         !clusterMetadata.getDescription().isPresent()
         clusterMetadata.getTags().isEmpty()
         !clusterMetadata.getMetadata().isPresent()
+
+        when: "Empty strings should result in not present"
+        def newTags = Sets.newHashSet(tags)
+        newTags.add("     ")
+        clusterMetadata = new ClusterMetadata.Builder(name, user, status)
+                .withVersion(" ")
+                .withDescription("")
+                .withTags(newTags)
+                .withMetadata(metadata)
+                .build()
+
+        then:
+        clusterMetadata.getName() == name
+        clusterMetadata.getUser() == user
+        clusterMetadata.getStatus() == status
+        !clusterMetadata.getVersion().isPresent()
+        !clusterMetadata.getDescription().isPresent()
+        clusterMetadata.getTags() == tags
+        clusterMetadata.getMetadata().orElse(Mock(JsonNode)) == metadata
     }
 }

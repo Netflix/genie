@@ -1062,38 +1062,39 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
      * @throws Exception when an unexpected error is encountered
      */
     @Test
-    public void cantCreateApplicationWithBlankFields() throws Exception {
+    public void canCreateApplicationWithBlankFields() throws Exception {
 
         final Set<String> stringSetWithBlank = Sets.newHashSet("foo", " ");
 
         final List<Application> invalidApplicationResources = Lists.newArrayList(
             new Application
                 .Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE)
-                .withId(ID)
+                .withId(UUID.randomUUID().toString())
                 .withSetupFile(" ")
                 .build(),
 
             new Application
                 .Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE)
-                .withId(ID)
+                .withId(UUID.randomUUID().toString())
                 .withConfigs(stringSetWithBlank)
                 .build(),
 
             new Application
                 .Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE)
-                .withId(ID)
+                .withId(UUID.randomUUID().toString())
                 .withDependencies(stringSetWithBlank)
                 .build(),
 
             new Application
                 .Builder(NAME, USER, VERSION, ApplicationStatus.ACTIVE)
-                .withId(ID)
+                .withId(UUID.randomUUID().toString())
                 .withTags(stringSetWithBlank)
                 .build()
         );
 
-        for (Application invalidApplicationResource : invalidApplicationResources) {
-            Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
+        long i = 0L;
+        for (final Application invalidApplicationResource : invalidApplicationResources) {
+            Assert.assertThat(this.applicationRepository.count(), Matchers.is(i));
 
             RestAssured
                 .given(this.getRequestSpecification())
@@ -1103,9 +1104,9 @@ public class ApplicationRestControllerIntegrationTests extends RestControllerInt
                 .port(this.port)
                 .post(APPLICATIONS_API)
                 .then()
-                .statusCode(Matchers.is(HttpStatus.PRECONDITION_FAILED.value()));
+                .statusCode(Matchers.is(HttpStatus.CREATED.value()));
 
-            Assert.assertThat(this.applicationRepository.count(), Matchers.is(0L));
+            Assert.assertThat(this.applicationRepository.count(), Matchers.is(++i));
         }
     }
 }

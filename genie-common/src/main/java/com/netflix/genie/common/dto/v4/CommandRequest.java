@@ -24,6 +24,7 @@ import com.google.common.collect.ImmutableList;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
 import javax.validation.Valid;
@@ -32,6 +33,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Fields representing all the values users can set when creating a new Command resource.
@@ -118,7 +120,8 @@ public class CommandRequest extends CommonRequestImpl {
          *
          * @param metadata   The user supplied metadata about a command resource
          * @param executable The executable arguments to use on job process launch. Typically the binary path followed
-         *                   by optional default parameters for that given binary. Must have at least one
+         *                   by optional default parameters for that given binary. Must have at least one. Blanks will
+         *                   be removed
          */
         @JsonCreator
         public Builder(
@@ -127,7 +130,11 @@ public class CommandRequest extends CommonRequestImpl {
         ) {
             super();
             this.bMetadata = metadata;
-            this.bExecutable = ImmutableList.copyOf(executable);
+            this.bExecutable = ImmutableList.copyOf(
+                executable
+                    .stream()
+                    .filter(StringUtils::isNotBlank)
+                    .collect(Collectors.toList()));
         }
 
         /**

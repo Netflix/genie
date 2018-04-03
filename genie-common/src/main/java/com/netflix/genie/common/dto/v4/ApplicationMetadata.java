@@ -24,6 +24,7 @@ import com.netflix.genie.common.dto.ApplicationStatus;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
@@ -99,7 +100,7 @@ public class ApplicationMetadata extends CommonMetadata {
          * @return The builder
          */
         public Builder withType(@Nullable final String type) {
-            this.bType = type;
+            this.bType = StringUtils.isBlank(type) ? null : type;
             return this;
         }
 

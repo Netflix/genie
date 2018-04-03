@@ -1601,35 +1601,36 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
      * @throws Exception when an unexpected error is encountered
      */
     @Test
-    public void cantCreateCommandWithBlankFields() throws Exception {
+    public void canCreateCommandWithBlankFields() throws Exception {
 
         final Set<String> stringSetWithBlank = Sets.newHashSet("foo", " ");
 
         final List<Command> invalidCommandResources = Lists.newArrayList(
             new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
-                .withId(ID)
+                .withId(UUID.randomUUID().toString())
                 .withSetupFile(" ")
                 .build(),
 
             new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
-                .withId(ID)
+                .withId(UUID.randomUUID().toString())
                 .withConfigs(stringSetWithBlank)
                 .build(),
 
             new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
-                .withId(ID)
+                .withId(UUID.randomUUID().toString())
                 .withDependencies(stringSetWithBlank)
 
                 .build(),
 
             new Command.Builder(NAME, USER, VERSION, CommandStatus.ACTIVE, EXECUTABLE, CHECK_DELAY)
-                .withId(ID)
+                .withId(UUID.randomUUID().toString())
                 .withTags(stringSetWithBlank)
                 .build()
         );
 
-        for (Command invalidCommandResource : invalidCommandResources) {
-            Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
+        long i = 0L;
+        for (final Command invalidCommandResource : invalidCommandResources) {
+            Assert.assertThat(this.commandRepository.count(), Matchers.is(i));
 
             RestAssured
                 .given(this.getRequestSpecification())
@@ -1639,9 +1640,9 @@ public class CommandRestControllerIntegrationTests extends RestControllerIntegra
                 .port(this.port)
                 .post(COMMANDS_API)
                 .then()
-                .statusCode(Matchers.is(HttpStatus.PRECONDITION_FAILED.value()));
+                .statusCode(Matchers.is(HttpStatus.CREATED.value()));
 
-            Assert.assertThat(this.commandRepository.count(), Matchers.is(0L));
+            Assert.assertThat(this.commandRepository.count(), Matchers.is(++i));
         }
     }
 }

@@ -59,4 +59,23 @@ class ExecutionResourceCriteriaSpec extends Specification {
         then:
         thrown(RuntimeException)
     }
+
+    def "Empty application id's are ignored"() {
+        def clusterCriteria = Lists.newArrayList(
+                new Criterion.Builder().withId(UUID.randomUUID().toString()).build(),
+                new Criterion.Builder().withId(UUID.randomUUID().toString()).build()
+        )
+
+        def commandCriterion = new Criterion.Builder().withStatus(CommandStatus.ACTIVE.toString()).build()
+        def validApplicationId = UUID.randomUUID().toString()
+        def applicationIds = Lists.newArrayList(" ", validApplicationId, "\t")
+
+        when:
+        def resourceCriteria = new ExecutionResourceCriteria(clusterCriteria, commandCriterion, applicationIds)
+
+        then:
+        resourceCriteria.getClusterCriteria() == clusterCriteria
+        resourceCriteria.getCommandCriterion() == commandCriterion
+        resourceCriteria.getApplicationIds() == Lists.newArrayList(validApplicationId)
+    }
 }

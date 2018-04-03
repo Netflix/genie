@@ -81,8 +81,7 @@ class ApplicationMetadataSpec extends Specification {
         !applicationMetadata.getType().isPresent()
 
         when:
-        applicationMetadata = new ApplicationMetadata.Builder(name, user, status)
-                .build()
+        applicationMetadata = new ApplicationMetadata.Builder(name, user, status).build()
 
         then:
         applicationMetadata.getName() == name
@@ -92,6 +91,27 @@ class ApplicationMetadataSpec extends Specification {
         !applicationMetadata.getDescription().isPresent()
         applicationMetadata.getTags().isEmpty()
         !applicationMetadata.getMetadata().isPresent()
+        !applicationMetadata.getType().isPresent()
+
+        when: "Empty strings should result in not present"
+        def newTags = Sets.newHashSet(tags)
+        newTags.add("     ")
+        applicationMetadata = new ApplicationMetadata.Builder(name, user, status)
+                .withVersion(" ")
+                .withDescription("")
+                .withTags(newTags)
+                .withMetadata(metadata)
+                .withType("\t")
+                .build()
+
+        then:
+        applicationMetadata.getName() == name
+        applicationMetadata.getUser() == user
+        applicationMetadata.getStatus() == status
+        !applicationMetadata.getVersion().isPresent()
+        !applicationMetadata.getDescription().isPresent()
+        applicationMetadata.getTags() == tags
+        applicationMetadata.getMetadata().orElse(Mock(JsonNode)) == metadata
         !applicationMetadata.getType().isPresent()
     }
 }

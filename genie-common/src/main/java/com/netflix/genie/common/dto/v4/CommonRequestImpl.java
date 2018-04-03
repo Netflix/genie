@@ -21,6 +21,7 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
 import javax.validation.Valid;
@@ -103,7 +104,7 @@ abstract class CommonRequestImpl implements CommonRequest {
          * @return The builder
          */
         public T withRequestedId(@Nullable final String requestedId) {
-            this.bRequestedId = requestedId;
+            this.bRequestedId = StringUtils.isBlank(requestedId) ? null : requestedId;
             return (T) this;
         }
 

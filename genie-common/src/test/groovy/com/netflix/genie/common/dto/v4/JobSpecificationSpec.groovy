@@ -98,6 +98,50 @@ class JobSpecificationSpec extends Specification {
         jobSpecification.getJobDirectoryLocation() == jobDirectoryLocation
     }
 
+    def "Can construct new job specification with empty optionals"() {
+        def jobId = UUID.randomUUID().toString()
+        def clusterId = UUID.randomUUID().toString()
+        def commandId = UUID.randomUUID().toString()
+        def applicationId = UUID.randomUUID().toString()
+
+        def commandArgs = Lists.newArrayList("one", "two", "three")
+        def emptyCommandArgs = Lists.newArrayList(commandArgs)
+        emptyCommandArgs.add("\n\n")
+        def job = new JobSpecification.ExecutionResource(jobId, new ExecutionEnvironment(null, null, null))
+        def cluster = new JobSpecification.ExecutionResource(clusterId, new ExecutionEnvironment(null, null, null))
+        def command = new JobSpecification.ExecutionResource(commandId, new ExecutionEnvironment(null, null, null))
+        def applications = Lists.newArrayList(
+                new JobSpecification.ExecutionResource(applicationId, new ExecutionEnvironment(null, null, null))
+        )
+        ImmutableMap<String, String> environmentVariables = ImmutableMap.of(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString()
+        )
+        def jobDirectoryLocation = new File(".")
+
+        when:
+        def jobSpecification = new JobSpecification(
+                emptyCommandArgs,
+                job,
+                cluster,
+                command,
+                applications,
+                environmentVariables,
+                false,
+                jobDirectoryLocation
+        )
+
+        then:
+        jobSpecification.getCommandArgs() == commandArgs
+        jobSpecification.getJob() == job
+        jobSpecification.getCluster() == cluster
+        jobSpecification.getCommand() == command
+        jobSpecification.getApplications() == applications
+        jobSpecification.getEnvironmentVariables() == environmentVariables
+        !jobSpecification.isInteractive()
+        jobSpecification.getJobDirectoryLocation() == jobDirectoryLocation
+    }
+
     def "Can construct execution resource without optionals"() {
         def id = UUID.randomUUID().toString()
 

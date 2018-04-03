@@ -26,8 +26,11 @@ import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Representation of various criterion options available. Used for determining which cluster and command are used to
@@ -40,14 +43,17 @@ import java.util.Set;
 @EqualsAndHashCode(doNotUseGetters = true)
 @ToString(doNotUseGetters = true)
 @JsonDeserialize(builder = Criterion.Builder.class)
+@SuppressWarnings("checkstyle:finalclass")
 public class Criterion {
 
     private final String id;
     private final String name;
     private final String status;
-    private final ImmutableSet<String> tags;
+    private final ImmutableSet<
+        @NotEmpty(message = "A tag can't be an empty string")
+        @Size(max = 255, message = "A tag can't be longer than 255 characters") String> tags;
 
-    Criterion(final Builder builder) throws GeniePreconditionException {
+    private Criterion(final Builder builder) throws GeniePreconditionException {
         this.id = builder.bId;
         this.name = builder.bName;
         this.status = builder.bStatus;
@@ -118,7 +124,7 @@ public class Criterion {
          * @return The builder
          */
         public Builder withId(@Nullable final String id) {
-            this.bId = id;
+            this.bId = StringUtils.isBlank(id) ? null : id;
             return this;
         }
 
@@ -129,7 +135,7 @@ public class Criterion {
          * @return The builder
          */
         public Builder withName(@Nullable final String name) {
-            this.bName = name;
+            this.bName = StringUtils.isBlank(name) ? null : name;
             return this;
         }
 
@@ -140,18 +146,22 @@ public class Criterion {
          * @return The builder
          */
         public Builder withStatus(@Nullable final String status) {
-            this.bStatus = status;
+            this.bStatus = StringUtils.isBlank(status) ? null : status;
             return this;
         }
 
         /**
          * Set the tags to use in the search.
          *
-         * @param tags The tags
+         * @param tags The tags. Any blanks will be removed
          * @return The builder
          */
         public Builder withTags(@Nullable final Set<String> tags) {
-            this.bTags = tags == null ? ImmutableSet.of() : ImmutableSet.copyOf(tags);
+            this.bTags = tags == null ? ImmutableSet.of() : ImmutableSet.copyOf(
+                tags
+                    .stream()
+                    .filter(StringUtils::isNotBlank)
+                    .collect(Collectors.toSet()));
             return this;
         }
 

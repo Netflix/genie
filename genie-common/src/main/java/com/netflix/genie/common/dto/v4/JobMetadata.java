@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.Email;
@@ -129,7 +130,7 @@ public class JobMetadata extends CommonMetadata {
          * @return The builder
          */
         public Builder withGroup(@Nullable final String group) {
-            this.bGroup = group;
+            this.bGroup = StringUtils.isBlank(group) ? null : group;
             return this;
         }
 
@@ -140,7 +141,7 @@ public class JobMetadata extends CommonMetadata {
          * @return The builder
          */
         public Builder withEmail(@Nullable final String email) {
-            this.bEmail = email;
+            this.bEmail = StringUtils.isBlank(email) ? null : email;
             return this;
         }
 
@@ -152,7 +153,7 @@ public class JobMetadata extends CommonMetadata {
          * @since 3.3.0
          */
         public Builder withGrouping(@Nullable final String grouping) {
-            this.bGrouping = grouping;
+            this.bGrouping = StringUtils.isBlank(grouping) ? null : grouping;
             return this;
         }
 
@@ -164,7 +165,7 @@ public class JobMetadata extends CommonMetadata {
          * @since 3.3.0
          */
         public Builder withGroupingInstance(@Nullable final String groupingInstance) {
-            this.bGroupingInstance = groupingInstance;
+            this.bGroupingInstance = StringUtils.isBlank(groupingInstance) ? null : groupingInstance;
             return this;
         }
 

@@ -89,5 +89,30 @@ class CommandSpec extends Specification {
         command.getExecutable() == executable
         !command.getMemory().isPresent()
         command.getCheckDelay() == checkDelay
+
+        when: "Executables contain blank strings they are removed"
+        def newExecutable = Lists.newArrayList(executable)
+        newExecutable.add("\t")
+        newExecutable.add("   ")
+        command = new Command(
+                id,
+                created,
+                updated,
+                null,
+                metadata,
+                newExecutable,
+                null,
+                checkDelay
+        )
+
+        then:
+        command.getId() == id
+        command.getCreated() == created
+        command.getUpdated() == updated
+        command.getResources() == new ExecutionEnvironment(null, null, null)
+        command.getMetadata() == metadata
+        command.getExecutable() == executable
+        !command.getMemory().isPresent()
+        command.getCheckDelay() == checkDelay
     }
 }
