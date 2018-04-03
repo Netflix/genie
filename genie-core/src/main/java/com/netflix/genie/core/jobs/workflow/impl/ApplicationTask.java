@@ -73,14 +73,16 @@ public class ApplicationTask extends GenieBaseTask {
      */
     @Override
     public void executeTask(
-        @NotNull
-        final Map<String, Object> context
+        @NotNull final Map<String, Object> context
     ) throws GenieException, IOException {
         final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
         final long start = System.nanoTime();
         try {
             final JobExecutionEnvironment jobExecEnv =
                 (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
+
+            MetricsUtils.addCommonJobWorkflowMetricTags(jobExecEnv, tags, NO_ID_FOUND);
+
             final String jobWorkingDirectory = jobExecEnv.getJobWorkingDir().getCanonicalPath();
             final String genieDir = jobWorkingDirectory
                 + JobConstants.FILE_PATH_DELIMITER

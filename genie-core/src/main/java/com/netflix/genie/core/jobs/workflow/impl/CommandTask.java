@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.core.jobs.workflow.impl;
 
-import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.core.jobs.AdminResources;
@@ -25,7 +24,6 @@ import com.netflix.genie.core.jobs.FileType;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
 import com.netflix.genie.core.services.impl.GenieFileTransferService;
-import com.netflix.genie.core.util.MetricsConstants;
 import com.netflix.genie.core.util.MetricsUtils;
 import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Registry;
@@ -74,9 +72,9 @@ public class CommandTask extends GenieBaseTask {
         try {
             final JobExecutionEnvironment jobExecEnv =
                 (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
-            final Command command = jobExecEnv.getCommand();
-            tags.put(MetricsConstants.TagKeys.COMMAND_NAME, command.getName());
-            tags.put(MetricsConstants.TagKeys.COMMAND_ID, command.getId().orElse(NO_ID_FOUND));
+
+            MetricsUtils.addCommonJobWorkflowMetricTags(jobExecEnv, tags, NO_ID_FOUND);
+
             final String jobWorkingDirectory = jobExecEnv.getJobWorkingDir().getCanonicalPath();
             final String genieDir = jobWorkingDirectory
                 + JobConstants.FILE_PATH_DELIMITER

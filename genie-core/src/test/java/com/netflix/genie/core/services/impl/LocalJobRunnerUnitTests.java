@@ -33,6 +33,7 @@ import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSubmitterService;
 import com.netflix.genie.test.categories.UnitTest;
+import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Registry;
 import com.netflix.spectator.api.Timer;
 import org.junit.Assert;
@@ -103,6 +104,8 @@ public class LocalJobRunnerUnitTests {
 
         final Registry registry = Mockito.mock(Registry.class);
         Mockito.when(registry.timer(Mockito.anyString())).thenReturn(Mockito.mock(Timer.class));
+        Mockito.when(registry.timer(Mockito.any(Id.class))).thenReturn(Mockito.mock(Timer.class));
+        Mockito.when(registry.createId(Mockito.anyString())).thenReturn(Mockito.mock(Id.class));
 
         this.jobSubmitterService = new LocalJobRunner(
             Mockito.mock(JobPersistenceService.class),

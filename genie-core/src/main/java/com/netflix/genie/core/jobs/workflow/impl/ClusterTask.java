@@ -25,7 +25,6 @@ import com.netflix.genie.core.jobs.FileType;
 import com.netflix.genie.core.jobs.JobConstants;
 import com.netflix.genie.core.jobs.JobExecutionEnvironment;
 import com.netflix.genie.core.services.impl.GenieFileTransferService;
-import com.netflix.genie.core.util.MetricsConstants;
 import com.netflix.genie.core.util.MetricsUtils;
 import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Registry;
@@ -56,10 +55,10 @@ public class ClusterTask extends GenieBaseTask {
      * Constructor.
      *
      * @param registry The metrics registry to use
-     * @param fts File transfer service
+     * @param fts      File transfer service
      */
     public ClusterTask(@NotNull final Registry registry,
-            @NotNull final GenieFileTransferService fts) {
+                       @NotNull final GenieFileTransferService fts) {
         super(registry);
         this.timerId = registry.createId("genie.jobs.tasks.clusterTask.timer");
         this.fts = fts;
@@ -76,8 +75,9 @@ public class ClusterTask extends GenieBaseTask {
             final JobExecutionEnvironment jobExecEnv =
                 (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
             final Cluster cluster = jobExecEnv.getCluster();
-            tags.put(MetricsConstants.TagKeys.CLUSTER_NAME, cluster.getName());
-            tags.put(MetricsConstants.TagKeys.CLUSTER_ID, cluster.getId().orElse(NO_ID_FOUND));
+
+            MetricsUtils.addCommonJobWorkflowMetricTags(jobExecEnv, tags, NO_ID_FOUND);
+
             final String jobWorkingDirectory = jobExecEnv.getJobWorkingDir().getCanonicalPath();
             final String genieDir = jobWorkingDirectory
                 + JobConstants.FILE_PATH_DELIMITER

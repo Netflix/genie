@@ -61,12 +61,9 @@ public class JobTask extends GenieBaseTask {
      * @throws GenieException If there is any problem.
      */
     public JobTask(
-        @NotNull
-        final AttachmentService attachmentService,
-        @NotNull
-        final Registry registry,
-        @NotNull
-        final GenieFileTransferService fts
+        @NotNull final AttachmentService attachmentService,
+        @NotNull final Registry registry,
+        @NotNull final GenieFileTransferService fts
     ) throws GenieException {
         super(registry);
         this.attachmentService = attachmentService;
@@ -84,6 +81,9 @@ public class JobTask extends GenieBaseTask {
         try {
             final JobExecutionEnvironment jobExecEnv
                 = (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
+
+            MetricsUtils.addCommonJobWorkflowMetricTags(jobExecEnv, tags, NO_ID_FOUND);
+
             final String jobWorkingDirectory = jobExecEnv.getJobWorkingDir().getCanonicalPath();
             final Writer writer = (Writer) context.get(JobConstants.WRITER_KEY);
             final String jobId = jobExecEnv

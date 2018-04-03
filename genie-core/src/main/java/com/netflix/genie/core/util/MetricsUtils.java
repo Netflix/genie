@@ -18,6 +18,9 @@
 package com.netflix.genie.core.util;
 
 import com.google.common.collect.Maps;
+import com.netflix.genie.common.dto.Cluster;
+import com.netflix.genie.common.dto.Command;
+import com.netflix.genie.core.jobs.JobExecutionEnvironment;
 
 import java.util.Map;
 
@@ -79,5 +82,48 @@ public final class MetricsUtils {
      */
     public static Map<String, String> newFailureTagsMapForException(final Throwable t) {
         return addFailureTagsWithException(Maps.newHashMap(), t);
+    }
+
+    /**
+     * Convenience method to add common tags from job execution environment, for
+     * slicing and dicing metrics, to the map of tags passed in.
+     * Populates defaultIdValue in case ids are not present in the job execution environment
+     * E.g defaultIdValue will be added to the tags maps for the cluster_id key in case cluster_id
+     * does not exist in jobExecEnv
+     *
+     * @param tags           The map of tags
+     * @param jobExecEnv     Genie job execution env
+     * @param defaultIdValue Default value for missing id in jobExecEnv
+     */
+    public static void addCommonJobWorkflowMetricTags(final JobExecutionEnvironment jobExecEnv,
+                                                      final Map<String, String> tags,
+                                                      final String defaultIdValue) {
+        addCommonJobWorkflowMetricTags(jobExecEnv.getCluster(), jobExecEnv.getCommand(), tags, defaultIdValue);
+    }
+
+    /**
+     * Convenience method to add common tags related to Cluster and Command, for
+     * slicing and dicing metrics, to the map of tags passed in.
+     * Populates defaultIdValue in case ids are not present in the objects passed in
+     * E.g defaultIdValue will be added to the tags maps for the cluster_id key in case cluster_id
+     * does not exist in Cluster object
+     *
+     * @param tags           The map of tags
+     * @param cluster        Cluster chosen for running the command
+     * @param command        Command chosen to be executed
+     * @param defaultIdValue Default value for missing id in jobExecEnv
+     */
+    public static void addCommonJobWorkflowMetricTags(final Cluster cluster,
+                                                      final Command command,
+                                                      final Map<String, String> tags,
+                                                      final String defaultIdValue) {
+        /* Add cluster tags */
+        tags.put(MetricsConstants.TagKeys.CLUSTER_NAME, cluster.getName());
+        tags.put(MetricsConstants.TagKeys.CLUSTER_ID, cluster.getId().orElse(defaultIdValue));
+
+        /* Add command tags  */
+        tags.put(MetricsConstants.TagKeys.COMMAND_NAME, command.getName());
+        tags.put(MetricsConstants.TagKeys.COMMAND_ID, command.getId().orElse(defaultIdValue));
+
     }
 }
