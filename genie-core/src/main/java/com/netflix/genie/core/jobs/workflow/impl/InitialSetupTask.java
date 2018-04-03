@@ -79,6 +79,9 @@ public class InitialSetupTask extends GenieBaseTask {
         try {
             final JobExecutionEnvironment jobExecEnv
                 = (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
+
+            MetricsUtils.addCommonJobWorkflowMetricTags(jobExecEnv, tags, NO_ID_FOUND);
+
             final String jobWorkingDirectory = jobExecEnv.getJobWorkingDir().getCanonicalPath();
             final Writer writer = (Writer) context.get(JobConstants.WRITER_KEY);
             final String jobId = jobExecEnv
@@ -456,6 +459,7 @@ public class InitialSetupTask extends GenieBaseTask {
      * Helper to convert a set of tags into a string that is a suitable value for a shell environment variable.
      * Adds double quotes as necessary (i.e. in case of spaces, newlines), performs escaping of in-tag quotes.
      * Input tags are sorted to produce a deterministic output value.
+     *
      * @param tags a set of tags or null
      * @return a CSV string
      */

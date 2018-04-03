@@ -195,6 +195,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                             Lists.newArrayList(StringUtils.splitByWholeSeparator(commandArgs, StringUtils.SPACE))
                         )
             );
+
             jobRequest.getDescription().ifPresent(jobBuilder::withDescription);
             if (!jobRequest.isDisableLogArchival()) {
                 jobBuilder.withArchiveLocation(
@@ -223,6 +224,8 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
             // Now that we have command how much memory should the job use?
             final int memory = jobRequest.getMemory()
                 .orElse(command.getMemory().orElse(this.jobsProperties.getMemory().getDefaultJobMemory()));
+
+            MetricsUtils.addCommonJobWorkflowMetricTags(cluster, command, tags, NO_ID_FOUND);
 
             // Save all the runtime information
             this.setRuntimeEnvironment(jobId, cluster, command, applications, memory);

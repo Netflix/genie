@@ -35,6 +35,8 @@ import com.netflix.genie.core.jobs.JobExecutionEnvironment;
 import com.netflix.genie.core.jobs.workflow.WorkflowTask;
 import com.netflix.genie.core.services.JobPersistenceService;
 import com.netflix.genie.core.services.JobSubmitterService;
+import com.netflix.genie.core.util.MetricsUtils;
+import com.netflix.spectator.api.Id;
 import com.netflix.spectator.api.Registry;
 import com.netflix.spectator.api.Timer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -72,13 +74,15 @@ public class LocalJobRunner implements JobSubmitterService {
     private final Resource baseWorkingDirPath;
     private final GenieEventBus genieEventBus;
 
-    private final Timer overallSubmitTimer;
     private final Timer createJobDirTimer;
     private final Timer createRunScriptTimer;
-    private final Timer executeJobTimer;
     private final Timer saveJobExecutionTimer;
     private final Timer publishJobStartedEventTimer;
     private final Timer createInitFailureDetailsFileTimer;
+    private final Id overallSubmitTimerId;
+    private final Id executeJobTimerId;
+
+    private final Registry registry;
 
     /**
      * Constructor create the object.
@@ -102,15 +106,17 @@ public class LocalJobRunner implements JobSubmitterService {
         this.baseWorkingDirPath = genieWorkingDir;
 
         // Metrics
-        this.overallSubmitTimer = registry.timer("genie.jobs.submit.localRunner.overall.timer");
+        this.overallSubmitTimerId = registry.createId("genie.jobs.submit.localRunner.overall.timer");
+        this.executeJobTimerId = registry.createId("genie.jobs.submit.localRunner.executeJob.timer");
         this.createJobDirTimer = registry.timer("genie.jobs.submit.localRunner.createJobDir.timer");
         this.createRunScriptTimer = registry.timer("genie.jobs.submit.localRunner.createRunScript.timer");
-        this.executeJobTimer = registry.timer("genie.jobs.submit.localRunner.executeJob.timer");
         this.saveJobExecutionTimer = registry.timer("genie.jobs.submit.localRunner.saveJobExecution.timer");
         this.publishJobStartedEventTimer = registry.timer("genie.jobs.submit.localRunner.publishJobStartedEvent.timer");
         this.createInitFailureDetailsFileTimer = registry.timer(
             "genie.jobs.submit.localRunner.createInitFailureDetailsFile.timer"
         );
+
+        this.registry = registry;
     }
 
     /**
@@ -132,9 +138,13 @@ public class LocalJobRunner implements JobSubmitterService {
         @Min(value = 1, message = "Memory can't be less than 1 MB") final int memory
     ) throws GenieException {
         final long start = System.nanoTime();
+        final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
 
         try {
             log.info("Beginning local job submission for {}", jobRequest);
+
+            MetricsUtils.addCommonJobWorkflowMetricTags(cluster, command, tags, NO_ID_FOUND);
+
             final String id = jobRequest.getId().orElseThrow(() -> new GenieServerException("No job id found."));
 
             try {
@@ -185,6 +195,7 @@ public class LocalJobRunner implements JobSubmitterService {
                 }
             } catch (final GeniePreconditionException gpe) {
                 log.error(gpe.getMessage(), gpe);
+                MetricsUtils.addFailureTagsWithException(tags, gpe);
                 this.createInitFailureDetailsFile(id, gpe);
                 this.genieEventBus.publishAsynchronousEvent(
                     new JobFinishedEvent(
@@ -194,6 +205,7 @@ public class LocalJobRunner implements JobSubmitterService {
                 throw gpe;
             } catch (final Exception e) {
                 log.error(e.getMessage(), e);
+                MetricsUtils.addFailureTagsWithException(tags, e);
                 this.createInitFailureDetailsFile(id, e);
                 this.genieEventBus.publishAsynchronousEvent(
                     new JobFinishedEvent(
@@ -203,7 +215,8 @@ public class LocalJobRunner implements JobSubmitterService {
                 throw e;
             }
         } finally {
-            this.overallSubmitTimer.record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+            registry.timer(overallSubmitTimerId.withTags(tags)).
+                record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
     }
 
@@ -310,12 +323,18 @@ public class LocalJobRunner implements JobSubmitterService {
 
     private JobExecution executeJob(final Map<String, Object> context, final File runScript) throws GenieException {
         final long start = System.nanoTime();
+        final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
         try (final Writer writer = new OutputStreamWriter(new FileOutputStream(runScript), StandardCharsets.UTF_8)) {
-            final String jobId = ((JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY))
+            final JobExecutionEnvironment jobExecutionEnvironment =
+                ((JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY));
+            final String jobId = jobExecutionEnvironment
                 .getJobRequest()
                 .getId()
                 .orElseThrow(() -> new GenieServerException("No job id. Unable to execute"));
             log.info("Executing job workflow for job {}", jobId);
+
+            MetricsUtils.addCommonJobWorkflowMetricTags(jobExecutionEnvironment, tags, NO_ID_FOUND);
+
             context.put(JobConstants.WRITER_KEY, writer);
 
             for (WorkflowTask workflowTask : this.jobWorkflowTasks) {
@@ -329,9 +348,11 @@ public class LocalJobRunner implements JobSubmitterService {
             log.info("Finished Executing job workflow for job {}", jobId);
             return (JobExecution) context.get(JobConstants.JOB_EXECUTION_DTO_KEY);
         } catch (final IOException ioe) {
+            MetricsUtils.addFailureTagsWithException(tags, ioe);
             throw new GenieServerException("Failed to execute job due to: " + ioe.getMessage(), ioe);
         } finally {
-            this.executeJobTimer.record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+            this.registry.timer(executeJobTimerId.withTags(tags)).
+                record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
     }
 }

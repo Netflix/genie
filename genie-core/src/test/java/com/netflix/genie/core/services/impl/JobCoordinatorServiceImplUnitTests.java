@@ -435,7 +435,9 @@ public class JobCoordinatorServiceImplUnitTests {
             .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
         Mockito
             .verify(this.coordinationTimerId, Mockito.times(1))
-            .withTags(SUCCESS_TIMER_TAGS);
+            .withTags(tagsCaptor.capture());
+        verifySuccessTags(tagsCaptor);
+
         Mockito
             .verify(this.noClusterSelectedCounter, Mockito.times(0)).increment();
         Mockito
@@ -546,7 +548,9 @@ public class JobCoordinatorServiceImplUnitTests {
             .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
         Mockito
             .verify(this.coordinationTimerId, Mockito.times(1))
-            .withTags(SUCCESS_TIMER_TAGS);
+            .withTags(tagsCaptor.capture());
+        verifySuccessTags(tagsCaptor);
+
         Mockito
             .verify(this.noClusterSelectedCounter, Mockito.times(0)).increment();
         Mockito
@@ -644,7 +648,9 @@ public class JobCoordinatorServiceImplUnitTests {
             .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
         Mockito
             .verify(this.coordinationTimerId, Mockito.times(1))
-            .withTags(SUCCESS_TIMER_TAGS);
+            .withTags(tagsCaptor.capture());
+        verifySuccessTags(tagsCaptor);
+
         Mockito
             .verify(this.noClusterSelectedCounter, Mockito.times(0)).increment();
         Mockito
@@ -731,7 +737,9 @@ public class JobCoordinatorServiceImplUnitTests {
 
             Mockito
                 .verify(this.coordinationTimerId, Mockito.times(1))
-                .withTags(MetricsUtils.newFailureTagsMapForException(new GeniePreconditionException("test")));
+                .withTags(tagsCaptor.capture());
+            verifyFailureTags(tagsCaptor, new GeniePreconditionException("test"));
+
             Mockito
                 .verify(this.noClusterSelectedCounter, Mockito.times(0)).increment();
             Mockito
@@ -832,7 +840,9 @@ public class JobCoordinatorServiceImplUnitTests {
 
             Mockito
                 .verify(this.coordinationTimerId, Mockito.times(1))
-                .withTags(MetricsUtils.newFailureTagsMapForException(new GenieServerUnavailableException("test")));
+                .withTags(tagsCaptor.capture());
+            verifyFailureTags(tagsCaptor, new GenieServerUnavailableException("test"));
+
             Mockito
                 .verify(this.noClusterSelectedCounter, Mockito.times(0)).increment();
             Mockito
@@ -924,7 +934,9 @@ public class JobCoordinatorServiceImplUnitTests {
             .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
         Mockito
             .verify(this.coordinationTimerId, Mockito.times(1))
-            .withTags(SUCCESS_TIMER_TAGS);
+            .withTags(tagsCaptor.capture());
+        verifySuccessTags(tagsCaptor);
+
         Mockito
             .verify(this.noClusterSelectedCounter, Mockito.times(0)).increment();
         Mockito
@@ -1015,9 +1027,9 @@ public class JobCoordinatorServiceImplUnitTests {
                 .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
             Mockito
                 .verify(this.coordinationTimerId, Mockito.times(1))
-                .withTags(MetricsUtils.newFailureTagsMapForException(
-                    new GenieUserLimitExceededException("test", "test", "test"))
-                );
+                .withTags(tagsCaptor.capture());
+            verifyFailureTags(tagsCaptor, new GenieUserLimitExceededException("test", "test", "test"));
+
             Mockito
                 .verify(this.noClusterSelectedCounter, Mockito.times(0)).increment();
             Mockito
@@ -1116,7 +1128,9 @@ public class JobCoordinatorServiceImplUnitTests {
                 .record(Mockito.anyLong(), Mockito.eq(TimeUnit.NANOSECONDS));
             Mockito
                 .verify(this.coordinationTimerId, Mockito.times(1))
-                .withTags(MetricsUtils.newFailureTagsMapForException(new RuntimeException("test")));
+                .withTags(tagsCaptor.capture());
+            verifyFailureTags(tagsCaptor, new RuntimeException("test"));
+
             Mockito
                 .verify(this.noClusterSelectedCounter, Mockito.times(0)).increment();
             Mockito
@@ -1339,5 +1353,50 @@ public class JobCoordinatorServiceImplUnitTests {
             .withNumAttachments(2)
             .withTotalSizeOfAttachments(28080L)
             .build();
+    }
+
+
+    /**
+     * Verify the presence of failure tags.
+     *
+     * @param argumentCaptor arguments captured in the unit test
+     * @param throwable      expected exception
+     */
+    private void verifyFailureTags(final ArgumentCaptor<Map<String, String>> argumentCaptor,
+                                   final Throwable throwable) {
+        final Map<String, String> failureTags = MetricsUtils.newFailureTagsMapForException(throwable);
+
+        Assert.assertEquals(argumentCaptor.getValue().get(MetricsConstants.TagKeys.STATUS),
+            failureTags.get(MetricsConstants.TagKeys.STATUS));
+        Assert.assertEquals(argumentCaptor.getValue().get(MetricsConstants.TagKeys.EXCEPTION_CLASS),
+            failureTags.get(MetricsConstants.TagKeys.EXCEPTION_CLASS));
+
+        verifyCommonTags(argumentCaptor);
+    }
+
+    /**
+     * Verify the presence of success tags.
+     *
+     * @param argumentCaptor arguments captured in the unit test
+     */
+    private void verifySuccessTags(final ArgumentCaptor<Map<String, String>> argumentCaptor) {
+        final Map<String, String> successTags = MetricsUtils.newSuccessTagsMap();
+
+        Assert.assertEquals(argumentCaptor.getValue().get(MetricsConstants.TagKeys.STATUS),
+            successTags.get(MetricsConstants.TagKeys.STATUS));
+
+        verifyCommonTags(argumentCaptor);
+    }
+
+    /**
+     * Verify the presence of common tags.
+     *
+     * @param argumentCaptor arguments captured in the unit test
+     */
+    private void verifyCommonTags(final ArgumentCaptor<Map<String, String>> argumentCaptor) {
+        Assert.assertTrue(argumentCaptor.getValue().containsKey(MetricsConstants.TagKeys.COMMAND_ID));
+        Assert.assertTrue(argumentCaptor.getValue().containsKey(MetricsConstants.TagKeys.COMMAND_NAME));
+        Assert.assertTrue(argumentCaptor.getValue().containsKey(MetricsConstants.TagKeys.CLUSTER_ID));
+        Assert.assertTrue(argumentCaptor.getValue().containsKey(MetricsConstants.TagKeys.CLUSTER_NAME));
     }
 }
