@@ -23,11 +23,14 @@ import com.google.common.collect.ImmutableSet;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Elements that should be brought into an execution environment for a given resource (job, cluster, etc).
@@ -39,10 +42,12 @@ import java.util.Set;
 @EqualsAndHashCode(doNotUseGetters = true)
 @ToString(doNotUseGetters = true)
 public class ExecutionEnvironment {
-    private final ImmutableSet<@Size(max = 1024, message = "Config file name is longer than 1024 characters") String>
-        configs;
-    private final ImmutableSet<@Size(max = 1024, message = "Dependency file is longer than 1024 characters") String>
-        dependencies;
+    private final ImmutableSet<
+        @NotEmpty(message = "The config file name can't be empty")
+        @Size(max = 1024, message = "Config file name is longer than 1024 characters") String> configs;
+    private final ImmutableSet<
+        @NotEmpty(message = "The dependency file name can't be empty")
+        @Size(max = 1024, message = "Dependency file is longer than 1024 characters") String> dependencies;
     @Size(max = 1024, message = "Max length of the setup file name is 1024 characters")
     private final String setupFile;
 
@@ -50,9 +55,9 @@ public class ExecutionEnvironment {
      * Constructor.
      *
      * @param configs      Any configuration files needed for a resource at execution time. 1024 characters max for
-     *                     each. Optional
+     *                     each. Optional. Any blanks will be removed
      * @param dependencies Any dependency files needed for a resource at execution time. 1024 characters max for each.
-     *                     Optional
+     *                     Optional. Any blanks will be removed
      * @param setupFile    Any file that should be run to setup a resource at execution time. 1024 characters max.
      *                     Optional
      */
@@ -62,9 +67,19 @@ public class ExecutionEnvironment {
         @JsonProperty("dependencies") @Nullable final Set<String> dependencies,
         @JsonProperty("setupFile") @Nullable final String setupFile
     ) {
-        this.configs = configs == null ? ImmutableSet.of() : ImmutableSet.copyOf(configs);
-        this.dependencies = dependencies == null ? ImmutableSet.of() : ImmutableSet.copyOf(dependencies);
-        this.setupFile = setupFile;
+        this.configs = configs == null ? ImmutableSet.of() : ImmutableSet.copyOf(
+            configs
+                .stream()
+                .filter(StringUtils::isNotBlank)
+                .collect(Collectors.toSet())
+        );
+        this.dependencies = dependencies == null ? ImmutableSet.of() : ImmutableSet.copyOf(
+            dependencies
+                .stream()
+                .filter(StringUtils::isNotBlank)
+                .collect(Collectors.toSet())
+        );
+        this.setupFile = StringUtils.isBlank(setupFile) ? null : setupFile;
     }
 
     /**

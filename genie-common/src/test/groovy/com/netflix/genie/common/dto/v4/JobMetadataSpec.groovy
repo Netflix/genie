@@ -100,5 +100,30 @@ class JobMetadataSpec extends Specification {
         !jobUserMetadata.getGroup().isPresent()
         !jobUserMetadata.getGrouping().isPresent()
         !jobUserMetadata.getGroupingInstance().isPresent()
+
+        when: "Empty optional fields are supplied they're ignored"
+        def newTags = Sets.newHashSet(tags)
+        newTags.add(" \t")
+        jobUserMetadata = new JobMetadata.Builder(name, user)
+                .withVersion("")
+                .withDescription(" ")
+                .withTags(newTags)
+                .withMetadata(metadata)
+                .withGroup("\n")
+                .withEmail("")
+                .withGrouping("\t\t")
+                .withGroupingInstance("\n\n")
+                .build()
+
+        then:
+        jobUserMetadata.getName() == name
+        jobUserMetadata.getUser() == user
+        !jobUserMetadata.getVersion().isPresent()
+        !jobUserMetadata.getDescription().isPresent()
+        jobUserMetadata.getTags() == tags
+        jobUserMetadata.getMetadata().orElse(Mock(JsonNode)) == metadata
+        !jobUserMetadata.getGroup().isPresent()
+        !jobUserMetadata.getGrouping().isPresent()
+        !jobUserMetadata.getGroupingInstance().isPresent()
     }
 }

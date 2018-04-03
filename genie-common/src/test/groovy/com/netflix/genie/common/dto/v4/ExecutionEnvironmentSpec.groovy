@@ -71,5 +71,17 @@ class ExecutionEnvironmentSpec extends Specification {
         environment.getSetupFile().orElse(UUID.randomUUID().toString()) == setupFile
         environment.getConfigs() != configs
         environment.getDependencies() != dependencies
+
+        when: "Empty resources are provided they're ignored"
+        environment = new ExecutionEnvironment(
+                Sets.newHashSet(" "),
+                Sets.newHashSet("\t", "\n"),
+                ""
+        )
+
+        then:
+        !environment.getSetupFile().isPresent()
+        environment.getConfigs().isEmpty()
+        environment.getDependencies().isEmpty()
     }
 }

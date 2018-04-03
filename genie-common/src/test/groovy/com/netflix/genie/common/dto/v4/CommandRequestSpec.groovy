@@ -68,5 +68,25 @@ class CommandRequestSpec extends Specification {
         request.getExecutable() == executable
         !request.getMemory().isPresent()
         !request.getCheckDelay().isPresent()
+
+        when: "Optional fields are blank they're ignored"
+        def newExecutable = Lists.newArrayList(executable)
+        newExecutable.add("\t")
+        newExecutable.add(" ")
+        newExecutable.add("")
+        request = new CommandRequest.Builder(metadata, newExecutable)
+                .withRequestedId(" ")
+                .withResources(resources)
+                .withMemory(memory)
+                .withCheckDelay(checkDelay)
+                .build()
+
+        then:
+        request.getMetadata() == metadata
+        !request.getRequestedId().isPresent()
+        request.getResources() == resources
+        request.getExecutable() == executable
+        request.getMemory().orElse(-1) == memory
+        request.getCheckDelay().orElse(null) == checkDelay
     }
 }

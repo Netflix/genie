@@ -1296,29 +1296,30 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
      * @throws Exception when an unexpected error is encountered
      */
     @Test
-    public void cantCreateClusterWithBlankFields() throws Exception {
+    public void canCreateClusterWithBlankFields() throws Exception {
         final List<Cluster> invalidClusterResources = Lists.newArrayList(
             new Cluster
                 .Builder(NAME, USER, VERSION, ClusterStatus.UP)
-                .withId(ID)
-                .withSetupFile(" ")
+                .withId(UUID.randomUUID().toString())
+                .withDependencies(Sets.newHashSet("foo", " "))
                 .build(),
 
             new Cluster
                 .Builder(NAME, USER, VERSION, ClusterStatus.UP)
-                .withId(ID)
+                .withId(UUID.randomUUID().toString())
                 .withConfigs(Sets.newHashSet("foo", " "))
                 .build(),
 
             new Cluster
                 .Builder(NAME, USER, VERSION, ClusterStatus.UP)
-                .withId(ID)
+                .withId(UUID.randomUUID().toString())
                 .withTags(Sets.newHashSet("foo", " "))
                 .build()
         );
 
-        for (Cluster invalidClusterResource : invalidClusterResources) {
-            Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
+        long i = 0L;
+        for (final Cluster invalidClusterResource : invalidClusterResources) {
+            Assert.assertThat(this.clusterRepository.count(), Matchers.is(i));
 
             RestAssured
                 .given(this.getRequestSpecification())
@@ -1328,9 +1329,9 @@ public class ClusterRestControllerIntegrationTests extends RestControllerIntegra
                 .port(this.port)
                 .post(CLUSTERS_API)
                 .then()
-                .statusCode(Matchers.is(HttpStatus.PRECONDITION_FAILED.value()));
+                .statusCode(Matchers.is(HttpStatus.CREATED.value()));
 
-            Assert.assertThat(this.clusterRepository.count(), Matchers.is(0L));
+            Assert.assertThat(this.clusterRepository.count(), Matchers.is(++i));
         }
     }
 }

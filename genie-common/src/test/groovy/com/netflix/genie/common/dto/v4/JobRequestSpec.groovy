@@ -103,6 +103,23 @@ class JobRequestSpec extends Specification {
         !jobRequest.getTimeout().isPresent()
         jobRequest.getResources() != null
         jobRequest.getRequestedAgentEnvironment() == new AgentEnvironmentRequest.Builder().build()
+
+        when: "Command args are blank they're ignored"
+        jobRequest = new ApiJobRequest.Builder(metadata, criteria)
+                .withCommandArgs(Lists.newArrayList(" ", "\t"))
+                .withRequestedAgentEnvironment(null)
+                .build()
+
+        then:
+        jobRequest.getMetadata() == metadata
+        jobRequest.getCriteria() == criteria
+        !jobRequest.getRequestedId().isPresent()
+        jobRequest.getCommandArgs().isEmpty()
+        !jobRequest.isArchivingDisabled()
+        !jobRequest.isInteractive()
+        !jobRequest.getTimeout().isPresent()
+        jobRequest.getResources() != null
+        jobRequest.getRequestedAgentEnvironment() == new AgentEnvironmentRequest.Builder().build()
     }
 
     def "Can build immutable agent job request"() {
@@ -171,6 +188,22 @@ class JobRequestSpec extends Specification {
         !jobRequest.getTimeout().isPresent()
         jobRequest.getResources() != null
         jobRequest.getRequestedJobDirectoryLocation().orElse(null) == new File(jobDirectoryLocation)
+
+        when: "Empty command args are supplied they're ignored"
+        jobRequest = new AgentJobRequest.Builder(metadata, criteria, jobDirectoryLocation)
+                .withCommandArgs(Lists.newArrayList(" ", "\n"))
+                .build()
+
+        then:
+        jobRequest.getMetadata() == metadata
+        jobRequest.getCriteria() == criteria
+        !jobRequest.getRequestedId().isPresent()
+        jobRequest.getCommandArgs().isEmpty()
+        !jobRequest.isArchivingDisabled()
+        !jobRequest.isInteractive()
+        !jobRequest.getTimeout().isPresent()
+        jobRequest.getResources() != null
+        jobRequest.getRequestedJobDirectoryLocation().orElse(null) == new File(jobDirectoryLocation)
     }
 
     def "Can build job request"() {
@@ -218,6 +251,31 @@ class JobRequestSpec extends Specification {
                 null,
                 null,
                 null,
+                false,
+                null,
+                false,
+                metadata,
+                criteria,
+                null
+        )
+
+        then:
+        jobRequest.getMetadata() == metadata
+        jobRequest.getCriteria() == criteria
+        !jobRequest.getRequestedId().isPresent()
+        jobRequest.getCommandArgs().isEmpty()
+        !jobRequest.isArchivingDisabled()
+        !jobRequest.isInteractive()
+        !jobRequest.getTimeout().isPresent()
+        jobRequest.getResources() != null
+        !jobRequest.getRequestedJobDirectoryLocation().isPresent()
+        jobRequest.getRequestedAgentEnvironment() != null
+
+        when: "Empty command args are supplied they're ignored"
+        jobRequest = new JobRequest(
+                null,
+                null,
+                Lists.newArrayList("\n\n"),
                 false,
                 null,
                 false,

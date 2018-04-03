@@ -84,5 +84,24 @@ class CommandMetadataSpec extends Specification {
         !commandMetadata.getDescription().isPresent()
         commandMetadata.getTags().isEmpty()
         !commandMetadata.getMetadata().isPresent()
+
+        when: "Empty strings should result in not present"
+        def newTags = Sets.newHashSet(tags)
+        newTags.add("     ")
+        commandMetadata = new CommandMetadata.Builder(name, user, status)
+                .withVersion(" ")
+                .withDescription("")
+                .withTags(newTags)
+                .withMetadata(metadata)
+                .build()
+
+        then:
+        commandMetadata.getName() == name
+        commandMetadata.getUser() == user
+        commandMetadata.getStatus() == status
+        !commandMetadata.getVersion().isPresent()
+        !commandMetadata.getDescription().isPresent()
+        commandMetadata.getTags() == tags
+        commandMetadata.getMetadata().orElse(Mock(JsonNode)) == metadata
     }
 }

@@ -25,6 +25,7 @@ import com.netflix.genie.common.util.GenieObjectMapper;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotEmpty;
@@ -32,6 +33,7 @@ import javax.validation.constraints.Size;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Metadata fields common to all Genie resources (Jobs, clusters, etc).
@@ -54,7 +56,9 @@ public abstract class CommonMetadata {
     @Size(max = 1000, message = "The description can be no longer than 1000 characters")
     private final String description;
     private final JsonNode metadata;
-    private final ImmutableSet<@Size(max = 255, message = "A tag can't be longer than 255 characters") String> tags;
+    private final ImmutableSet<
+        @NotEmpty(message = "A tag can't be an empty string")
+        @Size(max = 255, message = "A tag can't be longer than 255 characters") String> tags;
 
     /**
      * Constructor.
@@ -150,7 +154,7 @@ public abstract class CommonMetadata {
          * @return The builder
          */
         public T withVersion(@Nullable final String version) {
-            this.bVersion = version;
+            this.bVersion = StringUtils.isBlank(version) ? null : version;
             return (T) this;
         }
 
@@ -161,18 +165,23 @@ public abstract class CommonMetadata {
          * @return The builder
          */
         public T withDescription(@Nullable final String description) {
-            this.bDescription = description;
+            this.bDescription = StringUtils.isBlank(description) ? null : description;
             return (T) this;
         }
 
         /**
          * Set the tags to use for the resource.
          *
-         * @param tags The tags to use
+         * @param tags The tags to use. Blanks will be removed
          * @return The builder
          */
         public T withTags(@Nullable final Set<String> tags) {
-            this.bTags = tags == null ? ImmutableSet.of() : ImmutableSet.copyOf(tags);
+            this.bTags = tags == null ? ImmutableSet.of() : ImmutableSet.copyOf(
+                tags
+                    .stream()
+                    .filter(StringUtils::isNotBlank)
+                    .collect(Collectors.toSet())
+            );
             return (T) this;
         }
 

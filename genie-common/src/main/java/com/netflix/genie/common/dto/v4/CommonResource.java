@@ -22,6 +22,7 @@ import lombok.Getter;
 import lombok.ToString;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.time.Instant;
 
@@ -36,6 +37,7 @@ import java.time.Instant;
 @ToString(doNotUseGetters = true)
 abstract class CommonResource {
 
+    @NotEmpty(message = "An id is required")
     @Size(max = 255, message = "Max length for the ID is 255 characters")
     private final String id;
     private final Instant created;

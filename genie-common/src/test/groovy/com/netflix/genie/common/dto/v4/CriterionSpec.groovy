@@ -114,4 +114,31 @@ class CriterionSpec extends Specification {
         criterion.getStatus().orElse(UUID.randomUUID().toString()) == status
         criterion.getTags() != tags
     }
+
+    def "Empty strings and blank tags are treated as not present"() {
+        when:
+        new Criterion.Builder()
+                .withId("\t")
+                .withName(" ")
+                .withStatus("\n")
+                .withTags(Sets.newHashSet(""))
+                .build()
+
+        then:
+        thrown(GeniePreconditionException)
+
+        when:
+        def criterion = new Criterion.Builder()
+                .withId("\t")
+                .withName(" ")
+                .withStatus("\n")
+                .withTags(Sets.newHashSet("valid tag", " "))
+                .build()
+
+        then:
+        !criterion.getId().isPresent()
+        !criterion.getName().isPresent()
+        !criterion.getStatus().isPresent()
+        criterion.getTags() == Sets.newHashSet("valid tag")
+    }
 }

@@ -39,7 +39,6 @@ class ApplicationSpec extends Specification {
                 .withType(UUID.randomUUID().toString())
                 .build()
         def id = UUID.randomUUID().toString()
-        def status = ApplicationStatus.ACTIVE
         def resources = new ExecutionEnvironment(null, null, UUID.randomUUID().toString())
         def created = Instant.now()
         def updated = Instant.now()

@@ -165,7 +165,6 @@ class JobSpecificationServiceAdapterSpec extends Specification {
         def jobRequest2 = JobSpecificationServiceAdapter.toJobRequestDTO(resolveJobSpecificationRequest2)
 
         then:
-        resolveJobSpecificationRequest2 == resolveJobSpecificationRequest
         jobRequest2 == jobRequest
 
 

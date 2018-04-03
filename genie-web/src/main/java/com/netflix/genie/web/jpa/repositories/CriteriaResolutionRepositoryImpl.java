@@ -21,11 +21,13 @@ import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.dto.v4.Criterion;
 import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nonnull;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -104,8 +106,20 @@ public class CriteriaResolutionRepositoryImpl implements CriteriaResolutionRepos
 
         query.append(" WHERE");
 
-        criterion.getId().ifPresent(id -> query.append(" c.unique_id = '").append(id).append("' AND"));
-        criterion.getName().ifPresent(name -> query.append(" c.name = '").append(name).append("' AND"));
+        criterion.getId().ifPresent(
+            id -> {
+                if (StringUtils.isNotBlank(id)) {
+                    query.append(" c.unique_id = '").append(id).append("' AND");
+                }
+            }
+        );
+        criterion.getName().ifPresent(
+            name -> {
+                if (StringUtils.isNotBlank(name)) {
+                    query.append(" c.name = '").append(name).append("' AND");
+                }
+            }
+        );
 
         if (hasTags) {
             query
@@ -121,9 +135,17 @@ public class CriteriaResolutionRepositoryImpl implements CriteriaResolutionRepos
                 .append(") AND");
         }
 
+        final String status;
+        final Optional<String> criterionStatus = criterion.getStatus();
+        if (criterionStatus.isPresent()) {
+            final String unwrappedStatus = criterionStatus.get();
+            status = StringUtils.isBlank(unwrappedStatus) ? criteriaType.getDefaultStatus() : unwrappedStatus;
+        } else {
+            status = criteriaType.getDefaultStatus();
+        }
         query
             .append(" c.status = '")
-            .append(criterion.getStatus().orElse(criteriaType.getDefaultStatus()))
+            .append(status)
             .append("'");
 
         if (hasTags) {

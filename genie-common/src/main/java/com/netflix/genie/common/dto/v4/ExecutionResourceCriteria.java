@@ -23,12 +23,14 @@ import com.google.common.collect.ImmutableList;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Container for various options for user supplying criteria for the execution environment of a job.
@@ -55,7 +57,7 @@ public class ExecutionResourceCriteria {
      * @param commandCriterion The command criterion used to find a command to run on the cluster for job execution.
      *                         Not null.
      * @param applicationIds   The ordered list of application ids to override the applications associated with
-     *                         selected command for job execution. Optional.
+     *                         selected command for job execution. Optional. Any blanks will be removed
      */
     @JsonCreator
     public ExecutionResourceCriteria(
@@ -65,7 +67,12 @@ public class ExecutionResourceCriteria {
     ) {
         this.clusterCriteria = ImmutableList.copyOf(clusterCriteria);
         this.commandCriterion = commandCriterion;
-        this.applicationIds = applicationIds == null ? ImmutableList.of() : ImmutableList.copyOf(applicationIds);
+        this.applicationIds = applicationIds == null ? ImmutableList.of() : ImmutableList.copyOf(
+            applicationIds
+                .stream()
+                .filter(StringUtils::isNotBlank)
+                .collect(Collectors.toList())
+        );
     }
 
     /**
