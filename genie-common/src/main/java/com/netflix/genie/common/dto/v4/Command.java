@@ -50,7 +50,7 @@ public class Command extends CommonResource {
     @NotEmpty(message = "At least one executable entry is required")
     private final ImmutableList<
         @NotEmpty(message = "A default executable element shouldn't be an empty string")
-        @Size(max = 255, message = "Executable elements can only be 255 characters") String> executable;
+        @Size(max = 1024, message = "Executable elements can only be 1024 characters") String> executable;
     @Min(
         value = 1,
         message = "The minimum amount of memory if desired is 1 MB. Probably should be much more than that"

@@ -305,7 +305,7 @@ public final class DtoConverters {
             v3Command.getUpdated().orElse(Instant.now()),
             resources,
             metadataBuilder.build(),
-            Lists.newArrayList(StringUtils.split(v3Command.getExecutable(), ' ')),
+            Lists.newArrayList(StringUtils.split(v3Command.getExecutable())),
             v3Command.getMemory().orElse(null),
             v3Command.getCheckDelay()
         );

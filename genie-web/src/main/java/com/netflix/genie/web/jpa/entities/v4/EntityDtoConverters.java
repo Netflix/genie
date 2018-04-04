@@ -20,7 +20,6 @@ package com.netflix.genie.web.jpa.entities.v4;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.v4.Application;
 import com.netflix.genie.common.dto.v4.ApplicationMetadata;
 import com.netflix.genie.common.dto.v4.Cluster;
@@ -38,7 +37,6 @@ import com.netflix.genie.web.jpa.entities.FileEntity;
 import com.netflix.genie.web.jpa.entities.TagEntity;
 import com.netflix.genie.web.jpa.entities.projections.BaseProjection;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.stream.Collectors;
 
@@ -145,7 +143,7 @@ public final class EntityDtoConverters {
                 commandEntity.getSetupFile().isPresent() ? commandEntity.getSetupFile().get().getFile() : null
             ),
             metadataBuilder.build(),
-            Lists.newArrayList(StringUtils.split(commandEntity.getExecutable(), ' ')),
+            commandEntity.getExecutable(),
             commandEntity.getMemory().orElse(null),
             commandEntity.getCheckDelay()
         );

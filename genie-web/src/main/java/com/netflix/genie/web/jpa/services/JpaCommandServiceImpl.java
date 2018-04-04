@@ -54,7 +54,6 @@ import com.netflix.genie.web.services.CommandService;
 import com.netflix.genie.web.services.FileService;
 import com.netflix.genie.web.services.TagService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -564,8 +563,7 @@ public class JpaCommandServiceImpl extends JpaBaseService implements CommandServ
         final CommandEntity entity = new CommandEntity();
         entity.setUniqueId(request.getRequestedId().orElse(UUID.randomUUID().toString()));
         entity.setCheckDelay(request.getCheckDelay().orElse(com.netflix.genie.common.dto.Command.DEFAULT_CHECK_DELAY));
-        // TODO: Once entity executable saved as List modify this
-        entity.setExecutable(StringUtils.join(request.getExecutable(), ' '));
+        entity.setExecutable(request.getExecutable());
         request.getMemory().ifPresent(entity::setMemory);
         this.setEntityResources(entity, resources);
         this.setEntityTags(entity, metadata);
@@ -587,8 +585,7 @@ public class JpaCommandServiceImpl extends JpaBaseService implements CommandServ
         this.setEntityCommandMetadata(entity, metadata);
 
         entity.setCheckDelay(dto.getCheckDelay());
-        // TODO: Once entity executable saved as List modify this
-        entity.setExecutable(StringUtils.join(dto.getExecutable(), ' '));
+        entity.setExecutable(dto.getExecutable());
         entity.setMemory(dto.getMemory().orElse(null));
     }
 

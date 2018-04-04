@@ -220,7 +220,7 @@ class JpaServiceUtilsSpec extends Specification {
         final FileEntity setupFileEntity = new FileEntity()
         setupFileEntity.setFile(setupFile)
         entity.setSetupFile(setupFileEntity)
-        def executable = UUID.randomUUID().toString()
+        def executable = Lists.newArrayList(UUID.randomUUID().toString())
         entity.setExecutable(executable)
         def checkDelay = 2180234L
         entity.setCheckDelay(checkDelay)
@@ -239,7 +239,7 @@ class JpaServiceUtilsSpec extends Specification {
         command.getDescription().orElseGet(RandomSuppliers.STRING) == description
         command.getCreated().orElseGet(RandomSuppliers.INSTANT) == created
         command.getUpdated().orElseGet(RandomSuppliers.INSTANT) == updated
-        command.getExecutable() == executable
+        command.getExecutable() == StringUtils.join(executable, ' ')
         command.getCheckDelay() == checkDelay
         command.getTags() == tags
         command.getSetupFile().orElseGet(RandomSuppliers.STRING) == setupFile
