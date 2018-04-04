@@ -572,33 +572,5 @@ SELECT
   'Finished loading data into jobs_applications table' AS '';
 
 SELECT
-  CURRENT_TIMESTAMP     AS '',
-  'Dropping old tables' AS '';
-
-DROP TABLE IF EXISTS
-`job_metadata_320`,
-`job_executions_320`,
-`jobs_applications_320`,
-`jobs_320`,
-`job_requests_320`,
-`application_configs_320`,
-`application_dependencies_320`,
-`cluster_configs_320`,
-`cluster_dependencies_320`,
-`command_configs_320`,
-`command_dependencies_320`,
-`commands_applications_320`,
-`clusters_commands_320`,
-`applications_320`,
-`clusters_320`,
-`commands_320`;
-
-SELECT
-  CURRENT_TIMESTAMP              AS '',
-  'Finished dropping old tables' AS '';
-
-DROP TABLE IF EXISTS `criteria_tags_tmp`;
-
-SELECT
   CURRENT_TIMESTAMP                                                     AS '',
   'Finished loading data from old 3.2.0 jobs tables to 3.3.0 job table' AS '';
