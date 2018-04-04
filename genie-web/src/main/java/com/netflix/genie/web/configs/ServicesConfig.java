@@ -46,6 +46,7 @@ import com.netflix.genie.web.services.JobCoordinatorService;
 import com.netflix.genie.web.services.JobKillService;
 import com.netflix.genie.web.services.JobPersistenceService;
 import com.netflix.genie.web.services.JobSearchService;
+import com.netflix.genie.web.services.JobSpecificationService;
 import com.netflix.genie.web.services.JobStateService;
 import com.netflix.genie.web.services.JobSubmitterService;
 import com.netflix.genie.web.services.MailService;
@@ -376,7 +377,7 @@ public class ServicesConfig {
      * @param applicationService    Implementation of application service interface
      * @param clusterService        Implementation of cluster service interface
      * @param commandService        Implementation of command service interface
-     * @param clusterLoadBalancers  Implementations of the cluster load balancer interface in invocation order
+     * @param specificationService  The job specification service to use
      * @param registry              The metrics registry to use
      * @param hostName              The host this Genie instance is running on
      * @return An instance of the JobCoordinatorService.
@@ -391,13 +392,10 @@ public class ServicesConfig {
         final ApplicationService applicationService,
         final ClusterService clusterService,
         final CommandService commandService,
-        final List<ClusterLoadBalancer> clusterLoadBalancers,
+        final JobSpecificationService specificationService,
         final MeterRegistry registry,
         final String hostName
     ) {
-        if (clusterLoadBalancers.isEmpty()) {
-            throw new IllegalStateException("Must have at least one active implementation of ClusterLoadBalancer");
-        }
         return new JobCoordinatorServiceImpl(
             jobPersistenceService,
             jobKillService,
@@ -407,7 +405,7 @@ public class ServicesConfig {
             jobSearchService,
             clusterService,
             commandService,
-            clusterLoadBalancers,
+            specificationService,
             registry,
             hostName
         );

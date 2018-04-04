@@ -30,18 +30,17 @@ import com.netflix.genie.web.jpa.repositories.JpaJobRepository;
 import com.netflix.genie.web.jpa.repositories.JpaTagRepository;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.services.ApplicationService;
-import com.netflix.genie.web.services.ClusterLoadBalancer;
 import com.netflix.genie.web.services.ClusterService;
 import com.netflix.genie.web.services.CommandService;
 import com.netflix.genie.web.services.FileService;
 import com.netflix.genie.web.services.JobKillService;
 import com.netflix.genie.web.services.JobPersistenceService;
 import com.netflix.genie.web.services.JobSearchService;
+import com.netflix.genie.web.services.JobSpecificationService;
 import com.netflix.genie.web.services.JobStateService;
 import com.netflix.genie.web.services.TagService;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.exec.Executor;
-import org.assertj.core.util.Lists;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -250,29 +249,7 @@ public class ServicesConfigUnitTests {
                 Mockito.mock(ApplicationService.class),
                 Mockito.mock(ClusterService.class),
                 Mockito.mock(CommandService.class),
-                Lists.newArrayList(Mockito.mock(ClusterLoadBalancer.class)),
-                Mockito.mock(MeterRegistry.class),
-                UUID.randomUUID().toString()
-            )
-        );
-    }
-
-    /**
-     * Can't get a bean for Job Coordinator Service.
-     */
-    @Test(expected = IllegalStateException.class)
-    public void cantGetJobCoordinatorServiceBeanWhenNoClusterLoadBalancers() {
-        Assert.assertNotNull(
-            this.servicesConfig.jobCoordinatorService(
-                Mockito.mock(JobPersistenceService.class),
-                Mockito.mock(JobKillService.class),
-                Mockito.mock(JobStateService.class),
-                Mockito.mock(JobSearchService.class),
-                new JobsProperties(),
-                Mockito.mock(ApplicationService.class),
-                Mockito.mock(ClusterService.class),
-                Mockito.mock(CommandService.class),
-                Lists.newArrayList(),
+                Mockito.mock(JobSpecificationService.class),
                 Mockito.mock(MeterRegistry.class),
                 UUID.randomUUID().toString()
             )
