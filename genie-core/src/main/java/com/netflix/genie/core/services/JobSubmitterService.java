@@ -41,13 +41,6 @@ import java.util.List;
 public interface JobSubmitterService {
 
     /**
-     * Constant representing a no id found for tags added to metrics.
-     * E.g this values is used for a missing cluster id when tagging
-     * metrics by cluster id
-     */
-    String NO_ID_FOUND = "<no id>";
-
-    /**
      * Submit the job for appropriate execution based on environment.
      *
      * @param jobRequest   of job to run
