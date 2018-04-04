@@ -37,16 +37,16 @@ service AgentRegistrationService {
 }
 
 message AgentRegistrationRequest {
-    string agentVersion = 1;
-    string agentHostname = 2;
-    string agentPid = 3;
+    string agent_version = 1;
+    string agent_hostname = 2;
+    string agent_pid = 3;
 }
 
 message AgentRegistrationResponse {
-    string serverHostname = 1;
-    string agentId = 2;
-    bool agentAccepted = 3;
-    string serverMessage = 4;
+    string server_hostname = 1;
+    string agent_id = 2;
+    bool agent_accepted = 3;
+    string server_message = 4;
 }
 
 //
@@ -80,7 +80,7 @@ message JobMetadata {
     repeated string dependencies = 13;
     repeated string command_args = 14;
     bool is_interactive = 15;
-    string jobDirectoryLocation = 16;
+    string job_directory_location = 16;
 }
 
 message ExecutionResourceCriteria {
@@ -113,7 +113,7 @@ message JobSpecification {
     repeated ExecutionResource applications = 5;
     map<string, string> environment_variables = 6;
     bool is_interactive = 7;
-    string jobDirectoryLocation = 8;
+    string job_directory_location = 8;
 }
 
 message JobSpecificationServiceError {
