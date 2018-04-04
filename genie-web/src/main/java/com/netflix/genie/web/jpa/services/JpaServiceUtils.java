@@ -43,6 +43,7 @@ import com.netflix.genie.web.jpa.entities.projections.JobMetadataProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobRequestProjection;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.stream.Collectors;
 
@@ -131,7 +132,7 @@ public final class JpaServiceUtils {
             commandEntity.getUser(),
             commandEntity.getVersion().orElse(NO_VERSION_SUPPLIED),
             commandEntity.getStatus(),
-            commandEntity.getExecutable(),
+            StringUtils.join(commandEntity.getExecutable(), ' '),
             commandEntity.getCheckDelay()
         )
             .withId(commandEntity.getUniqueId())

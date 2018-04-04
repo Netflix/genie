@@ -51,6 +51,7 @@ import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.Instant;
@@ -247,9 +248,9 @@ public class JobEntity extends BaseEntity implements
             @JoinColumn(name = "job_id", nullable = false, updatable = false)
         }
     )
-    @Column(name = "argument", length = 2048, nullable = false, updatable = false)
+    @Column(name = "argument", length = 10_000, nullable = false, updatable = false)
     @OrderColumn(name = "argument_order", nullable = false, updatable = false)
-    private List<String> commandArgs = new ArrayList<>();
+    private List<@NotBlank @Size(max = 10_000) String> commandArgs = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(

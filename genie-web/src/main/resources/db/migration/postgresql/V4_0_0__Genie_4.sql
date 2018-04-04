@@ -34,6 +34,57 @@ applications_320,
 clusters_320,
 commands_320;
 
+CREATE TABLE command_executable_arguments (
+  command_id     BIGINT        NOT NULL,
+  argument       VARCHAR(1024) NOT NULL,
+  argument_order INT           NOT NULL,
+  PRIMARY KEY (command_id, argument_order),
+  CONSTRAINT command_executable_arguments_command_id_fkey FOREIGN KEY (command_id) REFERENCES commands (id)
+  ON DELETE CASCADE
+);
+
+CREATE INDEX command_executable_arguments_command_id_index
+  ON command_executable_arguments (command_id);
+
+CREATE OR REPLACE FUNCTION genie_split_commands_330()
+  RETURNS VOID AS $$
+DECLARE
+  command_record   RECORD;
+  executable_local VARCHAR(255);
+  argument         VARCHAR(1024);
+  argument_order   INT;
+BEGIN
+
+  << COMMANDS_LOOP >>
+  FOR command_record IN
+  SELECT
+    id,
+    executable
+  FROM commands
+  LOOP
+
+    argument_order = 0;
+    executable_local = command_record.executable;
+    << COMMAND_ARGS_LOOP >> WHILE LENGTH(executable_local) > 0 LOOP
+      argument = SPLIT_PART(executable_local, ' ', 1);
+      executable_local = TRIM(LEADING argument FROM executable_local);
+      executable_local = TRIM(LEADING ' ' FROM executable_local);
+      IF LENGTH(argument) > 0
+      THEN
+        INSERT INTO command_executable_arguments
+        VALUES (command_record.id, argument, argument_order);
+        argument_order = argument_order + 1;
+      END IF;
+    END LOOP COMMAND_ARGS_LOOP;
+
+  END LOOP COMMANDS_LOOP;
+END;
+$$
+LANGUAGE plpgsql;
+
+SELECT genie_split_commands_330();
+DROP FUNCTION genie_split_commands_330();
+
 ALTER TABLE applications
   ALTER COLUMN version DROP NOT NULL,
   ALTER COLUMN version SET DEFAULT NULL;
@@ -44,7 +95,8 @@ ALTER TABLE clusters
 
 ALTER TABLE commands
   ALTER COLUMN version DROP NOT NULL,
-  ALTER COLUMN version SET DEFAULT NULL;
+  ALTER COLUMN version SET DEFAULT NULL,
+  DROP COLUMN executable;
 
 ALTER TABLE jobs
   ALTER COLUMN version DROP NOT NULL,

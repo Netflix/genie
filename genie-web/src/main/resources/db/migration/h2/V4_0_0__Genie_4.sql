@@ -16,6 +16,45 @@
  *
  */
 
+CREATE TABLE `command_executable_arguments` (
+  `command_id`     BIGINT(20)    NOT NULL,
+  `argument`       VARCHAR(1024) NOT NULL,
+  `argument_order` INT(11)       NOT NULL,
+  PRIMARY KEY (`command_id`, `argument_order`),
+  CONSTRAINT `COMMAND_EXECUTABLE_ARGUMENTS_COMMAND_ID_FK` FOREIGN KEY (`command_id`) REFERENCES `commands` (`id`)
+  ON DELETE CASCADE
+);
+
+CREATE INDEX `COMMAND_EXECUTABLE_ARGUMENTS_COMMAND_ID_INDEX`
+  ON `command_executable_arguments` (`command_id`);
+
+DROP ALIAS IF EXISTS SPLIT_COMMAND_EXECUTABLE;
+
+CREATE ALIAS SPLIT_COMMAND_EXECUTABLE AS $$
+import java.sql.Connection;
+import java.sql.ResultSet;
+import org.apache.commons.lang3.StringUtils;
+@CODE
+void splitCommandExecutable(final Connection con) throws Exception {
+	final ResultSet rs = con.createStatement().executeQuery("SELECT `id`, `executable` FROM `commands`;");
+
+	while (rs.next()) {
+	    final long commandId = rs.getLong(1);
+	    final String executable = rs.getString(2);
+      final String[] arguments = StringUtils.split(executable);
+      for (int i = 0; i < arguments.length; i++) {
+          con
+              .createStatement()
+              .executeUpdate("INSERT INTO `command_executable_arguments` VALUES (" + commandId + ", '" + arguments[i] + "', " + i + ");");
+      }
+	}
+}
+$$;
+
+CALL SPLIT_COMMAND_EXECUTABLE();
+
+DROP ALIAS IF EXISTS SPLIT_COMMAND_EXECUTABLE;
+
 ALTER TABLE `applications`
   ALTER COLUMN `version` SET NULL;
 ALTER TABLE `applications`
@@ -30,6 +69,8 @@ ALTER TABLE `commands`
   ALTER COLUMN `version` SET NULL;
 ALTER TABLE `commands`
   ALTER COLUMN `version` SET DEFAULT NULL;
+ALTER TABLE `commands`
+  DROP COLUMN `executable`;
 
 ALTER TABLE `jobs`
   ALTER COLUMN `version` SET NULL;

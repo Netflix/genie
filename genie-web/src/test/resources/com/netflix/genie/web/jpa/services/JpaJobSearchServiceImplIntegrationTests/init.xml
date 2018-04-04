@@ -333,7 +333,6 @@
         genie_user="tgianos"
         name="spark"
         version="1.6.0"
-        executable="spark"
         check_delay="10000"
         status="ACTIVE"
     />
@@ -345,6 +344,12 @@
     <commands_tags
         command_id="1"
         tag_id="5"
+    />
+
+    <command_executable_arguments
+        command_id="1"
+        argument="spark"
+        argument_order="0"
     />
 
     <commands_applications command_id="1" application_id="1" application_order="0"/>

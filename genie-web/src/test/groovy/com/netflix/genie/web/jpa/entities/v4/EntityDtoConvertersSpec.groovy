@@ -25,9 +25,7 @@ import com.netflix.genie.common.dto.CommandStatus
 import com.netflix.genie.common.util.GenieObjectMapper
 import com.netflix.genie.test.suppliers.RandomSuppliers
 import com.netflix.genie.web.jpa.entities.*
-import org.apache.commons.lang3.StringUtils
 import spock.lang.Specification
-
 /**
  * Specifications for {@link EntityDtoConverters}.
  *
@@ -213,7 +211,7 @@ class EntityDtoConvertersSpec extends Specification {
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString()
         )
-        entity.setExecutable(StringUtils.join(executable, ' '))
+        entity.setExecutable(executable)
         def checkDelay = 2180234L
         entity.setCheckDelay(checkDelay)
         def memory = 10_241

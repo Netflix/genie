@@ -197,10 +197,15 @@
         genie_user="tgianos"
         name="pig_13_prod"
         version="1.2.3"
-        executable="pig"
         check_delay="10000"
         status="INACTIVE"
     />
 
     <commands_applications command_id="0" application_id="0" application_order="0"/>
+
+    <command_executable_arguments
+        command_id="0"
+        argument="pig"
+        argument_order="0"
+    />
 </dataset>

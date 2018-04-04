@@ -146,7 +146,6 @@
         genie_user="tgianos"
         name="pig_13_prod"
         version="1.2.3"
-        executable="pig"
         check_delay="18000"
         status="ACTIVE"
     />
@@ -170,6 +169,11 @@
         command_id="1"
         tag_id="3"
     />
+    <command_executable_arguments
+        command_id="1"
+        argument="pig"
+        argument_order="0"
+    />
 
     <commands_applications
         command_id="1"
@@ -186,7 +190,6 @@
         genie_user="amsharma"
         name="hive_11_prod"
         version="4.5.6"
-        executable="hive"
         check_delay="19000"
         status="INACTIVE"
     />
@@ -206,6 +209,11 @@
         command_id="2"
         tag_id="0"
     />
+    <command_executable_arguments
+        command_id="2"
+        argument="hive"
+        argument_order="0"
+    />
 
     <commands
         id="3"
@@ -216,7 +224,6 @@
         genie_user="tgianos"
         name="pig_11_prod"
         version="7.8.9"
-        executable="pig"
         check_delay="20000"
         status="DEPRECATED"
         metadata=
@@ -243,6 +250,11 @@
     <commands_tags
         command_id="3"
         tag_id="0"
+    />
+    <command_executable_arguments
+        command_id="3"
+        argument="pig"
+        argument_order="0"
     />
 
     <clusters

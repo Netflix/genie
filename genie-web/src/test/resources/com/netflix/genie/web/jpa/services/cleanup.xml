@@ -24,6 +24,7 @@
     <commands_configs/>
     <commands_dependencies/>
     <commands_tags/>
+    <command_executable_arguments/>
     <jobs_configs/>
     <jobs_dependencies/>
     <jobs_tags/>
