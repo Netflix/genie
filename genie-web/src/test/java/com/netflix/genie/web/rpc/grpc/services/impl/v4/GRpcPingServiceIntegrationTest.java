@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.rpc.services.impl;
+package com.netflix.genie.web.rpc.grpc.services.impl.v4;
 
 import com.netflix.genie.proto.PingRequest;
 import com.netflix.genie.proto.PingServiceGrpc;
@@ -31,13 +31,13 @@ import org.junit.experimental.categories.Category;
 import java.util.UUID;
 
 /**
- * Unit tests for the class PingServiceImpl using in-memory client/server channel.
+ * Unit tests for the class GRpcPingServiceImpl using in-memory client/server channel.
  *
  * @author mprimi
  * @since 4.0.0
  */
 @Category(IntegrationTest.class)
-public class PingServiceIntegrationTest {
+public class GRpcPingServiceIntegrationTest {
 
     private static final String HOST_NAME = "genie-foo.netflix.com";
     /**
@@ -53,7 +53,7 @@ public class PingServiceIntegrationTest {
      */
     @Before
     public void setUp() {
-        grpcServerRule.getServiceRegistry().addService(new PingServiceImpl(HOST_NAME));
+        grpcServerRule.getServiceRegistry().addService(new GRpcPingServiceImpl(HOST_NAME));
         blockingStub = PingServiceGrpc.newBlockingStub(grpcServerRule.getChannel());
     }
 
@@ -79,7 +79,7 @@ public class PingServiceIntegrationTest {
         Assert.assertNotNull(response.getTimestamp());
         Assert.assertEquals(
             HOST_NAME,
-            response.getServerMetadataOrThrow(PingServiceImpl.ServerMetadataKeys.SERVER_NAME)
+            response.getServerMetadataOrThrow(GRpcPingServiceImpl.ServerMetadataKeys.SERVER_NAME)
         );
     }
 

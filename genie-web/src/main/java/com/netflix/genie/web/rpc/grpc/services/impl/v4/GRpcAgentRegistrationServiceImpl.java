@@ -16,7 +16,7 @@
  *
  */
 
-package com.netflix.genie.web.rpc.services.impl;
+package com.netflix.genie.web.rpc.grpc.services.impl.v4;
 
 import com.netflix.genie.proto.AgentRegistrationRequest;
 import com.netflix.genie.proto.AgentRegistrationResponse;
@@ -42,11 +42,11 @@ import java.util.UUID;
     }
 )
 @Slf4j
-class AgentRegistrationServiceImpl extends AgentRegistrationServiceGrpc.AgentRegistrationServiceImplBase {
+class GRpcAgentRegistrationServiceImpl extends AgentRegistrationServiceGrpc.AgentRegistrationServiceImplBase {
 
     private final String hostName;
 
-    AgentRegistrationServiceImpl(
+    GRpcAgentRegistrationServiceImpl(
         final String hostName
     ) {
         this.hostName = hostName;
