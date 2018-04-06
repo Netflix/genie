@@ -22,6 +22,8 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.Application;
+import com.netflix.genie.common.dto.Cluster;
+import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobRequest;
@@ -154,6 +156,29 @@ public class JobCompletionService {
         final Map<String, String> tags = MetricsUtils.newSuccessTagsMap();
 
         try {
+            /*
+             * Get the cluster and command chosen for the job for tagging metrics.
+             * Swallowing any exception in getting those as this step is not
+             * critical and should not show that the entire job failed
+             */
+            Cluster cluster;
+            Command command;
+
+            try {
+                cluster = this.jobSearchService.getJobCluster(jobId);
+            } catch (final Exception e) {
+                log.warn("Unable to tag metrics with cluster", e);
+                cluster = null;
+            }
+
+            try {
+                command = this.jobSearchService.getJobCommand(jobId);
+            } catch (final Exception e) {
+                log.warn("Unable to tag metrics with command", e);
+                command = null;
+            }
+
+            MetricsUtils.addClusterAndCommandTags(cluster, command, tags);
             final Job job = this.retryTemplate.execute(context -> this.getJob(jobId));
 
             final JobStatus status = job.getStatus();

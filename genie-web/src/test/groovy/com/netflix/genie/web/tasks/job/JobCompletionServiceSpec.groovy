@@ -57,7 +57,12 @@ class JobCompletionServiceSpec extends Specification {
     private static final String NAME = UUID.randomUUID().toString()
     private static final String USER = UUID.randomUUID().toString()
     private static final String VERSION = UUID.randomUUID().toString()
+    private static final String CLUSTER_ID = UUID.randomUUID().toString()
+    private static final String COMMAND_ID = UUID.randomUUID().toString()
+    private static final long COMMAND_CHECK_DELAY = 1000
     private static final List<String> COMMAND_ARGS = Lists.newArrayList(UUID.randomUUID().toString())
+    Cluster cluster;
+    Command command;
     JobPersistenceService jobPersistenceService
     JobSearchService jobSearchService
     JobCompletionService jobCompletionService
@@ -108,6 +113,18 @@ class JobCompletionServiceSpec extends Specification {
         jobCompletionService = new JobCompletionService(jobPersistenceService, jobSearchService,
                 genieFileTransferService, new FileSystemResource("/tmp"), mailService, registry,
                 jobsProperties, new RetryTemplate())
+        cluster = new Cluster.Builder(NAME, USER, VERSION, ClusterStatus.UP)
+                .withId(CLUSTER_ID)
+                .build()
+        command = new Command.Builder(
+                NAME,
+                USER,
+                VERSION,
+                CommandStatus.ACTIVE,
+                null,
+                COMMAND_CHECK_DELAY)
+                .withId(COMMAND_ID)
+                .build()
     }
 
     def handleJobCompletion() throws Exception {
@@ -121,12 +138,8 @@ class JobCompletionServiceSpec extends Specification {
                 { throw new GenieServerException("null") } >>
                 { throw new GenieServerException("null") } >>
                 { throw new GenieServerException("null") }
-        completionTimerId.withTags(MetricsUtils.newFailureTagsMapForException(new GenieServerException("null")))
         1 * completionTimer.record(_, TimeUnit.NANOSECONDS)
-        timerTagsCapture == ImmutableMap.of(
-                MetricsConstants.TagKeys.EXCEPTION_CLASS, GenieServerException.class.canonicalName,
-                MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.FAILURE,
-        )
+        verifyFailureTags(timerTagsCapture, new GenieServerException("null"), null, null)
         0 * errorCounter.increment()
 
         when:
@@ -136,9 +149,7 @@ class JobCompletionServiceSpec extends Specification {
         1 * jobSearchService.getJob(jobId) >> new Job.Builder(NAME, USER, VERSION)
                 .withId(jobId).withStatus(JobStatus.SUCCEEDED).withCommandArgs(COMMAND_ARGS).build()
         0 * jobPersistenceService.updateJobStatus(jobId, _, _)
-        timerTagsCapture == ImmutableMap.of(
-                MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.SUCCESS,
-        )
+        verifySuccessTags(timerTagsCapture, null, null)
         0 * errorCounter.increment()
 
         when:
@@ -149,10 +160,8 @@ class JobCompletionServiceSpec extends Specification {
                 .withId(jobId).withStatus(JobStatus.RUNNING).withCommandArgs(COMMAND_ARGS).build()
         1 * jobPersistenceService.updateJobStatus(jobId, _, _)
         1 * completionTimer.record(_, TimeUnit.NANOSECONDS)
-        timerTagsCapture == ImmutableMap.of(
-                MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.SUCCESS,
-                JobCompletionService.JOB_FINAL_STATE, JobStatus.FAILED.toString()
-        )
+        verifySuccessTags(timerTagsCapture, null, null)
+        timerTagsCapture.get(JobCompletionService.JOB_FINAL_STATE).equals(JobStatus.FAILED.toString())
         4 * errorCounter.increment()
         counterTagsCaptures.containsAll(ImmutableList.of(
                 ImmutableMap.of(
@@ -185,11 +194,33 @@ class JobCompletionServiceSpec extends Specification {
         1 * jobPersistenceService.updateJobStatus(jobId, _, _)
         1 * mailService.sendEmail('admin@netflix.com', _, _)
         1 * completionTimer.record(_, TimeUnit.NANOSECONDS)
-        timerTagsCapture == ImmutableMap.of(
-                MetricsConstants.TagKeys.STATUS, MetricsConstants.TagValues.SUCCESS,
-                JobCompletionService.JOB_FINAL_STATE, JobStatus.FAILED.toString()
-        )
+        verifySuccessTags(timerTagsCapture, null, null)
+        timerTagsCapture.get(JobCompletionService.JOB_FINAL_STATE).equals(JobStatus.FAILED.toString())
         3 * errorCounter.increment()
+
+        when:
+        jobCompletionService.handleJobCompletion(new JobFinishedEvent(jobId, JobFinishedReason.PROCESS_COMPLETED, "null", this))
+        then:
+        1 * jobSearchService.getJob(jobId) >> new Job.Builder(NAME, USER, VERSION)
+                .withId(jobId).withStatus(JobStatus.SUCCEEDED).withCommandArgs(COMMAND_ARGS).build()
+        1 * jobSearchService.getJobCluster(jobId) >> cluster
+        1 * jobSearchService.getJobCommand(jobId) >> command
+        1 * completionTimer.record(_, TimeUnit.NANOSECONDS)
+        verifySuccessTags(timerTagsCapture, cluster, command)
+
+        when:
+        jobCompletionService.handleJobCompletion(new JobFinishedEvent(jobId, JobFinishedReason.KILLED, "null", this))
+        then:
+        noExceptionThrown()
+        3 * jobSearchService.getJob(jobId) >>
+                { throw new GenieServerException("null") } >>
+                { throw new GenieServerException("null") } >>
+                { throw new GenieServerException("null") }
+        1 * jobSearchService.getJobCluster(jobId) >> cluster
+        1 * jobSearchService.getJobCommand(jobId) >> command
+        1 * completionTimer.record(_, TimeUnit.NANOSECONDS)
+        verifyFailureTags(timerTagsCapture, new GenieServerException("null"), cluster, command)
+
     }
 
     def deleteDependenciesDirectories() {
@@ -224,4 +255,82 @@ class JobCompletionServiceSpec extends Specification {
             assert !d.exists()
         })
     }
+
+    /**
+     * Verify the presence of failure tags
+     *
+     * @param tags tags to be verified
+     * @param throwable exception thrown on failure
+     * @return true if all failure tags exist
+     */
+    private void verifyFailureTags(
+            final Map<String, String> tags,
+            final Throwable throwable,
+            final Cluster cluster,
+            final Command command
+    ) {
+        assert tags.get(MetricsConstants.TagKeys.STATUS)
+                .equals(MetricsConstants.TagValues.FAILURE)
+        assert tags.get(MetricsConstants.TagKeys.EXCEPTION_CLASS)
+                .equals(throwable.getClass().getCanonicalName())
+        verifyCommonTags(tags, cluster, command);
+    }
+
+    /**
+     * Verify the presence of success tags
+     *
+     * @param tags tags to be verified
+     * @return true if all success tags exist
+     */
+    private void verifySuccessTags(
+            final Map<String, String> tags,
+            final Cluster cluster,
+            final Command command
+    ) {
+        assert tags.get(MetricsConstants.TagKeys.STATUS).
+                equals(MetricsConstants.TagValues.SUCCESS);
+        verifyCommonTags(tags, cluster, command);
+    }
+
+    /**
+     * Verify the presence of common tags
+     *
+     * @param tags tags to be verified
+     * @return true if common tags exist
+     */
+    private void verifyCommonTags(
+            final Map<String, String> tags,
+            final Cluster cluster,
+            final Command command
+    ) {
+        assert tags.get(MetricsConstants.TagKeys.CLUSTER_NAME)
+                .equals(
+                cluster != null
+                        ? cluster.getName()
+                        : MetricsConstants.TagValues.NO_CLUSTER_FOUND
+        )
+
+        assert tags.get(MetricsConstants.TagKeys.CLUSTER_ID)
+                .equals(
+                cluster != null
+                        ? cluster.getId().orElse(MetricsConstants.TagValues.NO_ID_FOUND)
+                        : MetricsConstants.TagValues.NO_CLUSTER_FOUND
+
+        )
+
+        assert tags.get(MetricsConstants.TagKeys.COMMAND_ID)
+                .equals(
+                command != null
+                        ? command.getId().orElse(MetricsConstants.TagValues.NO_ID_FOUND)
+                        : MetricsConstants.TagValues.NO_COMMAND_FOUND
+        )
+
+        assert tags.get(MetricsConstants.TagKeys.COMMAND_NAME)
+                .equals(
+                command != null
+                        ? command.getName()
+                        : MetricsConstants.TagValues.NO_COMMAND_FOUND
+        )
+    }
+
 }

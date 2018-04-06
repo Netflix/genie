@@ -31,14 +31,6 @@ import java.util.Map;
  * @since 3.1.0
  */
 public final class MetricsUtils {
-
-    /**
-     * Constant representing a no id found for tags added to metrics.
-     * E.g this values is used for a missing cluster id when tagging
-     * metrics by cluster id
-     */
-    private static final String NO_ID_FOUND = "<no id>";
-
     /**
      * Utility class private constructor.
      */
@@ -94,6 +86,8 @@ public final class MetricsUtils {
     /**
      * Convenience method to add common tags from job execution environment, for
      * slicing and dicing metrics, to the map of tags passed in.
+     * Populates NO_COMMAND_FOUND if command is missing
+     * Populates NO_CLUSTER_FOUND if cluster is missing
      * Populates NO_ID_FOUND in case ids are not present in the job execution environment
      * E.g NO_ID_FOUND will be added to the tags maps for the cluster_id key in case cluster_id
      * does not exist in jobExecEnv
@@ -101,14 +95,18 @@ public final class MetricsUtils {
      * @param tags       The map of tags
      * @param jobExecEnv Genie job execution env
      */
-    public static void addCommonJobWorkflowMetricTags(final JobExecutionEnvironment jobExecEnv,
-                                                      final Map<String, String> tags) {
-        addCommonJobWorkflowMetricTags(jobExecEnv.getCluster(), jobExecEnv.getCommand(), tags);
+    public static void addClusterAndCommandTags(
+        final JobExecutionEnvironment jobExecEnv,
+        final Map<String, String> tags
+    ) {
+        addClusterAndCommandTags(jobExecEnv.getCluster(), jobExecEnv.getCommand(), tags);
     }
 
     /**
      * Convenience method to add common tags related to Cluster and Command, for
      * slicing and dicing metrics, to the map of tags passed in.
+     * Populates NO_COMMAND_FOUND if command is missing
+     * Populates NO_CLUSTER_FOUND if cluster is missing
      * Populates NO_ID_FOUND in case ids are not present in the objects passed in
      * E.g NO_ID_FOUND will be added to the tags maps for the cluster_id key in case cluster_id
      * does not exist in Cluster object
@@ -117,16 +115,39 @@ public final class MetricsUtils {
      * @param cluster Cluster chosen for running the command
      * @param command Command chosen to be executed
      */
-    public static void addCommonJobWorkflowMetricTags(final Cluster cluster,
-                                                      final Command command,
-                                                      final Map<String, String> tags) {
+    public static void addClusterAndCommandTags(
+        final Cluster cluster,
+        final Command command,
+        final Map<String, String> tags
+    ) {
         /* Add cluster tags */
-        tags.put(MetricsConstants.TagKeys.CLUSTER_NAME, cluster.getName());
-        tags.put(MetricsConstants.TagKeys.CLUSTER_ID, cluster.getId().orElse(NO_ID_FOUND));
+        tags.put(
+            MetricsConstants.TagKeys.CLUSTER_NAME,
+            cluster != null
+                ? cluster.getName()
+                : MetricsConstants.TagValues.NO_CLUSTER_FOUND
+        );
+
+        tags.put(
+            MetricsConstants.TagKeys.CLUSTER_ID,
+            cluster != null
+                ? cluster.getId().orElse(MetricsConstants.TagValues.NO_ID_FOUND)
+                : MetricsConstants.TagValues.NO_CLUSTER_FOUND
+        );
 
         /* Add command tags  */
-        tags.put(MetricsConstants.TagKeys.COMMAND_NAME, command.getName());
-        tags.put(MetricsConstants.TagKeys.COMMAND_ID, command.getId().orElse(NO_ID_FOUND));
+        tags.put(
+            MetricsConstants.TagKeys.COMMAND_NAME,
+            command != null
+                ? command.getName()
+                : MetricsConstants.TagValues.NO_COMMAND_FOUND
+        );
 
+        tags.put(
+            MetricsConstants.TagKeys.COMMAND_ID,
+            command != null
+                ? command.getId().orElse(MetricsConstants.TagValues.NO_ID_FOUND)
+                : MetricsConstants.TagValues.NO_COMMAND_FOUND
+        );
     }
 }

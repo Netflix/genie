@@ -80,7 +80,7 @@ public class InitialSetupTask extends GenieBaseTask {
             final JobExecutionEnvironment jobExecEnv
                 = (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
 
-            MetricsUtils.addCommonJobWorkflowMetricTags(jobExecEnv, tags);
+            MetricsUtils.addClusterAndCommandTags(jobExecEnv, tags);
 
             final String jobWorkingDirectory = jobExecEnv.getJobWorkingDir().getCanonicalPath();
             final Writer writer = (Writer) context.get(JobConstants.WRITER_KEY);

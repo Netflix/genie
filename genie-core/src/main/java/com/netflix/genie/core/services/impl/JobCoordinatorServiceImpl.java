@@ -225,7 +225,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
             final int memory = jobRequest.getMemory()
                 .orElse(command.getMemory().orElse(this.jobsProperties.getMemory().getDefaultJobMemory()));
 
-            MetricsUtils.addCommonJobWorkflowMetricTags(cluster, command, tags);
+            MetricsUtils.addClusterAndCommandTags(cluster, command, tags);
 
             // Save all the runtime information
             this.setRuntimeEnvironment(jobId, cluster, command, applications, memory);
