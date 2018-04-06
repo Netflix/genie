@@ -77,7 +77,7 @@ public class GRpcPingServiceImpl extends PingServiceGrpc.PingServiceImplBase {
         );
 
         sb.append("Client metadata: [ ");
-        for (Map.Entry<String, String> clientMetadataEntry : request.getClientMetadataMap().entrySet()) {
+        for (final Map.Entry<String, String> clientMetadataEntry : request.getClientMetadataMap().entrySet()) {
             sb
                 .append("{")
                 .append(clientMetadataEntry.getKey())

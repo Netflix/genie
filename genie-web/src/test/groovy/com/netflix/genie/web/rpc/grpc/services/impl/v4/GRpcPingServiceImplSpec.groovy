@@ -46,6 +46,7 @@ class GRpcPingServiceImplSpec extends Specification {
         PingRequest pingRequest = PingRequest.newBuilder()
                 .setRequestId(requestId)
                 .setTimestamp(Timestamps.fromMillis(System.currentTimeMillis()))
+                .putClientMetadata("foo", "bar")
                 .build()
         PongResponse pongResponse = null
 
