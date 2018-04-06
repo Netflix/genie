@@ -45,32 +45,32 @@ Health of the system is marked unhealthy if the CPU load of a system goes beyond
 |Whether or not to delete the dependencies directories for applications, cluster, command to save disk space after job completion
 |true
 
-|genie.jobs.clusters.loadBalancers.script.destination
+|genie.jobs.clusters.load-balancers.script.destination
 |The location on disk where the script source file should be stored after it is downloaded from
-`genie.jobs.clusters.loadBalancers.script.source`. The file will be given the same name.
+`genie.jobs.clusters.load-balancers.script.source`. The file will be given the same name.
 |file:///tmp/genie/loadbalancers/script/destination/
 
-|genie.jobs.clusters.loadBalancers.script.enabled
+|genie.jobs.clusters.load-balancers.script.enabled
 |Whether the script based load balancer should be enabled for the system or not.
-See also: `genie.jobs.clusters.loadBalancers.script.source`
-See also: `genie.jobs.clusters.loadBalancers.script.destination`
+See also: `genie.jobs.clusters.load-balancers.script.source`
+See also: `genie.jobs.clusters.load-balancers.script.destination`
 |false
 
-|genie.jobs.clusters.loadBalancers.script.order
+|genie.jobs.clusters.load-balancers.script.order
 |The order which the script load balancer should be evaluated. The lower this number the sooner it is evaluated. 0
 would be the first thing evaluated if nothing else is set to 0 as well. Must be < 2147483647 (Integer.MAX_VALUE). If
 no value set will be given Integer.MAX_VALUE - 1 (default).
 |2147483646
 
-|genie.jobs.clusters.loadBalancers.script.refreshRate
+|genie.jobs.clusters.load-balancers.script.refreshRate
 |How frequently to refresh the load balancer script (in milliseconds)
 |300000
 
-|genie.jobs.clusters.loadBalancers.script.source
+|genie.jobs.clusters.load-balancers.script.source
 |The location of the script the load balancer should load to evaluate which cluster to use for a job request
 |file:///tmp/genie/loadBalancers/script/source/loadBalance.js
 
-|genie.jobs.clusters.loadBalancers.script.timeout
+|genie.jobs.clusters.load-balancers.script.timeout
 |The amount of time (in milliseconds) that the system will attempt to run the cluster load balancer script before it
 forces a timeout
 |5000

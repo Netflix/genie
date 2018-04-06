@@ -77,19 +77,16 @@ import java.util.stream.Collectors;
  * @since 3.1.0
  */
 @Component
-@ConditionalOnProperty(value = "genie.jobs.clusters.loadBalancers.script.enabled", havingValue = "true")
+@ConditionalOnProperty(value = ScriptLoadBalancer.SCRIPT_LOAD_BALANCER_PROPERTY_GROUP + "enabled", havingValue = "true")
 @Slf4j
 public class ScriptLoadBalancer implements ClusterLoadBalancer {
 
-    static final String SCRIPT_TIMEOUT_PROPERTY_KEY = "genie.jobs.clusters.loadBalancers.script.timeout";
-    static final String SCRIPT_FILE_SOURCE_PROPERTY_KEY
-        = "genie.jobs.clusters.loadBalancers.script.source";
-    static final String SCRIPT_FILE_DESTINATION_PROPERTY_KEY
-        = "genie.jobs.clusters.loadBalancers.script.destination";
-    static final String SCRIPT_REFRESH_RATE_PROPERTY_KEY
-        = "genie.jobs.clusters.loadBalancers.script.refreshRate";
-    static final String SCRIPT_LOAD_BALANCER_ORDER_PROPERTY_KEY
-        = "genie.jobs.clusters.loadBalancers.script.order";
+    static final String SCRIPT_LOAD_BALANCER_PROPERTY_GROUP = "genie.jobs.clusters.load-balancers.script.";
+    static final String SCRIPT_LOAD_BALANCER_ORDER_PROPERTY_KEY = SCRIPT_LOAD_BALANCER_PROPERTY_GROUP + "order";
+    static final String SCRIPT_REFRESH_RATE_PROPERTY_KEY = SCRIPT_LOAD_BALANCER_PROPERTY_GROUP + "refreshRate";
+    static final String SCRIPT_FILE_DESTINATION_PROPERTY_KEY = SCRIPT_LOAD_BALANCER_PROPERTY_GROUP + "destination";
+    static final String SCRIPT_FILE_SOURCE_PROPERTY_KEY = SCRIPT_LOAD_BALANCER_PROPERTY_GROUP + "source";
+    static final String SCRIPT_TIMEOUT_PROPERTY_KEY = SCRIPT_LOAD_BALANCER_PROPERTY_GROUP + "timeout";
     static final String SELECT_TIMER_NAME = "genie.jobs.clusters.loadBalancers.script.select.timer";
     static final String UPDATE_TIMER_NAME = "genie.jobs.clusters.loadBalancers.script.update.timer";
     static final String STATUS_TAG_OK = "ok";
@@ -172,7 +169,7 @@ public class ScriptLoadBalancer implements ClusterLoadBalancer {
         log.debug("Called");
         final Set<Tag> tags = Sets.newHashSet();
         try {
-            if (this.isConfigured.get() && this.script != null && this.script.get() != null) {
+            if (this.isConfigured.get() && this.script.get() != null) {
                 log.debug("Evaluating script for job {}", jobRequest.getId().orElse("without id"));
                 final Bindings bindings = new SimpleBindings();
                 // TODO: For now for backwards compatibility with balancer scripts continue writing Clusters out in

@@ -27,7 +27,7 @@ genie:
       deleteArchiveFile: true
       deleteDependencies: true
     clusters:
-      loadBalancers:
+      load-balancers:
         script:
           destination: file:///tmp/genie/loadbalancers/script/destination/
           enabled: false
