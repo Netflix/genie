@@ -143,7 +143,7 @@ public class LocalJobRunner implements JobSubmitterService {
         try {
             log.info("Beginning local job submission for {}", jobRequest);
 
-            MetricsUtils.addCommonJobWorkflowMetricTags(cluster, command, tags);
+            MetricsUtils.addClusterAndCommandTags(cluster, command, tags);
 
             final String id = jobRequest.getId().orElseThrow(() -> new GenieServerException("No job id found."));
 
@@ -333,7 +333,7 @@ public class LocalJobRunner implements JobSubmitterService {
                 .orElseThrow(() -> new GenieServerException("No job id. Unable to execute"));
             log.info("Executing job workflow for job {}", jobId);
 
-            MetricsUtils.addCommonJobWorkflowMetricTags(jobExecutionEnvironment, tags);
+            MetricsUtils.addClusterAndCommandTags(jobExecutionEnvironment, tags);
 
             context.put(JobConstants.WRITER_KEY, writer);
 

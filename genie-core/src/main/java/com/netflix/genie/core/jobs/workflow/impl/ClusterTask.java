@@ -76,7 +76,7 @@ public class ClusterTask extends GenieBaseTask {
                 (JobExecutionEnvironment) context.get(JobConstants.JOB_EXECUTION_ENV_KEY);
             final Cluster cluster = jobExecEnv.getCluster();
 
-            MetricsUtils.addCommonJobWorkflowMetricTags(jobExecEnv, tags);
+            MetricsUtils.addClusterAndCommandTags(jobExecEnv, tags);
 
             final String jobWorkingDirectory = jobExecEnv.getJobWorkingDir().getCanonicalPath();
             final String genieDir = jobWorkingDirectory

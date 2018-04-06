@@ -102,6 +102,26 @@ public final class MetricsConstants {
          */
         public static final String FAILURE = "failure";
 
+
+        /**
+         * Constant representing a no id found for tags added to metrics.
+         * E.g this values is used for a missing cluster id when tagging
+         * metrics by cluster id
+         */
+        public static final String NO_ID_FOUND = "<no id>";
+
+        /**
+         * Constant representing no cluster found when tagging metrics
+         * with cluster tags.
+         */
+        public static final String NO_CLUSTER_FOUND = "NO CLUSTER";
+
+        /**
+         * Constant representing no command found when tagging metrics
+         * with command tags.
+         */
+        public static final String NO_COMMAND_FOUND = "NO COMMAND";
+
         /**
          * Utility class private constructor.
          */
