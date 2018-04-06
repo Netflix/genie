@@ -22,4 +22,4 @@
  * @author mprimi
  * @since 4.0.0
  */
-package com.netflix.genie.web.rpc.services.impl;
+package com.netflix.genie.web.rpc.grpc.services.impl.v4;
