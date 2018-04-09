@@ -23,7 +23,7 @@ import com.netflix.genie.proto.GetJobSpecificationRequest;
 import com.netflix.genie.proto.JobSpecificationResponse;
 import com.netflix.genie.proto.JobSpecificationServiceGrpc;
 import com.netflix.genie.proto.ResolveJobSpecificationRequest;
-import com.netflix.genie.proto.v4.adapters.JobSpecificationServiceAdapter;
+import com.netflix.genie.proto.v4.converters.JobSpecificationServiceConverter;
 import com.netflix.genie.web.rpc.interceptors.SimpleLoggingInterceptor;
 import com.netflix.genie.web.services.JobSpecificationService;
 import io.grpc.stub.StreamObserver;
@@ -79,12 +79,12 @@ public class GRpcJobSpecificationServiceImpl extends JobSpecificationServiceGrpc
             ? UUID.randomUUID().toString()
             : request.getMetadata().getId();
         try {
-            final JobRequest jobRequest = JobSpecificationServiceAdapter.toJobRequestDTO(request);
+            final JobRequest jobRequest = JobSpecificationServiceConverter.toJobRequestDTO(request);
             final JobSpecification jobSpec = this.jobSpecificationService.resolveJobSpecification(id, jobRequest);
-            responseObserver.onNext(JobSpecificationServiceAdapter.toProtoJobSpecificationResponse(jobSpec));
+            responseObserver.onNext(JobSpecificationServiceConverter.toProtoJobSpecificationResponse(jobSpec));
         } catch (final Throwable t) {
             log.error(t.getMessage(), t);
-            responseObserver.onNext(JobSpecificationServiceAdapter.toProtoJobSpecificationResponse(t));
+            responseObserver.onNext(JobSpecificationServiceConverter.toProtoJobSpecificationResponse(t));
         }
         responseObserver.onCompleted();
     }
