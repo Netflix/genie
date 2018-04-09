@@ -20,9 +20,10 @@ package com.netflix.genie.common.dto;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Possible statuses for a Job.
@@ -57,10 +58,11 @@ public enum JobStatus {
     INVALID(false);
 
     private static final Set<JobStatus> ACTIVE_STATUSES = Collections.unmodifiableSet(
-        EnumSet.of(JobStatus.INIT, JobStatus.RUNNING)
+        Arrays.stream(JobStatus.values()).filter(JobStatus::isActive).collect(Collectors.toSet())
     );
+
     private static final Set<JobStatus> FINISHED_STATUSES = Collections.unmodifiableSet(
-        EnumSet.of(JobStatus.SUCCEEDED, JobStatus.KILLED, JobStatus.FAILED, JobStatus.INVALID)
+        Arrays.stream(JobStatus.values()).filter(JobStatus::isFinished).collect(Collectors.toSet())
     );
 
     private final boolean active;
