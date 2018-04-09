@@ -64,6 +64,46 @@ for `Instant` serialization/deserialization.
 
 |===
 
+=== Metric Changes
+
+Switched to http://micrometer.io/[Micrometer]
+
+==== Renamed
+
+|===
+|Old Name |New Name |Reason
+
+
+|genie.jobs.coordination.clusterCommandQuery.timer
+|genie.services.specification.clusterCommandQuery.timer
+|Functionality moved to new service
+
+|genie.jobs.submit.selectCluster.loadBalancer.counter
+|genie.services.specification.loadBalancer.counter
+|Functionality moved to new service
+
+|genie.jobs.submit.localRunner.selectApplications.timer
+|genie.services.specification.selectApplications.timer
+|Functionality moved to new service
+
+|genie.jobs.submit.localRunner.selectCluster.timer
+|genie.services.specification.selectCluster.timer
+|Functionality moved to new service
+
+|genie.jobs.submit.selectCluster.noneSelected.counter
+|genie.services.specification.selectCluster.noneSelected.counter
+|Functionality moved to new service
+
+|genie.jobs.submit.selectCluster.noneFound.counter
+|genie.services.specification.selectCluster.noneFound.counter
+|Functionality moved to new service
+
+|genie.jobs.submit.localRunner.selectCommand.timer
+|genie.services.specification.selectCommand.timer
+|Functionality moved to new service
+
+|===
+
 == 3.3.0 Release Notes
 
 The following are the release notes for Genie 3.3.0.

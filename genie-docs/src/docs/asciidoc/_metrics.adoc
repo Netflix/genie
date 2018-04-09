@@ -91,53 +91,11 @@ published within the local JVM and available on the Actuator `/metrics` endpoint
 |JobCoordinatorServiceImpl
 |status, exceptionClass
 
-|genie.jobs.coordination.clusterCommandQuery.timer
-|Time taken to query the database and find clusters and commands matching the supplied criteria.
-|nanoseconds
-|JobCoordinatorServiceImpl
-|status, exceptionClass
-
-|genie.jobs.submit.localRunner.selectCluster.timer
-|Time taken to select a cluster using the load balancing strategy
-|nanoseconds
-|JobCoordinatorServiceImpl
-|status, exceptionClass
-
-|genie.jobs.submit.localRunner.selectCommand.timer
-|Time taken to resolve a command based on criteria and cluster
-|nanoseconds
-|JobCoordinatorServiceImpl
-|status, exceptionClass
-
-|genie.jobs.submit.localRunner.selectApplications.timer
-|Time taken to retrieve applications information for this task
-|nanoseconds
-|JobCoordinatorServiceImpl
-|status, exceptionClass
-
 |genie.jobs.submit.localRunner.setJobEnvironment.timer
 |Time taken to persist the job runtime information in the database
 |nanoseconds
 |JobCoordinatorServiceImpl
 |status, exceptionClass
-
-|genie.jobs.submit.selectCluster.loadBalancer.counter
-|Counter for cluster load balancer algorithms invocations
-|count
-|JobCoordinatorServiceImpl
-|class, status
-
-|genie.jobs.submit.selectCluster.noneSelected.counter
-|Number of times the cluster load balancing terminated without selecting a cluster
-|count
-|JobCoordinatorServiceImpl
-|-
-
-|genie.jobs.submit.selectCluster.noneFound.counter
-|Number of times the criteria for cluster selection does not match any cluster
-|count
-|JobCoordinatorServiceImpl
-|-
 
 |genie.jobs.running.gauge
 |Number of jobs currently running locally
@@ -438,6 +396,48 @@ published within the local JVM and available on the Actuator `/metrics` endpoint
 |count
 |DiskCleanupTask
 |-
+
+|genie.services.specification.clusterCommandQuery.timer
+|Time taken to query the database and find clusters and commands matching the supplied criteria.
+|nanoseconds
+|JobSpecificationServiceImpl
+|status, exceptionClass
+
+|genie.services.specification.loadBalancer.counter
+|Counter for cluster load balancer algorithms invocations
+|count
+|JobSpecificationServiceImpl
+|class, status
+
+|genie.services.specification.selectApplications.timer
+|Time taken to retrieve applications information for this task
+|nanoseconds
+|JobSpecificationServiceImpl
+|status, exceptionClass
+
+|genie.services.specification.selectCluster.timer
+|Time taken to select a cluster using the load balancing strategy
+|nanoseconds
+|JobSpecificationServiceImpl
+|status, exceptionClass
+
+|genie.services.specification.selectCluster.noneSelected.counter
+|Number of times the cluster load balancing terminated without selecting a cluster
+|count
+|JobSpecificationServiceImpl
+|-
+
+|genie.services.specification.selectCluster.noneFound.counter
+|Number of times the criteria for cluster selection does not match any cluster
+|count
+|JobSpecificationServiceImpl
+|-
+
+|genie.services.specification.selectCommand.timer
+|Time taken to resolve a command based on criteria and cluster
+|nanoseconds
+|JobSpecificationServiceImpl
+|status, exceptionClass
 
 |genie.health.endpoint.timer
 |Time taken for the Health endpoint to collect and aggregate state from health indicators
