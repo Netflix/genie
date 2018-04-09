@@ -23,6 +23,6 @@
  * @since 4.0.0
  */
 @ParametersAreNonnullByDefault
-package com.netflix.genie.proto.v4.adapters;
+package com.netflix.genie.proto.v4.converters;
 
 import javax.annotation.ParametersAreNonnullByDefault;

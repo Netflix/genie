@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.proto.v4.adapters
+package com.netflix.genie.proto.v4.converters
 
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.Lists
@@ -31,13 +31,13 @@ import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
 /**
- * Specifications for the {@link JobSpecificationServiceAdapter} utility class.
+ * Specifications for the {@link JobSpecificationServiceConverter} utility class.
  *
  * @author tgianos
  * @since 4.0.0
  */
 @Category(UnitTest.class)
-class JobSpecificationServiceAdapterSpec extends Specification {
+class JobSpecificationServiceConverterSpec extends Specification {
 
     def id = UUID.randomUUID().toString()
     def name = UUID.randomUUID().toString()
@@ -160,16 +160,16 @@ class JobSpecificationServiceAdapterSpec extends Specification {
         def resolveJobSpecificationRequest = createResolveJobSpecificationRequest()
 
         when:
-        def resolveJobSpecificationRequest2 = JobSpecificationServiceAdapter
+        def resolveJobSpecificationRequest2 = JobSpecificationServiceConverter
                 .toProtoResolveJobSpecificationRequest(jobRequest)
-        def jobRequest2 = JobSpecificationServiceAdapter.toJobRequestDTO(resolveJobSpecificationRequest2)
+        def jobRequest2 = JobSpecificationServiceConverter.toJobRequestDTO(resolveJobSpecificationRequest2)
 
         then:
         jobRequest2 == jobRequest
 
 
         when:
-        def jobRequest3 = JobSpecificationServiceAdapter.toJobRequestDTO(resolveJobSpecificationRequest)
+        def jobRequest3 = JobSpecificationServiceConverter.toJobRequestDTO(resolveJobSpecificationRequest)
 
         then:
         jobRequest3 == jobRequest
@@ -177,7 +177,7 @@ class JobSpecificationServiceAdapterSpec extends Specification {
 
     def "Can create a GetJobSpecificationRequest"() {
         when:
-        def request = JobSpecificationServiceAdapter.toProtoGetJobSpecificationRequest(id)
+        def request = JobSpecificationServiceConverter.toProtoGetJobSpecificationRequest(id)
 
         then:
         request.getId() == id
@@ -206,8 +206,8 @@ class JobSpecificationServiceAdapterSpec extends Specification {
         )
 
         when:
-        def specResponseProto = JobSpecificationServiceAdapter.toProtoJobSpecificationResponse(originalSpecification)
-        def convertedSpecification = JobSpecificationServiceAdapter.toJobSpecificationDTO(specResponseProto)
+        def specResponseProto = JobSpecificationServiceConverter.toProtoJobSpecificationResponse(originalSpecification)
+        def convertedSpecification = JobSpecificationServiceConverter.toJobSpecificationDTO(specResponseProto)
 
         then:
         originalSpecification == convertedSpecification
@@ -218,8 +218,8 @@ class JobSpecificationServiceAdapterSpec extends Specification {
         def jobSpecificationResponse = createJobSpecificationResponse()
 
         when:
-        def jobSpecificationResponse2 = JobSpecificationServiceAdapter.toProtoJobSpecificationResponse(jobSpecification)
-        def jobSpecification2 = JobSpecificationServiceAdapter.toJobSpecificationDTO(jobSpecificationResponse2)
+        def jobSpecificationResponse2 = JobSpecificationServiceConverter.toProtoJobSpecificationResponse(jobSpecification)
+        def jobSpecification2 = JobSpecificationServiceConverter.toJobSpecificationDTO(jobSpecificationResponse2)
 
         then:
         jobSpecificationResponse2.hasSpecification()
@@ -228,7 +228,7 @@ class JobSpecificationServiceAdapterSpec extends Specification {
 
 
         when:
-        def jobSpecification3 = JobSpecificationServiceAdapter.toJobSpecificationDTO(jobSpecificationResponse)
+        def jobSpecification3 = JobSpecificationServiceConverter.toJobSpecificationDTO(jobSpecificationResponse)
 
         then:
         jobSpecification3 == jobSpecification
@@ -238,7 +238,7 @@ class JobSpecificationServiceAdapterSpec extends Specification {
         def message = UUID.randomUUID().toString()
 
         when:
-        def response = JobSpecificationServiceAdapter.toProtoJobSpecificationResponse(
+        def response = JobSpecificationServiceConverter.toProtoJobSpecificationResponse(
                 new GenieConflictException(message)
         )
 
