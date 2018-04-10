@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2018-04-05</span>
+<span id="revdate">2018-04-10</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -732,6 +732,11 @@ b.conum * { color: inherit !important; }
 <ul class="sectlevel3">
 <li><a href="#_renamed">2.3.1. Renamed</a></li>
 <li><a href="#_removed">2.3.2. Removed</a></li>
+</ul>
+</li>
+<li><a href="#_metric_changes">2.4. Metric Changes</a>
+<ul class="sectlevel3">
+<li><a href="#_renamed_2">2.4.1. Renamed</a></li>
 </ul>
 </li>
 </ul>
@@ -761,7 +766,7 @@ b.conum * { color: inherit !important; }
 <li><a href="#_added">5.3.1. Added</a></li>
 <li><a href="#_changed_default_value">5.3.2. Changed Default Value</a></li>
 <li><a href="#_removed_2">5.3.3. Removed</a></li>
-<li><a href="#_renamed_2">5.3.4. Renamed</a></li>
+<li><a href="#_renamed_3">5.3.4. Renamed</a></li>
 </ul>
 </li>
 <li><a href="#_database_upgrades_2">5.4. Database Upgrades</a></li>
@@ -1017,6 +1022,12 @@ refer to their documentation.
 <td class="tableblock halign-left valign-top"><p class="tableblock">Modifications to how Spring handled
 <a href="https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.0-Migration-Guide#relaxed-binding">property binding</a></p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.loadBalancers.script.*</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.load-balancers.script.*</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Modifications to how Spring handled
+<a href="https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.0-Migration-Guide#relaxed-binding">property binding</a></p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -1038,6 +1049,66 @@ refer to their documentation.
 <td class="tableblock halign-left valign-top"><p class="tableblock">spring.jackson.date-format</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Switched to <code>java.time.Instant</code> from <code>java.util.Date</code> for timestamps. Formatting in ISO8601 supported out of the box
 for <code>Instant</code> serialization/deserialization.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_metric_changes"><a class="anchor" href="#_metric_changes"></a>2.4. Metric Changes</h3>
+<div class="paragraph">
+<p>Switched to <a href="http://micrometer.io/">Micrometer</a></p>
+</div>
+<div class="sect3">
+<h4 id="_renamed_2"><a class="anchor" href="#_renamed_2"></a>2.4.1. Renamed</h4>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 33%;">
+<col style="width: 33%;">
+<col style="width: 33%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Old Name</th>
+<th class="tableblock halign-left valign-top">New Name</th>
+<th class="tableblock halign-left valign-top">Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.coordination.clusterCommandQuery.timer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.services.specification.clusterCommandQuery.timer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Functionality moved to new service</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.submit.selectCluster.loadBalancer.counter</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.services.specification.loadBalancer.counter</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Functionality moved to new service</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.submit.localRunner.selectApplications.timer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.services.specification.selectApplications.timer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Functionality moved to new service</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.submit.localRunner.selectCluster.timer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.services.specification.selectCluster.timer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Functionality moved to new service</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.submit.selectCluster.noneSelected.counter</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.services.specification.selectCluster.noneSelected.counter</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Functionality moved to new service</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.submit.selectCluster.noneFound.counter</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.services.specification.selectCluster.noneFound.counter</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Functionality moved to new service</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.submit.localRunner.selectCommand.timer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.services.specification.selectCommand.timer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Functionality moved to new service</p></td>
 </tr>
 </tbody>
 </table>
@@ -1527,7 +1598,7 @@ for more information. Currently on classpath only none, hash_map, redis and jdbc
 
 </div>
 <div class="sect3">
-<h4 id="_renamed_2"><a class="anchor" href="#_renamed_2"></a>5.3.4. Renamed</h4>
+<h4 id="_renamed_3"><a class="anchor" href="#_renamed_3"></a>5.3.4. Renamed</h4>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 50%;">
@@ -4733,37 +4804,37 @@ Health of the system is marked unhealthy if the CPU load of a system goes beyond
 <td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.loadBalancers.script.destination</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.load-balancers.script.destination</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The location on disk where the script source file should be stored after it is downloaded from
-<code>genie.jobs.clusters.loadBalancers.script.source</code>. The file will be given the same name.</p></td>
+<code>genie.jobs.clusters.load-balancers.script.source</code>. The file will be given the same name.</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file:///tmp/genie/loadbalancers/script/destination/" class="bare">file:///tmp/genie/loadbalancers/script/destination/</a></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.loadBalancers.script.enabled</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.load-balancers.script.enabled</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Whether the script based load balancer should be enabled for the system or not.
-See also: <code>genie.jobs.clusters.loadBalancers.script.source</code>
-See also: <code>genie.jobs.clusters.loadBalancers.script.destination</code></p></td>
+See also: <code>genie.jobs.clusters.load-balancers.script.source</code>
+See also: <code>genie.jobs.clusters.load-balancers.script.destination</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.loadBalancers.script.order</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.load-balancers.script.order</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The order which the script load balancer should be evaluated. The lower this number the sooner it is evaluated. 0
 would be the first thing evaluated if nothing else is set to 0 as well. Must be &lt; 2147483647 (Integer.MAX_VALUE). If
 no value set will be given Integer.MAX_VALUE - 1 (default).</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">2147483646</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.loadBalancers.script.refreshRate</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.load-balancers.script.refreshRate</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">How frequently to refresh the load balancer script (in milliseconds)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">300000</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.loadBalancers.script.source</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.load-balancers.script.source</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The location of the script the load balancer should load to evaluate which cluster to use for a job request</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="file:///tmp/genie/loadBalancers/script/source/loadBalance.js" class="bare">file:///tmp/genie/loadBalancers/script/source/loadBalance.js</a></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.loadBalancers.script.timeout</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.jobs.clusters.load-balancers.script.timeout</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The amount of time (in milliseconds) that the system will attempt to run the cluster load balancer script before it
 forces a timeout</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">5000</p></td>
@@ -5580,60 +5651,11 @@ published within the local JVM and available on the Actuator <code>/metrics</cod
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.coordination.clusterCommandQuery.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to query the database and find clusters and commands matching the supplied criteria.</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobCoordinatorServiceImpl</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.submit.localRunner.selectCluster.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to select a cluster using the load balancing strategy</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobCoordinatorServiceImpl</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.submit.localRunner.selectCommand.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to resolve a command based on criteria and cluster</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobCoordinatorServiceImpl</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.submit.localRunner.selectApplications.timer</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to retrieve applications information for this task</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobCoordinatorServiceImpl</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
-</tr>
-<tr>
 <td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.submit.localRunner.setJobEnvironment.timer</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to persist the job runtime information in the database</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobCoordinatorServiceImpl</code></p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.submit.selectCluster.loadBalancer.counter</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Counter for cluster load balancer algorithms invocations</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobCoordinatorServiceImpl</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>class, status</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.submit.selectCluster.noneSelected.counter</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Number of times the cluster load balancing terminated without selecting a cluster</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobCoordinatorServiceImpl</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.submit.selectCluster.noneFound.counter</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Number of times the criteria for cluster selection does not match any cluster</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobCoordinatorServiceImpl</code></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.jobs.running.gauge</code></p></td>
@@ -5986,6 +6008,55 @@ published within the local JVM and available on the Actuator <code>/metrics</cod
 <td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
 </tr>
 <tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.services.specification.clusterCommandQuery.timer</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to query the database and find clusters and commands matching the supplied criteria.</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobSpecificationServiceImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.services.specification.loadBalancer.counter</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Counter for cluster load balancer algorithms invocations</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobSpecificationServiceImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>class, status</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.services.specification.selectApplications.timer</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to retrieve applications information for this task</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobSpecificationServiceImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.services.specification.selectCluster.timer</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to select a cluster using the load balancing strategy</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobSpecificationServiceImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.services.specification.selectCluster.noneSelected.counter</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of times the cluster load balancing terminated without selecting a cluster</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobSpecificationServiceImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.services.specification.selectCluster.noneFound.counter</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Number of times the criteria for cluster selection does not match any cluster</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">count</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobSpecificationServiceImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>-</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.services.specification.selectCommand.timer</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Time taken to resolve a command based on criteria and cluster</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>JobSpecificationServiceImpl</code></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><code>status, exceptionClass</code></p></td>
+</tr>
+<tr>
 <td class="tableblock halign-right valign-top"><p class="tableblock"><code>genie.health.endpoint.timer</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Time taken for the Health endpoint to collect and aggregate state from health indicators</p></td>
 <td class="tableblock halign-center valign-top"><p class="tableblock">nanoseconds</p></td>
@@ -6024,7 +6095,7 @@ published within the local JVM and available on the Actuator <code>/metrics</cod
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2018-04-05 18:02:55 UTC
+Last updated 2018-04-10 02:02:54 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
