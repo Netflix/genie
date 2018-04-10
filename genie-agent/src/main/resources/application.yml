@@ -5,3 +5,7 @@ cloud:
       instanceProfile: true
     stack:
       auto: false
+
+spring:
+  jmx:
+    enabled: false
