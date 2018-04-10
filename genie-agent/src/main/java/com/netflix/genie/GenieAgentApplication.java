@@ -19,7 +19,6 @@ package com.netflix.genie;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jmx.JmxAutoConfiguration;
 import org.springframework.cloud.aws.autoconfigure.context.ContextCredentialsAutoConfiguration;
 import org.springframework.cloud.aws.autoconfigure.context.ContextRegionProviderAutoConfiguration;
 import org.springframework.cloud.aws.autoconfigure.context.ContextResourceLoaderAutoConfiguration;
@@ -33,7 +32,6 @@ import org.springframework.cloud.aws.autoconfigure.context.ContextStackAutoConfi
  */
 @SpringBootApplication(
     exclude = {
-        JmxAutoConfiguration.class,
         ContextCredentialsAutoConfiguration.class,
         ContextResourceLoaderAutoConfiguration.class,
         ContextRegionProviderAutoConfiguration.class,
