@@ -19,10 +19,6 @@ package com.netflix.genie;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.aws.autoconfigure.context.ContextCredentialsAutoConfiguration;
-import org.springframework.cloud.aws.autoconfigure.context.ContextRegionProviderAutoConfiguration;
-import org.springframework.cloud.aws.autoconfigure.context.ContextResourceLoaderAutoConfiguration;
-import org.springframework.cloud.aws.autoconfigure.context.ContextStackAutoConfiguration;
 
 /**
  * Genie Agent application.
@@ -30,14 +26,7 @@ import org.springframework.cloud.aws.autoconfigure.context.ContextStackAutoConfi
  * @author mprimi
  * @since 4.0.0
  */
-@SpringBootApplication(
-    exclude = {
-        ContextCredentialsAutoConfiguration.class,
-        ContextResourceLoaderAutoConfiguration.class,
-        ContextRegionProviderAutoConfiguration.class,
-        ContextStackAutoConfiguration.class,
-    }
-)
+@SpringBootApplication
 public class GenieAgentApplication {
     /**
      * Main method, actual execution is delegated to GenieAgentRunner.
