@@ -16,6 +16,16 @@
 #
 ##
 
+cloud:
+  aws:
+    credentials:
+      useDefaultAwsCredentialsChain: true
+    region:
+      auto: false
+      static: us-east-1
+    stack:
+      auto: false
+
 genie:
   file:
     cache:

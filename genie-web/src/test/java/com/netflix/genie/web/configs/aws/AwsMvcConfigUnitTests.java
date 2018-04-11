@@ -54,15 +54,15 @@ public class AwsMvcConfigUnitTests {
     public void canGetPublicHostname() {
         final RestTemplate restTemplate = Mockito.mock(RestTemplate.class);
         final String hostname = UUID.randomUUID().toString();
-        Mockito.when(restTemplate.getForObject(this.awsMvcConfig.publicHostNameGet, String.class)).thenReturn(hostname);
+        Mockito.when(restTemplate.getForObject(AwsMvcConfig.PUBLIC_HOSTNAME_GET, String.class)).thenReturn(hostname);
 
         Assert.assertThat(this.awsMvcConfig.hostName(restTemplate), Matchers.is(hostname));
         Mockito
             .verify(restTemplate, Mockito.times(1))
-            .getForObject(this.awsMvcConfig.publicHostNameGet, String.class);
+            .getForObject(AwsMvcConfig.PUBLIC_HOSTNAME_GET, String.class);
         Mockito
             .verify(restTemplate, Mockito.never())
-            .getForObject(this.awsMvcConfig.localIPV4HostNameGet, String.class);
+            .getForObject(AwsMvcConfig.LOCAL_IPV4_HOSTNAME_GET, String.class);
     }
 
     /**
@@ -74,15 +74,15 @@ public class AwsMvcConfigUnitTests {
         final RestTemplate restTemplate = Mockito.mock(RestTemplate.class);
         final String hostname = UUID.randomUUID().toString();
         Mockito
-            .when(restTemplate.getForObject(this.awsMvcConfig.publicHostNameGet, String.class))
+            .when(restTemplate.getForObject(AwsMvcConfig.PUBLIC_HOSTNAME_GET, String.class))
             .thenThrow(RuntimeException.class);
 
-        Mockito.when(restTemplate.getForObject(this.awsMvcConfig.localIPV4HostNameGet, String.class))
+        Mockito.when(restTemplate.getForObject(AwsMvcConfig.LOCAL_IPV4_HOSTNAME_GET, String.class))
             .thenReturn(hostname);
 
         Assert.assertThat(this.awsMvcConfig.hostName(restTemplate), Matchers.is(hostname));
-        Mockito.verify(restTemplate, Mockito.times(1)).getForObject(awsMvcConfig.publicHostNameGet, String.class);
-        Mockito.verify(restTemplate, Mockito.times(1)).getForObject(awsMvcConfig.localIPV4HostNameGet, String.class);
+        Mockito.verify(restTemplate, Mockito.times(1)).getForObject(AwsMvcConfig.PUBLIC_HOSTNAME_GET, String.class);
+        Mockito.verify(restTemplate, Mockito.times(1)).getForObject(AwsMvcConfig.LOCAL_IPV4_HOSTNAME_GET, String.class);
     }
 
     /**
@@ -93,10 +93,10 @@ public class AwsMvcConfigUnitTests {
     public void cantGetHostname() {
         final RestTemplate restTemplate = Mockito.mock(RestTemplate.class);
         Mockito
-            .when(restTemplate.getForObject(this.awsMvcConfig.publicHostNameGet, String.class))
+            .when(restTemplate.getForObject(AwsMvcConfig.PUBLIC_HOSTNAME_GET, String.class))
             .thenThrow(RuntimeException.class);
         Mockito
-            .when(restTemplate.getForObject(this.awsMvcConfig.localIPV4HostNameGet, String.class))
+            .when(restTemplate.getForObject(AwsMvcConfig.LOCAL_IPV4_HOSTNAME_GET, String.class))
             .thenThrow(RuntimeException.class);
 
         this.awsMvcConfig.hostName(restTemplate);

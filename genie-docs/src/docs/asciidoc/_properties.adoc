@@ -13,6 +13,11 @@ The Spring properties described here are ones that we have overridden from Sprin
 |===
 |Property |Description| Default Value
 
+|genie.aws.credentials.role
+|The AWS role ARN to assume when connecting to S3. If this is set Genie will create a credentials provider that will
+attempt to assume this role on the host Genie is running on
+|
+
 |genie.file.cache.location
 |Where to store cached files on local disk
 |file:///tmp/genie/cache
@@ -511,14 +516,35 @@ for more information. Currently on classpath only none, redis and jdbc will work
 
 |===
 
-=== Profile Specific Properties
+==== Spring Cloud Properties
 
-==== Dev Profile
+Properties set by default to manipulate various https://projects.spring.io/spring-cloud/[Spring Cloud] libraries.
 
 |===
 |Property |Description| Default Value
 
+|cloud.aws.credentials.useDefaultAwsCredentialsChain
+|Whether to attempt creation of a standard AWS credentials chain.
+See https://cloud.spring.io/spring-cloud-aws/[Spring Cloud AWS] for more information.
+|true
+
+|cloud.aws.region.auto
+|Whether the AWS region will be attempted to be auto recognized via the AWS metadata services on EC2.
+See https://cloud.spring.io/spring-cloud-aws/[Spring Cloud AWS] for more information.
+|false
+
+|cloud.aws.region.static
+|The default AWS region. See https://cloud.spring.io/spring-cloud-aws/[Spring Cloud AWS] for more information.
+|us-east-1
+
+|cloud.aws.stack.auto
+|Whether auto stack detection is enabled.
+See https://cloud.spring.io/spring-cloud-aws/[Spring Cloud AWS] for more information.
+|false
+
 |===
+
+=== Profile Specific Properties
 
 ==== Prod Profile
 
@@ -576,20 +602,5 @@ for more information. Currently on classpath only none, redis and jdbc will work
 |spring.datasource.hikari.data-source-properties.maintainTimeStats
 |https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration[MySQL Tuning]
 |false
-
-|===
-
-==== S3 Profile
-
-|===
-|Property |Description| Default Value
-
-|genie.aws.credentials.file
-|The file path where the AWS credentials are stored
-|
-
-|genie.aws.credentials.role
-|The AWS role ARN to assume when connecting to S3
-|
 
 |===
