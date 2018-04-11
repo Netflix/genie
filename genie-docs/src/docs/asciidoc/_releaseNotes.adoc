@@ -26,6 +26,32 @@ https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.0-Migration-Gu
 NOTE: Many Spring properties were changed as part of the Boot 2.0 release. Those are not documented here. Please
 refer to their documentation.
 
+==== Added
+
+|===
+|Property |Description| Default Value
+
+|cloud.aws.credentials.useDefaultAwsCredentialsChain
+|Whether to attempt creation of a standard AWS credentials chain.
+See https://cloud.spring.io/spring-cloud-aws/[Spring Cloud AWS] for more information.
+|true
+
+|cloud.aws.region.auto
+|Whether the AWS region will be attempted to be auto recognized via the AWS metadata services on EC2.
+See https://cloud.spring.io/spring-cloud-aws/[Spring Cloud AWS] for more information.
+|false
+
+|cloud.aws.region.static
+|The default AWS region. See https://cloud.spring.io/spring-cloud-aws/[Spring Cloud AWS] for more information.
+|us-east-1
+
+|cloud.aws.stack.auto
+|Whether auto stack detection is enabled.
+See https://cloud.spring.io/spring-cloud-aws/[Spring Cloud AWS] for more information.
+|false
+
+|===
+
 ==== Renamed
 
 |===
@@ -57,6 +83,11 @@ https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.0-Migration-Gu
 
 |===
 |Name |Reason
+
+|genie.aws.credentials.file
+|No longer necessary as `cloud.aws.credentials.useDefaultAwsCredentialsChain` is enabled by default an other Spring
+Cloud AWS properties can be used to configure more specifically other than to assume role which still uses
+`genie.aws.credentials.role`.
 
 |spring.jackson.date-format
 |Switched to `java.time.Instant` from `java.util.Date` for timestamps. Formatting in ISO8601 supported out of the box

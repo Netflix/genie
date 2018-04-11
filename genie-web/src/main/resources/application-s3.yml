@@ -1,8 +1,0 @@
-# Properties for S3
-#genie:
-#  aws:
-#    credentials:
-#      # File containing aws credentials, i.e. accessKey and secretKey
-#      file: <AWS CREDENTIALS FILENAME>
-#      # Role arn to be used to get connection to aws
-#      role: <AWS ROLE ARN>

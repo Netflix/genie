@@ -200,28 +200,22 @@ the `genie.jobs.locations.*` properties described below in the <<Properties>> se
 ===== S3
 
 If your commands, applications, or jobs depend on artifacts referenced via S3 URI, you will need to configure the S3
-subsystem.
+subsystem. If you're not assuming a role there is nothing you necessarily have to do provided a default credentials
+provider chain can be created. See
+https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/auth/DefaultAWSCredentialsProviderChain.html[here]
+for the rules for that.
 
-1. Make sure `application-s3.yml` exists in `~/.genie` (or at a custom location, referenced by
-`--spring.config.location=`)
-2. An example of `application-s3.yml` is available below. Set either `credentials.file` or `credentials.role`
-  * For `credentials.file`, provide a filename of a file **in classpath** that contains the AWS access key and secret.
-  A convenient location to place this file is `~/.genie/lib`.
-  * For `credentials.role`, provide an inline role value.
-3. Enable the Spring Boot `s3` profile during Genie launch, for example via command-line:
-`--spring.profiles.active=prod,s3`
-4. To confirm things are properly configured, head to `/actuator/beans` and verify that the `file.system.s3` bean was
-created
+If you need to assume a order to access Amazon resources from your Genie node set the property
+`genie.aws.credentials.role` to the ARN of the role you'd like to assume. This will force Genie to create a
+https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/auth/STSAssumeRoleSessionCredentialsProvider.html[STSAssumeRoleSessionCredentialsProvider]
+instead of the default one.
 
-Example `application-s3.yml`
+Example role setting:
 ```
 genie:
   aws:
     credentials:
-      # File in classpath containing aws credentials, i.e. accessKey and secretKey
-      #file: <AWS CREDENTIALS FILENAME>
-      # OR role arn string
-      #role: <AWS ROLE ARN>
+      role: <AWS ROLE ARN>
 ```
 
 === Wrap Up

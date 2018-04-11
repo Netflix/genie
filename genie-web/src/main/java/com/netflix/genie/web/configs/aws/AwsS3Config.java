@@ -19,65 +19,30 @@ package com.netflix.genie.web.configs.aws;
 
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.AWSCredentialsProvider;
-import com.amazonaws.auth.ClasspathPropertiesFileCredentialsProvider;
-import com.amazonaws.auth.STSAssumeRoleSessionCredentialsProvider;
 import com.amazonaws.retry.PredefinedRetryPolicies;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.web.properties.S3FileTransferProperties;
 import com.netflix.genie.web.services.impl.S3FileTransferImpl;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.annotation.Order;
 
 /**
  * Beans and configuration specifically for S3 connection on AWS.
  *
  * @author amsharma
+ * @author tgianos
  * @since 3.0.0
  */
-@Profile("s3")
 @Configuration
 @Slf4j
 public class AwsS3Config {
-
-    /**
-     * Create the credentials needed for the application to be able to connect to Aws. Only triggered if the
-     * property cloud.aws.credentials.provided is set to true in the config.
-     *
-     * @param credentialsFilePath The path of the file containing aws credentials
-     * @return AWS credentials object to use to connect to AWS
-     */
-    @Bean
-    @ConditionalOnProperty(value = "genie.aws.credentials.file")
-    public ClasspathPropertiesFileCredentialsProvider awsCredentialsFromFile(
-        @Value("${genie.aws.credentials.file}") final String credentialsFilePath
-    ) {
-        log.info("Creating file credentials provider bean");
-        return new ClasspathPropertiesFileCredentialsProvider(credentialsFilePath);
-    }
-
-    /**
-     * Assume role credentials provider which will be used to fetch session credentials.
-     *
-     * @param roleArn Arn of the IAM role
-     * @return Credentials provider to ask the credentials from
-     */
-    @Bean
-    @ConditionalOnProperty(value = "genie.aws.credentials.role")
-    public STSAssumeRoleSessionCredentialsProvider awsCredentialsProvider(
-        @Value("${genie.aws.credentials.role}") final String roleArn
-    ) {
-        log.info("Creating STS Assume Role Session Credentials provider bean");
-        return new STSAssumeRoleSessionCredentialsProvider.Builder(roleArn, "Genie").build();
-    }
 
     /**
      * A bean providing a client to work with S3.
@@ -87,6 +52,7 @@ public class AwsS3Config {
      * @return An amazon s3 client object
      */
     @Bean
+    @Primary
     @ConditionalOnBean(AWSCredentialsProvider.class)
     public AmazonS3 genieS3Client(
         @Value("${genie.retry.s3.noOfRetries:5}") final int noOfS3Retries,
@@ -108,7 +74,6 @@ public class AwsS3Config {
      * @param registry                 The metrics registry to use
      * @param s3FileTransferProperties Configuration properties
      * @return An s3 implementation of the FileTransfer interface
-     * @throws GenieException if there is any problem
      */
     @Bean(name = {"file.system.s3", "file.system.s3n", "file.system.s3a"})
     @Order(value = 1)
@@ -117,7 +82,7 @@ public class AwsS3Config {
         final AmazonS3 s3Client,
         final MeterRegistry registry,
         final S3FileTransferProperties s3FileTransferProperties
-    ) throws GenieException {
+    ) {
         return new S3FileTransferImpl(s3Client, registry, s3FileTransferProperties);
     }
 }
