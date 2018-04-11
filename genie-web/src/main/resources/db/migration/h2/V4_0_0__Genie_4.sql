@@ -33,7 +33,6 @@ DROP ALIAS IF EXISTS SPLIT_COMMAND_EXECUTABLE;
 CREATE ALIAS SPLIT_COMMAND_EXECUTABLE AS $$
 import java.sql.Connection;
 import java.sql.ResultSet;
-import org.apache.commons.lang3.StringUtils;
 @CODE
 void splitCommandExecutable(final Connection con) throws Exception {
 	final ResultSet rs = con.createStatement().executeQuery("SELECT `id`, `executable` FROM `commands`;");
@@ -41,7 +40,7 @@ void splitCommandExecutable(final Connection con) throws Exception {
 	while (rs.next()) {
 	    final long commandId = rs.getLong(1);
 	    final String executable = rs.getString(2);
-      final String[] arguments = StringUtils.split(executable);
+      final String[] arguments = executable.split("\\s");
       for (int i = 0; i < arguments.length; i++) {
           con
               .createStatement()
