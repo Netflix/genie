@@ -29,6 +29,7 @@ import org.opensaml.xml.parse.ParserPool;
 import org.opensaml.xml.parse.StaticBasicParserPool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -751,7 +752,7 @@ public class SAMLConfig extends WebSecurityConfigurerAdapter {
         http
             .antMatcher("/**")
                 .authorizeRequests()
-                    .antMatchers("/actuator/**").permitAll()
+                    .requestMatchers(EndpointRequest.toAnyEndpoint()).permitAll()
                     .antMatchers("/api/**").permitAll()
                     .antMatchers("/error").permitAll()
                     .antMatchers("/saml/**").permitAll()

@@ -382,6 +382,11 @@ http://docs.spring.io/spring-boot/docs/{springBootVersion}/reference/htmlsingle/
 |The Genie version to be displayed by the UI and returned by the actuator /info endpoint. Set by the build.
 |Current build version
 
+|management.endpoints.web.base-path
+|The default base path for the Spring Actuator[https://docs.spring.io/spring-boot/docs/current/actuator-api/html/]
+management endpoints. Switched from default `/actuator`
+|/admin
+
 |security.oauth2.client.client-id
 |The id of the OAuth2 client
 |

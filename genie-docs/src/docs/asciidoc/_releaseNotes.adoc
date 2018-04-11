@@ -50,6 +50,11 @@ See https://cloud.spring.io/spring-cloud-aws/[Spring Cloud AWS] for more informa
 See https://cloud.spring.io/spring-cloud-aws/[Spring Cloud AWS] for more information.
 |false
 
+|management.endpoints.web.base-path
+|The default base path for the Spring Actuator[https://docs.spring.io/spring-boot/docs/current/actuator-api/html/]
+management endpoints. Switched from default `/actuator`
+|/admin
+
 |===
 
 ==== Renamed
