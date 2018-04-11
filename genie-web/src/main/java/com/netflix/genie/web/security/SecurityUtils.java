@@ -23,7 +23,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.savedrequest.NullRequestCache;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -51,17 +50,14 @@ public final class SecurityUtils {
      *
      * @param http                   The http security object to use
      * @param x509UserDetailsService The x509 authentication user details service to use
-     * @param actuatorEndpoint       The endpoint where the Spring Actuator sits
      * @throws Exception when there is a problem configuring HTTP errors
      */
     public static void buildAPIHttpSecurity(
         @NotNull final HttpSecurity http,
-        @NotNull final X509UserDetailsService x509UserDetailsService,
-        @NotBlank final String actuatorEndpoint
+        @NotNull final X509UserDetailsService x509UserDetailsService
     ) throws Exception {
         // @formatter:off
         http
-//            .regexMatcher("(/api/.*)|(" + actuatorEndpoint + ")/(?!health).*")
             .regexMatcher("(/api/.*)")
                 .authorizeRequests()
                     .regexMatchers(HttpMethod.DELETE, APPLICATIONS_API_REGEX).hasRole(ADMIN_ROLE)

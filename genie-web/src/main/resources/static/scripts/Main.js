@@ -32,7 +32,7 @@ export default class App extends React.Component {
   }
 
   componentDidMount() {
-    fetch("/actuator/info", null, "GET", "application/json").done(data => {
+    fetch("/admin/info", null, "GET", "application/json").done(data => {
       this.setState({ version: data.genie.version });
     });
   }

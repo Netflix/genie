@@ -19,7 +19,6 @@ package com.netflix.genie.web.security.x509;
 
 import com.netflix.genie.web.security.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -40,14 +39,11 @@ public class X509Config extends WebSecurityConfigurerAdapter {
     @Autowired
     private X509UserDetailsService x509UserDetailsService;
 
-    @Autowired
-    private WebEndpointProperties endpointProperties;
-
     /**
      * {@inheritDoc}
      */
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
-        SecurityUtils.buildAPIHttpSecurity(http, this.x509UserDetailsService, this.endpointProperties.getBasePath());
+        SecurityUtils.buildAPIHttpSecurity(http, this.x509UserDetailsService);
     }
 }

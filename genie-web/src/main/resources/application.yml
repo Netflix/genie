@@ -114,6 +114,11 @@ info:
   genie:
     version: GENIE_VERSION
 
+management:
+  endpoints:
+    web:
+      base-path: /admin
+
 spring:
   application:
     name: genie
