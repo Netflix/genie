@@ -718,7 +718,7 @@ b.conum * { color: inherit !important; }
 <span id="author" class="author">Tom Gianos</span><br>
 <span id="email" class="email"><a href="mailto:NetflixOSS@netflix.com">NetflixOSS@netflix.com</a></span><br>
 <span id="revnumber">version 4.0.0-SNAPSHOT,</span>
-<span id="revdate">2018-04-10</span>
+<span id="revdate">2018-04-12</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
@@ -730,8 +730,9 @@ b.conum * { color: inherit !important; }
 <li><a href="#_library_upgrades">2.2. Library Upgrades</a></li>
 <li><a href="#_property_changes">2.3. Property Changes</a>
 <ul class="sectlevel3">
-<li><a href="#_renamed">2.3.1. Renamed</a></li>
-<li><a href="#_removed">2.3.2. Removed</a></li>
+<li><a href="#_added">2.3.1. Added</a></li>
+<li><a href="#_renamed">2.3.2. Renamed</a></li>
+<li><a href="#_removed">2.3.3. Removed</a></li>
 </ul>
 </li>
 <li><a href="#_metric_changes">2.4. Metric Changes</a>
@@ -763,7 +764,7 @@ b.conum * { color: inherit !important; }
 <li><a href="#_library_upgrades_4">5.2. Library Upgrades</a></li>
 <li><a href="#_property_changes_3">5.3. Property Changes</a>
 <ul class="sectlevel3">
-<li><a href="#_added">5.3.1. Added</a></li>
+<li><a href="#_added_2">5.3.1. Added</a></li>
 <li><a href="#_changed_default_value">5.3.2. Changed Default Value</a></li>
 <li><a href="#_removed_2">5.3.3. Removed</a></li>
 <li><a href="#_renamed_3">5.3.4. Renamed</a></li>
@@ -843,13 +844,12 @@ b.conum * { color: inherit !important; }
 <ul class="sectlevel3">
 <li><a href="#_genie_properties">9.1.1. Genie Properties</a></li>
 <li><a href="#_spring_properties">9.1.2. Spring Properties</a></li>
+<li><a href="#_spring_cloud_properties">9.1.3. Spring Cloud Properties</a></li>
 </ul>
 </li>
 <li><a href="#_profile_specific_properties">9.2. Profile Specific Properties</a>
 <ul class="sectlevel3">
-<li><a href="#_dev_profile">9.2.1. Dev Profile</a></li>
-<li><a href="#_prod_profile">9.2.2. Prod Profile</a></li>
-<li><a href="#_s3_profile">9.2.3. S3 Profile</a></li>
+<li><a href="#_prod_profile">9.2.1. Prod Profile</a></li>
 </ul>
 </li>
 </ul>
@@ -989,7 +989,55 @@ refer to their documentation.
 </table>
 </div>
 <div class="sect3">
-<h4 id="_renamed"><a class="anchor" href="#_renamed"></a>2.3.1. Renamed</h4>
+<h4 id="_added"><a class="anchor" href="#_added"></a>2.3.1. Added</h4>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 33%;">
+<col style="width: 33%;">
+<col style="width: 33%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Property</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Default Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">cloud.aws.credentials.useDefaultAwsCredentialsChain</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to attempt creation of a standard AWS credentials chain.
+See <a href="https://cloud.spring.io/spring-cloud-aws/">Spring Cloud AWS</a> for more information.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">cloud.aws.region.auto</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether the AWS region will be attempted to be auto recognized via the AWS metadata services on EC2.
+See <a href="https://cloud.spring.io/spring-cloud-aws/">Spring Cloud AWS</a> for more information.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">cloud.aws.region.static</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The default AWS region. See <a href="https://cloud.spring.io/spring-cloud-aws/">Spring Cloud AWS</a> for more information.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">us-east-1</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">cloud.aws.stack.auto</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether auto stack detection is enabled.
+See <a href="https://cloud.spring.io/spring-cloud-aws/">Spring Cloud AWS</a> for more information.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">management.endpoints.web.base-path</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The default base path for the Spring Actuator[<a href="https://docs.spring.io/spring-boot/docs/current/actuator-api/html/" class="bare">https://docs.spring.io/spring-boot/docs/current/actuator-api/html/</a>]
+management endpoints. Switched from default <code>/actuator</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">/admin</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_renamed"><a class="anchor" href="#_renamed"></a>2.3.2. Renamed</h4>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 33%;">
@@ -1032,7 +1080,7 @@ refer to their documentation.
 </table>
 </div>
 <div class="sect3">
-<h4 id="_removed"><a class="anchor" href="#_removed"></a>2.3.2. Removed</h4>
+<h4 id="_removed"><a class="anchor" href="#_removed"></a>2.3.3. Removed</h4>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 50%;">
@@ -1045,6 +1093,12 @@ refer to their documentation.
 </tr>
 </thead>
 <tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.aws.credentials.file</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">No longer necessary as <code>cloud.aws.credentials.useDefaultAwsCredentialsChain</code> is enabled by default an other Spring
+Cloud AWS properties can be used to configure more specifically other than to assume role which still uses
+<code>genie.aws.credentials.role</code>.</p></td>
+</tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">spring.jackson.date-format</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Switched to <code>java.time.Instant</code> from <code>java.util.Date</code> for timestamps. Formatting in ISO8601 supported out of the box
@@ -1482,7 +1536,7 @@ to Spring Integration Zookeeper. That library is now used.</p>
 <div class="sect2">
 <h3 id="_property_changes_3"><a class="anchor" href="#_property_changes_3"></a>5.3. Property Changes</h3>
 <div class="sect3">
-<h4 id="_added"><a class="anchor" href="#_added"></a>5.3.1. Added</h4>
+<h4 id="_added_2"><a class="anchor" href="#_added_2"></a>5.3.1. Added</h4>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 33%;">
@@ -4677,50 +4731,26 @@ the <code>genie.jobs.locations.*</code> properties described below in the <a hre
 <h5 id="_s3"><a class="anchor" href="#_s3"></a>8.3.3.1. S3</h5>
 <div class="paragraph">
 <p>If your commands, applications, or jobs depend on artifacts referenced via S3 URI, you will need to configure the S3
-subsystem.</p>
-</div>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>Make sure <code>application-s3.yml</code> exists in <code>~/.genie</code> (or at a custom location, referenced by
-<code>--spring.config.location=</code>)</p>
-</li>
-<li>
-<p>An example of <code>application-s3.yml</code> is available below. Set either <code>credentials.file</code> or <code>credentials.role</code></p>
-<div class="ulist">
-<ul>
-<li>
-<p>For <code>credentials.file</code>, provide a filename of a file <strong>in classpath</strong> that contains the AWS access key and secret.
-A convenient location to place this file is <code>~/.genie/lib</code>.</p>
-</li>
-<li>
-<p>For <code>credentials.role</code>, provide an inline role value.</p>
-</li>
-</ul>
-</div>
-</li>
-<li>
-<p>Enable the Spring Boot <code>s3</code> profile during Genie launch, for example via command-line:
-<code>--spring.profiles.active=prod,s3</code></p>
-</li>
-<li>
-<p>To confirm things are properly configured, head to <code>/actuator/beans</code> and verify that the <code>file.system.s3</code> bean was
-created</p>
-</li>
-</ol>
+subsystem. If you&#8217;re not assuming a role there is nothing you necessarily have to do provided a default credentials
+provider chain can be created. See
+<a href="https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/auth/DefaultAWSCredentialsProviderChain.html">here</a>
+for the rules for that.</p>
 </div>
 <div class="paragraph">
-<p>Example <code>application-s3.yml</code></p>
+<p>If you need to assume a order to access Amazon resources from your Genie node set the property
+<code>genie.aws.credentials.role</code> to the ARN of the role you&#8217;d like to assume. This will force Genie to create a
+<a href="https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/auth/STSAssumeRoleSessionCredentialsProvider.html">STSAssumeRoleSessionCredentialsProvider</a>
+instead of the default one.</p>
+</div>
+<div class="paragraph">
+<p>Example role setting:</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code>genie:
   aws:
     credentials:
-      # File in classpath containing aws credentials, i.e. accessKey and secretKey
-      #file: &lt;AWS CREDENTIALS FILENAME&gt;
-      # OR role arn string
-      #role: &lt;AWS ROLE ARN&gt;</code></pre>
+      role: &lt;AWS ROLE ARN&gt;</code></pre>
 </div>
 </div>
 </div>
@@ -4764,6 +4794,12 @@ The Spring properties described here are ones that we have overridden from Sprin
 </tr>
 </thead>
 <tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">genie.aws.credentials.role</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The AWS role ARN to assume when connecting to S3. If this is set Genie will create a credentials provider that will
+attempt to assume this role on the host Genie is running on</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">genie.file.cache.location</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Where to store cached files on local disk</p></td>
@@ -5225,6 +5261,12 @@ to the number of CPU cores x 2 + 1</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Current build version</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">management.endpoints.web.base-path</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The default base path for the Spring Actuator[<a href="https://docs.spring.io/spring-boot/docs/current/actuator-api/html/" class="bare">https://docs.spring.io/spring-boot/docs/current/actuator-api/html/</a>]
+management endpoints. Switched from default <code>/actuator</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">/admin</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">security.oauth2.client.client-id</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The id of the OAuth2 client</p></td>
 <td class="tableblock halign-left valign-top"></td>
@@ -5391,11 +5433,11 @@ for more information. Currently on classpath only none, redis and jdbc will work
 </tbody>
 </table>
 </div>
-</div>
-<div class="sect2">
-<h3 id="_profile_specific_properties"><a class="anchor" href="#_profile_specific_properties"></a>9.2. Profile Specific Properties</h3>
 <div class="sect3">
-<h4 id="_dev_profile"><a class="anchor" href="#_dev_profile"></a>9.2.1. Dev Profile</h4>
+<h4 id="_spring_cloud_properties"><a class="anchor" href="#_spring_cloud_properties"></a>9.1.3. Spring Cloud Properties</h4>
+<div class="paragraph">
+<p>Properties set by default to manipulate various <a href="https://projects.spring.io/spring-cloud/">Spring Cloud</a> libraries.</p>
+</div>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 33%;">
@@ -5409,10 +5451,38 @@ for more information. Currently on classpath only none, redis and jdbc will work
 <th class="tableblock halign-left valign-top">Default Value</th>
 </tr>
 </thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">cloud.aws.credentials.useDefaultAwsCredentialsChain</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether to attempt creation of a standard AWS credentials chain.
+See <a href="https://cloud.spring.io/spring-cloud-aws/">Spring Cloud AWS</a> for more information.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">true</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">cloud.aws.region.auto</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether the AWS region will be attempted to be auto recognized via the AWS metadata services on EC2.
+See <a href="https://cloud.spring.io/spring-cloud-aws/">Spring Cloud AWS</a> for more information.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">cloud.aws.region.static</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The default AWS region. See <a href="https://cloud.spring.io/spring-cloud-aws/">Spring Cloud AWS</a> for more information.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">us-east-1</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">cloud.aws.stack.auto</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Whether auto stack detection is enabled.
+See <a href="https://cloud.spring.io/spring-cloud-aws/">Spring Cloud AWS</a> for more information.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
+</tr>
+</tbody>
 </table>
 </div>
+</div>
+<div class="sect2">
+<h3 id="_profile_specific_properties"><a class="anchor" href="#_profile_specific_properties"></a>9.2. Profile Specific Properties</h3>
 <div class="sect3">
-<h4 id="_prod_profile"><a class="anchor" href="#_prod_profile"></a>9.2.2. Prod Profile</h4>
+<h4 id="_prod_profile"><a class="anchor" href="#_prod_profile"></a>9.2.1. Prod Profile</h4>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 33%;">
@@ -5491,35 +5561,6 @@ for more information. Currently on classpath only none, redis and jdbc will work
 <td class="tableblock halign-left valign-top"><p class="tableblock">spring.datasource.hikari.data-source-properties.maintainTimeStats</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration">MySQL Tuning</a></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">false</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_s3_profile"><a class="anchor" href="#_s3_profile"></a>9.2.3. S3 Profile</h4>
-<table class="tableblock frame-all grid-all spread">
-<colgroup>
-<col style="width: 33%;">
-<col style="width: 33%;">
-<col style="width: 33%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Property</th>
-<th class="tableblock halign-left valign-top">Description</th>
-<th class="tableblock halign-left valign-top">Default Value</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.aws.credentials.file</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The file path where the AWS credentials are stored</p></td>
-<td class="tableblock halign-left valign-top"></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">genie.aws.credentials.role</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The AWS role ARN to assume when connecting to S3</p></td>
-<td class="tableblock halign-left valign-top"></td>
 </tr>
 </tbody>
 </table>
@@ -6095,7 +6136,7 @@ published within the local JVM and available on the Actuator <code>/metrics</cod
 <div id="footer">
 <div id="footer-text">
 Version 4.0.0-SNAPSHOT<br>
-Last updated 2018-04-10 02:02:54 UTC
+Last updated 2018-04-12 18:21:27 UTC
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
