@@ -48,7 +48,7 @@ public abstract class BaseStateAction implements StateAction {
         final String currentActionName = this.getClass().getSimpleName();
 
         // Enqueue this action for later cleanup
-        executionContext.getCleanupActions().addLast(this);
+        executionContext.addCleanupActions(this);
 
         Events nextEvent;
         try {
@@ -57,7 +57,7 @@ public abstract class BaseStateAction implements StateAction {
             nextEvent = executeStateAction(executionContext);
             log.info("State action {} returned {} as next event", currentActionName, nextEvent);
         } catch (final Exception e) {
-            executionContext.setStateActionError(currentState, this.getClass(), e);
+            executionContext.addStateActionError(currentState, this.getClass(), e);
             nextEvent = Events.ERROR;
             log.error(
                 "Action {} failed with exception",
