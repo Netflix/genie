@@ -20,20 +20,21 @@ package com.netflix.genie.agent.execution.statemachine.actions
 
 import com.netflix.genie.agent.execution.ExecutionContext
 import com.netflix.genie.agent.execution.statemachine.Events
+import org.assertj.core.util.Lists
 import spock.lang.Specification
 
 class CleanupJobActionSpec extends Specification {
     ExecutionContext executionContext
     CleanupJobAction action
-    Deque<StateAction> cleanupDeque
+    List<StateAction> cleanupQueue
 
 
     void setup() {
         this.executionContext = Mock(ExecutionContext)
         this.action = new CleanupJobAction(executionContext)
-        this.cleanupDeque = new ArrayDeque<>()
+        this.cleanupQueue = Lists.newArrayList()
 
-        executionContext.getCleanupActions() >> cleanupDeque
+        executionContext.getCleanupActions() >> cleanupQueue
     }
 
     void cleanup() {
@@ -51,9 +52,9 @@ class CleanupJobActionSpec extends Specification {
         setup:
         def action1 = Mock(StateAction)
         def action2 = Mock(StateAction)
-        cleanupDeque.addLast(action1)
-        cleanupDeque.addLast(action2)
-        cleanupDeque.addLast(action)
+        cleanupQueue.add(action1)
+        cleanupQueue.add(action2)
+        cleanupQueue.add(action)
 
         when:
         def event = action.executeStateAction(executionContext)
@@ -69,9 +70,9 @@ class CleanupJobActionSpec extends Specification {
         setup:
         def action1 = Mock(StateAction)
         def action2 = Mock(StateAction)
-        cleanupDeque.addLast(action1)
-        cleanupDeque.addLast(action2)
-        cleanupDeque.addLast(action)
+        cleanupQueue.add(action1)
+        cleanupQueue.add(action2)
+        cleanupQueue.add(action)
 
         when:
         def event = action.executeStateAction(executionContext)
