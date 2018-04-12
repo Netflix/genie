@@ -20,6 +20,7 @@ package com.netflix.genie.agent.execution;
 
 import com.netflix.genie.agent.execution.statemachine.States;
 import com.netflix.genie.agent.execution.statemachine.actions.StateAction;
+import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.v4.JobSpecification;
 import org.apache.commons.lang3.tuple.Triple;
 import org.springframework.statemachine.action.Action;
@@ -86,6 +87,7 @@ public interface ExecutionContext {
 
     /**
      * Set the job specification.
+     *
      * @param jobSpecification the job specification
      */
     void setJobSpecification(final JobSpecification jobSpecification);
@@ -143,4 +145,18 @@ public interface ExecutionContext {
      * @return a list of actions that failed in the form of a Triple.
      */
     List<Triple<States, Class<? extends Action>, Exception>> getStateActionErrors();
+
+    /**
+     * Set the final job status.
+     *
+     * @param jobStatus the final job status
+     */
+    void setFinalJobStatus(final JobStatus jobStatus);
+
+    /**
+     * Get the final job status, if one was set.
+     *
+     * @return the final job status or null
+     */
+    @Nullable JobStatus getFinalJobStatus();
 }

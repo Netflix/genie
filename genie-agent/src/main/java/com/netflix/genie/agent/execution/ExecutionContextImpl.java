@@ -22,6 +22,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
 import com.netflix.genie.agent.execution.statemachine.States;
 import com.netflix.genie.agent.execution.statemachine.actions.StateAction;
+import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.v4.JobSpecification;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Triple;
@@ -55,6 +56,7 @@ class ExecutionContextImpl implements ExecutionContext {
     private final AtomicReference<File> jobDirectoryRef = new AtomicReference<>();
     private final AtomicReference<JobSpecification> jobSpecRef = new AtomicReference<>();
     private final AtomicReference<Map<String, String>> jobEnvironmentRef = new AtomicReference<>();
+    private final AtomicReference<JobStatus> finalJobStatusRef = new AtomicReference<>();
     private final Deque<StateAction> cleanupActions = Queues.newArrayDeque();
     private final List<Triple<States, Class<? extends Action>, Exception>> stateActionErrors
         = Collections.synchronizedList(Lists.newArrayList());
@@ -173,6 +175,25 @@ class ExecutionContextImpl implements ExecutionContext {
     @Override
     public List<Triple<States, Class<? extends Action>, Exception>> getStateActionErrors() {
         return Collections.unmodifiableList(stateActionErrors);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setFinalJobStatus(final JobStatus jobStatus) {
+        if (jobStatus.isActive()) {
+            throw new IllegalArgumentException("Invalid final job status: " + jobStatus);
+        }
+        setIfNullOrTrow(jobStatus, finalJobStatusRef);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JobStatus getFinalJobStatus() {
+        return finalJobStatusRef.get();
     }
 
     private static <T> void setIfNullOrTrow(final T value, final AtomicReference<T> reference) {
