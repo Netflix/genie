@@ -18,22 +18,25 @@
 
 package com.netflix.genie.agent.execution
 
+import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.dto.v4.JobSpecification
 import com.netflix.genie.test.categories.UnitTest
 import org.junit.experimental.categories.Category
 import spock.lang.Specification
+import spock.lang.Unroll
 
 @Category(UnitTest.class)
 class ExecutionContextImplSpec extends Specification {
 
     def "Get and set all"() {
         setup:
-        ExecutionContext executionContext = new ExecutionContextImpl()
+        ExecutionContext executionContext = new ExecutionContextImpl(agentEventsService)
         String agentId = "foo"
         Process process = Mock()
         File directory = Mock()
         JobSpecification spec = Mock()
         Map<String, String> env = [ "foo": "bar" ]
+        JobStatus finalJobStatus = JobStatus.SUCCEEDED
 
         expect:
         null == executionContext.getAgentId()
@@ -41,6 +44,7 @@ class ExecutionContextImplSpec extends Specification {
         null == executionContext.getJobDirectory()
         null == executionContext.getJobSpecification()
         null == executionContext.getJobEnvironment()
+        null == executionContext.getFinalJobStatus()
 
         when:
         executionContext.setAgentId(agentId)
@@ -48,6 +52,7 @@ class ExecutionContextImplSpec extends Specification {
         executionContext.setJobDirectory(directory)
         executionContext.setJobSpecification(spec)
         executionContext.setJobEnvironment(env)
+        executionContext.setFinalJobStatus(finalJobStatus)
 
         then:
         agentId == executionContext.getAgentId()
@@ -55,6 +60,7 @@ class ExecutionContextImplSpec extends Specification {
         directory == executionContext.getJobDirectory()
         spec == executionContext.getJobSpecification()
         env == executionContext.getJobEnvironment()
+        finalJobStatus == executionContext.getFinalJobStatus()
 
         when:
         executionContext.setAgentId("bar")
@@ -85,5 +91,46 @@ class ExecutionContextImplSpec extends Specification {
 
         then:
         thrown(RuntimeException)
+
+        when:
+        executionContext.setFinalJobStatus(JobStatus.FAILED)
+
+        then:
+        thrown(RuntimeException)
+    }
+
+    @Unroll
+    def "Set final job status #jobStatus"(JobStatus jobStatus) {
+        setup:
+        ExecutionContext executionContext = new ExecutionContextImpl()
+
+        when:
+        executionContext.setFinalJobStatus(jobStatus)
+
+        then:
+        jobStatus == executionContext.getFinalJobStatus()
+
+        where:
+        jobStatus           | _
+        JobStatus.FAILED    | _
+        JobStatus.SUCCEEDED | _
+        JobStatus.KILLED    | _
+    }
+
+    @Unroll
+    def "Set invalid final job status #jobStatus"(JobStatus jobStatus) {
+        setup:
+        ExecutionContext executionContext = new ExecutionContextImpl()
+
+        when:
+        executionContext.setFinalJobStatus(jobStatus)
+
+        then:
+        thrown(IllegalArgumentException)
+
+        where:
+        jobStatus         | _
+        JobStatus.INIT    | _
+        JobStatus.RUNNING | _
     }
 }
