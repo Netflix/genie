@@ -36,7 +36,7 @@ import java.time.Instant;
  * @author tgianos
  */
 @Getter
-@ToString(callSuper = true, exclude = "entityVersion")
+@ToString(callSuper = true, of = {"created", "updated"})
 @MappedSuperclass
 public class AuditEntity extends IdEntity implements AuditProjection {
 

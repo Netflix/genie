@@ -71,16 +71,34 @@ import java.util.Set;
 @Setter
 @ToString(
     callSuper = true,
-    exclude = {
-        "configs",
-        "dependencies",
-        "tags",
-        "cluster",
-        "command",
-        "applications",
-        "clusterCriteria",
-        "commandCriterion",
-        "applicationsRequested"
+    of = {
+        "genieUserGroup",
+        "disableLogArchival",
+        "email",
+        "cpuRequested",
+        "memoryRequested",
+        "timeoutRequested",
+        "grouping",
+        "groupingInstance",
+        "clientHost",
+        "userAgent",
+        "numAttachments",
+        "totalSizeOfAttachments",
+        "stdOutSize",
+        "stdErrSize",
+        "clusterName",
+        "commandName",
+        "status",
+        "statusMsg",
+        "started",
+        "finished",
+        "hostName",
+        "processId",
+        "checkDelay",
+        "exitCode",
+        "memoryUsed",
+        "timeout",
+        "archiveLocation"
     }
 )
 @Entity

@@ -39,8 +39,8 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 @Getter
 @Setter
-@EqualsAndHashCode(of = "file", callSuper = false)
-@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = false, of = {"file"})
+@ToString(callSuper = true, of = {"file"})
 @Entity
 @Table(name = "files")
 public class FileEntity extends AuditEntity {
