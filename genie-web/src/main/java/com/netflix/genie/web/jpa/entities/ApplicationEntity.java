@@ -47,7 +47,7 @@ import java.util.Set;
  */
 @Getter
 @Setter
-@ToString(callSuper = true, exclude = {"configs", "dependencies", "tags", "commands"})
+@ToString(callSuper = true, of = {"status", "type"})
 @Entity
 @Table(name = "applications")
 public class ApplicationEntity extends BaseEntity {

@@ -52,7 +52,7 @@ import java.util.Set;
  */
 @Getter
 @Setter
-@ToString(callSuper = true, exclude = {"configs", "dependencies", "tags", "commands"})
+@ToString(callSuper = true, of = {"status"})
 @Entity
 @Table(name = "clusters")
 public class ClusterEntity extends BaseEntity implements ClusterCommandsProjection {
