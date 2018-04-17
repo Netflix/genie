@@ -361,12 +361,26 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
             = Lists.newArrayListWithExpectedSize(jobRequest.getClusterCriterias().size());
 
         for (final ClusterCriteria clusterCriterion : jobRequest.getClusterCriterias()) {
-            clusterCriteria.add(new CriterionEntity(this.createAndGetTagEntities(clusterCriterion.getTags())));
+            clusterCriteria.add(
+                new CriterionEntity(
+                    null,
+                    null,
+                    null,
+                    null,
+                    this.createAndGetTagEntities(clusterCriterion.getTags())
+                )
+            );
         }
         jobEntity.setClusterCriteria(clusterCriteria);
 
         jobEntity.setCommandCriterion(
-            new CriterionEntity(this.createAndGetTagEntities(jobRequest.getCommandCriteria()))
+            new CriterionEntity(
+                null,
+                null,
+                null,
+                null,
+                this.createAndGetTagEntities(jobRequest.getCommandCriteria())
+            )
         );
         jobEntity.setConfigs(this.createAndGetFileEntities(jobRequest.getConfigs()));
         jobEntity.setDependencies(this.createAndGetFileEntities(jobRequest.getDependencies()));
