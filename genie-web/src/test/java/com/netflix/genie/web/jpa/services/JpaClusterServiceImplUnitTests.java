@@ -114,9 +114,9 @@ public class JpaClusterServiceImplUnitTests {
             new ClusterMetadata.Builder(
                 CLUSTER_1_NAME,
                 CLUSTER_1_USER,
+                CLUSTER_1_VERSION,
                 ClusterStatus.OUT_OF_SERVICE
             )
-                .withVersion(CLUSTER_1_VERSION)
                 .build()
         )
             .withRequestedId(CLUSTER_1_ID)
@@ -148,7 +148,7 @@ public class JpaClusterServiceImplUnitTests {
                 Instant.now(),
                 Instant.now(),
                 new ExecutionEnvironment(null, null, null),
-                new ClusterMetadata.Builder(" ", " ", ClusterStatus.UP).build()
+                new ClusterMetadata.Builder(" ", " ", " ", ClusterStatus.UP).build()
             )
         );
     }

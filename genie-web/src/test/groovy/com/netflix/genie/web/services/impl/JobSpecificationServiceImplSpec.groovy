@@ -102,6 +102,7 @@ class JobSpecificationServiceImplSpec extends Specification {
                 new ClusterMetadata.Builder(
                         UUID.randomUUID().toString(),
                         UUID.randomUUID().toString(),
+                        UUID.randomUUID().toString(),
                         ClusterStatus.UP
                 ).withTags(clusterTags).build()
         )
@@ -111,6 +112,7 @@ class JobSpecificationServiceImplSpec extends Specification {
                 Instant.now(),
                 new ExecutionEnvironment(null, null, null),
                 new ClusterMetadata.Builder(
+                        UUID.randomUUID().toString(),
                         UUID.randomUUID().toString(),
                         UUID.randomUUID().toString(),
                         ClusterStatus.UP
@@ -128,6 +130,7 @@ class JobSpecificationServiceImplSpec extends Specification {
                 Instant.now(),
                 new ExecutionEnvironment(null, null, null),
                 new CommandMetadata.Builder(
+                        UUID.randomUUID().toString(),
                         UUID.randomUUID().toString(),
                         UUID.randomUUID().toString(),
                         CommandStatus.ACTIVE
@@ -254,6 +257,7 @@ class JobSpecificationServiceImplSpec extends Specification {
                 new ClusterMetadata.Builder(
                         clusterName,
                         UUID.randomUUID().toString(),
+                        UUID.randomUUID().toString(),
                         ClusterStatus.UP
                 ).withTags(clusterTags).build()
         )
@@ -264,6 +268,7 @@ class JobSpecificationServiceImplSpec extends Specification {
                 new ExecutionEnvironment(null, null, null),
                 new CommandMetadata.Builder(
                         commandName,
+                        UUID.randomUUID().toString(),
                         UUID.randomUUID().toString(),
                         CommandStatus.ACTIVE
                 ).withTags(commandTags).build(),
@@ -391,7 +396,7 @@ class JobSpecificationServiceImplSpec extends Specification {
                 true,
                 timeout,
                 true,
-                new JobMetadata.Builder(name, user)
+                new JobMetadata.Builder(name, user, version)
                         .withTags(tags)
                         .withGroupingInstance(groupingInstance)
                         .withGrouping(grouping)
@@ -399,7 +404,6 @@ class JobSpecificationServiceImplSpec extends Specification {
                         .withEmail(email)
                         .withMetadata(metadata)
                         .withDescription(description)
-                        .withVersion(version)
                         .build(),
                 new ExecutionResourceCriteria(clusterCriteria, commandCriterion, applicationIds),
                 null

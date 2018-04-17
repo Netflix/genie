@@ -50,8 +50,9 @@ public class BaseEntity extends UniqueIdEntity implements BaseProjection, SetupF
 
     private static final long serialVersionUID = -5040659007494311180L;
 
-    @Basic
-    @Column(name = "version")
+    @Basic(optional = false)
+    @Column(name = "version", nullable = false)
+    @NotBlank(message = "Version is missing and is required.")
     @Size(max = 255, message = "Max length in database is 255 characters")
     private String version;
 
@@ -86,23 +87,6 @@ public class BaseEntity extends UniqueIdEntity implements BaseProjection, SetupF
      */
     BaseEntity() {
         super();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Optional<String> getVersion() {
-        return Optional.ofNullable(this.version);
-    }
-
-    /**
-     * Set the version of the resource this entity represents.
-     *
-     * @param version The new version or null if there isn't one
-     */
-    public void setVersion(@Nullable final String version) {
-        this.version = version;
     }
 
     /**

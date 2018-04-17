@@ -99,6 +99,7 @@ public class JpaTagServiceImplIntegrationTest extends DBUnitTestBase {
             new ApplicationMetadata.Builder(
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
                 ApplicationStatus.ACTIVE
             )
                 .withTags(Sets.newHashSet(tag2))

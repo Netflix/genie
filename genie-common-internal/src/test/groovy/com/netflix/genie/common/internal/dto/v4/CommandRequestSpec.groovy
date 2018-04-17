@@ -33,6 +33,7 @@ class CommandRequestSpec extends Specification {
         def metadata = new CommandMetadata.Builder(
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
                 CommandStatus.ACTIVE
         ).build()
         def requestedId = UUID.randomUUID().toString()

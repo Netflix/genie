@@ -105,6 +105,7 @@ public class JpaFileServiceImplIntegrationTest extends DBUnitTestBase {
             new ApplicationMetadata.Builder(
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
                 ApplicationStatus.ACTIVE
             ).build())
             .withResources(

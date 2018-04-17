@@ -35,6 +35,7 @@ class CommandSpec extends Specification {
         def metadata = new CommandMetadata.Builder(
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
                 CommandStatus.ACTIVE
         ).build()
         def id = UUID.randomUUID().toString()

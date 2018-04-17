@@ -60,7 +60,6 @@ public final class DtoConverters {
      * The Genie 3 prefix for resource names added to the set of tags by the system.
      */
     public static final String GENIE_NAME_PREFIX = "genie.name:";
-    static final String NO_VERSION_SPECIFIED = "No Version Specified";
 
     private DtoConverters() {
     }
@@ -71,9 +70,9 @@ public final class DtoConverters {
         final ApplicationMetadata.Builder metadataBuilder = new ApplicationMetadata.Builder(
             v3Application.getName(),
             v3Application.getUser(),
+            v3Application.getVersion(),
             v3Application.getStatus()
         )
-            .withVersion(v3Application.getVersion())
             .withTags(toV4Tags(v3Application.getTags()));
 
         v3Application.getMetadata().ifPresent(metadataBuilder::withMetadata);
@@ -105,9 +104,9 @@ public final class DtoConverters {
         final ApplicationMetadata.Builder metadataBuilder = new ApplicationMetadata.Builder(
             v3Application.getName(),
             v3Application.getUser(),
+            v3Application.getVersion(),
             v3Application.getStatus()
         )
-            .withVersion(v3Application.getVersion())
             .withTags(toV4Tags(v3Application.getTags()));
 
         v3Application.getMetadata().ifPresent(metadataBuilder::withMetadata);
@@ -140,7 +139,7 @@ public final class DtoConverters {
             = new com.netflix.genie.common.dto.Application.Builder(
             applicationMetadata.getName(),
             applicationMetadata.getUser(),
-            applicationMetadata.getVersion().orElse(NO_VERSION_SPECIFIED),
+            applicationMetadata.getVersion(),
             applicationMetadata.getStatus()
         )
             .withId(v4Application.getId())
@@ -163,9 +162,9 @@ public final class DtoConverters {
         final ClusterMetadata.Builder metadataBuilder = new ClusterMetadata.Builder(
             v3Cluster.getName(),
             v3Cluster.getUser(),
+            v3Cluster.getVersion(),
             v3Cluster.getStatus()
         )
-            .withVersion(v3Cluster.getVersion())
             .withTags(toV4Tags(v3Cluster.getTags()));
 
         v3Cluster.getMetadata().ifPresent(metadataBuilder::withMetadata);
@@ -194,9 +193,9 @@ public final class DtoConverters {
         final ClusterMetadata.Builder metadataBuilder = new ClusterMetadata.Builder(
             v3Cluster.getName(),
             v3Cluster.getUser(),
+            v3Cluster.getVersion(),
             v3Cluster.getStatus()
         )
-            .withVersion(v3Cluster.getVersion())
             .withTags(toV4Tags(v3Cluster.getTags()));
 
         v3Cluster.getMetadata().ifPresent(metadataBuilder::withMetadata);
@@ -228,7 +227,7 @@ public final class DtoConverters {
             = new com.netflix.genie.common.dto.Cluster.Builder(
             clusterMetadata.getName(),
             clusterMetadata.getUser(),
-            clusterMetadata.getVersion().orElse(NO_VERSION_SPECIFIED),
+            clusterMetadata.getVersion(),
             clusterMetadata.getStatus()
         )
             .withId(v4Cluster.getId())
@@ -250,9 +249,9 @@ public final class DtoConverters {
         final CommandMetadata.Builder metadataBuilder = new CommandMetadata.Builder(
             v3Command.getName(),
             v3Command.getUser(),
+            v3Command.getVersion(),
             v3Command.getStatus()
         )
-            .withVersion(v3Command.getVersion())
             .withTags(toV4Tags(v3Command.getTags()));
 
         v3Command.getMetadata().ifPresent(metadataBuilder::withMetadata);
@@ -285,9 +284,9 @@ public final class DtoConverters {
         final CommandMetadata.Builder metadataBuilder = new CommandMetadata.Builder(
             v3Command.getName(),
             v3Command.getUser(),
+            v3Command.getVersion(),
             v3Command.getStatus()
         )
-            .withVersion(v3Command.getVersion())
             .withTags(toV4Tags(v3Command.getTags()));
 
         v3Command.getDescription().ifPresent(metadataBuilder::withDescription);
@@ -317,7 +316,7 @@ public final class DtoConverters {
         final com.netflix.genie.common.dto.Command.Builder builder = new com.netflix.genie.common.dto.Command.Builder(
             commandMetadata.getName(),
             commandMetadata.getUser(),
-            commandMetadata.getVersion().orElse(NO_VERSION_SPECIFIED),
+            commandMetadata.getVersion(),
             commandMetadata.getStatus(),
             StringUtils.join(v4Command.getExecutable(), ' '),
             v4Command.getCheckDelay()
@@ -357,10 +356,10 @@ public final class DtoConverters {
 
         final JobMetadata.Builder metadataBuilder = new JobMetadata.Builder(
             v3JobRequest.getName(),
-            v3JobRequest.getUser()
+            v3JobRequest.getUser(),
+            v3JobRequest.getVersion()
         )
-            .withTags(v3JobRequest.getTags())
-            .withVersion(v3JobRequest.getVersion());
+            .withTags(v3JobRequest.getTags());
 
         v3JobRequest.getMetadata().ifPresent(metadataBuilder::withMetadata);
         v3JobRequest.getEmail().ifPresent(metadataBuilder::withEmail);
@@ -409,7 +408,7 @@ public final class DtoConverters {
             = new com.netflix.genie.common.dto.JobRequest.Builder(
             v4JobRequest.getMetadata().getName(),
             v4JobRequest.getMetadata().getUser(),
-            v4JobRequest.getMetadata().getVersion().orElse(NO_VERSION_SPECIFIED),
+            v4JobRequest.getMetadata().getVersion(),
             v4JobRequest
                 .getCriteria()
                 .getClusterCriteria()

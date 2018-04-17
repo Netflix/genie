@@ -32,6 +32,7 @@ class ClusterRequestSpec extends Specification {
         def metadata = new ClusterMetadata.Builder(
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
                 ClusterStatus.OUT_OF_SERVICE
         ).build()
         def requestedId = UUID.randomUUID().toString()

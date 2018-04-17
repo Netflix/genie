@@ -32,6 +32,7 @@ class ApplicationRequestSpec extends Specification {
         def metadata = new ApplicationMetadata.Builder(
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
                 ApplicationStatus.DEPRECATED
         ).build()
         def requestedId = UUID.randomUUID().toString()

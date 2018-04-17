@@ -24,6 +24,7 @@ import com.netflix.genie.common.util.GenieObjectMapper
 import com.netflix.genie.test.categories.UnitTest
 import org.junit.experimental.categories.Category
 import spock.lang.Specification
+
 /**
  * Specifications for the {@link JobMetadata} class.
  *
@@ -45,8 +46,7 @@ class CommandMetadataSpec extends Specification {
         CommandMetadata commandMetadata
 
         when:
-        commandMetadata = new CommandMetadata.Builder(name, user, status)
-                .withVersion(version)
+        commandMetadata = new CommandMetadata.Builder(name, user, version, status)
                 .withDescription(description)
                 .withTags(tags)
                 .withMetadata(metadata)
@@ -56,31 +56,31 @@ class CommandMetadataSpec extends Specification {
         commandMetadata.getName() == name
         commandMetadata.getUser() == user
         commandMetadata.getStatus() == status
-        commandMetadata.getVersion().orElse(UUID.randomUUID().toString()) == version
+        commandMetadata.getVersion() == version
         commandMetadata.getDescription().orElse(UUID.randomUUID().toString()) == description
         commandMetadata.getTags() == tags
         commandMetadata.getMetadata().orElse(Mock(JsonNode)) == metadata
 
         when:
-        commandMetadata = new CommandMetadata.Builder(name, user, status).withMetadata(metadataJson).build()
+        commandMetadata = new CommandMetadata.Builder(name, user, version, status).withMetadata(metadataJson).build()
 
         then:
         commandMetadata.getName() == name
         commandMetadata.getUser() == user
         commandMetadata.getStatus() == status
-        !commandMetadata.getVersion().isPresent()
+        commandMetadata.getVersion() == version
         !commandMetadata.getDescription().isPresent()
         commandMetadata.getTags().isEmpty()
         commandMetadata.getMetadata().orElse(Mock(JsonNode)) == metadata
 
         when:
-        commandMetadata = new CommandMetadata.Builder(name, user, status).build()
+        commandMetadata = new CommandMetadata.Builder(name, user, version, status).build()
 
         then:
         commandMetadata.getName() == name
         commandMetadata.getUser() == user
         commandMetadata.getStatus() == status
-        !commandMetadata.getVersion().isPresent()
+        commandMetadata.getVersion() == version
         !commandMetadata.getDescription().isPresent()
         commandMetadata.getTags().isEmpty()
         !commandMetadata.getMetadata().isPresent()
@@ -88,8 +88,7 @@ class CommandMetadataSpec extends Specification {
         when: "Empty strings should result in not present"
         def newTags = Sets.newHashSet(tags)
         newTags.add("     ")
-        commandMetadata = new CommandMetadata.Builder(name, user, status)
-                .withVersion(" ")
+        commandMetadata = new CommandMetadata.Builder(name, user, version, status)
                 .withDescription("")
                 .withTags(newTags)
                 .withMetadata(metadata)
@@ -99,7 +98,7 @@ class CommandMetadataSpec extends Specification {
         commandMetadata.getName() == name
         commandMetadata.getUser() == user
         commandMetadata.getStatus() == status
-        !commandMetadata.getVersion().isPresent()
+        commandMetadata.getVersion() == version
         !commandMetadata.getDescription().isPresent()
         commandMetadata.getTags() == tags
         commandMetadata.getMetadata().orElse(Mock(JsonNode)) == metadata

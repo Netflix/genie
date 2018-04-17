@@ -85,19 +85,5 @@ LANGUAGE plpgsql;
 SELECT genie_split_commands_330();
 DROP FUNCTION genie_split_commands_330();
 
-ALTER TABLE applications
-  ALTER COLUMN version DROP NOT NULL,
-  ALTER COLUMN version SET DEFAULT NULL;
-
-ALTER TABLE clusters
-  ALTER COLUMN version DROP NOT NULL,
-  ALTER COLUMN version SET DEFAULT NULL;
-
 ALTER TABLE commands
-  ALTER COLUMN version DROP NOT NULL,
-  ALTER COLUMN version SET DEFAULT NULL,
   DROP COLUMN executable;
-
-ALTER TABLE jobs
-  ALTER COLUMN version DROP NOT NULL,
-  ALTER COLUMN version SET DEFAULT NULL;

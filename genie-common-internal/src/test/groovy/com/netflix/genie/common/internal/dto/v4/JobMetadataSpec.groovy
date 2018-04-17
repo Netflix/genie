@@ -49,7 +49,6 @@ class JobMetadataSpec extends Specification {
 
         when:
         jobUserMetadata = new JobMetadata.Builder(name, user)
-                .withVersion(version)
                 .withDescription(description)
                 .withTags(tags)
                 .withMetadata(metadata)
@@ -62,7 +61,7 @@ class JobMetadataSpec extends Specification {
         then:
         jobUserMetadata.getName() == name
         jobUserMetadata.getUser() == user
-        jobUserMetadata.getVersion().orElse(UUID.randomUUID().toString()) == version
+        jobUserMetadata.getVersion() == JobMetadata.DEFAULT_VERSION
         jobUserMetadata.getDescription().orElse(UUID.randomUUID().toString()) == description
         jobUserMetadata.getTags() == tags
         jobUserMetadata.getMetadata().orElse(Mock(JsonNode)) == metadata
@@ -71,14 +70,14 @@ class JobMetadataSpec extends Specification {
         jobUserMetadata.getGroupingInstance().orElse(UUID.randomUUID().toString()) == groupingInstance
 
         when:
-        jobUserMetadata = new JobMetadata.Builder(name, user)
+        jobUserMetadata = new JobMetadata.Builder(name, user, version)
                 .withMetadata(metadataJson)
                 .build()
 
         then:
         jobUserMetadata.getName() == name
         jobUserMetadata.getUser() == user
-        !jobUserMetadata.getVersion().isPresent()
+        jobUserMetadata.getVersion() == version
         !jobUserMetadata.getDescription().isPresent()
         jobUserMetadata.getTags().isEmpty()
         jobUserMetadata.getMetadata().orElse(Mock(JsonNode)) == metadata
@@ -87,13 +86,13 @@ class JobMetadataSpec extends Specification {
         !jobUserMetadata.getGroupingInstance().isPresent()
 
         when:
-        jobUserMetadata = new JobMetadata.Builder(name, user)
+        jobUserMetadata = new JobMetadata.Builder(name, user, version)
                 .build()
 
         then:
         jobUserMetadata.getName() == name
         jobUserMetadata.getUser() == user
-        !jobUserMetadata.getVersion().isPresent()
+        jobUserMetadata.getVersion() == version
         !jobUserMetadata.getDescription().isPresent()
         jobUserMetadata.getTags().isEmpty()
         !jobUserMetadata.getMetadata().isPresent()
@@ -105,7 +104,6 @@ class JobMetadataSpec extends Specification {
         def newTags = Sets.newHashSet(tags)
         newTags.add(" \t")
         jobUserMetadata = new JobMetadata.Builder(name, user)
-                .withVersion("")
                 .withDescription(" ")
                 .withTags(newTags)
                 .withMetadata(metadata)
@@ -118,7 +116,7 @@ class JobMetadataSpec extends Specification {
         then:
         jobUserMetadata.getName() == name
         jobUserMetadata.getUser() == user
-        !jobUserMetadata.getVersion().isPresent()
+        jobUserMetadata.getVersion() == JobMetadata.DEFAULT_VERSION
         !jobUserMetadata.getDescription().isPresent()
         jobUserMetadata.getTags() == tags
         jobUserMetadata.getMetadata().orElse(Mock(JsonNode)) == metadata

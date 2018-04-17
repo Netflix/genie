@@ -72,8 +72,9 @@ class ScriptLoadBalancerSpec extends Specification {
                     new ClusterMetadata.Builder(
                             "a",
                             "b",
+                            "c",
                             ClusterStatus.UP
-                    ).withVersion("c").build()
+                    ).build()
             ),
             new Cluster(
                     "0",
@@ -83,8 +84,9 @@ class ScriptLoadBalancerSpec extends Specification {
                     new ClusterMetadata.Builder(
                             "d",
                             "e",
+                            "f",
                             ClusterStatus.UP
-                    ).withVersion("f").build()
+                    ).build()
             ),
             new Cluster(
                     "1",
@@ -94,8 +96,9 @@ class ScriptLoadBalancerSpec extends Specification {
                     new ClusterMetadata.Builder(
                             "g",
                             "h",
+                            "i",
                             ClusterStatus.UP
-                    ).withVersion("i").build()
+                    ).build()
             )
     )
 
@@ -109,8 +112,9 @@ class ScriptLoadBalancerSpec extends Specification {
                     new ClusterMetadata.Builder(
                             "j",
                             "k",
+                            "l",
                             ClusterStatus.UP
-                    ).withVersion("l").build()
+                    ).build()
             ),
             new Cluster(
                     "4",
@@ -120,8 +124,9 @@ class ScriptLoadBalancerSpec extends Specification {
                     new ClusterMetadata.Builder(
                             "m",
                             "n",
+                            "o",
                             ClusterStatus.UP
-                    ).withVersion("o").build()
+                    ).build()
             )
     )
 

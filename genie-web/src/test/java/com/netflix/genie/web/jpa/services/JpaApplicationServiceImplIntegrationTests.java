@@ -102,7 +102,7 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(APP_1_ID, app.getId());
         Assert.assertEquals(APP_1_NAME, app.getMetadata().getName());
         Assert.assertEquals(APP_1_USER, app.getMetadata().getUser());
-        Assert.assertEquals(APP_1_VERSION, app.getMetadata().getVersion().orElseGet(RandomSuppliers.STRING));
+        Assert.assertEquals(APP_1_VERSION, app.getMetadata().getVersion());
         Assert.assertEquals(APP_1_STATUS, app.getMetadata().getStatus());
         Assert.assertFalse(app.getMetadata().getType().isPresent());
         Assert.assertEquals(1, app.getMetadata().getTags().size());
@@ -113,7 +113,7 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(APP_2_ID, app2.getId());
         Assert.assertEquals(APP_2_NAME, app2.getMetadata().getName());
         Assert.assertEquals(APP_2_USER, app2.getMetadata().getUser());
-        Assert.assertEquals(APP_2_VERSION, app2.getMetadata().getVersion().orElseGet(RandomSuppliers.STRING));
+        Assert.assertEquals(APP_2_VERSION, app2.getMetadata().getVersion());
         Assert.assertEquals(APP_2_STATUS, app2.getMetadata().getStatus());
         Assert.assertThat(app2.getMetadata().getType().orElseGet(RandomSuppliers.STRING), Matchers.is(APP_2_TYPE));
         Assert.assertEquals(2, app2.getMetadata().getTags().size());
@@ -124,7 +124,7 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(APP_3_ID, app3.getId());
         Assert.assertEquals(APP_3_NAME, app3.getMetadata().getName());
         Assert.assertEquals(APP_3_USER, app3.getMetadata().getUser());
-        Assert.assertEquals(APP_3_VERSION, app3.getMetadata().getVersion().orElseGet(RandomSuppliers.STRING));
+        Assert.assertEquals(APP_3_VERSION, app3.getMetadata().getVersion());
         Assert.assertEquals(APP_3_STATUS, app3.getMetadata().getStatus());
         Assert.assertThat(app3.getMetadata().getType().orElseGet(RandomSuppliers.STRING), Matchers.is(APP_3_TYPE));
         Assert.assertEquals(1, app3.getMetadata().getTags().size());
@@ -194,7 +194,7 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
 
         tags.add("somethingThatWouldNeverReallyExist");
         apps = this.appService.getApplications(null, null, null, tags, null, PAGEABLE);
-        Assert.assertTrue(apps.getNumberOfElements() == 0);
+        Assert.assertThat(apps.getNumberOfElements(), Matchers.is(0));
 
         tags.clear();
         apps = this.appService.getApplications(null, null, null, tags, null, PAGEABLE);
@@ -300,9 +300,9 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
             new ApplicationMetadata.Builder(
                 APP_1_NAME,
                 APP_1_USER,
+                APP_1_VERSION,
                 ApplicationStatus.ACTIVE
             )
-                .withVersion(APP_1_VERSION)
                 .build()
         )
             .withRequestedId(id)
@@ -338,9 +338,9 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
             new ApplicationMetadata.Builder(
                 APP_1_NAME,
                 APP_1_USER,
+                APP_1_VERSION,
                 ApplicationStatus.ACTIVE
             )
-                .withVersion(APP_1_VERSION)
                 .build()
         )
             .build();
@@ -385,9 +385,9 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
             new ApplicationMetadata.Builder(
                 getApp.getMetadata().getName(),
                 APP_2_USER,
+                getApp.getMetadata().getVersion(),
                 ApplicationStatus.ACTIVE
             )
-                .withVersion(getApp.getMetadata().getVersion().orElse(null))
                 .withDescription(getApp.getMetadata().getDescription().orElse(null))
                 .withType(getApp.getMetadata().getType().orElse(null))
                 .withTags(tags)

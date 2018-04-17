@@ -99,15 +99,5 @@ DELIMITER ;
 CALL GENIE_SPLIT_COMMANDS_330();
 DROP PROCEDURE GENIE_SPLIT_COMMANDS_330;
 
-ALTER TABLE `applications`
-  CHANGE `version` `version` VARCHAR(255) DEFAULT NULL;
-
-ALTER TABLE `clusters`
-  CHANGE `version` `version` VARCHAR(255) DEFAULT NULL;
-
 ALTER TABLE `commands`
-  CHANGE `version` `version` VARCHAR(255) DEFAULT NULL,
   DROP COLUMN `executable`;
-
-ALTER TABLE `jobs`
-  CHANGE `version` `version` VARCHAR(255) DEFAULT NULL;

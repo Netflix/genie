@@ -34,6 +34,7 @@ class ApplicationSpec extends Specification {
         def metadata = new ApplicationMetadata.Builder(
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
                 ApplicationStatus.INACTIVE
         )
                 .withType(UUID.randomUUID().toString())

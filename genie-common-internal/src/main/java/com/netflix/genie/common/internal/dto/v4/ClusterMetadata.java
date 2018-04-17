@@ -62,17 +62,19 @@ public class ClusterMetadata extends CommonMetadata {
         /**
          * Constructor which has required fields.
          *
-         * @param name   The name to use for the cluster
-         * @param user   The user who owns the cluster
-         * @param status The status of the cluster
+         * @param name    The name to use for the cluster
+         * @param user    The user who owns the cluster
+         * @param version The version of the cluster
+         * @param status  The status of the cluster
          */
         @JsonCreator
         public Builder(
             @JsonProperty(value = "name", required = true) final String name,
             @JsonProperty(value = "user", required = true) final String user,
+            @JsonProperty(value = "version", required = true) final String version,
             @JsonProperty(value = "status", required = true) final ClusterStatus status
         ) {
-            super(name, user);
+            super(name, user, version);
             this.bStatus = status;
         }
 
