@@ -120,6 +120,13 @@ public class CriteriaResolutionRepositoryImpl implements CriteriaResolutionRepos
                 }
             }
         );
+        criterion.getVersion().ifPresent(
+            version -> {
+                if (StringUtils.isNotBlank(version)) {
+                    query.append(" c.version = '").append(version).append("' AND");
+                }
+            }
+        );
 
         if (hasTags) {
             query

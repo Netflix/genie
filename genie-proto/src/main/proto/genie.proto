@@ -62,6 +62,7 @@ message Criterion {
     string id = 2;
     string name = 3;
     string status = 4;
+    string version = 5;
 }
 
 message JobMetadata {

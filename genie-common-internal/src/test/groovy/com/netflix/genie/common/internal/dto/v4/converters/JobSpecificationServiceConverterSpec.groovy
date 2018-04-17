@@ -84,6 +84,7 @@ class JobSpecificationServiceConverterSpec extends Specification {
 
     def commandCriterionId = UUID.randomUUID().toString()
     def commandCriterionName = UUID.randomUUID().toString()
+    def commandCriterionVersion = UUID.randomUUID().toString()
     def commandCriterionStatus = UUID.randomUUID().toString()
     def commandCriterionTags = Sets.newHashSet(
             UUID.randomUUID().toString(),
@@ -91,6 +92,7 @@ class JobSpecificationServiceConverterSpec extends Specification {
     )
     def clusterCriterion0Id = UUID.randomUUID().toString()
     def clusterCriterion0Name = UUID.randomUUID().toString()
+    def clusterCriterion0Version = UUID.randomUUID().toString()
     def clusterCriterion0Status = UUID.randomUUID().toString()
     def clusterCriterion0Tags = Sets.newHashSet(
             UUID.randomUUID().toString(),
@@ -99,6 +101,7 @@ class JobSpecificationServiceConverterSpec extends Specification {
     )
     def clusterCriterion1Id = UUID.randomUUID().toString()
     def clusterCriterion1Name = UUID.randomUUID().toString()
+    def clusterCriterion1Version = UUID.randomUUID().toString()
     def clusterCriterion1Status = UUID.randomUUID().toString()
     def clusterCriterion1Tags = Sets.newHashSet(
             UUID.randomUUID().toString(),
@@ -106,6 +109,7 @@ class JobSpecificationServiceConverterSpec extends Specification {
     )
     def clusterCriterion2Id = UUID.randomUUID().toString()
     def clusterCriterion2Name = UUID.randomUUID().toString()
+    def clusterCriterion2Version = UUID.randomUUID().toString()
     def clusterCriterion2Status = UUID.randomUUID().toString()
     def clusterCriterion2Tags = Sets.newHashSet(
             UUID.randomUUID().toString(),
@@ -193,7 +197,7 @@ class JobSpecificationServiceConverterSpec extends Specification {
         def originalSpecification = new JobSpecification(
                 ["echo"].asList(),
                 new JobSpecification.ExecutionResource(
-                    "my-job",
+                        "my-job",
                         new ExecutionEnvironment(null, null, null)
                 ),
                 new JobSpecification.ExecutionResource(
@@ -269,6 +273,7 @@ class JobSpecificationServiceConverterSpec extends Specification {
                                 .Builder()
                                 .withId(clusterCriterion0Id)
                                 .withName(clusterCriterion0Name)
+                                .withVersion(clusterCriterion0Version)
                                 .withStatus(clusterCriterion0Status)
                                 .withTags(clusterCriterion0Tags)
                                 .build(),
@@ -276,6 +281,7 @@ class JobSpecificationServiceConverterSpec extends Specification {
                                 .Builder()
                                 .withId(clusterCriterion1Id)
                                 .withName(clusterCriterion1Name)
+                                .withVersion(clusterCriterion1Version)
                                 .withStatus(clusterCriterion1Status)
                                 .withTags(clusterCriterion1Tags)
                                 .build(),
@@ -283,6 +289,7 @@ class JobSpecificationServiceConverterSpec extends Specification {
                                 .Builder()
                                 .withId(clusterCriterion2Id)
                                 .withName(clusterCriterion2Name)
+                                .withVersion(clusterCriterion2Version)
                                 .withStatus(clusterCriterion2Status)
                                 .withTags(clusterCriterion2Tags)
                                 .build()
@@ -291,6 +298,7 @@ class JobSpecificationServiceConverterSpec extends Specification {
                         .Builder()
                         .withId(commandCriterionId)
                         .withName(commandCriterionName)
+                        .withVersion(commandCriterionVersion)
                         .withStatus(commandCriterionStatus)
                         .withTags(commandCriterionTags)
                         .build(),
@@ -333,6 +341,7 @@ class JobSpecificationServiceConverterSpec extends Specification {
                                 .newBuilder()
                                 .setId(clusterCriterion0Id)
                                 .setName(clusterCriterion0Name)
+                                .setVersion(clusterCriterion0Version)
                                 .setStatus(clusterCriterion0Status)
                                 .addAllTags(clusterCriterion0Tags)
                                 .build(),
@@ -340,6 +349,7 @@ class JobSpecificationServiceConverterSpec extends Specification {
                                 .newBuilder()
                                 .setId(clusterCriterion1Id)
                                 .setName(clusterCriterion1Name)
+                                .setVersion(clusterCriterion1Version)
                                 .setStatus(clusterCriterion1Status)
                                 .addAllTags(clusterCriterion1Tags)
                                 .build(),
@@ -347,6 +357,7 @@ class JobSpecificationServiceConverterSpec extends Specification {
                                 .newBuilder()
                                 .setId(clusterCriterion2Id)
                                 .setName(clusterCriterion2Name)
+                                .setVersion(clusterCriterion2Version)
                                 .setStatus(clusterCriterion2Status)
                                 .addAllTags(clusterCriterion2Tags)
                                 .build()
@@ -356,6 +367,7 @@ class JobSpecificationServiceConverterSpec extends Specification {
                         .newBuilder()
                         .setId(commandCriterionId)
                         .setName(commandCriterionName)
+                        .setVersion(commandCriterionVersion)
                         .setStatus(commandCriterionStatus)
                         .addAllTags(commandCriterionTags)
                         .build()

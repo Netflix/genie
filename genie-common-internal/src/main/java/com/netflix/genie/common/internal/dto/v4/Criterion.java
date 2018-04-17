@@ -48,6 +48,7 @@ public class Criterion {
 
     private final String id;
     private final String name;
+    private final String version;
     private final String status;
     private final ImmutableSet<
         @NotEmpty(message = "A tag can't be an empty string")
@@ -56,13 +57,15 @@ public class Criterion {
     private Criterion(final Builder builder) throws GeniePreconditionException {
         this.id = builder.bId;
         this.name = builder.bName;
+        this.version = builder.bVersion;
         this.status = builder.bStatus;
         this.tags = builder.bTags == null ? ImmutableSet.of() : ImmutableSet.copyOf(builder.bTags);
 
         if (
-            StringUtils.isEmpty(this.id)
-                && StringUtils.isEmpty(this.name)
-                && StringUtils.isEmpty(this.status)
+            StringUtils.isBlank(this.id)
+                && StringUtils.isBlank(this.name)
+                && StringUtils.isBlank(this.version)
+                && StringUtils.isBlank(this.status)
                 && this.tags.isEmpty()
             ) {
             throw new GeniePreconditionException("Invalid criterion. One of the fields must have a valid value");
@@ -85,6 +88,15 @@ public class Criterion {
      */
     public Optional<String> getName() {
         return Optional.ofNullable(this.name);
+    }
+
+    /**
+     * Get the version of the resource desired if it exists.
+     *
+     * @return {@link Optional} wrapping the version
+     */
+    public Optional<String> getVersion() {
+        return Optional.ofNullable(this.version);
     }
 
     /**
@@ -114,6 +126,7 @@ public class Criterion {
     public static class Builder {
         private String bId;
         private String bName;
+        private String bVersion;
         private String bStatus;
         private ImmutableSet<String> bTags;
 
@@ -136,6 +149,17 @@ public class Criterion {
          */
         public Builder withName(@Nullable final String name) {
             this.bName = StringUtils.isBlank(name) ? null : name;
+            return this;
+        }
+
+        /**
+         * Set the version of the resource (cluster, command, etc) to search for.
+         *
+         * @param version The version of the resource
+         * @return The builder
+         */
+        public Builder withVersion(@Nullable final String version) {
+            this.bVersion = StringUtils.isBlank(version) ? null : version;
             return this;
         }
 

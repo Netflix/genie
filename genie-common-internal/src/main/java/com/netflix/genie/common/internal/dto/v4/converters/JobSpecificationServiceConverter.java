@@ -262,6 +262,7 @@ public final class JobSpecificationServiceConverter {
             .Builder()
             .withId(protoCriterion.getId())
             .withName(protoCriterion.getName())
+            .withVersion(protoCriterion.getVersion())
             .withStatus(protoCriterion.getStatus())
             .withTags(protoCriterion.getTagsList() != null ? Sets.newHashSet(protoCriterion.getTagsList()) : null)
             .build();
@@ -271,6 +272,7 @@ public final class JobSpecificationServiceConverter {
         final com.netflix.genie.proto.Criterion.Builder builder = com.netflix.genie.proto.Criterion.newBuilder();
         criterion.getId().ifPresent(builder::setId);
         criterion.getName().ifPresent(builder::setName);
+        criterion.getVersion().ifPresent(builder::setVersion);
         criterion.getStatus().ifPresent(builder::setStatus);
         builder.addAllTags(criterion.getTags());
         return builder.build();

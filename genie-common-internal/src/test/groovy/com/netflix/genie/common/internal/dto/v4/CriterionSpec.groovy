@@ -34,13 +34,13 @@ class CriterionSpec extends Specification {
 
     def "Exception thrown when invalid criterion creation is attempted"() {
         when:
-        new Criterion.Builder().withId(null).withName(null).withStatus(null).withTags(null).build()
+        new Criterion.Builder().withId(null).withName(null).withVersion(null).withStatus(null).withTags(null).build()
 
         then:
         thrown(GeniePreconditionException)
 
         when:
-        new Criterion.Builder().withId("").withName("").withStatus("").withTags(Sets.newHashSet()).build()
+        new Criterion.Builder().withId("").withName("").withVersion("").withStatus("").withTags(Sets.newHashSet()).build()
 
         then:
         thrown(GeniePreconditionException)
@@ -55,62 +55,116 @@ class CriterionSpec extends Specification {
     def "Can create valid criterion"() {
         def id = UUID.randomUUID().toString()
         def name = UUID.randomUUID().toString()
+        def version = UUID.randomUUID().toString()
         def status = UUID.randomUUID().toString()
         def tags = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
         Criterion criterion
 
         when:
-        criterion = new Criterion.Builder().withId(id).withName(name).withStatus(status).withTags(tags).build()
+        criterion = new Criterion.Builder()
+                .withId(id)
+                .withName(name)
+                .withVersion(version)
+                .withStatus(status)
+                .withTags(tags)
+                .build()
 
         then:
         criterion.getId().orElse(UUID.randomUUID().toString()) == id
         criterion.getName().orElse(UUID.randomUUID().toString()) == name
+        criterion.getVersion().orElse(UUID.randomUUID().toString()) == version
         criterion.getStatus().orElse(UUID.randomUUID().toString()) == status
         criterion.getTags() == tags
 
         when:
-        criterion = new Criterion.Builder().withName(name).withStatus(status).withTags(tags).build()
+        criterion = new Criterion.Builder()
+                .withName(name)
+                .withVersion(version)
+                .withStatus(status)
+                .withTags(tags)
+                .build()
 
         then:
         !criterion.getId().isPresent()
         criterion.getName().orElse(UUID.randomUUID().toString()) == name
+        criterion.getVersion().orElse(UUID.randomUUID().toString()) == version
         criterion.getStatus().orElse(UUID.randomUUID().toString()) == status
         criterion.getTags() == tags
 
         when:
-        criterion = new Criterion.Builder().withId(id).withStatus(status).withTags(tags).build()
+        criterion = new Criterion.Builder()
+                .withId(id)
+                .withVersion(version)
+                .withStatus(status)
+                .withTags(tags)
+                .build()
 
         then:
         criterion.getId().orElse(UUID.randomUUID().toString()) == id
         !criterion.getName().isPresent()
+        criterion.getVersion().orElse(UUID.randomUUID().toString()) == version
         criterion.getStatus().orElse(UUID.randomUUID().toString()) == status
         criterion.getTags() == tags
 
         when:
-        criterion = new Criterion.Builder().withId(id).withName(name).withTags(tags).build()
+        criterion = new Criterion.Builder()
+                .withId(id)
+                .withName(name)
+                .withStatus(status)
+                .withTags(tags)
+                .build()
 
         then:
         criterion.getId().orElse(UUID.randomUUID().toString()) == id
         criterion.getName().orElse(UUID.randomUUID().toString()) == name
+        !criterion.getVersion().isPresent()
+        criterion.getStatus().orElse(UUID.randomUUID().toString()) == status
+        criterion.getTags() == tags
+
+        when:
+        criterion = new Criterion.Builder()
+                .withId(id)
+                .withName(name)
+                .withVersion(version)
+                .withTags(tags)
+                .build()
+
+        then:
+        criterion.getId().orElse(UUID.randomUUID().toString()) == id
+        criterion.getName().orElse(UUID.randomUUID().toString()) == name
+        criterion.getVersion().orElse(UUID.randomUUID().toString()) == version
         !criterion.getStatus().isPresent()
         criterion.getTags() == tags
 
         when:
-        criterion = new Criterion.Builder().withId(id).withName(name).withStatus(status).build()
+        criterion = new Criterion.Builder()
+                .withId(id)
+                .withName(name)
+                .withVersion(version)
+                .withStatus(status)
+                .build()
 
         then:
         criterion.getId().orElse(UUID.randomUUID().toString()) == id
         criterion.getName().orElse(UUID.randomUUID().toString()) == name
+        criterion.getVersion().orElse(UUID.randomUUID().toString()) == version
         criterion.getStatus().orElse(UUID.randomUUID().toString()) == status
         criterion.getTags().isEmpty()
 
         when:
-        criterion = new Criterion.Builder().withId(id).withName(name).withStatus(status).withTags(tags).build()
+        criterion = new Criterion.Builder()
+                .withId(id)
+                .withName(name)
+                .withVersion(version)
+                .withStatus(status)
+                .withTags(tags)
+                .build()
         tags.add(UUID.randomUUID().toString())
 
         then:
         criterion.getId().orElse(UUID.randomUUID().toString()) == id
         criterion.getName().orElse(UUID.randomUUID().toString()) == name
+        criterion.getVersion().orElse(UUID.randomUUID().toString()) == version
         criterion.getStatus().orElse(UUID.randomUUID().toString()) == status
         criterion.getTags() != tags
     }
@@ -120,6 +174,7 @@ class CriterionSpec extends Specification {
         new Criterion.Builder()
                 .withId("\t")
                 .withName(" ")
+                .withVersion("\n\t")
                 .withStatus("\n")
                 .withTags(Sets.newHashSet(""))
                 .build()
@@ -131,6 +186,7 @@ class CriterionSpec extends Specification {
         def criterion = new Criterion.Builder()
                 .withId("\t")
                 .withName(" ")
+                .withVersion("\n\t")
                 .withStatus("\n")
                 .withTags(Sets.newHashSet("valid tag", " "))
                 .build()
@@ -138,6 +194,7 @@ class CriterionSpec extends Specification {
         then:
         !criterion.getId().isPresent()
         !criterion.getName().isPresent()
+        !criterion.getVersion().isPresent()
         !criterion.getStatus().isPresent()
         criterion.getTags() == Sets.newHashSet("valid tag")
     }
