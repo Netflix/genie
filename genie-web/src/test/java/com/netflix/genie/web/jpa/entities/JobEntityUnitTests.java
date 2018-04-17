@@ -516,9 +516,9 @@ public class JobEntityUnitTests extends EntityTestsBase {
             .map(TagEntity::new)
             .collect(Collectors.toSet());
 
-        final CriterionEntity entity1 = new CriterionEntity(one);
-        final CriterionEntity entity2 = new CriterionEntity(two);
-        final CriterionEntity entity3 = new CriterionEntity(three);
+        final CriterionEntity entity1 = new CriterionEntity(null, null, null, null, one);
+        final CriterionEntity entity2 = new CriterionEntity(null, null, null, null, two);
+        final CriterionEntity entity3 = new CriterionEntity(null, null, null, null, three);
 
         final List<CriterionEntity> clusterCriteria = Lists.newArrayList(entity1, entity2, entity3);
 
@@ -608,7 +608,7 @@ public class JobEntityUnitTests extends EntityTestsBase {
             new TagEntity(UUID.randomUUID().toString())
         );
 
-        final CriterionEntity commandCriterion = new CriterionEntity(tags);
+        final CriterionEntity commandCriterion = new CriterionEntity(null, null, null, null, tags);
 
         this.jobEntity.setCommandCriterion(commandCriterion);
         Assert.assertTrue(this.jobEntity.getCommandCriterion().isPresent());

@@ -24,7 +24,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import javax.validation.ConstraintViolationException;
 import java.util.Set;
 import java.util.UUID;
 
@@ -42,14 +41,14 @@ public class CriterionEntityUnitTest extends EntityTestsBase {
      */
     @Test
     public void canCreateCriterionEntityWithTags() {
-        CriterionEntity entity = new CriterionEntity(null);
+        CriterionEntity entity = new CriterionEntity(null, null, null, null, null);
         Assert.assertThat(entity.getTags(), Matchers.empty());
         final Set<TagEntity> tags = Sets.newHashSet();
-        entity = new CriterionEntity(tags);
+        entity = new CriterionEntity(null, null, null, null, tags);
         Assert.assertThat(entity.getTags(), Matchers.empty());
         tags.add(new TagEntity(UUID.randomUUID().toString()));
         tags.add(new TagEntity(UUID.randomUUID().toString()));
-        entity = new CriterionEntity(tags);
+        entity = new CriterionEntity(null, null, null, null, tags);
         Assert.assertThat(entity.getTags(), Matchers.is(tags));
     }
 
@@ -59,16 +58,59 @@ public class CriterionEntityUnitTest extends EntityTestsBase {
     @Test
     public void canCreateCriterionEntity() {
         final CriterionEntity entity = new CriterionEntity();
+        Assert.assertFalse(entity.getUniqueId().isPresent());
+        Assert.assertFalse(entity.getName().isPresent());
+        Assert.assertFalse(entity.getVersion().isPresent());
+        Assert.assertFalse(entity.getStatus().isPresent());
         Assert.assertThat(entity.getTags(), Matchers.empty());
     }
 
     /**
-     * Make sure a criterion can't be validated if the tags are empty.
+     * Make sure setter is using the right field.
      */
-    @Test(expected = ConstraintViolationException.class)
-    public void cantSaveCriterionDueToNoTags() {
+    @Test
+    public void canSetUniqueId() {
         final CriterionEntity entity = new CriterionEntity();
-        this.validate(entity);
+        Assert.assertFalse(entity.getUniqueId().isPresent());
+        final String uniqueId = UUID.randomUUID().toString();
+        entity.setUniqueId(uniqueId);
+        Assert.assertThat(entity.getUniqueId().orElse(null), Matchers.is(uniqueId));
+    }
+
+    /**
+     * Make sure setter is using the right field.
+     */
+    @Test
+    public void canSetName() {
+        final CriterionEntity entity = new CriterionEntity();
+        Assert.assertFalse(entity.getName().isPresent());
+        final String name = UUID.randomUUID().toString();
+        entity.setName(name);
+        Assert.assertThat(entity.getName().orElse(null), Matchers.is(name));
+    }
+
+    /**
+     * Make sure setter is using the right field.
+     */
+    @Test
+    public void canSetVersion() {
+        final CriterionEntity entity = new CriterionEntity();
+        Assert.assertFalse(entity.getVersion().isPresent());
+        final String status = UUID.randomUUID().toString();
+        entity.setVersion(status);
+        Assert.assertThat(entity.getVersion().orElse(null), Matchers.is(status));
+    }
+
+    /**
+     * Make sure setter is using the right field.
+     */
+    @Test
+    public void canSetStatus() {
+        final CriterionEntity entity = new CriterionEntity();
+        Assert.assertFalse(entity.getStatus().isPresent());
+        final String version = UUID.randomUUID().toString();
+        entity.setStatus(version);
+        Assert.assertThat(entity.getStatus().orElse(null), Matchers.is(version));
     }
 
     /**
@@ -97,8 +139,8 @@ public class CriterionEntityUnitTest extends EntityTestsBase {
             new TagEntity(UUID.randomUUID().toString()),
             new TagEntity(UUID.randomUUID().toString())
         );
-        final CriterionEntity one = new CriterionEntity(tags);
-        final CriterionEntity two = new CriterionEntity(tags);
+        final CriterionEntity one = new CriterionEntity(null, null, null, null, tags);
+        final CriterionEntity two = new CriterionEntity(null, null, null, null, tags);
         final CriterionEntity three = new CriterionEntity();
 
         Assert.assertTrue(one.equals(two));

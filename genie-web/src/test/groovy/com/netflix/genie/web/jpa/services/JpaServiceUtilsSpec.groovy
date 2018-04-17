@@ -417,7 +417,7 @@ class JpaServiceUtilsSpec extends Specification {
                                 new TagEntity(it)
                             }
                     )
-                    new CriterionEntity(clusterCriteriaTags)
+                    new CriterionEntity(null, null, null, null, clusterCriteriaTags)
                 }
         )
         entity.setClusterCriteria(clusterCriteriaEntities)
@@ -432,7 +432,7 @@ class JpaServiceUtilsSpec extends Specification {
                     new TagEntity(it)
                 }
         )
-        entity.setCommandCriterion(new CriterionEntity(commandCriterionTags))
+        entity.setCommandCriterion(new CriterionEntity(null, null, null, null, commandCriterionTags))
 
         def configs = Sets.newHashSet(
                 UUID.randomUUID().toString(),

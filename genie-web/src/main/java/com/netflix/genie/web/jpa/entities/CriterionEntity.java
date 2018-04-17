@@ -23,14 +23,17 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.annotation.Nullable;
+import javax.persistence.Basic;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -42,10 +45,30 @@ import java.util.Set;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString(callSuper = true)
+@ToString(callSuper = true, of = {"uniqueId", "name", "version", "status"}, doNotUseGetters = true)
 @Entity
 @Table(name = "criteria")
 public class CriterionEntity extends IdEntity {
+    @Basic
+    @Column(name = "unique_id", updatable = false)
+    @Size(max = 255, message = "The id part of the criterion can't be longer than 255 characters")
+    private String uniqueId;
+
+    @Basic
+    @Column(name = "name", updatable = false)
+    @Size(max = 255, message = "The name part of the criterion can't be longer than 255 characters")
+    private String name;
+
+    @Basic
+    @Column(name = "version", updatable = false)
+    @Size(max = 255, message = "The version part of the criterion can't be longer than 255 characters")
+    private String version;
+
+    @Basic
+    @Column(name = "status", updatable = false)
+    @Size(max = 255, message = "The status part of the criterion can't be longer than 255 characters")
+    private String status;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "criteria_tags",
@@ -56,19 +79,104 @@ public class CriterionEntity extends IdEntity {
             @JoinColumn(name = "tag_id", referencedColumnName = "id", nullable = false, updatable = false)
         }
     )
-    @NotEmpty(message = "Must have at least one tag associated with a criterion")
     private Set<TagEntity> tags = new HashSet<>();
 
     /**
      * Constructor.
      *
-     * @param tags The tags to associate with this criterion
+     * @param uniqueId The unique id of the resource this criterion is or was trying to match
+     * @param name     The name of the resource this criterion is or was trying to match
+     * @param version  The version of the resource this criterion is or was trying to match
+     * @param status   The status of the resource this criterion is or was trying to match
+     * @param tags     The tags on the resource this criterion is or was trying to match
      */
-    public CriterionEntity(@Nullable final Set<TagEntity> tags) {
+    public CriterionEntity(
+        @Nullable final String uniqueId,
+        @Nullable final String name,
+        @Nullable final String version,
+        @Nullable final String status,
+        @Nullable final Set<TagEntity> tags
+    ) {
         super();
+        this.uniqueId = uniqueId;
+        this.name = name;
+        this.version = version;
+        this.status = status;
         if (tags != null) {
             this.tags.addAll(tags);
         }
+    }
+
+    /**
+     * Get the unique id this criterion was using if there was one.
+     *
+     * @return The unique id wrapped in an {@link Optional}
+     */
+    public Optional<String> getUniqueId() {
+        return Optional.ofNullable(this.uniqueId);
+    }
+
+    /**
+     * Set the unique id this criterion used.
+     *
+     * @param uniqueId The unique id to set
+     */
+    public void setUniqueId(@Nullable final String uniqueId) {
+        this.uniqueId = uniqueId;
+    }
+
+    /**
+     * Get the name this criterion was using if there was one.
+     *
+     * @return The name wrapped in an {@link Optional}
+     */
+    public Optional<String> getName() {
+        return Optional.ofNullable(this.name);
+    }
+
+    /**
+     * Set the name this criterion used.
+     *
+     * @param name The name to set
+     */
+    public void setName(@Nullable final String name) {
+        this.name = name;
+    }
+
+    /**
+     * Get the version this criterion was using if there was one.
+     *
+     * @return The version wrapped in an {@link Optional}
+     */
+    public Optional<String> getVersion() {
+        return Optional.ofNullable(this.version);
+    }
+
+    /**
+     * Set the version this criterion used.
+     *
+     * @param version The version to set
+     */
+    public void setVersion(@Nullable final String version) {
+        this.version = version;
+    }
+
+    /**
+     * Get the status this criterion was using if there was one.
+     *
+     * @return The status wrapped in an {@link Optional}
+     */
+    public Optional<String> getStatus() {
+        return Optional.ofNullable(this.status);
+    }
+
+    /**
+     * Set the status this criterion used.
+     *
+     * @param status The version to set
+     */
+    public void setStatus(@Nullable final String status) {
+        this.status = status;
     }
 
     /**
