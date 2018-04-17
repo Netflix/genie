@@ -304,6 +304,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
      * @throws GenieException For any problem
      */
     @Test
+    @SuppressWarnings("checkstyle:methodlength")
     // TODO: This would be much easier with a spock data test
     public void testChooseClusterAndCommandForCriteria() throws GenieException {
         Map<Cluster, String> clustersAndCommands;
@@ -473,6 +474,48 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
                 }
             }
         );
+
+        // Search by version will break standard find
+        clustersAndCommands = this.service.findClustersAndCommandsForCriteria(
+            Lists.newArrayList(
+                new Criterion
+                    .Builder()
+                    .withId(CLUSTER_1_ID)
+                    .withVersion(UUID.randomUUID().toString())
+                    .build()
+            ),
+            new Criterion
+                .Builder()
+                .withTags(Sets.newHashSet("pig"))
+                .build()
+        );
+        Assert.assertThat(clustersAndCommands.size(), Matchers.is(0));
+
+        // Versions match so it'll match like the very first case
+        clustersAndCommands = this.service.findClustersAndCommandsForCriteria(
+            Lists.newArrayList(
+                new Criterion
+                    .Builder()
+                    .withId(CLUSTER_1_ID)
+                    .withVersion(CLUSTER_1_VERSION)
+                    .build()
+            ),
+            new Criterion
+                .Builder()
+                .withVersion("7.8.9")
+                .withTags(Sets.newHashSet("pig"))
+                .withStatus(CommandStatus.DEPRECATED.toString())
+                .build()
+        );
+        Assert.assertThat(clustersAndCommands.size(), Matchers.is(1));
+        Assert.assertThat(
+            clustersAndCommands
+                .entrySet()
+                .stream()
+                .filter(entry -> entry.getKey().getId().equals(CLUSTER_1_ID))
+                .count(),
+            Matchers.is(1L));
+        Assert.assertTrue(clustersAndCommands.containsValue(COMMAND_3_ID));
     }
 
     /**
