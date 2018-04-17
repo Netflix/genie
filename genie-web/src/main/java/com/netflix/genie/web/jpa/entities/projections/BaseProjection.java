@@ -25,7 +25,7 @@ import java.util.Optional;
  * @author tgianos
  * @since 3.3.0
  */
-public interface BaseProjection extends AuditProjection {
+public interface BaseProjection extends UniqueIdProjection {
     /**
      * Get the unique identifier for this entity.
      *
