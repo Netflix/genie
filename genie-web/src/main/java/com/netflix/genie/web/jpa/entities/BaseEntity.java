@@ -19,7 +19,6 @@ package com.netflix.genie.web.jpa.entities;
 
 import com.netflix.genie.web.jpa.entities.projections.BaseProjection;
 import com.netflix.genie.web.jpa.entities.projections.SetupFileProjection;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -35,7 +34,6 @@ import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * The base for all Genie top level entities. e.g. Applications, Jobs, etc.
@@ -46,18 +44,11 @@ import java.util.UUID;
  */
 @Getter
 @Setter
-@EqualsAndHashCode(of = "uniqueId", callSuper = false)
 @ToString(callSuper = true, of = {"version", "user", "name"})
 @MappedSuperclass
-public class BaseEntity extends AuditEntity implements BaseProjection, SetupFileProjection {
+public class BaseEntity extends UniqueIdEntity implements BaseProjection, SetupFileProjection {
 
     private static final long serialVersionUID = -5040659007494311180L;
-
-    @Basic(optional = false)
-    @Column(name = "unique_id", nullable = false, unique = true, updatable = false)
-    @NotBlank(message = "A unique identifier is missing and is required.")
-    @Size(max = 255, message = "Max length in database is 255 characters")
-    private String uniqueId = UUID.randomUUID().toString();
 
     @Basic
     @Column(name = "version")
@@ -163,5 +154,21 @@ public class BaseEntity extends AuditEntity implements BaseProjection, SetupFile
      */
     public void setSetupFile(@Nullable final FileEntity setupFile) {
         this.setupFile = setupFile;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object o) {
+        return super.equals(o);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 }
