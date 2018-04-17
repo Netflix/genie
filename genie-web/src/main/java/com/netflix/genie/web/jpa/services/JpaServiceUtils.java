@@ -56,8 +56,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public final class JpaServiceUtils {
 
-    private static final String NO_VERSION_SUPPLIED = "No version supplied";
-
     private JpaServiceUtils() {
     }
 
@@ -71,7 +69,7 @@ public final class JpaServiceUtils {
         final Application.Builder builder = new Application.Builder(
             applicationEntity.getName(),
             applicationEntity.getUser(),
-            applicationEntity.getVersion().orElse(NO_VERSION_SUPPLIED),
+            applicationEntity.getVersion(),
             applicationEntity.getStatus()
         )
             .withId(applicationEntity.getUniqueId())
@@ -101,7 +99,7 @@ public final class JpaServiceUtils {
         final Cluster.Builder builder = new Cluster.Builder(
             clusterEntity.getName(),
             clusterEntity.getUser(),
-            clusterEntity.getVersion().orElse(NO_VERSION_SUPPLIED),
+            clusterEntity.getVersion(),
             clusterEntity.getStatus()
         )
             .withId(clusterEntity.getUniqueId())
@@ -130,7 +128,7 @@ public final class JpaServiceUtils {
         final Command.Builder builder = new Command.Builder(
             commandEntity.getName(),
             commandEntity.getUser(),
-            commandEntity.getVersion().orElse(NO_VERSION_SUPPLIED),
+            commandEntity.getVersion(),
             commandEntity.getStatus(),
             StringUtils.join(commandEntity.getExecutable(), ' '),
             commandEntity.getCheckDelay()
@@ -161,7 +159,7 @@ public final class JpaServiceUtils {
         final Job.Builder builder = new Job.Builder(
             jobProjection.getName(),
             jobProjection.getUser(),
-            jobProjection.getVersion().orElse(NO_VERSION_SUPPLIED)
+            jobProjection.getVersion()
         )
             .withId(jobProjection.getUniqueId())
             .withCreated(jobProjection.getCreated())
@@ -188,7 +186,7 @@ public final class JpaServiceUtils {
         final JobRequest.Builder builder = new JobRequest.Builder(
             jobRequestProjection.getName(),
             jobRequestProjection.getUser(),
-            jobRequestProjection.getVersion().orElse(NO_VERSION_SUPPLIED),
+            jobRequestProjection.getVersion(),
             jobRequestProjection
                 .getClusterCriteria()
                 .stream()

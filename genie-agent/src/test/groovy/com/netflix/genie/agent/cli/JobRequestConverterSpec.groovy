@@ -64,7 +64,7 @@ class JobRequestConverterSpec extends Specification {
         jobRequest.getMetadata().getGroupingInstance() == Optional.ofNullable(jobRequestArgs.getGroupingInstance())
         jobRequest.getMetadata().getDescription() == Optional.ofNullable(jobRequestArgs.getJobDescription())
         jobRequest.getMetadata().getTags() == jobRequestArgs.getJobTags()
-        jobRequest.getMetadata().getVersion() == Optional.ofNullable(jobRequestArgs.getJobVersion())
+        jobRequest.getMetadata().getVersion() != null
         jobRequest.getMetadata().getName() == jobRequestArgs.getJobName()
         jobRequest.getMetadata().getMetadata() == Optional.ofNullable(jobRequestArgs.getJobMetadata())
         jobRequest.getMetadata().getGroup() == Optional.ofNullable(null)
@@ -113,7 +113,7 @@ class JobRequestConverterSpec extends Specification {
         jobRequestArgs.getJobTags() >> Sets.newHashSet(["t1", "t2"])
         jobRequest.getMetadata().getTags() == Sets.newHashSet(["t1", "t2"])
         jobRequestArgs.getJobVersion() >> "1.2.3"
-        jobRequest.getMetadata().getVersion() == Optional.of("1.2.3")
+        jobRequest.getMetadata().getVersion() == "1.2.3"
         jobRequestArgs.getJobName() >> "n"
         jobRequest.getMetadata().getName() == "n"
         jobRequestArgs.getJobMetadata() >> metadata

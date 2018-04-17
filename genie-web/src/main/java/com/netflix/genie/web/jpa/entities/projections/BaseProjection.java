@@ -36,9 +36,9 @@ public interface BaseProjection extends UniqueIdProjection {
     /**
      * Get the version.
      *
-     * @return The version of the resource (job, app, etc) wrapped in {@link Optional}
+     * @return The version of the resource (job, app, etc)
      */
-    Optional<String> getVersion();
+    String getVersion();
 
     /**
      * Get the user who created the resource.

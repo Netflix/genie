@@ -104,7 +104,7 @@ class DtoConvertersSpec extends Specification {
         applicationRequest.getMetadata().getMetadata().isPresent()
         applicationRequest.getMetadata().getTags().size() == 2
         applicationRequest.getMetadata().getDescription().orElse(null) == description
-        applicationRequest.getMetadata().getVersion().orElse(null) == version
+        applicationRequest.getMetadata().getVersion() == version
         applicationRequest.getMetadata().getUser() == user
         applicationRequest.getMetadata().getName() == name
         applicationRequest.getRequestedId().orElse(null) == id
@@ -127,7 +127,7 @@ class DtoConvertersSpec extends Specification {
         !applicationRequest.getMetadata().getMetadata().isPresent()
         applicationRequest.getMetadata().getTags().isEmpty()
         !applicationRequest.getMetadata().getDescription().isPresent()
-        applicationRequest.getMetadata().getVersion().orElse(null) == version
+        applicationRequest.getMetadata().getVersion() == version
         applicationRequest.getMetadata().getUser() == user
         applicationRequest.getMetadata().getName() == name
         !applicationRequest.getRequestedId().isPresent()
@@ -192,7 +192,7 @@ class DtoConvertersSpec extends Specification {
         v4Application.getMetadata().getMetadata().isPresent()
         v4Application.getMetadata().getTags().size() == 2
         v4Application.getMetadata().getDescription().orElse(null) == description
-        v4Application.getMetadata().getVersion().orElse(null) == version
+        v4Application.getMetadata().getVersion() == version
         v4Application.getMetadata().getUser() == user
         v4Application.getMetadata().getName() == name
         v4Application.getId() == id
@@ -241,12 +241,11 @@ class DtoConvertersSpec extends Specification {
                         dependencies,
                         setupFile
                 ),
-                new ApplicationMetadata.Builder(name, user, status)
+                new ApplicationMetadata.Builder(name, user, version, status)
                         .withDescription(description)
                         .withMetadata(metadata)
                         .withTags(tags)
                         .withType(type)
-                        .withVersion(version)
                         .build()
         )
         v3Application = DtoConverters.toV3Application(v4Application)
@@ -274,7 +273,7 @@ class DtoConvertersSpec extends Specification {
                 created,
                 updated,
                 null,
-                new ApplicationMetadata.Builder(name, user, status).build()
+                new ApplicationMetadata.Builder(name, user, version, status).build()
         )
         v3Application = DtoConverters.toV3Application(v4Application)
 
@@ -286,7 +285,7 @@ class DtoConvertersSpec extends Specification {
         v3Application.getTags().contains(DtoConverters.GENIE_ID_PREFIX + id)
         v3Application.getTags().contains(DtoConverters.GENIE_NAME_PREFIX + name)
         !v3Application.getDescription().isPresent()
-        v3Application.getVersion() == DtoConverters.NO_VERSION_SPECIFIED
+        v3Application.getVersion() == version
         v3Application.getUser() == user
         v3Application.getName() == name
         v3Application.getId().orElse(null) == id
@@ -344,7 +343,7 @@ class DtoConvertersSpec extends Specification {
         clusterRequest.getMetadata().getMetadata().isPresent()
         clusterRequest.getMetadata().getTags().size() == 2
         clusterRequest.getMetadata().getDescription().orElse(null) == description
-        clusterRequest.getMetadata().getVersion().orElse(null) == version
+        clusterRequest.getMetadata().getVersion() == version
         clusterRequest.getMetadata().getUser() == user
         clusterRequest.getMetadata().getName() == name
         clusterRequest.getRequestedId().orElse(null) == id
@@ -366,7 +365,7 @@ class DtoConvertersSpec extends Specification {
         !clusterRequest.getMetadata().getMetadata().isPresent()
         clusterRequest.getMetadata().getTags().isEmpty()
         !clusterRequest.getMetadata().getDescription().isPresent()
-        clusterRequest.getMetadata().getVersion().orElse(null) == version
+        clusterRequest.getMetadata().getVersion() == version
         clusterRequest.getMetadata().getUser() == user
         clusterRequest.getMetadata().getName() == name
         !clusterRequest.getRequestedId().isPresent()
@@ -424,7 +423,7 @@ class DtoConvertersSpec extends Specification {
         v4Cluster.getMetadata().getMetadata().isPresent()
         v4Cluster.getMetadata().getTags().size() == 2
         v4Cluster.getMetadata().getDescription().orElse(null) == description
-        v4Cluster.getMetadata().getVersion().orElse(null) == version
+        v4Cluster.getMetadata().getVersion() == version
         v4Cluster.getMetadata().getUser() == user
         v4Cluster.getMetadata().getName() == name
         v4Cluster.getId() == id
@@ -470,11 +469,10 @@ class DtoConvertersSpec extends Specification {
                         dependencies,
                         setupFile
                 ),
-                new ClusterMetadata.Builder(name, user, status)
+                new ClusterMetadata.Builder(name, user, version, status)
                         .withDescription(description)
                         .withMetadata(metadata)
                         .withTags(tags)
-                        .withVersion(version)
                         .build()
         )
         v3Cluster = DtoConverters.toV3Cluster(v4Cluster)
@@ -501,7 +499,7 @@ class DtoConvertersSpec extends Specification {
                 created,
                 updated,
                 null,
-                new ClusterMetadata.Builder(name, user, status).build()
+                new ClusterMetadata.Builder(name, user, version, status).build()
         )
         v3Cluster = DtoConverters.toV3Cluster(v4Cluster)
 
@@ -512,7 +510,7 @@ class DtoConvertersSpec extends Specification {
         v3Cluster.getTags().contains(DtoConverters.GENIE_ID_PREFIX + id)
         v3Cluster.getTags().contains(DtoConverters.GENIE_NAME_PREFIX + name)
         !v3Cluster.getDescription().isPresent()
-        v3Cluster.getVersion() == DtoConverters.NO_VERSION_SPECIFIED
+        v3Cluster.getVersion() == version
         v3Cluster.getUser() == user
         v3Cluster.getName() == name
         v3Cluster.getId().orElse(null) == id
@@ -578,7 +576,7 @@ class DtoConvertersSpec extends Specification {
         commandRequest.getMetadata().getMetadata().isPresent()
         commandRequest.getMetadata().getTags().size() == 2
         commandRequest.getMetadata().getDescription().orElse(null) == description
-        commandRequest.getMetadata().getVersion().orElse(null) == version
+        commandRequest.getMetadata().getVersion() == version
         commandRequest.getMetadata().getUser() == user
         commandRequest.getMetadata().getName() == name
         commandRequest.getRequestedId().orElse(null) == id
@@ -607,7 +605,7 @@ class DtoConvertersSpec extends Specification {
         !commandRequest.getMetadata().getMetadata().isPresent()
         commandRequest.getMetadata().getTags().isEmpty()
         !commandRequest.getMetadata().getDescription().isPresent()
-        commandRequest.getMetadata().getVersion().orElse(null) == version
+        commandRequest.getMetadata().getVersion() == version
         commandRequest.getMetadata().getUser() == user
         commandRequest.getMetadata().getName() == name
         !commandRequest.getRequestedId().isPresent()
@@ -686,7 +684,7 @@ class DtoConvertersSpec extends Specification {
         v4Command.getExecutable() == executable
         v4Command.getMetadata().getName() == name
         v4Command.getMetadata().getUser() == user
-        v4Command.getMetadata().getVersion().orElse(null) == version
+        v4Command.getMetadata().getVersion() == version
         v4Command.getMetadata().getTags().size() == 2
         !v4Command.getMetadata().getTags().contains(DtoConverters.GENIE_ID_PREFIX + id)
         !v4Command.getMetadata().getTags().contains(DtoConverters.GENIE_NAME_PREFIX + name)
@@ -719,7 +717,7 @@ class DtoConvertersSpec extends Specification {
         v4Command.getExecutable() == executable
         v4Command.getMetadata().getName() == name
         v4Command.getMetadata().getUser() == user
-        v4Command.getMetadata().getVersion().orElse(null) == version
+        v4Command.getMetadata().getVersion() == version
         v4Command.getMetadata().getTags().isEmpty()
         v4Command.getMetadata().getStatus() == status
         !v4Command.getMetadata().getDescription().isPresent()
@@ -771,11 +769,10 @@ class DtoConvertersSpec extends Specification {
                         dependencies,
                         setupFile
                 ),
-                new CommandMetadata.Builder(name, user, status)
+                new CommandMetadata.Builder(name, user, version, status)
                         .withDescription(description)
                         .withMetadata(metadata)
                         .withTags(tags)
-                        .withVersion(version)
                         .build(),
                 executable,
                 memory,
@@ -808,7 +805,7 @@ class DtoConvertersSpec extends Specification {
                 created,
                 updated,
                 null,
-                new CommandMetadata.Builder(name, user, status).build(),
+                new CommandMetadata.Builder(name, user, version, status).build(),
                 executable,
                 null,
                 checkDelay
@@ -822,7 +819,7 @@ class DtoConvertersSpec extends Specification {
         v3Command.getTags().contains(DtoConverters.GENIE_ID_PREFIX + id)
         v3Command.getTags().contains(DtoConverters.GENIE_NAME_PREFIX + name)
         !v3Command.getDescription().isPresent()
-        v3Command.getVersion() == DtoConverters.NO_VERSION_SPECIFIED
+        v3Command.getVersion() == version
         v3Command.getUser() == user
         v3Command.getName() == name
         v3Command.getId().orElse(null) == id
@@ -873,7 +870,7 @@ class DtoConvertersSpec extends Specification {
                 true,
                 timeout,
                 true,
-                new JobMetadata.Builder(name, user)
+                new JobMetadata.Builder(name, user, version)
                         .withTags(tags)
                         .withGroupingInstance(groupingInstance)
                         .withGrouping(grouping)
@@ -881,7 +878,6 @@ class DtoConvertersSpec extends Specification {
                         .withEmail(email)
                         .withMetadata(metadata)
                         .withDescription(description)
-                        .withVersion(version)
                         .build(),
                 new ExecutionResourceCriteria(clusterCriteria, commandCriterion, applicationIds),
                 null
@@ -979,7 +975,7 @@ class DtoConvertersSpec extends Specification {
         v4JobRequest.getRequestedId().orElse(null) == id
         v4JobRequest.getMetadata().getName() == name
         v4JobRequest.getMetadata().getUser() == user
-        v4JobRequest.getMetadata().getVersion().orElse(null) == version
+        v4JobRequest.getMetadata().getVersion() == version
         v4JobRequest.getMetadata().getTags() == tags
         v4JobRequest.getCriteria().getApplicationIds() == applicationIds
         v4JobRequest.getCommandArgs() == commandArgs

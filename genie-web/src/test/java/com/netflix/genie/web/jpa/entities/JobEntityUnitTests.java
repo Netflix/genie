@@ -78,7 +78,7 @@ public class JobEntityUnitTests extends EntityTestsBase {
         Assert.assertNotNull(this.jobEntity.getUniqueId());
         Assert.assertEquals(NAME, this.jobEntity.getName());
         Assert.assertEquals(USER, this.jobEntity.getUser());
-        Assert.assertThat(this.jobEntity.getVersion().orElse(UUID.randomUUID().toString()), Matchers.is(VERSION));
+        Assert.assertThat(this.jobEntity.getVersion(), Matchers.is(VERSION));
     }
 
     /**

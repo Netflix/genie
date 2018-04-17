@@ -22,6 +22,7 @@ import com.netflix.genie.common.internal.dto.v4.AgentJobRequest;
 import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria;
 import com.netflix.genie.common.internal.dto.v4.JobMetadata;
 import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
@@ -48,6 +49,7 @@ public class JobRequestConverter {
 
     /**
      * Convert Job request arguments into an AgentJobRequest object.
+     *
      * @param jobRequestArguments a job request arguments delegate
      * @return an AgentJobRequest DTO
      * @throws ConversionException if the resulting AgentJobRequest fails validation
@@ -61,21 +63,32 @@ public class JobRequestConverter {
             jobRequestArguments.getApplicationIds()
         );
 
-        final JobMetadata jobMetadata = new JobMetadata.Builder(
-            jobRequestArguments.getJobName(),
-            jobRequestArguments.getUser()
-        )
+        final String jobVersion = jobRequestArguments.getJobVersion();
+        final JobMetadata.Builder jobMetadataBuilder;
+        if (StringUtils.isBlank(jobVersion)) {
+            jobMetadataBuilder = new JobMetadata.Builder(
+                jobRequestArguments.getJobName(),
+                jobRequestArguments.getUser()
+            );
+        } else {
+            jobMetadataBuilder = new JobMetadata.Builder(
+                jobRequestArguments.getJobName(),
+                jobRequestArguments.getUser(),
+                jobVersion
+            );
+        }
+
+        jobMetadataBuilder
             .withEmail(jobRequestArguments.getEmail())
             .withGrouping(jobRequestArguments.getGrouping())
             .withGroupingInstance(jobRequestArguments.getGroupingInstance())
             .withMetadata(jobRequestArguments.getJobMetadata())
             .withDescription(jobRequestArguments.getJobDescription())
             .withTags(jobRequestArguments.getJobTags())
-            .withVersion(jobRequestArguments.getJobVersion())
             .build();
 
         final AgentJobRequest agentJobRequest = new AgentJobRequest.Builder(
-            jobMetadata,
+            jobMetadataBuilder.build(),
             criteria,
             jobRequestArguments.getJobDirectoryLocation().getAbsolutePath()
         )

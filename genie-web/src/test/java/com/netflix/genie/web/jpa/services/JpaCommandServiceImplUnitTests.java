@@ -113,9 +113,9 @@ public class JpaCommandServiceImplUnitTests {
             new CommandMetadata.Builder(
                 COMMAND_1_NAME,
                 COMMAND_1_USER,
+                COMMAND_1_VERSION,
                 CommandStatus.ACTIVE
             )
-                .withVersion(COMMAND_1_VERSION)
                 .build(),
             COMMAND_1_EXECUTABLE
         )
@@ -146,6 +146,7 @@ public class JpaCommandServiceImplUnitTests {
                 Instant.now(),
                 new ExecutionEnvironment(null, null, null),
                 new CommandMetadata.Builder(
+                    " ",
                     " ",
                     " ",
                     CommandStatus.ACTIVE

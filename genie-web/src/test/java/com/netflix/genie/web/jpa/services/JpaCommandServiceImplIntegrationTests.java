@@ -109,7 +109,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(COMMAND_1_ID, command1.getId());
         Assert.assertEquals(COMMAND_1_NAME, command1.getMetadata().getName());
         Assert.assertEquals(COMMAND_1_USER, command1.getMetadata().getUser());
-        Assert.assertEquals(COMMAND_1_VERSION, command1.getMetadata().getVersion().orElse(null));
+        Assert.assertEquals(COMMAND_1_VERSION, command1.getMetadata().getVersion());
         Assert.assertEquals(COMMAND_1_STATUS, command1.getMetadata().getStatus());
         Assert.assertEquals(COMMAND_1_EXECUTABLE, command1.getExecutable());
         Assert.assertEquals(3, command1.getMetadata().getTags().size());
@@ -120,7 +120,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(COMMAND_2_ID, command2.getId());
         Assert.assertEquals(COMMAND_2_NAME, command2.getMetadata().getName());
         Assert.assertEquals(COMMAND_2_USER, command2.getMetadata().getUser());
-        Assert.assertEquals(COMMAND_2_VERSION, command2.getMetadata().getVersion().orElse(null));
+        Assert.assertEquals(COMMAND_2_VERSION, command2.getMetadata().getVersion());
         Assert.assertEquals(COMMAND_2_STATUS, command2.getMetadata().getStatus());
         Assert.assertEquals(COMMAND_2_EXECUTABLE, command2.getExecutable());
         Assert.assertEquals(2, command2.getMetadata().getTags().size());
@@ -131,7 +131,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(COMMAND_3_ID, command3.getId());
         Assert.assertEquals(COMMAND_3_NAME, command3.getMetadata().getName());
         Assert.assertEquals(COMMAND_3_USER, command3.getMetadata().getUser());
-        Assert.assertEquals(COMMAND_3_VERSION, command3.getMetadata().getVersion().orElse(null));
+        Assert.assertEquals(COMMAND_3_VERSION, command3.getMetadata().getVersion());
         Assert.assertEquals(COMMAND_3_STATUS, command3.getMetadata().getStatus());
         Assert.assertEquals(COMMAND_3_EXECUTABLE, command3.getExecutable());
         Assert.assertEquals(3, command3.getMetadata().getTags().size());
@@ -273,9 +273,9 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
             new CommandMetadata.Builder(
                 COMMAND_1_NAME,
                 COMMAND_1_USER,
+                COMMAND_1_VERSION,
                 CommandStatus.ACTIVE
             )
-                .withVersion(COMMAND_1_VERSION)
                 .build(),
             COMMAND_1_EXECUTABLE
         )
@@ -317,9 +317,9 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
             new CommandMetadata.Builder(
                 COMMAND_1_NAME,
                 COMMAND_1_USER,
+                COMMAND_1_VERSION,
                 CommandStatus.ACTIVE
             )
-                .withVersion(COMMAND_1_VERSION)
                 .build(),
             COMMAND_1_EXECUTABLE
         )
@@ -371,9 +371,9 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
             new CommandMetadata.Builder(
                 command.getMetadata().getName(),
                 COMMAND_2_USER,
+                command.getMetadata().getVersion(),
                 CommandStatus.INACTIVE
             )
-                .withVersion(command.getMetadata().getVersion().orElse(null))
                 .withMetadata(command.getMetadata().getMetadata().orElse(null))
                 .withDescription(command.getMetadata().getDescription().orElse(null))
                 .withTags(tags)
@@ -412,9 +412,9 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
             new CommandMetadata.Builder(
                 command.getMetadata().getName(),
                 "", //invalid
+                command.getMetadata().getVersion(),
                 CommandStatus.INACTIVE
             )
-                .withVersion(command.getMetadata().getVersion().orElse(null))
                 .withMetadata(command.getMetadata().getMetadata().orElse(null))
                 .withDescription(command.getMetadata().getDescription().orElse(null))
                 .withTags(command.getMetadata().getTags())

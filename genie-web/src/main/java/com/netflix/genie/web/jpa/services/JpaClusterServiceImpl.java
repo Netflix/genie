@@ -171,7 +171,7 @@ public class JpaClusterServiceImpl extends JpaBaseService implements ClusterServ
         if (tags != null) {
             tagEntities = this.getTagRepository().findByTagIn(tags);
             if (tagEntities.size() != tags.size()) {
-                return new PageImpl<>(new ArrayList<Cluster>(), page, 0);
+                return new PageImpl<>(new ArrayList<>(), page, 0);
             }
         } else {
             tagEntities = null;
@@ -597,7 +597,7 @@ public class JpaClusterServiceImpl extends JpaBaseService implements ClusterServ
         // NOTE: These are all called in case someone has changed it to set something to null. DO NOT use ifPresent
         entity.setName(metadata.getName());
         entity.setUser(metadata.getUser());
-        entity.setVersion(metadata.getVersion().orElse(null));
+        entity.setVersion(metadata.getVersion());
         entity.setDescription(metadata.getDescription().orElse(null));
         entity.setStatus(metadata.getStatus());
         EntityDtoConverters.setEntityMetadata(GenieObjectMapper.getMapper(), metadata, entity);

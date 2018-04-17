@@ -254,8 +254,7 @@ class JobSpecificationServiceConverterSpec extends Specification {
     }
 
     AgentJobRequest createJobRequest() {
-        def jobMetadata = new JobMetadata.Builder(name, user)
-                .withVersion(version)
+        def jobMetadata = new JobMetadata.Builder(name, user, version)
                 .withDescription(description)
                 .withMetadata(metadata)
                 .withTags(tags)

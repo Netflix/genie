@@ -62,17 +62,19 @@ public class CommandMetadata extends CommonMetadata {
         /**
          * Constructor which has required fields.
          *
-         * @param name   The name to use for the command
-         * @param user   The user who owns the command
-         * @param status The status of the command
+         * @param name    The name to use for the command
+         * @param user    The user who owns the command
+         * @param version The version of the command
+         * @param status  The status of the command
          */
         @JsonCreator
         public Builder(
             @JsonProperty(value = "name", required = true) final String name,
             @JsonProperty(value = "user", required = true) final String user,
+            @JsonProperty(value = "version", required = true) final String version,
             @JsonProperty(value = "status", required = true) final CommandStatus status
         ) {
-            super(name, user);
+            super(name, user, version);
             this.bStatus = status;
         }
 

@@ -474,7 +474,7 @@ public class JobSpecificationServiceImpl implements JobSpecificationService {
             = new com.netflix.genie.common.dto.JobRequest.Builder(
             jobRequest.getMetadata().getName(),
             jobRequest.getMetadata().getUser(),
-            jobRequest.getMetadata().getVersion().orElse("No version provided"),
+            jobRequest.getMetadata().getVersion(),
             jobRequest
                 .getCriteria()
                 .getClusterCriteria()

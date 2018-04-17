@@ -144,8 +144,7 @@ public class LocalJobRunnerUnitTests {
                 Instant.now(),
                 new ExecutionEnvironment(null, null, null),
                 new ApplicationMetadata
-                    .Builder(placeholder, placeholder, ApplicationStatus.ACTIVE)
-                    .withVersion(placeholder)
+                    .Builder(placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE)
                     .build()
             ),
             new Application(
@@ -154,8 +153,7 @@ public class LocalJobRunnerUnitTests {
                 Instant.now(),
                 new ExecutionEnvironment(null, null, null),
                 new ApplicationMetadata
-                    .Builder(placeholder, placeholder, ApplicationStatus.ACTIVE)
-                    .withVersion(placeholder)
+                    .Builder(placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE)
                     .build()
             ),
             new Application(
@@ -164,8 +162,7 @@ public class LocalJobRunnerUnitTests {
                 Instant.now(),
                 new ExecutionEnvironment(null, null, null),
                 new ApplicationMetadata
-                    .Builder(placeholder, placeholder, ApplicationStatus.ACTIVE)
-                    .withVersion(placeholder)
+                    .Builder(placeholder, placeholder, placeholder, ApplicationStatus.ACTIVE)
                     .build()
             )
         );
@@ -186,7 +183,7 @@ public class LocalJobRunnerUnitTests {
             Instant.now(),
             Instant.now(),
             new ExecutionEnvironment(null, null, null),
-            new ClusterMetadata.Builder(CLUSTER_NAME, USER, ClusterStatus.UP).withVersion(VERSION).build()
+            new ClusterMetadata.Builder(CLUSTER_NAME, USER, VERSION, ClusterStatus.UP).build()
         );
 
         final Command command = new Command(
@@ -194,7 +191,7 @@ public class LocalJobRunnerUnitTests {
             Instant.now(),
             Instant.now(),
             new ExecutionEnvironment(null, null, null),
-            new CommandMetadata.Builder(COMMAND_NAME, USER, CommandStatus.ACTIVE).withVersion(VERSION).build(),
+            new CommandMetadata.Builder(COMMAND_NAME, USER, VERSION, CommandStatus.ACTIVE).build(),
             Lists.newArrayList("foo"),
             null,
             5000L

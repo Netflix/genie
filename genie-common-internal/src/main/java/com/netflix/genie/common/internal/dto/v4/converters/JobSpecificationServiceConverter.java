@@ -99,9 +99,9 @@ public final class JobSpecificationServiceConverter {
         final com.netflix.genie.proto.JobMetadata jobMetadata = request.getMetadata();
         final JobMetadata userMetadata = new JobMetadata.Builder(
             jobMetadata.getName(),
-            jobMetadata.getUser()
+            jobMetadata.getUser(),
+            jobMetadata.getVersion()
         )
-            .withVersion(jobMetadata.getVersion())
             .withDescription(jobMetadata.getDescription())
             .withTags(jobMetadata.getTagsList() != null ? Sets.newHashSet(jobMetadata.getTagsList()) : null)
             .withMetadata(jobMetadata.getMetadata())
@@ -287,7 +287,7 @@ public final class JobSpecificationServiceConverter {
         jobRequest.getRequestedId().ifPresent(builder::setId);
         builder.setName(userMetadata.getName());
         builder.setUser(userMetadata.getUser());
-        userMetadata.getVersion().ifPresent(builder::setVersion);
+        builder.setVersion(userMetadata.getVersion());
         userMetadata.getDescription().ifPresent(builder::setDescription);
         builder.addAllTags(userMetadata.getTags());
         if (userMetadata.getMetadata().isPresent()) {

@@ -62,11 +62,11 @@ public final class EntityDtoConverters {
         final ApplicationMetadata.Builder metadataBuilder = new ApplicationMetadata.Builder(
             applicationEntity.getName(),
             applicationEntity.getUser(),
+            applicationEntity.getVersion(),
             applicationEntity.getStatus()
         )
             .withTags(applicationEntity.getTags().stream().map(TagEntity::getTag).collect(Collectors.toSet()));
 
-        applicationEntity.getVersion().ifPresent(metadataBuilder::withVersion);
         applicationEntity.getType().ifPresent(metadataBuilder::withType);
         applicationEntity.getDescription().ifPresent(metadataBuilder::withDescription);
         setDtoMetadata(metadataBuilder, applicationEntity);
@@ -94,11 +94,11 @@ public final class EntityDtoConverters {
         final ClusterMetadata.Builder metadataBuilder = new ClusterMetadata.Builder(
             clusterEntity.getName(),
             clusterEntity.getUser(),
+            clusterEntity.getVersion(),
             clusterEntity.getStatus()
         )
             .withTags(clusterEntity.getTags().stream().map(TagEntity::getTag).collect(Collectors.toSet()));
 
-        clusterEntity.getVersion().ifPresent(metadataBuilder::withVersion);
         clusterEntity.getDescription().ifPresent(metadataBuilder::withDescription);
         setDtoMetadata(metadataBuilder, clusterEntity);
 
@@ -125,11 +125,11 @@ public final class EntityDtoConverters {
         final CommandMetadata.Builder metadataBuilder = new CommandMetadata.Builder(
             commandEntity.getName(),
             commandEntity.getUser(),
+            commandEntity.getVersion(),
             commandEntity.getStatus()
         )
             .withTags(commandEntity.getTags().stream().map(TagEntity::getTag).collect(Collectors.toSet()));
 
-        commandEntity.getVersion().ifPresent(metadataBuilder::withVersion);
         commandEntity.getDescription().ifPresent(metadataBuilder::withDescription);
         setDtoMetadata(metadataBuilder, commandEntity);
 

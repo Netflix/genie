@@ -103,9 +103,9 @@ public class JpaApplicationServiceImplUnitTests {
             new ApplicationMetadata.Builder(
                 APP_1_NAME,
                 APP_1_USER,
+                APP_1_VERSION,
                 ApplicationStatus.ACTIVE
             )
-                .withVersion(APP_1_VERSION)
                 .build()
         )
             .withRequestedId(APP_1_ID)
@@ -132,9 +132,9 @@ public class JpaApplicationServiceImplUnitTests {
             new ApplicationMetadata.Builder(
                 APP_1_NAME,
                 APP_1_USER,
+                APP_1_VERSION,
                 ApplicationStatus.ACTIVE
             )
-                .withVersion(APP_1_VERSION)
                 .build()
         );
         final String id = UUID.randomUUID().toString();
@@ -158,9 +158,9 @@ public class JpaApplicationServiceImplUnitTests {
             new ApplicationMetadata.Builder(
                 APP_1_NAME,
                 APP_1_USER,
+                APP_1_VERSION,
                 ApplicationStatus.ACTIVE
             )
-                .withVersion(APP_1_VERSION)
                 .build()
         );
         Mockito.when(this.jpaApplicationRepository.existsByUniqueId(id)).thenReturn(true);

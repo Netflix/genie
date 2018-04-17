@@ -64,7 +64,7 @@ public class ApplicationEntityUnitTests extends EntityTestsBase {
         Assert.assertNull(entity.getStatus());
         Assert.assertNull(entity.getName());
         Assert.assertNull(entity.getUser());
-        Assert.assertFalse(entity.getVersion().isPresent());
+        Assert.assertNull(entity.getVersion());
         Assert.assertNotNull(entity.getDependencies());
         Assert.assertTrue(entity.getDependencies().isEmpty());
         Assert.assertNotNull(entity.getConfigs());
@@ -82,6 +82,7 @@ public class ApplicationEntityUnitTests extends EntityTestsBase {
     public void testValidate() {
         this.a.setName(NAME);
         this.a.setUser(USER);
+        this.a.setVersion(VERSION);
         this.a.setStatus(ApplicationStatus.ACTIVE);
         this.validate(this.a);
     }
@@ -101,6 +102,15 @@ public class ApplicationEntityUnitTests extends EntityTestsBase {
     @Test(expected = ConstraintViolationException.class)
     public void testValidateNoUser() {
         this.a.setUser("");
+        this.validate(this.a);
+    }
+
+    /**
+     * Make sure validation works on with failure from super class.
+     */
+    @Test(expected = ConstraintViolationException.class)
+    public void testValidateNoVersion() {
+        this.a.setVersion("");
         this.validate(this.a);
     }
 

@@ -79,17 +79,19 @@ public class ApplicationMetadata extends CommonMetadata {
         /**
          * Constructor which has required fields.
          *
-         * @param name   The name to use for the application
-         * @param user   The user who owns the application
-         * @param status The status of the application
+         * @param name    The name to use for the application
+         * @param user    The user who owns the application
+         * @param version The version of the application
+         * @param status  The status of the application
          */
         @JsonCreator
         public Builder(
             @JsonProperty(value = "name", required = true) final String name,
             @JsonProperty(value = "user", required = true) final String user,
+            @JsonProperty(value = "version", required = true) final String version,
             @JsonProperty(value = "status", required = true) final ApplicationStatus status
         ) {
-            super(name, user);
+            super(name, user, version);
             this.bStatus = status;
         }
 

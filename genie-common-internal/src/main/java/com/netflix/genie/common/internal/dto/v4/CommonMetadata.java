@@ -28,6 +28,7 @@ import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.io.IOException;
@@ -45,12 +46,13 @@ import java.util.stream.Collectors;
 @EqualsAndHashCode(doNotUseGetters = true)
 @ToString(doNotUseGetters = true)
 public abstract class CommonMetadata {
-    @NotEmpty(message = "A name is required and must be at most 255 characters")
+    @NotBlank(message = "A name is required and must be at most 255 characters")
     @Size(max = 255, message = "The name can be no longer than 255 characters")
     private final String name;
-    @NotEmpty(message = "A user is required and must be at most 255 characters")
+    @NotBlank(message = "A user is required and must be at most 255 characters")
     @Size(max = 255, message = "The user can be no longer than 255 characters")
     private final String user;
+    @NotBlank(message = "A version is required and must be at most 255 characters")
     @Size(max = 255, message = "The version can be no longer than 255 characters")
     private final String version;
     @Size(max = 1000, message = "The description can be no longer than 1000 characters")
@@ -73,15 +75,6 @@ public abstract class CommonMetadata {
         this.description = builder.bDescription;
         this.metadata = builder.bMetadata;
         this.tags = builder.bTags == null ? ImmutableSet.of() : ImmutableSet.copyOf(builder.bTags);
-    }
-
-    /**
-     * Get the version.
-     *
-     * @return The version as an {@link Optional}
-     */
-    public Optional<String> getVersion() {
-        return Optional.ofNullable(this.version);
     }
 
     /**
@@ -128,7 +121,7 @@ public abstract class CommonMetadata {
 
         private final String bName;
         private final String bUser;
-        private String bVersion;
+        private final String bVersion;
         private String bDescription;
         private JsonNode bMetadata;
         private ImmutableSet<String> bTags;
@@ -136,26 +129,18 @@ public abstract class CommonMetadata {
         /**
          * Constructor with required fields.
          *
-         * @param name The name of the resource
-         * @param user The user owning the resource
+         * @param name    The name of the resource
+         * @param user    The user owning the resource
+         * @param version The version of hte resource
          */
         protected Builder(
             final String name,
-            final String user
+            final String user,
+            final String version
         ) {
             this.bName = name;
             this.bUser = user;
-        }
-
-        /**
-         * Set the version of the resource.
-         *
-         * @param version The version to set
-         * @return The builder
-         */
-        public T withVersion(@Nullable final String version) {
-            this.bVersion = StringUtils.isBlank(version) ? null : version;
-            return (T) this;
+            this.bVersion = version;
         }
 
         /**

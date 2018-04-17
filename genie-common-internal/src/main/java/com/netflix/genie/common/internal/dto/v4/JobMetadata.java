@@ -42,6 +42,7 @@ import java.util.Optional;
 @JsonDeserialize(builder = JobMetadata.Builder.class)
 @SuppressWarnings("checkstyle:finalclass")
 public class JobMetadata extends CommonMetadata {
+    static final String DEFAULT_VERSION = "0.1";
 
     @Size(max = 255, message = "Max length of the group is 255 characters")
     private final String group;
@@ -112,15 +113,27 @@ public class JobMetadata extends CommonMetadata {
         /**
          * Constructor which has required fields.
          *
-         * @param name The name to use for the job
-         * @param user The user to use for the Job
+         * @param name    The name to use for the job
+         * @param user    The user to use for the Job
+         * @param version The version of the job
          */
         @JsonCreator
         public Builder(
             @JsonProperty(value = "name", required = true) final String name,
-            @JsonProperty(value = "user", required = true) final String user
+            @JsonProperty(value = "user", required = true) final String user,
+            @JsonProperty(value = "version", required = true) final String version
         ) {
-            super(name, user);
+            super(name, user, version);
+        }
+
+        /**
+         * Constructor which will set a default version of 0.1.
+         *
+         * @param name The name to use for the job
+         * @param user The user to use for the job
+         */
+        public Builder(final String name, final String user) {
+            this(name, user, DEFAULT_VERSION);
         }
 
         /**

@@ -46,8 +46,7 @@ class ClusterMetadataSpec extends Specification {
         ClusterMetadata clusterMetadata
 
         when:
-        clusterMetadata = new ClusterMetadata.Builder(name, user, status)
-                .withVersion(version)
+        clusterMetadata = new ClusterMetadata.Builder(name, user, version, status)
                 .withDescription(description)
                 .withTags(tags)
                 .withMetadata(metadata)
@@ -57,31 +56,31 @@ class ClusterMetadataSpec extends Specification {
         clusterMetadata.getName() == name
         clusterMetadata.getUser() == user
         clusterMetadata.getStatus() == status
-        clusterMetadata.getVersion().orElse(UUID.randomUUID().toString()) == version
+        clusterMetadata.getVersion() == version
         clusterMetadata.getDescription().orElse(UUID.randomUUID().toString()) == description
         clusterMetadata.getTags() == tags
         clusterMetadata.getMetadata().orElse(Mock(JsonNode)) == metadata
 
         when:
-        clusterMetadata = new ClusterMetadata.Builder(name, user, status).withMetadata(metadataJson).build()
+        clusterMetadata = new ClusterMetadata.Builder(name, user, version, status).withMetadata(metadataJson).build()
 
         then:
         clusterMetadata.getName() == name
         clusterMetadata.getUser() == user
         clusterMetadata.getStatus() == status
-        !clusterMetadata.getVersion().isPresent()
+        clusterMetadata.getVersion() == version
         !clusterMetadata.getDescription().isPresent()
         clusterMetadata.getTags().isEmpty()
         clusterMetadata.getMetadata().orElse(Mock(JsonNode)) == metadata
 
         when:
-        clusterMetadata = new ClusterMetadata.Builder(name, user, status).build()
+        clusterMetadata = new ClusterMetadata.Builder(name, user, version, status).build()
 
         then:
         clusterMetadata.getName() == name
         clusterMetadata.getUser() == user
         clusterMetadata.getStatus() == status
-        !clusterMetadata.getVersion().isPresent()
+        clusterMetadata.getVersion() == version
         !clusterMetadata.getDescription().isPresent()
         clusterMetadata.getTags().isEmpty()
         !clusterMetadata.getMetadata().isPresent()
@@ -89,8 +88,7 @@ class ClusterMetadataSpec extends Specification {
         when: "Empty strings should result in not present"
         def newTags = Sets.newHashSet(tags)
         newTags.add("     ")
-        clusterMetadata = new ClusterMetadata.Builder(name, user, status)
-                .withVersion(" ")
+        clusterMetadata = new ClusterMetadata.Builder(name, user, version, status)
                 .withDescription("")
                 .withTags(newTags)
                 .withMetadata(metadata)
@@ -100,7 +98,7 @@ class ClusterMetadataSpec extends Specification {
         clusterMetadata.getName() == name
         clusterMetadata.getUser() == user
         clusterMetadata.getStatus() == status
-        !clusterMetadata.getVersion().isPresent()
+        clusterMetadata.getVersion() == version
         !clusterMetadata.getDescription().isPresent()
         clusterMetadata.getTags() == tags
         clusterMetadata.getMetadata().orElse(Mock(JsonNode)) == metadata

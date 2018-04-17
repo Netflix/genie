@@ -34,6 +34,7 @@ class ClusterSpec extends Specification {
         def metadata = new ClusterMetadata.Builder(
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
                 ClusterStatus.UP
         ).build()
         def id = UUID.randomUUID().toString()

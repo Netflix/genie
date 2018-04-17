@@ -84,7 +84,7 @@ class EntityDtoConvertersSpec extends Specification {
         application.getId() == id
         application.getMetadata().getName() == name
         application.getMetadata().getUser() == user
-        application.getMetadata().getVersion().orElseGet(RandomSuppliers.STRING) == version
+        application.getMetadata().getVersion() == version
         application.getCreated() == created
         application.getUpdated() == updated
         application.getMetadata().getDescription().orElseGet(RandomSuppliers.STRING) == description
@@ -151,7 +151,7 @@ class EntityDtoConvertersSpec extends Specification {
         cluster.getId() == id
         cluster.getMetadata().getName() == name
         cluster.getMetadata().getUser() == user
-        cluster.getMetadata().getVersion().orElseGet(RandomSuppliers.STRING) == version
+        cluster.getMetadata().getVersion() == version
         cluster.getMetadata().getDescription().orElseGet(RandomSuppliers.STRING) == description
         cluster.getMetadata().getStatus() == ClusterStatus.TERMINATED
         cluster.getCreated() == created
@@ -224,7 +224,7 @@ class EntityDtoConvertersSpec extends Specification {
         command.getId() == id
         command.getMetadata().getName() == name
         command.getMetadata().getUser() == user
-        command.getMetadata().getVersion().orElseGet(RandomSuppliers.STRING) == version
+        command.getMetadata().getVersion() == version
         command.getMetadata().getStatus() == CommandStatus.DEPRECATED
         command.getMetadata().getDescription().orElseGet(RandomSuppliers.STRING) == description
         command.getCreated() == created

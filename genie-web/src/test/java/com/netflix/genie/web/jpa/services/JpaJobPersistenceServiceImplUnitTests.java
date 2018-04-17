@@ -177,7 +177,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
         Assert.assertEquals(JOB_1_ID, argument.getValue().getUniqueId());
         Assert.assertEquals(JOB_1_USER, argument.getValue().getUser());
         Assert.assertThat(
-            argument.getValue().getVersion().orElse(UUID.randomUUID().toString()),
+            argument.getValue().getVersion(),
             Matchers.is(JOB_1_VERSION)
         );
         Assert.assertEquals(JOB_1_NAME, argument.getValue().getName());

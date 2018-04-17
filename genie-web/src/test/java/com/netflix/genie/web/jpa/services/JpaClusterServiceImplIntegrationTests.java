@@ -110,10 +110,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(CLUSTER_1_ID, cluster1.getId());
         Assert.assertEquals(CLUSTER_1_NAME, cluster1.getMetadata().getName());
         Assert.assertEquals(CLUSTER_1_USER, cluster1.getMetadata().getUser());
-        Assert.assertEquals(
-            CLUSTER_1_VERSION,
-            cluster1.getMetadata().getVersion().orElse(UUID.randomUUID().toString())
-        );
+        Assert.assertEquals(CLUSTER_1_VERSION, cluster1.getMetadata().getVersion());
         Assert.assertEquals(CLUSTER_1_STATUS, cluster1.getMetadata().getStatus());
         Assert.assertEquals(3, cluster1.getMetadata().getTags().size());
         Assert.assertEquals(1, cluster1.getResources().getConfigs().size());
@@ -123,10 +120,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertEquals(CLUSTER_2_ID, cluster2.getId());
         Assert.assertEquals(CLUSTER_2_NAME, cluster2.getMetadata().getName());
         Assert.assertEquals(CLUSTER_2_USER, cluster2.getMetadata().getUser());
-        Assert.assertEquals(
-            CLUSTER_2_VERSION,
-            cluster2.getMetadata().getVersion().orElse(UUID.randomUUID().toString())
-        );
+        Assert.assertEquals(CLUSTER_2_VERSION, cluster2.getMetadata().getVersion());
         Assert.assertEquals(CLUSTER_2_STATUS, cluster2.getMetadata().getStatus());
         Assert.assertEquals(3, cluster2.getMetadata().getTags().size());
         Assert.assertEquals(2, cluster2.getResources().getConfigs().size());
@@ -495,9 +489,9 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
             new ClusterMetadata.Builder(
                 CLUSTER_1_NAME,
                 CLUSTER_1_USER,
+                CLUSTER_1_VERSION,
                 ClusterStatus.OUT_OF_SERVICE
             )
-                .withVersion(CLUSTER_1_VERSION)
                 .build()
         )
             .withRequestedId(id)
@@ -537,9 +531,9 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
             new ClusterMetadata.Builder(
                 CLUSTER_1_NAME,
                 CLUSTER_1_USER,
+                CLUSTER_1_VERSION,
                 ClusterStatus.OUT_OF_SERVICE
             )
-                .withVersion(CLUSTER_1_VERSION)
                 .build()
         )
             .withResources(new ExecutionEnvironment(configs, dependencies, null))
@@ -590,9 +584,9 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
             new ClusterMetadata.Builder(
                 getCluster.getMetadata().getName(),
                 CLUSTER_2_USER,
+                getCluster.getMetadata().getVersion(),
                 ClusterStatus.OUT_OF_SERVICE
             )
-                .withVersion(getCluster.getMetadata().getVersion().orElse(null))
                 .withTags(tags)
                 .withDescription(getCluster.getMetadata().getDescription().orElse(null))
                 .build()
@@ -630,9 +624,9 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
             new ClusterMetadata.Builder(
                 "",
                 getCluster.getMetadata().getUser(),
+                getCluster.getMetadata().getVersion(),
                 ClusterStatus.OUT_OF_SERVICE
             )
-                .withVersion(getCluster.getMetadata().getVersion().orElse(null))
                 .withTags(getCluster.getMetadata().getTags())
                 .withDescription(getCluster.getMetadata().getDescription().orElse(null))
                 .build()
@@ -664,9 +658,9 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
             new ClusterMetadata.Builder(
                 getCluster.getMetadata().getUser(),
                 getCluster.getMetadata().getUser(),
+                getCluster.getMetadata().getVersion(),
                 getCluster.getMetadata().getStatus()
             )
-                .withVersion(getCluster.getMetadata().getVersion().orElse(null))
                 .withTags(getCluster.getMetadata().getTags())
                 .withDescription(getCluster.getMetadata().getDescription().orElse(null))
                 .build()
@@ -878,9 +872,9 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
                 new CommandMetadata.Builder(
                     "name",
                     "user",
+                    "23.1.0",
                     CommandStatus.ACTIVE
                 )
-                    .withVersion("23.1.0")
                     .build(),
                 Lists.newArrayList("pig")
             )
@@ -892,9 +886,9 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
                 new CommandMetadata.Builder(
                     "name2",
                     "user2",
+                    "23.1.1",
                     CommandStatus.INACTIVE
                 )
-                    .withVersion("23.1.1")
                     .build(),
                 Lists.newArrayList("pig2")
             )
@@ -949,9 +943,9 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
                 new CommandMetadata.Builder(
                     "name",
                     "user",
+                    "23.1.0",
                     CommandStatus.ACTIVE
                 )
-                    .withVersion("23.1.0")
                     .build(),
                 Lists.newArrayList("pig")
             )
@@ -963,9 +957,9 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
                 new CommandMetadata.Builder(
                     "name2",
                     "user2",
+                    "23.1.1",
                     CommandStatus.INACTIVE
                 )
-                    .withVersion("23.1.1")
                     .build(),
                 Lists.newArrayList("pig2")
             )
@@ -1099,9 +1093,9 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
             new ClusterMetadata.Builder(
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
                 ClusterStatus.OUT_OF_SERVICE
             )
-                .withVersion(UUID.randomUUID().toString())
                 .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
                 .build()
         )
