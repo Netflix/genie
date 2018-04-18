@@ -18,14 +18,9 @@
 package com.netflix.genie.agent.configs;
 
 import com.netflix.genie.proto.v4.converters.AgentEventConverter;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
-import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
-
-import javax.validation.Validator;
 
 /**
  * Configuration for converter beans (e.g., DTO to Protobuf).
@@ -33,14 +28,13 @@ import javax.validation.Validator;
  * @author mprimi
  * @since 4.0.0
  */
-//TODO test
 @Configuration
 class ConvertersConfig {
 
     /**
-     * Setup bean validation.
+     * Create a converter bean for AgentEvent DTO to/from Proto.
      *
-     * @return The bean validator
+     * @return the converter bean
      */
     @Bean
     @Lazy
