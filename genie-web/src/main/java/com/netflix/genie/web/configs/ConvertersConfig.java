@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2015 Netflix, Inc.
+ *  Copyright 2018 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -15,11 +15,28 @@
  *     limitations under the License.
  *
  */
+package com.netflix.genie.web.configs;
+
+import com.netflix.genie.proto.v4.converters.AgentEventConverter;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
- * Tests for implementations of gRPC services.
+ * Configuration for converter beans (e.g., DTO to Protobuf).
  *
  * @author mprimi
  * @since 4.0.0
  */
-package com.netflix.genie.web.rpc.services.impl;
+@Configuration
+class ConvertersConfig {
+
+    /**
+     * Create a converter bean for AgentEvent DTO to/from Proto.
+     *
+     * @return the converter bean
+     */
+    @Bean
+    public AgentEventConverter agentEventConverter() {
+        return new AgentEventConverter();
+    }
+}

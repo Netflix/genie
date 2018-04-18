@@ -27,7 +27,7 @@ import com.netflix.genie.proto.GetJobSpecificationRequest;
 import com.netflix.genie.proto.JobSpecificationResponse;
 import com.netflix.genie.proto.JobSpecificationServiceGrpc;
 import com.netflix.genie.proto.ResolveJobSpecificationRequest;
-import com.netflix.genie.proto.v4.adapters.JobSpecificationServiceAdapter;
+import com.netflix.genie.proto.v4.converters.JobSpecificationServiceConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -70,7 +70,7 @@ public class GRpcAgentJobSpecificationServiceImpl implements AgentJobSpecificati
 
         final ResolveJobSpecificationRequest resolveRequest;
         try {
-            resolveRequest = JobSpecificationServiceAdapter.toProtoResolveJobSpecificationRequest(agentJobRequest);
+            resolveRequest = JobSpecificationServiceConverter.toProtoResolveJobSpecificationRequest(agentJobRequest);
         } catch (final JsonProcessingException e) {
             throw new IllegalArgumentException("Invalid job request for job specification", e);
         }
@@ -119,7 +119,7 @@ public class GRpcAgentJobSpecificationServiceImpl implements AgentJobSpecificati
             );
         }
 
-        return JobSpecificationServiceAdapter.toJobSpecificationDTO(specResponse);
+        return JobSpecificationServiceConverter.toJobSpecificationDTO(specResponse);
 
     }
 }

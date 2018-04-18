@@ -19,6 +19,7 @@
 package com.netflix.genie.agent.execution.statemachine.actions;
 
 import com.netflix.genie.agent.execution.ExecutionContext;
+import com.netflix.genie.agent.execution.services.AgentEventsService;
 import com.netflix.genie.agent.execution.statemachine.Events;
 import com.netflix.genie.agent.execution.statemachine.States;
 import lombok.extern.slf4j.Slf4j;
@@ -33,9 +34,14 @@ import org.springframework.statemachine.StateContext;
 public abstract class BaseStateAction implements StateAction {
 
     private final ExecutionContext executionContext;
+    private final AgentEventsService agentEventsService;
 
-    protected BaseStateAction(final ExecutionContext executionContext) {
+    protected BaseStateAction(
+        final ExecutionContext executionContext,
+        final AgentEventsService agentEventsService
+    ) {
         this.executionContext = executionContext;
+        this.agentEventsService = agentEventsService;
     }
 
     /**
@@ -48,7 +54,7 @@ public abstract class BaseStateAction implements StateAction {
         final String currentActionName = this.getClass().getSimpleName();
 
         // Enqueue this action for later cleanup
-        executionContext.getCleanupActions().addLast(this);
+        executionContext.addCleanupActions(this);
 
         Events nextEvent;
         try {
@@ -56,8 +62,13 @@ public abstract class BaseStateAction implements StateAction {
             // State action returns the next event to send (or null)
             nextEvent = executeStateAction(executionContext);
             log.info("State action {} returned {} as next event", currentActionName, nextEvent);
+
+            // Emit successful action execution event
+            agentEventsService.emitStateActionExecution(currentState, this);
         } catch (final Exception e) {
-            executionContext.setStateActionError(currentState, this.getClass(), e);
+            executionContext.addStateActionError(currentState, this.getClass(), e);
+            // Emit failed action execution event
+            agentEventsService.emitStateActionExecution(currentState, this, e);
             nextEvent = Events.ERROR;
             log.error(
                 "Action {} failed with exception",

@@ -19,9 +19,9 @@
 package com.netflix.genie.agent.execution;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Queues;
 import com.netflix.genie.agent.execution.statemachine.States;
 import com.netflix.genie.agent.execution.statemachine.actions.StateAction;
+import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.v4.JobSpecification;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Triple;
@@ -33,7 +33,6 @@ import javax.annotation.concurrent.ThreadSafe;
 import javax.validation.constraints.NotBlank;
 import java.io.File;
 import java.util.Collections;
-import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -55,9 +54,12 @@ class ExecutionContextImpl implements ExecutionContext {
     private final AtomicReference<File> jobDirectoryRef = new AtomicReference<>();
     private final AtomicReference<JobSpecification> jobSpecRef = new AtomicReference<>();
     private final AtomicReference<Map<String, String>> jobEnvironmentRef = new AtomicReference<>();
-    private final Deque<StateAction> cleanupActions = Queues.newArrayDeque();
-    private final List<Triple<States, Class<? extends Action>, Exception>> stateActionErrors
-        = Collections.synchronizedList(Lists.newArrayList());
+    private final AtomicReference<JobStatus> finalJobStatusRef = new AtomicReference<>();
+    private final List<StateAction> cleanupActions = Lists.newArrayList();
+    private final List<Triple<States, Class<? extends Action>, Exception>> stateActionErrors = Lists.newArrayList();
+
+    ExecutionContextImpl() {
+    }
 
     /**
      * {@inheritDoc}
@@ -127,14 +129,6 @@ class ExecutionContextImpl implements ExecutionContext {
      * {@inheritDoc}
      */
     @Override
-    public Map<String, String> getJobEnvironment() {
-        return jobEnvironmentRef.get();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void setJobEnvironment(final Map<String, String> jobEnvironment) {
         setIfNullOrTrow(jobEnvironment, jobEnvironmentRef);
     }
@@ -143,20 +137,42 @@ class ExecutionContextImpl implements ExecutionContext {
      * {@inheritDoc}
      */
     @Override
-    public Deque<StateAction> getCleanupActions() {
-        return cleanupActions;
+    public Map<String, String> getJobEnvironment() {
+        return jobEnvironmentRef.get();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void setStateActionError(
+    public void addCleanupActions(final StateAction stateAction) {
+        synchronized (cleanupActions) {
+            cleanupActions.add(stateAction);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<StateAction> getCleanupActions() {
+        synchronized (cleanupActions) {
+            return Collections.unmodifiableList(cleanupActions);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addStateActionError(
         final States state,
         final Class<? extends Action> actionClass,
         final Exception exception
     ) {
-        stateActionErrors.add(Triple.of(state, actionClass, exception));
+        synchronized (stateActionErrors) {
+            stateActionErrors.add(Triple.of(state, actionClass, exception));
+        }
     }
 
     /**
@@ -164,7 +180,9 @@ class ExecutionContextImpl implements ExecutionContext {
      */
     @Override
     public boolean hasStateActionError() {
-        return !stateActionErrors.isEmpty();
+        synchronized (stateActionErrors) {
+            return !stateActionErrors.isEmpty();
+        }
     }
 
     /**
@@ -172,7 +190,28 @@ class ExecutionContextImpl implements ExecutionContext {
      */
     @Override
     public List<Triple<States, Class<? extends Action>, Exception>> getStateActionErrors() {
-        return Collections.unmodifiableList(stateActionErrors);
+        synchronized (stateActionErrors) {
+            return Collections.unmodifiableList(stateActionErrors);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setFinalJobStatus(final JobStatus jobStatus) {
+        if (jobStatus.isActive()) {
+            throw new IllegalArgumentException("Invalid final job status: " + jobStatus);
+        }
+        setIfNullOrTrow(jobStatus, finalJobStatusRef);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JobStatus getFinalJobStatus() {
+        return finalJobStatusRef.get();
     }
 
     private static <T> void setIfNullOrTrow(final T value, final AtomicReference<T> reference) {

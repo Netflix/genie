@@ -23,6 +23,7 @@ import com.google.common.collect.Lists;
 import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.exceptions.DownloadException;
 import com.netflix.genie.agent.execution.exceptions.SetUpJobException;
+import com.netflix.genie.agent.execution.services.AgentEventsService;
 import com.netflix.genie.agent.execution.services.DownloadService;
 import com.netflix.genie.agent.execution.statemachine.Events;
 import com.netflix.genie.agent.utils.EnvUtils;
@@ -61,9 +62,10 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
 
     SetUpJobAction(
         final ExecutionContext executionContext,
-        final DownloadService downloadService
+        final DownloadService downloadService,
+        final AgentEventsService agentEventsService
     ) {
-        super(executionContext);
+        super(executionContext, agentEventsService);
         this.downloadService = downloadService;
     }
 

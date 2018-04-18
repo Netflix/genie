@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.proto.v4.adapters;
+package com.netflix.genie.proto.v4.converters;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.ImmutableSet;
@@ -52,12 +52,12 @@ import java.util.stream.Collectors;
  * @see com.netflix.genie.proto
  * @since 4.0.0
  */
-public final class JobSpecificationServiceAdapter {
+public final class JobSpecificationServiceConverter {
 
     /**
      * Utility class shouldn't be constructed.
      */
-    private JobSpecificationServiceAdapter() {
+    private JobSpecificationServiceConverter() {
     }
 
     /**
@@ -198,7 +198,7 @@ public final class JobSpecificationServiceAdapter {
             protoSpec
                 .getApplicationsList()
                 .stream()
-                .map(JobSpecificationServiceAdapter::toExecutionResourceDTO)
+                .map(JobSpecificationServiceConverter::toExecutionResourceDTO)
                 .collect(Collectors.toList()),
             protoSpec.getEnvironmentVariablesMap(),
             protoSpec.getIsInteractive(),
@@ -220,7 +220,7 @@ public final class JobSpecificationServiceAdapter {
             jobSpecification
                 .getApplications()
                 .stream()
-                .map(JobSpecificationServiceAdapter::toProtoExecutionResource)
+                .map(JobSpecificationServiceConverter::toProtoExecutionResource)
                 .collect(Collectors.toList())
         );
         builder.putAllEnvironmentVariables(jobSpecification.getEnvironmentVariables());
@@ -317,7 +317,7 @@ public final class JobSpecificationServiceAdapter {
             executionResourceCriteria
                 .getClusterCriteria()
                 .stream()
-                .map(JobSpecificationServiceAdapter::toProtoCriterion)
+                .map(JobSpecificationServiceConverter::toProtoCriterion)
                 .collect(Collectors.toList())
         );
         builder.setCommandCriterion(

@@ -18,10 +18,16 @@
 
 package com.netflix.genie.agent.execution
 
+import com.netflix.genie.agent.execution.services.AgentEventsService
+import com.netflix.genie.agent.execution.statemachine.States
+import com.netflix.genie.agent.execution.statemachine.actions.StateAction
+import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.dto.v4.JobSpecification
 import com.netflix.genie.test.categories.UnitTest
+import org.apache.commons.lang3.tuple.Triple
 import org.junit.experimental.categories.Category
 import spock.lang.Specification
+import spock.lang.Unroll
 
 @Category(UnitTest.class)
 class ExecutionContextImplSpec extends Specification {
@@ -34,6 +40,10 @@ class ExecutionContextImplSpec extends Specification {
         File directory = Mock()
         JobSpecification spec = Mock()
         Map<String, String> env = [ "foo": "bar" ]
+        JobStatus finalJobStatus = JobStatus.SUCCEEDED
+        Exception exception = new RuntimeException()
+        StateAction action1 = Mock(StateAction.SetUpJob)
+        StateAction action2 = Mock(StateAction.LaunchJob)
 
         expect:
         null == executionContext.getAgentId()
@@ -41,6 +51,10 @@ class ExecutionContextImplSpec extends Specification {
         null == executionContext.getJobDirectory()
         null == executionContext.getJobSpecification()
         null == executionContext.getJobEnvironment()
+        null == executionContext.getFinalJobStatus()
+        !executionContext.hasStateActionError()
+        executionContext.getStateActionErrors().isEmpty()
+        executionContext.getCleanupActions().isEmpty()
 
         when:
         executionContext.setAgentId(agentId)
@@ -48,6 +62,9 @@ class ExecutionContextImplSpec extends Specification {
         executionContext.setJobDirectory(directory)
         executionContext.setJobSpecification(spec)
         executionContext.setJobEnvironment(env)
+        executionContext.setFinalJobStatus(finalJobStatus)
+        executionContext.addStateActionError(States.RESOLVE_JOB_SPECIFICATION, StateAction.ResolveJobSpecification, exception)
+        executionContext.addCleanupActions(action1)
 
         then:
         agentId == executionContext.getAgentId()
@@ -55,6 +72,12 @@ class ExecutionContextImplSpec extends Specification {
         directory == executionContext.getJobDirectory()
         spec == executionContext.getJobSpecification()
         env == executionContext.getJobEnvironment()
+        finalJobStatus == executionContext.getFinalJobStatus()
+        executionContext.hasStateActionError()
+        1 == executionContext.getStateActionErrors().size()
+        Triple.of(States.RESOLVE_JOB_SPECIFICATION, StateAction.ResolveJobSpecification, exception) == executionContext.getStateActionErrors().get(0)
+        1 == executionContext.getCleanupActions().size()
+        action1 == executionContext.getCleanupActions().get(0)
 
         when:
         executionContext.setAgentId("bar")
@@ -85,5 +108,63 @@ class ExecutionContextImplSpec extends Specification {
 
         then:
         thrown(RuntimeException)
+
+        when:
+        executionContext.setFinalJobStatus(JobStatus.FAILED)
+
+        then:
+        thrown(RuntimeException)
+
+        when:
+        executionContext.addStateActionError(States.SETUP_JOB, StateAction.SetUpJob, exception)
+
+        then:
+        executionContext.hasStateActionError()
+        2 == executionContext.getStateActionErrors().size()
+        Triple.of(States.RESOLVE_JOB_SPECIFICATION, StateAction.ResolveJobSpecification, exception) == executionContext.getStateActionErrors().get(0)
+        Triple.of(States.SETUP_JOB, StateAction.SetUpJob, exception) == executionContext.getStateActionErrors().get(1)
+
+        when:
+        executionContext.addCleanupActions(action2)
+
+        then:
+        2 == executionContext.getCleanupActions().size()
+        action1 == executionContext.getCleanupActions().get(0)
+        action2 == executionContext.getCleanupActions().get(1)
+    }
+
+    @Unroll
+    def "Set final job status #jobStatus"(JobStatus jobStatus) {
+        setup:
+        ExecutionContext executionContext = new ExecutionContextImpl()
+
+        when:
+        executionContext.setFinalJobStatus(jobStatus)
+
+        then:
+        jobStatus == executionContext.getFinalJobStatus()
+
+        where:
+        jobStatus           | _
+        JobStatus.FAILED    | _
+        JobStatus.SUCCEEDED | _
+        JobStatus.KILLED    | _
+    }
+
+    @Unroll
+    def "Set invalid final job status #jobStatus"(JobStatus jobStatus) {
+        setup:
+        ExecutionContext executionContext = new ExecutionContextImpl()
+
+        when:
+        executionContext.setFinalJobStatus(jobStatus)
+
+        then:
+        thrown(IllegalArgumentException)
+
+        where:
+        jobStatus         | _
+        JobStatus.INIT    | _
+        JobStatus.RUNNING | _
     }
 }

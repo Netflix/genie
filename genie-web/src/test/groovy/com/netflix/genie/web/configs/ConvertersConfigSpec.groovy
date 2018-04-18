@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2015 Netflix, Inc.
+ *  Copyright 2018 Netflix, Inc.
  *
  *     Licensed under the Apache License, Version 2.0 (the "License");
  *     you may not use this file except in compliance with the License.
@@ -16,10 +16,26 @@
  *
  */
 
-/**
- * Implementations of gRPC services.
- *
- * @author mprimi
- * @since 4.0.0
- */
-package com.netflix.genie.web.rpc.services.impl;
+package com.netflix.genie.web.configs
+
+import com.netflix.genie.proto.v4.converters.AgentEventConverter
+import com.netflix.genie.test.categories.UnitTest
+import org.junit.experimental.categories.Category
+import spock.lang.Specification
+
+@Category(UnitTest)
+class ConvertersConfigSpec extends Specification {
+    ConvertersConfig config
+
+    def setup() {
+        this.config = new ConvertersConfig()
+    }
+
+    def "AgentEventConverter"() {
+        when:
+        AgentEventConverter converter = config.agentEventConverter()
+
+        then:
+        converter != null
+    }
+}

@@ -20,6 +20,7 @@ package com.netflix.genie.agent.execution;
 
 import com.netflix.genie.agent.execution.statemachine.States;
 import com.netflix.genie.agent.execution.statemachine.actions.StateAction;
+import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.dto.v4.JobSpecification;
 import org.apache.commons.lang3.tuple.Triple;
 import org.springframework.statemachine.action.Action;
@@ -28,7 +29,6 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.validation.constraints.NotBlank;
 import java.io.File;
-import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 
@@ -42,19 +42,19 @@ import java.util.Map;
 public interface ExecutionContext {
 
     /**
-     * Get the agent identifier.
-     *
-     * @return a non-blank string if the agent identifier was set, or null.
-     */
-    String getAgentId();
-
-    /**
      * Set the unique agent identifier obtained by the server.
      *
      * @param agentId a non-blank string
      * @throws RuntimeException if the agent id is already set
      */
-    @Nullable void setAgentId(@NotBlank final String agentId);
+    void setAgentId(@NotBlank final String agentId);
+
+    /**
+     * Get the agent identifier.
+     *
+     * @return a non-blank string if the agent identifier was set, or null.
+     */
+    @Nullable String getAgentId();
 
     /**
      * Set the job process once it has been launched.
@@ -71,13 +71,6 @@ public interface ExecutionContext {
     @Nullable Process getJobProcess();
 
     /**
-     * Get the job run directory.
-     *
-     * @return the job directory File if one was set up, or null
-     */
-    @Nullable File getJobDirectory();
-
-    /**
      * Set the job directory.
      *
      * @param jobDirectory the job directory
@@ -85,7 +78,15 @@ public interface ExecutionContext {
     void setJobDirectory(final File jobDirectory);
 
     /**
+     * Get the job run directory.
+     *
+     * @return the job directory File if one was set up, or null
+     */
+    @Nullable File getJobDirectory();
+
+    /**
      * Set the job specification.
+     *
      * @param jobSpecification the job specification
      */
     void setJobSpecification(final JobSpecification jobSpecification);
@@ -98,13 +99,6 @@ public interface ExecutionContext {
     @Nullable JobSpecification getJobSpecification();
 
     /**
-     * Get the environment variables map for the job process.
-     *
-     * @return a map of environment variables and values if one was set, or null
-     */
-    @Nullable Map<String, String> getJobEnvironment();
-
-    /**
      * Set the job environment variables map.
      *
      * @param jobEnvironment a map of environment variables and their value to be passed to the job process at launch
@@ -112,10 +106,25 @@ public interface ExecutionContext {
     void setJobEnvironment(final Map<String, String> jobEnvironment);
 
     /**
+     * Get the environment variables map for the job process.
+     *
+     * @return a map of environment variables and values if one was set, or null
+     */
+    @Nullable Map<String, String> getJobEnvironment();
+
+    /**
+     * Enqueue cleanup for a state action.
+     *
+     * @param stateAction the action that needs cleanup
+     */
+    void addCleanupActions(StateAction stateAction);
+
+    /**
      * Get the queue of states visited for the purpose of tracking post-job cleanup execution.
+     *
      * @return a deque of state actions executed
      */
-    Deque<StateAction> getCleanupActions();
+    List<StateAction> getCleanupActions();
 
     /**
      * Record a state action failure to execute and threw an exception.
@@ -124,7 +133,7 @@ public interface ExecutionContext {
      * @param actionClass the class of the state action that failed
      * @param exception the exception thrown by the state action
      */
-    void setStateActionError(
+    void addStateActionError(
         final States state,
         final Class<? extends Action> actionClass,
         final Exception exception
@@ -143,4 +152,18 @@ public interface ExecutionContext {
      * @return a list of actions that failed in the form of a Triple.
      */
     List<Triple<States, Class<? extends Action>, Exception>> getStateActionErrors();
+
+    /**
+     * Set the final job status.
+     *
+     * @param jobStatus the final job status
+     */
+    void setFinalJobStatus(final JobStatus jobStatus);
+
+    /**
+     * Get the final job status, if one was set.
+     *
+     * @return the final job status or null
+     */
+    @Nullable JobStatus getFinalJobStatus();
 }

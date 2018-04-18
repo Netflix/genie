@@ -19,6 +19,7 @@
 package com.netflix.genie.agent.execution.statemachine.actions;
 
 import com.netflix.genie.agent.execution.ExecutionContext;
+import com.netflix.genie.agent.execution.services.AgentEventsService;
 import com.netflix.genie.agent.execution.statemachine.Events;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
@@ -34,8 +35,11 @@ import org.springframework.stereotype.Component;
 @Slf4j
 class HandleErrorAction extends BaseStateAction implements StateAction.HandleError {
 
-    HandleErrorAction(final ExecutionContext executionContext) {
-        super(executionContext);
+    HandleErrorAction(
+        final ExecutionContext executionContext,
+        final AgentEventsService agentEventsService
+    ) {
+        super(executionContext, agentEventsService);
     }
 
     /**

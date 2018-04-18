@@ -16,7 +16,7 @@
  *
  */
 
-package com.netflix.genie.web.rpc.services.impl
+package com.netflix.genie.web.rpc.grpc.services.impl.v4
 
 import com.netflix.genie.proto.AgentRegistrationRequest
 import com.netflix.genie.proto.AgentRegistrationResponse
@@ -24,14 +24,14 @@ import io.grpc.stub.StreamObserver
 import org.eclipse.jetty.util.StringUtil
 import spock.lang.Specification
 
-class AgentRegistrationServiceImplSpec extends Specification {
+class GRpcAgentRegistrationServiceImplSpec extends Specification {
     final String hostName = "server.com"
 
-    AgentRegistrationServiceImpl agentRegistrationService
+    GRpcAgentRegistrationServiceImpl agentRegistrationService
     StreamObserver<AgentRegistrationResponse> responseObserver
 
     void setup() {
-        agentRegistrationService = new AgentRegistrationServiceImpl(hostName)
+        agentRegistrationService = new GRpcAgentRegistrationServiceImpl(hostName)
         responseObserver = Mock(StreamObserver)
     }
 

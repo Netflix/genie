@@ -19,12 +19,13 @@
 package com.netflix.genie.agent.execution.statemachine.actions;
 
 import com.netflix.genie.agent.execution.ExecutionContext;
+import com.netflix.genie.agent.execution.services.AgentEventsService;
 import com.netflix.genie.agent.execution.statemachine.Events;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import java.util.Deque;
+import java.util.List;
 
 /**
  * Action performed when in state CLEANUP_JOB.
@@ -36,8 +37,11 @@ import java.util.Deque;
 @Lazy
 class CleanupJobAction extends BaseStateAction implements StateAction.CleanupJob {
 
-    CleanupJobAction(final ExecutionContext executionContext) {
-        super(executionContext);
+    CleanupJobAction(
+        final ExecutionContext executionContext,
+        final AgentEventsService agentEventsService
+    ) {
+        super(executionContext, agentEventsService);
     }
 
     /**
@@ -47,21 +51,20 @@ class CleanupJobAction extends BaseStateAction implements StateAction.CleanupJob
     protected Events executeStateAction(final ExecutionContext executionContext) {
         log.info("Cleaning up job...");
 
-        final Deque<StateAction> deque = executionContext.getCleanupActions();
-        while (!deque.isEmpty()) {
-            final StateAction nextAction = deque.pop();
+        final List<StateAction> cleanupActions = executionContext.getCleanupActions();
+        for (final StateAction cleanupAction : cleanupActions) {
 
-            if (nextAction == this) {
+            if (cleanupAction == this) {
                 // Skip self
                 continue;
             }
 
             try {
-                nextAction.cleanup();
+                cleanupAction.cleanup();
             } catch (final Exception e) {
                 log.warn(
                     "Exception during action {} cleanup",
-                    nextAction.getClass().getSimpleName(),
+                    cleanupAction.getClass().getSimpleName(),
                     e
                 );
             }

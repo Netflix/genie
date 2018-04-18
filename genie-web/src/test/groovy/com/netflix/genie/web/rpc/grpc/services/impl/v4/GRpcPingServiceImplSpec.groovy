@@ -16,7 +16,7 @@
  *
  */
 
-package com.netflix.genie.web.rpc.services.impl
+package com.netflix.genie.web.rpc.grpc.services.impl.v4
 
 import com.google.protobuf.util.Timestamps
 import com.netflix.genie.proto.PingRequest
@@ -27,7 +27,7 @@ import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
 @Category(UnitTest)
-class PingServiceImplSpec extends Specification {
+class GRpcPingServiceImplSpec extends Specification {
     public static final String HOST_NAME = "genie123.netflix.com"
 
     StreamObserver<PongResponse> responseObserver
@@ -41,11 +41,12 @@ class PingServiceImplSpec extends Specification {
 
     def "Ping"() {
         setup:
-        def service = new PingServiceImpl(HOST_NAME)
+        def service = new GRpcPingServiceImpl(HOST_NAME)
         String requestId = UUID.randomUUID().toString()
         PingRequest pingRequest = PingRequest.newBuilder()
                 .setRequestId(requestId)
                 .setTimestamp(Timestamps.fromMillis(System.currentTimeMillis()))
+                .putClientMetadata("foo", "bar")
                 .build()
         PongResponse pongResponse = null
 
@@ -60,7 +61,7 @@ class PingServiceImplSpec extends Specification {
 
         expect:
         pongResponse != null
-        HOST_NAME == pongResponse.getServerMetadataOrThrow(PingServiceImpl.ServerMetadataKeys.SERVER_NAME)
+        HOST_NAME == pongResponse.getServerMetadataOrThrow(GRpcPingServiceImpl.ServerMetadataKeys.SERVER_NAME)
         requestId == pongResponse.getRequestId()
         null != pongResponse.getTimestamp()
     }

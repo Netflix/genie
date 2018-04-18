@@ -16,13 +16,26 @@
  *
  */
 
-/**
- * Package for converting gRPC messages to V4 DTOs and vice versa.
- *
- * @author tgianos
- * @since 4.0.0
- */
-@ParametersAreNonnullByDefault
-package com.netflix.genie.proto.v4.adapters;
+package com.netflix.genie.agent.configs
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import com.netflix.genie.proto.v4.converters.AgentEventConverter
+import com.netflix.genie.test.categories.UnitTest
+import org.junit.experimental.categories.Category
+import spock.lang.Specification
+
+@Category(UnitTest)
+class ConvertersConfigSpec extends Specification {
+    ConvertersConfig config
+
+    def setup() {
+        this.config = new ConvertersConfig()
+    }
+
+    def "AgentEventConverter"() {
+        when:
+        AgentEventConverter converter = config.agentEventConverter()
+
+        then:
+        converter != null
+    }
+}

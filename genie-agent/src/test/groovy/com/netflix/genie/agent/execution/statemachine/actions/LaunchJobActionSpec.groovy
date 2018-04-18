@@ -20,6 +20,7 @@ package com.netflix.genie.agent.execution.statemachine.actions
 
 import com.netflix.genie.agent.execution.ExecutionContext
 import com.netflix.genie.agent.execution.exceptions.JobLaunchException
+import com.netflix.genie.agent.execution.services.AgentEventsService
 import com.netflix.genie.agent.execution.services.LaunchJobService
 import com.netflix.genie.agent.execution.statemachine.Events
 import com.netflix.genie.common.dto.v4.JobSpecification
@@ -38,6 +39,7 @@ class LaunchJobActionSpec extends Specification {
     File jobRunDirectory
     List<String> jobCommandLine
     boolean interactive
+    AgentEventsService agentEventsService = null
 
     void setup() {
         this.executionContext = Mock(ExecutionContext)
@@ -48,7 +50,7 @@ class LaunchJobActionSpec extends Specification {
         this.interactive = true
         this.launchJobService = Mock(LaunchJobService)
         this.process = Mock(Process)
-        this.action = new LaunchJobAction(executionContext, launchJobService)
+        this.action = new LaunchJobAction(executionContext, launchJobService, agentEventsService)
     }
 
     void cleanup() {

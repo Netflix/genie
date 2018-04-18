@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
- package com.netflix.genie.web.rpc.services.impl;
+ package com.netflix.genie.web.rpc.grpc.services.impl.v4;
 
 import com.google.protobuf.util.Timestamps;
 import com.netflix.genie.proto.PingRequest;
@@ -41,11 +41,11 @@ import java.util.Map;
     }
 )
 @Slf4j
-public class PingServiceImpl extends PingServiceGrpc.PingServiceImplBase {
+public class GRpcPingServiceImpl extends PingServiceGrpc.PingServiceImplBase {
 
     private final String hostName;
 
-    PingServiceImpl(final String hostName) {
+    GRpcPingServiceImpl(final String hostName) {
         this.hostName = hostName;
     }
 
@@ -77,7 +77,7 @@ public class PingServiceImpl extends PingServiceGrpc.PingServiceImplBase {
         );
 
         sb.append("Client metadata: [ ");
-        for (Map.Entry<String, String> clientMetadataEntry : request.getClientMetadataMap().entrySet()) {
+        for (final Map.Entry<String, String> clientMetadataEntry : request.getClientMetadataMap().entrySet()) {
             sb
                 .append("{")
                 .append(clientMetadataEntry.getKey())

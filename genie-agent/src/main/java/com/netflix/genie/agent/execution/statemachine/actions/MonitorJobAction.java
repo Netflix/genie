@@ -19,7 +19,9 @@
 package com.netflix.genie.agent.execution.statemachine.actions;
 
 import com.netflix.genie.agent.execution.ExecutionContext;
+import com.netflix.genie.agent.execution.services.AgentEventsService;
 import com.netflix.genie.agent.execution.statemachine.Events;
+import com.netflix.genie.common.dto.JobStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -34,8 +36,11 @@ import org.springframework.stereotype.Component;
 @Lazy
 class MonitorJobAction extends BaseStateAction implements StateAction.MonitorJob {
 
-    MonitorJobAction(final ExecutionContext executionContext) {
-        super(executionContext);
+    MonitorJobAction(
+        final ExecutionContext executionContext,
+        final AgentEventsService agentEventsService
+    ) {
+        super(executionContext, agentEventsService);
     }
 
     /**
@@ -53,6 +58,11 @@ class MonitorJobAction extends BaseStateAction implements StateAction.MonitorJob
         }
 
         log.info("Job process completed with exit code: {}", exitCode);
+
+        // TODO: handle KILLED case
+        executionContext.setFinalJobStatus(
+            exitCode == 0 ? JobStatus.SUCCEEDED : JobStatus.FAILED
+        );
 
         return Events.MONITOR_JOB_COMPLETE;
     }

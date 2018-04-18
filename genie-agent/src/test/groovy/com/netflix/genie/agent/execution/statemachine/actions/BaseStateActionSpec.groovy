@@ -18,10 +18,11 @@
 
 package com.netflix.genie.agent.execution.statemachine.actions
 
+import com.google.common.collect.Lists
 import com.netflix.genie.agent.execution.ExecutionContext
+import com.netflix.genie.agent.execution.services.AgentEventsService
 import com.netflix.genie.agent.execution.statemachine.Events
 import com.netflix.genie.agent.execution.statemachine.States
-import org.apache.commons.lang3.tuple.Triple
 import org.springframework.statemachine.StateContext
 import org.springframework.statemachine.StateMachine
 import org.springframework.statemachine.action.Action
@@ -33,15 +34,17 @@ class BaseStateActionSpec extends Specification {
     StateMachine<States, Events> stateMachine
     State<States, Events> state
     ExecutionContext executionContext
-    Deque<StateAction> cleanupDeque = new ArrayDeque()
+    List<StateAction> cleanupList = Lists.newArrayList()
+    AgentEventsService agentEventsService
 
     void setup() {
         this.stateContext = Mock(StateContext)
         this.stateMachine = Mock(StateMachine)
         this.state = Mock(State)
         this.executionContext = Mock(ExecutionContext)
+        this.agentEventsService = Mock(AgentEventsService)
 
-        executionContext.getCleanupActions() >> cleanupDeque
+        executionContext.getCleanupActions() >> cleanupList
     }
 
     void cleanup() {
@@ -49,7 +52,7 @@ class BaseStateActionSpec extends Specification {
 
     def "Execute"() {
         setup:
-        def stateAction = new BaseStateAction(executionContext) {
+        def stateAction = new BaseStateAction(executionContext, agentEventsService) {
             @Override
             protected Events executeStateAction(ExecutionContext executionContext) {
                 return Events.INITIALIZE_COMPLETE
@@ -63,17 +66,15 @@ class BaseStateActionSpec extends Specification {
         2 * stateContext.getStateMachine() >> stateMachine
         1 * stateMachine.getState() >> state
         1 * state.getId() >> States.READY
+        1 * executionContext.addCleanupActions(stateAction)
+        1 * agentEventsService.emitStateActionExecution(States.READY, stateAction)
         1 * stateMachine.sendEvent(Events.INITIALIZE_COMPLETE) >> true
-
-        expect:
-        executionContext.getCleanupActions().size() == 1
-        executionContext.getCleanupActions().contains(stateAction)
     }
 
     def "ExecuteThrows"() {
         setup:
         def exception = new RuntimeException()
-        def stateAction = new BaseStateAction(executionContext) {
+        def stateAction = new BaseStateAction(executionContext, agentEventsService) {
             @Override
             protected Events executeStateAction(ExecutionContext executionContext) {
                 throw exception
@@ -87,11 +88,9 @@ class BaseStateActionSpec extends Specification {
         2 * stateContext.getStateMachine() >> stateMachine
         1 * stateMachine.getState() >> state
         1 * state.getId() >> States.READY
+        1 * executionContext.addCleanupActions(stateAction)
+        1 * agentEventsService.emitStateActionExecution(States.READY, stateAction, exception)
         1 * stateMachine.sendEvent(Events.ERROR) >> true
-        1 * executionContext.setStateActionError(States.READY, stateAction.getClass() as Class<? extends Action>, exception)
-
-        expect:
-        executionContext.getCleanupActions().size() == 1
-        executionContext.getCleanupActions().contains(stateAction)
+        1 * executionContext.addStateActionError(States.READY, stateAction.getClass() as Class<? extends Action>, exception)
     }
 }
