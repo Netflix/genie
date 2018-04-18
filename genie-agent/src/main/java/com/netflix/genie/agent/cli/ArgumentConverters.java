@@ -21,6 +21,7 @@ package com.netflix.genie.agent.cli;
 import com.beust.jcommander.IStringConverter;
 import com.beust.jcommander.ParameterException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.internal.dto.v4.Criterion;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
@@ -37,6 +38,7 @@ import java.util.regex.Pattern;
 
 /**
  * Utilities to convert arguments during parsing.
+ *
  * @author mprimi
  * @since 4.0.0
  */
@@ -71,27 +73,57 @@ final class ArgumentConverters {
     }
 
     static final class CriterionConverter implements IStringConverter<Criterion> {
+        // Used to guarantee consistency in all places used (documentation, multiple regex)
+        private static final String ID_KEY = "ID";
+        private static final String NAME_KEY = "NAME";
+        private static final String VERSION_KEY = "VERSION";
+        private static final String STATUS_KEY = "STATUS";
+        private static final String TAGS_KEY = "TAGS";
+
+        // Used to guarantee consistency between regex compilation and matcher access
+        private static final String ID_CAPTURE_GROUP = "id";
+        private static final String NAME_CAPTURE_GROUP = "name";
+        private static final String VERSION_CAPTURE_GROUP = "version";
+        private static final String STATUS_CAPTURE_GROUP = "status";
+        private static final String TAGS_CAPTURE_GROUP = "tags";
+
+        private static final String EXAMPLE_CRITERION
+            = ID_KEY + "=i/" + NAME_KEY + "=n/" + VERSION_KEY + "=v/" + STATUS_KEY + "=s/" + TAGS_KEY + "=t1,t2,t3\n";
+
+        private static final String COMPONENT_STRING = StringUtils.join(
+            Lists.newArrayList(
+                ID_KEY,
+                NAME_KEY,
+                VERSION_KEY,
+                STATUS_KEY,
+                TAGS_KEY
+            ),
+            ','
+        );
 
         static final String CRITERION_SYNTAX_MESSAGE = "CRITERION SYNTAX:\n"
             + "Criterion is parsed as a string in the format:\n"
-            + "    ID=i/NAME=n/STATUS=s/TAGS=t1,t2,t3\n"
+            + "    " + EXAMPLE_CRITERION
             + "Note:\n"
-            + " - All components (ID, NAME, STATUS, TAGS) are optional, but at least one is required\n"
+            + " - All components (" + COMPONENT_STRING + ") are optional, but at least one is required\n"
             + " - Order of components is enforced (i.e. NAME cannot appear before ID)\n"
             + " - Values cannot be empty (skip the components altogether if no value is present)\n";
 
         private static final Pattern SINGLE_CRITERION_PATTERN = Pattern.compile(
-            "^ID=(?<id>[^/]+)|NAME=(?<name>[^/]+)|STATUS=(?<status>[^/]+)|TAGS=(?<tags>[^/]+)$"
+            "^" + ID_KEY + "=(?<" + ID_CAPTURE_GROUP + ">[^/]+)|"
+                + NAME_KEY + "=(?<" + NAME_CAPTURE_GROUP + ">[^/]+)|"
+                + VERSION_KEY + "=(?<" + VERSION_CAPTURE_GROUP + ">[^/]+)|"
+                + STATUS_KEY + "=(?<" + STATUS_CAPTURE_GROUP + ">[^/]+)|"
+                + TAGS_KEY + "=(?<" + TAGS_CAPTURE_GROUP + ">[^/]+)$"
         );
 
         private static final Pattern MULTI_CRITERION_PATTERN = Pattern.compile(
-            "^(ID=(?<id>[^/]+)/)?(NAME=(?<name>[^/]+))?/?(STATUS=(?<status>[^/]+))?/?(TAGS=(?<tags>[^/]+))?$"
+            "^(" + ID_KEY + "=(?<" + ID_CAPTURE_GROUP + ">[^/]+)/)?"
+                + "(" + NAME_KEY + "=(?<" + NAME_CAPTURE_GROUP + ">[^/]+))?/?"
+                + "(" + VERSION_KEY + "=(?<" + VERSION_CAPTURE_GROUP + ">[^/]+))?/?"
+                + "(" + STATUS_KEY + "=(?<" + STATUS_CAPTURE_GROUP + ">[^/]+))?/?"
+                + "(" + TAGS_KEY + "=(?<" + TAGS_CAPTURE_GROUP + ">[^/]+))?$"
         );
-
-        private static final String ID_CAPTURE_GROUP = "id";
-        private static final String NAME_CAPTURE_GROUP = "name";
-        private static final String STATUS_CAPTURE_GROUP = "status";
-        private static final String TAGS_CAPTURE_GROUP = "tags";
 
         @Override
         public Criterion convert(final String value) {
@@ -113,6 +145,7 @@ final class ArgumentConverters {
 
             final String id = matchingMatcher.group(ID_CAPTURE_GROUP);
             final String name = matchingMatcher.group(NAME_CAPTURE_GROUP);
+            final String version = matchingMatcher.group(VERSION_CAPTURE_GROUP);
             final String status = matchingMatcher.group(STATUS_CAPTURE_GROUP);
             final String tags = matchingMatcher.group(TAGS_CAPTURE_GROUP);
             final Set<String> splitTags = tags == null ? null : Sets.newHashSet(tags.split(","));
@@ -120,6 +153,7 @@ final class ArgumentConverters {
             criterionBuilder
                 .withId(id)
                 .withName(name)
+                .withVersion(version)
                 .withStatus(status)
                 .withTags(splitTags);
 
