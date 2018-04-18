@@ -20,6 +20,7 @@ package com.netflix.genie.agent.execution.statemachine.actions
 
 import com.google.common.collect.Lists
 import com.netflix.genie.agent.execution.ExecutionContext
+import com.netflix.genie.agent.execution.services.AgentEventsService
 import com.netflix.genie.agent.execution.statemachine.Events
 import com.netflix.genie.agent.execution.statemachine.States
 import org.springframework.statemachine.StateContext
@@ -34,12 +35,14 @@ class BaseStateActionSpec extends Specification {
     State<States, Events> state
     ExecutionContext executionContext
     List<StateAction> cleanupList = Lists.newArrayList()
+    AgentEventsService agentEventsService
 
     void setup() {
         this.stateContext = Mock(StateContext)
         this.stateMachine = Mock(StateMachine)
         this.state = Mock(State)
         this.executionContext = Mock(ExecutionContext)
+        this.agentEventsService = Mock(AgentEventsService)
 
         executionContext.getCleanupActions() >> cleanupList
     }
@@ -49,7 +52,7 @@ class BaseStateActionSpec extends Specification {
 
     def "Execute"() {
         setup:
-        def stateAction = new BaseStateAction(executionContext) {
+        def stateAction = new BaseStateAction(executionContext, agentEventsService) {
             @Override
             protected Events executeStateAction(ExecutionContext executionContext) {
                 return Events.INITIALIZE_COMPLETE
@@ -64,13 +67,14 @@ class BaseStateActionSpec extends Specification {
         1 * stateMachine.getState() >> state
         1 * state.getId() >> States.READY
         1 * executionContext.addCleanupActions(stateAction)
+        1 * agentEventsService.emitStateActionExecution(States.READY, stateAction)
         1 * stateMachine.sendEvent(Events.INITIALIZE_COMPLETE) >> true
     }
 
     def "ExecuteThrows"() {
         setup:
         def exception = new RuntimeException()
-        def stateAction = new BaseStateAction(executionContext) {
+        def stateAction = new BaseStateAction(executionContext, agentEventsService) {
             @Override
             protected Events executeStateAction(ExecutionContext executionContext) {
                 throw exception
@@ -85,6 +89,7 @@ class BaseStateActionSpec extends Specification {
         1 * stateMachine.getState() >> state
         1 * state.getId() >> States.READY
         1 * executionContext.addCleanupActions(stateAction)
+        1 * agentEventsService.emitStateActionExecution(States.READY, stateAction, exception)
         1 * stateMachine.sendEvent(Events.ERROR) >> true
         1 * executionContext.addStateActionError(States.READY, stateAction.getClass() as Class<? extends Action>, exception)
     }

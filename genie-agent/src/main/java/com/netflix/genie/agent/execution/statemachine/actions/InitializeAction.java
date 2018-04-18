@@ -20,6 +20,7 @@ package com.netflix.genie.agent.execution.statemachine.actions;
 
 import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.exceptions.AgentRegistrationException;
+import com.netflix.genie.agent.execution.services.AgentEventsService;
 import com.netflix.genie.agent.execution.services.AgentRegistrationService;
 import com.netflix.genie.agent.execution.statemachine.Events;
 import lombok.extern.slf4j.Slf4j;
@@ -41,9 +42,10 @@ class InitializeAction extends BaseStateAction implements StateAction.Initialize
 
     InitializeAction(
         final AgentRegistrationService agentRegistrationService,
-        final ExecutionContext executionContext
+        final ExecutionContext executionContext,
+        final AgentEventsService agentEventsService
     ) {
-        super(executionContext);
+        super(executionContext, agentEventsService);
         this.agentRegistrationService = agentRegistrationService;
     }
 

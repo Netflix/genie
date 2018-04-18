@@ -19,6 +19,7 @@
 package com.netflix.genie.agent.execution.statemachine.actions
 
 import com.netflix.genie.agent.execution.ExecutionContext
+import com.netflix.genie.agent.execution.services.AgentEventsService
 import com.netflix.genie.agent.execution.statemachine.Events
 import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.test.categories.UnitTest
@@ -30,10 +31,11 @@ class MonitorJobActionSpec extends Specification {
     ExecutionContext executionContext
     MonitorJobAction action
     Process process
+    AgentEventsService agentEventsService = null
 
     void setup() {
         this.executionContext = Mock(ExecutionContext)
-        this.action = new MonitorJobAction()
+        this.action = new MonitorJobAction(executionContext, agentEventsService)
         this.process = Mock(Process)
     }
 

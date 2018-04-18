@@ -19,6 +19,7 @@
 package com.netflix.genie.agent.execution.statemachine.actions
 
 import com.netflix.genie.agent.execution.ExecutionContext
+import com.netflix.genie.agent.execution.services.AgentEventsService
 import com.netflix.genie.agent.execution.statemachine.Events
 import org.assertj.core.util.Lists
 import spock.lang.Specification
@@ -27,11 +28,11 @@ class CleanupJobActionSpec extends Specification {
     ExecutionContext executionContext
     CleanupJobAction action
     List<StateAction> cleanupQueue
-
+    AgentEventsService agentEventsService = null
 
     void setup() {
         this.executionContext = Mock(ExecutionContext)
-        this.action = new CleanupJobAction(executionContext)
+        this.action = new CleanupJobAction(executionContext, agentEventsService)
         this.cleanupQueue = Lists.newArrayList()
 
         executionContext.getCleanupActions() >> cleanupQueue

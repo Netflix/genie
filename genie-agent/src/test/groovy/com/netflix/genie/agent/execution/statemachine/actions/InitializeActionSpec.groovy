@@ -20,6 +20,7 @@ package com.netflix.genie.agent.execution.statemachine.actions
 
 import com.netflix.genie.agent.execution.ExecutionContext
 import com.netflix.genie.agent.execution.exceptions.AgentRegistrationException
+import com.netflix.genie.agent.execution.services.AgentEventsService
 import com.netflix.genie.agent.execution.services.AgentRegistrationService
 import com.netflix.genie.agent.execution.statemachine.Events
 import com.netflix.genie.test.categories.UnitTest
@@ -31,20 +32,21 @@ class InitializeActionSpec extends Specification {
     AgentRegistrationService agentRegistrationService
     ExecutionContext executionContext
     String agentId
+    AgentEventsService agentEventsService = null
+    InitializeAction action
 
     void setup() {
         this.executionContext = Mock(ExecutionContext)
         this.agentRegistrationService = Mock(AgentRegistrationService)
         this.executionContext = Mock(ExecutionContext)
         this.agentId = UUID.randomUUID().toString()
+        this.action = new InitializeAction(agentRegistrationService, executionContext, agentEventsService)
     }
 
     void cleanup() {
     }
 
     def "Register"() {
-        setup:
-        InitializeAction action = new InitializeAction(agentRegistrationService, executionContext)
         when:
         def event = action.executeStateAction(executionContext)
         then:
@@ -56,7 +58,6 @@ class InitializeActionSpec extends Specification {
     def "RegistrationException"() {
         setup:
         def e = new AgentRegistrationException("test")
-        InitializeAction action = new InitializeAction(agentRegistrationService, executionContext)
         when:
         action.executeStateAction(executionContext)
         then:
@@ -68,7 +69,6 @@ class InitializeActionSpec extends Specification {
     def "RegistrationRuntimeException"() {
         setup:
         def e = new RuntimeException("test")
-        InitializeAction action = new InitializeAction(agentRegistrationService, executionContext)
         when:
         action.executeStateAction(executionContext)
         then:

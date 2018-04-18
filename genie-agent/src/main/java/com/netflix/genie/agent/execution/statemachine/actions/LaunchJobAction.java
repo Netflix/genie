@@ -20,6 +20,7 @@ package com.netflix.genie.agent.execution.statemachine.actions;
 
 import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.exceptions.JobLaunchException;
+import com.netflix.genie.agent.execution.services.AgentEventsService;
 import com.netflix.genie.agent.execution.services.LaunchJobService;
 import com.netflix.genie.agent.execution.statemachine.Events;
 import com.netflix.genie.common.dto.v4.JobSpecification;
@@ -46,9 +47,10 @@ class LaunchJobAction extends BaseStateAction implements StateAction.LaunchJob {
 
     LaunchJobAction(
         final ExecutionContext executionContext,
-        final LaunchJobService launchJobService
+        final LaunchJobService launchJobService,
+        final AgentEventsService agentEventsService
     ) {
-        super(executionContext);
+        super(executionContext, agentEventsService);
         this.launchJobService = launchJobService;
     }
 

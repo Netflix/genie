@@ -19,6 +19,7 @@
 package com.netflix.genie.agent.execution.statemachine.actions
 
 import com.netflix.genie.agent.execution.ExecutionContext
+import com.netflix.genie.agent.execution.services.AgentEventsService
 import com.netflix.genie.agent.execution.statemachine.Events
 import com.netflix.genie.test.categories.UnitTest
 import org.junit.experimental.categories.Category
@@ -28,10 +29,11 @@ import spock.lang.Specification
 class ShutdownActionSpec extends Specification {
     ExecutionContext executionContext
     ShutdownAction action
+    AgentEventsService agentEventsService = null
 
     void setup() {
         this.executionContext = Mock(ExecutionContext)
-        this.action = new ShutdownAction()
+        this.action = new ShutdownAction(executionContext, agentEventsService)
     }
 
     void cleanup() {

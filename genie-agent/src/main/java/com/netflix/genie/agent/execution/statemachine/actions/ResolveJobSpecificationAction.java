@@ -22,6 +22,7 @@ import com.netflix.genie.agent.cli.ArgumentDelegates;
 import com.netflix.genie.agent.cli.JobRequestConverter;
 import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.exceptions.JobSpecificationResolutionException;
+import com.netflix.genie.agent.execution.services.AgentEventsService;
 import com.netflix.genie.agent.execution.services.AgentJobSpecificationService;
 import com.netflix.genie.agent.execution.statemachine.Events;
 import com.netflix.genie.common.dto.v4.AgentJobRequest;
@@ -51,9 +52,10 @@ class ResolveJobSpecificationAction extends BaseStateAction implements StateActi
         final ExecutionContext executionContext,
         final ArgumentDelegates.JobRequestArguments jobRequestArguments,
         final AgentJobSpecificationService agentJobSpecificationService,
-        final JobRequestConverter jobRequestConverter
+        final JobRequestConverter jobRequestConverter,
+        final AgentEventsService agentEventsService
     ) {
-        super(executionContext);
+        super(executionContext, agentEventsService);
         this.jobRequestArguments = jobRequestArguments;
         this.agentJobSpecificationService = agentJobSpecificationService;
         this.jobRequestConverter = jobRequestConverter;

@@ -19,6 +19,7 @@
 package com.netflix.genie.agent.execution.statemachine.actions;
 
 import com.netflix.genie.agent.execution.ExecutionContext;
+import com.netflix.genie.agent.execution.services.AgentEventsService;
 import com.netflix.genie.agent.execution.statemachine.Events;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
@@ -36,8 +37,11 @@ import java.util.List;
 @Lazy
 class CleanupJobAction extends BaseStateAction implements StateAction.CleanupJob {
 
-    CleanupJobAction(final ExecutionContext executionContext) {
-        super(executionContext);
+    CleanupJobAction(
+        final ExecutionContext executionContext,
+        final AgentEventsService agentEventsService
+    ) {
+        super(executionContext, agentEventsService);
     }
 
     /**

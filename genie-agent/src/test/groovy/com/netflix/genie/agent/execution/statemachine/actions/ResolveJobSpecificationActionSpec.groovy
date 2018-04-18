@@ -23,6 +23,7 @@ import com.netflix.genie.agent.cli.ArgumentDelegates
 import com.netflix.genie.agent.cli.JobRequestConverter
 import com.netflix.genie.agent.execution.ExecutionContext
 import com.netflix.genie.agent.execution.exceptions.JobSpecificationResolutionException
+import com.netflix.genie.agent.execution.services.AgentEventsService
 import com.netflix.genie.agent.execution.services.AgentJobSpecificationService
 import com.netflix.genie.agent.execution.statemachine.Events
 import com.netflix.genie.common.dto.v4.AgentJobRequest
@@ -45,6 +46,7 @@ class ResolveJobSpecificationActionSpec extends Specification {
     AgentJobRequest request
     JobSpecification spec
     JobSpecificationResolutionException exception
+    AgentEventsService agentEventsService = null
 
     @Rule
     TemporaryFolder temporaryFolder
@@ -58,7 +60,8 @@ class ResolveJobSpecificationActionSpec extends Specification {
                 executionContext,
                 arguments,
                 service,
-                converter
+                converter,
+                agentEventsService
         )
         this.request = Mock(AgentJobRequest)
         this.spec = Mock(JobSpecification)

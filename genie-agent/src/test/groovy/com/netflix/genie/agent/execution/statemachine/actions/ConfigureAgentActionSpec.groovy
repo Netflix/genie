@@ -19,16 +19,18 @@
 package com.netflix.genie.agent.execution.statemachine.actions
 
 import com.netflix.genie.agent.execution.ExecutionContext
+import com.netflix.genie.agent.execution.services.AgentEventsService
 import com.netflix.genie.agent.execution.statemachine.Events
 import spock.lang.Specification
 
 class ConfigureAgentActionSpec extends Specification {
     ExecutionContext executionContext
     ConfigureAgentAction action
+    AgentEventsService agentEventsService = null
 
     void setup() {
         this.executionContext = Mock(ExecutionContext)
-        this.action = new ConfigureAgentAction(executionContext)
+        this.action = new ConfigureAgentAction(executionContext, agentEventsService)
     }
 
     void cleanup() {

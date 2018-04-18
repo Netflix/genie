@@ -21,7 +21,7 @@ package com.netflix.genie.agent.execution.statemachine.actions
 import com.netflix.genie.agent.execution.ExecutionContext
 import com.netflix.genie.agent.execution.exceptions.DownloadException
 import com.netflix.genie.agent.execution.exceptions.SetUpJobException
-
+import com.netflix.genie.agent.execution.services.AgentEventsService
 import com.netflix.genie.agent.execution.services.DownloadService
 import com.netflix.genie.agent.execution.statemachine.Events
 import com.netflix.genie.agent.utils.EnvUtils
@@ -93,6 +93,8 @@ class SetUpJobActionSpec extends Specification {
     Set<String> jobDeps = []
 
     Map<String, String> jobServerEnvMap
+
+    AgentEventsService agentEventsService = null
 
     void setup() {
 
@@ -205,7 +207,7 @@ class SetUpJobActionSpec extends Specification {
             _ * getEnvironmentVariables() >> jobServerEnvMap
         }
 
-        action = new SetUpJobAction(executionContext, downloadService)
+        action = new SetUpJobAction(executionContext, downloadService, agentEventsService)
     }
 
     void cleanup() {
