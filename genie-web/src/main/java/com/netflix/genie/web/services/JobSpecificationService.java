@@ -17,8 +17,8 @@
  */
 package com.netflix.genie.web.services;
 
-import com.netflix.genie.common.dto.v4.JobRequest;
-import com.netflix.genie.common.dto.v4.JobSpecification;
+import com.netflix.genie.common.internal.dto.v4.JobRequest;
+import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.ParametersAreNonnullByDefault;

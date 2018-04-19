@@ -18,7 +18,7 @@
 
 package com.netflix.genie.agent.utils;
 
-import com.netflix.genie.common.jobs.JobConstants;
+import com.netflix.genie.common.internal.jobs.JobConstants;
 
 import java.io.File;
 import java.nio.file.Path;

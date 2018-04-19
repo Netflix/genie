@@ -18,9 +18,9 @@
 package com.netflix.genie.web.jobs.workflow.impl;
 
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.dto.v4.Command;
+import com.netflix.genie.common.internal.dto.v4.Command;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.jobs.JobConstants;
+import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.web.jobs.AdminResources;
 import com.netflix.genie.web.jobs.FileType;
 import com.netflix.genie.web.jobs.JobExecutionEnvironment;

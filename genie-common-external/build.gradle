@@ -9,6 +9,8 @@ dependencies {
      * Implementation Dependencies
      *******************************/
 
+     implementation(project(":genie-common"))
+
     /*******************************
      * Provided Dependencies
      *******************************/

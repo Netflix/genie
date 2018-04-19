@@ -19,7 +19,7 @@ package com.netflix.genie.web.jobs.workflow.impl;
 
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.jobs.JobConstants;
+import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.web.jobs.JobExecutionEnvironment;
 import com.netflix.genie.web.util.MetricsUtils;
 import io.micrometer.core.instrument.MeterRegistry;

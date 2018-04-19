@@ -28,7 +28,7 @@ import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.events.JobFinishedEvent;
 import com.netflix.genie.web.events.JobFinishedReason;
 import com.netflix.genie.web.events.KillJobEvent;
-import com.netflix.genie.common.jobs.JobConstants;
+import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.web.jobs.JobKillReasonFile;
 import com.netflix.genie.web.services.JobKillService;
 import com.netflix.genie.web.services.JobSearchService;

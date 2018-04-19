@@ -22,7 +22,7 @@ import com.google.common.collect.Lists;
 import com.netflix.genie.agent.execution.statemachine.States;
 import com.netflix.genie.agent.execution.statemachine.actions.StateAction;
 import com.netflix.genie.common.dto.JobStatus;
-import com.netflix.genie.common.dto.v4.JobSpecification;
+import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Triple;
 import org.springframework.context.annotation.Lazy;

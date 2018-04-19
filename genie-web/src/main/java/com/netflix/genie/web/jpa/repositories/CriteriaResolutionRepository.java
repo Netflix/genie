@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.jpa.repositories;
 
-import com.netflix.genie.common.dto.v4.Criterion;
+import com.netflix.genie.common.internal.dto.v4.Criterion;
 
 import javax.annotation.Nonnull;
 import java.util.List;

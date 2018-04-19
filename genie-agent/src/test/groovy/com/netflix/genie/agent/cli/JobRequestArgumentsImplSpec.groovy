@@ -20,7 +20,7 @@ package com.netflix.genie.agent.cli
 
 import com.beust.jcommander.JCommander
 import com.beust.jcommander.ParametersDelegate
-import com.netflix.genie.common.dto.v4.Criterion
+import com.netflix.genie.common.internal.dto.v4.Criterion
 import com.netflix.genie.common.util.GenieObjectMapper
 import com.netflix.genie.test.categories.UnitTest
 import org.junit.experimental.categories.Category

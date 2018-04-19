@@ -19,6 +19,7 @@ dependencies {
      *******************************/
 
     compile(project(":genie-common"))
+    compile(project(":genie-common-internal"))
     compile(project(":genie-proto"))
 
     compile("com.amazonaws:aws-java-sdk-sts")

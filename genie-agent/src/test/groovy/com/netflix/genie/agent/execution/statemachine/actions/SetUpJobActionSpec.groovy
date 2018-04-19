@@ -26,9 +26,9 @@ import com.netflix.genie.agent.execution.services.DownloadService
 import com.netflix.genie.agent.execution.statemachine.Events
 import com.netflix.genie.agent.utils.EnvUtils
 import com.netflix.genie.agent.utils.PathUtils
-import com.netflix.genie.common.dto.v4.ExecutionEnvironment
-import com.netflix.genie.common.dto.v4.JobSpecification
-import com.netflix.genie.common.jobs.JobConstants
+import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment
+import com.netflix.genie.common.internal.dto.v4.JobSpecification
+import com.netflix.genie.common.internal.jobs.JobConstants
 import com.netflix.genie.test.categories.UnitTest
 import org.assertj.core.util.Sets
 import org.junit.Rule

@@ -20,11 +20,11 @@ package com.netflix.genie.agent.execution.services.impl.grpc
 
 import com.netflix.genie.agent.execution.exceptions.JobSpecificationResolutionException
 import com.netflix.genie.agent.execution.services.AgentJobSpecificationService
-import com.netflix.genie.common.dto.v4.AgentJobRequest
-import com.netflix.genie.common.dto.v4.Criterion
-import com.netflix.genie.common.dto.v4.ExecutionResourceCriteria
-import com.netflix.genie.common.dto.v4.JobMetadata
-import com.netflix.genie.common.dto.v4.JobSpecification
+import com.netflix.genie.common.internal.dto.v4.AgentJobRequest
+import com.netflix.genie.common.internal.dto.v4.Criterion
+import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria
+import com.netflix.genie.common.internal.dto.v4.JobMetadata
+import com.netflix.genie.common.internal.dto.v4.JobSpecification
 import com.netflix.genie.proto.GetJobSpecificationRequest
 import com.netflix.genie.proto.JobSpecificationResponse
 import com.netflix.genie.proto.JobSpecificationServiceError

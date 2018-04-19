@@ -9,6 +9,11 @@ dependencies {
      * Implementation Dependencies
      *******************************/
 
+     implementation(project(":genie-common"))
+     implementation(project(":genie-common-external"))
+     implementation(project(":genie-proto"))
+     implementation("org.apache.commons:commons-lang3")
+
     /*******************************
      * Provided Dependencies
      *******************************/
