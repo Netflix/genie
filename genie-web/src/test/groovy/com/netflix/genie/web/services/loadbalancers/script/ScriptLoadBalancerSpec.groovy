@@ -24,9 +24,9 @@ import com.google.common.collect.Sets
 import com.netflix.genie.common.dto.ClusterCriteria
 import com.netflix.genie.common.dto.ClusterStatus
 import com.netflix.genie.common.dto.JobRequest
-import com.netflix.genie.common.dto.v4.Cluster
-import com.netflix.genie.common.dto.v4.ClusterMetadata
-import com.netflix.genie.common.dto.v4.ExecutionEnvironment
+import com.netflix.genie.common.internal.dto.v4.Cluster
+import com.netflix.genie.common.internal.dto.v4.ClusterMetadata
+import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment
 import com.netflix.genie.common.util.GenieObjectMapper
 import com.netflix.genie.test.categories.UnitTest
 import com.netflix.genie.web.services.ClusterLoadBalancer

@@ -45,7 +45,7 @@ import com.netflix.genie.web.hateoas.resources.JobMetadataResource;
 import com.netflix.genie.web.hateoas.resources.JobRequestResource;
 import com.netflix.genie.web.hateoas.resources.JobResource;
 import com.netflix.genie.web.hateoas.resources.JobSearchResultResource;
-import com.netflix.genie.common.jobs.JobConstants;
+import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.resources.handlers.GenieResourceHttpRequestHandler;
 import com.netflix.genie.web.services.AttachmentService;

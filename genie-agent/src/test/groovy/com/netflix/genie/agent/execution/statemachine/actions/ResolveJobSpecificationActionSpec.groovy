@@ -25,9 +25,9 @@ import com.netflix.genie.agent.execution.ExecutionContext
 import com.netflix.genie.agent.execution.exceptions.JobSpecificationResolutionException
 import com.netflix.genie.agent.execution.services.AgentJobSpecificationService
 import com.netflix.genie.agent.execution.statemachine.Events
-import com.netflix.genie.common.dto.v4.AgentJobRequest
-import com.netflix.genie.common.dto.v4.ExecutionEnvironment
-import com.netflix.genie.common.dto.v4.JobSpecification
+import com.netflix.genie.common.internal.dto.v4.AgentJobRequest
+import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment
+import com.netflix.genie.common.internal.dto.v4.JobSpecification
 import com.netflix.genie.common.util.GenieObjectMapper
 import org.assertj.core.util.Sets
 import org.junit.Rule

@@ -18,9 +18,9 @@
 
 package com.netflix.genie.agent.cli;
 
-import com.netflix.genie.common.dto.v4.AgentJobRequest;
-import com.netflix.genie.common.dto.v4.ExecutionResourceCriteria;
-import com.netflix.genie.common.dto.v4.JobMetadata;
+import com.netflix.genie.common.internal.dto.v4.AgentJobRequest;
+import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria;
+import com.netflix.genie.common.internal.dto.v4.JobMetadata;
 import lombok.Getter;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;

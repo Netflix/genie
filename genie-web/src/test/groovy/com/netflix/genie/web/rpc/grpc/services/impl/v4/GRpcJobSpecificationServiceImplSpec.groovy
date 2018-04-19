@@ -20,9 +20,9 @@ package com.netflix.genie.web.rpc.grpc.services.impl.v4
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.Lists
 import com.google.common.collect.Sets
-import com.netflix.genie.common.dto.v4.ExecutionEnvironment
-import com.netflix.genie.common.dto.v4.JobRequest
-import com.netflix.genie.common.dto.v4.JobSpecification
+import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment
+import com.netflix.genie.common.internal.dto.v4.JobRequest
+import com.netflix.genie.common.internal.dto.v4.JobSpecification
 import com.netflix.genie.proto.*
 import com.netflix.genie.web.services.JobSpecificationService
 import io.grpc.stub.StreamObserver

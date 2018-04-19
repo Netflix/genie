@@ -24,11 +24,11 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
-import com.netflix.genie.common.dto.v4.Application;
-import com.netflix.genie.common.dto.v4.Cluster;
-import com.netflix.genie.common.dto.v4.Command;
-import com.netflix.genie.common.dto.v4.ExecutionEnvironment;
-import com.netflix.genie.common.dto.v4.JobSpecification;
+import com.netflix.genie.common.internal.dto.v4.Application;
+import com.netflix.genie.common.internal.dto.v4.Cluster;
+import com.netflix.genie.common.internal.dto.v4.Command;
+import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
+import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
@@ -172,7 +172,7 @@ public class JobCoordinatorServiceImplUnitTests {
             .when(
                 this.specificationService.resolveJobSpecification(
                     Mockito.anyString(),
-                    Mockito.any(com.netflix.genie.common.dto.v4.JobRequest.class))
+                    Mockito.any(com.netflix.genie.common.internal.dto.v4.JobRequest.class))
             )
             .thenThrow(new RuntimeException());
 
@@ -263,7 +263,7 @@ public class JobCoordinatorServiceImplUnitTests {
             .when(
                 this.specificationService.resolveJobSpecification(
                     Mockito.anyString(),
-                    Mockito.any(com.netflix.genie.common.dto.v4.JobRequest.class))
+                    Mockito.any(com.netflix.genie.common.internal.dto.v4.JobRequest.class))
             )
             .thenReturn(jobSpecification);
 
@@ -387,7 +387,7 @@ public class JobCoordinatorServiceImplUnitTests {
             .when(
                 this.specificationService.resolveJobSpecification(
                     Mockito.anyString(),
-                    Mockito.any(com.netflix.genie.common.dto.v4.JobRequest.class))
+                    Mockito.any(com.netflix.genie.common.internal.dto.v4.JobRequest.class))
             )
             .thenReturn(jobSpecification);
 
@@ -484,7 +484,7 @@ public class JobCoordinatorServiceImplUnitTests {
             .when(
                 this.specificationService.resolveJobSpecification(
                     Mockito.anyString(),
-                    Mockito.any(com.netflix.genie.common.dto.v4.JobRequest.class))
+                    Mockito.any(com.netflix.genie.common.internal.dto.v4.JobRequest.class))
             )
             .thenReturn(jobSpecification);
 
@@ -600,7 +600,7 @@ public class JobCoordinatorServiceImplUnitTests {
             .when(
                 this.specificationService.resolveJobSpecification(
                     Mockito.anyString(),
-                    Mockito.any(com.netflix.genie.common.dto.v4.JobRequest.class))
+                    Mockito.any(com.netflix.genie.common.internal.dto.v4.JobRequest.class))
             )
             .thenReturn(jobSpecification);
 
@@ -698,7 +698,7 @@ public class JobCoordinatorServiceImplUnitTests {
             .when(
                 this.specificationService.resolveJobSpecification(
                     Mockito.anyString(),
-                    Mockito.any(com.netflix.genie.common.dto.v4.JobRequest.class))
+                    Mockito.any(com.netflix.genie.common.internal.dto.v4.JobRequest.class))
             )
             .thenReturn(jobSpecification);
 
@@ -799,7 +799,7 @@ public class JobCoordinatorServiceImplUnitTests {
             .when(
                 this.specificationService.resolveJobSpecification(
                     Mockito.anyString(),
-                    Mockito.any(com.netflix.genie.common.dto.v4.JobRequest.class))
+                    Mockito.any(com.netflix.genie.common.internal.dto.v4.JobRequest.class))
             )
             .thenReturn(jobSpecification);
 

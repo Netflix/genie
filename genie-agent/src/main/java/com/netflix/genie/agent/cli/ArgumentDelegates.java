@@ -19,7 +19,7 @@
 package com.netflix.genie.agent.cli;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.netflix.genie.common.dto.v4.Criterion;
+import com.netflix.genie.common.internal.dto.v4.Criterion;
 
 import java.io.File;
 import java.util.List;

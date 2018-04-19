@@ -4,6 +4,7 @@ dependencies {
      *******************************/
 
     compile project(":genie-common")
+    compile project(":genie-common-external")
 
     compile("commons-beanutils:commons-beanutils")
     compile("com.squareup.okhttp3:okhttp")

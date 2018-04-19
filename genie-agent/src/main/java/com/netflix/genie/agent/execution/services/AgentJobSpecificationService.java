@@ -18,8 +18,8 @@
 package com.netflix.genie.agent.execution.services;
 
 import com.netflix.genie.agent.execution.exceptions.JobSpecificationResolutionException;
-import com.netflix.genie.common.dto.v4.AgentJobRequest;
-import com.netflix.genie.common.dto.v4.JobSpecification;
+import com.netflix.genie.common.internal.dto.v4.AgentJobRequest;
+import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;

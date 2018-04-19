@@ -21,7 +21,7 @@ package com.netflix.genie.agent.execution;
 import com.netflix.genie.agent.execution.statemachine.States;
 import com.netflix.genie.agent.execution.statemachine.actions.StateAction;
 import com.netflix.genie.common.dto.JobStatus;
-import com.netflix.genie.common.dto.v4.JobSpecification;
+import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import org.apache.commons.lang3.tuple.Triple;
 import org.springframework.statemachine.action.Action;
 

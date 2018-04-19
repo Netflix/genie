@@ -19,8 +19,8 @@
 package com.netflix.genie.agent.cli
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.netflix.genie.common.dto.v4.AgentJobRequest
-import com.netflix.genie.common.dto.v4.Criterion
+import com.netflix.genie.common.internal.dto.v4.AgentJobRequest
+import com.netflix.genie.common.internal.dto.v4.Criterion
 import com.netflix.genie.test.categories.UnitTest
 import org.assertj.core.util.Sets
 import org.junit.experimental.categories.Category

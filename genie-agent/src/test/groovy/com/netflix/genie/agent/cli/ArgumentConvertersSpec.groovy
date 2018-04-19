@@ -21,7 +21,7 @@ package com.netflix.genie.agent.cli
 import com.beust.jcommander.IStringConverter
 import com.beust.jcommander.ParameterException
 import com.fasterxml.jackson.databind.JsonNode
-import com.netflix.genie.common.dto.v4.Criterion
+import com.netflix.genie.common.internal.dto.v4.Criterion
 import com.netflix.genie.common.util.GenieObjectMapper
 import com.netflix.genie.test.categories.UnitTest
 import org.assertj.core.util.Sets

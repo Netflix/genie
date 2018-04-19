@@ -19,9 +19,9 @@ package com.netflix.genie.web.jobs;
 
 import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.JobRequest;
-import com.netflix.genie.common.dto.v4.Application;
-import com.netflix.genie.common.dto.v4.Cluster;
-import com.netflix.genie.common.dto.v4.Command;
+import com.netflix.genie.common.internal.dto.v4.Application;
+import com.netflix.genie.common.internal.dto.v4.Cluster;
+import com.netflix.genie.common.internal.dto.v4.Command;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.test.categories.UnitTest;
