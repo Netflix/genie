@@ -17,13 +17,13 @@
  */
 package com.netflix.genie.web.rpc.grpc.services.impl.v4;
 
-import com.netflix.genie.common.internal.dto.v4.JobRequest;
+import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
-import com.netflix.genie.proto.GetJobSpecificationRequest;
-import com.netflix.genie.proto.JobSpecificationResponse;
-import com.netflix.genie.proto.JobSpecificationServiceGrpc;
-import com.netflix.genie.proto.ResolveJobSpecificationRequest;
 import com.netflix.genie.common.internal.dto.v4.converters.JobSpecificationServiceConverter;
+import com.netflix.genie.proto.GetJobSpecificationRequest;
+import com.netflix.genie.proto.JobServiceGrpc;
+import com.netflix.genie.proto.JobSpecificationResponse;
+import com.netflix.genie.proto.ResolveJobSpecificationRequest;
 import com.netflix.genie.web.rpc.interceptors.SimpleLoggingInterceptor;
 import com.netflix.genie.web.services.JobSpecificationService;
 import io.grpc.stub.StreamObserver;
@@ -34,29 +34,29 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.UUID;
 
 /**
- * Extension of {@link com.netflix.genie.proto.JobSpecificationServiceGrpc.JobSpecificationServiceImplBase} to provide
+ * Extension of {@link com.netflix.genie.proto.JobServiceGrpc.JobServiceImplBase} to provide
  * functionality for resolving and fetching specifications for jobs to be run by the Genie Agent.
  *
  * @author tgianos
  * @since 4.0.0
  */
 @GrpcService(
-    value = JobSpecificationServiceGrpc.class,
+    value = JobServiceGrpc.class,
     interceptors = {
         SimpleLoggingInterceptor.class,
     }
 )
 @Slf4j
-public class GRpcJobSpecificationServiceImpl extends JobSpecificationServiceGrpc.JobSpecificationServiceImplBase {
+public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
 
     private final JobSpecificationService jobSpecificationService;
 
     /**
      * Constructor.
-     *
+     *GRpcJobServiceImplSpec
      * @param jobSpecificationService The implementation of the job specification service to use.
      */
-    public GRpcJobSpecificationServiceImpl(final JobSpecificationService jobSpecificationService) {
+    public GRpcJobServiceImpl(final JobSpecificationService jobSpecificationService) {
         this.jobSpecificationService = jobSpecificationService;
     }
 
@@ -75,12 +75,13 @@ public class GRpcJobSpecificationServiceImpl extends JobSpecificationServiceGrpc
     ) {
         // TODO: Make this better after the database interaction is done. Particularly the ID resolution.
         // TODO: Metrics?
-        final String id = StringUtils.isEmpty(request.getMetadata().getId())
+        final String id = StringUtils.isEmpty(request.getId())
             ? UUID.randomUUID().toString()
-            : request.getMetadata().getId();
+            : request.getId();
         try {
-            final JobRequest jobRequest = JobSpecificationServiceConverter.toJobRequestDTO(request);
-            final JobSpecification jobSpec = this.jobSpecificationService.resolveJobSpecification(id, jobRequest);
+            final ExecutionResourceCriteria criteria
+                = JobSpecificationServiceConverter.toExecutionResourceCriteriaDTO(request);
+            final JobSpecification jobSpec = this.jobSpecificationService.resolveJobSpecification(id, criteria);
             responseObserver.onNext(JobSpecificationServiceConverter.toProtoJobSpecificationResponse(jobSpec));
         } catch (final Throwable t) {
             log.error(t.getMessage(), t);

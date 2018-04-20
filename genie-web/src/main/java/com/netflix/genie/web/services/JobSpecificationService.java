@@ -17,12 +17,14 @@
  */
 package com.netflix.genie.web.services;
 
+import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 
 /**
  * Service API definition and helper methods for working with Genie Job Specifications to be used by the Agent.
@@ -43,6 +45,19 @@ public interface JobSpecificationService {
      * @return The complete job specification
      */
     JobSpecification resolveJobSpecification(final String id, @Valid final JobRequest jobRequest);
+
+    /**
+     * Given the execution resource criteria attempt to resolve a job specification for the given job identified by
+     * the supplied ID.
+     *
+     * @param id       The job id
+     * @param criteria The execution resource criteria
+     * @return The job specification if one could be resolved otherwise an exception will be thrown
+     */
+    JobSpecification resolveJobSpecification(
+        @NotBlank final String id,
+        @Valid final ExecutionResourceCriteria criteria
+    );
 
     /**
      * Given a job id return the entire job specification that would be used by the agent to run a job.

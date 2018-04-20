@@ -25,7 +25,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.netflix.genie.agent.execution.exceptions.JobSpecificationResolutionException;
-import com.netflix.genie.agent.execution.services.AgentJobSpecificationService;
+import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.common.internal.dto.v4.AgentJobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import com.netflix.genie.common.util.GenieObjectMapper;
@@ -53,16 +53,16 @@ import java.nio.file.StandardOpenOption;
 class ResolveJobSpecCommand implements AgentCommand {
 
     private final ResolveJobSpecCommandArguments resolveJobSpecCommandArguments;
-    private final AgentJobSpecificationService agentJobSpecificationService;
+    private final AgentJobService agentJobService;
     private final JobRequestConverter jobRequestConverter;
 
     ResolveJobSpecCommand(
         final ResolveJobSpecCommandArguments resolveJobSpecCommandArguments,
-        final AgentJobSpecificationService agentJobSpecificationService,
+        final AgentJobService agentJobService,
         final JobRequestConverter jobRequestConverter
     ) {
         this.resolveJobSpecCommandArguments = resolveJobSpecCommandArguments;
-        this.agentJobSpecificationService = agentJobSpecificationService;
+        this.agentJobService = agentJobService;
         this.jobRequestConverter = jobRequestConverter;
     }
 
@@ -79,7 +79,7 @@ class ResolveJobSpecCommand implements AgentCommand {
         if (!StringUtils.isBlank(specId)) {
             // Do a specification lookup if an id is given
             try {
-                spec = agentJobSpecificationService.getJobSpecification(specId);
+                spec = agentJobService.getJobSpecification(specId);
             } catch (final JobSpecificationResolutionException e) {
                 throw new RuntimeException("Failed to get spec: " + specId, e);
             }
@@ -106,7 +106,7 @@ class ResolveJobSpecCommand implements AgentCommand {
 
             // Resolve via service
             try {
-                spec = agentJobSpecificationService.resolveJobSpecification(agentJobRequest);
+                spec = agentJobService.resolveJobSpecification(agentJobRequest);
             } catch (final JobSpecificationResolutionException e) {
                 throw new RuntimeException("Failed to resolve job specification", e);
             }

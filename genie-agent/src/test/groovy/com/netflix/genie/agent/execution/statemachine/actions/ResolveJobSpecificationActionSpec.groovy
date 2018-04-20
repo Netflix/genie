@@ -23,7 +23,7 @@ import com.netflix.genie.agent.cli.ArgumentDelegates
 import com.netflix.genie.agent.cli.JobRequestConverter
 import com.netflix.genie.agent.execution.ExecutionContext
 import com.netflix.genie.agent.execution.exceptions.JobSpecificationResolutionException
-import com.netflix.genie.agent.execution.services.AgentJobSpecificationService
+import com.netflix.genie.agent.execution.services.AgentJobService
 import com.netflix.genie.agent.execution.statemachine.Events
 import com.netflix.genie.common.internal.dto.v4.AgentJobRequest
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment
@@ -39,7 +39,7 @@ import javax.validation.ConstraintViolation
 class ResolveJobSpecificationActionSpec extends Specification {
     ExecutionContext executionContext
     ArgumentDelegates.JobRequestArguments arguments
-    AgentJobSpecificationService service
+    AgentJobService service
     JobRequestConverter converter
     ResolveJobSpecificationAction action
     AgentJobRequest request
@@ -52,7 +52,7 @@ class ResolveJobSpecificationActionSpec extends Specification {
     void setup() {
         this.executionContext = Mock(ExecutionContext)
         this.arguments = Mock(ArgumentDelegates.JobRequestArguments)
-        this.service = Mock(AgentJobSpecificationService)
+        this.service = Mock(AgentJobService)
         this.converter = Mock(JobRequestConverter)
         this.action = new ResolveJobSpecificationAction(
                 executionContext,

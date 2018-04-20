@@ -20,7 +20,7 @@ package com.netflix.genie.agent.cli
 
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.netflix.genie.agent.execution.exceptions.JobSpecificationResolutionException
-import com.netflix.genie.agent.execution.services.AgentJobSpecificationService
+import com.netflix.genie.agent.execution.services.AgentJobService
 import com.netflix.genie.common.internal.dto.v4.AgentJobRequest
 import com.netflix.genie.common.internal.dto.v4.JobSpecification
 import com.netflix.genie.common.util.GenieObjectMapper
@@ -34,7 +34,7 @@ class ResolveJobSpecCommandSpec extends Specification {
     TemporaryFolder temporaryFolder
 
     ResolveJobSpecCommand.ResolveJobSpecCommandArguments commandArgs
-    AgentJobSpecificationService service
+    AgentJobService service
     ResolveJobSpecCommand command
     JobSpecification spec
     JobSpecificationResolutionException resolutionException

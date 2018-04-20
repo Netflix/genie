@@ -22,17 +22,18 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.ClusterCriteria;
+import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.internal.dto.v4.Application;
 import com.netflix.genie.common.internal.dto.v4.Cluster;
 import com.netflix.genie.common.internal.dto.v4.Command;
 import com.netflix.genie.common.internal.dto.v4.Criterion;
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
+import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria;
 import com.netflix.genie.common.internal.dto.v4.JobMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
-import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
-import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.services.ApplicationService;
@@ -50,8 +51,11 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.aop.TargetClassAware;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.io.File;
 import java.util.Comparator;
@@ -69,6 +73,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @Slf4j
+@Validated
 @ParametersAreNonnullByDefault
 public class JobSpecificationServiceImpl implements JobSpecificationService {
 
@@ -159,14 +164,10 @@ public class JobSpecificationServiceImpl implements JobSpecificationService {
     }
 
     /**
-     * Given a job request resolve all the details needed for a complete job specification can be run by the user.
-     * This implementation should save details to the database.
-     *
-     * @param jobRequest The job request containing all details a user wants to have for their job
-     * @return The complete job specification
+     * {@inheritDoc}
      */
     @Override
-    public JobSpecification resolveJobSpecification(final String id, final JobRequest jobRequest) {
+    public JobSpecification resolveJobSpecification(final String id, @Valid final JobRequest jobRequest) {
         final long start = System.nanoTime();
         final Set<Tag> tags = Sets.newHashSet();
         try {
@@ -216,6 +217,17 @@ public class JobSpecificationServiceImpl implements JobSpecificationService {
                 .timer(RESOLVE_JOB_SPECIFICATION_TIMER, tags)
                 .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JobSpecification resolveJobSpecification(
+        final @NotBlank String id,
+        final @Valid ExecutionResourceCriteria criteria
+    ) {
+        return null;
     }
 
     /**

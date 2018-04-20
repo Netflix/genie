@@ -17,17 +17,16 @@
  */
 package com.netflix.genie.agent.execution.services.impl.grpc;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.netflix.genie.agent.execution.exceptions.JobSpecificationResolutionException;
-import com.netflix.genie.agent.execution.services.AgentJobSpecificationService;
+import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.common.internal.dto.v4.AgentJobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
-import com.netflix.genie.proto.GetJobSpecificationRequest;
-import com.netflix.genie.proto.JobSpecificationResponse;
-import com.netflix.genie.proto.JobSpecificationServiceGrpc;
-import com.netflix.genie.proto.ResolveJobSpecificationRequest;
 import com.netflix.genie.common.internal.dto.v4.converters.JobSpecificationServiceConverter;
+import com.netflix.genie.proto.GetJobSpecificationRequest;
+import com.netflix.genie.proto.JobServiceGrpc;
+import com.netflix.genie.proto.JobSpecificationResponse;
+import com.netflix.genie.proto.ResolveJobSpecificationRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -45,17 +44,17 @@ import java.util.concurrent.ExecutionException;
 @Lazy
 @Service
 @Slf4j
-public class GRpcAgentJobSpecificationServiceImpl implements AgentJobSpecificationService {
+public class GRpcAgentJobServiceImpl implements AgentJobService {
 
-    private final JobSpecificationServiceGrpc.JobSpecificationServiceFutureStub client;
+    private final JobServiceGrpc.JobServiceFutureStub client;
 
     /**
      * Constructor.
      *
      * @param client The gRPC client to use to call the server. Asynchronous version to allow timeouts.
      */
-    public GRpcAgentJobSpecificationServiceImpl(
-        final JobSpecificationServiceGrpc.JobSpecificationServiceFutureStub client
+    public GRpcAgentJobServiceImpl(
+        final JobServiceGrpc.JobServiceFutureStub client
     ) {
         this.client = client;
     }
@@ -69,11 +68,7 @@ public class GRpcAgentJobSpecificationServiceImpl implements AgentJobSpecificati
     ) throws JobSpecificationResolutionException {
 
         final ResolveJobSpecificationRequest resolveRequest;
-        try {
-            resolveRequest = JobSpecificationServiceConverter.toProtoResolveJobSpecificationRequest(agentJobRequest);
-        } catch (final JsonProcessingException e) {
-            throw new IllegalArgumentException("Invalid job request for job specification", e);
-        }
+        resolveRequest = JobSpecificationServiceConverter.toProtoResolveJobSpecificationRequest(agentJobRequest);
 
         final ListenableFuture<JobSpecificationResponse> requestFuture = client.resolveJobSpecification(resolveRequest);
 

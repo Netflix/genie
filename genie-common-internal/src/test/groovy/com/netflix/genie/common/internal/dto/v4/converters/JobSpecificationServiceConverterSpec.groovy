@@ -90,6 +90,14 @@ class JobSpecificationServiceConverterSpec extends Specification {
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString()
     )
+    def commandCritierion = new Criterion.Builder()
+            .withId(commandCriterionId)
+            .withName(commandCriterionName)
+            .withVersion(commandCriterionVersion)
+            .withStatus(commandCriterionStatus)
+            .withTags(commandCriterionTags)
+            .build()
+
     def clusterCriterion0Id = UUID.randomUUID().toString()
     def clusterCriterion0Name = UUID.randomUUID().toString()
     def clusterCriterion0Version = UUID.randomUUID().toString()
@@ -99,6 +107,14 @@ class JobSpecificationServiceConverterSpec extends Specification {
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString()
     )
+    def clusterCriterion0 = new Criterion.Builder()
+            .withId(clusterCriterion0Id)
+            .withName(clusterCriterion0Name)
+            .withVersion(clusterCriterion0Version)
+            .withStatus(clusterCriterion0Status)
+            .withTags(clusterCriterion0Tags)
+            .build()
+
     def clusterCriterion1Id = UUID.randomUUID().toString()
     def clusterCriterion1Name = UUID.randomUUID().toString()
     def clusterCriterion1Version = UUID.randomUUID().toString()
@@ -107,6 +123,14 @@ class JobSpecificationServiceConverterSpec extends Specification {
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString()
     )
+    def clusterCriterion1 = new Criterion.Builder()
+            .withId(clusterCriterion1Id)
+            .withName(clusterCriterion1Name)
+            .withVersion(clusterCriterion1Version)
+            .withStatus(clusterCriterion1Status)
+            .withTags(clusterCriterion1Tags)
+            .build()
+
     def clusterCriterion2Id = UUID.randomUUID().toString()
     def clusterCriterion2Name = UUID.randomUUID().toString()
     def clusterCriterion2Version = UUID.randomUUID().toString()
@@ -117,6 +141,14 @@ class JobSpecificationServiceConverterSpec extends Specification {
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString()
     )
+    def clusterCriterion2 = new Criterion.Builder()
+            .withId(clusterCriterion2Id)
+            .withName(clusterCriterion2Name)
+            .withVersion(clusterCriterion2Version)
+            .withStatus(clusterCriterion2Status)
+            .withTags(clusterCriterion2Tags)
+            .build()
+
     def applicationIds = Lists.newArrayList(
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString()
@@ -164,24 +196,39 @@ class JobSpecificationServiceConverterSpec extends Specification {
 
     def environmentVariables = ImmutableMap.of(UUID.randomUUID().toString(), UUID.randomUUID().toString())
 
-    def "Can convert JobRequest to ResolveJobSpecificationRequest and vice versa"() {
-        def jobRequest = createJobRequest()
+//    def "Can convert JobRequest to ResolveJobSpecificationRequest and vice versa"() {
+//        def jobRequest = createJobRequest()
+//        def resolveJobSpecificationRequest = createResolveJobSpecificationRequest()
+//
+//        when:
+//        def resolveJobSpecificationRequest2 = JobSpecificationServiceAdapter
+//                .toProtoResolveJobSpecificationRequest(jobRequest)
+//        def jobRequest2 = JobSpecificationServiceAdapter.toJobRequestDTO(resolveJobSpecificationRequest2)
+//
+//        then:
+//        jobRequest2 == jobRequest
+//
+//
+//        when:
+//        def jobRequest3 = JobSpecificationServiceAdapter.toJobRequestDTO(resolveJobSpecificationRequest)
+//
+//        then:
+//        jobRequest3 == jobRequest
+//    }
+
+    def "Can convert ResolveJobSpecificationRequest criteria into DTO"() {
         def resolveJobSpecificationRequest = createResolveJobSpecificationRequest()
 
         when:
-        def resolveJobSpecificationRequest2 = JobSpecificationServiceConverter
-                .toProtoResolveJobSpecificationRequest(jobRequest)
-        def jobRequest2 = JobSpecificationServiceConverter.toJobRequestDTO(resolveJobSpecificationRequest2)
+        def criteria = JobSpecificationServiceConverter.toExecutionResourceCriteriaDTO(resolveJobSpecificationRequest)
 
         then:
-        jobRequest2 == jobRequest
-
-
-        when:
-        def jobRequest3 = JobSpecificationServiceConverter.toJobRequestDTO(resolveJobSpecificationRequest)
-
-        then:
-        jobRequest3 == jobRequest
+        criteria.getApplicationIds() == applicationIds
+        criteria.getCommandCriterion() == commandCritierion
+        criteria.getClusterCriteria().size() == 3
+        criteria.getClusterCriteria().get(0) == clusterCriterion0
+        criteria.getClusterCriteria().get(1) == clusterCriterion1
+        criteria.getClusterCriteria().get(2) == clusterCriterion2
     }
 
     def "Can create a GetJobSpecificationRequest"() {
@@ -314,25 +361,23 @@ class JobSpecificationServiceConverterSpec extends Specification {
     }
 
     ResolveJobSpecificationRequest createResolveJobSpecificationRequest() {
-        def jobMetadataProto = com.netflix.genie.proto.JobMetadata
-                .newBuilder()
-                .setId(id)
-                .setName(name)
-                .setUser(user)
-                .setVersion(version)
-                .setDescription(description)
-                .addAllTags(tags)
-                .setMetadata(metadataString)
-                .setEmail(email)
-                .setGrouping(grouping)
-                .setGroupingInstance(groupingInstance)
-                .setSetupFile(setupFile)
-                .addAllConfigs(configs)
-                .addAllDependencies(dependencies)
-                .addAllCommandArgs(commandArgs)
-                .setIsInteractive(interactive)
-                .setJobDirectoryLocation(jobDirectoryLocation)
-                .build()
+//        def jobMetadataProto = com.netflix.genie.proto.JobMetadata
+//                .newBuilder()
+//                .setId(id)
+//                .setName(name)
+//                .setUser(user)
+//                .setVersion(version)
+//                .setDescription(description)
+//                .addAllTags(tags)
+//                .setMetadata(metadataString)
+//                .setEmail(email)
+//                .setGrouping(grouping)
+//                .setGroupingInstance(groupingInstance)
+//                .setSetupFile(setupFile)
+//                .addAllConfigs(configs)
+//                .addAllDependencies(dependencies)
+//                .addAllCommandArgs(commandArgs)
+//                .build()
 
         def executionResourceCriteriaProto = com.netflix.genie.proto.ExecutionResourceCriteria.newBuilder()
                 .addAllClusterCriteria(
@@ -376,7 +421,8 @@ class JobSpecificationServiceConverterSpec extends Specification {
 
         return ResolveJobSpecificationRequest
                 .newBuilder()
-                .setMetadata(jobMetadataProto)
+                .setIsInteractive(interactive)
+                .setJobDirectoryLocation(jobDirectoryLocation)
                 .setCriteria(executionResourceCriteriaProto)
                 .build()
     }
