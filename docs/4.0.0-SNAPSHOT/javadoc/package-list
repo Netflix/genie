@@ -18,9 +18,11 @@ com.netflix.genie.client.security.oauth2
 com.netflix.genie.client.security.oauth2.impl
 com.netflix.genie.common.dto
 com.netflix.genie.common.dto.search
-com.netflix.genie.common.dto.v4
 com.netflix.genie.common.exceptions
-com.netflix.genie.common.jobs
+com.netflix.genie.common.internal.dto.v4
+com.netflix.genie.common.internal.dto.v4.converters
+com.netflix.genie.common.internal.jobs
+com.netflix.genie.common.internal.util
 com.netflix.genie.common.util
 com.netflix.genie.test.categories
 com.netflix.genie.test.suppliers
@@ -46,7 +48,6 @@ com.netflix.genie.web.resources.handlers
 com.netflix.genie.web.resources.writers
 com.netflix.genie.web.rpc.grpc.services.impl.v4
 com.netflix.genie.web.rpc.interceptors
-com.netflix.genie.web.rpc.services.impl
 com.netflix.genie.web.security
 com.netflix.genie.web.security.oauth2
 com.netflix.genie.web.security.oauth2.pingfederate
