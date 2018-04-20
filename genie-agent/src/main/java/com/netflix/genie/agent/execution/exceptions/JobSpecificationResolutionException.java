@@ -19,7 +19,7 @@
 package com.netflix.genie.agent.execution.exceptions;
 
 /**
- * Exception thrown by AgentJobSpecificationService.
+ * Exception thrown by AgentJobService.
  *
  * @author mprimi
  * @since 4.0.0

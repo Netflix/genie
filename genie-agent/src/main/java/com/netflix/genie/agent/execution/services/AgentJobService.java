@@ -32,7 +32,7 @@ import javax.validation.constraints.NotEmpty;
  * @since 4.0.0
  */
 @Validated
-public interface AgentJobSpecificationService {
+public interface AgentJobService {
 
     /**
      * Given the parameters supplied by the job request attempt to resolve a job specification on the server.

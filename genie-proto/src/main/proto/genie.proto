@@ -49,20 +49,11 @@ message AgentRegistrationResponse {
     string server_message = 4;
 }
 
-//
-// Job Specification APIs
-//
-service JobSpecificationService {
+// Job Service
+service JobService {
+    rpc reserveJobId (ReserveJobIdRequest) returns (ReserveJobIdResponse);
     rpc resolveJobSpecification (ResolveJobSpecificationRequest) returns (JobSpecificationResponse);
     rpc getJobSpecification (GetJobSpecificationRequest) returns (JobSpecificationResponse);
-}
-
-message Criterion {
-    repeated string tags = 1;
-    string id = 2;
-    string name = 3;
-    string status = 4;
-    string version = 5;
 }
 
 message JobMetadata {
@@ -80,8 +71,30 @@ message JobMetadata {
     repeated string configs = 12;
     repeated string dependencies = 13;
     repeated string command_args = 14;
-    bool is_interactive = 15;
-    string job_directory_location = 16;
+}
+
+message ReserveJobIdRequest {
+    JobMetadata metadata = 1;
+}
+
+message ReserveJobIdError {
+    string message = 1;
+    string exception = 2;
+}
+
+message ReserveJobIdResponse {
+    oneof response {
+        string id = 1;
+        ReserveJobIdError error = 2;
+    }
+}
+
+message Criterion {
+    repeated string tags = 1;
+    string id = 2;
+    string name = 3;
+    string status = 4;
+    string version = 5;
 }
 
 message ExecutionResourceCriteria {
@@ -91,8 +104,10 @@ message ExecutionResourceCriteria {
 }
 
 message ResolveJobSpecificationRequest {
-    JobMetadata metadata = 1;
-    ExecutionResourceCriteria criteria = 2;
+    string id = 1;
+    bool is_interactive = 2;
+    string job_directory_location = 3;
+    ExecutionResourceCriteria criteria = 4;
 }
 
 message GetJobSpecificationRequest {
@@ -120,9 +135,8 @@ message JobSpecification {
 message JobSpecificationServiceError {
     enum Type {
         UNKNOWN = 0;
-        JOB_ID_IN_USE = 1;
-        NO_CLUSTER_FOUND = 2;
-        NO_SPECIFICATION_FOUND = 3;
+        NO_CLUSTER_FOUND = 1;
+        NO_SPECIFICATION_FOUND = 2;
     }
     Type type = 1;
     string message = 2;

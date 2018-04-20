@@ -22,7 +22,7 @@ import com.netflix.genie.agent.cli.ArgumentDelegates;
 import com.netflix.genie.agent.cli.JobRequestConverter;
 import com.netflix.genie.agent.execution.ExecutionContext;
 import com.netflix.genie.agent.execution.exceptions.JobSpecificationResolutionException;
-import com.netflix.genie.agent.execution.services.AgentJobSpecificationService;
+import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.agent.execution.statemachine.Events;
 import com.netflix.genie.common.internal.dto.v4.AgentJobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
@@ -44,18 +44,18 @@ import java.io.IOException;
 class ResolveJobSpecificationAction extends BaseStateAction implements StateAction.ResolveJobSpecification {
 
     private final ArgumentDelegates.JobRequestArguments jobRequestArguments;
-    private final AgentJobSpecificationService agentJobSpecificationService;
+    private final AgentJobService agentJobService;
     private final JobRequestConverter jobRequestConverter;
 
     ResolveJobSpecificationAction(
         final ExecutionContext executionContext,
         final ArgumentDelegates.JobRequestArguments jobRequestArguments,
-        final AgentJobSpecificationService agentJobSpecificationService,
+        final AgentJobService agentJobService,
         final JobRequestConverter jobRequestConverter
     ) {
         super(executionContext);
         this.jobRequestArguments = jobRequestArguments;
-        this.agentJobSpecificationService = agentJobSpecificationService;
+        this.agentJobService = agentJobService;
         this.jobRequestConverter = jobRequestConverter;
     }
 
@@ -91,7 +91,7 @@ class ResolveJobSpecificationAction extends BaseStateAction implements StateActi
 
             // Resolve via service
             try {
-                jobSpecification = agentJobSpecificationService.resolveJobSpecification(agentJobRequest);
+                jobSpecification = agentJobService.resolveJobSpecification(agentJobRequest);
             } catch (final JobSpecificationResolutionException e) {
                 throw new RuntimeException("Failed to resolve job specification", e);
             }

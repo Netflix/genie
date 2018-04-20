@@ -19,17 +19,9 @@
 package com.netflix.genie.agent.execution.services.impl.grpc
 
 import com.netflix.genie.agent.execution.exceptions.JobSpecificationResolutionException
-import com.netflix.genie.agent.execution.services.AgentJobSpecificationService
-import com.netflix.genie.common.internal.dto.v4.AgentJobRequest
-import com.netflix.genie.common.internal.dto.v4.Criterion
-import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria
-import com.netflix.genie.common.internal.dto.v4.JobMetadata
-import com.netflix.genie.common.internal.dto.v4.JobSpecification
-import com.netflix.genie.proto.GetJobSpecificationRequest
-import com.netflix.genie.proto.JobSpecificationResponse
-import com.netflix.genie.proto.JobSpecificationServiceError
-import com.netflix.genie.proto.JobSpecificationServiceGrpc
-import com.netflix.genie.proto.ResolveJobSpecificationRequest
+import com.netflix.genie.agent.execution.services.AgentJobService
+import com.netflix.genie.common.internal.dto.v4.*
+import com.netflix.genie.proto.*
 import com.netflix.genie.test.categories.UnitTest
 import io.grpc.stub.StreamObserver
 import io.grpc.testing.GrpcServerRule
@@ -39,10 +31,10 @@ import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
 @Category(UnitTest.class)
-class GRpcAgentJobSpecificationServiceImplSpec extends Specification {
+class GRpcAgentJobServiceImplSpec extends Specification {
 
-    AgentJobSpecificationService service
-    JobSpecificationServiceGrpc.JobSpecificationServiceFutureStub client
+    AgentJobService service
+    JobServiceGrpc.JobServiceFutureStub client
 
     @Rule
     GrpcServerRule grpcServerRule = new GrpcServerRule().directExecutor()
@@ -53,7 +45,7 @@ class GRpcAgentJobSpecificationServiceImplSpec extends Specification {
     JobSpecificationResponse serverResponse
 
     void setup() {
-        this.grpcServerRule.getServiceRegistry().addService(new JobSpecificationServiceGrpc.JobSpecificationServiceImplBase() {
+        this.grpcServerRule.getServiceRegistry().addService(new JobServiceGrpc.JobServiceImplBase() {
             @Override
             void resolveJobSpecification(ResolveJobSpecificationRequest request, StreamObserver<JobSpecificationResponse> responseObserver) {
                 capturedResolveRequest = request
@@ -80,12 +72,12 @@ class GRpcAgentJobSpecificationServiceImplSpec extends Specification {
                 }
             }
         })
-        this.client = JobSpecificationServiceGrpc.newFutureStub(grpcServerRule.getChannel())
+        this.client = JobServiceGrpc.newFutureStub(grpcServerRule.getChannel())
         this.capturedResolveRequest = null
         this.serverException = null
         this.serverError = null
         this.serverResponse = null
-        this.service = new GRpcAgentJobSpecificationServiceImpl(client)
+        this.service = new GRpcAgentJobServiceImpl(client)
     }
 
     void cleanup() {
@@ -104,11 +96,8 @@ class GRpcAgentJobSpecificationServiceImplSpec extends Specification {
         ).build()
 
         serverResponse = JobSpecificationResponse.newBuilder()
-            .setSpecification(
-                new com.netflix.genie.proto.JobSpecification.Builder()
+                .setSpecification(com.netflix.genie.proto.JobSpecification.newBuilder().build())
                 .build()
-            )
-            .build()
 
         when:
         JobSpecification response = service.resolveJobSpecification(request)
@@ -130,12 +119,12 @@ class GRpcAgentJobSpecificationServiceImplSpec extends Specification {
         ).build()
 
         serverResponse = JobSpecificationResponse.newBuilder()
-            .setError(
+                .setError(
                 JobSpecificationServiceError.newBuilder()
-                   .setMessage("error")
-                    .setType(JobSpecificationServiceError.Type.NO_CLUSTER_FOUND)
-                    .build()
-            ).build()
+                        .setMessage("error")
+                        .setType(JobSpecificationServiceError.Type.NO_CLUSTER_FOUND)
+                        .build()
+        ).build()
 
         when:
         service.resolveJobSpecification(request)
@@ -171,10 +160,8 @@ class GRpcAgentJobSpecificationServiceImplSpec extends Specification {
         String id = "123456789"
 
         serverResponse = JobSpecificationResponse.newBuilder()
-                .setSpecification(
-                new com.netflix.genie.proto.JobSpecification.Builder()
-                        .build()
-        ).build()
+                .setSpecification(com.netflix.genie.proto.JobSpecification.newBuilder().build())
+                .build()
 
         when:
         JobSpecification response = service.getJobSpecification(id)
