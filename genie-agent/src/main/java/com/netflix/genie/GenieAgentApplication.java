@@ -38,10 +38,9 @@ public class GenieAgentApplication {
     }
 
     private int run(final String[] args) {
-        return SpringApplication.exit(
-            SpringApplication.run(
-                GenieAgentApplication.class, args
-            )
-        );
+        final SpringApplication app = new SpringApplication(GenieAgentApplication.class);
+        // Disable parsing of command-line arguments into properties.
+        app.setAddCommandLineProperties(false);
+        return SpringApplication.exit(app.run(args));
     }
 }
