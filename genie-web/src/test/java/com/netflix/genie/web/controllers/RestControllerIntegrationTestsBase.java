@@ -54,7 +54,6 @@ import org.springframework.restdocs.JUnitRestDocumentation;
 import org.springframework.restdocs.operation.preprocess.Preprocessors;
 import org.springframework.restdocs.restassured3.RestAssuredRestDocumentation;
 import org.springframework.restdocs.restassured3.RestDocumentationFilter;
-import org.springframework.restdocs.restassured3.operation.preprocess.RestAssuredPreprocessors;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -178,11 +177,11 @@ public abstract class RestControllerIntegrationTestsBase {
                     .operationPreprocessors()
                     .withRequestDefaults(
                         Preprocessors.prettyPrint(),
-                        RestAssuredPreprocessors.modifyUris().scheme(URI_SCHEME).host(URI_HOST).removePort()
+                        Preprocessors.modifyUris().scheme(URI_SCHEME).host(URI_HOST).removePort()
                     )
                     .withResponseDefaults(
                         Preprocessors.prettyPrint(),
-                        RestAssuredPreprocessors.modifyUris().host(URI_HOST).scheme(URI_SCHEME).removePort()
+                        Preprocessors.modifyUris().host(URI_HOST).scheme(URI_SCHEME).removePort()
                     )
             )
             .build();
