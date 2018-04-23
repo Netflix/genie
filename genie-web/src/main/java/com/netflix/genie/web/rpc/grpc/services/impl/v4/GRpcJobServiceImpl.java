@@ -53,7 +53,7 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
 
     /**
      * Constructor.
-     *GRpcJobServiceImplSpec
+     *
      * @param jobSpecificationService The implementation of the job specification service to use.
      */
     public GRpcJobServiceImpl(final JobSpecificationService jobSpecificationService) {
