@@ -63,7 +63,6 @@ public final class JobSpecificationServiceConverter {
      *
      * @param jobRequest The job request to convert
      * @return The request that should be sent to the server for a new Job Specification given the parameters
-     * @throws JsonProcessingException if any serialization errors occur
      */
     public static ResolveJobSpecificationRequest toProtoResolveJobSpecificationRequest(
         final AgentJobRequest jobRequest
