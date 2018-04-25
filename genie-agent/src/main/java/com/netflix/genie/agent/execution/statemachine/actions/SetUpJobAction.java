@@ -30,6 +30,7 @@ import com.netflix.genie.agent.utils.PathUtils;
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import com.netflix.genie.common.internal.jobs.JobConstants;
+import com.netflix.genie.common.internal.util.RegexRuleSet;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Lazy;
@@ -46,6 +47,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Action performed when in state SETUP_JOB.
@@ -83,6 +85,45 @@ class SetUpJobAction extends BaseStateAction implements StateAction.SetUpJob {
         // TODO: turn off console logging if the job is interactive
 
         return Events.SETUP_JOB_COMPLETE;
+    }
+
+    @Override
+    protected void executeStateActionCleanup(final ExecutionContext executionContext) {
+        final File jobDirectory = executionContext.getJobDirectory();
+        final Path jobDirectoryPath = jobDirectory.toPath();
+
+        // TODO: this is a simple and safe cleanup strategy, 3 patterns are added that match any files in the
+        // dependencies directory of any entity by absolute path.
+        // A different implementation would allow override via server or CLI options, or collect the files list as
+        // they are downloaded and compile an exact list using Pattern.quote()
+        final RegexRuleSet cleanupWhitelist = RegexRuleSet.buildWhitelist(
+            (Pattern[]) Lists.newArrayList(
+                PathUtils.jobClusterDirectoryPath(jobDirectory, ".*"),
+                PathUtils.jobCommandDirectoryPath(jobDirectory, ".*"),
+                PathUtils.jobApplicationDirectoryPath(jobDirectory, ".*")
+            )
+                .stream()
+                .map(PathUtils::jobEntityDependenciesPath)
+                .map(Path::toString)
+                .map(pathString -> pathString + "/.*")
+                .map(Pattern::compile)
+                .toArray(Pattern[]::new)
+        );
+
+        try {
+            Files.walk(jobDirectory.toPath())
+                .filter(path -> cleanupWhitelist.accept(path.toAbsolutePath().toString()))
+                .forEach(path -> {
+                    try {
+                        log.debug("Deleting {}", path);
+                        Files.deleteIfExists(path);
+                    } catch (final IOException e) {
+                        log.warn("Failed to delete: {}", path.toAbsolutePath().toString(), e);
+                    }
+                });
+        } catch (final IOException e) {
+            log.warn("Failed to walk job directory: {}", jobDirectoryPath, e);
+        }
     }
 
     private void performJobSetup(final ExecutionContext executionContext) throws SetUpJobException {

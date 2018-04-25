@@ -37,6 +37,7 @@ import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 
 import java.nio.charset.StandardCharsets
+import java.nio.file.Files
 
 @Category(UnitTest.class)
 class SetUpJobActionSpec extends Specification {
@@ -506,4 +507,59 @@ class SetUpJobActionSpec extends Specification {
         e.getCause().getCause().getClass() == EnvUtils.ParseException
     }
 
+    def "Dependencies cleanup"() {
+        setup:
+        File[] dependencies = [
+                jobId + "/genie/command/presto0180/dependencies/presto-wrapper.py",
+                jobId + "/genie/applications/presto0180/dependencies/presto.tar.gz",
+                jobId + "/genie/cluster/presto-v005/dependencies/presto-v005.txt",
+        ].collect { new File(temporaryFolder.getRoot(), it) }
+
+        File[] otherFiles = [
+                jobId + "/run",
+                jobId + "/genie/logs/genie.log",
+                jobId + "/genie/logs/env.log",
+                jobId + "/genie/applications/presto0180/config/presto.cfg",
+                jobId + "/genie/applications/presto0180/setup.sh",
+                jobId + "/genie/command/presto0180/config/presto-wrapper-config.py",
+                jobId + "/genie/command/presto0180/setup.sh",
+                jobId + "/genie/cluster/presto-v005/config/presto-v005.cfg",
+                jobId + "/genie/genie.done",
+                jobId + "/stdout",
+                jobId + "/stderr",
+                jobId + "/script.presto",
+                "dependencies/foo.txt"
+        ].collect { new File(temporaryFolder.getRoot(), it) }
+
+        def allFiles = dependencies + otherFiles as File[]
+
+        allFiles.each {
+            file ->
+                println "Creating dir " + file.getParentFile().getAbsolutePath()
+                Files.createDirectories(file.getParentFile().toPath())
+                println "Creating file " + file.getAbsolutePath()
+                Files.createFile(file.toPath())
+        }
+
+        when:
+        action.cleanup()
+
+        then:
+        1 * executionContext.getJobDirectory() >> new File(temporaryFolder.getRoot(), jobId)
+
+        dependencies.each {
+            // Check all dependencies deleted
+            file -> assert !file.exists()
+        }
+
+        otherFiles.each {
+            // Check all other files not deleted
+            file -> assert file.exists()
+        }
+
+        allFiles.each {
+            // Check all directories not deleted, even the empty dependencies one
+            file -> assert file.getParentFile().exists()
+        }
+    }
 }
