@@ -32,9 +32,11 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.UUID;
 
 /**
  * Action performed when in state RESOLVE_JOB_SPECIFICATION.
+ *
  * @author mprimi
  * @since 4.0.0
  */
@@ -91,7 +93,13 @@ class ResolveJobSpecificationAction extends BaseStateAction implements StateActi
 
             // Resolve via service
             try {
-                jobSpecification = agentJobService.resolveJobSpecification(agentJobRequest);
+                // TODO: Total placeholder here until we pass job id through ExecutionContext after reservation is
+                // complete
+                jobSpecification = agentJobService.resolveJobSpecification(
+                    agentJobRequest
+                        .getRequestedId()
+                        .orElse(UUID.randomUUID().toString())
+                );
             } catch (final JobSpecificationResolutionException e) {
                 throw new RuntimeException("Failed to resolve job specification", e);
             }

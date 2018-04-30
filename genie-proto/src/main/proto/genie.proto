@@ -52,8 +52,11 @@ message AgentRegistrationResponse {
 // Job Service
 service JobService {
     rpc reserveJobId (ReserveJobIdRequest) returns (ReserveJobIdResponse);
-    rpc resolveJobSpecification (ResolveJobSpecificationRequest) returns (JobSpecificationResponse);
-    rpc getJobSpecification (GetJobSpecificationRequest) returns (JobSpecificationResponse);
+    rpc resolveJobSpecification (JobSpecificationRequest) returns (JobSpecificationResponse);
+    rpc getJobSpecification (JobSpecificationRequest) returns (JobSpecificationResponse);
+    rpc resolveJobSpecificationDryRun (DryRunJobSpecificationRequest) returns (JobSpecificationResponse);
+    rpc claimJob (ClaimJobRequest) returns (ClaimJobResponse);
+    rpc changeJobStatus (ChangeJobStatusRequest) returns (ChangeJobStatusResponse);
 }
 
 message JobMetadata {
@@ -73,8 +76,29 @@ message JobMetadata {
     repeated string command_args = 14;
 }
 
+message Criterion {
+    repeated string tags = 1;
+    string id = 2;
+    string name = 3;
+    string status = 4;
+    string version = 5;
+}
+
+message ExecutionResourceCriteria {
+    repeated Criterion cluster_criteria = 1;
+    Criterion command_criterion = 2;
+    repeated string requested_application_id_overrides = 3;
+}
+
+message AgentConfig {
+    bool is_interactive = 1;
+    string job_directory_location = 2;
+}
+
 message ReserveJobIdRequest {
     JobMetadata metadata = 1;
+    ExecutionResourceCriteria criteria = 2;
+    AgentConfig agent_config = 3;
 }
 
 message ReserveJobIdError {
@@ -89,29 +113,14 @@ message ReserveJobIdResponse {
     }
 }
 
-message Criterion {
-    repeated string tags = 1;
-    string id = 2;
-    string name = 3;
-    string status = 4;
-    string version = 5;
-}
-
-message ExecutionResourceCriteria {
-    repeated Criterion cluster_criteria = 1;
-    Criterion command_criterion = 2;
-    repeated string application_ids = 3;
-}
-
-message ResolveJobSpecificationRequest {
+message JobSpecificationRequest {
     string id = 1;
-    bool is_interactive = 2;
-    string job_directory_location = 3;
-    ExecutionResourceCriteria criteria = 4;
 }
 
-message GetJobSpecificationRequest {
-    string id = 1;
+message DryRunJobSpecificationRequest {
+    JobMetadata metadata = 1;
+    ExecutionResourceCriteria criteria = 2;
+    AgentConfig agent_config = 3;
 }
 
 message ExecutionResource {
@@ -132,7 +141,7 @@ message JobSpecification {
     string job_directory_location = 8;
 }
 
-message JobSpecificationServiceError {
+message JobSpecificationError {
     enum Type {
         UNKNOWN = 0;
         NO_CLUSTER_FOUND = 1;
@@ -145,6 +154,52 @@ message JobSpecificationServiceError {
 message JobSpecificationResponse {
     oneof response {
         JobSpecification specification = 1;
-        JobSpecificationServiceError error = 2;
+        JobSpecificationError error = 2;
     }
+}
+
+message AgentMetadata {
+    string agent_version = 1;
+    string agent_hostname = 2;
+    string agent_pid = 3;
+}
+
+message ClaimJobRequest {
+    string id = 1;
+    AgentMetadata agent_metadata = 2;
+}
+
+message ClaimJobError {
+    enum Type {
+        UNKNOWN = 0;
+        ALREADY_CLAIMED = 1;
+        NO_SUCH_JOB = 2;
+    }
+    Type type = 1;
+    string message = 2;
+}
+
+message ClaimJobResponse {
+    bool successful = 1;
+    ClaimJobError error = 2;
+}
+
+message ChangeJobStatusRequest {
+    string current_status = 1;
+    string new_status = 2;
+}
+
+message ChangeJobStatusError {
+    enum Type {
+        INCORRECT_CURRENT_STATUS = 0;
+        UNKNOWN_STATUS_SUPPLIED = 1;
+        UNKNOWN = 2;
+    }
+    Type type = 1;
+    string message = 2;
+}
+
+message ChangeJobStatusResponse {
+    bool successful = 1;
+    ChangeJobStatusError error = 2;
 }

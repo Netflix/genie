@@ -66,7 +66,7 @@ class ResolveJobSpecCommandSpec extends Specification {
         1 * commandArgs.getSpecificationId() >> " "
         1 * commandArgs.getJobRequestArguments() >> jobArgs
         1 * jobRequestConverter.agentJobRequestArgsToDTO(jobArgs) >> jobRequest
-        1 * service.resolveJobSpecification(jobRequest) >> spec
+        1 * service.resolveJobSpecificationDryRun(jobRequest) >> spec
         1 * commandArgs.isPrintRequestDisabled() >> true
         1 * commandArgs.getOutputFile() >> null
     }
@@ -81,7 +81,7 @@ class ResolveJobSpecCommandSpec extends Specification {
         1 * commandArgs.getSpecificationId() >> " "
         1 * commandArgs.getJobRequestArguments() >> jobArgs
         1 * jobRequestConverter.agentJobRequestArgsToDTO(jobArgs) >> jobRequest
-        1 * service.resolveJobSpecification(jobRequest) >> {throw resolutionException}
+        1 * service.resolveJobSpecificationDryRun(jobRequest) >> { throw resolutionException }
         def e = thrown(RuntimeException)
         e.getCause() == resolutionException
     }
@@ -156,7 +156,7 @@ class ResolveJobSpecCommandSpec extends Specification {
         1 * commandArgs.getJobRequestArguments() >> jobArgs
         1 * jobRequestConverter.agentJobRequestArgsToDTO(jobArgs) >> jobRequest
         1 * commandArgs.isPrintRequestDisabled() >> false
-        1 * jobRequest.getCommandArgs() >> {throw new IOException("")}
+        1 * jobRequest.getCommandArgs() >> { throw new IOException("") }
         def e = thrown(RuntimeException)
         e.getCause() instanceof JsonProcessingException
     }
@@ -171,9 +171,9 @@ class ResolveJobSpecCommandSpec extends Specification {
         1 * commandArgs.getSpecificationId() >> " "
         1 * commandArgs.getJobRequestArguments() >> jobArgs
         1 * jobRequestConverter.agentJobRequestArgsToDTO(jobArgs) >> jobRequest
-        1 * service.resolveJobSpecification(jobRequest) >> spec
+        1 * service.resolveJobSpecificationDryRun(jobRequest) >> spec
         1 * commandArgs.isPrintRequestDisabled() >> false
-        1 * spec.getCommandArgs() >> {throw new IOException("")}
+        1 * spec.getCommandArgs() >> { throw new IOException("") }
         def e = thrown(RuntimeException)
         e.getCause() instanceof JsonProcessingException
     }
