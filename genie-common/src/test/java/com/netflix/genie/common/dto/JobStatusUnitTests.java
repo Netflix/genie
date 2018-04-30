@@ -45,6 +45,9 @@ public class JobStatusUnitTests {
         Assert.assertEquals(JobStatus.KILLED, JobStatus.parse(JobStatus.KILLED.name().toLowerCase()));
         Assert.assertEquals(JobStatus.INIT, JobStatus.parse(JobStatus.INIT.name().toLowerCase()));
         Assert.assertEquals(JobStatus.SUCCEEDED, JobStatus.parse(JobStatus.SUCCEEDED.name().toLowerCase()));
+        Assert.assertEquals(JobStatus.RESERVED, JobStatus.parse(JobStatus.RESERVED.name().toLowerCase()));
+        Assert.assertEquals(JobStatus.RESOLVED, JobStatus.parse(JobStatus.RESOLVED.name().toLowerCase()));
+        Assert.assertEquals(JobStatus.CLAIMED, JobStatus.parse(JobStatus.CLAIMED.name().toLowerCase()));
     }
 
     /**
@@ -78,6 +81,9 @@ public class JobStatusUnitTests {
         Assert.assertFalse(JobStatus.INVALID.isActive());
         Assert.assertFalse(JobStatus.KILLED.isActive());
         Assert.assertFalse(JobStatus.SUCCEEDED.isActive());
+        Assert.assertTrue(JobStatus.RESERVED.isActive());
+        Assert.assertTrue(JobStatus.RESOLVED.isActive());
+        Assert.assertTrue(JobStatus.CLAIMED.isActive());
     }
 
     /**
@@ -91,6 +97,9 @@ public class JobStatusUnitTests {
         Assert.assertTrue(JobStatus.INVALID.isFinished());
         Assert.assertTrue(JobStatus.KILLED.isFinished());
         Assert.assertTrue(JobStatus.SUCCEEDED.isFinished());
+        Assert.assertFalse(JobStatus.RESERVED.isFinished());
+        Assert.assertFalse(JobStatus.RESOLVED.isFinished());
+        Assert.assertFalse(JobStatus.CLAIMED.isFinished());
     }
 
     /**
@@ -98,9 +107,12 @@ public class JobStatusUnitTests {
      */
     @Test
     public void testGetActivesStatuses() {
-        Assert.assertThat(JobStatus.getActiveStatuses().size(), Matchers.is(2));
+        Assert.assertThat(JobStatus.getActiveStatuses().size(), Matchers.is(5));
         Assert.assertTrue(JobStatus.getActiveStatuses().contains(JobStatus.INIT));
         Assert.assertTrue(JobStatus.getActiveStatuses().contains(JobStatus.RUNNING));
+        Assert.assertTrue(JobStatus.getActiveStatuses().contains(JobStatus.RESERVED));
+        Assert.assertTrue(JobStatus.getActiveStatuses().contains(JobStatus.RESOLVED));
+        Assert.assertTrue(JobStatus.getActiveStatuses().contains(JobStatus.CLAIMED));
     }
 
     /**

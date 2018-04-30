@@ -33,6 +33,18 @@ import java.util.stream.Collectors;
 public enum JobStatus {
 
     /**
+     * The id of the job has been reserved.
+     */
+    RESERVED(true),
+    /**
+     * The job specification has been resolved.
+     */
+    RESOLVED(true),
+    /**
+     * The job has been claimed by a running agent.
+     */
+    CLAIMED(true),
+    /**
      * Job has been initialized, but not running yet.
      */
     INIT(true),
@@ -97,24 +109,6 @@ public enum JobStatus {
     }
 
     /**
-     * Check whether this job is in an active state or not.
-     *
-     * @return True if the job is still actively processing in some manner
-     */
-    public boolean isActive() {
-        return this.active;
-    }
-
-    /**
-     * Check whether the job is no longer running.
-     *
-     * @return True if the job is no longer processing for one reason or another.
-     */
-    public boolean isFinished() {
-        return !this.active;
-    }
-
-    /**
      * Get an unmodifiable set of all the statuses that make up a job being considered active.
      *
      * @return Unmodifiable set of all active statuses
@@ -130,5 +124,23 @@ public enum JobStatus {
      */
     public static Set<JobStatus> getFinishedStatuses() {
         return FINISHED_STATUSES;
+    }
+
+    /**
+     * Check whether this job is in an active state or not.
+     *
+     * @return True if the job is still actively processing in some manner
+     */
+    public boolean isActive() {
+        return this.active;
+    }
+
+    /**
+     * Check whether the job is no longer running.
+     *
+     * @return True if the job is no longer processing for one reason or another.
+     */
+    public boolean isFinished() {
+        return !this.active;
     }
 }
