@@ -106,7 +106,7 @@ class ResolveJobSpecCommand implements AgentCommand {
 
             // Resolve via service
             try {
-                spec = agentJobService.resolveJobSpecification(agentJobRequest);
+                spec = agentJobService.resolveJobSpecificationDryRun(agentJobRequest);
             } catch (final JobSpecificationResolutionException e) {
                 throw new RuntimeException("Failed to resolve job specification", e);
             }

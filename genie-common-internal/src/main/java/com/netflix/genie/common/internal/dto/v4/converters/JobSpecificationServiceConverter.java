@@ -31,10 +31,10 @@ import com.netflix.genie.common.internal.dto.v4.JobMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.proto.ExecutionResource;
-import com.netflix.genie.proto.GetJobSpecificationRequest;
+import com.netflix.genie.proto.JobSpecificationError;
+import com.netflix.genie.proto.JobSpecificationRequest;
 import com.netflix.genie.proto.JobSpecificationResponse;
-import com.netflix.genie.proto.JobSpecificationServiceError;
-import com.netflix.genie.proto.ResolveJobSpecificationRequest;
+import com.netflix.genie.proto.ReserveJobIdRequest;
 
 import java.io.File;
 import java.util.List;
@@ -58,38 +58,38 @@ public final class JobSpecificationServiceConverter {
     private JobSpecificationServiceConverter() {
     }
 
+//    /**
+//     * Convert a V4 Job Request DTO into a gRPC resolve job specification request to be sent to the server.
+//     *
+//     * @param jobRequest The job request to convert
+//     * @return The request that should be sent to the server for a new Job Specification given the parameters
+//     */
+//    public static JobSpecificationRequest toProtoJobSpecificationRequest(
+//        final AgentJobRequest jobRequest
+//    ) {
+//        final JobSpecificationRequest.Builder builder = JobSpecificationRequest
+//            .newBuilder()
+//            .setIsInteractive(jobRequest.isInteractive())
+//            .setCriteria(toProtoExecutionResourceCriteria(jobRequest.getCriteria()));
+//
+//        // TODO: This needs to be changed. ID is a required field at this point but for now getting to compile while
+//        //       we change how jobs transition through the system based on agreed upon workflow
+//        jobRequest.getRequestedId().ifPresent(builder::setId);
+//        jobRequest
+//            .getRequestedJobDirectoryLocation()
+//            .ifPresent(location -> builder.setJobDirectoryLocation(location.getAbsolutePath()));
+//
+//        return builder.build();
+//    }
+
     /**
-     * Convert a V4 Job Request DTO into a gRPC resolve job specification request to be sent to the server.
-     *
-     * @param jobRequest The job request to convert
-     * @return The request that should be sent to the server for a new Job Specification given the parameters
-     */
-    public static ResolveJobSpecificationRequest toProtoResolveJobSpecificationRequest(
-        final AgentJobRequest jobRequest
-    ) {
-        final ResolveJobSpecificationRequest.Builder builder = ResolveJobSpecificationRequest
-            .newBuilder()
-            .setIsInteractive(jobRequest.isInteractive())
-            .setCriteria(toProtoExecutionResourceCriteria(jobRequest.getCriteria()));
-
-        // TODO: This needs to be changed. ID is a required field at this point but for now getting to compile while
-        //       we change how jobs transition through the system based on agreed upon workflow
-        jobRequest.getRequestedId().ifPresent(builder::setId);
-        jobRequest
-            .getRequestedJobDirectoryLocation()
-            .ifPresent(location -> builder.setJobDirectoryLocation(location.getAbsolutePath()));
-
-        return builder.build();
-    }
-
-    /**
-     * Generate a {@link GetJobSpecificationRequest} from the given job id.
+     * Generate a {@link JobSpecificationRequest} from the given job id.
      *
      * @param id The job id to generate the request for
      * @return The request instance
      */
-    public static GetJobSpecificationRequest toProtoGetJobSpecificationRequest(final String id) {
-        return GetJobSpecificationRequest.newBuilder().setId(id).build();
+    public static JobSpecificationRequest toProtoJobSpecificationRequest(final String id) {
+        return JobSpecificationRequest.newBuilder().setId(id).build();
     }
 
 //    /**
@@ -158,7 +158,7 @@ public final class JobSpecificationServiceConverter {
      * @throws GenieException If the execution resource criteria is invalid based on preconditions
      */
     public static ExecutionResourceCriteria toExecutionResourceCriteriaDTO(
-        final ResolveJobSpecificationRequest request
+        final ReserveJobIdRequest request
     ) throws GenieException {
         final com.netflix.genie.proto.ExecutionResourceCriteria protoResourceCriteria = request.getCriteria();
         final List<com.netflix.genie.proto.Criterion> protoCriteria = protoResourceCriteria.getClusterCriteriaList();
@@ -170,7 +170,7 @@ public final class JobSpecificationServiceConverter {
         return new ExecutionResourceCriteria(
             clusterCriteria,
             toCriterionDTO(protoResourceCriteria.getCommandCriterion()),
-            protoResourceCriteria.getApplicationIdsList()
+            protoResourceCriteria.getRequestedApplicationIdOverridesList()
         );
     }
 
@@ -198,9 +198,9 @@ public final class JobSpecificationServiceConverter {
         return JobSpecificationResponse
             .newBuilder()
             .setError(
-                JobSpecificationServiceError
+                JobSpecificationError
                     .newBuilder()
-                    .setType(JobSpecificationServiceError.Type.UNKNOWN)
+                    .setType(JobSpecificationError.Type.UNKNOWN)
                     .setMessage(error.getMessage())
                     .build()
             )
@@ -350,7 +350,7 @@ public final class JobSpecificationServiceConverter {
         builder.setCommandCriterion(
             toProtoCriterion(executionResourceCriteria.getCommandCriterion())
         );
-        builder.addAllApplicationIds(executionResourceCriteria.getApplicationIds());
+        builder.addAllRequestedApplicationIdOverrides(executionResourceCriteria.getApplicationIds());
         return builder.build();
     }
 }

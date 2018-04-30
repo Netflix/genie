@@ -45,6 +45,7 @@ class ResolveJobSpecificationActionSpec extends Specification {
     AgentJobRequest request
     JobSpecification spec
     JobSpecificationResolutionException exception
+    String id
 
     @Rule
     TemporaryFolder temporaryFolder
@@ -65,6 +66,7 @@ class ResolveJobSpecificationActionSpec extends Specification {
         this.exception = new JobSpecificationResolutionException("error")
 
         this.temporaryFolder.create()
+        this.id = UUID.randomUUID().toString()
     }
 
     void cleanup() {
@@ -76,7 +78,8 @@ class ResolveJobSpecificationActionSpec extends Specification {
 
         then:
         1 * converter.agentJobRequestArgsToDTO(arguments) >> request
-        1 * service.resolveJobSpecification(request) >> spec
+        1 * request.getRequestedId() >> Optional.of(id)
+        1 * service.resolveJobSpecification(id) >> spec
         1 * executionContext.setJobSpecification(_ as JobSpecification)
 
         event == Events.RESOLVE_JOB_SPECIFICATION_COMPLETE
@@ -104,7 +107,7 @@ class ResolveJobSpecificationActionSpec extends Specification {
                         Maps.newHashMap(),
                         false,
                         new File("/tmp")
-                );
+                )
         GenieObjectMapper.getMapper().writeValue(specFile, minimalJobSpec)
 
         when:
@@ -113,7 +116,7 @@ class ResolveJobSpecificationActionSpec extends Specification {
         then:
         2 * arguments.getJobSpecificationFile() >> specFile
         0 * converter.agentJobRequestArgsToDTO(arguments)
-        0 * service.resolveJobSpecification(request)
+        0 * service.resolveJobSpecification(_ as String)
         1 * executionContext.setJobSpecification(minimalJobSpec)
         event == Events.RESOLVE_JOB_SPECIFICATION_COMPLETE
     }
@@ -128,8 +131,8 @@ class ResolveJobSpecificationActionSpec extends Specification {
         then:
         2 * arguments.getJobSpecificationFile() >> specFile
         0 * converter.agentJobRequestArgsToDTO(arguments)
-        0 * service.resolveJobSpecification(request)
-        0 * executionContext.setJobSpecification(_)
+        0 * service.resolveJobSpecification(_ as String)
+        0 * executionContext.setJobSpecification(_ as JobSpecification)
         Throwable e = thrown(RuntimeException)
         IOException.isInstance(e.getCause())
     }
@@ -158,7 +161,8 @@ class ResolveJobSpecificationActionSpec extends Specification {
 
         then:
         1 * converter.agentJobRequestArgsToDTO(arguments) >> request
-        1 * service.resolveJobSpecification(request) >> { throw exception }
+        1 * request.getRequestedId() >> Optional.of(id)
+        1 * service.resolveJobSpecification(id) >> { throw exception }
         def e = thrown(RuntimeException)
         e.getCause() == exception
     }

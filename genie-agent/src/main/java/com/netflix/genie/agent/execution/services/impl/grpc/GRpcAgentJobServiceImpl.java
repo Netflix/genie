@@ -23,16 +23,14 @@ import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.common.internal.dto.v4.AgentJobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import com.netflix.genie.common.internal.dto.v4.converters.JobSpecificationServiceConverter;
-import com.netflix.genie.proto.GetJobSpecificationRequest;
 import com.netflix.genie.proto.JobServiceGrpc;
 import com.netflix.genie.proto.JobSpecificationResponse;
-import com.netflix.genie.proto.ResolveJobSpecificationRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -64,30 +62,33 @@ public class GRpcAgentJobServiceImpl implements AgentJobService {
      */
     @Override
     public JobSpecification resolveJobSpecification(
-        @Valid final AgentJobRequest agentJobRequest
+        @NotBlank final String id
     ) throws JobSpecificationResolutionException {
+        final ListenableFuture<JobSpecificationResponse> requestFuture = this.client
+            .resolveJobSpecification(JobSpecificationServiceConverter.toProtoJobSpecificationRequest(id));
 
-        final ResolveJobSpecificationRequest resolveRequest;
-        resolveRequest = JobSpecificationServiceConverter.toProtoResolveJobSpecificationRequest(agentJobRequest);
-
-        final ListenableFuture<JobSpecificationResponse> requestFuture = client.resolveJobSpecification(resolveRequest);
-
-        return getAndHandleResponse(requestFuture);
+        return this.getAndHandleResponse(requestFuture);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public JobSpecification getJobSpecification(@NotEmpty final String id) throws JobSpecificationResolutionException {
+    public JobSpecification getJobSpecification(@NotBlank final String id) throws JobSpecificationResolutionException {
+        final ListenableFuture<JobSpecificationResponse> requestFuture = this.client
+            .getJobSpecification(JobSpecificationServiceConverter.toProtoJobSpecificationRequest(id));
 
-        final GetJobSpecificationRequest getRequest = GetJobSpecificationRequest.newBuilder()
-            .setId(id)
-            .build();
+        return this.getAndHandleResponse(requestFuture);
+    }
 
-        final ListenableFuture<JobSpecificationResponse> requestFuture = client.getJobSpecification(getRequest);
-
-        return getAndHandleResponse(requestFuture);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JobSpecification resolveJobSpecificationDryRun(
+        @Valid final AgentJobRequest jobRequest
+    ) throws JobSpecificationResolutionException {
+        throw new UnsupportedOperationException("Not yet implemented");
     }
 
     private JobSpecification getAndHandleResponse(

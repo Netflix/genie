@@ -21,20 +21,15 @@ import com.google.common.collect.ImmutableMap
 import com.google.common.collect.Lists
 import com.google.common.collect.Sets
 import com.netflix.genie.common.exceptions.GenieConflictException
-import com.netflix.genie.common.internal.dto.v4.AgentJobRequest
-import com.netflix.genie.common.internal.dto.v4.Criterion
-import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment
-import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria
-import com.netflix.genie.common.internal.dto.v4.JobMetadata
-import com.netflix.genie.common.internal.dto.v4.JobSpecification
+import com.netflix.genie.common.internal.dto.v4.*
 import com.netflix.genie.common.util.GenieObjectMapper
+import com.netflix.genie.proto.AgentConfig
 import com.netflix.genie.proto.ExecutionResource
 import com.netflix.genie.proto.JobSpecificationResponse
-import com.netflix.genie.proto.ResolveJobSpecificationRequest
+import com.netflix.genie.proto.ReserveJobIdRequest
 import com.netflix.genie.test.categories.UnitTest
 import org.junit.experimental.categories.Category
 import spock.lang.Specification
-
 /**
  * Specifications for the {@link JobSpecificationServiceConverter} utility class.
  *
@@ -90,7 +85,7 @@ class JobSpecificationServiceConverterSpec extends Specification {
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString()
     )
-    def commandCritierion = new Criterion.Builder()
+    def commandCriterion = new Criterion.Builder()
             .withId(commandCriterionId)
             .withName(commandCriterionName)
             .withVersion(commandCriterionVersion)
@@ -198,11 +193,11 @@ class JobSpecificationServiceConverterSpec extends Specification {
 
 //    def "Can convert JobRequest to ResolveJobSpecificationRequest and vice versa"() {
 //        def jobRequest = createJobRequest()
-//        def resolveJobSpecificationRequest = createResolveJobSpecificationRequest()
+//        def resolveJobSpecificationRequest = createReserveJobIdRequest()
 //
 //        when:
 //        def resolveJobSpecificationRequest2 = JobSpecificationServiceAdapter
-//                .toProtoResolveJobSpecificationRequest(jobRequest)
+//                .toProtoJobSpecificationRequest(jobRequest)
 //        def jobRequest2 = JobSpecificationServiceAdapter.toJobRequestDTO(resolveJobSpecificationRequest2)
 //
 //        then:
@@ -217,23 +212,23 @@ class JobSpecificationServiceConverterSpec extends Specification {
 //    }
 
     def "Can convert ResolveJobSpecificationRequest criteria into DTO"() {
-        def resolveJobSpecificationRequest = createResolveJobSpecificationRequest()
+        def reserveJobIdRequest = createReserveJobIdRequest()
 
         when:
-        def criteria = JobSpecificationServiceConverter.toExecutionResourceCriteriaDTO(resolveJobSpecificationRequest)
+        def criteria = JobSpecificationServiceConverter.toExecutionResourceCriteriaDTO(reserveJobIdRequest)
 
         then:
         criteria.getApplicationIds() == applicationIds
-        criteria.getCommandCriterion() == commandCritierion
+        criteria.getCommandCriterion() == commandCriterion
         criteria.getClusterCriteria().size() == 3
         criteria.getClusterCriteria().get(0) == clusterCriterion0
         criteria.getClusterCriteria().get(1) == clusterCriterion1
         criteria.getClusterCriteria().get(2) == clusterCriterion2
     }
 
-    def "Can create a GetJobSpecificationRequest"() {
+    def "Can create a JobSpecificationRequest"() {
         when:
-        def request = JobSpecificationServiceConverter.toProtoGetJobSpecificationRequest(id)
+        def request = JobSpecificationServiceConverter.toProtoJobSpecificationRequest(id)
 
         then:
         request.getId() == id
@@ -360,24 +355,24 @@ class JobSpecificationServiceConverterSpec extends Specification {
                 .build()
     }
 
-    ResolveJobSpecificationRequest createResolveJobSpecificationRequest() {
-//        def jobMetadataProto = com.netflix.genie.proto.JobMetadata
-//                .newBuilder()
-//                .setId(id)
-//                .setName(name)
-//                .setUser(user)
-//                .setVersion(version)
-//                .setDescription(description)
-//                .addAllTags(tags)
-//                .setMetadata(metadataString)
-//                .setEmail(email)
-//                .setGrouping(grouping)
-//                .setGroupingInstance(groupingInstance)
-//                .setSetupFile(setupFile)
-//                .addAllConfigs(configs)
-//                .addAllDependencies(dependencies)
-//                .addAllCommandArgs(commandArgs)
-//                .build()
+    ReserveJobIdRequest createReserveJobIdRequest() {
+        def jobMetadataProto = com.netflix.genie.proto.JobMetadata
+                .newBuilder()
+                .setId(id)
+                .setName(name)
+                .setUser(user)
+                .setVersion(version)
+                .setDescription(description)
+                .addAllTags(tags)
+                .setMetadata(metadataString)
+                .setEmail(email)
+                .setGrouping(grouping)
+                .setGroupingInstance(groupingInstance)
+                .setSetupFile(setupFile)
+                .addAllConfigs(configs)
+                .addAllDependencies(dependencies)
+                .addAllCommandArgs(commandArgs)
+                .build()
 
         def executionResourceCriteriaProto = com.netflix.genie.proto.ExecutionResourceCriteria.newBuilder()
                 .addAllClusterCriteria(
@@ -416,14 +411,20 @@ class JobSpecificationServiceConverterSpec extends Specification {
                         .setStatus(commandCriterionStatus)
                         .addAllTags(commandCriterionTags)
                         .build()
-        ).addAllApplicationIds(applicationIds)
+        ).addAllRequestedApplicationIdOverrides(applicationIds)
                 .build()
 
-        return ResolveJobSpecificationRequest
+        def agentConfigProto = AgentConfig
                 .newBuilder()
                 .setIsInteractive(interactive)
                 .setJobDirectoryLocation(jobDirectoryLocation)
+                .build()
+
+        return ReserveJobIdRequest
+                .newBuilder()
+                .setMetadata(jobMetadataProto)
                 .setCriteria(executionResourceCriteriaProto)
+                .setAgentConfig(agentConfigProto)
                 .build()
     }
 

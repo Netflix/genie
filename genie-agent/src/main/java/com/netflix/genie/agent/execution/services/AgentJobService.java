@@ -23,7 +23,7 @@ import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
 
 /**
  * Agent side job specification service for resolving and retrieving job specifications from the server.
@@ -37,12 +37,12 @@ public interface AgentJobService {
     /**
      * Given the parameters supplied by the job request attempt to resolve a job specification on the server.
      *
-     * @param agentJobRequest The agent job request
+     * @param id The id of the job to resolve a job specification for
      * @return The job specification
      * @throws JobSpecificationResolutionException if the specification cannot be resolved
      */
     JobSpecification resolveJobSpecification(
-        @Valid final AgentJobRequest agentJobRequest
+        @NotBlank final String id
     ) throws JobSpecificationResolutionException;
 
     /**
@@ -53,6 +53,17 @@ public interface AgentJobService {
      * @throws JobSpecificationResolutionException if the specification cannot be retrieved
      */
     JobSpecification getJobSpecification(
-        @NotEmpty final String id
+        @NotBlank final String id
+    ) throws JobSpecificationResolutionException;
+
+    /**
+     * Invoke the job specification resolution logic without persisting anything on the server.
+     *
+     * @param jobRequest The various parameters required to perform the dry run should be contained in this request
+     * @return The job specification
+     * @throws JobSpecificationResolutionException When an error occurred during attempted resolution
+     */
+    JobSpecification resolveJobSpecificationDryRun(
+        @Valid final AgentJobRequest jobRequest
     ) throws JobSpecificationResolutionException;
 }

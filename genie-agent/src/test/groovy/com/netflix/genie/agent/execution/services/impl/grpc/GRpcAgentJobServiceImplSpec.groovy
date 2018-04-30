@@ -20,12 +20,11 @@ package com.netflix.genie.agent.execution.services.impl.grpc
 
 import com.netflix.genie.agent.execution.exceptions.JobSpecificationResolutionException
 import com.netflix.genie.agent.execution.services.AgentJobService
-import com.netflix.genie.common.internal.dto.v4.*
+import com.netflix.genie.common.internal.dto.v4.JobSpecification
 import com.netflix.genie.proto.*
 import com.netflix.genie.test.categories.UnitTest
 import io.grpc.stub.StreamObserver
 import io.grpc.testing.GrpcServerRule
-import org.assertj.core.util.Lists
 import org.junit.Rule
 import org.junit.experimental.categories.Category
 import spock.lang.Specification
@@ -38,8 +37,8 @@ class GRpcAgentJobServiceImplSpec extends Specification {
 
     @Rule
     GrpcServerRule grpcServerRule = new GrpcServerRule().directExecutor()
-    ResolveJobSpecificationRequest capturedResolveRequest
-    GetJobSpecificationRequest capturedGetRequest
+    JobSpecificationRequest capturedResolveRequest
+    JobSpecificationRequest capturedGetRequest
     Exception serverException
     Throwable serverError
     JobSpecificationResponse serverResponse
@@ -47,7 +46,7 @@ class GRpcAgentJobServiceImplSpec extends Specification {
     void setup() {
         this.grpcServerRule.getServiceRegistry().addService(new JobServiceGrpc.JobServiceImplBase() {
             @Override
-            void resolveJobSpecification(ResolveJobSpecificationRequest request, StreamObserver<JobSpecificationResponse> responseObserver) {
+            void resolveJobSpecification(JobSpecificationRequest request, StreamObserver<JobSpecificationResponse> responseObserver) {
                 capturedResolveRequest = request
                 if (serverException != null) {
                     throw serverException
@@ -60,7 +59,7 @@ class GRpcAgentJobServiceImplSpec extends Specification {
             }
 
             @Override
-            void getJobSpecification(GetJobSpecificationRequest request, StreamObserver<JobSpecificationResponse> responseObserver) {
+            void getJobSpecification(JobSpecificationRequest request, StreamObserver<JobSpecificationResponse> responseObserver) {
                 capturedGetRequest = request
                 if (serverException != null) {
                     throw serverException
@@ -85,22 +84,23 @@ class GRpcAgentJobServiceImplSpec extends Specification {
 
     def "ResolveJobSpecification"() {
         setup:
-        AgentJobRequest request = new AgentJobRequest.Builder(
-                new JobMetadata.Builder("job x", "jdoe").build(),
-                new ExecutionResourceCriteria(
-                        Lists.newArrayList(),
-                        new Criterion.Builder().withName("foo").build(),
-                        Lists.newArrayList()
-                ),
-                "/tmp/jobs"
-        ).build()
+//        AgentJobRequest request = new AgentJobRequest.Builder(
+//                new JobMetadata.Builder("job x", "jdoe").build(),
+//                new ExecutionResourceCriteria(
+//                        Lists.newArrayList(),
+//                        new Criterion.Builder().withName("foo").build(),
+//                        Lists.newArrayList()
+//                ),
+//                "/tmp/jobs"
+//        ).build()
+        def id = UUID.randomUUID().toString()
 
         serverResponse = JobSpecificationResponse.newBuilder()
                 .setSpecification(com.netflix.genie.proto.JobSpecification.newBuilder().build())
                 .build()
 
         when:
-        JobSpecification response = service.resolveJobSpecification(request)
+        JobSpecification response = service.resolveJobSpecification(id)
 
         then:
         response != null
@@ -108,26 +108,27 @@ class GRpcAgentJobServiceImplSpec extends Specification {
 
     def "ResolveJobSpecification server error"() {
         setup:
-        AgentJobRequest request = new AgentJobRequest.Builder(
-                new JobMetadata.Builder("job x", "jdoe").build(),
-                new ExecutionResourceCriteria(
-                        Lists.newArrayList(),
-                        new Criterion.Builder().withName("foo").build(),
-                        Lists.newArrayList()
-                ),
-                "/tmp/jobs"
-        ).build()
+//        AgentJobRequest request = new AgentJobRequest.Builder(
+//                new JobMetadata.Builder("job x", "jdoe").build(),
+//                new ExecutionResourceCriteria(
+//                        Lists.newArrayList(),
+//                        new Criterion.Builder().withName("foo").build(),
+//                        Lists.newArrayList()
+//                ),
+//                "/tmp/jobs"
+//        ).build()
+        def id = UUID.randomUUID().toString()
 
         serverResponse = JobSpecificationResponse.newBuilder()
                 .setError(
-                JobSpecificationServiceError.newBuilder()
+                JobSpecificationError.newBuilder()
                         .setMessage("error")
-                        .setType(JobSpecificationServiceError.Type.NO_CLUSTER_FOUND)
+                        .setType(JobSpecificationError.Type.NO_CLUSTER_FOUND)
                         .build()
         ).build()
 
         when:
-        service.resolveJobSpecification(request)
+        service.resolveJobSpecification(id)
 
         then:
         thrown(JobSpecificationResolutionException)
@@ -135,20 +136,21 @@ class GRpcAgentJobServiceImplSpec extends Specification {
 
     def "ResolveJobSpecification server no response"() {
         setup:
-        AgentJobRequest request = new AgentJobRequest.Builder(
-                new JobMetadata.Builder("job x", "jdoe").build(),
-                new ExecutionResourceCriteria(
-                        Lists.newArrayList(),
-                        new Criterion.Builder().withName("foo").build(),
-                        Lists.newArrayList()
-                ),
-                "/tmp/jobs"
-        ).build()
+//        AgentJobRequest request = new AgentJobRequest.Builder(
+//                new JobMetadata.Builder("job x", "jdoe").build(),
+//                new ExecutionResourceCriteria(
+//                        Lists.newArrayList(),
+//                        new Criterion.Builder().withName("foo").build(),
+//                        Lists.newArrayList()
+//                ),
+//                "/tmp/jobs"
+//        ).build()
+        def id = UUID.randomUUID().toString()
 
         serverResponse = JobSpecificationResponse.newBuilder().build()
 
         when:
-        service.resolveJobSpecification(request)
+        service.resolveJobSpecification(id)
 
         then:
         thrown(JobSpecificationResolutionException)
