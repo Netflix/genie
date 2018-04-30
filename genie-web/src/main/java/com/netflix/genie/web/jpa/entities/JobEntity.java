@@ -158,7 +158,7 @@ public class JobEntity extends BaseEntity implements
     private String grouping;
 
     @Basic
-    @Column(name = "groupingInstance", updatable = false)
+    @Column(name = "grouping_instance", updatable = false)
     @Size(max = 255, message = "Max length in database is 255 characters")
     private String groupingInstance;
 
