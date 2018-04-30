@@ -26,12 +26,6 @@ import java.util.Optional;
  * @since 3.3.0
  */
 public interface BaseProjection extends UniqueIdProjection {
-    /**
-     * Get the unique identifier for this entity.
-     *
-     * @return The globally unique identifier of this entity
-     */
-    String getUniqueId();
 
     /**
      * Get the version.
