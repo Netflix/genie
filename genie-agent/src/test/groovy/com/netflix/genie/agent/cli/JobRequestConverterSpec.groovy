@@ -50,11 +50,11 @@ class JobRequestConverterSpec extends Specification {
         jobRequest = converter.agentJobRequestArgsToDTO(jobRequestArgs)
 
         then:
-        jobRequest.getTimeout() == Optional.ofNullable(jobRequestArgs.getTimeout())
+        jobRequest.getRequestedAgentConfig().getTimeoutRequested() == Optional.ofNullable(jobRequestArgs.getTimeout())
         jobRequest.getCommandArgs() == jobRequestArgs.getCommandArguments()
-        jobRequest.isArchivingDisabled() == jobRequestArgs.isArchivalDisabled()
-        jobRequest.isInteractive() == jobRequestArgs.isInteractive()
-        jobRequest.getRequestedJobDirectoryLocation() == Optional.ofNullable(jobRequestArgs.getJobDirectoryLocation())
+        jobRequest.getRequestedAgentConfig().isArchivingDisabled() == jobRequestArgs.isArchivalDisabled()
+        jobRequest.getRequestedAgentConfig().isInteractive() == jobRequestArgs.isInteractive()
+        jobRequest.getRequestedAgentConfig().getRequestedJobDirectoryLocation() == Optional.ofNullable(jobRequestArgs.getJobDirectoryLocation())
         jobRequest.getCriteria() != null
         jobRequest.getCriteria().getApplicationIds() == jobRequestArgs.getApplicationIds()
         jobRequest.getCriteria().getClusterCriteria() == jobRequestArgs.getClusterCriteria()
@@ -86,41 +86,41 @@ class JobRequestConverterSpec extends Specification {
         jobRequest = converter.agentJobRequestArgsToDTO(jobRequestArgs)
 
         then:
-        jobRequestArgs.getTimeout() >> 10
-        jobRequest.getTimeout().get() == 10
-        jobRequestArgs.getCommandArguments() >> ["foo", "bar"].asList()
+        1 * jobRequestArgs.getTimeout() >> 10
+        jobRequest.getRequestedAgentConfig().getTimeoutRequested().get() == 10
+        1 * jobRequestArgs.getCommandArguments() >> ["foo", "bar"].asList()
         jobRequest.getCommandArgs() == ["foo", "bar"].asList()
-        jobRequestArgs.isArchivalDisabled() >> true
-        jobRequest.isArchivingDisabled()
-        jobRequestArgs.isInteractive() >> true
-        jobRequest.isInteractive()
-        jobRequestArgs.getJobDirectoryLocation() >> new File("/tmp")
-        jobRequest.getRequestedJobDirectoryLocation() == Optional.of(new File("/tmp"))
-        jobRequestArgs.getClusterCriteria() >> [clusterCriterion1, clusterCriterion2].asList()
+        1 * jobRequestArgs.isArchivalDisabled() >> true
+        jobRequest.getRequestedAgentConfig().isArchivingDisabled()
+        1 * jobRequestArgs.isInteractive() >> true
+        jobRequest.getRequestedAgentConfig().isInteractive()
+        1 * jobRequestArgs.getJobDirectoryLocation() >> new File("/tmp")
+        jobRequest.getRequestedAgentConfig().getRequestedJobDirectoryLocation() == Optional.of(new File("/tmp"))
+        1 * jobRequestArgs.getClusterCriteria() >> [clusterCriterion1, clusterCriterion2].asList()
         jobRequest.getCriteria().getClusterCriteria() == [clusterCriterion1, clusterCriterion2].asList()
-        jobRequestArgs.getCommandCriterion() >> commandCriterion
+        1 * jobRequestArgs.getCommandCriterion() >> commandCriterion
         jobRequest.getCriteria().getCommandCriterion() == commandCriterion
-        jobRequestArgs.getApplicationIds() >> ["app1, app2"].asList()
+        1 * jobRequestArgs.getApplicationIds() >> ["app1, app2"].asList()
         jobRequest.getCriteria().getApplicationIds() == ["app1, app2"].asList()
-        jobRequestArgs.getEmail() >> "foo@bar.com"
+        1 * jobRequestArgs.getEmail() >> "foo@bar.com"
         jobRequest.getMetadata().getEmail() == Optional.of("foo@bar.com")
-        jobRequestArgs.getGrouping() >> "g"
+        1 * jobRequestArgs.getGrouping() >> "g"
         jobRequest.getMetadata().getGrouping() == Optional.of("g")
-        jobRequestArgs.getGroupingInstance() >> "gi"
+        1 * jobRequestArgs.getGroupingInstance() >> "gi"
         jobRequest.getMetadata().getGroupingInstance() == Optional.of("gi")
-        jobRequestArgs.getJobDescription() >> "d"
+        1 * jobRequestArgs.getJobDescription() >> "d"
         jobRequest.getMetadata().getDescription() == Optional.of("d")
-        jobRequestArgs.getJobTags() >> Sets.newHashSet(["t1", "t2"])
+        1 * jobRequestArgs.getJobTags() >> Sets.newHashSet(["t1", "t2"])
         jobRequest.getMetadata().getTags() == Sets.newHashSet(["t1", "t2"])
-        jobRequestArgs.getJobVersion() >> "1.2.3"
+        1 * jobRequestArgs.getJobVersion() >> "1.2.3"
         jobRequest.getMetadata().getVersion() == "1.2.3"
-        jobRequestArgs.getJobName() >> "n"
+        1 * jobRequestArgs.getJobName() >> "n"
         jobRequest.getMetadata().getName() == "n"
-        jobRequestArgs.getJobMetadata() >> metadata
+        1 * jobRequestArgs.getJobMetadata() >> metadata
         jobRequest.getMetadata().getMetadata() == Optional.of(metadata)
-        jobRequestArgs.getUser() >> "u"
+        1 * jobRequestArgs.getUser() >> "u"
         jobRequest.getMetadata().getUser() == "u"
-        validator.validate(_ as AgentJobRequest) >> Sets.newHashSet()
+        1 * validator.validate(_ as AgentJobRequest) >> Sets.newHashSet()
     }
 
     def "Convert fail validation"() {
@@ -133,8 +133,8 @@ class JobRequestConverterSpec extends Specification {
         converter.agentJobRequestArgsToDTO(jobRequestArgs)
 
         then:
-        validator.validate(_ as AgentJobRequest) >> Sets.newHashSet([violation])
-        violation.getMessage() >> "NO!"
+        1 * validator.validate(_ as AgentJobRequest) >> Sets.newHashSet([violation])
+        1 * violation.getMessage() >> "NO!"
         thrown(JobRequestConverter.ConversionException)
     }
 }

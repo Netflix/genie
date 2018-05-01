@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.common.internal.dto.v4
 
+import com.google.common.collect.ImmutableMap
 import com.google.common.collect.Lists
 import com.netflix.genie.common.util.GenieObjectMapper
 import spock.lang.Specification
@@ -43,10 +44,23 @@ class JobRequestSpec extends Specification {
         def archivingDisabled = true
         def jobResources = new ExecutionEnvironment(null, null, UUID.randomUUID().toString())
         def jobDirectoryLocation = "/tmp"
+        def requestedEnvironmentVariables = ImmutableMap.of(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString()
+        )
         def requestedAgentEnvironment = new AgentEnvironmentRequest.Builder()
                 .withRequestedJobCpu(3)
-                .withRequestedJobDirectoryLocation(jobDirectoryLocation)
                 .withRequestedJobMemory(10_000)
+                .withRequestedEnvironmentVariables(requestedEnvironmentVariables)
+                .withExt(GenieObjectMapper.getMapper().readTree("{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"))
+                .build()
+        def requestedAgentConfig = new AgentConfigRequest.Builder()
+                .withArchivingDisabled(archivingDisabled)
+                .withTimeoutRequested(timeout)
+                .withInteractive(interactive)
+                .withRequestedJobDirectoryLocation(jobDirectoryLocation)
                 .withExt(GenieObjectMapper.getMapper().readTree("{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"))
                 .build()
         ApiJobRequest jobRequest
@@ -55,11 +69,9 @@ class JobRequestSpec extends Specification {
         jobRequest = new ApiJobRequest.Builder(metadata, criteria)
                 .withRequestedId(requestedId)
                 .withCommandArgs(commandArgs)
-                .withArchivingDisabled(archivingDisabled)
-                .withTimeout(timeout)
-                .withInteractive(interactive)
                 .withResources(jobResources)
                 .withRequestedAgentEnvironment(requestedAgentEnvironment)
+                .withRequestedAgentConfig(requestedAgentConfig)
                 .build()
 
         then:
@@ -67,9 +79,7 @@ class JobRequestSpec extends Specification {
         jobRequest.getCriteria() == criteria
         jobRequest.getRequestedId().orElse(UUID.randomUUID().toString()) == requestedId
         jobRequest.getCommandArgs() == commandArgs
-        jobRequest.isArchivingDisabled()
-        jobRequest.isInteractive()
-        jobRequest.getTimeout().orElse(-1) == timeout
+        jobRequest.getRequestedAgentConfig() == requestedAgentConfig
         jobRequest.getResources() == jobResources
         jobRequest.getRequestedAgentEnvironment() == requestedAgentEnvironment
 
@@ -81,16 +91,15 @@ class JobRequestSpec extends Specification {
         jobRequest.getCriteria() == criteria
         !jobRequest.getRequestedId().isPresent()
         jobRequest.getCommandArgs().isEmpty()
-        !jobRequest.isArchivingDisabled()
-        !jobRequest.isInteractive()
-        !jobRequest.getTimeout().isPresent()
-        jobRequest.getResources() != null
+        jobRequest.getResources() == new ExecutionEnvironment(null, null, null)
         jobRequest.getRequestedAgentEnvironment() == new AgentEnvironmentRequest.Builder().build()
+        jobRequest.getRequestedAgentConfig() == new AgentConfigRequest.Builder().build()
 
         when:
         jobRequest = new ApiJobRequest.Builder(metadata, criteria)
                 .withCommandArgs(null)
                 .withRequestedAgentEnvironment(null)
+                .withRequestedAgentConfig(null)
                 .build()
 
         then:
@@ -98,16 +107,15 @@ class JobRequestSpec extends Specification {
         jobRequest.getCriteria() == criteria
         !jobRequest.getRequestedId().isPresent()
         jobRequest.getCommandArgs().isEmpty()
-        !jobRequest.isArchivingDisabled()
-        !jobRequest.isInteractive()
-        !jobRequest.getTimeout().isPresent()
-        jobRequest.getResources() != null
+        jobRequest.getResources() == new ExecutionEnvironment(null, null, null)
         jobRequest.getRequestedAgentEnvironment() == new AgentEnvironmentRequest.Builder().build()
+        jobRequest.getRequestedAgentConfig() == new AgentConfigRequest.Builder().build()
 
         when: "Command args are blank they're ignored"
         jobRequest = new ApiJobRequest.Builder(metadata, criteria)
                 .withCommandArgs(Lists.newArrayList(" ", "\t"))
                 .withRequestedAgentEnvironment(null)
+                .withRequestedAgentConfig(null)
                 .build()
 
         then:
@@ -115,11 +123,9 @@ class JobRequestSpec extends Specification {
         jobRequest.getCriteria() == criteria
         !jobRequest.getRequestedId().isPresent()
         jobRequest.getCommandArgs().isEmpty()
-        !jobRequest.isArchivingDisabled()
-        !jobRequest.isInteractive()
-        !jobRequest.getTimeout().isPresent()
-        jobRequest.getResources() != null
+        jobRequest.getResources() == new ExecutionEnvironment(null, null, null)
         jobRequest.getRequestedAgentEnvironment() == new AgentEnvironmentRequest.Builder().build()
+        jobRequest.getRequestedAgentConfig() == new AgentConfigRequest.Builder().build()
     }
 
     def "Can build immutable agent job request"() {
@@ -136,15 +142,19 @@ class JobRequestSpec extends Specification {
         def archivingDisabled = true
         def jobResources = new ExecutionEnvironment(null, null, UUID.randomUUID().toString())
         def jobDirectoryLocation = "/tmp"
+        def requestedAgentConfig = new AgentConfigRequest.Builder()
+                .withArchivingDisabled(archivingDisabled)
+                .withTimeoutRequested(timeout)
+                .withInteractive(interactive)
+                .withRequestedJobDirectoryLocation(jobDirectoryLocation)
+                .withExt(GenieObjectMapper.getMapper().readTree("{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"))
+                .build()
         AgentJobRequest jobRequest
 
         when:
-        jobRequest = new AgentJobRequest.Builder(metadata, criteria, jobDirectoryLocation)
+        jobRequest = new AgentJobRequest.Builder(metadata, criteria, requestedAgentConfig)
                 .withRequestedId(requestedId)
                 .withCommandArgs(commandArgs)
-                .withArchivingDisabled(archivingDisabled)
-                .withTimeout(timeout)
-                .withInteractive(interactive)
                 .withResources(jobResources)
                 .build()
 
@@ -153,28 +163,22 @@ class JobRequestSpec extends Specification {
         jobRequest.getCriteria() == criteria
         jobRequest.getRequestedId().orElse(UUID.randomUUID().toString()) == requestedId
         jobRequest.getCommandArgs() == commandArgs
-        jobRequest.isArchivingDisabled()
-        jobRequest.isInteractive()
-        jobRequest.getTimeout().orElse(-1) == timeout
+        jobRequest.getRequestedAgentConfig() == requestedAgentConfig
         jobRequest.getResources() == jobResources
-        jobRequest.getRequestedJobDirectoryLocation().orElse(null) == new File(jobDirectoryLocation)
 
         when:
-        jobRequest = new AgentJobRequest.Builder(metadata, criteria, jobDirectoryLocation).build()
+        jobRequest = new AgentJobRequest.Builder(metadata, criteria, requestedAgentConfig).build()
 
         then:
         jobRequest.getMetadata() == metadata
         jobRequest.getCriteria() == criteria
         !jobRequest.getRequestedId().isPresent()
         jobRequest.getCommandArgs().isEmpty()
-        !jobRequest.isArchivingDisabled()
-        !jobRequest.isInteractive()
-        !jobRequest.getTimeout().isPresent()
+        jobRequest.getRequestedAgentConfig() == requestedAgentConfig
         jobRequest.getResources() != null
-        jobRequest.getRequestedJobDirectoryLocation().orElse(null) == new File(jobDirectoryLocation)
 
         when:
-        jobRequest = new AgentJobRequest.Builder(metadata, criteria, jobDirectoryLocation)
+        jobRequest = new AgentJobRequest.Builder(metadata, criteria, requestedAgentConfig)
                 .withCommandArgs(null)
                 .build()
 
@@ -183,14 +187,11 @@ class JobRequestSpec extends Specification {
         jobRequest.getCriteria() == criteria
         !jobRequest.getRequestedId().isPresent()
         jobRequest.getCommandArgs().isEmpty()
-        !jobRequest.isArchivingDisabled()
-        !jobRequest.isInteractive()
-        !jobRequest.getTimeout().isPresent()
+        jobRequest.getRequestedAgentConfig() == requestedAgentConfig
         jobRequest.getResources() != null
-        jobRequest.getRequestedJobDirectoryLocation().orElse(null) == new File(jobDirectoryLocation)
 
         when: "Empty command args are supplied they're ignored"
-        jobRequest = new AgentJobRequest.Builder(metadata, criteria, jobDirectoryLocation)
+        jobRequest = new AgentJobRequest.Builder(metadata, criteria, requestedAgentConfig)
                 .withCommandArgs(Lists.newArrayList(" ", "\n"))
                 .build()
 
@@ -199,11 +200,8 @@ class JobRequestSpec extends Specification {
         jobRequest.getCriteria() == criteria
         !jobRequest.getRequestedId().isPresent()
         jobRequest.getCommandArgs().isEmpty()
-        !jobRequest.isArchivingDisabled()
-        !jobRequest.isInteractive()
-        !jobRequest.getTimeout().isPresent()
+        jobRequest.getRequestedAgentConfig() == requestedAgentConfig
         jobRequest.getResources() != null
-        jobRequest.getRequestedJobDirectoryLocation().orElse(null) == new File(jobDirectoryLocation)
     }
 
     def "Can build job request"() {
@@ -220,6 +218,25 @@ class JobRequestSpec extends Specification {
         def archivingDisabled = true
         def jobResources = new ExecutionEnvironment(null, null, UUID.randomUUID().toString())
         def jobDirectoryLocation = "/tmp"
+        def requestedEnvironmentVariables = ImmutableMap.of(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString()
+        )
+        def requestedAgentEnvironment = new AgentEnvironmentRequest.Builder()
+                .withRequestedEnvironmentVariables(requestedEnvironmentVariables)
+                .withRequestedJobCpu(2)
+                .withRequestedJobMemory(10_000)
+                .withExt(GenieObjectMapper.getMapper().readTree("{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"))
+                .build()
+        def requestedAgentConfig = new AgentConfigRequest.Builder()
+                .withArchivingDisabled(archivingDisabled)
+                .withTimeoutRequested(timeout)
+                .withInteractive(interactive)
+                .withRequestedJobDirectoryLocation(jobDirectoryLocation)
+                .withExt(GenieObjectMapper.getMapper().readTree("{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"))
+                .build()
         JobRequest jobRequest
 
         when:
@@ -227,12 +244,10 @@ class JobRequestSpec extends Specification {
                 requestedId,
                 jobResources,
                 commandArgs,
-                archivingDisabled,
-                timeout,
-                interactive,
                 metadata,
                 criteria,
-                new AgentEnvironmentRequest.Builder().withRequestedJobDirectoryLocation(jobDirectoryLocation).build()
+                requestedAgentEnvironment,
+                requestedAgentConfig
         )
 
         then:
@@ -240,22 +255,18 @@ class JobRequestSpec extends Specification {
         jobRequest.getCriteria() == criteria
         jobRequest.getRequestedId().orElse(UUID.randomUUID().toString()) == requestedId
         jobRequest.getCommandArgs() == commandArgs
-        jobRequest.isArchivingDisabled()
-        jobRequest.isInteractive()
-        jobRequest.getTimeout().orElse(-1) == timeout
+        jobRequest.getRequestedAgentConfig() == requestedAgentConfig
         jobRequest.getResources() == jobResources
-        jobRequest.getRequestedJobDirectoryLocation().orElse(null) == new File(jobDirectoryLocation)
+        jobRequest.getRequestedAgentEnvironment() == requestedAgentEnvironment
 
         when:
         jobRequest = new JobRequest(
                 null,
                 null,
                 null,
-                false,
-                null,
-                false,
                 metadata,
                 criteria,
+                null,
                 null
         )
 
@@ -264,23 +275,19 @@ class JobRequestSpec extends Specification {
         jobRequest.getCriteria() == criteria
         !jobRequest.getRequestedId().isPresent()
         jobRequest.getCommandArgs().isEmpty()
-        !jobRequest.isArchivingDisabled()
-        !jobRequest.isInteractive()
-        !jobRequest.getTimeout().isPresent()
-        jobRequest.getResources() != null
-        !jobRequest.getRequestedJobDirectoryLocation().isPresent()
-        jobRequest.getRequestedAgentEnvironment() != null
+        jobRequest.getResources() == new ExecutionEnvironment(null, null, null)
+        jobRequest.getRequestedAgentEnvironment() == new AgentEnvironmentRequest.Builder().build()
+        jobRequest.getRequestedAgentConfig() == new AgentConfigRequest.Builder().build()
 
-        when: "Empty command args are supplied they're ignored"
+        when:
+        "Empty command args are supplied they're ignored"
         jobRequest = new JobRequest(
                 null,
                 null,
                 Lists.newArrayList("\n\n"),
-                false,
-                null,
-                false,
                 metadata,
                 criteria,
+                null,
                 null
         )
 
@@ -289,11 +296,8 @@ class JobRequestSpec extends Specification {
         jobRequest.getCriteria() == criteria
         !jobRequest.getRequestedId().isPresent()
         jobRequest.getCommandArgs().isEmpty()
-        !jobRequest.isArchivingDisabled()
-        !jobRequest.isInteractive()
-        !jobRequest.getTimeout().isPresent()
-        jobRequest.getResources() != null
-        !jobRequest.getRequestedJobDirectoryLocation().isPresent()
-        jobRequest.getRequestedAgentEnvironment() != null
+        jobRequest.getResources() == new ExecutionEnvironment(null, null, null)
+        jobRequest.getRequestedAgentEnvironment() == new AgentEnvironmentRequest.Builder().build()
+        jobRequest.getRequestedAgentConfig() == new AgentConfigRequest.Builder().build()
     }
 }

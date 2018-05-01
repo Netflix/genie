@@ -17,16 +17,19 @@
  */
 package com.netflix.genie.common.internal.dto.v4;
 
-import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.Min;
-import java.io.File;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -43,15 +46,20 @@ import java.util.Optional;
 public class AgentEnvironmentRequest {
     @Min(value = 1, message = "Number of CPU's requested can't be less than 1")
     private final Integer requestedJobCpu;
-    private final File requestedJobDirectoryLocation;
     @Min(value = 1, message = "Amount of memory requested has to be greater than 1 MB and preferably much more")
     private final Integer requestedJobMemory;
+    private final ImmutableMap<
+        @NotBlank(message = "Environment variable key can't be blank")
+        @Size(max = 255, message = "Max environment variable name length is 255 characters") String,
+        @NotBlank(message = "Environment variable value can't be blank")
+        @Size(max = 1024, message = "Max environment variable value length is 1024 characters") String>
+        requestedEnvironmentVariables;
     private final JsonNode ext;
 
     private AgentEnvironmentRequest(final Builder builder) {
         this.requestedJobCpu = builder.bRequestedJobCpu;
-        this.requestedJobDirectoryLocation = builder.bRequestedJobDirectoryLocation;
         this.requestedJobMemory = builder.bRequestedJobMemory;
+        this.requestedEnvironmentVariables = ImmutableMap.copyOf(builder.bRequestedEnvironmentVariables);
         this.ext = builder.bExt;
     }
 
@@ -65,21 +73,21 @@ public class AgentEnvironmentRequest {
     }
 
     /**
-     * Get the location where the Agent should place the job directory when it runs.
-     *
-     * @return The directory location wrapped in an {@link Optional}
-     */
-    public Optional<File> getRequestedJobDirectoryLocation() {
-        return Optional.ofNullable(this.requestedJobDirectoryLocation);
-    }
-
-    /**
      * Get the amount of memory requested by the user to launch the job process with.
      *
      * @return The memory requested wrapped in an {@link Optional}
      */
     public Optional<Integer> getRequestedJobMemory() {
         return Optional.ofNullable(this.requestedJobMemory);
+    }
+
+    /**
+     * Get the environment variables requested by the user to be added to the job runtime.
+     *
+     * @return The environment variables backed by an immutable map. Any attempt to modify with throw exception
+     */
+    public Map<String, String> getRequestedEnvironmentVariables() {
+        return this.requestedEnvironmentVariables;
     }
 
     /**
@@ -98,8 +106,8 @@ public class AgentEnvironmentRequest {
      * @since 4.0.0
      */
     public static class Builder {
+        private final Map<String, String> bRequestedEnvironmentVariables = Maps.newHashMap();
         private Integer bRequestedJobCpu;
-        private File bRequestedJobDirectoryLocation;
         private Integer bRequestedJobMemory;
         private JsonNode bExt;
 
@@ -115,31 +123,6 @@ public class AgentEnvironmentRequest {
         }
 
         /**
-         * Set the directory where the agent should put the job working directory.
-         *
-         * @param requestedJobDirectoryLocation The location
-         * @return The builder
-         */
-        @JsonSetter
-        public Builder withRequestedJobDirectoryLocation(@Nullable final String requestedJobDirectoryLocation) {
-            this.bRequestedJobDirectoryLocation = requestedJobDirectoryLocation == null
-                ? null
-                : new File(requestedJobDirectoryLocation);
-            return this;
-        }
-
-        /**
-         * Set the directory where the agent should put the job working directory.
-         *
-         * @param requestedJobDirectoryLocation The location
-         * @return The builder
-         */
-        public Builder withRequestedJobDirectoryLocation(@Nullable final File requestedJobDirectoryLocation) {
-            this.bRequestedJobDirectoryLocation = requestedJobDirectoryLocation;
-            return this;
-        }
-
-        /**
          * Set the amount of memory (in MB) that should be allocated for the job processes.
          *
          * @param requestedJobMemory The requested memory. Must be greater than or equal to 1 but preferably much more
@@ -147,6 +130,22 @@ public class AgentEnvironmentRequest {
          */
         public Builder withRequestedJobMemory(@Nullable final Integer requestedJobMemory) {
             this.bRequestedJobMemory = requestedJobMemory;
+            return this;
+        }
+
+        /**
+         * Set any environment variables that the agent should add to the job runtime.
+         *
+         * @param requestedEnvironmentVariables Additional environment variables
+         * @return The builder
+         */
+        public Builder withRequestedEnvironmentVariables(
+            @Nullable final Map<String, String> requestedEnvironmentVariables
+        ) {
+            this.bRequestedEnvironmentVariables.clear();
+            if (requestedEnvironmentVariables != null) {
+                this.bRequestedEnvironmentVariables.putAll(requestedEnvironmentVariables);
+            }
             return this;
         }
 
