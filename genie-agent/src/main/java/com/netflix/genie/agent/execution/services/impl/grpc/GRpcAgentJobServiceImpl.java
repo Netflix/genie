@@ -22,7 +22,7 @@ import com.netflix.genie.agent.execution.exceptions.JobSpecificationResolutionEx
 import com.netflix.genie.agent.execution.services.AgentJobService;
 import com.netflix.genie.common.internal.dto.v4.AgentJobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
-import com.netflix.genie.common.internal.dto.v4.converters.JobSpecificationServiceConverter;
+import com.netflix.genie.common.internal.dto.v4.converters.JobServiceProtoConverter;
 import com.netflix.genie.proto.JobServiceGrpc;
 import com.netflix.genie.proto.JobSpecificationResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -65,7 +65,7 @@ public class GRpcAgentJobServiceImpl implements AgentJobService {
         @NotBlank final String id
     ) throws JobSpecificationResolutionException {
         final ListenableFuture<JobSpecificationResponse> requestFuture = this.client
-            .resolveJobSpecification(JobSpecificationServiceConverter.toProtoJobSpecificationRequest(id));
+            .resolveJobSpecification(JobServiceProtoConverter.toProtoJobSpecificationRequest(id));
 
         return this.getAndHandleResponse(requestFuture);
     }
@@ -76,7 +76,7 @@ public class GRpcAgentJobServiceImpl implements AgentJobService {
     @Override
     public JobSpecification getJobSpecification(@NotBlank final String id) throws JobSpecificationResolutionException {
         final ListenableFuture<JobSpecificationResponse> requestFuture = this.client
-            .getJobSpecification(JobSpecificationServiceConverter.toProtoJobSpecificationRequest(id));
+            .getJobSpecification(JobServiceProtoConverter.toProtoJobSpecificationRequest(id));
 
         return this.getAndHandleResponse(requestFuture);
     }
@@ -115,7 +115,7 @@ public class GRpcAgentJobServiceImpl implements AgentJobService {
             );
         }
 
-        return JobSpecificationServiceConverter.toJobSpecificationDTO(specResponse);
+        return JobServiceProtoConverter.toJobSpecificationDTO(specResponse);
 
     }
 }
