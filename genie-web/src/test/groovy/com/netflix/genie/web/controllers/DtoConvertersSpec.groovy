@@ -23,20 +23,7 @@ import com.netflix.genie.common.dto.ApplicationStatus
 import com.netflix.genie.common.dto.ClusterCriteria
 import com.netflix.genie.common.dto.ClusterStatus
 import com.netflix.genie.common.dto.CommandStatus
-import com.netflix.genie.common.internal.dto.v4.Application
-import com.netflix.genie.common.internal.dto.v4.ApplicationMetadata
-import com.netflix.genie.common.internal.dto.v4.ApplicationRequest
-import com.netflix.genie.common.internal.dto.v4.Cluster
-import com.netflix.genie.common.internal.dto.v4.ClusterMetadata
-import com.netflix.genie.common.internal.dto.v4.ClusterRequest
-import com.netflix.genie.common.internal.dto.v4.Command
-import com.netflix.genie.common.internal.dto.v4.CommandMetadata
-import com.netflix.genie.common.internal.dto.v4.CommandRequest
-import com.netflix.genie.common.internal.dto.v4.Criterion
-import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment
-import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria
-import com.netflix.genie.common.internal.dto.v4.JobMetadata
-import com.netflix.genie.common.internal.dto.v4.JobRequest
+import com.netflix.genie.common.internal.dto.v4.*
 import com.netflix.genie.common.util.GenieObjectMapper
 import org.apache.commons.lang3.StringUtils
 import spock.lang.Specification
@@ -867,9 +854,6 @@ class DtoConvertersSpec extends Specification {
                 id,
                 new ExecutionEnvironment(configs, dependencies, setupFile),
                 commandArgs,
-                true,
-                timeout,
-                true,
                 new JobMetadata.Builder(name, user, version)
                         .withTags(tags)
                         .withGroupingInstance(groupingInstance)
@@ -880,7 +864,13 @@ class DtoConvertersSpec extends Specification {
                         .withDescription(description)
                         .build(),
                 new ExecutionResourceCriteria(clusterCriteria, commandCriterion, applicationIds),
-                null
+                null,
+                new AgentConfigRequest
+                        .Builder()
+                        .withTimeoutRequested(timeout)
+                        .withInteractive(true)
+                        .withArchivingDisabled(true)
+                        .build()
         )
 
         when:
@@ -980,14 +970,14 @@ class DtoConvertersSpec extends Specification {
         v4JobRequest.getCriteria().getApplicationIds() == applicationIds
         v4JobRequest.getCommandArgs() == commandArgs
         v4JobRequest.getRequestedAgentEnvironment().getRequestedJobMemory().orElse(null) == memory
-        v4JobRequest.getTimeout().orElse(-1) == timeout
+        v4JobRequest.getRequestedAgentConfig().getTimeoutRequested().orElse(-1) == timeout
         v4JobRequest.getMetadata().getMetadata().orElse(null) == metadata
         v4JobRequest.getMetadata().getGrouping().orElse(null) == grouping
         v4JobRequest.getMetadata().getGroupingInstance().orElse(null) == groupingInstance
         v4JobRequest.getMetadata().getGroup().orElse(null) == group
         v4JobRequest.getMetadata().getDescription().orElse(null) == description
         v4JobRequest.getRequestedAgentEnvironment().getRequestedJobCpu().orElse(null) == cpu
-        !v4JobRequest.getRequestedAgentEnvironment().getRequestedJobDirectoryLocation().isPresent()
+        !v4JobRequest.getRequestedAgentConfig().getRequestedJobDirectoryLocation().isPresent()
         !v4JobRequest.getRequestedAgentEnvironment().getExt().isPresent()
         v4JobRequest.getResources().getDependencies() == dependencies
         v4JobRequest.getResources().getConfigs() == configs

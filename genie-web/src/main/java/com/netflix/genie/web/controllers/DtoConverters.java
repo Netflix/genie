@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.ClusterCriteria;
+import com.netflix.genie.common.internal.dto.v4.AgentConfigRequest;
 import com.netflix.genie.common.internal.dto.v4.AgentEnvironmentRequest;
 import com.netflix.genie.common.internal.dto.v4.Application;
 import com.netflix.genie.common.internal.dto.v4.ApplicationMetadata;
@@ -382,18 +383,22 @@ public final class DtoConverters {
         v3JobRequest.getCpu().ifPresent(agentEnvironmentBuilder::withRequestedJobCpu);
         v3JobRequest.getMemory().ifPresent(agentEnvironmentBuilder::withRequestedJobMemory);
 
+        final AgentConfigRequest.Builder agentConfigBuilder = new AgentConfigRequest
+            .Builder()
+            .withArchivingDisabled(v3JobRequest.isDisableLogArchival())
+            .withInteractive(false);
+        v3JobRequest.getTimeout().ifPresent(agentConfigBuilder::withTimeoutRequested);
+
         return new JobRequest(
             v3JobRequest.getId().orElse(null),
             resources,
             v3JobRequest.getCommandArgs().isPresent()
                 ? Lists.newArrayList(StringUtils.split(v3JobRequest.getCommandArgs().get(), ' '))
                 : null,
-            v3JobRequest.isDisableLogArchival(),
-            v3JobRequest.getTimeout().orElse(null),
-            false,
             metadataBuilder.build(),
             criteria,
-            agentEnvironmentBuilder.build()
+            agentEnvironmentBuilder.build(),
+            agentConfigBuilder.build()
         );
     }
 
@@ -419,7 +424,7 @@ public final class DtoConverters {
         )
             .withApplications(v4JobRequest.getCriteria().getApplicationIds())
             .withCommandArgs(v4JobRequest.getCommandArgs())
-            .withDisableLogArchival(v4JobRequest.isArchivingDisabled())
+            .withDisableLogArchival(v4JobRequest.getRequestedAgentConfig().isArchivingDisabled())
             .withTags(v4JobRequest.getMetadata().getTags());
 
         v4JobRequest.getRequestedId().ifPresent(v3Builder::withId);
@@ -437,7 +442,7 @@ public final class DtoConverters {
         v3Builder.withDependencies(jobResources.getDependencies());
         jobResources.getSetupFile().ifPresent(v3Builder::withSetupFile);
 
-        v4JobRequest.getTimeout().ifPresent(v3Builder::withTimeout);
+        v4JobRequest.getRequestedAgentConfig().getTimeoutRequested().ifPresent(v3Builder::withTimeout);
 
         return v3Builder.build();
     }

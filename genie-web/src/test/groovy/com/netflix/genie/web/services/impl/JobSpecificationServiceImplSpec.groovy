@@ -22,6 +22,7 @@ import com.google.common.collect.Maps
 import com.google.common.collect.Sets
 import com.netflix.genie.common.dto.ClusterStatus
 import com.netflix.genie.common.dto.CommandStatus
+import com.netflix.genie.common.internal.dto.v4.AgentConfigRequest
 import com.netflix.genie.common.internal.dto.v4.Cluster
 import com.netflix.genie.common.internal.dto.v4.ClusterMetadata
 import com.netflix.genie.common.internal.dto.v4.Command
@@ -87,11 +88,9 @@ class JobSpecificationServiceImplSpec extends Specification {
                 null,
                 null,
                 commandArgs,
-                false,
-                null,
-                false,
                 new JobMetadata.Builder(jobName, UUID.randomUUID().toString()).build(),
                 new ExecutionResourceCriteria(clusterCriteria, commandCriterion, null),
+                null,
                 null
         )
         def cluster1 = new Cluster(
@@ -239,14 +238,12 @@ class JobSpecificationServiceImplSpec extends Specification {
                 null,
                 null,
                 null,
-                false,
-                null,
-                false,
                 new JobMetadata
                         .Builder(jobName, UUID.randomUUID().toString())
                         .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
                         .build(),
                 new ExecutionResourceCriteria(clusterCriteria, commandCriterion, null),
+                null,
                 null
         )
         def cluster = new Cluster(
@@ -393,9 +390,6 @@ class JobSpecificationServiceImplSpec extends Specification {
                 null,
                 new ExecutionEnvironment(configs, dependencies, setupFile),
                 commandArgs,
-                true,
-                timeout,
-                true,
                 new JobMetadata.Builder(name, user, version)
                         .withTags(tags)
                         .withGroupingInstance(groupingInstance)
@@ -406,7 +400,13 @@ class JobSpecificationServiceImplSpec extends Specification {
                         .withDescription(description)
                         .build(),
                 new ExecutionResourceCriteria(clusterCriteria, commandCriterion, applicationIds),
-                null
+                null,
+                new AgentConfigRequest
+                        .Builder()
+                        .withArchivingDisabled(true)
+                        .withInteractive(true)
+                        .withTimeoutRequested(timeout)
+                        .build()
         )
 
         when:

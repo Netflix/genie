@@ -203,8 +203,8 @@ public class JobSpecificationServiceImpl implements JobSpecificationService {
                 new JobSpecification.ExecutionResource(command.getId(), command.getResources()),
                 applicationResources,
                 this.generateEnvironmentVariables(id, jobRequest, cluster, command),
-                jobRequest.isInteractive(),
-                jobRequest.getRequestedJobDirectoryLocation().orElse(DEFAULT_JOB_DIRECTORY)
+                jobRequest.getRequestedAgentConfig().isInteractive(),
+                jobRequest.getRequestedAgentConfig().getRequestedJobDirectoryLocation().orElse(DEFAULT_JOB_DIRECTORY)
             );
 
             MetricsUtils.addSuccessTags(tags);
@@ -498,7 +498,7 @@ public class JobSpecificationServiceImpl implements JobSpecificationService {
             .withId(id)
             .withApplications(jobRequest.getCriteria().getApplicationIds())
             .withCommandArgs(jobRequest.getCommandArgs())
-            .withDisableLogArchival(jobRequest.isArchivingDisabled())
+            .withDisableLogArchival(jobRequest.getRequestedAgentConfig().isArchivingDisabled())
             .withTags(jobRequest.getMetadata().getTags());
 
         final JobMetadata metadata = jobRequest.getMetadata();
@@ -514,7 +514,7 @@ public class JobSpecificationServiceImpl implements JobSpecificationService {
         v3Builder.withDependencies(jobResources.getDependencies());
         jobResources.getSetupFile().ifPresent(v3Builder::withSetupFile);
 
-        jobRequest.getTimeout().ifPresent(v3Builder::withTimeout);
+        jobRequest.getRequestedAgentConfig().getTimeoutRequested().ifPresent(v3Builder::withTimeout);
 
         return v3Builder.build();
     }

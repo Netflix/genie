@@ -18,6 +18,7 @@
 
 package com.netflix.genie.agent.cli;
 
+import com.netflix.genie.common.internal.dto.v4.AgentConfigRequest;
 import com.netflix.genie.common.internal.dto.v4.AgentJobRequest;
 import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria;
 import com.netflix.genie.common.internal.dto.v4.JobMetadata;
@@ -87,19 +88,24 @@ public class JobRequestConverter {
             .withTags(jobRequestArguments.getJobTags())
             .build();
 
+        final AgentConfigRequest requestedAgentConfig = new AgentConfigRequest
+            .Builder()
+            .withRequestedJobDirectoryLocation(jobRequestArguments.getJobDirectoryLocation())
+            .withTimeoutRequested(jobRequestArguments.getTimeout())
+            .withArchivingDisabled(jobRequestArguments.isArchivalDisabled())
+            .withInteractive(jobRequestArguments.isInteractive())
+            .build();
+
         final AgentJobRequest agentJobRequest = new AgentJobRequest.Builder(
             jobMetadataBuilder.build(),
             criteria,
-            jobRequestArguments.getJobDirectoryLocation().getAbsolutePath()
+            requestedAgentConfig
         )
             .withCommandArgs(jobRequestArguments.getCommandArguments())
-            .withInteractive(jobRequestArguments.isInteractive())
-            .withArchivingDisabled(jobRequestArguments.isArchivalDisabled())
-            .withTimeout(jobRequestArguments.getTimeout())
             .withRequestedId(jobRequestArguments.getJobId())
             .build();
 
-        final Set<ConstraintViolation<AgentJobRequest>> violations = validator.validate(agentJobRequest);
+        final Set<ConstraintViolation<AgentJobRequest>> violations = this.validator.validate(agentJobRequest);
 
         if (!violations.isEmpty()) {
             throw new ConversionException(violations);
