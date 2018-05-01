@@ -87,12 +87,12 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
 //            : request.getId();
 //        try {
 //            final ExecutionResourceCriteria criteria
-//                = JobSpecificationServiceConverter.toExecutionResourceCriteriaDTO(request);
+//                = JobServiceProtoConverter.toExecutionResourceCriteriaDTO(request);
 //            final JobSpecification jobSpec = this.jobSpecificationService.resolveJobSpecification(id, criteria);
-//            responseObserver.onNext(JobSpecificationServiceConverter.toProtoJobSpecificationResponse(jobSpec));
+//            responseObserver.onNext(JobServiceProtoConverter.toProtoJobSpecificationResponse(jobSpec));
 //        } catch (final Throwable t) {
 //            log.error(t.getMessage(), t);
-//            responseObserver.onNext(JobSpecificationServiceConverter.toProtoJobSpecificationResponse(t));
+//            responseObserver.onNext(JobServiceProtoConverter.toProtoJobSpecificationResponse(t));
 //        }
 //        responseObserver.onCompleted();
     }

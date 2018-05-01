@@ -50,12 +50,12 @@ import java.util.stream.Collectors;
  * @see com.netflix.genie.proto
  * @since 4.0.0
  */
-public final class JobSpecificationServiceConverter {
+public final class JobServiceProtoConverter {
 
     /**
      * Utility class shouldn't be constructed.
      */
-    private JobSpecificationServiceConverter() {
+    private JobServiceProtoConverter() {
     }
 
 //    /**
@@ -227,7 +227,7 @@ public final class JobSpecificationServiceConverter {
             protoSpec
                 .getApplicationsList()
                 .stream()
-                .map(JobSpecificationServiceConverter::toExecutionResourceDTO)
+                .map(JobServiceProtoConverter::toExecutionResourceDTO)
                 .collect(Collectors.toList()),
             protoSpec.getEnvironmentVariablesMap(),
             protoSpec.getIsInteractive(),
@@ -249,7 +249,7 @@ public final class JobSpecificationServiceConverter {
             jobSpecification
                 .getApplications()
                 .stream()
-                .map(JobSpecificationServiceConverter::toProtoExecutionResource)
+                .map(JobServiceProtoConverter::toProtoExecutionResource)
                 .collect(Collectors.toList())
         );
         builder.putAllEnvironmentVariables(jobSpecification.getEnvironmentVariables());
@@ -344,7 +344,7 @@ public final class JobSpecificationServiceConverter {
             executionResourceCriteria
                 .getClusterCriteria()
                 .stream()
-                .map(JobSpecificationServiceConverter::toProtoCriterion)
+                .map(JobServiceProtoConverter::toProtoCriterion)
                 .collect(Collectors.toList())
         );
         builder.setCommandCriterion(
