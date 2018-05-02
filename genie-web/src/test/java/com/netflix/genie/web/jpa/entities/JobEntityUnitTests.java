@@ -18,6 +18,7 @@
 package com.netflix.genie.web.jpa.entities;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.test.categories.UnitTest;
@@ -31,6 +32,7 @@ import org.junit.experimental.categories.Category;
 import javax.validation.ConstraintViolationException;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -699,6 +701,107 @@ public class JobEntityUnitTests extends EntityTestsBase {
         final int timeout = 28023423;
         this.jobEntity.setTimeoutRequested(timeout);
         Assert.assertThat(this.jobEntity.getTimeoutRequested().orElseGet(RandomSuppliers.INT), Matchers.is(timeout));
+    }
+
+    /**
+     * Test the setter.
+     */
+    @Test
+    public void canSetRequestedEnvironmentVariables() {
+        Assert.assertThat(this.jobEntity.getRequestedEnvironmentVariables(), Matchers.notNullValue());
+        Assert.assertTrue(this.jobEntity.getRequestedEnvironmentVariables().isEmpty());
+
+        this.jobEntity.setRequestedEnvironmentVariables(null);
+        Assert.assertThat(this.jobEntity.getRequestedEnvironmentVariables(), Matchers.notNullValue());
+        Assert.assertTrue(this.jobEntity.getRequestedEnvironmentVariables().isEmpty());
+
+        final Map<String, String> variables = Maps.newHashMap();
+        variables.put(UUID.randomUUID().toString(), UUID.randomUUID().toString());
+        this.jobEntity.setRequestedEnvironmentVariables(variables);
+        Assert.assertThat(this.jobEntity.getRequestedEnvironmentVariables(), Matchers.is(variables));
+
+        // Make sure outside modifications of collection don't effect internal class state
+        variables.put(UUID.randomUUID().toString(), UUID.randomUUID().toString());
+        Assert.assertThat(this.jobEntity.getRequestedEnvironmentVariables(), Matchers.not(variables));
+
+        this.jobEntity.setRequestedEnvironmentVariables(variables);
+        Assert.assertThat(this.jobEntity.getRequestedEnvironmentVariables(), Matchers.is(variables));
+
+        // Make sure this clears variables
+        this.jobEntity.setRequestedEnvironmentVariables(null);
+        Assert.assertTrue(this.jobEntity.getRequestedEnvironmentVariables().isEmpty());
+    }
+
+    /**
+     * Test the setter.
+     */
+    @Test
+    public void canSetEnvironmentVariables() {
+        Assert.assertThat(this.jobEntity.getEnvironmentVariables(), Matchers.notNullValue());
+        Assert.assertTrue(this.jobEntity.getEnvironmentVariables().isEmpty());
+
+        this.jobEntity.setEnvironmentVariables(null);
+        Assert.assertThat(this.jobEntity.getEnvironmentVariables(), Matchers.notNullValue());
+        Assert.assertTrue(this.jobEntity.getEnvironmentVariables().isEmpty());
+
+        final Map<String, String> variables = Maps.newHashMap();
+        variables.put(UUID.randomUUID().toString(), UUID.randomUUID().toString());
+        this.jobEntity.setEnvironmentVariables(variables);
+        Assert.assertThat(this.jobEntity.getEnvironmentVariables(), Matchers.is(variables));
+
+        // Make sure outside modifications of collection don't effect internal class state
+        variables.put(UUID.randomUUID().toString(), UUID.randomUUID().toString());
+        Assert.assertThat(this.jobEntity.getEnvironmentVariables(), Matchers.not(variables));
+
+        this.jobEntity.setEnvironmentVariables(variables);
+        Assert.assertThat(this.jobEntity.getEnvironmentVariables(), Matchers.is(variables));
+
+        // Make sure this clears variables
+        this.jobEntity.setEnvironmentVariables(null);
+        Assert.assertTrue(this.jobEntity.getEnvironmentVariables().isEmpty());
+    }
+
+    /**
+     * Test setter/getter.
+     */
+    @Test
+    public void canSetInteractive() {
+        Assert.assertFalse(this.jobEntity.isInteractive());
+        this.jobEntity.setInteractive(true);
+        Assert.assertTrue(this.jobEntity.isInteractive());
+    }
+
+    /**
+     * Test setter/getter.
+     */
+    @Test
+    public void canSetRequestedJobDirectoryLocation() {
+        Assert.assertThat(this.jobEntity.getRequestedJobDirectoryLocation(), Matchers.nullValue());
+        final String location = UUID.randomUUID().toString();
+        this.jobEntity.setRequestedJobDirectoryLocation(location);
+        Assert.assertThat(this.jobEntity.getRequestedJobDirectoryLocation(), Matchers.is(location));
+    }
+
+    /**
+     * Test setter/getter.
+     */
+    @Test
+    public void canSetRequestedAgentConfigExt() {
+        Assert.assertThat(this.jobEntity.getRequestedAgentConfigExt(), Matchers.nullValue());
+        final String ext = "{\"" + UUID.randomUUID().toString() + "\": \"" + UUID.randomUUID().toString() + "\"}";
+        this.jobEntity.setRequestedAgentConfigExt(ext);
+        Assert.assertThat(this.jobEntity.getRequestedAgentConfigExt(), Matchers.is(ext));
+    }
+
+    /**
+     * Test setter/getter.
+     */
+    @Test
+    public void canSetRequestedAgentEnvironmentExt() {
+        Assert.assertThat(this.jobEntity.getRequestedAgentEnvironmentExt(), Matchers.nullValue());
+        final String ext = "{\"" + UUID.randomUUID().toString() + "\": \"" + UUID.randomUUID().toString() + "\"}";
+        this.jobEntity.setRequestedAgentEnvironmentExt(ext);
+        Assert.assertThat(this.jobEntity.getRequestedAgentEnvironmentExt(), Matchers.is(ext));
     }
 
     /**
