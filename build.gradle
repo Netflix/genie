@@ -127,7 +127,7 @@ configure(javaProjects) {
             }
             dependency("org.springframework.security.extensions:spring-security-saml2-core:1.0.3.RELEASE")
             dependency("org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:2.0.0.RELEASE")
-            dependencySet(group: "org.springframework.statemachine", version: "2.0.0.RELEASE") {
+            dependencySet(group: "org.springframework.statemachine", version: "2.0.1.RELEASE") {
               entry "spring-statemachine-core"
               entry "spring-statemachine-test"
             }
