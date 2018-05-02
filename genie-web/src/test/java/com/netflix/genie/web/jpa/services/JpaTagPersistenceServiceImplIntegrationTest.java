@@ -20,13 +20,13 @@ package com.netflix.genie.web.jpa.services;
 import com.github.springtestdbunit.annotation.DatabaseTearDown;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.ApplicationStatus;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.internal.dto.v4.ApplicationMetadata;
 import com.netflix.genie.common.internal.dto.v4.ApplicationRequest;
-import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.test.categories.IntegrationTest;
 import com.netflix.genie.web.jpa.entities.TagEntity;
-import com.netflix.genie.web.services.ApplicationService;
-import com.netflix.genie.web.services.TagService;
+import com.netflix.genie.web.services.ApplicationPersistenceService;
+import com.netflix.genie.web.services.TagPersistenceService;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
@@ -38,21 +38,21 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Integration tests for the JpaTagServiceImpl class.
+ * Integration tests for the JpaTagPersistenceServiceImpl class.
  *
  * @author tgianos
  * @since 3.3.0
  */
 @Category(IntegrationTest.class)
 @DatabaseTearDown("cleanup.xml")
-public class JpaTagServiceImplIntegrationTest extends DBUnitTestBase {
+public class JpaTagPersistenceServiceImplIntegrationTest extends DBUnitTestBase {
 
     // This needs to be injected as a Spring Bean otherwise transactions don't work as there is no proxy
     @Autowired
-    private TagService tagService;
+    private TagPersistenceService tagPersistenceService;
 
     @Autowired
-    private ApplicationService applicationService;
+    private ApplicationPersistenceService applicationPersistenceService;
 
     /**
      * Make sure that no matter how many times we try to create a tag it doesn't throw an error on duplicate key it
@@ -62,7 +62,7 @@ public class JpaTagServiceImplIntegrationTest extends DBUnitTestBase {
     public void canCreateTagIfNotExists() {
         Assert.assertThat(this.tagRepository.count(), Matchers.is(0L));
         final String tag = UUID.randomUUID().toString();
-        this.tagService.createTagIfNotExists(tag);
+        this.tagPersistenceService.createTagIfNotExists(tag);
         Assert.assertThat(this.tagRepository.count(), Matchers.is(1L));
         Assert.assertTrue(this.tagRepository.existsByTag(tag));
         final Optional<TagEntity> tagEntityOptional = this.tagRepository.findByTag(tag);
@@ -71,7 +71,7 @@ public class JpaTagServiceImplIntegrationTest extends DBUnitTestBase {
         Assert.assertThat(tagEntity.getTag(), Matchers.is(tag));
 
         // Try again with the same tag
-        this.tagService.createTagIfNotExists(tag);
+        this.tagPersistenceService.createTagIfNotExists(tag);
         Assert.assertThat(this.tagRepository.count(), Matchers.is(1L));
         Assert.assertTrue(this.tagRepository.existsByTag(tag));
         final Optional<TagEntity> tagEntityOptional2 = this.tagRepository.findByTag(tag);
@@ -93,7 +93,7 @@ public class JpaTagServiceImplIntegrationTest extends DBUnitTestBase {
         Assert.assertThat(this.tagRepository.count(), Matchers.is(0L));
         final String tag1 = UUID.randomUUID().toString();
         final String tag2 = UUID.randomUUID().toString();
-        this.tagService.createTagIfNotExists(tag1);
+        this.tagPersistenceService.createTagIfNotExists(tag1);
 
         final ApplicationRequest app = new ApplicationRequest.Builder(
             new ApplicationMetadata.Builder(
@@ -106,12 +106,12 @@ public class JpaTagServiceImplIntegrationTest extends DBUnitTestBase {
                 .build()
         ).build();
 
-        this.applicationService.createApplication(app);
+        this.applicationPersistenceService.createApplication(app);
 
         Assert.assertTrue(this.tagRepository.existsByTag(tag1));
         Assert.assertTrue(this.tagRepository.existsByTag(tag2));
 
-        Assert.assertThat(this.tagService.deleteUnusedTags(Instant.now()), Matchers.is(1L));
+        Assert.assertThat(this.tagPersistenceService.deleteUnusedTags(Instant.now()), Matchers.is(1L));
 
         Assert.assertFalse(this.tagRepository.existsByTag(tag1));
         Assert.assertTrue(this.tagRepository.existsByTag(tag2));

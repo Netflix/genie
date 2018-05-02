@@ -20,15 +20,15 @@ package com.netflix.genie.web.jpa.services;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.ApplicationStatus;
-import com.netflix.genie.common.internal.dto.v4.Application;
-import com.netflix.genie.common.internal.dto.v4.ApplicationMetadata;
-import com.netflix.genie.common.internal.dto.v4.ApplicationRequest;
-import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.internal.dto.v4.Application;
+import com.netflix.genie.common.internal.dto.v4.ApplicationMetadata;
+import com.netflix.genie.common.internal.dto.v4.ApplicationRequest;
+import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.jpa.entities.ApplicationEntity;
 import com.netflix.genie.web.jpa.entities.CommandEntity;
@@ -36,8 +36,8 @@ import com.netflix.genie.web.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.web.jpa.repositories.JpaFileRepository;
 import com.netflix.genie.web.jpa.repositories.JpaTagRepository;
-import com.netflix.genie.web.services.FileService;
-import com.netflix.genie.web.services.TagService;
+import com.netflix.genie.web.services.FilePersistenceService;
+import com.netflix.genie.web.services.TagPersistenceService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -54,7 +54,7 @@ import java.util.UUID;
  * @author tgianos
  */
 @Category(UnitTest.class)
-public class JpaApplicationServiceImplUnitTests {
+public class JpaApplicationPersistenceServiceImplUnitTests {
 
     private static final String APP_1_ID = "app1";
     private static final String APP_1_NAME = "tez";
@@ -62,7 +62,7 @@ public class JpaApplicationServiceImplUnitTests {
     private static final String APP_1_VERSION = "1.2.3";
 
     private JpaApplicationRepository jpaApplicationRepository;
-    private JpaApplicationServiceImpl appService;
+    private JpaApplicationPersistenceServiceImpl appService;
 
     /**
      * Setup the tests.
@@ -70,10 +70,10 @@ public class JpaApplicationServiceImplUnitTests {
     @Before
     public void setup() {
         this.jpaApplicationRepository = Mockito.mock(JpaApplicationRepository.class);
-        this.appService = new JpaApplicationServiceImpl(
-            Mockito.mock(TagService.class),
+        this.appService = new JpaApplicationPersistenceServiceImpl(
+            Mockito.mock(TagPersistenceService.class),
             Mockito.mock(JpaTagRepository.class),
-            Mockito.mock(FileService.class),
+            Mockito.mock(FilePersistenceService.class),
             Mockito.mock(JpaFileRepository.class),
             this.jpaApplicationRepository,
             Mockito.mock(JpaCommandRepository.class)

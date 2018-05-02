@@ -20,14 +20,14 @@ package com.netflix.genie.web.jpa.services;
 import com.github.springtestdbunit.annotation.DatabaseTearDown;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.ApplicationStatus;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.internal.dto.v4.ApplicationMetadata;
 import com.netflix.genie.common.internal.dto.v4.ApplicationRequest;
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
-import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.test.categories.IntegrationTest;
 import com.netflix.genie.web.jpa.entities.FileEntity;
-import com.netflix.genie.web.services.ApplicationService;
-import com.netflix.genie.web.services.FileService;
+import com.netflix.genie.web.services.ApplicationPersistenceService;
+import com.netflix.genie.web.services.FilePersistenceService;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
@@ -39,21 +39,21 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Integration tests for the JpaFileServiceImpl class.
+ * Integration tests for the JpaFilePersistenceServiceImpl class.
  *
  * @author tgianos
  * @since 3.3.0
  */
 @Category(IntegrationTest.class)
 @DatabaseTearDown("cleanup.xml")
-public class JpaFileServiceImplIntegrationTest extends DBUnitTestBase {
+public class JpaFilePersistenceServiceImplIntegrationTest extends DBUnitTestBase {
 
     // This needs to be injected as a Spring Bean otherwise transactions don't work as there is no proxy
     @Autowired
-    private FileService fileService;
+    private FilePersistenceService filePersistenceService;
 
     @Autowired
-    private ApplicationService applicationService;
+    private ApplicationPersistenceService applicationPersistenceService;
 
     /**
      * Make sure that no matter how many times we try to create a file it doesn't throw an error on duplicate key it
@@ -63,7 +63,7 @@ public class JpaFileServiceImplIntegrationTest extends DBUnitTestBase {
     public void canCreateFileIfNotExists() {
         Assert.assertThat(this.fileRepository.count(), Matchers.is(0L));
         final String file = UUID.randomUUID().toString();
-        this.fileService.createFileIfNotExists(file);
+        this.filePersistenceService.createFileIfNotExists(file);
         Assert.assertThat(this.fileRepository.count(), Matchers.is(1L));
         Assert.assertTrue(this.fileRepository.existsByFile(file));
         final Optional<FileEntity> fileEntityOptional = this.fileRepository.findByFile(file);
@@ -72,7 +72,7 @@ public class JpaFileServiceImplIntegrationTest extends DBUnitTestBase {
         Assert.assertThat(fileEntity.getFile(), Matchers.is(file));
 
         // Try again with the same file
-        this.fileService.createFileIfNotExists(file);
+        this.filePersistenceService.createFileIfNotExists(file);
         Assert.assertThat(this.fileRepository.count(), Matchers.is(1L));
         Assert.assertTrue(this.fileRepository.existsByFile(file));
         final Optional<FileEntity> fileEntityOptional2 = this.fileRepository.findByFile(file);
@@ -98,8 +98,8 @@ public class JpaFileServiceImplIntegrationTest extends DBUnitTestBase {
         final String file4 = UUID.randomUUID().toString();
         final String file5 = UUID.randomUUID().toString();
 
-        this.fileService.createFileIfNotExists(file1);
-        this.fileService.createFileIfNotExists(file4);
+        this.filePersistenceService.createFileIfNotExists(file1);
+        this.filePersistenceService.createFileIfNotExists(file4);
 
         final ApplicationRequest app = new ApplicationRequest.Builder(
             new ApplicationMetadata.Builder(
@@ -117,7 +117,7 @@ public class JpaFileServiceImplIntegrationTest extends DBUnitTestBase {
             )
             .build();
 
-        final String appId = this.applicationService.createApplication(app);
+        final String appId = this.applicationPersistenceService.createApplication(app);
 
         Assert.assertTrue(this.fileRepository.existsByFile(file1));
         Assert.assertTrue(this.fileRepository.existsByFile(file2));
@@ -125,7 +125,7 @@ public class JpaFileServiceImplIntegrationTest extends DBUnitTestBase {
         Assert.assertTrue(this.fileRepository.existsByFile(file4));
         Assert.assertTrue(this.fileRepository.existsByFile(file5));
 
-        Assert.assertThat(this.fileService.deleteUnusedFiles(Instant.now()), Matchers.is(2L));
+        Assert.assertThat(this.filePersistenceService.deleteUnusedFiles(Instant.now()), Matchers.is(2L));
 
         Assert.assertFalse(this.fileRepository.existsByFile(file1));
         Assert.assertTrue(this.fileRepository.existsByFile(file2));
@@ -133,6 +133,6 @@ public class JpaFileServiceImplIntegrationTest extends DBUnitTestBase {
         Assert.assertFalse(this.fileRepository.existsByFile(file4));
         Assert.assertTrue(this.fileRepository.existsByFile(file5));
 
-        this.applicationService.deleteApplication(appId);
+        this.applicationPersistenceService.deleteApplication(appId);
     }
 }

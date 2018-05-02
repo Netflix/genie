@@ -22,17 +22,17 @@ import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseTearDown;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.ApplicationStatus;
+import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.internal.dto.v4.Application;
 import com.netflix.genie.common.internal.dto.v4.ApplicationMetadata;
 import com.netflix.genie.common.internal.dto.v4.ApplicationRequest;
 import com.netflix.genie.common.internal.dto.v4.Command;
-import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.test.categories.IntegrationTest;
 import com.netflix.genie.test.suppliers.RandomSuppliers;
-import com.netflix.genie.web.services.ApplicationService;
-import com.netflix.genie.web.services.CommandService;
+import com.netflix.genie.web.services.ApplicationPersistenceService;
+import com.netflix.genie.web.services.CommandPersistenceService;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
@@ -51,15 +51,15 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Integration tests for the JpaApplicationServiceImpl.
+ * Integration tests for the JpaApplicationPersistenceServiceImpl.
  *
  * @author tgianos
  * @since 2.0.0
  */
 @Category(IntegrationTest.class)
-@DatabaseSetup("JpaApplicationServiceImplIntegrationTests/init.xml")
+@DatabaseSetup("JpaApplicationPersistenceServiceImplIntegrationTests/init.xml")
 @DatabaseTearDown("cleanup.xml")
-public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
+public class JpaApplicationPersistenceServiceImplIntegrationTests extends DBUnitTestBase {
 
     private static final String APP_1_ID = "app1";
     private static final String APP_1_NAME = "tez";
@@ -86,10 +86,10 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
     private static final Pageable PAGEABLE = PageRequest.of(0, 10, Sort.Direction.DESC, "updated");
 
     @Autowired
-    private ApplicationService appService;
+    private ApplicationPersistenceService appService;
 
     @Autowired
-    private CommandService commandService;
+    private CommandPersistenceService commandPersistenceService;
 
     /**
      * Test the get application method.
@@ -457,7 +457,7 @@ public class JpaApplicationServiceImplIntegrationTests extends DBUnitTestBase {
             this.appService.getApplications(null, null, null, null, null, PAGEABLE).getNumberOfElements()
         );
         // To solve referential integrity problem
-        this.commandService.deleteCommand(COMMAND_1_ID);
+        this.commandPersistenceService.deleteCommand(COMMAND_1_ID);
         this.appService.deleteAllApplications();
         Assert.assertTrue(
             this.appService.getApplications(null, null, null, null, null, PAGEABLE).getNumberOfElements() == 0

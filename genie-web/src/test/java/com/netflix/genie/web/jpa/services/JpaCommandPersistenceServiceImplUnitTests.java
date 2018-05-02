@@ -20,15 +20,15 @@ package com.netflix.genie.web.jpa.services;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.CommandStatus;
-import com.netflix.genie.common.internal.dto.v4.Command;
-import com.netflix.genie.common.internal.dto.v4.CommandMetadata;
-import com.netflix.genie.common.internal.dto.v4.CommandRequest;
-import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.internal.dto.v4.Command;
+import com.netflix.genie.common.internal.dto.v4.CommandMetadata;
+import com.netflix.genie.common.internal.dto.v4.CommandRequest;
+import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.jpa.entities.ApplicationEntity;
 import com.netflix.genie.web.jpa.entities.CommandEntity;
@@ -37,8 +37,8 @@ import com.netflix.genie.web.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.web.jpa.repositories.JpaFileRepository;
 import com.netflix.genie.web.jpa.repositories.JpaTagRepository;
-import com.netflix.genie.web.services.FileService;
-import com.netflix.genie.web.services.TagService;
+import com.netflix.genie.web.services.FilePersistenceService;
+import com.netflix.genie.web.services.TagPersistenceService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -57,7 +57,7 @@ import java.util.UUID;
  * @since 2.0.0
  */
 @Category(UnitTest.class)
-public class JpaCommandServiceImplUnitTests {
+public class JpaCommandPersistenceServiceImplUnitTests {
 
     private static final String COMMAND_1_ID = "command1";
     private static final String COMMAND_1_NAME = "pig_13_prod";
@@ -68,7 +68,7 @@ public class JpaCommandServiceImplUnitTests {
 
     private static final String COMMAND_2_ID = "command2";
 
-    private JpaCommandServiceImpl service;
+    private JpaCommandPersistenceServiceImpl service;
     private JpaCommandRepository jpaCommandRepository;
     private JpaApplicationRepository jpaApplicationRepository;
 
@@ -79,10 +79,10 @@ public class JpaCommandServiceImplUnitTests {
     public void setup() {
         this.jpaCommandRepository = Mockito.mock(JpaCommandRepository.class);
         this.jpaApplicationRepository = Mockito.mock(JpaApplicationRepository.class);
-        this.service = new JpaCommandServiceImpl(
-            Mockito.mock(TagService.class),
+        this.service = new JpaCommandPersistenceServiceImpl(
+            Mockito.mock(TagPersistenceService.class),
             Mockito.mock(JpaTagRepository.class),
-            Mockito.mock(FileService.class),
+            Mockito.mock(FilePersistenceService.class),
             Mockito.mock(JpaFileRepository.class),
             this.jpaCommandRepository,
             this.jpaApplicationRepository,

@@ -23,16 +23,16 @@ import com.github.springtestdbunit.annotation.DatabaseTearDown;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.CommandStatus;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.internal.dto.v4.Cluster;
 import com.netflix.genie.common.internal.dto.v4.Command;
 import com.netflix.genie.common.internal.dto.v4.CommandMetadata;
 import com.netflix.genie.common.internal.dto.v4.CommandRequest;
-import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.test.categories.IntegrationTest;
-import com.netflix.genie.web.services.ApplicationService;
-import com.netflix.genie.web.services.ClusterService;
-import com.netflix.genie.web.services.CommandService;
+import com.netflix.genie.web.services.ApplicationPersistenceService;
+import com.netflix.genie.web.services.ClusterPersistenceService;
+import com.netflix.genie.web.services.CommandPersistenceService;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
@@ -58,9 +58,9 @@ import java.util.UUID;
  * @author tgianos
  */
 @Category(IntegrationTest.class)
-@DatabaseSetup("JpaCommandServiceImplIntegrationTests/init.xml")
+@DatabaseSetup("JpaCommandPersistenceServiceImplIntegrationTests/init.xml")
 @DatabaseTearDown("cleanup.xml")
-public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
+public class JpaCommandPersistenceServiceImplIntegrationTests extends DBUnitTestBase {
 
     private static final String APP_1_ID = "app1";
     private static final String CLUSTER_1_ID = "cluster1";
@@ -90,13 +90,13 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
     private static final Pageable PAGE = PageRequest.of(0, 10, Sort.Direction.DESC, "updated");
 
     @Autowired
-    private CommandService service;
+    private CommandPersistenceService service;
 
     @Autowired
-    private ClusterService clusterService;
+    private ClusterPersistenceService clusterPersistenceService;
 
     @Autowired
-    private ApplicationService appService;
+    private ApplicationPersistenceService appService;
 
     /**
      * Test the get command method.
@@ -498,7 +498,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void testDelete() throws GenieException {
-        List<Command> commands = this.clusterService.getCommandsForCluster(CLUSTER_1_ID, null);
+        List<Command> commands = this.clusterPersistenceService.getCommandsForCluster(CLUSTER_1_ID, null);
         Assert.assertEquals(3, commands.size());
         boolean found = false;
         for (final Command command : commands) {
@@ -524,7 +524,7 @@ public class JpaCommandServiceImplIntegrationTests extends DBUnitTestBase {
         //Actually delete it
         this.service.deleteCommand(COMMAND_1_ID);
 
-        commands = this.clusterService.getCommandsForCluster(CLUSTER_1_ID, null);
+        commands = this.clusterPersistenceService.getCommandsForCluster(CLUSTER_1_ID, null);
         Assert.assertEquals(2, commands.size());
         found = false;
         for (final Command command : commands) {

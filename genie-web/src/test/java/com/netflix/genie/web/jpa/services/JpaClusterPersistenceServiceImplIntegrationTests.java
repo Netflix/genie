@@ -26,6 +26,7 @@ import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.dto.JobRequest;
+import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.internal.dto.v4.Cluster;
 import com.netflix.genie.common.internal.dto.v4.ClusterMetadata;
 import com.netflix.genie.common.internal.dto.v4.ClusterRequest;
@@ -34,11 +35,10 @@ import com.netflix.genie.common.internal.dto.v4.CommandMetadata;
 import com.netflix.genie.common.internal.dto.v4.CommandRequest;
 import com.netflix.genie.common.internal.dto.v4.Criterion;
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
-import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.test.categories.IntegrationTest;
-import com.netflix.genie.web.services.ClusterService;
-import com.netflix.genie.web.services.CommandService;
+import com.netflix.genie.web.services.ClusterPersistenceService;
+import com.netflix.genie.web.services.CommandPersistenceService;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
@@ -70,9 +70,9 @@ import java.util.UUID;
  * @since 2.0.0
  */
 @Category(IntegrationTest.class)
-@DatabaseSetup("JpaClusterServiceImplIntegrationTests/init.xml")
+@DatabaseSetup("JpaClusterPersistenceServiceImplIntegrationTests/init.xml")
 @DatabaseTearDown("cleanup.xml")
-public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
+public class JpaClusterPersistenceServiceImplIntegrationTests extends DBUnitTestBase {
 
     private static final String COMMAND_1_ID = "command1";
     private static final String COMMAND_2_ID = "command2";
@@ -94,10 +94,10 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
     private static final Pageable PAGE = PageRequest.of(0, 10, Sort.Direction.DESC, "updated");
 
     @Autowired
-    private ClusterService service;
+    private ClusterPersistenceService service;
 
     @Autowired
-    private CommandService commandService;
+    private CommandPersistenceService commandPersistenceService;
 
     /**
      * Test the get cluster method.
@@ -764,29 +764,29 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void testDelete() throws GenieException {
-        Assert.assertEquals(2, this.commandService.getClustersForCommand(COMMAND_1_ID, null).size());
-        Assert.assertEquals(2, this.commandService.getClustersForCommand(COMMAND_2_ID, null).size());
-        Assert.assertEquals(2, this.commandService.getClustersForCommand(COMMAND_3_ID, null).size());
+        Assert.assertEquals(2, this.commandPersistenceService.getClustersForCommand(COMMAND_1_ID, null).size());
+        Assert.assertEquals(2, this.commandPersistenceService.getClustersForCommand(COMMAND_2_ID, null).size());
+        Assert.assertEquals(2, this.commandPersistenceService.getClustersForCommand(COMMAND_3_ID, null).size());
 
         this.service.deleteCluster(CLUSTER_1_ID);
 
-        Assert.assertEquals(1, this.commandService.getClustersForCommand(COMMAND_1_ID, null).size());
+        Assert.assertEquals(1, this.commandPersistenceService.getClustersForCommand(COMMAND_1_ID, null).size());
         Assert.assertEquals(1,
-            this.commandService.getClustersForCommand(COMMAND_1_ID, null)
+            this.commandPersistenceService.getClustersForCommand(COMMAND_1_ID, null)
                 .stream()
                 .filter(cluster -> CLUSTER_2_ID.equals(cluster.getId()))
                 .count()
         );
-        Assert.assertEquals(1, this.commandService.getClustersForCommand(COMMAND_2_ID, null).size());
+        Assert.assertEquals(1, this.commandPersistenceService.getClustersForCommand(COMMAND_2_ID, null).size());
         Assert.assertEquals(1,
-            this.commandService.getClustersForCommand(COMMAND_2_ID, null)
+            this.commandPersistenceService.getClustersForCommand(COMMAND_2_ID, null)
                 .stream()
                 .filter(cluster -> CLUSTER_2_ID.equals(cluster.getId()))
                 .count()
         );
-        Assert.assertEquals(1, this.commandService.getClustersForCommand(COMMAND_3_ID, null).size());
+        Assert.assertEquals(1, this.commandPersistenceService.getClustersForCommand(COMMAND_3_ID, null).size());
         Assert.assertEquals(1,
-            this.commandService.getClustersForCommand(COMMAND_3_ID, null)
+            this.commandPersistenceService.getClustersForCommand(COMMAND_3_ID, null)
                 .stream()
                 .filter(cluster -> CLUSTER_2_ID.equals(cluster.getId()))
                 .count()
@@ -910,7 +910,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void testAddCommandsForCluster() throws GenieException {
-        final String command1Id = this.commandService.createCommand(
+        final String command1Id = this.commandPersistenceService.createCommand(
             new CommandRequest.Builder(
                 new CommandMetadata.Builder(
                     "name",
@@ -924,7 +924,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
                 .withCheckDelay(8108123L)
                 .build()
         );
-        final String command2Id = this.commandService.createCommand(
+        final String command2Id = this.commandPersistenceService.createCommand(
             new CommandRequest.Builder(
                 new CommandMetadata.Builder(
                     "name2",
@@ -981,7 +981,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void testUpdateCommandsForCluster() throws GenieException {
-        final String command1Id = this.commandService.createCommand(
+        final String command1Id = this.commandPersistenceService.createCommand(
             new CommandRequest.Builder(
                 new CommandMetadata.Builder(
                     "name",
@@ -995,7 +995,7 @@ public class JpaClusterServiceImplIntegrationTests extends DBUnitTestBase {
                 .withCheckDelay(137324L)
                 .build()
         );
-        final String command2Id = this.commandService.createCommand(
+        final String command2Id = this.commandPersistenceService.createCommand(
             new CommandRequest.Builder(
                 new CommandMetadata.Builder(
                     "name2",

@@ -17,13 +17,13 @@
  */
 package com.netflix.genie.web.tasks.leader;
 
-import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.common.internal.jobs.JobConstants;
+import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.properties.DatabaseCleanupProperties;
-import com.netflix.genie.web.services.ClusterService;
-import com.netflix.genie.web.services.FileService;
+import com.netflix.genie.web.services.ClusterPersistenceService;
+import com.netflix.genie.web.services.FilePersistenceService;
 import com.netflix.genie.web.services.JobPersistenceService;
-import com.netflix.genie.web.services.TagService;
+import com.netflix.genie.web.services.TagPersistenceService;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.hamcrest.Matchers;
@@ -49,9 +49,9 @@ public class DatabaseCleanupTaskUnitTests {
 
     private DatabaseCleanupProperties cleanupProperties;
     private JobPersistenceService jobPersistenceService;
-    private ClusterService clusterService;
-    private FileService fileService;
-    private TagService tagService;
+    private ClusterPersistenceService clusterPersistenceService;
+    private FilePersistenceService filePersistenceService;
+    private TagPersistenceService tagPersistenceService;
     private DatabaseCleanupTask task;
 
     /**
@@ -61,15 +61,15 @@ public class DatabaseCleanupTaskUnitTests {
     public void setup() {
         this.cleanupProperties = Mockito.mock(DatabaseCleanupProperties.class);
         this.jobPersistenceService = Mockito.mock(JobPersistenceService.class);
-        this.clusterService = Mockito.mock(ClusterService.class);
-        this.fileService = Mockito.mock(FileService.class);
-        this.tagService = Mockito.mock(TagService.class);
+        this.clusterPersistenceService = Mockito.mock(ClusterPersistenceService.class);
+        this.filePersistenceService = Mockito.mock(FilePersistenceService.class);
+        this.tagPersistenceService = Mockito.mock(TagPersistenceService.class);
         this.task = new DatabaseCleanupTask(
             this.cleanupProperties,
             this.jobPersistenceService,
-            this.clusterService,
-            this.fileService,
-            this.tagService,
+            this.clusterPersistenceService,
+            this.filePersistenceService,
+            this.tagPersistenceService,
             new SimpleMeterRegistry()
         );
     }
@@ -123,9 +123,9 @@ public class DatabaseCleanupTaskUnitTests {
             .thenReturn(deletedCount3)
             .thenReturn(0L);
 
-        Mockito.when(this.clusterService.deleteTerminatedClusters()).thenReturn(1L, 2L);
-        Mockito.when(this.fileService.deleteUnusedFiles(Mockito.any(Instant.class))).thenReturn(3L, 4L);
-        Mockito.when(this.tagService.deleteUnusedTags(Mockito.any(Instant.class))).thenReturn(5L, 6L);
+        Mockito.when(this.clusterPersistenceService.deleteTerminatedClusters()).thenReturn(1L, 2L);
+        Mockito.when(this.filePersistenceService.deleteUnusedFiles(Mockito.any(Instant.class))).thenReturn(3L, 4L);
+        Mockito.when(this.tagPersistenceService.deleteUnusedTags(Mockito.any(Instant.class))).thenReturn(5L, 6L);
 
         // The multiple calendar instances are to protect against running this test when the day flips
         final Calendar before = Calendar.getInstance(JobConstants.UTC);
@@ -145,12 +145,12 @@ public class DatabaseCleanupTaskUnitTests {
             date.add(Calendar.DAY_OF_YEAR, negativeDays);
             Assert.assertThat(argument.getAllValues().get(0).toEpochMilli(), Matchers.is(date.getTime().getTime()));
             Assert.assertThat(argument.getAllValues().get(1).toEpochMilli(), Matchers.is(date.getTime().getTime()));
-            Mockito.verify(this.clusterService, Mockito.times(2)).deleteTerminatedClusters();
+            Mockito.verify(this.clusterPersistenceService, Mockito.times(2)).deleteTerminatedClusters();
             Mockito
-                .verify(this.fileService, Mockito.times(2))
+                .verify(this.filePersistenceService, Mockito.times(2))
                 .deleteUnusedFiles(Mockito.any(Instant.class));
             Mockito
-                .verify(this.tagService, Mockito.times(2))
+                .verify(this.tagPersistenceService, Mockito.times(2))
                 .deleteUnusedTags(Mockito.any(Instant.class));
         }
     }
@@ -203,13 +203,13 @@ public class DatabaseCleanupTaskUnitTests {
                 Mockito.anyInt()
             );
         Mockito
-            .verify(this.clusterService, Mockito.never())
+            .verify(this.clusterPersistenceService, Mockito.never())
             .deleteTerminatedClusters();
         Mockito
-            .verify(this.fileService, Mockito.never())
+            .verify(this.filePersistenceService, Mockito.never())
             .deleteUnusedFiles(Mockito.any(Instant.class));
         Mockito
-            .verify(this.tagService, Mockito.never())
+            .verify(this.tagPersistenceService, Mockito.never())
             .deleteUnusedTags(Mockito.any(Instant.class));
     }
 }

@@ -48,7 +48,7 @@ import java.util.Set;
  * @author tgianos
  */
 @Validated
-public interface ClusterService {
+public interface ClusterPersistenceService {
 
     /**
      * Create new cluster configuration.

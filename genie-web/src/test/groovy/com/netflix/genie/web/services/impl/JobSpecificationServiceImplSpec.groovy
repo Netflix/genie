@@ -36,10 +36,10 @@ import com.netflix.genie.common.internal.jobs.JobConstants
 import com.netflix.genie.common.util.GenieObjectMapper
 import com.netflix.genie.test.categories.UnitTest
 import com.netflix.genie.web.properties.JobsProperties
-import com.netflix.genie.web.services.ApplicationService
+import com.netflix.genie.web.services.ApplicationPersistenceService
 import com.netflix.genie.web.services.ClusterLoadBalancer
-import com.netflix.genie.web.services.ClusterService
-import com.netflix.genie.web.services.CommandService
+import com.netflix.genie.web.services.ClusterPersistenceService
+import com.netflix.genie.web.services.CommandPersistenceService
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import org.apache.commons.lang3.StringUtils
@@ -146,14 +146,14 @@ class JobSpecificationServiceImplSpec extends Specification {
         Map<Cluster, String> clusterCommandMap = Maps.newHashMap()
         clusterCommandMap.put(cluster1, commandId)
         clusterCommandMap.put(cluster2, commandId)
-        def clusterService = Mock(ClusterService) {
+        def clusterService = Mock(ClusterPersistenceService) {
             1 * findClustersAndCommandsForCriteria(clusterCriteria, commandCriterion) >> clusterCommandMap
         }
         def loadBalancer = Mock(ClusterLoadBalancer) {
             1 * selectCluster(clusters, _ as com.netflix.genie.common.dto.JobRequest) >> cluster1
         }
-        def applicationService = Mock(ApplicationService)
-        def commandService = Mock(CommandService) {
+        def applicationService = Mock(ApplicationPersistenceService)
+        def commandService = Mock(CommandPersistenceService) {
             1 * getCommand(commandId) >> command
             1 * getApplicationsForCommand(commandId) >> Lists.newArrayList()
         }
@@ -181,9 +181,9 @@ class JobSpecificationServiceImplSpec extends Specification {
 
     def "Can convert tags to string"() {
         def service = new JobSpecificationServiceImpl(
-                Mock(ApplicationService),
-                Mock(ClusterService),
-                Mock(CommandService),
+                Mock(ApplicationPersistenceService),
+                Mock(ClusterPersistenceService),
+                Mock(CommandPersistenceService),
                 Lists.newArrayList(),
                 Mock(MeterRegistry),
                 new JobsProperties()
@@ -208,9 +208,9 @@ class JobSpecificationServiceImplSpec extends Specification {
     def "Can generate correct environment variables"() {
         def jobsProperties = new JobsProperties()
         def service = new JobSpecificationServiceImpl(
-                Mock(ApplicationService),
-                Mock(ClusterService),
-                Mock(CommandService),
+                Mock(ApplicationPersistenceService),
+                Mock(ClusterPersistenceService),
+                Mock(CommandPersistenceService),
                 Lists.newArrayList(),
                 Mock(MeterRegistry),
                 jobsProperties
@@ -298,9 +298,9 @@ class JobSpecificationServiceImplSpec extends Specification {
     def "Can convert V4 Criterion to V3 tags"() {
         def jobsProperties = new JobsProperties()
         def service = new JobSpecificationServiceImpl(
-                Mock(ApplicationService),
-                Mock(ClusterService),
-                Mock(CommandService),
+                Mock(ApplicationPersistenceService),
+                Mock(ClusterPersistenceService),
+                Mock(CommandPersistenceService),
                 Lists.newArrayList(),
                 Mock(MeterRegistry),
                 jobsProperties
@@ -378,9 +378,9 @@ class JobSpecificationServiceImplSpec extends Specification {
 
         def jobsProperties = new JobsProperties()
         def service = new JobSpecificationServiceImpl(
-                Mock(ApplicationService),
-                Mock(ClusterService),
-                Mock(CommandService),
+                Mock(ApplicationPersistenceService),
+                Mock(ClusterPersistenceService),
+                Mock(CommandPersistenceService),
                 Lists.newArrayList(),
                 Mock(MeterRegistry),
                 jobsProperties
