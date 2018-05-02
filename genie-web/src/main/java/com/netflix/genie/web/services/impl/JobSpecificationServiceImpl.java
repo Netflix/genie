@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.web.services.impl;
 
-import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -211,7 +210,7 @@ public class JobSpecificationServiceImpl implements JobSpecificationService {
             return jobSpecification;
         } catch (final Throwable t) {
             MetricsUtils.addFailureTagsWithException(tags, t);
-            throw Throwables.propagate(t);
+            throw new RuntimeException(t);
         } finally {
             this.registry
                 .timer(RESOLVE_JOB_SPECIFICATION_TIMER, tags)
