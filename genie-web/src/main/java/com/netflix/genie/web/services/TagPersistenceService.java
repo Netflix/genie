@@ -30,7 +30,7 @@ import java.time.Instant;
  * @since 3.3.0
  */
 @Validated
-public interface TagService {
+public interface TagPersistenceService {
 
     /**
      * Attempt to create a tag in the system if it doesn't already exist.

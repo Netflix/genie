@@ -17,9 +17,9 @@
  */
 package com.netflix.genie.web.jpa.services;
 
-import com.netflix.genie.web.jpa.entities.FileEntity;
-import com.netflix.genie.web.jpa.repositories.JpaFileRepository;
-import com.netflix.genie.web.services.FileService;
+import com.netflix.genie.web.jpa.entities.TagEntity;
+import com.netflix.genie.web.jpa.repositories.JpaTagRepository;
+import com.netflix.genie.web.services.TagPersistenceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,43 +30,40 @@ import java.time.Instant;
 import java.util.stream.Collectors;
 
 /**
- * JPA based implementation of the FileService interface.
+ * JPA based implementation of the TagPersistenceService interface.
  *
  * @author tgianos
  * @since 3.3.0
  */
 @Slf4j
 @Transactional
-public class JpaFileServiceImpl implements FileService {
+public class JpaTagPersistenceServiceImpl implements TagPersistenceService {
 
-    private final JpaFileRepository fileRepository;
+    private final JpaTagRepository tagRepository;
 
     /**
      * Constructor.
      *
-     * @param fileRepository The repository to use to perform CRUD operations on files
+     * @param tagRepository The repository to use to perform CRUD operations on tags
      */
-    public JpaFileServiceImpl(final JpaFileRepository fileRepository) {
-        this.fileRepository = fileRepository;
+    public JpaTagPersistenceServiceImpl(final JpaTagRepository tagRepository) {
+        this.tagRepository = tagRepository;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void createFileIfNotExists(@NotBlank(message = "File path cannot be blank") final String file) {
-        if (this.fileRepository.existsByFile(file)) {
+    public void createTagIfNotExists(@NotBlank(message = "Tag cannot be blank") final String tag) {
+        if (this.tagRepository.existsByTag(tag)) {
             return;
         }
 
-        // Try to create the file
-        final FileEntity fileEntity = new FileEntity(file);
-
         try {
-            this.fileRepository.saveAndFlush(fileEntity);
+            this.tagRepository.saveAndFlush(new TagEntity(tag));
         } catch (final DataIntegrityViolationException e) {
             // Must've been created during the time between exists query and now
-            log.error("File expected not to be there but seems to be {}", e.getMessage(), e);
+            log.error("Tag expected not to be there but seems to be {}", e.getMessage(), e);
         }
     }
 
@@ -74,10 +71,10 @@ public class JpaFileServiceImpl implements FileService {
      * {@inheritDoc}
      */
     @Override
-    public long deleteUnusedFiles(@NotNull final Instant createdThreshold) {
-        return this.fileRepository.deleteByIdIn(
-            this.fileRepository
-                .findUnusedFiles(createdThreshold)
+    public long deleteUnusedTags(@NotNull final Instant createdThreshold) {
+        return this.tagRepository.deleteByIdIn(
+            this.tagRepository
+                .findUnusedTags(createdThreshold)
                 .stream()
                 .map(Number::longValue)
                 .collect(Collectors.toSet())

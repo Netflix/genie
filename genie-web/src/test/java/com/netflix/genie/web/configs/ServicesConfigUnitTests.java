@@ -29,16 +29,16 @@ import com.netflix.genie.web.jpa.repositories.JpaFileRepository;
 import com.netflix.genie.web.jpa.repositories.JpaJobRepository;
 import com.netflix.genie.web.jpa.repositories.JpaTagRepository;
 import com.netflix.genie.web.properties.JobsProperties;
-import com.netflix.genie.web.services.ApplicationService;
-import com.netflix.genie.web.services.ClusterService;
-import com.netflix.genie.web.services.CommandService;
-import com.netflix.genie.web.services.FileService;
+import com.netflix.genie.web.services.ApplicationPersistenceService;
+import com.netflix.genie.web.services.ClusterPersistenceService;
+import com.netflix.genie.web.services.CommandPersistenceService;
+import com.netflix.genie.web.services.FilePersistenceService;
 import com.netflix.genie.web.services.JobKillService;
 import com.netflix.genie.web.services.JobPersistenceService;
 import com.netflix.genie.web.services.JobSearchService;
 import com.netflix.genie.web.services.JobSpecificationService;
 import com.netflix.genie.web.services.JobStateService;
-import com.netflix.genie.web.services.TagService;
+import com.netflix.genie.web.services.TagPersistenceService;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.exec.Executor;
 import org.junit.Assert;
@@ -63,9 +63,9 @@ import java.util.UUID;
 @Category(UnitTest.class)
 public class ServicesConfigUnitTests {
 
-    private TagService tagService;
+    private TagPersistenceService tagPersistenceService;
     private JpaTagRepository tagRepository;
-    private FileService fileService;
+    private FilePersistenceService filePersistenceService;
     private JpaFileRepository fileRepository;
     private JpaApplicationRepository applicationRepository;
     private JpaClusterRepository clusterRepository;
@@ -79,9 +79,9 @@ public class ServicesConfigUnitTests {
      */
     @Before
     public void setUp() {
-        this.tagService = Mockito.mock(TagService.class);
+        this.tagPersistenceService = Mockito.mock(TagPersistenceService.class);
         this.tagRepository = Mockito.mock(JpaTagRepository.class);
-        this.fileService = Mockito.mock(FileService.class);
+        this.filePersistenceService = Mockito.mock(FilePersistenceService.class);
         this.fileRepository = Mockito.mock(JpaFileRepository.class);
         this.applicationRepository = Mockito.mock(JpaApplicationRepository.class);
         this.clusterRepository = Mockito.mock(JpaClusterRepository.class);
@@ -134,9 +134,9 @@ public class ServicesConfigUnitTests {
     public void canGetApplicationServiceBean() {
         Assert.assertNotNull(
             this.servicesConfig.applicationService(
-                this.tagService,
+                this.tagPersistenceService,
                 this.tagRepository,
-                this.fileService,
+                this.filePersistenceService,
                 this.fileRepository,
                 this.applicationRepository,
                 this.commandRepository
@@ -152,9 +152,9 @@ public class ServicesConfigUnitTests {
 
         Assert.assertNotNull(
             this.servicesConfig.commandService(
-                this.tagService,
+                this.tagPersistenceService,
                 this.tagRepository,
-                this.fileService,
+                this.filePersistenceService,
                 this.fileRepository,
                 this.commandRepository,
                 this.applicationRepository,
@@ -170,9 +170,9 @@ public class ServicesConfigUnitTests {
     public void canGetClusterServiceBean() {
         Assert.assertNotNull(
             this.servicesConfig.clusterService(
-                this.tagService,
+                this.tagPersistenceService,
                 this.tagRepository,
-                this.fileService,
+                this.filePersistenceService,
                 this.fileRepository,
                 this.clusterRepository,
                 this.commandRepository
@@ -201,9 +201,9 @@ public class ServicesConfigUnitTests {
     public void canGetJobPersistenceServiceBean() {
         Assert.assertNotNull(
             this.servicesConfig.jobPersistenceService(
-                this.tagService,
+                this.tagPersistenceService,
                 this.tagRepository,
-                this.fileService,
+                this.filePersistenceService,
                 this.fileRepository,
                 this.jobRepository,
                 this.applicationRepository,
@@ -246,9 +246,9 @@ public class ServicesConfigUnitTests {
                 Mockito.mock(JobStateService.class),
                 Mockito.mock(JobSearchService.class),
                 new JobsProperties(),
-                Mockito.mock(ApplicationService.class),
-                Mockito.mock(ClusterService.class),
-                Mockito.mock(CommandService.class),
+                Mockito.mock(ApplicationPersistenceService.class),
+                Mockito.mock(ClusterPersistenceService.class),
+                Mockito.mock(CommandPersistenceService.class),
                 Mockito.mock(JobSpecificationService.class),
                 Mockito.mock(MeterRegistry.class),
                 UUID.randomUUID().toString()

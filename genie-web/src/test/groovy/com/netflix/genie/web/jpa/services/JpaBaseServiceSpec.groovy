@@ -21,8 +21,8 @@ import com.netflix.genie.common.exceptions.GenieNotFoundException
 import com.netflix.genie.test.categories.UnitTest
 import com.netflix.genie.web.jpa.repositories.JpaFileRepository
 import com.netflix.genie.web.jpa.repositories.JpaTagRepository
-import com.netflix.genie.web.services.FileService
-import com.netflix.genie.web.services.TagService
+import com.netflix.genie.web.services.FilePersistenceService
+import com.netflix.genie.web.services.TagPersistenceService
 import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
@@ -39,11 +39,11 @@ class JpaBaseServiceSpec extends Specification {
         def jpaFileRepository = Mock(JpaFileRepository) {
             1 * findByFile(_ as String) >> Optional.empty()
         }
-        def fileService = Mock(FileService) {
+        def fileService = Mock(FilePersistenceService) {
             1 * createFileIfNotExists(_ as String)
         }
         def service = new JpaBaseService(
-                Mock(TagService),
+                Mock(TagPersistenceService),
                 Mock(JpaTagRepository),
                 fileService,
                 jpaFileRepository
@@ -60,13 +60,13 @@ class JpaBaseServiceSpec extends Specification {
         def jpaTagRepository = Mock(JpaTagRepository) {
             1 * findByTag(_ as String) >> Optional.empty()
         }
-        def tagService = Mock(TagService) {
+        def tagService = Mock(TagPersistenceService) {
             1 * createTagIfNotExists(_ as String)
         }
         def service = new JpaBaseService(
                 tagService,
                 jpaTagRepository,
-                Mock(FileService),
+                Mock(FilePersistenceService),
                 Mock(JpaFileRepository)
         )
 

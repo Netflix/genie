@@ -41,8 +41,8 @@ import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.web.jpa.repositories.JpaFileRepository;
 import com.netflix.genie.web.jpa.repositories.JpaJobRepository;
 import com.netflix.genie.web.jpa.repositories.JpaTagRepository;
-import com.netflix.genie.web.services.FileService;
-import com.netflix.genie.web.services.TagService;
+import com.netflix.genie.web.services.FilePersistenceService;
+import com.netflix.genie.web.services.TagPersistenceService;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -97,9 +97,9 @@ public class JpaJobPersistenceServiceImplUnitTests {
         this.fileRepository = Mockito.mock(JpaFileRepository.class);
 
         this.jobPersistenceService = new JpaJobPersistenceServiceImpl(
-            Mockito.mock(TagService.class),
+            Mockito.mock(TagPersistenceService.class),
             this.tagRepository,
-            Mockito.mock(FileService.class),
+            Mockito.mock(FilePersistenceService.class),
             this.fileRepository,
             this.jobRepository,
             this.applicationRepository,

@@ -24,22 +24,22 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
-import com.netflix.genie.common.internal.dto.v4.Application;
-import com.netflix.genie.common.internal.dto.v4.Cluster;
-import com.netflix.genie.common.internal.dto.v4.Command;
-import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
-import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
 import com.netflix.genie.common.exceptions.GenieUserLimitExceededException;
+import com.netflix.genie.common.internal.dto.v4.Application;
+import com.netflix.genie.common.internal.dto.v4.Cluster;
+import com.netflix.genie.common.internal.dto.v4.Command;
+import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
+import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.properties.JobsProperties;
-import com.netflix.genie.web.services.ApplicationService;
-import com.netflix.genie.web.services.ClusterService;
-import com.netflix.genie.web.services.CommandService;
+import com.netflix.genie.web.services.ApplicationPersistenceService;
+import com.netflix.genie.web.services.ClusterPersistenceService;
+import com.netflix.genie.web.services.CommandPersistenceService;
 import com.netflix.genie.web.services.JobKillService;
 import com.netflix.genie.web.services.JobPersistenceService;
 import com.netflix.genie.web.services.JobSearchService;
@@ -88,9 +88,9 @@ public class JobCoordinatorServiceImplUnitTests {
     private JobKillService jobKillService;
     private JobStateService jobStateService;
     private JobSearchService jobSearchService;
-    private ApplicationService applicationService;
-    private ClusterService clusterService;
-    private CommandService commandService;
+    private ApplicationPersistenceService applicationPersistenceService;
+    private ClusterPersistenceService clusterPersistenceService;
+    private CommandPersistenceService commandPersistenceService;
     private JobSpecificationService specificationService;
     private JobsProperties jobsProperties;
     private MeterRegistry registry;
@@ -111,9 +111,9 @@ public class JobCoordinatorServiceImplUnitTests {
         this.jobsProperties.getLocations().setArchives(BASE_ARCHIVE_LOCATION);
         this.jobsProperties.getMemory().setDefaultJobMemory(MEMORY);
         this.jobsProperties.getUsers().getActiveLimit().setEnabled(ACTIVE_JOBS_LIMIT_ENABLED);
-        this.applicationService = Mockito.mock(ApplicationService.class);
-        this.clusterService = Mockito.mock(ClusterService.class);
-        this.commandService = Mockito.mock(CommandService.class);
+        this.applicationPersistenceService = Mockito.mock(ApplicationPersistenceService.class);
+        this.clusterPersistenceService = Mockito.mock(ClusterPersistenceService.class);
+        this.commandPersistenceService = Mockito.mock(CommandPersistenceService.class);
         this.specificationService = Mockito.mock(JobSpecificationService.class);
 
         this.registry = Mockito.mock(MeterRegistry.class);
@@ -141,10 +141,10 @@ public class JobCoordinatorServiceImplUnitTests {
             this.jobKillService,
             this.jobStateService,
             this.jobsProperties,
-            this.applicationService,
+            this.applicationPersistenceService,
             this.jobSearchService,
-            this.clusterService,
-            this.commandService,
+            this.clusterPersistenceService,
+            this.commandPersistenceService,
             this.specificationService,
             this.registry,
             HOST_NAME
@@ -212,23 +212,23 @@ public class JobCoordinatorServiceImplUnitTests {
         final String clusterId = UUID.randomUUID().toString();
         final Cluster cluster = Mockito.mock(Cluster.class);
         Mockito.when(cluster.getId()).thenReturn(clusterId);
-        Mockito.when(this.clusterService.getCluster(clusterId)).thenReturn(cluster);
+        Mockito.when(this.clusterPersistenceService.getCluster(clusterId)).thenReturn(cluster);
 
         final String commandId = UUID.randomUUID().toString();
         final Command command = Mockito.mock(Command.class);
         Mockito.when(command.getId()).thenReturn(commandId);
         Mockito.when(command.getMemory()).thenReturn(Optional.empty());
-        Mockito.when(this.commandService.getCommand(commandId)).thenReturn(command);
+        Mockito.when(this.commandPersistenceService.getCommand(commandId)).thenReturn(command);
 
         final String application0Id = UUID.randomUUID().toString();
         final Application application0 = Mockito.mock(Application.class);
         Mockito.when(application0.getId()).thenReturn(application0Id);
-        Mockito.when(this.applicationService.getApplication(application0Id)).thenReturn(application0);
+        Mockito.when(this.applicationPersistenceService.getApplication(application0Id)).thenReturn(application0);
 
         final String application1Id = UUID.randomUUID().toString();
         final Application application1 = Mockito.mock(Application.class);
         Mockito.when(application1.getId()).thenReturn(application1Id);
-        Mockito.when(this.applicationService.getApplication(application1Id)).thenReturn(application1);
+        Mockito.when(this.applicationPersistenceService.getApplication(application1Id)).thenReturn(application1);
 
         final JobSpecification jobSpecification = new JobSpecification(
             null,
@@ -336,23 +336,23 @@ public class JobCoordinatorServiceImplUnitTests {
         final String clusterId = UUID.randomUUID().toString();
         final Cluster cluster = Mockito.mock(Cluster.class);
         Mockito.when(cluster.getId()).thenReturn(clusterId);
-        Mockito.when(this.clusterService.getCluster(clusterId)).thenReturn(cluster);
+        Mockito.when(this.clusterPersistenceService.getCluster(clusterId)).thenReturn(cluster);
 
         final String commandId = UUID.randomUUID().toString();
         final Command command = Mockito.mock(Command.class);
         Mockito.when(command.getId()).thenReturn(commandId);
         Mockito.when(command.getMemory()).thenReturn(Optional.empty());
-        Mockito.when(this.commandService.getCommand(commandId)).thenReturn(command);
+        Mockito.when(this.commandPersistenceService.getCommand(commandId)).thenReturn(command);
 
         final String application0Id = UUID.randomUUID().toString();
         final Application application0 = Mockito.mock(Application.class);
         Mockito.when(application0.getId()).thenReturn(application0Id);
-        Mockito.when(this.applicationService.getApplication(application0Id)).thenReturn(application0);
+        Mockito.when(this.applicationPersistenceService.getApplication(application0Id)).thenReturn(application0);
 
         final String application1Id = UUID.randomUUID().toString();
         final Application application1 = Mockito.mock(Application.class);
         Mockito.when(application1.getId()).thenReturn(application1Id);
-        Mockito.when(this.applicationService.getApplication(application1Id)).thenReturn(application1);
+        Mockito.when(this.applicationPersistenceService.getApplication(application1Id)).thenReturn(application1);
 
         final JobSpecification jobSpecification = new JobSpecification(
             null,
@@ -433,23 +433,23 @@ public class JobCoordinatorServiceImplUnitTests {
         final String clusterId = UUID.randomUUID().toString();
         final Cluster cluster = Mockito.mock(Cluster.class);
         Mockito.when(cluster.getId()).thenReturn(clusterId);
-        Mockito.when(this.clusterService.getCluster(clusterId)).thenReturn(cluster);
+        Mockito.when(this.clusterPersistenceService.getCluster(clusterId)).thenReturn(cluster);
 
         final String commandId = UUID.randomUUID().toString();
         final Command command = Mockito.mock(Command.class);
         Mockito.when(command.getId()).thenReturn(commandId);
         Mockito.when(command.getMemory()).thenReturn(Optional.of(1));
-        Mockito.when(this.commandService.getCommand(commandId)).thenReturn(command);
+        Mockito.when(this.commandPersistenceService.getCommand(commandId)).thenReturn(command);
 
         final String application0Id = UUID.randomUUID().toString();
         final Application application0 = Mockito.mock(Application.class);
         Mockito.when(application0.getId()).thenReturn(application0Id);
-        Mockito.when(this.applicationService.getApplication(application0Id)).thenReturn(application0);
+        Mockito.when(this.applicationPersistenceService.getApplication(application0Id)).thenReturn(application0);
 
         final String application1Id = UUID.randomUUID().toString();
         final Application application1 = Mockito.mock(Application.class);
         Mockito.when(application1.getId()).thenReturn(application1Id);
-        Mockito.when(this.applicationService.getApplication(application1Id)).thenReturn(application1);
+        Mockito.when(this.applicationPersistenceService.getApplication(application1Id)).thenReturn(application1);
 
         final JobSpecification jobSpecification = new JobSpecification(
             null,
@@ -549,23 +549,23 @@ public class JobCoordinatorServiceImplUnitTests {
         final String clusterId = UUID.randomUUID().toString();
         final Cluster cluster = Mockito.mock(Cluster.class);
         Mockito.when(cluster.getId()).thenReturn(clusterId);
-        Mockito.when(this.clusterService.getCluster(clusterId)).thenReturn(cluster);
+        Mockito.when(this.clusterPersistenceService.getCluster(clusterId)).thenReturn(cluster);
 
         final String commandId = UUID.randomUUID().toString();
         final Command command = Mockito.mock(Command.class);
         Mockito.when(command.getId()).thenReturn(commandId);
         Mockito.when(command.getMemory()).thenReturn(Optional.of(1));
-        Mockito.when(this.commandService.getCommand(commandId)).thenReturn(command);
+        Mockito.when(this.commandPersistenceService.getCommand(commandId)).thenReturn(command);
 
         final String application0Id = UUID.randomUUID().toString();
         final Application application0 = Mockito.mock(Application.class);
         Mockito.when(application0.getId()).thenReturn(application0Id);
-        Mockito.when(this.applicationService.getApplication(application0Id)).thenReturn(application0);
+        Mockito.when(this.applicationPersistenceService.getApplication(application0Id)).thenReturn(application0);
 
         final String application1Id = UUID.randomUUID().toString();
         final Application application1 = Mockito.mock(Application.class);
         Mockito.when(application1.getId()).thenReturn(application1Id);
-        Mockito.when(this.applicationService.getApplication(application1Id)).thenReturn(application1);
+        Mockito.when(this.applicationPersistenceService.getApplication(application1Id)).thenReturn(application1);
 
         final JobSpecification jobSpecification = new JobSpecification(
             null,
@@ -647,23 +647,23 @@ public class JobCoordinatorServiceImplUnitTests {
         final String clusterId = UUID.randomUUID().toString();
         final Cluster cluster = Mockito.mock(Cluster.class);
         Mockito.when(cluster.getId()).thenReturn(clusterId);
-        Mockito.when(this.clusterService.getCluster(clusterId)).thenReturn(cluster);
+        Mockito.when(this.clusterPersistenceService.getCluster(clusterId)).thenReturn(cluster);
 
         final String commandId = UUID.randomUUID().toString();
         final Command command = Mockito.mock(Command.class);
         Mockito.when(command.getId()).thenReturn(commandId);
         Mockito.when(command.getMemory()).thenReturn(Optional.of(1));
-        Mockito.when(this.commandService.getCommand(commandId)).thenReturn(command);
+        Mockito.when(this.commandPersistenceService.getCommand(commandId)).thenReturn(command);
 
         final String application0Id = UUID.randomUUID().toString();
         final Application application0 = Mockito.mock(Application.class);
         Mockito.when(application0.getId()).thenReturn(application0Id);
-        Mockito.when(this.applicationService.getApplication(application0Id)).thenReturn(application0);
+        Mockito.when(this.applicationPersistenceService.getApplication(application0Id)).thenReturn(application0);
 
         final String application1Id = UUID.randomUUID().toString();
         final Application application1 = Mockito.mock(Application.class);
         Mockito.when(application1.getId()).thenReturn(application1Id);
-        Mockito.when(this.applicationService.getApplication(application1Id)).thenReturn(application1);
+        Mockito.when(this.applicationPersistenceService.getApplication(application1Id)).thenReturn(application1);
 
         final JobSpecification jobSpecification = new JobSpecification(
             null,
@@ -748,23 +748,23 @@ public class JobCoordinatorServiceImplUnitTests {
         final String clusterId = UUID.randomUUID().toString();
         final Cluster cluster = Mockito.mock(Cluster.class);
         Mockito.when(cluster.getId()).thenReturn(clusterId);
-        Mockito.when(this.clusterService.getCluster(clusterId)).thenReturn(cluster);
+        Mockito.when(this.clusterPersistenceService.getCluster(clusterId)).thenReturn(cluster);
 
         final String commandId = UUID.randomUUID().toString();
         final Command command = Mockito.mock(Command.class);
         Mockito.when(command.getId()).thenReturn(commandId);
         Mockito.when(command.getMemory()).thenReturn(Optional.of(1));
-        Mockito.when(this.commandService.getCommand(commandId)).thenReturn(command);
+        Mockito.when(this.commandPersistenceService.getCommand(commandId)).thenReturn(command);
 
         final String application0Id = UUID.randomUUID().toString();
         final Application application0 = Mockito.mock(Application.class);
         Mockito.when(application0.getId()).thenReturn(application0Id);
-        Mockito.when(this.applicationService.getApplication(application0Id)).thenReturn(application0);
+        Mockito.when(this.applicationPersistenceService.getApplication(application0Id)).thenReturn(application0);
 
         final String application1Id = UUID.randomUUID().toString();
         final Application application1 = Mockito.mock(Application.class);
         Mockito.when(application1.getId()).thenReturn(application1Id);
-        Mockito.when(this.applicationService.getApplication(application1Id)).thenReturn(application1);
+        Mockito.when(this.applicationPersistenceService.getApplication(application1Id)).thenReturn(application1);
 
         final JobSpecification jobSpecification = new JobSpecification(
             null,

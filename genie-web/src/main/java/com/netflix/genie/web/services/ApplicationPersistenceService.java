@@ -42,7 +42,7 @@ import java.util.Set;
  * @author tgianos
  */
 @Validated
-public interface ApplicationService {
+public interface ApplicationPersistenceService {
 
     /**
      * Create new application.

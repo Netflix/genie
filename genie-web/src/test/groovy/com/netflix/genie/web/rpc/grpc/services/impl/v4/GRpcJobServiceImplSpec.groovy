@@ -22,7 +22,13 @@ import com.google.common.collect.Lists
 import com.google.common.collect.Sets
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment
 import com.netflix.genie.common.internal.dto.v4.JobSpecification
-import com.netflix.genie.proto.*
+import com.netflix.genie.proto.AgentConfig
+import com.netflix.genie.proto.Criterion
+import com.netflix.genie.proto.ExecutionResourceCriteria
+import com.netflix.genie.proto.JobMetadata
+import com.netflix.genie.proto.JobSpecificationRequest
+import com.netflix.genie.proto.JobSpecificationResponse
+import com.netflix.genie.proto.ReserveJobIdRequest
 import com.netflix.genie.web.services.JobPersistenceService
 import com.netflix.genie.web.services.JobSpecificationService
 import io.grpc.stub.StreamObserver

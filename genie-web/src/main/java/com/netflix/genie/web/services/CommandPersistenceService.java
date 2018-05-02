@@ -45,7 +45,7 @@ import java.util.Set;
  * @author tgianos
  */
 @Validated
-public interface CommandService {
+public interface CommandPersistenceService {
 
     /**
      * Create new command configuration.

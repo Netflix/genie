@@ -26,18 +26,18 @@ import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.dto.JobRequest;
-import com.netflix.genie.common.internal.dto.v4.Cluster;
-import com.netflix.genie.common.internal.dto.v4.ClusterMetadata;
-import com.netflix.genie.common.internal.dto.v4.ClusterRequest;
-import com.netflix.genie.common.internal.dto.v4.Command;
-import com.netflix.genie.common.internal.dto.v4.Criterion;
-import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.common.internal.dto.v4.Cluster;
+import com.netflix.genie.common.internal.dto.v4.ClusterMetadata;
+import com.netflix.genie.common.internal.dto.v4.ClusterRequest;
+import com.netflix.genie.common.internal.dto.v4.Command;
+import com.netflix.genie.common.internal.dto.v4.Criterion;
+import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.controllers.DtoConverters;
 import com.netflix.genie.web.jpa.entities.ClusterEntity;
@@ -51,9 +51,9 @@ import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.web.jpa.repositories.JpaFileRepository;
 import com.netflix.genie.web.jpa.repositories.JpaTagRepository;
 import com.netflix.genie.web.jpa.specifications.JpaClusterSpecs;
-import com.netflix.genie.web.services.ClusterService;
-import com.netflix.genie.web.services.FileService;
-import com.netflix.genie.web.services.TagService;
+import com.netflix.genie.web.services.ClusterPersistenceService;
+import com.netflix.genie.web.services.FilePersistenceService;
+import com.netflix.genie.web.services.TagPersistenceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -78,7 +78,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
- * Implementation of the ClusterService interface using JPA.
+ * Implementation of the ClusterPersistenceService interface using JPA.
  *
  * @author amsharma
  * @author tgianos
@@ -90,29 +90,29 @@ import java.util.stream.Collectors;
     }
 )
 @Slf4j
-public class JpaClusterServiceImpl extends JpaBaseService implements ClusterService {
+public class JpaClusterPersistenceServiceImpl extends JpaBaseService implements ClusterPersistenceService {
     private final JpaClusterRepository clusterRepository;
     private final JpaCommandRepository commandRepository;
 
     /**
      * Default constructor - initialize all required dependencies.
      *
-     * @param tagService        The tag service to use
-     * @param tagRepository     The tag repository to use
-     * @param fileService       The file service to use
-     * @param fileRepository    The file repository to use
-     * @param clusterRepository The cluster repository to use.
-     * @param commandRepository The command repository to use.
+     * @param tagPersistenceService  The tag service to use
+     * @param tagRepository          The tag repository to use
+     * @param filePersistenceService The file service to use
+     * @param fileRepository         The file repository to use
+     * @param clusterRepository      The cluster repository to use.
+     * @param commandRepository      The command repository to use.
      */
-    public JpaClusterServiceImpl(
-        final TagService tagService,
+    public JpaClusterPersistenceServiceImpl(
+        final TagPersistenceService tagPersistenceService,
         final JpaTagRepository tagRepository,
-        final FileService fileService,
+        final FilePersistenceService filePersistenceService,
         final JpaFileRepository fileRepository,
         final JpaClusterRepository clusterRepository,
         final JpaCommandRepository commandRepository
     ) {
-        super(tagService, tagRepository, fileService, fileRepository);
+        super(tagPersistenceService, tagRepository, filePersistenceService, fileRepository);
         this.clusterRepository = clusterRepository;
         this.commandRepository = commandRepository;
     }

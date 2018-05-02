@@ -20,15 +20,15 @@ package com.netflix.genie.web.jpa.services;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.ClusterStatus;
-import com.netflix.genie.common.internal.dto.v4.Cluster;
-import com.netflix.genie.common.internal.dto.v4.ClusterMetadata;
-import com.netflix.genie.common.internal.dto.v4.ClusterRequest;
-import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.internal.dto.v4.Cluster;
+import com.netflix.genie.common.internal.dto.v4.ClusterMetadata;
+import com.netflix.genie.common.internal.dto.v4.ClusterRequest;
+import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.jpa.entities.ClusterEntity;
 import com.netflix.genie.web.jpa.entities.CommandEntity;
@@ -38,8 +38,8 @@ import com.netflix.genie.web.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.web.jpa.repositories.JpaFileRepository;
 import com.netflix.genie.web.jpa.repositories.JpaTagRepository;
-import com.netflix.genie.web.services.FileService;
-import com.netflix.genie.web.services.TagService;
+import com.netflix.genie.web.services.FilePersistenceService;
+import com.netflix.genie.web.services.TagPersistenceService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -60,14 +60,14 @@ import java.util.UUID;
  * @since 2.0.0
  */
 @Category(UnitTest.class)
-public class JpaClusterServiceImplUnitTests {
+public class JpaClusterPersistenceServiceImplUnitTests {
 
     private static final String CLUSTER_1_ID = "cluster1";
     private static final String CLUSTER_1_USER = "tgianos";
     private static final String CLUSTER_1_NAME = "h2prod";
     private static final String CLUSTER_1_VERSION = "2.4.0";
 
-    private JpaClusterServiceImpl service;
+    private JpaClusterPersistenceServiceImpl service;
     private JpaClusterRepository jpaClusterRepository;
     private JpaCommandRepository jpaCommandRepository;
     private JpaFileRepository jpaFileRepository;
@@ -80,10 +80,10 @@ public class JpaClusterServiceImplUnitTests {
         this.jpaClusterRepository = Mockito.mock(JpaClusterRepository.class);
         this.jpaCommandRepository = Mockito.mock(JpaCommandRepository.class);
         this.jpaFileRepository = Mockito.mock(JpaFileRepository.class);
-        this.service = new JpaClusterServiceImpl(
-            Mockito.mock(TagService.class),
+        this.service = new JpaClusterPersistenceServiceImpl(
+            Mockito.mock(TagPersistenceService.class),
             Mockito.mock(JpaTagRepository.class),
-            Mockito.mock(FileService.class),
+            Mockito.mock(FilePersistenceService.class),
             this.jpaFileRepository,
             this.jpaClusterRepository,
             this.jpaCommandRepository

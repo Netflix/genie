@@ -30,7 +30,7 @@ import java.time.Instant;
  * @since 3.3.0
  */
 @Validated
-public interface FileService {
+public interface FilePersistenceService {
 
     /**
      * Attempt to create a file reference in the system if it doesn't already exist.

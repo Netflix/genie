@@ -22,17 +22,17 @@ import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.netflix.genie.common.dto.ApplicationStatus;
 import com.netflix.genie.common.dto.CommandStatus;
-import com.netflix.genie.common.internal.dto.v4.Application;
-import com.netflix.genie.common.internal.dto.v4.ApplicationMetadata;
-import com.netflix.genie.common.internal.dto.v4.ApplicationRequest;
-import com.netflix.genie.common.internal.dto.v4.Command;
-import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.exceptions.GenieBadRequestException;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.common.internal.dto.v4.Application;
+import com.netflix.genie.common.internal.dto.v4.ApplicationMetadata;
+import com.netflix.genie.common.internal.dto.v4.ApplicationRequest;
+import com.netflix.genie.common.internal.dto.v4.Command;
+import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.jpa.entities.ApplicationEntity;
 import com.netflix.genie.web.jpa.entities.CommandEntity;
@@ -45,9 +45,9 @@ import com.netflix.genie.web.jpa.repositories.JpaFileRepository;
 import com.netflix.genie.web.jpa.repositories.JpaTagRepository;
 import com.netflix.genie.web.jpa.specifications.JpaApplicationSpecs;
 import com.netflix.genie.web.jpa.specifications.JpaCommandSpecs;
-import com.netflix.genie.web.services.ApplicationService;
-import com.netflix.genie.web.services.FileService;
-import com.netflix.genie.web.services.TagService;
+import com.netflix.genie.web.services.ApplicationPersistenceService;
+import com.netflix.genie.web.services.FilePersistenceService;
+import com.netflix.genie.web.services.TagPersistenceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -69,7 +69,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
- * JPA based implementation of the ApplicationService.
+ * JPA based implementation of the ApplicationPersistenceService.
  *
  * @author amsharma
  * @author tgianos
@@ -82,7 +82,7 @@ import java.util.stream.Collectors;
     }
 )
 @Slf4j
-public class JpaApplicationServiceImpl extends JpaBaseService implements ApplicationService {
+public class JpaApplicationPersistenceServiceImpl extends JpaBaseService implements ApplicationPersistenceService {
 
     private final JpaApplicationRepository applicationRepository;
     private final JpaCommandRepository commandRepository;
@@ -90,22 +90,22 @@ public class JpaApplicationServiceImpl extends JpaBaseService implements Applica
     /**
      * Default constructor.
      *
-     * @param tagService            The tag service to use
-     * @param tagRepository         The tag repository to use
-     * @param fileService           The file service to use
-     * @param fileRepository        The file repository to use
-     * @param applicationRepository The application repository to use
-     * @param commandRepository     The command repository to use
+     * @param tagPersistenceService  The tag service to use
+     * @param tagRepository          The tag repository to use
+     * @param filePersistenceService The file service to use
+     * @param fileRepository         The file repository to use
+     * @param applicationRepository  The application repository to use
+     * @param commandRepository      The command repository to use
      */
-    public JpaApplicationServiceImpl(
-        final TagService tagService,
+    public JpaApplicationPersistenceServiceImpl(
+        final TagPersistenceService tagPersistenceService,
         final JpaTagRepository tagRepository,
-        final FileService fileService,
+        final FilePersistenceService filePersistenceService,
         final JpaFileRepository fileRepository,
         final JpaApplicationRepository applicationRepository,
         final JpaCommandRepository commandRepository
     ) {
-        super(tagService, tagRepository, fileService, fileRepository);
+        super(tagPersistenceService, tagRepository, filePersistenceService, fileRepository);
         this.applicationRepository = applicationRepository;
         this.commandRepository = commandRepository;
     }

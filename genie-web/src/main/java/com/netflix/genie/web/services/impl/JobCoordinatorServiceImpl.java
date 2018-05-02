@@ -25,23 +25,23 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobMetadata;
 import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
-import com.netflix.genie.common.internal.dto.v4.Application;
-import com.netflix.genie.common.internal.dto.v4.Cluster;
-import com.netflix.genie.common.internal.dto.v4.Command;
-import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.common.exceptions.GenieServerUnavailableException;
 import com.netflix.genie.common.exceptions.GenieUserLimitExceededException;
+import com.netflix.genie.common.internal.dto.v4.Application;
+import com.netflix.genie.common.internal.dto.v4.Cluster;
+import com.netflix.genie.common.internal.dto.v4.Command;
+import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import com.netflix.genie.common.internal.jobs.JobConstants;
 import com.netflix.genie.web.controllers.DtoConverters;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.properties.JobsUsersActiveLimitProperties;
-import com.netflix.genie.web.services.ApplicationService;
-import com.netflix.genie.web.services.ClusterService;
-import com.netflix.genie.web.services.CommandService;
+import com.netflix.genie.web.services.ApplicationPersistenceService;
+import com.netflix.genie.web.services.ClusterPersistenceService;
+import com.netflix.genie.web.services.CommandPersistenceService;
 import com.netflix.genie.web.services.JobCoordinatorService;
 import com.netflix.genie.web.services.JobKillService;
 import com.netflix.genie.web.services.JobPersistenceService;
@@ -80,10 +80,10 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
     private final JobPersistenceService jobPersistenceService;
     private final JobKillService jobKillService;
     private final JobStateService jobStateService;
-    private final ApplicationService applicationService;
+    private final ApplicationPersistenceService applicationPersistenceService;
     private final JobSearchService jobSearchService;
-    private final ClusterService clusterService;
-    private final CommandService commandService;
+    private final ClusterPersistenceService clusterPersistenceService;
+    private final CommandPersistenceService commandPersistenceService;
     private final JobSpecificationService specificationService;
     private final JobsProperties jobsProperties;
     private final String hostName;
@@ -94,28 +94,28 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
     /**
      * Constructor.
      *
-     * @param jobPersistenceService implementation of job persistence service interface
-     * @param jobKillService        The job kill service to use
-     * @param jobStateService       The service where we report the job state and keep track of various metrics about
-     *                              jobs currently running
-     * @param jobsProperties        The jobs properties to use
-     * @param applicationService    Implementation of application service interface
-     * @param jobSearchService      Implementation of job search service
-     * @param clusterService        Implementation of cluster service interface
-     * @param commandService        Implementation of command service interface
-     * @param specificationService  The job specification service to use
-     * @param registry              The registry
-     * @param hostName              The name of the host this Genie instance is running on
+     * @param jobPersistenceService         implementation of job persistence service interface
+     * @param jobKillService                The job kill service to use
+     * @param jobStateService               The service where we report the job state and keep track of
+     *                                      various metrics about jobs currently running
+     * @param jobsProperties                The jobs properties to use
+     * @param applicationPersistenceService Implementation of application service interface
+     * @param jobSearchService              Implementation of job search service
+     * @param clusterPersistenceService     Implementation of cluster service interface
+     * @param commandPersistenceService     Implementation of command service interface
+     * @param specificationService          The job specification service to use
+     * @param registry                      The registry
+     * @param hostName                      The name of the host this Genie instance is running on
      */
     public JobCoordinatorServiceImpl(
         @NotNull final JobPersistenceService jobPersistenceService,
         @NotNull final JobKillService jobKillService,
         @NotNull final JobStateService jobStateService,
         @NotNull final JobsProperties jobsProperties,
-        @NotNull final ApplicationService applicationService,
+        @NotNull final ApplicationPersistenceService applicationPersistenceService,
         @NotNull final JobSearchService jobSearchService,
-        @NotNull final ClusterService clusterService,
-        @NotNull final CommandService commandService,
+        @NotNull final ClusterPersistenceService clusterPersistenceService,
+        @NotNull final CommandPersistenceService commandPersistenceService,
         @NotNull final JobSpecificationService specificationService,
         @NotNull final MeterRegistry registry,
         @NotBlank final String hostName
@@ -123,10 +123,10 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
         this.jobPersistenceService = jobPersistenceService;
         this.jobKillService = jobKillService;
         this.jobStateService = jobStateService;
-        this.applicationService = applicationService;
+        this.applicationPersistenceService = applicationPersistenceService;
         this.jobSearchService = jobSearchService;
-        this.clusterService = clusterService;
-        this.commandService = commandService;
+        this.clusterPersistenceService = clusterPersistenceService;
+        this.commandPersistenceService = commandPersistenceService;
         this.specificationService = specificationService;
         this.jobsProperties = jobsProperties;
         this.hostName = hostName;
@@ -199,8 +199,8 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
                 //TODO: Here for now as we figure out what to do with exceptions for JobSpecificationServiceImpl
                 throw new GeniePreconditionException(re.getMessage(), re);
             }
-            final Cluster cluster = this.clusterService.getCluster(jobSpecification.getCluster().getId());
-            final Command command = this.commandService.getCommand(jobSpecification.getCommand().getId());
+            final Cluster cluster = this.clusterPersistenceService.getCluster(jobSpecification.getCluster().getId());
+            final Command command = this.commandPersistenceService.getCommand(jobSpecification.getCommand().getId());
 
             // Now that we have command how much memory should the job use?
             final int memory = jobRequest.getMemory()
@@ -208,7 +208,7 @@ public class JobCoordinatorServiceImpl implements JobCoordinatorService {
 
             final ImmutableList.Builder<Application> applicationsBuilder = ImmutableList.builder();
             for (final JobSpecification.ExecutionResource applicationResource : jobSpecification.getApplications()) {
-                applicationsBuilder.add(this.applicationService.getApplication(applicationResource.getId()));
+                applicationsBuilder.add(this.applicationPersistenceService.getApplication(applicationResource.getId()));
             }
             final ImmutableList<Application> applications = applicationsBuilder.build();
 

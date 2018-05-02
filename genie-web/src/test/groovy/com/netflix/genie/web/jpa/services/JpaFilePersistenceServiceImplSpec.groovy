@@ -25,15 +25,15 @@ import org.springframework.dao.DuplicateKeyException
 import spock.lang.Specification
 
 /**
- * Unit tests for JpaFileServiceImpl.
+ * Unit tests for JpaFilePersistenceServiceImpl.
  *
  * @author tgianos
  * @since 3.3.0
  */
 @Category(UnitTest.class)
-class JpaFileServiceImplSpec extends Specification {
+class JpaFilePersistenceServiceImplSpec extends Specification {
     def fileRepository = Mock(JpaFileRepository)
-    def service = new JpaFileServiceImpl(this.fileRepository)
+    def service = new JpaFilePersistenceServiceImpl(this.fileRepository)
 
     def "If file exists no creation is attempted"() {
         def file = UUID.randomUUID().toString()

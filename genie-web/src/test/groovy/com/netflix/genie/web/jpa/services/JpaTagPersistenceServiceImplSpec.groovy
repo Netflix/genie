@@ -25,15 +25,15 @@ import org.springframework.dao.DuplicateKeyException
 import spock.lang.Specification
 
 /**
- * Unit tests for JpaTagServiceImpl.
+ * Unit tests for JpaTagPersistenceServiceImpl.
  *
  * @author tgianos
  * @since 3.3.0
  */
 @Category(UnitTest.class)
-class JpaTagServiceImplSpec extends Specification {
+class JpaTagPersistenceServiceImplSpec extends Specification {
     def tagRepository = Mock(JpaTagRepository)
-    def service = new JpaTagServiceImpl(this.tagRepository)
+    def service = new JpaTagPersistenceServiceImpl(this.tagRepository)
 
     def "If tag exists no creation is attempted"() {
         def tag = UUID.randomUUID().toString()
