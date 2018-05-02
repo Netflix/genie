@@ -104,6 +104,40 @@ ALTER TABLE `commands`
 
 ALTER TABLE `criteria`
   ADD COLUMN `unique_id` VARCHAR(255) DEFAULT NULL,
-  ADD COLUMN `name` VARCHAR(255) DEFAULT NULL,
-  ADD COLUMN `version` VARCHAR(255) DEFAULT NULL,
-  ADD COLUMN `status` VARCHAR(255) DEFAULT NULL;
+  ADD COLUMN `name`      VARCHAR(255) DEFAULT NULL,
+  ADD COLUMN `version`   VARCHAR(255) DEFAULT NULL,
+  ADD COLUMN `status`    VARCHAR(255) DEFAULT NULL;
+
+CREATE TABLE `job_requested_environment_variables` (
+  `job_id` BIGINT(20)    NOT NULL,
+  `name`   VARCHAR(255)  NOT NULL,
+  `value`  VARCHAR(1024) NOT NULL,
+  PRIMARY KEY (`job_id`, `name`),
+  KEY `JOB_REQUESTED_ENVIRONMENT_VARIABLES_JOB_ID_INDEX` (`job_id`),
+  CONSTRAINT `JOB_REQUESTED_ENVIRONMENT_VARIABLES_JOB_ID_FK` FOREIGN KEY (`job_id`) REFERENCES `jobs` (`id`)
+    ON DELETE CASCADE
+)
+  ENGINE = InnoDB
+  DEFAULT CHARSET = utf8
+  DEFAULT COLLATE = utf8_bin
+  ROW_FORMAT = DYNAMIC;
+
+CREATE TABLE `job_environment_variables` (
+  `job_id` BIGINT(20)    NOT NULL,
+  `name`   VARCHAR(255)  NOT NULL,
+  `value`  VARCHAR(1024) NOT NULL,
+  PRIMARY KEY (`job_id`, `name`),
+  KEY `JOB_ENVIRONMENT_VARIABLES_JOB_ID_INDEX` (`job_id`),
+  CONSTRAINT `JOB_ENVIRONMENT_VARIABLES_JOB_ID_FK` FOREIGN KEY (`job_id`) REFERENCES `jobs` (`id`)
+    ON DELETE CASCADE
+)
+  ENGINE = InnoDB
+  DEFAULT CHARSET = utf8
+  DEFAULT COLLATE = utf8_bin
+  ROW_FORMAT = DYNAMIC;
+
+ALTER TABLE `jobs`
+  ADD COLUMN `interactive`                      BOOLEAN       DEFAULT FALSE NOT NULL,
+  ADD COLUMN `requested_job_directory_location` VARCHAR(1024) DEFAULT NULL,
+  ADD COLUMN `requested_agent_config_ext`       TEXT          DEFAULT NULL,
+  ADD COLUMN `requested_agent_environment_ext`  TEXT          DEFAULT NULL;

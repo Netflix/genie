@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.jpa.entities;
 
+import com.google.common.collect.Maps;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.web.jpa.entities.projections.JobApplicationsProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobClusterProjection;
@@ -44,8 +45,10 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapKeyColumn;
 import javax.persistence.OrderColumn;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
@@ -58,6 +61,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -251,6 +255,24 @@ public class JobEntity extends BaseEntity implements
     @Size(max = 1024, message = "Max length in database is 1024 characters")
     private String archiveLocation;
 
+    @Basic(optional = false)
+    @Column(name = "interactive", nullable = false, updatable = false)
+    private boolean interactive;
+
+    @Basic
+    @Column(name = "requested_job_directory_location", length = 1024, updatable = false)
+    private String requestedJobDirectoryLocation;
+
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "requested_agent_config_ext", columnDefinition = "TEXT DEFAULT NULL")
+    private String requestedAgentConfigExt;
+
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "requested_agent_environment_ext", columnDefinition = "TEXT DEFAULT NULL")
+    private String requestedAgentEnvironmentExt;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cluster_id")
     private ClusterEntity cluster;
@@ -269,6 +291,30 @@ public class JobEntity extends BaseEntity implements
     @Column(name = "argument", length = 10_000, nullable = false, updatable = false)
     @OrderColumn(name = "argument_order", nullable = false, updatable = false)
     private List<@NotBlank @Size(max = 10_000) String> commandArgs = new ArrayList<>();
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(
+        name = "job_requested_environment_variables",
+        joinColumns = {
+            @JoinColumn(name = "job_id", nullable = false, updatable = false)
+        }
+    )
+    @MapKeyColumn(name = "name", updatable = false)
+    @Column(name = "value", length = 1024, nullable = false, updatable = false)
+    private Map<@NotBlank @Size(max = 255) String, @NotBlank @Size(max = 1024) String>
+        requestedEnvironmentVariables = Maps.newHashMap();
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(
+        name = "job_environment_variables",
+        joinColumns = {
+            @JoinColumn(name = "job_id", nullable = false)
+        }
+    )
+    @MapKeyColumn(name = "name")
+    @Column(name = "value", length = 1024, nullable = false)
+    private Map<@NotBlank @Size(max = 255) String, @NotBlank @Size(max = 1024) String>
+        environmentVariables = Maps.newHashMap();
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -717,6 +763,30 @@ public class JobEntity extends BaseEntity implements
         this.tags.clear();
         if (tags != null) {
             this.tags.addAll(tags);
+        }
+    }
+
+    /**
+     * Set the requested environment variables.
+     *
+     * @param requestedEnvironmentVariables The environment variables the user requested be added to the job runtime
+     */
+    public void setRequestedEnvironmentVariables(@Nullable final Map<String, String> requestedEnvironmentVariables) {
+        this.requestedEnvironmentVariables.clear();
+        if (requestedEnvironmentVariables != null) {
+            this.requestedEnvironmentVariables.putAll(requestedEnvironmentVariables);
+        }
+    }
+
+    /**
+     * Set the environment variables for the job.
+     *
+     * @param environmentVariables The final set of environment variables that were set in the job runtime
+     */
+    public void setEnvironmentVariables(@Nullable final Map<String, String> environmentVariables) {
+        this.environmentVariables.clear();
+        if (environmentVariables != null) {
+            this.environmentVariables.putAll(environmentVariables);
         }
     }
 

@@ -65,3 +65,36 @@ ALTER TABLE `criteria`
   ADD COLUMN `version` VARCHAR(255) DEFAULT NULL;
 ALTER TABLE `criteria`
   ADD COLUMN `status` VARCHAR(255) DEFAULT NULL;
+
+CREATE TABLE `job_requested_environment_variables` (
+  `job_id` BIGINT(20)    NOT NULL,
+  `name`   VARCHAR(255)  NOT NULL,
+  `value`  VARCHAR(1024) NOT NULL,
+  PRIMARY KEY (`job_id`, `name`),
+  CONSTRAINT `JOB_REQUESTED_ENVIRONMENT_VARIABLES_JOB_ID_FK` FOREIGN KEY (`job_id`) REFERENCES `jobs` (`id`)
+  ON DELETE CASCADE
+);
+
+CREATE INDEX `JOB_REQUESTED_ENVIRONMENT_VARIABLES_JOB_ID_INDEX`
+  ON `job_requested_environment_variables` (`job_id`);
+
+CREATE TABLE `job_environment_variables` (
+  `job_id` BIGINT(20)    NOT NULL,
+  `name`   VARCHAR(255)  NOT NULL,
+  `value`  VARCHAR(1024) NOT NULL,
+  PRIMARY KEY (`job_id`, `name`),
+  CONSTRAINT `JOB_ENVIRONMENT_VARIABLES_JOB_ID_FK` FOREIGN KEY (`job_id`) REFERENCES `jobs` (`id`)
+  ON DELETE CASCADE
+);
+
+CREATE INDEX `JOB_ENVIRONMENT_VARIABLES_JOB_ID_INDEX`
+  ON `job_environment_variables` (`job_id`);
+
+ALTER TABLE `jobs`
+  ADD COLUMN `interactive` BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE `jobs`
+  ADD COLUMN `requested_job_directory_location` VARCHAR(1024) DEFAULT NULL;
+ALTER TABLE `jobs`
+  ADD COLUMN `requested_agent_config_ext` TEXT DEFAULT NULL;
+ALTER TABLE `jobs`
+  ADD COLUMN `requested_agent_environment_ext` TEXT DEFAULT NULL;
