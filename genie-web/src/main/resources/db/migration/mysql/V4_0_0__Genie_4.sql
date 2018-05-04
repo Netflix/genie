@@ -137,7 +137,23 @@ CREATE TABLE `job_environment_variables` (
   ROW_FORMAT = DYNAMIC;
 
 ALTER TABLE `jobs`
-  ADD COLUMN `interactive`                      BOOLEAN       DEFAULT FALSE NOT NULL,
-  ADD COLUMN `requested_job_directory_location` VARCHAR(1024) DEFAULT NULL,
-  ADD COLUMN `requested_agent_config_ext`       TEXT          DEFAULT NULL,
-  ADD COLUMN `requested_agent_environment_ext`  TEXT          DEFAULT NULL;
+  ADD COLUMN    `interactive`                               BOOLEAN       DEFAULT FALSE NOT NULL,
+  ADD COLUMN    `requested_job_directory_location`          VARCHAR(1024) DEFAULT NULL,
+  ADD COLUMN    `requested_agent_config_ext`                TEXT          DEFAULT NULL,
+  ADD COLUMN    `requested_agent_environment_ext`           TEXT          DEFAULT NULL,
+  CHANGE COLUMN `disable_log_archival` `archiving_disabled` BOOLEAN       DEFAULT FALSE NOT NULL,
+  CHANGE COLUMN `cpu_requested` `requested_cpu`             INT(11)       DEFAULT NULL,
+  CHANGE COLUMN `memory_requested` `requested_memory`       INT(11)       DEFAULT NULL,
+  CHANGE COLUMN `timeout_requested` `requested_timeout`     INT(11)       DEFAULT NULL,
+  CHANGE COLUMN `host_name` `agent_hostname`                VARCHAR(255)  DEFAULT NULL,
+  CHANGE COLUMN `client_host` `client_hostname`             VARCHAR(255)  DEFAULT NULL;
+
+ALTER TABLE `job_applications_requested` RENAME TO `job_requested_applications`;
+ALTER TABLE `job_requested_applications`
+  DROP FOREIGN KEY `JOB_APPLICATIONS_REQUESTED_JOB_ID_FK`,
+  DROP KEY `JOB_APPLICATIONS_REQUESTED_APPLICATION_ID_INDEX`,
+  DROP KEY `JOB_APPLICATIONS_REQUESTED_JOB_ID_INDEX`,
+  ADD CONSTRAINT `JOB_REQUESTED_APPLICATIONS_JOB_ID_FK` FOREIGN KEY (`job_id`) REFERENCES `jobs` (`id`)
+    ON DELETE CASCADE,
+  ADD KEY `JOB_REQUESTED_APPLICATIONS_APPLICATION_ID_INDEX` (`application_id`),
+  ADD KEY `JOB_REQUESTED_APPLICATIONS_JOB_ID_INDEX` (`job_id`);

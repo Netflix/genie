@@ -317,7 +317,7 @@ class JpaServiceUtilsSpec extends Specification {
         def id = UUID.randomUUID().toString()
         entity.setUniqueId(id)
         def hostName = UUID.randomUUID().toString()
-        entity.setHostName(hostName)
+        entity.setAgentHostname(hostName)
         def processId = 29038
         entity.setProcessId(processId)
         def checkDelay = 1890347L
@@ -349,7 +349,7 @@ class JpaServiceUtilsSpec extends Specification {
         def id = UUID.randomUUID().toString()
         entity.setUniqueId(id)
         def clientHost = UUID.randomUUID().toString()
-        entity.setClientHost(clientHost)
+        entity.setClientHostname(clientHost)
         def userAgent = UUID.randomUUID().toString()
         entity.setUserAgent(userAgent)
         def numAttachments = 3
@@ -462,7 +462,7 @@ class JpaServiceUtilsSpec extends Specification {
         )
         entity.setDependencies(dependencies)
 
-        entity.setDisableLogArchival(true)
+        entity.setArchivingDisabled(true)
 
         def email = UUID.randomUUID().toString()
         entity.setEmail(email)
@@ -476,10 +476,10 @@ class JpaServiceUtilsSpec extends Specification {
         entity.setSetupFile(setupFileEntity)
 
         final int cpu = 38
-        entity.setCpuRequested(cpu)
+        entity.setRequestedCpu(cpu)
 
         final int memory = 3060
-        entity.setMemoryRequested(memory)
+        entity.setRequestedMemory(memory)
 
         final List<String> applications = Lists.newArrayList(
                 UUID.randomUUID().toString(),
@@ -487,10 +487,10 @@ class JpaServiceUtilsSpec extends Specification {
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString()
         )
-        entity.setApplicationsRequested(applications)
+        entity.setRequestedApplications(applications)
 
         final int timeout = 824197
-        entity.setTimeoutRequested(timeout)
+        entity.setRequestedTimeout(timeout)
 
         when:
         def request = JpaServiceUtils.toJobRequestDto(entity)

@@ -26,7 +26,7 @@ import com.netflix.genie.web.jpa.entities.JobEntity;
 import com.netflix.genie.web.jpa.entities.projections.JobApplicationsProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobClusterProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobCommandProjection;
-import com.netflix.genie.web.jpa.entities.projections.JobHostNameProjection;
+import com.netflix.genie.web.jpa.entities.projections.AgentHostnameProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobProjection;
 import com.netflix.genie.web.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
@@ -187,7 +187,7 @@ public class JpaJobSearchServiceImplUnitTests {
     public void cantGetJobHostIfNoJobExecution() throws GenieException {
         final String jobId = UUID.randomUUID().toString();
         Mockito
-            .when(this.jobRepository.findByUniqueId(jobId, JobHostNameProjection.class))
+            .when(this.jobRepository.findByUniqueId(jobId, AgentHostnameProjection.class))
             .thenReturn(Optional.empty());
         this.service.getJobHost(jobId);
     }
@@ -202,9 +202,9 @@ public class JpaJobSearchServiceImplUnitTests {
         final String jobId = UUID.randomUUID().toString();
         final String hostName = UUID.randomUUID().toString();
         final JobEntity jobEntity = Mockito.mock(JobEntity.class);
-        Mockito.when(jobEntity.getHostName()).thenReturn(hostName);
+        Mockito.when(jobEntity.getAgentHostname()).thenReturn(Optional.of(hostName));
         Mockito
-            .when(this.jobRepository.findByUniqueId(jobId, JobHostNameProjection.class))
+            .when(this.jobRepository.findByUniqueId(jobId, AgentHostnameProjection.class))
             .thenReturn(Optional.of(jobEntity));
 
         Assert.assertThat(this.service.getJobHost(jobId), Matchers.is(hostName));

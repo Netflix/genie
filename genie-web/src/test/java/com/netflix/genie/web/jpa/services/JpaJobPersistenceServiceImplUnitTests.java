@@ -181,9 +181,9 @@ public class JpaJobPersistenceServiceImplUnitTests {
             Matchers.is(JOB_1_VERSION)
         );
         Assert.assertEquals(JOB_1_NAME, argument.getValue().getName());
-        final int actualCpu = argument.getValue().getCpuRequested().orElseThrow(IllegalArgumentException::new);
+        final int actualCpu = argument.getValue().getRequestedCpu().orElseThrow(IllegalArgumentException::new);
         Assert.assertThat(actualCpu, Matchers.is(cpu));
-        final int actualMemory = argument.getValue().getMemoryRequested().orElseThrow(IllegalArgumentException::new);
+        final int actualMemory = argument.getValue().getRequestedMemory().orElseThrow(IllegalArgumentException::new);
         Assert.assertThat(actualMemory, Matchers.is(mem));
         final String actualEmail = argument.getValue().getEmail().orElseThrow(IllegalArgumentException::new);
         Assert.assertThat(actualEmail, Matchers.is(email));
@@ -199,7 +199,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
         final String actualDescription
             = argument.getValue().getDescription().orElseThrow(IllegalArgumentException::new);
         Assert.assertThat(actualDescription, Matchers.is(description));
-        Assert.assertThat(argument.getValue().getApplicationsRequested(), Matchers.empty());
+        Assert.assertThat(argument.getValue().getRequestedApplications(), Matchers.empty());
     }
 
     /**

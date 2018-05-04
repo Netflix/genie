@@ -384,24 +384,24 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         );
         jobEntity.setConfigs(this.createAndGetFileEntities(jobRequest.getConfigs()));
         jobEntity.setDependencies(this.createAndGetFileEntities(jobRequest.getDependencies()));
-        jobEntity.setDisableLogArchival(jobRequest.isDisableLogArchival());
+        jobEntity.setArchivingDisabled(jobRequest.isDisableLogArchival());
         jobRequest.getEmail().ifPresent(jobEntity::setEmail);
         if (!jobRequest.getTags().isEmpty()) {
             jobEntity.setTags(this.createAndGetTagEntities(jobRequest.getTags()));
         }
-        jobRequest.getCpu().ifPresent(jobEntity::setCpuRequested);
-        jobRequest.getMemory().ifPresent(jobEntity::setMemoryRequested);
+        jobRequest.getCpu().ifPresent(jobEntity::setRequestedCpu);
+        jobRequest.getMemory().ifPresent(jobEntity::setRequestedMemory);
         if (!jobRequest.getApplications().isEmpty()) {
-            jobEntity.setApplicationsRequested(jobRequest.getApplications());
+            jobEntity.setRequestedApplications(jobRequest.getApplications());
         }
-        jobRequest.getTimeout().ifPresent(jobEntity::setTimeoutRequested);
+        jobRequest.getTimeout().ifPresent(jobEntity::setRequestedTimeout);
 
         jobRequest.getGrouping().ifPresent(jobEntity::setGrouping);
         jobRequest.getGroupingInstance().ifPresent(jobEntity::setGroupingInstance);
 
         // Fields collected as metadata
 
-        jobMetadata.getClientHost().ifPresent(jobEntity::setClientHost);
+        jobMetadata.getClientHost().ifPresent(jobEntity::setClientHostname);
         jobMetadata.getUserAgent().ifPresent(jobEntity::setUserAgent);
         jobMetadata.getNumAttachments().ifPresent(jobEntity::setNumAttachments);
         jobMetadata.getTotalSizeOfAttachments().ifPresent(jobEntity::setTotalSizeOfAttachments);
@@ -417,7 +417,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         job.getStatusMsg().ifPresent(jobEntity::setStatusMsg);
 
         // Fields set by system as part of job execution
-        jobEntity.setHostName(jobExecution.getHostName());
+        jobEntity.setAgentHostname(jobExecution.getHostName());
         jobExecution.getProcessId().ifPresent(jobEntity::setProcessId);
         jobExecution.getCheckDelay().ifPresent(jobEntity::setCheckDelay);
         jobExecution.getTimeout().ifPresent(jobEntity::setTimeout);

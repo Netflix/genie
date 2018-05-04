@@ -26,7 +26,7 @@ import java.util.Optional;
  * @author tgianos
  * @since 3.3.0
  */
-public interface JobExecutionProjection extends AuditProjection, JobHostNameProjection {
+public interface JobExecutionProjection extends AuditProjection, AgentHostnameProjection {
 
     /**
      * Get the unique identifier of this job execution.

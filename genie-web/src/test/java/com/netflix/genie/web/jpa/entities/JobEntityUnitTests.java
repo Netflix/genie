@@ -351,8 +351,11 @@ public class JobEntityUnitTests extends EntityTestsBase {
     @Test
     public void canSetHostName() {
         final String hostName = UUID.randomUUID().toString();
-        this.jobEntity.setHostName(hostName);
-        Assert.assertThat(this.jobEntity.getHostName(), Matchers.is(hostName));
+        this.jobEntity.setAgentHostname(hostName);
+        Assert.assertThat(
+            this.jobEntity.getAgentHostname().orElse(UUID.randomUUID().toString()),
+            Matchers.is(hostName)
+        );
     }
 
     /**
@@ -415,10 +418,13 @@ public class JobEntityUnitTests extends EntityTestsBase {
      * Make sure can set the client host name the request came from.
      */
     @Test
-    public void canSetClientHost() {
+    public void canSetClientHostname() {
         final String clientHost = UUID.randomUUID().toString();
-        this.jobEntity.setClientHost(clientHost);
-        Assert.assertThat(this.jobEntity.getClientHost().orElseGet(RandomSuppliers.STRING), Matchers.is(clientHost));
+        this.jobEntity.setClientHostname(clientHost);
+        Assert.assertThat(
+            this.jobEntity.getClientHostname().orElseGet(RandomSuppliers.STRING),
+            Matchers.is(clientHost)
+        );
     }
 
     /**
@@ -585,9 +591,9 @@ public class JobEntityUnitTests extends EntityTestsBase {
      * Make sure can set whether to disable logs or not.
      */
     @Test
-    public void canSetDisableLogArchival() {
-        this.jobEntity.setDisableLogArchival(true);
-        Assert.assertTrue(this.jobEntity.isDisableLogArchival());
+    public void canSetArchivingDisabled() {
+        this.jobEntity.setArchivingDisabled(true);
+        Assert.assertTrue(this.jobEntity.isArchivingDisabled());
     }
 
     /**
@@ -665,42 +671,42 @@ public class JobEntityUnitTests extends EntityTestsBase {
      * Make sure can set the number of cpu's to use for the job.
      */
     @Test
-    public void canSetCpu() {
+    public void canSetRequestedCpu() {
         final int cpu = 16;
-        this.jobEntity.setCpuRequested(cpu);
-        Assert.assertThat(this.jobEntity.getCpuRequested().orElseGet(RandomSuppliers.INT), Matchers.is(cpu));
+        this.jobEntity.setRequestedCpu(cpu);
+        Assert.assertThat(this.jobEntity.getRequestedCpu().orElseGet(RandomSuppliers.INT), Matchers.is(cpu));
     }
 
     /**
      * Make sure can set the amount of memory to use for the job.
      */
     @Test
-    public void canSetMemory() {
+    public void canSetRequestedMemory() {
         final int memory = 2048;
-        this.jobEntity.setMemoryRequested(memory);
-        Assert.assertThat(this.jobEntity.getMemoryRequested().orElseGet(RandomSuppliers.INT), Matchers.is(memory));
+        this.jobEntity.setRequestedMemory(memory);
+        Assert.assertThat(this.jobEntity.getRequestedMemory().orElseGet(RandomSuppliers.INT), Matchers.is(memory));
     }
 
     /**
      * Make sure the jobEntity class sets the applications requested right.
      */
     @Test
-    public void canSetApplicationsRequested() {
+    public void canSetRequestedApplications() {
         final String application = UUID.randomUUID().toString();
         final List<String> applications = Lists.newArrayList(application);
-        this.jobEntity.setApplicationsRequested(applications);
-        Assert.assertThat(this.jobEntity.getApplicationsRequested(), Matchers.is(applications));
+        this.jobEntity.setRequestedApplications(applications);
+        Assert.assertThat(this.jobEntity.getRequestedApplications(), Matchers.is(applications));
     }
 
     /**
      * Make sure can set the timeout date for the job.
      */
     @Test
-    public void canSetTimeoutRequested() {
-        Assert.assertFalse(this.jobEntity.getTimeoutRequested().isPresent());
+    public void canSetRequestedTimeout() {
+        Assert.assertFalse(this.jobEntity.getRequestedTimeout().isPresent());
         final int timeout = 28023423;
-        this.jobEntity.setTimeoutRequested(timeout);
-        Assert.assertThat(this.jobEntity.getTimeoutRequested().orElseGet(RandomSuppliers.INT), Matchers.is(timeout));
+        this.jobEntity.setRequestedTimeout(timeout);
+        Assert.assertThat(this.jobEntity.getRequestedTimeout().orElseGet(RandomSuppliers.INT), Matchers.is(timeout));
     }
 
     /**

@@ -17,8 +17,8 @@ package com.netflix.genie.web.jpa.repositories;
 
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.web.jpa.entities.JobEntity;
+import com.netflix.genie.web.jpa.entities.projections.AgentHostnameProjection;
 import com.netflix.genie.web.jpa.entities.projections.IdProjection;
-import com.netflix.genie.web.jpa.entities.projections.JobHostNameProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobProjection;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -43,11 +43,11 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
     /**
      * Find jobs by host name and status.
      *
-     * @param hostName The host name to search for
-     * @param statuses The job statuses to filter by
+     * @param agentHostname The host name to search for
+     * @param statuses      The job statuses to filter by
      * @return The jobs
      */
-    Set<JobProjection> findByHostNameAndStatusIn(final String hostName, final Set<JobStatus> statuses);
+    Set<JobProjection> findByAgentHostnameAndStatusIn(final String agentHostname, final Set<JobStatus> statuses);
 
     /**
      * Find the jobs with one of the statuses entered.
@@ -55,7 +55,7 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
      * @param statuses The statuses to search
      * @return The job information requested
      */
-    Set<JobHostNameProjection> findByStatusIn(final Set<JobStatus> statuses);
+    Set<AgentHostnameProjection> findByStatusIn(final Set<JobStatus> statuses);
 
     /**
      * Deletes all jobs for the given ids.
