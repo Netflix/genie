@@ -66,7 +66,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Representation of the state of a Genie job.
+ * A row in jobs table.
  *
  * @author amsharma
  * @author tgianos
@@ -77,14 +77,14 @@ import java.util.Set;
     callSuper = true,
     of = {
         "genieUserGroup",
-        "disableLogArchival",
+        "archivingDisabled",
         "email",
-        "cpuRequested",
-        "memoryRequested",
-        "timeoutRequested",
+        "requestedCpu",
+        "requestedMemory",
+        "requestedTimeout",
         "grouping",
         "groupingInstance",
-        "clientHost",
+        "clientHostname",
         "userAgent",
         "numAttachments",
         "totalSizeOfAttachments",
@@ -96,14 +96,15 @@ import java.util.Set;
         "statusMsg",
         "started",
         "finished",
-        "hostName",
+        "agentHostname",
         "processId",
         "checkDelay",
         "exitCode",
         "memoryUsed",
         "timeout",
         "archiveLocation"
-    }
+    },
+    doNotUseGetters = true
 )
 @Entity
 @Table(name = "jobs")
@@ -119,6 +120,7 @@ public class JobEntity extends BaseEntity implements
 
     private static final long serialVersionUID = 2849367731657512224L;
 
+    // TODO: Drop this column once search implemented via better mechanism
     @Basic
     @Column(name = "tags", length = 1024, updatable = false)
     @Size(max = 1024, message = "Max length in database is 1024 characters")
@@ -126,14 +128,15 @@ public class JobEntity extends BaseEntity implements
     @Setter(AccessLevel.NONE)
     private String tagSearchString;
 
+    // TODO: Drop this column once all jobs run via Agent
     @Basic
     @Column(name = "genie_user_group", updatable = false)
     @Size(max = 255, message = "Max length in database is 255 characters")
     private String genieUserGroup;
 
     @Basic(optional = false)
-    @Column(name = "disable_log_archival", nullable = false, updatable = false)
-    private boolean disableLogArchival;
+    @Column(name = "archiving_disabled", nullable = false, updatable = false)
+    private boolean archivingDisabled;
 
     @Basic
     @Column(name = "email", updatable = false)
@@ -142,19 +145,19 @@ public class JobEntity extends BaseEntity implements
     private String email;
 
     @Basic
-    @Column(name = "cpu_requested", updatable = false)
+    @Column(name = "requested_cpu", updatable = false)
     @Min(value = 1, message = "Can't have less than 1 CPU")
-    private Integer cpuRequested;
+    private Integer requestedCpu;
 
     @Basic
-    @Column(name = "memory_requested", updatable = false)
+    @Column(name = "requested_memory", updatable = false)
     @Min(value = 1, message = "Can't have less than 1 MB of memory allocated")
-    private Integer memoryRequested;
+    private Integer requestedMemory;
 
     @Basic
-    @Column(name = "timeout_requested", updatable = false)
+    @Column(name = "requested_timeout", updatable = false)
     @Min(value = 1)
-    private Integer timeoutRequested;
+    private Integer requestedTimeout;
 
     @Basic
     @Column(name = "grouping", updatable = false)
@@ -167,9 +170,9 @@ public class JobEntity extends BaseEntity implements
     private String groupingInstance;
 
     @Basic
-    @Column(name = "client_host", updatable = false)
+    @Column(name = "client_hostname", updatable = false)
     @Size(max = 255, message = "Max length in database is 255 characters")
-    private String clientHost;
+    private String clientHostname;
 
     @Basic
     @Column(name = "user_agent", length = 1024, updatable = false)
@@ -224,10 +227,10 @@ public class JobEntity extends BaseEntity implements
     @Column(name = "finished")
     private Instant finished;
 
-    @Basic(optional = false)
-    @Column(name = "host_name", nullable = false, updatable = false)
-    @Size(min = 1, max = 255, message = "Must have a host name no longer than 255 characters")
-    private String hostName;
+    @Basic
+    @Column(name = "agent_hostname")
+    @Size(max = 255, message = "An agent host name can be no longer than 255 characters")
+    private String agentHostname;
 
     @Basic
     @Column(name = "process_id")
@@ -265,12 +268,12 @@ public class JobEntity extends BaseEntity implements
 
     @Lob
     @Basic(fetch = FetchType.LAZY)
-    @Column(name = "requested_agent_config_ext", columnDefinition = "TEXT DEFAULT NULL")
+    @Column(name = "requested_agent_config_ext", updatable = false, columnDefinition = "TEXT DEFAULT NULL")
     private String requestedAgentConfigExt;
 
     @Lob
     @Basic(fetch = FetchType.LAZY)
-    @Column(name = "requested_agent_environment_ext", columnDefinition = "TEXT DEFAULT NULL")
+    @Column(name = "requested_agent_environment_ext", updatable = false, columnDefinition = "TEXT DEFAULT NULL")
     private String requestedAgentEnvironmentExt;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -333,29 +336,29 @@ public class JobEntity extends BaseEntity implements
     @JoinTable(
         name = "jobs_cluster_criteria",
         joinColumns = {
-            @JoinColumn(name = "job_id", referencedColumnName = "id", nullable = false)
+            @JoinColumn(name = "job_id", referencedColumnName = "id", nullable = false, updatable = false)
         },
         inverseJoinColumns = {
-            @JoinColumn(name = "criterion_id", referencedColumnName = "id", nullable = false)
+            @JoinColumn(name = "criterion_id", referencedColumnName = "id", nullable = false, updatable = false)
         }
     )
     @OrderColumn(name = "priority_order", nullable = false, updatable = false)
     private List<CriterionEntity> clusterCriteria = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "command_criterion", updatable = false)
+    @JoinColumn(name = "command_criterion", nullable = false, updatable = false)
     private CriterionEntity commandCriterion;
 
     @ElementCollection
     @CollectionTable(
-        name = "job_applications_requested",
+        name = "job_requested_applications",
         joinColumns = {
             @JoinColumn(name = "job_id", nullable = false, updatable = false)
         }
     )
     @Column(name = "application_id", nullable = false, updatable = false)
     @OrderColumn(name = "application_order", nullable = false, updatable = false)
-    private List<String> applicationsRequested = new ArrayList<>();
+    private List<String> requestedApplications = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -413,58 +416,51 @@ public class JobEntity extends BaseEntity implements
     }
 
     /**
-     * Get the user group for this job.
-     *
-     * @return the user group
+     * {@inheritDoc}
      */
+    @Override
     public Optional<String> getGenieUserGroup() {
         return Optional.ofNullable(this.genieUserGroup);
     }
 
     /**
-     * Get the command criterion if one exists.
-     *
-     * @return The command criterion if one exists
+     * {@inheritDoc}
      */
+    @Override
     public Optional<CriterionEntity> getCommandCriterion() {
         return Optional.ofNullable(this.commandCriterion);
     }
 
     /**
-     * Get the email of the user associated with this job if they desire an email notification at completion
-     * of the job.
-     *
-     * @return The email
+     * {@inheritDoc}
      */
+    @Override
     public Optional<String> getEmail() {
         return Optional.ofNullable(this.email);
     }
 
     /**
-     * Get the number of CPU's requested to run this job.
-     *
-     * @return The number of CPU's as an Optional
+     * {@inheritDoc}
      */
-    public Optional<Integer> getCpuRequested() {
-        return Optional.ofNullable(this.cpuRequested);
+    @Override
+    public Optional<Integer> getRequestedCpu() {
+        return Optional.ofNullable(this.requestedCpu);
     }
 
     /**
-     * Get the memory requested to run this job with.
-     *
-     * @return The amount of memory the user requested for this job in MB as an Optional
+     * {@inheritDoc}
      */
-    public Optional<Integer> getMemoryRequested() {
-        return Optional.ofNullable(this.memoryRequested);
+    @Override
+    public Optional<Integer> getRequestedMemory() {
+        return Optional.ofNullable(this.requestedMemory);
     }
 
     /**
-     * Get the timeout (in seconds) requested by the user for this job.
-     *
-     * @return The number of seconds before a timeout as an Optional
+     * {@inheritDoc}
      */
-    public Optional<Integer> getTimeoutRequested() {
-        return Optional.ofNullable(this.timeoutRequested);
+    @Override
+    public Optional<Integer> getRequestedTimeout() {
+        return Optional.ofNullable(this.requestedTimeout);
     }
 
     /**
@@ -477,73 +473,65 @@ public class JobEntity extends BaseEntity implements
     }
 
     /**
-     * Get the grouping this job is a part of. e.g. scheduler job name for job run many times
-     *
-     * @return The grouping
+     * {@inheritDoc}
      */
+    @Override
     public Optional<String> getGrouping() {
         return Optional.ofNullable(this.grouping);
     }
 
     /**
-     * Get the instance identifier of a grouping. e.g. the run id of a given scheduled job
-     *
-     * @return The grouping instance
+     * {@inheritDoc}
      */
+    @Override
     public Optional<String> getGroupingInstance() {
         return Optional.ofNullable(this.groupingInstance);
     }
 
     /**
-     * Get the client host.
-     *
-     * @return Optional of the client host
+     * {@inheritDoc}
      */
-    public Optional<String> getClientHost() {
-        return Optional.ofNullable(this.clientHost);
+    @Override
+    public Optional<String> getClientHostname() {
+        return Optional.ofNullable(this.clientHostname);
     }
 
     /**
-     * Get the user agent.
-     *
-     * @return Optional of the user agent
+     * {@inheritDoc}
      */
+    @Override
     public Optional<String> getUserAgent() {
         return Optional.ofNullable(this.userAgent);
     }
 
     /**
-     * Get the number of attachments.
-     *
-     * @return The number of attachments as an optional
+     * {@inheritDoc}
      */
+    @Override
     public Optional<Integer> getNumAttachments() {
         return Optional.ofNullable(this.numAttachments);
     }
 
     /**
-     * Get the total size of the attachments.
-     *
-     * @return The total size of attachments as an optional
+     * {@inheritDoc}
      */
+    @Override
     public Optional<Long> getTotalSizeOfAttachments() {
         return Optional.ofNullable(this.totalSizeOfAttachments);
     }
 
     /**
-     * Get the size of standard out for this job.
-     *
-     * @return The size (in bytes) of this jobs standard out file as Optional
+     * {@inheritDoc}
      */
+    @Override
     public Optional<Long> getStdOutSize() {
         return Optional.ofNullable(this.stdOutSize);
     }
 
     /**
-     * Get the size of standard error for this job.
-     *
-     * @return The size (in bytes) of this jobs standard error file as Optional
+     * {@inheritDoc}
      */
+    @Override
     public Optional<Long> getStdErrSize() {
         return Optional.ofNullable(this.stdErrSize);
     }
@@ -593,19 +581,17 @@ public class JobEntity extends BaseEntity implements
     }
 
     /**
-     * Gets the status message or this job.
-     *
-     * @return statusMsg
+     * {@inheritDoc}
      */
+    @Override
     public Optional<String> getStatusMsg() {
         return Optional.ofNullable(this.statusMsg);
     }
 
     /**
-     * Gets the start time for this job.
-     *
-     * @return startTime or empty optional if not yet started
+     * {@inheritDoc}
      */
+    @Override
     public Optional<Instant> getStarted() {
         return Optional.ofNullable(this.started);
     }
@@ -620,10 +606,9 @@ public class JobEntity extends BaseEntity implements
     }
 
     /**
-     * Gets the finish time for this job.
-     *
-     * @return finished. The job finish timestamp.
+     * {@inheritDoc}
      */
+    @Override
     public Optional<Instant> getFinished() {
         return Optional.ofNullable(this.finished);
     }
@@ -638,73 +623,73 @@ public class JobEntity extends BaseEntity implements
     }
 
     /**
-     * Get location where logs are archived.
-     *
-     * @return Location where logs are archived
+     * {@inheritDoc}
      */
+    @Override
+    public Optional<String> getAgentHostname() {
+        return Optional.ofNullable(this.agentHostname);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Optional<String> getArchiveLocation() {
         return Optional.ofNullable(this.archiveLocation);
     }
 
     /**
-     * Gets the name of the cluster on which this job was run.
-     *
-     * @return the cluster name
+     * {@inheritDoc}
      */
+    @Override
     public Optional<String> getClusterName() {
         return Optional.ofNullable(this.clusterName);
     }
 
     /**
-     * Gets the command name for this job.
-     *
-     * @return The command name
+     * {@inheritDoc}
      */
+    @Override
     public Optional<String> getCommandName() {
         return Optional.ofNullable(this.commandName);
     }
 
     /**
-     * Get the process id of the job.
-     *
-     * @return the process id
+     * {@inheritDoc}
      */
+    @Override
     public Optional<Integer> getProcessId() {
         return Optional.ofNullable(this.processId);
     }
 
     /**
-     * Get the amount of time (in milliseconds) to delay the check for the job status.
-     *
-     * @return Could be null so return optional of the Long
+     * {@inheritDoc}
      */
+    @Override
     public Optional<Long> getCheckDelay() {
         return Optional.ofNullable(this.checkDelay);
     }
 
     /**
-     * Get the exit code from the process that ran the job.
-     *
-     * @return The exit code or -1 if the job hasn't finished yet
+     * {@inheritDoc}
      */
+    @Override
     public Optional<Integer> getExitCode() {
         return Optional.ofNullable(this.exitCode);
     }
 
     /**
-     * Get the amount of memory (in MB) that this job is/was run with.
-     *
-     * @return The memory as an optional as it could be null
+     * {@inheritDoc}
      */
+    @Override
     public Optional<Integer> getMemoryUsed() {
         return Optional.ofNullable(this.memoryUsed);
     }
 
     /**
-     * Get the date this job will be killed due to exceeding its set timeout duration.
-     *
-     * @return The timeout date
+     * {@inheritDoc}
      */
+    @Override
     public Optional<Instant> getTimeout() {
         return Optional.ofNullable(this.timeout);
     }
@@ -791,10 +776,9 @@ public class JobEntity extends BaseEntity implements
     }
 
     /**
-     * Get the cluster that is running or did run this job.
-     *
-     * @return The cluster or empty Optional if it hasn't been set
+     * {@inheritDoc}
      */
+    @Override
     public Optional<ClusterEntity> getCluster() {
         return Optional.ofNullable(this.cluster);
     }
@@ -817,10 +801,9 @@ public class JobEntity extends BaseEntity implements
     }
 
     /**
-     * Get the command that is executing this job.
-     *
-     * @return The command or empty Optional if one wasn't set yet
+     * {@inheritDoc}
      */
+    @Override
     public Optional<CommandEntity> getCommand() {
         return Optional.ofNullable(this.command);
     }

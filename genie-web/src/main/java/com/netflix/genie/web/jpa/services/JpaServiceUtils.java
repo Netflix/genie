@@ -45,6 +45,7 @@ import com.netflix.genie.web.jpa.entities.projections.JobRequestProjection;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -202,7 +203,7 @@ public final class JpaServiceUtils {
         )
             .withCreated(jobRequestProjection.getCreated())
             .withId(jobRequestProjection.getUniqueId())
-            .withDisableLogArchival(jobRequestProjection.isDisableLogArchival())
+            .withDisableLogArchival(jobRequestProjection.isArchivingDisabled())
             .withConfigs(
                 jobRequestProjection
                     .getConfigs()
@@ -219,15 +220,15 @@ public final class JpaServiceUtils {
             )
             .withTags(jobRequestProjection.getTags().stream().map(TagEntity::getTag).collect(Collectors.toSet()))
             .withUpdated(jobRequestProjection.getUpdated())
-            .withApplications(jobRequestProjection.getApplicationsRequested())
+            .withApplications(jobRequestProjection.getRequestedApplications())
             .withCommandArgs(jobRequestProjection.getCommandArgs());
 
         jobRequestProjection.getEmail().ifPresent(builder::withEmail);
         jobRequestProjection.getGenieUserGroup().ifPresent(builder::withGroup);
         jobRequestProjection.getDescription().ifPresent(builder::withDescription);
-        jobRequestProjection.getCpuRequested().ifPresent(builder::withCpu);
-        jobRequestProjection.getMemoryRequested().ifPresent(builder::withMemory);
-        jobRequestProjection.getTimeoutRequested().ifPresent(builder::withTimeout);
+        jobRequestProjection.getRequestedCpu().ifPresent(builder::withCpu);
+        jobRequestProjection.getRequestedMemory().ifPresent(builder::withMemory);
+        jobRequestProjection.getRequestedTimeout().ifPresent(builder::withTimeout);
         jobRequestProjection
             .getSetupFile()
             .ifPresent(setupFileEntity -> builder.withSetupFile(setupFileEntity.getFile()));
@@ -249,7 +250,8 @@ public final class JpaServiceUtils {
     }
 
     static JobExecution toJobExecutionDto(final JobExecutionProjection jobExecutionProjection) {
-        final JobExecution.Builder builder = new JobExecution.Builder(jobExecutionProjection.getHostName())
+        final JobExecution.Builder builder = new JobExecution
+            .Builder(jobExecutionProjection.getAgentHostname().orElse(UUID.randomUUID().toString()))
             .withId(jobExecutionProjection.getUniqueId())
             .withCreated(jobExecutionProjection.getCreated())
             .withUpdated(jobExecutionProjection.getUpdated());
@@ -269,7 +271,7 @@ public final class JpaServiceUtils {
             .withCreated(jobMetadataProjection.getCreated())
             .withUpdated(jobMetadataProjection.getUpdated());
 
-        jobMetadataProjection.getClientHost().ifPresent(builder::withClientHost);
+        jobMetadataProjection.getClientHostname().ifPresent(builder::withClientHost);
         jobMetadataProjection.getUserAgent().ifPresent(builder::withUserAgent);
         jobMetadataProjection.getNumAttachments().ifPresent(builder::withNumAttachments);
         jobMetadataProjection.getTotalSizeOfAttachments().ifPresent(builder::withTotalSizeOfAttachments);

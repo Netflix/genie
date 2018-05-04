@@ -118,8 +118,29 @@ CREATE TABLE job_environment_variables (
 CREATE INDEX job_environment_variables_job_id_index
   ON job_environment_variables (job_id);
 
+ALTER TABLE jobs RENAME COLUMN disable_log_archival TO archiving_disabled;
+ALTER TABLE jobs RENAME COLUMN cpu_requested        TO requested_cpu;
+ALTER TABLE jobs RENAME COLUMN memory_requested     TO requested_memory;
+ALTER TABLE jobs RENAME COLUMN timeout_requested    TO requested_timeout;
+ALTER TABLE jobs RENAME COLUMN host_name            TO agent_hostname;
+ALTER TABLE jobs RENAME COLUMN client_host          TO client_hostname;
+
 ALTER TABLE jobs
   ADD COLUMN interactive                      BOOLEAN       DEFAULT FALSE NOT NULL,
   ADD COLUMN requested_job_directory_location VARCHAR(1024) DEFAULT NULL,
   ADD COLUMN requested_agent_config_ext       TEXT          DEFAULT NULL,
-  ADD COLUMN requested_agent_environment_ext  TEXT          DEFAULT NULL;
+  ADD COLUMN requested_agent_environment_ext  TEXT          DEFAULT NULL,
+  ALTER COLUMN agent_hostname DROP NOT NULL,
+  ALTER COLUMN agent_hostname SET DEFAULT NULL;
+
+ALTER TABLE job_applications_requested RENAME TO job_requested_applications;
+ALTER TABLE job_requested_applications
+  DROP CONSTRAINT job_applications_requested_job_id_fkey,
+  ADD CONSTRAINT job_requested_applications_job_id_fkey FOREIGN KEY (job_id) REFERENCES jobs (id) ON DELETE CASCADE;
+
+DROP INDEX job_applications_requested_application_id_index;
+CREATE INDEX job_requested_applications_application_id_index
+  ON job_requested_applications (application_id);
+DROP INDEX job_applications_requested_job_id_index;
+CREATE INDEX job_requested_applications_job_id_index
+  ON job_requested_applications (job_id);

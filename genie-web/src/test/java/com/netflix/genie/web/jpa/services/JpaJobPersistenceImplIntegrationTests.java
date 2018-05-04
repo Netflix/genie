@@ -398,7 +398,7 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
 
     private void validateJobMetadata(final JobMetadataProjection savedMetadata) {
         Assert.assertThat(
-            savedMetadata.getClientHost().orElseThrow(IllegalArgumentException::new),
+            savedMetadata.getClientHostname().orElseThrow(IllegalArgumentException::new),
             Matchers.is(CLIENT_HOST)
         );
         Assert.assertThat(

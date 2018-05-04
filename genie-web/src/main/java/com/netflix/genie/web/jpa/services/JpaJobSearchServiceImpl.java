@@ -32,11 +32,11 @@ import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GenieServerException;
 import com.netflix.genie.web.jpa.entities.JobEntity;
 import com.netflix.genie.web.jpa.entities.JobEntity_;
+import com.netflix.genie.web.jpa.entities.projections.AgentHostnameProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobApplicationsProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobClusterProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobCommandProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobExecutionProjection;
-import com.netflix.genie.web.jpa.entities.projections.JobHostNameProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobMetadataProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobRequestProjection;
@@ -67,6 +67,7 @@ import javax.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -212,7 +213,7 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
         log.debug("Called with hostname {}", hostName);
 
         final Set<JobProjection> jobs
-            = this.jobRepository.findByHostNameAndStatusIn(hostName, JobStatus.getActiveStatuses());
+            = this.jobRepository.findByAgentHostnameAndStatusIn(hostName, JobStatus.getActiveStatuses());
 
         return jobs
             .stream()
@@ -230,7 +231,9 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
         return this.jobRepository
             .findByStatusIn(JobStatus.getActiveStatuses())
             .stream()
-            .map(JobHostNameProjection::getHostName)
+            .map(AgentHostnameProjection::getAgentHostname)
+            .filter(Optional::isPresent)
+            .map(Optional::get)
             .collect(Collectors.toList());
     }
 
@@ -345,9 +348,10 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
     @Override
     public String getJobHost(@NotBlank final String jobId) throws GenieException {
         return this.jobRepository
-            .findByUniqueId(jobId, JobHostNameProjection.class)
+            .findByUniqueId(jobId, AgentHostnameProjection.class)
             .orElseThrow(() -> new GenieNotFoundException("No job execution found for id " + jobId))
-            .getHostName();
+            .getAgentHostname()
+            .orElseThrow(() -> new GenieNotFoundException("No hostname set for job "  + jobId));
     }
 
     /**

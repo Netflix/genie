@@ -72,7 +72,7 @@ public interface JobRequestProjection extends JobCommonFieldsProjection, SetupFi
      *
      * @return true if log archival was disabled
      */
-    boolean isDisableLogArchival();
+    boolean isArchivingDisabled();
 
     /**
      * Get the email of the user associated with this job if they desire an email notification at completion
@@ -87,26 +87,26 @@ public interface JobRequestProjection extends JobCommonFieldsProjection, SetupFi
      *
      * @return The number of CPU's as an Optional
      */
-    Optional<Integer> getCpuRequested();
+    Optional<Integer> getRequestedCpu();
 
     /**
      * Get the memory requested to run this job with.
      *
      * @return The amount of memory the user requested for this job in MB as an Optional
      */
-    Optional<Integer> getMemoryRequested();
+    Optional<Integer> getRequestedMemory();
 
     /**
      * Get the timeout (in seconds) requested by the user for this job.
      *
      * @return The number of seconds before a timeout as an Optional
      */
-    Optional<Integer> getTimeoutRequested();
+    Optional<Integer> getRequestedTimeout();
 
     /**
      * Get any applications requested by their id.
      *
      * @return The applications
      */
-    List<String> getApplicationsRequested();
+    List<String> getRequestedApplications();
 }

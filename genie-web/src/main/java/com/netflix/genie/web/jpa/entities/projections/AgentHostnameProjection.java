@@ -17,18 +17,20 @@
  */
 package com.netflix.genie.web.jpa.entities.projections;
 
+import java.util.Optional;
+
 /**
  * Projection for job hosts.
  *
  * @author tgianos
  * @since 3.3.0
  */
-public interface JobHostNameProjection {
+public interface AgentHostnameProjection {
 
     /**
-     * Get the host name for the job.
+     * Get the host name where the agent ran or is running the job.
      *
-     * @return The host name where the job is running or was run
+     * @return The host name where the job agent is running or was run wrapped in an {@link Optional}
      */
-    String getHostName();
+    Optional<String> getAgentHostname();
 }
