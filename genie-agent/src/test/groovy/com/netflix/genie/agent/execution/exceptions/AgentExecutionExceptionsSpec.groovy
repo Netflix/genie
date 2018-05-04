@@ -49,5 +49,6 @@ class AgentExecutionExceptionsSpec extends Specification {
         SetUpJobException.class                     | _
         JobLaunchException.class                    | _
         JobSpecificationResolutionException.class   | _
+        LockException.class                         | _
     }
 }
