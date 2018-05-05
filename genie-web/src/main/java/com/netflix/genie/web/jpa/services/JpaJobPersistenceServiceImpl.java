@@ -17,17 +17,26 @@
  */
 package com.netflix.genie.web.jpa.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.ClusterCriteria;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
-import com.netflix.genie.common.dto.JobMetadata;
-import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.internal.dto.v4.AgentConfigRequest;
+import com.netflix.genie.common.internal.dto.v4.AgentEnvironmentRequest;
+import com.netflix.genie.common.internal.dto.v4.Criterion;
+import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
+import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria;
+import com.netflix.genie.common.internal.dto.v4.JobMetadata;
+import com.netflix.genie.common.internal.dto.v4.JobRequest;
+import com.netflix.genie.common.internal.dto.v4.JobRequestMetadata;
+import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.jpa.entities.ApplicationEntity;
 import com.netflix.genie.web.jpa.entities.ClusterEntity;
@@ -55,11 +64,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nullable;
 import javax.validation.ConstraintViolationException;
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -115,8 +128,8 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
      */
     @Override
     public void createJob(
-        @NotNull final JobRequest jobRequest,
-        @NotNull final JobMetadata jobMetadata,
+        @NotNull final com.netflix.genie.common.dto.JobRequest jobRequest,
+        @NotNull final com.netflix.genie.common.dto.JobMetadata jobMetadata,
         @NotNull final Job job,
         @NotNull final JobExecution jobExecution
     ) throws GenieException {
@@ -307,6 +320,50 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         return totalAttemptedDeletions;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String saveJobRequest(
+        @Valid final JobRequest jobRequest,
+        @Valid final JobRequestMetadata jobRequestMetadata
+    ) throws GenieException {
+        log.debug("Attempting to save job request {} with request metadata {}", jobRequest, jobRequestMetadata);
+        // TODO: Metrics
+        final JobEntity jobEntity = new JobEntity();
+
+        jobEntity.setUniqueId(jobRequest.getRequestedId().orElse(UUID.randomUUID().toString()));
+        jobEntity.setCommandArgs(jobRequest.getCommandArgs());
+
+        this.setJobMetadataFields(jobEntity, jobRequest.getMetadata());
+        this.setExecutionEnvironmentFields(jobEntity, jobRequest.getResources());
+        this.setExecutionResourceCriteriaFields(jobEntity, jobRequest.getCriteria());
+        this.setRequestedAgentEnvironmentFields(jobEntity, jobRequest.getRequestedAgentEnvironment());
+        this.setRequestedAgentConfigFields(jobEntity, jobRequest.getRequestedAgentConfig());
+        this.setRequestMetadataFields(jobEntity, jobRequestMetadata);
+
+        // Persist. Catch exception if the ID is reused
+        try {
+            return this.jobRepository.save(jobEntity).getUniqueId();
+        } catch (final DataIntegrityViolationException e) {
+            throw new GenieConflictException(
+                "A job with id " + jobEntity.getUniqueId() + " already exists. Unable to reserve id.",
+                e
+            );
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setJobSpecification(
+        @NotBlank(message = "Id is missing and is required") final String id,
+        @Nullable final JobSpecification specification
+    ) throws GenieException {
+
+    }
+
     private void updateJobStatus(final JobEntity jobEntity, final JobStatus jobStatus, final String statusMsg) {
         final JobStatus status = jobEntity.getStatus();
         // Only change the status if the entity isn't already in a terminal state
@@ -327,8 +384,8 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
 
     private JobEntity toEntity(
         final String id,
-        final JobRequest jobRequest,
-        final JobMetadata jobMetadata,
+        final com.netflix.genie.common.dto.JobRequest jobRequest,
+        final com.netflix.genie.common.dto.JobMetadata jobMetadata,
         final Job job,
         final JobExecution jobExecution
     ) throws GenieException {
@@ -340,6 +397,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         jobEntity.setName(jobRequest.getName());
         jobEntity.setUser(jobRequest.getUser());
         jobEntity.setVersion(jobRequest.getVersion());
+        jobEntity.setStatus(JobStatus.INIT);
         jobRequest.getDescription().ifPresent(jobEntity::setDescription);
         JpaServiceUtils.setEntityMetadata(GenieObjectMapper.getMapper(), jobRequest, jobEntity);
         jobRequest.getCommandArgs().ifPresent(
@@ -401,8 +459,8 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
 
         // Fields collected as metadata
 
-        jobMetadata.getClientHost().ifPresent(jobEntity::setClientHostname);
-        jobMetadata.getUserAgent().ifPresent(jobEntity::setUserAgent);
+        jobMetadata.getClientHost().ifPresent(jobEntity::setRequestApiClientHostname);
+        jobMetadata.getUserAgent().ifPresent(jobEntity::setRequestApiClientUserAgent);
         jobMetadata.getNumAttachments().ifPresent(jobEntity::setNumAttachments);
         jobMetadata.getTotalSizeOfAttachments().ifPresent(jobEntity::setTotalSizeOfAttachments);
         jobMetadata.getStdErrSize().ifPresent(jobEntity::setStdErrSize);
@@ -424,5 +482,128 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         jobExecution.getMemory().ifPresent(jobEntity::setMemoryUsed);
 
         return jobEntity;
+    }
+
+    private CriterionEntity toCriterionEntity(final Criterion criterion) throws GenieException {
+        final CriterionEntity criterionEntity = new CriterionEntity();
+        criterion.getId().ifPresent(criterionEntity::setUniqueId);
+        criterion.getName().ifPresent(criterionEntity::setName);
+        criterion.getVersion().ifPresent(criterionEntity::setVersion);
+        criterion.getStatus().ifPresent(criterionEntity::setStatus);
+        criterionEntity.setTags(this.createAndGetTagEntities(criterion.getTags()));
+        return criterionEntity;
+    }
+
+    private void jsonToString(
+        final JsonNode json,
+        final Consumer<? super String> consumer
+    ) {
+        try {
+            consumer.accept(GenieObjectMapper.getMapper().writeValueAsString(json));
+        } catch (final JsonProcessingException jpe) {
+            // TODO: Should never happen. Swallow for now till we decide what we want to do
+            log.error("Invalid JSON, unable to convert {} to string", json, jpe);
+            consumer.accept("{\"jsonProcessingException\": \"" + jpe.getMessage() + "\"}");
+        }
+    }
+
+    private void setJobMetadataFields(
+        final JobEntity jobEntity,
+        final JobMetadata jobMetadata
+    ) throws GenieException {
+        // Required fields
+        jobEntity.setName(jobMetadata.getName());
+        jobEntity.setUser(jobMetadata.getUser());
+        jobEntity.setVersion(jobMetadata.getVersion());
+
+        // Optional fields
+        jobEntity.setTags(this.createAndGetTagEntities(jobMetadata.getTags()));
+
+        final Optional<JsonNode> jsonMetadata = jobMetadata.getMetadata();
+        jsonMetadata.ifPresent(jsonNode -> this.jsonToString(jsonNode, jobEntity::setMetadata));
+        jobMetadata.getDescription().ifPresent(jobEntity::setDescription);
+        jobMetadata.getEmail().ifPresent(jobEntity::setEmail);
+        jobMetadata.getGroup().ifPresent(jobEntity::setGenieUserGroup);
+        jobMetadata.getGrouping().ifPresent(jobEntity::setGrouping);
+        jobMetadata.getGroupingInstance().ifPresent(jobEntity::setGroupingInstance);
+    }
+
+    private void setExecutionEnvironmentFields(
+        final JobEntity jobEntity,
+        final ExecutionEnvironment executionEnvironment
+    ) throws GenieException {
+        final FileEntity setupFile = executionEnvironment.getSetupFile().isPresent()
+            ? this.createAndGetFileEntity(executionEnvironment.getSetupFile().get())
+            : null;
+        if (setupFile != null) {
+            jobEntity.setSetupFile(setupFile);
+        }
+        jobEntity.setConfigs(this.createAndGetFileEntities(executionEnvironment.getConfigs()));
+        jobEntity.setDependencies(this.createAndGetFileEntities(executionEnvironment.getDependencies()));
+    }
+
+    private void setExecutionResourceCriteriaFields(
+        final JobEntity jobEntity,
+        final ExecutionResourceCriteria criteria
+    ) throws GenieException {
+        final List<Criterion> clusterCriteria = criteria.getClusterCriteria();
+        final List<CriterionEntity> clusterCriteriaEntities
+            = Lists.newArrayListWithExpectedSize(clusterCriteria.size());
+
+        for (final Criterion clusterCriterion : clusterCriteria) {
+            clusterCriteriaEntities.add(this.toCriterionEntity(clusterCriterion));
+        }
+        jobEntity.setClusterCriteria(clusterCriteriaEntities);
+        jobEntity.setCommandCriterion(this.toCriterionEntity(criteria.getCommandCriterion()));
+        jobEntity.setRequestedApplications(criteria.getApplicationIds());
+    }
+
+    private void setRequestedAgentEnvironmentFields(
+        final JobEntity jobEntity,
+        final AgentEnvironmentRequest requestedAgentEnvironment
+    ) throws GenieException {
+        jobEntity.setRequestedEnvironmentVariables(requestedAgentEnvironment.getRequestedEnvironmentVariables());
+        requestedAgentEnvironment.getRequestedJobMemory().ifPresent(jobEntity::setRequestedMemory);
+        requestedAgentEnvironment.getRequestedJobCpu().ifPresent(jobEntity::setRequestedCpu);
+        final Optional<JsonNode> agentEnvironmentExt = requestedAgentEnvironment.getExt();
+        agentEnvironmentExt.ifPresent(
+            jsonNode -> this.jsonToString(jsonNode, jobEntity::setRequestedAgentEnvironmentExt)
+        );
+    }
+
+    private void setRequestedAgentConfigFields(
+        final JobEntity jobEntity,
+        final AgentConfigRequest requestedAgentConfig
+    ) {
+        jobEntity.setInteractive(requestedAgentConfig.isInteractive());
+        jobEntity.setArchivingDisabled(requestedAgentConfig.isArchivingDisabled());
+        requestedAgentConfig
+            .getRequestedJobDirectoryLocation()
+            .ifPresent(location -> jobEntity.setRequestedJobDirectoryLocation(location.getAbsolutePath()));
+        requestedAgentConfig.getTimeoutRequested().ifPresent(jobEntity::setRequestedTimeout);
+        requestedAgentConfig.getExt().ifPresent(
+            jsonNode -> this.jsonToString(jsonNode, jobEntity::setRequestedAgentConfigExt)
+        );
+    }
+
+    private void setRequestMetadataFields(
+        final JobEntity jobEntity,
+        final JobRequestMetadata jobRequestMetadata
+    ) {
+        jobEntity.setNumAttachments(jobRequestMetadata.getNumAttachments());
+        jobEntity.setTotalSizeOfAttachments(jobRequestMetadata.getTotalSizeOfAttachments());
+        jobRequestMetadata.getApiClientMetadata().ifPresent(
+            apiClientMetadata -> {
+                apiClientMetadata.getHostname().ifPresent(jobEntity::setRequestApiClientHostname);
+                apiClientMetadata.getUserAgent().ifPresent(jobEntity::setRequestApiClientUserAgent);
+            }
+        );
+        jobRequestMetadata.getAgentClientMetadata().ifPresent(
+            agentClientMetadata -> {
+                agentClientMetadata.getHostname().ifPresent(jobEntity::setRequestAgentClientHostname);
+                agentClientMetadata.getVersion().ifPresent(jobEntity::setRequestAgentClientVersion);
+                agentClientMetadata.getPid().ifPresent(jobEntity::setRequestAgentClientPid);
+            }
+        );
     }
 }

@@ -84,8 +84,11 @@ import java.util.Set;
         "requestedTimeout",
         "grouping",
         "groupingInstance",
-        "clientHostname",
-        "userAgent",
+        "requestApiClientHostname",
+        "requestApiClientUserAgent",
+        "requestAgentClientHostname",
+        "requestAgentClientVersion",
+        "requestAgentClientPid",
         "numAttachments",
         "totalSizeOfAttachments",
         "stdOutSize",
@@ -170,14 +173,29 @@ public class JobEntity extends BaseEntity implements
     private String groupingInstance;
 
     @Basic
-    @Column(name = "client_hostname", updatable = false)
+    @Column(name = "request_api_client_hostname", updatable = false)
     @Size(max = 255, message = "Max length in database is 255 characters")
-    private String clientHostname;
+    private String requestApiClientHostname;
 
     @Basic
-    @Column(name = "user_agent", length = 1024, updatable = false)
+    @Column(name = "request_api_client_user_agent", length = 1024, updatable = false)
     @Size(max = 1024, message = "Max length in database is 1024 characters")
-    private String userAgent;
+    private String requestApiClientUserAgent;
+
+    @Basic
+    @Column(name = "request_agent_client_hostname", updatable = false)
+    @Size(max = 255, message = "Max length in database is 255 characters")
+    private String requestAgentClientHostname;
+
+    @Basic
+    @Column(name = "request_agent_client_version", updatable = false)
+    @Size(max = 255, message = "Max length in database is 255 characters")
+    private String requestAgentClientVersion;
+
+    @Basic
+    @Column(name = "request_agent_client_pid", updatable = false)
+    @Min(value = 0, message = "Agent Client Pid can't be less than zero")
+    private Integer requestAgentClientPid;
 
     @Basic
     @Column(name = "num_attachments", updatable = false)
@@ -212,7 +230,7 @@ public class JobEntity extends BaseEntity implements
     @Basic(optional = false)
     @Column(name = "status", nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
-    private JobStatus status = JobStatus.INIT;
+    private JobStatus status = JobStatus.RESERVED;
 
     @Basic
     @Column(name = "status_msg")
@@ -492,16 +510,43 @@ public class JobEntity extends BaseEntity implements
      * {@inheritDoc}
      */
     @Override
-    public Optional<String> getClientHostname() {
-        return Optional.ofNullable(this.clientHostname);
+    public Optional<String> getRequestApiClientHostname() {
+        return Optional.ofNullable(this.requestApiClientHostname);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Optional<String> getUserAgent() {
-        return Optional.ofNullable(this.userAgent);
+    public Optional<String> getRequestApiClientUserAgent() {
+        return Optional.ofNullable(this.requestApiClientUserAgent);
+    }
+
+    /**
+     * Get the hostname of the agent that requested this job be run if there was one.
+     *
+     * @return The hostname wrapped in an {@link Optional}
+     */
+    public Optional<String> getRequestAgentClientHostname() {
+        return Optional.ofNullable(this.requestAgentClientHostname);
+    }
+
+    /**
+     * Get the version of the agent that requested this job be run if there was one.
+     *
+     * @return The version wrapped in an {@link Optional}
+     */
+    public Optional<String> getRequestAgentClientVersion() {
+        return Optional.ofNullable(this.requestAgentClientVersion);
+    }
+
+    /**
+     * Get the PID of the agent that requested this job be run if there was one.
+     *
+     * @return The PID wrapped in an {@link Optional}
+     */
+    public Optional<Integer> getRequestAgentClientPid() {
+        return Optional.ofNullable(this.requestAgentClientPid);
     }
 
     /**

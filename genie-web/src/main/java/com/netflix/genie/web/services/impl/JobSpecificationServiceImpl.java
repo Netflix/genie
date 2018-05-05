@@ -29,7 +29,6 @@ import com.netflix.genie.common.internal.dto.v4.Cluster;
 import com.netflix.genie.common.internal.dto.v4.Command;
 import com.netflix.genie.common.internal.dto.v4.Criterion;
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
-import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria;
 import com.netflix.genie.common.internal.dto.v4.JobMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
@@ -46,7 +45,6 @@ import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.aop.TargetClassAware;
 import org.springframework.stereotype.Service;
@@ -54,7 +52,6 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.io.File;
 import java.util.Comparator;
@@ -216,27 +213,6 @@ public class JobSpecificationServiceImpl implements JobSpecificationService {
                 .timer(RESOLVE_JOB_SPECIFICATION_TIMER, tags)
                 .record(System.nanoTime() - start, TimeUnit.NANOSECONDS);
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public JobSpecification resolveJobSpecification(
-        final @NotBlank String id,
-        final @Valid ExecutionResourceCriteria criteria
-    ) {
-        return null;
-    }
-
-    /**
-     * Given a job id return the entire job specification that would be used by the agent to run a job.
-     *
-     * @param id The job id to get a specification for
-     * @return The job specification
-     */
-    public JobSpecification getJobSpecification(final String id) {
-        throw new NotImplementedException("Not yet implemented.");
     }
 
     private Map<Cluster, String> queryForClustersAndCommands(

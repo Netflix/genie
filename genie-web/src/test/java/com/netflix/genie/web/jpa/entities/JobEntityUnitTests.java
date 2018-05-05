@@ -148,7 +148,7 @@ public class JobEntityUnitTests extends EntityTestsBase {
      */
     @Test
     public void testSetGetStatus() {
-        Assert.assertThat(this.jobEntity.getStatus(), Matchers.is(JobStatus.INIT));
+        Assert.assertThat(this.jobEntity.getStatus(), Matchers.is(JobStatus.RESERVED));
         this.jobEntity.setStatus(JobStatus.KILLED);
         Assert.assertEquals(JobStatus.KILLED, this.jobEntity.getStatus());
     }
@@ -418,11 +418,11 @@ public class JobEntityUnitTests extends EntityTestsBase {
      * Make sure can set the client host name the request came from.
      */
     @Test
-    public void canSetClientHostname() {
+    public void canSetRequestApiClientHostname() {
         final String clientHost = UUID.randomUUID().toString();
-        this.jobEntity.setClientHostname(clientHost);
+        this.jobEntity.setRequestApiClientHostname(clientHost);
         Assert.assertThat(
-            this.jobEntity.getClientHostname().orElseGet(RandomSuppliers.STRING),
+            this.jobEntity.getRequestApiClientHostname().orElseGet(RandomSuppliers.STRING),
             Matchers.is(clientHost)
         );
     }
@@ -431,13 +431,52 @@ public class JobEntityUnitTests extends EntityTestsBase {
      * Make sure we can set and get the user agent string.
      */
     @Test
-    public void canSetUserAgent() {
-        Assert.assertFalse(this.jobEntity.getUserAgent().isPresent());
+    public void canSetRequestApiClientUserAgent() {
+        Assert.assertFalse(this.jobEntity.getRequestApiClientUserAgent().isPresent());
         final String userAgent = UUID.randomUUID().toString();
-        this.jobEntity.setUserAgent(userAgent);
+        this.jobEntity.setRequestApiClientUserAgent(userAgent);
         Assert.assertThat(
-            this.jobEntity.getUserAgent().orElseGet(RandomSuppliers.STRING),
+            this.jobEntity.getRequestApiClientUserAgent().orElseGet(RandomSuppliers.STRING),
             Matchers.is(userAgent)
+        );
+    }
+
+    /**
+     * Make sure can set the client host name the request came from.
+     */
+    @Test
+    public void canSetRequestAgentClientHostname() {
+        final String clientHost = UUID.randomUUID().toString();
+        this.jobEntity.setRequestAgentClientHostname(clientHost);
+        Assert.assertThat(
+            this.jobEntity.getRequestAgentClientHostname().orElseGet(RandomSuppliers.STRING),
+            Matchers.is(clientHost)
+        );
+    }
+
+    /**
+     * Make sure can set the client version the request came from.
+     */
+    @Test
+    public void canSetRequestAgentClientVersion() {
+        final String version = UUID.randomUUID().toString();
+        this.jobEntity.setRequestAgentClientVersion(version);
+        Assert.assertThat(
+            this.jobEntity.getRequestAgentClientVersion().orElseGet(RandomSuppliers.STRING),
+            Matchers.is(version)
+        );
+    }
+
+    /**
+     * Make sure can set the client pid the request came from.
+     */
+    @Test
+    public void canSetRequestAgentClientPid() {
+        final int pid = 28_000;
+        this.jobEntity.setRequestAgentClientPid(pid);
+        Assert.assertThat(
+            this.jobEntity.getRequestAgentClientPid().orElseGet(RandomSuppliers.INT),
+            Matchers.is(pid)
         );
     }
 

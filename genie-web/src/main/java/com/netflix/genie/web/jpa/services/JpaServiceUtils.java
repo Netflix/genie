@@ -271,8 +271,8 @@ public final class JpaServiceUtils {
             .withCreated(jobMetadataProjection.getCreated())
             .withUpdated(jobMetadataProjection.getUpdated());
 
-        jobMetadataProjection.getClientHostname().ifPresent(builder::withClientHost);
-        jobMetadataProjection.getUserAgent().ifPresent(builder::withUserAgent);
+        jobMetadataProjection.getRequestApiClientHostname().ifPresent(builder::withClientHost);
+        jobMetadataProjection.getRequestApiClientUserAgent().ifPresent(builder::withUserAgent);
         jobMetadataProjection.getNumAttachments().ifPresent(builder::withNumAttachments);
         jobMetadataProjection.getTotalSizeOfAttachments().ifPresent(builder::withTotalSizeOfAttachments);
         jobMetadataProjection.getStdErrSize().ifPresent(builder::withStdErrSize);

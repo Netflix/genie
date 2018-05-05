@@ -19,13 +19,16 @@ package com.netflix.genie.web.services;
 
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
-import com.netflix.genie.common.dto.JobMetadata;
-import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.internal.dto.v4.JobRequest;
+import com.netflix.genie.common.internal.dto.v4.JobRequestMetadata;
+import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Nullable;
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -51,8 +54,8 @@ public interface JobPersistenceService {
      * @throws GenieException if there is an error
      */
     void createJob(
-        @NotNull final JobRequest jobRequest,
-        @NotNull final JobMetadata jobMetadata,
+        @NotNull final com.netflix.genie.common.dto.JobRequest jobRequest,
+        @NotNull final com.netflix.genie.common.dto.JobMetadata jobMetadata,
         @NotNull final Job job,
         @NotNull final JobExecution jobExecution
     ) throws GenieException;
@@ -139,4 +142,32 @@ public interface JobPersistenceService {
         @Min(1) final int maxDeleted,
         @Min(1) final int pageSize
     );
+
+    // V4 APIs
+
+    /**
+     * Save the job request information.
+     *
+     * @param jobRequest         All the metadata provided by the user about the job
+     * @param jobRequestMetadata Metadata about the request gathered by the system not provided by the user
+     * @return The id that was reserved in the system for this job
+     * @throws GenieConflictException When the requested ID is already in use
+     * @throws GenieException         On other type of error
+     */
+    String saveJobRequest(
+        @Valid final JobRequest jobRequest,
+        @Valid final JobRequestMetadata jobRequestMetadata
+    ) throws GenieException;
+
+    /**
+     * Given the criteria and resultant specification (optionally) save the information to the database.
+     *
+     * @param id            The id of the job
+     * @param specification The resultant job specification if there was one
+     * @throws GenieException When the job can't be found or the persistence throws an exception
+     */
+    void setJobSpecification(
+        @NotBlank(message = "Id is missing and is required") final String id,
+        @Nullable final JobSpecification specification
+    ) throws GenieException;
 }

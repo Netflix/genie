@@ -137,16 +137,21 @@ CREATE TABLE `job_environment_variables` (
   ROW_FORMAT = DYNAMIC;
 
 ALTER TABLE `jobs`
-  ADD COLUMN    `interactive`                               BOOLEAN       DEFAULT FALSE NOT NULL,
-  ADD COLUMN    `requested_job_directory_location`          VARCHAR(1024) DEFAULT NULL,
-  ADD COLUMN    `requested_agent_config_ext`                TEXT          DEFAULT NULL,
-  ADD COLUMN    `requested_agent_environment_ext`           TEXT          DEFAULT NULL,
-  CHANGE COLUMN `disable_log_archival` `archiving_disabled` BOOLEAN       DEFAULT FALSE NOT NULL,
-  CHANGE COLUMN `cpu_requested` `requested_cpu`             INT(11)       DEFAULT NULL,
-  CHANGE COLUMN `memory_requested` `requested_memory`       INT(11)       DEFAULT NULL,
-  CHANGE COLUMN `timeout_requested` `requested_timeout`     INT(11)       DEFAULT NULL,
-  CHANGE COLUMN `host_name` `agent_hostname`                VARCHAR(255)  DEFAULT NULL,
-  CHANGE COLUMN `client_host` `client_hostname`             VARCHAR(255)  DEFAULT NULL;
+  ADD COLUMN    `interactive`                                BOOLEAN       DEFAULT FALSE NOT NULL,
+  ADD COLUMN    `requested_job_directory_location`           VARCHAR(1024) DEFAULT NULL,
+  ADD COLUMN    `requested_agent_config_ext`                 TEXT          DEFAULT NULL,
+  ADD COLUMN    `requested_agent_environment_ext`            TEXT          DEFAULT NULL,
+  CHANGE COLUMN `disable_log_archival` `archiving_disabled`  BOOLEAN       DEFAULT FALSE NOT NULL,
+  CHANGE COLUMN `cpu_requested` `requested_cpu`              INT(11)       DEFAULT NULL,
+  CHANGE COLUMN `memory_requested` `requested_memory`        INT(11)       DEFAULT NULL,
+  CHANGE COLUMN `timeout_requested` `requested_timeout`      INT(11)       DEFAULT NULL,
+  CHANGE COLUMN `host_name` `agent_hostname`                 VARCHAR(255)  DEFAULT NULL,
+  CHANGE COLUMN `client_host` `request_api_client_hostname`  VARCHAR(255)  DEFAULT NULL,
+  CHANGE COLUMN `user_agent` `request_api_client_user_agent` VARCHAR(255)  DEFAULT NULL,
+  ADD COLUMN    `request_agent_client_hostname`              VARCHAR(255)  DEFAULT NULL,
+  ADD COLUMN    `request_agent_client_version`               VARCHAR(255)  DEFAULT NULL,
+  ADD COLUMN    `request_agent_client_pid`                   INT(11)  DEFAULT NULL,
+  ALTER COLUMN `status` SET DEFAULT 'RESERVED';
 
 ALTER TABLE `job_applications_requested` RENAME TO `job_requested_applications`;
 ALTER TABLE `job_requested_applications`

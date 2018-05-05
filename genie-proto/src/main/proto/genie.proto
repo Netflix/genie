@@ -99,6 +99,7 @@ message ReserveJobIdRequest {
     JobMetadata metadata = 1;
     ExecutionResourceCriteria criteria = 2;
     AgentConfig agent_config = 3;
+    AgentMetadata agent_metadata = 4;
 }
 
 message ReserveJobIdError {
@@ -161,7 +162,7 @@ message JobSpecificationResponse {
 message AgentMetadata {
     string agent_version = 1;
     string agent_hostname = 2;
-    string agent_pid = 3;
+    int32 agent_pid = 3;
 }
 
 message ClaimJobRequest {

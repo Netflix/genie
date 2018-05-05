@@ -20,6 +20,8 @@ package com.netflix.genie.common.internal.dto.v4
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.Lists
 import com.netflix.genie.common.util.GenieObjectMapper
+import com.netflix.genie.test.categories.UnitTest
+import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
 /**
@@ -28,6 +30,7 @@ import spock.lang.Specification
  * @author tgianos
  * @since 4.0.0
  */
+@Category(UnitTest.class)
 class JobRequestSpec extends Specification {
 
     def "Can build immutable api job request"() {

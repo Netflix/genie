@@ -23,13 +23,17 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata;
+import com.netflix.genie.common.internal.dto.v4.AgentConfigRequest;
 import com.netflix.genie.common.internal.dto.v4.AgentJobRequest;
 import com.netflix.genie.common.internal.dto.v4.Criterion;
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria;
 import com.netflix.genie.common.internal.dto.v4.JobMetadata;
+import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import com.netflix.genie.common.util.GenieObjectMapper;
+import com.netflix.genie.proto.AgentMetadata;
 import com.netflix.genie.proto.ExecutionResource;
 import com.netflix.genie.proto.JobSpecificationError;
 import com.netflix.genie.proto.JobSpecificationRequest;
@@ -58,29 +62,27 @@ public final class JobServiceProtoConverter {
     private JobServiceProtoConverter() {
     }
 
-//    /**
-//     * Convert a V4 Job Request DTO into a gRPC resolve job specification request to be sent to the server.
-//     *
-//     * @param jobRequest The job request to convert
-//     * @return The request that should be sent to the server for a new Job Specification given the parameters
-//     */
-//    public static JobSpecificationRequest toProtoJobSpecificationRequest(
-//        final AgentJobRequest jobRequest
-//    ) {
-//        final JobSpecificationRequest.Builder builder = JobSpecificationRequest
-//            .newBuilder()
-//            .setIsInteractive(jobRequest.isInteractive())
-//            .setCriteria(toProtoExecutionResourceCriteria(jobRequest.getCriteria()));
-//
-//        // TODO: This needs to be changed. ID is a required field at this point but for now getting to compile while
-//        //       we change how jobs transition through the system based on agreed upon workflow
-//        jobRequest.getRequestedId().ifPresent(builder::setId);
-//        jobRequest
-//            .getRequestedJobDirectoryLocation()
-//            .ifPresent(location -> builder.setJobDirectoryLocation(location.getAbsolutePath()));
-//
-//        return builder.build();
-//    }
+    /**
+     * Convert a V4 Job Request DTO into a gRPC reserve job id request to be sent to the server.
+     *
+     * @param jobRequest          The job request to convert
+     * @param agentClientMetadata The metadata about the agent
+     * @return The request that should be sent to the server for a new Job Specification given the parameters
+     * @throws JsonProcessingException When the metadata can't be converted to a string
+     */
+    public static ReserveJobIdRequest toProtoReserveJobIdRequest(
+        final AgentJobRequest jobRequest,
+        final AgentClientMetadata agentClientMetadata
+    ) throws JsonProcessingException {
+        final ReserveJobIdRequest.Builder builder = ReserveJobIdRequest.newBuilder();
+
+        builder.setMetadata(toProtoJobMetadata(jobRequest));
+        builder.setCriteria(toProtoExecutionResourceCriteria(jobRequest));
+        builder.setAgentConfig(toProtoAgentConfig(jobRequest));
+        builder.setAgentMetadata(toProtoAgentMetadata(agentClientMetadata));
+
+        return builder.build();
+    }
 
     /**
      * Generate a {@link JobSpecificationRequest} from the given job id.
@@ -92,85 +94,81 @@ public final class JobServiceProtoConverter {
         return JobSpecificationRequest.newBuilder().setId(id).build();
     }
 
-//    /**
-//     * Convert a gRPC resolve job specification request into a V4 Job Request DTO for use within Genie codebase.
-//     *
-//     * @param request The request to convert
-//     * @return The job request
-//     * @throws GenieException if any serialization errors occur
-//     */
-//    public static JobRequest toJobRequestDTO(final ResolveJobSpecificationRequest request) throws GenieException {
-//        final com.netflix.genie.proto.JobMetadata jobMetadata = request.getMetadata();
-//        final JobMetadata userMetadata = new JobMetadata.Builder(
-//            jobMetadata.getName(),
-//            jobMetadata.getUser(),
-//            jobMetadata.getVersion()
-//        )
-//            .withDescription(jobMetadata.getDescription())
-//            .withTags(jobMetadata.getTagsList() != null ? Sets.newHashSet(jobMetadata.getTagsList()) : null)
-//            .withMetadata(jobMetadata.getMetadata())
-//            .withEmail(jobMetadata.getEmail())
-//            .withGrouping(jobMetadata.getGrouping())
-//            .withGroupingInstance(jobMetadata.getGroupingInstance())
-//            .build();
-//
-//        final com.netflix.genie.proto.ExecutionResourceCriteria protoResourceCriteria = request.getCriteria();
-//        final List<com.netflix.genie.proto.Criterion> protoCriteria = protoResourceCriteria.getClusterCriteriaList();
-//        final List<Criterion> clusterCriteria = Lists.newArrayListWithExpectedSize(protoCriteria.size());
-//        for (final com.netflix.genie.proto.Criterion protoCriterion : protoCriteria) {
-//            clusterCriteria.add(toCriterionDTO(protoCriterion));
-//        }
-//
-//        final ExecutionResourceCriteria executionResourceCriteria = new ExecutionResourceCriteria(
-//            clusterCriteria,
-//            toCriterionDTO(protoResourceCriteria.getCommandCriterion()),
-//            protoResourceCriteria.getApplicationIdsList()
-//        );
-//
-//        final ExecutionEnvironment jobResources = new ExecutionEnvironment(
-//            jobMetadata.getConfigsList() != null ? Sets.newHashSet(jobMetadata.getConfigsList()) : null,
-//            jobMetadata.getDependenciesList() != null ? Sets.newHashSet(jobMetadata.getDependenciesList()) : null,
-//            jobMetadata.getSetupFile()
-//        );
-//
-//        return new JobRequest(
-//            jobMetadata.getId(),
-//            jobResources,
-//            jobMetadata.getCommandArgsList(),
-//            false,
-//            null,
-//            jobMetadata.getIsInteractive(),
-//            userMetadata,
-//            executionResourceCriteria,
-//            jobMetadata.getJobDirectoryLocation() == null
-//                ? null
-//                : new AgentEnvironmentRequest.Builder()
-//                .withRequestedJobDirectoryLocation(jobMetadata.getJobDirectoryLocation())
-//                .build()
-//        );
-//    }
-
     /**
-     * Extract the Execution Resource Criteria from the resolve job specification request.
+     * Convert a gRPC reserve job id request into a V4 Job Request DTO for use within Genie codebase.
      *
-     * @param request The request to extract from
-     * @return The execution resource criteria DTO
-     * @throws GenieException If the execution resource criteria is invalid based on preconditions
+     * @param request The request to convert
+     * @return The job request
+     * @throws GenieException if any serialization errors occur
      */
-    public static ExecutionResourceCriteria toExecutionResourceCriteriaDTO(
-        final ReserveJobIdRequest request
-    ) throws GenieException {
-        final com.netflix.genie.proto.ExecutionResourceCriteria protoResourceCriteria = request.getCriteria();
-        final List<com.netflix.genie.proto.Criterion> protoCriteria = protoResourceCriteria.getClusterCriteriaList();
+    public static JobRequest toJobRequestDTO(final ReserveJobIdRequest request) throws GenieException {
+        final com.netflix.genie.proto.JobMetadata protoJobMetadata = request.getMetadata();
+        final JobMetadata jobMetadata = new JobMetadata.Builder(
+            protoJobMetadata.getName(),
+            protoJobMetadata.getUser(),
+            protoJobMetadata.getVersion()
+        )
+            .withDescription(protoJobMetadata.getDescription())
+            .withTags(protoJobMetadata.getTagsList() != null ? Sets.newHashSet(protoJobMetadata.getTagsList()) : null)
+            .withMetadata(protoJobMetadata.getMetadata())
+            .withEmail(protoJobMetadata.getEmail())
+            .withGrouping(protoJobMetadata.getGrouping())
+            .withGroupingInstance(protoJobMetadata.getGroupingInstance())
+            .build();
+
+        final com.netflix.genie.proto.ExecutionResourceCriteria protoExecutionResourceCriteria = request.getCriteria();
+        final List<com.netflix.genie.proto.Criterion> protoCriteria
+            = protoExecutionResourceCriteria.getClusterCriteriaList();
         final List<Criterion> clusterCriteria = Lists.newArrayListWithExpectedSize(protoCriteria.size());
         for (final com.netflix.genie.proto.Criterion protoCriterion : protoCriteria) {
             clusterCriteria.add(toCriterionDTO(protoCriterion));
         }
 
-        return new ExecutionResourceCriteria(
+        final ExecutionResourceCriteria executionResourceCriteria = new ExecutionResourceCriteria(
             clusterCriteria,
-            toCriterionDTO(protoResourceCriteria.getCommandCriterion()),
-            protoResourceCriteria.getRequestedApplicationIdOverridesList()
+            toCriterionDTO(protoExecutionResourceCriteria.getCommandCriterion()),
+            protoExecutionResourceCriteria.getRequestedApplicationIdOverridesList()
+        );
+
+        final ExecutionEnvironment jobResources = new ExecutionEnvironment(
+            protoJobMetadata.getConfigsList() != null
+                ? Sets.newHashSet(protoJobMetadata.getConfigsList())
+                : null,
+            protoJobMetadata.getDependenciesList() != null
+                ? Sets.newHashSet(protoJobMetadata.getDependenciesList())
+                : null,
+            protoJobMetadata.getSetupFile()
+        );
+
+        final com.netflix.genie.proto.AgentConfig protoAgentConfig = request.getAgentConfig();
+        final AgentConfigRequest agentConfigRequest = new AgentConfigRequest
+            .Builder()
+            .withRequestedJobDirectoryLocation(protoAgentConfig.getJobDirectoryLocation())
+            .withInteractive(protoAgentConfig.getIsInteractive())
+            .build();
+
+        return new JobRequest(
+            protoJobMetadata.getId(),
+            jobResources,
+            protoJobMetadata.getCommandArgsList(),
+            jobMetadata,
+            executionResourceCriteria,
+            null,
+            agentConfigRequest
+        );
+    }
+
+    /**
+     * Convert a proto {@link AgentMetadata} to an {@link AgentClientMetadata}.
+     *
+     * @param agentMetadata The metadata to convert
+     * @return The immutable DTO representation
+     */
+    public static AgentClientMetadata toAgentClientMetadataDTO(final AgentMetadata agentMetadata) {
+        return new AgentClientMetadata(
+            agentMetadata.getAgentHostname(),
+            agentMetadata.getAgentVersion(),
+            agentMetadata.getAgentPid()
         );
     }
 
@@ -309,25 +307,25 @@ public final class JobServiceProtoConverter {
     private static com.netflix.genie.proto.JobMetadata toProtoJobMetadata(
         final AgentJobRequest jobRequest
     ) throws JsonProcessingException {
-        final JobMetadata userMetadata = jobRequest.getMetadata();
+        final JobMetadata jobMetadata = jobRequest.getMetadata();
         final ExecutionEnvironment jobResources = jobRequest.getResources();
 
         final com.netflix.genie.proto.JobMetadata.Builder builder
             = com.netflix.genie.proto.JobMetadata.newBuilder();
         jobRequest.getRequestedId().ifPresent(builder::setId);
-        builder.setName(userMetadata.getName());
-        builder.setUser(userMetadata.getUser());
-        builder.setVersion(userMetadata.getVersion());
-        userMetadata.getDescription().ifPresent(builder::setDescription);
-        builder.addAllTags(userMetadata.getTags());
-        if (userMetadata.getMetadata().isPresent()) {
+        builder.setName(jobMetadata.getName());
+        builder.setUser(jobMetadata.getUser());
+        builder.setVersion(jobMetadata.getVersion());
+        jobMetadata.getDescription().ifPresent(builder::setDescription);
+        builder.addAllTags(jobMetadata.getTags());
+        if (jobMetadata.getMetadata().isPresent()) {
             builder.setMetadata(
-                GenieObjectMapper.getMapper().writeValueAsString(userMetadata.getMetadata().get())
+                GenieObjectMapper.getMapper().writeValueAsString(jobMetadata.getMetadata().get())
             );
         }
-        userMetadata.getEmail().ifPresent(builder::setEmail);
-        userMetadata.getGrouping().ifPresent(builder::setGrouping);
-        userMetadata.getGroupingInstance().ifPresent(builder::setGroupingInstance);
+        jobMetadata.getEmail().ifPresent(builder::setEmail);
+        jobMetadata.getGrouping().ifPresent(builder::setGrouping);
+        jobMetadata.getGroupingInstance().ifPresent(builder::setGroupingInstance);
         jobResources.getSetupFile().ifPresent(builder::setSetupFile);
         builder.addAllConfigs(jobResources.getConfigs());
         builder.addAllDependencies(jobResources.getDependencies());
@@ -336,8 +334,9 @@ public final class JobServiceProtoConverter {
     }
 
     private static com.netflix.genie.proto.ExecutionResourceCriteria toProtoExecutionResourceCriteria(
-        final ExecutionResourceCriteria executionResourceCriteria
+        final AgentJobRequest jobRequest
     ) {
+        final ExecutionResourceCriteria executionResourceCriteria = jobRequest.getCriteria();
         final com.netflix.genie.proto.ExecutionResourceCriteria.Builder builder
             = com.netflix.genie.proto.ExecutionResourceCriteria.newBuilder();
         builder.addAllClusterCriteria(
@@ -351,6 +350,24 @@ public final class JobServiceProtoConverter {
             toProtoCriterion(executionResourceCriteria.getCommandCriterion())
         );
         builder.addAllRequestedApplicationIdOverrides(executionResourceCriteria.getApplicationIds());
+        return builder.build();
+    }
+
+    private static com.netflix.genie.proto.AgentConfig toProtoAgentConfig(final AgentJobRequest jobRequest) {
+        final com.netflix.genie.proto.AgentConfig.Builder builder = com.netflix.genie.proto.AgentConfig.newBuilder();
+        final AgentConfigRequest agentConfigRequest = jobRequest.getRequestedAgentConfig();
+        agentConfigRequest.getRequestedJobDirectoryLocation().ifPresent(
+            location -> builder.setJobDirectoryLocation(location.getAbsolutePath())
+        );
+        builder.setIsInteractive(agentConfigRequest.isInteractive());
+        return builder.build();
+    }
+
+    private static AgentMetadata toProtoAgentMetadata(final AgentClientMetadata agentClientMetadata) {
+        final AgentMetadata.Builder builder = AgentMetadata.newBuilder();
+        agentClientMetadata.getHostname().ifPresent(builder::setAgentHostname);
+        agentClientMetadata.getVersion().ifPresent(builder::setAgentVersion);
+        agentClientMetadata.getPid().ifPresent(builder::setAgentPid);
         return builder.build();
     }
 }

@@ -19,15 +19,30 @@ package com.netflix.genie.web.jpa.services;
 
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseTearDown;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import com.netflix.genie.common.dto.ClusterCriteria;
+import com.netflix.genie.common.dto.ClusterStatus;
+import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
-import com.netflix.genie.common.dto.JobMetadata;
-import com.netflix.genie.common.dto.JobRequest;
 import com.netflix.genie.common.dto.JobStatus;
+import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieNotFoundException;
+import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata;
+import com.netflix.genie.common.internal.dto.v4.AgentConfigRequest;
+import com.netflix.genie.common.internal.dto.v4.AgentEnvironmentRequest;
+import com.netflix.genie.common.internal.dto.v4.ApiClientMetadata;
+import com.netflix.genie.common.internal.dto.v4.Criterion;
+import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
+import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria;
+import com.netflix.genie.common.internal.dto.v4.JobMetadata;
+import com.netflix.genie.common.internal.dto.v4.JobRequest;
+import com.netflix.genie.common.internal.dto.v4.JobRequestMetadata;
+import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.test.categories.IntegrationTest;
+import com.netflix.genie.web.jpa.entities.JobEntity;
 import com.netflix.genie.web.jpa.entities.projections.JobMetadataProjection;
 import com.netflix.genie.web.services.JobPersistenceService;
 import com.netflix.genie.web.services.JobSearchService;
@@ -39,11 +54,13 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.time.Month;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -109,7 +126,7 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
     private static final long STD_OUT_SIZE = 78723423L;
 
     // Job Execution fields
-    private static final String HOST_NAME = UUID.randomUUID().toString();
+    private static final String HOSTNAME = UUID.randomUUID().toString();
     private static final int PROCESS_ID = 3203;
     private static final long CHECK_DELAY = 8728L;
     private static final Instant TIMEOUT = Instant.now();
@@ -208,7 +225,7 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
     public void canPersistAndGetAJob() throws GenieException {
         // Set up some fields for comparison
 
-        final JobRequest jobRequest = new JobRequest.Builder(
+        final com.netflix.genie.common.dto.JobRequest jobRequest = new com.netflix.genie.common.dto.JobRequest.Builder(
             NAME, USER, VERSION, CLUSTER_CRITERIA, COMMAND_CRITERION
         )
             .withId(UNIQUE_ID)
@@ -229,7 +246,8 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
             .withGroupingInstance(GROUPING_INSTANCE)
             .build();
 
-        final JobMetadata jobMetadata = new JobMetadata.Builder()
+        final com.netflix.genie.common.dto.JobMetadata jobMetadata = new com.netflix.genie.common.dto.JobMetadata
+            .Builder()
             .withClientHost(CLIENT_HOST)
             .withUserAgent(USER_AGENT)
             .withNumAttachments(NUM_ATTACHMENTS)
@@ -253,7 +271,7 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
         jobBuilder.withCommandArgs(COMMAND_ARGS);
         final Job job = jobBuilder.build();
 
-        final JobExecution jobExecution = new JobExecution.Builder(HOST_NAME)
+        final JobExecution jobExecution = new JobExecution.Builder(HOSTNAME)
             .withId(UNIQUE_ID)
             .withCheckDelay(CHECK_DELAY)
             .withTimeout(TIMEOUT)
@@ -279,7 +297,156 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
         this.validateJobMetadata(metadataProjection.get());
     }
 
-    private void validateJobRequest(final JobRequest savedJobRequest) {
+    /**
+     * Test the V4 {@link JobPersistenceService#saveJobRequest(JobRequest, JobRequestMetadata)} method.
+     *
+     * @throws GenieException on error
+     * @throws IOException    on JSON error
+     */
+    @Test
+    public void canSaveJobRequest() throws GenieException, IOException {
+        final String metadata = "{\"" + UUID.randomUUID().toString() + "\": \"" + UUID.randomUUID().toString() + "\"}";
+        final JobMetadata jobMetadata = new JobMetadata
+            .Builder(NAME, USER, VERSION)
+            .withMetadata(metadata)
+            .withEmail(EMAIL)
+            .withGroup(GROUP)
+            .withGrouping(GROUPING)
+            .withGroupingInstance(GROUPING_INSTANCE)
+            .withDescription(DESCRIPTION)
+            .withTags(TAGS)
+            .build();
+
+        final List<Criterion> clusterCriteria = Lists.newArrayList(
+            new Criterion
+                .Builder()
+                .withId(UUID.randomUUID().toString())
+                .withName(UUID.randomUUID().toString())
+                .withStatus(ClusterStatus.OUT_OF_SERVICE.toString())
+                .withTags(Sets.newHashSet(UUID.randomUUID().toString()))
+                .withVersion(UUID.randomUUID().toString())
+                .build(),
+            new Criterion
+                .Builder()
+                .withId(UUID.randomUUID().toString())
+                .withName(UUID.randomUUID().toString())
+                .withStatus(ClusterStatus.UP.toString())
+                .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+                .withVersion(UUID.randomUUID().toString())
+                .build()
+        );
+        final Criterion commandCriterion = new Criterion
+            .Builder()
+            .withId(UUID.randomUUID().toString())
+            .withName(UUID.randomUUID().toString())
+            .withStatus(CommandStatus.ACTIVE.toString())
+            .withTags(Sets.newHashSet(UUID.randomUUID().toString()))
+            .withVersion(UUID.randomUUID().toString())
+            .build();
+        final List<String> requestedApplications = Lists.newArrayList(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
+        );
+        final ExecutionResourceCriteria criteria = new ExecutionResourceCriteria(
+            clusterCriteria,
+            commandCriterion,
+            requestedApplications
+        );
+
+        final ExecutionEnvironment executionEnvironment = new ExecutionEnvironment(
+            CONFIGS,
+            DEPENDENCIES,
+            SETUP_FILE
+        );
+
+        final Map<String, String> requestedEnvironmentVariables = ImmutableMap.of(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
+        );
+        final String agentEnvironmentExt
+            = "{\"" + UUID.randomUUID().toString() + "\": \"" + UUID.randomUUID().toString() + "\"}";
+        final AgentEnvironmentRequest agentEnvironmentRequest = new AgentEnvironmentRequest
+            .Builder()
+            .withRequestedEnvironmentVariables(requestedEnvironmentVariables)
+            .withExt(GenieObjectMapper.getMapper().readTree(agentEnvironmentExt))
+            .withRequestedJobCpu(CPU_REQUESTED)
+            .withRequestedJobMemory(MEMORY_REQUESTED)
+            .build();
+
+        final String agentConfigExt
+            = "{\"" + UUID.randomUUID().toString() + "\": \"" + UUID.randomUUID().toString() + "\"}";
+        final String requestedJobDirectoryLocation = "/tmp/" + UUID.randomUUID().toString();
+        final AgentConfigRequest agentConfigRequest = new AgentConfigRequest
+            .Builder()
+            .withExt(GenieObjectMapper.getMapper().readTree(agentConfigExt))
+            .withInteractive(true)
+            .withTimeoutRequested(TIMEOUT_REQUESTED)
+            .withArchivingDisabled(true)
+            .withRequestedJobDirectoryLocation(requestedJobDirectoryLocation)
+            .build();
+
+        final String job0Id = UUID.randomUUID().toString();
+        final JobRequest jobRequest0 = new JobRequest(
+            job0Id,
+            executionEnvironment,
+            COMMAND_ARGS,
+            jobMetadata,
+            criteria,
+            agentEnvironmentRequest,
+            agentConfigRequest
+        );
+        final JobRequest jobRequest1 = new JobRequest(
+            null,
+            executionEnvironment,
+            COMMAND_ARGS,
+            jobMetadata,
+            criteria,
+            agentEnvironmentRequest,
+            agentConfigRequest
+        );
+        final JobRequest jobRequest2 = new JobRequest(
+            JOB_3_ID,
+            executionEnvironment,
+            COMMAND_ARGS,
+            jobMetadata,
+            criteria,
+            agentEnvironmentRequest,
+            agentConfigRequest
+        );
+
+        final String agentVersion = UUID.randomUUID().toString();
+        final int agentPid = 388;
+        final AgentClientMetadata agentClientMetadata = new AgentClientMetadata(
+            HOSTNAME,
+            agentVersion,
+            agentPid
+        );
+
+        final ApiClientMetadata apiClientMetadata = new ApiClientMetadata(HOSTNAME, USER_AGENT);
+        final JobRequestMetadata jobRequestMetadata = new JobRequestMetadata(
+            apiClientMetadata,
+            agentClientMetadata,
+            NUM_ATTACHMENTS,
+            TOTAL_SIZE_ATTACHMENTS
+        );
+
+        String id = this.jobPersistenceService.saveJobRequest(jobRequest0, jobRequestMetadata);
+        Assert.assertThat(id, Matchers.is(job0Id));
+        this.validateSavedJobRequest(id, jobRequest0, jobRequestMetadata);
+
+        id = this.jobPersistenceService.saveJobRequest(jobRequest1, jobRequestMetadata);
+        Assert.assertThat(id, Matchers.notNullValue());
+        this.validateSavedJobRequest(id, jobRequest0, jobRequestMetadata);
+
+        try {
+            this.jobPersistenceService.saveJobRequest(jobRequest2, jobRequestMetadata);
+            Assert.fail();
+        } catch (final GenieConflictException gce) {
+            // Expected
+        }
+    }
+
+    private void validateJobRequest(final com.netflix.genie.common.dto.JobRequest savedJobRequest) {
         Assert.assertThat(
             savedJobRequest.getId().orElseThrow(IllegalArgumentException::new),
             Matchers.is(UNIQUE_ID)
@@ -377,7 +544,7 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
     }
 
     private void validateJobExecution(final JobExecution savedJobExecution) {
-        Assert.assertThat(savedJobExecution.getHostName(), Matchers.is(HOST_NAME));
+        Assert.assertThat(savedJobExecution.getHostName(), Matchers.is(HOSTNAME));
         Assert.assertThat(
             savedJobExecution.getProcessId().orElseThrow(IllegalArgumentException::new),
             Matchers.is(PROCESS_ID)
@@ -398,11 +565,11 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
 
     private void validateJobMetadata(final JobMetadataProjection savedMetadata) {
         Assert.assertThat(
-            savedMetadata.getClientHostname().orElseThrow(IllegalArgumentException::new),
+            savedMetadata.getRequestApiClientHostname().orElseThrow(IllegalArgumentException::new),
             Matchers.is(CLIENT_HOST)
         );
         Assert.assertThat(
-            savedMetadata.getUserAgent().orElseThrow(IllegalArgumentException::new),
+            savedMetadata.getRequestApiClientUserAgent().orElseThrow(IllegalArgumentException::new),
             Matchers.is(USER_AGENT)
         );
         Assert.assertThat(
@@ -421,5 +588,107 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
             savedMetadata.getStdOutSize().orElseThrow(IllegalArgumentException::new),
             Matchers.is(STD_OUT_SIZE)
         );
+    }
+
+    private void validateSavedJobRequest(
+        final String id,
+        final JobRequest jobRequest,
+        final JobRequestMetadata jobRequestMetadata
+    ) throws GenieNotFoundException {
+        // TODO: Switch to compare results of a get once implemented to avoid collection transaction problem
+        final JobEntity jobEntity = this.jobRepository
+            .findByUniqueId(id)
+            .orElseThrow(() -> new GenieNotFoundException("No job with id " + id + " found when one was expected"));
+
+        Assert.assertThat(jobEntity.getUniqueId(), Matchers.is(id));
+        // TODO: Test command args
+
+        // Job Request Metadata Fields
+        jobRequestMetadata.getApiClientMetadata().ifPresent(
+            apiClientMetadata -> {
+                apiClientMetadata.getHostname().ifPresent(
+                    hostname -> Assert.assertThat(
+                        jobEntity.getRequestApiClientHostname().orElse(UUID.randomUUID().toString()),
+                        Matchers.is(hostname)
+                    )
+                );
+                apiClientMetadata.getUserAgent().ifPresent(
+                    userAgent -> Assert.assertThat(
+                        jobEntity.getRequestApiClientUserAgent().orElse(UUID.randomUUID().toString()),
+                        Matchers.is(userAgent)
+                    )
+                );
+            }
+        );
+        jobRequestMetadata.getAgentClientMetadata().ifPresent(
+            apiClientMetadata -> {
+                apiClientMetadata.getHostname().ifPresent(
+                    hostname -> Assert.assertThat(
+                        jobEntity.getRequestAgentClientHostname().orElse(UUID.randomUUID().toString()),
+                        Matchers.is(hostname)
+                    )
+                );
+                apiClientMetadata.getVersion().ifPresent(
+                    version -> Assert.assertThat(
+                        jobEntity.getRequestAgentClientVersion().orElse(UUID.randomUUID().toString()),
+                        Matchers.is(version)
+                    )
+                );
+                apiClientMetadata.getPid().ifPresent(
+                    pid -> Assert.assertThat(jobEntity.getRequestAgentClientPid().orElse(-1), Matchers.is(pid))
+                );
+            }
+        );
+        Assert.assertThat(
+            jobEntity.getNumAttachments().orElse(-1),
+            Matchers.is(jobRequestMetadata.getNumAttachments())
+        );
+        Assert.assertThat(
+            jobEntity.getTotalSizeOfAttachments().orElse(-1L),
+            Matchers.is(jobRequestMetadata.getTotalSizeOfAttachments())
+        );
+
+        // Job Request fields
+        final JobMetadata jobMetadata = jobRequest.getMetadata();
+        Assert.assertThat(jobEntity.getName(), Matchers.is(jobMetadata.getName()));
+        Assert.assertThat(jobEntity.getUser(), Matchers.is(jobMetadata.getUser()));
+        Assert.assertThat(jobEntity.getVersion(), Matchers.is(jobMetadata.getVersion()));
+        // TODO: Test tags
+        // TODO: Test metadata
+        jobMetadata.getDescription().ifPresent(
+            description -> Assert.assertThat(
+                jobEntity.getDescription().orElse(UUID.randomUUID().toString()),
+                Matchers.is(description)
+            )
+        );
+        jobMetadata.getEmail().ifPresent(
+            email -> Assert.assertThat(
+                jobEntity.getEmail().orElse(UUID.randomUUID().toString()),
+                Matchers.is(email)
+            )
+        );
+        jobMetadata.getGroup().ifPresent(
+            group -> Assert.assertThat(
+                jobEntity.getGenieUserGroup().orElse(UUID.randomUUID().toString()),
+                Matchers.is(group)
+            )
+        );
+        jobMetadata.getGrouping().ifPresent(
+            grouping -> Assert.assertThat(
+                jobEntity.getGrouping().orElse(UUID.randomUUID().toString()),
+                Matchers.is(grouping)
+            )
+        );
+        jobMetadata.getGroupingInstance().ifPresent(
+            groupingInstance -> Assert.assertThat(
+                jobEntity.getGroupingInstance().orElse(UUID.randomUUID().toString()),
+                Matchers.is(groupingInstance)
+            )
+        );
+
+        // TODO: Test criteria
+        // TODO: Test execution environment
+        // TODO: Test Agent Environment Request
+        // TODO: Test Agent Config Request
     }
 }
