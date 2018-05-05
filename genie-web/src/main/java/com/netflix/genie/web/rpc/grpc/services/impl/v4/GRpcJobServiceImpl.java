@@ -17,19 +17,27 @@
  */
 package com.netflix.genie.web.rpc.grpc.services.impl.v4;
 
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata;
+import com.netflix.genie.common.internal.dto.v4.JobRequest;
+import com.netflix.genie.common.internal.dto.v4.JobSpecification;
+import com.netflix.genie.common.internal.dto.v4.converters.JobServiceProtoConverter;
 import com.netflix.genie.proto.JobServiceGrpc;
 import com.netflix.genie.proto.JobSpecificationRequest;
 import com.netflix.genie.proto.JobSpecificationResponse;
+import com.netflix.genie.proto.ReserveJobIdError;
+import com.netflix.genie.proto.ReserveJobIdRequest;
+import com.netflix.genie.proto.ReserveJobIdResponse;
 import com.netflix.genie.web.rpc.interceptors.SimpleLoggingInterceptor;
-import com.netflix.genie.web.services.JobPersistenceService;
-import com.netflix.genie.web.services.JobSpecificationService;
+import com.netflix.genie.web.services.AgentJobService;
 import io.grpc.stub.StreamObserver;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.springboot.autoconfigure.grpc.server.GrpcService;
+import org.apache.commons.lang3.StringUtils;
 
 /**
- * Extension of {@link com.netflix.genie.proto.JobServiceGrpc.JobServiceImplBase} to provide
+ * Extension of {@link JobServiceGrpc.JobServiceImplBase} to provide
  * functionality for resolving and fetching specifications for jobs to be run by the Genie Agent.
  *
  * @author tgianos
@@ -43,26 +51,57 @@ import net.devh.springboot.autoconfigure.grpc.server.GrpcService;
 )
 @Slf4j
 public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
-
-    private final JobPersistenceService jobPersistenceService;
-    private final JobSpecificationService jobSpecificationService;
+    private final AgentJobService agentJobService;
     private final MeterRegistry registry;
 
     /**
      * Constructor.
      *
-     * @param jobPersistenceService   The service to use to access persistence tier for jobs
-     * @param jobSpecificationService The implementation of the job specification service to use
-     * @param registry                The metrics repository to use
+     * @param agentJobService The implementation of the {@link AgentJobService} to use
+     * @param registry        The metrics repository to use
      */
-    public GRpcJobServiceImpl(
-        final JobPersistenceService jobPersistenceService,
-        final JobSpecificationService jobSpecificationService,
-        final MeterRegistry registry
-    ) {
-        this.jobPersistenceService = jobPersistenceService;
-        this.jobSpecificationService = jobSpecificationService;
+    public GRpcJobServiceImpl(final AgentJobService agentJobService, final MeterRegistry registry) {
+        this.agentJobService = agentJobService;
         this.registry = registry;
+    }
+
+    /**
+     * This API will reserve a job id using the supplied metadata in the request and return the reserved job id.
+     *
+     * @param request          The request containing all the metadata necessary to reserve a job id in the system
+     * @param responseObserver To send the response
+     */
+    @Override
+    public void reserveJobId(
+        final ReserveJobIdRequest request,
+        final StreamObserver<ReserveJobIdResponse> responseObserver
+    ) {
+        // TODO: Metrics
+        try {
+            final JobRequest jobRequest = JobServiceProtoConverter.toJobRequestDTO(request);
+            final AgentClientMetadata agentClientMetadata
+                = JobServiceProtoConverter.toAgentClientMetadataDTO(request.getAgentMetadata());
+            responseObserver.onNext(
+                ReserveJobIdResponse
+                    .newBuilder()
+                    .setId(this.agentJobService.reserveJobId(jobRequest, agentClientMetadata))
+                    .build()
+            );
+        } catch (final Exception e) {
+            log.error("Error reserving job id for request " + request, e);
+            responseObserver.onNext(
+                ReserveJobIdResponse
+                    .newBuilder()
+                    .setError(
+                        ReserveJobIdError
+                            .newBuilder()
+                            .setException(e.getClass().getCanonicalName())
+                            .setMessage(e.getMessage())
+                    )
+                    .build()
+            );
+        }
+        responseObserver.onCompleted();
     }
 
     /**
@@ -78,23 +117,24 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
         final JobSpecificationRequest request,
         final StreamObserver<JobSpecificationResponse> responseObserver
     ) {
-        // Disable for now
-        super.resolveJobSpecification(request, responseObserver);
-//        // TODO: Make this better after the database interaction is done. Particularly the ID resolution.
-//        // TODO: Metrics?
-//        final String id = StringUtils.isEmpty(request.getId())
-//            ? UUID.randomUUID().toString()
-//            : request.getId();
-//        try {
-//            final ExecutionResourceCriteria criteria
-//                = JobServiceProtoConverter.toExecutionResourceCriteriaDTO(request);
-//            final JobSpecification jobSpec = this.jobSpecificationService.resolveJobSpecification(id, criteria);
-//            responseObserver.onNext(JobServiceProtoConverter.toProtoJobSpecificationResponse(jobSpec));
-//        } catch (final Throwable t) {
-//            log.error(t.getMessage(), t);
-//            responseObserver.onNext(JobServiceProtoConverter.toProtoJobSpecificationResponse(t));
-//        }
-//        responseObserver.onCompleted();
+        // TODO: Metrics?
+        final String id = request.getId();
+        if (StringUtils.isBlank(id)) {
+            responseObserver.onNext(
+                JobServiceProtoConverter.toProtoJobSpecificationResponse(
+                    new GeniePreconditionException("No job id entered")
+                )
+            );
+        } else {
+            try {
+                final JobSpecification jobSpec = this.agentJobService.resolveJobSpecification(id);
+                responseObserver.onNext(JobServiceProtoConverter.toProtoJobSpecificationResponse(jobSpec));
+            } catch (final Throwable t) {
+                log.error(t.getMessage(), t);
+                responseObserver.onNext(JobServiceProtoConverter.toProtoJobSpecificationResponse(t));
+            }
+        }
+        responseObserver.onCompleted();
     }
 
     /**

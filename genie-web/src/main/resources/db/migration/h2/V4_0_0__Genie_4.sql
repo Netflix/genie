@@ -113,7 +113,17 @@ ALTER TABLE `jobs`
 ALTER TABLE `jobs`
   ALTER COLUMN `agent_hostname` SET DEFAULT NULL;
 ALTER TABLE `jobs`
-  ALTER COLUMN `client_host` RENAME TO `client_hostname`;
+  ALTER COLUMN `client_host` RENAME TO `request_api_client_hostname`;
+ALTER TABLE `jobs`
+  ALTER COLUMN `user_agent` RENAME TO `request_api_client_user_agent`;
+ALTER TABLE `jobs`
+  ADD COLUMN `request_agent_client_hostname` VARCHAR(255) DEFAULT NULL;
+ALTER TABLE `jobs`
+  ADD COLUMN `request_agent_client_version` VARCHAR(255) DEFAULT NULL;
+ALTER TABLE `jobs`
+  ADD COLUMN `request_agent_client_pid` INT(11) DEFAULT NULL;
+ALTER TABLE `jobs`
+  ALTER COLUMN `status` SET DEFAULT 'RESERVED';
 
 ALTER TABLE `job_applications_requested`
   RENAME TO `job_requested_applications`;

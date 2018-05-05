@@ -349,9 +349,9 @@ class JpaServiceUtilsSpec extends Specification {
         def id = UUID.randomUUID().toString()
         entity.setUniqueId(id)
         def clientHost = UUID.randomUUID().toString()
-        entity.setClientHostname(clientHost)
+        entity.setRequestApiClientHostname(clientHost)
         def userAgent = UUID.randomUUID().toString()
-        entity.setUserAgent(userAgent)
+        entity.setRequestApiClientUserAgent(userAgent)
         def numAttachments = 3
         entity.setNumAttachments(numAttachments)
         def totalSizeOfAttachments = 38023423L

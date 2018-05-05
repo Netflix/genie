@@ -20,17 +20,20 @@ package com.netflix.genie.web.rpc.grpc.services.impl.v4
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.Lists
 import com.google.common.collect.Sets
+import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment
+import com.netflix.genie.common.internal.dto.v4.JobRequest
 import com.netflix.genie.common.internal.dto.v4.JobSpecification
 import com.netflix.genie.proto.AgentConfig
+import com.netflix.genie.proto.AgentMetadata
 import com.netflix.genie.proto.Criterion
 import com.netflix.genie.proto.ExecutionResourceCriteria
 import com.netflix.genie.proto.JobMetadata
 import com.netflix.genie.proto.JobSpecificationRequest
 import com.netflix.genie.proto.JobSpecificationResponse
 import com.netflix.genie.proto.ReserveJobIdRequest
-import com.netflix.genie.web.services.JobPersistenceService
-import com.netflix.genie.web.services.JobSpecificationService
+import com.netflix.genie.proto.ReserveJobIdResponse
+import com.netflix.genie.web.services.AgentJobService
 import io.grpc.stub.StreamObserver
 import io.micrometer.core.instrument.MeterRegistry
 import spock.lang.Specification
@@ -42,6 +45,8 @@ import spock.lang.Specification
  * @since 4.0.0
  */
 class GRpcJobServiceImplSpec extends Specification {
+
+    // TODO: explore using GrpcServerRule
 
     def id = UUID.randomUUID().toString()
     def name = UUID.randomUUID().toString()
@@ -156,55 +161,68 @@ class GRpcJobServiceImplSpec extends Specification {
 
     def environmentVariables = ImmutableMap.of(UUID.randomUUID().toString(), UUID.randomUUID().toString())
 
+    def agentHostname = UUID.randomUUID().toString()
+    def agentVersion = UUID.randomUUID().toString()
+    def agentPid = 12_345
+
+    def "Can reserve job id"() {
+        def reserveJobIdRequest = createReserveJobIdRequest()
+        def agentJobService = Mock(AgentJobService)
+        def registry = Mock(MeterRegistry)
+        def service = new GRpcJobServiceImpl(agentJobService, registry)
+        StreamObserver<ReserveJobIdResponse> responseObserver = Mock()
+
+        when:
+        service.reserveJobId(reserveJobIdRequest, responseObserver)
+
+        then:
+        1 * agentJobService.reserveJobId(_ as JobRequest, _ as AgentClientMetadata) >> id
+        1 * responseObserver.onNext(_ as ReserveJobIdResponse)
+        1 * responseObserver.onCompleted()
+
+        when:
+        service.reserveJobId(reserveJobIdRequest, responseObserver)
+
+        then:
+        1 * agentJobService.reserveJobId(_ as JobRequest, _ as AgentClientMetadata) >> {
+            throw new RuntimeException("uh oh")
+        }
+        1 * responseObserver.onNext(_ as ReserveJobIdResponse)
+        1 * responseObserver.onCompleted()
+    }
+
     def "Can resolve job specification"() {
         def jobSpecification = createJobSpecification()
-        def jobPersistenceService = Mock(JobPersistenceService)
-        def jobSpecificationService = Mock(JobSpecificationService)
+        def agentJobService = Mock(AgentJobService)
         def registry = Mock(MeterRegistry)
-        def service = new GRpcJobServiceImpl(jobPersistenceService, jobSpecificationService, registry)
+        def service = new GRpcJobServiceImpl(agentJobService, registry)
         StreamObserver<JobSpecificationResponse> responseObserver = Mock()
 
         when:
         service.resolveJobSpecification(createJobSpecificationRequest(), responseObserver)
 
         then:
-        0 * jobSpecificationService.resolveJobSpecification(
-                _ as String,
-                _ as com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria
-        )
         // TODO: Fix once reimplemented
-//        1 * jobSpecificationService.resolveJobSpecification(
-//                id as String,
-//                _ as com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria
-//        ) >> jobSpecification
-//        1 * responseObserver.onNext(_ as JobSpecificationResponse)
-//        1 * responseObserver.onCompleted()
+        1 * agentJobService.resolveJobSpecification(id) >> jobSpecification
+        1 * responseObserver.onNext(_ as JobSpecificationResponse)
+        1 * responseObserver.onCompleted()
     }
 
     def "Can't resolve job specification"() {
-        def jobPersistenceService = Mock(JobPersistenceService)
-        def jobSpecificationService = Mock(JobSpecificationService)
+        def agentJobService = Mock(AgentJobService)
         def registry = Mock(MeterRegistry)
-        def service = new GRpcJobServiceImpl(jobPersistenceService, jobSpecificationService, registry)
+        def service = new GRpcJobServiceImpl(agentJobService, registry)
         StreamObserver<JobSpecificationResponse> responseObserver = Mock()
 
         when:
         service.resolveJobSpecification(createJobSpecificationRequest(), responseObserver)
 
         then:
-        0 * jobSpecificationService.resolveJobSpecification(
-                _ as String,
-                _ as com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria
-        )
-        // TODO: Fix once reimplemented
-//        1 * jobSpecificationService.resolveJobSpecification(
-//                id as String,
-//                _ as com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria
-//        ) >> {
-//            throw new RuntimeException(UUID.randomUUID().toString())
-//        }
-//        1 * responseObserver.onNext(_ as JobSpecificationResponse)
-//        1 * responseObserver.onCompleted()
+        1 * agentJobService.resolveJobSpecification(id) >> {
+            throw new RuntimeException(UUID.randomUUID().toString())
+        }
+        1 * responseObserver.onNext(_ as JobSpecificationResponse)
+        1 * responseObserver.onCompleted()
     }
 
     JobSpecificationRequest createJobSpecificationRequest() {
@@ -263,7 +281,7 @@ class GRpcJobServiceImplSpec extends Specification {
                         .setStatus(commandCriterionStatus)
                         .addAllTags(commandCriterionTags)
                         .build()
-        ).addAllApplicationIds(applicationIds)
+        ).addAllRequestedApplicationIdOverrides(applicationIds)
                 .build()
 
         def agentConfigProto = AgentConfig
@@ -272,11 +290,19 @@ class GRpcJobServiceImplSpec extends Specification {
                 .setJobDirectoryLocation(jobDirectoryLocation)
                 .build()
 
+        def agentMetadata = AgentMetadata
+                .newBuilder()
+                .setAgentHostname(agentHostname)
+                .setAgentVersion(agentVersion)
+                .setAgentPid(agentPid)
+                .build()
+
         return ReserveJobIdRequest
                 .newBuilder()
                 .setMetadata(jobMetadataProto)
                 .setCriteria(executionResourceCriteriaProto)
                 .setAgentConfig(agentConfigProto)
+                .setAgentMetadata(agentMetadata)
                 .build()
     }
 

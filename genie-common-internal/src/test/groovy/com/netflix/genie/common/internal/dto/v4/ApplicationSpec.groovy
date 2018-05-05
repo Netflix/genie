@@ -18,6 +18,8 @@
 package com.netflix.genie.common.internal.dto.v4
 
 import com.netflix.genie.common.dto.ApplicationStatus
+import com.netflix.genie.test.categories.UnitTest
+import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
 import java.time.Instant
@@ -28,6 +30,7 @@ import java.time.Instant
  * @author tgianos
  * @since 4.0.0
  */
+@Category(UnitTest.class)
 class ApplicationSpec extends Specification {
 
     def "Can build immutable application resource"() {

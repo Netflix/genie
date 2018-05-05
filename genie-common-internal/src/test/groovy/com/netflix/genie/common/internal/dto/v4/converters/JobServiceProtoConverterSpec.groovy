@@ -21,15 +21,24 @@ import com.google.common.collect.ImmutableMap
 import com.google.common.collect.Lists
 import com.google.common.collect.Sets
 import com.netflix.genie.common.exceptions.GenieConflictException
-import com.netflix.genie.common.internal.dto.v4.*
+import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata
+import com.netflix.genie.common.internal.dto.v4.AgentConfigRequest
+import com.netflix.genie.common.internal.dto.v4.AgentJobRequest
+import com.netflix.genie.common.internal.dto.v4.Criterion
+import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment
+import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria
+import com.netflix.genie.common.internal.dto.v4.JobMetadata
+import com.netflix.genie.common.internal.dto.v4.JobSpecification
 import com.netflix.genie.common.util.GenieObjectMapper
 import com.netflix.genie.proto.AgentConfig
+import com.netflix.genie.proto.AgentMetadata
 import com.netflix.genie.proto.ExecutionResource
 import com.netflix.genie.proto.JobSpecificationResponse
 import com.netflix.genie.proto.ReserveJobIdRequest
 import com.netflix.genie.test.categories.UnitTest
 import org.junit.experimental.categories.Category
 import spock.lang.Specification
+
 /**
  * Specifications for the {@link JobServiceProtoConverter} utility class.
  *
@@ -191,39 +200,28 @@ class JobServiceProtoConverterSpec extends Specification {
 
     def environmentVariables = ImmutableMap.of(UUID.randomUUID().toString(), UUID.randomUUID().toString())
 
-//    def "Can convert JobRequest to ResolveJobSpecificationRequest and vice versa"() {
-//        def jobRequest = createJobRequest()
-//        def resolveJobSpecificationRequest = createReserveJobIdRequest()
-//
-//        when:
-//        def resolveJobSpecificationRequest2 = JobSpecificationServiceAdapter
-//                .toProtoJobSpecificationRequest(jobRequest)
-//        def jobRequest2 = JobSpecificationServiceAdapter.toJobRequestDTO(resolveJobSpecificationRequest2)
-//
-//        then:
-//        jobRequest2 == jobRequest
-//
-//
-//        when:
-//        def jobRequest3 = JobSpecificationServiceAdapter.toJobRequestDTO(resolveJobSpecificationRequest)
-//
-//        then:
-//        jobRequest3 == jobRequest
-//    }
+    def agentHostname = UUID.randomUUID().toString()
+    def agentVersion = UUID.randomUUID().toString()
+    def agentPid = 21_031
 
-    def "Can convert ResolveJobSpecificationRequest criteria into DTO"() {
+    def "Can convert JobRequest to ReserveJobIdRequest and vice versa"() {
+        def jobRequest = createJobRequest()
+        def agentClientMetadata = createAgentClientMetadata()
         def reserveJobIdRequest = createReserveJobIdRequest()
 
         when:
-        def criteria = JobServiceProtoConverter.toExecutionResourceCriteriaDTO(reserveJobIdRequest)
+        def reserveJobIdRequest1 = JobServiceProtoConverter.toProtoReserveJobIdRequest(jobRequest, agentClientMetadata)
+        def jobRequest1 = JobServiceProtoConverter.toJobRequestDTO(reserveJobIdRequest1)
 
         then:
-        criteria.getApplicationIds() == applicationIds
-        criteria.getCommandCriterion() == commandCriterion
-        criteria.getClusterCriteria().size() == 3
-        criteria.getClusterCriteria().get(0) == clusterCriterion0
-        criteria.getClusterCriteria().get(1) == clusterCriterion1
-        criteria.getClusterCriteria().get(2) == clusterCriterion2
+        jobRequest1 == jobRequest
+
+
+        when:
+        def jobRequest2 = JobServiceProtoConverter.toJobRequestDTO(reserveJobIdRequest)
+
+        then:
+        jobRequest2 == jobRequest
     }
 
     def "Can create a JobSpecificationRequest"() {
@@ -232,6 +230,17 @@ class JobServiceProtoConverterSpec extends Specification {
 
         then:
         request.getId() == id
+    }
+
+    def "Can convert AgentMetadata to AgentClientMetadata"() {
+        def agentMetadata = createReserveJobIdRequest().getAgentMetadata()
+        def agentClientMetadata = createAgentClientMetadata()
+
+        when:
+        def agentClientMetadata1 = JobServiceProtoConverter.toAgentClientMetadataDTO(agentMetadata)
+
+        then:
+        agentClientMetadata1 == agentClientMetadata
     }
 
     def "Can convert JobSpecification with default values"() {
@@ -347,12 +356,20 @@ class JobServiceProtoConverterSpec extends Specification {
                 applicationIds
         )
 
-        return new AgentJobRequest.Builder(jobMetadata, executionResourceCriteria, jobDirectoryLocation)
-                .withRequestedId(id)
+        def agentConfigRequest = new AgentConfigRequest.Builder()
                 .withInteractive(interactive)
+                .withRequestedJobDirectoryLocation(jobDirectoryLocation)
+                .build()
+
+        return new AgentJobRequest.Builder(jobMetadata, executionResourceCriteria, agentConfigRequest)
+                .withRequestedId(id)
                 .withCommandArgs(commandArgs)
                 .withResources(new ExecutionEnvironment(configs, dependencies, setupFile))
                 .build()
+    }
+
+    AgentClientMetadata createAgentClientMetadata() {
+        return new AgentClientMetadata(agentHostname, agentVersion, agentPid)
     }
 
     ReserveJobIdRequest createReserveJobIdRequest() {
@@ -420,11 +437,19 @@ class JobServiceProtoConverterSpec extends Specification {
                 .setJobDirectoryLocation(jobDirectoryLocation)
                 .build()
 
+        def agentMetadataProto = AgentMetadata
+                .newBuilder()
+                .setAgentHostname(agentHostname)
+                .setAgentVersion(agentVersion)
+                .setAgentPid(agentPid)
+                .build()
+
         return ReserveJobIdRequest
                 .newBuilder()
                 .setMetadata(jobMetadataProto)
                 .setCriteria(executionResourceCriteriaProto)
                 .setAgentConfig(agentConfigProto)
+                .setAgentMetadata(agentMetadataProto)
                 .build()
     }
 
