@@ -22,6 +22,7 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.web.jpa.entities.FileEntity;
 import com.netflix.genie.web.jpa.entities.TagEntity;
+import com.netflix.genie.web.jpa.entities.UniqueIdEntity;
 import com.netflix.genie.web.jpa.repositories.JpaFileRepository;
 import com.netflix.genie.web.jpa.repositories.JpaTagRepository;
 import com.netflix.genie.web.services.FilePersistenceService;
@@ -30,8 +31,10 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Base service for other services to extend for common functionality.
@@ -131,5 +134,22 @@ class JpaBaseService {
             tagEntities.add(this.createAndGetTagEntity(tag));
         }
         return tagEntities;
+    }
+
+    /**
+     * Set the unique id and other related fields for an entity.
+     *
+     * @param entity      The entity to set the unique id for
+     * @param requestedId The id requested if there was one. Null if not.
+     * @param <E>         The entity type which must extend {@link UniqueIdEntity}
+     */
+    <E extends UniqueIdEntity> void setUniqueId(final E entity, @Nullable final String requestedId) {
+        if (requestedId != null) {
+            entity.setUniqueId(requestedId);
+            entity.setRequestedId(true);
+        } else {
+            entity.setUniqueId(UUID.randomUUID().toString());
+            entity.setRequestedId(false);
+        }
     }
 }

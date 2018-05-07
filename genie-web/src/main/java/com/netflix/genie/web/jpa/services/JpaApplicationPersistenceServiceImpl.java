@@ -65,7 +65,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -449,7 +448,7 @@ public class JpaApplicationPersistenceServiceImpl extends JpaBaseService impleme
         final ApplicationMetadata metadata = request.getMetadata();
 
         final ApplicationEntity entity = new ApplicationEntity();
-        entity.setUniqueId(request.getRequestedId().orElse(UUID.randomUUID().toString()));
+        this.setUniqueId(entity, request.getRequestedId().orElse(null));
         this.setEntityResources(entity, resources);
         this.setEntityTags(entity, metadata);
         this.setEntityApplicationMetadata(entity, metadata);

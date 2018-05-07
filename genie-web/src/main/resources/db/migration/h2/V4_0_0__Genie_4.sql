@@ -54,8 +54,16 @@ CALL SPLIT_COMMAND_EXECUTABLE();
 
 DROP ALIAS IF EXISTS SPLIT_COMMAND_EXECUTABLE;
 
+ALTER TABLE `applications`
+  ADD COLUMN `requested_id` BOOLEAN NOT NULL DEFAULT FALSE;
+
+ALTER TABLE `clusters`
+  ADD COLUMN `requested_id` BOOLEAN NOT NULL DEFAULT FALSE;
+
 ALTER TABLE `commands`
   DROP COLUMN `executable`;
+ALTER TABLE `commands`
+  ADD COLUMN `requested_id` BOOLEAN NOT NULL DEFAULT FALSE;
 
 ALTER TABLE `criteria`
   ADD COLUMN `unique_id` VARCHAR(255) DEFAULT NULL;
@@ -124,6 +132,8 @@ ALTER TABLE `jobs`
   ADD COLUMN `request_agent_client_pid` INT(11) DEFAULT NULL;
 ALTER TABLE `jobs`
   ALTER COLUMN `status` SET DEFAULT 'RESERVED';
+ALTER TABLE `jobs`
+  ADD COLUMN `requested_id` BOOLEAN NOT NULL DEFAULT FALSE;
 
 ALTER TABLE `job_applications_requested`
   RENAME TO `job_requested_applications`;

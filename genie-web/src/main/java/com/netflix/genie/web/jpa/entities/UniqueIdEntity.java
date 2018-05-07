@@ -47,4 +47,8 @@ public class UniqueIdEntity extends AuditEntity {
     @NotBlank(message = "A unique identifier is missing and is required.")
     @Size(max = 255, message = "Max length in database is 255 characters")
     private String uniqueId = UUID.randomUUID().toString();
+
+    @Basic(optional = false)
+    @Column(name = "requested_id", nullable = false, updatable = false)
+    private boolean requestedId;
 }

@@ -70,7 +70,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -561,7 +560,7 @@ public class JpaCommandPersistenceServiceImpl extends JpaBaseService implements 
         final CommandMetadata metadata = request.getMetadata();
 
         final CommandEntity entity = new CommandEntity();
-        entity.setUniqueId(request.getRequestedId().orElse(UUID.randomUUID().toString()));
+        this.setUniqueId(entity, request.getRequestedId().orElse(null));
         entity.setCheckDelay(request.getCheckDelay().orElse(com.netflix.genie.common.dto.Command.DEFAULT_CHECK_DELAY));
         entity.setExecutable(request.getExecutable());
         request.getMemory().ifPresent(entity::setMemory);

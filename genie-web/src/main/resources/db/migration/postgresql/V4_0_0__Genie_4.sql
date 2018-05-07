@@ -85,8 +85,15 @@ LANGUAGE plpgsql;
 SELECT genie_split_commands_330();
 DROP FUNCTION genie_split_commands_330();
 
+ALTER TABLE applications
+  ADD COLUMN requested_id BOOLEAN DEFAULT FALSE NOT NULL;
+
+ALTER TABLE clusters
+  ADD COLUMN requested_id BOOLEAN DEFAULT FALSE NOT NULL;
+
 ALTER TABLE commands
-  DROP COLUMN executable;
+  DROP COLUMN executable,
+  ADD COLUMN requested_id BOOLEAN DEFAULT FALSE NOT NULL;
 
 ALTER TABLE criteria
   ADD COLUMN unique_id VARCHAR(255) DEFAULT NULL,
@@ -136,7 +143,8 @@ ALTER TABLE jobs
   ADD COLUMN request_agent_client_hostname    VARCHAR(255)  DEFAULT NULL,
   ADD COLUMN request_agent_client_version     VARCHAR(255)  DEFAULT NULL,
   ADD COLUMN request_agent_client_pid         INT           DEFAULT NULL,
-  ALTER COLUMN status SET DEFAULT 'RESERVED';
+  ALTER COLUMN status SET DEFAULT 'RESERVED',
+  ADD COLUMN requested_id                     BOOLEAN       DEFAULT FALSE NOT NULL;
 
 ALTER TABLE job_applications_requested RENAME TO job_requested_applications;
 ALTER TABLE job_requested_applications
