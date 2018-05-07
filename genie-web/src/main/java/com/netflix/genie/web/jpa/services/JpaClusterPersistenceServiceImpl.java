@@ -74,7 +74,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -572,7 +571,7 @@ public class JpaClusterPersistenceServiceImpl extends JpaBaseService implements 
         final ClusterMetadata metadata = request.getMetadata();
 
         final ClusterEntity entity = new ClusterEntity();
-        entity.setUniqueId(request.getRequestedId().orElse(UUID.randomUUID().toString()));
+        this.setUniqueId(entity, request.getRequestedId().orElse(null));
         this.setEntityResources(entity, resources);
         this.setEntityTags(entity, metadata);
         this.setEntityClusterMetadata(entity, metadata);

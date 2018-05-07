@@ -71,7 +71,6 @@ import javax.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -332,7 +331,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         // TODO: Metrics
         final JobEntity jobEntity = new JobEntity();
 
-        jobEntity.setUniqueId(jobRequest.getRequestedId().orElse(UUID.randomUUID().toString()));
+        this.setUniqueId(jobEntity, jobRequest.getRequestedId().orElse(null));
         jobEntity.setCommandArgs(jobRequest.getCommandArgs());
 
         this.setJobMetadataFields(jobEntity, jobRequest.getMetadata());

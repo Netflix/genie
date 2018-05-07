@@ -66,6 +66,7 @@ public class BaseEntityUnitTests extends EntityTestsBase {
         Assert.assertNull(local.getVersion());
         Assert.assertFalse(local.getDescription().isPresent());
         Assert.assertFalse(local.getSetupFile().isPresent());
+        Assert.assertFalse(local.isRequestedId());
     }
 
     /**
@@ -191,6 +192,16 @@ public class BaseEntityUnitTests extends EntityTestsBase {
         Assert.assertThat(this.b.getMetadata().orElseThrow(IllegalArgumentException::new), Matchers.is(METADATA));
         this.b.setMetadata(null);
         Assert.assertFalse(this.b.getMetadata().isPresent());
+    }
+
+    /**
+     * Test the is requested id fields.
+     */
+    @Test
+    public void testSetRequestedId() {
+        Assert.assertFalse(this.b.isRequestedId());
+        this.b.setRequestedId(true);
+        Assert.assertTrue(this.b.isRequestedId());
     }
 
     /**
