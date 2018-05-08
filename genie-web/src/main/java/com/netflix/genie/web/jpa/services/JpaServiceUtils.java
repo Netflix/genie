@@ -195,7 +195,6 @@ public final class JpaServiceUtils {
                 .collect(Collectors.toList()),
             jobRequestProjection
                 .getCommandCriterion()
-                .orElse(new CriterionEntity())
                 .getTags()
                 .stream()
                 .map(TagEntity::getTag)

@@ -22,6 +22,8 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.exceptions.GenieNotFoundException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobRequestMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
@@ -158,6 +160,17 @@ public interface JobPersistenceService {
         @Valid final JobRequest jobRequest,
         @Valid final JobRequestMetadata jobRequestMetadata
     ) throws GenieException;
+
+    /**
+     * Get the original request for a job.
+     *
+     * @param id The unique id of the job to get
+     * @return The job request if one was found
+     * @throws GenieNotFoundException     If no job is found
+     * @throws GeniePreconditionException If unable to convert values properly
+     * @throws GenieException             on other exception
+     */
+    JobRequest getJobRequest(final String id) throws GenieException;
 
     /**
      * Given the criteria and resultant specification (optionally) save the information to the database.

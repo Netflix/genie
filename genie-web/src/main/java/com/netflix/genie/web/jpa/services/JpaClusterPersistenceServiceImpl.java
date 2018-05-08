@@ -599,7 +599,7 @@ public class JpaClusterPersistenceServiceImpl extends JpaBaseService implements 
         entity.setVersion(metadata.getVersion());
         entity.setDescription(metadata.getDescription().orElse(null));
         entity.setStatus(metadata.getStatus());
-        EntityDtoConverters.setEntityMetadata(GenieObjectMapper.getMapper(), metadata, entity);
+        EntityDtoConverters.setJsonField(metadata.getMetadata().orElse(null), entity::setMetadata);
     }
 
     private void setEntityResources(

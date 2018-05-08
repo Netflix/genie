@@ -17,15 +17,33 @@
  */
 package com.netflix.genie.web.jpa.entities.v4
 
+import com.fasterxml.jackson.databind.JsonNode
+import com.google.common.collect.ImmutableMap
 import com.google.common.collect.Lists
 import com.google.common.collect.Sets
 import com.netflix.genie.common.dto.ApplicationStatus
 import com.netflix.genie.common.dto.ClusterStatus
 import com.netflix.genie.common.dto.CommandStatus
+import com.netflix.genie.common.internal.dto.v4.AgentConfigRequest
+import com.netflix.genie.common.internal.dto.v4.AgentEnvironmentRequest
+import com.netflix.genie.common.internal.dto.v4.Criterion
+import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment
+import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria
+import com.netflix.genie.common.internal.dto.v4.JobMetadata
+import com.netflix.genie.common.internal.dto.v4.JobRequest
 import com.netflix.genie.common.util.GenieObjectMapper
 import com.netflix.genie.test.suppliers.RandomSuppliers
-import com.netflix.genie.web.jpa.entities.*
+import com.netflix.genie.web.jpa.entities.ApplicationEntity
+import com.netflix.genie.web.jpa.entities.ClusterEntity
+import com.netflix.genie.web.jpa.entities.CommandEntity
+import com.netflix.genie.web.jpa.entities.CriterionEntity
+import com.netflix.genie.web.jpa.entities.FileEntity
+import com.netflix.genie.web.jpa.entities.JobEntity
+import com.netflix.genie.web.jpa.entities.TagEntity
 import spock.lang.Specification
+
+import java.util.function.Consumer
+
 /**
  * Specifications for {@link EntityDtoConverters}.
  *
@@ -239,4 +257,282 @@ class EntityDtoConvertersSpec extends Specification {
         GenieObjectMapper.getMapper().writeValueAsString(command.getMetadata().getMetadata().get()) == metadata
         command.getCheckDelay() == checkDelay
     }
+
+    def "Can convert job request projection to V4 job request DTO"() {
+        def id = UUID.randomUUID().toString()
+        def name = UUID.randomUUID().toString()
+        def user = UUID.randomUUID().toString()
+        def description = UUID.randomUUID().toString()
+        def version = UUID.randomUUID().toString()
+        def metadataString = "{\"" + UUID.randomUUID().toString() + "\":\"" + UUID.randomUUID().toString() + "\"}"
+        def metadata = GenieObjectMapper
+                .getMapper()
+                .readTree(metadataString)
+        def tags = Sets.newHashSet(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString()
+        )
+        def email = UUID.randomUUID().toString()
+        def grouping = UUID.randomUUID().toString()
+        def groupingInstance = UUID.randomUUID().toString()
+
+        def interactive = true
+        def commandArgs = Lists.newArrayList(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString()
+        )
+        def jobDirectoryLocation = "/tmp"
+
+        def configs = Sets.newHashSet(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString()
+        )
+        def dependencies = Sets.newHashSet(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString()
+        )
+        def setupFile = UUID.randomUUID().toString()
+
+        def commandCriterionId = UUID.randomUUID().toString()
+        def commandCriterionName = UUID.randomUUID().toString()
+        def commandCriterionVersion = UUID.randomUUID().toString()
+        def commandCriterionStatus = UUID.randomUUID().toString()
+        def commandCriterionTags = Sets.newHashSet(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString()
+        )
+        def commandCriterion = new Criterion.Builder()
+                .withId(commandCriterionId)
+                .withName(commandCriterionName)
+                .withVersion(commandCriterionVersion)
+                .withStatus(commandCriterionStatus)
+                .withTags(commandCriterionTags)
+                .build()
+
+        def clusterCriterion0Id = UUID.randomUUID().toString()
+        def clusterCriterion0Name = UUID.randomUUID().toString()
+        def clusterCriterion0Version = UUID.randomUUID().toString()
+        def clusterCriterion0Status = UUID.randomUUID().toString()
+        def clusterCriterion0Tags = Sets.newHashSet(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString()
+        )
+        def clusterCriterion0 = new Criterion.Builder()
+                .withId(clusterCriterion0Id)
+                .withName(clusterCriterion0Name)
+                .withVersion(clusterCriterion0Version)
+                .withStatus(clusterCriterion0Status)
+                .withTags(clusterCriterion0Tags)
+                .build()
+
+        def clusterCriterion1Id = UUID.randomUUID().toString()
+        def clusterCriterion1Name = UUID.randomUUID().toString()
+        def clusterCriterion1Version = UUID.randomUUID().toString()
+        def clusterCriterion1Status = UUID.randomUUID().toString()
+        def clusterCriterion1Tags = Sets.newHashSet(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString()
+        )
+        def clusterCriterion1 = new Criterion.Builder()
+                .withId(clusterCriterion1Id)
+                .withName(clusterCriterion1Name)
+                .withVersion(clusterCriterion1Version)
+                .withStatus(clusterCriterion1Status)
+                .withTags(clusterCriterion1Tags)
+                .build()
+
+        def clusterCriterion2Id = UUID.randomUUID().toString()
+        def clusterCriterion2Name = UUID.randomUUID().toString()
+        def clusterCriterion2Version = UUID.randomUUID().toString()
+        def clusterCriterion2Status = UUID.randomUUID().toString()
+        def clusterCriterion2Tags = Sets.newHashSet(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString()
+        )
+        def clusterCriterion2 = new Criterion.Builder()
+                .withId(clusterCriterion2Id)
+                .withName(clusterCriterion2Name)
+                .withVersion(clusterCriterion2Version)
+                .withStatus(clusterCriterion2Status)
+                .withTags(clusterCriterion2Tags)
+                .build()
+        def clusterCriteria = Lists.newArrayList(clusterCriterion0, clusterCriterion1, clusterCriterion2)
+
+        def applicationIds = Lists.newArrayList(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString()
+        )
+
+        def requestedTimeout = 32_000
+        def requestedMemory = 32_387
+        def requestedCpu = 3
+
+        def requestedEnvironmentVariables = ImmutableMap.of(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString()
+        )
+
+        def jobMetadata = new JobMetadata.Builder(name, user, version)
+                .withDescription(description)
+                .withMetadata(metadata)
+                .withTags(tags)
+                .withGrouping(grouping)
+                .withGroupingInstance(groupingInstance)
+                .withEmail(email)
+                .build()
+
+        def executionResourceCriteria = new ExecutionResourceCriteria(
+                clusterCriteria,
+                commandCriterion,
+                applicationIds
+        )
+
+        def agentConfigRequest = new AgentConfigRequest.Builder()
+                .withInteractive(interactive)
+                .withArchivingDisabled(true)
+                .withRequestedJobDirectoryLocation(jobDirectoryLocation)
+                .withExt(metadata)
+                .withTimeoutRequested(requestedTimeout)
+                .build()
+
+        def agentEnvironmentRequest = new AgentEnvironmentRequest.Builder()
+                .withExt(metadata)
+                .withRequestedJobMemory(requestedMemory)
+                .withRequestedJobCpu(requestedCpu)
+                .withRequestedEnvironmentVariables(requestedEnvironmentVariables)
+                .build()
+
+        def jobRequest0 = new JobRequest(
+                id,
+                new ExecutionEnvironment(configs, dependencies, setupFile),
+                commandArgs,
+                jobMetadata,
+                executionResourceCriteria,
+                agentEnvironmentRequest,
+                agentConfigRequest
+        )
+        def jobRequest1 = new JobRequest(
+                null,
+                new ExecutionEnvironment(configs, dependencies, setupFile),
+                commandArgs,
+                jobMetadata,
+                executionResourceCriteria,
+                agentEnvironmentRequest,
+                agentConfigRequest
+        )
+
+        def jobEntity = new JobEntity()
+        jobEntity.setRequestedId(true)
+        jobEntity.setUniqueId(id)
+        jobEntity.setVersion(version)
+        jobEntity.setName(name)
+        jobEntity.setUser(user)
+        jobEntity.setTags(tags.collect({ tag -> new TagEntity(tag) }).toSet())
+        jobEntity.setMetadata(metadataString)
+        jobEntity.setSetupFile(new FileEntity(setupFile))
+        jobEntity.setRequestedAgentConfigExt(metadataString)
+        jobEntity.setRequestedEnvironmentVariables(requestedEnvironmentVariables)
+        jobEntity.setRequestedAgentEnvironmentExt(metadataString)
+        jobEntity.setRequestedJobDirectoryLocation(jobDirectoryLocation)
+        jobEntity.setCommandArgs(commandArgs)
+        jobEntity.setDescription(description)
+        jobEntity.setEmail(email)
+        jobEntity.setGenieUserGroup(null)
+        jobEntity.setGrouping(grouping)
+        jobEntity.setGroupingInstance(groupingInstance)
+        jobEntity.setRequestedApplications(applicationIds)
+        jobEntity.setRequestedCpu(requestedCpu)
+        jobEntity.setRequestedMemory(requestedMemory)
+        jobEntity.setRequestedTimeout(requestedTimeout)
+        jobEntity.setConfigs(configs.collect({ config -> new FileEntity(config) }).toSet())
+        jobEntity.setDependencies(dependencies.collect({ dependency -> new FileEntity(dependency) }).toSet())
+        jobEntity.setClusterCriteria(
+                clusterCriteria.
+                        collect(
+                                {
+                                    criterion ->
+                                        new CriterionEntity(
+                                                criterion.getId().orElse(null),
+                                                criterion.getName().orElse(null),
+                                                criterion.getVersion().orElse(null),
+                                                criterion.getStatus().orElse(null),
+                                                criterion.getTags().collect({ tag -> new TagEntity(tag) }).toSet()
+                                        )
+                                }
+                        ).toList()
+        )
+        jobEntity.setCommandCriterion(
+                new CriterionEntity(
+                        commandCriterionId,
+                        commandCriterionName,
+                        commandCriterionVersion,
+                        commandCriterionStatus,
+                        commandCriterionTags.collect({ tag -> new TagEntity(tag) }).toSet()
+                )
+        )
+        jobEntity.setInteractive(interactive)
+        jobEntity.setArchivingDisabled(true)
+
+        def jobRequestResult
+
+        when:
+        jobRequestResult = EntityDtoConverters.toV4JobRequestDto(jobEntity)
+
+        then:
+        jobRequestResult == jobRequest0
+
+        when:
+        jobEntity.setRequestedId(false)
+        jobEntity.setUniqueId(UUID.randomUUID().toString())
+        jobRequestResult = EntityDtoConverters.toV4JobRequestDto(jobEntity)
+
+        then:
+        jobRequestResult == jobRequest1
+    }
+
+    def "Can set JSON field from string"() {
+        def json = "{\"" + UUID.randomUUID().toString() + "\": \"" + UUID.randomUUID().toString() + "\"}"
+        Consumer<JsonNode> consumer = Mock(Consumer)
+
+        when:
+        EntityDtoConverters.setJsonField(json, consumer)
+
+        then:
+        1 * consumer.accept(_ as JsonNode)
+
+        when:
+        EntityDtoConverters.setJsonField("I'm not valid json", consumer)
+
+        then:
+        1 * consumer.accept(null)
+    }
+
+    def "Can set string field from json"() {
+        def json = GenieObjectMapper
+                .getMapper()
+                .readTree("{\"" + UUID.randomUUID().toString() + "\": \"" + UUID.randomUUID().toString() + "\"}")
+        Consumer<String> consumer = Mock(Consumer)
+
+        when:
+        EntityDtoConverters.setJsonField(json, consumer)
+
+        then:
+        1 * consumer.accept(_ as String)
+
+        when:
+        EntityDtoConverters.setJsonField((JsonNode) null, consumer)
+
+        then:
+        1 * consumer.accept(null)
+    }
+
 }
