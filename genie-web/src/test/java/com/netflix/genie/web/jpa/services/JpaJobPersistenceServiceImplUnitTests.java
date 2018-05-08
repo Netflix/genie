@@ -35,6 +35,7 @@ import com.netflix.genie.web.jpa.entities.CommandEntity;
 import com.netflix.genie.web.jpa.entities.FileEntity;
 import com.netflix.genie.web.jpa.entities.JobEntity;
 import com.netflix.genie.web.jpa.entities.TagEntity;
+import com.netflix.genie.web.jpa.entities.projections.v4.V4JobRequestProjection;
 import com.netflix.genie.web.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.web.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
@@ -575,5 +576,19 @@ public class JpaJobPersistenceServiceImplUnitTests {
         this.jobPersistenceService.setJobCompletionInformation(JOB_1_ID, 0, JobStatus.FAILED, "k", null, 100L);
         Mockito.verify(jobEntity, Mockito.times(1)).setStdErrSize(100L);
         Mockito.verify(jobEntity, Mockito.times(1)).setStdOutSize(null);
+    }
+
+    /**
+     * When a request is made for a job that doesn't have a record in the database a GenieNotFoundException is thrown.
+     *
+     * @throws GenieException When the job isn't found
+     */
+    @Test(expected = GenieNotFoundException.class)
+    public void noJobRequestFoundThrowsException() throws GenieException {
+        Mockito
+            .when(this.jobRepository.findByUniqueId(Mockito.anyString(), Mockito.eq(V4JobRequestProjection.class)))
+            .thenReturn(Optional.empty());
+
+        this.jobPersistenceService.getJobRequest(UUID.randomUUID().toString());
     }
 }

@@ -27,6 +27,7 @@ import com.netflix.genie.web.jpa.entities.projections.JobMetadataProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobRequestProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobSearchProjection;
+import com.netflix.genie.web.jpa.entities.projections.v4.V4JobRequestProjection;
 import com.netflix.genie.web.jpa.specifications.JpaSpecificationUtils;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -119,7 +120,8 @@ public class JobEntity extends BaseEntity implements
     JobApplicationsProjection,
     JobClusterProjection,
     JobCommandProjection,
-    JobSearchProjection {
+    JobSearchProjection,
+    V4JobRequestProjection {
 
     private static final long serialVersionUID = 2849367731657512224L;
 
@@ -445,14 +447,6 @@ public class JobEntity extends BaseEntity implements
      * {@inheritDoc}
      */
     @Override
-    public Optional<CriterionEntity> getCommandCriterion() {
-        return Optional.ofNullable(this.commandCriterion);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Optional<String> getEmail() {
         return Optional.ofNullable(this.email);
     }
@@ -523,33 +517,6 @@ public class JobEntity extends BaseEntity implements
     }
 
     /**
-     * Get the hostname of the agent that requested this job be run if there was one.
-     *
-     * @return The hostname wrapped in an {@link Optional}
-     */
-    public Optional<String> getRequestAgentClientHostname() {
-        return Optional.ofNullable(this.requestAgentClientHostname);
-    }
-
-    /**
-     * Get the version of the agent that requested this job be run if there was one.
-     *
-     * @return The version wrapped in an {@link Optional}
-     */
-    public Optional<String> getRequestAgentClientVersion() {
-        return Optional.ofNullable(this.requestAgentClientVersion);
-    }
-
-    /**
-     * Get the PID of the agent that requested this job be run if there was one.
-     *
-     * @return The PID wrapped in an {@link Optional}
-     */
-    public Optional<Integer> getRequestAgentClientPid() {
-        return Optional.ofNullable(this.requestAgentClientPid);
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -597,6 +564,33 @@ public class JobEntity extends BaseEntity implements
      */
     public void setStdOutSize(@Nullable final Long stdOutSize) {
         this.stdOutSize = stdOutSize;
+    }
+
+    /**
+     * Get the hostname of the agent that requested this job be run if there was one.
+     *
+     * @return The hostname wrapped in an {@link Optional}
+     */
+    public Optional<String> getRequestAgentClientHostname() {
+        return Optional.ofNullable(this.requestAgentClientHostname);
+    }
+
+    /**
+     * Get the version of the agent that requested this job be run if there was one.
+     *
+     * @return The version wrapped in an {@link Optional}
+     */
+    public Optional<String> getRequestAgentClientVersion() {
+        return Optional.ofNullable(this.requestAgentClientVersion);
+    }
+
+    /**
+     * Get the PID of the agent that requested this job be run if there was one.
+     *
+     * @return The PID wrapped in an {@link Optional}
+     */
+    public Optional<Integer> getRequestAgentClientPid() {
+        return Optional.ofNullable(this.requestAgentClientPid);
     }
 
     /**
@@ -671,14 +665,6 @@ public class JobEntity extends BaseEntity implements
      * {@inheritDoc}
      */
     @Override
-    public Optional<String> getAgentHostname() {
-        return Optional.ofNullable(this.agentHostname);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Optional<String> getArchiveLocation() {
         return Optional.ofNullable(this.archiveLocation);
     }
@@ -697,6 +683,14 @@ public class JobEntity extends BaseEntity implements
     @Override
     public Optional<String> getCommandName() {
         return Optional.ofNullable(this.commandName);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Optional<String> getAgentHostname() {
+        return Optional.ofNullable(this.agentHostname);
     }
 
     /**
@@ -818,6 +812,30 @@ public class JobEntity extends BaseEntity implements
         if (environmentVariables != null) {
             this.environmentVariables.putAll(environmentVariables);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Optional<String> getRequestedJobDirectoryLocation() {
+        return Optional.ofNullable(this.requestedJobDirectoryLocation);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Optional<String> getRequestedAgentEnvironmentExt() {
+        return Optional.ofNullable(this.requestedAgentEnvironmentExt);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Optional<String> getRequestedAgentConfigExt() {
+        return Optional.ofNullable(this.requestedAgentConfigExt);
     }
 
     /**

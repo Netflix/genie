@@ -658,20 +658,7 @@ public class JobEntityUnitTests extends EntityTestsBase {
         final CriterionEntity commandCriterion = new CriterionEntity(null, null, null, null, tags);
 
         this.jobEntity.setCommandCriterion(commandCriterion);
-        Assert.assertTrue(this.jobEntity.getCommandCriterion().isPresent());
-        Assert.assertThat(
-            this.jobEntity.getCommandCriterion().orElseThrow(IllegalArgumentException::new),
-            Matchers.is(commandCriterion)
-        );
-    }
-
-    /**
-     * Make sure the setter for the jobEntity class works for JPA for null command criteria.
-     */
-    @Test
-    public void canSetNullCommandCriterion() {
-        this.jobEntity.setCommandCriterion(null);
-        Assert.assertFalse(this.jobEntity.getCommandCriterion().isPresent());
+        Assert.assertThat(this.jobEntity.getCommandCriterion(), Matchers.is(commandCriterion));
     }
 
     /**
@@ -821,10 +808,13 @@ public class JobEntityUnitTests extends EntityTestsBase {
      */
     @Test
     public void canSetRequestedJobDirectoryLocation() {
-        Assert.assertThat(this.jobEntity.getRequestedJobDirectoryLocation(), Matchers.nullValue());
+        Assert.assertFalse(this.jobEntity.getRequestedJobDirectoryLocation().isPresent());
         final String location = UUID.randomUUID().toString();
         this.jobEntity.setRequestedJobDirectoryLocation(location);
-        Assert.assertThat(this.jobEntity.getRequestedJobDirectoryLocation(), Matchers.is(location));
+        Assert.assertThat(
+            this.jobEntity.getRequestedJobDirectoryLocation().orElse(UUID.randomUUID().toString()),
+            Matchers.is(location)
+        );
     }
 
     /**
@@ -832,10 +822,13 @@ public class JobEntityUnitTests extends EntityTestsBase {
      */
     @Test
     public void canSetRequestedAgentConfigExt() {
-        Assert.assertThat(this.jobEntity.getRequestedAgentConfigExt(), Matchers.nullValue());
+        Assert.assertFalse(this.jobEntity.getRequestedAgentConfigExt().isPresent());
         final String ext = "{\"" + UUID.randomUUID().toString() + "\": \"" + UUID.randomUUID().toString() + "\"}";
         this.jobEntity.setRequestedAgentConfigExt(ext);
-        Assert.assertThat(this.jobEntity.getRequestedAgentConfigExt(), Matchers.is(ext));
+        Assert.assertThat(
+            this.jobEntity.getRequestedAgentConfigExt().orElse(UUID.randomUUID().toString()),
+            Matchers.is(ext)
+        );
     }
 
     /**
@@ -843,10 +836,13 @@ public class JobEntityUnitTests extends EntityTestsBase {
      */
     @Test
     public void canSetRequestedAgentEnvironmentExt() {
-        Assert.assertThat(this.jobEntity.getRequestedAgentEnvironmentExt(), Matchers.nullValue());
+        Assert.assertFalse(this.jobEntity.getRequestedAgentEnvironmentExt().isPresent());
         final String ext = "{\"" + UUID.randomUUID().toString() + "\": \"" + UUID.randomUUID().toString() + "\"}";
         this.jobEntity.setRequestedAgentEnvironmentExt(ext);
-        Assert.assertThat(this.jobEntity.getRequestedAgentEnvironmentExt(), Matchers.is(ext));
+        Assert.assertThat(
+            this.jobEntity.getRequestedAgentEnvironmentExt().orElse(UUID.randomUUID().toString()),
+            Matchers.is(ext)
+        );
     }
 
     /**

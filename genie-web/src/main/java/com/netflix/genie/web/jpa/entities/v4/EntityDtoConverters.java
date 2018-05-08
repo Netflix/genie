@@ -19,25 +19,34 @@ package com.netflix.genie.web.jpa.entities.v4;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableList;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.internal.dto.v4.AgentConfigRequest;
+import com.netflix.genie.common.internal.dto.v4.AgentEnvironmentRequest;
 import com.netflix.genie.common.internal.dto.v4.Application;
 import com.netflix.genie.common.internal.dto.v4.ApplicationMetadata;
 import com.netflix.genie.common.internal.dto.v4.Cluster;
 import com.netflix.genie.common.internal.dto.v4.ClusterMetadata;
 import com.netflix.genie.common.internal.dto.v4.Command;
 import com.netflix.genie.common.internal.dto.v4.CommandMetadata;
-import com.netflix.genie.common.internal.dto.v4.CommonMetadata;
+import com.netflix.genie.common.internal.dto.v4.Criterion;
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria;
+import com.netflix.genie.common.internal.dto.v4.JobMetadata;
+import com.netflix.genie.common.internal.dto.v4.JobRequest;
+import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.jpa.entities.ApplicationEntity;
-import com.netflix.genie.web.jpa.entities.BaseEntity;
 import com.netflix.genie.web.jpa.entities.ClusterEntity;
 import com.netflix.genie.web.jpa.entities.CommandEntity;
+import com.netflix.genie.web.jpa.entities.CriterionEntity;
 import com.netflix.genie.web.jpa.entities.FileEntity;
 import com.netflix.genie.web.jpa.entities.TagEntity;
-import com.netflix.genie.web.jpa.entities.projections.BaseProjection;
+import com.netflix.genie.web.jpa.entities.projections.v4.V4JobRequestProjection;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.annotation.Nullable;
+import java.io.IOException;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -69,7 +78,7 @@ public final class EntityDtoConverters {
 
         applicationEntity.getType().ifPresent(metadataBuilder::withType);
         applicationEntity.getDescription().ifPresent(metadataBuilder::withDescription);
-        setDtoMetadata(metadataBuilder, applicationEntity);
+        applicationEntity.getMetadata().ifPresent(metadata -> setJsonField(metadata, metadataBuilder::withMetadata));
 
         return new Application(
             applicationEntity.getUniqueId(),
@@ -100,7 +109,7 @@ public final class EntityDtoConverters {
             .withTags(clusterEntity.getTags().stream().map(TagEntity::getTag).collect(Collectors.toSet()));
 
         clusterEntity.getDescription().ifPresent(metadataBuilder::withDescription);
-        setDtoMetadata(metadataBuilder, clusterEntity);
+        clusterEntity.getMetadata().ifPresent(metadata -> setJsonField(metadata, metadataBuilder::withMetadata));
 
         return new Cluster(
             clusterEntity.getUniqueId(),
@@ -131,7 +140,7 @@ public final class EntityDtoConverters {
             .withTags(commandEntity.getTags().stream().map(TagEntity::getTag).collect(Collectors.toSet()));
 
         commandEntity.getDescription().ifPresent(metadataBuilder::withDescription);
-        setDtoMetadata(metadataBuilder, commandEntity);
+        commandEntity.getMetadata().ifPresent(metadata -> setJsonField(metadata, metadataBuilder::withMetadata));
 
         return new Command(
             commandEntity.getUniqueId(),
@@ -149,45 +158,137 @@ public final class EntityDtoConverters {
         );
     }
 
-    private static <B extends CommonMetadata.Builder, E extends BaseProjection> void setDtoMetadata(
-        final B builder,
-        final E entity
-    ) {
-        if (entity.getMetadata().isPresent()) {
-            try {
-                builder.withMetadata(entity.getMetadata().get());
-            } catch (final GeniePreconditionException gpe) {
-                // Since the DTO can't be constructed on input with invalid JSON this should never even happen
-                log.error("Invalid JSON metadata. Should never happen.", gpe);
-                builder.withMetadata((JsonNode) null);
-            }
+    /**
+     * Convert a job request entity to a DTO.
+     *
+     * @param jobRequestProjection The projection of the {@link com.netflix.genie.web.jpa.entities.JobEntity} to
+     *                             convert
+     * @return The original job request DTO
+     * @throws GeniePreconditionException When criterion can't be properly converted
+     */
+    public static JobRequest toV4JobRequestDto(
+        final V4JobRequestProjection jobRequestProjection
+    ) throws GeniePreconditionException {
+        final String requestedId = jobRequestProjection.isRequestedId() ? jobRequestProjection.getUniqueId() : null;
+
+        // Rebuild the job metadata
+        final JobMetadata.Builder jobMetadataBuilder = new JobMetadata.Builder(
+            jobRequestProjection.getName(),
+            jobRequestProjection.getUser(),
+            jobRequestProjection.getVersion()
+        );
+        jobRequestProjection.getGenieUserGroup().ifPresent(jobMetadataBuilder::withGroup);
+        jobRequestProjection.getEmail().ifPresent(jobMetadataBuilder::withEmail);
+        jobRequestProjection.getGrouping().ifPresent(jobMetadataBuilder::withGrouping);
+        jobRequestProjection.getGroupingInstance().ifPresent(jobMetadataBuilder::withGroupingInstance);
+        jobRequestProjection.getDescription().ifPresent(jobMetadataBuilder::withDescription);
+        jobMetadataBuilder.withTags(
+            jobRequestProjection.getTags().stream().map(TagEntity::getTag).collect(Collectors.toSet())
+        );
+        jobRequestProjection
+            .getMetadata()
+            .ifPresent(metadata -> setJsonField(metadata, jobMetadataBuilder::withMetadata));
+
+
+        // Rebuild the execution resource criteria
+        final ImmutableList.Builder<Criterion> clusterCriteria = ImmutableList.builder();
+        for (final CriterionEntity criterionEntity : jobRequestProjection.getClusterCriteria()) {
+            clusterCriteria.add(toCriterionDto(criterionEntity));
+        }
+        final Criterion commandCriterion = toCriterionDto(jobRequestProjection.getCommandCriterion());
+        final ExecutionResourceCriteria executionResourceCriteria = new ExecutionResourceCriteria(
+            clusterCriteria.build(),
+            commandCriterion,
+            jobRequestProjection.getRequestedApplications()
+        );
+
+        // Rebuild the job resources
+        final String setupFile = jobRequestProjection.getSetupFile().map(FileEntity::getFile).orElse(null);
+        final ExecutionEnvironment jobResources = new ExecutionEnvironment(
+            jobRequestProjection.getConfigs().stream().map(FileEntity::getFile).collect(Collectors.toSet()),
+            jobRequestProjection.getDependencies().stream().map(FileEntity::getFile).collect(Collectors.toSet()),
+            setupFile
+        );
+
+        // Rebuild the Agent Config Request
+        final AgentConfigRequest.Builder agentConfigRequestBuilder = new AgentConfigRequest.Builder();
+        jobRequestProjection
+            .getRequestedAgentConfigExt()
+            .ifPresent(ext -> setJsonField(ext, agentConfigRequestBuilder::withExt));
+        jobRequestProjection
+            .getRequestedJobDirectoryLocation()
+            .ifPresent(agentConfigRequestBuilder::withRequestedJobDirectoryLocation);
+        agentConfigRequestBuilder.withInteractive(jobRequestProjection.isInteractive());
+        agentConfigRequestBuilder.withArchivingDisabled(jobRequestProjection.isArchivingDisabled());
+        jobRequestProjection.getRequestedTimeout().ifPresent(agentConfigRequestBuilder::withTimeoutRequested);
+
+        // Rebuild the Agent Environment Request
+        final AgentEnvironmentRequest.Builder agentEnvironmentRequestBuilder = new AgentEnvironmentRequest.Builder();
+        jobRequestProjection
+            .getRequestedAgentEnvironmentExt()
+            .ifPresent(ext -> setJsonField(ext, agentEnvironmentRequestBuilder::withExt));
+        agentEnvironmentRequestBuilder
+            .withRequestedEnvironmentVariables(jobRequestProjection.getRequestedEnvironmentVariables());
+        jobRequestProjection.getRequestedCpu().ifPresent(agentEnvironmentRequestBuilder::withRequestedJobCpu);
+        jobRequestProjection.getRequestedMemory().ifPresent(agentEnvironmentRequestBuilder::withRequestedJobMemory);
+
+        return new JobRequest(
+            requestedId,
+            jobResources,
+            jobRequestProjection.getCommandArgs(),
+            jobMetadataBuilder.build(),
+            executionResourceCriteria,
+            agentEnvironmentRequestBuilder.build(),
+            agentConfigRequestBuilder.build()
+        );
+    }
+
+    private static Criterion toCriterionDto(final CriterionEntity criterionEntity) throws GeniePreconditionException {
+        final Criterion.Builder builder = new Criterion.Builder();
+        criterionEntity.getUniqueId().ifPresent(builder::withId);
+        criterionEntity.getName().ifPresent(builder::withName);
+        criterionEntity.getVersion().ifPresent(builder::withVersion);
+        criterionEntity.getStatus().ifPresent(builder::withStatus);
+        builder.withTags(criterionEntity.getTags().stream().map(TagEntity::getTag).collect(Collectors.toSet()));
+        return builder.build();
+    }
+
+    /**
+     * Write a JSON string into the consumer function as a JSON node.
+     *
+     * @param json     The JSON string to serialize into a JSON node.
+     * @param consumer The consuming function of the JSON node.
+     */
+    static void setJsonField(final String json, final Consumer<JsonNode> consumer) {
+        try {
+            consumer.accept(GenieObjectMapper.getMapper().readTree(json));
+        } catch (final IOException ioe) {
+            // Should never happen as preconditions for all inputs would have been checked before persistence happened
+            log.error("Reading JSON string {} into JSON node failed with error {}", json, ioe.getMessage(), ioe);
+            // Could recurse here and pass error json back through this method but don't want infinite loop
+            consumer.accept(null);
         }
     }
 
     /**
-     * Set the metadata field on the supplied entity given the data supplied.
+     * Given a JSON node convert it to a string representation and hand it to the consumer.
      *
-     * @param mapper   The object mapper to use
-     * @param metadata The entire metadata contents including the raw ad-hoc metadata field to convert
-     * @param entity   The entity to set the ad-hoc metadata field on
-     * @param <M>      The extension of {@link CommonMetadata} to use
-     * @param <E>      The extension of {@link BaseEntity} to use
+     * @param json     The JSON node to convert. If null {@literal null} will be passed to the consumer
+     * @param consumer The consumer function to call with the string representation
      */
-    public static <M extends CommonMetadata, E extends BaseEntity> void setEntityMetadata(
-        final ObjectMapper mapper,
-        final M metadata,
-        final E entity
-    ) {
-        if (metadata.getMetadata().isPresent()) {
+    public static void setJsonField(@Nullable final JsonNode json, final Consumer<String> consumer) {
+        if (json != null) {
             try {
-                entity.setMetadata(mapper.writeValueAsString(metadata.getMetadata().get()));
+                consumer.accept(GenieObjectMapper.getMapper().writeValueAsString(json));
             } catch (final JsonProcessingException jpe) {
-                // Should never happen. Swallow and set to null as metadata is not Genie critical
-                log.error("Invalid JSON, unable to convert to string", jpe);
-                entity.setMetadata(null);
+                // Should never happen as the JSON was valid to get to a JSON node in the first place
+                log.error("Unable to write JSON node {} as string due to {}", json, jpe.getMessage(), jpe);
+                consumer.accept("{\"jsonProcessingException\": \"" + jpe.getMessage() + "\"}");
             }
         } else {
-            entity.setMetadata(null);
+            // Here this method is used to update entities so sometimes we'll want to set the value to null if a user
+            // is requesting we clear out a value via an update call
+            consumer.accept(null);
         }
     }
 }

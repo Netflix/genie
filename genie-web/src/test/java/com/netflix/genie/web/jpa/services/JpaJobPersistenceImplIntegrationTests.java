@@ -304,7 +304,7 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
      * @throws IOException    on JSON error
      */
     @Test
-    public void canSaveJobRequest() throws GenieException, IOException {
+    public void canSaveAndRetrieveJobRequest() throws GenieException, IOException {
         final String metadata = "{\"" + UUID.randomUUID().toString() + "\": \"" + UUID.randomUUID().toString() + "\"}";
         final JobMetadata jobMetadata = new JobMetadata
             .Builder(NAME, USER, VERSION)
@@ -436,7 +436,7 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
 
         id = this.jobPersistenceService.saveJobRequest(jobRequest1, jobRequestMetadata);
         Assert.assertThat(id, Matchers.notNullValue());
-        this.validateSavedJobRequest(id, jobRequest0, jobRequestMetadata);
+        this.validateSavedJobRequest(id, jobRequest1, jobRequestMetadata);
 
         try {
             this.jobPersistenceService.saveJobRequest(jobRequest2, jobRequestMetadata);
@@ -594,14 +594,12 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
         final String id,
         final JobRequest jobRequest,
         final JobRequestMetadata jobRequestMetadata
-    ) throws GenieNotFoundException {
+    ) throws GenieException {
+        Assert.assertThat(this.jobPersistenceService.getJobRequest(id), Matchers.is(jobRequest));
         // TODO: Switch to compare results of a get once implemented to avoid collection transaction problem
         final JobEntity jobEntity = this.jobRepository
             .findByUniqueId(id)
             .orElseThrow(() -> new GenieNotFoundException("No job with id " + id + " found when one was expected"));
-
-        Assert.assertThat(jobEntity.getUniqueId(), Matchers.is(id));
-        // TODO: Test command args
 
         // Job Request Metadata Fields
         jobRequestMetadata.getApiClientMetadata().ifPresent(
@@ -647,48 +645,5 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
             jobEntity.getTotalSizeOfAttachments().orElse(-1L),
             Matchers.is(jobRequestMetadata.getTotalSizeOfAttachments())
         );
-
-        // Job Request fields
-        final JobMetadata jobMetadata = jobRequest.getMetadata();
-        Assert.assertThat(jobEntity.getName(), Matchers.is(jobMetadata.getName()));
-        Assert.assertThat(jobEntity.getUser(), Matchers.is(jobMetadata.getUser()));
-        Assert.assertThat(jobEntity.getVersion(), Matchers.is(jobMetadata.getVersion()));
-        // TODO: Test tags
-        // TODO: Test metadata
-        jobMetadata.getDescription().ifPresent(
-            description -> Assert.assertThat(
-                jobEntity.getDescription().orElse(UUID.randomUUID().toString()),
-                Matchers.is(description)
-            )
-        );
-        jobMetadata.getEmail().ifPresent(
-            email -> Assert.assertThat(
-                jobEntity.getEmail().orElse(UUID.randomUUID().toString()),
-                Matchers.is(email)
-            )
-        );
-        jobMetadata.getGroup().ifPresent(
-            group -> Assert.assertThat(
-                jobEntity.getGenieUserGroup().orElse(UUID.randomUUID().toString()),
-                Matchers.is(group)
-            )
-        );
-        jobMetadata.getGrouping().ifPresent(
-            grouping -> Assert.assertThat(
-                jobEntity.getGrouping().orElse(UUID.randomUUID().toString()),
-                Matchers.is(grouping)
-            )
-        );
-        jobMetadata.getGroupingInstance().ifPresent(
-            groupingInstance -> Assert.assertThat(
-                jobEntity.getGroupingInstance().orElse(UUID.randomUUID().toString()),
-                Matchers.is(groupingInstance)
-            )
-        );
-
-        // TODO: Test criteria
-        // TODO: Test execution environment
-        // TODO: Test Agent Environment Request
-        // TODO: Test Agent Config Request
     }
 }

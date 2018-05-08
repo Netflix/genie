@@ -49,9 +49,9 @@ public interface JobRequestProjection extends JobCommonFieldsProjection, SetupFi
     /**
      * Get the command criterion for this job.
      *
-     * @return The command criterion for this job if one exists
+     * @return The command criterion for this job
      */
-    Optional<CriterionEntity> getCommandCriterion();
+    CriterionEntity getCommandCriterion();
 
     /**
      * Get all the dependency files for this job.

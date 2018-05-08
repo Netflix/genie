@@ -320,39 +320,11 @@ class JobServiceProtoConverterSpec extends Specification {
 
         def executionResourceCriteria = new ExecutionResourceCriteria(
                 Lists.newArrayList(
-                        new Criterion
-                                .Builder()
-                                .withId(clusterCriterion0Id)
-                                .withName(clusterCriterion0Name)
-                                .withVersion(clusterCriterion0Version)
-                                .withStatus(clusterCriterion0Status)
-                                .withTags(clusterCriterion0Tags)
-                                .build(),
-                        new Criterion
-                                .Builder()
-                                .withId(clusterCriterion1Id)
-                                .withName(clusterCriterion1Name)
-                                .withVersion(clusterCriterion1Version)
-                                .withStatus(clusterCriterion1Status)
-                                .withTags(clusterCriterion1Tags)
-                                .build(),
-                        new Criterion
-                                .Builder()
-                                .withId(clusterCriterion2Id)
-                                .withName(clusterCriterion2Name)
-                                .withVersion(clusterCriterion2Version)
-                                .withStatus(clusterCriterion2Status)
-                                .withTags(clusterCriterion2Tags)
-                                .build()
+                        clusterCriterion0,
+                        clusterCriterion1,
+                        clusterCriterion2
                 ),
-                new Criterion
-                        .Builder()
-                        .withId(commandCriterionId)
-                        .withName(commandCriterionName)
-                        .withVersion(commandCriterionVersion)
-                        .withStatus(commandCriterionStatus)
-                        .withTags(commandCriterionTags)
-                        .build(),
+                commandCriterion,
                 applicationIds
         )
 

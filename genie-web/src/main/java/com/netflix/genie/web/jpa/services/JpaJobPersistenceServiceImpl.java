@@ -17,7 +17,6 @@
  */
 package com.netflix.genie.web.jpa.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
 import com.netflix.genie.common.dto.ClusterCriteria;
@@ -45,6 +44,8 @@ import com.netflix.genie.web.jpa.entities.CriterionEntity;
 import com.netflix.genie.web.jpa.entities.FileEntity;
 import com.netflix.genie.web.jpa.entities.JobEntity;
 import com.netflix.genie.web.jpa.entities.projections.IdProjection;
+import com.netflix.genie.web.jpa.entities.projections.v4.V4JobRequestProjection;
+import com.netflix.genie.web.jpa.entities.v4.EntityDtoConverters;
 import com.netflix.genie.web.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.web.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
@@ -71,7 +72,6 @@ import javax.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -356,6 +356,20 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
      * {@inheritDoc}
      */
     @Override
+    @Transactional(readOnly = true)
+    public JobRequest getJobRequest(final String id) throws GenieException {
+        log.debug("Requested to get Job Request for id {}", id);
+        final V4JobRequestProjection jobRequestProjection = this.jobRepository
+            .findByUniqueId(id, V4JobRequestProjection.class)
+            .orElseThrow(() -> new GenieNotFoundException("No job request with id " + id + " exists."));
+
+        return EntityDtoConverters.toV4JobRequestDto(jobRequestProjection);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void setJobSpecification(
         @NotBlank(message = "Id is missing and is required") final String id,
         @Nullable final JobSpecification specification
@@ -493,19 +507,6 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         return criterionEntity;
     }
 
-    private void jsonToString(
-        final JsonNode json,
-        final Consumer<? super String> consumer
-    ) {
-        try {
-            consumer.accept(GenieObjectMapper.getMapper().writeValueAsString(json));
-        } catch (final JsonProcessingException jpe) {
-            // TODO: Should never happen. Swallow for now till we decide what we want to do
-            log.error("Invalid JSON, unable to convert {} to string", json, jpe);
-            consumer.accept("{\"jsonProcessingException\": \"" + jpe.getMessage() + "\"}");
-        }
-    }
-
     private void setJobMetadataFields(
         final JobEntity jobEntity,
         final JobMetadata jobMetadata
@@ -519,7 +520,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         jobEntity.setTags(this.createAndGetTagEntities(jobMetadata.getTags()));
 
         final Optional<JsonNode> jsonMetadata = jobMetadata.getMetadata();
-        jsonMetadata.ifPresent(jsonNode -> this.jsonToString(jsonNode, jobEntity::setMetadata));
+        jsonMetadata.ifPresent(jsonNode -> EntityDtoConverters.setJsonField(jsonNode, jobEntity::setMetadata));
         jobMetadata.getDescription().ifPresent(jobEntity::setDescription);
         jobMetadata.getEmail().ifPresent(jobEntity::setEmail);
         jobMetadata.getGroup().ifPresent(jobEntity::setGenieUserGroup);
@@ -560,13 +561,13 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
     private void setRequestedAgentEnvironmentFields(
         final JobEntity jobEntity,
         final AgentEnvironmentRequest requestedAgentEnvironment
-    ) throws GenieException {
+    ) {
         jobEntity.setRequestedEnvironmentVariables(requestedAgentEnvironment.getRequestedEnvironmentVariables());
         requestedAgentEnvironment.getRequestedJobMemory().ifPresent(jobEntity::setRequestedMemory);
         requestedAgentEnvironment.getRequestedJobCpu().ifPresent(jobEntity::setRequestedCpu);
         final Optional<JsonNode> agentEnvironmentExt = requestedAgentEnvironment.getExt();
         agentEnvironmentExt.ifPresent(
-            jsonNode -> this.jsonToString(jsonNode, jobEntity::setRequestedAgentEnvironmentExt)
+            jsonNode -> EntityDtoConverters.setJsonField(jsonNode, jobEntity::setRequestedAgentEnvironmentExt)
         );
     }
 
@@ -581,7 +582,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
             .ifPresent(location -> jobEntity.setRequestedJobDirectoryLocation(location.getAbsolutePath()));
         requestedAgentConfig.getTimeoutRequested().ifPresent(jobEntity::setRequestedTimeout);
         requestedAgentConfig.getExt().ifPresent(
-            jsonNode -> this.jsonToString(jsonNode, jobEntity::setRequestedAgentConfigExt)
+            jsonNode -> EntityDtoConverters.setJsonField(jsonNode, jobEntity::setRequestedAgentConfigExt)
         );
     }
 
