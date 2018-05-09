@@ -39,9 +39,7 @@ import com.netflix.genie.web.jpa.entities.projections.v4.V4JobRequestProjection;
 import com.netflix.genie.web.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.web.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
-import com.netflix.genie.web.jpa.repositories.JpaFileRepository;
 import com.netflix.genie.web.jpa.repositories.JpaJobRepository;
-import com.netflix.genie.web.jpa.repositories.JpaTagRepository;
 import com.netflix.genie.web.services.FilePersistenceService;
 import com.netflix.genie.web.services.TagPersistenceService;
 import org.hamcrest.Matchers;
@@ -80,8 +78,8 @@ public class JpaJobPersistenceServiceImplUnitTests {
     private JpaApplicationRepository applicationRepository;
     private JpaClusterRepository clusterRepository;
     private JpaCommandRepository commandRepository;
-    private JpaTagRepository tagRepository;
-    private JpaFileRepository fileRepository;
+    private FilePersistenceService filePersistenceService;
+    private TagPersistenceService tagPersistenceService;
 
     private JpaJobPersistenceServiceImpl jobPersistenceService;
 
@@ -94,14 +92,12 @@ public class JpaJobPersistenceServiceImplUnitTests {
         this.applicationRepository = Mockito.mock(JpaApplicationRepository.class);
         this.clusterRepository = Mockito.mock(JpaClusterRepository.class);
         this.commandRepository = Mockito.mock(JpaCommandRepository.class);
-        this.tagRepository = Mockito.mock(JpaTagRepository.class);
-        this.fileRepository = Mockito.mock(JpaFileRepository.class);
+        this.tagPersistenceService = Mockito.mock(TagPersistenceService.class);
+        this.filePersistenceService = Mockito.mock(FilePersistenceService.class);
 
         this.jobPersistenceService = new JpaJobPersistenceServiceImpl(
-            Mockito.mock(TagPersistenceService.class),
-            this.tagRepository,
-            Mockito.mock(FilePersistenceService.class),
-            this.fileRepository,
+            this.tagPersistenceService,
+            this.filePersistenceService,
             this.jobRepository,
             this.applicationRepository,
             this.clusterRepository,
@@ -163,13 +159,13 @@ public class JpaJobPersistenceServiceImplUnitTests {
 
         final TagEntity fooTag = new TagEntity();
         fooTag.setTag("foo");
-        Mockito.when(this.tagRepository.findByTag("foo")).thenReturn(Optional.of(fooTag));
+        Mockito.when(this.tagPersistenceService.getTag("foo")).thenReturn(Optional.of(fooTag));
         final TagEntity barTag = new TagEntity();
         barTag.setTag("bar");
-        Mockito.when(this.tagRepository.findByTag("bar")).thenReturn(Optional.of(barTag));
+        Mockito.when(this.tagPersistenceService.getTag("bar")).thenReturn(Optional.of(barTag));
         final FileEntity setupFileEntity = new FileEntity();
         setupFileEntity.setFile(setupFile);
-        Mockito.when(this.fileRepository.findByFile(setupFile)).thenReturn(Optional.of(setupFileEntity));
+        Mockito.when(this.filePersistenceService.getFile(setupFile)).thenReturn(Optional.of(setupFileEntity));
 
         final ArgumentCaptor<JobEntity> argument = ArgumentCaptor.forClass(JobEntity.class);
         this.jobPersistenceService.createJob(jobRequest, metadata, job, execution);
@@ -260,10 +256,10 @@ public class JpaJobPersistenceServiceImplUnitTests {
         final JobExecution execution = new JobExecution.Builder(UUID.randomUUID().toString()).build();
 
         Mockito
-            .when(this.tagRepository.findByTag(Mockito.anyString()))
+            .when(this.tagPersistenceService.getTag(Mockito.anyString()))
             .thenReturn(Optional.of(new TagEntity(UUID.randomUUID().toString())));
         Mockito
-            .when(this.fileRepository.findByFile(Mockito.anyString()))
+            .when(this.filePersistenceService.getFile(Mockito.anyString()))
             .thenReturn(Optional.of(new FileEntity(UUID.randomUUID().toString())));
         Mockito
             .when(this.jobRepository.save(Mockito.any(JobEntity.class)))

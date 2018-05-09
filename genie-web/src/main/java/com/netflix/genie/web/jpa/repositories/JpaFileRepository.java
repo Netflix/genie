@@ -72,6 +72,14 @@ public interface JpaFileRepository extends JpaIdRepository<FileEntity> {
     boolean existsByFile(final String file);
 
     /**
+     * Find file entities where the file value is in the given set of files.
+     *
+     * @param files The files to find entities for
+     * @return The file entities
+     */
+    Set<FileEntity> findByFileIn(final Set<String> files);
+
+    /**
      * Find the ids of all files from the database that aren't referenced which were created before the supplied created
      * threshold.
      *

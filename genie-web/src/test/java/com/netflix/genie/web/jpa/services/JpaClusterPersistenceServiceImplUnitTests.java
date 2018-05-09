@@ -36,8 +36,6 @@ import com.netflix.genie.web.jpa.entities.FileEntity;
 import com.netflix.genie.web.jpa.entities.projections.ClusterCommandsProjection;
 import com.netflix.genie.web.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
-import com.netflix.genie.web.jpa.repositories.JpaFileRepository;
-import com.netflix.genie.web.jpa.repositories.JpaTagRepository;
 import com.netflix.genie.web.services.FilePersistenceService;
 import com.netflix.genie.web.services.TagPersistenceService;
 import org.junit.Before;
@@ -70,7 +68,7 @@ public class JpaClusterPersistenceServiceImplUnitTests {
     private JpaClusterPersistenceServiceImpl service;
     private JpaClusterRepository jpaClusterRepository;
     private JpaCommandRepository jpaCommandRepository;
-    private JpaFileRepository jpaFileRepository;
+    private FilePersistenceService filePersistenceService;
 
     /**
      * Setup for the tests.
@@ -79,12 +77,10 @@ public class JpaClusterPersistenceServiceImplUnitTests {
     public void setup() {
         this.jpaClusterRepository = Mockito.mock(JpaClusterRepository.class);
         this.jpaCommandRepository = Mockito.mock(JpaCommandRepository.class);
-        this.jpaFileRepository = Mockito.mock(JpaFileRepository.class);
+        this.filePersistenceService = Mockito.mock(FilePersistenceService.class);
         this.service = new JpaClusterPersistenceServiceImpl(
             Mockito.mock(TagPersistenceService.class),
-            Mockito.mock(JpaTagRepository.class),
-            Mockito.mock(FilePersistenceService.class),
-            this.jpaFileRepository,
+            this.filePersistenceService,
             this.jpaClusterRepository,
             this.jpaCommandRepository
         );
@@ -124,7 +120,7 @@ public class JpaClusterPersistenceServiceImplUnitTests {
             .build();
 
         Mockito
-            .when(this.jpaFileRepository.findByFile(Mockito.anyString()))
+            .when(this.filePersistenceService.getFile(Mockito.anyString()))
             .thenReturn(Optional.of(new FileEntity(UUID.randomUUID().toString())));
         Mockito
             .when(this.jpaClusterRepository.save(Mockito.any(ClusterEntity.class)))

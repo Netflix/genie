@@ -46,8 +46,6 @@ import com.netflix.genie.web.jpa.entities.v4.EntityDtoConverters;
 import com.netflix.genie.web.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.web.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
-import com.netflix.genie.web.jpa.repositories.JpaFileRepository;
-import com.netflix.genie.web.jpa.repositories.JpaTagRepository;
 import com.netflix.genie.web.jpa.specifications.JpaClusterSpecs;
 import com.netflix.genie.web.jpa.specifications.JpaCommandSpecs;
 import com.netflix.genie.web.services.CommandPersistenceService;
@@ -95,23 +93,19 @@ public class JpaCommandPersistenceServiceImpl extends JpaBaseService implements 
      * Default constructor.
      *
      * @param tagPersistenceService  The tag service to use
-     * @param tagRepository          The tag repository to use
      * @param filePersistenceService The file service to use
-     * @param fileRepository         The file repository to use
      * @param commandRepository      the command repository to use
      * @param applicationRepository  the application repository to use
      * @param clusterRepository      the cluster repository to use
      */
     public JpaCommandPersistenceServiceImpl(
         final TagPersistenceService tagPersistenceService,
-        final JpaTagRepository tagRepository,
         final FilePersistenceService filePersistenceService,
-        final JpaFileRepository fileRepository,
         final JpaCommandRepository commandRepository,
         final JpaApplicationRepository applicationRepository,
         final JpaClusterRepository clusterRepository
     ) {
-        super(tagPersistenceService, tagRepository, filePersistenceService, fileRepository);
+        super(tagPersistenceService, filePersistenceService);
         this.commandRepository = commandRepository;
         this.applicationRepository = applicationRepository;
         this.clusterRepo = clusterRepository;
@@ -168,7 +162,7 @@ public class JpaCommandPersistenceServiceImpl extends JpaBaseService implements 
         // Find the tag entity references. If one doesn't exist return empty page as if the tag doesn't exist
         // no entities tied to that tag will exist either and today our search for tags is an AND
         if (tags != null) {
-            tagEntities = this.getTagRepository().findByTagIn(tags);
+            tagEntities = this.getTagPersistenceService().getTags(tags);
             if (tagEntities.size() != tags.size()) {
                 return new PageImpl<>(new ArrayList<>(), page, 0);
             }
@@ -318,7 +312,7 @@ public class JpaCommandPersistenceServiceImpl extends JpaBaseService implements 
         @NotBlank(message = "No command id entered. Unable to remove configuration.") final String id,
         @NotBlank(message = "No config entered. Unable to remove.") final String config
     ) throws GenieException {
-        this.getFileRepository().findByFile(config).ifPresent(this.findCommand(id).getConfigs()::remove);
+        this.getFilePersistenceService().getFile(config).ifPresent(this.findCommand(id).getConfigs()::remove);
     }
 
     /**
@@ -372,7 +366,7 @@ public class JpaCommandPersistenceServiceImpl extends JpaBaseService implements 
         @NotBlank(message = "No command id entered. Unable to remove dependency.") final String id,
         @NotBlank(message = "No dependency entered. Unable to remove dependency.") final String dependency
     ) throws GenieException {
-        this.getFileRepository().findByFile(dependency).ifPresent(this.findCommand(id).getDependencies()::remove);
+        this.getFilePersistenceService().getFile(dependency).ifPresent(this.findCommand(id).getDependencies()::remove);
     }
 
     /**
@@ -426,7 +420,7 @@ public class JpaCommandPersistenceServiceImpl extends JpaBaseService implements 
         @NotBlank(message = "No command id entered. Unable to remove tag.") final String id,
         @NotBlank(message = "No tag entered. Unable to remove.") final String tag
     ) throws GenieException {
-        this.getTagRepository().findByTag(tag).ifPresent(this.findCommand(id).getTags()::remove);
+        this.getTagPersistenceService().getTag(tag).ifPresent(this.findCommand(id).getTags()::remove);
     }
 
     /**

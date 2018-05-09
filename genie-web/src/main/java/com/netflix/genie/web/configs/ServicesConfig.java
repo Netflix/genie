@@ -116,9 +116,7 @@ public class ServicesConfig {
      * Get JPA based implementation of the ApplicationPersistenceService.
      *
      * @param tagPersistenceService  The tag service to use
-     * @param tagRepository          The tag repository to use
      * @param filePersistenceService The file service to use
-     * @param fileRepository         The file repository to use
      * @param applicationRepository  The application repository to use.
      * @param commandRepository      The command repository to use.
      * @return An application service instance.
@@ -126,17 +124,13 @@ public class ServicesConfig {
     @Bean
     public ApplicationPersistenceService applicationService(
         final TagPersistenceService tagPersistenceService,
-        final JpaTagRepository tagRepository,
         final FilePersistenceService filePersistenceService,
-        final JpaFileRepository fileRepository,
         final JpaApplicationRepository applicationRepository,
         final JpaCommandRepository commandRepository
     ) {
         return new JpaApplicationPersistenceServiceImpl(
             tagPersistenceService,
-            tagRepository,
             filePersistenceService,
-            fileRepository,
             applicationRepository,
             commandRepository
         );
@@ -146,9 +140,7 @@ public class ServicesConfig {
      * Get JPA based implementation of the ClusterPersistenceService.
      *
      * @param tagPersistenceService  The tag service to use
-     * @param tagRepository          The tag repository to use
      * @param filePersistenceService The file service to use
-     * @param fileRepository         The file repository to use
      * @param clusterRepository      The cluster repository to use.
      * @param commandRepository      The command repository to use.
      * @return A cluster service instance.
@@ -156,17 +148,13 @@ public class ServicesConfig {
     @Bean
     public ClusterPersistenceService clusterService(
         final TagPersistenceService tagPersistenceService,
-        final JpaTagRepository tagRepository,
         final FilePersistenceService filePersistenceService,
-        final JpaFileRepository fileRepository,
         final JpaClusterRepository clusterRepository,
         final JpaCommandRepository commandRepository
     ) {
         return new JpaClusterPersistenceServiceImpl(
             tagPersistenceService,
-            tagRepository,
             filePersistenceService,
-            fileRepository,
             clusterRepository,
             commandRepository
         );
@@ -176,9 +164,7 @@ public class ServicesConfig {
      * Get JPA based implementation of the CommandPersistenceService.
      *
      * @param tagPersistenceService  The tag service to use
-     * @param tagRepository          The tag repository to use
      * @param filePersistenceService The file service to use
-     * @param fileRepository         The file repository to use
      * @param commandRepository      the command repository to use
      * @param applicationRepository  the application repository to use
      * @param clusterRepository      the cluster repository to use
@@ -187,18 +173,14 @@ public class ServicesConfig {
     @Bean
     public CommandPersistenceService commandService(
         final TagPersistenceService tagPersistenceService,
-        final JpaTagRepository tagRepository,
         final FilePersistenceService filePersistenceService,
-        final JpaFileRepository fileRepository,
         final JpaCommandRepository commandRepository,
         final JpaApplicationRepository applicationRepository,
         final JpaClusterRepository clusterRepository
     ) {
         return new JpaCommandPersistenceServiceImpl(
             tagPersistenceService,
-            tagRepository,
             filePersistenceService,
-            fileRepository,
             commandRepository,
             applicationRepository,
             clusterRepository
@@ -230,9 +212,7 @@ public class ServicesConfig {
      * Get JPA based implementation of the JobPersistenceService.
      *
      * @param tagPersistenceService  The tag service to use
-     * @param tagRepository          The tag repository to use
      * @param filePersistenceService The file service to use
-     * @param fileRepository         The file repository to use
      * @param jobRepository          The job repository to use
      * @param applicationRepository  The application repository to use
      * @param clusterRepository      The cluster repository to use
@@ -242,9 +222,7 @@ public class ServicesConfig {
     @Bean
     public JobPersistenceService jobPersistenceService(
         final TagPersistenceService tagPersistenceService,
-        final JpaTagRepository tagRepository,
         final FilePersistenceService filePersistenceService,
-        final JpaFileRepository fileRepository,
         final JpaJobRepository jobRepository,
         final JpaApplicationRepository applicationRepository,
         final JpaClusterRepository clusterRepository,
@@ -252,9 +230,7 @@ public class ServicesConfig {
     ) {
         return new JpaJobPersistenceServiceImpl(
             tagPersistenceService,
-            tagRepository,
             filePersistenceService,
-            fileRepository,
             jobRepository,
             applicationRepository,
             clusterRepository,
