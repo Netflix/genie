@@ -22,11 +22,10 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.exceptions.GenieNotFoundException;
-import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobRequestMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
 import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Nullable;
@@ -36,6 +35,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Interfaces for providing persistence functions for jobs other than search.
@@ -165,22 +165,20 @@ public interface JobPersistenceService {
      * Get the original request for a job.
      *
      * @param id The unique id of the job to get
-     * @return The job request if one was found
-     * @throws GenieNotFoundException     If no job is found
-     * @throws GeniePreconditionException If unable to convert values properly
-     * @throws GenieException             on other exception
+     * @return The job request if one was found. Wrapped in {@link Optional} so empty optional returned if no job found
+     * @throws GenieRuntimeException On error converting entity values to DTO values
      */
-    JobRequest getJobRequest(final String id) throws GenieException;
+    Optional<JobRequest> getJobRequest(@NotBlank(message = "Id is missing and is required") final String id);
 
     /**
-     * Given the criteria and resultant specification (optionally) save the information to the database.
+     * Save the given job specification details for a job. Sets the job status to {@link JobStatus#RESOLVED}.
      *
      * @param id            The id of the job
-     * @param specification The resultant job specification if there was one
+     * @param specification The job specification
      * @throws GenieException When the job can't be found or the persistence throws an exception
      */
-    void setJobSpecification(
+    void saveJobSpecification(
         @NotBlank(message = "Id is missing and is required") final String id,
-        @Nullable final JobSpecification specification
+        @NotNull final JobSpecification specification
     ) throws GenieException;
 }

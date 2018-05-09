@@ -33,6 +33,7 @@ import com.netflix.genie.common.internal.dto.v4.ApplicationMetadata;
 import com.netflix.genie.common.internal.dto.v4.ApplicationRequest;
 import com.netflix.genie.common.internal.dto.v4.Command;
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.jpa.entities.ApplicationEntity;
 import com.netflix.genie.web.jpa.entities.CommandEntity;
@@ -75,6 +76,7 @@ import java.util.stream.Collectors;
 @Transactional(
     rollbackFor = {
         GenieException.class,
+        GenieRuntimeException.class,
         ConstraintViolationException.class
     }
 )
@@ -439,29 +441,26 @@ public class JpaApplicationPersistenceServiceImpl extends JpaBaseService impleme
             .orElseThrow(() -> new GenieNotFoundException("No application with id " + id));
     }
 
-    private ApplicationEntity createApplicationEntity(final ApplicationRequest request) throws GenieException {
+    private ApplicationEntity createApplicationEntity(final ApplicationRequest request) {
         final ExecutionEnvironment resources = request.getResources();
         final ApplicationMetadata metadata = request.getMetadata();
 
         final ApplicationEntity entity = new ApplicationEntity();
         this.setUniqueId(entity, request.getRequestedId().orElse(null));
-        this.setEntityResources(entity, resources);
-        this.setEntityTags(entity, metadata);
+        this.setEntityResources(resources, entity::setConfigs, entity::setDependencies, entity::setSetupFile);
+        this.setEntityTags(metadata.getTags(), entity::setTags);
         this.setEntityApplicationMetadata(entity, metadata);
 
         return entity;
     }
 
-    private void updateEntityWithDtoContents(
-        final ApplicationEntity entity,
-        final Application dto
-    ) throws GenieException {
+    private void updateEntityWithDtoContents(final ApplicationEntity entity, final Application dto) {
         final ExecutionEnvironment resources = dto.getResources();
         final ApplicationMetadata metadata = dto.getMetadata();
 
         // Save all the unowned entities first to avoid unintended flushes
-        this.setEntityResources(entity, resources);
-        this.setEntityTags(entity, metadata);
+        this.setEntityResources(resources, entity::setConfigs, entity::setDependencies, entity::setSetupFile);
+        this.setEntityTags(metadata.getTags(), entity::setTags);
         this.setEntityApplicationMetadata(entity, metadata);
     }
 
@@ -474,29 +473,6 @@ public class JpaApplicationPersistenceServiceImpl extends JpaBaseService impleme
         entity.setStatus(metadata.getStatus());
         entity.setType(metadata.getType().orElse(null));
         EntityDtoConverters.setJsonField(metadata.getMetadata().orElse(null), entity::setMetadata);
-    }
-
-    private void setEntityResources(
-        final ApplicationEntity entity,
-        final ExecutionEnvironment resources
-    ) throws GenieException {
-        // Save all the unowned entities first to avoid unintended flushes
-        final Set<FileEntity> configs = this.createAndGetFileEntities(resources.getConfigs());
-        final Set<FileEntity> dependencies = this.createAndGetFileEntities(resources.getDependencies());
-        final FileEntity setupFile = resources.getSetupFile().isPresent()
-            ? this.createAndGetFileEntity(resources.getSetupFile().get())
-            : null;
-
-        entity.setConfigs(configs);
-        entity.setDependencies(dependencies);
-        entity.setSetupFile(setupFile);
-    }
-
-    private void setEntityTags(
-        final ApplicationEntity entity,
-        final ApplicationMetadata metadata
-    ) throws GenieException {
-        entity.setTags(this.createAndGetTagEntities(metadata.getTags()));
     }
 
     private void checkCommands(final ApplicationEntity applicationEntity) throws GeniePreconditionException {

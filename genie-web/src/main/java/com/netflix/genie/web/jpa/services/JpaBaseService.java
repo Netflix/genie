@@ -18,8 +18,8 @@
 package com.netflix.genie.web.jpa.services;
 
 import com.google.common.collect.Sets;
-import com.netflix.genie.common.exceptions.GenieException;
-import com.netflix.genie.common.exceptions.GenieNotFoundException;
+import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
 import com.netflix.genie.web.jpa.entities.FileEntity;
 import com.netflix.genie.web.jpa.entities.TagEntity;
 import com.netflix.genie.web.jpa.entities.UniqueIdEntity;
@@ -33,6 +33,7 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotBlank;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 /**
  * Base service for other services to extend for common functionality.
@@ -43,9 +44,6 @@ import java.util.UUID;
 @Slf4j
 @Getter(AccessLevel.PACKAGE)
 class JpaBaseService {
-
-    private static final char COMMA = ',';
-    private static final String EMPTY_STRING = "";
 
     private final TagPersistenceService tagPersistenceService;
     private final FilePersistenceService filePersistenceService;
@@ -69,14 +67,14 @@ class JpaBaseService {
      *
      * @param file The file to create
      * @return The file entity that has been persisted in the database
-     * @throws GenieException on error
+     * @throws GenieRuntimeException If we can't find the entity after creation.
      */
-    FileEntity createAndGetFileEntity(
-        @NotBlank(message = "File path cannot be blank") final String file
-    ) throws GenieException {
+    FileEntity createAndGetFileEntity(@NotBlank(message = "File path cannot be blank") final String file) {
         this.filePersistenceService.createFileIfNotExists(file);
         return this.filePersistenceService.getFile(file).orElseThrow(
-            () -> new GenieNotFoundException("Couldn't find file entity for file " + file)
+            // This shouldn't ever happen as the contract of previous API call states it will exists hence
+            // throw a Runtime exception as there is no real recovery
+            () -> new GenieRuntimeException("Couldn't find file entity for file " + file)
         );
     }
 
@@ -85,9 +83,9 @@ class JpaBaseService {
      *
      * @param files The files to create
      * @return The set of attached entities
-     * @throws GenieException on error
+     * @throws GenieRuntimeException on error
      */
-    Set<FileEntity> createAndGetFileEntities(final Set<String> files) throws GenieException {
+    Set<FileEntity> createAndGetFileEntities(final Set<String> files) {
         final Set<FileEntity> fileEntities = Sets.newHashSet();
         for (final String file : files) {
             fileEntities.add(this.createAndGetFileEntity(file));
@@ -100,14 +98,14 @@ class JpaBaseService {
      *
      * @param tag The file to create
      * @return The tag entity that has been persisted in the database
-     * @throws GenieException on error
+     * @throws GenieRuntimeException on error
      */
-    TagEntity createAndGetTagEntity(
-        @NotBlank(message = "Tag cannot be blank") final String tag
-    ) throws GenieException {
+    TagEntity createAndGetTagEntity(@NotBlank(message = "Tag cannot be blank") final String tag) {
         this.tagPersistenceService.createTagIfNotExists(tag);
         return this.tagPersistenceService.getTag(tag).orElseThrow(
-            () -> new GenieNotFoundException("Couldn't find tag entity for tag " + tag)
+            // This shouldn't ever happen as the contract of previous API call states it will exists hence
+            // throw a Runtime exception as there is no real recovery
+            () -> new GenieRuntimeException("Couldn't find tag entity for tag " + tag)
         );
     }
 
@@ -116,9 +114,9 @@ class JpaBaseService {
      *
      * @param tags The tags to create
      * @return The set of attached entities
-     * @throws GenieException on error
+     * @throws GenieRuntimeException on error
      */
-    Set<TagEntity> createAndGetTagEntities(final Set<String> tags) throws GenieException {
+    Set<TagEntity> createAndGetTagEntities(final Set<String> tags) {
         final Set<TagEntity> tagEntities = Sets.newHashSet();
         for (final String tag : tags) {
             tagEntities.add(this.createAndGetTagEntity(tag));
@@ -141,5 +139,39 @@ class JpaBaseService {
             entity.setUniqueId(UUID.randomUUID().toString());
             entity.setRequestedId(false);
         }
+    }
+
+    /**
+     * Set the resources (configs, dependencies, setup file) for an Entity.
+     *
+     * @param resources            The resources to set
+     * @param configsConsumer      The consumer method for the created config file entities
+     * @param dependenciesConsumer The consumer method for the created dependency file entities
+     * @param setupFileConsumer    The consumer method for the created setup file reference
+     */
+    void setEntityResources(
+        final ExecutionEnvironment resources,
+        final Consumer<Set<FileEntity>> configsConsumer,
+        final Consumer<Set<FileEntity>> dependenciesConsumer,
+        final Consumer<FileEntity> setupFileConsumer
+    ) {
+        // Save all the unowned entities first to avoid unintended flushes
+        configsConsumer.accept(this.createAndGetFileEntities(resources.getConfigs()));
+        dependenciesConsumer.accept(this.createAndGetFileEntities(resources.getDependencies()));
+        setupFileConsumer.accept(
+            resources.getSetupFile().isPresent()
+                ? this.createAndGetFileEntity(resources.getSetupFile().get())
+                : null
+        );
+    }
+
+    /**
+     * Set the tag entities created into the consumer.
+     *
+     * @param tags         The tags to create and set
+     * @param tagsConsumer Where to store the created tags
+     */
+    void setEntityTags(final Set<String> tags, final Consumer<Set<TagEntity>> tagsConsumer) {
+        tagsConsumer.accept(this.createAndGetTagEntities(tags));
     }
 }

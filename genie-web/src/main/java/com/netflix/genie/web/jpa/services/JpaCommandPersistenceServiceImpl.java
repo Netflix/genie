@@ -36,6 +36,7 @@ import com.netflix.genie.common.internal.dto.v4.Command;
 import com.netflix.genie.common.internal.dto.v4.CommandMetadata;
 import com.netflix.genie.common.internal.dto.v4.CommandRequest;
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.jpa.entities.ApplicationEntity;
 import com.netflix.genie.web.jpa.entities.ClusterEntity;
@@ -80,6 +81,7 @@ import java.util.stream.Collectors;
 @Transactional(
     rollbackFor = {
         GenieException.class,
+        GenieRuntimeException.class,
         ConstraintViolationException.class
     }
 )
@@ -549,7 +551,7 @@ public class JpaCommandPersistenceServiceImpl extends JpaBaseService implements 
             .orElseThrow(() -> new GenieNotFoundException("No command with id " + id + " exists."));
     }
 
-    private CommandEntity createCommandEntity(final CommandRequest request) throws GenieException {
+    private CommandEntity createCommandEntity(final CommandRequest request) {
         final ExecutionEnvironment resources = request.getResources();
         final CommandMetadata metadata = request.getMetadata();
 
@@ -558,23 +560,20 @@ public class JpaCommandPersistenceServiceImpl extends JpaBaseService implements 
         entity.setCheckDelay(request.getCheckDelay().orElse(com.netflix.genie.common.dto.Command.DEFAULT_CHECK_DELAY));
         entity.setExecutable(request.getExecutable());
         request.getMemory().ifPresent(entity::setMemory);
-        this.setEntityResources(entity, resources);
-        this.setEntityTags(entity, metadata);
+        this.setEntityResources(resources, entity::setConfigs, entity::setDependencies, entity::setSetupFile);
+        this.setEntityTags(metadata.getTags(), entity::setTags);
         this.setEntityCommandMetadata(entity, metadata);
 
         return entity;
     }
 
-    private void updateEntityWithDtoContents(
-        final CommandEntity entity,
-        final Command dto
-    ) throws GenieException {
+    private void updateEntityWithDtoContents(final CommandEntity entity, final Command dto) {
         final ExecutionEnvironment resources = dto.getResources();
         final CommandMetadata metadata = dto.getMetadata();
 
         // Save all the unowned entities first to avoid unintended flushes
-        this.setEntityResources(entity, resources);
-        this.setEntityTags(entity, metadata);
+        this.setEntityResources(resources, entity::setConfigs, entity::setDependencies, entity::setSetupFile);
+        this.setEntityTags(metadata.getTags(), entity::setTags);
         this.setEntityCommandMetadata(entity, metadata);
 
         entity.setCheckDelay(dto.getCheckDelay());
@@ -592,28 +591,5 @@ public class JpaCommandPersistenceServiceImpl extends JpaBaseService implements 
         entity.setDescription(metadata.getDescription().orElse(null));
         entity.setStatus(metadata.getStatus());
         EntityDtoConverters.setJsonField(metadata.getMetadata().orElse(null), entity::setMetadata);
-    }
-
-    private void setEntityResources(
-        final CommandEntity entity,
-        final ExecutionEnvironment resources
-    ) throws GenieException {
-        // Save all the unowned entities first to avoid unintended flushes
-        final Set<FileEntity> configs = this.createAndGetFileEntities(resources.getConfigs());
-        final Set<FileEntity> dependencies = this.createAndGetFileEntities(resources.getDependencies());
-        final FileEntity setupFile = resources.getSetupFile().isPresent()
-            ? this.createAndGetFileEntity(resources.getSetupFile().get())
-            : null;
-
-        entity.setConfigs(configs);
-        entity.setDependencies(dependencies);
-        entity.setSetupFile(setupFile);
-    }
-
-    private void setEntityTags(
-        final CommandEntity entity,
-        final CommandMetadata metadata
-    ) throws GenieException {
-        entity.setTags(this.createAndGetTagEntities(metadata.getTags()));
     }
 }

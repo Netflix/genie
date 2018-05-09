@@ -575,16 +575,16 @@ public class JpaJobPersistenceServiceImplUnitTests {
     }
 
     /**
-     * When a request is made for a job that doesn't have a record in the database a GenieNotFoundException is thrown.
+     * When a request is made for a job that doesn't have a record in the database an empty optional is returned.
      *
-     * @throws GenieException When the job isn't found
+     * @throws GenieException On error
      */
-    @Test(expected = GenieNotFoundException.class)
-    public void noJobRequestFoundThrowsException() throws GenieException {
+    @Test
+    public void noJobRequestFoundReturnsEmptyOptional() throws GenieException {
         Mockito
             .when(this.jobRepository.findByUniqueId(Mockito.anyString(), Mockito.eq(V4JobRequestProjection.class)))
             .thenReturn(Optional.empty());
 
-        this.jobPersistenceService.getJobRequest(UUID.randomUUID().toString());
+        Assert.assertFalse(this.jobPersistenceService.getJobRequest(UUID.randomUUID().toString()).isPresent());
     }
 }
