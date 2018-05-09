@@ -49,9 +49,7 @@ import com.netflix.genie.web.jpa.entities.v4.EntityDtoConverters;
 import com.netflix.genie.web.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.web.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
-import com.netflix.genie.web.jpa.repositories.JpaFileRepository;
 import com.netflix.genie.web.jpa.repositories.JpaJobRepository;
-import com.netflix.genie.web.jpa.repositories.JpaTagRepository;
 import com.netflix.genie.web.services.FilePersistenceService;
 import com.netflix.genie.web.services.JobPersistenceService;
 import com.netflix.genie.web.services.TagPersistenceService;
@@ -97,9 +95,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
      * Constructor.
      *
      * @param tagPersistenceService  The tag service to use
-     * @param tagRepository          The tag repository to use
      * @param filePersistenceService The file service to use
-     * @param fileRepository         The file repository to use
      * @param jobRepository          The job repository to use
      * @param applicationRepository  The application repository to use
      * @param clusterRepository      The cluster repository to use
@@ -107,15 +103,13 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
      */
     public JpaJobPersistenceServiceImpl(
         final TagPersistenceService tagPersistenceService,
-        final JpaTagRepository tagRepository,
         final FilePersistenceService filePersistenceService,
-        final JpaFileRepository fileRepository,
         final JpaJobRepository jobRepository,
         final JpaApplicationRepository applicationRepository,
         final JpaClusterRepository clusterRepository,
         final JpaCommandRepository commandRepository
     ) {
-        super(tagPersistenceService, tagRepository, filePersistenceService, fileRepository);
+        super(tagPersistenceService, filePersistenceService);
         this.jobRepository = jobRepository;
         this.applicationRepository = applicationRepository;
         this.clusterRepository = clusterRepository;

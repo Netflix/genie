@@ -23,8 +23,6 @@ import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.web.jpa.entities.FileEntity;
 import com.netflix.genie.web.jpa.entities.TagEntity;
 import com.netflix.genie.web.jpa.entities.UniqueIdEntity;
-import com.netflix.genie.web.jpa.repositories.JpaFileRepository;
-import com.netflix.genie.web.jpa.repositories.JpaTagRepository;
 import com.netflix.genie.web.services.FilePersistenceService;
 import com.netflix.genie.web.services.TagPersistenceService;
 import lombok.AccessLevel;
@@ -50,28 +48,20 @@ class JpaBaseService {
     private static final String EMPTY_STRING = "";
 
     private final TagPersistenceService tagPersistenceService;
-    private final JpaTagRepository tagRepository;
     private final FilePersistenceService filePersistenceService;
-    private final JpaFileRepository fileRepository;
 
     /**
      * Constructor.
      *
      * @param tagPersistenceService  The tag service to use
-     * @param tagRepository          The tag repository to use
      * @param filePersistenceService The file service to use
-     * @param fileRepository         The file repository to use
      */
     JpaBaseService(
         final TagPersistenceService tagPersistenceService,
-        final JpaTagRepository tagRepository,
-        final FilePersistenceService filePersistenceService,
-        final JpaFileRepository fileRepository
+        final FilePersistenceService filePersistenceService
     ) {
         this.tagPersistenceService = tagPersistenceService;
-        this.tagRepository = tagRepository;
         this.filePersistenceService = filePersistenceService;
-        this.fileRepository = fileRepository;
     }
 
     /**
@@ -85,7 +75,7 @@ class JpaBaseService {
         @NotBlank(message = "File path cannot be blank") final String file
     ) throws GenieException {
         this.filePersistenceService.createFileIfNotExists(file);
-        return this.fileRepository.findByFile(file).orElseThrow(
+        return this.filePersistenceService.getFile(file).orElseThrow(
             () -> new GenieNotFoundException("Couldn't find file entity for file " + file)
         );
     }
@@ -116,7 +106,7 @@ class JpaBaseService {
         @NotBlank(message = "Tag cannot be blank") final String tag
     ) throws GenieException {
         this.tagPersistenceService.createTagIfNotExists(tag);
-        return this.tagRepository.findByTag(tag).orElseThrow(
+        return this.tagPersistenceService.getTag(tag).orElseThrow(
             () -> new GenieNotFoundException("Couldn't find tag entity for tag " + tag)
         );
     }

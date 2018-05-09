@@ -27,6 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.Instant;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -82,5 +84,23 @@ public class JpaFilePersistenceServiceImpl implements FilePersistenceService {
                 .map(Number::longValue)
                 .collect(Collectors.toSet())
         );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<FileEntity> getFile(@NotBlank(message = "File path cannot be blank") final String file) {
+        return this.fileRepository.findByFile(file);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Set<FileEntity> getFiles(@NotNull final Set<String> files) {
+        return this.fileRepository.findByFileIn(files);
     }
 }

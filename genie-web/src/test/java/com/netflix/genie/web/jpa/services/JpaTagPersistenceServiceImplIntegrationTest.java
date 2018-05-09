@@ -35,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.Instant;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -62,10 +63,11 @@ public class JpaTagPersistenceServiceImplIntegrationTest extends DBUnitTestBase 
     public void canCreateTagIfNotExists() {
         Assert.assertThat(this.tagRepository.count(), Matchers.is(0L));
         final String tag = UUID.randomUUID().toString();
+        Assert.assertFalse(this.tagPersistenceService.getTag(tag).isPresent());
         this.tagPersistenceService.createTagIfNotExists(tag);
         Assert.assertThat(this.tagRepository.count(), Matchers.is(1L));
         Assert.assertTrue(this.tagRepository.existsByTag(tag));
-        final Optional<TagEntity> tagEntityOptional = this.tagRepository.findByTag(tag);
+        final Optional<TagEntity> tagEntityOptional = this.tagPersistenceService.getTag(tag);
         Assert.assertTrue(tagEntityOptional.isPresent());
         final TagEntity tagEntity = tagEntityOptional.get();
         Assert.assertThat(tagEntity.getTag(), Matchers.is(tag));
@@ -74,7 +76,7 @@ public class JpaTagPersistenceServiceImplIntegrationTest extends DBUnitTestBase 
         this.tagPersistenceService.createTagIfNotExists(tag);
         Assert.assertThat(this.tagRepository.count(), Matchers.is(1L));
         Assert.assertTrue(this.tagRepository.existsByTag(tag));
-        final Optional<TagEntity> tagEntityOptional2 = this.tagRepository.findByTag(tag);
+        final Optional<TagEntity> tagEntityOptional2 = this.tagPersistenceService.getTag(tag);
         Assert.assertTrue(tagEntityOptional2.isPresent());
         final TagEntity tagEntity2 = tagEntityOptional2.get();
         Assert.assertThat(tagEntity2.getTag(), Matchers.is(tag));
@@ -115,5 +117,31 @@ public class JpaTagPersistenceServiceImplIntegrationTest extends DBUnitTestBase 
 
         Assert.assertFalse(this.tagRepository.existsByTag(tag1));
         Assert.assertTrue(this.tagRepository.existsByTag(tag2));
+    }
+
+    /**
+     * Make sure we can find tags.
+     */
+    @Test
+    public void canFindTags() {
+        Assert.assertThat(this.tagRepository.count(), Matchers.is(0L));
+        final String tag1 = UUID.randomUUID().toString();
+        final String tag2 = UUID.randomUUID().toString();
+        this.tagPersistenceService.createTagIfNotExists(tag1);
+        final TagEntity tagEntity1 = this.tagPersistenceService.getTag(tag1).orElseThrow(IllegalArgumentException::new);
+        this.tagPersistenceService.createTagIfNotExists(tag2);
+        final TagEntity tagEntity2 = this.tagPersistenceService.getTag(tag2).orElseThrow(IllegalArgumentException::new);
+
+        Set<TagEntity> tags = this.tagPersistenceService.getTags(Sets.newHashSet(tag1, tag2));
+        Assert.assertThat(tags.size(), Matchers.is(2));
+        Assert.assertThat(tags, Matchers.hasItems(tagEntity1, tagEntity2));
+
+        tags = this.tagPersistenceService.getTags(Sets.newHashSet(tag1, tag2, UUID.randomUUID().toString()));
+        Assert.assertThat(tags.size(), Matchers.is(2));
+        Assert.assertThat(tags, Matchers.hasItems(tagEntity1, tagEntity2));
+
+        tags = this.tagPersistenceService.getTags(Sets.newHashSet(tag1, UUID.randomUUID().toString()));
+        Assert.assertThat(tags.size(), Matchers.is(1));
+        Assert.assertThat(tags, Matchers.hasItem(tagEntity1));
     }
 }

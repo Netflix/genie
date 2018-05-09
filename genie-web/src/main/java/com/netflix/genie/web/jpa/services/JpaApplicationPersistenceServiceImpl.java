@@ -41,8 +41,6 @@ import com.netflix.genie.web.jpa.entities.TagEntity;
 import com.netflix.genie.web.jpa.entities.v4.EntityDtoConverters;
 import com.netflix.genie.web.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
-import com.netflix.genie.web.jpa.repositories.JpaFileRepository;
-import com.netflix.genie.web.jpa.repositories.JpaTagRepository;
 import com.netflix.genie.web.jpa.specifications.JpaApplicationSpecs;
 import com.netflix.genie.web.jpa.specifications.JpaCommandSpecs;
 import com.netflix.genie.web.services.ApplicationPersistenceService;
@@ -90,21 +88,17 @@ public class JpaApplicationPersistenceServiceImpl extends JpaBaseService impleme
      * Default constructor.
      *
      * @param tagPersistenceService  The tag service to use
-     * @param tagRepository          The tag repository to use
      * @param filePersistenceService The file service to use
-     * @param fileRepository         The file repository to use
      * @param applicationRepository  The application repository to use
      * @param commandRepository      The command repository to use
      */
     public JpaApplicationPersistenceServiceImpl(
         final TagPersistenceService tagPersistenceService,
-        final JpaTagRepository tagRepository,
         final FilePersistenceService filePersistenceService,
-        final JpaFileRepository fileRepository,
         final JpaApplicationRepository applicationRepository,
         final JpaCommandRepository commandRepository
     ) {
-        super(tagPersistenceService, tagRepository, filePersistenceService, fileRepository);
+        super(tagPersistenceService, filePersistenceService);
         this.applicationRepository = applicationRepository;
         this.commandRepository = commandRepository;
     }
@@ -161,7 +155,7 @@ public class JpaApplicationPersistenceServiceImpl extends JpaBaseService impleme
         // Find the tag entity references. If one doesn't exist return empty page as if the tag doesn't exist
         // no entities tied to that tag will exist either and today our search for tags is an AND
         if (tags != null) {
-            tagEntities = this.getTagRepository().findByTagIn(tags);
+            tagEntities = this.getTagPersistenceService().getTags(tags);
             if (tagEntities.size() != tags.size()) {
                 return new PageImpl<>(new ArrayList<>(), page, 0);
             }
@@ -298,7 +292,7 @@ public class JpaApplicationPersistenceServiceImpl extends JpaBaseService impleme
         @NotBlank(message = "No application id entered. Unable to remove configuration.") final String id,
         @NotBlank(message = "No config entered. Unable to remove.") final String config
     ) throws GenieException {
-        this.getFileRepository().findByFile(config).ifPresent(this.findApplication(id).getConfigs()::remove);
+        this.getFilePersistenceService().getFile(config).ifPresent(this.findApplication(id).getConfigs()::remove);
     }
 
     /**
@@ -352,7 +346,9 @@ public class JpaApplicationPersistenceServiceImpl extends JpaBaseService impleme
         @NotBlank(message = "No application id entered. Unable to remove dependency.") final String id,
         @NotBlank(message = "No dependency entered. Unable to remove dependency.") final String dependency
     ) throws GenieException {
-        this.getFileRepository().findByFile(dependency).ifPresent(this.findApplication(id).getDependencies()::remove);
+        this.getFilePersistenceService()
+            .getFile(dependency)
+            .ifPresent(this.findApplication(id).getDependencies()::remove);
     }
 
     /**
@@ -406,7 +402,7 @@ public class JpaApplicationPersistenceServiceImpl extends JpaBaseService impleme
         @NotBlank(message = "No application id entered. Unable to remove tag.") final String id,
         @NotBlank(message = "No tag entered. Unable to remove.") final String tag
     ) throws GenieException {
-        this.getTagRepository().findByTag(tag).ifPresent(this.findApplication(id).getTags()::remove);
+        this.getTagPersistenceService().getTag(tag).ifPresent(this.findApplication(id).getTags()::remove);
     }
 
     /**

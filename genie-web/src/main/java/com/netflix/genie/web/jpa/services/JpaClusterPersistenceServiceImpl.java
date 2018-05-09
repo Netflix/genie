@@ -48,8 +48,6 @@ import com.netflix.genie.web.jpa.entities.projections.ClusterCommandsProjection;
 import com.netflix.genie.web.jpa.entities.v4.EntityDtoConverters;
 import com.netflix.genie.web.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
-import com.netflix.genie.web.jpa.repositories.JpaFileRepository;
-import com.netflix.genie.web.jpa.repositories.JpaTagRepository;
 import com.netflix.genie.web.jpa.specifications.JpaClusterSpecs;
 import com.netflix.genie.web.services.ClusterPersistenceService;
 import com.netflix.genie.web.services.FilePersistenceService;
@@ -97,21 +95,17 @@ public class JpaClusterPersistenceServiceImpl extends JpaBaseService implements 
      * Default constructor - initialize all required dependencies.
      *
      * @param tagPersistenceService  The tag service to use
-     * @param tagRepository          The tag repository to use
      * @param filePersistenceService The file service to use
-     * @param fileRepository         The file repository to use
      * @param clusterRepository      The cluster repository to use.
      * @param commandRepository      The command repository to use.
      */
     public JpaClusterPersistenceServiceImpl(
         final TagPersistenceService tagPersistenceService,
-        final JpaTagRepository tagRepository,
         final FilePersistenceService filePersistenceService,
-        final JpaFileRepository fileRepository,
         final JpaClusterRepository clusterRepository,
         final JpaCommandRepository commandRepository
     ) {
-        super(tagPersistenceService, tagRepository, filePersistenceService, fileRepository);
+        super(tagPersistenceService, filePersistenceService);
         this.clusterRepository = clusterRepository;
         this.commandRepository = commandRepository;
     }
@@ -168,7 +162,7 @@ public class JpaClusterPersistenceServiceImpl extends JpaBaseService implements 
         // Find the tag entity references. If one doesn't exist return empty page as if the tag doesn't exist
         // no entities tied to that tag will exist either and today our search for tags is an AND
         if (tags != null) {
-            tagEntities = this.getTagRepository().findByTagIn(tags);
+            tagEntities = this.getTagPersistenceService().getTags(tags);
             if (tagEntities.size() != tags.size()) {
                 return new PageImpl<>(new ArrayList<>(), page, 0);
             }
@@ -392,7 +386,7 @@ public class JpaClusterPersistenceServiceImpl extends JpaBaseService implements 
         @NotBlank(message = "No cluster id entered. Unable to remove dependency.") final String id,
         @NotBlank(message = "No dependency entered. Unable to remove dependency.") final String dependency
     ) throws GenieException {
-        this.getFileRepository().findByFile(dependency).ifPresent(this.findCluster(id).getDependencies()::remove);
+        this.getFilePersistenceService().getFile(dependency).ifPresent(this.findCluster(id).getDependencies()::remove);
     }
 
     /**
@@ -446,7 +440,7 @@ public class JpaClusterPersistenceServiceImpl extends JpaBaseService implements 
         @NotBlank(message = "No cluster id entered. Unable to remove tag.") final String id,
         @NotBlank(message = "No tag entered. Unable to remove.") final String tag
     ) throws GenieException {
-        this.getTagRepository().findByTag(tag).ifPresent(this.findCluster(id).getTags()::remove);
+        this.getTagPersistenceService().getTag(tag).ifPresent(this.findCluster(id).getTags()::remove);
     }
 
     /**

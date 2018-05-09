@@ -135,9 +135,7 @@ public class ServicesConfigUnitTests {
         Assert.assertNotNull(
             this.servicesConfig.applicationService(
                 this.tagPersistenceService,
-                this.tagRepository,
                 this.filePersistenceService,
-                this.fileRepository,
                 this.applicationRepository,
                 this.commandRepository
             )
@@ -153,9 +151,7 @@ public class ServicesConfigUnitTests {
         Assert.assertNotNull(
             this.servicesConfig.commandService(
                 this.tagPersistenceService,
-                this.tagRepository,
                 this.filePersistenceService,
-                this.fileRepository,
                 this.commandRepository,
                 this.applicationRepository,
                 this.clusterRepository
@@ -171,9 +167,7 @@ public class ServicesConfigUnitTests {
         Assert.assertNotNull(
             this.servicesConfig.clusterService(
                 this.tagPersistenceService,
-                this.tagRepository,
                 this.filePersistenceService,
-                this.fileRepository,
                 this.clusterRepository,
                 this.commandRepository
             )
@@ -202,9 +196,7 @@ public class ServicesConfigUnitTests {
         Assert.assertNotNull(
             this.servicesConfig.jobPersistenceService(
                 this.tagPersistenceService,
-                this.tagRepository,
                 this.filePersistenceService,
-                this.fileRepository,
                 this.jobRepository,
                 this.applicationRepository,
                 this.clusterRepository,

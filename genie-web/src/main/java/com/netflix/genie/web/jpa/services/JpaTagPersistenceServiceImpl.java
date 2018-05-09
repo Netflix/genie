@@ -27,6 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.Instant;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -79,5 +81,23 @@ public class JpaTagPersistenceServiceImpl implements TagPersistenceService {
                 .map(Number::longValue)
                 .collect(Collectors.toSet())
         );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<TagEntity> getTag(@NotBlank(message = "Tag string to find can't be blank") final String tag) {
+        return this.tagRepository.findByTag(tag);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Set<TagEntity> getTags(@NotNull final Set<String> tags) {
+        return this.tagRepository.findByTagIn(tags);
     }
 }

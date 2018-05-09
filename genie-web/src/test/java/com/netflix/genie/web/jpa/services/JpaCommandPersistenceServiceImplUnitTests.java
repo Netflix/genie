@@ -35,8 +35,6 @@ import com.netflix.genie.web.jpa.entities.CommandEntity;
 import com.netflix.genie.web.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.web.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
-import com.netflix.genie.web.jpa.repositories.JpaFileRepository;
-import com.netflix.genie.web.jpa.repositories.JpaTagRepository;
 import com.netflix.genie.web.services.FilePersistenceService;
 import com.netflix.genie.web.services.TagPersistenceService;
 import org.junit.Before;
@@ -81,9 +79,7 @@ public class JpaCommandPersistenceServiceImplUnitTests {
         this.jpaApplicationRepository = Mockito.mock(JpaApplicationRepository.class);
         this.service = new JpaCommandPersistenceServiceImpl(
             Mockito.mock(TagPersistenceService.class),
-            Mockito.mock(JpaTagRepository.class),
             Mockito.mock(FilePersistenceService.class),
-            Mockito.mock(JpaFileRepository.class),
             this.jpaCommandRepository,
             this.jpaApplicationRepository,
             Mockito.mock(JpaClusterRepository.class)
