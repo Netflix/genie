@@ -17,7 +17,7 @@
  */
 package com.netflix.genie.web.jpa.services
 
-import com.netflix.genie.common.exceptions.GenieNotFoundException
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException
 import com.netflix.genie.test.categories.UnitTest
 import com.netflix.genie.web.services.FilePersistenceService
 import com.netflix.genie.web.services.TagPersistenceService
@@ -47,7 +47,7 @@ class JpaBaseServiceSpec extends Specification {
         service.createAndGetFileEntity(UUID.randomUUID().toString())
 
         then:
-        thrown(GenieNotFoundException)
+        thrown(GenieRuntimeException)
     }
 
     def "Can't get tag entity if doesn't exist"() {
@@ -64,6 +64,6 @@ class JpaBaseServiceSpec extends Specification {
         service.createAndGetTagEntity(UUID.randomUUID().toString())
 
         then:
-        thrown(GenieNotFoundException)
+        thrown(GenieRuntimeException)
     }
 }

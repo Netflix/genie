@@ -20,6 +20,7 @@ package com.netflix.genie.web.aspect;
 import com.google.common.collect.ImmutableMap;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieServerException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
 import com.netflix.genie.web.properties.DataServiceRetryProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -103,9 +104,11 @@ public class DataServiceRetryAspect implements Ordered {
     public Object profile(final ProceedingJoinPoint pjp) throws GenieException {
         try {
             return retryTemplate.execute(context -> pjp.proceed());
-        } catch (GenieException | ConstraintViolationException e) {
+        } catch (GenieException | GenieRuntimeException | ConstraintViolationException e) {
             throw e;
         } catch (Throwable e) {
+            // TODO: We need to be careful about this as it throws a checked exception via aspect and could impact
+            //       methods that aren't marked to throw a checked exception. We should probably switch this to runtime
             throw new GenieServerException(
                 "Failed to execute data service method",
                 e

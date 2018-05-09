@@ -34,6 +34,7 @@ import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria;
 import com.netflix.genie.common.internal.dto.v4.JobMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.jpa.entities.ApplicationEntity;
 import com.netflix.genie.web.jpa.entities.ClusterEntity;
@@ -164,11 +165,9 @@ public final class EntityDtoConverters {
      * @param jobRequestProjection The projection of the {@link com.netflix.genie.web.jpa.entities.JobEntity} to
      *                             convert
      * @return The original job request DTO
-     * @throws GeniePreconditionException When criterion can't be properly converted
+     * @throws GenieRuntimeException When criterion can't be properly converted
      */
-    public static JobRequest toV4JobRequestDto(
-        final V4JobRequestProjection jobRequestProjection
-    ) throws GeniePreconditionException {
+    public static JobRequest toV4JobRequestDto(final V4JobRequestProjection jobRequestProjection) {
         final String requestedId = jobRequestProjection.isRequestedId() ? jobRequestProjection.getUniqueId() : null;
 
         // Rebuild the job metadata
@@ -243,14 +242,23 @@ public final class EntityDtoConverters {
         );
     }
 
-    private static Criterion toCriterionDto(final CriterionEntity criterionEntity) throws GeniePreconditionException {
+    private static Criterion toCriterionDto(final CriterionEntity criterionEntity) {
         final Criterion.Builder builder = new Criterion.Builder();
         criterionEntity.getUniqueId().ifPresent(builder::withId);
         criterionEntity.getName().ifPresent(builder::withName);
         criterionEntity.getVersion().ifPresent(builder::withVersion);
         criterionEntity.getStatus().ifPresent(builder::withStatus);
         builder.withTags(criterionEntity.getTags().stream().map(TagEntity::getTag).collect(Collectors.toSet()));
-        return builder.build();
+        // Since these entities have been stored successfully they were validated before and shouldn't contain errors
+        // we can't recover from error anyway in a good way here. Hence re-wrapping checked exception in runtime
+        try {
+            return builder.build();
+        } catch (final GeniePreconditionException gpe) {
+            log.error("Creating a Criterion DTO from a Criterion entity threw exception", gpe);
+            // TODO: For now this is a generic GenieRuntimeException. If we would like more advanced logic at the
+            //       edges (REST API, RPC API) based on type of exceptions we should subclass GenieRuntimeException
+            throw new GenieRuntimeException(gpe);
+        }
     }
 
     /**

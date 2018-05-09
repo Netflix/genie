@@ -38,6 +38,7 @@ import com.netflix.genie.common.internal.dto.v4.ClusterRequest;
 import com.netflix.genie.common.internal.dto.v4.Command;
 import com.netflix.genie.common.internal.dto.v4.Criterion;
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.controllers.DtoConverters;
 import com.netflix.genie.web.jpa.entities.ClusterEntity;
@@ -83,6 +84,7 @@ import java.util.stream.Collectors;
 @Transactional(
     rollbackFor = {
         GenieException.class,
+        GenieRuntimeException.class,
         ConstraintViolationException.class
     }
 )
@@ -560,29 +562,26 @@ public class JpaClusterPersistenceServiceImpl extends JpaBaseService implements 
         );
     }
 
-    private ClusterEntity createClusterEntity(final ClusterRequest request) throws GenieException {
+    private ClusterEntity createClusterEntity(final ClusterRequest request) {
         final ExecutionEnvironment resources = request.getResources();
         final ClusterMetadata metadata = request.getMetadata();
 
         final ClusterEntity entity = new ClusterEntity();
         this.setUniqueId(entity, request.getRequestedId().orElse(null));
-        this.setEntityResources(entity, resources);
-        this.setEntityTags(entity, metadata);
+        this.setEntityResources(resources, entity::setConfigs, entity::setDependencies, entity::setSetupFile);
+        this.setEntityTags(metadata.getTags(), entity::setTags);
         this.setEntityClusterMetadata(entity, metadata);
 
         return entity;
     }
 
-    private void updateEntityWithDtoContents(
-        final ClusterEntity entity,
-        final Cluster dto
-    ) throws GenieException {
+    private void updateEntityWithDtoContents(final ClusterEntity entity, final Cluster dto) {
         final ExecutionEnvironment resources = dto.getResources();
         final ClusterMetadata metadata = dto.getMetadata();
 
         // Save all the unowned entities first to avoid unintended flushes
-        this.setEntityResources(entity, resources);
-        this.setEntityTags(entity, metadata);
+        this.setEntityResources(resources, entity::setConfigs, entity::setDependencies, entity::setSetupFile);
+        this.setEntityTags(metadata.getTags(), entity::setTags);
         this.setEntityClusterMetadata(entity, metadata);
     }
 
@@ -594,29 +593,6 @@ public class JpaClusterPersistenceServiceImpl extends JpaBaseService implements 
         entity.setDescription(metadata.getDescription().orElse(null));
         entity.setStatus(metadata.getStatus());
         EntityDtoConverters.setJsonField(metadata.getMetadata().orElse(null), entity::setMetadata);
-    }
-
-    private void setEntityResources(
-        final ClusterEntity entity,
-        final ExecutionEnvironment resources
-    ) throws GenieException {
-        // Save all the unowned entities first to avoid unintended flushes
-        final Set<FileEntity> configs = this.createAndGetFileEntities(resources.getConfigs());
-        final Set<FileEntity> dependencies = this.createAndGetFileEntities(resources.getDependencies());
-        final FileEntity setupFile = resources.getSetupFile().isPresent()
-            ? this.createAndGetFileEntity(resources.getSetupFile().get())
-            : null;
-
-        entity.setConfigs(configs);
-        entity.setDependencies(dependencies);
-        entity.setSetupFile(setupFile);
-    }
-
-    private void setEntityTags(
-        final ClusterEntity entity,
-        final ClusterMetadata metadata
-    ) throws GenieException {
-        entity.setTags(this.createAndGetTagEntities(metadata.getTags()));
     }
 
     private Map<Cluster, String> findClustersAndCommandsForJob(

@@ -36,6 +36,8 @@ import com.netflix.genie.common.internal.dto.v4.JobMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobRequestMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieIdAlreadyExistsException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.jpa.entities.ApplicationEntity;
 import com.netflix.genie.web.jpa.entities.ClusterEntity;
@@ -80,6 +82,7 @@ import java.util.stream.Collectors;
 @Transactional(
     rollbackFor = {
         GenieException.class,
+        GenieRuntimeException.class,
         ConstraintViolationException.class
     }
 )
@@ -339,7 +342,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         try {
             return this.jobRepository.save(jobEntity).getUniqueId();
         } catch (final DataIntegrityViolationException e) {
-            throw new GenieConflictException(
+            throw new GenieIdAlreadyExistsException(
                 "A job with id " + jobEntity.getUniqueId() + " already exists. Unable to reserve id.",
                 e
             );
@@ -351,22 +354,20 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
      */
     @Override
     @Transactional(readOnly = true)
-    public JobRequest getJobRequest(final String id) throws GenieException {
+    public Optional<JobRequest> getJobRequest(@NotBlank(message = "Id is missing and is required") final String id) {
         log.debug("Requested to get Job Request for id {}", id);
-        final V4JobRequestProjection jobRequestProjection = this.jobRepository
+        return this.jobRepository
             .findByUniqueId(id, V4JobRequestProjection.class)
-            .orElseThrow(() -> new GenieNotFoundException("No job request with id " + id + " exists."));
-
-        return EntityDtoConverters.toV4JobRequestDto(jobRequestProjection);
+            .map(EntityDtoConverters::toV4JobRequestDto);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void setJobSpecification(
+    public void saveJobSpecification(
         @NotBlank(message = "Id is missing and is required") final String id,
-        @Nullable final JobSpecification specification
+        @NotNull final JobSpecification specification
     ) throws GenieException {
 
     }
@@ -395,7 +396,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         final com.netflix.genie.common.dto.JobMetadata jobMetadata,
         final Job job,
         final JobExecution jobExecution
-    ) throws GenieException {
+    ) {
         final JobEntity jobEntity = new JobEntity();
 
         // Fields from the original Job Request
@@ -491,7 +492,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         return jobEntity;
     }
 
-    private CriterionEntity toCriterionEntity(final Criterion criterion) throws GenieException {
+    private CriterionEntity toCriterionEntity(final Criterion criterion) {
         final CriterionEntity criterionEntity = new CriterionEntity();
         criterion.getId().ifPresent(criterionEntity::setUniqueId);
         criterion.getName().ifPresent(criterionEntity::setName);
@@ -501,10 +502,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         return criterionEntity;
     }
 
-    private void setJobMetadataFields(
-        final JobEntity jobEntity,
-        final JobMetadata jobMetadata
-    ) throws GenieException {
+    private void setJobMetadataFields(final JobEntity jobEntity, final JobMetadata jobMetadata) {
         // Required fields
         jobEntity.setName(jobMetadata.getName());
         jobEntity.setUser(jobMetadata.getUser());
@@ -525,7 +523,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
     private void setExecutionEnvironmentFields(
         final JobEntity jobEntity,
         final ExecutionEnvironment executionEnvironment
-    ) throws GenieException {
+    ) {
         final FileEntity setupFile = executionEnvironment.getSetupFile().isPresent()
             ? this.createAndGetFileEntity(executionEnvironment.getSetupFile().get())
             : null;
@@ -539,7 +537,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
     private void setExecutionResourceCriteriaFields(
         final JobEntity jobEntity,
         final ExecutionResourceCriteria criteria
-    ) throws GenieException {
+    ) {
         final List<Criterion> clusterCriteria = criteria.getClusterCriteria();
         final List<CriterionEntity> clusterCriteriaEntities
             = Lists.newArrayListWithExpectedSize(clusterCriteria.size());

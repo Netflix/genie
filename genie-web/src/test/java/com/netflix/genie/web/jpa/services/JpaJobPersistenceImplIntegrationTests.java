@@ -27,7 +27,6 @@ import com.netflix.genie.common.dto.CommandStatus;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobStatus;
-import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata;
@@ -40,6 +39,7 @@ import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria;
 import com.netflix.genie.common.internal.dto.v4.JobMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobRequestMetadata;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieIdAlreadyExistsException;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.test.categories.IntegrationTest;
 import com.netflix.genie.web.jpa.entities.JobEntity;
@@ -441,7 +441,7 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
         try {
             this.jobPersistenceService.saveJobRequest(jobRequest2, jobRequestMetadata);
             Assert.fail();
-        } catch (final GenieConflictException gce) {
+        } catch (final GenieIdAlreadyExistsException e) {
             // Expected
         }
     }
@@ -595,7 +595,12 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
         final JobRequest jobRequest,
         final JobRequestMetadata jobRequestMetadata
     ) throws GenieException {
-        Assert.assertThat(this.jobPersistenceService.getJobRequest(id), Matchers.is(jobRequest));
+        Assert.assertThat(
+            this.jobPersistenceService
+                .getJobRequest(id)
+                .orElseThrow(() -> new GenieNotFoundException("No job request with id " + id + " exists.")),
+            Matchers.is(jobRequest)
+        );
         // TODO: Switch to compare results of a get once implemented to avoid collection transaction problem
         final JobEntity jobEntity = this.jobRepository
             .findByUniqueId(id)
