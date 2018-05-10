@@ -23,8 +23,6 @@ import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeExcept
 import com.netflix.genie.web.jpa.entities.FileEntity;
 import com.netflix.genie.web.jpa.entities.TagEntity;
 import com.netflix.genie.web.jpa.entities.UniqueIdEntity;
-import com.netflix.genie.web.services.FilePersistenceService;
-import com.netflix.genie.web.services.TagPersistenceService;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -45,8 +43,8 @@ import java.util.function.Consumer;
 @Getter(AccessLevel.PACKAGE)
 class JpaBaseService {
 
-    private final TagPersistenceService tagPersistenceService;
-    private final FilePersistenceService filePersistenceService;
+    private final JpaTagPersistenceService tagPersistenceService;
+    private final JpaFilePersistenceService filePersistenceService;
 
     /**
      * Constructor.
@@ -55,8 +53,8 @@ class JpaBaseService {
      * @param filePersistenceService The file service to use
      */
     JpaBaseService(
-        final TagPersistenceService tagPersistenceService,
-        final FilePersistenceService filePersistenceService
+        final JpaTagPersistenceService tagPersistenceService,
+        final JpaFilePersistenceService filePersistenceService
     ) {
         this.tagPersistenceService = tagPersistenceService;
         this.filePersistenceService = filePersistenceService;

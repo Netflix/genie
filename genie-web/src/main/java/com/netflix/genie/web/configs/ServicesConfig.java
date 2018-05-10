@@ -21,26 +21,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.jobs.workflow.WorkflowTask;
-import com.netflix.genie.web.jpa.repositories.JpaApplicationRepository;
-import com.netflix.genie.web.jpa.repositories.JpaClusterRepository;
-import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
-import com.netflix.genie.web.jpa.repositories.JpaFileRepository;
-import com.netflix.genie.web.jpa.repositories.JpaJobRepository;
-import com.netflix.genie.web.jpa.repositories.JpaTagRepository;
-import com.netflix.genie.web.jpa.services.JpaApplicationPersistenceServiceImpl;
-import com.netflix.genie.web.jpa.services.JpaClusterPersistenceServiceImpl;
-import com.netflix.genie.web.jpa.services.JpaCommandPersistenceServiceImpl;
-import com.netflix.genie.web.jpa.services.JpaFilePersistenceServiceImpl;
-import com.netflix.genie.web.jpa.services.JpaJobPersistenceServiceImpl;
-import com.netflix.genie.web.jpa.services.JpaJobSearchServiceImpl;
-import com.netflix.genie.web.jpa.services.JpaTagPersistenceServiceImpl;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.services.ApplicationPersistenceService;
 import com.netflix.genie.web.services.AttachmentService;
 import com.netflix.genie.web.services.ClusterLoadBalancer;
 import com.netflix.genie.web.services.ClusterPersistenceService;
 import com.netflix.genie.web.services.CommandPersistenceService;
-import com.netflix.genie.web.services.FilePersistenceService;
 import com.netflix.genie.web.services.FileTransferFactory;
 import com.netflix.genie.web.services.JobCoordinatorService;
 import com.netflix.genie.web.services.JobKillService;
@@ -50,7 +36,6 @@ import com.netflix.genie.web.services.JobSpecificationService;
 import com.netflix.genie.web.services.JobStateService;
 import com.netflix.genie.web.services.JobSubmitterService;
 import com.netflix.genie.web.services.MailService;
-import com.netflix.genie.web.services.TagPersistenceService;
 import com.netflix.genie.web.services.impl.CacheGenieFileTransferService;
 import com.netflix.genie.web.services.impl.DefaultMailServiceImpl;
 import com.netflix.genie.web.services.impl.FileSystemAttachmentService;
@@ -110,132 +95,6 @@ public class ServicesConfig {
     @ConditionalOnMissingBean
     public MailService getDefaultMailServiceImpl() {
         return new DefaultMailServiceImpl();
-    }
-
-    /**
-     * Get JPA based implementation of the ApplicationPersistenceService.
-     *
-     * @param tagPersistenceService  The tag service to use
-     * @param filePersistenceService The file service to use
-     * @param applicationRepository  The application repository to use.
-     * @param commandRepository      The command repository to use.
-     * @return An application service instance.
-     */
-    @Bean
-    public ApplicationPersistenceService applicationService(
-        final TagPersistenceService tagPersistenceService,
-        final FilePersistenceService filePersistenceService,
-        final JpaApplicationRepository applicationRepository,
-        final JpaCommandRepository commandRepository
-    ) {
-        return new JpaApplicationPersistenceServiceImpl(
-            tagPersistenceService,
-            filePersistenceService,
-            applicationRepository,
-            commandRepository
-        );
-    }
-
-    /**
-     * Get JPA based implementation of the ClusterPersistenceService.
-     *
-     * @param tagPersistenceService  The tag service to use
-     * @param filePersistenceService The file service to use
-     * @param clusterRepository      The cluster repository to use.
-     * @param commandRepository      The command repository to use.
-     * @return A cluster service instance.
-     */
-    @Bean
-    public ClusterPersistenceService clusterService(
-        final TagPersistenceService tagPersistenceService,
-        final FilePersistenceService filePersistenceService,
-        final JpaClusterRepository clusterRepository,
-        final JpaCommandRepository commandRepository
-    ) {
-        return new JpaClusterPersistenceServiceImpl(
-            tagPersistenceService,
-            filePersistenceService,
-            clusterRepository,
-            commandRepository
-        );
-    }
-
-    /**
-     * Get JPA based implementation of the CommandPersistenceService.
-     *
-     * @param tagPersistenceService  The tag service to use
-     * @param filePersistenceService The file service to use
-     * @param commandRepository      the command repository to use
-     * @param applicationRepository  the application repository to use
-     * @param clusterRepository      the cluster repository to use
-     * @return A command service instance.
-     */
-    @Bean
-    public CommandPersistenceService commandService(
-        final TagPersistenceService tagPersistenceService,
-        final FilePersistenceService filePersistenceService,
-        final JpaCommandRepository commandRepository,
-        final JpaApplicationRepository applicationRepository,
-        final JpaClusterRepository clusterRepository
-    ) {
-        return new JpaCommandPersistenceServiceImpl(
-            tagPersistenceService,
-            filePersistenceService,
-            commandRepository,
-            applicationRepository,
-            clusterRepository
-        );
-    }
-
-    /**
-     * Get JPA based implementation of the JobSearchService.
-     *
-     * @param jobRepository     The repository to use for job entities
-     * @param clusterRepository The repository to use for cluster entities
-     * @param commandRepository The repository to use for command entities
-     * @return A job search service instance.
-     */
-    @Bean
-    public JobSearchService jobSearchService(
-        final JpaJobRepository jobRepository,
-        final JpaClusterRepository clusterRepository,
-        final JpaCommandRepository commandRepository
-    ) {
-        return new JpaJobSearchServiceImpl(
-            jobRepository,
-            clusterRepository,
-            commandRepository
-        );
-    }
-
-    /**
-     * Get JPA based implementation of the JobPersistenceService.
-     *
-     * @param tagPersistenceService  The tag service to use
-     * @param filePersistenceService The file service to use
-     * @param jobRepository          The job repository to use
-     * @param applicationRepository  The application repository to use
-     * @param clusterRepository      The cluster repository to use
-     * @param commandRepository      The command repository to use
-     * @return A job search service instance.
-     */
-    @Bean
-    public JobPersistenceService jobPersistenceService(
-        final TagPersistenceService tagPersistenceService,
-        final FilePersistenceService filePersistenceService,
-        final JpaJobRepository jobRepository,
-        final JpaApplicationRepository applicationRepository,
-        final JpaClusterRepository clusterRepository,
-        final JpaCommandRepository commandRepository
-    ) {
-        return new JpaJobPersistenceServiceImpl(
-            tagPersistenceService,
-            filePersistenceService,
-            jobRepository,
-            applicationRepository,
-            clusterRepository,
-            commandRepository
-        );
     }
 
     /**
@@ -408,27 +267,5 @@ public class ServicesConfig {
         final ServiceLocatorFactoryBean factoryBean = new ServiceLocatorFactoryBean();
         factoryBean.setServiceLocatorInterface(FileTransferFactory.class);
         return factoryBean;
-    }
-
-    /**
-     * Create the tag service bean.
-     *
-     * @param tagRepository The tag repository to use
-     * @return The tag service implementation
-     */
-    @Bean
-    public TagPersistenceService tagService(final JpaTagRepository tagRepository) {
-        return new JpaTagPersistenceServiceImpl(tagRepository);
-    }
-
-    /**
-     * Create the file service bean.
-     *
-     * @param fileRepository The file repository to use
-     * @return The file service implementation
-     */
-    @Bean
-    public FilePersistenceService fileService(final JpaFileRepository fileRepository) {
-        return new JpaFilePersistenceServiceImpl(fileRepository);
     }
 }

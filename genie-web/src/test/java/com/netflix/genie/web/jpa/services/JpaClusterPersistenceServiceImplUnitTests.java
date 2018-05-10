@@ -36,8 +36,6 @@ import com.netflix.genie.web.jpa.entities.FileEntity;
 import com.netflix.genie.web.jpa.entities.projections.ClusterCommandsProjection;
 import com.netflix.genie.web.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
-import com.netflix.genie.web.services.FilePersistenceService;
-import com.netflix.genie.web.services.TagPersistenceService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -68,7 +66,7 @@ public class JpaClusterPersistenceServiceImplUnitTests {
     private JpaClusterPersistenceServiceImpl service;
     private JpaClusterRepository jpaClusterRepository;
     private JpaCommandRepository jpaCommandRepository;
-    private FilePersistenceService filePersistenceService;
+    private JpaFilePersistenceService filePersistenceService;
 
     /**
      * Setup for the tests.
@@ -77,9 +75,9 @@ public class JpaClusterPersistenceServiceImplUnitTests {
     public void setup() {
         this.jpaClusterRepository = Mockito.mock(JpaClusterRepository.class);
         this.jpaCommandRepository = Mockito.mock(JpaCommandRepository.class);
-        this.filePersistenceService = Mockito.mock(FilePersistenceService.class);
+        this.filePersistenceService = Mockito.mock(JpaFilePersistenceService.class);
         this.service = new JpaClusterPersistenceServiceImpl(
-            Mockito.mock(TagPersistenceService.class),
+            Mockito.mock(JpaTagPersistenceService.class),
             this.filePersistenceService,
             this.jpaClusterRepository,
             this.jpaCommandRepository

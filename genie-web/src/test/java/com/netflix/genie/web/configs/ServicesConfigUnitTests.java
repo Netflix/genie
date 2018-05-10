@@ -22,23 +22,15 @@ import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.events.GenieEventBus;
 import com.netflix.genie.web.jobs.workflow.WorkflowTask;
-import com.netflix.genie.web.jpa.repositories.JpaApplicationRepository;
-import com.netflix.genie.web.jpa.repositories.JpaClusterRepository;
-import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
-import com.netflix.genie.web.jpa.repositories.JpaFileRepository;
-import com.netflix.genie.web.jpa.repositories.JpaJobRepository;
-import com.netflix.genie.web.jpa.repositories.JpaTagRepository;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.services.ApplicationPersistenceService;
 import com.netflix.genie.web.services.ClusterPersistenceService;
 import com.netflix.genie.web.services.CommandPersistenceService;
-import com.netflix.genie.web.services.FilePersistenceService;
 import com.netflix.genie.web.services.JobKillService;
 import com.netflix.genie.web.services.JobPersistenceService;
 import com.netflix.genie.web.services.JobSearchService;
 import com.netflix.genie.web.services.JobSpecificationService;
 import com.netflix.genie.web.services.JobStateService;
-import com.netflix.genie.web.services.TagPersistenceService;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.commons.exec.Executor;
 import org.junit.Assert;
@@ -63,14 +55,6 @@ import java.util.UUID;
 @Category(UnitTest.class)
 public class ServicesConfigUnitTests {
 
-    private TagPersistenceService tagPersistenceService;
-    private JpaTagRepository tagRepository;
-    private FilePersistenceService filePersistenceService;
-    private JpaFileRepository fileRepository;
-    private JpaApplicationRepository applicationRepository;
-    private JpaClusterRepository clusterRepository;
-    private JpaCommandRepository commandRepository;
-    private JpaJobRepository jobRepository;
     private JobSearchService jobSearchService;
     private ServicesConfig servicesConfig;
 
@@ -79,14 +63,6 @@ public class ServicesConfigUnitTests {
      */
     @Before
     public void setUp() {
-        this.tagPersistenceService = Mockito.mock(TagPersistenceService.class);
-        this.tagRepository = Mockito.mock(JpaTagRepository.class);
-        this.filePersistenceService = Mockito.mock(FilePersistenceService.class);
-        this.fileRepository = Mockito.mock(JpaFileRepository.class);
-        this.applicationRepository = Mockito.mock(JpaApplicationRepository.class);
-        this.clusterRepository = Mockito.mock(JpaClusterRepository.class);
-        this.commandRepository = Mockito.mock(JpaCommandRepository.class);
-        this.jobRepository = Mockito.mock(JpaJobRepository.class);
         this.jobSearchService = Mockito.mock(JobSearchService.class);
 
         this.servicesConfig = new ServicesConfig();
@@ -125,84 +101,6 @@ public class ServicesConfigUnitTests {
     public void canGetMailServiceImpl() {
         final JavaMailSender javaMailSender = Mockito.mock(JavaMailSender.class);
         Assert.assertNotNull(this.servicesConfig.getJavaMailSenderMailService(javaMailSender, "fromAddress"));
-    }
-
-    /**
-     * Can get a bean for Application Service.
-     */
-    @Test
-    public void canGetApplicationServiceBean() {
-        Assert.assertNotNull(
-            this.servicesConfig.applicationService(
-                this.tagPersistenceService,
-                this.filePersistenceService,
-                this.applicationRepository,
-                this.commandRepository
-            )
-        );
-    }
-
-    /**
-     * Can get a bean for Command Service.
-     */
-    @Test
-    public void canGetCommandServiceBean() {
-
-        Assert.assertNotNull(
-            this.servicesConfig.commandService(
-                this.tagPersistenceService,
-                this.filePersistenceService,
-                this.commandRepository,
-                this.applicationRepository,
-                this.clusterRepository
-            )
-        );
-    }
-
-    /**
-     * Can get a bean for Cluster Service.
-     */
-    @Test
-    public void canGetClusterServiceBean() {
-        Assert.assertNotNull(
-            this.servicesConfig.clusterService(
-                this.tagPersistenceService,
-                this.filePersistenceService,
-                this.clusterRepository,
-                this.commandRepository
-            )
-        );
-    }
-
-    /**
-     * Can get a bean for Job Search Service.
-     */
-    @Test
-    public void canGetJobSearchServiceBean() {
-        Assert.assertNotNull(
-            this.servicesConfig.jobSearchService(
-                this.jobRepository,
-                Mockito.mock(JpaClusterRepository.class),
-                Mockito.mock(JpaCommandRepository.class)
-            )
-        );
-    }
-
-    /**
-     * Can get a bean for Job Persistence Service.
-     */
-    @Test
-    public void canGetJobPersistenceServiceBean() {
-        Assert.assertNotNull(
-            this.servicesConfig.jobPersistenceService(
-                this.tagPersistenceService,
-                this.filePersistenceService,
-                this.jobRepository,
-                this.applicationRepository,
-                this.clusterRepository,
-                this.commandRepository
-            )
-        );
     }
 
     /**
@@ -264,21 +162,5 @@ public class ServicesConfigUnitTests {
                 GenieObjectMapper.getMapper()
             )
         );
-    }
-
-    /**
-     * Make sure a tag service bean can be created.
-     */
-    @Test
-    public void canGetTagServiceBean() {
-        Assert.assertNotNull(this.servicesConfig.tagService(this.tagRepository));
-    }
-
-    /**
-     * Make sure a tag service bean can be created.
-     */
-    @Test
-    public void canGetFileServiceBean() {
-        Assert.assertNotNull(this.servicesConfig.fileService(this.fileRepository));
     }
 }

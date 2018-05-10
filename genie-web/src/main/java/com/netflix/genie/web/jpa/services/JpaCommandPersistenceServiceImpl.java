@@ -50,13 +50,12 @@ import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.web.jpa.specifications.JpaClusterSpecs;
 import com.netflix.genie.web.jpa.specifications.JpaCommandSpecs;
 import com.netflix.genie.web.services.CommandPersistenceService;
-import com.netflix.genie.web.services.FilePersistenceService;
-import com.netflix.genie.web.services.TagPersistenceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nullable;
@@ -78,6 +77,7 @@ import java.util.stream.Collectors;
  * @author tgianos
  * @since 2.0.0
  */
+@Service
 @Transactional(
     rollbackFor = {
         GenieException.class,
@@ -101,8 +101,8 @@ public class JpaCommandPersistenceServiceImpl extends JpaBaseService implements 
      * @param clusterRepository      the cluster repository to use
      */
     public JpaCommandPersistenceServiceImpl(
-        final TagPersistenceService tagPersistenceService,
-        final FilePersistenceService filePersistenceService,
+        final JpaTagPersistenceService tagPersistenceService,
+        final JpaFilePersistenceService filePersistenceService,
         final JpaCommandRepository commandRepository,
         final JpaApplicationRepository applicationRepository,
         final JpaClusterRepository clusterRepository

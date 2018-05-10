@@ -19,9 +19,9 @@ package com.netflix.genie.web.jpa.services;
 
 import com.netflix.genie.web.jpa.entities.FileEntity;
 import com.netflix.genie.web.jpa.repositories.JpaFileRepository;
-import com.netflix.genie.web.services.FilePersistenceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotBlank;
@@ -37,9 +37,10 @@ import java.util.stream.Collectors;
  * @author tgianos
  * @since 3.3.0
  */
-@Slf4j
+@Service
 @Transactional
-public class JpaFilePersistenceServiceImpl implements FilePersistenceService {
+@Slf4j
+public class JpaFilePersistenceServiceImpl implements JpaFilePersistenceService {
 
     private final JpaFileRepository fileRepository;
 
