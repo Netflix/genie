@@ -26,7 +26,6 @@ import com.netflix.genie.common.internal.dto.v4.ApplicationRequest;
 import com.netflix.genie.test.categories.IntegrationTest;
 import com.netflix.genie.web.jpa.entities.TagEntity;
 import com.netflix.genie.web.services.ApplicationPersistenceService;
-import com.netflix.genie.web.services.TagPersistenceService;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
@@ -50,7 +49,7 @@ public class JpaTagPersistenceServiceImplIntegrationTest extends DBUnitTestBase 
 
     // This needs to be injected as a Spring Bean otherwise transactions don't work as there is no proxy
     @Autowired
-    private TagPersistenceService tagPersistenceService;
+    private JpaTagPersistenceService tagPersistenceService;
 
     @Autowired
     private ApplicationPersistenceService applicationPersistenceService;

@@ -19,8 +19,6 @@ package com.netflix.genie.web.jpa.services
 
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException
 import com.netflix.genie.test.categories.UnitTest
-import com.netflix.genie.web.services.FilePersistenceService
-import com.netflix.genie.web.services.TagPersistenceService
 import org.junit.experimental.categories.Category
 import spock.lang.Specification
 
@@ -34,12 +32,12 @@ import spock.lang.Specification
 class JpaBaseServiceSpec extends Specification {
 
     def "Can't get file entity if doesn't exist"() {
-        def fileService = Mock(FilePersistenceService) {
+        def fileService = Mock(JpaFilePersistenceService) {
             1 * createFileIfNotExists(_ as String)
             1 * getFile(_ as String) >> Optional.empty()
         }
         def service = new JpaBaseService(
-                Mock(TagPersistenceService),
+                Mock(JpaTagPersistenceService),
                 fileService
         )
 
@@ -51,13 +49,13 @@ class JpaBaseServiceSpec extends Specification {
     }
 
     def "Can't get tag entity if doesn't exist"() {
-        def tagService = Mock(TagPersistenceService) {
+        def tagService = Mock(JpaTagPersistenceService) {
             1 * createTagIfNotExists(_ as String)
             1 * getTag(_ as String) >> Optional.empty()
         }
         def service = new JpaBaseService(
                 tagService,
-                Mock(FilePersistenceService)
+                Mock(JpaFilePersistenceService)
         )
 
         when:

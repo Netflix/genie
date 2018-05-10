@@ -52,15 +52,14 @@ import com.netflix.genie.web.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.web.jpa.repositories.JpaClusterRepository;
 import com.netflix.genie.web.jpa.repositories.JpaCommandRepository;
 import com.netflix.genie.web.jpa.repositories.JpaJobRepository;
-import com.netflix.genie.web.services.FilePersistenceService;
 import com.netflix.genie.web.services.JobPersistenceService;
-import com.netflix.genie.web.services.TagPersistenceService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nullable;
@@ -78,7 +77,9 @@ import java.util.stream.Collectors;
  * JPA implementation of the job persistence service.
  *
  * @author amsharma
+ * @author tgianos
  */
+@Service
 @Transactional(
     rollbackFor = {
         GenieException.class,
@@ -90,6 +91,8 @@ import java.util.stream.Collectors;
 public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobPersistenceService {
 
     private final JpaJobRepository jobRepository;
+
+    // TODO: Switch to services
     private final JpaApplicationRepository applicationRepository;
     private final JpaClusterRepository clusterRepository;
     private final JpaCommandRepository commandRepository;
@@ -105,8 +108,8 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
      * @param commandRepository      The command repository to use
      */
     public JpaJobPersistenceServiceImpl(
-        final TagPersistenceService tagPersistenceService,
-        final FilePersistenceService filePersistenceService,
+        final JpaTagPersistenceService tagPersistenceService,
+        final JpaFilePersistenceService filePersistenceService,
         final JpaJobRepository jobRepository,
         final JpaApplicationRepository applicationRepository,
         final JpaClusterRepository clusterRepository,
@@ -407,6 +410,9 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         jobEntity.setVersion(jobRequest.getVersion());
         jobEntity.setStatus(JobStatus.INIT);
         jobRequest.getDescription().ifPresent(jobEntity::setDescription);
+        jobRequest
+            .getMetadata()
+            .ifPresent(metadata -> EntityDtoConverters.setJsonField(metadata, jobEntity::setMetadata));
         JpaServiceUtils.setEntityMetadata(GenieObjectMapper.getMapper(), jobRequest, jobEntity);
         jobRequest.getCommandArgs().ifPresent(
             commandArgs ->

@@ -256,7 +256,7 @@ public class JpaApplicationPersistenceServiceImplIntegrationTests extends DBUnit
      * Test the get applications method default order by.
      */
     @Test
-    public void testGetApplicationssOrderBysDefault() {
+    public void testGetApplicationsOrderBysDefault() {
         //Default to order by Updated
         final Page<Application> applications = this.appService.getApplications(null, null, null, null, null, PAGEABLE);
         Assert.assertEquals(3, applications.getNumberOfElements());

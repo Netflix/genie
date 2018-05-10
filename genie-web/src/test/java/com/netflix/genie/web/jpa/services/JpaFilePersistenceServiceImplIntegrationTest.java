@@ -27,7 +27,6 @@ import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.test.categories.IntegrationTest;
 import com.netflix.genie.web.jpa.entities.FileEntity;
 import com.netflix.genie.web.services.ApplicationPersistenceService;
-import com.netflix.genie.web.services.FilePersistenceService;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
@@ -51,7 +50,7 @@ public class JpaFilePersistenceServiceImplIntegrationTest extends DBUnitTestBase
 
     // This needs to be injected as a Spring Bean otherwise transactions don't work as there is no proxy
     @Autowired
-    private FilePersistenceService filePersistenceService;
+    private JpaFilePersistenceService filePersistenceService;
 
     @Autowired
     private ApplicationPersistenceService applicationPersistenceService;

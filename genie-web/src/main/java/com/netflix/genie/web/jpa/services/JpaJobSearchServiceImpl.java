@@ -51,8 +51,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.Nullable;
 import javax.persistence.EntityManager;
@@ -77,9 +77,9 @@ import java.util.stream.Collectors;
  * @author amsharma
  * @author tgianos
  */
-@Slf4j
+@Service
 @Transactional(readOnly = true)
-@Validated
+@Slf4j
 public class JpaJobSearchServiceImpl implements JobSearchService {
 
     private final JpaJobRepository jobRepository;
@@ -351,7 +351,7 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
             .findByUniqueId(jobId, AgentHostnameProjection.class)
             .orElseThrow(() -> new GenieNotFoundException("No job execution found for id " + jobId))
             .getAgentHostname()
-            .orElseThrow(() -> new GenieNotFoundException("No hostname set for job "  + jobId));
+            .orElseThrow(() -> new GenieNotFoundException("No hostname set for job " + jobId));
     }
 
     /**
