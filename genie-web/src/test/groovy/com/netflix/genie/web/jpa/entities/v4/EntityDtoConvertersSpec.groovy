@@ -31,6 +31,8 @@ import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment
 import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria
 import com.netflix.genie.common.internal.dto.v4.JobMetadata
 import com.netflix.genie.common.internal.dto.v4.JobRequest
+import com.netflix.genie.common.internal.dto.v4.JobSpecification
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException
 import com.netflix.genie.common.util.GenieObjectMapper
 import com.netflix.genie.test.suppliers.RandomSuppliers
 import com.netflix.genie.web.jpa.entities.ApplicationEntity
@@ -40,6 +42,7 @@ import com.netflix.genie.web.jpa.entities.CriterionEntity
 import com.netflix.genie.web.jpa.entities.FileEntity
 import com.netflix.genie.web.jpa.entities.JobEntity
 import com.netflix.genie.web.jpa.entities.TagEntity
+import com.netflix.genie.web.jpa.entities.projections.v4.JobSpecificationProjection
 import spock.lang.Specification
 
 import java.util.function.Consumer
@@ -535,4 +538,180 @@ class EntityDtoConvertersSpec extends Specification {
         1 * consumer.accept(null)
     }
 
+    def "Can JobSpecificationProjection to JobSpecification DTO"() {
+        def id = UUID.randomUUID().toString()
+
+        def environmentVariables = ImmutableMap.of(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString()
+        )
+        def jobDirectoryLocation = UUID.randomUUID().toString()
+        def commandArgs = Lists.newArrayList(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def interactive = true
+        def jobConfigs = Sets.newHashSet(UUID.randomUUID().toString())
+        def jobDependencies = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def jobSetupFile = null
+
+        def clusterId = UUID.randomUUID().toString()
+        def clusterConfigs = Sets.newHashSet(UUID.randomUUID().toString())
+        def clusterDependencies = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def clusterSetupFile = UUID.randomUUID().toString()
+        def clusterEntity = Mock(ClusterEntity) {
+            1 * getUniqueId() >> clusterId
+            1 * getConfigs() >> clusterConfigs
+                    .collect({ config -> new FileEntity(config) })
+                    .toSet()
+            1 * getDependencies() >> clusterDependencies
+                    .collect({ dependency -> new FileEntity(dependency) })
+                    .toSet()
+            1 * getSetupFile() >> Optional.ofNullable(new FileEntity(clusterSetupFile))
+        }
+
+        def commandId = UUID.randomUUID().toString()
+        def commandConfigs = Sets.newHashSet(UUID.randomUUID().toString())
+        def commandDependencies = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def commandSetupFile = UUID.randomUUID().toString()
+        def executable = Lists.newArrayList(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def commandEntity = Mock(CommandEntity) {
+            1 * getUniqueId() >> commandId
+            1 * getConfigs() >> commandConfigs
+                    .collect({ config -> new FileEntity(config) })
+                    .toSet()
+            1 * getDependencies() >> commandDependencies
+                    .collect({ dependency -> new FileEntity(dependency) })
+                    .toSet()
+            1 * getSetupFile() >> Optional.ofNullable(new FileEntity(commandSetupFile))
+            1 * getExecutable() >> executable
+        }
+
+        def application0Id = UUID.randomUUID().toString()
+        def application0Configs = Sets.newHashSet(UUID.randomUUID().toString())
+        def application0Dependencies = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def application0SetupFile = null
+        def application0Entity = Mock(ApplicationEntity) {
+            1 * getUniqueId() >> application0Id
+            1 * getConfigs() >> application0Configs
+                    .collect({ config -> new FileEntity(config) })
+                    .toSet()
+            1 * getDependencies() >> application0Dependencies
+                    .collect({ dependency -> new FileEntity(dependency) })
+                    .toSet()
+            1 * getSetupFile() >> Optional.ofNullable(application0SetupFile)
+        }
+
+        def application1Id = UUID.randomUUID().toString()
+        def application1Configs = Sets.newHashSet(UUID.randomUUID().toString())
+        def application1Dependencies = Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+        def application1SetupFile = UUID.randomUUID().toString()
+        def application1Entity = Mock(ApplicationEntity) {
+            1 * getUniqueId() >> application1Id
+            1 * getConfigs() >> application1Configs
+                    .collect({ config -> new FileEntity(config) })
+                    .toSet()
+            1 * getDependencies() >> application1Dependencies
+                    .collect({ dependency -> new FileEntity(dependency) })
+                    .toSet()
+            1 * getSetupFile() >> Optional.ofNullable(new FileEntity(application1SetupFile))
+        }
+        def applications = Lists.newArrayList(application0Entity, application1Entity)
+
+        def jobSpecificationProjection = Mock(JobSpecificationProjection)
+
+        when:
+        EntityDtoConverters.toJobSpecificationDto(jobSpecificationProjection)
+
+        then:
+        1 * jobSpecificationProjection.getUniqueId() >> id
+        1 * jobSpecificationProjection.getCluster() >> Optional.empty()
+        thrown(GenieRuntimeException)
+
+        when:
+        EntityDtoConverters.toJobSpecificationDto(jobSpecificationProjection)
+
+        then:
+        1 * jobSpecificationProjection.getUniqueId() >> id
+        1 * jobSpecificationProjection.getCluster() >> Optional.of(clusterEntity)
+        1 * jobSpecificationProjection.getCommand() >> Optional.empty()
+        thrown(GenieRuntimeException)
+
+        when:
+        EntityDtoConverters.toJobSpecificationDto(jobSpecificationProjection)
+
+        then:
+        1 * jobSpecificationProjection.getUniqueId() >> id
+        1 * jobSpecificationProjection.getCluster() >> Optional.of(clusterEntity)
+        1 * jobSpecificationProjection.getCommand() >> Optional.of(commandEntity)
+        1 * jobSpecificationProjection.getJobDirectoryLocation() >> Optional.empty()
+        thrown(GenieRuntimeException)
+
+        when:
+        def jobSpecification = EntityDtoConverters.toJobSpecificationDto(jobSpecificationProjection)
+
+        then:
+        1 * jobSpecificationProjection.getUniqueId() >> id
+        1 * jobSpecificationProjection.getCluster() >> Optional.of(clusterEntity)
+        1 * jobSpecificationProjection.getCommand() >> Optional.of(commandEntity)
+        1 * jobSpecificationProjection.getJobDirectoryLocation() >> Optional.of(jobDirectoryLocation)
+        1 * jobSpecificationProjection.getApplications() >> applications
+        1 * jobSpecificationProjection.getCommandArgs() >> commandArgs
+        1 * jobSpecificationProjection.isInteractive() >> interactive
+        1 * jobSpecificationProjection.getConfigs() >> jobConfigs
+                .collect({ config -> new FileEntity(config) })
+                .toSet()
+        1 * jobSpecificationProjection.getDependencies() >> jobDependencies
+                .collect({ dependency -> new FileEntity(dependency) })
+                .toSet()
+        1 * jobSpecificationProjection.getSetupFile() >> Optional.ofNullable(jobSetupFile)
+        1 * jobSpecificationProjection.getEnvironmentVariables() >> environmentVariables
+        jobSpecification.isInteractive()
+        jobSpecification.getCommandArgs() == executable + commandArgs
+        jobSpecification.getEnvironmentVariables() == environmentVariables
+        jobSpecification.getJobDirectoryLocation() == new File(jobDirectoryLocation)
+        jobSpecification.getJob() == new JobSpecification.ExecutionResource(
+                id,
+                new ExecutionEnvironment(
+                        jobConfigs,
+                        jobDependencies,
+                        jobSetupFile
+                )
+        )
+        jobSpecification.getCluster() == new JobSpecification.ExecutionResource(
+                clusterId,
+                new ExecutionEnvironment(
+                        clusterConfigs,
+                        clusterDependencies,
+                        clusterSetupFile
+                )
+        )
+        jobSpecification.getCommand() == new JobSpecification.ExecutionResource(
+                commandId,
+                new ExecutionEnvironment(
+                        commandConfigs,
+                        commandDependencies,
+                        commandSetupFile
+                )
+        )
+        jobSpecification.getApplications() == Lists.newArrayList(
+                new JobSpecification.ExecutionResource(
+                        application0Id,
+                        new ExecutionEnvironment(
+                                application0Configs,
+                                application0Dependencies,
+                                application0SetupFile
+                        )
+                ),
+                new JobSpecification.ExecutionResource(
+                        application1Id,
+                        new ExecutionEnvironment(
+                                application1Configs,
+                                application1Dependencies,
+                                application1SetupFile
+                        )
+                )
+        )
+    }
 }

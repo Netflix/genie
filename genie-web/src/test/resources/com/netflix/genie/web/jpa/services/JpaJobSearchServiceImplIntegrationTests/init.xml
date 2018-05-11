@@ -418,6 +418,9 @@
         timeout="2015-08-18 01:49:00"
         grouping="job1Grouping"
         grouping_instance="job1GroupingInstance"
+        requested_id="true"
+        job_directory_location="/tmp/genie/jobs/1"
+        resolved="true"
     />
     <job_command_arguments
         job_id="1"
@@ -508,6 +511,9 @@
         timeout="2015-08-19 01:49:00"
         grouping="job2Grouping"
         grouping_instance="job2GroupingInstance"
+        requested_id="true"
+        job_directory_location="/tmp/genie/jobs/2"
+        resolved="true"
     />
     <job_command_arguments
         job_id="2"
@@ -588,6 +594,9 @@
         timeout="2016-03-03 01:49:00"
         grouping="job3Grouping"
         grouping_instance="job3GroupingInstance"
+        requested_id="true"
+        job_directory_location="/tmp/genie/jobs/3"
+        resolved="true"
     />
     <job_command_arguments
         job_id="3"

@@ -415,6 +415,9 @@
         process_id="317"
         check_delay="10000"
         timeout="2015-08-18 01:49:00"
+        requested_id="true"
+        job_directory_location="/tmp/genie/jobs/1"
+        resolved="true"
     />
     <job_requested_applications
         job_id="1"
@@ -503,6 +506,9 @@
         process_id="318"
         check_delay="11000"
         timeout="2015-08-19 01:49:00"
+        requested_id="true"
+        job_directory_location="/tmp/genie/jobs/2"
+        resolved="true"
     />
     <job_command_arguments
         job_id="2"
@@ -581,6 +587,9 @@
         process_id="319"
         check_delay="12000"
         timeout="2016-03-03 01:49:00"
+        requested_id="true"
+        job_directory_location="/tmp/genie/jobs/3"
+        resolved="true"
     />
     <job_command_arguments
         job_id="3"

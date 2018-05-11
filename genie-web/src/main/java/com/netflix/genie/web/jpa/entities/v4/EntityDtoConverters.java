@@ -20,6 +20,7 @@ package com.netflix.genie.web.jpa.entities.v4;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.internal.dto.v4.AgentConfigRequest;
 import com.netflix.genie.common.internal.dto.v4.AgentEnvironmentRequest;
@@ -34,6 +35,7 @@ import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria;
 import com.netflix.genie.common.internal.dto.v4.JobMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
+import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.jpa.entities.ApplicationEntity;
@@ -42,11 +44,15 @@ import com.netflix.genie.web.jpa.entities.CommandEntity;
 import com.netflix.genie.web.jpa.entities.CriterionEntity;
 import com.netflix.genie.web.jpa.entities.FileEntity;
 import com.netflix.genie.web.jpa.entities.TagEntity;
+import com.netflix.genie.web.jpa.entities.projections.v4.JobSpecificationProjection;
 import com.netflix.genie.web.jpa.entities.projections.v4.V4JobRequestProjection;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.Nullable;
+import java.io.File;
 import java.io.IOException;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -85,10 +91,10 @@ public final class EntityDtoConverters {
             applicationEntity.getUniqueId(),
             applicationEntity.getCreated(),
             applicationEntity.getUpdated(),
-            new ExecutionEnvironment(
-                applicationEntity.getConfigs().stream().map(FileEntity::getFile).collect(Collectors.toSet()),
-                applicationEntity.getDependencies().stream().map(FileEntity::getFile).collect(Collectors.toSet()),
-                applicationEntity.getSetupFile().isPresent() ? applicationEntity.getSetupFile().get().getFile() : null
+            toExecutionEnvironment(
+                applicationEntity.getConfigs(),
+                applicationEntity.getDependencies(),
+                applicationEntity.getSetupFile().orElse(null)
             ),
             metadataBuilder.build()
         );
@@ -116,10 +122,10 @@ public final class EntityDtoConverters {
             clusterEntity.getUniqueId(),
             clusterEntity.getCreated(),
             clusterEntity.getUpdated(),
-            new ExecutionEnvironment(
-                clusterEntity.getConfigs().stream().map(FileEntity::getFile).collect(Collectors.toSet()),
-                clusterEntity.getDependencies().stream().map(FileEntity::getFile).collect(Collectors.toSet()),
-                clusterEntity.getSetupFile().isPresent() ? clusterEntity.getSetupFile().get().getFile() : null
+            toExecutionEnvironment(
+                clusterEntity.getConfigs(),
+                clusterEntity.getDependencies(),
+                clusterEntity.getSetupFile().orElse(null)
             ),
             metadataBuilder.build()
         );
@@ -147,10 +153,10 @@ public final class EntityDtoConverters {
             commandEntity.getUniqueId(),
             commandEntity.getCreated(),
             commandEntity.getUpdated(),
-            new ExecutionEnvironment(
-                commandEntity.getConfigs().stream().map(FileEntity::getFile).collect(Collectors.toSet()),
-                commandEntity.getDependencies().stream().map(FileEntity::getFile).collect(Collectors.toSet()),
-                commandEntity.getSetupFile().isPresent() ? commandEntity.getSetupFile().get().getFile() : null
+            toExecutionEnvironment(
+                commandEntity.getConfigs(),
+                commandEntity.getDependencies(),
+                commandEntity.getSetupFile().orElse(null)
             ),
             metadataBuilder.build(),
             commandEntity.getExecutable(),
@@ -202,11 +208,10 @@ public final class EntityDtoConverters {
         );
 
         // Rebuild the job resources
-        final String setupFile = jobRequestProjection.getSetupFile().map(FileEntity::getFile).orElse(null);
-        final ExecutionEnvironment jobResources = new ExecutionEnvironment(
-            jobRequestProjection.getConfigs().stream().map(FileEntity::getFile).collect(Collectors.toSet()),
-            jobRequestProjection.getDependencies().stream().map(FileEntity::getFile).collect(Collectors.toSet()),
-            setupFile
+        final ExecutionEnvironment jobResources = toExecutionEnvironment(
+            jobRequestProjection.getConfigs(),
+            jobRequestProjection.getDependencies(),
+            jobRequestProjection.getSetupFile().orElse(null)
         );
 
         // Rebuild the Agent Config Request
@@ -298,5 +303,106 @@ public final class EntityDtoConverters {
             // is requesting we clear out a value via an update call
             consumer.accept(null);
         }
+    }
+
+    /**
+     * Convert the values contained in the {@link JobSpecificationProjection} to an immutable {@link JobSpecification}
+     * DTO.
+     *
+     * @param jobSpecificationProjection The entity values to convert
+     * @return An immutable Job Specification instance
+     * @throws GenieRuntimeException All input should be valid at this point so if we can't create a job spec dto
+     *                               something has become corrupted in the db
+     */
+    public static JobSpecification toJobSpecificationDto(final JobSpecificationProjection jobSpecificationProjection) {
+        final String id = jobSpecificationProjection.getUniqueId();
+
+        // Check error conditions up front
+        final ClusterEntity clusterEntity = jobSpecificationProjection
+            .getCluster()
+            .orElseThrow(
+                () -> new GenieRuntimeException("No cluster found for job " + id + ". Was expected to exist.")
+            );
+        final CommandEntity commandEntity = jobSpecificationProjection
+            .getCommand()
+            .orElseThrow(
+                () -> new GenieRuntimeException("No command found for job " + id + ". Was expected to exist.")
+            );
+
+        final File jobDirectoryLocation = jobSpecificationProjection
+            .getJobDirectoryLocation()
+            .map(File::new)
+            .orElseThrow(
+                () -> new GenieRuntimeException(
+                    "No job directory location available for job " + id + ". Was expected to exist"
+                )
+            );
+
+        final JobSpecification.ExecutionResource job = toExecutionResource(
+            id,
+            jobSpecificationProjection.getConfigs(),
+            jobSpecificationProjection.getDependencies(),
+            jobSpecificationProjection.getSetupFile().orElse(null)
+        );
+        final JobSpecification.ExecutionResource cluster = toExecutionResource(
+            clusterEntity.getUniqueId(),
+            clusterEntity.getConfigs(),
+            clusterEntity.getDependencies(),
+            clusterEntity.getSetupFile().orElse(null)
+        );
+        final JobSpecification.ExecutionResource command = toExecutionResource(
+            commandEntity.getUniqueId(),
+            commandEntity.getConfigs(),
+            commandEntity.getDependencies(),
+            commandEntity.getSetupFile().orElse(null)
+        );
+        final List<JobSpecification.ExecutionResource> applications = jobSpecificationProjection
+            .getApplications()
+            .stream()
+            .map(
+                applicationEntity -> toExecutionResource(
+                    applicationEntity.getUniqueId(),
+                    applicationEntity.getConfigs(),
+                    applicationEntity.getDependencies(),
+                    applicationEntity.getSetupFile().orElse(null)
+                )
+            )
+            .collect(Collectors.toList());
+
+        final List<String> commandArgs = Lists.newArrayList(commandEntity.getExecutable());
+        commandArgs.addAll(jobSpecificationProjection.getCommandArgs());
+
+        return new JobSpecification(
+            commandArgs,
+            job,
+            cluster,
+            command,
+            applications,
+            jobSpecificationProjection.getEnvironmentVariables(),
+            jobSpecificationProjection.isInteractive(),
+            jobDirectoryLocation
+        );
+    }
+
+    private static JobSpecification.ExecutionResource toExecutionResource(
+        final String id,
+        final Set<FileEntity> configs,
+        final Set<FileEntity> dependencies,
+        @Nullable final FileEntity setupFile
+    ) {
+        return new JobSpecification.ExecutionResource(id, toExecutionEnvironment(configs, dependencies, setupFile));
+    }
+
+    private static ExecutionEnvironment toExecutionEnvironment(
+        final Set<FileEntity> configs,
+        final Set<FileEntity> dependencies,
+        @Nullable final FileEntity setupFile
+    ) {
+
+        return new ExecutionEnvironment(
+            configs.stream().map(FileEntity::getFile).collect(Collectors.toSet()),
+            dependencies.stream().map(FileEntity::getFile).collect(Collectors.toSet()),
+            setupFile != null ? setupFile.getFile() : null
+        );
     }
 }

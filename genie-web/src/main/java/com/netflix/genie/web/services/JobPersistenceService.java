@@ -20,11 +20,12 @@ package com.netflix.genie.web.services;
 import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobStatus;
-import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobRequestMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieIdAlreadyExistsException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
 import org.springframework.validation.annotation.Validated;
 
@@ -153,13 +154,13 @@ public interface JobPersistenceService {
      * @param jobRequest         All the metadata provided by the user about the job
      * @param jobRequestMetadata Metadata about the request gathered by the system not provided by the user
      * @return The id that was reserved in the system for this job
-     * @throws GenieConflictException When the requested ID is already in use
-     * @throws GenieException         On other type of error
+     * @throws GenieIdAlreadyExistsException When the requested ID is already in use
+     * @throws GenieRuntimeException         On other type of error
      */
     String saveJobRequest(
         @Valid final JobRequest jobRequest,
         @Valid final JobRequestMetadata jobRequestMetadata
-    ) throws GenieException;
+    );
 
     /**
      * Get the original request for a job.
@@ -175,10 +176,25 @@ public interface JobPersistenceService {
      *
      * @param id            The id of the job
      * @param specification The job specification
-     * @throws GenieException When the job can't be found or the persistence throws an exception
+     * @throws GenieJobNotFoundException When the job identified by {@code id} can't be found and the specification
+     *                                   can't be saved
+     * @throws GenieRuntimeException     When specification resources (cluster, command, applications) can't be found
      */
     void saveJobSpecification(
         @NotBlank(message = "Id is missing and is required") final String id,
-        @NotNull final JobSpecification specification
-    ) throws GenieException;
+        @Valid final JobSpecification specification
+    );
+
+    /**
+     * Get the saved job specification for the given job. If the job hasn't had a job specification resolved an empty
+     * {@link Optional} will be returned.
+     *
+     * @param id The id of the job
+     * @return The job specification if one is present else an empty {@link Optional}
+     * @throws GenieJobNotFoundException If no job with {@code id} exists
+     * @throws GenieRuntimeException     on unexpected error
+     */
+    Optional<JobSpecification> getJobSpecification(
+        @NotBlank(message = "Id is missing and is required") final String id
+    );
 }

@@ -28,6 +28,11 @@ import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.internal.dto.v4.JobSpecification;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieApplicationNotFoundException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieCommandNotFoundException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.jpa.entities.ApplicationEntity;
 import com.netflix.genie.web.jpa.entities.ClusterEntity;
@@ -35,6 +40,7 @@ import com.netflix.genie.web.jpa.entities.CommandEntity;
 import com.netflix.genie.web.jpa.entities.FileEntity;
 import com.netflix.genie.web.jpa.entities.JobEntity;
 import com.netflix.genie.web.jpa.entities.TagEntity;
+import com.netflix.genie.web.jpa.entities.projections.v4.JobSpecificationProjection;
 import com.netflix.genie.web.jpa.entities.projections.v4.V4JobRequestProjection;
 import com.netflix.genie.web.jpa.repositories.JpaApplicationRepository;
 import com.netflix.genie.web.jpa.repositories.JpaClusterRepository;
@@ -574,15 +580,160 @@ public class JpaJobPersistenceServiceImplUnitTests {
 
     /**
      * When a request is made for a job that doesn't have a record in the database an empty optional is returned.
-     *
-     * @throws GenieException On error
      */
     @Test
-    public void noJobRequestFoundReturnsEmptyOptional() throws GenieException {
+    public void noJobRequestFoundReturnsEmptyOptional() {
         Mockito
             .when(this.jobRepository.findByUniqueId(Mockito.anyString(), Mockito.eq(V4JobRequestProjection.class)))
             .thenReturn(Optional.empty());
 
         Assert.assertFalse(this.jobPersistenceService.getJobRequest(UUID.randomUUID().toString()).isPresent());
+    }
+
+    /**
+     * If a job isn't found to save a specification for an exception is thrown.
+     */
+    @Test(expected = GenieJobNotFoundException.class)
+    public void noJobUnableToSaveJobSpecification() {
+        Mockito
+            .when(this.jobRepository.findByUniqueId(Mockito.anyString()))
+            .thenReturn(Optional.empty());
+
+        this.jobPersistenceService.saveJobSpecification(
+            UUID.randomUUID().toString(), Mockito.mock(JobSpecification.class)
+        );
+    }
+
+    /**
+     * If a job is already resolved nothing is done.
+     */
+    @Test
+    public void jobAlreadyResolvedDoesNotSaveSpecificationAgain() {
+        final JobEntity jobEntity = Mockito.mock(JobEntity.class);
+        final JobSpecification jobSpecification = Mockito.mock(JobSpecification.class);
+        Mockito
+            .when(this.jobRepository.findByUniqueId(Mockito.anyString()))
+            .thenReturn(Optional.of(jobEntity));
+
+        Mockito.when(jobEntity.isResolved()).thenReturn(true);
+
+        this.jobPersistenceService.saveJobSpecification(UUID.randomUUID().toString(), jobSpecification);
+
+        Mockito.verify(jobEntity, Mockito.never()).setCluster(Mockito.any(ClusterEntity.class));
+    }
+
+    /**
+     * If a job is already terminal.
+     */
+    @Test
+    public void jobAlreadyTerminalDoesNotSaveJobSpecification() {
+        final JobEntity jobEntity = Mockito.mock(JobEntity.class);
+        final JobSpecification jobSpecification = Mockito.mock(JobSpecification.class);
+        Mockito
+            .when(this.jobRepository.findByUniqueId(Mockito.anyString()))
+            .thenReturn(Optional.of(jobEntity));
+
+        Mockito.when(jobEntity.isResolved()).thenReturn(false);
+        Mockito.when(jobEntity.getStatus()).thenReturn(JobStatus.KILLED);
+
+        this.jobPersistenceService.saveJobSpecification(UUID.randomUUID().toString(), jobSpecification);
+
+        Mockito.verify(jobEntity, Mockito.never()).setCluster(Mockito.any(ClusterEntity.class));
+    }
+
+    /**
+     * If a job isn't found to save a specification for an exception is thrown.
+     */
+    @Test
+    public void noResourceToSaveForJobSpecification() {
+        final String jobId = UUID.randomUUID().toString();
+        final JobEntity jobEntity = Mockito.mock(JobEntity.class);
+        Mockito.when(jobEntity.isResolved()).thenReturn(false);
+        Mockito.when(jobEntity.getStatus()).thenReturn(JobStatus.RESERVED);
+
+        final String clusterId = UUID.randomUUID().toString();
+        final ClusterEntity clusterEntity = Mockito.mock(ClusterEntity.class);
+        final JobSpecification.ExecutionResource clusterResource
+            = Mockito.mock(JobSpecification.ExecutionResource.class);
+        Mockito.when(clusterResource.getId()).thenReturn(clusterId);
+        final String commandId = UUID.randomUUID().toString();
+        final CommandEntity commandEntity = Mockito.mock(CommandEntity.class);
+        final JobSpecification.ExecutionResource commandResource
+            = Mockito.mock(JobSpecification.ExecutionResource.class);
+        Mockito.when(commandResource.getId()).thenReturn(commandId);
+        final String applicationId = UUID.randomUUID().toString();
+        final JobSpecification.ExecutionResource applicationResource
+            = Mockito.mock(JobSpecification.ExecutionResource.class);
+        Mockito.when(applicationResource.getId()).thenReturn(applicationId);
+
+        final JobSpecification jobSpecification = Mockito.mock(JobSpecification.class);
+        Mockito.when(jobSpecification.getCluster()).thenReturn(clusterResource);
+        Mockito.when(jobSpecification.getCommand()).thenReturn(commandResource);
+        Mockito
+            .when(jobSpecification.getApplications())
+            .thenReturn(Lists.newArrayList(applicationResource));
+
+        Mockito
+            .when(this.jobRepository.findByUniqueId(jobId))
+            .thenReturn(Optional.of(jobEntity));
+
+        Mockito
+            .when(this.clusterRepository.findByUniqueId(clusterId))
+            .thenReturn(Optional.empty())
+            .thenReturn(Optional.of(clusterEntity))
+            .thenReturn(Optional.of(clusterEntity));
+
+        Mockito
+            .when(this.commandRepository.findByUniqueId(commandId))
+            .thenReturn(Optional.empty())
+            .thenReturn(Optional.of(commandEntity));
+        Mockito.when(this.applicationRepository.findByUniqueId(applicationId)).thenReturn(Optional.empty());
+
+        try {
+            this.jobPersistenceService.saveJobSpecification(jobId, jobSpecification);
+            Assert.fail();
+        } catch (final GenieClusterNotFoundException e) {
+            // expected
+        }
+        try {
+            this.jobPersistenceService.saveJobSpecification(jobId, jobSpecification);
+            Assert.fail();
+        } catch (final GenieCommandNotFoundException e) {
+            // expected
+        }
+        try {
+            this.jobPersistenceService.saveJobSpecification(jobId, jobSpecification);
+            Assert.fail();
+        } catch (final GenieApplicationNotFoundException e) {
+            // expected
+        }
+    }
+
+    /**
+     * If a job isn't found to retrieve a job specification.
+     */
+    @Test(expected = GenieJobNotFoundException.class)
+    public void noJobUnableToGetJobSpecification() {
+        Mockito
+            .when(this.jobRepository.findByUniqueId(Mockito.anyString(), Mockito.eq(JobSpecificationProjection.class)))
+            .thenReturn(Optional.empty());
+
+        this.jobPersistenceService.getJobSpecification(UUID.randomUUID().toString());
+    }
+
+
+    /**
+     * If a job isn't resolved empty {@link Optional} returned.
+     */
+    @Test
+    public void unresolvedJobReturnsEmptyOptional() {
+        final JobEntity jobEntity = Mockito.mock(JobEntity.class);
+        Mockito
+            .when(this.jobRepository.findByUniqueId(Mockito.anyString(), Mockito.eq(JobSpecificationProjection.class)))
+            .thenReturn(Optional.of(jobEntity));
+
+        Mockito.when(jobEntity.isResolved()).thenReturn(false);
+
+        Assert.assertFalse(this.jobPersistenceService.getJobSpecification(UUID.randomUUID().toString()).isPresent());
     }
 }

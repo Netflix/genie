@@ -134,6 +134,10 @@ ALTER TABLE `jobs`
   ALTER COLUMN `status` SET DEFAULT 'RESERVED';
 ALTER TABLE `jobs`
   ADD COLUMN `requested_id` BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE `jobs`
+  ADD COLUMN `job_directory_location` VARCHAR(1024) DEFAULT NULL;
+ALTER TABLE `jobs`
+  ADD COLUMN `resolved` BOOLEAN NOT NULL DEFAULT FALSE;
 
 ALTER TABLE `job_applications_requested`
   RENAME TO `job_requested_applications`;
