@@ -27,6 +27,7 @@ import com.netflix.genie.web.events.KillJobEvent;
 import com.netflix.genie.web.properties.JobsProperties;
 import com.netflix.genie.web.tasks.GenieTaskScheduleType;
 import com.netflix.genie.web.tasks.node.NodeTask;
+import com.netflix.genie.web.util.ExponentialBackOffTrigger;
 import com.netflix.genie.web.util.ProcessChecker;
 import com.netflix.genie.web.util.UnixProcessChecker;
 import io.micrometer.core.instrument.Counter;
@@ -36,6 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.Executor;
 import org.apache.commons.lang3.SystemUtils;
+import org.springframework.scheduling.Trigger;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -63,6 +65,7 @@ public class JobMonitor extends NodeTask {
     private final File stdErr;
     private final long maxStdOutLength;
     private final long maxStdErrLength;
+    private final Trigger trigger;
 
     // Metrics
     private final Counter successfulCheckRate;
@@ -111,6 +114,13 @@ public class JobMonitor extends NodeTask {
 
         this.maxStdOutLength = jobsProperties.getMax().getStdOutSize();
         this.maxStdErrLength = jobsProperties.getMax().getStdErrSize();
+
+        this.trigger = new ExponentialBackOffTrigger(
+            ExponentialBackOffTrigger.DelayType.FROM_PREVIOUS_SCHEDULING,
+            jobsProperties.getCompletionCheckBackOff().getMinInterval(),
+            execution.getCheckDelay().orElse(jobsProperties.getCompletionCheckBackOff().getMaxInterval()),
+            jobsProperties.getCompletionCheckBackOff().getFactor()
+        );
 
         this.successfulCheckRate = registry.counter("genie.jobs.successfulStatusCheck.rate");
         this.timeoutRate = registry.counter("genie.jobs.timeout.rate");
@@ -205,14 +215,14 @@ public class JobMonitor extends NodeTask {
      */
     @Override
     public GenieTaskScheduleType getScheduleType() {
-        return GenieTaskScheduleType.FIXED_DELAY;
+        return GenieTaskScheduleType.TRIGGER;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public long getFixedDelay() {
-        return this.execution.getCheckDelay().orElseThrow(IllegalArgumentException::new);
+    public Trigger getTrigger() {
+        return trigger;
     }
 }
