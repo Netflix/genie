@@ -347,19 +347,19 @@ public class JobMonitorUnitTests {
      */
     @Test
     public void canGetScheduleType() {
-        Assert.assertThat(this.monitor.getScheduleType(), Matchers.is(GenieTaskScheduleType.FIXED_DELAY));
+        Assert.assertThat(this.monitor.getScheduleType(), Matchers.is(GenieTaskScheduleType.TRIGGER));
     }
 
     /**
-     * Make sure asking for a trigger isn't allowed.
+     * Make sure asking for a trigger is returns one.
      */
-    @Test(expected = UnsupportedOperationException.class)
-    public void cantGetTrigger() {
-        this.monitor.getTrigger();
+    @Test
+    public void canGetTrigger() {
+        Assert.assertNotNull(this.monitor.getTrigger());
     }
 
     /**
-     * Make sure asking for a trigger isn't allowed.
+     * Make sure asking for a fixed rate isn't allowed.
      */
     @Test(expected = UnsupportedOperationException.class)
     public void cantGetFixedRate() {
@@ -367,10 +367,10 @@ public class JobMonitorUnitTests {
     }
 
     /**
-     * Make sure the fixed delay value is what we expect.
+     * Make sure asking for a fixed delay isn't allowed.
      */
-    @Test
-    public void canGetFixedDelay() {
+    @Test(expected = UnsupportedOperationException.class)
+    public void cantGetFixedDelay() {
         Assert.assertThat(DELAY, Matchers.is(this.monitor.getFixedDelay()));
     }
 }

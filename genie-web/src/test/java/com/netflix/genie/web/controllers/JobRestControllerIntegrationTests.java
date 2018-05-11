@@ -129,7 +129,7 @@ public class JobRestControllerIntegrationTests extends RestControllerIntegration
     private static final String JOB_CLUSTER_LINK_PATH = "$._links.cluster.href";
     private static final String JOB_APPLICATIONS_LINK_PATH = "$._links.applications.href";
 
-    private static final long CHECK_DELAY = 1L;
+    private static final long CHECK_DELAY = 500L;
 
     private static final String BASE_DIR
         = "com/netflix/genie/web/controllers/JobRestControllerIntegrationTests/";
