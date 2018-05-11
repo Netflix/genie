@@ -50,4 +50,7 @@ public class JobsProperties {
 
     @NotNull
     private JobsUsersProperties users = new JobsUsersProperties();
+
+    @NotNull
+    private ExponentialBackOffTriggerProperties completionCheckBackOff = new ExponentialBackOffTriggerProperties();
 }

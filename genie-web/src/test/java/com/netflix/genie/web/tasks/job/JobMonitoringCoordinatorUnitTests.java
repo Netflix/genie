@@ -44,6 +44,7 @@ import org.mockito.Mockito;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.io.Resource;
 import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.Trigger;
 
 import java.io.File;
 import java.io.IOException;
@@ -154,7 +155,7 @@ public class JobMonitoringCoordinatorUnitTests {
         this.coordinator.onJobStarted(event1);
         Mockito
             .verify(this.scheduler, Mockito.times(1))
-            .scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(DELAY));
+            .schedule(Mockito.any(JobMonitor.class), Mockito.any(Trigger.class));
 
         final Job j1 = Mockito.mock(Job.class);
         Mockito.when(j1.getId()).thenReturn(Optional.of(job1Id));
@@ -184,7 +185,7 @@ public class JobMonitoringCoordinatorUnitTests {
             .publishAsynchronousEvent(Mockito.any(JobFinishedEvent.class));
         Mockito
             .verify(this.scheduler, Mockito.times(3))
-            .scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(DELAY));
+            .schedule(Mockito.any(JobMonitor.class), Mockito.any(Trigger.class));
         Assert.assertThat(this.coordinator.getNumActiveJobs(), Matchers.is(3));
         Assert.assertThat(this.coordinator.getUsedMemory(), Matchers.is(3 * 1024));
     }
@@ -232,7 +233,7 @@ public class JobMonitoringCoordinatorUnitTests {
         final ScheduledFuture future = Mockito.mock(ScheduledFuture.class);
 
         Mockito.when(
-            this.scheduler.scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(DELAY))
+            this.scheduler.schedule(Mockito.any(JobMonitor.class), Mockito.any(Trigger.class))
         ).thenReturn(future);
 
         Assert.assertThat(this.coordinator.getNumActiveJobs(), Matchers.is(4));
@@ -255,7 +256,7 @@ public class JobMonitoringCoordinatorUnitTests {
 
         Mockito
             .verify(this.scheduler, Mockito.times(5))
-            .scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(DELAY));
+            .schedule(Mockito.any(JobMonitor.class), Mockito.any(Trigger.class));
     }
 
     /**
@@ -291,7 +292,7 @@ public class JobMonitoringCoordinatorUnitTests {
         Mockito.when(future2.cancel(true)).thenReturn(false);
 
         Mockito.when(
-            this.scheduler.scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(DELAY))
+            this.scheduler.schedule(Mockito.any(JobMonitor.class), Mockito.any(Trigger.class))
         ).thenReturn(future1, future2);
 
         Assert.assertThat(this.coordinator.getNumActiveJobs(), Matchers.is(0));
@@ -309,7 +310,7 @@ public class JobMonitoringCoordinatorUnitTests {
 
         Mockito
             .verify(this.scheduler, Mockito.times(2))
-            .scheduleWithFixedDelay(Mockito.any(JobMonitor.class), Mockito.eq(DELAY));
+            .schedule(Mockito.any(JobMonitor.class), Mockito.any(Trigger.class));
 
         Assert.assertThat(this.coordinator.getNumActiveJobs(), Matchers.is(2));
         Assert.assertThat(this.coordinator.getUsedMemory(), Matchers.is(2048));
