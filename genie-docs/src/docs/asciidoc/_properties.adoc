@@ -138,6 +138,18 @@ to work.
 |The maximum number of active jobs a user is allowed to have. Once a user hits this limit, jobs submitted are rejected. This is property is ignored unless `genie.jobs.users.activeLimit.enabled` is set to true.
 |100
 
+|genie.jobs.completionCheckBackOff.minInterval
+|The minimum time between checks for job completion in milliseconds. Must be greater than zero.
+|100
+
+|genie.jobs.completionCheckBackOff.maxInterval
+|The maximum time between checks for job completion in milliseconds. This is a fallback value, the value used in most cases is specified as part of the `Command` entity for a particular job.
+|10000
+
+|genie.jobs.completionCheckBackOff.factor
+|Multiplication factor that grows the delay between checks for job completions. Must be greater than 1.
+|1.2
+
 |genie.leader.enabled
 |Whether this node should be the leader of the cluster or not. Should only be used if leadership is not being
 determined by Zookeeper or other mechanism via Spring
