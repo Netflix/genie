@@ -27,6 +27,7 @@ import com.netflix.genie.web.jpa.entities.projections.JobMetadataProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobRequestProjection;
 import com.netflix.genie.web.jpa.entities.projections.JobSearchProjection;
+import com.netflix.genie.web.jpa.entities.projections.v4.JobSpecificationProjection;
 import com.netflix.genie.web.jpa.entities.projections.v4.V4JobRequestProjection;
 import com.netflix.genie.web.jpa.specifications.JpaSpecificationUtils;
 import lombok.AccessLevel;
@@ -106,7 +107,10 @@ import java.util.Set;
         "exitCode",
         "memoryUsed",
         "timeout",
-        "archiveLocation"
+        "archiveLocation",
+        "requestedJobDirectoryLocation",
+        "jobDirectoryLocation",
+        "resolved"
     },
     doNotUseGetters = true
 )
@@ -121,7 +125,8 @@ public class JobEntity extends BaseEntity implements
     JobClusterProjection,
     JobCommandProjection,
     JobSearchProjection,
-    V4JobRequestProjection {
+    V4JobRequestProjection,
+    JobSpecificationProjection {
 
     private static final long serialVersionUID = 2849367731657512224L;
 
@@ -282,9 +287,17 @@ public class JobEntity extends BaseEntity implements
     @Column(name = "interactive", nullable = false, updatable = false)
     private boolean interactive;
 
+    @Basic(optional = false)
+    @Column(name = "resolved", nullable = false)
+    private boolean resolved;
+
     @Basic
     @Column(name = "requested_job_directory_location", length = 1024, updatable = false)
     private String requestedJobDirectoryLocation;
+
+    @Basic
+    @Column(name = "job_directory_location", length = 1024)
+    private String jobDirectoryLocation;
 
     @Lob
     @Basic(fetch = FetchType.LAZY)
@@ -836,6 +849,14 @@ public class JobEntity extends BaseEntity implements
     @Override
     public Optional<String> getRequestedAgentConfigExt() {
         return Optional.ofNullable(this.requestedAgentConfigExt);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Optional<String> getJobDirectoryLocation() {
+        return Optional.ofNullable(this.jobDirectoryLocation);
     }
 
     /**

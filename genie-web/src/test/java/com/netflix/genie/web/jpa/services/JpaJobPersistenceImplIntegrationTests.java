@@ -29,21 +29,30 @@ import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
+import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata;
 import com.netflix.genie.common.internal.dto.v4.AgentConfigRequest;
 import com.netflix.genie.common.internal.dto.v4.AgentEnvironmentRequest;
 import com.netflix.genie.common.internal.dto.v4.ApiClientMetadata;
+import com.netflix.genie.common.internal.dto.v4.Application;
+import com.netflix.genie.common.internal.dto.v4.Cluster;
+import com.netflix.genie.common.internal.dto.v4.Command;
 import com.netflix.genie.common.internal.dto.v4.Criterion;
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment;
 import com.netflix.genie.common.internal.dto.v4.ExecutionResourceCriteria;
 import com.netflix.genie.common.internal.dto.v4.JobMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobRequestMetadata;
+import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieIdAlreadyExistsException;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.test.categories.IntegrationTest;
+import com.netflix.genie.test.suppliers.RandomSuppliers;
 import com.netflix.genie.web.jpa.entities.JobEntity;
 import com.netflix.genie.web.jpa.entities.projections.JobMetadataProjection;
+import com.netflix.genie.web.services.ApplicationPersistenceService;
+import com.netflix.genie.web.services.ClusterPersistenceService;
+import com.netflix.genie.web.services.CommandPersistenceService;
 import com.netflix.genie.web.services.JobPersistenceService;
 import com.netflix.genie.web.services.JobSearchService;
 import org.assertj.core.util.Lists;
@@ -54,6 +63,8 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.Nullable;
+import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.Month;
@@ -143,6 +154,12 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
     private JobPersistenceService jobPersistenceService;
     @Autowired
     private JobSearchService jobSearchService;
+    @Autowired
+    private ClusterPersistenceService clusterPersistenceService;
+    @Autowired
+    private CommandPersistenceService commandPersistenceService;
+    @Autowired
+    private ApplicationPersistenceService applicationPersistenceService;
 
     /**
      * Setup.
@@ -305,130 +322,11 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
      */
     @Test
     public void canSaveAndRetrieveJobRequest() throws GenieException, IOException {
-        final String metadata = "{\"" + UUID.randomUUID().toString() + "\": \"" + UUID.randomUUID().toString() + "\"}";
-        final JobMetadata jobMetadata = new JobMetadata
-            .Builder(NAME, USER, VERSION)
-            .withMetadata(metadata)
-            .withEmail(EMAIL)
-            .withGroup(GROUP)
-            .withGrouping(GROUPING)
-            .withGroupingInstance(GROUPING_INSTANCE)
-            .withDescription(DESCRIPTION)
-            .withTags(TAGS)
-            .build();
-
-        final List<Criterion> clusterCriteria = Lists.newArrayList(
-            new Criterion
-                .Builder()
-                .withId(UUID.randomUUID().toString())
-                .withName(UUID.randomUUID().toString())
-                .withStatus(ClusterStatus.OUT_OF_SERVICE.toString())
-                .withTags(Sets.newHashSet(UUID.randomUUID().toString()))
-                .withVersion(UUID.randomUUID().toString())
-                .build(),
-            new Criterion
-                .Builder()
-                .withId(UUID.randomUUID().toString())
-                .withName(UUID.randomUUID().toString())
-                .withStatus(ClusterStatus.UP.toString())
-                .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
-                .withVersion(UUID.randomUUID().toString())
-                .build()
-        );
-        final Criterion commandCriterion = new Criterion
-            .Builder()
-            .withId(UUID.randomUUID().toString())
-            .withName(UUID.randomUUID().toString())
-            .withStatus(CommandStatus.ACTIVE.toString())
-            .withTags(Sets.newHashSet(UUID.randomUUID().toString()))
-            .withVersion(UUID.randomUUID().toString())
-            .build();
-        final List<String> requestedApplications = Lists.newArrayList(
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString()
-        );
-        final ExecutionResourceCriteria criteria = new ExecutionResourceCriteria(
-            clusterCriteria,
-            commandCriterion,
-            requestedApplications
-        );
-
-        final ExecutionEnvironment executionEnvironment = new ExecutionEnvironment(
-            CONFIGS,
-            DEPENDENCIES,
-            SETUP_FILE
-        );
-
-        final Map<String, String> requestedEnvironmentVariables = ImmutableMap.of(
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString()
-        );
-        final String agentEnvironmentExt
-            = "{\"" + UUID.randomUUID().toString() + "\": \"" + UUID.randomUUID().toString() + "\"}";
-        final AgentEnvironmentRequest agentEnvironmentRequest = new AgentEnvironmentRequest
-            .Builder()
-            .withRequestedEnvironmentVariables(requestedEnvironmentVariables)
-            .withExt(GenieObjectMapper.getMapper().readTree(agentEnvironmentExt))
-            .withRequestedJobCpu(CPU_REQUESTED)
-            .withRequestedJobMemory(MEMORY_REQUESTED)
-            .build();
-
-        final String agentConfigExt
-            = "{\"" + UUID.randomUUID().toString() + "\": \"" + UUID.randomUUID().toString() + "\"}";
-        final String requestedJobDirectoryLocation = "/tmp/" + UUID.randomUUID().toString();
-        final AgentConfigRequest agentConfigRequest = new AgentConfigRequest
-            .Builder()
-            .withExt(GenieObjectMapper.getMapper().readTree(agentConfigExt))
-            .withInteractive(true)
-            .withTimeoutRequested(TIMEOUT_REQUESTED)
-            .withArchivingDisabled(true)
-            .withRequestedJobDirectoryLocation(requestedJobDirectoryLocation)
-            .build();
-
         final String job0Id = UUID.randomUUID().toString();
-        final JobRequest jobRequest0 = new JobRequest(
-            job0Id,
-            executionEnvironment,
-            COMMAND_ARGS,
-            jobMetadata,
-            criteria,
-            agentEnvironmentRequest,
-            agentConfigRequest
-        );
-        final JobRequest jobRequest1 = new JobRequest(
-            null,
-            executionEnvironment,
-            COMMAND_ARGS,
-            jobMetadata,
-            criteria,
-            agentEnvironmentRequest,
-            agentConfigRequest
-        );
-        final JobRequest jobRequest2 = new JobRequest(
-            JOB_3_ID,
-            executionEnvironment,
-            COMMAND_ARGS,
-            jobMetadata,
-            criteria,
-            agentEnvironmentRequest,
-            agentConfigRequest
-        );
-
-        final String agentVersion = UUID.randomUUID().toString();
-        final int agentPid = 388;
-        final AgentClientMetadata agentClientMetadata = new AgentClientMetadata(
-            HOSTNAME,
-            agentVersion,
-            agentPid
-        );
-
-        final ApiClientMetadata apiClientMetadata = new ApiClientMetadata(HOSTNAME, USER_AGENT);
-        final JobRequestMetadata jobRequestMetadata = new JobRequestMetadata(
-            apiClientMetadata,
-            agentClientMetadata,
-            NUM_ATTACHMENTS,
-            TOTAL_SIZE_ATTACHMENTS
-        );
+        final JobRequest jobRequest0 = this.createJobRequest(job0Id);
+        final JobRequest jobRequest1 = this.createJobRequest(null);
+        final JobRequest jobRequest2 = this.createJobRequest(JOB_3_ID);
+        final JobRequestMetadata jobRequestMetadata = this.createJobRequestMetadata();
 
         String id = this.jobPersistenceService.saveJobRequest(jobRequest0, jobRequestMetadata);
         Assert.assertThat(id, Matchers.is(job0Id));
@@ -444,6 +342,81 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
         } catch (final GenieIdAlreadyExistsException e) {
             // Expected
         }
+    }
+
+    /**
+     * Make sure saving and retrieving a job specification works as expected.
+     *
+     * @throws GenieException on error
+     * @throws IOException    on json error
+     */
+    @Test
+    public void canSaveAndRetrieveJobSpecification() throws GenieException, IOException {
+        final String jobId = this.jobPersistenceService.saveJobRequest(
+            this.createJobRequest(null),
+            this.createJobRequestMetadata()
+        );
+
+        final JobRequest jobRequest = this.jobPersistenceService
+            .getJobRequest(jobId)
+            .orElseThrow(IllegalArgumentException::new);
+
+        final String clusterId = "cluster1";
+        final String commandId = "command1";
+        final String application0Id = "app1";
+        final String application1Id = "app2";
+
+        final Cluster cluster = this.clusterPersistenceService.getCluster(clusterId);
+        final Command command = this.commandPersistenceService.getCommand(commandId);
+        final Application application0 = this.applicationPersistenceService.getApplication(application0Id);
+        final Application application1 = this.applicationPersistenceService.getApplication(application1Id);
+
+        final Map<String, String> environmentVariables = ImmutableMap.of(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
+        );
+
+        final File jobDirectoryLocation = new File("/tmp/genie/jobs/" + jobId);
+
+        final List<String> commandArgs = Lists.newArrayList(command.getExecutable());
+        commandArgs.addAll(jobRequest.getCommandArgs());
+
+        final JobSpecification jobSpecification = new JobSpecification(
+            commandArgs,
+            new JobSpecification.ExecutionResource(
+                jobId,
+                jobRequest.getResources()
+            ),
+            new JobSpecification.ExecutionResource(
+                clusterId,
+                cluster.getResources()
+            ),
+            new JobSpecification.ExecutionResource(
+                commandId,
+                command.getResources()
+            ),
+            Lists.newArrayList(
+                new JobSpecification.ExecutionResource(
+                    application0Id,
+                    application0.getResources()
+                ),
+                new JobSpecification.ExecutionResource(
+                    application1Id,
+                    application1.getResources()
+                )
+            ),
+            environmentVariables,
+            jobRequest.getRequestedAgentConfig().isInteractive(),
+            jobDirectoryLocation
+        );
+
+        this.jobPersistenceService.saveJobSpecification(jobId, jobSpecification);
+        Assert.assertThat(
+            this.jobPersistenceService.getJobSpecification(jobId).orElse(null),
+            Matchers.is(jobSpecification)
+        );
     }
 
     private void validateJobRequest(final com.netflix.genie.common.dto.JobRequest savedJobRequest) {
@@ -606,6 +579,8 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
             .findByUniqueId(id)
             .orElseThrow(() -> new GenieNotFoundException("No job with id " + id + " found when one was expected"));
 
+        Assert.assertFalse(jobEntity.isResolved());
+
         // Job Request Metadata Fields
         jobRequestMetadata.getApiClientMetadata().ifPresent(
             apiClientMetadata -> {
@@ -649,6 +624,125 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertThat(
             jobEntity.getTotalSizeOfAttachments().orElse(-1L),
             Matchers.is(jobRequestMetadata.getTotalSizeOfAttachments())
+        );
+    }
+
+    private JobRequest createJobRequest(
+        @Nullable final String requestedId
+    ) throws GeniePreconditionException, IOException {
+        final String metadata = "{\"" + UUID.randomUUID().toString() + "\": \"" + UUID.randomUUID().toString() + "\"}";
+        final JobMetadata jobMetadata = new JobMetadata
+            .Builder(UUID.randomUUID().toString(), UUID.randomUUID().toString(), UUID.randomUUID().toString())
+            .withMetadata(metadata)
+            .withEmail(UUID.randomUUID().toString() + "@" + UUID.randomUUID().toString() + ".com")
+            .withGroup(UUID.randomUUID().toString())
+            .withGrouping(UUID.randomUUID().toString())
+            .withGroupingInstance(UUID.randomUUID().toString())
+            .withDescription(UUID.randomUUID().toString())
+            .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+            .build();
+
+        final List<Criterion> clusterCriteria = Lists.newArrayList(
+            new Criterion
+                .Builder()
+                .withId(UUID.randomUUID().toString())
+                .withName(UUID.randomUUID().toString())
+                .withStatus(ClusterStatus.OUT_OF_SERVICE.toString())
+                .withTags(Sets.newHashSet(UUID.randomUUID().toString()))
+                .withVersion(UUID.randomUUID().toString())
+                .build(),
+            new Criterion
+                .Builder()
+                .withId(UUID.randomUUID().toString())
+                .withName(UUID.randomUUID().toString())
+                .withStatus(ClusterStatus.UP.toString())
+                .withTags(Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()))
+                .withVersion(UUID.randomUUID().toString())
+                .build()
+        );
+        final Criterion commandCriterion = new Criterion
+            .Builder()
+            .withId(UUID.randomUUID().toString())
+            .withName(UUID.randomUUID().toString())
+            .withStatus(CommandStatus.ACTIVE.toString())
+            .withTags(Sets.newHashSet(UUID.randomUUID().toString()))
+            .withVersion(UUID.randomUUID().toString())
+            .build();
+        final List<String> requestedApplications = Lists.newArrayList(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
+        );
+        final ExecutionResourceCriteria criteria = new ExecutionResourceCriteria(
+            clusterCriteria,
+            commandCriterion,
+            requestedApplications
+        );
+
+        final ExecutionEnvironment executionEnvironment = new ExecutionEnvironment(
+            Sets.newHashSet(UUID.randomUUID().toString()),
+            Sets.newHashSet(UUID.randomUUID().toString(), UUID.randomUUID().toString()),
+            UUID.randomUUID().toString()
+        );
+
+        final Map<String, String> requestedEnvironmentVariables = ImmutableMap.of(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
+        );
+        final String agentEnvironmentExt
+            = "{\"" + UUID.randomUUID().toString() + "\": \"" + UUID.randomUUID().toString() + "\"}";
+        final AgentEnvironmentRequest agentEnvironmentRequest = new AgentEnvironmentRequest
+            .Builder()
+            .withRequestedEnvironmentVariables(requestedEnvironmentVariables)
+            .withExt(GenieObjectMapper.getMapper().readTree(agentEnvironmentExt))
+            .withRequestedJobCpu(CPU_REQUESTED)
+            .withRequestedJobMemory(MEMORY_REQUESTED)
+            .build();
+
+        final String agentConfigExt
+            = "{\"" + UUID.randomUUID().toString() + "\": \"" + UUID.randomUUID().toString() + "\"}";
+        final String requestedJobDirectoryLocation = "/tmp/" + UUID.randomUUID().toString();
+        final AgentConfigRequest agentConfigRequest = new AgentConfigRequest
+            .Builder()
+            .withExt(GenieObjectMapper.getMapper().readTree(agentConfigExt))
+            .withInteractive(true)
+            .withTimeoutRequested(TIMEOUT_REQUESTED)
+            .withArchivingDisabled(true)
+            .withRequestedJobDirectoryLocation(requestedJobDirectoryLocation)
+            .build();
+
+        return new JobRequest(
+            requestedId,
+            executionEnvironment,
+            Lists.newArrayList(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString()
+            ),
+            jobMetadata,
+            criteria,
+            agentEnvironmentRequest,
+            agentConfigRequest
+        );
+    }
+
+    private JobRequestMetadata createJobRequestMetadata() {
+        final String agentVersion = UUID.randomUUID().toString();
+        final int agentPid = RandomSuppliers.INT.get();
+        final AgentClientMetadata agentClientMetadata = new AgentClientMetadata(
+            UUID.randomUUID().toString(),
+            agentVersion,
+            agentPid
+        );
+
+        final ApiClientMetadata apiClientMetadata = new ApiClientMetadata(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
+        );
+        return new JobRequestMetadata(
+            apiClientMetadata,
+            agentClientMetadata,
+            NUM_ATTACHMENTS,
+            TOTAL_SIZE_ATTACHMENTS
         );
     }
 }

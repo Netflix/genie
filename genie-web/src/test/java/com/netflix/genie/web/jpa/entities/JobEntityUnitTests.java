@@ -807,12 +807,36 @@ public class JobEntityUnitTests extends EntityTestsBase {
      * Test setter/getter.
      */
     @Test
+    public void canSetResolved() {
+        Assert.assertFalse(this.jobEntity.isResolved());
+        this.jobEntity.setResolved(true);
+        Assert.assertTrue(this.jobEntity.isResolved());
+    }
+
+    /**
+     * Test setter/getter.
+     */
+    @Test
     public void canSetRequestedJobDirectoryLocation() {
         Assert.assertFalse(this.jobEntity.getRequestedJobDirectoryLocation().isPresent());
         final String location = UUID.randomUUID().toString();
         this.jobEntity.setRequestedJobDirectoryLocation(location);
         Assert.assertThat(
             this.jobEntity.getRequestedJobDirectoryLocation().orElse(UUID.randomUUID().toString()),
+            Matchers.is(location)
+        );
+    }
+
+    /**
+     * Test setter/getter.
+     */
+    @Test
+    public void canSetJobDirectoryLocation() {
+        Assert.assertFalse(this.jobEntity.getJobDirectoryLocation().isPresent());
+        final String location = UUID.randomUUID().toString();
+        this.jobEntity.setJobDirectoryLocation(location);
+        Assert.assertThat(
+            this.jobEntity.getJobDirectoryLocation().orElse(UUID.randomUUID().toString()),
             Matchers.is(location)
         );
     }

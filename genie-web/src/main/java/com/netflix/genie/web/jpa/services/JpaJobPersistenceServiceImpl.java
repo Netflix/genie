@@ -36,7 +36,11 @@ import com.netflix.genie.common.internal.dto.v4.JobMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobRequestMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieApplicationNotFoundException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieCommandNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieIdAlreadyExistsException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.web.jpa.entities.ApplicationEntity;
@@ -46,6 +50,7 @@ import com.netflix.genie.web.jpa.entities.CriterionEntity;
 import com.netflix.genie.web.jpa.entities.FileEntity;
 import com.netflix.genie.web.jpa.entities.JobEntity;
 import com.netflix.genie.web.jpa.entities.projections.IdProjection;
+import com.netflix.genie.web.jpa.entities.projections.v4.JobSpecificationProjection;
 import com.netflix.genie.web.jpa.entities.projections.v4.V4JobRequestProjection;
 import com.netflix.genie.web.jpa.entities.v4.EntityDtoConverters;
 import com.netflix.genie.web.jpa.repositories.JpaApplicationRepository;
@@ -171,29 +176,20 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         final JobEntity job = this.jobRepository
             .findByUniqueId(jobId)
             .orElseThrow(() -> new GenieNotFoundException("No job with id " + jobId + " exists."));
-
-        final ClusterEntity cluster = this.clusterRepository
-            .findByUniqueId(clusterId)
-            .orElseThrow(() -> new GenieNotFoundException("Cannot find cluster with ID " + clusterId));
-
-        final CommandEntity command = this.commandRepository
-            .findByUniqueId(commandId)
-            .orElseThrow(() -> new GenieNotFoundException("Cannot find command with ID " + commandId));
-
-        final List<ApplicationEntity> applications = Lists.newArrayList();
-        for (final String applicationId : applicationIds) {
-            final ApplicationEntity application = this.applicationRepository
-                .findByUniqueId(applicationId)
-                .orElseThrow(() -> new GenieNotFoundException("Cannot find application with ID + " + applicationId));
-            applications.add(application);
+        try {
+            this.setExecutionResources(job, clusterId, commandId, applicationIds);
+        } catch (
+            final GenieClusterNotFoundException
+                | GenieCommandNotFoundException
+                | GenieApplicationNotFoundException e
+            ) {
+            throw new GenieNotFoundException(e.getMessage(), e);
         }
-
-        job.setCluster(cluster);
-        job.setCommand(command);
-        job.setApplications(applications);
 
         // Save the amount of memory to allocate to the job
         job.setMemoryUsed(memory);
+        job.setResolved(true);
+        // TODO: Should we set status to RESOLVED here? Not sure how that will work with V3 so leaving it INIT for now
     }
 
     /**
@@ -326,7 +322,7 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
     public String saveJobRequest(
         @Valid final JobRequest jobRequest,
         @Valid final JobRequestMetadata jobRequestMetadata
-    ) throws GenieException {
+    ) {
         log.debug("Attempting to save job request {} with request metadata {}", jobRequest, jobRequestMetadata);
         // TODO: Metrics
         final JobEntity jobEntity = new JobEntity();
@@ -370,9 +366,84 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
     @Override
     public void saveJobSpecification(
         @NotBlank(message = "Id is missing and is required") final String id,
-        @NotNull final JobSpecification specification
-    ) throws GenieException {
+        @Valid final JobSpecification specification
+    ) {
+        log.debug("Requested to save job specification {} for job with id {}", specification, id);
+        final JobEntity entity = this.jobRepository
+            .findByUniqueId(id)
+            .orElseThrow(() -> {
+                    final String error = "No job found with id " + id + ". Unable to save job specification";
+                    log.error(error);
+                    return new GenieJobNotFoundException(error);
+                }
+            );
 
+        try {
+            if (entity.isResolved()) {
+                log.error(
+                    "Attempted to save job specification {} for job {} that was already resolved",
+                    specification,
+                    id
+                );
+                // This job has already been resolved there's nothing further to save
+                return;
+            }
+            // Make sure if the job is terminal already don't do anything.
+            if (entity.getStatus().isFinished()) {
+                log.error(
+                    "Job {} is already in terminal state {}. Won't save job specification",
+                    id,
+                    entity.getStatus()
+                );
+                return;
+            }
+            this.setExecutionResources(
+                entity,
+                specification.getCluster().getId(),
+                specification.getCommand().getId(),
+                specification
+                    .getApplications()
+                    .stream()
+                    .map(JobSpecification.ExecutionResource::getId)
+                    .collect(Collectors.toList())
+            );
+
+            entity.setEnvironmentVariables(specification.getEnvironmentVariables());
+            entity.setJobDirectoryLocation(specification.getJobDirectoryLocation().getAbsolutePath());
+            entity.setResolved(true);
+            entity.setStatus(JobStatus.RESOLVED);
+        } catch (
+            final GenieApplicationNotFoundException
+                | GenieCommandNotFoundException
+                | GenieClusterNotFoundException e
+            ) {
+            log.error(" Unable to save Job Specification due to ", e.getMessage(), e);
+            throw e;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<JobSpecification> getJobSpecification(
+        @NotBlank(message = "Id is missing and is required") final String id
+    ) {
+        log.debug("Requested to get job specification for job {}", id);
+        final JobSpecificationProjection projection = this.jobRepository
+            .findByUniqueId(id, JobSpecificationProjection.class)
+            .orElseThrow(
+                () -> {
+                    final String errorMessage = "No job ith id " + id + "exists. Unable to get job specification.";
+                    log.error(errorMessage);
+                    return new GenieJobNotFoundException(errorMessage);
+                }
+            );
+
+        return projection.isResolved()
+            ? Optional.of(EntityDtoConverters.toJobSpecificationDto(projection))
+            : Optional.empty();
     }
 
     private void updateJobStatus(final JobEntity jobEntity, final JobStatus jobStatus, final String statusMsg) {
@@ -603,5 +674,34 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
                 agentClientMetadata.getPid().ifPresent(jobEntity::setRequestAgentClientPid);
             }
         );
+    }
+
+    private void setExecutionResources(
+        final JobEntity job,
+        final String clusterId,
+        final String commandId,
+        final List<String> applicationIds
+    ) {
+        final ClusterEntity cluster = this.clusterRepository
+            .findByUniqueId(clusterId)
+            .orElseThrow(() -> new GenieClusterNotFoundException("Cannot find cluster with ID " + clusterId));
+
+        final CommandEntity command = this.commandRepository
+            .findByUniqueId(commandId)
+            .orElseThrow(() -> new GenieCommandNotFoundException("Cannot find command with ID " + commandId));
+
+        final List<ApplicationEntity> applications = Lists.newArrayList();
+        for (final String applicationId : applicationIds) {
+            final ApplicationEntity application = this.applicationRepository
+                .findByUniqueId(applicationId)
+                .orElseThrow(
+                    () -> new GenieApplicationNotFoundException("Cannot find application with ID + " + applicationId)
+                );
+            applications.add(application);
+        }
+
+        job.setCluster(cluster);
+        job.setCommand(command);
+        job.setApplications(applications);
     }
 }
