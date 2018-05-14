@@ -24,6 +24,9 @@ import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobRequestMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieApplicationNotFoundException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieCommandNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieIdAlreadyExistsException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
@@ -176,9 +179,14 @@ public interface JobPersistenceService {
      *
      * @param id            The id of the job
      * @param specification The job specification
-     * @throws GenieJobNotFoundException When the job identified by {@code id} can't be found and the specification
-     *                                   can't be saved
-     * @throws GenieRuntimeException     When specification resources (cluster, command, applications) can't be found
+     * @throws GenieJobNotFoundException         When the job identified by {@code id} can't be found and the
+     *                                           specification can't be saved
+     * @throws GenieClusterNotFoundException     When the cluster specified in the job specification doesn't actually
+     *                                           exist
+     * @throws GenieCommandNotFoundException     When the command specified in the job specification doesn't actually
+     *                                           exist
+     * @throws GenieApplicationNotFoundException When an application specified in the job specification doesn't
+     *                                           actually exist
      */
     void saveJobSpecification(
         @NotBlank(message = "Id is missing and is required") final String id,

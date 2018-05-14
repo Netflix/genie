@@ -17,10 +17,14 @@
  */
 package com.netflix.genie.web.services;
 
-import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieApplicationNotFoundException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieCommandNotFoundException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieIdAlreadyExistsException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
@@ -40,12 +44,9 @@ public interface AgentJobService {
      * @param jobRequest          The job request containing all the metadata needed to reserve a job id
      * @param agentClientMetadata The metadata about the agent driving this job request
      * @return The unique id of the job which was saved in the database
-     * @throws GenieException on error reserving the job id
+     * @throws GenieIdAlreadyExistsException If the id requested along with the job request is already in use
      */
-    String reserveJobId(
-        @Valid final JobRequest jobRequest,
-        @Valid final AgentClientMetadata agentClientMetadata
-    ) throws GenieException;
+    String reserveJobId(@Valid final JobRequest jobRequest, @Valid final AgentClientMetadata agentClientMetadata);
 
     /**
      * Resolve the job specification for job identified by the given id. This method will persist the job specification
@@ -53,6 +54,13 @@ public interface AgentJobService {
      *
      * @param id The id of the job to resolve the specification for. Must already have a reserved an id in the database
      * @return The job specification if one could be resolved
+     * @throws GenieJobNotFoundException         If the job has not yet had its ID reserved and/or can't be found
+     * @throws GenieClusterNotFoundException     When the cluster specified in the job specification doesn't actually
+     *                                           exist
+     * @throws GenieCommandNotFoundException     When the command specified in the job specification doesn't actually
+     *                                           exist
+     * @throws GenieApplicationNotFoundException When an application specified in the job specification doesn't
+     *                                           actually exist
      */
     JobSpecification resolveJobSpecification(final String id);
 }
