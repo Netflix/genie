@@ -15,7 +15,7 @@
  *     limitations under the License.
  *
  */
-package com.netflix.genie.web.rpc.interceptors;
+package com.netflix.genie.web.rpc.grpc.interceptors;
 
 import io.grpc.ForwardingServerCall;
 import io.grpc.Metadata;

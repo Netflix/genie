@@ -21,7 +21,7 @@ import com.google.protobuf.util.Timestamps;
 import com.netflix.genie.proto.PingRequest;
 import com.netflix.genie.proto.PingServiceGrpc;
 import com.netflix.genie.proto.PongResponse;
-import com.netflix.genie.web.rpc.interceptors.SimpleLoggingInterceptor;
+import com.netflix.genie.web.rpc.grpc.interceptors.SimpleLoggingInterceptor;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.springboot.autoconfigure.grpc.server.GrpcService;

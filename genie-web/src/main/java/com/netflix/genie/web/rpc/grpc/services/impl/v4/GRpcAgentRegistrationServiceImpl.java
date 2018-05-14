@@ -21,7 +21,7 @@ package com.netflix.genie.web.rpc.grpc.services.impl.v4;
 import com.netflix.genie.proto.AgentRegistrationRequest;
 import com.netflix.genie.proto.AgentRegistrationResponse;
 import com.netflix.genie.proto.AgentRegistrationServiceGrpc;
-import com.netflix.genie.web.rpc.interceptors.SimpleLoggingInterceptor;
+import com.netflix.genie.web.rpc.grpc.interceptors.SimpleLoggingInterceptor;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.springboot.autoconfigure.grpc.server.GrpcService;
