@@ -56,6 +56,8 @@ import java.util.stream.Collectors;
  */
 public final class JobServiceProtoConverter {
 
+    private static final String NO_ERROR_MESSAGE_PROVIDED =  "No error message provided";
+
     /**
      * Utility class shouldn't be constructed.
      */
@@ -199,7 +201,7 @@ public final class JobServiceProtoConverter {
                 JobSpecificationError
                     .newBuilder()
                     .setType(JobSpecificationError.Type.UNKNOWN)
-                    .setMessage(error.getMessage())
+                    .setMessage(error.getMessage() == null ? NO_ERROR_MESSAGE_PROVIDED : error.getMessage())
                     .build()
             )
             .build();
