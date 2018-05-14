@@ -22,6 +22,7 @@ import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobRequestMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificationNotFoundException;
 import com.netflix.genie.web.services.AgentJobService;
 import com.netflix.genie.web.services.JobPersistenceService;
 import com.netflix.genie.web.services.JobSpecificationService;
@@ -87,5 +88,17 @@ public class AgentJobServiceImpl implements AgentJobService {
         final JobSpecification jobSpecification = this.jobSpecificationService.resolveJobSpecification(id, jobRequest);
         this.jobPersistenceService.saveJobSpecification(id, jobSpecification);
         return jobSpecification;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JobSpecification getJobSpecification(final String id) {
+        return this.jobPersistenceService
+            .getJobSpecification(id)
+            .orElseThrow(
+                () -> new GenieJobSpecificationNotFoundException("No job specification exists for job with id " + id)
+            );
     }
 }
