@@ -17,11 +17,11 @@
  */
 package com.netflix.genie.web.services.impl;
 
-import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobRequestMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
 import com.netflix.genie.web.services.AgentJobService;
 import com.netflix.genie.web.services.JobPersistenceService;
 import com.netflix.genie.web.services.JobSpecificationService;
@@ -71,7 +71,7 @@ public class AgentJobServiceImpl implements AgentJobService {
     public String reserveJobId(
         @Valid final JobRequest jobRequest,
         @Valid final AgentClientMetadata agentClientMetadata
-    ) throws GenieException {
+    ) {
         final JobRequestMetadata jobRequestMetadata = new JobRequestMetadata(null, agentClientMetadata, 0, 0);
         return this.jobPersistenceService.saveJobRequest(jobRequest, jobRequestMetadata);
     }
@@ -81,6 +81,11 @@ public class AgentJobServiceImpl implements AgentJobService {
      */
     @Override
     public JobSpecification resolveJobSpecification(final String id) {
-        return null;
+        final JobRequest jobRequest = this.jobPersistenceService
+            .getJobRequest(id)
+            .orElseThrow(() -> new GenieJobNotFoundException("No job request exists for job id " + id));
+        final JobSpecification jobSpecification = this.jobSpecificationService.resolveJobSpecification(id, jobRequest);
+        this.jobPersistenceService.saveJobSpecification(id, jobSpecification);
+        return jobSpecification;
     }
 }
