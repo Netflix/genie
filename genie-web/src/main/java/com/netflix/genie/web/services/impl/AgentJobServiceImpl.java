@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
+import java.util.UUID;
 
 /**
  * Default implementation of {@link AgentJobService}.
@@ -100,5 +101,16 @@ public class AgentJobServiceImpl implements AgentJobService {
             .orElseThrow(
                 () -> new GenieJobSpecificationNotFoundException("No job specification exists for job with id " + id)
             );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JobSpecification dryRunJobSpecificationResolution(@Valid final JobRequest jobRequest) {
+        return this.jobSpecificationService.resolveJobSpecification(
+            jobRequest.getRequestedId().orElse(UUID.randomUUID().toString()),
+            jobRequest
+        );
     }
 }

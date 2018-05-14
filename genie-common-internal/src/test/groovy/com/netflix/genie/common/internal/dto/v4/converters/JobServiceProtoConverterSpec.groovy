@@ -32,6 +32,7 @@ import com.netflix.genie.common.internal.dto.v4.JobSpecification
 import com.netflix.genie.common.util.GenieObjectMapper
 import com.netflix.genie.proto.AgentConfig
 import com.netflix.genie.proto.AgentMetadata
+import com.netflix.genie.proto.DryRunJobSpecificationRequest
 import com.netflix.genie.proto.ExecutionResource
 import com.netflix.genie.proto.JobSpecificationResponse
 import com.netflix.genie.proto.ReserveJobIdRequest
@@ -224,6 +225,25 @@ class JobServiceProtoConverterSpec extends Specification {
         jobRequest2 == jobRequest
     }
 
+    def "Can convert JobRequest to DryRunJobSpecificationRequest and vice versa"() {
+        def jobRequest = createJobRequest()
+        def dryRunJobSpecificationRequest = createDryRunJobSpecificationRequest()
+
+        when:
+        def dryRunJobSpecificationRequest1 = JobServiceProtoConverter.toProtoDryRunJobSpecificationRequest(jobRequest)
+        def jobRequest1 = JobServiceProtoConverter.toJobRequestDTO(dryRunJobSpecificationRequest1)
+
+        then:
+        jobRequest1 == jobRequest
+
+
+        when:
+        def jobRequest2 = JobServiceProtoConverter.toJobRequestDTO(dryRunJobSpecificationRequest)
+
+        then:
+        jobRequest2 == jobRequest
+    }
+
     def "Can create a JobSpecificationRequest"() {
         when:
         def request = JobServiceProtoConverter.toProtoJobSpecificationRequest(id)
@@ -345,69 +365,11 @@ class JobServiceProtoConverterSpec extends Specification {
     }
 
     ReserveJobIdRequest createReserveJobIdRequest() {
-        def jobMetadataProto = com.netflix.genie.proto.JobMetadata
-                .newBuilder()
-                .setId(id)
-                .setName(name)
-                .setUser(user)
-                .setVersion(version)
-                .setDescription(description)
-                .addAllTags(tags)
-                .setMetadata(metadataString)
-                .setEmail(email)
-                .setGrouping(grouping)
-                .setGroupingInstance(groupingInstance)
-                .setSetupFile(setupFile)
-                .addAllConfigs(configs)
-                .addAllDependencies(dependencies)
-                .addAllCommandArgs(commandArgs)
-                .build()
+        def jobMetadataProto = createJobMetadataProto()
 
-        def executionResourceCriteriaProto = com.netflix.genie.proto.ExecutionResourceCriteria.newBuilder()
-                .addAllClusterCriteria(
-                Lists.newArrayList(
-                        com.netflix.genie.proto.Criterion
-                                .newBuilder()
-                                .setId(clusterCriterion0Id)
-                                .setName(clusterCriterion0Name)
-                                .setVersion(clusterCriterion0Version)
-                                .setStatus(clusterCriterion0Status)
-                                .addAllTags(clusterCriterion0Tags)
-                                .build(),
-                        com.netflix.genie.proto.Criterion
-                                .newBuilder()
-                                .setId(clusterCriterion1Id)
-                                .setName(clusterCriterion1Name)
-                                .setVersion(clusterCriterion1Version)
-                                .setStatus(clusterCriterion1Status)
-                                .addAllTags(clusterCriterion1Tags)
-                                .build(),
-                        com.netflix.genie.proto.Criterion
-                                .newBuilder()
-                                .setId(clusterCriterion2Id)
-                                .setName(clusterCriterion2Name)
-                                .setVersion(clusterCriterion2Version)
-                                .setStatus(clusterCriterion2Status)
-                                .addAllTags(clusterCriterion2Tags)
-                                .build()
-                )
-        ).setCommandCriterion(
-                com.netflix.genie.proto.Criterion
-                        .newBuilder()
-                        .setId(commandCriterionId)
-                        .setName(commandCriterionName)
-                        .setVersion(commandCriterionVersion)
-                        .setStatus(commandCriterionStatus)
-                        .addAllTags(commandCriterionTags)
-                        .build()
-        ).addAllRequestedApplicationIdOverrides(applicationIds)
-                .build()
+        def executionResourceCriteriaProto = createExecutionResourceCriteriaProto()
 
-        def agentConfigProto = AgentConfig
-                .newBuilder()
-                .setIsInteractive(interactive)
-                .setJobDirectoryLocation(jobDirectoryLocation)
-                .build()
+        def agentConfigProto = createAgentConfig()
 
         def agentMetadataProto = AgentMetadata
                 .newBuilder()
@@ -422,6 +384,19 @@ class JobServiceProtoConverterSpec extends Specification {
                 .setCriteria(executionResourceCriteriaProto)
                 .setAgentConfig(agentConfigProto)
                 .setAgentMetadata(agentMetadataProto)
+                .build()
+    }
+
+    DryRunJobSpecificationRequest createDryRunJobSpecificationRequest() {
+        def jobMetadataProto = createJobMetadataProto()
+        def executionResourceCriteriaProto = createExecutionResourceCriteriaProto()
+        def agentConfigProto = createAgentConfig()
+
+        return DryRunJobSpecificationRequest
+                .newBuilder()
+                .setMetadata(jobMetadataProto)
+                .setCriteria(executionResourceCriteriaProto)
+                .setAgentConfig(agentConfigProto)
                 .build()
     }
 
@@ -518,5 +493,75 @@ class JobServiceProtoConverterSpec extends Specification {
                 .build()
 
         return JobSpecificationResponse.newBuilder().setSpecification(jobSpecification).build()
+    }
+
+    com.netflix.genie.proto.JobMetadata createJobMetadataProto() {
+        return com.netflix.genie.proto.JobMetadata
+                .newBuilder()
+                .setId(id)
+                .setName(name)
+                .setUser(user)
+                .setVersion(version)
+                .setDescription(description)
+                .addAllTags(tags)
+                .setMetadata(metadataString)
+                .setEmail(email)
+                .setGrouping(grouping)
+                .setGroupingInstance(groupingInstance)
+                .setSetupFile(setupFile)
+                .addAllConfigs(configs)
+                .addAllDependencies(dependencies)
+                .addAllCommandArgs(commandArgs)
+                .build()
+    }
+
+    com.netflix.genie.proto.ExecutionResourceCriteria createExecutionResourceCriteriaProto() {
+        return com.netflix.genie.proto.ExecutionResourceCriteria.newBuilder()
+                .addAllClusterCriteria(
+                Lists.newArrayList(
+                        com.netflix.genie.proto.Criterion
+                                .newBuilder()
+                                .setId(clusterCriterion0Id)
+                                .setName(clusterCriterion0Name)
+                                .setVersion(clusterCriterion0Version)
+                                .setStatus(clusterCriterion0Status)
+                                .addAllTags(clusterCriterion0Tags)
+                                .build(),
+                        com.netflix.genie.proto.Criterion
+                                .newBuilder()
+                                .setId(clusterCriterion1Id)
+                                .setName(clusterCriterion1Name)
+                                .setVersion(clusterCriterion1Version)
+                                .setStatus(clusterCriterion1Status)
+                                .addAllTags(clusterCriterion1Tags)
+                                .build(),
+                        com.netflix.genie.proto.Criterion
+                                .newBuilder()
+                                .setId(clusterCriterion2Id)
+                                .setName(clusterCriterion2Name)
+                                .setVersion(clusterCriterion2Version)
+                                .setStatus(clusterCriterion2Status)
+                                .addAllTags(clusterCriterion2Tags)
+                                .build()
+                )
+        ).setCommandCriterion(
+                com.netflix.genie.proto.Criterion
+                        .newBuilder()
+                        .setId(commandCriterionId)
+                        .setName(commandCriterionName)
+                        .setVersion(commandCriterionVersion)
+                        .setStatus(commandCriterionStatus)
+                        .addAllTags(commandCriterionTags)
+                        .build()
+        ).addAllRequestedApplicationIdOverrides(applicationIds)
+                .build()
+    }
+
+    AgentConfig createAgentConfig() {
+        return AgentConfig
+                .newBuilder()
+                .setIsInteractive(interactive)
+                .setJobDirectoryLocation(jobDirectoryLocation)
+                .build()
     }
 }

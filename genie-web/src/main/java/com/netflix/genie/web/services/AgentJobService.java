@@ -75,4 +75,12 @@ public interface AgentJobService {
      *                                                resolved or saved yet
      */
     JobSpecification getJobSpecification(final String id);
+
+    /**
+     * Run the job specification resolution algorithm on the given input but save nothing in the system.
+     *
+     * @param jobRequest The job request containing all the metadata needed to resolve a job specification
+     * @return The job specification that would have been resolved for the given input
+     */
+    JobSpecification dryRunJobSpecificationResolution(@Valid final JobRequest jobRequest);
 }

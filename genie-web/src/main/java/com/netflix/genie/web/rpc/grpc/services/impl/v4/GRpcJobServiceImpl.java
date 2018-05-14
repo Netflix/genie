@@ -22,6 +22,7 @@ import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import com.netflix.genie.common.internal.dto.v4.converters.JobServiceProtoConverter;
+import com.netflix.genie.proto.DryRunJobSpecificationRequest;
 import com.netflix.genie.proto.JobServiceGrpc;
 import com.netflix.genie.proto.JobSpecificationRequest;
 import com.netflix.genie.proto.JobSpecificationResponse;
@@ -160,6 +161,30 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
                 log.error(e.getMessage(), e);
                 responseObserver.onNext(JobServiceProtoConverter.toProtoJobSpecificationResponse(e));
             }
+        }
+        responseObserver.onCompleted();
+    }
+
+    /**
+     * The agent requests that a job specification be resolved without impacting any state in the database. This
+     * operation is completely transient and just reflects what the job specification would look like given the
+     * current state of the system and the input parameters.
+     *
+     * @param request          The request containing all the metadata required to resolve a job specification
+     * @param responseObserver The observer to send a response with
+     */
+    @Override
+    public void resolveJobSpecificationDryRun(
+        final DryRunJobSpecificationRequest request,
+        final StreamObserver<JobSpecificationResponse> responseObserver
+    ) {
+        try {
+            final JobRequest jobRequest = JobServiceProtoConverter.toJobRequestDTO(request);
+            final JobSpecification jobSpecification = this.agentJobService.dryRunJobSpecificationResolution(jobRequest);
+            responseObserver.onNext(JobServiceProtoConverter.toProtoJobSpecificationResponse(jobSpecification));
+        } catch (final Exception e) {
+            log.error("Error resolving job specification for request " + request, e);
+            responseObserver.onNext(JobServiceProtoConverter.toProtoJobSpecificationResponse(e));
         }
         responseObserver.onCompleted();
     }

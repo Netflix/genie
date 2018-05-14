@@ -25,9 +25,11 @@ import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment
 import com.netflix.genie.common.internal.dto.v4.JobRequest
 import com.netflix.genie.common.internal.dto.v4.JobSpecification
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificationNotFoundException
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException
 import com.netflix.genie.proto.AgentConfig
 import com.netflix.genie.proto.AgentMetadata
 import com.netflix.genie.proto.Criterion
+import com.netflix.genie.proto.DryRunJobSpecificationRequest
 import com.netflix.genie.proto.ExecutionResourceCriteria
 import com.netflix.genie.proto.JobMetadata
 import com.netflix.genie.proto.JobSpecificationRequest
@@ -252,70 +254,45 @@ class GRpcJobServiceImplSpec extends Specification {
         1 * responseObserver.onCompleted()
     }
 
+    def "Can dry run job specification resolution"() {
+        def agentJobService = Mock(AgentJobService)
+        def service = new GRpcJobServiceImpl(agentJobService)
+        StreamObserver<JobSpecificationResponse> responseObserver = Mock()
+        def jobSpecification = createJobSpecification()
+
+        when:
+        service.resolveJobSpecificationDryRun(createDryRunSpecificationRequest(), responseObserver)
+
+        then:
+        1 * agentJobService.dryRunJobSpecificationResolution(_ as JobRequest) >> jobSpecification
+        1 * responseObserver.onNext(_ as JobSpecificationResponse)
+        1 * responseObserver.onCompleted()
+    }
+
+    def "Can not dry run job specification resolution if resolution throws an error"() {
+        def agentJobService = Mock(AgentJobService)
+        def service = new GRpcJobServiceImpl(agentJobService)
+        StreamObserver<JobSpecificationResponse> responseObserver = Mock()
+
+        when:
+        service.resolveJobSpecificationDryRun(createDryRunSpecificationRequest(), responseObserver)
+
+        then:
+        1 * agentJobService.dryRunJobSpecificationResolution(_ as JobRequest) >> {
+            throw new GenieRuntimeException()
+        }
+        1 * responseObserver.onNext(_ as JobSpecificationResponse)
+        1 * responseObserver.onCompleted()
+    }
+
     JobSpecificationRequest createJobSpecificationRequest() {
         return JobSpecificationRequest.newBuilder().setId(id).build()
     }
 
     ReserveJobIdRequest createReserveJobIdRequest() {
-        def jobMetadataProto = JobMetadata
-                .newBuilder()
-                .setId(id)
-                .setName(name)
-                .setUser(user)
-                .setVersion(version)
-                .setDescription(description)
-                .addAllTags(tags)
-                .setMetadata(metadataString)
-                .setEmail(email)
-                .setGrouping(grouping)
-                .setGroupingInstance(groupingInstance)
-                .setSetupFile(setupFile)
-                .addAllConfigs(configs)
-                .addAllDependencies(dependencies)
-                .addAllCommandArgs(commandArgs)
-                .build()
-
-        def executionResourceCriteriaProto = ExecutionResourceCriteria.newBuilder()
-                .addAllClusterCriteria(
-                Lists.newArrayList(
-                        Criterion
-                                .newBuilder()
-                                .setId(clusterCriterion0Id)
-                                .setName(clusterCriterion0Name)
-                                .setStatus(clusterCriterion0Status)
-                                .addAllTags(clusterCriterion0Tags)
-                                .build(),
-                        Criterion
-                                .newBuilder()
-                                .setId(clusterCriterion1Id)
-                                .setName(clusterCriterion1Name)
-                                .setStatus(clusterCriterion1Status)
-                                .addAllTags(clusterCriterion1Tags)
-                                .build(),
-                        Criterion
-                                .newBuilder()
-                                .setId(clusterCriterion2Id)
-                                .setName(clusterCriterion2Name)
-                                .setStatus(clusterCriterion2Status)
-                                .addAllTags(clusterCriterion2Tags)
-                                .build()
-                )
-        ).setCommandCriterion(
-                Criterion
-                        .newBuilder()
-                        .setId(commandCriterionId)
-                        .setName(commandCriterionName)
-                        .setStatus(commandCriterionStatus)
-                        .addAllTags(commandCriterionTags)
-                        .build()
-        ).addAllRequestedApplicationIdOverrides(applicationIds)
-                .build()
-
-        def agentConfigProto = AgentConfig
-                .newBuilder()
-                .setIsInteractive(interactive)
-                .setJobDirectoryLocation(jobDirectoryLocation)
-                .build()
+        def jobMetadataProto = createJobMetadataProto()
+        def executionResourceCriteriaProto = createExecutionResourceCriteriaProto()
+        def agentConfigProto = createAgentConfigProto()
 
         def agentMetadata = AgentMetadata
                 .newBuilder()
@@ -330,6 +307,19 @@ class GRpcJobServiceImplSpec extends Specification {
                 .setCriteria(executionResourceCriteriaProto)
                 .setAgentConfig(agentConfigProto)
                 .setAgentMetadata(agentMetadata)
+                .build()
+    }
+
+    DryRunJobSpecificationRequest createDryRunSpecificationRequest() {
+        def jobMetadataProto = createJobMetadataProto()
+        def executionResourceCriteriaProto = createExecutionResourceCriteriaProto()
+        def agentConfigProto = createAgentConfigProto()
+
+        return DryRunJobSpecificationRequest
+                .newBuilder()
+                .setMetadata(jobMetadataProto)
+                .setCriteria(executionResourceCriteriaProto)
+                .setAgentConfig(agentConfigProto)
                 .build()
     }
 
@@ -370,5 +360,71 @@ class GRpcJobServiceImplSpec extends Specification {
                 interactive,
                 new File(jobDirectoryLocation)
         )
+    }
+
+    JobMetadata createJobMetadataProto() {
+        return JobMetadata
+                .newBuilder()
+                .setId(id)
+                .setName(name)
+                .setUser(user)
+                .setVersion(version)
+                .setDescription(description)
+                .addAllTags(tags)
+                .setMetadata(metadataString)
+                .setEmail(email)
+                .setGrouping(grouping)
+                .setGroupingInstance(groupingInstance)
+                .setSetupFile(setupFile)
+                .addAllConfigs(configs)
+                .addAllDependencies(dependencies)
+                .addAllCommandArgs(commandArgs)
+                .build()
+    }
+
+    ExecutionResourceCriteria createExecutionResourceCriteriaProto() {
+        ExecutionResourceCriteria.newBuilder()
+                .addAllClusterCriteria(
+                Lists.newArrayList(
+                        Criterion
+                                .newBuilder()
+                                .setId(clusterCriterion0Id)
+                                .setName(clusterCriterion0Name)
+                                .setStatus(clusterCriterion0Status)
+                                .addAllTags(clusterCriterion0Tags)
+                                .build(),
+                        Criterion
+                                .newBuilder()
+                                .setId(clusterCriterion1Id)
+                                .setName(clusterCriterion1Name)
+                                .setStatus(clusterCriterion1Status)
+                                .addAllTags(clusterCriterion1Tags)
+                                .build(),
+                        Criterion
+                                .newBuilder()
+                                .setId(clusterCriterion2Id)
+                                .setName(clusterCriterion2Name)
+                                .setStatus(clusterCriterion2Status)
+                                .addAllTags(clusterCriterion2Tags)
+                                .build()
+                )
+        ).setCommandCriterion(
+                Criterion
+                        .newBuilder()
+                        .setId(commandCriterionId)
+                        .setName(commandCriterionName)
+                        .setStatus(commandCriterionStatus)
+                        .addAllTags(commandCriterionTags)
+                        .build()
+        ).addAllRequestedApplicationIdOverrides(applicationIds)
+                .build()
+    }
+
+    AgentConfig createAgentConfigProto() {
+        return AgentConfig
+                .newBuilder()
+                .setIsInteractive(interactive)
+                .setJobDirectoryLocation(jobDirectoryLocation)
+                .build()
     }
 }
