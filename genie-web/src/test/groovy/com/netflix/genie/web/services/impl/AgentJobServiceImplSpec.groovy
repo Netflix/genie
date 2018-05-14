@@ -121,4 +121,36 @@ class AgentJobServiceImplSpec extends Specification {
         1 * jobPersistenceService.getJobSpecification(jobId) >> Optional.empty()
         thrown(GenieJobSpecificationNotFoundException)
     }
+
+    def "Can dry run job specification resolution"() {
+        def jobPersistenceService = Mock(JobPersistenceService)
+        def jobSpecificationService = Mock(JobSpecificationService)
+        def meterRegistry = Mock(MeterRegistry)
+        def jobRequest = Mock(JobRequest)
+
+        AgentJobServiceImpl service = new AgentJobServiceImpl(
+                jobPersistenceService,
+                jobSpecificationService,
+                meterRegistry
+        )
+
+        def jobSpecificationMock = Mock(JobSpecification)
+        def id = UUID.randomUUID().toString()
+
+        when:
+        def jobSpecification = service.dryRunJobSpecificationResolution(jobRequest)
+
+        then:
+        1 * jobRequest.getRequestedId() >> Optional.empty()
+        1 * jobSpecificationService.resolveJobSpecification(_ as String, jobRequest) >> jobSpecificationMock
+        jobSpecification == jobSpecificationMock
+
+        when:
+        jobSpecification = service.dryRunJobSpecificationResolution(jobRequest)
+
+        then:
+        1 * jobRequest.getRequestedId() >> Optional.of(id)
+        1 * jobSpecificationService.resolveJobSpecification(id, jobRequest) >> jobSpecificationMock
+        jobSpecification == jobSpecificationMock
+    }
 }

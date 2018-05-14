@@ -34,6 +34,7 @@ import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.proto.AgentMetadata;
+import com.netflix.genie.proto.DryRunJobSpecificationRequest;
 import com.netflix.genie.proto.ExecutionResource;
 import com.netflix.genie.proto.JobSpecificationError;
 import com.netflix.genie.proto.JobSpecificationRequest;
@@ -56,7 +57,7 @@ import java.util.stream.Collectors;
  */
 public final class JobServiceProtoConverter {
 
-    private static final String NO_ERROR_MESSAGE_PROVIDED =  "No error message provided";
+    private static final String NO_ERROR_MESSAGE_PROVIDED = "No error message provided";
 
     /**
      * Utility class shouldn't be constructed.
@@ -104,60 +105,38 @@ public final class JobServiceProtoConverter {
      * @throws GenieException if any serialization errors occur
      */
     public static JobRequest toJobRequestDTO(final ReserveJobIdRequest request) throws GenieException {
-        final com.netflix.genie.proto.JobMetadata protoJobMetadata = request.getMetadata();
-        final JobMetadata jobMetadata = new JobMetadata.Builder(
-            protoJobMetadata.getName(),
-            protoJobMetadata.getUser(),
-            protoJobMetadata.getVersion()
-        )
-            .withDescription(protoJobMetadata.getDescription())
-            .withTags(protoJobMetadata.getTagsList() != null ? Sets.newHashSet(protoJobMetadata.getTagsList()) : null)
-            .withMetadata(protoJobMetadata.getMetadata())
-            .withEmail(protoJobMetadata.getEmail())
-            .withGrouping(protoJobMetadata.getGrouping())
-            .withGroupingInstance(protoJobMetadata.getGroupingInstance())
-            .build();
+        return toJobRequest(request.getMetadata(), request.getCriteria(), request.getAgentConfig());
+    }
 
-        final com.netflix.genie.proto.ExecutionResourceCriteria protoExecutionResourceCriteria = request.getCriteria();
-        final List<com.netflix.genie.proto.Criterion> protoCriteria
-            = protoExecutionResourceCriteria.getClusterCriteriaList();
-        final List<Criterion> clusterCriteria = Lists.newArrayListWithExpectedSize(protoCriteria.size());
-        for (final com.netflix.genie.proto.Criterion protoCriterion : protoCriteria) {
-            clusterCriteria.add(toCriterionDTO(protoCriterion));
-        }
+    /**
+     * Convert a V4 Job Request DTO into a gRPC dry run resolve job specification request to be sent to the server.
+     *
+     * @param jobRequest The job request to convert
+     * @return The request that should be sent to the server for a new Job Specification given the parameters
+     * @throws JsonProcessingException When the metadata can't be converted to a string
+     */
+    public static DryRunJobSpecificationRequest toProtoDryRunJobSpecificationRequest(
+        final AgentJobRequest jobRequest
+    ) throws JsonProcessingException {
+        final DryRunJobSpecificationRequest.Builder builder = DryRunJobSpecificationRequest.newBuilder();
 
-        final ExecutionResourceCriteria executionResourceCriteria = new ExecutionResourceCriteria(
-            clusterCriteria,
-            toCriterionDTO(protoExecutionResourceCriteria.getCommandCriterion()),
-            protoExecutionResourceCriteria.getRequestedApplicationIdOverridesList()
-        );
+        builder.setMetadata(toProtoJobMetadata(jobRequest));
+        builder.setCriteria(toProtoExecutionResourceCriteria(jobRequest));
+        builder.setAgentConfig(toProtoAgentConfig(jobRequest));
 
-        final ExecutionEnvironment jobResources = new ExecutionEnvironment(
-            protoJobMetadata.getConfigsList() != null
-                ? Sets.newHashSet(protoJobMetadata.getConfigsList())
-                : null,
-            protoJobMetadata.getDependenciesList() != null
-                ? Sets.newHashSet(protoJobMetadata.getDependenciesList())
-                : null,
-            protoJobMetadata.getSetupFile()
-        );
+        return builder.build();
+    }
 
-        final com.netflix.genie.proto.AgentConfig protoAgentConfig = request.getAgentConfig();
-        final AgentConfigRequest agentConfigRequest = new AgentConfigRequest
-            .Builder()
-            .withRequestedJobDirectoryLocation(protoAgentConfig.getJobDirectoryLocation())
-            .withInteractive(protoAgentConfig.getIsInteractive())
-            .build();
-
-        return new JobRequest(
-            protoJobMetadata.getId(),
-            jobResources,
-            protoJobMetadata.getCommandArgsList(),
-            jobMetadata,
-            executionResourceCriteria,
-            null,
-            agentConfigRequest
-        );
+    /**
+     * Convert a gRPC request to dry run a job specification resolution into a {@link JobRequest} for use within
+     * Genie server codebase.
+     *
+     * @param request The request to convert
+     * @return The job request
+     * @throws GenieException if any error occurs
+     */
+    public static JobRequest toJobRequestDTO(final DryRunJobSpecificationRequest request) throws GenieException {
+        return toJobRequest(request.getMetadata(), request.getCriteria(), request.getAgentConfig());
     }
 
     /**
@@ -371,5 +350,63 @@ public final class JobServiceProtoConverter {
         agentClientMetadata.getVersion().ifPresent(builder::setAgentVersion);
         agentClientMetadata.getPid().ifPresent(builder::setAgentPid);
         return builder.build();
+    }
+
+    private static JobRequest toJobRequest(
+        final com.netflix.genie.proto.JobMetadata protoJobMetadata,
+        final com.netflix.genie.proto.ExecutionResourceCriteria protoExecutionResourceCriteria,
+        final com.netflix.genie.proto.AgentConfig protoAgentConfig
+    ) throws GenieException {
+        final JobMetadata jobMetadata = new JobMetadata.Builder(
+            protoJobMetadata.getName(),
+            protoJobMetadata.getUser(),
+            protoJobMetadata.getVersion()
+        )
+            .withDescription(protoJobMetadata.getDescription())
+            .withTags(protoJobMetadata.getTagsList() != null ? Sets.newHashSet(protoJobMetadata.getTagsList()) : null)
+            .withMetadata(protoJobMetadata.getMetadata())
+            .withEmail(protoJobMetadata.getEmail())
+            .withGrouping(protoJobMetadata.getGrouping())
+            .withGroupingInstance(protoJobMetadata.getGroupingInstance())
+            .build();
+
+        final List<com.netflix.genie.proto.Criterion> protoCriteria
+            = protoExecutionResourceCriteria.getClusterCriteriaList();
+        final List<Criterion> clusterCriteria = Lists.newArrayListWithExpectedSize(protoCriteria.size());
+        for (final com.netflix.genie.proto.Criterion protoCriterion : protoCriteria) {
+            clusterCriteria.add(toCriterionDTO(protoCriterion));
+        }
+
+        final ExecutionResourceCriteria executionResourceCriteria = new ExecutionResourceCriteria(
+            clusterCriteria,
+            toCriterionDTO(protoExecutionResourceCriteria.getCommandCriterion()),
+            protoExecutionResourceCriteria.getRequestedApplicationIdOverridesList()
+        );
+
+        final ExecutionEnvironment jobResources = new ExecutionEnvironment(
+            protoJobMetadata.getConfigsList() != null
+                ? Sets.newHashSet(protoJobMetadata.getConfigsList())
+                : null,
+            protoJobMetadata.getDependenciesList() != null
+                ? Sets.newHashSet(protoJobMetadata.getDependenciesList())
+                : null,
+            protoJobMetadata.getSetupFile()
+        );
+
+        final AgentConfigRequest agentConfigRequest = new AgentConfigRequest
+            .Builder()
+            .withRequestedJobDirectoryLocation(protoAgentConfig.getJobDirectoryLocation())
+            .withInteractive(protoAgentConfig.getIsInteractive())
+            .build();
+
+        return new JobRequest(
+            protoJobMetadata.getId(),
+            jobResources,
+            protoJobMetadata.getCommandArgsList(),
+            jobMetadata,
+            executionResourceCriteria,
+            null,
+            agentConfigRequest
+        );
     }
 }
