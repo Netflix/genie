@@ -25,6 +25,7 @@ import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFou
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieCommandNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieIdAlreadyExistsException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificationNotFoundException;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
@@ -63,4 +64,15 @@ public interface AgentJobService {
      *                                           actually exist
      */
     JobSpecification resolveJobSpecification(final String id);
+
+    /**
+     * Get a job specification if has been resolved.
+     *
+     * @param id the id of the job to retrieve the specification for
+     * @return The job specification for the job
+     * @throws GenieJobNotFoundException              If the job has not yet had its ID reserved and/or can't be found
+     * @throws GenieJobSpecificationNotFoundException If the job exists but the specification hasn't been
+     *                                                resolved or saved yet
+     */
+    JobSpecification getJobSpecification(final String id);
 }

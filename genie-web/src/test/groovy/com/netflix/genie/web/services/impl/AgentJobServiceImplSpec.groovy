@@ -22,6 +22,7 @@ import com.netflix.genie.common.internal.dto.v4.JobRequest
 import com.netflix.genie.common.internal.dto.v4.JobRequestMetadata
 import com.netflix.genie.common.internal.dto.v4.JobSpecification
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificationNotFoundException
 import com.netflix.genie.test.categories.UnitTest
 import com.netflix.genie.web.services.JobPersistenceService
 import com.netflix.genie.web.services.JobSpecificationService
@@ -90,5 +91,34 @@ class AgentJobServiceImplSpec extends Specification {
         1 * jobSpecificationService.resolveJobSpecification(jobId, jobRequest) >> jobSpecificationMock
         1 * jobPersistenceService.saveJobSpecification(jobId, jobSpecificationMock)
         jobSpecification == jobSpecificationMock
+    }
+
+    def "Can retrieve Job Specification"() {
+        def jobPersistenceService = Mock(JobPersistenceService)
+        def jobSpecificationService = Mock(JobSpecificationService)
+        def meterRegistry = Mock(MeterRegistry)
+        def jobId = UUID.randomUUID().toString()
+
+        AgentJobServiceImpl service = new AgentJobServiceImpl(
+                jobPersistenceService,
+                jobSpecificationService,
+                meterRegistry
+        )
+        def jobSpecificationMock = Mock(JobSpecification)
+        JobSpecification jobSpecification
+
+        when:
+        jobSpecification = service.getJobSpecification(jobId)
+
+        then:
+        1 * jobPersistenceService.getJobSpecification(jobId) >> Optional.of(jobSpecificationMock)
+        jobSpecification == jobSpecificationMock
+
+        when:
+        service.getJobSpecification(jobId)
+
+        then:
+        1 * jobPersistenceService.getJobSpecification(jobId) >> Optional.empty()
+        thrown(GenieJobSpecificationNotFoundException)
     }
 }
