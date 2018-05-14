@@ -22,4 +22,4 @@
  * @author mprimi
  * @since 4.0.0
  */
-package com.netflix.genie.web.rpc.interceptors;
+package com.netflix.genie.web.rpc.grpc.interceptors;

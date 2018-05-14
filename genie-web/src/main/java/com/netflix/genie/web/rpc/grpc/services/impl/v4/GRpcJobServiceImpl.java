@@ -28,7 +28,7 @@ import com.netflix.genie.proto.JobSpecificationResponse;
 import com.netflix.genie.proto.ReserveJobIdError;
 import com.netflix.genie.proto.ReserveJobIdRequest;
 import com.netflix.genie.proto.ReserveJobIdResponse;
-import com.netflix.genie.web.rpc.interceptors.SimpleLoggingInterceptor;
+import com.netflix.genie.web.rpc.grpc.interceptors.SimpleLoggingInterceptor;
 import com.netflix.genie.web.services.AgentJobService;
 import io.grpc.stub.StreamObserver;
 import io.micrometer.core.instrument.MeterRegistry;
