@@ -17,13 +17,13 @@
  */
 package com.netflix.genie.web.rpc.interceptors;
 
-    import io.grpc.ForwardingServerCall;
-    import io.grpc.Metadata;
-    import io.grpc.ServerCall;
-    import io.grpc.ServerCallHandler;
-    import io.grpc.ServerInterceptor;
-    import io.grpc.Status;
-    import lombok.extern.slf4j.Slf4j;
+import io.grpc.ForwardingServerCall;
+import io.grpc.Metadata;
+import io.grpc.ServerCall;
+import io.grpc.ServerCallHandler;
+import io.grpc.ServerInterceptor;
+import io.grpc.Status;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Proof of concept server interceptor that logs gRPC requests and errors.
