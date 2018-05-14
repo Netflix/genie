@@ -31,7 +31,6 @@ import com.netflix.genie.proto.ReserveJobIdResponse;
 import com.netflix.genie.web.rpc.grpc.interceptors.SimpleLoggingInterceptor;
 import com.netflix.genie.web.services.AgentJobService;
 import io.grpc.stub.StreamObserver;
-import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.springboot.autoconfigure.grpc.server.GrpcService;
 import org.apache.commons.lang3.StringUtils;
@@ -52,17 +51,16 @@ import org.apache.commons.lang3.StringUtils;
 @Slf4j
 public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
     private final AgentJobService agentJobService;
-    private final MeterRegistry registry;
+
+    // TODO: Metrics which I believe can be captured by an interceptor
 
     /**
      * Constructor.
      *
      * @param agentJobService The implementation of the {@link AgentJobService} to use
-     * @param registry        The metrics repository to use
      */
-    public GRpcJobServiceImpl(final AgentJobService agentJobService, final MeterRegistry registry) {
+    public GRpcJobServiceImpl(final AgentJobService agentJobService) {
         this.agentJobService = agentJobService;
-        this.registry = registry;
     }
 
     /**
@@ -76,7 +74,6 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
         final ReserveJobIdRequest request,
         final StreamObserver<ReserveJobIdResponse> responseObserver
     ) {
-        // TODO: Metrics
         try {
             final JobRequest jobRequest = JobServiceProtoConverter.toJobRequestDTO(request);
             final AgentClientMetadata agentClientMetadata
@@ -117,7 +114,6 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
         final JobSpecificationRequest request,
         final StreamObserver<JobSpecificationResponse> responseObserver
     ) {
-        // TODO: Metrics?
         final String id = request.getId();
         if (StringUtils.isBlank(id)) {
             responseObserver.onNext(
@@ -129,9 +125,9 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
             try {
                 final JobSpecification jobSpec = this.agentJobService.resolveJobSpecification(id);
                 responseObserver.onNext(JobServiceProtoConverter.toProtoJobSpecificationResponse(jobSpec));
-            } catch (final Throwable t) {
-                log.error(t.getMessage(), t);
-                responseObserver.onNext(JobServiceProtoConverter.toProtoJobSpecificationResponse(t));
+            } catch (final Exception e) {
+                log.error(e.getMessage(), e);
+                responseObserver.onNext(JobServiceProtoConverter.toProtoJobSpecificationResponse(e));
             }
         }
         responseObserver.onCompleted();
@@ -139,7 +135,7 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
 
     /**
      * Assuming a specification has already been resolved the agent will call this API with a job id to fetch the
-     * specification. The server will mark the specification as owned.
+     * specification.
      *
      * @param request          The request containing the job id to return the specification for
      * @param responseObserver How to send a response
@@ -149,6 +145,22 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
         final JobSpecificationRequest request,
         final StreamObserver<JobSpecificationResponse> responseObserver
     ) {
-        super.getJobSpecification(request, responseObserver);
+        final String id = request.getId();
+        if (StringUtils.isBlank(id)) {
+            responseObserver.onNext(
+                JobServiceProtoConverter.toProtoJobSpecificationResponse(
+                    new GeniePreconditionException("No job id entered")
+                )
+            );
+        } else {
+            try {
+                final JobSpecification jobSpecification = this.agentJobService.getJobSpecification(id);
+                responseObserver.onNext(JobServiceProtoConverter.toProtoJobSpecificationResponse(jobSpecification));
+            } catch (final Exception e) {
+                log.error(e.getMessage(), e);
+                responseObserver.onNext(JobServiceProtoConverter.toProtoJobSpecificationResponse(e));
+            }
+        }
+        responseObserver.onCompleted();
     }
 }

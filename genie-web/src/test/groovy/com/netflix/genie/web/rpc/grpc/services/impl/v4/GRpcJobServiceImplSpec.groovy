@@ -24,6 +24,7 @@ import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment
 import com.netflix.genie.common.internal.dto.v4.JobRequest
 import com.netflix.genie.common.internal.dto.v4.JobSpecification
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificationNotFoundException
 import com.netflix.genie.proto.AgentConfig
 import com.netflix.genie.proto.AgentMetadata
 import com.netflix.genie.proto.Criterion
@@ -35,7 +36,6 @@ import com.netflix.genie.proto.ReserveJobIdRequest
 import com.netflix.genie.proto.ReserveJobIdResponse
 import com.netflix.genie.web.services.AgentJobService
 import io.grpc.stub.StreamObserver
-import io.micrometer.core.instrument.MeterRegistry
 import spock.lang.Specification
 
 /**
@@ -168,8 +168,7 @@ class GRpcJobServiceImplSpec extends Specification {
     def "Can reserve job id"() {
         def reserveJobIdRequest = createReserveJobIdRequest()
         def agentJobService = Mock(AgentJobService)
-        def registry = Mock(MeterRegistry)
-        def service = new GRpcJobServiceImpl(agentJobService, registry)
+        def service = new GRpcJobServiceImpl(agentJobService)
         StreamObserver<ReserveJobIdResponse> responseObserver = Mock()
 
         when:
@@ -194,15 +193,13 @@ class GRpcJobServiceImplSpec extends Specification {
     def "Can resolve job specification"() {
         def jobSpecification = createJobSpecification()
         def agentJobService = Mock(AgentJobService)
-        def registry = Mock(MeterRegistry)
-        def service = new GRpcJobServiceImpl(agentJobService, registry)
+        def service = new GRpcJobServiceImpl(agentJobService)
         StreamObserver<JobSpecificationResponse> responseObserver = Mock()
 
         when:
         service.resolveJobSpecification(createJobSpecificationRequest(), responseObserver)
 
         then:
-        // TODO: Fix once reimplemented
         1 * agentJobService.resolveJobSpecification(id) >> jobSpecification
         1 * responseObserver.onNext(_ as JobSpecificationResponse)
         1 * responseObserver.onCompleted()
@@ -210,8 +207,7 @@ class GRpcJobServiceImplSpec extends Specification {
 
     def "Can't resolve job specification"() {
         def agentJobService = Mock(AgentJobService)
-        def registry = Mock(MeterRegistry)
-        def service = new GRpcJobServiceImpl(agentJobService, registry)
+        def service = new GRpcJobServiceImpl(agentJobService)
         StreamObserver<JobSpecificationResponse> responseObserver = Mock()
 
         when:
@@ -220,6 +216,37 @@ class GRpcJobServiceImplSpec extends Specification {
         then:
         1 * agentJobService.resolveJobSpecification(id) >> {
             throw new RuntimeException(UUID.randomUUID().toString())
+        }
+        1 * responseObserver.onNext(_ as JobSpecificationResponse)
+        1 * responseObserver.onCompleted()
+    }
+
+    def "Can get a job specification that has already been resolved"() {
+        def jobSpecification = createJobSpecification()
+        def agentJobService = Mock(AgentJobService)
+        def service = new GRpcJobServiceImpl(agentJobService)
+        StreamObserver<JobSpecificationResponse> responseObserver = Mock()
+
+        when:
+        service.getJobSpecification(createJobSpecificationRequest(), responseObserver)
+
+        then:
+        1 * agentJobService.getJobSpecification(id) >> jobSpecification
+        1 * responseObserver.onNext(_ as JobSpecificationResponse)
+        1 * responseObserver.onCompleted()
+    }
+
+    def "Can not get a job specification that hasn't already been resolved"() {
+        def agentJobService = Mock(AgentJobService)
+        def service = new GRpcJobServiceImpl(agentJobService)
+        StreamObserver<JobSpecificationResponse> responseObserver = Mock()
+
+        when:
+        service.getJobSpecification(createJobSpecificationRequest(), responseObserver)
+
+        then:
+        1 * agentJobService.getJobSpecification(id) >> {
+            throw new GenieJobSpecificationNotFoundException()
         }
         1 * responseObserver.onNext(_ as JobSpecificationResponse)
         1 * responseObserver.onCompleted()
