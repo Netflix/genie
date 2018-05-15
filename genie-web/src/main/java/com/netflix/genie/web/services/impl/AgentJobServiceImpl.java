@@ -95,6 +95,7 @@ public class AgentJobServiceImpl implements AgentJobService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional(readOnly = true)
     public JobSpecification getJobSpecification(final String id) {
         return this.jobPersistenceService
             .getJobSpecification(id)
@@ -107,10 +108,19 @@ public class AgentJobServiceImpl implements AgentJobService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional(readOnly = true)
     public JobSpecification dryRunJobSpecificationResolution(@Valid final JobRequest jobRequest) {
         return this.jobSpecificationService.resolveJobSpecification(
             jobRequest.getRequestedId().orElse(UUID.randomUUID().toString()),
             jobRequest
         );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void claimJob(final String id, @Valid final AgentClientMetadata agentClientMetadata) {
+        this.jobPersistenceService.claimJob(id, agentClientMetadata);
     }
 }

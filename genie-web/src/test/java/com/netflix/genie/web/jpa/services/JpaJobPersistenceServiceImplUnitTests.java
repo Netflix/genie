@@ -28,10 +28,13 @@ import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieApplicationNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieCommandNotFoundException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobAlreadyClaimedException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
 import com.netflix.genie.test.categories.UnitTest;
 import com.netflix.genie.web.jpa.entities.ApplicationEntity;
@@ -726,7 +729,7 @@ public class JpaJobPersistenceServiceImplUnitTests {
      * If a job isn't resolved empty {@link Optional} returned.
      */
     @Test
-    public void unresolvedJobReturnsEmptyOptional() {
+    public void unresolvedJobReturnsEmptyJobSpecificationOptional() {
         final JobEntity jobEntity = Mockito.mock(JobEntity.class);
         Mockito
             .when(this.jobRepository.findByUniqueId(Mockito.anyString(), Mockito.eq(JobSpecificationProjection.class)))
@@ -735,5 +738,77 @@ public class JpaJobPersistenceServiceImplUnitTests {
         Mockito.when(jobEntity.isResolved()).thenReturn(false);
 
         Assert.assertFalse(this.jobPersistenceService.getJobSpecification(UUID.randomUUID().toString()).isPresent());
+    }
+
+    /**
+     * Test all the error cases covered in the
+     * {@link JpaJobPersistenceServiceImpl#claimJob(String, AgentClientMetadata)} API.
+     */
+    @Test
+    public void testClaimJobErrorCases() {
+        Mockito
+            .when(this.jobRepository.findByUniqueId(Mockito.anyString()))
+            .thenReturn(Optional.empty());
+
+        try {
+            this.jobPersistenceService.claimJob(UUID.randomUUID().toString(), Mockito.mock(AgentClientMetadata.class));
+            Assert.fail();
+        } catch (final GenieJobNotFoundException e) {
+            // expected
+        }
+
+        final JobEntity jobEntity = Mockito.mock(JobEntity.class);
+        final String id = UUID.randomUUID().toString();
+        Mockito
+            .when(this.jobRepository.findByUniqueId(id))
+            .thenReturn(Optional.of(jobEntity));
+
+        Mockito.when(jobEntity.isClaimed()).thenReturn(true);
+
+        try {
+            this.jobPersistenceService.claimJob(id, Mockito.mock(AgentClientMetadata.class));
+            Assert.fail();
+        } catch (final GenieJobAlreadyClaimedException e) {
+            // expected
+        }
+
+        Mockito.when(jobEntity.isClaimed()).thenReturn(false);
+        Mockito.when(jobEntity.getStatus()).thenReturn(JobStatus.INVALID);
+
+        try {
+            this.jobPersistenceService.claimJob(id, Mockito.mock(AgentClientMetadata.class));
+            Assert.fail();
+        } catch (final GenieInvalidStatusException e) {
+            // expected
+        }
+    }
+
+    /**
+     * Test valid behavior of the {@link JpaJobPersistenceServiceImpl#claimJob(String, AgentClientMetadata)} API.
+     */
+    @Test
+    public void testClaimJobValidBehavior() {
+        final JobEntity jobEntity = Mockito.mock(JobEntity.class);
+        final AgentClientMetadata agentClientMetadata = Mockito.mock(AgentClientMetadata.class);
+        final String id = UUID.randomUUID().toString();
+
+        Mockito.when(this.jobRepository.findByUniqueId(id)).thenReturn(Optional.of(jobEntity));
+        Mockito.when(jobEntity.isClaimed()).thenReturn(false);
+        Mockito.when(jobEntity.getStatus()).thenReturn(JobStatus.RESOLVED);
+
+        final String agentHostname = UUID.randomUUID().toString();
+        Mockito.when(agentClientMetadata.getHostname()).thenReturn(Optional.of(agentHostname));
+        final String agentVersion = UUID.randomUUID().toString();
+        Mockito.when(agentClientMetadata.getVersion()).thenReturn(Optional.of(agentVersion));
+        final int agentPid = 238;
+        Mockito.when(agentClientMetadata.getPid()).thenReturn(Optional.of(agentPid));
+
+        this.jobPersistenceService.claimJob(id, agentClientMetadata);
+
+        Mockito.verify(jobEntity, Mockito.times(1)).setClaimed(true);
+        Mockito.verify(jobEntity, Mockito.times(1)).setStatus(JobStatus.CLAIMED);
+        Mockito.verify(jobEntity, Mockito.times(1)).setAgentHostname(agentHostname);
+        Mockito.verify(jobEntity, Mockito.times(1)).setAgentVersion(agentVersion);
+        Mockito.verify(jobEntity, Mockito.times(1)).setAgentPid(agentPid);
     }
 }

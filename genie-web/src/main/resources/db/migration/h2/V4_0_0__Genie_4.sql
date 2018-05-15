@@ -138,6 +138,12 @@ ALTER TABLE `jobs`
   ADD COLUMN `job_directory_location` VARCHAR(1024) DEFAULT NULL;
 ALTER TABLE `jobs`
   ADD COLUMN `resolved` BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE `jobs`
+  ADD COLUMN `agent_version` VARCHAR(255) DEFAULT NULL;
+ALTER TABLE `jobs`
+  ADD COLUMN `agent_pid` INT(11) DEFAULT NULL;
+ALTER TABLE `jobs`
+  ADD COLUMN `claimed` BOOLEAN NOT NULL DEFAULT FALSE;
 
 ALTER TABLE `job_applications_requested`
   RENAME TO `job_requested_applications`;

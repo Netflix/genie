@@ -27,6 +27,7 @@ import com.netflix.genie.common.exceptions.GenieConflictException;
 import com.netflix.genie.common.exceptions.GenieException;
 import com.netflix.genie.common.exceptions.GenieNotFoundException;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
+import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata;
 import com.netflix.genie.common.internal.dto.v4.AgentConfigRequest;
 import com.netflix.genie.common.internal.dto.v4.AgentEnvironmentRequest;
 import com.netflix.genie.common.internal.dto.v4.Criterion;
@@ -40,6 +41,8 @@ import com.netflix.genie.common.internal.exceptions.unchecked.GenieApplicationNo
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieCommandNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieIdAlreadyExistsException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobAlreadyClaimedException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
 import com.netflix.genie.common.util.GenieObjectMapper;
@@ -388,12 +391,13 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
                 // This job has already been resolved there's nothing further to save
                 return;
             }
-            // Make sure if the job is terminal already don't do anything.
-            if (entity.getStatus().isFinished()) {
+            // Make sure if the job is resolvable otherwise don't do anything
+            if (!entity.getStatus().isResolvable()) {
                 log.error(
-                    "Job {} is already in terminal state {}. Won't save job specification",
+                    "Job {} is already in a non-resolvable state {}. Needs to be one of {}. Won't save job spec",
                     id,
-                    entity.getStatus()
+                    entity.getStatus(),
+                    JobStatus.getResolvableStatuses()
                 );
                 return;
             }
@@ -444,6 +448,54 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         return projection.isResolved()
             ? Optional.of(EntityDtoConverters.toJobSpecificationDto(projection))
             : Optional.empty();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    // TODO: The AOP aspects are firing on a lot of these APIs for retries and we may not want them to given a lot of
+    //       these are un-recoverable. May want to revisit what is in the aspect.
+    @Override
+    public void claimJob(
+        @NotBlank(message = "Job id is missing and is required") final String id,
+        final @Valid AgentClientMetadata agentClientMetadata
+    ) {
+        log.debug("Agent with metadata {} requesting to claim job with id {}", agentClientMetadata, id);
+        final JobEntity jobEntity = this.jobRepository
+            .findByUniqueId(id)
+            .orElseThrow(() -> new GenieJobNotFoundException("No job with id " + id + " exists. Unable to claim."));
+
+        if (jobEntity.isClaimed()) {
+            throw new GenieJobAlreadyClaimedException("Job with id " + id + " is already claimed. Unable to claim.");
+        }
+
+        final JobStatus currentStatus = jobEntity.getStatus();
+        // The job must be in one of the claimable states in order to be claimed
+        // TODO: Perhaps could use jobEntity.isResolved here also but wouldn't check the case that the job was in a
+        //       terminal state like killed or invalid in which case we shouldn't claim it anyway as the agent would
+        //       continue running
+        if (!currentStatus.isClaimable()) {
+            throw new GenieInvalidStatusException(
+                "Job "
+                    + id
+                    + " is in status "
+                    + currentStatus
+                    + " and can't be claimed. Needs to be one of "
+                    + JobStatus.getClaimableStatuses()
+            );
+        }
+
+        // Good to claim
+        jobEntity.setClaimed(true);
+        jobEntity.setStatus(JobStatus.CLAIMED);
+        // TODO: It might be nice to set the status message as well to something like "Job claimed by XYZ..."
+        //       we could do this in other places too like after reservation, resolving, etc
+
+        // TODO: Should these be required? We're reusing the DTO here but perhaps the expectation at this point
+        //       is that the agent will always send back certain metadata
+        agentClientMetadata.getHostname().ifPresent(jobEntity::setAgentHostname);
+        agentClientMetadata.getVersion().ifPresent(jobEntity::setAgentVersion);
+        agentClientMetadata.getPid().ifPresent(jobEntity::setAgentPid);
     }
 
     private void updateJobStatus(final JobEntity jobEntity, final JobStatus jobStatus, final String statusMsg) {

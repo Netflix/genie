@@ -24,6 +24,8 @@ import com.netflix.genie.common.internal.exceptions.unchecked.GenieApplicationNo
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieCommandNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieIdAlreadyExistsException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobAlreadyClaimedException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificationNotFoundException;
 import org.springframework.validation.annotation.Validated;
@@ -83,4 +85,17 @@ public interface AgentJobService {
      * @return The job specification that would have been resolved for the given input
      */
     JobSpecification dryRunJobSpecificationResolution(@Valid final JobRequest jobRequest);
+
+    /**
+     * Set a job identified by {@code id} to be owned by the agent identified by {@code agentClientMetadata}. The
+     * job status in the system will be set to {@link com.netflix.genie.common.dto.JobStatus#CLAIMED}
+     *
+     * @param id                  The id of the job to claim. Must exist in the system.
+     * @param agentClientMetadata The metadata about the client claiming the job
+     * @throws GenieJobNotFoundException       if no job with the given {@code id} exists
+     * @throws GenieJobAlreadyClaimedException if the job with the given {@code id} already has been claimed
+     * @throws GenieInvalidStatusException     if the current job status is not
+     *                                         {@link com.netflix.genie.common.dto.JobStatus#RESOLVED}
+     */
+    void claimJob(final String id, @Valid final AgentClientMetadata agentClientMetadata);
 }

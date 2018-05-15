@@ -102,6 +102,8 @@ import java.util.Set;
         "started",
         "finished",
         "agentHostname",
+        "agentVersion",
+        "agentPid",
         "processId",
         "checkDelay",
         "exitCode",
@@ -110,7 +112,8 @@ import java.util.Set;
         "archiveLocation",
         "requestedJobDirectoryLocation",
         "jobDirectoryLocation",
-        "resolved"
+        "resolved",
+        "claimed"
     },
     doNotUseGetters = true
 )
@@ -254,8 +257,18 @@ public class JobEntity extends BaseEntity implements
 
     @Basic
     @Column(name = "agent_hostname")
-    @Size(max = 255, message = "An agent host name can be no longer than 255 characters")
+    @Size(max = 255, message = "An agent hostname can be no longer than 255 characters")
     private String agentHostname;
+
+    @Basic
+    @Column(name = "agent_version")
+    @Size(max = 255, message = "An agent version can be no longer than 255 characters")
+    private String agentVersion;
+
+    @Basic
+    @Column(name = "agent_pid")
+    @Min(0)
+    private Integer agentPid;
 
     @Basic
     @Column(name = "process_id")
@@ -290,6 +303,10 @@ public class JobEntity extends BaseEntity implements
     @Basic(optional = false)
     @Column(name = "resolved", nullable = false)
     private boolean resolved;
+
+    @Basic(optional = false)
+    @Column(name = "claimed", nullable = false)
+    private boolean claimed;
 
     @Basic
     @Column(name = "requested_job_directory_location", length = 1024, updatable = false)
@@ -704,6 +721,26 @@ public class JobEntity extends BaseEntity implements
     @Override
     public Optional<String> getAgentHostname() {
         return Optional.ofNullable(this.agentHostname);
+    }
+
+    /**
+     * Get the version of the agent that claimed this job.
+     *
+     * @return The version wrapped in an {@link Optional} in case it wasn't set yet in which case it will be
+     * {@link Optional#empty()}
+     */
+    public Optional<String> getAgentVersion() {
+        return Optional.ofNullable(this.agentVersion);
+    }
+
+    /**
+     * Get the pid of the agent that claimed this job.
+     *
+     * @return The pid wrapped in an {@link Optional} in case it wasn't set yet in which case it will be
+     * {@link Optional#empty()}
+     */
+    public Optional<Integer> getAgentPid() {
+        return Optional.ofNullable(this.agentPid);
     }
 
     /**

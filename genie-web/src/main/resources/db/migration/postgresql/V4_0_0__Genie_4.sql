@@ -146,7 +146,10 @@ ALTER TABLE jobs
   ALTER COLUMN status SET DEFAULT 'RESERVED',
   ADD COLUMN requested_id                     BOOLEAN       DEFAULT FALSE NOT NULL,
   ADD COLUMN job_directory_location           VARCHAR(1024) DEFAULT NULL,
-  ADD COLUMN resolved                         BOOLEAN       DEFAULT FALSE NOT NULL;
+  ADD COLUMN resolved                         BOOLEAN       DEFAULT FALSE NOT NULL,
+  ADD COLUMN agent_version                    VARCHAR(255)  DEFAULT NULL,
+  ADD COLUMN agent_pid                        INT           DEFAULT NULL,
+  ADD COLUMN claimed                          BOOLEAN       DEFAULT FALSE NOT NULL;
 
 ALTER TABLE job_applications_requested RENAME TO job_requested_applications;
 ALTER TABLE job_requested_applications

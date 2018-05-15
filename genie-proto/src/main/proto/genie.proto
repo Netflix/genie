@@ -175,6 +175,8 @@ message ClaimJobError {
         UNKNOWN = 0;
         ALREADY_CLAIMED = 1;
         NO_SUCH_JOB = 2;
+        NO_ID_SUPPLIED = 3;
+        INVALID_STATUS = 4;
     }
     Type type = 1;
     string message = 2;

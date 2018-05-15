@@ -24,10 +24,16 @@ import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment
 import com.netflix.genie.common.internal.dto.v4.JobRequest
 import com.netflix.genie.common.internal.dto.v4.JobSpecification
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobAlreadyClaimedException
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificationNotFoundException
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException
 import com.netflix.genie.proto.AgentConfig
 import com.netflix.genie.proto.AgentMetadata
+import com.netflix.genie.proto.ClaimJobError
+import com.netflix.genie.proto.ClaimJobRequest
+import com.netflix.genie.proto.ClaimJobResponse
 import com.netflix.genie.proto.Criterion
 import com.netflix.genie.proto.DryRunJobSpecificationRequest
 import com.netflix.genie.proto.ExecutionResourceCriteria
@@ -39,6 +45,7 @@ import com.netflix.genie.proto.ReserveJobIdResponse
 import com.netflix.genie.web.services.AgentJobService
 import io.grpc.stub.StreamObserver
 import spock.lang.Specification
+import spock.lang.Unroll
 
 /**
  * Specifications for the {@link GRpcJobServiceImpl} class.
@@ -285,6 +292,74 @@ class GRpcJobServiceImplSpec extends Specification {
         1 * responseObserver.onCompleted()
     }
 
+    def "Can't claim job for agent if id isn't present"() {
+        def agentJobService = Mock(AgentJobService)
+        def service = new GRpcJobServiceImpl(agentJobService)
+        StreamObserver<ClaimJobResponse> responseObserver = Mock()
+        ClaimJobResponse response
+
+        when:
+        service.claimJob(ClaimJobRequest.newBuilder().setId("").build(), responseObserver)
+
+        then:
+        1 * responseObserver.onNext(_ as ClaimJobResponse) >> {
+            arguments -> response = (ClaimJobResponse) arguments[0]
+        }
+        0 * agentJobService.claimJob(_ as String, _ as AgentClientMetadata)
+        response != null
+        !response.getSuccessful()
+        response.getError().getType() == ClaimJobError.Type.NO_ID_SUPPLIED
+        response.getError().getMessage() != null
+    }
+
+    @Unroll
+    def "Can't claim job for agent when #error.class is thrown"() {
+        def agentJobService = Mock(AgentJobService)
+        def service = new GRpcJobServiceImpl(agentJobService)
+        StreamObserver<ClaimJobResponse> responseObserver = Mock()
+        ClaimJobResponse response
+
+        when:
+        service.claimJob(createClaimJobRequest(), responseObserver)
+
+        then:
+        1 * responseObserver.onNext(_ as ClaimJobResponse) >> {
+            arguments -> response = (ClaimJobResponse) arguments[0]
+        }
+        1 * agentJobService.claimJob(_ as String, _ as AgentClientMetadata) >> {
+            throw error
+        }
+        response != null
+        !response.getSuccessful()
+        response.getError().getType() == type
+        response.getError().getMessage() == error.getMessage()
+
+        where:
+        error                                                             | type
+        new GenieJobAlreadyClaimedException(UUID.randomUUID().toString()) | ClaimJobError.Type.ALREADY_CLAIMED
+        new GenieJobNotFoundException(UUID.randomUUID().toString())       | ClaimJobError.Type.NO_SUCH_JOB
+        new GenieInvalidStatusException(UUID.randomUUID().toString())     | ClaimJobError.Type.INVALID_STATUS
+        new RuntimeException(UUID.randomUUID().toString())                | ClaimJobError.Type.UNKNOWN
+    }
+
+    def "Can claim job for agent"() {
+        def agentJobService = Mock(AgentJobService)
+        def service = new GRpcJobServiceImpl(agentJobService)
+        StreamObserver<ClaimJobResponse> responseObserver = Mock()
+        ClaimJobResponse response
+
+        when:
+        service.claimJob(createClaimJobRequest(), responseObserver)
+
+        then:
+        1 * responseObserver.onNext(_ as ClaimJobResponse) >> {
+            arguments -> response = (ClaimJobResponse) arguments[0]
+        }
+        1 * agentJobService.claimJob(_ as String, _ as AgentClientMetadata)
+        response != null
+        response.getSuccessful()
+    }
+
     JobSpecificationRequest createJobSpecificationRequest() {
         return JobSpecificationRequest.newBuilder().setId(id).build()
     }
@@ -293,13 +368,7 @@ class GRpcJobServiceImplSpec extends Specification {
         def jobMetadataProto = createJobMetadataProto()
         def executionResourceCriteriaProto = createExecutionResourceCriteriaProto()
         def agentConfigProto = createAgentConfigProto()
-
-        def agentMetadata = AgentMetadata
-                .newBuilder()
-                .setAgentHostname(agentHostname)
-                .setAgentVersion(agentVersion)
-                .setAgentPid(agentPid)
-                .build()
+        def agentMetadata = createAgentMetadataProto()
 
         return ReserveJobIdRequest
                 .newBuilder()
@@ -320,6 +389,17 @@ class GRpcJobServiceImplSpec extends Specification {
                 .setMetadata(jobMetadataProto)
                 .setCriteria(executionResourceCriteriaProto)
                 .setAgentConfig(agentConfigProto)
+                .build()
+    }
+
+    ClaimJobRequest createClaimJobRequest() {
+        def id = UUID.randomUUID().toString()
+        def agentMetadataProto = createAgentMetadataProto()
+
+        return ClaimJobRequest
+                .newBuilder()
+                .setId(id)
+                .setAgentMetadata(agentMetadataProto)
                 .build()
     }
 
@@ -425,6 +505,15 @@ class GRpcJobServiceImplSpec extends Specification {
                 .newBuilder()
                 .setIsInteractive(interactive)
                 .setJobDirectoryLocation(jobDirectoryLocation)
+                .build()
+    }
+
+    AgentMetadata createAgentMetadataProto() {
+        return AgentMetadata
+                .newBuilder()
+                .setAgentHostname(agentHostname)
+                .setAgentVersion(agentVersion)
+                .setAgentPid(agentPid)
                 .build()
     }
 }

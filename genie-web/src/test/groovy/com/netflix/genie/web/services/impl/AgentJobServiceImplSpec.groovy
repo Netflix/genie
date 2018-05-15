@@ -153,4 +153,24 @@ class AgentJobServiceImplSpec extends Specification {
         1 * jobSpecificationService.resolveJobSpecification(id, jobRequest) >> jobSpecificationMock
         jobSpecification == jobSpecificationMock
     }
+
+    def "Can claim job"() {
+        def jobPersistenceService = Mock(JobPersistenceService)
+        def jobSpecificationService = Mock(JobSpecificationService)
+        def meterRegistry = Mock(MeterRegistry)
+        def agentClientMetadata = Mock(AgentClientMetadata)
+        def id = UUID.randomUUID().toString()
+
+        AgentJobServiceImpl service = new AgentJobServiceImpl(
+                jobPersistenceService,
+                jobSpecificationService,
+                meterRegistry
+        )
+
+        when:
+        service.claimJob(id, agentClientMetadata)
+
+        then:
+        1 * jobPersistenceService.claimJob(id, agentClientMetadata)
+    }
 }

@@ -22,6 +22,14 @@ import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import com.netflix.genie.common.internal.dto.v4.converters.JobServiceProtoConverter;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobAlreadyClaimedException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
+import com.netflix.genie.proto.ChangeJobStatusRequest;
+import com.netflix.genie.proto.ChangeJobStatusResponse;
+import com.netflix.genie.proto.ClaimJobError;
+import com.netflix.genie.proto.ClaimJobRequest;
+import com.netflix.genie.proto.ClaimJobResponse;
 import com.netflix.genie.proto.DryRunJobSpecificationRequest;
 import com.netflix.genie.proto.JobServiceGrpc;
 import com.netflix.genie.proto.JobSpecificationRequest;
@@ -187,5 +195,78 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
             responseObserver.onNext(JobServiceProtoConverter.toProtoJobSpecificationResponse(e));
         }
         responseObserver.onCompleted();
+    }
+
+    /**
+     * When an agent is claiming responsibility and ownership for a job this API is called.
+     *
+     * @param request          The request containing the job id being claimed and other pertinent metadata
+     * @param responseObserver The observer to send a response with
+     */
+    @Override
+    public void claimJob(final ClaimJobRequest request, final StreamObserver<ClaimJobResponse> responseObserver) {
+        final String id = request.getId();
+        if (StringUtils.isBlank(id)) {
+            responseObserver.onNext(
+                ClaimJobResponse
+                    .newBuilder()
+                    .setSuccessful(false)
+                    .setError(
+                        ClaimJobError
+                            .newBuilder()
+                            .setType(ClaimJobError.Type.NO_ID_SUPPLIED)
+                            .setMessage("No job id provided. Unable to claim.")
+                            .build()
+                    )
+                    .build()
+            );
+        } else {
+            try {
+                final AgentClientMetadata clientMetadata
+                    = JobServiceProtoConverter.toAgentClientMetadataDTO(request.getAgentMetadata());
+                this.agentJobService.claimJob(id, clientMetadata);
+                responseObserver.onNext(ClaimJobResponse.newBuilder().setSuccessful(true).build());
+            } catch (final Exception e) {
+                log.error(e.getMessage(), e);
+                final ClaimJobError.Builder builder = ClaimJobError.newBuilder();
+                if (e.getMessage() != null) {
+                    builder.setMessage(e.getMessage());
+                } else {
+                    builder.setMessage("No error message provided");
+                }
+
+                if (e instanceof GenieJobAlreadyClaimedException) {
+                    builder.setType(ClaimJobError.Type.ALREADY_CLAIMED);
+                } else if (e instanceof GenieJobNotFoundException) {
+                    builder.setType(ClaimJobError.Type.NO_SUCH_JOB);
+                } else if (e instanceof GenieInvalidStatusException) {
+                    builder.setType(ClaimJobError.Type.INVALID_STATUS);
+                } else {
+                    builder.setType(ClaimJobError.Type.UNKNOWN);
+                }
+                responseObserver.onNext(
+                    ClaimJobResponse
+                        .newBuilder()
+                        .setSuccessful(false)
+                        .setError(builder)
+                        .build()
+                );
+            }
+        }
+        responseObserver.onCompleted();
+    }
+
+    /**
+     * When the agent wants to tell the system that the status of a job is changed this API is called.
+     *
+     * @param request          The request containing the necessary metadata to change job status for a given job
+     * @param responseObserver The observer to send a response with
+     */
+    @Override
+    public void changeJobStatus(
+        final ChangeJobStatusRequest request,
+        final StreamObserver<ChangeJobStatusResponse> responseObserver
+    ) {
+        super.changeJobStatus(request, responseObserver);
     }
 }
