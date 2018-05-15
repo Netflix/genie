@@ -106,6 +106,40 @@ public class JobStatusUnitTests {
     }
 
     /**
+     * Test to make sure isResolvable is working properly.
+     */
+    @Test
+    public void testIsResolvable() {
+        Assert.assertFalse(JobStatus.RUNNING.isResolvable());
+        Assert.assertFalse(JobStatus.INIT.isResolvable());
+        Assert.assertFalse(JobStatus.FAILED.isResolvable());
+        Assert.assertFalse(JobStatus.INVALID.isResolvable());
+        Assert.assertFalse(JobStatus.KILLED.isResolvable());
+        Assert.assertFalse(JobStatus.SUCCEEDED.isResolvable());
+        Assert.assertTrue(JobStatus.RESERVED.isResolvable());
+        Assert.assertFalse(JobStatus.RESOLVED.isResolvable());
+        Assert.assertFalse(JobStatus.CLAIMED.isResolvable());
+        Assert.assertFalse(JobStatus.ACCEPTED.isResolvable());
+    }
+
+    /**
+     * Test to make sure isClaimable is working properly.
+     */
+    @Test
+    public void testIsClaimable() {
+        Assert.assertFalse(JobStatus.RUNNING.isClaimable());
+        Assert.assertFalse(JobStatus.INIT.isClaimable());
+        Assert.assertFalse(JobStatus.FAILED.isClaimable());
+        Assert.assertFalse(JobStatus.INVALID.isClaimable());
+        Assert.assertFalse(JobStatus.KILLED.isClaimable());
+        Assert.assertFalse(JobStatus.SUCCEEDED.isClaimable());
+        Assert.assertFalse(JobStatus.RESERVED.isClaimable());
+        Assert.assertTrue(JobStatus.RESOLVED.isClaimable());
+        Assert.assertFalse(JobStatus.CLAIMED.isClaimable());
+        Assert.assertTrue(JobStatus.ACCEPTED.isClaimable());
+    }
+
+    /**
      * Make sure all the active statuses are present in the set.
      */
     @Test
@@ -129,5 +163,23 @@ public class JobStatusUnitTests {
         Assert.assertTrue(JobStatus.getFinishedStatuses().contains(JobStatus.FAILED));
         Assert.assertTrue(JobStatus.getFinishedStatuses().contains(JobStatus.KILLED));
         Assert.assertTrue(JobStatus.getFinishedStatuses().contains(JobStatus.SUCCEEDED));
+    }
+
+    /**
+     * Make sure all the claimable status are present in the set.
+     */
+    @Test
+    public void testGetResolvableStatuses() {
+        Assert.assertThat(JobStatus.getResolvableStatuses().size(), Matchers.is(1));
+        Assert.assertThat(JobStatus.getResolvableStatuses(), Matchers.hasItem(JobStatus.RESERVED));
+    }
+
+    /**
+     * Make sure all the claimable status are present in the set.
+     */
+    @Test
+    public void testGetClaimableStatuses() {
+        Assert.assertThat(JobStatus.getClaimableStatuses().size(), Matchers.is(2));
+        Assert.assertThat(JobStatus.getClaimableStatuses(), Matchers.hasItems(JobStatus.RESOLVED, JobStatus.ACCEPTED));
     }
 }

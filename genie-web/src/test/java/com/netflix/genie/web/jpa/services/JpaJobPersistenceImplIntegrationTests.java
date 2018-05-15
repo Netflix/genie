@@ -361,62 +361,64 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
             .getJobRequest(jobId)
             .orElseThrow(IllegalArgumentException::new);
 
-        final String clusterId = "cluster1";
-        final String commandId = "command1";
-        final String application0Id = "app1";
-        final String application1Id = "app2";
-
-        final Cluster cluster = this.clusterPersistenceService.getCluster(clusterId);
-        final Command command = this.commandPersistenceService.getCommand(commandId);
-        final Application application0 = this.applicationPersistenceService.getApplication(application0Id);
-        final Application application1 = this.applicationPersistenceService.getApplication(application1Id);
-
-        final Map<String, String> environmentVariables = ImmutableMap.of(
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString(),
-            UUID.randomUUID().toString()
-        );
-
-        final File jobDirectoryLocation = new File("/tmp/genie/jobs/" + jobId);
-
-        final List<String> commandArgs = Lists.newArrayList(command.getExecutable());
-        commandArgs.addAll(jobRequest.getCommandArgs());
-
-        final JobSpecification jobSpecification = new JobSpecification(
-            commandArgs,
-            new JobSpecification.ExecutionResource(
-                jobId,
-                jobRequest.getResources()
-            ),
-            new JobSpecification.ExecutionResource(
-                clusterId,
-                cluster.getResources()
-            ),
-            new JobSpecification.ExecutionResource(
-                commandId,
-                command.getResources()
-            ),
-            Lists.newArrayList(
-                new JobSpecification.ExecutionResource(
-                    application0Id,
-                    application0.getResources()
-                ),
-                new JobSpecification.ExecutionResource(
-                    application1Id,
-                    application1.getResources()
-                )
-            ),
-            environmentVariables,
-            jobRequest.getRequestedAgentConfig().isInteractive(),
-            jobDirectoryLocation
-        );
+        final JobSpecification jobSpecification = this.createJobSpecification(jobId, jobRequest);
 
         this.jobPersistenceService.saveJobSpecification(jobId, jobSpecification);
         Assert.assertThat(
             this.jobPersistenceService.getJobSpecification(jobId).orElse(null),
             Matchers.is(jobSpecification)
         );
+    }
+
+    /**
+     * Make sure {@link JpaJobPersistenceServiceImpl#claimJob(String, AgentClientMetadata)} works as expected.
+     *
+     * @throws GenieException on error
+     * @throws IOException    on json error
+     */
+    @Test
+    public void canClaimJob() throws GenieException, IOException {
+        final String jobId = this.jobPersistenceService.saveJobRequest(
+            this.createJobRequest(null),
+            this.createJobRequestMetadata()
+        );
+
+        final JobRequest jobRequest = this.jobPersistenceService
+            .getJobRequest(jobId)
+            .orElseThrow(IllegalArgumentException::new);
+
+        final JobSpecification jobSpecification = this.createJobSpecification(jobId, jobRequest);
+
+        this.jobPersistenceService.saveJobSpecification(jobId, jobSpecification);
+
+        final JobEntity preClaimedJob = this.jobRepository
+            .findByUniqueId(jobId)
+            .orElseThrow(IllegalArgumentException::new);
+
+        Assert.assertThat(preClaimedJob.getStatus(), Matchers.is(JobStatus.RESOLVED));
+        Assert.assertTrue(preClaimedJob.isResolved());
+        Assert.assertFalse(preClaimedJob.isClaimed());
+        Assert.assertThat(preClaimedJob.getAgentHostname(), Matchers.is(Optional.empty()));
+        Assert.assertThat(preClaimedJob.getAgentVersion(), Matchers.is(Optional.empty()));
+        Assert.assertThat(preClaimedJob.getAgentPid(), Matchers.is(Optional.empty()));
+
+        final String agentHostname = UUID.randomUUID().toString();
+        final String agentVersion = UUID.randomUUID().toString();
+        final int agentPid = RandomSuppliers.INT.get();
+        final AgentClientMetadata agentClientMetadata = new AgentClientMetadata(agentHostname, agentVersion, agentPid);
+
+        this.jobPersistenceService.claimJob(jobId, agentClientMetadata);
+
+        final JobEntity postClaimedJob = this.jobRepository
+            .findByUniqueId(jobId)
+            .orElseThrow(IllegalArgumentException::new);
+
+        Assert.assertThat(postClaimedJob.getStatus(), Matchers.is(JobStatus.CLAIMED));
+        Assert.assertTrue(postClaimedJob.isResolved());
+        Assert.assertTrue(postClaimedJob.isClaimed());
+        Assert.assertThat(postClaimedJob.getAgentHostname(), Matchers.is(Optional.of(agentHostname)));
+        Assert.assertThat(postClaimedJob.getAgentVersion(), Matchers.is(Optional.of(agentVersion)));
+        Assert.assertThat(postClaimedJob.getAgentPid(), Matchers.is(Optional.of(agentPid)));
     }
 
     private void validateJobRequest(final com.netflix.genie.common.dto.JobRequest savedJobRequest) {
@@ -743,6 +745,62 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
             agentClientMetadata,
             NUM_ATTACHMENTS,
             TOTAL_SIZE_ATTACHMENTS
+        );
+    }
+
+    private JobSpecification createJobSpecification(
+        final String jobId,
+        final JobRequest jobRequest
+    ) throws GenieException {
+        final String clusterId = "cluster1";
+        final String commandId = "command1";
+        final String application0Id = "app1";
+        final String application1Id = "app2";
+
+        final Cluster cluster = this.clusterPersistenceService.getCluster(clusterId);
+        final Command command = this.commandPersistenceService.getCommand(commandId);
+        final Application application0 = this.applicationPersistenceService.getApplication(application0Id);
+        final Application application1 = this.applicationPersistenceService.getApplication(application1Id);
+
+        final Map<String, String> environmentVariables = ImmutableMap.of(
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString(),
+            UUID.randomUUID().toString()
+        );
+
+        final File jobDirectoryLocation = new File("/tmp/genie/jobs/" + jobId);
+
+        final List<String> commandArgs = Lists.newArrayList(command.getExecutable());
+        commandArgs.addAll(jobRequest.getCommandArgs());
+
+        return new JobSpecification(
+            commandArgs,
+            new JobSpecification.ExecutionResource(
+                jobId,
+                jobRequest.getResources()
+            ),
+            new JobSpecification.ExecutionResource(
+                clusterId,
+                cluster.getResources()
+            ),
+            new JobSpecification.ExecutionResource(
+                commandId,
+                command.getResources()
+            ),
+            Lists.newArrayList(
+                new JobSpecification.ExecutionResource(
+                    application0Id,
+                    application0.getResources()
+                ),
+                new JobSpecification.ExecutionResource(
+                    application1Id,
+                    application1.getResources()
+                )
+            ),
+            environmentVariables,
+            jobRequest.getRequestedAgentConfig().isInteractive(),
+            jobDirectoryLocation
         );
     }
 }

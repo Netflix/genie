@@ -21,6 +21,7 @@ import com.netflix.genie.common.dto.Job;
 import com.netflix.genie.common.dto.JobExecution;
 import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GenieException;
+import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobRequestMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
@@ -28,6 +29,8 @@ import com.netflix.genie.common.internal.exceptions.unchecked.GenieApplicationNo
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieClusterNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieCommandNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieIdAlreadyExistsException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobAlreadyClaimedException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException;
 import org.springframework.validation.annotation.Validated;
@@ -204,5 +207,21 @@ public interface JobPersistenceService {
      */
     Optional<JobSpecification> getJobSpecification(
         @NotBlank(message = "Id is missing and is required") final String id
+    );
+
+    /**
+     * Set a job identified by {@code id} to be owned by the agent identified by {@code agentClientMetadata}. The
+     * job status in the system will be set to {@link com.netflix.genie.common.dto.JobStatus#CLAIMED}
+     *
+     * @param id                  The id of the job to claim. Must exist in the system.
+     * @param agentClientMetadata The metadata about the client claiming the job
+     * @throws GenieJobNotFoundException       if no job with the given {@code id} exists
+     * @throws GenieJobAlreadyClaimedException if the job with the given {@code id} already has been claimed
+     * @throws GenieInvalidStatusException     if the current job status is not
+     *                                         {@link com.netflix.genie.common.dto.JobStatus#RESOLVED}
+     */
+    void claimJob(
+        @NotBlank(message = "Job id is missing and is required") final String id,
+        @Valid final AgentClientMetadata agentClientMetadata
     );
 }
