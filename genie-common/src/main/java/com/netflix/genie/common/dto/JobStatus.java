@@ -41,6 +41,10 @@ public enum JobStatus {
      */
     RESOLVED(true),
     /**
+     * The job has been accepted by the system via the REST API.
+     */
+    ACCEPTED(true),
+    /**
      * The job has been claimed by a running agent.
      */
     CLAIMED(true),

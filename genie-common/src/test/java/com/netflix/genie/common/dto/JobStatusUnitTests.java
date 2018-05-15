@@ -48,6 +48,7 @@ public class JobStatusUnitTests {
         Assert.assertEquals(JobStatus.RESERVED, JobStatus.parse(JobStatus.RESERVED.name().toLowerCase()));
         Assert.assertEquals(JobStatus.RESOLVED, JobStatus.parse(JobStatus.RESOLVED.name().toLowerCase()));
         Assert.assertEquals(JobStatus.CLAIMED, JobStatus.parse(JobStatus.CLAIMED.name().toLowerCase()));
+        Assert.assertEquals(JobStatus.ACCEPTED, JobStatus.parse(JobStatus.ACCEPTED.name().toLowerCase()));
     }
 
     /**
@@ -84,6 +85,7 @@ public class JobStatusUnitTests {
         Assert.assertTrue(JobStatus.RESERVED.isActive());
         Assert.assertTrue(JobStatus.RESOLVED.isActive());
         Assert.assertTrue(JobStatus.CLAIMED.isActive());
+        Assert.assertTrue(JobStatus.ACCEPTED.isActive());
     }
 
     /**
@@ -100,6 +102,7 @@ public class JobStatusUnitTests {
         Assert.assertFalse(JobStatus.RESERVED.isFinished());
         Assert.assertFalse(JobStatus.RESOLVED.isFinished());
         Assert.assertFalse(JobStatus.CLAIMED.isFinished());
+        Assert.assertFalse(JobStatus.ACCEPTED.isFinished());
     }
 
     /**
@@ -107,12 +110,13 @@ public class JobStatusUnitTests {
      */
     @Test
     public void testGetActivesStatuses() {
-        Assert.assertThat(JobStatus.getActiveStatuses().size(), Matchers.is(5));
+        Assert.assertThat(JobStatus.getActiveStatuses().size(), Matchers.is(6));
         Assert.assertTrue(JobStatus.getActiveStatuses().contains(JobStatus.INIT));
         Assert.assertTrue(JobStatus.getActiveStatuses().contains(JobStatus.RUNNING));
         Assert.assertTrue(JobStatus.getActiveStatuses().contains(JobStatus.RESERVED));
         Assert.assertTrue(JobStatus.getActiveStatuses().contains(JobStatus.RESOLVED));
         Assert.assertTrue(JobStatus.getActiveStatuses().contains(JobStatus.CLAIMED));
+        Assert.assertTrue(JobStatus.getActiveStatuses().contains(JobStatus.ACCEPTED));
     }
 
     /**
