@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.rpc.grpc.services.impl.v4;
 
+import com.netflix.genie.common.dto.JobStatus;
 import com.netflix.genie.common.exceptions.GeniePreconditionException;
 import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobRequest;
@@ -25,6 +26,7 @@ import com.netflix.genie.common.internal.dto.v4.converters.JobServiceProtoConver
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobAlreadyClaimedException;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobNotFoundException;
+import com.netflix.genie.proto.ChangeJobStatusError;
 import com.netflix.genie.proto.ChangeJobStatusRequest;
 import com.netflix.genie.proto.ChangeJobStatusResponse;
 import com.netflix.genie.proto.ClaimJobError;
@@ -267,6 +269,55 @@ public class GRpcJobServiceImpl extends JobServiceGrpc.JobServiceImplBase {
         final ChangeJobStatusRequest request,
         final StreamObserver<ChangeJobStatusResponse> responseObserver
     ) {
-        super.changeJobStatus(request, responseObserver);
+        final String id = request.getId();
+        if (StringUtils.isBlank(id)) {
+            responseObserver.onNext(
+                ChangeJobStatusResponse
+                    .newBuilder()
+                    .setSuccessful(false)
+                    .setError(
+                        ChangeJobStatusError
+                            .newBuilder()
+                            .setType(ChangeJobStatusError.Type.NO_ID_SUPPLIED)
+                            .setMessage("No job id provided. Unable to update status.")
+                            .build()
+                    )
+                    .build()
+            );
+        } else {
+            try {
+                final JobStatus currentStatus = JobStatus.parse(request.getCurrentStatus());
+                final JobStatus newStatus = JobStatus.parse(request.getNewStatus());
+                final String newStatusMessage = request.getNewStatusMessage();
+                this.agentJobService.updateJobStatus(id, currentStatus, newStatus, newStatusMessage);
+                responseObserver.onNext(ChangeJobStatusResponse.newBuilder().setSuccessful(true).build());
+            } catch (final Exception e) {
+                log.error(e.getMessage(), e);
+                final ChangeJobStatusError.Builder builder = ChangeJobStatusError.newBuilder();
+                if (e.getMessage() != null) {
+                    builder.setMessage(e.getMessage());
+                } else {
+                    builder.setMessage("No error message provided");
+                }
+
+                if (e instanceof GenieJobNotFoundException) {
+                    builder.setType(ChangeJobStatusError.Type.NO_SUCH_JOB);
+                } else if (e instanceof GenieInvalidStatusException) {
+                    builder.setType(ChangeJobStatusError.Type.INCORRECT_CURRENT_STATUS);
+                } else if (e instanceof GeniePreconditionException) {
+                    builder.setType(ChangeJobStatusError.Type.UNKNOWN_STATUS_SUPPLIED);
+                } else {
+                    builder.setType(ChangeJobStatusError.Type.UNKNOWN);
+                }
+                responseObserver.onNext(
+                    ChangeJobStatusResponse
+                        .newBuilder()
+                        .setSuccessful(false)
+                        .setError(builder)
+                        .build()
+                );
+            }
+        }
+        responseObserver.onCompleted();
     }
 }

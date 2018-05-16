@@ -126,7 +126,7 @@ public enum JobStatus {
             }
         }
         throw new GeniePreconditionException(
-            "Unacceptable job status. Must be one of {Init, Running, Succeeded, Killed, Failed, Invalid}"
+            "Unacceptable job status. Must be one of " + Arrays.toString(JobStatus.values())
         );
     }
 

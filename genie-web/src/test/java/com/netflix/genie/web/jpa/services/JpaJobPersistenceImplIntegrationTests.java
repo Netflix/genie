@@ -45,6 +45,7 @@ import com.netflix.genie.common.internal.dto.v4.JobRequest;
 import com.netflix.genie.common.internal.dto.v4.JobRequestMetadata;
 import com.netflix.genie.common.internal.dto.v4.JobSpecification;
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieIdAlreadyExistsException;
+import com.netflix.genie.common.internal.exceptions.unchecked.GenieInvalidStatusException;
 import com.netflix.genie.common.util.GenieObjectMapper;
 import com.netflix.genie.test.categories.IntegrationTest;
 import com.netflix.genie.test.suppliers.RandomSuppliers;
@@ -377,7 +378,7 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
      * @throws IOException    on json error
      */
     @Test
-    public void canClaimJob() throws GenieException, IOException {
+    public void canClaimJobAndUpdateStatus() throws GenieException, IOException {
         final String jobId = this.jobPersistenceService.saveJobRequest(
             this.createJobRequest(null),
             this.createJobRequestMetadata()
@@ -419,6 +420,84 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertThat(postClaimedJob.getAgentHostname(), Matchers.is(Optional.of(agentHostname)));
         Assert.assertThat(postClaimedJob.getAgentVersion(), Matchers.is(Optional.of(agentVersion)));
         Assert.assertThat(postClaimedJob.getAgentPid(), Matchers.is(Optional.of(agentPid)));
+    }
+
+    /**
+     * Test the {@link JpaJobPersistenceServiceImpl#updateJobStatus(String, JobStatus, JobStatus, String)} method.
+     *
+     * @throws GenieException on error
+     * @throws IOException    on error
+     */
+    @Test
+    public void canUpdateJobStatus() throws GenieException, IOException {
+        final String jobId = this.jobPersistenceService.saveJobRequest(
+            this.createJobRequest(null),
+            this.createJobRequestMetadata()
+        );
+
+        final JobRequest jobRequest = this.jobPersistenceService
+            .getJobRequest(jobId)
+            .orElseThrow(IllegalArgumentException::new);
+
+        final JobSpecification jobSpecification = this.createJobSpecification(jobId, jobRequest);
+
+        this.jobPersistenceService.saveJobSpecification(jobId, jobSpecification);
+
+        final String agentHostname = UUID.randomUUID().toString();
+        final String agentVersion = UUID.randomUUID().toString();
+        final int agentPid = RandomSuppliers.INT.get();
+        final AgentClientMetadata agentClientMetadata = new AgentClientMetadata(agentHostname, agentVersion, agentPid);
+
+        this.jobPersistenceService.claimJob(jobId, agentClientMetadata);
+
+        JobEntity jobEntity = this.jobRepository
+            .findByUniqueId(jobId)
+            .orElseThrow(IllegalArgumentException::new);
+
+        Assert.assertThat(jobEntity.getStatus(), Matchers.is(JobStatus.CLAIMED));
+
+        try {
+            this.jobPersistenceService.updateJobStatus(jobId, JobStatus.RUNNING, JobStatus.FAILED, null);
+            Assert.fail();
+        } catch (final GenieInvalidStatusException e) {
+            // status won't match so it will throw exception
+        }
+
+        final String initStatusMessage = "Job is initializing";
+        this.jobPersistenceService.updateJobStatus(jobId, JobStatus.CLAIMED, JobStatus.INIT, initStatusMessage);
+
+        jobEntity = this.jobRepository
+            .findByUniqueId(jobId)
+            .orElseThrow(IllegalArgumentException::new);
+
+        Assert.assertThat(jobEntity.getStatus(), Matchers.is(JobStatus.INIT));
+        Assert.assertThat(jobEntity.getStatusMsg(), Matchers.is(Optional.of(initStatusMessage)));
+        Assert.assertFalse(jobEntity.getStarted().isPresent());
+        Assert.assertFalse(jobEntity.getFinished().isPresent());
+
+        final String runningStatusMessage = "Job is running";
+        this.jobPersistenceService.updateJobStatus(jobId, JobStatus.INIT, JobStatus.RUNNING, runningStatusMessage);
+
+        jobEntity = this.jobRepository
+            .findByUniqueId(jobId)
+            .orElseThrow(IllegalArgumentException::new);
+
+        Assert.assertThat(jobEntity.getStatus(), Matchers.is(JobStatus.RUNNING));
+        Assert.assertThat(jobEntity.getStatusMsg(), Matchers.is(Optional.of(runningStatusMessage)));
+        Assert.assertTrue(jobEntity.getStarted().isPresent());
+        Assert.assertFalse(jobEntity.getFinished().isPresent());
+
+        final String successStatusMessage = "Job completed successfully";
+        this.jobPersistenceService.updateJobStatus(jobId, JobStatus.RUNNING, JobStatus.SUCCEEDED, successStatusMessage);
+
+        jobEntity = this.jobRepository
+            .findByUniqueId(jobId)
+            .orElseThrow(IllegalArgumentException::new);
+
+        Assert.assertThat(jobEntity.getStatus(), Matchers.is(JobStatus.SUCCEEDED));
+        Assert.assertThat(jobEntity.getStatusMsg(), Matchers.is(Optional.of(successStatusMessage)));
+        Assert.assertTrue(jobEntity.getStarted().isPresent());
+        Assert.assertTrue(jobEntity.getFinished().isPresent());
     }
 
     private void validateJobRequest(final com.netflix.genie.common.dto.JobRequest savedJobRequest) {

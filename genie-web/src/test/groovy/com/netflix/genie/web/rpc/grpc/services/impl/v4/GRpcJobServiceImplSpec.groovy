@@ -20,6 +20,7 @@ package com.netflix.genie.web.rpc.grpc.services.impl.v4
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.Lists
 import com.google.common.collect.Sets
+import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata
 import com.netflix.genie.common.internal.dto.v4.ExecutionEnvironment
 import com.netflix.genie.common.internal.dto.v4.JobRequest
@@ -31,6 +32,9 @@ import com.netflix.genie.common.internal.exceptions.unchecked.GenieJobSpecificat
 import com.netflix.genie.common.internal.exceptions.unchecked.GenieRuntimeException
 import com.netflix.genie.proto.AgentConfig
 import com.netflix.genie.proto.AgentMetadata
+import com.netflix.genie.proto.ChangeJobStatusError
+import com.netflix.genie.proto.ChangeJobStatusRequest
+import com.netflix.genie.proto.ChangeJobStatusResponse
 import com.netflix.genie.proto.ClaimJobError
 import com.netflix.genie.proto.ClaimJobRequest
 import com.netflix.genie.proto.ClaimJobResponse
@@ -310,6 +314,7 @@ class GRpcJobServiceImplSpec extends Specification {
         !response.getSuccessful()
         response.getError().getType() == ClaimJobError.Type.NO_ID_SUPPLIED
         response.getError().getMessage() != null
+        1 * responseObserver.onCompleted()
     }
 
     @Unroll
@@ -333,6 +338,7 @@ class GRpcJobServiceImplSpec extends Specification {
         !response.getSuccessful()
         response.getError().getType() == type
         response.getError().getMessage() == error.getMessage()
+        1 * responseObserver.onCompleted()
 
         where:
         error                                                             | type
@@ -358,6 +364,120 @@ class GRpcJobServiceImplSpec extends Specification {
         1 * agentJobService.claimJob(_ as String, _ as AgentClientMetadata)
         response != null
         response.getSuccessful()
+        1 * responseObserver.onCompleted()
+    }
+
+    def "Can't update job for agent if id isn't present"() {
+        def agentJobService = Mock(AgentJobService)
+        def service = new GRpcJobServiceImpl(agentJobService)
+        StreamObserver<ChangeJobStatusResponse> responseObserver = Mock()
+        ChangeJobStatusResponse response
+
+        when:
+        service.changeJobStatus(ChangeJobStatusRequest.newBuilder().setId("").build(), responseObserver)
+
+        then:
+        1 * responseObserver.onNext(_ as ChangeJobStatusResponse) >> {
+            arguments -> response = (ChangeJobStatusResponse) arguments[0]
+        }
+        0 * agentJobService.updateJobStatus(_ as String, _ as JobStatus, _ as JobStatus, _ as String)
+        response != null
+        !response.getSuccessful()
+        response.getError().getType() == ChangeJobStatusError.Type.NO_ID_SUPPLIED
+        response.getError().getMessage() != null
+        1 * responseObserver.onCompleted()
+    }
+
+    @Unroll
+    def "Can't update job for agent if request has invalid status #request.getCurrentStatus() #request.getNewStatus()"() {
+        def agentJobService = Mock(AgentJobService)
+        def service = new GRpcJobServiceImpl(agentJobService)
+        StreamObserver<ChangeJobStatusResponse> responseObserver = Mock()
+        ChangeJobStatusResponse response
+
+        when:
+        service.changeJobStatus(request, responseObserver)
+
+        then:
+        1 * responseObserver.onNext(_ as ChangeJobStatusResponse) >> {
+            arguments -> response = (ChangeJobStatusResponse) arguments[0]
+        }
+        0 * agentJobService.updateJobStatus(_ as String, _ as JobStatus, _ as JobStatus, _ as String)
+        response != null
+        !response.getSuccessful()
+        response.getError().getType() == ChangeJobStatusError.Type.UNKNOWN_STATUS_SUPPLIED
+        response.getError().getMessage() != null
+        1 * responseObserver.onCompleted()
+
+        where:
+        request          | _
+        ChangeJobStatusRequest
+                .newBuilder()
+                .setId(UUID.randomUUID().toString())
+                .setCurrentStatus(UUID.randomUUID().toString())
+                .setNewStatusMessage(JobStatus.RUNNING.toString())
+                .build() | _
+        ChangeJobStatusRequest
+                .newBuilder()
+                .setId(UUID.randomUUID().toString())
+                .setCurrentStatus(JobStatus.INIT.toString())
+                .setNewStatusMessage(UUID.randomUUID().toString())
+                .build() | _
+    }
+
+    @Unroll
+    def "Can't update job for agent when #error.class is thrown"() {
+        def agentJobService = Mock(AgentJobService)
+        def service = new GRpcJobServiceImpl(agentJobService)
+        StreamObserver<ChangeJobStatusResponse> responseObserver = Mock()
+        ChangeJobStatusResponse response
+
+        when:
+        service.changeJobStatus(createChangeJobStatusRequest(), responseObserver)
+
+        then:
+        1 * responseObserver.onNext(_ as ChangeJobStatusResponse) >> {
+            arguments -> response = (ChangeJobStatusResponse) arguments[0]
+        }
+        1 * agentJobService.updateJobStatus(_ as String, _ as JobStatus, _ as JobStatus, _ as String) >> {
+            throw error
+        }
+        response != null
+        !response.getSuccessful()
+        response.getError().getType() == type
+        response.getError().getMessage() == error.getMessage()
+        1 * responseObserver.onCompleted()
+
+        where:
+        error                                                         | type
+        new GenieJobNotFoundException(UUID.randomUUID().toString())   | ChangeJobStatusError.Type.NO_SUCH_JOB
+        new GenieInvalidStatusException(UUID.randomUUID().toString()) | ChangeJobStatusError.Type.INCORRECT_CURRENT_STATUS
+        new RuntimeException(UUID.randomUUID().toString())            | ChangeJobStatusError.Type.UNKNOWN
+    }
+
+    def "Can update job status for agent"() {
+        def agentJobService = Mock(AgentJobService)
+        def service = new GRpcJobServiceImpl(agentJobService)
+        StreamObserver<ChangeJobStatusResponse> responseObserver = Mock()
+        ChangeJobStatusResponse response
+        def request = createChangeJobStatusRequest()
+
+        when:
+        service.changeJobStatus(request, responseObserver)
+
+        then:
+        1 * responseObserver.onNext(_ as ChangeJobStatusResponse) >> {
+            arguments -> response = (ChangeJobStatusResponse) arguments[0]
+        }
+        1 * agentJobService.updateJobStatus(
+                request.getId(),
+                JobStatus.parse(request.getCurrentStatus()),
+                JobStatus.parse(request.getNewStatus()),
+                request.getNewStatusMessage()
+        )
+        response != null
+        response.getSuccessful()
+        1 * responseObserver.onCompleted()
     }
 
     JobSpecificationRequest createJobSpecificationRequest() {
@@ -400,6 +520,16 @@ class GRpcJobServiceImplSpec extends Specification {
                 .newBuilder()
                 .setId(id)
                 .setAgentMetadata(agentMetadataProto)
+                .build()
+    }
+
+    ChangeJobStatusRequest createChangeJobStatusRequest() {
+        return ChangeJobStatusRequest
+                .newBuilder()
+                .setId(UUID.randomUUID().toString())
+                .setCurrentStatus(JobStatus.INIT.toString())
+                .setNewStatus(JobStatus.RUNNING.toString())
+                .setNewStatusMessage(UUID.randomUUID().toString())
                 .build()
     }
 
