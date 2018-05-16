@@ -811,4 +811,73 @@ public class JpaJobPersistenceServiceImplUnitTests {
         Mockito.verify(jobEntity, Mockito.times(1)).setAgentVersion(agentVersion);
         Mockito.verify(jobEntity, Mockito.times(1)).setAgentPid(agentPid);
     }
+
+    /**
+     * Test all the error cases covered in the
+     * {@link JpaJobPersistenceServiceImpl#updateJobStatus(String, JobStatus, JobStatus, String)} API.
+     */
+    @Test
+    public void testUpdateJobStatusErrorCases() {
+        final String id = UUID.randomUUID().toString();
+        try {
+            this.jobPersistenceService.updateJobStatus(id, JobStatus.CLAIMED, JobStatus.CLAIMED, null);
+            Assert.fail();
+        } catch (final GenieInvalidStatusException e) {
+            // expected
+        }
+
+        Mockito
+            .when(this.jobRepository.findByUniqueId(id))
+            .thenReturn(Optional.empty());
+
+        try {
+            this.jobPersistenceService.updateJobStatus(id, JobStatus.CLAIMED, JobStatus.INIT, null);
+            Assert.fail();
+        } catch (final GenieJobNotFoundException e) {
+            // expected
+        }
+
+        final JobEntity jobEntity = Mockito.mock(JobEntity.class);
+        Mockito
+            .when(this.jobRepository.findByUniqueId(id))
+            .thenReturn(Optional.of(jobEntity));
+
+        Mockito.when(jobEntity.getStatus()).thenReturn(JobStatus.INIT);
+
+        try {
+            this.jobPersistenceService.updateJobStatus(id, JobStatus.CLAIMED, JobStatus.INIT, null);
+            Assert.fail();
+        } catch (final GenieInvalidStatusException e) {
+            // expected
+        }
+    }
+
+    /**
+     * Test the valid behavior of
+     * {@link JpaJobPersistenceServiceImpl#updateJobStatus(String, JobStatus, JobStatus, String)}.
+     */
+    @Test
+    public void testUpdateJobValidBehavior() {
+        final String id = UUID.randomUUID().toString();
+        final String newStatusMessage = UUID.randomUUID().toString();
+        final JobEntity jobEntity = Mockito.mock(JobEntity.class);
+
+        Mockito.when(this.jobRepository.findByUniqueId(id)).thenReturn(Optional.of(jobEntity));
+        Mockito.when(jobEntity.getStatus()).thenReturn(JobStatus.INIT);
+
+        this.jobPersistenceService.updateJobStatus(id, JobStatus.INIT, JobStatus.RUNNING, newStatusMessage);
+
+        Mockito.verify(jobEntity, Mockito.times(1)).setStatus(JobStatus.RUNNING);
+        Mockito.verify(jobEntity, Mockito.times(1)).setStatusMsg(newStatusMessage);
+        Mockito.verify(jobEntity, Mockito.times(1)).setStarted(Mockito.any(Instant.class));
+
+        final String finalStatusMessage = UUID.randomUUID().toString();
+        Mockito.when(jobEntity.getStatus()).thenReturn(JobStatus.RUNNING);
+        Mockito.when(jobEntity.getStarted()).thenReturn(Optional.of(Instant.now()));
+        this.jobPersistenceService.updateJobStatus(id, JobStatus.RUNNING, JobStatus.SUCCEEDED, finalStatusMessage);
+
+        Mockito.verify(jobEntity, Mockito.times(1)).setStatus(JobStatus.SUCCEEDED);
+        Mockito.verify(jobEntity, Mockito.times(1)).setStatusMsg(finalStatusMessage);
+        Mockito.verify(jobEntity, Mockito.times(1)).setFinished(Mockito.any(Instant.class));
+    }
 }

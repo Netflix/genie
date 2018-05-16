@@ -188,15 +188,19 @@ message ClaimJobResponse {
 }
 
 message ChangeJobStatusRequest {
-    string current_status = 1;
-    string new_status = 2;
+    string id = 1;
+    string current_status = 2;
+    string new_status = 3;
+    string new_status_message = 4;
 }
 
 message ChangeJobStatusError {
     enum Type {
-        INCORRECT_CURRENT_STATUS = 0;
-        UNKNOWN_STATUS_SUPPLIED = 1;
-        UNKNOWN = 2;
+        NO_ID_SUPPLIED = 0;
+        INCORRECT_CURRENT_STATUS = 1;
+        UNKNOWN_STATUS_SUPPLIED = 2;
+        NO_SUCH_JOB = 4;
+        UNKNOWN = 3;
     }
     Type type = 1;
     string message = 2;

@@ -224,4 +224,27 @@ public interface JobPersistenceService {
         @NotBlank(message = "Job id is missing and is required") final String id,
         @Valid final AgentClientMetadata agentClientMetadata
     );
+
+    /**
+     * Update the status of the job identified with {@code id} to be {@code newStatus} provided that the current status
+     * of the job matches {@code newStatus}. Optionally a status message can be provided to provide more details to
+     * users. If the {@code newStatus} is {@link JobStatus#RUNNING} the start time will be set. If the {@code newStatus}
+     * is a member of {@link JobStatus#getFinishedStatuses()} and the job had a started time set the finished time of
+     * the job will be set.
+     *
+     * @param id               The id of the job to update status for. Must exist in the system.
+     * @param currentStatus    The status the caller to this API thinks the job currently has
+     * @param newStatus        The new status the caller would like to update the status to
+     * @param newStatusMessage An optional status message to associate with this change
+     * @throws GenieJobNotFoundException   if no job with the given {@code id} exists
+     * @throws GenieInvalidStatusException if the current status of the job identified by {@code id} in the system
+     *                                     doesn't match the supplied {@code currentStatus}.
+     *                                     Also if the {@code currentStatus} equals the {@code newStatus}.
+     */
+    void updateJobStatus(
+        @NotBlank(message = "Id is missing and is required") final String id,
+        @NotNull final JobStatus currentStatus,
+        @NotNull final JobStatus newStatus,
+        @Nullable final String newStatusMessage
+    );
 }

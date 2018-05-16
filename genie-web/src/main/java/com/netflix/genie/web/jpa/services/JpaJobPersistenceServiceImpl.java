@@ -342,7 +342,14 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
 
         // Persist. Catch exception if the ID is reused
         try {
-            return this.jobRepository.save(jobEntity).getUniqueId();
+            final String id = this.jobRepository.save(jobEntity).getUniqueId();
+            log.debug(
+                "Saved job request {} with request metadata {} under job id {}",
+                jobRequest,
+                jobRequestMetadata,
+                id
+            );
+            return id;
         } catch (final DataIntegrityViolationException e) {
             throw new GenieIdAlreadyExistsException(
                 "A job with id " + jobEntity.getUniqueId() + " already exists. Unable to reserve id.",
@@ -416,12 +423,19 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
             entity.setJobDirectoryLocation(specification.getJobDirectoryLocation().getAbsolutePath());
             entity.setResolved(true);
             entity.setStatus(JobStatus.RESOLVED);
+            log.debug("Saved job specification {} for job with id {}", specification, id);
         } catch (
             final GenieApplicationNotFoundException
                 | GenieCommandNotFoundException
                 | GenieClusterNotFoundException e
             ) {
-            log.error(" Unable to save Job Specification due to ", e.getMessage(), e);
+            log.error(
+                "Unable to save Job Specification {} for job {} due to {}",
+                specification,
+                id,
+                e.getMessage(),
+                e
+            );
             throw e;
         }
     }
@@ -496,19 +510,83 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         agentClientMetadata.getHostname().ifPresent(jobEntity::setAgentHostname);
         agentClientMetadata.getVersion().ifPresent(jobEntity::setAgentVersion);
         agentClientMetadata.getPid().ifPresent(jobEntity::setAgentPid);
+        log.debug("Claimed job {} for agent with metadata {}", id, agentClientMetadata);
     }
 
-    private void updateJobStatus(final JobEntity jobEntity, final JobStatus jobStatus, final String statusMsg) {
-        final JobStatus status = jobEntity.getStatus();
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateJobStatus(
+        @NotBlank(message = "Id is missing and is required") final String id,
+        @NotNull final JobStatus currentStatus,
+        @NotNull final JobStatus newStatus,
+        @Nullable final String newStatusMessage
+    ) {
+        log.debug(
+            "Requested to change the status of job {} from {} to {} with message {}",
+            id,
+            currentStatus,
+            newStatus,
+            newStatusMessage
+        );
+        if (currentStatus == newStatus) {
+            throw new GenieInvalidStatusException(
+                "Can't update the status of job " + id + " because both current and new status are " + currentStatus
+            );
+        }
+
+        final JobEntity jobEntity = this.jobRepository
+            .findByUniqueId(id)
+            .orElseThrow(
+                () -> new GenieJobNotFoundException("No job with id " + id + " exists. Unable to update status.")
+            );
+
+        final JobStatus actualCurrentStatus = jobEntity.getStatus();
+        if (actualCurrentStatus != currentStatus) {
+            throw new GenieInvalidStatusException(
+                "Job "
+                    + id
+                    + " current status is "
+                    + actualCurrentStatus
+                    + " but API caller expected it to be "
+                    + currentStatus
+                    + ". Unable to update status due to inconsistent state."
+            );
+        }
+
+        // TODO: Should we throw an exception if the job is already in a terminal state and someone is trying to
+        //       further update it? In the private method below used in Genie 3 it's just swallowed and is a no-op
+
+        // TODO: Should we prevent updating status for statuses already covered by "reserveJobId" and
+        //      "saveJobSpecification"?
+
+        this.updateJobStatus(jobEntity, newStatus, newStatusMessage);
+
+        log.debug(
+            "Changed the status of job {} from {} to {} with message {}",
+            id,
+            currentStatus,
+            newStatus,
+            newStatusMessage
+        );
+    }
+
+    private void updateJobStatus(
+        final JobEntity jobEntity,
+        final JobStatus newStatus,
+        @Nullable final String statusMsg
+    ) {
+        final JobStatus currentStatus = jobEntity.getStatus();
         // Only change the status if the entity isn't already in a terminal state
-        if (status.isActive()) {
-            jobEntity.setStatus(jobStatus);
+        if (currentStatus.isActive()) {
+            jobEntity.setStatus(newStatus);
             jobEntity.setStatusMsg(statusMsg);
 
-            if (jobStatus.equals(JobStatus.RUNNING)) {
+            if (newStatus.equals(JobStatus.RUNNING)) {
                 // Status being changed to running so set start date.
                 jobEntity.setStarted(Instant.now());
-            } else if (jobEntity.getStarted().isPresent() && jobStatus.isFinished()) {
+            } else if (jobEntity.getStarted().isPresent() && newStatus.isFinished()) {
                 // Since start date is set the job was running previously and now has finished
                 // with status killed, failed or succeeded. So we set the job finish time.
                 jobEntity.setFinished(Instant.now());

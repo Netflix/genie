@@ -17,6 +17,7 @@
  */
 package com.netflix.genie.web.services.impl
 
+import com.netflix.genie.common.dto.JobStatus
 import com.netflix.genie.common.internal.dto.v4.AgentClientMetadata
 import com.netflix.genie.common.internal.dto.v4.JobRequest
 import com.netflix.genie.common.internal.dto.v4.JobRequestMetadata
@@ -172,5 +173,24 @@ class AgentJobServiceImplSpec extends Specification {
 
         then:
         1 * jobPersistenceService.claimJob(id, agentClientMetadata)
+    }
+
+    def "Can update job status"() {
+        def jobPersistenceService = Mock(JobPersistenceService)
+        def jobSpecificationService = Mock(JobSpecificationService)
+        def meterRegistry = Mock(MeterRegistry)
+        def id = UUID.randomUUID().toString()
+
+        AgentJobServiceImpl service = new AgentJobServiceImpl(
+                jobPersistenceService,
+                jobSpecificationService,
+                meterRegistry
+        )
+
+        when:
+        service.updateJobStatus(id, JobStatus.CLAIMED, JobStatus.INIT, UUID.randomUUID().toString())
+
+        then:
+        1 * jobPersistenceService.updateJobStatus(id, JobStatus.CLAIMED, JobStatus.INIT, _ as String)
     }
 }
