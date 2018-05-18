@@ -18,7 +18,6 @@
 package com.netflix.genie.web.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.netflix.genie.common.dto.Application;
 import com.netflix.genie.common.dto.ApplicationStatus;
@@ -26,6 +25,7 @@ import com.netflix.genie.common.dto.Cluster;
 import com.netflix.genie.common.dto.ClusterStatus;
 import com.netflix.genie.common.dto.Command;
 import com.netflix.genie.common.dto.CommandStatus;
+import com.netflix.genie.common.util.GenieDateFormat;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,7 +83,7 @@ public abstract class AbstractAPISecurityIntegrationTests {
     static {
         OBJECT_MAPPER = new ObjectMapper()
             .setTimeZone(TimeZone.getTimeZone("UTC"))
-            .setDateFormat(new ISO8601DateFormat())
+            .setDateFormat(new GenieDateFormat())
             .registerModule(new Jdk8Module());
     }
 

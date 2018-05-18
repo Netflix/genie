@@ -17,28 +17,30 @@
  */
 package com.netflix.genie.common.util;
 
-import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
-import com.fasterxml.jackson.databind.util.ISO8601Utils;
+import com.fasterxml.jackson.databind.util.StdDateFormat;
 
 import java.text.FieldPosition;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 /**
- * An extension of the ISO8601DateFormat to include milliseconds.
+ * The date format used by Genie.
+ * Override the serialization to output a date string containing milliseconds and string representation of the timezone.
  *
  * @author tgianos
  * @since 3.0.0
  */
-public class GenieDateFormat extends ISO8601DateFormat {
+public class GenieDateFormat extends StdDateFormat {
+
+    private static final TimeZone TIMEZONE = TimeZone.getTimeZone("UTC");
 
     /**
      * Constructor.
      */
     public GenieDateFormat() {
         super();
-        this.calendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
     }
 
     /**
@@ -46,8 +48,21 @@ public class GenieDateFormat extends ISO8601DateFormat {
      */
     @Override
     public StringBuffer format(final Date date, final StringBuffer toAppendTo, final FieldPosition fieldPosition) {
-        final String value = ISO8601Utils.format(date, true);
-        toAppendTo.append(value);
-        return toAppendTo;
+        // StdDateFormat and ISO8601Utils do not offer a way to format consistent with the current Genie API format
+        // (i.e. include milliseconds and use 'Z' as timezone). Therefore, format manually for backward compatibility.
+        final Calendar calendar = new GregorianCalendar(TIMEZONE);
+        calendar.setTime(date);
+        return toAppendTo.append(
+            String.format(
+                "%04d-%02d-%02dT%02d:%02d:%02d.%03dZ",
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH) + 1,
+                calendar.get(Calendar.DAY_OF_MONTH),
+                calendar.get(Calendar.HOUR_OF_DAY),
+                calendar.get(Calendar.MINUTE),
+                calendar.get(Calendar.SECOND),
+                calendar.get(Calendar.MILLISECOND)
+            )
+        );
     }
 }

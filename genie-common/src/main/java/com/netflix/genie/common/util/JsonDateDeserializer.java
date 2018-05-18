@@ -20,7 +20,7 @@ package com.netflix.genie.common.util;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
+import com.fasterxml.jackson.databind.util.StdDateFormat;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -40,7 +40,7 @@ public class JsonDateDeserializer extends JsonDeserializer<Date> {
      */
     @Override
     public Date deserialize(final JsonParser parser, final DeserializationContext context) throws IOException {
-        final DateFormat format = new ISO8601DateFormat();
+        final DateFormat format = new StdDateFormat();
 
         final String text = parser.getText();
 
