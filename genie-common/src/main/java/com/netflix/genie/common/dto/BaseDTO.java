@@ -29,7 +29,6 @@ import java.io.Serializable;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.Optional;
-import java.util.TimeZone;
 
 /**
  * Base fields for multiple DTOs.
@@ -45,9 +44,8 @@ public abstract class BaseDTO implements Serializable {
     private static final long serialVersionUID = 9093424855934127120L;
 
     static {
-        final DateFormat iso8601 = new GenieDateFormat();
-        iso8601.setTimeZone(TimeZone.getTimeZone("UTC"));
-        MAPPER = new ObjectMapper().registerModule(new Jdk8Module()).setDateFormat(iso8601);
+        final DateFormat dateFormat = new GenieDateFormat(); //ISO8601, UTC timezone
+        MAPPER = new ObjectMapper().registerModule(new Jdk8Module()).setDateFormat(dateFormat);
     }
 
     @Size(max = 255, message = "Max length for the ID is 255 characters")

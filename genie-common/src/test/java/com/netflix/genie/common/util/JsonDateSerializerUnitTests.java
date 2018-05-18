@@ -17,11 +17,9 @@
  */
 package com.netflix.genie.common.util;
 
-import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.util.ISO8601Utils;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import com.netflix.genie.test.categories.UnitTest;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.mockito.Mockito;
@@ -40,15 +38,7 @@ public class JsonDateSerializerUnitTests {
     private static final long MILLISECONDS = 1405715627311L;
     private static final Date DATE = new Date(MILLISECONDS);
 
-    private String expectedString;
-
-    /**
-     * Setup the tests.
-     */
-    @Before
-    public void setup() {
-        this.expectedString = ISO8601Utils.format(DATE, true);
-    }
+    private String expectedString = "2014-07-18T20:33:47.311Z";
 
     /**
      * Test the serialization method.
