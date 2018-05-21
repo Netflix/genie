@@ -55,7 +55,7 @@ public interface JpaJobRepository extends JpaBaseRepository<JobEntity> {
      * @param statuses The statuses to search
      * @return The job information requested
      */
-    Set<AgentHostnameProjection> findByStatusIn(final Set<JobStatus> statuses);
+    Set<AgentHostnameProjection> findDistinctByStatusInAndV4IsFalse(final Set<JobStatus> statuses);
 
     /**
      * Deletes all jobs for the given ids.

@@ -225,16 +225,16 @@ public class JpaJobSearchServiceImpl implements JobSearchService {
      * {@inheritDoc}
      */
     @Override
-    public List<String> getAllHostsWithActiveJobs() {
+    public Set<String> getAllHostsWithActiveJobs() {
         log.debug("Called");
 
         return this.jobRepository
-            .findByStatusIn(JobStatus.getActiveStatuses())
+            .findDistinctByStatusInAndV4IsFalse(JobStatus.getActiveStatuses())
             .stream()
             .map(AgentHostnameProjection::getAgentHostname)
             .filter(Optional::isPresent)
             .map(Optional::get)
-            .collect(Collectors.toList());
+            .collect(Collectors.toSet());
     }
 
     /**
