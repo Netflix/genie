@@ -51,7 +51,10 @@ import java.util.concurrent.atomic.AtomicLong;
  * This task runs on every Genie node and is responsible for cleaning up the local disk so that space can be
  * recaptured.
  */
-@ConditionalOnProperty("genie.tasks.databaseCleanup.enabled")
+@ConditionalOnProperty(
+    value = "genie.tasks.databaseCleanup.enabled",
+    havingValue = "true"
+)
 @Component
 @Slf4j
 public class DiskCleanupTask implements Runnable {
