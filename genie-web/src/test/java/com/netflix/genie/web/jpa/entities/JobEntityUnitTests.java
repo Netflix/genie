@@ -908,6 +908,16 @@ public class JobEntityUnitTests extends EntityTestsBase {
     }
 
     /**
+     * Test setter/getter.
+     */
+    @Test
+    public void canSetV4() {
+        Assert.assertFalse(this.jobEntity.isV4());
+        this.jobEntity.setV4(true);
+        Assert.assertTrue(this.jobEntity.isV4());
+    }
+
+    /**
      * Test the toString method.
      */
     @Test

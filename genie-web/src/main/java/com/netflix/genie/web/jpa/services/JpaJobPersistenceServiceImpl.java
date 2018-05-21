@@ -340,6 +340,9 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         this.setRequestedAgentConfigFields(jobEntity, jobRequest.getRequestedAgentConfig());
         this.setRequestMetadataFields(jobEntity, jobRequestMetadata);
 
+        // Flag to signal to rest of system that this job is V4. Temporary until everything moved to v4
+        jobEntity.setV4(true);
+
         // Persist. Catch exception if the ID is reused
         try {
             final String id = this.jobRepository.save(jobEntity).getUniqueId();
@@ -695,6 +698,9 @@ public class JpaJobPersistenceServiceImpl extends JpaBaseService implements JobP
         jobExecution.getCheckDelay().ifPresent(jobEntity::setCheckDelay);
         jobExecution.getTimeout().ifPresent(jobEntity::setTimeout);
         jobExecution.getMemory().ifPresent(jobEntity::setMemoryUsed);
+
+        // Flag to signal to rest of system that this job is V3. Temporary until everything moved to v4
+        jobEntity.setV4(false);
 
         return jobEntity;
     }

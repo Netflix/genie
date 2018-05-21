@@ -305,6 +305,10 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
         Assert.assertThat(this.tagRepository.count(), Matchers.is(25L));
         Assert.assertThat(this.fileRepository.count(), Matchers.is(15L));
 
+        Assert.assertFalse(
+            this.jobRepository.findByUniqueId(UNIQUE_ID).orElseThrow(IllegalArgumentException::new).isV4()
+        );
+
         this.validateJobRequest(this.jobSearchService.getJobRequest(UNIQUE_ID));
         this.validateJob(this.jobSearchService.getJob(UNIQUE_ID));
         this.validateJobExecution(this.jobSearchService.getJobExecution(UNIQUE_ID));
@@ -661,6 +665,7 @@ public class JpaJobPersistenceImplIntegrationTests extends DBUnitTestBase {
             .orElseThrow(() -> new GenieNotFoundException("No job with id " + id + " found when one was expected"));
 
         Assert.assertFalse(jobEntity.isResolved());
+        Assert.assertTrue(jobEntity.isV4());
 
         // Job Request Metadata Fields
         jobRequestMetadata.getApiClientMetadata().ifPresent(
